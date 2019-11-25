@@ -1,0 +1,27 @@
+﻿@using BackendSite.Service.Model
+@model IEnumerable<DepositRequest>
+@{
+    Layout = null;
+}
+
+<table>
+    <tr>
+        <td>TransId</td>
+        <td>User Name</td>
+        <td>Amount</td>
+        <td>Memo</td>
+        <td>CreateTime</td>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.TransId</td>
+            <td>@item.UserName</td>
+            <td>@item.Amount</td>
+            <td>@item.Memo</td>
+            <td>@item.CreateTime</td>
+        </tr>
+    }
+
+</table>
+
