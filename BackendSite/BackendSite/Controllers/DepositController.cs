@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-//using BackendSite.Service.BLL;
+using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
-//using BackendSite.Service.Library;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using BackendSite.Service.BLL;
 
 namespace BackendSite.Controllers
-{ 
+{
     public class DepositController : Controller
     {
         private readonly DepositBLL depositBLL;
@@ -29,11 +28,53 @@ namespace BackendSite.Controllers
             return View(depositRequests.ToList());
         }
 
-        public IActionResult DepositApprove(string transID)
+        public IActionResult DepositApprove(string transID, string actualDeposit)
         {
             DepositRequest depositRequest = depositBLL.GetDepositRequest(transID);
 
             return View(depositRequest);
+        }
+
+        public class DepositReq
+        {
+            public decimal ActualDeposit { set; get; }
+            public string Command { set; get; }
+            public string TransId { set; get; }
+            public int Action { set; get; }
+        }
+
+        [HttpPost]
+        public ApiResult DepositConfirm([FromBody]DepositReq depositReq)
+        {
+            //var apiResult = new ApiResult(selLangBLL);
+            var apiResult = new ApiResult();
+            var depositConfirmReuslt = 99;
+
+            if (depositReq.Action == 1)
+            {
+                if (depositReq.ActualDeposit > 0)
+                     depositConfirmReuslt = depositBLL.DepositApproved(depositReq.TransId, depositReq.ActualDeposit, "", depositReq.Command);
+            }
+            else if (depositReq.Action == 2)
+            {
+                 depositConfirmReuslt = depositBLL.DepositRejectd(depositReq.TransId, depositReq.ActualDeposit, "", depositReq.Command);
+            }
+            else
+            {
+                 depositConfirmReuslt = depositBLL.DepositDraft(depositReq.TransId, depositReq.ActualDeposit, "", depositReq.Command);
+            }
+
+            if (depositConfirmReuslt !=0)
+            {
+                apiResult.ErrorCode = 1101;
+                //apiResult.Message = selLangBLL.GetMsg("msg_DepositProcessLogin_15");
+            }
+            else
+            {
+                apiResult.ErrorCode = 0;
+            }
+
+            return apiResult;
         }
     }
 }

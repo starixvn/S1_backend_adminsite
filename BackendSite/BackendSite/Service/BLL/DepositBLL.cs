@@ -41,6 +41,7 @@ namespace BackendSite.Service.BLL
             var serverInfo = serverInfoService.GetModel();
             return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, memo, comment, DepositStatus.Pending, DepositStatus.Approved);
         }
+
         public int DepositRejectd(string transId, decimal actualDeposit, string memo, string comment)
         {
             var serverInfo = serverInfoService.GetModel();
@@ -48,6 +49,7 @@ namespace BackendSite.Service.BLL
             return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, memo, comment, DepositStatus.Pending, DepositStatus.Rejected);
 
         }
+
         public int DepositDraft(string transId, decimal actualDeposit, string memo, string comment)
         {
             var serverInfo = serverInfoService.GetModel();

@@ -90,7 +90,7 @@ namespace BackendSite.Service.DAL
                 SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatus.Error, actualDeposit);
             }
 
-            return result;
+            return result > 0 ? 0 : 99;
         }
 
         private int SetDepositInfoFirstDeposit(int depositId, int siteId, MySqlConnection conn, MySqlTransaction trans)
