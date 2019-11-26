@@ -9,30 +9,29 @@ using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using BackendSite.Service.BLL;
 
 namespace BackendSite.Controllers
 { 
     public class DepositController : Controller
     {
-        private readonly IWebHostEnvironment environment;
-        private readonly IConfiguration configuration;
-        private readonly DepositRequestService depositRequestService;
+        private readonly DepositBLL depositBLL;
 
-        public DepositController( DepositRequestService depositrequest)
+        public DepositController(DepositBLL depositBLL)
         {
-            this.depositRequestService = depositrequest;
+            this.depositBLL = depositBLL;
         }
 
         public IActionResult DepositRequest()
         {
-            IEnumerable<DepositRequest> depositRequests = depositRequestService.GetDepositRequest();
+            IEnumerable<DepositRequest> depositRequests = depositBLL.GetDepositRequestList();
 
             return View(depositRequests.ToList());
         }
 
         public IActionResult DepositApprove(string transID)
         {
-            DepositRequest depositRequest = depositRequestService.GetDepositRequest(transID);
+            DepositRequest depositRequest = depositBLL.GetDepositRequest(transID);
 
             return View(depositRequest);
         }

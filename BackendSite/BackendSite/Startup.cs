@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -23,8 +25,17 @@ namespace BackendSite
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            /*Library*/
+            services.AddSingleton<Tools>();
+            services.AddSingleton<Common>();
+
             /*DAL*/
-            services.AddSingleton<DepositRequestService>();
+            services.AddSingleton<ServerInfoService>();
+            services.AddSingleton<DepositService>();
+
+            /*BLL*/
+            services.AddSingleton<ServerInfoBLL>();
+            services.AddSingleton<DepositBLL>();
 
             services.AddControllersWithViews();
         }

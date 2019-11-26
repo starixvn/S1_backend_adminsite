@@ -16,9 +16,4 @@
     <PackageReference Include="MySql.Data" Version="8.0.18" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Service\BLL\" />
-    <Folder Include="Service\Library\" />
-  </ItemGroup>
-
 </Project>
