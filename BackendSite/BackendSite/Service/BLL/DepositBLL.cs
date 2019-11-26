@@ -1,8 +1,11 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
@@ -26,8 +29,30 @@ namespace BackendSite.Service.BLL
         public DepositRequest GetDepositRequest(string transId)
         {
             var serverInfo = serverInfoService.GetModel();
+            int depositId = 0;
 
-            return depositService.GetDepositRequest(transId, serverInfo.SiteId);
+            Match m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out depositId);
+            return depositService.GetDepositRequest(depositId, serverInfo.SiteId);
+        }
+
+        public int DepositApproved(string transId, decimal actualDeposit, string memo, string comment)
+        {
+            var serverInfo = serverInfoService.GetModel();
+            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, memo, comment, DepositStatus.Pending, DepositStatus.Approved);
+        }
+        public int DepositRejectd(string transId, decimal actualDeposit, string memo, string comment)
+        {
+            var serverInfo = serverInfoService.GetModel();
+
+            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, memo, comment, DepositStatus.Pending, DepositStatus.Rejected);
+
+        }
+        public int DepositDraft(string transId, decimal actualDeposit, string memo, string comment)
+        {
+            var serverInfo = serverInfoService.GetModel();
+
+            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, memo, comment, DepositStatus.Pending, DepositStatus.Pending);
         }
     }
 }

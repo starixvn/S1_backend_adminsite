@@ -40,5 +40,6 @@ namespace BackendSite.Service.Model.enums
         Rejected = 4,
         Canceled = 5,
         Expired = 6,
+        Error = 99
     }
 }

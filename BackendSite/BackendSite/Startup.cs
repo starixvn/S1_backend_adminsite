@@ -32,6 +32,7 @@ namespace BackendSite
             /*DAL*/
             services.AddSingleton<ServerInfoService>();
             services.AddSingleton<DepositService>();
+            services.AddSingleton<WalletService>();
 
             /*BLL*/
             services.AddSingleton<ServerInfoBLL>();
