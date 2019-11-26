@@ -1,0 +1,23 @@
+﻿
+@{
+    ViewData["Title"] = "DepositApprove";
+}
+
+<h1>DepositApprove</h1>
+
+
+<form style="margin-left:10px;" method="post" action="/DepositRequest/DepositConfirm">
+    <div>Trans ID: @Model.TransId</div>
+    <div>User Name: @Model.UserName</div>
+    <div>Deposit Type: @Model.DispositType</div>
+    
+    <div>Amount: @Model.Amount</div>
+    <div>Memo: @Model.Memo</div>
+    <div>Post Script: @Model.PostScript</div>
+    <div>Create Time: @Model.CreateTime</div>
+
+    <div ><textarea id="command" name="command"
+          rows="5" cols="33"></textarea></div>
+       
+    <button type="submit" class="btn btn-primary">Approve</button>
+</form>

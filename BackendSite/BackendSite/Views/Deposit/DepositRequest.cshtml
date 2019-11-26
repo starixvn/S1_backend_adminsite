@@ -8,19 +8,33 @@
     <tr>
         <td>TransId</td>
         <td>User Name</td>
+        <td>Deposit Type</td>
+        <td>Account Number</td>
+        <td>Account Name</td>
         <td>Amount</td>
         <td>Memo</td>
+        <td>PostScript</td>
         <td>CreateTime</td>
+        <td>Approve</td>
     </tr>
     @foreach (var item in Model)
     {
+        var bank = ((DispositInfo3_1)item.dispositInfo);
         <tr>
-            <td>@item.TransId</td>
-            <td>@item.UserName</td>
-            <td>@item.Amount</td>
-            <td>@item.Memo</td>
-            <td>@item.CreateTime</td>
-        </tr>
+        <td>@item.TransId</td>
+        <td>@item.UserName</td>
+        <td>@item.DispositType</td>
+        <td>@bank.AccountNo</td>
+        <td>@bank.AccountName</td>
+        <td>@item.Amount</td>
+        <td>@item.Memo</td>
+        <td>@item.PostScript</td>
+        <td>@item.CreateTime</td>
+        <td>@Html.ActionLink("Approve", "DepositApprove", "Deposit",new { transID = @item.TransId })</td>
+  
+
+
+          </tr>
     }
 
 </table>

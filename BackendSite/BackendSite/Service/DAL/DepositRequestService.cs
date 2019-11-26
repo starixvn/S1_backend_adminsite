@@ -27,5 +27,14 @@ namespace BackendSite.Service.DAL
                 return conn.Query<DepositRequest>("DepositRequest_Get", commandType: CommandType.StoredProcedure);
             }
         }
+
+        public DepositRequest GetDepositRequest(string transId)
+        {
+            //int siteId = 1;
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.QueryFirstOrDefault<DepositRequest>("DepositRequestTransID_Get", new { TransId = transId }, commandType: CommandType.StoredProcedure);
+            }
+        }
     }
 }

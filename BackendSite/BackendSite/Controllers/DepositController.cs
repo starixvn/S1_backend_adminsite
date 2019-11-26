@@ -16,18 +16,25 @@ namespace BackendSite.Controllers
     {
         private readonly IWebHostEnvironment environment;
         private readonly IConfiguration configuration;
-        private readonly DepositRequestService depositrequestService;
+        private readonly DepositRequestService depositRequestService;
 
         public DepositController( DepositRequestService depositrequest)
         {
-            this.depositrequestService = depositrequest;
+            this.depositRequestService = depositrequest;
         }
 
         public IActionResult DepositRequest()
         {
-            IEnumerable<DepositRequest> dr = depositrequestService.GetDepositRequest();
+            IEnumerable<DepositRequest> depositRequests = depositRequestService.GetDepositRequest();
 
-            return View(dr.ToList());
+            return View(depositRequests.ToList());
+        }
+
+        public IActionResult DepositApprove(string transID)
+        {
+            DepositRequest depositRequest = depositRequestService.GetDepositRequest(transID);
+
+            return View(depositRequest);
         }
     }
 }
