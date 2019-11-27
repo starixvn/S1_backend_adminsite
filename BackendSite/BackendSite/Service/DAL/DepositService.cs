@@ -40,7 +40,15 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string memo, string comment, DepositStatus forStatus, DepositStatus status)
+        public IEnumerable<Comments> GetDepositRequestComment(int depositId, int siteId)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.Query<Comments>("DepositRequestComment_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, DepositStatus forStatus, DepositStatus status)
         {
             int depositId = 0;
             int type = 1;
@@ -55,7 +63,7 @@ namespace BackendSite.Service.DAL
                     conn.Open();
                     using (var trans = conn.BeginTransaction())
                     {
-                        var p = new DynamicParameters(new { DepositId = depositId, SiteId = siteId, ActualDeposit = actualDeposit, Memo = memo, Comment = comment, ForStatus = (int)forStatus, Status = (int)status });
+                        var p = new DynamicParameters(new { DepositId = depositId, SiteId = siteId, ActualDeposit = actualDeposit, Comment = comment, ForStatus = (int)forStatus, Status = (int)status });
                         p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
                         p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
                         result = conn.Execute("DepositInfo_Set", p, trans, commandType: CommandType.StoredProcedure);
@@ -71,7 +79,7 @@ namespace BackendSite.Service.DAL
 
                                 int custId = p.Get<int?>("CustId") ?? 0;
                                 string UserName = p.Get<string>("UserName");
-                                result = walletService.SetBalance(custId, siteId, UserName, actualDeposit, type, memo, transId, out afterAmount, out is1stDepoist, conn, trans);
+                                result = walletService.SetBalance(custId, siteId, UserName, actualDeposit, type, comment, transId, out afterAmount, out is1stDepoist, conn, trans);
 
                                 if (is1stDepoist == 1 && result > 0)
                                 {

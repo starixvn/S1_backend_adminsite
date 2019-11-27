@@ -17,7 +17,7 @@ namespace BackendSite.Service.Model
         public decimal ActualDeposit { set; get; }
         public DateTime CreateTime { set; get; }
         public IDispositInfo dispositInfo {
-            get 
+            get
             {
                 if (DispositType == 3)
                 {
@@ -29,7 +29,11 @@ namespace BackendSite.Service.Model
         public int FirstDeposit { set; get; }
         public string Memo { set; get; }
         public string PostScript { set; get; }
+
+        public virtual IEnumerable<Comments> Comments { get; set; }
     }
+
+
     public interface IDispositInfo
     {
         int Ver { get; set; }
@@ -48,5 +52,12 @@ namespace BackendSite.Service.Model
         public int SysId { get; set; }
         public string AccountName { get; set; }
         public string AccountNo { get; set; }
+    }
+
+    public class Comments
+    {
+        public string Comment { get; set; }
+        public DateTime CreateTime { get; set; }
+        public int Action { get; set; }
     }
 }

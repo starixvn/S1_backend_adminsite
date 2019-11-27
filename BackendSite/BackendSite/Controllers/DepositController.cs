@@ -21,6 +21,14 @@ namespace BackendSite.Controllers
             this.depositBLL = depositBLL;
         }
 
+        public class DepositReq
+        {
+            public decimal ActualDeposit { set; get; }
+            public string Command { set; get; }
+            public string TransId { set; get; }
+            public int Action { set; get; }
+        }
+
         public IActionResult DepositRequest()
         {
             IEnumerable<DepositRequest> depositRequests = depositBLL.GetDepositRequestList();
@@ -28,19 +36,13 @@ namespace BackendSite.Controllers
             return View(depositRequests.ToList());
         }
 
-        public IActionResult DepositApprove(string transID, string actualDeposit)
+        public IActionResult DepositApprove(string transId)
         {
-            DepositRequest depositRequest = depositBLL.GetDepositRequest(transID);
+            DepositRequest depositRequest = depositBLL.GetDepositRequest(transId);
+            IEnumerable<Comments> comments = depositBLL.GetDepositRequestComment(transId);
 
+            depositRequest.Comments = comments;
             return View(depositRequest);
-        }
-
-        public class DepositReq
-        {
-            public decimal ActualDeposit { set; get; }
-            public string Command { set; get; }
-            public string TransId { set; get; }
-            public int Action { set; get; }
         }
 
         [HttpPost]
@@ -53,15 +55,15 @@ namespace BackendSite.Controllers
             if (depositReq.Action == 1)
             {
                 if (depositReq.ActualDeposit > 0)
-                     depositConfirmReuslt = depositBLL.DepositApproved(depositReq.TransId, depositReq.ActualDeposit, "", depositReq.Command);
+                     depositConfirmReuslt = depositBLL.DepositApproved(depositReq.TransId, depositReq.ActualDeposit, depositReq.Command);
             }
             else if (depositReq.Action == 2)
             {
-                 depositConfirmReuslt = depositBLL.DepositRejectd(depositReq.TransId, depositReq.ActualDeposit, "", depositReq.Command);
+                 depositConfirmReuslt = depositBLL.DepositRejectd(depositReq.TransId, depositReq.ActualDeposit, depositReq.Command);
             }
             else
             {
-                 depositConfirmReuslt = depositBLL.DepositDraft(depositReq.TransId, depositReq.ActualDeposit, "", depositReq.Command);
+                 depositConfirmReuslt = depositBLL.DepositDraft(depositReq.TransId, depositReq.ActualDeposit, depositReq.Command);
             }
 
             if (depositConfirmReuslt !=0)

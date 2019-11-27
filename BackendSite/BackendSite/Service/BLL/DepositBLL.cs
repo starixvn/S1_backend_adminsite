@@ -36,25 +36,35 @@ namespace BackendSite.Service.BLL
             return depositService.GetDepositRequest(depositId, serverInfo.SiteId);
         }
 
-        public int DepositApproved(string transId, decimal actualDeposit, string memo, string comment)
+        public IEnumerable<Comments> GetDepositRequestComment(string transId)
         {
             var serverInfo = serverInfoService.GetModel();
-            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, memo, comment, DepositStatus.Pending, DepositStatus.Approved);
+            int depositId = 0;
+
+            Match m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out depositId);
+            return depositService.GetDepositRequestComment(depositId, serverInfo.SiteId);
         }
 
-        public int DepositRejectd(string transId, decimal actualDeposit, string memo, string comment)
+        public int DepositApproved(string transId, decimal actualDeposit, string comment)
+        {
+            var serverInfo = serverInfoService.GetModel();
+            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, comment, DepositStatus.Pending, DepositStatus.Approved);
+        }
+
+        public int DepositRejectd(string transId, decimal actualDeposit, string comment)
         {
             var serverInfo = serverInfoService.GetModel();
 
-            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, memo, comment, DepositStatus.Pending, DepositStatus.Rejected);
+            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, comment, DepositStatus.Pending, DepositStatus.Rejected);
 
         }
 
-        public int DepositDraft(string transId, decimal actualDeposit, string memo, string comment)
+        public int DepositDraft(string transId, decimal actualDeposit, string comment)
         {
             var serverInfo = serverInfoService.GetModel();
 
-            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, memo, comment, DepositStatus.Pending, DepositStatus.Pending);
+            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, comment, DepositStatus.Draft, DepositStatus.Draft);
         }
     }
 }
