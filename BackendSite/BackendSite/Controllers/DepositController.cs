@@ -40,7 +40,6 @@ namespace BackendSite.Controllers
         {
             DepositRequest depositRequest = depositBLL.GetDepositRequest(transId);
             IEnumerable<Comments> comments = depositBLL.GetDepositRequestComment(transId);
-
             depositRequest.Comments = comments;
             return View(depositRequest);
         }
@@ -69,11 +68,13 @@ namespace BackendSite.Controllers
             if (depositConfirmReuslt !=0)
             {
                 apiResult.ErrorCode = 1101;
+                apiResult.Message = "Update Failed!";
                 //apiResult.Message = selLangBLL.GetMsg("msg_DepositProcessLogin_15");
             }
             else
             {
                 apiResult.ErrorCode = 0;
+                apiResult.Message = "Update Scuessed!";
             }
 
             return apiResult;

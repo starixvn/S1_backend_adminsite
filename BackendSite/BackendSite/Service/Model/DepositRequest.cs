@@ -29,8 +29,12 @@ namespace BackendSite.Service.Model
         public int FirstDeposit { set; get; }
         public string Memo { set; get; }
         public string PostScript { set; get; }
+        public int Status { set; get; }
 
         public virtual IEnumerable<Comments> Comments { get; set; }
+
+        public virtual string DispositTypeString { get; set; }
+        public virtual string StatusString { get; set; }
     }
 
 
@@ -59,5 +63,9 @@ namespace BackendSite.Service.Model
         public string Comment { get; set; }
         public DateTime CreateTime { get; set; }
         public int Action { get; set; }
+
+        public string ActionString { get; set; }
+
+        public decimal ActualDeposit { get; set; }
     }
 }

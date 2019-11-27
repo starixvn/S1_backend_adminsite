@@ -4,38 +4,41 @@
     Layout = null;
 }
 
-<table>
+<script src="~/lib/bootstrap/dist/js/bootstrap.min.js" asp-append-version="true"></script>
+<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container">
+    <table class="table table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">TransId</th>
+                <th scope="col">User Name</th>
+                <th scope="col">Deposit Type</th>
+                <th scope="col">Account Number</th>
+                <th scope="col">Account Name</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Memo</th>
+                <th scope="col">PostScript</th>
+                <th scope="col">CreateTime</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+
+        @foreach (var item in Model)
+        {
+            var bank = ((DispositInfo3_1)item.dispositInfo);
     <tr>
-        <td>TransId</td>
-        <td>User Name</td>
-        <td>Deposit Type</td>
-        <td>Account Number</td>
-        <td>Account Name</td>
-        <td>Amount</td>
-        <td>Memo</td>
-        <td>PostScript</td>
-        <td>CreateTime</td>
-        <td>Approve</td>
-    </tr>
-    @foreach (var item in Model)
-    {
-        var bank = ((DispositInfo3_1)item.dispositInfo);
-        <tr>
-        <td>@item.TransId</td>
+        <td scope="row">@Html.ActionLink(@item.TransId, "DepositApprove", "Deposit", new { transID = @item.TransId })</td>
         <td>@item.UserName</td>
-        <td>@item.DispositType</td>
+        <td>@item.DispositTypeString</td>
         <td>@bank.AccountNo</td>
         <td>@bank.AccountName</td>
         <td>@item.Amount</td>
         <td>@item.Memo</td>
         <td>@item.PostScript</td>
         <td>@item.CreateTime</td>
-        <td>@Html.ActionLink("Approve", "DepositApprove", "Deposit",new { transID = @item.TransId })</td>
-  
-
-
-          </tr>
-    }
-
-</table>
-
+        <td>@item.StatusString</td>
+    </tr>
+        }
+    </table>
+</div>
