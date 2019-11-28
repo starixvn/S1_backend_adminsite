@@ -32,13 +32,17 @@ namespace BackendSite
             /*DAL*/
             services.AddSingleton<ServerInfoService>();
             services.AddSingleton<DepositService>();
+            services.AddSingleton<WithdrawService>();
             services.AddSingleton<WalletService>();
 
             /*BLL*/
             services.AddSingleton<ServerInfoBLL>();
+            services.AddSingleton<SelLangBLL>();
             services.AddSingleton<DepositBLL>();
+            services.AddSingleton<WithdrawBLL>();
 
             services.AddControllersWithViews();
+            services.AddHttpContextAccessor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
