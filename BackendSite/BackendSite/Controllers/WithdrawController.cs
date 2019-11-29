@@ -19,7 +19,7 @@ namespace BackendSite.Controllers
             this.withdrawBLL = withdrawBLL;
         }
 
-        public IActionResult WithdrawRequest()
+        public IActionResult WithdrawList()
         {
             IEnumerable<WithdrawRequest> withdrawRequests = withdrawBLL.GetWithdrawRequestList();
 

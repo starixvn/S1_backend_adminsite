@@ -1,0 +1,43 @@
+﻿@using BackendSite.Service.Model
+@{
+    ViewData["Title"] = "BankDetailList";
+}
+<script src="~/lib/bootstrap/dist/js/bootstrap.min.js" asp-append-version="true"></script>
+<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<h1>BankInfoList</h1>
+
+
+<div class="container">
+    <table class="table table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">BankName</th>
+                <th scope="col">AccountName</th>
+                <th scope="col">AccountNo</th>
+                <th scope="col">MinAmount</th>
+                <th scope="col">MaxAmount</th>
+                <th scope="col">Currency</th>
+                <th scope="col">Status</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.BankName</td>
+                <td>@item.AccountName</td>
+                <td>@item.AccountNo</td>
+                <td>@item.MinAmount</td>
+                <td>@item.MaxAmount</td>
+                <td>@item.CurrencyId</td>
+                <td>@item.Status</td>
+                <td>
+                    <input type='button' class="btn btn-primary" onclick='UpdateStatus(1)' value='Edit'>
+                    <input type='button' class="btn btn-primary" onclick='UpdateStatus(1)' value='Disable'>
+                </td>
+            </tr>
+        }
+    </table>
+</div>

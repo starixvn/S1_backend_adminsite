@@ -28,7 +28,7 @@ namespace BackendSite.Service.DAL
 
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.Query<DepositRequest>("DepositRequest_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+                return conn.Query<DepositRequest>("DepositList_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
             }
         }
 

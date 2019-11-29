@@ -34,12 +34,14 @@ namespace BackendSite
             services.AddSingleton<DepositService>();
             services.AddSingleton<WithdrawService>();
             services.AddSingleton<WalletService>();
+            services.AddSingleton<BankDetailService>();
 
             /*BLL*/
             services.AddSingleton<ServerInfoBLL>();
             services.AddSingleton<SelLangBLL>();
             services.AddSingleton<DepositBLL>();
             services.AddSingleton<WithdrawBLL>();
+            services.AddSingleton<BankDetailBLL>();
 
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();

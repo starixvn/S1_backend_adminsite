@@ -32,7 +32,7 @@ namespace BackendSite.Controllers
             public int Action { set; get; }
         }
 
-        public IActionResult DepositRequest()
+        public IActionResult DepositList()
         {
             IEnumerable<DepositRequest> depositRequests = depositBLL.GetDepositRequestList();
 
@@ -84,7 +84,7 @@ namespace BackendSite.Controllers
             return View(depositRequests.ToList());
         }
 
-        public IActionResult DepositApprove(string transId)
+        public IActionResult DepositRequest(string transId)
         {
             DepositRequest depositRequest = depositBLL.GetDepositRequest(transId);
             IEnumerable<Comments> comments = depositBLL.GetDepositRequestComment(transId);
