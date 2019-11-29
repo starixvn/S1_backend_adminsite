@@ -22,5 +22,7 @@ namespace BackendSite.Service.Model
         public int Sort { set; get; }
 
         public int Status { set; get; }
+
+        public int PointLevel { set; get; }
     }
 }

@@ -20,7 +20,7 @@ namespace BackendSite.Service.BLL
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.Query<BankDetail>("BankAccountOffList_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+                return conn.Query<BankDetail>("BankDetailList_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
             }
         }
 
@@ -28,7 +28,7 @@ namespace BackendSite.Service.BLL
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.Query<BankDetail>("BankAccountOffList_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+                return conn.Query<BankDetail>("BankDetail_Ins", new { SiteId = siteId, SysId = bankDetail.BankDid, BankAccountName = bankDetail.AccountName, BankAccountNo = bankDetail.AccountNo, MinAmount = bankDetail.MinAmount, MaxAmount = bankDetail.MaxAmount, PointLevel = bankDetail.PointLevel  }, commandType: CommandType.StoredProcedure);
             }
         }
 
@@ -36,15 +36,15 @@ namespace BackendSite.Service.BLL
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.Query<BankDetail>("BankAccountOffList_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+                return conn.Query<BankDetail>("BankDetail_Set", new { SiteId = siteId, SysId = bankDetail.BankDid, BankAccountName = bankDetail.AccountName, BankAccountNo = bankDetail.AccountNo, MinAmount = bankDetail.MinAmount, MaxAmount = bankDetail.MaxAmount, PointLevel = bankDetail.PointLevel }, commandType: CommandType.StoredProcedure);
             }
         }
 
-        public IEnumerable<BankDetail> DisableBankDetail(int siteId, BankDetail bankDetail, int direction)
+        public IEnumerable<BankDetail> BankInfoStatus(int siteId, int bankId, int status)
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.Query<BankDetail>("BankAccountOffList_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+                return conn.Query<BankDetail>("BankDetailStatus_Set", new { SiteId = siteId, BankId = bankId, Status = status }, commandType: CommandType.StoredProcedure);
             }
         }
     }

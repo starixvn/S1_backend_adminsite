@@ -41,10 +41,10 @@ namespace BackendSite.Service.BLL
             return results;
         }
 
-        public IEnumerable<BankDetail> DisableBankInfo(BankDetail bankDetail, int direction)
+        public IEnumerable<BankDetail> BankInfoStatus(BankDetail bankDetail, int bankId, int status)
         {
             var serverInfo = serverInfoService.GetModel();
-            var results = bankDetailService.DisableBankDetail(serverInfo.SiteId, bankDetail, direction);
+            var results = bankDetailService.BankInfoStatus(serverInfo.SiteId, bankId, status);
             return results;
         }
     }
