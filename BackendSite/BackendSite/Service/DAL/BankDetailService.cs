@@ -20,7 +20,7 @@ namespace BackendSite.Service.BLL
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.Query<BankDetail>("BankDetailList_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+                return conn.Query<BankDetail>("BankDetail_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
             }
         }
 

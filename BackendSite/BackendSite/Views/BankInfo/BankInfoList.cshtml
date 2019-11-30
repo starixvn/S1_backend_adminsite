@@ -1,43 +1,40 @@
 ﻿@using BackendSite.Service.Model
+@using Microsoft.AspNetCore.Hosting
+
+@inject IWebHostEnvironment environment
 @{
     ViewData["Title"] = "BankDetailList";
 }
-<script src="~/lib/bootstrap/dist/js/bootstrap.min.js" asp-append-version="true"></script>
-<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+@section Style{
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.csss" rel="stylesheet" />
+}
 
 <h1>BankInfoList</h1>
 
+<input className="react-switch-checkbox"
+       id=test
+       type="checkbox" />
 
-<div class="container">
-    <table class="table table-striped">
-        <thead class="thead-light">
-            <tr>
-                <th scope="col">BankName</th>
-                <th scope="col">AccountName</th>
-                <th scope="col">AccountNo</th>
-                <th scope="col">MinAmount</th>
-                <th scope="col">MaxAmount</th>
-                <th scope="col">Currency</th>
-                <th scope="col">Status</th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
+<div id="Bank"></div>
 
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.BankName</td>
-                <td>@item.AccountName</td>
-                <td>@item.AccountNo</td>
-                <td>@item.MinAmount</td>
-                <td>@item.MaxAmount</td>
-                <td>@item.CurrencyId</td>
-                <td>@item.Status</td>
-                <td>
-                    <input type='button' class="btn btn-primary" onclick='UpdateStatus(1)' value='Edit'>
-                    <input type='button' class="btn btn-primary" onclick='UpdateStatus(1)' value='Disable'>
-                </td>
-            </tr>
-        }
-    </table>
-</div>
+
+@section Scripts{
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/lib/axios.min.js"></script>
+
+    @if (environment.EnvironmentName == "Development")
+    {
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+        <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+        <script type="text/babel" src="~/js/Bank.jsx">
+        </script>
+
+    }
+    else
+    {
+
+    }
+}

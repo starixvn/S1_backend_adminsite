@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=utf-8>
+    <meta name=description content="">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <title></title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/4.0.0-alpha.1/css/bootstrap-switch.min.css" />
+    <script type="text/javascript" src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script  src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/4.0.0-alpha.1/js/bootstrap-switch.min.js"></script>
+
+</head>
+<body>
+    <input name="status" type="checkbox" data-size="small">
+    <script type="text/javascript">
+			$('[name="status"]').bootstrapSwitch({
+	        onText:"啟動",
+	        offText:"停止",
+	        onColor:"success",
+	        offColor:"info",
+	        size:"small",
+        onSwitchChange:function(event,state){
+            if(state==true){
+               alert('已開啟');
+            }else{
+                alert('已關閉');
+            }
+        }
+
+   			 })
+
+    </script>
+</body>
+</html>

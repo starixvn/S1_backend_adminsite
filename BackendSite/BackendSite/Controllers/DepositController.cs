@@ -78,7 +78,6 @@ namespace BackendSite.Controllers
                         item.StatusString = selLangBLL.GetMsg("msg_Error");
                         break;
                 }
-
             }
 
             return View(depositRequests.ToList());
