@@ -13,7 +13,7 @@
 <table class="table">
     <tr>
         <th scope="row">WithdrawalId</th>
-        <td></td>
+        <td>@Model.WithdrawalId</td>
     </tr>
     <tr>
         <th scope="row">UserName</th>
@@ -100,10 +100,9 @@
 
     <script type="text/javascript">
     function UpdateStatus(Status) {
-        let data = { "TransId": "@Model.TransId", "Command": $("#command").val() };
+        let data = { "TransId": "@Model.TransId", "Action": Status, "Command": $("#command").val() };
         axios.post('/Withdrawal/WithdrawalConfirm', data)
             .then(function (response) {
-                console.log(response.data);
                 let result = response.data;
                 if (result.errorCode == 0) {
                     alert(result.message);

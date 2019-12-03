@@ -20,13 +20,13 @@ namespace BackendSite.Service.BLL
             this.serverInfoService = serverInfoService;
         }
 
-        public IEnumerable<WithdrawalList> GetWithdrawalRequestList()
+        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList()
         {
             var serverInfo = serverInfoService.GetModel();
             return withdrawalService.GetWithdrawalRequestList(serverInfo.SiteId);
         }
 
-        public WithdrawalList GetWithdrawalRequest(string transId)
+        public WithdrawalRequest GetWithdrawalRequest(string transId)
         {
             var serverInfo = serverInfoService.GetModel();
             int withdrawalId = 0;

@@ -30,14 +30,14 @@ namespace BackendSite.Controllers
 
         public IActionResult WithdrawalList()
         {
-            IEnumerable<WithdrawalList> withdrawRequests = withdrawalBLL.GetWithdrawalRequestList();
+            IEnumerable<WithdrawalRequest> withdrawRequests = withdrawalBLL.GetWithdrawalRequestList();
 
             return View(withdrawRequests.ToList());
         }
 
         public IActionResult WithdrawalRequest(string transId)
         {
-            WithdrawalList withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(transId);
+            WithdrawalRequest withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(transId);
             IEnumerable<Comments> comments = withdrawalBLL.GetWithdrawalRequestComment(transId);
             withdrawalRequest.Comments = comments;
             return View(withdrawalRequest);
@@ -52,8 +52,7 @@ namespace BackendSite.Controllers
 
             if (withdrawalReq.Action == 1)
             {
-                //if (withdrawalReq.ActualDeposit > 0)
-                //    withdrawConfirmReuslt = withdrawalBLL.WithdrawalApproved(withdrawalReq.TransId, withdrawalReq.Command);
+                withdrawConfirmReuslt = withdrawalBLL.WithdrawalApproved(withdrawalReq.TransId, withdrawalReq.Command);
             }
             else if (withdrawalReq.Action == 2)
             {

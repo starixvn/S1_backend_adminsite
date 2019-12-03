@@ -36,8 +36,6 @@ namespace BackendSite.Service.Model
         public virtual string DispositTypeString { get; set; }
         public virtual string StatusString { get; set; }
     }
-
-
     public interface IDispositInfo
     {
         int Ver { get; set; }
@@ -57,7 +55,6 @@ namespace BackendSite.Service.Model
         public string AccountName { get; set; }
         public string AccountNo { get; set; }
     }
-
     public class Comments
     {
         public string Comment { get; set; }
