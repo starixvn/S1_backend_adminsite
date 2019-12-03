@@ -32,7 +32,7 @@ namespace BackendSite
             /*DAL*/
             services.AddSingleton<ServerInfoService>();
             services.AddSingleton<DepositService>();
-            services.AddSingleton<WithdrawService>();
+            services.AddSingleton<WithdrawalService>();
             services.AddSingleton<WalletService>();
             services.AddSingleton<BankDetailService>();
 
@@ -40,7 +40,7 @@ namespace BackendSite
             services.AddSingleton<ServerInfoBLL>();
             services.AddSingleton<SelLangBLL>();
             services.AddSingleton<DepositBLL>();
-            services.AddSingleton<WithdrawBLL>();
+            services.AddSingleton<WithdrawalBLL>();
             services.AddSingleton<BankDetailBLL>();
 
             services.AddControllersWithViews();

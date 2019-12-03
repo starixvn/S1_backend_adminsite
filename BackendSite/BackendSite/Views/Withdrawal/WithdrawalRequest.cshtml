@@ -1,0 +1,119 @@
+﻿
+@{
+    ViewData["Title"] = "WithdrawalRequest";
+}
+
+@section Style{
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+}
+
+<h1>WithdrawalRequest</h1>
+
+<div class="container">
+<table class="table">
+    <tr>
+        <th scope="row">WithdrawalId</th>
+        <td></td>
+    </tr>
+    <tr>
+        <th scope="row">UserName</th>
+        <td>@Model.UserName</td>
+    </tr>
+    <tr>
+        <th scope="row">Trans ID</th>
+        <td>@Model.TransId</td>
+    </tr>
+    <tr>
+        <th scope="row">WithdrawalType</th>
+        <td>@Model.WithdrawalType</td>
+    </tr>
+    <tr>
+        <th scope="row">WithdrawalInfo</th>
+        <td>@Model.WithdrawalInfo</td>
+    </tr>
+    <tr>
+        <th scope="row">Amount</th>
+        <td>@Model.Amount</td>
+    </tr>
+    <tr>
+        <th scope="row">ChargeFee</th>
+        <td>@Model.ChargeFee</td>
+    </tr>
+    <tr>
+        <th scope="row">Memo</th>
+        <td>@Model.Memo</td>
+    </tr>
+    <tr>
+        <th scope="row">Create Time</th>
+        <td>@Model.CreateTime</td>
+    </tr>
+    <tr>
+        <th scope="row">Status</th>
+        <td>@Model.Status</td>
+    </tr>
+</table>
+
+<div class="container">
+    <table class="table table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Create Time</th>
+                <th scope="col">Actual Deposit</th>
+                <th scope="col">Comment</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        @{var i = 1; }
+        @foreach (var item in @Model.Comments)
+        {
+            <tr>
+                <td scope="row">@(i++)</td>
+                <td>@item.CreateTime</td>
+                <td>@item.ActualDeposit</td>
+                <td>@item.Comment</td>
+                <td>@item.ActionString</td>
+            </tr>
+        }
+    </table>
+</div>
+
+<div class="form-group">
+    <label for="command">Command</label>
+    <textarea class="form-control" id="command" rows="3"></textarea>
+</div>
+
+<div class="container">
+    @{ if (@Model.Status == 0 || @Model.Status == 1)
+        {
+            <input type='button' class="btn btn-primary" onclick='UpdateStatus(1)' value='Approve'>
+            <input type='button' class="btn btn-primary" onclick='UpdateStatus(2)' value='Reject'>
+        }
+        <input type='button' class="btn btn-primary" onclick='UpdateStatus(3)' value='Command'>
+    }
+</div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/axios.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js" asp-append-version="true"></script>
+
+    <script type="text/javascript">
+    function UpdateStatus(Status) {
+        let data = { "TransId": "@Model.TransId", "Command": $("#command").val() };
+        axios.post('/Withdrawal/WithdrawalConfirm', data)
+            .then(function (response) {
+                console.log(response.data);
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert(result.message);
+                }
+            }).catch(function (error) {
+                alert(error);
+            });
+      }
+    </script>
+}

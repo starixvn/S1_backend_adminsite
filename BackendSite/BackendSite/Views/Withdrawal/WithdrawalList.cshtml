@@ -1,0 +1,56 @@
+﻿@using BackendSite.Service.Model
+@model IEnumerable<WithdrawalList>
+@{
+    Layout = null;
+}
+
+@{
+    ViewData["Title"] = "WithdrawalList";
+}
+
+@section Style{
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.csss" rel="stylesheet" />
+}
+
+<h1>WithdrawalList</h1>
+
+<div class="container">
+    <table class="table table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">Withdrawal Id</th>
+                <th scope="col">Withdrawal Type</th>
+                <th scope="col">User Name</th>
+                <th scope="col">WithdrawalInfo</th>
+                <th scope="col">Amount</th>
+                <th scope="col">ChargeFee</th>
+                <th scope="col">Memo</th>
+                <th scope="col">CreateTime</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+
+        @foreach (var item in Model)
+        {
+    <tr>
+        <td scope="row">@Html.ActionLink(@item.TransId, "WithdrawalRequest", "Withdrawal", new { transID = @item.TransId })</td>
+        <td>@item.WithdrawalId</td>
+        <td>@item.WithdrawalType</td>
+        <td>@item.UserName</td>
+        <td>@item.WithdrawalInfo</td>
+        <td>@item.Amount</td>
+        <td>@item.Memo</td>
+        <td>@item.ChargeFee</td>
+        <td>@item.Memo</td>
+        <td>@item.CreateTime</td>
+        <td>@item.Status</td>
+
+    </tr>
+        }
+    </table>
+</div>
+
+@section Scripts{
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/lib/axios.min.js"></script>
+}

@@ -4,8 +4,11 @@
     Layout = null;
 }
 
-<script src="~/lib/bootstrap/dist/js/bootstrap.min.js" asp-append-version="true"></script>
-<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+@section Style{
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+}
+
+
 
 <div class="container">
     <table class="table table-striped">
@@ -27,18 +30,23 @@
         @foreach (var item in Model)
         {
             var bank = ((DispositInfo3_1)item.dispositInfo);
-    <tr>
-        <td scope="row">@Html.ActionLink(@item.TransId, "DepositApprove", "Deposit", new { transID = @item.TransId })</td>
-        <td>@item.UserName</td>
-        <td>@item.DispositTypeString</td>
-        <td>@bank.AccountNo</td>
-        <td>@bank.AccountName</td>
-        <td>@item.Amount</td>
-        <td>@item.Memo</td>
-        <td>@item.PostScript</td>
-        <td>@item.CreateTime</td>
-        <td>@item.StatusString</td>
-    </tr>
+            <tr>
+                <td scope="row">@Html.ActionLink(@item.TransId, "DepositRequest", "Deposit", new { transID = @item.TransId })</td>
+                <td>@item.UserName</td>
+                <td>@item.DispositTypeString</td>
+                <td>@bank.AccountNo</td>
+                <td>@bank.AccountName</td>
+                <td>@item.Amount</td>
+                <td>@item.Memo</td>
+                <td>@item.PostScript</td>
+                <td>@item.CreateTime</td>
+                <td>@item.StatusString</td>
+            </tr>
         }
     </table>
 </div>
+
+
+@section Scripts{
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js" asp-append-version="true"></script>
+}

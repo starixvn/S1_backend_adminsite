@@ -20,9 +20,7 @@ namespace BackendSite.Service.Model
         public string BankLogo { set; get; }
         public string BankSite { set; get; }
         public int Sort { set; get; }
-
         public int Status { set; get; }
-
         public int PointLevel { set; get; }
     }
 }

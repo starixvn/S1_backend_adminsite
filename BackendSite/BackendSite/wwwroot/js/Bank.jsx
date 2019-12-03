@@ -53,7 +53,11 @@ class RowEdit extends React.Component {
                 <td><input type="text" name="minAmount" maxlength="4" size ="4" value={Data.minAmount} onkeyup="value=value.replace(/[^\d]/g,'') "/></td>
                 <td><input type="text" name="maxAmount" maxlength="4" size ="4" value={Data.maxAmount} onkeyup="value=value.replace(/[^\d]/g,'') "/></td>
                 <td><input type="text" name="currencyId" value={Data.currencyId} size ="4"/></td>
-                <td><input name="status" type="checkbox" data-size="small"/></td>
+                <td>
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="customSwitches" disabled />
+                    </div>
+                </td>
                 <td>
                     <input type="button" class="btn btn-primary" onclick="UpdateStatus(1)" value="Save" />
                     <input type="button" class="btn btn-primary" onclick="UpdateStatus(1)" value="Cancel" />

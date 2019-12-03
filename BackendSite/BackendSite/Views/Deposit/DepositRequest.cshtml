@@ -3,9 +3,12 @@
     ViewData["Title"] = "DepositApprove";
 }
 
-<script src="~/lib/axios.min.js" asp-append-version="true"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.min.js" asp-append-version="true"></script>
-<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+@section Style{
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+}
+
+
 <h1>DepositApprove</h1>
 
 <div class="container">
@@ -102,7 +105,13 @@
         }
     </div>
 </div>
-<script type="text/javascript">
+
+
+@section Scripts{
+    <script src="~/lib/axios.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js" asp-append-version="true"></script>
+
+    <script type="text/javascript">
     function UpdateStatus(Status) {
         let data = { "TransId": "@Model.TransId", "Action": Status, "ActualDeposit": parseFloat($("#actualdeposit").val()), "Command": $("#command").val() };
         axios.post('/Deposit/DepositConfirm', data)
@@ -119,4 +128,5 @@
                 alert(error);
             });
       }
-</script>
+    </script>
+}

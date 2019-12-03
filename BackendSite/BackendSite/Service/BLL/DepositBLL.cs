@@ -23,8 +23,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<DepositRequest> GetDepositRequestList()
         {
             var serverInfo = serverInfoService.GetModel();
-            var results = depositService.GetDepositRequestList(serverInfo.SiteId);
-            return results;
+            return depositService.GetDepositRequestList(serverInfo.SiteId);
         }
         public DepositRequest GetDepositRequest(string transId)
         {
@@ -33,8 +32,7 @@ namespace BackendSite.Service.BLL
 
             Match m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out depositId);
-            var result = depositService.GetDepositRequest(depositId, serverInfo.SiteId);
-            return result;
+            return depositService.GetDepositRequest(depositId, serverInfo.SiteId);
         }
 
         public IEnumerable<Comments> GetDepositRequestComment(string transId)
@@ -44,8 +42,7 @@ namespace BackendSite.Service.BLL
 
             Match m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out depositId);
-            var results = depositService.GetDepositRequestComment(depositId, serverInfo.SiteId);
-            return results;
+            return depositService.GetDepositRequestComment(depositId, serverInfo.SiteId);
         }
 
         public int DepositApproved(string transId, decimal actualDeposit, string comment)
