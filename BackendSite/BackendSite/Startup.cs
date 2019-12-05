@@ -39,6 +39,7 @@ namespace BackendSite
             services.AddSingleton<WalletService>();
             services.AddSingleton<BankDetailService>();
             services.AddSingleton<AdminUserService>();
+            services.AddSingleton<MenuService>();
 
             /*BLL*/
             services.AddSingleton<ServerInfoBLL>();
@@ -52,7 +53,7 @@ namespace BackendSite
             services.AddHttpContextAccessor();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
             {
-                option.LoginPath = "/Home/Login";
+                option.LoginPath = "/Home/Signin";
                 option.Cookie.Name = ".backend";
                 option.ExpireTimeSpan = TimeSpan.FromMinutes(30);//沒給預設14天
             });
@@ -71,8 +72,8 @@ namespace BackendSite
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-            app.UseStaticFiles();
 
+            app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
@@ -81,7 +82,7 @@ namespace BackendSite
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}");
             });
         }
     }

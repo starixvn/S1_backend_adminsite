@@ -17,7 +17,7 @@
         }
 
         var data = {txtID:$("#txtID").val(),txtPW:$("#txtPW").val()};
-        axios.post('/api/Home/Login',data)
+        axios.post('/api/Home/Signin',data)
         .then(function (response) {
             let result = response.data;
             if (result.errorCode == 0) {

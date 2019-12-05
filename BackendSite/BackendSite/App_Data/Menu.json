@@ -1,0 +1,19 @@
+[
+  {
+    "Key": "",
+    "Title": "Test",
+    "Controller": "XXXX",
+    "Action": "",
+    "Icon": "",
+    "Childs": [
+      {
+        "Key": "",
+        "Title": "Test1",
+        "Controller": "XXXX222",
+        "Action": "",
+        "Icon": "",
+        "Childs": null
+      }
+    ]
+  }
+]

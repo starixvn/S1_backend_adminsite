@@ -37,7 +37,7 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ApiResult> Login([FromBody]LoginModel loginModel)
+        public async Task<ApiResult> Signin([FromBody]LoginModel loginModel)
         {
             var apiResult = new ApiResult(selLangBLL);
             string userName = loginModel.txtID;

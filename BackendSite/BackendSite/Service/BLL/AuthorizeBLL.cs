@@ -15,12 +15,14 @@ namespace BackendSite.Service.BLL
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly AdminUserService adminUserService;
         private readonly Tools tools;
+        private readonly MenuService menuService;
 
-        public AuthorizeBLL(ServerInfoBLL serverInfoBLL, AdminUserService adminUserService, Tools tools)
+        public AuthorizeBLL(ServerInfoBLL serverInfoBLL, AdminUserService adminUserService, Tools tools, MenuService menuService)
         {
             this.serverInfoBLL = serverInfoBLL;
             this.adminUserService = adminUserService;
             this.tools = tools;
+            this.menuService = menuService;
         }
         public int UserLogin(string userName, string pwd, string ip, string fromUrl, string userAgent, ref AdminUser adminUser)
         {
@@ -43,6 +45,10 @@ namespace BackendSite.Service.BLL
             {
                 return 0;
             }
+        }
+        public IEnumerable<MenuItem> GetMenuData()
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<MenuItem>>(menuService.GetMenuData());
         }
     }
 }

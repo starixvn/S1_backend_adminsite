@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Service.DAL;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -13,7 +14,6 @@ namespace BackendSite.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
@@ -26,7 +26,7 @@ namespace BackendSite.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Login()
+        public IActionResult Signin()
         {
             return View();
         }
