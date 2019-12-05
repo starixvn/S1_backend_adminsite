@@ -54,7 +54,7 @@ namespace BackendSite.Service.BLL
             var context = httpContextAccessor.HttpContext;
             if (context.User.Identity.IsAuthenticated)
             {
-                langId = context.User.Claims.FirstOrDefault(m => m.Type == "LangId").Value;
+                langId = context.User.Claims.FirstOrDefault(m => m.Type == "LangId")?.Value;
             }
             else
             {
@@ -133,7 +133,15 @@ namespace BackendSite.Service.BLL
             {
                 rm.TryAdd(sKey, new ResourceManager(sKey, Assembly.GetExecutingAssembly()));
             }
-            labelString = rm[sKey].GetString(key);
+
+            try
+            {
+                labelString = rm[sKey].GetString(key);
+            }
+            catch(MissingManifestResourceException mme)
+            {
+
+            }
 
             if (string.IsNullOrEmpty(labelString) && langId != "en")
             {
