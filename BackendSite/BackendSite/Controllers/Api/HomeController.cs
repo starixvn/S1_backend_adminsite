@@ -76,7 +76,7 @@ namespace BackendSite.Controllers.Api
                 {
                     new Claim(ClaimTypes.Name,adminUser.UserName ),
                     new Claim(ClaimTypes.NameIdentifier,adminUser.UserId.ToString() ),
-                    new Claim("LangId","en" ),
+                    //new Claim("LangId",? ),
                 };
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
