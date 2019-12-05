@@ -16,6 +16,7 @@ namespace BackendSite.Service.DAL
     {
         private readonly IConfiguration configuration;
         private readonly WalletService walletService;
+        private int typePosition = 1000;
 
         public WithdrawalService(IConfiguration configuration, WalletService walletService)
         {
@@ -51,7 +52,7 @@ namespace BackendSite.Service.DAL
         public int SetWithdrawalInfo(string transId, int siteId, string comment, DepositStatus forStatus, DepositStatus status)
         {
             int withdrawalId = 0;
-            int type = 1;
+            int type = 1 + typePosition;
             Match m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out withdrawalId);
 
@@ -81,7 +82,7 @@ namespace BackendSite.Service.DAL
                                 int custId = p.Get<int?>("CustId") ?? 0;
                                 string UserName = p.Get<string>("UserName");
                                 decimal amount = p.Get<decimal>("Amount");
-                                result = walletService.SetBalance(custId, siteId, UserName, amount, type, comment, transId, out afterAmount, out is1stDepoist, conn, trans);
+                                result = walletService.SetBalance(custId, siteId, UserName, amount, type, $"Withdrawal Rejected: {amount}", transId, out afterAmount, out is1stDepoist, conn, trans);
                             }
 
                             if (result > 0)
