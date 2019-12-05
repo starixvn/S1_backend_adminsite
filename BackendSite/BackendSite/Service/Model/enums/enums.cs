@@ -42,4 +42,11 @@ namespace BackendSite.Service.Model.enums
         Expired = 6,
         Error = 99
     }
+
+    public enum AdminUserStatus
+    {
+        Running = 1,
+        Suspend = 2,
+        Closed = 3,
+    }
 }

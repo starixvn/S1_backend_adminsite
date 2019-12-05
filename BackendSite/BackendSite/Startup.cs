@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,6 +38,7 @@ namespace BackendSite
             services.AddSingleton<WithdrawalService>();
             services.AddSingleton<WalletService>();
             services.AddSingleton<BankDetailService>();
+            services.AddSingleton<AdminUserService>();
 
             /*BLL*/
             services.AddSingleton<ServerInfoBLL>();
@@ -42,9 +46,18 @@ namespace BackendSite
             services.AddSingleton<DepositBLL>();
             services.AddSingleton<WithdrawalBLL>();
             services.AddSingleton<BankDetailBLL>();
+            services.AddSingleton<AuthorizeBLL>();
 
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
+            {
+                option.LoginPath = "/Home/Login";
+                option.Cookie.Name = ".backend";
+                option.ExpireTimeSpan = TimeSpan.FromMinutes(30);//沒給預設14天
+            });
+            /*services.AddDataProtection().DisableAutomaticKeyGeneration();
+            services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("CookieKeys")).SetApplicationName("SharedCookieApp");*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,7 +74,7 @@ namespace BackendSite
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
