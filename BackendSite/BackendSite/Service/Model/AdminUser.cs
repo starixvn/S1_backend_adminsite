@@ -14,4 +14,12 @@ namespace BackendSite.Service.Model
         public bool IsAdmin { set; get; }
         public int Status { set; get; }
     }
+    public class AuthData
+    {
+        public int UserId { set; get; }
+        public string UserName { set; get; }
+
+        /*public string Token { set; get; }
+        public string LangId { set; get; }*/
+    }
 }

@@ -1,8 +1,234 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Hosting
+@using BackendSite.Service.BLL
+@using BackendSite.Service.Model
+@inject IWebHostEnvironment environment
+@inject SelLangBLL selLangBLL
+@inject ServerInfoBLL serverInfoBLL
+@inject AuthorizeBLL authorizeBLL
+@{
     ViewData["Title"] = "Home Page";
-}
+    Layout = null;
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+    var menuList = authorizeBLL.GetMenuData();
+
+}
+@functions {
+    private void MenuComponent(MenuItem menuItem)
+    {
+        if (menuItem.Childs != null && menuItem.Childs.Count() > 0)
+        {
+            <div class="menubox">
+                @if (menuItem.Controller != null && menuItem.Action != null)
+                {
+                    <a href="@Url.RouteUrl("default", new { action = menuItem.Action, controller = menuItem.Controller })" target="main">@(selLangBLL.GetResourceValue(menuItem.Key) ?? menuItem.Title)</a>
+                }
+                else
+                {
+                    <h2 class="icon @menuItem.Icon">
+                        @(selLangBLL.GetResourceValue(menuItem.Key) ?? menuItem.Title)
+                    </h2>
+                }
+                <ul class="sliderbar left_menu" style="display: none">
+                    @foreach (var menuItem1 in menuItem.Childs)
+                    {
+                        MenuComponent(menuItem1);
+                    }
+                </ul>
+            </div>
+        }
+        else
+        {
+            <li>
+                <a href="@Url.RouteUrl("default", new { action = menuItem.Action, controller = menuItem.Controller })" target="main">@(selLangBLL.GetResourceValue(menuItem.Key) ?? menuItem.Title)</a>
+            </li>
+        }
+    }
+}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>
+        Admin
+    </title>
+    <link href="~/css/Star/css.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body style="background: url(@Url.Content("~/images/Star/leftbg.png")) 0 0 repeat-y #fff">
+    <div id="top">
+        <a href="javascript:void(0);" class="loginout" title="Logout">
+            <img src="@Url.Content("~/images/Star/tc.png")" alt="Logout" />
+        </a>
+    </div>
+    <div id="main">
+        <div id="left" class="left">
+            <div class="username">
+                <h2>
+                    <span>@User.Identity.Name</span>
+                </h2>
+            </div>
+            <ul id="leftTopInfo" class="sliderbar left_top_info">
+                <li>
+                    <p><a href="javascript:void(0);" class="coloryellow changepsd" data-toggle="modal" data-target="#exampleModal">修改密码</a></p>
+                </li>
+            </ul>
+            @foreach (var menuItem in authorizeBLL.GetMenuData())
+            {
+                MenuComponent(menuItem);
+            }
+            @*div class="menubox on">
+                <h2 class="icon iconbb">报表管理</h2>
+                <ul class="sliderbar left_menu" style="display: block">
+                    <li>
+                        <a href="verticalStatistics.aspx" target="main" id="verticalStatistics">统计报表</a>
+                    </li>
+                    <li>
+                        <a href="userLeaderboard.aspx" target="main" id="userLeaderboard">个人盈亏</a>
+                    </li>
+                    <li>
+                        <a href="proxyLeaderboard.aspx" target="main" id="proxyLeaderboard">团队盈亏</a>
+                    </li>
+                    <li>
+                        <a href="variableAccountList.aspx" target="main" id="variableAccountList">账户明细</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="menubox">
+                <h2 class=" icon icontz">投注管理</h2>
+                <ul class="sliderbar left_menu">
+                    <li>
+                        <a href="bettingRecords.aspx?isChaseTerm=1" target="main" id="bettingRecords">投注记录</a>
+                    </li>
+                    <li>
+                        <a href="bettingRecords.aspx?isChaseTerm=2" target="main" id="chaseTermRecords">追号记录</a>
+                    </li>
+                    <li>
+                        <a href="CasinoBetRecords.aspx" target="main" id="casinoBetRecords">真人游戏记录</a>
+                    </li>
+                    <li>
+                        <a href="currentBettingRecords.aspx" target="main" id="currentBettingRecords">当前投注记录</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="menubox">
+                <h2 class="last">用户管理</h2>
+                <ul class="sliderbar left_menu">
+                    <li>
+                        <a href="UserList.aspx" target="main" id="userListView">用户信息</a>
+                    </li>
+                    <li>
+                        <a href="RegAgentSetup.aspx" target="main">开户中心</a>
+                    </li>
+                    <li>
+                        <a href="Affiliate.aspx" target="main">推广代码连结</a>
+                    </li>
+                    <li>
+                        <a href="AddMessages.aspx" target="main">消息中心</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="menubox">
+                <h2 class="icon iconhd last_a" style="color: #e74646;">活动专区</h2>
+                <ul class="sliderbar left_menu">
+                    <li>
+                        <a href="commissionList.aspx" target="main" id="commissionList">充值佣金</a>
+                    </li>
+                    <li>
+                        <a href="consumptionCommissionList.aspx" target="main" id="consumptionCommissionList">投注佣金</a>
+                    </li>
+                    <li>
+                        <a href="profitCommissionList.aspx" target="main" id="profitCommissionList">盈亏佣金</a>
+                    </li>
+                </ul>
+            </div>*@
+        </div>
+        <div id="right" class="right">
+            <iframe allowtransparency="true" src="" frameborder="0" width="100%" scrolling="no" id="iframe" class="iframe" name="main">
+            </iframe>
+        </div>
+        <div class="clear">
+        </div>
+    </div>
+    <!---修改密码弹框--->
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">密码修改</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="updateUserPwd" method="post">
+                    <div class="modal-body">
+                        <div class="dialog-gonggao-body">
+                            <div class="inputgroup">
+                                <span class="inputgroupkey">原密码</span><input type="password" id="oldPwd" autocomplete="off" />
+                            </div>
+                            <div class="inputgroup">
+                                <span class="inputgroupkey">新密码</span><input type="password" id="newPwd" autocomplete="off" />
+                            </div>
+                            <div class="inputgroup">
+                                <span class="inputgroupkey">确认密码</span><input type="password" id="confirmPwd" autocomplete="off" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="button button-default" value="取消" data-dismiss="modal" />
+                        <input type="submit" class="button button-yellow" value="确定" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="~/lib/axios.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('.menubox h2').on('click', function () {
+                $(this).siblings('ul').slideToggle(300, function () {
+                    if ($(this).css('display') === 'block') {
+                        $(this).parent('.menubox').addClass('on')
+                    } else {
+                        $(this).parent('.menubox').removeClass('on')
+                    }
+                });
+            });
+
+            $('.loginout').on('click', function () {
+                axios.post('/api/Home/Signout')
+                    .then(function (response) {
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            window.location.replace(result.message);
+                        } else {
+                            alert(result.message);
+                        }
+                    }).catch(function (error) {
+                        alert(error);
+                    });
+            });
+
+            $('#updateUserPwd').submit(function (event) {
+                event.preventDefault();
+                axios.post('/api/Home/XXXX')
+                    .then(function (response) {
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            //window.location.replace(result.message);
+                        } else {
+                            alert(result.message);
+                        }
+                    }).catch(function (error) {
+                        alert(error);
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>
+

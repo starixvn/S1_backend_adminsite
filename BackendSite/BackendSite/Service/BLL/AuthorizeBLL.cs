@@ -2,10 +2,12 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
@@ -16,13 +18,15 @@ namespace BackendSite.Service.BLL
         private readonly AdminUserService adminUserService;
         private readonly Tools tools;
         private readonly MenuService menuService;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public AuthorizeBLL(ServerInfoBLL serverInfoBLL, AdminUserService adminUserService, Tools tools, MenuService menuService)
+        public AuthorizeBLL(IHttpContextAccessor httpContextAccessor, ServerInfoBLL serverInfoBLL, AdminUserService adminUserService, Tools tools, MenuService menuService)
         {
             this.serverInfoBLL = serverInfoBLL;
             this.adminUserService = adminUserService;
             this.tools = tools;
             this.menuService = menuService;
+            this.httpContextAccessor = httpContextAccessor;
         }
         public int UserLogin(string userName, string pwd, string ip, string fromUrl, string userAgent, ref AdminUser adminUser)
         {
@@ -49,6 +53,23 @@ namespace BackendSite.Service.BLL
         public IEnumerable<MenuItem> GetMenuData()
         {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<MenuItem>>(menuService.GetMenuData());
+        }
+
+        public AuthData GetAuthData()
+        {
+            AuthData authData = null;
+            if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+            {
+                authData = new AuthData();
+                int userId = 0;
+                int.TryParse(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.NameIdentifier).Value, out userId);
+                authData.UserId = userId;
+                authData.UserName = httpContextAccessor.HttpContext.User.Identity.Name;
+                //authData.Token = httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == "Token").Value;
+                //authData.LangId = httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == "LangId").Value;
+            }
+
+            return authData;
         }
     }
 }

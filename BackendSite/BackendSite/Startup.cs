@@ -53,6 +53,7 @@ namespace BackendSite
             services.AddHttpContextAccessor();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
             {
+                //option.AccessDeniedPath
                 option.LoginPath = "/Home/Signin";
                 option.Cookie.Name = ".backend";
                 option.ExpireTimeSpan = TimeSpan.FromMinutes(30);//沒給預設14天

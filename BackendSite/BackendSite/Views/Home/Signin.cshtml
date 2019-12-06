@@ -79,30 +79,30 @@
         //-->
     </script>
 </head>
-<body onload="MM_preloadImages('@Url.Content("~/images/btnlogin_ov.gif")')">
+<body onload="MM_preloadImages('@Url.Content("~/images/Deposit/btnlogin_ov.gif")')">
     <form id="frmLogin" name="frmLogin">
         <table width="860" border="0" align="center" cellpadding="0" cellspacing="0">
             <tr>
                 <td height="377">
-                    <img src="~/images/index_logo.jpg" width="283" height="129" /><img src="~/images/index_pic01.jpg" width="577" height="129" /><br />
-                    <img src="~/images/index_pic02.jpg" width="475" height="248" /><img src="~/images/index_pic03.jpg" width="385" height="248" />
+                    <img src="~/images/Deposit/index_logo.jpg" width="283" height="129" /><img src="~/images/Deposit/index_pic01.jpg" width="577" height="129" /><br />
+                    <img src="~/images/Deposit/index_pic02.jpg" width="475" height="248" /><img src="~/images/Deposit/index_pic03.jpg" width="385" height="248" />
                 </td>
             </tr>
             <tr>
-                <td height="86" background="@Url.Content("~/images/index_pic04.jpg")">
+                <td height="86" background="@Url.Content("~/images/Deposit/index_pic04.jpg")">
                     <table width="530" border="0" align="center" cellpadding="0" cellspacing="0">
                         <tr>
-                            <td width="26"><img src="~/images/icon_pen.gif" width="26" height="20" /></td>
+                            <td width="26"><img src="~/images/Deposit/icon_pen.gif" width="26" height="20" /></td>
                             <td class="title">
                                 Username
                                 <input type="text" id="txtID" name="txtID" placeholder="Username" />
                             </td>
-                            <td width="26"><img src="~/images/icon_pen.gif" width="26" height="20" /></td>
+                            <td width="26"><img src="~/images/Deposit/icon_pen.gif" width="26" height="20" /></td>
                             <td class="title">
                                 Password
                                 <input type="password" id="txtPW" name="txtPW" placeholder="Password" />
                             </td>
-                            <td><button type="submit" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('btnlogin','','@Url.Content("~/images/btnlogin_ov.gif")',1)"><img src="~/images/btnlogin.gif" name="btnlogin" width="64" height="37" border="0" id="btnlogin" /></button></td>
+                            <td><button type="submit" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('btnlogin','','@Url.Content("~/images/Deposit/btnlogin_ov.gif")',1)"><img src="~/images/Deposit/btnlogin.gif" name="btnlogin" width="64" height="37" border="0" id="btnlogin" /></button></td>
                         </tr>
 
                     </table>
@@ -111,18 +111,17 @@
         </table>
         <table width="860" height="79" border="0" align="center" cellpadding="0" cellspacing="0">
             <tr>
-                <td width="36"><img src="~/images/index_fotl.gif" width="36" height="79" /></td>
-                <td align="center" valign="top" background="@Url.Content("~/images/index_fotbg.gif")">
+                <td width="36"><img src="~/images/Deposit/index_fotl.gif" width="36" height="79" /></td>
+                <td align="center" valign="top" background="@Url.Content("~/images/Deposit/index_fotbg.gif")">
                     <span class="footer">
                         <br />
                         &copy;&nbsp;Copyright @DateTime.Now.Year @(serverInfo.SiteName).com
                     </span>
                 </td>
-                <td width="36"><img src="~/images/index_fotr.gif" width="36" height="79" /></td>
+                <td width="36"><img src="~/images/Deposit/index_fotr.gif" width="36" height="79" /></td>
             </tr>
         </table>
     </form>
-    @Newtonsoft.Json.JsonConvert.SerializeObject(authorizeBLL.GetMenuData())
     <script>
         document.getElementById('txtID').focus();
         @{

@@ -76,11 +76,22 @@ namespace BackendSite.Controllers.Api
                 {
                     new Claim(ClaimTypes.Name,adminUser.UserName ),
                     new Claim(ClaimTypes.NameIdentifier,adminUser.UserId.ToString() ),
+                    //new Claim(ClaimTypes.Role
                     //new Claim("LangId",? ),
                 };
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
             apiResult.Message = Url.Action("Index", "Home");
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        [HttpPost]
+        public async Task<ApiResult> Signout()
+        {
+            var apiResult = new ApiResult(selLangBLL);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            apiResult.Message = Url.RouteUrl("default", new { action = "Signin", controller = "Home" });
             apiResult.ErrorCode = 0;
             return apiResult;
         }

@@ -1,10 +1,9 @@
 [
   {
     "Key": "",
-    "Title": "Test",
-    "Controller": "XXXX",
-    "Action": "",
-    "Icon": "",
+    "Title": "Reports",
+    "Icon": "iconbb",
+    "Roles": null,
     "Childs": [
       {
         "Key": "",
@@ -12,6 +11,58 @@
         "Controller": "XXXX222",
         "Action": "",
         "Icon": "",
+        "Roles": null,
+        "Childs": null
+      }
+    ]
+  },
+  {
+    "Key": "",
+    "Title": "CSD",
+    "Icon": "last",
+    "Roles": null,
+    "Childs": [
+      {
+        "Key": "",
+        "Title": "Test1",
+        "Controller": "XXXX222",
+        "Action": "",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      }
+    ]
+  },
+  {
+    "Key": "",
+    "Title": "Finance",
+    "Icon": "",
+    "Roles": null,
+    "Childs": [
+      {
+        "Key": "",
+        "Title": "BankInfo",
+        "Controller": "BankInfo",
+        "Action": "BankInfoList",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      }
+    ]
+  },
+  {
+    "Key": "",
+    "Title": "Administration",
+    "Icon": "",
+    "Roles": null,
+    "Childs": [
+      {
+        "Key": "",
+        "Title": "Test1",
+        "Controller": "XXXX222",
+        "Action": "",
+        "Icon": "",
+        "Roles": null,
         "Childs": null
       }
     ]
