@@ -1,19 +1,82 @@
-﻿
+﻿@model BackendSite.Service.Model.BankDetail
+
 @{
     ViewData["Title"] = "AddBankInfo";
 }
 
-<h1>AddBankInfo</h1>
-
 @section Style{
-    <link href="~/lib/bootstrap/dist/css/bootstrap.min.csss" rel="stylesheet" />
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/lib/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet" />
 }
 
+<h1>AddBankInfo</h1>
 
+<h4>BankDetail</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form id="frmzAddbank" method="post">
+            <div>
+                <label>CurrencyId</label>
+                <input id="CurrencyId" name="CurrencyId" />
+            </div>
+            <div>
+                <label>BankDid</label>
+                <input id="BankDid" name="BankDid" />
+            </div>
+            <div>
+                <label>AccountName</label>
+                <input id="AccountName" name="AccountName" />
+            </div>
+            <div>
+                <label>AccountNo</label>
+                <input id="AccountNo" name="AccountNo" />
+            </div>
+            <div>
+                <label>MinAmount</label>
+                <input id="MinAmount" name="MinAmount" />
+            </div>
+            <div>
+                <label>MaxAmount</label>
+                <input id="MaxAmount" name="MaxAmount" />
+            </div>
+            <div>
+                <label>PointLevel</label>
+                <input id="PointLevel" name="PointLevel" />
+            </div>
+            <div>
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
 
-
+        <div>
+            @Html.ActionLink("Back to List", "BankInfoList", "BankInfo")
+        </div>
+    </div>
+</div>
 
 @section Scripts{
-    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="~/lib/axios.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#frmzAddbank").submit(function (event) {
+                event.preventDefault();
+                var data = { "BankDid": parseInt($("#BankDid").val()), "AccountName": $("#AccountName").val(), "AccountNo": $("#AccountNo").val(), "MinAmount": parseFloat($("#MinAmount").val()), "MaxAmount": parseFloat($("#MaxAmount").val()), "PointLevel": parseInt($("#PointLevel").val()) };
+                axios.post('/BankList/AddBank', data)
+                    .then(function (response) {
+                        var result = response.data;
+                        if (result.errorCode == 0) {
+                            alert(result.message);
+                            location.href = "/BankInfo/BankInfoList";
+                        } else {
+                            alert(result.message);
+                        }
+                    }).catch(function (error) {
+                        alert(error);
+                    });
+            });
+        });
+    </script>
 }

@@ -79,7 +79,7 @@ namespace BackendSite.Service.DAL
 
                                 int custId = p.Get<int?>("CustId") ?? 0;
                                 string UserName = p.Get<string>("UserName");
-                                result = walletService.SetBalance(custId, siteId, UserName, actualDeposit, type, comment, transId, out afterAmount, out is1stDepoist, conn, trans);
+                                result = walletService.SetBalance(custId, siteId, UserName, actualDeposit, type, $"Deposit Approved: {actualDeposit}", transId, out afterAmount, out is1stDepoist, conn, trans);
 
                                 if (is1stDepoist == 1 && result > 0)
                                 {

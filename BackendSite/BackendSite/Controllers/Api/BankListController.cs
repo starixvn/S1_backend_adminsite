@@ -48,5 +48,25 @@ namespace BackendSite.Controllers.Api
             apiResult.ErrorCode = 0;
             return apiResult;
         }
+
+        [HttpPost]
+        public ApiResult AddBank([FromBody]BankDetail bankDetail)
+        {
+            IEnumerable<BankDetail> result = bankDetailBLL.AddBankInfo(bankDetail);
+            var apiResult = new ApiResult();
+            apiResult.ErrorCode = 0;
+            apiResult.Message = "Done";
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult EditBank([FromBody]BankDetail bankDetail)
+        {
+            IEnumerable<BankDetail> bankInfoList = bankDetailBLL.EditBankInfo(bankDetail);
+            var apiResult = new ApiResult();
+            apiResult.ErrorCode = 0;
+            apiResult.Message = "Done";
+            return apiResult;
+        }
     }
 }

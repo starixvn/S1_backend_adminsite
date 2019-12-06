@@ -40,12 +40,5 @@ namespace BackendSite.Service.BLL
             var results = bankDetailService.EditBankDetail(serverInfo.SiteId, bankDetail);
             return results;
         }
-
-        public IEnumerable<BankDetail> BankInfoStatus(BankDetail bankDetail, int bankId, int status)
-        {
-            var serverInfo = serverInfoService.GetModel();
-            var results = bankDetailService.BankInfoStatus(serverInfo.SiteId, bankId, status);
-            return results;
-        }
     }
 }

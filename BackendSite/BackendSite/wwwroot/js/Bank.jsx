@@ -75,7 +75,7 @@ class Tag extends React.Component {
 
     componentDidMount() {
         let tt=this;
-        axios.post('/BankList/GetBankList')
+        axios.post('/BankList/GetBankListAll')
             .then(function (response) {
                 let result = response.data;
                 if (result.errorCode == 0) {
@@ -94,7 +94,7 @@ class Tag extends React.Component {
 
         if(this.state.Data!=null) {
             rows = this.state.Data.map(function(obj) { 
-                return <RowEdit Data={obj}/>;
+                return <Row Data={obj}/>;
              });
             
         }
