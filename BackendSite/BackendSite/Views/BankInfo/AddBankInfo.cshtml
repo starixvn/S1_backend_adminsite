@@ -1,64 +1,86 @@
 ﻿@model BackendSite.Service.Model.BankDetail
+@using Microsoft.AspNetCore.Hosting
 
+@inject IWebHostEnvironment environment
 @{
+    Layout = null;
     ViewData["Title"] = "AddBankInfo";
 }
 
-@section Style{
-    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="~/lib/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet" />
-}
 
-<h1>AddBankInfo</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BackendSite</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <h1>AddBankInfo</h1>
 
-<h4>BankDetail</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form id="frmzAddbank" method="post">
-            <div>
-                <label>CurrencyId</label>
-                <input id="CurrencyId" name="CurrencyId" />
-            </div>
-            <div>
-                <label>BankDid</label>
-                <input id="BankDid" name="BankDid" />
-            </div>
-            <div>
-                <label>AccountName</label>
-                <input id="AccountName" name="AccountName" />
-            </div>
-            <div>
-                <label>AccountNo</label>
-                <input id="AccountNo" name="AccountNo" />
-            </div>
-            <div>
-                <label>MinAmount</label>
-                <input id="MinAmount" name="MinAmount" />
-            </div>
-            <div>
-                <label>MaxAmount</label>
-                <input id="MaxAmount" name="MaxAmount" />
-            </div>
-            <div>
-                <label>PointLevel</label>
-                <input id="PointLevel" name="PointLevel" />
-            </div>
-            <div>
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+    <h4>BankDetail</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form id="frmzAddbank" method="post">
+                <div>
+                    <label>CurrencyId</label>
+                    <input id="CurrencyId" name="CurrencyId" />
+                </div>
+                <div>
+                    <label>BankDid</label>
+                    <input id="BankDid" name="BankDid" />
+                </div>
+                <div>
+                    <label>AccountName</label>
+                    <input id="AccountName" name="AccountName" />
+                </div>
+                <div>
+                    <label>AccountNo</label>
+                    <input id="AccountNo" name="AccountNo" />
+                </div>
+                <div>
+                    <label>MinAmount</label>
+                    <input id="MinAmount" name="MinAmount" />
+                </div>
+                <div>
+                    <label>MaxAmount</label>
+                    <input id="MaxAmount" name="MaxAmount" />
+                </div>
+                <div>
+                    <label>PointLevel</label>
+                    <input id="PointLevel" name="PointLevel" />
+                </div>
+                <div>
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>
+            </form>
 
-        <div>
-            @Html.ActionLink("Back to List", "BankInfoList", "BankInfo")
+            <div>
+                @Html.ActionLink("Back to List", "BankInfoList", "BankInfo")
+            </div>
         </div>
     </div>
-</div>
 
-@section Scripts{
-    <script src="~/lib/axios.min.js"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/lib/axios.min.js"></script>
+    @if (environment.EnvironmentName == "Development")
+    {
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+        <script type="text/babel" src="~/js/Bank.jsx">
+        </script>
+
+    }
+    else
+    {
+
+    }
+
     <script type="text/javascript">
         $(function () {
             $("#frmzAddbank").submit(function (event) {
@@ -79,4 +101,6 @@
             });
         });
     </script>
-}
+
+</body>
+</html>

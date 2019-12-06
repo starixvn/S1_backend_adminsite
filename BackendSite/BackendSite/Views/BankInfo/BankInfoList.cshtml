@@ -3,24 +3,31 @@
 
 @inject IWebHostEnvironment environment
 @{
+    Layout = null;
     ViewData["Title"] = "BankDetailList";
 }
 
-@section Style{
-    <link href="~/lib/bootstrap/dist/css/bootstrap.min.csss" rel="stylesheet" />
-}
 
-<h1>BankInfoList</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BackendSite</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
 
-@Html.ActionLink("Add", "AddBankInfo", "BankInfo")
 
-<div id="Bank"></div>
+    <h1>BankInfoList</h1>
 
+    @Html.ActionLink("Add", "AddBankInfo", "BankInfo")
 
-@section Scripts{
+    <div id="Bank"></div>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="~/lib/axios.min.js"></script>
-
     @if (environment.EnvironmentName == "Development")
     {
         <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
@@ -34,4 +41,5 @@
     {
 
     }
-}
+</body>
+</html>
