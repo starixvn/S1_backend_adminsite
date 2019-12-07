@@ -47,6 +47,15 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Add Bank",
+        "Controller": "BankInfo",
+        "Action": "AddBankInfo",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

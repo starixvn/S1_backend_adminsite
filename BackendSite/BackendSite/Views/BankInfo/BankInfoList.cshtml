@@ -1,12 +1,16 @@
-﻿@using BackendSite.Service.Model
+﻿@model IEnumerable<BackendSite.Service.Model.BankDetail>
 @using Microsoft.AspNetCore.Hosting
-
+@using BackendSite.Service.BLL
+@using BackendSite.Service.Model
+@inject IWebHostEnvironment environment
+@inject SelLangBLL selLangBLL
+@inject ServerInfoBLL serverInfoBLL
+@inject AuthorizeBLL authorizeBLL
 @inject IWebHostEnvironment environment
 @{
     Layout = null;
     ViewData["Title"] = "BankDetailList";
 }
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -19,10 +23,7 @@
 </head>
 <body>
 
-
     <h1>BankInfoList</h1>
-
-    @Html.ActionLink("Add", "AddBankInfo", "BankInfo")
 
     <div id="Bank"></div>
 
@@ -34,7 +35,8 @@
         <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
         <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
-        <script type="text/babel" src="~/js/Bank.jsx"></script>
+        <script type="text/babel" src="~/js/Bank.jsx">
+        </script>
 
     }
     else

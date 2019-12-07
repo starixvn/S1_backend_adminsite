@@ -162,11 +162,50 @@
   <data name="Currency_9" xml:space="preserve">
     <value>AUD</value>
   </data>
+  <data name="lbl_AccountName" xml:space="preserve">
+    <value>Account Name</value>
+  </data>
+  <data name="lbl_AccountNo" xml:space="preserve">
+    <value>Account No</value>
+  </data>
+  <data name="lbl_AddBank" xml:space="preserve">
+    <value>Add New Bank Card</value>
+  </data>
+  <data name="lbl_BankName" xml:space="preserve">
+    <value>Bank Name</value>
+  </data>
+  <data name="lbl_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="lbl_Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="lbl_Currency" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="lbl_Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="lbl_MaxAmount" xml:space="preserve">
+    <value>Max Amount</value>
+  </data>
+  <data name="lbl_MinAmount" xml:space="preserve">
+    <value>Min Amount</value>
+  </data>
   <data name="lbl_MobilePayment" xml:space="preserve">
     <value>Mobile Payment</value>
   </data>
   <data name="lbl_OnlineBanking" xml:space="preserve">
     <value>Online Banking</value>
+  </data>
+  <data name="lbl_PointLevel" xml:space="preserve">
+    <value>Point Level</value>
+  </data>
+  <data name="lbl_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="lbl_Status" xml:space="preserve">
+    <value>Status</value>
   </data>
   <data name="lbl_WireTransfer" xml:space="preserve">
     <value>Wire Transfer</value>

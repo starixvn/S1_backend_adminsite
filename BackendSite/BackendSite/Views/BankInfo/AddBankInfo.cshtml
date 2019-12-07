@@ -1,12 +1,23 @@
-﻿@model BackendSite.Service.Model.BankDetail
+﻿@model IEnumerable<BackendSite.Service.Model.BankDetail>
 @using Microsoft.AspNetCore.Hosting
-
+@using BackendSite.Service.BLL
+@using BackendSite.Service.Model
 @inject IWebHostEnvironment environment
+@inject SelLangBLL selLangBLL
+@inject ServerInfoBLL serverInfoBLL
+@inject AuthorizeBLL authorizeBLL
 @{
     Layout = null;
     ViewData["Title"] = "AddBankInfo";
 }
-
+@{
+    var serverInfo = serverInfoBLL.GetServerInfo();
+    List<dynamic> currencyList = new List<dynamic>();
+    foreach (var currencyId in serverInfo.ICurrencyList)
+    {
+        currencyList.Add(new { text = selLangBLL.GetResourceValue($"Currency_{currencyId}"), value = currencyId });
+    }
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -18,51 +29,67 @@
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-    <h1>AddBankInfo</h1>
-
-    <h4>BankDetail</h4>
+    <h1>@selLangBLL.GetResourceValue("lbl_AddBank")</h1>
     <hr />
-    <div class="row">
-        <div class="col-md-4">
-            <form id="frmzAddbank" method="post">
-                <div>
-                    <label>CurrencyId</label>
-                    <input id="CurrencyId" name="CurrencyId" />
-                </div>
-                <div>
-                    <label>BankDid</label>
-                    <input id="BankDid" name="BankDid" />
-                </div>
-                <div>
-                    <label>AccountName</label>
-                    <input id="AccountName" name="AccountName" />
-                </div>
-                <div>
-                    <label>AccountNo</label>
-                    <input id="AccountNo" name="AccountNo" />
-                </div>
-                <div>
-                    <label>MinAmount</label>
-                    <input id="MinAmount" name="MinAmount" />
-                </div>
-                <div>
-                    <label>MaxAmount</label>
-                    <input id="MaxAmount" name="MaxAmount" />
-                </div>
-                <div>
-                    <label>PointLevel</label>
-                    <input id="PointLevel" name="PointLevel" />
-                </div>
-                <div>
-                    <input type="submit" value="Create" class="btn btn-primary" />
-                </div>
-            </form>
-
-            <div>
-                @Html.ActionLink("Back to List", "BankInfoList", "BankInfo")
+    <form id="frmzAddbank" method="post" class="form-horizontal">
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_Currency")</label>
+            <div class="col-sm-10">
+                <select id="CurrencyId" class="custom-select mr-sm-2">
+                    @foreach (var item in currencyList)
+                    {
+                        <option value="@item.value">@item.text</option>
+                    }
+                </select>
             </div>
         </div>
-    </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_BankName")</label>
+            <div class="col-sm-10">
+                <select id="CurrencyId" class="custom-select mr-sm-2">
+                    @foreach (var item in Model)
+                    {
+                        <option id="BankDid" name="BankDid" value="@item.BankId">@item.BankName</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_AccountName")</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="AccountName" placeholder="@selLangBLL.GetResourceValue("lbl_AccountName")">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_AccountNo")</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="AccountNo" placeholder="@selLangBLL.GetResourceValue("lbl_AccountNo")">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_MinAmount")</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="MinAmount" placeholder="@selLangBLL.GetResourceValue("lbl_MinAmount")">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_MaxAmount")</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="MaxAmount" placeholder="@selLangBLL.GetResourceValue("lbl_MaxAmount")">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_PointLevel")</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="PointLevel" placeholder="@selLangBLL.GetResourceValue("lbl_PointLevel")">
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-10">
+                <button type="submit" class="btn btn-primary">@selLangBLL.GetResourceValue("lbl_Create")</button>
+            </div>
+        </div>
+    </form>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="~/lib/axios.min.js"></script>
@@ -72,9 +99,6 @@
         <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
         <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
-        <script type="text/babel" src="~/js/Bank.jsx">
-        </script>
-
     }
     else
     {
@@ -91,7 +115,8 @@
                         var result = response.data;
                         if (result.errorCode == 0) {
                             alert(result.message);
-                            location.href = "/BankInfo/BankInfoList";
+                            //location.href = "/BankInfo/BankInfoList";
+                            location.reload();
                         } else {
                             alert(result.message);
                         }

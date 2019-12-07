@@ -28,8 +28,8 @@ namespace BackendSite.Controllers
 
         public IActionResult AddBankInfo()
         {
-
-            return View();
+            IEnumerable<BankDetail> bankDetail = bankDetailBLL.BankList();
+            return View(bankDetail);
         }
     }
 }
