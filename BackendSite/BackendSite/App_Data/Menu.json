@@ -41,7 +41,7 @@
     "Childs": [
       {
         "Key": "",
-        "Title": "BankInfo",
+        "Title": "Bank List",
         "Controller": "BankInfo",
         "Action": "BankInfoList",
         "Icon": "",
@@ -53,6 +53,24 @@
         "Title": "Add Bank",
         "Controller": "BankInfo",
         "Action": "AddBankInfo",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Deposit Request",
+        "Controller": "Deposit",
+        "Action": "DepositList",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Withdraw Request",
+        "Controller": "Withdrawal",
+        "Action": "WithdrawalList",
         "Icon": "",
         "Roles": null,
         "Childs": null

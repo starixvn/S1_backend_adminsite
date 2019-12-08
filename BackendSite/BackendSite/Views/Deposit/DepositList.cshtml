@@ -1,52 +1,75 @@
-﻿@using BackendSite.Service.Model
-@model IEnumerable<DepositRequest>
+﻿@model IEnumerable<DepositRequest>
+@using Microsoft.AspNetCore.Hosting
+@using BackendSite.Service.BLL
+@using BackendSite.Service.Model
+@inject IWebHostEnvironment environment
+@inject SelLangBLL selLangBLL
+@inject ServerInfoBLL serverInfoBLL
+@inject AuthorizeBLL authorizeBLL
 @{
     Layout = null;
+    ViewData["Title"] = @selLangBLL.GetResourceValue("lbl_DepositRequest");
 }
 
-@section Style{
-    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BackendSite</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <h1>@selLangBLL.GetResourceValue("lbl_DepositRequest")</h1>
+    <div class="container">
+        <table class="table table-striped">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">@selLangBLL.GetResourceValue("lbl_TransId")</th>
+                    <th scope="col">@selLangBLL.GetResourceValue("lbl_UserName")</th>
+                    <th scope="col">@selLangBLL.GetResourceValue("lbl_DepositType")</th>
+                    <th scope="col">@selLangBLL.GetResourceValue("lbl_AccountNo")</th>
+                    <th scope="col">@selLangBLL.GetResourceValue("lbl_AccountName")</th>
+                    <th scope="col">@selLangBLL.GetResourceValue("lbl_Amount")</th>
+                    <th scope="col">@selLangBLL.GetResourceValue("lbl_Memo")</th>
+                    <th scope="col">@selLangBLL.GetResourceValue("lbl_Postscript")</th>
+                    <th scope="col">@selLangBLL.GetResourceValue("lbl_CreateTime")</th>
+                    <th scope="col">@selLangBLL.GetResourceValue("lbl_Status")</th>
+                </tr>
+            </thead>
+
+            @foreach (var item in Model)
+            {
+                var bank = ((DispositInfo3_1)item.dispositInfo);
+                <tr>
+                    <td scope="row">@Html.ActionLink(@item.TransId, "DepositRequest", "Deposit", new { transID = @item.TransId })</td>
+                    <td>@item.UserName</td>
+                    <td>@item.DispositTypeString</td>
+                    <td>@bank.AccountNo</td>
+                    <td>@bank.AccountName</td>
+                    <td>@item.Amount</td>
+                    <td>@item.Memo</td>
+                    <td>@item.PostScript</td>
+                    <td>@item.CreateTime</td>
+                    <td>@item.StatusString</td>
+                </tr>
+            }
+        </table>
+    </div>
 
 
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    @if (environment.EnvironmentName == "Development")
+    {
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+    }
+    else
+    {
 
-<div class="container">
-    <table class="table table-striped">
-        <thead class="thead-light">
-            <tr>
-                <th scope="col">TransId</th>
-                <th scope="col">User Name</th>
-                <th scope="col">Deposit Type</th>
-                <th scope="col">Account Number</th>
-                <th scope="col">Account Name</th>
-                <th scope="col">Amount</th>
-                <th scope="col">Memo</th>
-                <th scope="col">PostScript</th>
-                <th scope="col">CreateTime</th>
-                <th scope="col">Status</th>
-            </tr>
-        </thead>
-
-        @foreach (var item in Model)
-        {
-            var bank = ((DispositInfo3_1)item.dispositInfo);
-            <tr>
-                <td scope="row">@Html.ActionLink(@item.TransId, "DepositRequest", "Deposit", new { transID = @item.TransId })</td>
-                <td>@item.UserName</td>
-                <td>@item.DispositTypeString</td>
-                <td>@bank.AccountNo</td>
-                <td>@bank.AccountName</td>
-                <td>@item.Amount</td>
-                <td>@item.Memo</td>
-                <td>@item.PostScript</td>
-                <td>@item.CreateTime</td>
-                <td>@item.StatusString</td>
-            </tr>
-        }
-    </table>
-</div>
-
-
-@section Scripts{
-    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js" asp-append-version="true"></script>
-}
+    }
+</body>
+</html>

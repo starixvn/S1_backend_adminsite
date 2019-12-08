@@ -27,7 +27,7 @@ namespace BackendSite.Controllers
         public class DepositReq
         {
             public decimal ActualDeposit { set; get; }
-            public string Command { set; get; }
+            public string Comment { set; get; }
             public string TransId { set; get; }
             public int Action { set; get; }
         }
@@ -145,15 +145,15 @@ namespace BackendSite.Controllers
             if (depositReq.Action == 1)
             {
                 if (depositReq.ActualDeposit > 0)
-                     depositConfirmReuslt = depositBLL.DepositApproved(depositReq.TransId, depositReq.ActualDeposit, depositReq.Command);
+                     depositConfirmReuslt = depositBLL.DepositApproved(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment);
             }
             else if (depositReq.Action == 2)
             {
-                 depositConfirmReuslt = depositBLL.DepositRejectd(depositReq.TransId, depositReq.ActualDeposit, depositReq.Command);
+                 depositConfirmReuslt = depositBLL.DepositRejectd(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment);
             }
             else
             {
-                 depositConfirmReuslt = depositBLL.DepositDraft(depositReq.TransId, depositReq.ActualDeposit, depositReq.Command);
+                 depositConfirmReuslt = depositBLL.DepositDraft(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment);
             }
 
             if (depositConfirmReuslt !=0)

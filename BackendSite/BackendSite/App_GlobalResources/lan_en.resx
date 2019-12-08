@@ -168,8 +168,20 @@
   <data name="lbl_AccountNo" xml:space="preserve">
     <value>Account No</value>
   </data>
+  <data name="lbl_Action" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="lbl_ActualDeposit" xml:space="preserve">
+    <value>Actual Deposit</value>
+  </data>
   <data name="lbl_AddBank" xml:space="preserve">
     <value>Add New Bank Card</value>
+  </data>
+  <data name="lbl_Amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="lbl_Approve" xml:space="preserve">
+    <value>Approve</value>
   </data>
   <data name="lbl_BankName" xml:space="preserve">
     <value>Bank Name</value>
@@ -177,11 +189,29 @@
   <data name="lbl_Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="lbl_ChargeFee" xml:space="preserve">
+    <value>ChargeFee</value>
+  </data>
+  <data name="lbl_Comment" xml:space="preserve">
+    <value>Comment</value>
+  </data>
   <data name="lbl_Create" xml:space="preserve">
     <value>Create</value>
   </data>
+  <data name="lbl_CreateTime" xml:space="preserve">
+    <value>Create Time</value>
+  </data>
   <data name="lbl_Currency" xml:space="preserve">
     <value>Currency</value>
+  </data>
+  <data name="lbl_DepositApproval" xml:space="preserve">
+    <value>Deposit Approval</value>
+  </data>
+  <data name="lbl_DepositRequest" xml:space="preserve">
+    <value>Deposit Request</value>
+  </data>
+  <data name="lbl_DepositType" xml:space="preserve">
+    <value>Deposit Type</value>
   </data>
   <data name="lbl_Edit" xml:space="preserve">
     <value>Edit</value>
@@ -189,11 +219,17 @@
   <data name="lbl_MaxAmount" xml:space="preserve">
     <value>Max Amount</value>
   </data>
+  <data name="lbl_Memo" xml:space="preserve">
+    <value>Memo</value>
+  </data>
   <data name="lbl_MinAmount" xml:space="preserve">
     <value>Min Amount</value>
   </data>
   <data name="lbl_MobilePayment" xml:space="preserve">
     <value>Mobile Payment</value>
+  </data>
+  <data name="lbl_No" xml:space="preserve">
+    <value>#</value>
   </data>
   <data name="lbl_OnlineBanking" xml:space="preserve">
     <value>Online Banking</value>
@@ -201,13 +237,37 @@
   <data name="lbl_PointLevel" xml:space="preserve">
     <value>Point Level</value>
   </data>
+  <data name="lbl_Postscript" xml:space="preserve">
+    <value>Postscript</value>
+  </data>
+  <data name="lbl_Reject" xml:space="preserve">
+    <value>Reject</value>
+  </data>
   <data name="lbl_Save" xml:space="preserve">
     <value>Save</value>
   </data>
   <data name="lbl_Status" xml:space="preserve">
     <value>Status</value>
   </data>
+  <data name="lbl_TransId" xml:space="preserve">
+    <value>Transation ID</value>
+  </data>
+  <data name="lbl_UserName" xml:space="preserve">
+    <value>User Name</value>
+  </data>
   <data name="lbl_WireTransfer" xml:space="preserve">
     <value>Wire Transfer</value>
+  </data>
+  <data name="lbl_WithdrawalApproval" xml:space="preserve">
+    <value>Withdrawal Approval</value>
+  </data>
+  <data name="lbl_WithdrawalId" xml:space="preserve">
+    <value>Withdrawal ID</value>
+  </data>
+  <data name="lbl_WithdrawalRequest" xml:space="preserve">
+    <value>Withdrawal Request</value>
+  </data>
+  <data name="lbl_WithdrawalType" xml:space="preserve">
+    <value>Withdrawal Type</value>
   </data>
 </root>
