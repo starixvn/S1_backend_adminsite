@@ -34,6 +34,7 @@ namespace BackendSite
 
             /*DAL*/
             services.AddSingleton<ServerInfoService>();
+            services.AddSingleton<AdminService>();
             services.AddSingleton<DepositService>();
             services.AddSingleton<WithdrawalService>();
             services.AddSingleton<WalletService>();
@@ -43,6 +44,7 @@ namespace BackendSite
 
             /*BLL*/
             services.AddSingleton<ServerInfoBLL>();
+            services.AddSingleton<AdminBLL>();
             services.AddSingleton<SelLangBLL>();
             services.AddSingleton<DepositBLL>();
             services.AddSingleton<WithdrawalBLL>();

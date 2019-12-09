@@ -1,0 +1,104 @@
+﻿@model BackendSite.Service.Model.AdminUser
+@using Microsoft.AspNetCore.Hosting
+@using BackendSite.Service.BLL
+@using BackendSite.Service.Model
+@inject IWebHostEnvironment environment
+@inject SelLangBLL selLangBLL
+@inject ServerInfoBLL serverInfoBLL
+@inject AuthorizeBLL authorizeBLL
+@{
+    Layout = null;
+    ViewData["Title"] = @selLangBLL.GetResourceValue("lbl_AddAccount");
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BackendSite</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <h1>@selLangBLL.GetResourceValue("lbl_AddAccount")</h1>
+    <hr />
+    <form id="AddAccount" method="post" class="form-horizontal">
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_UserName")</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="UserName" placeholder="@selLangBLL.GetResourceValue("lbl_UserName")">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_Userpwd")</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="Userpwd" placeholder="@selLangBLL.GetResourceValue("lbl_Userpwd")">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_Role")</label>
+            <div class="col-sm-10">
+                <div class="form-check-inline">
+                    <label class="form-check-label">
+                        <input type="checkbox" id="Role[]" name="Role" class="form-check-input" value="Admin">Admin
+                    </label>
+                </div>
+                <div class="form-check-inline">
+                    <label class="form-check-label">
+                        <input type="checkbox" id="Role[]" name="Role" class="form-check-input" value="CSD">CSD
+                    </label>
+                </div>
+                <div class="form-check-inline">
+                    <label class="form-check-label">
+                        <input type="checkbox" id="Role[]" name="Role" class="form-check-input" value="Fiance">Fiance
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-10">
+                <button type="submit" class="btn btn-primary">@selLangBLL.GetResourceValue("lbl_Create")</button>
+            </div>
+        </div>
+    </form>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/lib/axios.min.js"></script>
+    @if (environment.EnvironmentName == "Development")
+    {
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+    }
+    else
+    {
+
+    }
+
+    <script type="text/javascript">
+        $(function () {
+            $("#AddAccount").submit(function (event) {
+                event.preventDefault();
+                var role = $('input:checkbox:checked[name="Role"]').map(function () { return $(this).val(); }).get();
+
+                var data = { "UserName": $("#UserName").val(), "Userpwd": $("#Userpwd").val(), "Role": JSON.stringify(role) };
+                axios.post('/api/Admin/AddAccount', data)
+                    .then(function (response) {
+                        var result = response.data;
+                        if (result.errorCode == 0) {
+                            alert(result.message);
+                            location.reload();
+                        } else {
+                            alert(result.message);
+                        }
+                    }).catch(function (error) {
+                        alert(error);
+                    });
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -85,9 +85,9 @@
     "Childs": [
       {
         "Key": "",
-        "Title": "Test1",
-        "Controller": "XXXX222",
-        "Action": "",
+        "Title": "Add Account",
+        "Controller": "Admin",
+        "Action": "AddAccount",
         "Icon": "",
         "Roles": null,
         "Childs": null

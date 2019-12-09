@@ -8,7 +8,7 @@
 @inject AuthorizeBLL authorizeBLL
 @{
     Layout = null;
-    ViewData["Title"] = "AddBankInfo";
+    ViewData["Title"] = @selLangBLL.GetResourceValue("lbl_AddBank");
 }
 @{
     var serverInfo = serverInfoBLL.GetServerInfo();
@@ -31,7 +31,7 @@
 <body>
     <h1>@selLangBLL.GetResourceValue("lbl_AddBank")</h1>
     <hr />
-    <form id="frmzAddbank" method="post" class="form-horizontal">
+    <form id="Addbank" method="post" class="form-horizontal">
         <div class="form-group row">
             <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_Currency")</label>
             <div class="col-sm-10">
@@ -107,10 +107,10 @@
 
     <script type="text/javascript">
         $(function () {
-            $("#frmzAddbank").submit(function (event) {
+            $("#Addbank").submit(function (event) {
                 event.preventDefault();
                 var data = { "BankDid": parseInt($("#BankDid").val()), "AccountName": $("#AccountName").val(), "AccountNo": $("#AccountNo").val(), "MinAmount": parseFloat($("#MinAmount").val()), "MaxAmount": parseFloat($("#MaxAmount").val()), "PointLevel": parseInt($("#PointLevel").val()) };
-                axios.post('/BankList/AddBank', data)
+                axios.post('/api/BankList/AddBank', data)
                     .then(function (response) {
                         var result = response.data;
                         if (result.errorCode == 0) {
