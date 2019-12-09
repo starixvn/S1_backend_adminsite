@@ -49,7 +49,7 @@ namespace BackendSite.Service.DAL
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.Execute("AdminAccountId_Set", new { SiteId = siteId, UserId = adminUser.UserId, Role= adminUser.Role, Status = adminUser.Status }, commandType: CommandType.StoredProcedure)>0;
+                return conn.Execute("AdminAccountId_Set", new { SiteId = siteId, UserId = adminUser.UserId, Role = adminUser.Role, Status = adminUser.Status }, commandType: CommandType.StoredProcedure)>0;
             }
         }
     }
