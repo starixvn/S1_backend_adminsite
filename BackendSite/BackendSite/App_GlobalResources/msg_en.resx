@@ -141,6 +141,12 @@
   <data name="msg_Expired" xml:space="preserve">
     <value>Expired</value>
   </data>
+  <data name="msg_InsertFailed" xml:space="preserve">
+    <value>Insert Failed</value>
+  </data>
+  <data name="msg_InsertSuccessful" xml:space="preserve">
+    <value>Insert Successful</value>
+  </data>
   <data name="msg_Paid" xml:space="preserve">
     <value>Paid</value>
   </data>

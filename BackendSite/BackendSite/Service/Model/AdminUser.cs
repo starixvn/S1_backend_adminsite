@@ -14,7 +14,9 @@ namespace BackendSite.Service.Model
         public bool IsSuper { set; get; }
         public int Status { set; get; }
         public string Role { set; get; }
+        public DateTime CreateTime { set; get; }
     }
+
     public class AuthData
     {
         public int UserId { set; get; }

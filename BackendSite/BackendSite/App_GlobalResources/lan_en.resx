@@ -162,6 +162,9 @@
   <data name="Currency_9" xml:space="preserve">
     <value>AUD</value>
   </data>
+  <data name="lbl_AccountList" xml:space="preserve">
+    <value>Account List</value>
+  </data>
   <data name="lbl_AccountName" xml:space="preserve">
     <value>Account Name</value>
   </data>
@@ -218,12 +221,6 @@
   </data>
   <data name="lbl_Edit" xml:space="preserve">
     <value>Edit</value>
-  </data>
-  <data name="lbl_InsertFailed" xml:space="preserve">
-    <value>Insert Failed</value>
-  </data>
-  <data name="lbl_InsertSuccessful" xml:space="preserve">
-    <value>Insert Successful</value>
   </data>
   <data name="lbl_MaxAmount" xml:space="preserve">
     <value>Max Amount</value>

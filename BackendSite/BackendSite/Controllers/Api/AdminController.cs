@@ -32,14 +32,40 @@ namespace BackendSite.Controllers.Api
             if (result)
             {
                 apiResult.ErrorCode = 0;
-                apiResult.Message = selLangBLL.GetResourceValue("lbl_InsertSuccessful");
+                apiResult.Message = selLangBLL.GetMsg("msg_InsertSuccessful");
             }
             else
             {
                 apiResult.ErrorCode = 9;
-                apiResult.Message = selLangBLL.GetResourceValue("lbl_InsertFailed");
+                apiResult.Message = selLangBLL.GetMsg("msg_InsertFailed");
             }
             return apiResult;
         }
+
+        //public IActionResult AccountList()
+        //{
+        //    IEnumerable<AdminUser> accountList = adminBLL.AccountList();
+        //    return View(accountList.ToList());
+        //}
+
+        [HttpPost]
+        public ApiResult EditAccount([FromBody]AdminUser adminUser)
+        {
+            bool result = adminBLL.EditAccount(adminUser);
+            var apiResult = new ApiResult();
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+
+        
     }
 }

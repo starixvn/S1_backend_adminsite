@@ -28,5 +28,29 @@ namespace BackendSite.Service.DAL
                 return conn.Execute("AdminAccount_Ins", p, commandType: CommandType.StoredProcedure) >0;
             }
         }
+
+        public IEnumerable<AdminUser> AccountList(int siteId)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.Query<AdminUser>("AdminAccount_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public AdminUser GetAccount(int siteId, int userId)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.QueryFirst<AdminUser>("AdminAccountId_Get", new { SiteId = siteId, UserId = userId }, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public bool EditAccount(int siteId, AdminUser adminUser)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.Execute("AdminAccountId_Set", new { SiteId = siteId, UserId = adminUser.UserId, Role= adminUser.Role, Status = adminUser.Status }, commandType: CommandType.StoredProcedure)>0;
+            }
+        }
     }
 }

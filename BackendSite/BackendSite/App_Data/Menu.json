@@ -91,6 +91,15 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Account List",
+        "Controller": "Admin",
+        "Action": "AccountList",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   }

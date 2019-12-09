@@ -27,5 +27,23 @@ namespace BackendSite.Service.BLL
             adminUser.Userpwd = tools.MD5Encrypt(adminUser.Userpwd);
             return adminService.AddAccount(serverInfo.SiteId, adminUser);
         }
+
+        public IEnumerable<AdminUser> AccountList()
+        {
+            var serverInfo = serverInfoService.GetModel();
+            return adminService.AccountList(serverInfo.SiteId);
+        }
+
+        public AdminUser GetAccount(int userId)
+        {
+            var serverInfo = serverInfoService.GetModel();
+            return adminService.GetAccount(serverInfo.SiteId, userId);
+        }
+
+        public bool EditAccount(AdminUser adminUser)
+        {
+            var serverInfo = serverInfoService.GetModel();
+            return adminService.EditAccount(serverInfo.SiteId, adminUser);
+        }
     }
 }

@@ -24,6 +24,17 @@ namespace BackendSite.Controllers
             return View();
         }
 
+        public IActionResult AccountList()
+        {
+            IEnumerable<AdminUser> adminUsers = adminBLL.AccountList();
+            return View(adminUsers.ToList());
+        }
 
+        public IActionResult AccountEdit(int userId)
+        {
+            AdminUser adminUser = adminBLL.GetAccount(userId);
+            return View(adminUser);
+        }
+        
     }
 }
