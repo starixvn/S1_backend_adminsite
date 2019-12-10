@@ -42,12 +42,6 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        //public IActionResult AccountList()
-        //{
-        //    IEnumerable<AdminUser> accountList = adminBLL.AccountList();
-        //    return View(accountList.ToList());
-        //}
-
         [HttpPost]
         public ApiResult EditAccount([FromBody]AdminUser adminUser)
         {
@@ -66,6 +60,51 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        [HttpPost]
+        public ApiResult ChangePwdAccount([FromBody]AdminUser adminUser)
+        {
+            bool result = adminBLL.ChangePwdAccount(adminUser);
+            var apiResult = new ApiResult();
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdatesuccessfulNewpwd");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
         
+
+        [HttpPost]
+        public ApiResult ChangePwd([FromBody]ChangePwd changePwd)
+        {
+            int response = 0;
+            bool result = adminBLL.ChangePwd(changePwd, out response);
+            var apiResult = new ApiResult();
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                if (response == 8)
+                {
+                    apiResult.ErrorCode = 8;
+                    apiResult.Message = selLangBLL.GetMsg("msg_OldpwdNotMatch");
+                }
+                else
+                {
+                    apiResult.ErrorCode = 9;
+                    apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+                }
+            }
+            return apiResult;
+        }
+
     }
 }

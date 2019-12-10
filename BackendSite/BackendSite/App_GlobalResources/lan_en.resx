@@ -195,11 +195,26 @@
   <data name="lbl_Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="lbl_ChangePwd" xml:space="preserve">
+    <value>Change Password</value>
+  </data>
+  <data name="lbl_ChangeUserpwd" xml:space="preserve">
+    <value>Change Password</value>
+  </data>
+  <data name="lbl_ChangeUserPwdAlert" xml:space="preserve">
+    <value>Are you sure to change user password?</value>
+  </data>
   <data name="lbl_ChargeFee" xml:space="preserve">
     <value>ChargeFee</value>
   </data>
   <data name="lbl_Comment" xml:space="preserve">
     <value>Comment</value>
+  </data>
+  <data name="lbl_Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="lbl_ConfirmPwd" xml:space="preserve">
+    <value>Confirm Password</value>
   </data>
   <data name="lbl_Create" xml:space="preserve">
     <value>Create</value>
@@ -209,6 +224,9 @@
   </data>
   <data name="lbl_Currency" xml:space="preserve">
     <value>Currency</value>
+  </data>
+  <data name="lbl_CurrentPwd" xml:space="preserve">
+    <value>Current Password</value>
   </data>
   <data name="lbl_DepositApproval" xml:space="preserve">
     <value>Deposit Approval</value>
@@ -233,6 +251,9 @@
   </data>
   <data name="lbl_MobilePayment" xml:space="preserve">
     <value>Mobile Payment</value>
+  </data>
+  <data name="lbl_NewPwd" xml:space="preserve">
+    <value>New Password</value>
   </data>
   <data name="lbl_No" xml:space="preserve">
     <value>#</value>

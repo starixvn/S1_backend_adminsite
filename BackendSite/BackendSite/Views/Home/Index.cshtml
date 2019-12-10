@@ -70,7 +70,7 @@
             </div>
             <ul id="leftTopInfo" class="sliderbar left_top_info">
                 <li>
-                    <p><a href="javascript:void(0);" class="coloryellow changepsd" data-toggle="modal" data-target="#exampleModal">修改密码</a></p>
+                    <p><a href="javascript:void(0);" class="coloryellow changepsd" data-toggle="modal" data-target="#exampleModal">@selLangBLL.GetResourceValue("lbl_ChangePwd")</a></p>
                 </li>
             </ul>
             @foreach (var menuItem in authorizeBLL.GetMenuData())
@@ -156,7 +156,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">密码修改</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">@selLangBLL.GetResourceValue("lbl_ChangePwd")</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -165,19 +165,19 @@
                     <div class="modal-body">
                         <div class="dialog-gonggao-body">
                             <div class="inputgroup">
-                                <span class="inputgroupkey">原密码</span><input type="password" id="oldPwd" autocomplete="off" />
+                                <span class="inputgroupkey">@selLangBLL.GetResourceValue("lbl_CurrentPwd")</span><input type="password" id="oldPwd" autocomplete="off" />
                             </div>
                             <div class="inputgroup">
-                                <span class="inputgroupkey">新密码</span><input type="password" id="newPwd" autocomplete="off" />
+                                <span class="inputgroupkey">@selLangBLL.GetResourceValue("lbl_NewPwd")</span><input type="password" id="newPwd" autocomplete="off" />
                             </div>
                             <div class="inputgroup">
-                                <span class="inputgroupkey">确认密码</span><input type="password" id="confirmPwd" autocomplete="off" />
+                                <span class="inputgroupkey">@selLangBLL.GetResourceValue("lbl_ConfirmPwd")</span><input type="password" id="confirmPwd" autocomplete="off" />
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <input type="button" class="button button-default" value="取消" data-dismiss="modal" />
-                        <input type="submit" class="button button-yellow" value="确定" />
+                        <input type="button" class="button button-default" value="@selLangBLL.GetResourceValue("lbl_Cancel")" data-dismiss="modal" />
+                        <input type="submit" class="button button-yellow" value="@selLangBLL.GetResourceValue("lbl_Confirm")" />
                     </div>
                 </form>
             </div>
@@ -213,18 +213,28 @@
             });
 
             $('#updateUserPwd').submit(function (event) {
-                event.preventDefault();
-                axios.post('/api/Home/XXXX')
-                    .then(function (response) {
-                        let result = response.data;
-                        if (result.errorCode == 0) {
-                            //window.location.replace(result.message);
-                        } else {
-                            alert(result.message);
-                        }
-                    }).catch(function (error) {
-                        alert(error);
-                    });
+                if ($("#newPwd").val() != $("#confirmPwd").val()) {
+                    alert("@selLangBLL.GetMsg("msg_ConfirmpwdNotMatch")");
+                }
+                else  if ($("#newPwd").val() != $("#newPwd").val()) {
+                    alert("@selLangBLL.GetMsg("msg_Updatesuccessful")");
+                }
+                else {
+                    event.preventDefault();
+                    var data = { "oldPwd": $("#oldPwd").val(), "newPwd": $("#newPwd").val() };
+                    axios.post('/api/Admin/ChangePwd', data)
+                        .then(function (response) {
+                            let result = response.data;
+                            if (result.errorCode == 0) {
+                                alert(result.message);
+                                window.location.replace(result.message);
+                            } else {
+                                alert(result.message);
+                            }
+                        }).catch(function (error) {
+                            alert(error);
+                        });
+                }
             });
         });
     </script>

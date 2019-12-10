@@ -31,6 +31,12 @@
             </div>
         </div>
         <div class="form-group row">
+            <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_Userpwd")</label>
+            <div class="col-sm-10">
+                <button type="button" id="Userpwd" name="Userpwd" class="btn btn-warning">@selLangBLL.GetResourceValue("lbl_ChangeUserpwd")</button>
+            </div>
+        </div>
+        <div class="form-group row">
             <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_Role")</label>
             <div class="col-sm-10">
                 <div class="form-check-inline">
@@ -83,10 +89,8 @@
     <script type="text/javascript">
         $(function () {
             $("#EditAccount").submit(function (event) {
-                console.log("test");
                 event.preventDefault();
                 var role = $('input:checkbox:checked[name="Role"]').map(function () { return $(this).val(); }).get();
-
                 var data = { "UserId": @Model.UserId, "UserName": $("#UserName").val(), "Role": JSON.stringify(role) , "Status": parseInt($("#Status").val())};
                 axios.post('/api/Admin/EditAccount', data)
                     .then(function (response) {
@@ -101,7 +105,29 @@
                         alert(error);
                     });
             });
+            
+            $('#Userpwd').click(function () {
+                if (confirm("@selLangBLL.GetResourceValue("lbl_ChangeUserPwdAlert")")) {
+                    var data = { "UserId": @Model.UserId};
+                    axios.post('/api/Admin/ChangePwdAccount', data)
+                        .then(function (response) {
+                            var result = response.data;
+                            if (result.errorCode == 0) {
+                                alert(result.message);
+                                location.reload();
+                            } else {
+                                alert(result.message);
+                            }
+                        }).catch(function (error) {
+                            alert(error);
+                        });
+                }
+            });
         });
+
+        //$('#Userpwd').click(function () {
+        //        $("#Userpwd").hide();
+        //    );
     </script>
 
 </body>

@@ -25,6 +25,5 @@ namespace BackendSite.Service.DAL
                 return conn.QueryFirstOrDefault<AdminUser>("LoginAdminUser_Get", new { UserName = userName, SiteId = siteId }, commandType: CommandType.StoredProcedure);
             }
         }
-
     }
 }

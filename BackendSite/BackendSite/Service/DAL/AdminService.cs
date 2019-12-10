@@ -52,5 +52,26 @@ namespace BackendSite.Service.DAL
                 return conn.Execute("AdminAccountId_Set", new { SiteId = siteId, UserId = adminUser.UserId, Role = adminUser.Role, Status = adminUser.Status }, commandType: CommandType.StoredProcedure)>0;
             }
         }
+        
+        public bool ChangePwdAccount(int siteId, AdminUser adminUser)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.Execute("AdminAccountChangePwd_Set", new { SiteId = siteId, UserId = adminUser.UserId, UserPWD = adminUser.Userpwd }, commandType: CommandType.StoredProcedure) > 0;
+            }
+        }
+
+        public bool ChangePwd(int siteId, int userId, ChangePwd changePwd, out string Md5Userpwd)
+        {
+            Md5Userpwd = null;
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                var p = new DynamicParameters(new { SiteId = siteId, UserId = userId, Md5OldPassword = changePwd.Oldpwd, Md5NewPassword = changePwd.NewPwd });
+                p.Add("Md5Userpwd", dbType: DbType.String, direction: ParameterDirection.Output);
+                var result = conn.Execute("AdminAccountChangeSelfPwd_Set", p, commandType: CommandType.StoredProcedure);
+                Md5Userpwd = p.Get<string>("Md5Userpwd");
+                return result > 0;
+            }
+        }
     }
 }

@@ -25,4 +25,13 @@ namespace BackendSite.Service.Model
         /*public string Token { set; get; }
         public string LangId { set; get; }*/
     }
+
+    public class ChangePwd
+    {
+        public string Oldpwd { set; get; }
+        public string NewPwd { set; get; }
+
+        /*public string Token { set; get; }
+        public string LangId { set; get; }*/
+    }
 }

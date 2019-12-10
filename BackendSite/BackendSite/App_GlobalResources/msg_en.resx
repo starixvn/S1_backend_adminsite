@@ -132,6 +132,9 @@
   <data name="msg_Canceled" xml:space="preserve">
     <value>Canceled</value>
   </data>
+  <data name="msg_ConfirmpwdNotMatch" xml:space="preserve">
+    <value>New password and confirm password does not match</value>
+  </data>
   <data name="msg_Draft" xml:space="preserve">
     <value>Draft</value>
   </data>
@@ -147,6 +150,9 @@
   <data name="msg_InsertSuccessful" xml:space="preserve">
     <value>Insert Successful</value>
   </data>
+  <data name="msg_OldpwdNotMatch" xml:space="preserve">
+    <value>Old password does not match</value>
+  </data>
   <data name="msg_Paid" xml:space="preserve">
     <value>Paid</value>
   </data>
@@ -161,5 +167,8 @@
   </data>
   <data name="msg_Updatesuccessful" xml:space="preserve">
     <value>Update Successful</value>
+  </data>
+  <data name="msg_UpdatesuccessfulNewpwd" xml:space="preserve">
+    <value>Password Retset Successful. Please use 123456 login and change password!</value>
   </data>
 </root>
