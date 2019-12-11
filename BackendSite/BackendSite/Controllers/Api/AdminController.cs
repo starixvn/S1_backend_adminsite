@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.Api
 {
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class AdminController : Controller

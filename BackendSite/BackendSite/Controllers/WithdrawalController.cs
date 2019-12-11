@@ -8,9 +8,11 @@ using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackendSite.Controllers
 {
+    [Authorize(Roles = "Admin, Finance")]
     public class WithdrawalController : Controller
     {
         private readonly WithdrawalBLL withdrawalBLL;

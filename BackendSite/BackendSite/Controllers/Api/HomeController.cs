@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.Api
 {
@@ -49,17 +50,17 @@ namespace BackendSite.Controllers.Api
             if (userLoginResult == -1)
             {
                 apiResult.ErrorCode = 1101;
-                apiResult.Message = selLangBLL.GetMsg("msg_DepositProcessLogin_LoginFailed");
+                apiResult.Message = selLangBLL.GetMsg("msg_LoginFailed");
             }
             else if (userLoginResult == -2)
             {
                 apiResult.ErrorCode = 1001;
-                apiResult.Message = selLangBLL.GetMsg("msg_DepositProcessLogin_LoginFailed");
+                apiResult.Message = selLangBLL.GetMsg("msg_LoginFailed");
             }
             else if (userLoginResult == -3)
             {
                 apiResult.ErrorCode = 1102;
-                apiResult.Message = selLangBLL.GetMsg("msg_DepositProcessLogin_ACLocked");
+                apiResult.Message = selLangBLL.GetMsg("msg_ACLocked");
             }
             else if (userLoginResult != 0)
             {
@@ -75,10 +76,16 @@ namespace BackendSite.Controllers.Api
             var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name,adminUser.UserName ),
-                    new Claim(ClaimTypes.NameIdentifier,adminUser.UserId.ToString() ),
-                    //new Claim(ClaimTypes.Role
+                    new Claim(ClaimTypes.NameIdentifier,adminUser.UserId.ToString())
                     //new Claim("LangId",? ),
-                };
+            };
+
+            List<string> roleList = JsonConvert.DeserializeObject<List<string>>(adminUser.Role);
+            foreach (var item in roleList)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, item.ToString()));
+            }
+
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
             apiResult.Message = Url.Action("Index", "Home");

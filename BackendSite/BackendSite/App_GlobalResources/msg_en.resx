@@ -126,6 +126,9 @@
   <data name="incorrect_un_pw" xml:space="preserve">
     <value>Incorrect username/password</value>
   </data>
+  <data name="msg_ACLocked" xml:space="preserve">
+    <value>Account Locked!</value>
+  </data>
   <data name="msg_Approved" xml:space="preserve">
     <value>Approved</value>
   </data>
@@ -149,6 +152,9 @@
   </data>
   <data name="msg_InsertSuccessful" xml:space="preserve">
     <value>Insert Successful</value>
+  </data>
+  <data name="msg_LoginFailed" xml:space="preserve">
+    <value>Login Failed, Please check with your username and password</value>
   </data>
   <data name="msg_OldpwdNotMatch" xml:space="preserve">
     <value>Old password does not match</value>

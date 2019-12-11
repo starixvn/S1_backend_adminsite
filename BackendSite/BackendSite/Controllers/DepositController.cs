@@ -10,9 +10,11 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using BackendSite.Service.Model.enums;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackendSite.Controllers
 {
+    [Authorize(Roles = "Admin, Finance")]
     public class DepositController : Controller
     {
         private readonly DepositBLL depositBLL;

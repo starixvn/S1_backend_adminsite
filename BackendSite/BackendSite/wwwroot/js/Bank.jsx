@@ -75,7 +75,7 @@ class Tag extends React.Component {
 
     componentDidMount() {
         let tt=this;
-        axios.post('/BankList/GetBankListAll')
+        axios.post('/api/BankList/GetBankListAll')
             .then(function (response) {
                 let result = response.data;
                 if (result.errorCode == 0) {
