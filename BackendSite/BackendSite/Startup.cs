@@ -31,9 +31,11 @@ namespace BackendSite
             /*Library*/
             services.AddSingleton<Tools>();
             services.AddSingleton<Common>();
+            services.AddSingleton<CourierAdapter>(); 
 
             /*DAL*/
             services.AddSingleton<ServerInfoService>();
+            services.AddSingleton<PendingFundService>();
             services.AddSingleton<AdminService>();
             services.AddSingleton<DepositService>();
             services.AddSingleton<WithdrawalService>();
@@ -44,6 +46,7 @@ namespace BackendSite
 
             /*BLL*/
             services.AddSingleton<ServerInfoBLL>();
+            services.AddSingleton<PendingFundBLL>();
             services.AddSingleton<AdminBLL>();
             services.AddSingleton<SelLangBLL>();
             services.AddSingleton<DepositBLL>();

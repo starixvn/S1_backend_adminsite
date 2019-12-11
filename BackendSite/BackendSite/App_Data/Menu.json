@@ -74,6 +74,15 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Pending Funds",
+        "Controller": "PendingFund",
+        "Action": "Index",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

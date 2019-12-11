@@ -192,6 +192,12 @@
   <data name="lbl_Approve" xml:space="preserve">
     <value>Approve</value>
   </data>
+  <data name="lbl_Balance" xml:space="preserve">
+    <value>Balance</value>
+  </data>
+  <data name="lbl_BankDetailList" xml:space="preserve">
+    <value>Bank List</value>
+  </data>
   <data name="lbl_BankName" xml:space="preserve">
     <value>Bank Name</value>
   </data>
@@ -270,11 +276,17 @@
   <data name="lbl_OnlineBanking" xml:space="preserve">
     <value>Online Banking</value>
   </data>
+  <data name="lbl_PendingList" xml:space="preserve">
+    <value>Fund Pending List</value>
+  </data>
   <data name="lbl_PointLevel" xml:space="preserve">
     <value>Point Level</value>
   </data>
   <data name="lbl_Postscript" xml:space="preserve">
     <value>Postscript</value>
+  </data>
+  <data name="lbl_Process" xml:space="preserve">
+    <value>Process</value>
   </data>
   <data name="lbl_Reject" xml:space="preserve">
     <value>Reject</value>
