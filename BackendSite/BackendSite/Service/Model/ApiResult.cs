@@ -44,7 +44,7 @@ namespace BackendSite.Service.Model
         public string RawErrorCode { get; set; }
         public string RawMessage { get; set; }
         public ApiResult() : this(9000, "", "", "") { }
-        public ApiResult(ISelLang selLang) : this(9000, "", "", "") { this.SelLang = selLang; }
+        public ApiResult(ISelLang selLang) : this(9000, "", "", "") { SelLang = selLang; }
         public ApiResult(int ErrorCode, string Message) : this(ErrorCode, Message, "", "") { }
         public ApiResult(int _ErrorCode, string Message, string RawErrorCode, string RawMessage)
         {
@@ -57,8 +57,19 @@ namespace BackendSite.Service.Model
     public class ApiResult<TData> : ApiResult
     {
         public ApiResult() : this(9000, "",  default) { }
-        public ApiResult(ISelLang selLang) : this(9000, "", default) { this.SelLang = selLang; }
-        public ApiResult(int ErrorCode, string Message, TData data) : base(ErrorCode, Message) { this.Data = data; }
+        public ApiResult(ISelLang selLang) : this(9000, "", default) { SelLang = selLang; }
+        public ApiResult(int ErrorCode, string Message, TData data) : base(ErrorCode, Message) { Data = data; }
         public TData Data { get; set; }
+    }
+
+    public class ApiListResult<TData> : ApiResult
+    {
+        public ApiListResult() : this(9000, "") { }
+        public ApiListResult(ISelLang selLang) : this(9000, "") { SelLang = selLang; }
+        public ApiListResult(int ErrorCode, string Message) : base(ErrorCode, Message) { }
+        public IEnumerable<TData>  Data { get; set; }
+
+        public int TotalPages { get; set; }
+        public int PageNumber { get; set; }
     }
 }

@@ -31,7 +31,7 @@ namespace BackendSite
             /*Library*/
             services.AddSingleton<Tools>();
             services.AddSingleton<Common>();
-            services.AddSingleton<CourierAdapter>(); 
+            services.AddSingleton<CourierAdapter>();
 
             /*DAL*/
             services.AddSingleton<ServerInfoService>();
@@ -43,6 +43,7 @@ namespace BackendSite
             services.AddSingleton<BankDetailService>();
             services.AddSingleton<AdminUserService>();
             services.AddSingleton<MenuService>();
+            services.AddSingleton<CustInfoService>();
 
             /*BLL*/
             services.AddSingleton<ServerInfoBLL>();
@@ -53,6 +54,7 @@ namespace BackendSite
             services.AddSingleton<WithdrawalBLL>();
             services.AddSingleton<BankDetailBLL>();
             services.AddSingleton<AuthorizeBLL>();
+            services.AddSingleton<CustInfoBLL>();
 
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();

@@ -1,0 +1,40 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Hosting
+@inject IWebHostEnvironment environment
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Customer Information</title>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container-fluid" id="CustInfoPanel">
+
+    </div>
+    <script src="~/lib/axios.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script>
+        var i18n = {};
+    </script>
+    @if (environment.EnvironmentName == "Development")
+    {
+        <script src="~/lib/react.development.js"></script>
+        <script src="~/lib/react-dom.development.js"></script>
+        <script src="~/lib/babel.min.js"></script>
+        <script type="text/babel" src="~/js/component/CustManage/CustInfo.jsx">
+        </script>
+    }
+    else
+    {
+        <script src="~/lib/react.production.min.js"></script>
+        <script src="~/lib/react-dom.production.min.js"></script>
+    }
+</body>
+</html>

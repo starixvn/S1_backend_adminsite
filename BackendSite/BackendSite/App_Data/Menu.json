@@ -24,9 +24,9 @@
     "Childs": [
       {
         "Key": "",
-        "Title": "Test1",
-        "Controller": "XXXX222",
-        "Action": "",
+        "Title": "Customer Administration",
+        "Controller": "CustManage",
+        "Action": "CustInfo",
         "Icon": "",
         "Roles": null,
         "Childs": null
