@@ -43,5 +43,21 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
+        public class CustInfoReq
+        {
+            public int CustId { get; set; }
+        }
+
+        [HttpPost]
+        public ApiResult<dynamic> GetCustInfo(CustInfoReq custInfoReq)
+        {
+            var apiResult = new ApiResult<dynamic>();
+
+            apiResult.Data = custInfoBLL.GetCustInfo(custInfoReq.CustId);
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
+        }
     }
 }

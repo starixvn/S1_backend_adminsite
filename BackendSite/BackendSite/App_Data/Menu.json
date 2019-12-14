@@ -26,7 +26,7 @@
         "Key": "",
         "Title": "Customer Administration",
         "Controller": "CustManage",
-        "Action": "CustInfo",
+        "Action": "CustInfoList",
         "Icon": "",
         "Roles": null,
         "Childs": null
