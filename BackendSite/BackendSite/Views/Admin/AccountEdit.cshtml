@@ -21,56 +21,58 @@
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-    <h1>@selLangBLL.GetResourceValue("lblEditAccount")</h1>
+    <h1>@selLangBLL.GetResourceValue("lbl_EditAccount")</h1>
     <hr />
-    <form id="EditAccount" method="post" class="form-horizontal">
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_UserName")</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" id="UserName" value="@Model.UserName" disabled>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_Userpwd")</label>
-            <div class="col-sm-10">
-                <button type="button" id="Userpwd" name="Userpwd" class="btn btn-warning">@selLangBLL.GetResourceValue("lbl_ChangeUserpwd")</button>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_Role")</label>
-            <div class="col-sm-10">
-                <div class="form-check-inline">
-                    <label class="form-check-label">
-                        <input type="checkbox" id="Role[]" name="Role" class="form-check-input" value="Admin" checked="@(Model.Role.IndexOf("Admin")>0)">@selLangBLL.GetResourceValue("lbl_Admin")
-                    </label>
-                </div>
-                <div class="form-check-inline">
-                    <label class="form-check-label">
-                        <input type="checkbox" id="Role[]" name="Role" class="form-check-input" value="CSD" checked="@(Model.Role.IndexOf("CSD")>0)">@selLangBLL.GetResourceValue("lbl_CSD")
-                    </label>
-                </div>
-                <div class="form-check-inline">
-                    <label class="form-check-label">
-                        <input type="checkbox" id="Role[]" name="Role" class="form-check-input" value="Finance" checked="@(Model.Role.IndexOf("Finance")>0)">@selLangBLL.GetResourceValue("lbl_Finance")
-                    </label>
+    <div class="container-fluid">
+        <form id="EditAccount" method="post" class="form-horizontal">
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_UserName")</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="UserName" value="@Model.UserName" disabled>
                 </div>
             </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_Status")</label>
-            <div class="col-sm-10">
-                <select id="Status" name="Status" class="custom-select">
-                    <option value="1" selected="@(Model.Status == 1 ? "selected" : null)">Active</option>
-                    <option value="0" selected="@(Model.Status == 0 ? "selected" : null)">Deactive</option>
-                </select>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_Userpwd")</label>
+                <div class="col-sm-10">
+                    <button type="button" id="Userpwd" name="Userpwd" class="btn btn-warning">@selLangBLL.GetResourceValue("lbl_ChangeUserpwd")</button>
+                </div>
             </div>
-        </div>
-        <div class="form-group row">
-            <div class="col-sm-10">
-                <button type="submit" class="btn btn-primary">@selLangBLL.GetResourceValue("lbl_Edit")</button>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_Role")</label>
+                <div class="col-sm-10">
+                    <div class="form-check-inline">
+                        <label class="form-check-label">
+                            <input type="checkbox" id="Role[]" name="Role" class="form-check-input" value="Admin" checked="@(Model.Role.IndexOf("Admin")>0)">@selLangBLL.GetResourceValue("lbl_Admin")
+                        </label>
+                    </div>
+                    <div class="form-check-inline">
+                        <label class="form-check-label">
+                            <input type="checkbox" id="Role[]" name="Role" class="form-check-input" value="CSD" checked="@(Model.Role.IndexOf("CSD")>0)">@selLangBLL.GetResourceValue("lbl_CSD")
+                        </label>
+                    </div>
+                    <div class="form-check-inline">
+                        <label class="form-check-label">
+                            <input type="checkbox" id="Role[]" name="Role" class="form-check-input" value="Finance" checked="@(Model.Role.IndexOf("Finance")>0)">@selLangBLL.GetResourceValue("lbl_Finance")
+                        </label>
+                    </div>
+                </div>
             </div>
-        </div>
-    </form>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_Status")</label>
+                <div class="col-sm-10">
+                    <select id="Status" name="Status" class="custom-select">
+                        <option value="1" selected="@(Model.Status == 1 ? "selected" : null)">Active</option>
+                        <option value="0" selected="@(Model.Status == 0 ? "selected" : null)">Deactive</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-primary">@selLangBLL.GetResourceValue("lbl_Edit")</button>
+                </div>
+            </div>
+        </form>
+    </div>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="~/lib/axios.min.js"></script>
@@ -105,7 +107,7 @@
                         alert(error);
                     });
             });
-            
+
             $('#Userpwd').click(function () {
                 if (confirm("@selLangBLL.GetResourceValue("lbl_ChangeUserPwdAlert")")) {
                     var data = { "UserId": @Model.UserId};

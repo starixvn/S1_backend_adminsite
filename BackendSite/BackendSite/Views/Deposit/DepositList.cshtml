@@ -22,9 +22,10 @@
 </head>
 <body>
     <h1>@selLangBLL.GetResourceValue("lbl_DepositRequest")</h1>
-    <div class="container">
+    <hr />
+    <div class="container-fluid">
         <table class="table table-striped">
-            <thead class="thead-light">
+            <thead>
                 <tr>
                     <th scope="col">@selLangBLL.GetResourceValue("lbl_TransId")</th>
                     <th scope="col">@selLangBLL.GetResourceValue("lbl_UserName")</th>
@@ -38,23 +39,24 @@
                     <th scope="col">@selLangBLL.GetResourceValue("lbl_Status")</th>
                 </tr>
             </thead>
-
-            @foreach (var item in Model)
-            {
-                var bank = ((DispositInfo3_1)item.dispositInfo);
-                <tr>
-                    <td scope="row">@Html.ActionLink(@item.TransId, "DepositRequest", "Deposit", new { transID = @item.TransId })</td>
-                    <td>@item.UserName</td>
-                    <td>@item.DispositTypeString</td>
-                    <td>@bank.AccountNo</td>
-                    <td>@bank.AccountName</td>
-                    <td>@item.Amount</td>
-                    <td>@item.Memo</td>
-                    <td>@item.PostScript</td>
-                    <td>@item.CreateTime</td>
-                    <td>@item.StatusString</td>
-                </tr>
-            }
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var bank = ((DispositInfo3_1)item.dispositInfo);
+                    <tr>
+                        <th scope="row">@Html.ActionLink(@item.TransId, "DepositRequest", "Deposit", new { transID = @item.TransId })</th>
+                        <td>@item.UserName</td>
+                        <td>@item.DispositTypeString</td>
+                        <td>@bank.AccountNo</td>
+                        <td>@bank.AccountName</td>
+                        <td>@item.Amount</td>
+                        <td>@item.Memo</td>
+                        <td>@item.PostScript</td>
+                        <td>@item.CreateTime</td>
+                        <td>@item.StatusString</td>
+                    </tr>
+                }
+            </tbody>
         </table>
     </div>
 

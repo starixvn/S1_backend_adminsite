@@ -23,6 +23,7 @@
 <body>
     <h1>@selLangBLL.GetResourceValue("lbl_AddAccount")</h1>
     <hr />
+    <div class="container-fluid"
     <form id="AddAccount" method="post" class="form-horizontal">
         <div class="form-group row">
             <label class="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_UserName")</label>
@@ -62,7 +63,7 @@
             </div>
         </div>
     </form>
-
+    </div>
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="~/lib/axios.min.js"></script>
     @if (environment.EnvironmentName == "Development")

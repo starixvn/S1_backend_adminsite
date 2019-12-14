@@ -22,9 +22,10 @@
 </head>
 <body>
     <h1>@selLangBLL.GetResourceValue("lbl_AccountList")</h1>
-    <div class="container">
+    <hr />
+    <div class="container-fluid">
         <table class="table table-striped">
-            <thead class="thead-light">
+            <thead>
                 <tr>
                     <th scope="col">@selLangBLL.GetResourceValue("lbl_UserName")</th>
                     <th scope="col">@selLangBLL.GetResourceValue("lbl_Role")</th>
@@ -33,19 +34,19 @@
                     <th></th>
                 </tr>
             </thead>
-
-            @foreach (var item in Model)
-            {
-                <tbody>
+            <tbody>
+                @foreach (var item in Model)
+                {
                     <tr>
-                        <td>@item.UserName</td>
+                        <th scope="row">@item.UserName</th>
                         <td>@item.Role</td>
                         <td>@item.Status</td>
                         <td>@item.CreateTime</td>
-                        <td>@Html.ActionLink(@selLangBLL.GetResourceValue("lbl_Edit"), "AccountEdit", "Admin", new { UserId = @item.UserId })</td>
+                        <!--<td>@Html.ActionLink(@selLangBLL.GetResourceValue("lbl_Edit"), "AccountEdit", "Admin", new { UserId = @item.UserId })</td>-->
+                        <td><button onclick="javascript:location.href='/Admin/AccountEdit?UserId=@item.UserId'" class="btn btn-primary">@selLangBLL.GetResourceValue("lbl_Edit")</button>
                     </tr>
-                </tbody>
-            }
+                }
+            </tbody>
         </table>
     </div>
 

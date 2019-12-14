@@ -22,9 +22,10 @@
 </head>
 <body>
     <h1>@selLangBLL.GetResourceValue("lbl_WithdrawalRequest")</h1>
-    <div class="container">
+    <hr />
+    <div class="container-fluid">
         <table class="table table-striped">
-            <thead class="thead-light">
+            <thead>
                 <tr>
                     <th scope="col">@selLangBLL.GetResourceValue("lbl_WithdrawalId")</th>
                     <th scope="col">@selLangBLL.GetResourceValue("lbl_WithdrawalType")</th>
@@ -37,21 +38,22 @@
                     <th scope="col">@selLangBLL.GetResourceValue("lbl_Status")</th>
                 </tr>
             </thead>
-
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td scope="row">@Html.ActionLink(@item.TransId, "WithdrawalRequest", "Withdrawal", new { transID = @item.TransId })</td>
-                    <td>@item.WithdrawalType</td>
-                    <td>@item.UserName</td>
-                    <td>@item.WithdrawalInfo</td>
-                    <td>@item.Amount</td>
-                    <td>@item.ChargeFee</td>
-                    <td>@item.Memo</td>
-                    <td>@item.CreateTime</td>
-                    <td>@item.Status</td>
-                </tr>
-            }
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <th scope="row">@Html.ActionLink(@item.TransId, "WithdrawalRequest", "Withdrawal", new { transID = @item.TransId })</th>
+                        <td>@item.WithdrawalType</td>
+                        <td>@item.UserName</td>
+                        <td>@item.WithdrawalInfo</td>
+                        <td>@item.Amount</td>
+                        <td>@item.ChargeFee</td>
+                        <td>@item.Memo</td>
+                        <td>@item.CreateTime</td>
+                        <td>@item.Status</td>
+                    </tr>
+                }
+            </tbody>
         </table>
     </div>
 

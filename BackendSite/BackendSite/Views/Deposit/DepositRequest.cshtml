@@ -21,13 +21,12 @@
 </head>
 <body>
     <h1>@selLangBLL.GetResourceValue("lbl_DepositApproval")</h1>
-
-    <div class="container">
+    <hr />
+    <div class="container-fluid">
         <table class="table table-striped">
             <tr>
-                <table class="table table-striped">
-                    <th scope="row">@selLangBLL.GetResourceValue("lbl_TransId")</th>
-                    <td>@Model.TransId</td>
+                <th scope="row">@selLangBLL.GetResourceValue("lbl_TransId")</th>
+                <td>@Model.TransId</td>
             </tr>
             <tr>
                 <th scope="row">@selLangBLL.GetResourceValue("lbl_UserName")</th>
@@ -73,18 +72,18 @@
             </tr>
         </table>
 
-        <div class="container">
-            <table class="table table-striped">
-                <thead class="thead-light">
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Create Time</th>
-                        <th scope="col">Actual Deposit</th>
-                        <th scope="col">Comment</th>
-                        <th scope="col">Action</th>
-                    </tr>
-                </thead>
-                @{var i = 1; }
+        <table class="table table-striped">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Create Time</th>
+                    <th scope="col">Actual Deposit</th>
+                    <th scope="col">Comment</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            @{var i = 1; }
+            <tbody>
                 @foreach (var item in @Model.Comments)
                 {
                     <tr>
@@ -95,23 +94,19 @@
                         <td>@item.ActionString</td>
                     </tr>
                 }
-            </table>
-        </div>
-
-        <div class="form-group">
+                </tdbody>
+        </table>
+        <div class="container form-group">
             <label for="Command">@selLangBLL.GetResourceValue("lbl_Comment")</label>
             <textarea class="form-control" id="comment" rows="3"></textarea>
         </div>
-
-        <div class="container">
-            @{ if (@Model.Status == 0 || @Model.Status == 1)
-                {
-                    <input type='button' class="btn btn-primary" onclick='UpdateStatus(1)' value='@selLangBLL.GetResourceValue("lbl_Approve")'>
-                    <input type='button' class="btn btn-primary" onclick='UpdateStatus(2)' value='@selLangBLL.GetResourceValue("lbl_Reject")'>
-                }
-                <input type='button' class="btn btn-primary" onclick='UpdateStatus(3)' value='@selLangBLL.GetResourceValue("lbl_Comment")'>
+        @{ if (@Model.Status == 0 || @Model.Status == 1)
+            {
+                <input type='button' class="btn btn-primary" onclick='UpdateStatus(1)' value='@selLangBLL.GetResourceValue("lbl_Approve")'>
+                <input type='button' class="btn btn-primary" onclick='UpdateStatus(2)' value='@selLangBLL.GetResourceValue("lbl_Reject")'>
             }
-        </div>
+            <input type='button' class="btn btn-primary" onclick='UpdateStatus(3)' value='@selLangBLL.GetResourceValue("lbl_Comment")'>
+        }
     </div>
 
 

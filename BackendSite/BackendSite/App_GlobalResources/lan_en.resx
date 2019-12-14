@@ -252,6 +252,9 @@
   <data name="lbl_Edit" xml:space="preserve">
     <value>Edit</value>
   </data>
+  <data name="lbl_EditAccount" xml:space="preserve">
+    <value>Edit Account</value>
+  </data>
   <data name="lbl_Finance" xml:space="preserve">
     <value>Finance</value>
   </data>

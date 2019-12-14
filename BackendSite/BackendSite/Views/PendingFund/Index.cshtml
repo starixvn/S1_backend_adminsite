@@ -22,9 +22,10 @@
 </head>
 <body>
     <h1>@selLangBLL.GetResourceValue("lbl_PendingList")</h1>
-    <div class="container">
+    <hr />
+    <div class="container-fluid">
         <table class="table table-striped">
-            <thead class="thead-light">
+            <thead>
                 <tr>
                     <th scope="col">@selLangBLL.GetResourceValue("lbl_UserName")</th>
                     <th scope="col">@selLangBLL.GetResourceValue("lbl_Currency")</th>
@@ -33,19 +34,18 @@
                     <th></th>
                 </tr>
             </thead>
-
-            @foreach (var item in Model)
-            {
-                <tbody>
+            <tbody>
+                @foreach (var item in Model)
+                {
                     <tr>
-                        <td>@item.UserName</td>
+                        <th scope="row">@item.UserName</th>
                         <td>@item.CurrencyId</td>
                         <td>@item.Status</td>
                         <td>@item.Balance</td>
-                        <td><button onclick='process(@item.CustId)'>@selLangBLL.GetResourceValue("lbl_Process")</button>
+                        <td><button onclick='process(@item.CustId)' class="btn btn-primary">@selLangBLL.GetResourceValue("lbl_Process")</button>
                     </tr>
-                </tbody>
-            }
+                }
+            </tbody>
         </table>
     </div>
 
@@ -64,22 +64,22 @@
     }
 
     <script type="text/javascript">
-        function process(custId){
-                event.preventDefault();
+        function process(custId) {
+            event.preventDefault();
             var data = { "CustId": custId };
-                axios.post('/api/PendingFund/Process', data)
-                    .then(function (response) {
-                        var result = response.data;
-                        if (result.errorCode == 0) {
-                            alert(result.message);
-                            location.reload();
-                        } else {
-                            alert(result.message);
-                        }
-                    }).catch(function (error) {
-                        alert(error);
-                    });
-           }
+            axios.post('/api/PendingFund/Process', data)
+                .then(function (response) {
+                    var result = response.data;
+                    if (result.errorCode == 0) {
+                        alert(result.message);
+                        location.reload();
+                    } else {
+                        alert(result.message);
+                    }
+                }).catch(function (error) {
+                    alert(error);
+                });
+        }
     </script>
 </body>
 </html>
