@@ -27,13 +27,13 @@ namespace BackendSite.Service.BLL
             return bankDetailService.GetBankDetailList(serverInfo.SiteId);
         }
 
-        public IEnumerable<BankDetail> AddBankInfo(BankDetail bankDetail)
+        public bool AddBankInfo(BankDetail bankDetail)
         {
             var serverInfo = serverInfoService.GetModel();
             return bankDetailService.AddBankDetail(serverInfo.SiteId, bankDetail);
         }
 
-        public IEnumerable<BankDetail> EditBankInfo(BankDetail bankDetail)
+        public bool EditBankInfo(BankDetail bankDetail)
         {
             var serverInfo = serverInfoService.GetModel();
             return bankDetailService.EditBankDetail(serverInfo.SiteId, bankDetail);

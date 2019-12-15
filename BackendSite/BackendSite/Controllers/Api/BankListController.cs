@@ -14,12 +14,14 @@ namespace BackendSite.Controllers.Api
     [ApiController]
     public class BankListController : ControllerBase
     {
+        private readonly SelLangBLL selLangBLL;
         private readonly BankDetailBLL bankDetailBLL;
         private readonly ServerInfoBLL serverInfoBLL;
 
-        public BankListController(BankDetailBLL bankDetailBLL, ServerInfoBLL serverInfoBLL)
+        public BankListController(BankDetailBLL bankDetailBLL, SelLangBLL selLangBLL, ServerInfoBLL serverInfoBLL)
         {
             this.bankDetailBLL = bankDetailBLL;
+            this.selLangBLL = selLangBLL;
             this.serverInfoBLL = serverInfoBLL;
         }
 
@@ -54,20 +56,36 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult AddBank([FromBody]BankDetail bankDetail)
         {
-            IEnumerable<BankDetail> result = bankDetailBLL.AddBankInfo(bankDetail);
+            bool result = bankDetailBLL.AddBankInfo(bankDetail);
             var apiResult = new ApiResult();
-            apiResult.ErrorCode = 0;
-            apiResult.Message = "Done";
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
             return apiResult;
         }
 
         [HttpPost]
         public ApiResult EditBank([FromBody]BankDetail bankDetail)
         {
-            IEnumerable<BankDetail> bankInfoList = bankDetailBLL.EditBankInfo(bankDetail);
+            bool result = bankDetailBLL.EditBankInfo(bankDetail);
             var apiResult = new ApiResult();
-            apiResult.ErrorCode = 0;
-            apiResult.Message = "Done";
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
             return apiResult;
         }
     }
