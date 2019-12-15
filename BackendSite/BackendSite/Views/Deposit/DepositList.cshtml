@@ -42,7 +42,7 @@
             <tbody>
                 @foreach (var item in Model)
                 {
-                    var bank = ((DispositInfo3_1)item.dispositInfo);
+                    var bank = ((DepositInfo3_1)item.depositInfo);
                     <tr>
                         <th scope="row">@Html.ActionLink(@item.TransId, "DepositRequest", "Deposit", new { transID = @item.TransId })</th>
                         <td>@item.UserName</td>

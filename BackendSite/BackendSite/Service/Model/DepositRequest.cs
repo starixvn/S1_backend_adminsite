@@ -12,16 +12,17 @@ namespace BackendSite.Service.Model
         public int CustId { set; get; }
         public string UserName { set; get; }
         public int SiteId { set; get; }
-        public string DispositInfo { set; get; }
+        public string DepositInfo { set; get; }
         public decimal Amount { set; get; }
         public decimal ActualDeposit { set; get; }
         public DateTime CreateTime { set; get; }
-        public IDispositInfo dispositInfo {
+        public IDepositInfo depositInfo
+        {
             get
             {
                 if (DepositType == 3)
                 {
-                    return Newtonsoft.Json.JsonConvert.DeserializeObject<DispositInfo3_1>(DispositInfo);
+                    return Newtonsoft.Json.JsonConvert.DeserializeObject<DepositInfo3_1>(DepositInfo);
                 }
                 return null;
             }
@@ -36,19 +37,19 @@ namespace BackendSite.Service.Model
         public virtual string DepositTypeString { get; set; }
         public virtual string StatusString { get; set; }
     }
-    public interface IDispositInfo
+    public interface IDepositInfo
     {
         int Ver { get; set; }
     }
-    public class DispositInfo1_1 : IDispositInfo
+    public class DepositInfo1_1 : IDepositInfo
     {
         public int Ver { get; set; }
     }
-    public class DispositInfo2_1 : IDispositInfo
+    public class DepositInfo2_1 : IDepositInfo
     {
         public int Ver { get; set; }
     }
-    public class DispositInfo3_1 : IDispositInfo
+    public class DepositInfo3_1 : IDepositInfo
     {
         public int Ver { get; set; }
         public int SysId { get; set; }
