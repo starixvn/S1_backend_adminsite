@@ -8,7 +8,7 @@ namespace BackendSite.Service.Model
     public class DepositRequest
     {
         public string TransId { set; get; }
-        public int DispositType { set; get; }
+        public int DepositType { set; get; }
         public int CustId { set; get; }
         public string UserName { set; get; }
         public int SiteId { set; get; }
@@ -19,7 +19,7 @@ namespace BackendSite.Service.Model
         public IDispositInfo dispositInfo {
             get
             {
-                if (DispositType == 3)
+                if (DepositType == 3)
                 {
                     return Newtonsoft.Json.JsonConvert.DeserializeObject<DispositInfo3_1>(DispositInfo);
                 }
@@ -33,7 +33,7 @@ namespace BackendSite.Service.Model
 
         public virtual IEnumerable<Comments> Comments { get; set; }
 
-        public virtual string DispositTypeString { get; set; }
+        public virtual string DepositTypeString { get; set; }
         public virtual string StatusString { get; set; }
     }
     public interface IDispositInfo

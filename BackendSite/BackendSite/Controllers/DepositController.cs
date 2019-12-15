@@ -40,16 +40,16 @@ namespace BackendSite.Controllers
 
             foreach (var item in depositRequests)
             {
-                switch (item.DispositType)
+                switch (item.DepositType)
                 {
-                    case (int)DispositType.OnlineBanking:
-                        item.DispositTypeString = selLangBLL.GetResourceValue("lbl_OnlineBanking");
+                    case (int)DepositType.OnlineBanking:
+                        item.DepositTypeString = selLangBLL.GetResourceValue("lbl_OnlineBanking");
                         break;
-                    case (int)DispositType.MobilePayment:
-                        item.DispositTypeString = selLangBLL.GetResourceValue("lbl_MobilePayment");
+                    case (int)DepositType.MobilePayment:
+                        item.DepositTypeString = selLangBLL.GetResourceValue("lbl_MobilePayment");
                         break;
-                    case (int)DispositType.WireTransfer:
-                        item.DispositTypeString = selLangBLL.GetResourceValue("lbl_WireTransfer");
+                    case (int)DepositType.WireTransfer:
+                        item.DepositTypeString = selLangBLL.GetResourceValue("lbl_WireTransfer");
                         break;
                 }
 
@@ -90,16 +90,16 @@ namespace BackendSite.Controllers
             DepositRequest depositRequest = depositBLL.GetDepositRequest(transId);
             IEnumerable<Comments> comments = depositBLL.GetDepositRequestComment(transId);
 
-            switch (depositRequest.DispositType)
+            switch (depositRequest.DepositType)
             {
-                case (int)DispositType.OnlineBanking:
-                    depositRequest.DispositTypeString = selLangBLL.GetResourceValue("lbl_OnlineBanking");
+                case (int)DepositType.OnlineBanking:
+                    depositRequest.DepositTypeString = selLangBLL.GetResourceValue("lbl_OnlineBanking");
                     break;
-                case (int)DispositType.MobilePayment:
-                    depositRequest.DispositTypeString = selLangBLL.GetResourceValue("lbl_MobilePayment");
+                case (int)DepositType.MobilePayment:
+                    depositRequest.DepositTypeString = selLangBLL.GetResourceValue("lbl_MobilePayment");
                     break;
-                case (int)DispositType.WireTransfer:
-                    depositRequest.DispositTypeString = selLangBLL.GetResourceValue("lbl_WireTransfer");
+                case (int)DepositType.WireTransfer:
+                    depositRequest.DepositTypeString = selLangBLL.GetResourceValue("lbl_WireTransfer");
                     break;
             }
 
