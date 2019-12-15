@@ -31,5 +31,12 @@ namespace BackendSite.Service.DAL
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             return result;
         }
+
+        public dynamic GetCustInfo(int custId, int siteId)
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var result = conn.QueryFirstOrDefault<dynamic>("CustInfoDetailSearch_Get", new { CustId = custId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            return result;
+        }
     }
 }

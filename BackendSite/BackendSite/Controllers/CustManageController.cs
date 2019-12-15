@@ -8,7 +8,13 @@ namespace BackendSite.Controllers
 {
     public class CustManageController : Controller
     {
-        public IActionResult CustInfo()
+        [HttpGet]
+        public IActionResult CustInfoList()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult CustInfo(int CustId, string TransId)
         {
             return View();
         }
