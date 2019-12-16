@@ -171,6 +171,9 @@
   <data name="msg_UpdateFailed" xml:space="preserve">
     <value>Update Failed</value>
   </data>
+  <data name="msg_UpdateFailedtoSB" xml:space="preserve">
+    <value>Transfer to OW wallet failed, please check with pending list</value>
+  </data>
   <data name="msg_Updatesuccessful" xml:space="preserve">
     <value>Update Successful</value>
   </data>

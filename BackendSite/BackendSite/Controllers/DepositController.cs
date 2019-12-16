@@ -19,11 +19,12 @@ namespace BackendSite.Controllers
     {
         private readonly DepositBLL depositBLL;
         private readonly SelLangBLL selLangBLL;
-
-        public DepositController(DepositBLL depositBLL, SelLangBLL selLangBLL)
+        private readonly PendingFundBLL pendingFundBLL;
+        public DepositController(DepositBLL depositBLL, SelLangBLL selLangBLL, PendingFundBLL pendingFundBLL)
         {
             this.depositBLL = depositBLL;
             this.selLangBLL = selLangBLL;
+            this.pendingFundBLL = pendingFundBLL;
         }
 
         public class DepositReq
@@ -148,6 +149,16 @@ namespace BackendSite.Controllers
             {
                 if (depositReq.ActualDeposit > 0)
                      depositConfirmReuslt = depositBLL.DepositApproved(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment);
+
+                if (depositConfirmReuslt > 0)
+                {
+                    PendingFund pendingFund = new PendingFund();
+                    pendingFund.CustId = depositConfirmReuslt;
+                    Task<bool> tmp =  Process(pendingFund);
+                    
+                    if (!tmp.Result)
+                        depositConfirmReuslt = -4;
+                }
             }
             else if (depositReq.Action == 2)
             {
@@ -158,7 +169,13 @@ namespace BackendSite.Controllers
                  depositConfirmReuslt = depositBLL.DepositDraft(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment);
             }
 
-            if (depositConfirmReuslt !=0)
+
+            if (depositConfirmReuslt == -4)
+            {
+                apiResult.ErrorCode = 1102;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailedtoSB");
+            }
+            else if (depositConfirmReuslt ==0)
             {
                 apiResult.ErrorCode = 1101;
                 apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
@@ -170,6 +187,12 @@ namespace BackendSite.Controllers
             }
 
             return apiResult;
+        }
+
+        public async Task<bool> Process(PendingFund pendingFund)
+        {
+            bool result = await pendingFundBLL.ProcessAsync(pendingFund);
+            return result;
         }
     }
 }

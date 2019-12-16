@@ -25,7 +25,6 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<DepositRequest> GetDepositRequestList(int siteId)
         {
-
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.Query<DepositRequest>("DepositList_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
@@ -90,6 +89,10 @@ namespace BackendSite.Service.DAL
                             if (result > 0)
                                 trans.Commit();
                         }
+
+                        //sportsbook
+                        if (result > 0)
+                            result = p.Get<int?>("CustId") ?? result;
                     }
                 }
             }
@@ -98,7 +101,10 @@ namespace BackendSite.Service.DAL
                 SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatus.Error, actualDeposit);
             }
 
-            return result > 0 ? 0 : 99;
+            //return result > 0 ? 0 : 99;
+
+            //sportsbook
+            return result > 0 ? result : 99;
         }
 
         private int SetDepositInfoFirstDeposit(int depositId, int siteId, MySqlConnection conn, MySqlTransaction trans)
