@@ -24,6 +24,24 @@ class Row extends React.Component {
 
     render() {
         let Data = this.props.Data;
+        let currency = null;
+        let status = null;
+        switch(Data.currencyId) {
+            case 2: currency = i18n.lbl_Currency2;
+                     break;
+            case 4: currency = i18n.lbl_Currency4;
+                     break;
+            case 15: currency = i18n.lbl_Currency15;
+                     break;         
+            case 51: currency = i18n.lbl_Currency51;
+                     break;
+        }
+        switch(Data.status) {
+            case 0: status = i18n.lbl_Disable;
+                     break;
+            case 1: status = i18n.lbl_Enable;
+                     break;
+        }
         return (
             <tr>
                 <th scope="row">{Data.bankName}</th>
@@ -31,8 +49,8 @@ class Row extends React.Component {
                 <td>{Data.accountNo}</td>
                 <td>{Data.minAmount}</td>
                 <td>{Data.maxAmount}</td>
-                <td>{Data.currencyId}</td>
-                <td>{Data.status}</td>
+                <td>{currency}</td>
+                <td>{status}</td>
                 <td>
                     <input type="button" class="btn btn-primary" onclick="UpdateStatus(1)" value="Edit" />
                 </td>

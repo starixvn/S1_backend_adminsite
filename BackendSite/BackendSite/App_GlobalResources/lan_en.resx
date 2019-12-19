@@ -183,8 +183,14 @@
   <data name="lbl_AddBank" xml:space="preserve">
     <value>Add New Bank Card</value>
   </data>
+  <data name="lbl_AddBankCard" xml:space="preserve">
+    <value>Add Bank Card</value>
+  </data>
   <data name="lbl_Admin" xml:space="preserve">
     <value>Admin</value>
+  </data>
+  <data name="lbl_Administration" xml:space="preserve">
+    <value>Administration</value>
   </data>
   <data name="lbl_Amount" xml:space="preserve">
     <value>Amount</value>
@@ -192,17 +198,23 @@
   <data name="lbl_Approve" xml:space="preserve">
     <value>Approve</value>
   </data>
+  <data name="lbl_Approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
   <data name="lbl_Balance" xml:space="preserve">
     <value>Balance</value>
   </data>
-  <data name="lbl_BankDetailList" xml:space="preserve">
-    <value>Bank List</value>
+  <data name="lbl_BankCardList" xml:space="preserve">
+    <value>Bank Card List</value>
   </data>
   <data name="lbl_BankName" xml:space="preserve">
     <value>Bank Name</value>
   </data>
   <data name="lbl_Cancel" xml:space="preserve">
     <value>Cancel</value>
+  </data>
+  <data name="lbl_Canceled" xml:space="preserve">
+    <value>Canceled</value>
   </data>
   <data name="lbl_ChangePwd" xml:space="preserve">
     <value>Change Password</value>
@@ -215,6 +227,9 @@
   </data>
   <data name="lbl_ChargeFee" xml:space="preserve">
     <value>ChargeFee</value>
+  </data>
+  <data name="lbl_Closed" xml:space="preserve">
+    <value>Closed</value>
   </data>
   <data name="lbl_Comment" xml:space="preserve">
     <value>Comment</value>
@@ -240,6 +255,9 @@
   <data name="lbl_CurrentPwd" xml:space="preserve">
     <value>Current Password</value>
   </data>
+  <data name="lbl_CustomerAdministration" xml:space="preserve">
+    <value>Customer Administration</value>
+  </data>
   <data name="lbl_DepositApproval" xml:space="preserve">
     <value>Deposit Approval</value>
   </data>
@@ -249,11 +267,26 @@
   <data name="lbl_DepositType" xml:space="preserve">
     <value>Deposit Type</value>
   </data>
+  <data name="lbl_Disable" xml:space="preserve">
+    <value>Disable</value>
+  </data>
+  <data name="lbl_Draft" xml:space="preserve">
+    <value>Draft</value>
+  </data>
   <data name="lbl_Edit" xml:space="preserve">
     <value>Edit</value>
   </data>
   <data name="lbl_EditAccount" xml:space="preserve">
     <value>Edit Account</value>
+  </data>
+  <data name="lbl_Enable" xml:space="preserve">
+    <value>Enable</value>
+  </data>
+  <data name="lbl_Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="lbl_Expired" xml:space="preserve">
+    <value>Expired</value>
   </data>
   <data name="lbl_Finance" xml:space="preserve">
     <value>Finance</value>
@@ -279,6 +312,12 @@
   <data name="lbl_OnlineBanking" xml:space="preserve">
     <value>Online Banking</value>
   </data>
+  <data name="lbl_Paid" xml:space="preserve">
+    <value>Paid</value>
+  </data>
+  <data name="lbl_Pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
   <data name="lbl_PendingList" xml:space="preserve">
     <value>Fund Pending List</value>
   </data>
@@ -294,14 +333,23 @@
   <data name="lbl_Reject" xml:space="preserve">
     <value>Reject</value>
   </data>
+  <data name="lbl_Rejected" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
   <data name="lbl_Role" xml:space="preserve">
     <value>Role</value>
+  </data>
+  <data name="lbl_Running" xml:space="preserve">
+    <value>Running</value>
   </data>
   <data name="lbl_Save" xml:space="preserve">
     <value>Save</value>
   </data>
   <data name="lbl_Status" xml:space="preserve">
     <value>Status</value>
+  </data>
+  <data name="lbl_Suspend" xml:space="preserve">
+    <value>Suspend</value>
   </data>
   <data name="lbl_TransId" xml:space="preserve">
     <value>Transation ID</value>

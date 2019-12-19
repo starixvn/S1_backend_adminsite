@@ -10,7 +10,15 @@
     Layout = null;
     ViewData["Title"] = @selLangBLL.GetResourceValue("lbl_WithdrawalRequest");
 }
-
+@{
+    var i18n = new Dictionary<string, string>();
+    i18n.Add("lbl_Currency2", selLangBLL.GetResourceValue("Currency_2"));
+    i18n.Add("lbl_Currency4", selLangBLL.GetResourceValue("Currency_4"));
+    i18n.Add("lbl_Currency15", selLangBLL.GetResourceValue("Currency_15"));
+    i18n.Add("lbl_Currency51", selLangBLL.GetResourceValue("Currency_51"));
+    i18n.Add("lbl_Pending", selLangBLL.GetResourceValue("lbl_Pending"));
+    i18n.Add("lbl_Approved", selLangBLL.GetResourceValue("lbl_Approved"));
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,6 +66,9 @@
     </div>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script>
+        var i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
+    </script>
     @if (environment.EnvironmentName == "Development")
     {
         <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>

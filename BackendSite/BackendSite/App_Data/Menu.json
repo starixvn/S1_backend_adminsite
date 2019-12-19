@@ -23,7 +23,7 @@
     "Roles": null,
     "Childs": [
       {
-        "Key": "",
+        "Key": "lbl_CustomerAdministration",
         "Title": "Customer Administration",
         "Controller": "CustManage",
         "Action": "CustInfoList",
@@ -34,14 +34,14 @@
     ]
   },
   {
-    "Key": "",
+    "Key": "lbl_Finance",
     "Title": "Finance",
     "Icon": "",
     "Roles": null,
     "Childs": [
       {
-        "Key": "",
-        "Title": "Bank List",
+        "Key": "lbl_BankCardList",
+        "Title": "Bank Card List",
         "Controller": "BankInfo",
         "Action": "BankInfoList",
         "Icon": "",
@@ -49,8 +49,8 @@
         "Childs": null
       },
       {
-        "Key": "",
-        "Title": "Add Bank",
+        "Key": "lbl_AddBankCard",
+        "Title": "Add Bank Card",
         "Controller": "BankInfo",
         "Action": "AddBankInfo",
         "Icon": "",
@@ -58,7 +58,7 @@
         "Childs": null
       },
       {
-        "Key": "",
+        "Key": "lbl_DepositRequest",
         "Title": "Deposit Request",
         "Controller": "Deposit",
         "Action": "DepositList",
@@ -67,8 +67,8 @@
         "Childs": null
       },
       {
-        "Key": "",
-        "Title": "Withdraw Request",
+        "Key": "lbl_WithdrawalRequest",
+        "Title": "Withdrawal Request",
         "Controller": "Withdrawal",
         "Action": "WithdrawalList",
         "Icon": "",
@@ -87,13 +87,13 @@
     ]
   },
   {
-    "Key": "",
+    "Key": "lbl_Administration",
     "Title": "Administration",
     "Icon": "",
     "Roles": null,
     "Childs": [
       {
-        "Key": "",
+        "Key": "lbl_AddAccount",
         "Title": "Add Account",
         "Controller": "Admin",
         "Action": "AddAccount",
@@ -102,7 +102,7 @@
         "Childs": null
       },
       {
-        "Key": "",
+        "Key": "lbl_AccountList",
         "Title": "Account List",
         "Controller": "Admin",
         "Action": "AccountList",

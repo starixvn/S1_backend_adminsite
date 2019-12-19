@@ -9,7 +9,16 @@
 @inject IWebHostEnvironment environment
 @{
     Layout = null;
-    ViewData["Title"] = @selLangBLL.GetResourceValue("lbl_BankDetailList");
+    ViewData["Title"] = @selLangBLL.GetResourceValue("lbl_BankCardList");
+}
+@{
+    var i18n = new Dictionary<string, string>();
+    i18n.Add("lbl_Currency2", selLangBLL.GetResourceValue("Currency_2"));
+    i18n.Add("lbl_Currency4", selLangBLL.GetResourceValue("Currency_4"));
+    i18n.Add("lbl_Currency15", selLangBLL.GetResourceValue("Currency_15"));
+    i18n.Add("lbl_Currency51", selLangBLL.GetResourceValue("Currency_51"));
+    i18n.Add("lbl_Enable", selLangBLL.GetResourceValue("lbl_Enable"));
+    i18n.Add("lbl_Disable", selLangBLL.GetResourceValue("lbl_Disable"));
 }
 
 <!DOCTYPE html>
@@ -22,12 +31,15 @@
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-    <h1>@selLangBLL.GetResourceValue("lbl_BankDetailList")</h1>
+    <h1>@selLangBLL.GetResourceValue("lbl_BankCardList")</h1>
     <hr />
     <div class="container-fluid" id="Bank" />
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="~/lib/axios.min.js"></script>
+    <script>
+        var i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
+    </script>
     @if (environment.EnvironmentName == "Development")
     {
         <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
@@ -41,5 +53,8 @@
     {
 
     }
+
+
+
 </body>
 </html>
