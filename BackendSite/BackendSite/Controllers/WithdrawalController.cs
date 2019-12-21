@@ -17,11 +17,13 @@ namespace BackendSite.Controllers
     {
         private readonly WithdrawalBLL withdrawalBLL;
         private readonly SelLangBLL selLangBLL;
+        private readonly MessageBLL messageBLL;
 
-        public WithdrawalController(WithdrawalBLL withdrawBLL, SelLangBLL selLangBLL)
+        public WithdrawalController(WithdrawalBLL withdrawBLL, SelLangBLL selLangBLL, MessageBLL messageBLL)
         {
             this.withdrawalBLL = withdrawBLL;
             this.selLangBLL = selLangBLL;
+            this.messageBLL = messageBLL;
         }
 
         public class WithdrawalReq
@@ -83,22 +85,46 @@ namespace BackendSite.Controllers
         {
             var apiResult = new ApiResult(selLangBLL);
             //var apiResult = new ApiResult();
-            var withdrawConfirmReuslt = 99;
+            var withdrawConfirmReuslt = -1;
 
             if (withdrawalReq.Action == 1)
             {
                 withdrawConfirmReuslt = withdrawalBLL.WithdrawalApproved(withdrawalReq.TransId, withdrawalReq.Comment);
+
+                if(withdrawConfirmReuslt > 0)
+                {
+                    // Send message to player
+                    string result = selLangBLL.GetResourceValue("lbl_Approved");
+                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender");
+                    string title = selLangBLL.GetResourceValue("lbl_MessageWithdrawalTitle");
+                    title = string.Format(title, withdrawalReq.TransId, result);
+                    string content = selLangBLL.GetResourceValue("lbl_MessageWithdrawalContent");
+                    content = string.Format(content, withdrawalReq.TransId, result);
+                    messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
+                }
             }
             else if (withdrawalReq.Action == 2)
             {
                 withdrawConfirmReuslt = withdrawalBLL.WithdrawalRejectd(withdrawalReq.TransId, withdrawalReq.Comment);
+
+                if (withdrawConfirmReuslt > 0)
+                {
+                    // Send message to player
+                    string result = selLangBLL.GetResourceValue("lbl_Rejected");
+                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender");
+                    string title = selLangBLL.GetResourceValue("lbl_MessageWithdrawalTitle");
+                    title = string.Format(title, withdrawalReq.TransId, result);
+                    string content = selLangBLL.GetResourceValue("lbl_MessageWithdrawalContent");
+                    content = string.Format(content, withdrawalReq.TransId, result);
+                    messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
+                }
             }
             else
             {
                 withdrawConfirmReuslt = withdrawalBLL.WithdrawalDraft(withdrawalReq.TransId, withdrawalReq.Comment);
             }
 
-            if (withdrawConfirmReuslt != 0)
+            if (withdrawConfirmReuslt <= 0)
             {
                 apiResult.ErrorCode = 1101;
                 apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");

@@ -87,12 +87,11 @@ namespace BackendSite.Service.DAL
                             }
 
                             if (result > 0)
+                            {
                                 trans.Commit();
+                                result = p.Get<int?>("CustId") ?? result;
+                            }
                         }
-
-                        //sportsbook
-                        if (result > 0)
-                            result = p.Get<int?>("CustId") ?? result;
                     }
                 }
             }
@@ -101,10 +100,7 @@ namespace BackendSite.Service.DAL
                 SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatus.Error, actualDeposit);
             }
 
-            //return result > 0 ? 0 : 99;
-
-            //sportsbook
-            return result > 0 ? result : 99;
+            return result;
         }
 
         private int SetDepositInfoFirstDeposit(int depositId, int siteId, MySqlConnection conn, MySqlTransaction trans)

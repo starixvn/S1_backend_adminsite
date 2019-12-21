@@ -297,6 +297,21 @@
   <data name="lbl_Memo" xml:space="preserve">
     <value>Memo</value>
   </data>
+  <data name="lbl_MessageDepoistWithdrawalSender" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="lbl_MessageDepositContent" xml:space="preserve">
+    <value>Your deposit request {0}  has been {1}. Please check with CSD if you have any concern.</value>
+  </data>
+  <data name="lbl_MessageDepositTitle" xml:space="preserve">
+    <value>Your Deposit {0} has been {1}</value>
+  </data>
+  <data name="lbl_MessageWithdrawalContent" xml:space="preserve">
+    <value>Your withdrawal request {0} has been {1}. Please check with CSD if you have any concern.</value>
+  </data>
+  <data name="lbl_MessageWithdrawalTitle" xml:space="preserve">
+    <value>Your Withdrawal {0}  has been {1}</value>
+  </data>
   <data name="lbl_MinAmount" xml:space="preserve">
     <value>Min Amount</value>
   </data>

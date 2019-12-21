@@ -86,7 +86,10 @@ namespace BackendSite.Service.DAL
                             }
 
                             if (result > 0)
+                            {
                                 trans.Commit();
+                                result = p.Get<int?>("CustId") ?? result;
+                            }
                         }
                     }
                 }
@@ -96,7 +99,7 @@ namespace BackendSite.Service.DAL
                 SetWithdrawalLog(withdrawalId, siteId, ex.Message, (int)DepositStatus.Error);
             }
 
-            return result > 0 ? 0 : 99;
+            return result;
         }
 
 

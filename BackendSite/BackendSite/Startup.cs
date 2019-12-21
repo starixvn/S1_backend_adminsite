@@ -42,6 +42,7 @@ namespace BackendSite
             services.AddSingleton<WalletService>();
             services.AddSingleton<BankDetailService>();
             services.AddSingleton<AdminUserService>();
+            services.AddSingleton<MessageService>();
             services.AddSingleton<MenuService>();
             services.AddSingleton<CustInfoService>();
 
@@ -53,6 +54,7 @@ namespace BackendSite
             services.AddSingleton<DepositBLL>();
             services.AddSingleton<WithdrawalBLL>();
             services.AddSingleton<BankDetailBLL>();
+            services.AddSingleton<MessageBLL>();
             services.AddSingleton<AuthorizeBLL>();
             services.AddSingleton<CustInfoBLL>();
 

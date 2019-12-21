@@ -20,11 +20,14 @@ namespace BackendSite.Controllers
         private readonly DepositBLL depositBLL;
         private readonly SelLangBLL selLangBLL;
         private readonly PendingFundBLL pendingFundBLL;
-        public DepositController(DepositBLL depositBLL, SelLangBLL selLangBLL, PendingFundBLL pendingFundBLL)
+        private readonly MessageBLL messageBLL;
+
+        public DepositController(DepositBLL depositBLL, SelLangBLL selLangBLL, PendingFundBLL pendingFundBLL, MessageBLL messageBLL)
         {
             this.depositBLL = depositBLL;
             this.selLangBLL = selLangBLL;
             this.pendingFundBLL = pendingFundBLL;
+            this.messageBLL = messageBLL;
         }
 
         public class DepositReq
@@ -142,8 +145,7 @@ namespace BackendSite.Controllers
         public ApiResult DepositConfirm([FromBody]DepositReq depositReq)
         {
             var apiResult = new ApiResult(selLangBLL);
-            //var apiResult = new ApiResult();
-            var depositConfirmReuslt = 99;
+            var depositConfirmReuslt = -1;
 
             if (depositReq.Action == 1)
             {
@@ -155,14 +157,39 @@ namespace BackendSite.Controllers
                     PendingFund pendingFund = new PendingFund();
                     pendingFund.CustId = depositConfirmReuslt;
                     Task<bool> tmp =  Process(pendingFund);
-                    
+
                     if (!tmp.Result)
+                    {
                         depositConfirmReuslt = -4;
+                    }
+                    else
+                    {
+                        // Send message to player
+                        string result = selLangBLL.GetResourceValue("lbl_Approved");
+                        string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender");
+                        string title = selLangBLL.GetResourceValue("lbl_MessageDepositTitle");
+                        title = string.Format(title, depositReq.TransId, result);
+                        string content = selLangBLL.GetResourceValue("lbl_MessageDepositContent");
+                        content = string.Format(content, depositReq.TransId, result);
+                        messageBLL.SendMessageToPlayer(sender, title, content, depositConfirmReuslt);
+                    }
                 }
             }
             else if (depositReq.Action == 2)
             {
                  depositConfirmReuslt = depositBLL.DepositRejectd(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment);
+
+                if (depositConfirmReuslt > 0)
+                {
+                    // Send message to player
+                    string result = selLangBLL.GetResourceValue("lbl_Rejected");
+                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender");
+                    string title = selLangBLL.GetResourceValue("lbl_MessageDepositTitle");
+                    title = string.Format(title, depositReq.TransId, result);
+                    string content = selLangBLL.GetResourceValue("lbl_MessageDepositContent");
+                    content = string.Format(content, depositReq.TransId, result);
+                    messageBLL.SendMessageToPlayer(sender, title, content, depositConfirmReuslt);
+                }
             }
             else
             {
