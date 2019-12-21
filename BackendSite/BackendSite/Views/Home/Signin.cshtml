@@ -8,120 +8,44 @@
     Layout = null;
     var serverInfo = serverInfoBLL.GetServerInfo();
 }
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-    @*<meta name="viewport" content="width=device-width" />*@
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Backend System 3.0</title>
-    <style type="text/css">
-        <!--
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            margin-top: 0px;
-            margin-left: 0px;
-            margin-right: 0px;
-            margin-bottom: 0px;
-        }
-
-        .footer {
-            font-size: 10px;
-            font-family: Arial, Helvetica, sans-serif;
-            color: #666666;
-        }
-
-        .title {
-            font-size: 12px;
-            font-weight: bold;
-            color: #35738f;
-        }
-
-        select, form, input, textarea {
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 11px;
-            color: #454545;
-            font-weight: normal;
-        }
-
-        input {
-            border: 1px solid #67bde0;
-            padding: 2px 3px 2px 3px;
-        }
-        -->
-    </style>
-    <script type="text/JavaScript">
-<!--
-        function MM_swapImgRestore() { //v3.0
-            var i, x, a = document.MM_sr; for (i = 0; a && i < a.length && (x = a[i]) && x.oSrc; i++) x.src = x.oSrc;
-        }
-
-        function MM_preloadImages() { //v3.0
-            var d = document; if (d.images) {
-                if (!d.MM_p) d.MM_p = new Array();
-                var i, j = d.MM_p.length, a = MM_preloadImages.arguments; for (i = 0; i < a.length; i++)
-                    if (a[i].indexOf("#") != 0) { d.MM_p[j] = new Image; d.MM_p[j++].src = a[i]; }
-            }
-        }
-
-        function MM_findObj(n, d) { //v4.01
-            var p, i, x; if (!d) d = document; if ((p = n.indexOf("?")) > 0 && parent.frames.length) {
-                d = parent.frames[n.substring(p + 1)].document; n = n.substring(0, p);
-            }
-            if (!(x = d[n]) && d.all) x = d.all[n]; for (i = 0; !x && i < d.forms.length; i++) x = d.forms[i][n];
-            for (i = 0; !x && d.layers && i < d.layers.length; i++) x = MM_findObj(n, d.layers[i].document);
-            if (!x && d.getElementById) x = d.getElementById(n); return x;
-        }
-
-        function MM_swapImage() { //v3.0
-            var i, j = 0, x, a = MM_swapImage.arguments; document.MM_sr = new Array; for (i = 0; i < (a.length - 2); i += 3)
-                if ((x = MM_findObj(a[i])) != null) { document.MM_sr[j++] = x; if (!x.oSrc) x.oSrc = x.src; x.src = a[i + 2]; }
-        }
-        //-->
-    </script>
+    <title>Admin Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <link type="text/css" rel="stylesheet" href="~/css/admin-login.css">
 </head>
-<body onload="MM_preloadImages('@Url.Content("~/images/Deposit/btnlogin_ov.gif")')">
-    <form id="frmLogin" name="frmLogin">
-        <table width="860" border="0" align="center" cellpadding="0" cellspacing="0">
-            <tr>
-                <td height="377">
-                    <img src="~/images/Deposit/index_logo.jpg" width="283" height="129" /><img src="~/images/Deposit/index_pic01.jpg" width="577" height="129" /><br />
-                    <img src="~/images/Deposit/index_pic02.jpg" width="475" height="248" /><img src="~/images/Deposit/index_pic03.jpg" width="385" height="248" />
-                </td>
-            </tr>
-            <tr>
-                <td height="86" background="@Url.Content("~/images/Deposit/index_pic04.jpg")">
-                    <table width="530" border="0" align="center" cellpadding="0" cellspacing="0">
-                        <tr>
-                            <td width="26"><img src="~/images/Deposit/icon_pen.gif" width="26" height="20" /></td>
-                            <td class="title">
-                                Username
-                                <input type="text" id="txtID" name="txtID" placeholder="Username" />
-                            </td>
-                            <td width="26"><img src="~/images/Deposit/icon_pen.gif" width="26" height="20" /></td>
-                            <td class="title">
-                                Password
-                                <input type="password" id="txtPW" name="txtPW" placeholder="Password" />
-                            </td>
-                            <td><button type="submit" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('btnlogin','','@Url.Content("~/images/Deposit/btnlogin_ov.gif")',1)"><img src="~/images/Deposit/btnlogin.gif" name="btnlogin" width="64" height="37" border="0" id="btnlogin" /></button></td>
-                        </tr>
 
-                    </table>
-                </td>
-            </tr>
-        </table>
-        <table width="860" height="79" border="0" align="center" cellpadding="0" cellspacing="0">
-            <tr>
-                <td width="36"><img src="~/images/Deposit/index_fotl.gif" width="36" height="79" /></td>
-                <td align="center" valign="top" background="@Url.Content("~/images/Deposit/index_fotbg.gif")">
-                    <span class="footer">
-                        <br />
-                        &copy;&nbsp;Copyright @DateTime.Now.Year @(serverInfo.SiteName).com
-                    </span>
-                </td>
-                <td width="36"><img src="~/images/Deposit/index_fotr.gif" width="36" height="79" /></td>
-            </tr>
-        </table>
+<body>
+    <form id="frmLogin" name="frmLogin">
+        <div class="login">
+            <div class="login__item">
+                <span class="logo">
+                    <img src="~/images/logo.svg">
+                </span>
+            </div>
+            <div class="login__item">
+                <div class="textfield">
+                    <input class="textfield__input" type="text" id="txtID" name="txtID" placeholder="@selLangBLL.GetResourceValue("lbl_UserName")">
+                </div>
+            </div>
+            <div class="login__item">
+                <div class="textfield">
+                    <input class="textfield__input" type="password" id="txtPW" name="txtPW" placeholder="@selLangBLL.GetResourceValue("lbl_Userpwd")">
+                </div>
+            </div>
+            <div class="login__item">
+                <button class="btn btn-highlight">
+                    <span class="text">@selLangBLL.GetResourceValue("lbl_Login")</span>
+                </button>
+            </div>
+        </div>
     </form>
+    
     <script>
         document.getElementById('txtID').focus();
         @{
