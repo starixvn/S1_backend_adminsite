@@ -20,7 +20,15 @@ namespace BackendSite.Service.Model
         {
             get
             {
-                if (DepositType == 3)
+                if (DepositType == 1)
+                {
+                    return Newtonsoft.Json.JsonConvert.DeserializeObject<DepositInfo1_1>(DepositInfo);
+                }
+                else if (DepositType == 2)
+                {
+                    return Newtonsoft.Json.JsonConvert.DeserializeObject<DepositInfo2_1>(DepositInfo);
+                }
+                else if (DepositType == 3)
                 {
                     return Newtonsoft.Json.JsonConvert.DeserializeObject<DepositInfo3_1>(DepositInfo);
                 }
@@ -40,14 +48,36 @@ namespace BackendSite.Service.Model
     public interface IDepositInfo
     {
         int Ver { get; set; }
+        int CurrencyId { get; set; }
     }
-    public class DepositInfo1_1 : IDepositInfo
+    public interface IPay
+    {
+        int PayId { get; set; }
+        int ChannelId { get; set; }
+        int CurrencyId { get; set; }
+    }
+    public class DepositInfo1_1 : IDepositInfo, IPay
     {
         public int Ver { get; set; }
+        public int SysId { get; set; }
+        public int CurrencyId { get; set; }
+        public string SysBankCode { get; set; }
+        public string SysBankName { get; set; }
+        public string BankLogo { get; set; }
+        public int PayId { get; set; }
+        public string BankCode { get; set; }
+        public string BankName { get; set; }
+        public int ChannelId { get; set; }
+        public int Mode { get; set; }
+        public int PointLevel { get; set; }
+        public string PayCode { get; set; }
     }
-    public class DepositInfo2_1 : IDepositInfo
+    public class DepositInfo2_1 : IDepositInfo, IPay
     {
         public int Ver { get; set; }
+        public int PayId { get; set; }
+        public int ChannelId { get; set; }
+        public int CurrencyId { get; set; }
     }
     public class DepositInfo3_1 : IDepositInfo
     {
@@ -55,6 +85,7 @@ namespace BackendSite.Service.Model
         public int SysId { get; set; }
         public string AccountName { get; set; }
         public string AccountNo { get; set; }
+        public int CurrencyId { get; set; }
     }
     public class Comments
     {

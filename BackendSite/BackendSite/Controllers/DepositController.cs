@@ -150,13 +150,13 @@ namespace BackendSite.Controllers
             if (depositReq.Action == 1)
             {
                 if (depositReq.ActualDeposit > 0)
-                     depositConfirmReuslt = depositBLL.DepositApproved(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment);
+                    depositConfirmReuslt = depositBLL.DepositApproved(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment, User.Identity.Name);
 
                 if (depositConfirmReuslt > 0)
                 {
                     PendingFund pendingFund = new PendingFund();
                     pendingFund.CustId = depositConfirmReuslt;
-                    Task<bool> tmp =  Process(pendingFund);
+                    Task<bool> tmp = Process(pendingFund);
 
                     if (!tmp.Result)
                     {
@@ -177,7 +177,7 @@ namespace BackendSite.Controllers
             }
             else if (depositReq.Action == 2)
             {
-                 depositConfirmReuslt = depositBLL.DepositRejectd(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment);
+                depositConfirmReuslt = depositBLL.DepositRejectd(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment, User.Identity.Name);
 
                 if (depositConfirmReuslt > 0)
                 {
@@ -193,16 +193,15 @@ namespace BackendSite.Controllers
             }
             else
             {
-                 depositConfirmReuslt = depositBLL.DepositDraft(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment);
+                depositConfirmReuslt = depositBLL.DepositDraft(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment, User.Identity.Name);
             }
-
 
             if (depositConfirmReuslt == -4)
             {
                 apiResult.ErrorCode = 1102;
                 apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailedtoSB");
             }
-            else if (depositConfirmReuslt ==0)
+            else if (depositConfirmReuslt == 0)
             {
                 apiResult.ErrorCode = 1101;
                 apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");

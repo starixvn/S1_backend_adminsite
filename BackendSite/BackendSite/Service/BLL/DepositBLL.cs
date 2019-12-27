@@ -45,22 +45,22 @@ namespace BackendSite.Service.BLL
             return depositService.GetDepositRequestComment(depositId, serverInfo.SiteId);
         }
 
-        public int DepositApproved(string transId, decimal actualDeposit, string comment)
+        public int DepositApproved(string transId, decimal actualDeposit, string comment, string Operator)
         {
             var serverInfo = serverInfoService.GetModel();
-            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, comment, DepositStatus.Pending, DepositStatus.Approved);
+            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, comment, Operator, DepositStatus.Pending, DepositStatus.Approved);
         }
 
-        public int DepositRejectd(string transId, decimal actualDeposit, string comment)
+        public int DepositRejectd(string transId, decimal actualDeposit, string comment, string Operator)
         {
             var serverInfo = serverInfoService.GetModel();
-            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, comment, DepositStatus.Pending, DepositStatus.Rejected);
+            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, comment, Operator, DepositStatus.Pending, DepositStatus.Rejected);
         }
 
-        public int DepositDraft(string transId, decimal actualDeposit, string comment)
+        public int DepositDraft(string transId, decimal actualDeposit, string comment, string Operator)
         {
             var serverInfo = serverInfoService.GetModel();
-            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, comment, DepositStatus.Draft, DepositStatus.Draft);
+            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, comment, Operator, DepositStatus.Draft, DepositStatus.Draft);
         }
     }
 }
