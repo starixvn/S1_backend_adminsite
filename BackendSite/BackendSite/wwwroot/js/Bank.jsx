@@ -5,6 +5,7 @@ class Header extends React.Component {
         return (
             <thead>
                 <tr>
+                    <th scope="col">BankCode</th>
                     <th scope="col">BankName</th>
                     <th scope="col">AccountName</th>
                     <th scope="col">AccountNo</th>
@@ -44,7 +45,8 @@ class Row extends React.Component {
         }
         return (
             <tr>
-                <th scope="row">{Data.bankName}</th>
+                <th scope="row">{Data.bankCode}</th>
+                <td>{Data.bankName}</td>
                 <td>{Data.accountName}</td>
                 <td>{Data.accountNo}</td>
                 <td>{Data.minAmount}</td>
@@ -66,6 +68,7 @@ class RowEdit extends React.Component {
         let Data = this.props.Data;
         return (
             <tr>
+                <td><input type="text" name="bankCode" value={Data.bankCode} /></td>
                 <td><input type="text" name="bankName" value={Data.bankName} /></td>
                 <td><input type="text" name="accountName" size="10" value={Data.accountName} /></td>
                 <td><input type="text" name="accountNo" maxlength="20" size="20" value={Data.accountNo} /></td>
