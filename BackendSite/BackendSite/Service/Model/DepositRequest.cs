@@ -97,4 +97,13 @@ namespace BackendSite.Service.Model
 
         public decimal ActualDeposit { get; set; }
     }
+
+    public class DepositReceipt
+    {
+        public int DepositId { get; set; }
+        public string RefNo { get; set; }
+        public DateTime DepositTime { get; set; }
+        public string PicFileName { get; set; }
+        public byte[] DepositPic { get; set; }
+    }
 }

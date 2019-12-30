@@ -62,5 +62,14 @@ namespace BackendSite.Service.BLL
             var serverInfo = serverInfoService.GetModel();
             return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, comment, Operator, DepositStatus.Draft, DepositStatus.Draft);
         }
+
+        public DepositReceipt GetDepositReceipt(string transId)
+        {
+            int depositId = 0;
+            Match m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out depositId);
+            var serverInfo = serverInfoService.GetModel();
+            return depositService.GetDepositReceipt(depositId, serverInfo.SiteId);
+        }
     }
 }

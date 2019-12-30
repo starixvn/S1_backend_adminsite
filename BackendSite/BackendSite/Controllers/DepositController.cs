@@ -220,5 +220,18 @@ namespace BackendSite.Controllers
             bool result = await pendingFundBLL.ProcessAsync(pendingFund);
             return result;
         }
+
+        [HttpGet]
+        public IActionResult GetDepositReceiptPic(string transId)
+        {
+            var depositReceipt = depositBLL.GetDepositReceipt(transId);
+            if (depositReceipt == null)
+            {
+                return StatusCode(404);
+            }
+            var image = depositReceipt.DepositPic;
+            
+            return File(image, "image/jpeg");
+        }
     }
 }
