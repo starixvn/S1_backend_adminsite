@@ -6,112 +6,97 @@
 @inject ServerInfoBLL serverInfoBLL
 @inject AuthorizeBLL authorizeBLL
 @{
-    Layout = null;
+    Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
     ViewData["Title"] = @selLangBLL.GetResourceValue("lbl_DepositApproval");
 }
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - BackendSite</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
-</head>
-<body>
-    <h1>@selLangBLL.GetResourceValue("lbl_DepositApproval")</h1>
-    <hr />
-    <div class="container-fluid">
-        <table class="table table-striped">
-            <tr>
-                <th scope="row">@selLangBLL.GetResourceValue("lbl_TransId")</th>
-                <td>@Model.TransId</td>
-            </tr>
-            <tr>
-                <th scope="row">@selLangBLL.GetResourceValue("lbl_UserName")</th>
-                <td>@Model.UserName</td>
-            </tr>
-            <tr>
-                <th scope="row">@selLangBLL.GetResourceValue("lbl_DepositType")</th>
-                <td>@Model.DepositTypeString</td>
-            </tr>
-            <tr>
-                <th scope="row">@selLangBLL.GetResourceValue("lbl_Aount")</th>
-                <td>@Model.Amount</td>
-            </tr>
-            <tr>
-                <th scope="row">@selLangBLL.GetResourceValue("lbl_ActualDeposit")</th>
-                @{ if (@Model.Status == 0 || @Model.Status == 1)
-                    {
-                        <td><input type="number" id="actualdeposit" value="@Model.ActualDeposit" /></td>
-
-                    }
-                    else
-                    {
-                        <td>@Model.ActualDeposit</td>
-                        <input type="hidden" id="actualdeposit" value="@Model.ActualDeposit" />
-                    }
-                }
-            </tr>
-            <tr>
-                <th scope="row">@selLangBLL.GetResourceValue("lbl_Memo")</th>
-                <td>@Model.Memo</td>
-            </tr>
-            <tr>
-                <th scope="row">@selLangBLL.GetResourceValue("lbl_Postscript")</th>
-                <td>@Model.PostScript</td>
-            </tr>
-            <tr>
-                <th scope="row">@selLangBLL.GetResourceValue("lbl_CreateTime")</th>
-                <td>@Model.CreateTime</td>
-            </tr>
-            <tr>
-                <th scope="row">@selLangBLL.GetResourceValue("lbl_Status")</th>
-                <td>@Model.StatusString</td>
-            </tr>
-        </table>
-
-        <table class="table table-striped">
-            <thead class="thead-light">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Create Time</th>
-                    <th scope="col">Actual Deposit</th>
-                    <th scope="col">Comment</th>
-                    <th scope="col">Action</th>
-                </tr>
-            </thead>
-            @{var i = 1; }
-            <tbody>
-                @foreach (var item in @Model.Comments)
-                {
-                    <tr>
-                        <td scope="row">@(i++)</td>
-                        <td>@item.CreateTime</td>
-                        <td>@item.ActualDeposit</td>
-                        <td>@item.Comment</td>
-                        <td>@item.ActionString</td>
-                    </tr>
-                }
-                </tdbody>
-        </table>
-        <div class="container form-group">
-            <label for="Command">@selLangBLL.GetResourceValue("lbl_Comment")</label>
-            <textarea class="form-control" id="comment" rows="3"></textarea>
-        </div>
+<h1>@selLangBLL.GetResourceValue("lbl_DepositApproval")</h1>
+<table class="table table-striped">
+    <tr>
+        <th scope="row">@selLangBLL.GetResourceValue("lbl_TransId")</th>
+        <td>@Model.TransId</td>
+    </tr>
+    <tr>
+        <th scope="row">@selLangBLL.GetResourceValue("lbl_UserName")</th>
+        <td>@Model.UserName</td>
+    </tr>
+    <tr>
+        <th scope="row">@selLangBLL.GetResourceValue("lbl_DepositType")</th>
+        <td>@Model.DepositTypeString</td>
+    </tr>
+    <tr>
+        <th scope="row">@selLangBLL.GetResourceValue("lbl_Aount")</th>
+        <td>@Model.Amount</td>
+    </tr>
+    <tr>
+        <th scope="row">@selLangBLL.GetResourceValue("lbl_ActualDeposit")</th>
         @{ if (@Model.Status == 0 || @Model.Status == 1)
             {
-                <input type='button' class="btn btn-primary" onclick='UpdateStatus(1)' value='@selLangBLL.GetResourceValue("lbl_Approve")'>
-                <input type='button' class="btn btn-primary" onclick='UpdateStatus(2)' value='@selLangBLL.GetResourceValue("lbl_Reject")'>
+                <td><input type="number" id="actualdeposit" value="@Model.ActualDeposit" /></td>
+
             }
-            <input type='button' class="btn btn-primary" onclick='UpdateStatus(3)' value='@selLangBLL.GetResourceValue("lbl_Comment")'>
+            else
+            {
+                <td>@Model.ActualDeposit</td>
+                <input type="hidden" id="actualdeposit" value="@Model.ActualDeposit" />
+            }
         }
-    </div>
+    </tr>
+    <tr>
+        <th scope="row">@selLangBLL.GetResourceValue("lbl_Memo")</th>
+        <td>@Model.Memo</td>
+    </tr>
+    <tr>
+        <th scope="row">@selLangBLL.GetResourceValue("lbl_Postscript")</th>
+        <td>@Model.PostScript</td>
+    </tr>
+    <tr>
+        <th scope="row">@selLangBLL.GetResourceValue("lbl_CreateTime")</th>
+        <td>@Model.CreateTime</td>
+    </tr>
+    <tr>
+        <th scope="row">@selLangBLL.GetResourceValue("lbl_Status")</th>
+        <td>@Model.StatusString</td>
+    </tr>
+</table>
 
-
-    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="~/lib/axios.min.js"></script>
+<table class="table table-striped">
+    <thead class="thead-light">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Create Time</th>
+            <th scope="col">Actual Deposit</th>
+            <th scope="col">Comment</th>
+            <th scope="col">Action</th>
+        </tr>
+    </thead>
+    @{
+        var i = 1;
+    }
+    <tbody>
+        @foreach (var item in @Model.Comments)
+        {
+            <tr>
+                <td scope="row">@(i++)</td>
+                <td>@item.CreateTime</td>
+                <td>@item.ActualDeposit</td>
+                <td>@item.Comment</td>
+                <td>@item.ActionString</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="container form-group">
+    <label for="Command">@selLangBLL.GetResourceValue("lbl_Comment")</label>
+    <textarea class="form-control" id="comment" rows="3"></textarea>
+</div>
+@{ if (@Model.Status == 0 || @Model.Status == 1)
+    {
+        <input type='button' class="btn btn-primary" onclick='UpdateStatus(1)' value='@selLangBLL.GetResourceValue("lbl_Approve")'>
+        <input type='button' class="btn btn-primary" onclick='UpdateStatus(2)' value='@selLangBLL.GetResourceValue("lbl_Reject")'>
+    }
+    <input type='button' class="btn btn-primary" onclick='UpdateStatus(3)' value='@selLangBLL.GetResourceValue("lbl_Comment")'>
+}
+@section Scripts {
     <script type="text/javascript">
 
     function UpdateStatus(Status) {
@@ -130,16 +115,4 @@
             });
       }
     </script>
-    @if (environment.EnvironmentName == "Development")
-    {
-        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
-        <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
-        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
-    }
-    else
-    {
-
-    }
-</body>
-</html>
+}
