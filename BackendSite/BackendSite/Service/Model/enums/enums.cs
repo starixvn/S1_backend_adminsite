@@ -43,6 +43,18 @@ namespace BackendSite.Service.Model.enums
         Error = 99
     }
 
+    public enum WithdrawalStatus
+    {
+        Pending = 1,
+        OnHold = 2,
+        Verify = 3,
+        Process = 4,
+        Cancelled = 5,
+        Approved = 6,
+        Rejected = 7,
+        Error = 99
+    }
+
     public enum AdminUserStatus
     {
         Running = 1,

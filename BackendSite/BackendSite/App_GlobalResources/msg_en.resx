@@ -165,6 +165,9 @@
   <data name="msg_Pending" xml:space="preserve">
     <value>Pending</value>
   </data>
+  <data name="msg_Processing" xml:space="preserve">
+    <value>Processing</value>
+  </data>
   <data name="msg_Rejected" xml:space="preserve">
     <value>Rejected</value>
   </data>

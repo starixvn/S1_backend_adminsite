@@ -50,19 +50,19 @@ namespace BackendSite.Service.BLL
         public int WithdrawalApproved(string transId, string comment)
         {
             var serverInfo = serverInfoService.GetModel();
-            return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, DepositStatus.Pending, DepositStatus.Approved);
+            return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, WithdrawalStatus.Pending, WithdrawalStatus.Approved);
         }
 
         public int WithdrawalRejectd(string transId, string comment)
         {
             var serverInfo = serverInfoService.GetModel();
-            return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, DepositStatus.Pending, DepositStatus.Rejected);
+            return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, WithdrawalStatus.Pending, WithdrawalStatus.Rejected);
         }
 
-        public int WithdrawalDraft(string transId, string comment)
+        public int WithdrawalVerify(string transId, string comment)
         {
             var serverInfo = serverInfoService.GetModel();
-            return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, DepositStatus.Draft, DepositStatus.Draft);
+            return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, WithdrawalStatus.Pending, WithdrawalStatus.Pending);
         }
     }
 }

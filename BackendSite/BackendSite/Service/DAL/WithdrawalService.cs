@@ -49,7 +49,7 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public int SetWithdrawalInfo(string transId, int siteId, string comment, DepositStatus forStatus, DepositStatus status)
+        public int SetWithdrawalInfo(string transId, int siteId, string comment, WithdrawalStatus forStatus, WithdrawalStatus status)
         {
             int withdrawalId = 0;
             int type = 1 + typePosition;
@@ -74,7 +74,7 @@ namespace BackendSite.Service.DAL
                         {
                             SetWithdrawalLog(withdrawalId, siteId, comment, (int)status);
 
-                            if (status == DepositStatus.Rejected)
+                            if (status == WithdrawalStatus.Rejected)
                             {
                                 byte is1stDepoist = 0;
                                 decimal afterAmount = 0;
@@ -96,7 +96,7 @@ namespace BackendSite.Service.DAL
             }
             catch (Exception ex)
             {
-                SetWithdrawalLog(withdrawalId, siteId, ex.Message, (int)DepositStatus.Error);
+                SetWithdrawalLog(withdrawalId, siteId, ex.Message, (int)WithdrawalStatus.Error);
             }
 
             return result;
