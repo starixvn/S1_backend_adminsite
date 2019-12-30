@@ -21,7 +21,6 @@ namespace BackendSite.Controllers
         private readonly SelLangBLL selLangBLL;
         private readonly PendingFundBLL pendingFundBLL;
         private readonly MessageBLL messageBLL;
-
         public DepositController(DepositBLL depositBLL, SelLangBLL selLangBLL, PendingFundBLL pendingFundBLL, MessageBLL messageBLL)
         {
             this.depositBLL = depositBLL;
@@ -230,7 +229,6 @@ namespace BackendSite.Controllers
                 return StatusCode(404);
             }
             var image = depositReceipt.DepositPic;
-            
             return File(image, "image/jpeg");
         }
     }
