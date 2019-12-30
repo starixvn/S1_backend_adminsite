@@ -70,5 +70,5 @@
         }
     }
 
-    ReactDOM.render(<CustInfoPanel/>,document.getElementById('CustInfoPanel'));
+    ReactDOM.render(<CustInfoPanel/>,document.getElementById('Panel'));
 })(jQuery, React, ReactDOM, i18n, axios);
