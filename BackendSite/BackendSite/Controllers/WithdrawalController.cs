@@ -49,28 +49,28 @@ namespace BackendSite.Controllers
             {
                 switch (item.Action)
                 {
-                    case (int)DepositStatus.Draft:
-                        item.ActionString = selLangBLL.GetMsg("msg_Draft");
-                        break;
-                    case (int)DepositStatus.Pending:
+                    case (int)WithdrawalStatus.Pending:
                         item.ActionString = selLangBLL.GetMsg("msg_Pending");
                         break;
-                    case (int)DepositStatus.Paid:
-                        item.ActionString = selLangBLL.GetMsg("msg_Paid");
+                    case (int)WithdrawalStatus.OnHold:
+                        item.ActionString = selLangBLL.GetMsg("msg_OnHold");
                         break;
-                    case (int)DepositStatus.Approved:
+                    case (int)WithdrawalStatus.Verify:
+                        item.ActionString = selLangBLL.GetMsg("msg_Verify");
+                        break;
+                    case (int)WithdrawalStatus.Process:
+                        item.ActionString = selLangBLL.GetMsg("msg_Processing");
+                        break;
+                    case (int)WithdrawalStatus.Cancelled:
+                        item.ActionString = selLangBLL.GetMsg("msg_Cancelled");
+                        break;
+                    case (int)WithdrawalStatus.Approved:
                         item.ActionString = selLangBLL.GetMsg("msg_Approved");
                         break;
-                    case (int)DepositStatus.Rejected:
+                    case (int)WithdrawalStatus.Rejected:
                         item.ActionString = selLangBLL.GetMsg("msg_Rejected");
                         break;
-                    case (int)DepositStatus.Canceled:
-                        item.ActionString = selLangBLL.GetMsg("msg_Canceled");
-                        break;
-                    case (int)DepositStatus.Expired:
-                        item.ActionString = selLangBLL.GetMsg("msg_Expired");
-                        break;
-                    case (int)DepositStatus.Error:
+                    case (int)WithdrawalStatus.Error:
                         item.ActionString = selLangBLL.GetMsg("msg_Error");
                         break;
                 }
@@ -121,7 +121,7 @@ namespace BackendSite.Controllers
             }
             else
             {
-                withdrawConfirmReuslt = withdrawalBLL.WithdrawalDraft(withdrawalReq.TransId, withdrawalReq.Comment);
+                withdrawConfirmReuslt = withdrawalBLL.WithdrawalVerify(withdrawalReq.TransId, withdrawalReq.Comment);
             }
 
             if (withdrawConfirmReuslt <= 0)
