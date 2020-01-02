@@ -210,6 +210,9 @@
   <data name="lbl_BankName" xml:space="preserve">
     <value>Bank Name</value>
   </data>
+  <data name="lbl_BankSlip" xml:space="preserve">
+    <value>Bank Slip</value>
+  </data>
   <data name="lbl_Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
@@ -264,6 +267,9 @@
   <data name="lbl_DepositRequest" xml:space="preserve">
     <value>Deposit Request</value>
   </data>
+  <data name="lbl_DepositTime" xml:space="preserve">
+    <value>Deposit Time</value>
+  </data>
   <data name="lbl_DepositType" xml:space="preserve">
     <value>Deposit Type</value>
   </data>
@@ -296,9 +302,6 @@
   </data>
   <data name="lbl_MaxAmount" xml:space="preserve">
     <value>Max Amount</value>
-  </data>
-  <data name="lbl_Memo" xml:space="preserve">
-    <value>Memo</value>
   </data>
   <data name="lbl_MessageDepoistWithdrawalSender" xml:space="preserve">
     <value>System</value>
@@ -347,6 +350,9 @@
   </data>
   <data name="lbl_Process" xml:space="preserve">
     <value>Process</value>
+  </data>
+  <data name="lbl_RefNo" xml:space="preserve">
+    <value>Ref No.</value>
   </data>
   <data name="lbl_Reject" xml:space="preserve">
     <value>Reject</value>

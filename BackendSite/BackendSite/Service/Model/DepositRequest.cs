@@ -36,9 +36,11 @@ namespace BackendSite.Service.Model
             }
         }
         public int FirstDeposit { set; get; }
-        public string Memo { set; get; }
         public string PostScript { set; get; }
         public int Status { set; get; }
+        public int Receipt { set; get; }
+        public string RefNo { set; get; }
+        public DateTime DepositTime { set; get; }
 
         public virtual IEnumerable<Comments> Comments { get; set; }
 
