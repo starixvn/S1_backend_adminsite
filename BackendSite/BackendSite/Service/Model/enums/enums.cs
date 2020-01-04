@@ -52,6 +52,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum WithdrawalStatus
     {
+        Draft = 0,
         Pending = 1,
         OnHold = 2,
         Verify = 3,

@@ -459,6 +459,9 @@
   <data name="lbl_WithdrawalRequest" xml:space="preserve">
     <value>Withdrawal Request</value>
   </data>
+  <data name="lbl_WithdrawalStatus0" xml:space="preserve">
+    <value>Draft</value>
+  </data>
   <data name="lbl_WithdrawalStatus1" xml:space="preserve">
     <value>Pending</value>
   </data>
