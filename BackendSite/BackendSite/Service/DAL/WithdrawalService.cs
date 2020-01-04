@@ -24,13 +24,26 @@ namespace BackendSite.Service.DAL
             this.walletService = walletService;
         }
 
-        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(int siteId)
+        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(int? withdrawalType, long startDate, long endDate, int siteId, string WithdrawalId, string UserName, int? currencyId, int? status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            int withdrawalId = 0;
+            if (!string.IsNullOrWhiteSpace(WithdrawalId))
             {
-                return conn.Query<WithdrawalRequest>("WithdrawalList_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+                Match m = Regex.Match(WithdrawalId, @"\d+");
+                int.TryParse(m.Value, out withdrawalId);
             }
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var p = new DynamicParameters(new { WithdrawalType = withdrawalType, StartDate = startDate, EndDate = endDate, SiteId = siteId, WithdrawalId = withdrawalId, TransId = WithdrawalId, UserName, CurrencyId = currencyId, Status = status, PageSize = pageSize });
+            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = conn.Query<WithdrawalRequest>("WithdrawalList_Get", p, commandType: CommandType.StoredProcedure);
+            pageNumber = p.Get<int?>("PageNumber") ?? 0;
+            totalPages = p.Get<int?>("TotalPages") ?? 0;
+            rowCount = p.Get<int?>("RowCount") ?? 0;
+            return result;
         }
 
         public WithdrawalRequest GetWithdrawalRequest(int withdrawalId, int siteId)

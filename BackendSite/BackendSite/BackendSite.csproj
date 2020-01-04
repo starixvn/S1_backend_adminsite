@@ -10,6 +10,35 @@
 
   <ItemGroup>
     <None Include="wwwroot\js\site.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\calendar-setup.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\calendar-setup_stripped.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\calendar.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\calendar_stripped.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\doc\reference.pdf" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-br.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-ca.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-cs-win.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-da.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-du.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-el.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-en.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-es.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-fr.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-hr-utf8.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-hr.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-hu.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-it.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-nl.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-no.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-pl.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-pt.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-ro.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-ru.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-sp.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-sw.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-tr.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-zh.js" />
+    <None Include="wwwroot\lib\Oneworks\jscalendar\README" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,5 +47,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0" />
     <PackageReference Include="MySql.Data" Version="8.0.18" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties app_3data_4menu_1json__JsonSchema="http://json-schema.org/draft-04/schema" /></VisualStudio></ProjectExtensions>
 
 </Project>

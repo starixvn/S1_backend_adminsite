@@ -17,7 +17,7 @@
 
     class CustInfoList extends React.Component {
         ChangePage(pageNumber) {
-            this.props.doSearch(pageNumber);
+            this.props.onSearch(pageNumber);
         }
 
         render() {
@@ -28,7 +28,7 @@
                 custInfoRows = <tbody>{data.CustInfoList.map(x => <CustInfoRow TransId={data.sTransId} key={x.CustId} dataRow={x}/>)}</tbody>;
 
                 for(let i = 1; i<=data.TotalPages; i++){
-                PageNum.push(<li className={"page-item"+(data.PageNumber==i?" active":"")} key={i}><a className="page-link" href="javascript:void(0);" onClick={data.PageNumber==i ? null: this.ChangePage.bind(this, i)}>{i}</a></li>);
+                PageNum.push(<li className={"page-item"+(data.PageNumber==i?" active":"")} key={i}><a className="page-link" onClick={data.PageNumber==i ? null: this.ChangePage.bind(this, i)}>{i}</a></li>);
                 }
             }
             
@@ -85,11 +85,11 @@
             event.preventDefault();
             this._Search = true;
             this.setState({sUserName: this.state.UserName,sTransId:this.state.TransId, Loading: true}, function() {
-                this.doSearch(1);
+                this.onSearch(1);
             }.bind(this));
         }
 
-        doSearch(pageNumber) {
+        onSearch(pageNumber) {
 
             let data = {UserName: this.state.sUserName=="" ? null:this.state.sUserName, TransId: this.state.sTransId=="" ? null:this.state.sTransId,PageNumber: pageNumber, PageSize: this._PageSize};
 
@@ -134,7 +134,7 @@
                         </div>
                         <button type="submit" className="btn btn-primary">Search</button>
                     </form>
-                    {this._Search ? <CustInfoList Data={{...this.state}} doSearch={this.doSearch.bind(this)}/>: null}     
+                    {this._Search ? <CustInfoList Data={{...this.state}} onSearch={this.onSearch.bind(this)}/>: null}     
                 </div>                
             )
         }

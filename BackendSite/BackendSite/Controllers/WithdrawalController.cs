@@ -35,9 +35,7 @@ namespace BackendSite.Controllers
 
         public IActionResult WithdrawalList()
         {
-            IEnumerable<WithdrawalRequest> withdrawRequests = withdrawalBLL.GetWithdrawalRequestList();
-
-            return View(withdrawRequests.ToList());
+            return View();
         }
 
         public IActionResult WithdrawalRequest(string transId)

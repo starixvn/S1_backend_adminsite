@@ -1,84 +1,95 @@
-﻿@model IEnumerable<WithdrawalRequest>
-@using Microsoft.AspNetCore.Hosting
+﻿@using Microsoft.AspNetCore.Hosting
 @using BackendSite.Service.BLL
 @using BackendSite.Service.Model
 @inject IWebHostEnvironment environment
 @inject SelLangBLL selLangBLL
 @inject ServerInfoBLL serverInfoBLL
 @inject AuthorizeBLL authorizeBLL
+@section Style {
+    <link href="~/css/Oneworks/system_style.css" rel="stylesheet" />
+    <link href="~/lib/Oneworks/jscalendar/calendar-blue.css" rel="stylesheet" />
+}
 @{
-    Layout = null;
+    Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
     ViewData["Title"] = @selLangBLL.GetResourceValue("lbl_WithdrawalRequest");
 }
 @{
+    var serverInfo = serverInfoBLL.GetServerInfo();
     var i18n = new Dictionary<string, string>();
-    i18n.Add("lbl_Currency2", selLangBLL.GetResourceValue("Currency_2"));
-    i18n.Add("lbl_Currency4", selLangBLL.GetResourceValue("Currency_4"));
-    i18n.Add("lbl_Currency15", selLangBLL.GetResourceValue("Currency_15"));
-    i18n.Add("lbl_Currency51", selLangBLL.GetResourceValue("Currency_51"));
+
+    foreach (var currency in serverInfo.ICurrencyList)
+    {
+        if (!i18n.ContainsKey($"lbl_Currency{currency}"))
+            i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+    }
+
     i18n.Add("lbl_Pending", selLangBLL.GetResourceValue("lbl_Pending"));
     i18n.Add("lbl_Approved", selLangBLL.GetResourceValue("lbl_Approved"));
-}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - BackendSite</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
-</head>
-<body>
-    <h1>@selLangBLL.GetResourceValue("lbl_WithdrawalRequest")</h1>
-    <hr />
-    <div class="container-fluid">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">@selLangBLL.GetResourceValue("lbl_WithdrawalId")</th>
-                    <th scope="col">@selLangBLL.GetResourceValue("lbl_WithdrawalType")</th>
-                    <th scope="col">@selLangBLL.GetResourceValue("lbl_UserName")</th>
-                    <th scope="col">WithdrawalInfo</th>
-                    <th scope="col">@selLangBLL.GetResourceValue("lbl_Amount")</th>
-                    <th scope="col">@selLangBLL.GetResourceValue("lbl_ChargeFee")</th>
-                    <th scope="col">@selLangBLL.GetResourceValue("lbl_Memo")</th>
-                    <th scope="col">@selLangBLL.GetResourceValue("lbl_CreateTime")</th>
-                    <th scope="col">@selLangBLL.GetResourceValue("lbl_Status")</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <th scope="row">@Html.ActionLink(@item.TransId, "WithdrawalRequest", "Withdrawal", new { transID = @item.TransId })</th>
-                        <td>@item.WithdrawalType</td>
-                        <td>@item.UserName</td>
-                        <td>@item.WithdrawalInfo</td>
-                        <td>@item.Amount</td>
-                        <td>@item.ChargeFee</td>
-                        <td>@item.Memo</td>
-                        <td>@item.CreateTime</td>
-                        <td>@item.Status</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
 
-    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script>
-        var i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
+    string[] lbl_Txts = new string[] { "lbl_WithdrawalId", "lbl_WithdrawalType", "lbl_UserName", "lbl_Amount", "lbl_ChargeFee", "lbl_Memo", "lbl_CreateTime", "lbl_Status" };
+    foreach (var lbl_Txt in lbl_Txts)
+    {
+        if (!i18n.ContainsKey(lbl_Txt))
+            i18n.Add(lbl_Txt, selLangBLL.GetResourceValue(lbl_Txt));
+    }
+
+}
+<h4>@selLangBLL.GetResourceValue("lbl_WithdrawalRequest")</h4>
+<div id="searchForm"></div>
+@*<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">@selLangBLL.GetResourceValue("lbl_WithdrawalId")</th>
+            <th scope="col">@selLangBLL.GetResourceValue("lbl_WithdrawalType")</th>
+            <th scope="col">@selLangBLL.GetResourceValue("lbl_UserName")</th>
+            <th scope="col">WithdrawalInfo</th>
+            <th scope="col">@selLangBLL.GetResourceValue("lbl_Amount")</th>
+            <th scope="col">@selLangBLL.GetResourceValue("lbl_ChargeFee")</th>
+            <th scope="col">@selLangBLL.GetResourceValue("lbl_Memo")</th>
+            <th scope="col">@selLangBLL.GetResourceValue("lbl_CreateTime")</th>
+            <th scope="col">@selLangBLL.GetResourceValue("lbl_Status")</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <th scope="row">@Html.ActionLink(@item.TransId, "WithdrawalRequest", "Withdrawal", new { transID = @item.TransId })</th>
+                <td>@item.WithdrawalType</td>
+                <td>@item.UserName</td>
+                <td>@item.WithdrawalInfo</td>
+                <td>@item.Amount</td>
+                <td>@item.ChargeFee</td>
+                <td>@item.Memo</td>
+                <td>@item.CreateTime</td>
+                <td>@item.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        <li class="page-item disabled"><a class="page-link" href="javascript:void(0);" tabindex="-1" aria-disabled="true">Previous</a></li>
+        <li class="page-item active"><a class="page-link" href="javascript:void(0);">1</a></li>
+        <li class="page-item"><a class="page-link" href="javascript:void(0);">2</a></li>
+        <li class="page-item"><a class="page-link" href="javascript:void(0);" aria-disabled="false">Next</a></li>
+    </ul>
+</nav>*@
+@section Scripts {
+    <script src="~/lib/Oneworks/jscalendar/calendar.js"></script>
+    <script src="~/lib/Oneworks/jscalendar/lang/calendar-en.js"></script>
+    <script src="~/lib/Oneworks/jscalendar/calendar-setup.js"></script>
+    <script type="text/javascript">
+        $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
+        var CurrencyList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(serverInfo.ICurrencyList));
     </script>
+    <script src="~/js/component/Withdrawal/WithdrawalList.min.js" asp-append-version="true"></script>
     @if (environment.EnvironmentName == "Development")
     {
-        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
-        <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
-        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+
     }
     else
     {
 
     }
-</body>
-</html>
+}

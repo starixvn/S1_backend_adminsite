@@ -1,0 +1,47 @@
+
+  <link rel="stylesheet" type="text/css" media="all" href="calendar-blue.css" title="win2k-cold-1" />
+  <script type="text/javascript" src="calendar.js"></script>
+  <script type="text/javascript" src="lang/calendar-en.js"></script>
+  <script type="text/javascript" src="calendar-setup.js"></script>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta name="GENERATOR" content="Microsoft FrontPage 5.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>New Page 1</title>
+</head>
+
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111"  id="AutoNumber1">
+  <tr>
+    <td width="100%">From<input type="text" name="fromdate" id="f_date_b" size="13" readonly/>
+<img src="img.gif" id="f_trigger_b" style="cursor: pointer; border: 1px solid red;" title="Date selector"
+      onmouseover="this.style.background='red';" onmouseout="this.style.background=''" width="18" height="18" />
+ <script type="text/javascript">
+    Calendar.setup({
+        inputField     :    "f_date_b",      // id of the input field
+        ifFormat       :    "mm/dd/y",       // format of the input field
+        button         :    "f_trigger_b",   // trigger for the calendar (button ID)
+        singleClick    :    true           // double-click mode
+    });
+    </script>
+To
+<input type="text" name="todate" id="f_date_c" size="13" readonly/>
+<img src="img.gif" id="f_trigger_c" style="cursor: pointer; border: 1px solid red;" title="Date selector"
+      onmouseover="this.style.background='red';" onmouseout="this.style.background=''" width="18" height="18" />
+ <script type="text/javascript">
+    Calendar.setup({
+        inputField     :    "f_date_c",      // id of the input field
+        ifFormat       :    "mm/dd/y",       // format of the input field
+        button         :    "f_trigger_c",   // trigger for the calendar (button ID)
+        singleClick    :    true           // double-click mode
+    });
+    </script>
+</td>
+  </tr>
+</table>
+</body>
+
+</html>

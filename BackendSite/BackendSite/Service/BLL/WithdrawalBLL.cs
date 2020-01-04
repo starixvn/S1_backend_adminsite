@@ -20,10 +20,10 @@ namespace BackendSite.Service.BLL
             this.serverInfoService = serverInfoService;
         }
 
-        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList()
+        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(int? withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, int? currencyId, int? status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             var serverInfo = serverInfoService.GetModel();
-            return withdrawalService.GetWithdrawalRequestList(serverInfo.SiteId);
+            return withdrawalService.GetWithdrawalRequestList(withdrawalType, startDate, endDate, serverInfo.SiteId, WithdrawalId, UserName, currencyId, status, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
 
         public WithdrawalRequest GetWithdrawalRequest(string transId)
