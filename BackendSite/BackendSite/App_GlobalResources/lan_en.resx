@@ -174,6 +174,12 @@
   <data name="lbl_Action" xml:space="preserve">
     <value>Action</value>
   </data>
+  <data name="lbl_ActStatus1" xml:space="preserve">
+    <value>Non Deposit Customer</value>
+  </data>
+  <data name="lbl_ActStatus2" xml:space="preserve">
+    <value>Deposit Customer</value>
+  </data>
   <data name="lbl_ActualDeposit" xml:space="preserve">
     <value>Actual Deposit</value>
   </data>
@@ -261,17 +267,65 @@
   <data name="lbl_CustomerAdministration" xml:space="preserve">
     <value>Customer Administration</value>
   </data>
+  <data name="lbl_CustStatus1" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="lbl_CustStatus2" xml:space="preserve">
+    <value>Suspend</value>
+  </data>
+  <data name="lbl_CustStatus3" xml:space="preserve">
+    <value>Closed</value>
+  </data>
   <data name="lbl_DepositApproval" xml:space="preserve">
     <value>Deposit Approval</value>
   </data>
   <data name="lbl_DepositRequest" xml:space="preserve">
     <value>Deposit Request</value>
   </data>
+  <data name="lbl_DepositStatus0" xml:space="preserve">
+    <value>Draft</value>
+  </data>
+  <data name="lbl_DepositStatus1" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="lbl_DepositStatus2" xml:space="preserve">
+    <value>Paid</value>
+  </data>
+  <data name="lbl_DepositStatus3" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="lbl_DepositStatus4" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="lbl_DepositStatus5" xml:space="preserve">
+    <value>Canceled</value>
+  </data>
+  <data name="lbl_DepositStatus6" xml:space="preserve">
+    <value>Expired</value>
+  </data>
+  <data name="lbl_DepositStatus99" xml:space="preserve">
+    <value>Error</value>
+  </data>
   <data name="lbl_DepositTime" xml:space="preserve">
     <value>Deposit Time</value>
   </data>
   <data name="lbl_DepositType" xml:space="preserve">
     <value>Deposit Type</value>
+  </data>
+  <data name="lbl_DepositType1" xml:space="preserve">
+    <value>Online Banking</value>
+  </data>
+  <data name="lbl_DepositType2" xml:space="preserve">
+    <value>Mobile Payment</value>
+  </data>
+  <data name="lbl_DepositType3" xml:space="preserve">
+    <value>Offline Banking</value>
+  </data>
+  <data name="lbl_Directio2" xml:space="preserve">
+    <value>Debeit</value>
+  </data>
+  <data name="lbl_Direction1" xml:space="preserve">
+    <value>Credit</value>
   </data>
   <data name="lbl_Disable" xml:space="preserve">
     <value>Disable</value>
@@ -384,6 +438,15 @@
   <data name="lbl_Userpwd" xml:space="preserve">
     <value>User Password</value>
   </data>
+  <data name="lbl_UserStatus1" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="lbl_UserStatus2" xml:space="preserve">
+    <value>Suspend</value>
+  </data>
+  <data name="lbl_UserStatus3" xml:space="preserve">
+    <value>Closed</value>
+  </data>
   <data name="lbl_WireTransfer" xml:space="preserve">
     <value>Wire Transfer</value>
   </data>
@@ -395,6 +458,30 @@
   </data>
   <data name="lbl_WithdrawalRequest" xml:space="preserve">
     <value>Withdrawal Request</value>
+  </data>
+  <data name="lbl_WithdrawalStatus1" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="lbl_WithdrawalStatus2" xml:space="preserve">
+    <value>OnHold</value>
+  </data>
+  <data name="lbl_WithdrawalStatus3" xml:space="preserve">
+    <value>Verify</value>
+  </data>
+  <data name="lbl_WithdrawalStatus4" xml:space="preserve">
+    <value>Process</value>
+  </data>
+  <data name="lbl_WithdrawalStatus5" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="lbl_WithdrawalStatus6" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="lbl_WithdrawalStatus7" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="lbl_WithdrawalStatus99" xml:space="preserve">
+    <value>Error</value>
   </data>
   <data name="lbl_WithdrawalType" xml:space="preserve">
     <value>Withdrawal Type</value>
