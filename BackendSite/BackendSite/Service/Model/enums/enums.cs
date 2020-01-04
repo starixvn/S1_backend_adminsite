@@ -28,9 +28,16 @@ namespace BackendSite.Service.Model.enums
         WireTransfer = 3,
     }
 
+    public enum WithdrawalType
+    {
+        Undefine = 0,
+        LocalBank = 1,
+        OnlinePayment = 2,
+    }
+    
     /// <summary>
-    /// 
-    /// </summary>
+     /// 
+     /// </summary>
     public enum DepositStatus
     {
         Draft = 0,

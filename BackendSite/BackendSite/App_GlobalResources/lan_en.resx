@@ -319,7 +319,7 @@
     <value>Mobile Payment</value>
   </data>
   <data name="lbl_DepositType3" xml:space="preserve">
-    <value>Offline Banking</value>
+    <value>Local Bank</value>
   </data>
   <data name="lbl_Directio2" xml:space="preserve">
     <value>Debeit</value>
@@ -485,5 +485,14 @@
   </data>
   <data name="lbl_WithdrawalType" xml:space="preserve">
     <value>Withdrawal Type</value>
+  </data>
+  <data name="lbl_WithdrawalType0" xml:space="preserve">
+    <value>Undefined</value>
+  </data>
+  <data name="lbl_WithdrawalType1" xml:space="preserve">
+    <value>Local Bank</value>
+  </data>
+  <data name="lbl_WithdrawalType2" xml:space="preserve">
+    <value>Online Payment</value>
   </data>
 </root>
