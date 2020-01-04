@@ -321,11 +321,11 @@
   <data name="lbl_DepositType3" xml:space="preserve">
     <value>Local Bank</value>
   </data>
-  <data name="lbl_Directio2" xml:space="preserve">
-    <value>Debeit</value>
-  </data>
   <data name="lbl_Direction1" xml:space="preserve">
     <value>Credit</value>
+  </data>
+  <data name="lbl_Direction2" xml:space="preserve">
+    <value>Debeit</value>
   </data>
   <data name="lbl_Disable" xml:space="preserve">
     <value>Disable</value>
