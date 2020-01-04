@@ -406,11 +406,11 @@ th.bluebgcolor {background-image: none;}
 
 /**Dropdown**/
 
-.btn {
+/*.btn {
     border-radius: 0px;
     font-size: 12px;
     padding: 0px 6px;
-}
+}*/
 .btn-default {border: 1px solid #e2e2e2;}
 
 .btn-default:hover, .btn-default:focus, .btn-default.focus, .btn-default:active, .btn-default.active, .open > .dropdown-toggle.btn-default {

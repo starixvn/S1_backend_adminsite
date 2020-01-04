@@ -74,7 +74,7 @@ namespace BackendSite.Controllers
                 }
             }
 
-            withdrawalRequest.Comments = comments;
+            //withdrawalRequest.Comments = comments;
             return View(withdrawalRequest);
         }
 

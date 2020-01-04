@@ -59,7 +59,10 @@ namespace BackendSite
             services.AddSingleton<AuthorizeBLL>();
             services.AddSingleton<CustInfoBLL>();
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.IgnoreNullValues = true;
+            });
             services.AddRazorPages(options =>
             {
                 options.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());

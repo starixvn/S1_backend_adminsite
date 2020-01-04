@@ -6,7 +6,7 @@
 @inject ServerInfoBLL serverInfoBLL
 @inject AuthorizeBLL authorizeBLL
 @section Style {
-    <link href="~/css/Oneworks/system_style.css" rel="stylesheet" />
+    <link href="~/css/Oneworks/system_style.css" rel="stylesheet" asp-append-version="true"/>
     <link href="~/lib/Oneworks/jscalendar/calendar-blue.css" rel="stylesheet" />
 }
 @{
@@ -26,55 +26,29 @@
     i18n.Add("lbl_Pending", selLangBLL.GetResourceValue("lbl_Pending"));
     i18n.Add("lbl_Approved", selLangBLL.GetResourceValue("lbl_Approved"));
 
-    string[] lbl_Txts = new string[] { "lbl_WithdrawalId", "lbl_WithdrawalType", "lbl_UserName", "lbl_Amount", "lbl_ChargeFee", "lbl_Memo", "lbl_CreateTime", "lbl_Status" };
+    string[] lbl_Txts = new string[] { "lbl_Action", "lbl_Comment", "lbl_ActualDeposit", "lbl_No", "lbl_WithdrawalId", "lbl_WithdrawalType", "lbl_UserName", "lbl_Amount", "lbl_ChargeFee", "lbl_Memo", "lbl_CreateTime", "lbl_Status" };
     foreach (var lbl_Txt in lbl_Txts)
     {
         if (!i18n.ContainsKey(lbl_Txt))
             i18n.Add(lbl_Txt, selLangBLL.GetResourceValue(lbl_Txt));
     }
 
+    for (int i = 0; i <= 7; i++)
+    {
+        if (!i18n.ContainsKey($"lbl_WithdrawalStatus{i}"))
+            i18n.Add($"lbl_WithdrawalStatus{i}", selLangBLL.GetResourceValue($"lbl_WithdrawalStatus{i}"));
+    }
+    i18n.Add($"lbl_WithdrawalStatus{99}", selLangBLL.GetResourceValue($"lbl_WithdrawalStatus{99}"));
+
+    for (int i = 0; i <= 2; i++)
+    {
+        if (!i18n.ContainsKey($"lbl_WithdrawalType{i}"))
+            i18n.Add($"lbl_WithdrawalType{i}", selLangBLL.GetResourceValue($"lbl_WithdrawalType{i}"));
+    }
+
 }
 <h4>@selLangBLL.GetResourceValue("lbl_WithdrawalRequest")</h4>
 <div id="searchForm"></div>
-@*<table class="table table-striped">
-    <thead>
-        <tr>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_WithdrawalId")</th>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_WithdrawalType")</th>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_UserName")</th>
-            <th scope="col">WithdrawalInfo</th>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_Amount")</th>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_ChargeFee")</th>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_Memo")</th>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_CreateTime")</th>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_Status")</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <th scope="row">@Html.ActionLink(@item.TransId, "WithdrawalRequest", "Withdrawal", new { transID = @item.TransId })</th>
-                <td>@item.WithdrawalType</td>
-                <td>@item.UserName</td>
-                <td>@item.WithdrawalInfo</td>
-                <td>@item.Amount</td>
-                <td>@item.ChargeFee</td>
-                <td>@item.Memo</td>
-                <td>@item.CreateTime</td>
-                <td>@item.Status</td>
-            </tr>
-        }
-    </tbody>
-</table>
-<nav aria-label="Page navigation example">
-    <ul class="pagination justify-content-center">
-        <li class="page-item disabled"><a class="page-link" href="javascript:void(0);" tabindex="-1" aria-disabled="true">Previous</a></li>
-        <li class="page-item active"><a class="page-link" href="javascript:void(0);">1</a></li>
-        <li class="page-item"><a class="page-link" href="javascript:void(0);">2</a></li>
-        <li class="page-item"><a class="page-link" href="javascript:void(0);" aria-disabled="false">Next</a></li>
-    </ul>
-</nav>*@
 @section Scripts {
     <script src="~/lib/Oneworks/jscalendar/calendar.js"></script>
     <script src="~/lib/Oneworks/jscalendar/lang/calendar-en.js"></script>

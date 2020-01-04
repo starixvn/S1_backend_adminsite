@@ -48,10 +48,8 @@ namespace BackendSite.Service.DAL
 
         public WithdrawalRequest GetWithdrawalRequest(int withdrawalId, int siteId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                return conn.QueryFirstOrDefault<WithdrawalRequest>("WithdrawalRequestTransID_Get", new { WithdrawalId = withdrawalId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
-            }
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.QueryFirstOrDefault<WithdrawalRequest>("WithdrawalRequestTransID_Get", new { WithdrawalId = withdrawalId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<Comments> GetWithdrawalRequestComment(int withdrawalId, int siteId)

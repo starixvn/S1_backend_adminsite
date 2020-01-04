@@ -11,12 +11,23 @@ namespace BackendSite.Service.Model
         public string TransId { set; get; }
         public int WithdrawalType { set; get; }
         public string UserName { set; get; }
-        public string WithdrawalInfo { set; get; }
+        public string Email { set; get; }
+        //public string WithdrawalInfo { set; get; }
+        public int CurrencyId { set; get; }
         public decimal Amount { set; get; }
         public decimal ChargeFee { set; get; }
         public string Memo { set; get; }
-        public string CreateTime { set; get; }
+        public DateTime CreateTime { set; get; }
         public int Status { set; get; }
-        public virtual IEnumerable<Comments> Comments { get; set; }
+        public string SiteName { set; get; }
+        public string BankName { set; get; }
+        public string BankCode { set; get; }
+        public int SysId { set; get; }
+        public int PayId { set; get; }
+        public string AccountNo { set; get; }
+        public string AccountName { set; get; }
+        public string RefId { set; get; }
+        
+        //public virtual IEnumerable<Comments> Comments { get; set; }
     }
 }

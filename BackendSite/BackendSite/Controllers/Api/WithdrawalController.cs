@@ -49,5 +49,31 @@ namespace BackendSite.Controllers.Api
 
             return apiListResult;
         }
+
+
+        public class WithdrawalReq
+        {
+            public string transId { get; set; }
+        }
+
+        [HttpPost]
+        public ApiResult<WithdrawalRequest> GetWithdrawalRequest(WithdrawalReq withdrawalReq)
+        {
+            var apiResult = new ApiResult<WithdrawalRequest>();
+            var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.transId);
+            apiResult.Data = withdrawalRequest;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<Comments>> GetWithdrawalRequestComment(WithdrawalReq withdrawalReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<Comments>>();
+            var comments = withdrawalBLL.GetWithdrawalRequestComment(withdrawalReq.transId);
+            apiResult.Data = comments;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
     }
 }

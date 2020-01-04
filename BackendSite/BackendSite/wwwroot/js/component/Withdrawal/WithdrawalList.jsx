@@ -8,32 +8,41 @@ import {Pagination} from '../commJS/Pagination.jsx';
 
         }
 
+        onCheckDetail(id) {
+            this.props.onCheckDetail(id);
+        }
+
+        onRefresh() {
+            this.props.onRefresh();
+        }
+
         render() {
             let rows = this.props.searchData.data.map(row => 
                 <tr key={row.transId}>
-                    <th scope="row">{row.transId}</th>
-                    <td>{row.withdrawalType}</td>
+                    <th scope="row"><a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a></th>
+                    <td>{i18n["lbl_WithdrawalType" + row.withdrawalType]}</td>
                     <td>{row.userName}</td>
-                    <td>{row.withdrawalInfo}</td>
-                    <td>{number_format(row.amount)}</td>
-                    <td>{row.chargeFee}</td>
+                    <td className="text-right">{number_format(row.amount)}</td>                    
+                    <td>{row.accountNo}</td>
+                    <td>{row.accountName}</td>
                     <td>{row.memo}</td>
                     <td>{moment(row.createTime).format('l LTS')}</td>
-                    <td>{row.status}</td>
+                    <td>{i18n["lbl_WithdrawalStatus"+row.status]}</td>
                 </tr>
             );
 
             return (
                 <div>
+                    <button type="button" className="btn btn-secondary float-right" onClick={this.onRefresh.bind(this)}>Refresh</button>
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">{i18n.lbl_WithdrawalId}</th>
+                                <th scope="col">Trxn.ID</th>
                                 <th scope="col">{i18n.lbl_WithdrawalType}</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
-                                <th scope="col">WithdrawalInfo</th>
-                                <th scope="col">{i18n.lbl_Amount}</th>
-                                <th scope="col">{i18n.lbl_ChargeFee}</th>
+                                <th scope="col" className="text-right">{i18n.lbl_Amount}</th>
+                                <th scope="col">To Acc. NO.</th>
+                                <th scope="col">To Acc. Name</th>                                
                                 <th scope="col">{i18n.lbl_Memo}</th>
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{i18n.lbl_Status}</th>
@@ -49,7 +58,187 @@ import {Pagination} from '../commJS/Pagination.jsx';
         }
     }
 
-    class WithdrawalSearchForm extends React.Component {
+    class WithdrawalRequestComment  extends React.Component {
+        constructor(props) {
+            super(props);
+        }
+        render() {
+            let data = this.props.Data;
+            let i = 0;
+            let rows = null;
+            if(data !=null) {
+                rows = data.map(function(obj) { 
+                    return <tr key={i}>
+                                    <td scope="row">{i++}</td>
+                                    <td>{obj.createTime}</td>
+                                    <td>{obj.actualDeposit}</td>
+                                    <td>{obj.comment}</td>
+                                    <td>{i18n["lbl_WithdrawalStatus"+obj.action]}</td>
+                                </tr>;
+                });
+            }
+
+            return (
+                data !=null ? 
+        <table className="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">{i18n.lbl_No}</th>
+                    <th scope="col">{i18n.lbl_CreateTime}</th>
+                    <th scope="col">{i18n.lbl_ActualDeposit}</th>
+                    <th scope="col">{i18n.lbl_Comment}</th>
+                    <th scope="col">{i18n.lbl_Action}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {rows}
+            </tbody>
+        </table> : null
+            )
+        }
+    }            
+
+    class WithdrawalDetail extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state={Data:null};
+        }
+
+        componentDidMount() {
+            this.onGetData();
+            this.onGetComment();
+        }
+
+        onGetData() {
+            //Loading.OnLoading();
+            axios.post('/api/Withdrawal/GetWithdrawalRequest', { transId: this.props.transId})
+            .then(function (response) {
+                //Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    this.setState({Data: result.data, GetData: true});
+                } else {
+                    alert(result.message);
+                }
+            }.bind(this)).catch(function (error) {
+                //Loading.UnLoading();
+                alert(error);
+            }.bind(this));
+        }
+
+        onBack() {
+            this.props.onBack();
+        }
+
+        onGetComment(){
+            axios.post('/api/Withdrawal/GetWithdrawalRequestComment', { transId: this.props.transId})
+            .then(function (response) {
+                //Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    this.setState({Comment: result.data, GetData: true});
+                } else {
+                    alert(result.message);
+                }
+            }.bind(this)).catch(function (error) {
+                //Loading.UnLoading();
+                alert(error);
+            }.bind(this));    
+        }
+
+        componentDidUpdate(prevProps, prevState, snapshot) {
+            //this.onGetData();
+        }
+
+        render() {
+            let data = this.state.Data;
+            let btnGroup = [];
+            if(data != null) {
+                if(data.status==1||data.status==2||data.status==3||data.status==4)
+                    btnGroup.push(<button key={0} type="button" className="btn btn-primary" onClick={null}>Draft</button>);
+                if(data.status==1)
+                    btnGroup.push(<button key={2} type="button" className="btn btn-primary" onClick={null}>On Hold(Risk Check)</button>);
+                if(data.status==1 || data.status==2 || data.status==4)
+                    btnGroup.push(<button key={3} type="button" className="btn btn-primary" onClick={null}>Verify</button>);
+                if(data.status==3)
+                    btnGroup.push(<button key={4} type="button" className="btn btn-primary" onClick={null}>Process</button>);                
+                if(data.status==4)
+                    btnGroup.push(<button key={6} type="button" className="btn btn-primary" onClick={null}>Approved</button>);
+                if(data.status==3 || data.status==2)
+                    btnGroup.push(<button key={7} type="button" className="btn btn-primary" onClick={null}>Rejected</button>);
+            }
+
+            return (
+                data !=null ? <div>
+            <table className="table table-striped">
+                <tbody>
+                    <tr>
+                        <th scope="row">SiteName</th>
+                        <td>{data.siteName}</td>
+                    </tr>                
+                    <tr>
+                        <th scope="row">Transaction No.</th>
+                        <td>{data.transId}</td>
+                    </tr>                
+                    <tr>
+                        <th scope="row">Status</th>
+                        <td>{i18n["lbl_WithdrawalStatus"+data.status]}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Username</th>
+                        <td>{data.userName}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{"Date" + " (" + moment().format('Z') + ")"}</th>
+                        <td>{moment(data.createTime).format('l LTS')}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Name of Bank</th>
+                        <td>{data.bankName}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Account No</th>
+                        <td>{data.accountNo}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Account Name</th>
+                        <td>{data.accountName}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Currency</th>
+                        <td>{i18n["lbl_Currency"+data.currencyId]}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Request Amount</th>
+                        <td>{number_format(data.amount)}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Type</th>
+                        <td>{i18n["lbl_WithdrawalType" +data.withdrawalType]}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">eMail</th>
+                        <td>{data.email}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Ref ID</th>
+                        <td>{data.refId}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <WithdrawalRequestComment Data={this.state.Comment} />
+                <div class="container form-group">
+                    <label for="command">{i18n.lbl_Comment}</label>
+                    <textarea class="form-control" id="comment" rows="3"></textarea>
+                </div>                
+                <button type="button" className="btn btn-primary" onClick={this.onBack.bind(this)}>Back</button>
+                {btnGroup}
+            </div> : null
+            )
+        }
+    }    
+
+    class WithdrawalPanel extends React.Component {
         constructor(props) {
             super(props);
             this.f_trigger_Start = React.createRef();
@@ -57,7 +246,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
             this.f_trigger_End = React.createRef();
             this.selectdate_end = React.createRef();
 
-            this.state={selectType:"", selectCurrency:"", selectStatus:"1", SelectUser:"", SelectWithdrawalID:""};
+            this.state={selectType:"", selectCurrency:"", selectStatus:"1", SelectUser:"", SelectWithdrawalID:"", ShowDetial: false};
         }
 
         onRefresh() {
@@ -137,6 +326,14 @@ import {Pagination} from '../commJS/Pagination.jsx';
             });            
         }
 
+        onCheckDetail(id) {
+            this.setState({transId: id, ShowDetial: true});
+        }
+
+        onBack() {
+            this.setState({ShowDetial: false});
+        }
+
         render() {
             let selectCurrency = CurrencyList.map(function(obj) { 
                 return <option key={obj} value={obj}>{i18n["lbl_Currency"+obj]}</option>;
@@ -148,7 +345,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
 
             return (
                 <div>
-                    <form method="post" className="shadow p-3 mb-5 bg-white rounded" onSubmit={this.handleSubmit.bind(this)}>
+                     {!this.state.ShowDetial ? <form method="post" className="shadow p-3 mb-5 bg-white rounded" onSubmit={this.handleSubmit.bind(this)}>
                         <div className="boxgy">
                             <table border="0" cellPadding="5" cellSpacing="0">
                                 <tbody>
@@ -228,13 +425,14 @@ import {Pagination} from '../commJS/Pagination.jsx';
                                 </div>
                             </div>
                         </div>
-                    </form>
-                    {searchData !=null ? <WithdrawalList searchData={searchData} ChangePage={this.onSearch.bind(this)}/> : null}
+                    </form> : null}
+                    {searchData !=null && !this.state.ShowDetial ? <WithdrawalList searchData={searchData} ChangePage={this.onSearch.bind(this)} onCheckDetail={this.onCheckDetail.bind(this)} onRefresh={this.onRefresh.bind(this)} /> : null}
+                    {this.state.transId != null && this.state.ShowDetial ? <WithdrawalDetail transId={this.state.transId} onBack={this.onBack.bind(this)}/> : null}
                 </div>
             )
         }
     }
     
-    ReactDOM.render(<WithdrawalSearchForm/>,document.getElementById('searchForm'));
+    ReactDOM.render(<WithdrawalPanel/>,document.getElementById('searchForm'));
     })(jQuery, React, ReactDOM, i18n, axios, moment, Calendar);
     
