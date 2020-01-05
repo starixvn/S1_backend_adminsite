@@ -98,6 +98,7 @@ namespace BackendSite.Service.Model
         public string ActionString { get; set; }
 
         public decimal ActualDeposit { get; set; }
+        public string Operator { get; set; }
     }
 
     public class DepositReceipt

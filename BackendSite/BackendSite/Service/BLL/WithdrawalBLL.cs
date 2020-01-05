@@ -47,22 +47,50 @@ namespace BackendSite.Service.BLL
             return results;
         }
 
-        public int WithdrawalApproved(string transId, string comment)
+        public int WithdrawalApproved(string transId, string comment, string Operator)
         {
             var serverInfo = serverInfoService.GetModel();
-            return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, WithdrawalStatus.Pending, WithdrawalStatus.Approved);
+            List<int> forStatus = new List<int>();
+            forStatus.Add((int)WithdrawalStatus.Process);
+
+            return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, Operator, forStatus, WithdrawalStatus.Approved);
         }
 
-        public int WithdrawalRejectd(string transId, string comment)
+        public int WithdrawalRejectd(string transId, string comment, string Operator)
         {
             var serverInfo = serverInfoService.GetModel();
-            return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, WithdrawalStatus.Pending, WithdrawalStatus.Rejected);
+            List<int> forStatus = new List<int>();
+            forStatus.Add((int)WithdrawalStatus.OnHold);
+            forStatus.Add((int)WithdrawalStatus.Verify);
+
+            return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, Operator, forStatus, WithdrawalStatus.Rejected);
         }
 
-        public int WithdrawalVerify(string transId, string comment)
+        public int WithdrawalVerify(string transId, string comment, string Operator)
         {
             var serverInfo = serverInfoService.GetModel();
-            return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, WithdrawalStatus.Pending, WithdrawalStatus.Pending);
+            List<int> forStatus = new List<int>();
+            forStatus.Add((int)WithdrawalStatus.Pending);
+            forStatus.Add((int)WithdrawalStatus.OnHold);
+            forStatus.Add((int)WithdrawalStatus.Process);
+            return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, Operator, forStatus, WithdrawalStatus.Verify);
+        }
+        public int WithdrawalOnHold (string transId, string comment, string Operator)
+        {
+            var serverInfo = serverInfoService.GetModel();
+            List<int> forStatus = new List<int>();
+            forStatus.Add((int)WithdrawalStatus.Pending);
+            return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, Operator, forStatus, WithdrawalStatus.OnHold);
+        }
+        public int WithdrawalDraft(string transId, string comment, string Operator)
+        {
+            var serverInfo = serverInfoService.GetModel();
+            List<int> forStatus = new List<int>();
+            forStatus.Add((int)WithdrawalStatus.Pending);
+            forStatus.Add((int)WithdrawalStatus.OnHold);
+            forStatus.Add((int)WithdrawalStatus.Verify);
+            forStatus.Add((int)WithdrawalStatus.Process);
+            return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, Operator, forStatus, WithdrawalStatus.Draft);
         }
     }
 }

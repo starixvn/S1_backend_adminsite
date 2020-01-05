@@ -64,16 +64,17 @@ import {Pagination} from '../commJS/Pagination.jsx';
         }
         render() {
             let data = this.props.Data;
-            let i = 0;
+            let i = 1;
             let rows = null;
             if(data !=null) {
                 rows = data.map(function(obj) { 
                     return <tr key={i}>
                                     <td scope="row">{i++}</td>
-                                    <td>{obj.createTime}</td>
+                                    <td>{moment(obj.createTime).format('l LTS')}</td>
                                     <td>{obj.actualDeposit}</td>
                                     <td>{obj.comment}</td>
                                     <td>{i18n["lbl_WithdrawalStatus"+obj.action]}</td>
+                                    <td>{obj.operator}</td>
                                 </tr>;
                 });
             }
@@ -88,6 +89,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                     <th scope="col">{i18n.lbl_ActualDeposit}</th>
                     <th scope="col">{i18n.lbl_Comment}</th>
                     <th scope="col">{i18n.lbl_Action}</th>
+                    <th scope="col">Operator</th>
                 </tr>
             </thead>
             <tbody>
@@ -130,13 +132,33 @@ import {Pagination} from '../commJS/Pagination.jsx';
             this.props.onBack();
         }
 
+        setComment(event) {
+            this.setState({Comment: event.target.value});
+        }
+
         onGetComment(){
             axios.post('/api/Withdrawal/GetWithdrawalRequestComment', { transId: this.props.transId})
             .then(function (response) {
                 //Loading.UnLoading();
                 let result = response.data;
                 if (result.errorCode == 0) {
-                    this.setState({Comment: result.data, GetData: true});
+                    this.setState({Comments: result.data, GetData: true});
+                } else {
+                    alert(result.message);
+                }
+            }.bind(this)).catch(function (error) {
+                //Loading.UnLoading();
+                alert(error);
+            }.bind(this));    
+        }
+
+        onConfirm(action){
+            axios.post('/api/Withdrawal/WithdrawalConfirm', { transId: this.props.transId, Comment : this.state.Comment, Action:action})
+            .then(function (response) {
+                //Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    alert(result.message);
                 } else {
                     alert(result.message);
                 }
@@ -155,17 +177,17 @@ import {Pagination} from '../commJS/Pagination.jsx';
             let btnGroup = [];
             if(data != null) {
                 if(data.status==1||data.status==2||data.status==3||data.status==4)
-                    btnGroup.push(<button key={0} type="button" className="btn btn-primary" onClick={null}>Draft</button>);
+                    btnGroup.push(<button key={0} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
                 if(data.status==1)
-                    btnGroup.push(<button key={2} type="button" className="btn btn-primary" onClick={null}>On Hold(Risk Check)</button>);
+                    btnGroup.push(<button key={2} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 2)}>On Hold(Risk Check)</button>);
                 if(data.status==1 || data.status==2 || data.status==4)
-                    btnGroup.push(<button key={3} type="button" className="btn btn-primary" onClick={null}>Verify</button>);
+                    btnGroup.push(<button key={3} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 3)}>Verify</button>);
                 if(data.status==3)
-                    btnGroup.push(<button key={4} type="button" className="btn btn-primary" onClick={null}>Process</button>);                
+                    btnGroup.push(<button key={4} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 4)}>Process</button>);                
                 if(data.status==4)
-                    btnGroup.push(<button key={6} type="button" className="btn btn-primary" onClick={null}>Approved</button>);
+                    btnGroup.push(<button key={6} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 6)}>Approved</button>);
                 if(data.status==3 || data.status==2)
-                    btnGroup.push(<button key={7} type="button" className="btn btn-primary" onClick={null}>Rejected</button>);
+                    btnGroup.push(<button key={7} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 7)}>Rejected</button>);
             }
 
             return (
@@ -226,10 +248,10 @@ import {Pagination} from '../commJS/Pagination.jsx';
                     </tr>
                     </tbody>
                 </table>
-                <WithdrawalRequestComment Data={this.state.Comment} />
-                <div class="container form-group">
-                    <label for="command">{i18n.lbl_Comment}</label>
-                    <textarea class="form-control" id="comment" rows="3"></textarea>
+                <WithdrawalRequestComment Data={this.state.Comments} />
+                <div className="container form-group">
+                    <label htmlFor="command">{i18n.lbl_Comment}</label>
+                    <textarea id="command" className="form-control" rows="3" value={this.state.Comment} onChange={this.setComment.bind(this)} />
                 </div>                
                 <button type="button" className="btn btn-primary" onClick={this.onBack.bind(this)}>Back</button>
                 {btnGroup}

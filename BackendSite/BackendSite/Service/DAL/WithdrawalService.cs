@@ -54,13 +54,11 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<Comments> GetWithdrawalRequestComment(int withdrawalId, int siteId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                return conn.Query<Comments>("WithdrawalRequestComment_Get", new { WithdrawalId = withdrawalId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
-            }
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Query<Comments>("WithdrawalRequestComment_Get", new { WithdrawalId = withdrawalId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
 
-        public int SetWithdrawalInfo(string transId, int siteId, string comment, WithdrawalStatus forStatus, WithdrawalStatus status)
+        public int SetWithdrawalInfo(string transId, int siteId, string comment, string Operator, IEnumerable<int> forStatus, WithdrawalStatus status)
         {
             int withdrawalId = 0;
             int type = 1 + typePosition;
@@ -75,7 +73,8 @@ namespace BackendSite.Service.DAL
                     conn.Open();
                     using (var trans = conn.BeginTransaction())
                     {
-                        var p = new DynamicParameters(new { WithdrawalId = withdrawalId, SiteId = siteId, Comment = comment, ForStatus = (int)forStatus, Status = (int)status });
+                        string sForStatus = Newtonsoft.Json.JsonConvert.SerializeObject(forStatus);
+                        var p = new DynamicParameters(new { WithdrawalId = withdrawalId, SiteId = siteId, Comment = comment, ForStatus = sForStatus, Status = (int)status });
                         p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
                         p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
                         p.Add("Amount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
@@ -83,7 +82,7 @@ namespace BackendSite.Service.DAL
 
                         if (result > 0)
                         {
-                            SetWithdrawalLog(withdrawalId, siteId, comment, (int)status);
+                            SetWithdrawalLog(withdrawalId, siteId, comment, (int)status, Operator);
 
                             if (status == WithdrawalStatus.Rejected)
                             {
@@ -107,19 +106,17 @@ namespace BackendSite.Service.DAL
             }
             catch (Exception ex)
             {
-                SetWithdrawalLog(withdrawalId, siteId, ex.Message, (int)WithdrawalStatus.Error);
+                SetWithdrawalLog(withdrawalId, siteId, ex.Message, (int)WithdrawalStatus.Error, Operator);
             }
 
             return result;
         }
 
 
-        private int SetWithdrawalLog(int withdrawalId, int siteId, string comment, int status)
+        private int SetWithdrawalLog(int withdrawalId, int siteId, string comment, int status, string Operator)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                return conn.Execute("WithdrawalLog_Ins", new { WithdrawalId = withdrawalId, SiteId = siteId, Comment = comment, Action = status }, commandType: CommandType.StoredProcedure);
-            }
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("WithdrawalLog_Ins", new { WithdrawalId = withdrawalId, SiteId = siteId, Comment = comment, Action = status, Operator }, commandType: CommandType.StoredProcedure);
         }
     }
 }

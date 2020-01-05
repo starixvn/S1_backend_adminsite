@@ -25,14 +25,6 @@ namespace BackendSite.Controllers
             this.selLangBLL = selLangBLL;
             this.messageBLL = messageBLL;
         }
-
-        public class WithdrawalReq
-        {
-            public string Comment { set; get; }
-            public string TransId { set; get; }
-            public int Action { set; get; }
-        }
-
         public IActionResult WithdrawalList()
         {
             return View();
@@ -76,64 +68,6 @@ namespace BackendSite.Controllers
 
             //withdrawalRequest.Comments = comments;
             return View(withdrawalRequest);
-        }
-
-        [HttpPost]
-        public ApiResult WithdrawalConfirm([FromBody]WithdrawalReq withdrawalReq)
-        {
-            var apiResult = new ApiResult(selLangBLL);
-            //var apiResult = new ApiResult();
-            var withdrawConfirmReuslt = -1;
-
-            if (withdrawalReq.Action == 1)
-            {
-                withdrawConfirmReuslt = withdrawalBLL.WithdrawalApproved(withdrawalReq.TransId, withdrawalReq.Comment);
-
-                if(withdrawConfirmReuslt > 0)
-                {
-                    // Send message to player
-                    string result = selLangBLL.GetResourceValue("lbl_Approved");
-                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender");
-                    string title = selLangBLL.GetResourceValue("lbl_MessageWithdrawalTitle");
-                    title = string.Format(title, withdrawalReq.TransId, result);
-                    string content = selLangBLL.GetResourceValue("lbl_MessageWithdrawalContent");
-                    content = string.Format(content, withdrawalReq.TransId, result);
-                    messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
-                }
-            }
-            else if (withdrawalReq.Action == 2)
-            {
-                withdrawConfirmReuslt = withdrawalBLL.WithdrawalRejectd(withdrawalReq.TransId, withdrawalReq.Comment);
-
-                if (withdrawConfirmReuslt > 0)
-                {
-                    // Send message to player
-                    string result = selLangBLL.GetResourceValue("lbl_Rejected");
-                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender");
-                    string title = selLangBLL.GetResourceValue("lbl_MessageWithdrawalTitle");
-                    title = string.Format(title, withdrawalReq.TransId, result);
-                    string content = selLangBLL.GetResourceValue("lbl_MessageWithdrawalContent");
-                    content = string.Format(content, withdrawalReq.TransId, result);
-                    messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
-                }
-            }
-            else
-            {
-                withdrawConfirmReuslt = withdrawalBLL.WithdrawalVerify(withdrawalReq.TransId, withdrawalReq.Comment);
-            }
-
-            if (withdrawConfirmReuslt <= 0)
-            {
-                apiResult.ErrorCode = 1101;
-                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
-            }
-            else
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
-            }
-
-            return apiResult;
         }
     }
 }
