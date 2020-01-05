@@ -58,13 +58,14 @@ namespace BackendSite.Service.DAL
             return conn.Query<Comments>("WithdrawalRequestComment_Get", new { WithdrawalId = withdrawalId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
 
-        public int SetWithdrawalInfo(string transId, int siteId, string comment, string Operator, IEnumerable<int> forStatus, WithdrawalStatus status)
+        public int SetWithdrawalInfo(string transId, int siteId, string comment, string Operator, IEnumerable<int> forStatus, WithdrawalStatus status, string WithdrawalInfo, int? withdrawalType, out int custId, out decimal amount)
         {
             int withdrawalId = 0;
             int type = 1 + typePosition;
             Match m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out withdrawalId);
-
+            custId = 0;
+            amount = 0m;
             int result = 0;
             try
             {
@@ -74,12 +75,14 @@ namespace BackendSite.Service.DAL
                     using (var trans = conn.BeginTransaction())
                     {
                         string sForStatus = Newtonsoft.Json.JsonConvert.SerializeObject(forStatus);
-                        var p = new DynamicParameters(new { WithdrawalId = withdrawalId, SiteId = siteId, Comment = comment, ForStatus = sForStatus, Status = (int)status });
+                        var p = new DynamicParameters(new { WithdrawalId = withdrawalId, SiteId = siteId, Comment = comment, ForStatus = sForStatus, Status = (int)status, WithdrawalInfo, WithdrawalType = withdrawalType, RefId = (string)null });
                         p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
                         p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
                         p.Add("Amount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
                         result = conn.Execute("WithdrawalInfo_Set", p, trans, commandType: CommandType.StoredProcedure);
-
+                        custId = p.Get<int?>("CustId") ?? 0;
+                        string UserName = p.Get<string>("UserName");
+                        amount = p.Get<decimal>("Amount");
                         if (result > 0)
                         {
                             SetWithdrawalLog(withdrawalId, siteId, comment, (int)status, Operator);
@@ -89,9 +92,6 @@ namespace BackendSite.Service.DAL
                                 byte is1stDepoist = 0;
                                 decimal afterAmount = 0;
 
-                                int custId = p.Get<int?>("CustId") ?? 0;
-                                string UserName = p.Get<string>("UserName");
-                                decimal amount = p.Get<decimal>("Amount");
                                 result = walletService.SetBalance(custId, siteId, UserName, amount, type, $"Withdrawal Rejected: {amount}", transId, out afterAmount, out is1stDepoist, conn, trans);
                             }
 

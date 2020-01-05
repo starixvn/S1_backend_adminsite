@@ -24,5 +24,4 @@ namespace BackendSite.Service.Model
         public int Sort { get; set; }
         public int Ver { get; set; }
     }
-
 }

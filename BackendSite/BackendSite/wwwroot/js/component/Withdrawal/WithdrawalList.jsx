@@ -71,7 +71,6 @@ import {Pagination} from '../commJS/Pagination.jsx';
                     return <tr key={i}>
                                     <td scope="row">{i++}</td>
                                     <td>{moment(obj.createTime).format('l LTS')}</td>
-                                    <td>{obj.actualDeposit}</td>
                                     <td>{obj.comment}</td>
                                     <td>{i18n["lbl_WithdrawalStatus"+obj.action]}</td>
                                     <td>{obj.operator}</td>
@@ -86,7 +85,6 @@ import {Pagination} from '../commJS/Pagination.jsx';
                 <tr>
                     <th scope="col">{i18n.lbl_No}</th>
                     <th scope="col">{i18n.lbl_CreateTime}</th>
-                    <th scope="col">{i18n.lbl_ActualDeposit}</th>
                     <th scope="col">{i18n.lbl_Comment}</th>
                     <th scope="col">{i18n.lbl_Action}</th>
                     <th scope="col">Operator</th>
@@ -131,8 +129,16 @@ import {Pagination} from '../commJS/Pagination.jsx';
                     if(result.data.status==3) {
                         await this.onGetPayList(result.data.currencyId, result.data.sysId);
                         await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId);
-                    }                    
-                    this.setState({Data: result.data, selectType: result.data.withdrawalType, GetData: true});
+                    }
+                    
+                    let SelId = null;
+                    if(result.data.withdrawalType==1) {
+                        SelId = result.data.payId;
+                    } else if (result.data.withdrawalType==2) {
+                        SelId = result.data.bankId;
+                    }
+
+                    this.setState({Data: result.data, selectType: result.data.withdrawalType, GetData: true,SelId: SelId});
                 } else {
                     alert(result.message);
                 }
@@ -168,7 +174,15 @@ import {Pagination} from '../commJS/Pagination.jsx';
 
         onConfirm(action){
             if((action != 0 && confirm('Are you sure?')) || action==0) {
-                axios.post('/api/Withdrawal/WithdrawalConfirm', { transId: this.props.transId, Comment : this.state.Comment, Action:action})
+                let data = { transId: this.props.transId, Comment : this.state.Comment, Action:action};
+                
+                if(action == 4) {
+                    data.WithdrawalInfo = this.state.Data.withdrawalInfo;
+                    data.SelId = this.state.SelId;
+                    data.WithdrawalType = this.state.selectType;
+                }
+
+                axios.post('/api/Withdrawal/WithdrawalConfirm', data)
                 .then(function (response) {
                     //Loading.UnLoading();
                     let result = response.data;
@@ -181,6 +195,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                         }
                     } else {
                         alert(result.message);
+                        this.onGetComment();
                     }
                 }.bind(this)).catch(function (error) {
                     //Loading.UnLoading();
@@ -190,11 +205,18 @@ import {Pagination} from '../commJS/Pagination.jsx';
         }
 
         onSelectType(event) {
-            this.setState({selectType: event.target.value});
+            let SelId=null;
+
+            if(parseInt(event.target.value)==1 && this.state.PayList.length>0) {
+                SelId=this.state.PayList[0].payId;
+            } else if(parseInt(event.target.value)==2 && this.state.BankInfoOffList.length>0) {
+                SelId=this.state.BankInfoOffList[0].bankId;
+            }
+
+            this.setState({selectType: parseInt(event.target.value), SelId: SelId});
         }
 
         async onGetBankInfoOffList(currencyId, sysId) {
-            let selectType = this.state.selectType;
             let data = this.state.Data;
             await axios.post('/api/Withdrawal/GetBankInfoOffList', { CurrencyId: currencyId, SysId: sysId})
             .then(function (response) {
@@ -212,7 +234,6 @@ import {Pagination} from '../commJS/Pagination.jsx';
         }
 
         async onGetPayList(currencyId, sysId) {
-            let selectType = this.state.selectType;
             let data = this.state.Data;
             await axios.post('/api/Withdrawal/GetPayList', { CurrencyId: currencyId, SysId: sysId})
             .then(function (response) {
@@ -229,10 +250,15 @@ import {Pagination} from '../commJS/Pagination.jsx';
             }.bind(this));
         }        
 
+        onSelId(event) {
+            this.setState({SelId: event.target.value });
+        }
+
         render() {
             let data = this.state.Data;
             let btnGroup = [];
             let selectType = null
+            let selectPay = null;            
             if(data != null) {
                 if(data.status==1||data.status==2||data.status==3||data.status==4)
                     btnGroup.push(<button key={0} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
@@ -242,7 +268,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                     btnGroup.push(<button key={3} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 3)}>Verify</button>);
                 if(data.status==3)
                     btnGroup.push(<button key={4} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 4)}>Process</button>);                
-                if(data.status==4 && data.withdrawalType != 2)
+                if(data.status==4 && data.withdrawalType != 1)
                     btnGroup.push(<button key={6} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 6)}>Approved</button>);
                 if((data.status==3 || data.status==2))
                     btnGroup.push(<button key={7} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 7)}>Rejected</button>);
@@ -260,6 +286,26 @@ import {Pagination} from '../commJS/Pagination.jsx';
                     selectType = <select className="form-control" onChange={this.onSelectType.bind(this)} value={this.state.selectType}>
                         {selectOp}
                     </select>;
+
+                    selectPay = null;
+                    if(this.state.selectType==1) {
+                        selectPay = this.state.PayList.map(row => <option key={row.payId} value={row.payId}>{row.payName}</option>);
+                        /*if(this.state.PayList.length>0) {
+                            this.state.SelId=this.state.PayList[0];
+                        }*/                       
+                    } else if(this.state.selectType==2) {
+                        selectPay = this.state.BankInfoOffList.map(row => <option key={row.bankId} value={row.bankId}>{row.bankCode + "-"  + row.accountName + "-" + row.accountNo}</option>);
+                        /*if(this.state.BankInfoOffList.length>0) {
+                            this.state.SelId=this.state.BankInfoOffList[0];
+                        }*/
+                    }
+
+                    if(selectPay!=null){
+                        selectPay = <tr>
+                            <th scope="row">select Pay</th>
+                            <td><select className="form-control" value={this.state.SelId} onChange={this.onSelId.bind(this)}>{selectPay}</select></td>
+                        </tr>;
+                    }
                 }
             }
 
@@ -311,6 +357,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                         <th scope="row">Type</th>
                         <td>{selectType}</td>
                     </tr>
+                    {selectPay}
                     <tr>
                         <th scope="row">E-mail</th>
                         <td>{data.email}</td>
@@ -357,8 +404,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
 
         onSearch(pageNumber) {
             //Loading.OnLoading();
-            let endDate = moment(this.selectdate_end.current.value).add(1, 'days').unix()-1;
-            let data = {StartDate: moment(this.selectdate_start.current.value).unix(), EndDate: endDate, PageNumber: pageNumber};
+            let data = {StartDate: this.state.StartDate, EndDate: this.state.EndDate, PageNumber: pageNumber};
             if(this.state.SelectWithdrawalID!=""){
                 data.WithdrawalId = this.state.SelectWithdrawalID;
             }
@@ -397,7 +443,12 @@ import {Pagination} from '../commJS/Pagination.jsx';
         handleSubmit(event) {
             event.preventDefault();
             //this._Search = true;
-            this.onSearch(1);
+            let endDate = moment(this.selectdate_end.current.value).add(1, 'days').unix()-1;
+            let data = {StartDate: moment(this.selectdate_start.current.value).unix(), EndDate: endDate};
+
+            this.setState(data, function(){
+                this.onSearch(1);
+            }.bind(this));
         }
 
         componentDidMount() {
@@ -406,6 +457,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
             let selectdate_end = this.selectdate_end.current;
             let selectdate_start = this.selectdate_start.current;
 
+                //selectdate_start.value
             Calendar.setup({
                 inputField: selectdate_end, // id of the input field
                 ifFormat: "mm/dd/y",        // format of the input field
@@ -418,7 +470,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                 ifFormat: "mm/dd/y",        // format of the input field
                 button: f_trigger_Start,  // trigger for the calendar (button ID)
                 singleClick: true              // double-click mode
-            });            
+            });
         }
 
         onCheckDetail(id) {
@@ -438,7 +490,8 @@ import {Pagination} from '../commJS/Pagination.jsx';
             selectCurrency.splice(0 ,0 , <option key={""} value={""}>{"All"}</option>)
             selectCurrency = <select name="selectCurrency" onChange={this.onChange.bind(this)} value={this.state.selectCurrency}>{selectCurrency}</select>;
             let searchData = this.state.searchData;
-
+            let StartDate = this.state.StartDate;
+            let EndDate = this.state.EndDate;
             return (
                 <div>
                      {!this.state.ShowDetial ? <form method="post" className="shadow p-3 mb-5 bg-white rounded" onSubmit={this.handleSubmit.bind(this)}>
@@ -457,9 +510,9 @@ import {Pagination} from '../commJS/Pagination.jsx';
                                         </td>
                                         <td className="title11bk">
                                             <img src="/css/Oneworks/images/icon_arrowdb_rd.gif" width="13" height="6" />Select date of withdrawal
-                                            <input ref={this.selectdate_start} type="text" defaultValue={moment().add(-10, 'days').format('l')} size="8"/>
+                                            <input ref={this.selectdate_start} type="text" defaultValue={StartDate != null ? moment.unix(StartDate).format('l') :  moment().add(-10, 'days').format('l')} size="8"/>
                                             <a><img ref={this.f_trigger_Start} src="/css/Oneworks/images/icon_date.gif" width="21" height="14" border="0"/></a>to
-                                            <input ref={this.selectdate_end} type="text" defaultValue={moment().format('l')} size="8" />
+                                            <input ref={this.selectdate_end} type="text" defaultValue={EndDate != null ?  moment.unix(EndDate).format('l') : moment().format('l')} size="8" />
                                             <a><img ref={this.f_trigger_End} src="/css/Oneworks/images/icon_date.gif" width="21" height="14" border="0"/></a>
                                         </td>
                                         {/*<td style={{width:"10px"}}>

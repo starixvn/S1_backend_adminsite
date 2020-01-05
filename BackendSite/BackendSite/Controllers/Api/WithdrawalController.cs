@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace BackendSite.Controllers.Api
 {
@@ -21,12 +23,16 @@ namespace BackendSite.Controllers.Api
         private readonly MessageBLL messageBLL;
         private readonly BankDetailBLL bankDetailBLL;
         private readonly static BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
-        public WithdrawalController(WithdrawalBLL withdrawalBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, BankDetailBLL bankDetailBLL)
+        private readonly string payApiUrl;
+        private readonly CourierAdapter courierAdapter;
+        public WithdrawalController(IConfiguration configuration, CourierAdapter courierAdapter, WithdrawalBLL withdrawalBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, BankDetailBLL bankDetailBLL)
         {
             this.withdrawalBLL = withdrawalBLL;
             this.selLangBLL = selLangBLL;
             this.messageBLL = messageBLL;
             this.bankDetailBLL = bankDetailBLL;
+            payApiUrl = configuration.GetValue<string>("PayService");
+            this.courierAdapter = courierAdapter;
         }
 
         public class WithdrawalListReq
@@ -84,10 +90,13 @@ namespace BackendSite.Controllers.Api
         {
             public string Comment { set; get; }
             public int Action { set; get; }
+            public string WithdrawalInfo { set; get; }
+            public int? WithdrawalType { set; get; }
+            public int? SelId { set; get; }
         }
 
         [HttpPost]
-        public ApiResult WithdrawalConfirm(WithdrawalReq2 withdrawalReq)
+        public async Task<ApiResult> WithdrawalConfirmAsync(WithdrawalReq2 withdrawalReq)
         {
             var apiResult = new ApiResult(selLangBLL);
             //var apiResult = new ApiResult();
@@ -129,6 +138,69 @@ namespace BackendSite.Controllers.Api
             {
                 withdrawConfirmReuslt = withdrawalBLL.WithdrawalVerify(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
             }
+            else if (withdrawalReq.Action == (int)WithdrawalStatus.Process)
+            {
+                var withdrawalInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalReq.WithdrawalInfo);
+                if (withdrawalReq.WithdrawalType == 1)
+                {
+                    withdrawalInfo.PayId = withdrawalReq.SelId;
+                }
+                else if (withdrawalReq.WithdrawalType == 2)
+                {
+                    var bankInfoOff = bankDetailBLL.GetBankInfoOff().Where(x => x.BankId == withdrawalReq.SelId).FirstOrDefault();
+
+                    if (bankInfoOff != null)
+                    {
+                        withdrawalInfo.FromAccountNo = bankInfoOff.AccountNo;
+                        withdrawalInfo.FromAccountName = bankInfoOff.AccountName;
+                        withdrawalInfo.FromSysId = bankInfoOff.SysId;
+                        withdrawalInfo.BankId = bankInfoOff.BankId;
+                    }
+                }
+
+                if (withdrawalReq.WithdrawalType == null || withdrawalReq.WithdrawalType == 0)
+                {
+                    apiResult.ErrorCode = 1101;
+                    apiResult.Message = "Select 1 Type of Withdrawal Please.";
+                    return apiResult;
+                }
+                else
+                {
+                    int custId = 0;
+                    decimal amount = 0m;
+                    withdrawConfirmReuslt = withdrawalBLL.WithdrawalProcess(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name, Newtonsoft.Json.JsonConvert.SerializeObject(withdrawalInfo), withdrawalReq.WithdrawalType, out custId, out amount);
+
+                    if (withdrawConfirmReuslt > 0 && withdrawalReq.WithdrawalType == 1)
+                    {
+                        var reqWithdrawalOnline = new ReqWithdrawalOnline
+                        {
+                            SysId = withdrawalInfo.SysId,
+                            TransId = withdrawalReq.TransId,
+                            CustId = custId,
+                            Amount = amount,
+                            PayId = withdrawalInfo.PayId ?? 0,
+                            AccountName = withdrawalInfo.AccountName,
+                            AccountNo = withdrawalInfo.AccountNo,
+                            //ReturnUrl = Url.RouteUrl("desktop", new { action = "Deposit", controller = "Cashier", authData.LangId }, protocol: Request.Scheme, host: Request.Host.Port == 80 ? Request.Host.Host : $"{Request.Host.Host}:{Request.Host.Port}")
+                        };
+
+                        var myUrl = $"{payApiUrl}Withdrawal";
+                        var apiOnlineResult = await courierAdapter.MyPostAsync<bool, ReqWithdrawalOnline>(myUrl, reqWithdrawalOnline);
+                        if (apiOnlineResult == null)
+                        {
+                            withdrawConfirmReuslt = withdrawalBLL.WithdrawalVerify(withdrawalReq.TransId, apiResult.Message, User.Identity.Name);
+                            apiResult.ErrorCode = 1101;
+                            apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+                            return apiResult;
+                        }
+                        else if (apiOnlineResult.ErrorCode != 0)
+                        {
+                            withdrawConfirmReuslt = withdrawalBLL.WithdrawalVerify(withdrawalReq.TransId, apiOnlineResult.Message, User.Identity.Name);
+                            return apiOnlineResult;
+                        }
+                    }
+                }
+            }
             else if (withdrawalReq.Action == (int)WithdrawalStatus.OnHold)
             {
                 withdrawConfirmReuslt = withdrawalBLL.WithdrawalOnHold(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
@@ -150,6 +222,19 @@ namespace BackendSite.Controllers.Api
             }
 
             return apiResult;
+        }
+
+        public class ReqWithdrawalOnline
+        {
+            public int SysId { get; set; }
+            public string TransId { get; set; }
+            public int PayId { get; set; }
+            public int CustId { get; set; }
+            public decimal Amount { get; set; }
+            //public string ClientIP { set; get; }
+            public string AccountName { set; get; }
+            public string AccountNo { set; get; }
+            public string ReturnUrl { set; get; }
         }
 
         public class WithdrawalReq3
