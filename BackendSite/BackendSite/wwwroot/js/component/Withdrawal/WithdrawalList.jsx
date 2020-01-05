@@ -101,6 +101,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
     }            
 
     class WithdrawalDetail extends React.Component {
+        _clipboard=null;
         constructor(props) {
             super(props);
             this.state={Data:null};
@@ -109,6 +110,14 @@ import {Pagination} from '../commJS/Pagination.jsx';
         componentDidMount() {
             this.onGetData();
             this.onGetComment();
+            this._clipboard = new ClipboardJS(".js-copy");
+
+            this._clipboard.on('success', function(e) {
+                //console.log(e);
+            });
+            this._clipboard.on('error', function(e) {
+                //console.log(e);
+            });            
         }
 
         onGetData() {
@@ -153,19 +162,26 @@ import {Pagination} from '../commJS/Pagination.jsx';
         }
 
         onConfirm(action){
-            axios.post('/api/Withdrawal/WithdrawalConfirm', { transId: this.props.transId, Comment : this.state.Comment, Action:action})
-            .then(function (response) {
-                //Loading.UnLoading();
-                let result = response.data;
-                if (result.errorCode == 0) {
-                    alert(result.message);
-                } else {
-                    alert(result.message);
-                }
-            }.bind(this)).catch(function (error) {
-                //Loading.UnLoading();
-                alert(error);
-            }.bind(this));    
+            if((action != 0 && confirm('Are you sure?')) || action==0) {
+                axios.post('/api/Withdrawal/WithdrawalConfirm', { transId: this.props.transId, Comment : this.state.Comment, Action:action})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        alert(result.message);
+                        if(action!=0) {
+                            this.onBack();
+                        } else {
+                            this.onGetComment();
+                        }
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+            } 
         }
 
         componentDidUpdate(prevProps, prevState, snapshot) {
@@ -220,11 +236,11 @@ import {Pagination} from '../commJS/Pagination.jsx';
                     </tr>
                     <tr>
                         <th scope="row">Account No</th>
-                        <td>{data.accountNo}</td>
+                        <td>{data.accountNo}<button type="button" className="btn btn-secondary js-copy" data-clipboard-text={data.accountNo}>Copy</button></td>
                     </tr>
                     <tr>
                         <th scope="row">Account Name</th>
-                        <td>{data.accountName}</td>
+                        <td>{data.accountName}<button type="button" className="btn btn-secondary js-copy" data-clipboard-text={data.accountName}>Copy</button></td>
                     </tr>
                     <tr>
                         <th scope="row">Currency</th>
@@ -232,14 +248,14 @@ import {Pagination} from '../commJS/Pagination.jsx';
                     </tr>
                     <tr>
                         <th scope="row">Request Amount</th>
-                        <td>{number_format(data.amount)}</td>
+                        <td>{number_format(data.amount)}<button type="button" className="btn btn-secondary js-copy" data-clipboard-text={data.amount}>Copy</button></td>
                     </tr>
                     <tr>
                         <th scope="row">Type</th>
                         <td>{i18n["lbl_WithdrawalType" +data.withdrawalType]}</td>
                     </tr>
                     <tr>
-                        <th scope="row">eMail</th>
+                        <th scope="row">E-mail</th>
                         <td>{data.email}</td>
                     </tr>
                     <tr>
@@ -354,6 +370,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
 
         onBack() {
             this.setState({ShowDetial: false});
+            this.onRefresh();
         }
 
         render() {
