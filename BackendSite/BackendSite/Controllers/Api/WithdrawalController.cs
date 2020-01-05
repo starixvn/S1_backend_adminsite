@@ -19,12 +19,14 @@ namespace BackendSite.Controllers.Api
         private readonly WithdrawalBLL withdrawalBLL;
         private readonly SelLangBLL selLangBLL;
         private readonly MessageBLL messageBLL;
-
-        public WithdrawalController(WithdrawalBLL withdrawalBLL, SelLangBLL selLangBLL, MessageBLL messageBLL)
+        private readonly BankDetailBLL bankDetailBLL;
+        private readonly static BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
+        public WithdrawalController(WithdrawalBLL withdrawalBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, BankDetailBLL bankDetailBLL)
         {
             this.withdrawalBLL = withdrawalBLL;
             this.selLangBLL = selLangBLL;
             this.messageBLL = messageBLL;
+            this.bankDetailBLL = bankDetailBLL;
         }
 
         public class WithdrawalListReq
@@ -78,7 +80,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public class WithdrawalReq2: WithdrawalReq
+        public class WithdrawalReq2 : WithdrawalReq
         {
             public string Comment { set; get; }
             public int Action { set; get; }
@@ -148,6 +150,60 @@ namespace BackendSite.Controllers.Api
             }
 
             return apiResult;
+        }
+
+        public class WithdrawalReq3
+        {
+            public int CurrencyId { get; set; }
+            public int SysId { get; set; }
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffList(WithdrawalReq3 withdrawalReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
+            var bankInfoOff = bankDetailBLL.GetBankInfoOff();
+            bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == withdrawalReq.CurrencyId && x.SysId == withdrawalReq.SysId).OrderBy(x => x.BSort);
+            apiResult.Data = bankInfoOff;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        public class Pay
+        {
+            public int PayId { get; set; }
+            public string PayName { get; set; }
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<Pay>> GetPayList(WithdrawalReq3 withdrawalReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<Pay>>();
+            var bankInfoPay = bankDetailBLL.GetBankInfoPay();
+            var _payInfo = (from x in bankInfoPay
+                            where x.CurrencyId == withdrawalReq.CurrencyId && x.SysId == withdrawalReq.SysId
+                            select new Pay
+                            {
+                                PayId = x.PayId,
+                                PayName = x.PayName
+
+                            }).Distinct(bankInfoPayComparer);
+            apiResult.Data = _payInfo;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        private class BankInfoPayComparer : IEqualityComparer<Pay>
+        {
+            public bool Equals(Pay t1, Pay t2)
+            {
+                return (t1.PayId == t2.PayId);
+            }
+
+            public int GetHashCode(Pay t)
+            {
+                return t.ToString().GetHashCode();
+            }
         }
     }
 }

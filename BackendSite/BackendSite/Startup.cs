@@ -29,6 +29,7 @@ namespace BackendSite
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMemoryCache();
             /*Library*/
             services.AddSingleton<Tools>();
             services.AddSingleton<Common>();
@@ -46,6 +47,7 @@ namespace BackendSite
             services.AddSingleton<MessageService>();
             services.AddSingleton<MenuService>();
             services.AddSingleton<CustInfoService>();
+            services.AddSingleton<LocalBankService>();
 
             /*BLL*/
             services.AddSingleton<ServerInfoBLL>();

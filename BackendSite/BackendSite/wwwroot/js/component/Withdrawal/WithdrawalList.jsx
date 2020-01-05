@@ -123,11 +123,16 @@ import {Pagination} from '../commJS/Pagination.jsx';
         onGetData() {
             //Loading.OnLoading();
             axios.post('/api/Withdrawal/GetWithdrawalRequest', { transId: this.props.transId})
-            .then(function (response) {
+            .then(async function (response) {
                 //Loading.UnLoading();
                 let result = response.data;
                 if (result.errorCode == 0) {
-                    this.setState({Data: result.data, GetData: true});
+
+                    if(result.data.status==3) {
+                        await this.onGetPayList(result.data.currencyId, result.data.sysId);
+                        await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId);
+                    }                    
+                    this.setState({Data: result.data, selectType: result.data.withdrawalType, GetData: true});
                 } else {
                     alert(result.message);
                 }
@@ -184,13 +189,50 @@ import {Pagination} from '../commJS/Pagination.jsx';
             } 
         }
 
-        componentDidUpdate(prevProps, prevState, snapshot) {
-            //this.onGetData();
+        onSelectType(event) {
+            this.setState({selectType: event.target.value});
         }
+
+        async onGetBankInfoOffList(currencyId, sysId) {
+            let selectType = this.state.selectType;
+            let data = this.state.Data;
+            await axios.post('/api/Withdrawal/GetBankInfoOffList', { CurrencyId: currencyId, SysId: sysId})
+            .then(function (response) {
+                //Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    this.setState({BankInfoOffList: result.data});
+                } else {
+                    alert(result.message);
+                }
+            }.bind(this)).catch(function (error) {
+                //Loading.UnLoading();
+                alert(error);
+            }.bind(this));
+        }
+
+        async onGetPayList(currencyId, sysId) {
+            let selectType = this.state.selectType;
+            let data = this.state.Data;
+            await axios.post('/api/Withdrawal/GetPayList', { CurrencyId: currencyId, SysId: sysId})
+            .then(function (response) {
+                //Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    this.setState({PayList: result.data});
+                } else {
+                    alert(result.message);
+                }
+            }.bind(this)).catch(function (error) {
+                //Loading.UnLoading();
+                alert(error);
+            }.bind(this));
+        }        
 
         render() {
             let data = this.state.Data;
             let btnGroup = [];
+            let selectType = null
             if(data != null) {
                 if(data.status==1||data.status==2||data.status==3||data.status==4)
                     btnGroup.push(<button key={0} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
@@ -200,10 +242,25 @@ import {Pagination} from '../commJS/Pagination.jsx';
                     btnGroup.push(<button key={3} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 3)}>Verify</button>);
                 if(data.status==3)
                     btnGroup.push(<button key={4} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 4)}>Process</button>);                
-                if(data.status==4)
+                if(data.status==4 && data.withdrawalType != 2)
                     btnGroup.push(<button key={6} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 6)}>Approved</button>);
-                if(data.status==3 || data.status==2)
+                if((data.status==3 || data.status==2))
                     btnGroup.push(<button key={7} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 7)}>Rejected</button>);
+
+                
+                selectType = i18n["lbl_WithdrawalType" +data.withdrawalType];
+
+                if(data.status==3) {
+                    let selectOp = [];
+                    selectOp.push(<option key={0} value="0">Undefine</option>);
+                     if(this.state.PayList.length > 0)
+                        selectOp.push(<option key={1} value="1">Online Payment</option>);
+                     if(this.state.BankInfoOffList.length > 0)
+                        selectOp.push(<option key={2} value="2">Local Bank</option>);
+                    selectType = <select className="form-control" onChange={this.onSelectType.bind(this)} value={this.state.selectType}>
+                        {selectOp}
+                    </select>;
+                }
             }
 
             return (
@@ -252,7 +309,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                     </tr>
                     <tr>
                         <th scope="row">Type</th>
-                        <td>{i18n["lbl_WithdrawalType" +data.withdrawalType]}</td>
+                        <td>{selectType}</td>
                     </tr>
                     <tr>
                         <th scope="row">E-mail</th>
@@ -394,8 +451,8 @@ import {Pagination} from '../commJS/Pagination.jsx';
                                             <select name="selectType" onChange={this.onChange.bind(this)} value={this.state.selectType}>
                                                 <option value="">All</option>
                                                 <option value="0">Undefine</option>
-                                                <option value="1">Local Bank</option>
-                                                <option value="2">Online Payment</option>
+                                                <option value="1">Online Payment</option>                                                
+                                                <option value="2">Local Bank</option>
                                             </select>
                                         </td>
                                         <td className="title11bk">
