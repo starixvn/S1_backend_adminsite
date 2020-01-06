@@ -178,7 +178,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                 
                 if(action == 4) {
                     data.WithdrawalInfo = this.state.Data.withdrawalInfo;
-                    data.SelId = this.state.SelId;
+                    data.SelId = parseInt(this.state.SelId);
                     data.WithdrawalType = this.state.selectType;
                 }
 
