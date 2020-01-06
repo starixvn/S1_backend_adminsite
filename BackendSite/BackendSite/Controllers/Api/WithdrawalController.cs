@@ -248,7 +248,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
             var bankInfoOff = bankDetailBLL.GetBankInfoOff();
-            bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == withdrawalReq.CurrencyId && x.SysId == withdrawalReq.SysId).OrderBy(x => x.BSort);
+            bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == withdrawalReq.CurrencyId).OrderBy(x => x.BSort);
             apiResult.Data = bankInfoOff;
             apiResult.ErrorCode = 0;
             return apiResult;
