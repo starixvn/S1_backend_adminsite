@@ -94,6 +94,7 @@ namespace BackendSite.Service.BLL
         {
             var serverInfo = serverInfoService.GetModel();
             List<int> forStatus = new List<int>();
+            forStatus.Add((int)WithdrawalStatus.Verify);
             forStatus.Add((int)WithdrawalStatus.Pending);
             int custId = 0;
             decimal amount = 0m;
