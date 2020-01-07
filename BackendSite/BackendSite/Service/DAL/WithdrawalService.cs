@@ -96,6 +96,7 @@ namespace BackendSite.Service.DAL
 
                             if (status == WithdrawalStatus.Rejected)
                             {
+                                type = 2 + typePosition; /*Rejected  Withdrawal 1002*/
                                 byte is1stDepoist = 0;
                                 decimal afterAmount = 0;
 
