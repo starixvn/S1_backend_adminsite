@@ -21,7 +21,7 @@
         .then(function (response) {
             let result = response.data;
             if (result.errorCode == 0) {
-                window.location.replace(result.message);
+                window.top.location.replace(result.message);
             } else {
                 alert(result.message);
             }
