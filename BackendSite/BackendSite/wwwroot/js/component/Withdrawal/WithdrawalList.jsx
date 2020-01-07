@@ -258,7 +258,8 @@ import {Pagination} from '../commJS/Pagination.jsx';
             let data = this.state.Data;
             let btnGroup = [];
             let selectType = null
-            let selectPay = null;            
+            let selectPay = null;
+            let PayFrom = [];
             if(data != null) {
                 if(data.status==1||data.status==2||data.status==3||data.status==4)
                     btnGroup.push(<button key={0} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
@@ -273,7 +274,6 @@ import {Pagination} from '../commJS/Pagination.jsx';
                 if((data.status==3 || data.status==2))
                     btnGroup.push(<button key={7} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 7)}>Rejected</button>);
 
-                
                 selectType = i18n["lbl_WithdrawalType" +data.withdrawalType];
 
                 if(data.status==3) {
@@ -306,6 +306,32 @@ import {Pagination} from '../commJS/Pagination.jsx';
                             <td><select className="form-control" value={this.state.SelId} onChange={this.onSelId.bind(this)}>{selectPay}</select></td>
                         </tr>;
                     }
+                } else {
+                    if(data.payId > 0) {
+                        PayFrom.push(<tr key={1}>
+                            <th scope="row">Payment</th>
+                            <td>{data.payName}</td>
+                        </tr>);
+                    } else if(data.bankId > 0) {
+                        PayFrom.push(<tr key={1}>
+                            <th scope="row">From Bank Code</th>
+                            <td>{data.fromBankCode}</td>
+                        </tr>);
+
+                        PayFrom.push(<tr key={2}>
+                            <th scope="row">From Bank Name</th>
+                            <td>{data.fromBankName}</td>
+                        </tr>);
+                        let bankInfoObj = JSON.parse(data.withdrawalInfo);
+                       PayFrom.push(<tr key={3}>
+                            <th scope="row">From Account Name</th>
+                            <td>{bankInfoObj.FromAccountName}</td>
+                        </tr>);
+                       PayFrom.push(<tr key={4}>
+                            <th scope="row">From Account No</th>
+                            <td>{bankInfoObj.FromAccountNo}</td>
+                        </tr>);                                     
+                    }
                 }
             }
 
@@ -329,6 +355,10 @@ import {Pagination} from '../commJS/Pagination.jsx';
                         <th scope="row">Username</th>
                         <td>{data.userName}</td>
                     </tr>
+                    <tr>
+                        <th scope="row">E-mail</th>
+                        <td>{data.email}</td>
+                    </tr>                    
                     <tr>
                         <th scope="row">{"Date" + " (" + moment().format('Z') + ")"}</th>
                         <td>{moment(data.createTime).format('l LTS')}</td>
@@ -358,10 +388,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                         <td>{selectType}</td>
                     </tr>
                     {selectPay}
-                    <tr>
-                        <th scope="row">E-mail</th>
-                        <td>{data.email}</td>
-                    </tr>
+                    {PayFrom}
                     <tr>
                         <th scope="row">Ref ID</th>
                         <td>{data.refId}</td>

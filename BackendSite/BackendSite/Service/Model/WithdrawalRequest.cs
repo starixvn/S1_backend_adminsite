@@ -25,6 +25,9 @@ namespace BackendSite.Service.Model
         public string SiteName { set; get; }
         public string BankName { set; get; }
         public string BankCode { set; get; }
+        public string FromBankName { set; get; }
+        public string FromBankCode { set; get; }
+        public string PayName { set; get; }
         public int SysId { set; get; }
         public int PayId { set; get; }
         public int BankId { set; get; }

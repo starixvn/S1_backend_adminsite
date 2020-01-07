@@ -73,18 +73,18 @@ namespace BackendSite.Service.BLL
         {
             var serverInfo = serverInfoService.GetModel();
             string sBankInfoPayListKey = $"BankInfoPayList_{serverInfo.SiteId}";
-            var BankInfoOffList = cache.Get<IEnumerable<BankInfoPay>>(sBankInfoPayListKey);
-            if (BankInfoOffList == null)
+            var BankInfoPayList = cache.Get<IEnumerable<BankInfoPay>>(sBankInfoPayListKey);
+            if (BankInfoPayList == null)
             {
-                BankInfoOffList = localBankService.GetBankInfoPayList();
-                if (BankInfoOffList != null)
+                BankInfoPayList = localBankService.GetBankInfoPayList();
+                if (BankInfoPayList != null)
                 {
-                    cache.Set(sBankInfoPayListKey, BankInfoOffList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
+                    cache.Set(sBankInfoPayListKey, BankInfoPayList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
                 }
             }
 
             //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
-            return BankInfoOffList;
+            return BankInfoPayList;
         }
     }
 }

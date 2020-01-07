@@ -72,6 +72,16 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<WithdrawalRequest>();
             var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
+
+            if (withdrawalRequest.BankId > 0)
+            {
+            }
+
+            if (withdrawalRequest.PayId > 0)
+            {
+
+            }
+
             apiResult.Data = withdrawalRequest;
             apiResult.ErrorCode = 0;
             return apiResult;
