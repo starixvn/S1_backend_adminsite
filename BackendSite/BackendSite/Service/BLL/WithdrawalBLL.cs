@@ -54,8 +54,14 @@ namespace BackendSite.Service.BLL
             forStatus.Add((int)WithdrawalStatus.Process);
             int custId = 0;
             decimal amount = 0m;
+            int withdrawalId = 0;
 
-            return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, Operator, forStatus, WithdrawalStatus.Approved, null, (int?)null, out custId, out amount);
+            Match m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out withdrawalId);
+            var withdrawalRequest = withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            var withdrawalInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalRequest.WithdrawalInfo);
+            withdrawalInfo.CurrencyId = withdrawalRequest.CurrencyId;
+            return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, Operator, forStatus, WithdrawalStatus.Approved, Newtonsoft.Json.JsonConvert.SerializeObject(withdrawalInfo), withdrawalRequest.WithdrawalType, out custId, out amount);
         }
 
         public int WithdrawalRejectd(string transId, string comment, string Operator)

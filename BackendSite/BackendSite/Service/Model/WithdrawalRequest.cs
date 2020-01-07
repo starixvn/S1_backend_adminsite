@@ -52,5 +52,7 @@ namespace BackendSite.Service.Model
         public int? PayId { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int? BankId { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public int? CurrencyId { set; get; }
     }
 }
