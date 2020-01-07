@@ -39,105 +39,59 @@ namespace BackendSite.Controllers
 
         public IActionResult DepositList()
         {
-            IEnumerable<DepositRequest> depositRequests = depositBLL.GetDepositRequestList();
-
-            foreach (var item in depositRequests)
-            {
-                switch (item.DepositType)
-                {
-                    case (int)DepositType.OnlineBanking:
-                        item.DepositTypeString = selLangBLL.GetResourceValue("lbl_OnlineBanking");
-                        break;
-                    case (int)DepositType.MobilePayment:
-                        item.DepositTypeString = selLangBLL.GetResourceValue("lbl_MobilePayment");
-                        break;
-                    case (int)DepositType.WireTransfer:
-                        item.DepositTypeString = selLangBLL.GetResourceValue("lbl_WireTransfer");
-                        break;
-                }
-
-                switch (item.Status)
-                {
-                    case (int)DepositStatus.Draft:
-                        item.StatusString = selLangBLL.GetMsg("msg_Draft");
-                        break;
-                    case (int)DepositStatus.Pending:
-                        item.StatusString = selLangBLL.GetMsg("msg_Pending");
-                        break;
-                    case (int)DepositStatus.Paid:
-                        item.StatusString = selLangBLL.GetMsg("msg_Paid");
-                        break;
-                    case (int)DepositStatus.Approved:
-                        item.StatusString = selLangBLL.GetMsg("msg_Approved");
-                        break;
-                    case (int)DepositStatus.Rejected:
-                        item.StatusString = selLangBLL.GetMsg("msg_Rejected");
-                        break;
-                    case (int)DepositStatus.Canceled:
-                        item.StatusString = selLangBLL.GetMsg("msg_Canceled");
-                        break;
-                    case (int)DepositStatus.Expired:
-                        item.StatusString = selLangBLL.GetMsg("msg_Expired");
-                        break;
-                    case (int)DepositStatus.Error:
-                        item.StatusString = selLangBLL.GetMsg("msg_Error");
-                        break;
-                }
-            }
-
-            return View(depositRequests.ToList());
+            return View();
         }
 
         public IActionResult DepositRequest(string transId)
         {
-            DepositRequest depositRequest = depositBLL.GetDepositRequest(transId);
-            IEnumerable<Comments> comments = depositBLL.GetDepositRequestComment(transId);
+            //DepositRequest depositRequest = depositBLL.GetDepositRequest(transId);
+            //IEnumerable<Comments> comments = depositBLL.GetDepositRequestComment(transId);
 
-            switch (depositRequest.DepositType)
-            {
-                case (int)DepositType.OnlineBanking:
-                    depositRequest.DepositTypeString = selLangBLL.GetResourceValue("lbl_OnlineBanking");
-                    break;
-                case (int)DepositType.MobilePayment:
-                    depositRequest.DepositTypeString = selLangBLL.GetResourceValue("lbl_MobilePayment");
-                    break;
-                case (int)DepositType.WireTransfer:
-                    depositRequest.DepositTypeString = selLangBLL.GetResourceValue("lbl_WireTransfer");
-                    break;
-            }
+            //switch (depositRequest.DepositType)
+            //{
+            //    case (int)DepositType.OnlineBanking:
+            //        depositRequest.DepositTypeString = selLangBLL.GetResourceValue("lbl_OnlineBanking");
+            //        break;
+            //    case (int)DepositType.MobilePayment:
+            //        depositRequest.DepositTypeString = selLangBLL.GetResourceValue("lbl_MobilePayment");
+            //        break;
+            //    case (int)DepositType.WireTransfer:
+            //        depositRequest.DepositTypeString = selLangBLL.GetResourceValue("lbl_WireTransfer");
+            //        break;
+            //}
 
-            foreach (var item in comments)
-            {
-                switch (item.Action)
-                {
-                    case (int)DepositStatus.Draft:
-                        item.ActionString = selLangBLL.GetMsg("msg_Draft");
-                        break;
-                    case (int)DepositStatus.Pending:
-                        item.ActionString = selLangBLL.GetMsg("msg_Pending");
-                        break;
-                    case (int)DepositStatus.Paid:
-                        item.ActionString = selLangBLL.GetMsg("msg_Paid");
-                        break;
-                    case (int)DepositStatus.Approved:
-                        item.ActionString = selLangBLL.GetMsg("msg_Approved");
-                        break;
-                    case (int)DepositStatus.Rejected:
-                        item.ActionString = selLangBLL.GetMsg("msg_Rejected");
-                        break;
-                    case (int)DepositStatus.Canceled:
-                        item.ActionString = selLangBLL.GetMsg("msg_Canceled");
-                        break;
-                    case (int)DepositStatus.Expired:
-                        item.ActionString = selLangBLL.GetMsg("msg_Expired");
-                        break;
-                    case (int)DepositStatus.Error:
-                        item.ActionString = selLangBLL.GetMsg("msg_Error");
-                        break;
-                }
-            }
-            depositRequest.Comments = comments;
-            return View(depositRequest);
+            //foreach (var item in comments)
+            //{
+            //    switch (item.Action)
+            //    {
+            //        case (int)DepositStatus.Draft:
+            //            item.ActionString = selLangBLL.GetMsg("msg_Draft");
+            //            break;
+            //        case (int)DepositStatus.Pending:
+            //            item.ActionString = selLangBLL.GetMsg("msg_Pending");
+            //            break;
+            //        case (int)DepositStatus.Paid:
+            //            item.ActionString = selLangBLL.GetMsg("msg_Paid");
+            //            break;
+            //        case (int)DepositStatus.Approved:
+            //            item.ActionString = selLangBLL.GetMsg("msg_Approved");
+            //            break;
+            //        case (int)DepositStatus.Rejected:
+            //            item.ActionString = selLangBLL.GetMsg("msg_Rejected");
+            //            break;
+            //        case (int)DepositStatus.Canceled:
+            //            item.ActionString = selLangBLL.GetMsg("msg_Canceled");
+            //            break;
+            //        case (int)DepositStatus.Expired:
+            //            item.ActionString = selLangBLL.GetMsg("msg_Expired");
+            //            break;
+            //        case (int)DepositStatus.Error:
+            //            item.ActionString = selLangBLL.GetMsg("msg_Error");
+            //            break;
+            //    }
+            //}
+            //depositRequest.Comments = comments;
+            return View();
         }
 
         [HttpPost]

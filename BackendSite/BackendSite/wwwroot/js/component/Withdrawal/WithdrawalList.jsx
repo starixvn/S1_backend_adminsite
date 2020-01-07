@@ -22,6 +22,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                     <th scope="row"><a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a></th>
                     <td>{i18n["lbl_WithdrawalType" + row.withdrawalType]}</td>
                     <td>{row.userName}</td>
+                    <td>{i18n["lbl_Currency"+row.currencyId]}</td>
                     <td className="text-right">{number_format(row.amount)}</td>                    
                     <td>{row.accountNo}</td>
                     <td>{row.accountName}</td>
@@ -40,6 +41,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                                 <th scope="col">Trxn.ID</th>
                                 <th scope="col">{i18n.lbl_WithdrawalType}</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
+                                <th scope="col">CCY</th>
                                 <th scope="col" className="text-right">{i18n.lbl_Amount}</th>
                                 <th scope="col">To Acc. NO.</th>
                                 <th scope="col">To Acc. Name</th>                                
@@ -138,7 +140,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                         SelId = result.data.bankId;
                     }
 
-                    this.setState({Data: result.data, selectType: result.data.withdrawalType, GetData: true,SelId: SelId});
+                    this.setState({Data: result.data, selectType: result.data.withdrawalType, GetData: true,SelId: SelId,Comment: result.data.comment});
                 } else {
                     alert(result.message);
                 }
@@ -595,7 +597,6 @@ import {Pagination} from '../commJS/Pagination.jsx';
                                 <div className="btnstyle" style={{textAlign:"center"}}>
                                     <ul>
                                         <li><button className="btnbu" type="submit"><span>Search</span></button></li>
-                                        <li><button className="btngy" type="Reset"><span>Reset</span></button></li>
                                         {/*<li><a href="javascript:ReportToExport();" style="" className="btnbu"><span>Export</span></a></li>*/}
                                     </ul>
                                 </div>

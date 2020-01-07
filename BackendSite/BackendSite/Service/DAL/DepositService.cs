@@ -24,31 +24,41 @@ namespace BackendSite.Service.DAL
             this.walletService = walletService;
         }
 
-        public IEnumerable<DepositRequest> GetDepositRequestList(int siteId)
+        public IEnumerable<DepositRequest> GetDepositRequestList(int? depositType, long startDate, long endDate, int siteId, string DepositId, string UserName, int? currencyId, int? status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            int depositId = 0;
+            if (!string.IsNullOrWhiteSpace(DepositId))
             {
-                return conn.Query<DepositRequest>("DepositList_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+                Match m = Regex.Match(DepositId, @"\d+");
+                int.TryParse(m.Value, out depositId);
             }
+            var p = new DynamicParameters(new { DepositType = depositType, StartDate = startDate, EndDate = endDate, SiteId = siteId, DepositId = depositId, TransId = DepositId, UserName, CurrencyId = currencyId, Status = status, PageSize = pageSize });
+            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var depositList = conn.Query<DepositRequest>("DepositList_Get", p, commandType: CommandType.StoredProcedure);
+            pageNumber = p.Get<int?>("PageNumber") ?? 0;
+            totalPages = p.Get<int?>("TotalPages") ?? 0;
+            rowCount = p.Get<int?>("RowCount") ?? 0;
+            return depositList;
         }
 
         public DepositRequest GetDepositRequest(int depositId, int siteId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                return conn.QueryFirstOrDefault<DepositRequest>("DepositRequestTransID_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.QueryFirstOrDefault<DepositRequest>("DepositRequestTransID_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<Comments> GetDepositRequestComment(int depositId, int siteId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                return conn.Query<Comments>("DepositRequestComment_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Query<Comments>("DepositRequestComment_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
 
-        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, DepositStatus forStatus, DepositStatus status)
+        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatus status, DepositRequest depositRequest)
         {
             int depositId = 0;
             int type = 1;
@@ -58,12 +68,13 @@ namespace BackendSite.Service.DAL
             int result = 0;
             try
             {
-                using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+                using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
                 {
                     conn.Open();
                     using (var trans = conn.BeginTransaction())
                     {
-                        var p = new DynamicParameters(new { DepositId = depositId, SiteId = siteId, ActualDeposit = actualDeposit, Comment = comment, ForStatus = (int)forStatus, Status = (int)status, ThirdId = (string)null });
+                        string sForStatus = Newtonsoft.Json.JsonConvert.SerializeObject(forStatus);
+                        var p = new DynamicParameters(new { DepositId = depositId, SiteId = siteId, ActualDeposit = actualDeposit, Comment = comment, ForStatus = sForStatus, Status = (int)status, ThirdId = (string)null });
                         p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
                         p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
                         result = conn.Execute("DepositInfo_Set", p, trans, commandType: CommandType.StoredProcedure);
@@ -74,10 +85,9 @@ namespace BackendSite.Service.DAL
 
                             if (status == DepositStatus.Approved)
                             {
-                                var depositRequest = conn.QueryFirstOrDefault<DepositRequest>("DepositRequestTransID_Get", new { DepositId = depositId, SiteId = siteId }, trans, commandType: CommandType.StoredProcedure);
                                 if (depositRequest.DepositType != 3)
                                 {
-                                    var pay = (IPay)depositRequest.depositInfo;
+                                    var pay = (IPay)depositRequest.oDepositInfo;
                                     type = payTypePosition + pay.PayId;
                                 }
 
@@ -97,12 +107,12 @@ namespace BackendSite.Service.DAL
                                 {
                                     if (depositRequest.DepositType == 3)
                                     {
-                                        var depositInfo3 = (DepositInfo3_1)depositRequest.depositInfo;
+                                        var depositInfo3 = (DepositInfo3_1)depositRequest.oDepositInfo;
                                         result = walletService.SetBankOffDummy(depositRequest.SiteId, depositInfo3.SysId, depositInfo3.AccountNo, depositInfo3.CurrencyId, actualDeposit, conn, trans);
                                     }
-                                    else if (depositRequest.depositInfo is IPay)
+                                    else if (depositRequest.oDepositInfo is IPay)
                                     {
-                                        var pay = (IPay)depositRequest.depositInfo;
+                                        var pay = (IPay)depositRequest.oDepositInfo;
                                         result = walletService.SetPayDummy(depositRequest.SiteId, pay.PayId, pay.CurrencyId, actualDeposit, conn, trans);
                                     }
                                 }

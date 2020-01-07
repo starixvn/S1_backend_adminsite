@@ -6,7 +6,9 @@ module.exports = {
   entry:{
 		"js/component/Withdrawal/WithdrawalList.min":[
 			'../BackendSite/BackendSite/wwwroot/js/component/Withdrawal/WithdrawalList.jsx'
-    ],
+    ],"js/component/Deposit/DepositList.min":[
+			'../BackendSite/BackendSite/wwwroot/js/component/Deposit/DepositList.jsx'
+    ]
   },
   output: {
     path:  path.resolve(__dirname,'../BackendSite/BackendSite/wwwroot/'),

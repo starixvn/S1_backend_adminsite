@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,43 +10,42 @@ namespace BackendSite.Service.Model
     {
         public string TransId { set; get; }
         public int DepositType { set; get; }
+        public int CurrencyId { get; set; }
         public int CustId { set; get; }
         public string UserName { set; get; }
         public int SiteId { set; get; }
+        public string SiteName { set; get; }
         public string DepositInfo { set; get; }
         public decimal Amount { set; get; }
         public decimal ActualDeposit { set; get; }
+        public string Comment { set; get; }
         public DateTime CreateTime { set; get; }
-        public IDepositInfo depositInfo
-        {
-            get
-            {
-                if (DepositType == 1)
+        [System.Text.Json.Serialization.JsonIgnore]
+        public IDepositInfo oDepositInfo =>
+                DepositType switch
                 {
-                    return Newtonsoft.Json.JsonConvert.DeserializeObject<DepositInfo1_1>(DepositInfo);
-                }
-                else if (DepositType == 2)
-                {
-                    return Newtonsoft.Json.JsonConvert.DeserializeObject<DepositInfo2_1>(DepositInfo);
-                }
-                else if (DepositType == 3)
-                {
-                    return Newtonsoft.Json.JsonConvert.DeserializeObject<DepositInfo3_1>(DepositInfo);
-                }
-                return null;
-            }
-        }
+                    1 => JsonConvert.DeserializeObject<DepositInfo1_1>(DepositInfo),
+                    2 => JsonConvert.DeserializeObject<DepositInfo2_1>(DepositInfo),
+                    3 => JsonConvert.DeserializeObject<DepositInfo3_1>(DepositInfo),
+                    _ => null
+                };
         public int FirstDeposit { set; get; }
-        public string PostScript { set; get; }
+        //public string PostScript { set; get; }
         public int Status { set; get; }
-        public int Receipt { set; get; }
-        public string RefNo { set; get; }
+        public bool Receipt { set; get; }
+        public string RefId { set; get; }
         public DateTime DepositTime { set; get; }
+        public string AccountName { set; get; }
+        public string AccountNo { set; get; }
+        public string BankName { set; get; }
+        public string BankCode { set; get; }
+        public string PayName { set; get; }
+        public string PicFileName { set; get; }
 
-        public virtual IEnumerable<Comments> Comments { get; set; }
+        //public virtual IEnumerable<Comments> Comments { get; set; }
 
-        public virtual string DepositTypeString { get; set; }
-        public virtual string StatusString { get; set; }
+        //public virtual string DepositTypeString { get; set; }
+        //public virtual string StatusString { get; set; }
     }
     public interface IDepositInfo
     {

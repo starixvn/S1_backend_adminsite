@@ -1,46 +1,71 @@
-﻿@model IEnumerable<DepositRequest>
-@using Microsoft.AspNetCore.Hosting
+﻿@using Microsoft.AspNetCore.Hosting
 @using BackendSite.Service.BLL
-@using BackendSite.Service.Model
 @inject IWebHostEnvironment environment
 @inject SelLangBLL selLangBLL
 @inject ServerInfoBLL serverInfoBLL
 @inject AuthorizeBLL authorizeBLL
+@section Style {
+    <link href="~/css/Oneworks/system_style.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/lib/Oneworks/jscalendar/calendar-blue.css" rel="stylesheet" />
+}
 @{
     Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
     ViewData["Title"] = @selLangBLL.GetResourceValue("lbl_DepositRequest");
 }
-<h1>@selLangBLL.GetResourceValue("lbl_DepositRequest")</h1>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_TransId")</th>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_UserName")</th>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_DepositType")</th>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_AccountNo")</th>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_AccountName")</th>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_Amount")</th>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_Memo")</th>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_Postscript")</th>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_CreateTime")</th>
-            <th scope="col">@selLangBLL.GetResourceValue("lbl_Status")</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            var bank = ((DepositInfo3_1)item.depositInfo);
-            <tr>
-                <th scope="row">@Html.ActionLink(@item.TransId, "DepositRequest", "Deposit", new { transID = @item.TransId })</th>
-                <td>@item.UserName</td>
-                <td>@item.DepositTypeString</td>
-                <td>@bank.AccountNo</td>
-                <td>@bank.AccountName</td>
-                <td>@item.Amount</td>
-                <td>@item.PostScript</td>
-                <td>@item.CreateTime</td>
-                <td>@item.StatusString</td>
-            </tr>
-        }
-    </tbody>
-</table>
+@{
+    var serverInfo = serverInfoBLL.GetServerInfo();
+    var i18n = new Dictionary<string, string>();
+
+    foreach (var currency in serverInfo.ICurrencyList)
+    {
+        if (!i18n.ContainsKey($"lbl_Currency{currency}"))
+            i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+    }
+
+    i18n.Add("lbl_Pending", selLangBLL.GetResourceValue("lbl_Pending"));
+    i18n.Add("lbl_Approved", selLangBLL.GetResourceValue("lbl_Approved"));
+
+    string[] lbl_Txts = new string[] { "lbl_Action", "lbl_Comment", "lbl_ActualDeposit", "lbl_No", "lbl_TransId", "lbl_DepositType", "lbl_UserName", "lbl_Amount", "lbl_Postscript", "lbl_Memo", "lbl_CreateTime", "lbl_Status" };
+    foreach (var lbl_Txt in lbl_Txts)
+    {
+        if (!i18n.ContainsKey(lbl_Txt))
+            i18n.Add(lbl_Txt, selLangBLL.GetResourceValue(lbl_Txt));
+    }
+
+    for (int i = 0; i <= 6; i++)
+    {
+        if (!i18n.ContainsKey($"lbl_DepositStatus{i}"))
+            i18n.Add($"lbl_DepositStatus{i}", selLangBLL.GetResourceValue($"lbl_DepositStatus{i}"));
+    }
+    i18n.Add($"lbl_DepositStatus{99}", selLangBLL.GetResourceValue($"lbl_DepositStatus{99}"));
+
+    for (int i = 1; i <= 3; i++)
+    {
+        if (!i18n.ContainsKey($"lbl_DepositType{i}"))
+            i18n.Add($"lbl_DepositType{i}", selLangBLL.GetResourceValue($"lbl_DepositType{i}"));
+    }
+
+}
+<h4>@selLangBLL.GetResourceValue("lbl_DepositRequest")</h4>
+<div id="searchForm"></div>
+@section Scripts {
+    <script src="~/lib/runtime.min.js"></script>
+    <script src="~/lib/clipboard.min.js"></script>
+    <script src="~/lib/Oneworks/jscalendar/calendar.js"></script>
+    <script src="~/lib/Oneworks/jscalendar/lang/calendar-en.js"></script>
+    <script src="~/lib/Oneworks/jscalendar/calendar-setup.js"></script>
+    <script type="text/javascript">
+        $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
+        var CurrencyList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(serverInfo.ICurrencyList));
+    </script>
+    <script src="~/js/component/Withdrawal/WithdrawalList.min.js" asp-append-version="true"></script>
+    <script src="~/js/component/Deposit/DepositList.min.js" asp-append-version="true"></script>
+    @if (environment.EnvironmentName == "Development")
+    {
+
+    }
+    else
+    {
+
+    }
+}

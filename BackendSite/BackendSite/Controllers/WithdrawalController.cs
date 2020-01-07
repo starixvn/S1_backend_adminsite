@@ -28,44 +28,44 @@ namespace BackendSite.Controllers
             return View();
         }
 
-        public IActionResult WithdrawalRequest(string transId)
-        {
-            WithdrawalRequest withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(transId);
-            IEnumerable<Comments> comments = withdrawalBLL.GetWithdrawalRequestComment(transId);
+        //public IActionResult WithdrawalRequest(string transId)
+        //{
+        //    WithdrawalRequest withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(transId);
+        //    IEnumerable<Comments> comments = withdrawalBLL.GetWithdrawalRequestComment(transId);
 
-            foreach (var item in comments)
-            {
-                switch (item.Action)
-                {
-                    case (int)WithdrawalStatus.Pending:
-                        item.ActionString = selLangBLL.GetMsg("msg_Pending");
-                        break;
-                    case (int)WithdrawalStatus.OnHold:
-                        item.ActionString = selLangBLL.GetMsg("msg_OnHold");
-                        break;
-                    case (int)WithdrawalStatus.Verify:
-                        item.ActionString = selLangBLL.GetMsg("msg_Verify");
-                        break;
-                    case (int)WithdrawalStatus.Process:
-                        item.ActionString = selLangBLL.GetMsg("msg_Processing");
-                        break;
-                    case (int)WithdrawalStatus.Cancelled:
-                        item.ActionString = selLangBLL.GetMsg("msg_Cancelled");
-                        break;
-                    case (int)WithdrawalStatus.Approved:
-                        item.ActionString = selLangBLL.GetMsg("msg_Approved");
-                        break;
-                    case (int)WithdrawalStatus.Rejected:
-                        item.ActionString = selLangBLL.GetMsg("msg_Rejected");
-                        break;
-                    case (int)WithdrawalStatus.Error:
-                        item.ActionString = selLangBLL.GetMsg("msg_Error");
-                        break;
-                }
-            }
+        //    foreach (var item in comments)
+        //    {
+        //        switch (item.Action)
+        //        {
+        //            case (int)WithdrawalStatus.Pending:
+        //                item.ActionString = selLangBLL.GetMsg("msg_Pending");
+        //                break;
+        //            case (int)WithdrawalStatus.OnHold:
+        //                item.ActionString = selLangBLL.GetMsg("msg_OnHold");
+        //                break;
+        //            case (int)WithdrawalStatus.Verify:
+        //                item.ActionString = selLangBLL.GetMsg("msg_Verify");
+        //                break;
+        //            case (int)WithdrawalStatus.Process:
+        //                item.ActionString = selLangBLL.GetMsg("msg_Processing");
+        //                break;
+        //            case (int)WithdrawalStatus.Cancelled:
+        //                item.ActionString = selLangBLL.GetMsg("msg_Cancelled");
+        //                break;
+        //            case (int)WithdrawalStatus.Approved:
+        //                item.ActionString = selLangBLL.GetMsg("msg_Approved");
+        //                break;
+        //            case (int)WithdrawalStatus.Rejected:
+        //                item.ActionString = selLangBLL.GetMsg("msg_Rejected");
+        //                break;
+        //            case (int)WithdrawalStatus.Error:
+        //                item.ActionString = selLangBLL.GetMsg("msg_Error");
+        //                break;
+        //        }
+        //    }
 
-            //withdrawalRequest.Comments = comments;
-            return View(withdrawalRequest);
-        }
+        //    //withdrawalRequest.Comments = comments;
+        //    return View(withdrawalRequest);
+        //}
     }
 }

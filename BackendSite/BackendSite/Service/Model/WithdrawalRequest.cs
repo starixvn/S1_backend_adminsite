@@ -20,6 +20,7 @@ namespace BackendSite.Service.Model
         public decimal Amount { set; get; }
         public decimal ChargeFee { set; get; }
         public string Memo { set; get; }
+        public string Comment { set; get; }
         public DateTime CreateTime { set; get; }
         public int Status { set; get; }
         public string SiteName { set; get; }
