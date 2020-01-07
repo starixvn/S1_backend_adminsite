@@ -94,6 +94,19 @@ namespace BackendSite.Service.DAL
 
                                 result = walletService.SetBalance(custId, siteId, UserName, amount, type, $"Withdrawal Rejected: {amount}", transId, out afterAmount, out is1stDepoist, conn, trans);
                             }
+                            else if (status == WithdrawalStatus.Approved)
+                            {
+                                var withdrawalRequest = conn.QueryFirstOrDefault<WithdrawalRequest>("WithdrawalRequestTransID_Get", new { WithdrawalId = withdrawalId, SiteId = siteId }, trans, commandType: CommandType.StoredProcedure);
+                                var withdrawalInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalRequest.WithdrawalInfo);
+                                if (withdrawalRequest.WithdrawalType == 1)
+                                {
+                                    result = walletService.SetPayDummy(siteId, withdrawalInfo.PayId ?? 0, withdrawalRequest.CurrencyId, -1 * amount, conn, trans);
+                                }
+                                else if (withdrawalRequest.WithdrawalType == 2)
+                                {
+                                    result = walletService.SetBankOffDummy(siteId, withdrawalInfo.FromSysId ?? 0, withdrawalInfo.FromAccountNo, withdrawalRequest.CurrencyId, -1 * amount, conn, trans);
+                                }
+                            }
 
                             if (result > 0)
                             {
