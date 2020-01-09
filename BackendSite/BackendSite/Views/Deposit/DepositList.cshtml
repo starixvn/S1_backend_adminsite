@@ -47,6 +47,7 @@
 
 }
 <h4>@selLangBLL.GetResourceValue("lbl_DepositRequest")</h4>
+<hr />
 <div id="searchForm"></div>
 @section Scripts {
     <script src="~/lib/runtime.min.js"></script>
@@ -58,7 +59,6 @@
         $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
         var CurrencyList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(serverInfo.ICurrencyList));
     </script>
-    <script src="~/js/component/Withdrawal/WithdrawalList.min.js" asp-append-version="true"></script>
     <script src="~/js/component/Deposit/DepositList.min.js" asp-append-version="true"></script>
     @if (environment.EnvironmentName == "Development")
     {

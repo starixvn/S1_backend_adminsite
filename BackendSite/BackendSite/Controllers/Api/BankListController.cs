@@ -35,23 +35,37 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        [HttpPost]
-        public ApiResult<IEnumerable<BankDetail>> GetBankListByCurrencyId(int currencyId)
+        public class LoaclBankReq
         {
-            var apiResult = new ApiResult<IEnumerable<BankDetail>>();
-            apiResult.Data = bankDetailBLL.BankInfoList().Where(x => x.CurrencyId == currencyId);
-            apiResult.ErrorCode = 0;
-            return apiResult;
+            public int? CurrencyId { get; set; }
+            public int PageNumber { get; set; }
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<BankDetail>> GetBankListAll()
+        public ApiListResult<BankDetail> GetLoaclBankList(LoaclBankReq loaclBankReq)
         {
-            var apiResult = new ApiResult<IEnumerable<BankDetail>>();
-            apiResult.Data = bankDetailBLL.BankInfoList();
-            apiResult.ErrorCode = 0;
-            return apiResult;
+            var apiListResult = new ApiListResult<BankDetail>();
+            int pageNumber = loaclBankReq.PageNumber;
+            int totalPages = 0;
+            int rowCount = 0;
+            var depositRequestList = bankDetailBLL.GetLoaclBankList(loaclBankReq.CurrencyId, 10, ref pageNumber, out totalPages, out rowCount);
+            apiListResult.Data = depositRequestList;
+            apiListResult.ErrorCode = 0;
+            apiListResult.PageNumber = pageNumber;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.RowCount = rowCount;
+
+            return apiListResult;
         }
+
+        //[HttpPost]
+        //public ApiListResult<IEnumerable<BankDetail>> GetBankListAll()
+        //{
+        //    var apiListResult = new ApiListResult<IEnumerable<BankDetail>>();
+        //    apiListResult.Data = bankDetailBLL.BankInfoList(int pageSize, ref int pageNumber, out int totalPages, out int rowCount);
+        //    apiListResult.ErrorCode = 0;
+        //    return apiListResult;
+        //}
 
         [HttpPost]
         public ApiResult AddBank([FromBody]BankDetail bankDetail)

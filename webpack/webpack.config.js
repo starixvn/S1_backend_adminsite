@@ -8,6 +8,8 @@ module.exports = {
 			'../BackendSite/BackendSite/wwwroot/js/component/Withdrawal/WithdrawalList.jsx'
     ],"js/component/Deposit/DepositList.min":[
 			'../BackendSite/BackendSite/wwwroot/js/component/Deposit/DepositList.jsx'
+    ],"js/component/Payment/BankInfoList.min":[
+			'../BackendSite/BackendSite/wwwroot/js/component/Payment/BankInfoList.jsx'
     ]
   },
   output: {

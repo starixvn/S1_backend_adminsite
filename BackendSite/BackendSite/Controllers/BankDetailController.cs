@@ -24,8 +24,7 @@ namespace BackendSite.Controllers
 
         public IActionResult BankInfoList()
         {
-            IEnumerable<BankDetail> bankInfoList = bankDetailBLL.BankInfoList();
-            return View(bankInfoList.ToList());
+            return View();
         }
 
         public IActionResult AddBankInfo()

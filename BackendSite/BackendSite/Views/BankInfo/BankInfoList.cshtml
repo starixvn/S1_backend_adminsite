@@ -8,53 +8,34 @@
 @inject AuthorizeBLL authorizeBLL
 @inject IWebHostEnvironment environment
 @{
-    Layout = null;
+    Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
     ViewData["Title"] = @selLangBLL.GetResourceValue("lbl_BankCardList");
 }
 @{
     var i18n = new Dictionary<string, string>();
-    i18n.Add("lbl_Currency2", selLangBLL.GetResourceValue("Currency_2"));
-    i18n.Add("lbl_Currency4", selLangBLL.GetResourceValue("Currency_4"));
-    i18n.Add("lbl_Currency15", selLangBLL.GetResourceValue("Currency_15"));
-    i18n.Add("lbl_Currency51", selLangBLL.GetResourceValue("Currency_51"));
-    i18n.Add("lbl_Enable", selLangBLL.GetResourceValue("lbl_Enable"));
-    i18n.Add("lbl_Disable", selLangBLL.GetResourceValue("lbl_Disable"));
+    string[] lbl_Txts = new string[] { "lbl_Enable", "lbl_Disable" };
+    foreach (var lbl_Txt in lbl_Txts)
+    {
+        if (!i18n.ContainsKey(lbl_Txt))
+            i18n.Add(lbl_Txt, selLangBLL.GetResourceValue(lbl_Txt));
+    }
+
+    var serverInfo = serverInfoBLL.GetServerInfo();
+
+    foreach (var currency in serverInfo.ICurrencyList)
+    {
+        if (!i18n.ContainsKey($"lbl_Currency{currency}"))
+            i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+    }
 }
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - BackendSite</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
-</head>
-<body>
-    <h1>@selLangBLL.GetResourceValue("lbl_BankCardList")</h1>
-    <hr />
-    <div class="container-fluid" id="Bank" />
-
-    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="~/lib/axios.min.js"></script>
+<h4>@selLangBLL.GetResourceValue("lbl_BankCardList")</h4>
+<hr />
+<div id="ListPanel"></div>
+@section Scripts {
     <script>
-        var i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
+         $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
+        var CurrencyList=@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(serverInfo.ICurrencyList));
     </script>
-    @if (environment.EnvironmentName == "Development")
-    {
-        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
-        <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
-        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
-        <script type="text/babel" src="~/js/Bank.jsx">
-        </script>
-    }
-    else
-    {
-
-    }
-
-
-
-</body>
-</html>
+    <script src="~/lib/runtime.min.js"></script>
+    <script src="~/js/component/Payment/BankInfoList.min.js" asp-append-version="true"></script>
+}
