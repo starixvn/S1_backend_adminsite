@@ -523,7 +523,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
             let EndDate = this.state.EndDate;
             return (
                 <div>
-                     {!this.state.ShowDetial ? <form method="post" className="shadow p-3 mb-5 bg-white rounded" onSubmit={this.handleSubmit.bind(this)}>
+                     {!this.state.ShowDetial ? <form method="post" onSubmit={this.handleSubmit.bind(this)}>
                         <div className="boxgy">
                             <table border="0" cellPadding="5" cellSpacing="0">
                                 <tbody>

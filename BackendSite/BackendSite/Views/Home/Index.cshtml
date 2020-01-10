@@ -17,24 +17,24 @@
     {
         if (menuItem.Childs != null && menuItem.Childs.Count() > 0)
         {
-            <div class="menubox">
+            <li>
                 @if (menuItem.Controller != null && menuItem.Action != null)
                 {
                     <a href="@Url.RouteUrl("default", new { action = menuItem.Action, controller = menuItem.Controller })" target="main">@(selLangBLL.GetResourceValue(menuItem.Key) ?? menuItem.Title)</a>
                 }
                 else
                 {
-                    <h2 class="icon @menuItem.Icon">
-                        @(selLangBLL.GetResourceValue(menuItem.Key) ?? menuItem.Title)
-                    </h2>
+                    <a href="javascript:void(0)"><i class="@menuItem.Icon"></i><span>@(selLangBLL.GetResourceValue(menuItem.Key) ?? menuItem.Title)</span></a>
                 }
-                <ul class="sliderbar left_menu" style="display: none">
+                <ul class="collapse">
                     @foreach (var menuItem1 in menuItem.Childs)
                     {
                         MenuComponent(menuItem1);
                     }
                 </ul>
-            </div>
+            </li>
+
+
         }
         else
         {
@@ -52,38 +52,64 @@
     <title>
         Admin
     </title>
-    <link href="~/css/Star/css.css" rel="stylesheet" />
     <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="~/css/style.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.7.95/css/materialdesignicons.min.css" />
+    <link href="~/css/style.css" rel="stylesheet" asp-append-version="true" />
 </head>
-<body style="background: url(@Url.Content("~/images/Star/leftbg.png")) 0 0 repeat-y #fff">
-    <div id="top">
-        <a href="javascript:void(0);" class="loginout" title="Logout">
-            <img src="@Url.Content("~/images/Star/tc.png")" alt="Logout" />
-        </a>
-    </div>
-    <div id="main">
-        <div id="left" class="left">
-            <div class="username">
-                <h2>
-                    <span>@User.Identity.Name</span>
-                </h2>
+<body>
+    <div class="page-container">
+        <div class="sidebar-menu">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <a href="#"><img src="~/images/logo.png" alt="logo" /></a>
+                </div>
             </div>
-            <ul id="leftTopInfo" class="sliderbar left_top_info">
-                <li>
-                    <p><a href="javascript:void(0);" class="coloryellow changepsd" data-toggle="modal" data-target="#exampleModal">@selLangBLL.GetResourceValue("lbl_ChangePwd")</a></p>
-                </li>
-            </ul>
-            @foreach (var menuItem in authorizeBLL.GetMenuData())
-            {
-                MenuComponent(menuItem);
-            }
+            <div class="main-menu">
+                <nav>
+                    <ul class="metismenu" id="menu">
+                        @foreach (var menuItem in authorizeBLL.GetMenuData())
+                        {
+                            MenuComponent(menuItem);
+                        }
+                    </ul>
+                </nav>
+            </div>
         </div>
-        <div id="right" class="right">
-            <iframe allowtransparency="true" src="" frameborder="0" width="100%" scrolling="auto" id="iframe" class="iframe" name="main">
-            </iframe>
-        </div>
-        <div class="clear">
+
+        <div class="main-content">
+            <div class="page-title-area">
+                <div class="row align-items-center">
+                    <div class="col-sm-6">
+                        <div class="nav-btn pull-left">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        @*<div class="search-box pull-left">
+                            <form action="#">
+                                <input type="text" name="search" placeholder="Search..." required="" />
+                                <i class="icon-search"></i>
+                            </form>
+                        </div>*@
+                        
+                    </div>
+                    <div class="col-sm-6 clearfix">
+                        <div class="user-profile pull-right">
+                            <i class="icon-account"></i>
+                            <h4 class="user-name dropdown-toggle" data-toggle="dropdown">@User.Identity.Name <i class="icon-chevron-down"></i></h4>
+                            <div class="dropdown-menu">
+                                <a href="javascript:void(0);" class="dropdown-item coloryellow changepsd" data-toggle="modal" data-target="#exampleModal">@selLangBLL.GetResourceValue("lbl_ChangePwd")</a>
+                                <a class="dropdown-item loginout" href="javascript:void(0);" title="Logout">Log Out</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content-inner">
+                <iframe allowtransparency="true" src="" frameborder="0" scrolling="auto" id="iframe" class="iframe" name="main">
+                </iframe>
+            </div>
         </div>
     </div>
     <!---修改密码弹框--->
@@ -121,7 +147,9 @@
     </div>
     <script src="~/lib/axios.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/popper.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/lib/metisMenu.min.js"></script>
     <script type="text/javascript">
         $(function () {
             $('.menubox h2').on('click', function () {
@@ -171,9 +199,14 @@
                         });
                 }
             });
+
+            $("#menu").metisMenu();
+
+            $('.nav-btn').on('click', function() {
+                $('.page-container').toggleClass('sbar_collapsed');
+            });
         });
     </script>
 </body>
-
 </html>
 
