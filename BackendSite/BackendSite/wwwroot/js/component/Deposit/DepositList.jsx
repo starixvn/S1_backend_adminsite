@@ -12,6 +12,16 @@ import {Pagination} from '../commJS/Pagination.jsx';
         OnHold :7
     };
 
+    const DepositStatusOp = {
+        1:<span className="status status-pending">{i18n["lbl_DepositStatus1"]}</span>,
+        2:<span className="status status-">Paid</span>,
+        3:<span className="status status-approved">{i18n["lbl_DepositStatus3"]}</span>,
+        4:<span className="status status-rejected">{i18n["lbl_DepositStatus4"]}</span>,
+        5:<span className="status status-cancelled">{i18n["lbl_DepositStatus5"]}</span>,
+        6:<span className="status status-">Expired</span>,
+        7:<span className="status status-hold">{i18n["lbl_DepositStatus7"]}</span>,
+    }    
+
     class DepositList extends React.Component {
         constructor(props) {
             super(props);
@@ -38,15 +48,14 @@ import {Pagination} from '../commJS/Pagination.jsx';
                     <td>{row.accountName}</td>
                     <td>{row.memo}</td>
                     <td>{moment(row.createTime).format('l LTS')}</td>
-                    <td>{i18n["lbl_DepositStatus"+row.status]}</td>
+                    <td>{DepositStatusOp[row.status]}</td>
                 </tr>
             );
 
             return (
-                <div class="table">                    
+                <div className="table">                    
                     <div className="table-options">
-                        <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>
-                            <img src="/css/Oneworks/images/icon-refresh.png" />
+                        <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>                            
                             Refresh
                         </button>
                     </div>
@@ -250,7 +259,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
 
                 if(data.receipt) {
                     PayFrom.push(<tr key={payK++}>
-                        <td colSpan={2}><img class="img-receipt" src={"/Deposit/GetDepositReceiptPic?transId=" + data.transId} /></td>
+                        <td colSpan={2}><img className="img-receipt" src={"/Deposit/GetDepositReceiptPic?transId=" + data.transId} /></td>
                     </tr>);
                 }
             }

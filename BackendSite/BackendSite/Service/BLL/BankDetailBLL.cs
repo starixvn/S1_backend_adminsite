@@ -31,6 +31,11 @@ namespace BackendSite.Service.BLL
             return bankDetailService.GetLoaclBankList(siteId);
         }
 
+        public int SetBankCard(int siteId, int SysId, string BankAccountName, string BankAccountNo, decimal MinAmount, decimal MaxAmount, decimal DailyLimitAmount, int PointLevel, int Purpose, int Status, int Sort)
+        {
+            return bankDetailService.SetBankCard(siteId, SysId, BankAccountName, BankAccountNo, MinAmount, MaxAmount, DailyLimitAmount, PointLevel, Purpose, Status, Sort);
+        }
+
         public bool AddBankInfo(BankDetail bankDetail)
         {
             var serverInfo = serverInfoService.GetModel();
@@ -43,12 +48,22 @@ namespace BackendSite.Service.BLL
             return bankDetailService.EditBankDetail(serverInfo.SiteId, bankDetail);
         }
 
-        public IEnumerable<BankDetail> BankList()
+        public IEnumerable<BankInfoSys> GetSysBankList()
         {
-            var serverInfo = serverInfoService.GetModel();
-            IEnumerable<BankDetail> bankDetail = bankDetailService.BankList(serverInfo.SiteId);
+            string sBankInfoSysListKey = $"SysBankList";
+
+            var sysBankList = cache.Get<IEnumerable<BankInfoSys>>(sBankInfoSysListKey);
+            if (sysBankList == null)
+            {
+                sysBankList = bankDetailService.GetSysBankList();
+                if (sysBankList != null)
+                {
+                    cache.Set(sBankInfoSysListKey, sysBankList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromHours(10)));
+                }
+            }
+
             //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
-            return bankDetail;
+            return sysBankList;
         }
 
         public IEnumerable<BankInfoOff> GetBankInfoOff()

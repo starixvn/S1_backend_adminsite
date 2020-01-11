@@ -2,6 +2,26 @@
 import {Pagination} from '../commJS/Pagination.jsx';
 
 (function ($, React, ReactDOM, i18n, axios, moment, Calendar) {
+    const WithdrawalStatus = {
+        Pending:1,
+        OnHold :2,
+        Verify:3,
+        Process:4,
+        Cancelled:5,
+        Approved:6,
+        Rejected :7
+    };
+
+    const WithdrawalStatusOp = {
+        1:<span className="status status-pending">{i18n["lbl_WithdrawalStatus1"]}</span>,
+        2:<span className="status status-hold">{i18n["lbl_WithdrawalStatus2"]}</span>,
+        3:<span className="status status-verify">{i18n["lbl_WithdrawalStatus3"]}</span>,
+        4:<span className="status status-process">{i18n["lbl_WithdrawalStatus4"]}</span>,
+        5:<span className="status status-cancelled">{i18n["lbl_WithdrawalStatus5"]}</span>,
+        6:<span className="status status-approved">{i18n["lbl_WithdrawalStatus6"]}</span>,
+        7:<span className="status status-rejected">{i18n["lbl_WithdrawalStatus7"]}</span>,
+    }
+
     class WithdrawalList extends React.Component {
         constructor(props) {
             super(props);
@@ -28,7 +48,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                     <td>{row.accountName}</td>
                     <td>{row.memo}</td>
                     <td>{moment(row.createTime).format('l LTS')}</td>
-                    <td>{i18n["lbl_WithdrawalStatus"+row.status]}</td>
+                    <td>{WithdrawalStatusOp[row.status]}</td>
                 </tr>
             );
 
@@ -36,7 +56,6 @@ import {Pagination} from '../commJS/Pagination.jsx';
                 <div className="table">
                     <div className="table-options">
                         <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>
-                            <img src="/css/Oneworks/images/icon-refresh.png" />
                             Refresh
                         </button>
                     </div>

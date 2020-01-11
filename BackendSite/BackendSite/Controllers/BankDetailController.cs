@@ -26,11 +26,5 @@ namespace BackendSite.Controllers
         {
             return View();
         }
-
-        public IActionResult AddBankInfo()
-        {
-            IEnumerable<BankDetail> bankDetail = bankDetailBLL.BankList();
-            return View(bankDetail);
-        }
     }
 }

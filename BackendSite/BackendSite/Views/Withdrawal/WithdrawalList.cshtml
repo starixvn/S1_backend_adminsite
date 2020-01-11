@@ -6,7 +6,7 @@
 @inject ServerInfoBLL serverInfoBLL
 @inject AuthorizeBLL authorizeBLL
 @section Style {
-    <link href="~/css/Oneworks/system_style.css" rel="stylesheet" asp-append-version="true"/>
+    <link href="~/css/main.css" rel="stylesheet" asp-append-version="true"/>
     <link href="~/lib/Oneworks/jscalendar/calendar-blue.css" rel="stylesheet" />
 }
 @{
@@ -17,9 +17,9 @@
     var serverInfo = serverInfoBLL.GetServerInfo();
     var i18n = new Dictionary<string, string>();
 
-    foreach (var currency in serverInfo.ICurrencyList)
+    for (var currency = 1; currency <= 51; currency++)
     {
-        if (!i18n.ContainsKey($"lbl_Currency{currency}"))
+        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
 

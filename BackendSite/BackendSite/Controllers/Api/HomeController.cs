@@ -23,12 +23,14 @@ namespace BackendSite.Controllers.Api
         private readonly SelLangBLL selLangBLL;
         private readonly AuthorizeBLL authorizeBLL;
         private readonly Tools tools;
+        private readonly ServerInfoBLL serverInfoBLL;
 
-        public HomeController(SelLangBLL selLangBLL, AuthorizeBLL authorizeBLL, Tools tools)
+        public HomeController(SelLangBLL selLangBLL, AuthorizeBLL authorizeBLL, Tools tools, ServerInfoBLL serverInfoBLL)
         {
             this.selLangBLL = selLangBLL;
             this.authorizeBLL = authorizeBLL;
             this.tools = tools;
+            this.serverInfoBLL = serverInfoBLL;
         }
         public class LoginModel
         {
@@ -100,6 +102,16 @@ namespace BackendSite.Controllers.Api
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             apiResult.Message = Url.RouteUrl("default", new { action = "Signin", controller = "Home" });
             apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<ServerInfo>> GetSiteList()
+        {
+            var apiResult = new ApiResult<IEnumerable<ServerInfo>>(selLangBLL);
+            apiResult.Data = serverInfoBLL.GetSiteList();
+            apiResult.ErrorCode = 0;
+
             return apiResult;
         }
     }

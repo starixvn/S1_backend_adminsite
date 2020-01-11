@@ -20,10 +20,13 @@ namespace BackendSite.Service.DAL
         public ServerInfo GetModel()
         {
             int siteId = 1;
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                return conn.QueryFirstOrDefault<ServerInfo>("ServerInfo_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.QueryFirstOrDefault<ServerInfo>("ServerInfo_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+        }
+        public IEnumerable<ServerInfo> GetSiteList()
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Query<ServerInfo>("ServerInfoList_Get", commandType: CommandType.StoredProcedure);
         }
     }
 }

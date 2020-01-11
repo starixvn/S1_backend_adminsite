@@ -7,6 +7,9 @@
 @inject ServerInfoBLL serverInfoBLL
 @inject AuthorizeBLL authorizeBLL
 @inject IWebHostEnvironment environment
+@section Style {
+    <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
+}
 @{
     Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
     ViewData["Title"] = @selLangBLL.GetResourceValue("lbl_BankCardList");
@@ -20,21 +23,20 @@
             i18n.Add(lbl_Txt, selLangBLL.GetResourceValue(lbl_Txt));
     }
 
-    var serverInfo = serverInfoBLL.GetServerInfo();
+    //var serverInfo = serverInfoBLL.GetServerInfo();
 
-    foreach (var currency in serverInfo.ICurrencyList)
+    for (var currency = 1; currency <= 51; currency++)
     {
-        if (!i18n.ContainsKey($"lbl_Currency{currency}"))
+        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
 }
 <h4>@selLangBLL.GetResourceValue("lbl_BankCardList")</h4>
-<hr />
 <div id="BankCardInfoPanel"></div>
 @section Scripts {
     <script>
-         $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
-        var CurrencyList=@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(serverInfo.ICurrencyList));
+        $('.collapse').collapse();
+        $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
     </script>
     <script src="~/lib/runtime.min.js"></script>
     <script src="~/js/component/Payment/BankInfoList.min.js" asp-append-version="true"></script>

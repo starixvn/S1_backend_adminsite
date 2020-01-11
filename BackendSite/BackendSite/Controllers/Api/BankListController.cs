@@ -50,6 +50,16 @@ namespace BackendSite.Controllers.Api
             return apiListResult;
         }
 
+        [HttpPost]
+        public ApiResult<IEnumerable<BankInfoSys>> GetSysBankList()
+        {
+            var apiResult = new ApiResult<IEnumerable<BankInfoSys>>();
+            var sysBankList = bankDetailBLL.GetSysBankList();
+            apiResult.Data = sysBankList;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
         //[HttpPost]
         //public ApiListResult<IEnumerable<BankDetail>> GetBankListAll()
         //{
@@ -58,9 +68,41 @@ namespace BackendSite.Controllers.Api
         //    apiListResult.ErrorCode = 0;
         //    return apiListResult;
         //}
+        public class bankCardReq
+        {
+            public int siteId { get; set; }
+            public int SysId { get; set; }
+            public string BankAccountName { get; set; }
+            public string BankAccountNo { get; set; }
+            public decimal MinAmount { get; set; }
+            public decimal MaxAmount { get; set; }
+            public decimal DailyLimitAmount { get; set; }
+            public int PointLevel { get; set; }
+            public int Purpose { get; set; }
+            public int Status { get; set; }
+            public int Sort { get; set; }
+        }
 
         [HttpPost]
-        public ApiResult AddBank([FromBody]BankDetail bankDetail)
+        public ApiResult SetBankCard(bankCardReq bankCardReq)
+        {
+            int result = bankDetailBLL.SetBankCard(bankCardReq.siteId, bankCardReq.SysId, bankCardReq.BankAccountName, bankCardReq.BankAccountNo, bankCardReq.MinAmount, bankCardReq.MaxAmount, bankCardReq.DailyLimitAmount, bankCardReq.PointLevel, bankCardReq.Purpose, bankCardReq.Status, bankCardReq.Sort);
+            var apiResult = new ApiResult();
+            if (result > 0)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult AddBank(BankDetail bankDetail)
         {
             bool result = bankDetailBLL.AddBankInfo(bankDetail);
             var apiResult = new ApiResult();
@@ -76,6 +118,8 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
+
+
 
         [HttpPost]
         public ApiResult EditBank([FromBody]BankDetail bankDetail)
