@@ -1,5 +1,4 @@
 import {number_format} from '../commJS/common';
-import {Pagination} from '../commJS/Pagination.jsx';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     class BankCardInfoList extends React.Component {
@@ -52,7 +51,6 @@ import {Pagination} from '../commJS/Pagination.jsx';
                             {rows}
                         </tbody>
                     </table>
-                    <Pagination Data={{...this.props.searchData}} ChangePage={this.props.ChangePage}/>
                 </div>
             )
         }
@@ -150,8 +148,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
         }
 
         onRefresh() {
-            let siteId = this.state.SiteId;
-            this.onSearch(siteId);
+            this.onSearch();
         }
 
         onChange(event) {
@@ -200,8 +197,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
         }
 
         componentDidMount() {
-            console.log('test');
-            this.onSearch(1);
+            this.onSearch();
         }
 
         onCheckDetail(id) {
@@ -215,12 +211,16 @@ import {Pagination} from '../commJS/Pagination.jsx';
 
         render() {
             let searchData = this.state.searchData;
+            let dataContainter = [];
+            if(searchData!=null) {
+                
+            }
 
             return (
                 this.state.ShowForm ? <BankCardForm closeForm={this.closeForm.bind(this)}/> : 
                 <div>
-                    {searchData&&searchData.data!=null?<BankCardInfoList ChangePage={this.onSearch.bind(this)} searchData={searchData} onRefresh={this.onRefresh.bind(this)}/>:null}
                     <button onClick={this.showForm.bind(this)}>Add Bank Card</button>
+                    {searchData&&searchData.data!=null?<BankCardInfoList ChangePage={this.onSearch.bind(this)} searchData={searchData} onRefresh={this.onRefresh.bind(this)}/>:null}
                 </div>
             )
         }
