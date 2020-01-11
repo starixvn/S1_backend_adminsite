@@ -26,10 +26,9 @@ namespace BackendSite.Service.BLL
             this.cache = cache;
         }
 
-        public IEnumerable<BankDetail> GetLoaclBankList(int? currencyId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<BankDetail> GetLoaclBankList(int siteId)
         {
-            var serverInfo = serverInfoService.GetModel();
-            return bankDetailService.GetLoaclBankList(serverInfo.SiteId, currencyId, pageSize, ref pageNumber, out totalPages, out rowCount);
+            return bankDetailService.GetLoaclBankList(siteId);
         }
 
         public bool AddBankInfo(BankDetail bankDetail)

@@ -19,14 +19,21 @@ export class Pagination extends React.Component {
         let disableNext=data.pageNumber==data.totalPages||data.totalPages==0;
 
         return (
-            <nav aria-label="Page navigation example">
-                <ul className="pagination justify-content-center">
+            <nav className="paging" aria-label="Page navigation example">
+                <span>Total records: {data.rowCount}</span>
+                <ul className="pagination">
                     <li className={"page-item"+ (data.pageNumber==1?" disabled":"")}>
-                        <a className="page-link" tabIndex="-1" aria-disabled={data.pageNumber==1} onClick={data.pageNumber==1 ? null: this.ChangePage.bind(this, data.pageNumber-1)}>Previous</a>
+                        <a className="page-link" tabIndex="-1" aria-disabled={data.pageNumber == 1} onClick={data.pageNumber == 1 ? null : this.ChangePage.bind(this, data.pageNumber - 1)}>
+                            <span aria-hidden="true">&laquo;</span>
+                            <span className="sr-only">Previous</span>
+                        </a>
                     </li>
                     {PageNum}
                     <li className={"page-item"+ (disableNext?" disabled":"")}>
-                        <a className="page-link" tabIndex="+1" aria-disabled={disableNext} onClick={disableNext ? null: this.ChangePage.bind(this, data.pageNumber+1)}>Next</a>
+                        <a className="page-link" tabIndex="+1" aria-disabled={disableNext} onClick={disableNext ? null : this.ChangePage.bind(this, data.pageNumber + 1)}>
+                            <span aria-hidden="true">&raquo;</span>
+                            <span className="sr-only">Next</span>
+                        </a>
                     </li>
                 </ul>
             </nav>

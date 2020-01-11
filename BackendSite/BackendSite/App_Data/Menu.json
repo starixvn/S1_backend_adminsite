@@ -41,18 +41,9 @@
     "Childs": [
       {
         "Key": "lbl_BankCardList",
-        "Title": "Bank Card List",
+        "Title": "Bank Card Management",
         "Controller": "BankInfo",
         "Action": "BankInfoList",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "lbl_AddBankCard",
-        "Title": "Add Bank Card",
-        "Controller": "BankInfo",
-        "Action": "AddBankInfo",
         "Icon": "",
         "Roles": null,
         "Childs": null

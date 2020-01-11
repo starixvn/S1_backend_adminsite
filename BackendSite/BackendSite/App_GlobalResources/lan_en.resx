@@ -211,7 +211,7 @@
     <value>Balance</value>
   </data>
   <data name="lbl_BankCardList" xml:space="preserve">
-    <value>Bank Card List</value>
+    <value>Bank Card Management</value>
   </data>
   <data name="lbl_BankName" xml:space="preserve">
     <value>Bank Name</value>

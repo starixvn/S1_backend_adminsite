@@ -16,21 +16,10 @@ namespace BackendSite.Service.BLL
             this.configuration = configuration;
         }
 
-        public IEnumerable<BankDetail> GetLoaclBankList(int siteId, int? currencyId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<BankDetail> GetLoaclBankList(int siteId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var p = new DynamicParameters(new { SiteId = siteId, CurrencyId = currencyId, PageSize = pageSize });
-            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            var bankDetailList = conn.Query<BankDetail>("LoaclBankList_Get", p, commandType: CommandType.StoredProcedure);
-            pageNumber = p.Get<int?>("PageNumber") ?? 0;
-            totalPages = p.Get<int?>("TotalPages") ?? 0;
-            rowCount = p.Get<int?>("RowCount") ?? 0;
-
-            return bankDetailList;
+            return conn.Query<BankDetail>("LoaclBankList_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
 
         public bool AddBankDetail(int siteId, BankDetail bankDetail)

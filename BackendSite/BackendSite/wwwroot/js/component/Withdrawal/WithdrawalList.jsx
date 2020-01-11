@@ -33,8 +33,14 @@ import {Pagination} from '../commJS/Pagination.jsx';
             );
 
             return (
-                <div>
-                    <button type="button" className="btn btn-secondary float-right" onClick={this.onRefresh.bind(this)}>Refresh</button>
+                <div className="table">
+                    <div className="table-options">
+                        <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>
+                            <img src="/css/Oneworks/images/icon-refresh.png" />
+                            Refresh
+                        </button>
+                    </div>
+                    
                     <table className="table table-striped">
                         <thead>
                             <tr>
@@ -262,19 +268,19 @@ import {Pagination} from '../commJS/Pagination.jsx';
             let selectType = null
             let selectPay = null;
             let PayFrom = [];
-            if(data != null) {
-                if(data.status==1||data.status==2||data.status==3||data.status==4)
-                    btnGroup.push(<button key={0} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
-                if(data.status==1 || data.status==3)
-                    btnGroup.push(<button key={2} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 2)}>On Hold(Risk Check)</button>);
-                if(data.status==1 || data.status==2 || data.status==4)
-                    btnGroup.push(<button key={3} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 3)}>Verify</button>);
-                if(data.status==3)
-                    btnGroup.push(<button key={4} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 4)}>Process</button>);                
-                if(data.status==4 && data.withdrawalType != 1)
-                    btnGroup.push(<button key={6} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 6)}>Approved</button>);
-                if((data.status==3 || data.status==2))
-                    btnGroup.push(<button key={7} type="button" className="btn btn-primary" onClick={this.onConfirm.bind(this, 7)}>Rejected</button>);
+            if (data != null) {
+                if (data.status == 1 || data.status == 2 || data.status == 3 || data.status == 4)
+                    btnGroup.push(<button key={0} type="button" className="btn btn-draft" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
+                if (data.status == 1 || data.status == 3)
+                    btnGroup.push(<button key={2} type="button" className="btn btn-hold" onClick={this.onConfirm.bind(this, 2)}>On Hold(Risk Check)</button>);
+                if (data.status == 1 || data.status == 2 || data.status == 4)
+                    btnGroup.push(<button key={3} type="button" className="btn btn-verify" onClick={this.onConfirm.bind(this, 3)}>Verify</button>);
+                if (data.status == 3)
+                    btnGroup.push(<button key={4} type="button" className="btn btn-process" onClick={this.onConfirm.bind(this, 4)}>Process</button>);
+                if (data.status == 4 && data.withdrawalType != 1)
+                    btnGroup.push(<button key={6} type="button" className="btn btn-aprroved" onClick={this.onConfirm.bind(this, 6)}>Approved</button>);
+                if ((data.status == 3 || data.status == 2))
+                    btnGroup.push(<button key={7} type="button" className="btn btn-rejected" onClick={this.onConfirm.bind(this, 7)}>Rejected</button>);
 
                 selectType = i18n["lbl_WithdrawalType" +data.withdrawalType];
 
@@ -338,73 +344,80 @@ import {Pagination} from '../commJS/Pagination.jsx';
             }
 
             return (
-                data !=null ? <div>
-            <table className="table table-striped">
-                <tbody>
-                    <tr>
-                        <th scope="row">SiteName</th>
-                        <td>{data.siteName}</td>
-                    </tr>                
-                    <tr>
-                        <th scope="row">Transaction No.</th>
-                        <td>{data.transId}</td>
-                    </tr>                
-                    <tr>
-                        <th scope="row">Status</th>
-                        <td>{i18n["lbl_WithdrawalStatus"+data.status]}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Username</th>
-                        <td>{data.userName}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">E-mail</th>
-                        <td>{data.email}</td>
-                    </tr>                    
-                    <tr>
-                        <th scope="row">{"Date" + " (" + moment().format('Z') + ")"}</th>
-                        <td>{moment(data.createTime).format('l LTS')}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Name of Bank</th>
-                        <td>{data.bankName}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Account No</th>
-                        <td>{data.accountNo}<button type="button" className="btn btn-secondary js-copy" data-clipboard-text={data.accountNo}>Copy</button></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Account Name</th>
-                        <td>{data.accountName}<button type="button" className="btn btn-secondary js-copy" data-clipboard-text={data.accountName}>Copy</button></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Currency</th>
-                        <td>{i18n["lbl_Currency"+data.currencyId]}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Request Amount</th>
-                        <td>{number_format(data.amount)}<button type="button" className="btn btn-secondary js-copy" data-clipboard-text={data.amount}>Copy</button></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Type</th>
-                        <td>{selectType}</td>
-                    </tr>
-                    {selectPay}
-                    {PayFrom}
-                    <tr>
-                        <th scope="row">Ref ID</th>
-                        <td>{data.refId}</td>
-                    </tr>
-                    </tbody>
-                </table>
-                <WithdrawalRequestComment Data={this.state.Comments} />
-                <div className="container form-group">
-                    <label htmlFor="command">{i18n.lbl_Comment}</label>
-                    <textarea id="command" className="form-control" rows="3" value={this.state.Comment} onChange={this.setComment.bind(this)} />
-                </div>                
-                <button type="button" className="btn btn-primary" onClick={this.onBack.bind(this)}>Back</button>
-                {btnGroup}
-            </div> : null
+                data != null ? <div>
+                    <table className="table table-detail">
+                        <tbody>
+                            <tr>
+                                <th scope="row">SiteName</th>
+                                <td>{data.siteName}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Transaction No.</th>
+                                <td>{data.transId}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Status</th>
+                                <td>{i18n["lbl_WithdrawalStatus" + data.status]}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Username</th>
+                                <td>{data.userName}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">E-mail</th>
+                                <td>{data.email}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">{"Date" + " (" + moment().format('Z') + ")"}</th>
+                                <td>{moment(data.createTime).format('l LTS')}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Name of Bank</th>
+                                <td>{data.bankName}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Account No</th>
+                                <td>
+                                    {data.accountNo}
+                                    <button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.accountNo}>Copy</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Account Name</th>
+                                <td>{data.accountName}<button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.accountName}>Copy</button></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Currency</th>
+                                <td>{i18n["lbl_Currency" + data.currencyId]}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Request Amount</th>
+                                <td>{number_format(data.amount)}<button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.amount}>Copy</button></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Type</th>
+                                <td>{selectType}</td>
+                            </tr>
+                            {selectPay}
+                            {PayFrom}
+                            <tr>
+                                <th scope="row">Ref ID</th>
+                                <td>{data.refId}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <WithdrawalRequestComment Data={this.state.Comments} />
+                    <div className="input-field mt-20">
+                        <label htmlFor="command" className="label">{i18n.lbl_Comment}</label>
+                        <textarea id="command" className="form-control" rows="2" value={this.state.Comment} onChange={this.setComment.bind(this)} />
+                    </div>
+                    <div className="button-group mt-10">
+                        <button type="button" className="btn btn-back pull-left" onClick={this.onBack.bind(this)}>Back</button>
+                        <div className="pull-right">{btnGroup}</div>
+                        <div className="clearfix"></div>
+                    </div>
+                    
+                </div> : null
             )
         }
     }    
@@ -523,82 +536,78 @@ import {Pagination} from '../commJS/Pagination.jsx';
             let EndDate = this.state.EndDate;
             return (
                 <div>
-                     {!this.state.ShowDetial ? <form method="post" onSubmit={this.handleSubmit.bind(this)}>
-                        <div className="boxgy">
-                            <table border="0" cellPadding="5" cellSpacing="0">
-                                <tbody>
-                                    <tr>
-                                        <td className="title11bk">
-                                            <img src="/css/Oneworks/images/icon_arrowdb_rd.gif" width="13" height="6" />Select Type of withdrawal
-                                            <select name="selectType" onChange={this.onChange.bind(this)} value={this.state.selectType}>
-                                                <option value="">All</option>
-                                                <option value="0">Undefine</option>
-                                                <option value="1">Online Payment</option>                                                
-                                                <option value="2">Local Bank</option>
-                                            </select>
-                                        </td>
-                                        <td className="title11bk">
-                                            <img src="/css/Oneworks/images/icon_arrowdb_rd.gif" width="13" height="6" />Select date of withdrawal
-                                            <input ref={this.selectdate_start} type="text" defaultValue={StartDate != null ? moment.unix(StartDate).format('l') :  moment().add(-10, 'days').format('l')} size="8"/>
-                                            <a><img ref={this.f_trigger_Start} src="/css/Oneworks/images/icon_date.gif" width="21" height="14" border="0"/></a>to
-                                            <input ref={this.selectdate_end} type="text" defaultValue={EndDate != null ?  moment.unix(EndDate).format('l') : moment().format('l')} size="8" />
-                                            <a><img ref={this.f_trigger_End} src="/css/Oneworks/images/icon_date.gif" width="21" height="14" border="0"/></a>
-                                        </td>
-                                        {/*<td style={{width:"10px"}}>
-                                            <div id="ExportIcon">
-                                                <a><img id="ImgExcel" name="ImgExcel" src="/css/Oneworks/images/excel.gif" border="0"/></a>
-                                            </div>
-                                        </td>*/}
-                                    </tr>
-                                    <tr>
-                                        <td className="title11bk">
-                                            <img src="/css/Oneworks/images/icon_arrowdb_rd.gif" width="13" height="6" />Select currency of withdrawal
-                                                {selectCurrency}
-                                        </td>
-                                        <td className="title11bk">
-                                            <img src="/css/Oneworks/images/icon_arrowdb_rd.gif" width="13" height="6" />Select type of withdrawal status
-                                            <select name="selectStatus" onChange={this.onChange.bind(this)} value={this.state.selectStatus}>
-                                                <option value="">All</option>
-                                                <option value="1">Pending</option>
-                                                <option value="2">On Hold</option>
-                                                <option value="3">Verify</option>
-                                                <option value="4">Process</option>
-                                                <option value="5">Cancelled</option>
-                                                <option value="6">Approved</option>
-                                                <option value="7">Rejected</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="title11bk">
-                                            <img src="/css/Oneworks/images/icon_arrowdb_rd.gif" width="13" height="6" />Select User
-                                            <input type="text" name="SelectUser" value={this.state.SelectUser} onChange={this.onChange.bind(this)}/>
-                                        </td>
-                                        <td className="title11bk">
-                                            <img src="/css/Oneworks/images/icon_arrowdb_rd.gif" width="13" height="6" />Select Withdrawal ID
-                                            <input type="text" name="SelectWithdrawalID" value={this.state.SelectWithdrawalID} onChange={this.onChange.bind(this)}/>
-                                        </td>
-                                    </tr>
-                                    {/*<tr>
-                                        <td className="title11bk">
-                                            <img src="/css/Oneworks/images/icon_arrowdb_rd.gif" width="13" height="6" />Select Bank Code
-                                            <select name="selectBankType">
-                                                <option value="">All</option>
-                                                <option value="1">abc</option>
-                                                <option value="2">qwe</option>
-                                                <option value="4">win365</option>
-                                                <option value="14">xxx</option>
-                                            </select>
-                                        </td>
-                                    </tr>*/}
-                                </tbody>
-                            </table>
-                            <div className="btnarea">
-                                <div className="btnstyle" style={{textAlign:"center"}}>
-                                    <ul>
-                                        <li><button className="btnbu" type="submit"><span>Search</span></button></li>
-                                        {/*<li><a href="javascript:ReportToExport();" style="" className="btnbu"><span>Export</span></a></li>*/}
-                                    </ul>
+                    {!this.state.ShowDetial ? <form method="post" onSubmit={this.handleSubmit.bind(this)}>
+                        <div className="filter">
+                            <div className="row-flex">
+                                <div className="input-item">
+                                    <span className="label">Type</span>
+                                    <div className="field">
+                                        <select name="selectType" onChange={this.onChange.bind(this)} value={this.state.selectType}>
+                                            <option value="">All</option>
+                                            <option value="0">Undefine</option>
+                                            <option value="1">Online Payment</option>
+                                            <option value="2">Local Bank</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="input-item">
+                                    <span className="label">From Date</span>
+                                    <div className="date">
+                                        <input ref={this.selectdate_start} type="text" defaultValue={StartDate != null ? moment.unix(StartDate).format('l') : moment().add(-10, 'days').format('l')} size="8" />
+                                        <a className="icon-calendar"><img ref={this.f_trigger_Start} src="/css/Oneworks/images/icon-calendar.png" /></a>
+                                    </div>
+                                </div>
+
+                                <div className="input-item">
+                                    <span className="label">To Date</span>
+                                    <div className="field date">
+                                        <input ref={this.selectdate_end} type="text" defaultValue={EndDate != null ? moment.unix(EndDate).format('l') : moment().format('l')} size="8" />
+                                        <a className="icon-calendar"><img ref={this.f_trigger_End} src="/css/Oneworks/images/icon-calendar.png" /></a>
+                                    </div>
+                                </div>
+
+                                <div className="input-item">
+                                    <span className="label">Currency</span>
+                                    <div className="field currency">
+                                        {selectCurrency}
+                                    </div>
+                                </div>
+
+                                <div className="input-item">
+                                    <span className="label">Status</span>
+                                    <div className="field">
+                                        <select name="selectStatus" onChange={this.onChange.bind(this)} value={this.state.selectStatus}>
+                                            <option value="">All</option>
+                                            <option value="1">Pending</option>
+                                            <option value="2">On Hold</option>
+                                            <option value="3">Verify</option>
+                                            <option value="4">Process</option>
+                                            <option value="5">Cancelled</option>
+                                            <option value="6">Approved</option>
+                                            <option value="7">Rejected</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="row-flex">
+                                <div className="input-item">
+                                    <span className="label">User</span>
+                                    <div className="field">
+                                        <input type="text" name="SelectUser" value={this.state.SelectUser} onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>
+
+                                <div className="input-item">
+                                    <span className="label">Withdrawal ID</span>
+                                    <div className="field">
+                                        <input type="text" name="SelectWithdrawalID" value={this.state.SelectWithdrawalID} onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>
+
+                                <div className="button-group">
+                                    <button className="btn btn-search" type="submit"><span>Search</span></button>
                                 </div>
                             </div>
                         </div>

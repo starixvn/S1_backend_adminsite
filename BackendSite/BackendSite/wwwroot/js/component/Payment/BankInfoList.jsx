@@ -58,16 +58,100 @@ import {Pagination} from '../commJS/Pagination.jsx';
         }
     }
 
+    class BankCardForm extends React.Component {
+        constructor(props) {
+            super(props);
+
+            this.state={};
+        }
+
+        closeForm() {
+            this.props.closeForm();
+        }
+
+        render() {
+            let searchData = this.state.searchData;
+
+            return (
+                <form method="post" className="form-horizontal">
+                    <div className="form-group row">                
+                        <label className="col-sm-2 col-form-label">Site Name</label>
+                        <div className="form-check form-check-inline">
+                            <input type="radio" className="form-check-input" id="A" name="SiteName"/>
+                            <label className="form-check-label" for="A">1</label>
+                        </div>
+                        <div className="form-check form-check-inline">
+                            <input type="radio" className="form-check-input" id="B" name="SiteName"/>
+                            <label className="form-check-label" for="B">1</label>
+                        </div>                        
+                    </div>
+                    <div className="form-group row">
+                        <label className="col-sm-2 col-form-label">CCY</label>
+                        <div className="col-sm-10">
+                            <select id="CurrencyId" className="custom-select mr-sm-2">
+                                <option value="@item.value">@item.text</option>
+                         </select>
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <label className="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_BankName")</label>
+                        <div className="col-sm-10">
+                            <select id="BankCode" className="custom-select mr-sm-2">
+                                <option id="SysId" name="SysId" value="@item.SysId">@item.BankName</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <label className="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_AccountName")</label>
+                        <div className="col-sm-10">
+                            <input type="text" className="form-control" id="AccountName" placeholder=""/>
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <label className="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_AccountNo")</label>
+                        <div className="col-sm-10">
+                            <input type="text" className="form-control" id="AccountNo" placeholder=""/>
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <label className="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_MinAmount")</label>
+                        <div className="col-sm-10">
+                            <input type="text" className="form-control" id="MinAmount" placeholder=""/>
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <label className="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_MaxAmount")</label>
+                        <div className="col-sm-10">
+                            <input type="text" className="form-control" id="MaxAmount" placeholder=""/>
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <label className="col-sm-2 col-form-label">@selLangBLL.GetResourceValue("lbl_PointLevel")</label>
+                        <div className="col-sm-10">
+                            <input type="text" className="form-control" id="PointLevel" placeholder=""/>
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <div className="col-sm-10">
+                            <button type="submit" className="btn btn-primary" onClick={this.closeForm.bind(this)}>Back</button>
+                            <button type="submit" className="btn btn-primary">Create</button>
+                        </div>
+                    </div>
+                </form>
+            )
+        }
+    }        
+
     class BankCardInfoPanel extends React.Component {
         constructor(props) {
             super(props);
 
-            this.state={selectCurrency: ""};
+            this.state={SiteId: 1, ShowForm: false};
         }
 
         onRefresh() {
-            let searchData = this.state.searchData;
-            this.onSearch(searchData.pageNumber);
+            let siteId = this.state.SiteId;
+            this.onSearch(siteId);
         }
 
         onChange(event) {
@@ -76,9 +160,9 @@ import {Pagination} from '../commJS/Pagination.jsx';
             this.setState(obj);
         }
 
-        onSearch(pageNumber) {
+        onSearch() {
             //Loading.OnLoading();
-            let data = {PageNumber: pageNumber};
+            let data = {SiteId: this.state.SiteId};
 
             /*if(this.state.selectCurrency!=""){
                 data.CurrencyID = parseInt(this.state.selectCurrency);
@@ -107,7 +191,16 @@ import {Pagination} from '../commJS/Pagination.jsx';
             }.bind(this));
         }
 
+        showForm(){
+            this.setState({ShowForm: true});
+        }
+
+        closeForm(){
+            this.setState({ShowForm: false});
+        }
+
         componentDidMount() {
+            console.log('test');
             this.onSearch(1);
         }
 
@@ -124,12 +217,14 @@ import {Pagination} from '../commJS/Pagination.jsx';
             let searchData = this.state.searchData;
 
             return (
+                this.state.ShowForm ? <BankCardForm closeForm={this.closeForm.bind(this)}/> : 
                 <div>
                     {searchData&&searchData.data!=null?<BankCardInfoList ChangePage={this.onSearch.bind(this)} searchData={searchData} onRefresh={this.onRefresh.bind(this)}/>:null}
+                    <button onClick={this.showForm.bind(this)}>Add Bank Card</button>
                 </div>
             )
         }
     }
     
-    ReactDOM.render(<BankCardInfoPanel/>, document.getElementById('ListPanel'));
+    ReactDOM.render(<BankCardInfoPanel/>, document.getElementById('BankCardInfoPanel'));
     })(jQuery, React, ReactDOM, i18n, axios, moment);

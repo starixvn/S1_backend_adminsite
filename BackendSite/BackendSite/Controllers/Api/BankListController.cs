@@ -37,24 +37,16 @@ namespace BackendSite.Controllers.Api
 
         public class LoaclBankReq
         {
-            public int? CurrencyId { get; set; }
-            public int PageNumber { get; set; }
+            public int SiteId { get; set; }
         }
 
         [HttpPost]
-        public ApiListResult<BankDetail> GetLoaclBankList(LoaclBankReq loaclBankReq)
+        public ApiResult<IEnumerable<BankDetail>> GetLoaclBankList(LoaclBankReq loaclBankReq)
         {
-            var apiListResult = new ApiListResult<BankDetail>();
-            int pageNumber = loaclBankReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
-            var depositRequestList = bankDetailBLL.GetLoaclBankList(loaclBankReq.CurrencyId, 10, ref pageNumber, out totalPages, out rowCount);
+            var apiListResult = new ApiResult<IEnumerable<BankDetail>>();
+            var depositRequestList = bankDetailBLL.GetLoaclBankList(loaclBankReq.SiteId);
             apiListResult.Data = depositRequestList;
             apiListResult.ErrorCode = 0;
-            apiListResult.PageNumber = pageNumber;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.RowCount = rowCount;
-
             return apiListResult;
         }
 
