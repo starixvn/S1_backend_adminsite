@@ -78,8 +78,8 @@ namespace BackendSite
                 option.Cookie.Name = ".backend";
                 option.ExpireTimeSpan = TimeSpan.FromMinutes(30);//沒給預設14天
             });
-            /*services.AddDataProtection().DisableAutomaticKeyGeneration();
-            services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("CookieKeys")).SetApplicationName("SharedCookieApp");*/
+            services.AddDataProtection().DisableAutomaticKeyGeneration();
+            services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("CookieKeys")).SetApplicationName("SharedCookieApp");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
