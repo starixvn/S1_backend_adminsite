@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +25,15 @@ namespace BackendSite.Controllers
             Dictionary<string, string> ServerInfoData = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             ServerInfoData.Add("Now", DateTime.Now.ToString());
             ServerInfoData.Add("EnvironmentName", environment.EnvironmentName);
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            int i = 1;
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    ServerInfoData.Add($"IP {i++}.", ip.ToString());
+                }
+            }
             ServerInfoData.Add("Url.Host", Request.Host.Host);
             ServerInfoData.Add("Url.Port", Request.Host.Port.ToString());
             var userAgent = Request.Headers["User-Agent"];
