@@ -10,6 +10,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="CookieKeys\key-65b62d1a-3dd2-4487-bb78-3482ab6c080c.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="CookieKeys\key-65b62d1a-3dd2-4487-bb78-3482ab6c080c.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="wwwroot\css\fonts\icomoon.svg" />
     <None Include="wwwroot\js\site.js" />
     <None Include="wwwroot\lib\Oneworks\jscalendar\calendar-setup.js" />
