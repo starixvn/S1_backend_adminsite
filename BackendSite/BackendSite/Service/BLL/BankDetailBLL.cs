@@ -80,7 +80,7 @@ namespace BackendSite.Service.BLL
                 BankInfoOffList = localBankService.GetBankAccountOff(serverInfo.SiteId);
                 if (BankInfoOffList != null)
                 {
-                    cache.Set(sBankInfoOffListKey, BankInfoOffList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
+                    cache.Set(sBankInfoOffListKey, BankInfoOffList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30)));
                 }
             }
 

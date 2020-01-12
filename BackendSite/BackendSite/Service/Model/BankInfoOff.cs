@@ -14,6 +14,7 @@ namespace BackendSite.Service.Model
         public decimal MinAmount { get; set; }
         public decimal MaxAmount { get; set; }
         public int PointLevel { get; set; }
+        public int Purpose { get; set; }
         public string Memo { get; set; }
         public int BSort { get; set; }
         public int CurrencyId { get; set; }
