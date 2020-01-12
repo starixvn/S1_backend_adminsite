@@ -35,6 +35,10 @@ namespace BackendSite.Service.BLL
         {
             return bankDetailService.SetBankCard(siteId, SysId, BankAccountName, BankAccountNo, MinAmount, MaxAmount, DailyLimitAmount, PointLevel, Purpose, Status, Sort);
         }
+        public int DelBankCard(int siteId, int bankId)
+        {
+            return bankDetailService.DelBankCard(siteId, bankId);
+        }
 
         public bool AddBankInfo(BankDetail bankDetail)
         {

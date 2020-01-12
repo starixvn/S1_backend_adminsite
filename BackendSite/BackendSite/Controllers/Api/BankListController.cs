@@ -101,6 +101,30 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        public class DelbankCardReq
+        {
+            public int siteId { get; set; }
+            public int bankId { get; set; }
+        }
+
+        [HttpPost]
+        public ApiResult DelBankCard(DelbankCardReq bankCardReq)
+        {
+            int result = bankDetailBLL.DelBankCard(bankCardReq.siteId, bankCardReq.bankId);
+            var apiResult = new ApiResult();
+            if (result > 0)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+
         [HttpPost]
         public ApiResult AddBank(BankDetail bankDetail)
         {

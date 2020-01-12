@@ -9,19 +9,91 @@ import {number_format} from '../commJS/common';
                     2:<span>Withdrawal</span>,
                     3:<span>Deposit & Withdrawal</span>};                     
 
-    class BankCardInfoList extends React.Component {
+    class EditRow extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state={row: {...this.props.row}};
+        }
+
+        onCancel(bankId) {
+            this.props.onCancel(bankId);
+        }
+
+        onChange(event) {
+            let obj=this.state.row;
+            obj[event.target.name]=event.target.value;
+            this.setState({row:obj});
+        }
+
+        onSaveBankCard(){
+            let thisState=this.state.row;
+            let status = parseInt(thisState.status);
+            status = status == 0 ? 1 : status;
+            let data = {siteId:this.props.SiteId, SysId: thisState.sysId, BankAccountName: thisState.accountName, BankAccountNo: thisState.accountNo, MaxAmount: parseFloat(thisState.maxAmount), MinAmount: parseFloat(thisState.minAmount), DailyLimitAmount: parseFloat(thisState.dailyLimitAmount), PointLevel: parseInt(thisState.pointLevel), Purpose: parseInt(thisState.purpose), Status: status,Sort: parseInt(thisState.bSort)};
+            let finishFunc = this.onCancel.bind(this, thisState.bankId);
+            this.props.onSaveBankCard(data, finishFunc);
+        }
+
+        render() {
+            let row = this.state.row;
+            console.log(row)
+            return (
+                <tr>
+                    <th scope="row">{row.bankCode}</th>
+                    <td>{row.bankName}</td>
+                    <td>{row.accountNo}</td>
+                    <td>{row.accountName}</td>                    
+                    <td>
+                        <select className="custom-select" name="pointLevel" onChange={this.onChange.bind(this)} value={row.pointLevel}>
+                            <option value={0}>0</option>
+                            <option value={1}>1</option>
+                            <option value={2}>2</option>
+                            <option value={3}>3</option>
+                        </select>                        
+                    </td>
+                    <td><input className="text-right" type="number" name="minAmount" value={row.minAmount} onChange={this.onChange.bind(this)}/></td>
+                    <td><input className="text-right" type="number" name="maxAmount" value={row.maxAmount} onChange={this.onChange.bind(this)}/></td>
+                    <td><input className="text-right" type="number" name="dailyLimitAmount" value={row.dailyLimitAmount} onChange={this.onChange.bind(this)}/></td>
+                    <td>
+                        <select className="custom-select" name="purpose" onChange={this.onChange.bind(this)} value={row.purpose}>
+                            <option value={1}>Deposit</option>
+                            <option value={2}>Withdrawal</option>
+                            <option value={3}>Deposit & Withdrawal</option>
+                        </select>
+                    </td>
+                    <td>
+                        {row.status < 3? <select className="custom-select" name="status" onChange={this.onChange.bind(this)} value={row.status}>
+                            <option value={1}>Active</option>
+                            <option value={2}>Suspend</option>
+                            <option value={3}>Closed</option>
+                        </select> : BankCardStatus[row.status]}
+                    </td>
+                    <td>{number_format(row.dummy)}</td>
+                    <td><input className="text-right" type="number" name="bSort" value={row.bSort} onChange={this.onChange.bind(this)}/></td>
+                    <td><button className="btn btn-add" onClick={this.onSaveBankCard.bind(this)}>Save</button><button className="btn btn-add" onClick={this.onCancel.bind(this, row.bankId)}>Cancel</button></td>
+                </tr>
+            )
+        }
+    }
+
+    class DataRow extends React.Component {
         constructor(props) {
             super(props);
 
         }
 
-        onRefresh() {
-            this.props.onRefresh();
+        onDelete(binkId) {
+            this.props.onDelete(binkId);
+        }
+
+        onEdit(binkId) {
+            this.props.onEdit(binkId);
         }
 
         render() {
-            let rows = this.props.searchData.map(row => 
-                <tr key={row.bankId}>
+            let row = this.props.row;
+            return (
+                <tr>
                     <th scope="row">{row.bankCode}</th>
                     <td>{row.bankName}</td>
                     <td>{row.accountNo}</td>
@@ -33,7 +105,63 @@ import {number_format} from '../commJS/common';
                     <td>{Purpose[row.purpose]}</td>
                     <td>{BankCardStatus[row.status]}</td>
                     <td className="text-right">{number_format(row.dummy)}</td>
+                    <td className="text-right">{row.bSort}</td>
+                    <td><button className="btn btn-add" onClick={this.onEdit.bind(this, row.bankId)}>Edit</button><button className="btn btn-add" onClick={this.onDelete.bind(this, row.bankId)}>Delete</button></td>
                 </tr>
+            )
+        }
+    }
+
+    class BankCardInfoList extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state={onEdit:[]};
+        }
+
+        onRefresh() {
+            this.props.onRefresh();
+        }
+
+        onEdit(bankId) {
+            let onEdit=this.state.onEdit;
+            onEdit.push(bankId);
+
+            this.setState(onEdit);
+        }
+
+        onCancel(bankId) {
+            let onEdit=this.state.onEdit;
+            let idx = onEdit.indexOf(bankId);
+            if(idx>-1) {
+                onEdit.splice(idx, 1);
+            }
+
+            this.setState(onEdit);
+        }
+
+        onDelete(bankId) {
+            if(confirm('Are you sure?')) {
+                axios.post('/api/BankList/DelBankCard', {siteId:this.props.SiteId, bankId: bankId})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        alert(result.message);
+                        this.props.onRefresh();
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+            }
+        }
+
+        render() {
+            let onEdit=this.state.onEdit;
+            let rows = this.props.searchData.map(row => 
+                onEdit.indexOf(row.bankId) > -1 ? <EditRow SiteId={this.props.SiteId} onSaveBankCard={this.props.onSaveBankCard} key={row.bankId} row={row} onCancel={this.onCancel.bind(this)}/> : <DataRow key={row.bankId} row={row} onDelete={this.onDelete.bind(this)} onEdit={this.onEdit.bind(this)}/>
             );
 
             return (
@@ -57,6 +185,8 @@ import {number_format} from '../commJS/common';
                                 <th scope="col">Purpose</th>
                                 <th scope="col">Status</th>
                                 <th scope="col" className="text-right">Dummy</th>
+                                <th scope="col" className="text-right">Sort</th>
+                                <th scope="col" className="text-right"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -74,10 +204,6 @@ import {number_format} from '../commJS/common';
 
         }
 
-        onRefresh() {
-            this.props.onRefresh();
-        }
-
         showForm(currencyId) {
             this.props.showForm(currencyId);
         }
@@ -91,7 +217,7 @@ import {number_format} from '../commJS/common';
                 <button className="btn btn-add" onClick={this.showForm.bind(this, this.props.currencyId)}>Add Bank Card</button>
                 <div className="panel-body">
                     <div className="collapse show" id={"collapseExample-"+this.props.currencyId}>
-                        <BankCardInfoList searchData={this.props.searchData}/>          
+                        <BankCardInfoList SiteId={this.props.SiteId} onSaveBankCard={this.props.onSaveBankCard} searchData={this.props.searchData} onRefresh={this.props.onRefresh}/>          
                     </div>
                 </div>
             </div>
@@ -124,7 +250,7 @@ import {number_format} from '../commJS/common';
                 alert('Please Select Site');
                 return;
             }
-            
+
             if(thisState.SelSysId==null) {
                 alert('Please Select Bank');
                 return;
@@ -166,21 +292,7 @@ import {number_format} from '../commJS/common';
             }            
 
             let data = {siteId:SelSite.siteId,SysId: thisState.SelSysId,BankAccountName: thisState.BankAccountName, BankAccountNo: thisState.BankAccountNo, MaxAmount: parseFloat(thisState.MaxAmount), MinAmount: parseFloat(thisState.MinAmount), DailyLimitAmount: parseFloat(thisState.DailyLimitAmount), PointLevel: parseInt(thisState.PointLevel), Purpose: parseInt(thisState.Purpose), Status: thisState.Status,Sort: thisState.Sort}
-
-            axios.post('/api/BankList/SetBankCard', data)
-            .then(function (response) {
-                //Loading.UnLoading();
-                let result = response.data;
-                if (result.errorCode == 0) {
-                    alert(result.message);
-                    this.props.onSaveForm();
-                } else {
-                    alert(result.message);
-                }
-            }.bind(this)).catch(function (error) {
-                //Loading.UnLoading();
-                alert(error);
-            }.bind(this));
+            this.props.onSaveBankCard(data);
         }
 
         onSelCcyId(e) {
@@ -270,15 +382,15 @@ import {number_format} from '../commJS/common';
                         </div>
                         <div className="form-group">
                             <label className="col-form-label">Min Amount (0 is not checked)</label>
-                            <input className="form-control" type="number" name="MinAmount" onChange={this.onChange.bind(this)}/>
+                            <input className="form-control text-right" type="number" name="MinAmount" onChange={this.onChange.bind(this)}/>
                         </div>
                         <div className="form-group">
                             <label className="col-form-label">Max Amount (0 is not checked)</label>
-                            <input className="form-control" type="number" name="MaxAmount" onChange={this.onChange.bind(this)}/>
+                            <input className="form-control text-right" type="number" name="MaxAmount" onChange={this.onChange.bind(this)}/>
                         </div>
                         <div className="form-group">
                             <label className="col-form-label">Daily Limit Amount (0 is not checked)</label>
-                            <input className="form-control" type="number" name="DailyLimitAmount" onChange={this.onChange.bind(this)}/>
+                            <input className="form-control text-right" type="number" name="DailyLimitAmount" onChange={this.onChange.bind(this)}/>
                         </div>                        
                         <div className="form-group">
                             <label className="col-form-label d-block">Point Level</label>
@@ -422,9 +534,27 @@ import {number_format} from '../commJS/common';
             this.setState({ShowForm: false});
         }
 
-        onSaveForm() {
-            this.onSearch();            
-            this.setState({ShowForm: false});
+        onSaveBankCard(data, finishFunc) {
+            axios.post('/api/BankList/SetBankCard', data)
+            .then(function (response) {
+                //Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    alert(result.message);
+                    if(finishFunc!=null){
+                        finishFunc();
+                        this.onSearch();
+                    } else {
+                        this.setState({ShowForm: false});
+                        this.onSearch();                        
+                    }
+                } else {
+                    alert(result.message);
+                }
+            }.bind(this)).catch(function (error) {
+                //Loading.UnLoading();
+                alert(error);
+            }.bind(this));            
         }
 
         componentDidMount() {
@@ -453,7 +583,7 @@ import {number_format} from '../commJS/common';
                 }
 
                 for (var prop in dataContainter) {
-                    ccyPanel.push(<CcyPanel showForm={this.showForm.bind(this)} key={prop} searchData={dataContainter[prop]} currencyId={prop} onRefresh={this.onRefresh.bind(this)}/>);
+                    ccyPanel.push(<CcyPanel SiteId={this.state.SiteId} onSaveBankCard={this.onSaveBankCard.bind(this)} showForm={this.showForm.bind(this)} key={prop} searchData={dataContainter[prop]} currencyId={prop} onRefresh={this.onRefresh.bind(this)}/>);
                 }
             }
 
@@ -465,7 +595,7 @@ import {number_format} from '../commJS/common';
                         </div>;
             }.bind(this));
             return (
-                this.state.ShowForm ? <BankCardForm onSaveForm={this.onSaveForm.bind(this)} closeForm={this.closeForm.bind(this)} {...this.state} onSiteChanged={this.onSiteChanged.bind(this)}/> : 
+                this.state.ShowForm ? <BankCardForm onSaveBankCard={this.onSaveBankCard.bind(this)} closeForm={this.closeForm.bind(this)} {...this.state} onSiteChanged={this.onSiteChanged.bind(this)}/> : 
                 <div>
                     {this.state.SysBankList != null ? <button className="btn btn-add" onClick={this.showForm.bind(this, null)}>Add Bank Card</button>:null}
                     <div className="form-group">

@@ -27,7 +27,11 @@ namespace BackendSite.Service.BLL
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("BankCard_Set", new { SiteId = siteId, SysId, BankAccountName, BankAccountNo, MinAmount, MaxAmount, DailyLimitAmount, PointLevel, Purpose, Status, Sort }, commandType: CommandType.StoredProcedure);
         }
-
+        public int DelBankCard(int siteId, int bankId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("BankCard_Del", new { SiteId = siteId, BankId = bankId }, commandType: CommandType.StoredProcedure);
+        }
         public bool AddBankDetail(int siteId, BankDetail bankDetail)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
