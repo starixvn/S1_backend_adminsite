@@ -160,8 +160,21 @@ import {number_format} from '../commJS/common';
 
         render() {
             let onEdit=this.state.onEdit;
-            let rows = this.props.searchData.map(row => 
-                onEdit.indexOf(row.bankId) > -1 ? <EditRow SiteId={this.props.SiteId} onSaveBankCard={this.props.onSaveBankCard} key={row.bankId} row={row} onCancel={this.onCancel.bind(this)}/> : <DataRow key={row.bankId} row={row} onDelete={this.onDelete.bind(this)} onEdit={this.onEdit.bind(this)}/>
+            let rows = this.props.searchData.sort(function (rowA, rowB) {
+                    if(rowA.bankCode > rowB.bankCode) {
+                        return 1;                        
+                    } else if(rowA.bankCode < rowB.bankCode) {
+                        return -1;
+                    } else {
+                        if(rowA.bSort > rowB.bSort) {
+                            return 1;
+                        } else if(rowA.bSort < rowB.bSort) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                }).map(row => onEdit.indexOf(row.bankId) > -1 ? <EditRow SiteId={this.props.SiteId} onSaveBankCard={this.props.onSaveBankCard} key={row.bankId} row={row} onCancel={this.onCancel.bind(this)}/> : <DataRow key={row.bankId} row={row} onDelete={this.onDelete.bind(this)} onEdit={this.onEdit.bind(this)}/>
             );
 
             return (
