@@ -24,22 +24,33 @@ import {number_format} from '../commJS/common';
             }.bind(this));
         }
 
-        
-
         onSumbitPaymentAdjustment(event) {
             event.preventDefault();
             let custData = this.state.CustData;
             let option = this.state.Option;
+            let bankId = this.state.BankId;
+            let amount = this.state.Amount;
             if(option==null) {
                 alert('Please select one Option.');
                 return;
             }
-            axios.post('/api/CustManage/', {...custData, Option: parseInt(option) })
+
+            if(bankId==null) {
+                alert('Please select one Bank Care Account.');
+                return;
+            }
+
+            if(isNaN(amount)) {
+                alert('Please select one Bank Care Account.');
+                return;
+            }     
+
+            axios.post('/api/Deposit/PaymentAdjustment', {CustId: custData.custId, Option: parseInt(option), BankId: parseInt(bankId), Amount: parseFloat(amount)})
             .then(function (response) {
                 //Loading.UnLoading();
                 let result = response.data;
                 if (result.errorCode == 0) {
-                    this.setState({CustData:result.data});
+                    alert(result.message);
                 } else {
                     alert(result.message);
                 }
@@ -61,11 +72,11 @@ import {number_format} from '../commJS/common';
             let SelBank = null;
             if(bankInfoList!=null){
                 SelBank=<div className="form-group">
-                    <label className="col-form-label">Bank</label>
-                    <select className="custom-select" onChange={this.onSelSysId.bind(this)} value={this.state.SelSysId}>
-                        {this.state.SelSysId==null ? <option>Open this select Bank</option> : null}
-                        {BankList.filter(bankInfo => bankInfo.currencyId == selCcyId).map(function(bankInfo) { 
-                            return <option key={bankInfo.sysId} value={bankInfo.sysId}>{bankInfo.bankCode + " - " + bankInfo.bankName}</option>;
+                    <label className="col-form-label">Bank Card Account</label>
+                    <select className="custom-select" name="BankId" onChange={this.onChange.bind(this)} value={this.state.BankId}>
+                        {this.state.BankId==null ? <option>Open this select Bank</option> : null}
+                        {bankInfoList.map(function(bankInfo) { 
+                            return <option key={bankInfo.bankId} value={bankInfo.bankId}>{bankInfo.bankCode + " - " + bankInfo.accountName + " - " + bankInfo.accountNo}</option>;
                         }.bind(this))}
                     </select>
                 </div>;
@@ -105,6 +116,7 @@ import {number_format} from '../commJS/common';
                                     </tr>
                                 </tbody>
                             </table>
+                            {SelBank}
                             <div className="form-group">
                                 <label className="col-form-label d-block">Option</label>
                                 <div className="custom-control custom-radio custom-control-inline">
@@ -115,7 +127,11 @@ import {number_format} from '../commJS/common';
                                     <input type="radio" id="Credit" name="Option" className="custom-control-input" value={2} onChange={this.onChange.bind(this)}/>
                                     <label className="custom-control-label" htmlFor="Credit">Credit</label>
                                 </div>
-                            </div>                                           
+                            </div>
+                            <div className="form-group">
+                                <label className="col-form-label">Amount</label>
+                                <input className="form-control" type="number" name="Amount" onChange={this.onChange.bind(this)}/>
+                            </div>                                                           
                             <div className="button-group mt-10">
                                 <button type="submit" className="btn btn-primary">Submit</button>
                             </div>                        

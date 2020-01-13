@@ -84,6 +84,7 @@ namespace BackendSite.Controllers.Api
                              BankId = x.BankId,
                              BankLogo = x.BankLogo,
                              BankName = x.BankName,
+                             BankCode = x.BankCode,
                              BankSite = x.BankSite,
                              AccountName = x.AccountName,
                              AccountNo = x.AccountNo

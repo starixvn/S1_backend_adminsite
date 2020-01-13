@@ -93,6 +93,17 @@ namespace BackendSite.Service.DAL
                                     var pay = (IPay)depositRequest.oDepositInfo;
                                     type = payTypePosition + pay.PayId;
                                 }
+                                else if(depositRequest.AdjustFlag)
+                                {
+                                    if (actualDeposit > 0)
+                                    {
+                                        type = 2;
+                                    }
+                                    else
+                                    {
+                                        type = 3;
+                                    }
+                                }
 
                                 byte is1stDepoist = 0;
                                 decimal afterAmount = 0;
