@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using BackendSite.Service.Model;
+using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System;
@@ -17,6 +18,12 @@ namespace BackendSite.Service.DAL
         {
             this.configuration = configuration;
         }
+
+        public Customer GetCustInfo(int custId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.QueryFirstOrDefault<Customer>("Customer_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+        }
         public IEnumerable<dynamic> GetCustInfoList(string userName, string transId, int siteId, int pageSize, ref int pageNumber, out int totalPages)
         {
             totalPages = 0;
@@ -25,17 +32,23 @@ namespace BackendSite.Service.DAL
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var result = conn.Query<dynamic>("CustInfoSearch_Get", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             return result;
         }
 
-        public dynamic GetCustInfo(int custId, int siteId)
+        public int GetVipLevel(int custId)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var result = conn.QueryFirstOrDefault<dynamic>("CustInfoDetailSearch_Get", new { CustId = custId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.ExecuteScalar<int>("VipLevel_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+        }
+
+        public CustInfoDetail GetCustInfoDetail(int custId, string userName)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var result = conn.QueryFirstOrDefault<CustInfoDetail>("CustInfoDetailSearch_Get", new { CustId = custId, UserName = userName }, commandType: CommandType.StoredProcedure);
             return result;
         }
     }

@@ -9,19 +9,18 @@ namespace BackendSite.Service.BLL
     public class MessageBLL
     {
         private readonly MessageService messageService;
-        private readonly ServerInfoService serverInfoService;
+        private readonly CustInfoBLL custInfoBLL;
 
-        public MessageBLL(MessageService messageService, ServerInfoService serverInfoService)
+        public MessageBLL(MessageService messageService, CustInfoBLL custInfoBLL)
         {
             this.messageService = messageService;
-            this.serverInfoService = serverInfoService;
+            this.custInfoBLL = custInfoBLL;
         }
 
         public int SendMessageToPlayer(string sender, string title, string content, int custId)
         {
-            var serverInfo = serverInfoService.GetModel();
-            Customer customer = messageService.GetCustInfo(custId);
-            return messageService.SendMessageToPlayer(serverInfo.SiteId, sender, title, content, custId, customer.UserName, serverInfo.DefLang);
+            var customer = custInfoBLL.GetCustInfoWithCache(custId);
+            return messageService.SendMessageToPlayer(customer.SiteId, sender, title, content, custId, customer.UserName, customer.UserLang);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.Model;
+﻿using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
@@ -16,12 +17,14 @@ namespace BackendSite.Service.DAL
     {
         private readonly IConfiguration configuration;
         private readonly WalletService walletService;
+        private readonly Common common;
         private int payTypePosition = 100;
 
-        public DepositService(IConfiguration configuration, WalletService walletService)
+        public DepositService(IConfiguration configuration, WalletService walletService, Common common)
         {
             this.configuration = configuration;
             this.walletService = walletService;
+            this.common = common;
         }
 
         public IEnumerable<DepositRequest> GetDepositRequestList(int? depositType, long startDate, long endDate, int siteId, string DepositId, string UserName, int? currencyId, int? status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
@@ -150,6 +153,22 @@ namespace BackendSite.Service.DAL
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.QueryFirstOrDefault<DepositReceipt>("DepositReceipt_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
+        }
+
+        public int PaymentAdjustment(DepositRequest depositRequest, out string transId)
+        {
+            transId = null;
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            var p = new DynamicParameters(new { depositRequest.CustId, depositRequest.UserName, depositRequest.CurrencyId, depositRequest.SiteId, depositRequest.DepositInfo, depositRequest.Amount, Prefix = $"A{common.GetEnv()}" });
+            p.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
+
+            var result = conn.Execute("PaymentAdjustment_Ins", p, transaction: trans, commandType: CommandType.StoredProcedure);
+            trans.Commit();
+            transId = p.Get<string>("TransId");
+
+            return result;
         }
     }
 }

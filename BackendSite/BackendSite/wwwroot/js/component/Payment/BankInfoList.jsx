@@ -44,16 +44,16 @@ import {number_format} from '../commJS/common';
                     <td>{row.accountNo}</td>
                     <td>{row.accountName}</td>                    
                     <td>
-                        <select className="custom-select" name="pointLevel" onChange={this.onChange.bind(this)} value={row.pointLevel}>
+                        <select className="custom-select width-50" name="pointLevel" onChange={this.onChange.bind(this)} value={row.pointLevel}>
                             <option value={0}>0</option>
                             <option value={1}>1</option>
                             <option value={2}>2</option>
                             <option value={3}>3</option>
                         </select>                        
                     </td>
-                    <td><input className="text-right" type="number" name="minAmount" value={row.minAmount} onChange={this.onChange.bind(this)}/></td>
-                    <td><input className="text-right" type="number" name="maxAmount" value={row.maxAmount} onChange={this.onChange.bind(this)}/></td>
-                    <td><input className="text-right" type="number" name="dailyLimitAmount" value={row.dailyLimitAmount} onChange={this.onChange.bind(this)}/></td>
+                    <td className="text-right"><input className="input-medium" type="number" name="minAmount" value={row.minAmount} onChange={this.onChange.bind(this)} /></td>
+                    <td className="text-right"><input className="input-medium" type="number" name="maxAmount" value={row.maxAmount} onChange={this.onChange.bind(this)}/></td>
+                    <td className="text-right"><input className="input-medium" type="number" name="dailyLimitAmount" value={row.dailyLimitAmount} onChange={this.onChange.bind(this)}/></td>
                     <td>
                         <select className="custom-select" name="purpose" onChange={this.onChange.bind(this)} value={row.purpose}>
                             <option value={1}>Deposit</option>
@@ -69,8 +69,17 @@ import {number_format} from '../commJS/common';
                         </select> : BankCardStatus[row.status]}
                     </td>
                     <td>{number_format(row.dummy)}</td>
-                    <td><input className="text-right" type="number" name="bSort" value={row.bSort} onChange={this.onChange.bind(this)}/></td>
-                    <td><button className="btn btn-add" onClick={this.onSaveBankCard.bind(this)}>Save</button><button className="btn btn-add" onClick={this.onCancel.bind(this, row.bankId)}>Cancel</button></td>
+                    <td className="text-right"><input className="input-small" type="number" name="bSort" value={row.bSort} onChange={this.onChange.bind(this)} /></td>
+                    <td>
+                        <div className="button-action">
+                            <button className="btn btn-save" onClick={this.onSaveBankCard.bind(this)}>
+                                <i className="icon-save" />
+                            </button>
+                            <button className="btn btn-cancel" onClick={this.onCancel.bind(this, row.bankId)}>
+                                <i className="icon-cancel" />
+                                </button>
+                        </div>
+                    </td>
                 </tr>
             )
         }
@@ -106,7 +115,16 @@ import {number_format} from '../commJS/common';
                     <td>{BankCardStatus[row.status]}</td>
                     <td className="text-right">{number_format(row.dummy)}</td>
                     <td className="text-right">{row.bSort}</td>
-                    <td><button className="btn btn-add" onClick={this.onEdit.bind(this, row.bankId)}>Edit</button><button className="btn btn-add" onClick={this.onDelete.bind(this, row.bankId)}>Delete</button></td>
+                    <td>
+                        <div className="button-action">
+                            <button className="btn btn-edit" onClick={this.onEdit.bind(this, row.bankId)}>
+                                <i className="icon-edit" />
+                            </button>
+                            <button className="btn btn-delete" onClick={this.onDelete.bind(this, row.bankId)}>
+                                <i className="icon-delete" />
+                                </button>
+                        </div>
+                    </td>
                 </tr>
             )
         }
@@ -198,8 +216,8 @@ import {number_format} from '../commJS/common';
                                 <th scope="col">Purpose</th>
                                 <th scope="col">Status</th>
                                 <th scope="col" className="text-right">Dummy</th>
-                                <th scope="col" className="text-right">Sort</th>
-                                <th scope="col" className="text-right"></th>
+                                <th scope="col" className="text-right width-50">Sort</th>
+                                <th scope="col" className="width-85">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -225,9 +243,10 @@ import {number_format} from '../commJS/common';
             return (
             <div className="panel mt-20">
                 <a className="panel-title" data-toggle="collapse" href={"#collapseExample-"+this.props.currencyId} role="button" aria-expanded="true" aria-controls="collapseExample">
-                  {i18n["lbl_Currency"+this.props.currencyId]}
+                    {i18n["lbl_Currency" + this.props.currencyId]}
+                    <button className="btn btn-add" onClick={this.showForm.bind(this, this.props.currencyId)}>Add Bank Card</button>
                 </a>
-                <button className="btn btn-add" onClick={this.showForm.bind(this, this.props.currencyId)}>Add Bank Card</button>
+                
                 <div className="panel-body">
                     <div className="collapse show" id={"collapseExample-"+this.props.currencyId}>
                         <BankCardInfoList SiteId={this.props.SiteId} onSaveBankCard={this.props.onSaveBankCard} searchData={this.props.searchData} onRefresh={this.props.onRefresh}/>          

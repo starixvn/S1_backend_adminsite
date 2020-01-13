@@ -318,8 +318,8 @@ blockquote p {
 /*# sourceMappingURL=metisMenu.css.map */
 @font-face {
   font-family: 'icomoon';
-  src: url("/css/fonts/icomoon.eot?mafk2k");
-  src: url("/css/fonts/icomoon.eot?mafk2k#iefix") format("embedded-opentype"), url("/css/fonts/icomoon.ttf?mafk2k") format("truetype"), url("/css/fonts/icomoon.woff?mafk2k") format("woff"), url("/css/fonts/icomoon.svg?mafk2k#icomoon") format("svg");
+  src: url("/css/fonts/icomoon.eot?raermh");
+  src: url("/css/fonts/icomoon.eot?raermh#iefix") format("embedded-opentype"), url("/css/fonts/icomoon.ttf?raermh") format("truetype"), url("/css/fonts/icomoon.woff?raermh") format("woff"), url("/css/fonts/icomoon.svg?raermh#icomoon") format("svg");
   font-weight: normal;
   font-style: normal;
   font-display: block; }
@@ -336,6 +336,24 @@ blockquote p {
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
+
+.icon-save:before {
+  content: "\e90d"; }
+
+.icon-cancel:before {
+  content: "\e90e"; }
+
+.icon-edit:before {
+  content: "\e90c"; }
+
+.icon-refresh:before {
+  content: "\e909"; }
+
+.icon-calendar:before {
+  content: "\e90a"; }
+
+.icon-delete:before {
+  content: "\e90b"; }
 
 .icon-search:before {
   content: "\e908"; }

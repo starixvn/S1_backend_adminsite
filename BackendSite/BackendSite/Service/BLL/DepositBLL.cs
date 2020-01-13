@@ -90,8 +90,6 @@ namespace BackendSite.Service.BLL
             forStatus.Add((int)DepositStatus.OnHold);
             return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.Pending, null);
         }
-
-
         public DepositReceipt GetDepositReceipt(string transId)
         {
             int depositId = 0;
@@ -99,6 +97,10 @@ namespace BackendSite.Service.BLL
             int.TryParse(m.Value, out depositId);
             var serverInfo = serverInfoService.GetModel();
             return depositService.GetDepositReceipt(depositId, serverInfo.SiteId);
+        }
+        public int PaymentAdjustment(DepositRequest depositRequest, out string transId)
+        {
+            return depositService.PaymentAdjustment(depositRequest, out transId);
         }
     }
 }
