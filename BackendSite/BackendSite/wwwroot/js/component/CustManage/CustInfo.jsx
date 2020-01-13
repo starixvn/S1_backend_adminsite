@@ -30,7 +30,7 @@
     }
     
     class CustInfoPanel extends React.Component {
-        _Tabs=["Customer Info","Financial Log","Deposit Info","Transfer Info","Withdrawal Info","Login Log"];
+        _Tabs=["Customer Info","Financial Log","Deposit Info","Transfer Info","Withdrawal Info","Login Log", "Note"];
 
         constructor(props) {
             super(props);

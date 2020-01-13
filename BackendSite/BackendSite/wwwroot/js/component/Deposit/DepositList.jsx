@@ -259,7 +259,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
 
                 if(data.receipt) {
                     PayFrom.push(<tr key={payK++}>
-                        <td colSpan={2}><img className="img-receipt" src={"/Deposit/GetDepositReceiptPic?transId=" + data.transId} /></td>
+                        <td colSpan={2}><img className="img-receipt" src={"/Finance/GetDepositReceiptPic?transId=" + data.transId} /></td>
                     </tr>);
                 }
             }

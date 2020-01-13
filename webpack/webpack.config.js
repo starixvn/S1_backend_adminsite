@@ -10,6 +10,8 @@ module.exports = {
 			'../BackendSite/BackendSite/wwwroot/js/component/Deposit/DepositList.jsx'
     ],"js/component/Payment/BankInfoList.min":[
 			'../BackendSite/BackendSite/wwwroot/js/component/Payment/BankInfoList.jsx'
+    ],"js/component/Payment/PaymentAdjustment.min":[
+			'../BackendSite/BackendSite/wwwroot/js/component/Payment/PaymentAdjustment.jsx'
     ]
   },
   output: {

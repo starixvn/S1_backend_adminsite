@@ -42,7 +42,7 @@
       {
         "Key": "lbl_BankCardList",
         "Title": "Bank Card Management",
-        "Controller": "BankInfo",
+        "Controller": "Finance",
         "Action": "BankInfoList",
         "Icon": "",
         "Roles": null,
@@ -51,7 +51,7 @@
       {
         "Key": "lbl_DepositRequest",
         "Title": "Deposit Request",
-        "Controller": "Deposit",
+        "Controller": "Finance",
         "Action": "DepositList",
         "Icon": "",
         "Roles": null,
@@ -60,7 +60,7 @@
       {
         "Key": "lbl_WithdrawalRequest",
         "Title": "Withdrawal Request",
-        "Controller": "Withdrawal",
+        "Controller": "Finance",
         "Action": "WithdrawalList",
         "Icon": "",
         "Roles": null,
@@ -68,9 +68,18 @@
       },
       {
         "Key": "",
+        "Title": "Payment Adjustment",
+        "Controller": "Finance",
+        "Action": "PaymentAdjustment",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
         "Title": "Pending Funds",
-        "Controller": "PendingFund",
-        "Action": "Index",
+        "Controller": "Finance",
+        "Action": "PendingFund",
         "Icon": "",
         "Roles": null,
         "Childs": null

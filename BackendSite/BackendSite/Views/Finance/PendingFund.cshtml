@@ -1,0 +1,85 @@
+﻿@model IEnumerable<PendingFund>
+@using Microsoft.AspNetCore.Hosting
+@using BackendSite.Service.BLL
+@using BackendSite.Service.Model
+@inject IWebHostEnvironment environment
+@inject SelLangBLL selLangBLL
+@inject ServerInfoBLL serverInfoBLL
+@inject AuthorizeBLL authorizeBLL
+@{
+    Layout = null;
+    ViewData["Title"] = @selLangBLL.GetResourceValue("lbl_PendingList");
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BackendSite</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <h1>@selLangBLL.GetResourceValue("lbl_PendingList")</h1>
+    <hr />
+    <div class="container-fluid">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">@selLangBLL.GetResourceValue("lbl_UserName")</th>
+                    <th scope="col">@selLangBLL.GetResourceValue("lbl_Currency")</th>
+                    <th scope="col">@selLangBLL.GetResourceValue("lbl_Status")</th>
+                    <th scope="col">@selLangBLL.GetResourceValue("lbl_Balance")</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <th scope="row">@item.UserName</th>
+                        <td>@item.CurrencyId</td>
+                        <td>@item.Status</td>
+                        <td>@item.Balance</td>
+                        <td><button onclick='process(@item.CustId)' class="btn btn-primary">@selLangBLL.GetResourceValue("lbl_Process")</button>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/lib/axios.min.js"></script>
+    @if (environment.EnvironmentName == "Development")
+    {
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+    }
+    else
+    {
+
+    }
+
+    <script type="text/javascript">
+        function process(custId) {
+            event.preventDefault();
+            var data = { "CustId": custId };
+            axios.post('/api/PendingFund/Process', data)
+                .then(function (response) {
+                    var result = response.data;
+                    if (result.errorCode == 0) {
+                        alert(result.message);
+                        location.reload();
+                    } else {
+                        alert(result.message);
+                    }
+                }).catch(function (error) {
+                    alert(error);
+                });
+        }
+    </script>
+</body>
+</html>
