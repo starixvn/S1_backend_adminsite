@@ -7,6 +7,7 @@ namespace BackendSite.Service.Model
 {
     public class Customer
     {
+        public string SiteName { get; set; }
         public int CustId { get; set; }
         public int SiteId { get; set; }
         public string UserName { get; set; }

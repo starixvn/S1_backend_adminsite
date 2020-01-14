@@ -35,15 +35,16 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiListResult<dynamic> GetCustInfoList(CustInfoListReq custInfoListReq)
+        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq custInfoListReq)
         {
-            var apiResult = new ApiListResult<dynamic>();
-            int totalPages = 0;
+            var apiResult = new ApiListResult<CustInfoDetail>();
+            int totalPages = 0, rowCount = 0;
             int pageNumber = custInfoListReq.PageNumber;
 
-            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.UserName, custInfoListReq.TransId, custInfoListReq.PageSize, ref pageNumber, out totalPages);
+            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.UserName, custInfoListReq.TransId, custInfoListReq.PageSize, ref pageNumber, out totalPages,out rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
+            apiResult.RowCount = rowCount;
             apiResult.ErrorCode = 0;
 
             return apiResult;

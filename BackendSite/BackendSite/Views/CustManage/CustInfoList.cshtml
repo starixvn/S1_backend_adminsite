@@ -1,18 +1,27 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using Microsoft.AspNetCore.Hosting
+@using BackendSite.Service.BLL
 @inject IWebHostEnvironment environment
+@inject SelLangBLL selLangBLL
+@section Style {
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Poppins&display=swap" rel="stylesheet">
+    <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
+}
 @{
     ViewData["Title"] = "CustInfoList";
     Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
 }
+@{
+    var i18n = new Dictionary<string, string>();
+    for (var currency = 1; currency <= 51; currency++)
+    {
+        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
+            i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+    }
+}
 @section Scripts {
-    @if (environment.EnvironmentName == "Development")
-    {
-        <script type="text/babel" src="~/js/component/CustManage/CustInfoList.jsx">
-        </script>
-    }
-    else
-    {
-
-    }
+    <script type="text/javascript">
+        $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
+    </script>
+    <script src="~/js/component/CustManage/CustInfoList.min.js" asp-append-version="true"></script>
 }

@@ -91,8 +91,7 @@ import {number_format} from '../commJS/common';
                             </div>                            
                         </form>
                     </div>
-                    
-                    {custData != null ? 
+                {custData != null ? 
                     <div>
                         <h4 className="page-name">Cust Info</h4>
                         <form method="post" onSubmit={this.onSumbitPaymentAdjustment.bind(this)}>
