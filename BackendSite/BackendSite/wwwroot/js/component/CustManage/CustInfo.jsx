@@ -55,16 +55,16 @@
                                 <td>{CustStatusOp[data.status]}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Last Login Time</th>
-                                <td>{data.lastLoginTime}</td>
-                            </tr>
-                            <tr>
                                 <th scope="row">Registration Time</th>
-                                <td>{data.regTime}</td>
+                                <td>{moment(data.regTime).format('l LTS (Z)')}</td>
+                            </tr>                            
+                            <tr>
+                                <th scope="row">Last Login Time</th>
+                                <td>{moment(data.lastLoginTime).format('l LTS (Z)')}</td>
                             </tr>
                             <tr>
                                 <th scope="row">First Deposit Time</th>
-                                <td>{data.firstDepositTime}</td>
+                                <td>{moment(data.firstDepositTime).format('l LTS (Z)')}</td>
                             </tr>                            
                             <tr>
                                 <th scope="row">E-Mail</th>
