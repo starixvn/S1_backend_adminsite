@@ -13,7 +13,7 @@ import {number_format} from '../commJS/common';
         }
 
         onGetCustInfoForPayAdjust(){
-            axios.post('/api/CustManage/GetCustInfoForPayAdjust', {CustId:0, UserName: this.state.UserName})
+            axios.post('/api/CustManage/GetCustInfoDetail', {CustId:0, UserName: this.state.UserName})
             .then(function (response) {
                 //Loading.UnLoading();
                 let result = response.data;
