@@ -73,7 +73,7 @@ namespace BackendSite.Controllers.Api
         public async Task<ApiResult<CustInfoDetail>> GetCustInfoDetailAsync(CustInfoReq custInfoReq)
         {
             var apiResult = new ApiResult<CustInfoDetail>();
-            var custInfoDetail = await custInfoBLL.GetCustInfoDetailAsync(0, custInfoReq.UserName);
+            var custInfoDetail = await custInfoBLL.GetCustInfoDetailAsync(custInfoReq.CustId, custInfoReq.UserName);
 
             if (custInfoDetail != null)
             {

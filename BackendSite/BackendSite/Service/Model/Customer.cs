@@ -40,9 +40,10 @@ namespace BackendSite.Service.Model
         public string Email { get; set; }
         public string Profile { get; set; }
         public decimal Balance { get; set; }
-        public decimal SportsBalance { get; set; }
+        public decimal DepositSum { get; set; }
+        public decimal WithdrawlSum { get; set; }
+        public decimal EffectiveBetSum { get; set; }
         public DateTime FirstDepositTime { get; set; }
-
         public IEnumerable<TpWallet> tpWallet { get; set; }
 }
 }

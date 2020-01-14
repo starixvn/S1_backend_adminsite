@@ -1,6 +1,15 @@
 ﻿import {number_format, getUrlParameter} from '../commJS/common';
 
 (function ($, React, ReactDOM, i18n, axios) {
+    const CustStatusOp = {
+        1:<span className="status status-active">Running</span>,
+        2:<span className="status status-suspend">Suspend</span>,
+        3:<span className="status status-closed">Closed</span>,
+    }   
+    const CustActStatusOp = {
+        1:<span className="status status-initial">Non-Deposit</span>,
+        2:<span className="status status-active">Deposited</span>,
+    }           
     class CustInfo extends React.Component {
         constructor(props) {
             super(props);
@@ -8,66 +17,74 @@
         }
 
         render() {
-
+            let data = this.props.CustInfoData;
             return (
-                <div>
+                data==null ? <div className="text-center">
+                    <div className="spinner-border" role="status">
+                        <span className="sr-only">Loading...</span>
+                    </div>
+                </div> : <div>
                     <table class="table table-detail">
                         <tbody>
                             <tr>
-                                <th scope="row">User ID</th>
-                                <td>Nova88</td>
+                                <th scope="row">Site Name</th>
+                                <td>{data.siteName}</td>
                             </tr>
                             <tr>
-                                <th scope="row">First name</th>
-                                <td>Luke</td></tr>
+                                <th scope="row">User Name</th>
+                                <td>{data.userName}</td></tr>
                             <tr>
-                                <th scope="row">Last Name</th>
-                                <td>Davids</td></tr>
+                                <th scope="row">Currency</th>
+                                <td>{i18n["lbl_Currency"+data.currencyId]}</td></tr>
                             <tr>
-                                <th scope="row">Gender</th>
-                                <td>Male</td></tr>
+                                <th scope="row">Agent Name</th>
+                                <td>{data.agent}</td></tr>
                             <tr>
-                                <th scope="row">Date Of Birth</th>
-                                <td>12/01/1988</td>
+                                <th scope="row">Prefer Languages</th>
+                                <td>{data.userLang}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Mobile</th>
-                                <td>090 1234 567</td>
+                                <th scope="row">Act Status</th>
+                                <td>{CustActStatusOp[data.actStatus]}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Country</th>
-                                <td>Thailand</td></tr>
+                                <th scope="row">IsTest</th>
+                                <td>{data.isTest ? "True" : "False"}</td></tr>
                             <tr>
-                                <th scope="row">Address</th>
-                                <td>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</td>
+                                <th scope="row">Status</th>
+                                <td>{CustStatusOp[data.status]}</td>
                             </tr>
                             <tr>
-                                <th scope="row">City/Town</th>
-                                <td>Bangkok</td>
+                                <th scope="row">Last Login Time</th>
+                                <td>{data.lastLoginTime}</td>
                             </tr>
                             <tr>
-                                <th scope="row">State</th>
-                                <td></td>
+                                <th scope="row">Registration Time</th>
+                                <td>{data.regTime}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Zip Code</th>
-                                <td></td>
+                                <th scope="row">First Deposit Time</th>
+                                <td>{data.firstDepositTime}</td>
+                            </tr>                            
+                            <tr>
+                                <th scope="row">E-Mail</th>
+                                <td>{data.email}</td>
                             </tr>
                             <tr>
-                                <th scope="row">My preferred username</th>
-                                <td></td>
+                                <th scope="row">Mail Wallet Amount</th>
+                                <td>{number_format(data.balance)}</td>
                             </tr>
                             <tr>
-                                <th scope="row">My preferred currency</th>
-                                <td></td>
+                                <th scope="row">Deposit Summary</th>
+                                <td>{number_format(data.depositSum)}</td>
                             </tr>
                             <tr>
-                                <th scope="row">My preferred odds</th>
-                                <td></td>
+                                <th scope="row">Withdrawl Summary</th>
+                                <td>{number_format(data.withdrawlSum)}</td>
                             </tr>
                             <tr>
-                                <th scope="row">My preferred languages</th>
-                                <td>English</td>
+                                <th scope="row">Effective Betting Summary</th>
+                                <td>{number_format(data.effectiveBetSum)}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -86,6 +103,30 @@
 
         onTab(idx) {
             this.setState({TabIdx: idx});
+        }
+
+        componentDidMount() {
+            this.onGetCustInfoDetail();
+        }
+
+        onGetCustInfoDetail(){
+            let CustId = getUrlParameter("custId");
+            if(!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                axios.post('/api/CustManage/GetCustInfoDetail', {CustId: iCustId})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.setState({CustInfoData: result.data});
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+            }
         }
 
         render() {

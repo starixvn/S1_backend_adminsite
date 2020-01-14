@@ -67,7 +67,8 @@ namespace BackendSite.Service.BLL
         public async Task<CustInfoDetail> GetCustInfoDetailAsync(int custId, string userName)
         {
             var custInfoDetail = custInfoService.GetCustInfoDetail(custId, userName);
-            custInfoDetail.tpWallet = await tpBLL.GetTpWalletAsync(custInfoDetail.CustId);
+            if (custInfoDetail != null)
+                custInfoDetail.tpWallet = await tpBLL.GetTpWalletAsync(custInfoDetail.CustId);
             return custInfoDetail;
         }
 

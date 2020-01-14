@@ -30,9 +30,9 @@
             let data = this.props.searchData&&this.props.searchData.data;
             console.log(data)
             let custInfoRows = null;
-
+            let TransId = this.props.TransId;
             if(data!=null){
-                custInfoRows = <tbody>{data.map(x => <CustInfoRow TransId={data.sTransId} key={x.CustId} dataRow={x}/>)}</tbody>;
+                custInfoRows = <tbody>{data.map(x => <CustInfoRow transId={TransId} key={x.CustId} dataRow={x}/>)}</tbody>;
             }
 
             return (
@@ -134,7 +134,7 @@
                             </div>
                         </div>
                     </form>
-                    {this._Search && this.state.searchData !=null ? <CustInfoList searchData={this.state.searchData} ChangePage={this.onSearch.bind(this)}/>: null}     
+                    {this._Search && this.state.searchData !=null ? <CustInfoList searchData={this.state.searchData} TransId={this.state.sTransId} ChangePage={this.onSearch.bind(this)}/>: null}     
                 </div>                
             )
         }
