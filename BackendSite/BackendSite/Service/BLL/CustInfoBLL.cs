@@ -13,12 +13,16 @@ namespace BackendSite.Service.BLL
         private readonly CustInfoService custInfoService;
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly IMemoryCache cache;
+        private readonly TpBLL tpBLL;
+        private readonly WalletService walletService;
 
-        public CustInfoBLL(IMemoryCache cache, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL)
+        public CustInfoBLL(IMemoryCache cache, WalletService walletService, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL, TpBLL tpBLL)
         {
             this.custInfoService = custInfoService;
             this.serverInfoBLL = serverInfoBLL;
             this.cache = cache;
+            this.tpBLL = tpBLL;
+            this.walletService = walletService;
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -61,9 +65,16 @@ namespace BackendSite.Service.BLL
             return custInfoService.GetCustInfoList(userName, transId, serverInfo.SiteId, pageSize, ref pageNumber, out totalPages);
         }
 
-        public CustInfoDetail GetCustInfoDetail(int custId, string userName)
+        public async Task<CustInfoDetail> GetCustInfoDetailAsync(int custId, string userName)
         {
-            return custInfoService.GetCustInfoDetail(custId, userName);
+            var custInfoDetail = custInfoService.GetCustInfoDetail(custId, userName);
+            custInfoDetail.tpWallet = await tpBLL.GetTpWalletAsync(custInfoDetail.CustId);
+            return custInfoDetail;
+        }
+
+        public decimal GetBalance(int custId)
+        {
+            return walletService.GetBalance(custId);
         }
     }
 }

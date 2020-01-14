@@ -41,7 +41,6 @@ namespace BackendSite.Service.Model
         public string BankCode { set; get; }
         public string PayName { set; get; }
         public string PicFileName { set; get; }
-        public bool AdjustFlag { set; get; }
 
         //public virtual IEnumerable<Comments> Comments { get; set; }
 

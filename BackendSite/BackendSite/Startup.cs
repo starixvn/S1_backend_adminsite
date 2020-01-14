@@ -48,6 +48,8 @@ namespace BackendSite
             services.AddSingleton<MenuService>();
             services.AddSingleton<CustInfoService>();
             services.AddSingleton<LocalBankService>();
+            services.AddSingleton<AdjustmentService>();
+            services.AddSingleton<ThirdPartyService>();
 
             /*BLL*/
             services.AddSingleton<ServerInfoBLL>();
@@ -60,6 +62,8 @@ namespace BackendSite
             services.AddSingleton<MessageBLL>();
             services.AddSingleton<AuthorizeBLL>();
             services.AddSingleton<CustInfoBLL>();
+            services.AddSingleton<PaymentBLL>();
+            services.AddSingleton<TpBLL>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {

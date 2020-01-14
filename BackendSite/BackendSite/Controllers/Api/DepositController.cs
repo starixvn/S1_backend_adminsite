@@ -58,7 +58,6 @@ namespace BackendSite.Controllers.Api
 
             return apiListResult;
         }
-
         public class DepositReq
         {
             public string TransId { get; set; }
@@ -176,47 +175,6 @@ namespace BackendSite.Controllers.Api
         {
             bool result = await pendingFundBLL.ProcessAsync(pendingFund);
             return result;
-        }
-
-        public class PaymentAdjustmentReq
-        {
-            public int CustId { get; set; }
-            public int Option { get; set; }
-            public int BankId { get; set; }
-            public decimal Amount { get; set; }
-        }
-
-        [HttpPost]
-        public ApiResult PaymentAdjustment(PaymentAdjustmentReq paymentAdjustmentReq)
-        {
-            ApiResult apiResult = new ApiResult();
-            DepositRequest depositRequest = new DepositRequest();
-            var custInfo = custInfoBLL.GetCustInfoWithCache(paymentAdjustmentReq.CustId);
-            var bankInfo = bankDetailBLL.GetBankInfoOff().Where(x => x.BankId == paymentAdjustmentReq.BankId).FirstOrDefault();
-            if (bankInfo != null && custInfo != null)
-            {
-                depositRequest.CustId = custInfo.CustId;
-                depositRequest.CurrencyId = custInfo.CurrencyId;
-                depositRequest.UserName = custInfo.UserName;
-                depositRequest.SiteId = custInfo.SiteId;
-                depositRequest.Amount = paymentAdjustmentReq.Amount * (paymentAdjustmentReq.Option == 2 ? -1 : 1);
-                DepositInfo3_1 depositInfo3_1 = new DepositInfo3_1();
-                depositInfo3_1.AccountName = bankInfo.AccountName;
-                depositInfo3_1.AccountNo = bankInfo.AccountNo;
-                depositInfo3_1.CurrencyId = custInfo.CurrencyId;
-                depositInfo3_1.SysId = bankInfo.SysId;
-                depositRequest.DepositInfo = Newtonsoft.Json.JsonConvert.SerializeObject(depositInfo3_1);
-
-                string transId = null;
-
-                if (depositBLL.PaymentAdjustment(depositRequest, out transId) > 0)
-                {
-                    apiResult.ErrorCode = 0;
-                    apiResult.Message = $"Success. ID is {transId}";
-                }
-            }
-
-            return apiResult;
         }
     }
 }

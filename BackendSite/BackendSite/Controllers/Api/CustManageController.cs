@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.BLL;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,11 +18,13 @@ namespace BackendSite.Controllers.Api
     {
         private readonly CustInfoBLL custInfoBLL;
         private readonly BankDetailBLL bankDetailBLL;
+        private readonly TpBLL tpBLL;
 
-        public CustManageController(CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL)
+        public CustManageController(CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, TpBLL tpBLL)
         {
             this.custInfoBLL = custInfoBLL;
             this.bankDetailBLL = bankDetailBLL;
+            this.tpBLL = tpBLL;
         }
         public class CustInfoListReq
         {
@@ -66,45 +69,22 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<ReturnData> GetCustInfoForPayAdjust(CustInfoReq custInfoReq)
+        public async Task<ApiResult<CustInfoDetail>> GetCustInfoForPayAdjustAsync(CustInfoReq custInfoReq)
         {
-            var apiResult = new ApiResult<ReturnData>();
-            var custInfoDetail = custInfoBLL.GetCustInfoDetail(custInfoReq.CustId, custInfoReq.UserName);
-            var bankInfoList = bankDetailBLL.GetBankInfoOff();
-            //DepositRep3 depositRep3 = new DepositRep3();
+            var apiResult = new ApiResult<CustInfoDetail>();
+            var custInfoDetail = await custInfoBLL.GetCustInfoDetailAsync(custInfoReq.CustId, custInfoReq.UserName);
 
-            var vipLevel = custInfoBLL.GetVipLevelWithCache(custInfoDetail.CustId);
-            var bankAccountOffList = bankInfoList;
-            var _info = (from x in bankAccountOffList
-                         where vipLevel >= x.PointLevel && x.CurrencyId == custInfoDetail.CurrencyId
-                         orderby x.PointLevel descending, x.BSort
-                         select new BankInfoOff
-                         {
-                             SysId = x.SysId,
-                             BankId = x.BankId,
-                             BankLogo = x.BankLogo,
-                             BankName = x.BankName,
-                             BankCode = x.BankCode,
-                             BankSite = x.BankSite,
-                             AccountName = x.AccountName,
-                             AccountNo = x.AccountNo
-                         });
-            ReturnData returnData = new ReturnData();
-            if (custInfoDetail != null && _info != null)
+            if (custInfoDetail != null)
             {
-                returnData.bankInfoList = _info;
-                returnData.custInfoDetail = custInfoDetail;
-                apiResult.Data = returnData;
+                apiResult.Data = custInfoDetail;
                 apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.Message = "";
             }
 
             return apiResult;
-        }
-
-        public class ReturnData
-        {
-            public CustInfoDetail custInfoDetail { get; set; }
-            public IEnumerable<BankInfoOff> bankInfoList { get; set; }
         }
     }
 }

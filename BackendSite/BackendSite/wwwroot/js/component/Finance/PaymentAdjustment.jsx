@@ -9,12 +9,16 @@ import {number_format} from '../commJS/common';
 
         handleSubmit(event) {
             event.preventDefault();
+            this.onGetCustInfoForPayAdjust();
+        }
+
+        onGetCustInfoForPayAdjust(){
             axios.post('/api/CustManage/GetCustInfoForPayAdjust', {CustId:0, UserName: this.state.UserName})
             .then(function (response) {
                 //Loading.UnLoading();
                 let result = response.data;
                 if (result.errorCode == 0) {
-                    this.setState({CustData:result.data.custInfoDetail, BankInfoList: result.data.bankInfoList});
+                    this.setState({CustData: result.data});
                 } else {
                     alert(result.message);
                 }
@@ -28,15 +32,9 @@ import {number_format} from '../commJS/common';
             event.preventDefault();
             let custData = this.state.CustData;
             let option = this.state.Option;
-            let bankId = this.state.BankId;
             let amount = this.state.Amount;
             if(option==null) {
                 alert('Please select one Option.');
-                return;
-            }
-
-            if(bankId==null) {
-                alert('Please select one Bank Care Account.');
                 return;
             }
 
@@ -45,11 +43,12 @@ import {number_format} from '../commJS/common';
                 return;
             }     
 
-            axios.post('/api/Deposit/PaymentAdjustment', {CustId: custData.custId, Option: parseInt(option), BankId: parseInt(bankId), Amount: parseFloat(amount)})
+            axios.post('/api/Payment/PaymentAdjustment', {CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount)})
             .then(function (response) {
                 //Loading.UnLoading();
                 let result = response.data;
                 if (result.errorCode == 0) {
+                    this.onGetCustInfoForPayAdjust();
                     alert(result.message);
                 } else {
                     alert(result.message);
@@ -68,34 +67,35 @@ import {number_format} from '../commJS/common';
 
         render() {
             let custData=this.state.CustData;
-            let bankInfoList = this.state.BankInfoList;
-            let SelBank = null;
-            if(bankInfoList!=null){
-                SelBank=<div className="form-group">
-                    <label className="col-form-label">Bank Card Account</label>
-                    <select className="custom-select" name="BankId" onChange={this.onChange.bind(this)} value={this.state.BankId}>
-                        {this.state.BankId==null ? <option>Open this select Bank</option> : null}
-                        {bankInfoList.map(function(bankInfo) { 
-                            return <option key={bankInfo.bankId} value={bankInfo.bankId}>{bankInfo.bankCode + " - " + bankInfo.accountName + " - " + bankInfo.accountNo}</option>;
-                        }.bind(this))}
-                    </select>
-                </div>;
+            let tpWallet= null;
+            if(custData!=null && custData.tpWallet!=null) {
+                tpWallet = <ul className="wallet-wrap">{custData.tpWallet.map(function(wallet) { 
+                    return <li key={wallet.tpId} className="wallet-item">
+                                <span>{wallet.tpName}</span>
+                                <span className={wallet.balance <0 ? "negative-num":"positive-num"}>{number_format(wallet.balance)}</span>
+                            </li>;
+                }.bind(this))}</ul>;
             }
             return (
-                <div className="card">
-                    <form method="post" className="form-horizontal add-form" onSubmit={this.handleSubmit.bind(this)}>
-                        <div className="form-group">
-                            <label className="col-form-label">UserName</label>
-                            <input className="form-control" type="text" name="UserName" onChange={this.onChange.bind(this)}/>
-                        </div>
-                        <div className="button-group mt-10">
-                            <button type="submit" className="btn btn-primary">Submit</button>
-                        </div>                        
-                    </form>
+                <div>
+                    <div className="filter">
+                        <form method="post" onSubmit={this.handleSubmit.bind(this)}>
+                            <div className="row-flex">
+                                <div className="input-item">
+                                    <label className="col-form-label label">UserName</label>
+                                    <input className="form-control" type="text" name="UserName" onChange={this.onChange.bind(this)} />
+                                </div>
+                                <div className="button-group">
+                                    <button type="submit" className="btn btn-primary">Submit</button>
+                                </div>
+                            </div>                            
+                        </form>
+                    </div>
+                    
                     {custData != null ? 
-                    <div className="">
-                        <h4 class="page-name">Cust Info</h4>
-                        <form method="post" className="form-horizontal add-form" onSubmit={this.onSumbitPaymentAdjustment.bind(this)}>
+                    <div>
+                        <h4 className="page-name">Cust Info</h4>
+                        <form method="post" onSubmit={this.onSumbitPaymentAdjustment.bind(this)}>
                             <table className="table table-detail">
                                 <tbody>
                                     <tr>
@@ -112,11 +112,11 @@ import {number_format} from '../commJS/common';
                                     </tr>
                                     <tr>
                                         <th scope="row">Withdrawable Amount</th>
-                                        <td>{number_format(custData.balance) + " (Sports: "+number_format(custData.sportsBalance)+")"}</td>
+                                        <td>{number_format(custData.balance)}</td>
                                     </tr>
                                 </tbody>
                             </table>
-                            {SelBank}
+                                {tpWallet}
                             <div className="form-group">
                                 <label className="col-form-label d-block">Option</label>
                                 <div className="custom-control custom-radio custom-control-inline">
@@ -128,9 +128,9 @@ import {number_format} from '../commJS/common';
                                     <label className="custom-control-label" htmlFor="Credit">Credit</label>
                                 </div>
                             </div>
-                            <div className="form-group">
+                            <div className="form-group width-200">
                                 <label className="col-form-label">Amount</label>
-                                <input className="form-control" type="number" name="Amount" onChange={this.onChange.bind(this)}/>
+                                <input className="form-control" type="number" name="Amount" onChange={this.onChange.bind(this)} step="1" min="1"/>
                             </div>                                                           
                             <div className="button-group mt-10">
                                 <button type="submit" className="btn btn-primary">Submit</button>

@@ -8,6 +8,7 @@
 @inject AuthorizeBLL authorizeBLL
 @inject IWebHostEnvironment environment
 @section Style {
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Poppins&display=swap" rel="stylesheet">
     <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
 }
 @{
@@ -31,7 +32,7 @@
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
 }
-<h4>Payment Adjustment</h4>
+<h4 class="page-name">Payment Adjustment</h4>
 <div id="App"></div>
 @section Scripts {
     <script>

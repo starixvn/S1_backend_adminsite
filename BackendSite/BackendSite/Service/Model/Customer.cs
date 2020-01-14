@@ -41,5 +41,7 @@ namespace BackendSite.Service.Model
         public decimal Balance { get; set; }
         public decimal SportsBalance { get; set; }
         public DateTime FirstDepositTime { get; set; }
-    }
+
+        public IEnumerable<TpWallet> tpWallet { get; set; }
+}
 }

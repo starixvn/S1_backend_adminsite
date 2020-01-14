@@ -93,17 +93,6 @@ namespace BackendSite.Service.DAL
                                     var pay = (IPay)depositRequest.oDepositInfo;
                                     type = payTypePosition + pay.PayId;
                                 }
-                                else if(depositRequest.AdjustFlag)
-                                {
-                                    if (actualDeposit > 0)
-                                    {
-                                        type = 2;
-                                    }
-                                    else
-                                    {
-                                        type = 3;
-                                    }
-                                }
 
                                 byte is1stDepoist = 0;
                                 decimal afterAmount = 0;
@@ -164,22 +153,6 @@ namespace BackendSite.Service.DAL
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.QueryFirstOrDefault<DepositReceipt>("DepositReceipt_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
-        }
-
-        public int PaymentAdjustment(DepositRequest depositRequest, out string transId)
-        {
-            transId = null;
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            conn.Open();
-            using var trans = conn.BeginTransaction();
-            var p = new DynamicParameters(new { depositRequest.CustId, depositRequest.UserName, depositRequest.CurrencyId, depositRequest.SiteId, depositRequest.DepositInfo, depositRequest.Amount, Prefix = $"A{common.GetEnv()}" });
-            p.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
-
-            var result = conn.Execute("PaymentAdjustment_Ins", p, transaction: trans, commandType: CommandType.StoredProcedure);
-            trans.Commit();
-            transId = p.Get<string>("TransId");
-
-            return result;
         }
     }
 }

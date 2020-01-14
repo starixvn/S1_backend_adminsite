@@ -14,11 +14,13 @@ namespace BackendSite.Service.BLL
     {
         private readonly DepositService depositService;
         private readonly ServerInfoService serverInfoService;
+        private readonly AdjustmentService adjustmentService;
 
-        public DepositBLL(DepositService depositService, ServerInfoService serverInfoService)
+        public DepositBLL(DepositService depositService, ServerInfoService serverInfoService, AdjustmentService adjustmentService)
         {
             this.depositService = depositService;
             this.serverInfoService = serverInfoService;
+            this.adjustmentService = adjustmentService;
         }
         public IEnumerable<DepositRequest> GetDepositRequestList(int? depositType, long startDate, long endDate, string DepositId, string UserName, int? currencyId, int? status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
@@ -97,10 +99,6 @@ namespace BackendSite.Service.BLL
             int.TryParse(m.Value, out depositId);
             var serverInfo = serverInfoService.GetModel();
             return depositService.GetDepositReceipt(depositId, serverInfo.SiteId);
-        }
-        public int PaymentAdjustment(DepositRequest depositRequest, out string transId)
-        {
-            return depositService.PaymentAdjustment(depositRequest, out transId);
         }
     }
 }

@@ -63,6 +63,15 @@ namespace BackendSite.Service.Model.enums
         Rejected = 7,
         Error = 99
     }
+    public enum AdjustStatus
+    {
+        Draft = 0,
+        Pending = 1,
+        Approved = 2,
+        Rejected = 3,
+        OnHold = 4,
+        Error = 99
+    }
 
     public enum AdminUserStatus
     {

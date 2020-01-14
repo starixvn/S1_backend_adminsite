@@ -1,0 +1,92 @@
+﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace BackendSite.Service.BLL
+{
+    public class TpBLL
+    {
+        private readonly CourierAdapter courierAdapter;
+        private readonly string apiUrl;
+        private readonly ThirdPartyService thirdPartyService;
+
+        public TpBLL(IConfiguration configuration, CourierAdapter courierAdapter, ThirdPartyService thirdPartyService)
+        {
+            this.courierAdapter = courierAdapter;
+            this.apiUrl = configuration.GetValue<string>("TpService");
+            this.thirdPartyService = thirdPartyService;
+        }
+
+        public async Task<IEnumerable<TpWallet>> GetTpWalletAsync(int custId)
+        {
+            var tpWalletList = thirdPartyService.GetTpWallet(custId);
+            foreach(var tpWallet in tpWalletList)
+            {
+                try
+                {
+                    var tpInfo = new TpInfo
+                    {
+                        TpId = tpWallet.TpId,
+                        CustId = custId,
+                    };
+                    var apiResult = await GetBalanceAsync(tpInfo);
+                    if (apiResult.ErrorCode == 0)
+                    {
+                        tpWallet.Balance = apiResult.Data.balance;
+                    }
+
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+            return tpWalletList;
+        }
+
+        public async Task<ApiResult<TransferResult>> TransferAsync(TpTransfer inTpTransfer)
+        {
+            decimal amount = inTpTransfer.Amount;
+            if (amount.ToString().IndexOf(".") > -1)
+            {
+                decimal.TryParse(amount.ToString("#.##"), out amount);
+            }
+
+            var tpTransfer = new TpTransfer
+            {
+                TpId = inTpTransfer.TpId,
+                CustId = inTpTransfer.CustId,
+                Amount = amount,
+                direction = inTpTransfer.direction,
+                inputs = null
+            };
+            var myUrl = $"{apiUrl}Transfer";
+            var data = await courierAdapter.MyPostAsync<TransferResult, TpTransfer>(myUrl, tpTransfer);
+
+            return data;
+        }
+        public async Task<ApiResult<UserBalance>> GetBalanceAsync(TpInfo inInfo)
+        {
+            Dictionary<string, string> input = new Dictionary<string, string>();
+            var myUrl = $"{apiUrl}GetBalance";
+            var oTpInfo = new TpInfo
+            {
+                TpId = inInfo.TpId,
+                CustId = inInfo.CustId,
+                inputs = input
+            };
+
+            var data = await courierAdapter.MyPostAsync<UserBalance, TpInfo>(myUrl, oTpInfo);
+
+            ApiResult<UserBalance> result = data;
+
+            return result;
+        }
+    }
+}
