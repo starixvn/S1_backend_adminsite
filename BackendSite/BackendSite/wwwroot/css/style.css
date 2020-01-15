@@ -318,11 +318,29 @@ blockquote p {
 /*# sourceMappingURL=metisMenu.css.map */
 @font-face {
   font-family: 'icomoon';
-  src: url("/css/fonts/icomoon.eot?raermh");
-  src: url("/css/fonts/icomoon.eot?raermh#iefix") format("embedded-opentype"), url("/css/fonts/icomoon.ttf?raermh") format("truetype"), url("/css/fonts/icomoon.woff?raermh") format("woff"), url("/css/fonts/icomoon.svg?raermh#icomoon") format("svg");
+  src: url("/css/fonts/icomoon.eot?aypdxm");
+  src: url("/css/fonts/icomoon.eot?aypdxm#iefix") format("embedded-opentype"), url("/css/fonts/icomoon.ttf?aypdxm") format("truetype"), url("/css/fonts/icomoon.woff?aypdxm") format("woff"), url("/css/fonts/icomoon.svg?aypdxm#icomoon") format("svg");
   font-weight: normal;
   font-style: normal;
   font-display: block; }
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: normal;
+  src: local("Poppins Medium"), url("/css/fonts/Poppins-Medium.woff") format("woff"); }
+
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 400;
+  src: local("Lato Regular"), url("/css/fonts/Lato-Regular.woff") format("woff"); }
+
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 600;
+  src: local("Lato Bold"), url("/css/fonts/Lato-Bold.woff") format("woff"); }
 
 [class^="icon-"], [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
@@ -336,6 +354,17 @@ blockquote p {
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
+
+.icon-group:before {
+  content: "\e911"; }
+
+.icon-password:before {
+  content: "\e90f";
+  color: #fff; }
+
+.icon-username:before {
+  content: "\e910";
+  color: #fff; }
 
 .icon-save:before {
   content: "\e90d"; }
@@ -381,6 +410,11 @@ blockquote p {
 
 .icon-account:before {
   content: "\e900"; }
+
+.btn-cancel {
+  background-color: #9FB0BC;
+  color: #fff;
+  border-color: #9FB0BC; }
 
 .sidebar-menu {
   position: fixed;
@@ -492,7 +526,7 @@ blockquote p {
 /*-------------------- END Sidebar Menu -------------------*/
 .page-title-area {
   padding: 0 30px;
-  background: #fff;
+  background: #0C83D9;
   position: relative;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.05), 0 1px 0 rgba(0, 0, 0, 0.05); }
 
@@ -511,7 +545,7 @@ blockquote p {
   display: block;
   width: 22px;
   height: 2px;
-  background: #b3aaaa;
+  background: #fff;
   margin: 4px 0;
   border-radius: 15px;
   -webkit-transition: all 0.3s ease 0s;
@@ -597,7 +631,8 @@ ul.breadcrumbs {
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
   padding: 17px 38px;
-  position: relative; }
+  position: relative;
+  color: #fff; }
   .user-profile img.avatar {
     height: 35px;
     width: 35px;
@@ -684,3 +719,9 @@ ul.breadcrumbs {
 .form-group .btn-primary {
   margin-right: 10px;
   color: red; }
+
+.modal-header {
+  border-bottom: 0; }
+
+.modal-footer {
+  border-top: 0; }

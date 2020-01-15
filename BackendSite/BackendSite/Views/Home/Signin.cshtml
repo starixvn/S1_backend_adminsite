@@ -17,24 +17,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
-    <link type="text/css" rel="stylesheet" href="~/css/admin-login.css">
+    <link type="text/css" rel="stylesheet" href="~/css/admin-login.css" asp-append-version="true">
 </head>
 
 <body>
     <form id="frmLogin" name="frmLogin">
+        <i class="icon-group"></i>
         <div class="login">
             <div class="login__item">
-                <span class="logo">
-                    <img src="~/images/logo.svg">
-                </span>
+                <span class="title">Admin Login</span>
             </div>
             <div class="login__item">
                 <div class="textfield">
+                    <i class="icon-username"></i>
                     <input class="textfield__input" type="text" id="txtID" name="txtID" placeholder="@selLangBLL.GetResourceValue("lbl_UserName")">
                 </div>
             </div>
             <div class="login__item">
                 <div class="textfield">
+                    <i class="icon-password"></i>
                     <input class="textfield__input" type="password" id="txtPW" name="txtPW" placeholder="@selLangBLL.GetResourceValue("lbl_Userpwd")">
                 </div>
             </div>
@@ -57,6 +58,6 @@
     </script>
     <script src="~/lib/axios.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/Home/Login.js"></script>
+    <script src="~/js/Home/Login.js" asp-append-version="true"></script>
 </body>
 </html>
