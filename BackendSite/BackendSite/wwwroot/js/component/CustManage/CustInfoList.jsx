@@ -28,7 +28,6 @@
 
         render() {
             let data = this.props.searchData&&this.props.searchData.data;
-            console.log(data)
             let custInfoRows = null;
             let TransId = this.props.TransId;
             if(data!=null){

@@ -18,13 +18,24 @@
 
         render() {
             let data = this.props.CustInfoData;
+            let tpWallet= null;
+            if(data!=null && data.tpWallet!=null) {
+                tpWallet = <ul className="wallet-wrap">{data.tpWallet.map(function(wallet) { 
+                    return <li key={wallet.tpId} className="wallet-item">
+                                <span>{wallet.tpName}</span>
+                                <span>{wallet.tpUserName}</span>
+                                <span className={wallet.balance <0 ? "negative-num":"positive-num"}>{number_format(wallet.balance)}</span>
+                            </li>;
+                }.bind(this))}</ul>;
+            }
+
             return (
                 data==null ? <div className="text-center">
                     <div className="spinner-border" role="status">
                         <span className="sr-only">Loading...</span>
                     </div>
                 </div> : <div>
-                    <table class="table table-detail">
+                    <table className="table table-detail">
                         <tbody>
                             <tr>
                                 <th scope="row">Site Name</th>
@@ -65,7 +76,7 @@
                             <tr>
                                 <th scope="row">First Deposit Time</th>
                                 <td>{moment(data.firstDepositTime).format('l LTS (Z)')}</td>
-                            </tr>                            
+                            </tr>             
                             <tr>
                                 <th scope="row">E-Mail</th>
                                 <td>{data.email}</td>
@@ -88,6 +99,7 @@
                             </tr>
                         </tbody>
                     </table>
+                    {tpWallet}
                 </div>
             )
         }
@@ -153,7 +165,7 @@
                                 <div className="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                                     <div className="user">
                                         <img className="avatar" src="/images/avatar.png" alt="User image" />
-                                        <span className="name">Luke Davids</span>
+                                        <span className="name">{getUrlParameter("UserName")}</span>
                                     </div>
                                     {tabBtn}
                                 </div>

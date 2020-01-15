@@ -466,14 +466,14 @@ import {Pagination} from '../commJS/Pagination.jsx';
                                     <span className="label">From Date</span>
                                     <div className="date">
                                         <input ref={this.selectdate_start} type="text" defaultValue={StartDate != null ? moment.unix(StartDate).format('l') : moment().add(-10, 'days').format('l')} size="8" />
-                                        <a className="icon-calendar"><img ref={this.f_trigger_Start} src="/css/Oneworks/images/icon-calendar.png" /></a>
+                                        <a className="icon-calendar" ref={this.f_trigger_Start}>{/*<img ref={this.f_trigger_Start} src="/css/Oneworks/images/icon-calendar.png" />*/}</a>
                                     </div>
                                 </div>
                                 <div className="input-item">
                                     <span className="label">To Date</span>
                                     <div className="date">
                                         <input ref={this.selectdate_end} type="text" defaultValue={EndDate != null ? moment.unix(EndDate).format('l') : moment().format('l')} size="8" />
-                                        <a className="icon-calendar"><img ref={this.f_trigger_End} src="/css/Oneworks/images/icon-calendar.png" /></a>
+                                        <a className="icon-calendar" ref={this.f_trigger_End}>{/*<img ref={this.f_trigger_End} src="/css/Oneworks/images/icon-calendar.png" />*/}</a>
                                     </div>
                                 </div>
                                 <div className="input-item">
