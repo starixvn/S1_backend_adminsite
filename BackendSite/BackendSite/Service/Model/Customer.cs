@@ -34,6 +34,8 @@ namespace BackendSite.Service.Model
         public string UserLang { get; set; }
         public int ActStatus { get; set; }
         public bool IsTest { get; set; }
+        public bool IsKyc { get; set; }
+        public bool IsRisk { get; set; }
         public int Status { get; set; }
         public DateTime LastLoginTime { get; set; }
         public DateTime RegTime { get; set; }

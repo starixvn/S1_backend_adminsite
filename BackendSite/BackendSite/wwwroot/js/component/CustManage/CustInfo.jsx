@@ -60,7 +60,16 @@
                             </tr>
                             <tr>
                                 <th scope="row">IsTest</th>
-                                <td>{data.isTest ? "True" : "False"}</td></tr>
+                                <td>{data.isTest ? "Yes" : "No"}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">IsKyc</th>
+                                <td>{data.isKyc ? "Yes" : "No"}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">IsRisk</th>
+                                <td>{data.isRisk ? "Yes" : "No"}</td>
+                            </tr>                                                        
                             <tr>
                                 <th scope="row">Status</th>
                                 <td>{CustStatusOp[data.status]}</td>
