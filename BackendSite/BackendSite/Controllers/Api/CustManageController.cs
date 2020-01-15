@@ -50,6 +50,22 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        public class CustStatusSwitch
+        {
+            public int CustId { get; set; }
+            public int Op { get; set; }
+        }
+
+        [HttpPost]
+        public ApiResult<bool> SetCustStatusSwitch(CustStatusSwitch custStatusSwitch)
+        {
+            var apiResult = new ApiResult<bool>();
+            apiResult.Data = custInfoBLL.SetCustStatusSwitch(custStatusSwitch.CustId, custStatusSwitch.Op) > 0;
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
+        }
+
         public class CustInfoReq
         {
             public int CustId { get; set; }

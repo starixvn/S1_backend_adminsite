@@ -16,6 +16,40 @@
             this.state = {};
         }
 
+        onKycChange(e) {
+            let data = this.props.CustInfoData;
+            axios.post('/api/CustManage/SetCustStatusSwitch', {CustId: data.custId, OP:1})
+            .then(function (response) {
+                //Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    this.props.onGetCustInfoDetail();
+                } else {
+                    alert(result.message);
+                }
+            }.bind(this)).catch(function (error) {
+                //Loading.UnLoading();
+                alert(error);
+            }.bind(this));       
+        }
+
+        onRiskChange(e) {
+            let data = this.props.CustInfoData;
+            axios.post('/api/CustManage/SetCustStatusSwitch', {CustId: data.custId, OP:2})
+            .then(function (response) {
+                //Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    this.props.onGetCustInfoDetail();
+                } else {
+                    alert(result.message);
+                }
+            }.bind(this)).catch(function (error) {
+                //Loading.UnLoading();
+                alert(error);
+            }.bind(this));            
+        }
+
         render() {
             let data = this.props.CustInfoData;
             let tpWallet= null;
@@ -34,80 +68,104 @@
                     <div className="spinner-border" role="status">
                         <span className="sr-only">Loading...</span>
                     </div>
-                </div> : <div>
-                    <table className="table table-detail">
-                        <tbody>
-                            <tr>
-                                <th scope="row">Site Name</th>
-                                <td>{data.siteName}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">User Name</th>
-                                <td>{data.userName}</td></tr>
-                            <tr>
-                                <th scope="row">Currency</th>
-                                <td>{i18n["lbl_Currency"+data.currencyId]}</td></tr>
-                            <tr>
-                                <th scope="row">Agent Name</th>
-                                <td>{data.agent}</td></tr>
-                            <tr>
-                                <th scope="row">Prefer Languages</th>
-                                <td>{data.userLang}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Act Status</th>
-                                <td>{CustActStatusOp[data.actStatus]}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">IsTest</th>
-                                <td>{data.isTest ? "Yes" : "No"}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">IsKyc</th>
-                                <td>{data.isKyc ? "Yes" : "No"}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">IsRisk</th>
-                                <td>{data.isRisk ? "Yes" : "No"}</td>
-                            </tr>                                                        
-                            <tr>
-                                <th scope="row">Status</th>
-                                <td>{CustStatusOp[data.status]}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Registration Time</th>
-                                <td>{moment(data.regTime).format('l LTS (Z)')}</td>
-                            </tr>                            
-                            <tr>
-                                <th scope="row">Last Login Time</th>
-                                <td>{moment(data.lastLoginTime).format('l LTS (Z)')}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">First Deposit Time</th>
-                                <td>{moment(data.firstDepositTime).format('l LTS (Z)')}</td>
-                            </tr>             
-                            <tr>
-                                <th scope="row">E-Mail</th>
-                                <td>{data.email}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Mail Wallet Amount</th>
-                                <td>{number_format(data.balance)}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Deposit Summary</th>
-                                <td>{number_format(data.depositSum)}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Withdrawl Summary</th>
-                                <td>{number_format(data.withdrawlSum)}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Effective Betting Summary</th>
-                                <td>{number_format(data.effectiveBetSum)}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                </div> : 
+                <div>
+                    <div className="flex-wrap">
+                        <table className="table table-detail">
+                            <tbody>
+                                <tr>
+                                    <th scope="row">Site Name</th>
+                                    <td>{data.siteName}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">User Name</th>
+                                    <td>{data.userName}</td></tr>
+                                <tr>
+                                    <th scope="row">Currency</th>
+                                    <td>{i18n["lbl_Currency"+data.currencyId]}</td></tr>
+                                <tr>
+                                    <th scope="row">Agent Name</th>
+                                    <td>{data.agent}</td></tr>
+                                <tr>
+                                    <th scope="row">Prefer Languages</th>
+                                    <td>{data.userLang}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Act Status</th>
+                                    <td>{CustActStatusOp[data.actStatus]}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">IsTest</th>
+                                    <td>
+                                        <span>{data.isTest ? "Yes" : "No"}</span>
+                                        {/*<div class="switch__container">
+                                            <input id="switch-isTest" className="switch switch--flat" type="checkbox"/>
+                                            <label htmlFor="switch-isTest"></label>
+                                        </div>*/}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">IsKyc</th>
+                                    <td>
+                                        {data.isKyc ? "Yes" : "No"}
+                                        <div class="switch__container">
+                                            <input id="switch-isKyc" className="switch switch--flat" checked={data.isKyc} type="checkbox" onChange={this.onKycChange.bind(this)}/>
+                                            <label htmlFor="switch-isKyc"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">IsRisk</th>
+                                    <td>{data.isRisk ? "Yes" : "No"}
+                                        <div class="switch__container">
+                                            <input id="switch-isRisk" className="switch switch--flat" checked={data.isRisk} type="checkbox" onChange={this.onRiskChange.bind(this)}/>
+                                            <label htmlFor="switch-isRisk"></label>
+                                        </div>
+                                    </td>
+                                </tr>                                                        
+                                <tr>
+                                    <th scope="row">Status</th>
+                                    <td>{CustStatusOp[data.status]}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Registration Time</th>
+                                    <td>{moment(data.regTime).format('l LTS (Z)')}</td>
+                                </tr>                            
+                                <tr>
+                                    <th scope="row">Last Login Time</th>
+                                    <td>{moment(data.lastLoginTime).format('l LTS (Z)')}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">First Deposit Time</th>
+                                    <td>{moment(data.firstDepositTime).format('l LTS (Z)')}</td>
+                                </tr>             
+                                <tr>
+                                    <th scope="row">E-Mail</th>
+                                    <td>{data.email}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Mail Wallet Amount</th>
+                                    <td>{number_format(data.balance)}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Deposit Summary</th>
+                                    <td>{number_format(data.depositSum)}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Withdrawl Summary</th>
+                                    <td>{number_format(data.withdrawlSum)}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Effective Betting Summary</th>
+                                    <td>{number_format(data.effectiveBetSum)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        {data.hasPhotoId ? <div className="id-image">
+                            <img src={"/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" />
+                        </div>:null}
+                    </div>
                     {tpWallet}
                 </div>
             )
@@ -154,7 +212,7 @@
             let dataContainer = null;
             let TabIdx = this.state.TabIdx;
             if(TabIdx == 0){
-                dataContainer = <CustInfo CustInfoData={this.state.CustInfoData}/>
+                dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)}/>
             } else {
 
             }

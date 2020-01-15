@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -14,36 +15,49 @@ namespace BackendSite.Service.BLL
         private readonly CourierAdapter courierAdapter;
         private readonly string apiUrl;
         private readonly ThirdPartyService thirdPartyService;
+        private readonly IMemoryCache cache;
 
-        public TpBLL(IConfiguration configuration, CourierAdapter courierAdapter, ThirdPartyService thirdPartyService)
+        public TpBLL(IMemoryCache cache, IConfiguration configuration, CourierAdapter courierAdapter, ThirdPartyService thirdPartyService)
         {
             this.courierAdapter = courierAdapter;
             this.apiUrl = configuration.GetValue<string>("TpService");
             this.thirdPartyService = thirdPartyService;
+            this.cache = cache;
         }
 
         public async Task<IEnumerable<TpWallet>> GetTpWalletAsync(int custId)
         {
-            var tpWalletList = thirdPartyService.GetTpWallet(custId);
-            foreach(var tpWallet in tpWalletList)
+            string sKey = $"TpWallet_{custId}";
+            var tpWalletList = cache.Get<IEnumerable<TpWallet>>(sKey);
+            if (tpWalletList == null)
             {
-                try
+                tpWalletList = thirdPartyService.GetTpWallet(custId);
+                foreach (var tpWallet in tpWalletList)
                 {
-                    var tpInfo = new TpInfo
+                    try
                     {
-                        TpId = tpWallet.TpId,
-                        CustId = custId,
-                    };
-                    var apiResult = await GetBalanceAsync(tpInfo);
-                    if (apiResult.ErrorCode == 0)
-                    {
-                        tpWallet.Balance = apiResult.Data.balance;
+                        var tpInfo = new TpInfo
+                        {
+                            TpId = tpWallet.TpId,
+                            CustId = custId,
+                        };
+                        var apiResult = await GetBalanceAsync(tpInfo);
+                        if (apiResult.ErrorCode == 0)
+                        {
+                            tpWallet.Balance = apiResult.Data.balance;
+                        }
+
                     }
+                    catch (Exception)
+                    {
 
+                    }
                 }
-                catch (Exception)
+                if (tpWalletList != null)
                 {
-
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(1));
+                    cache.Set(sKey, tpWalletList, cacheEntryOptions);
                 }
             }
 

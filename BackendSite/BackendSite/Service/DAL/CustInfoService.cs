@@ -53,5 +53,17 @@ namespace BackendSite.Service.DAL
             var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfoDetailSearch_Get", new { CustId = custId, UserName = userName }, commandType: CommandType.StoredProcedure);
             return result;
         }
+
+        public int SetCustStatusSwitch(int custId, int Op)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var result = conn.Execute("Admin_CustStatusSwitch_Set", new { CustId = custId, Op }, commandType: CommandType.StoredProcedure);
+            return result;
+        }
+        public CustPhotoId GetCustPhotoId(int CustId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.QueryFirstOrDefault<CustPhotoId>("Admin_CustPhotoId_Get", new { CustId = CustId }, commandType: CommandType.StoredProcedure);
+        }
     }
 }

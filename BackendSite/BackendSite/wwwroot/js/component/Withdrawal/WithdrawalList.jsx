@@ -41,7 +41,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                 <tr key={row.transId}>
                     <th scope="row"><a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a></th>
                     <td>{i18n["lbl_WithdrawalType" + row.withdrawalType]}</td>
-                    <td>{row.userName}</td>
+                    <td><a href={"/CustManage/CustInfo?UserName="+row.userName+"&custId="+ row.custId +"&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
                     <td>{i18n["lbl_Currency"+row.currencyId]}</td>
                     <td className="text-right">{number_format(row.amount)}</td>                    
                     <td>{row.accountNo}</td>
@@ -380,7 +380,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                             </tr>
                             <tr>
                                 <th scope="row">Username</th>
-                                <td>{data.userName}</td>
+                                <td><a href={"/CustManage/CustInfo?UserName="+data.userName+"&custId="+ data.custId +"&TransId=" + data.transId} target="_blank">{data.userName}</a></td>
                             </tr>
                             <tr>
                                 <th scope="row">E-mail</th>

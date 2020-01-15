@@ -45,7 +45,15 @@ namespace BackendSite.Service.Model
         public decimal DepositSum { get; set; }
         public decimal WithdrawlSum { get; set; }
         public decimal EffectiveBetSum { get; set; }
+        public bool HasPhotoId { get; set; }
         public DateTime FirstDepositTime { get; set; }
         public IEnumerable<TpWallet> tpWallet { get; set; }
-}
+    }
+
+    public class CustPhotoId
+    {
+        public int CustId { get; set; }
+        public string PicFileName { get; set; }
+        public byte[] PhotoIdPic { get; set; }
+    }
 }

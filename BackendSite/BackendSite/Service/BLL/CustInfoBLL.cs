@@ -76,5 +76,14 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetBalance(custId);
         }
+        public int SetCustStatusSwitch(int custId, int Op)
+        {
+            return custInfoService.SetCustStatusSwitch(custId, Op);
+        }
+
+        public CustPhotoId GetCustPhotoId(int custId)
+        {
+            return custInfoService.GetCustPhotoId(custId);
+        }
     }
 }
