@@ -50,6 +50,7 @@ namespace BackendSite
             services.AddSingleton<LocalBankService>();
             services.AddSingleton<AdjustmentService>();
             services.AddSingleton<ThirdPartyService>();
+			services.AddSingleton<MarketingService>();
 
             /*BLL*/
             services.AddSingleton<ServerInfoBLL>();
@@ -62,6 +63,7 @@ namespace BackendSite
             services.AddSingleton<MessageBLL>();
             services.AddSingleton<AuthorizeBLL>();
             services.AddSingleton<CustInfoBLL>();
+            services.AddSingleton<MarketingBLL>();			
             services.AddSingleton<PaymentBLL>();
             services.AddSingleton<TpBLL>();
 

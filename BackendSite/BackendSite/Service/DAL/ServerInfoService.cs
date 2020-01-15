@@ -23,6 +23,13 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.QueryFirstOrDefault<ServerInfo>("ServerInfo_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
+
+        public ServerInfo GetModelWithSiteId(int siteId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.QueryFirstOrDefault<ServerInfo>("ServerInfo_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+        }
+
         public IEnumerable<ServerInfo> GetSiteList()
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));

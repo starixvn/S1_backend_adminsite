@@ -22,6 +22,11 @@ namespace BackendSite.Service.BLL
             this.cache = cache;
         }
 
+        public ServerInfo GetServerInfoWithSiteId(int siteId)
+        {
+            serverInfo = serverInfoService.GetModelWithSiteId(siteId);
+            return serverInfo;
+        }
         public ServerInfo GetServerInfo()
         {
             if (serverInfo != null)
