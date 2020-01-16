@@ -1,7 +1,93 @@
-﻿.btn-cancel {
+﻿.btn {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  border: 1px solid transparent;
+  padding: 5px 20px;
+  font-size: 13px;
+  line-height: 1.5;
+  border-radius: 3px;
+  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out; }
+  .btn:hover {
+    color: #fff; }
+
+.btn-search, .btn-refresh, .btn-add {
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff; }
+  .btn-search:hover, .btn-refresh:hover, .btn-add:hover {
+    background-color: #0069d9; }
+
+.btn-refresh::before {
+  content: "";
+  display: inline-block;
+  margin-right: 7px;
+  background: url("/images/img-sprite.png") no-repeat -17px -1px;
+  width: 13px;
+  height: 13px;
+  vertical-align: middle; }
+
+.btn-back {
+  background-color: #6c757d;
+  color: #fff; }
+  .btn-back:hover {
+    background-color: #5a6268; }
+
+.btn-hold {
+  background-color: #ffc107; }
+  .btn-hold:hover {
+    background-color: #d39e00;
+    color: #212529; }
+
+.btn-draft {
+  background-color: #17a2b8;
+  color: #fff; }
+  .btn-draft:hover {
+    background-color: #117a8b; }
+
+.btn-verify {
+  background-color: #007bff;
+  color: #fff; }
+  .btn-verify:hover {
+    background-color: #0062cc; }
+
+.btn-process {
+  background-color: #17a2b8;
+  color: #fff; }
+  .btn-process:hover {
+    background-color: #117a8b; }
+
+.btn-approved {
+  background-color: #28a745;
+  color: #fff; }
+  .btn-approved:hover {
+    background-color: #1e7e34; }
+
+.btn-rejected {
+  background-color: #dc3545;
+  color: #fff; }
+  .btn-rejected:hover {
+    background-color: #c82333; }
+
+.btn-cancel {
   background-color: #9FB0BC;
   color: #fff;
   border-color: #9FB0BC; }
+
+.btn-delete {
+  background-color: #D70404;
+  color: #fff;
+  border-color: #D70404; }
+
+.btn.disabled, .btn:disabled {
+  background: #6c757d;
+  border-color: #6c757d; }
 
 .switch__container {
   float: right; }
@@ -79,7 +165,10 @@ body {
   max-width: 500px;
   margin-left: 20px; }
   .id-image img {
-    width: 100%; }
+    width: 100%;
+    margin-bottom: 10px; }
+  .id-image .btn-delete {
+    float: right; }
 
 .flex-wrap {
   display: flex; }

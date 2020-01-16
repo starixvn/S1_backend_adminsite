@@ -50,6 +50,25 @@
             }.bind(this));            
         }
 
+        onAskReupload() {
+            if(confirm('Are you sure?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/api/CustManage/DelCustPhotoId', {CustId: data.custId})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.props.onGetCustInfoDetail();
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));            
+            }
+        }        
+
         render() {
             let data = this.props.CustInfoData;
             let tpWallet= null;
@@ -176,6 +195,7 @@
                         
                         {data.hasPhotoId ? <div className="id-image">
                             <img src={"/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" />
+                            <button className="btn btn-delete" disabled={data.isKyc} onClick={!data.isKyc ? this.onAskReupload.bind(this) : null}>Ask Re-Upload</button>
                         </div>:null}
                     </div>
                     {tpWallet}

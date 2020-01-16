@@ -66,6 +66,15 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        public ApiResult<bool> DelCustPhotoId(CustInfoReq custInfoReq)
+        {
+            var apiResult = new ApiResult<bool>();
+            apiResult.Data = custInfoBLL.DelCustPhotoId(custInfoReq.CustId);
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
+        }
+
         public class CustInfoReq
         {
             public int CustId { get; set; }

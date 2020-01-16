@@ -85,5 +85,9 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.GetCustPhotoId(custId);
         }
+        public bool DelCustPhotoId(int custId)
+        {
+            return custInfoService.DelCustPhotoId(custId);
+        }
     }
 }
