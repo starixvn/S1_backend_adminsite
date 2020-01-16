@@ -53,11 +53,10 @@ namespace BackendSite.Service.BLL
 
                     }
                 }
+
                 if (tpWalletList != null)
                 {
-                    var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(1));
-                    cache.Set(sKey, tpWalletList, cacheEntryOptions);
+                    cache.Set(sKey, tpWalletList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(5)));
                 }
             }
 
