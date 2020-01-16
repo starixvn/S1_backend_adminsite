@@ -47,6 +47,10 @@ namespace BackendSite.Service.Model
         public decimal EffectiveBetSum { get; set; }
         public bool HasPhotoId { get; set; }
         public DateTime FirstDepositTime { get; set; }
+        public string AccountName { get; set; }
+        public string CountryCode { get; set; }
+        public string AreaCode { get; set; }
+        public string PhoneNo { get; set; }
         public IEnumerable<TpWallet> tpWallet { get; set; }
     }
 

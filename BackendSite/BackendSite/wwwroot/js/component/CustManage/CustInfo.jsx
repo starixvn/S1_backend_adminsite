@@ -91,6 +91,18 @@
                                     <td>{data.userLang}</td>
                                 </tr>
                                 <tr>
+                                    <th scope="row">Full Name</th>
+                                    <td>{data.accountName}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Country Code</th>
+                                    <td>{data.countryCode}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Phone Number</th>
+                                    <td>{"("+data.areaCode+") "+data.phoneNo}</td>
+                                </tr>                                               
+                                <tr>
                                     <th scope="row">Act Status</th>
                                     <td>{CustActStatusOp[data.actStatus]}</td>
                                 </tr>
