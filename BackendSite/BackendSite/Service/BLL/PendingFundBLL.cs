@@ -23,7 +23,7 @@ namespace BackendSite.Service.BLL
         private readonly string apiUrl;
         private readonly WalletService walletService;
 
-        public PendingFundBLL(CourierAdapter courierAdapter, IConfiguration configuration, Tools tools, PendingFundService pendingFundService,  ServerInfoService serverInfoService, WalletService walletService)
+        public PendingFundBLL(CourierAdapter courierAdapter, IConfiguration configuration, Tools tools, PendingFundService pendingFundService, ServerInfoService serverInfoService, WalletService walletService)
         {
             this.courierAdapter = courierAdapter;
             this.configuration = configuration;
@@ -39,10 +39,11 @@ namespace BackendSite.Service.BLL
             return pendingFundService.PendingFundList(serverInfo.SiteId);
         }
 
-        public async Task<bool> ProcessAsync(PendingFund pendingFund)
+        public async Task<ApiResult<TransferResult>> ProcessAsync(PendingFund pendingFund)
         {
             var serverInfo = serverInfoService.GetModel();
             pendingFund.Balance = walletService.GetBalance(pendingFund.CustId);
+            var apiResult = new ApiResult<TransferResult>();
 
             if (pendingFund.Balance > 0)
             {
@@ -55,12 +56,14 @@ namespace BackendSite.Service.BLL
                     inputs = new Dictionary<string, string>()
                 };
                 var myUrl = $"{apiUrl}Transfer";
-                var data = await courierAdapter.MyPostAsync<TransferResult, TpTransfer>(myUrl, tpTransfer);
-
-                return data.ErrorCode == 0;
+                apiResult = await courierAdapter.MyPostAsync<TransferResult, TpTransfer>(myUrl, tpTransfer);
             }
             else
-                return false;
+            {
+                apiResult.Message = "Balance less than 0";
+            }
+
+            return apiResult;
         }
     }
 }

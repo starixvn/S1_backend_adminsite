@@ -34,16 +34,14 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public async Task<ApiResult> ProcessAsync([FromBody]PendingFund pendingFund)
         {
-            bool result = await pendingFundBLL.ProcessAsync(pendingFund);
-            var apiResult = new ApiResult();
-            if (result)
+            var apiResult = await pendingFundBLL.ProcessAsync(pendingFund);
+
+            if (apiResult.ErrorCode == 0)
             {
-                apiResult.ErrorCode = 0;
                 apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
             }
             else
             {
-                apiResult.ErrorCode = 9;
                 apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
             }
             return apiResult;
