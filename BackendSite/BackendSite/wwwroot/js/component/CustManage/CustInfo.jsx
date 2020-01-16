@@ -1,15 +1,286 @@
 ﻿import {number_format, getUrlParameter} from '../commJS/common';
+import {Pagination} from '../commJS/Pagination.jsx';
 
 (function ($, React, ReactDOM, i18n, axios) {
     const CustStatusOp = {
         1:<span className="status status-active">Running</span>,
         2:<span className="status status-suspend">Suspend</span>,
         3:<span className="status status-closed">Closed</span>,
-    }   
+    }
+
     const CustActStatusOp = {
         1:<span className="status status-initial">Non-Deposit</span>,
         2:<span className="status status-active">Deposited</span>,
-    }           
+    }
+    
+    const DepositStatus = {
+        Pending:1,
+        Paid :2,
+        Approved:3,
+        Rejected:4,
+        Canceled:5,
+        Expired:6,
+        OnHold :7
+    };
+
+    const DepositStatusOp = {
+        1:<span className="status status-pending">{i18n["lbl_DepositStatus1"]}</span>,
+        2:<span className="status status-">Paid</span>,
+        3:<span className="status status-approved">{i18n["lbl_DepositStatus3"]}</span>,
+        4:<span className="status status-rejected">{i18n["lbl_DepositStatus4"]}</span>,
+        5:<span className="status status-cancelled">{i18n["lbl_DepositStatus5"]}</span>,
+        6:<span className="status status-">Expired</span>,
+        7:<span className="status status-hold">{i18n["lbl_DepositStatus7"]}</span>,
+    } 
+
+    class DepositList extends React.Component {
+        constructor(props) {
+            super(props);
+
+        }
+
+        onCheckDetail(id) {
+            this.props.onCheckDetail(id);
+        }
+
+        onRefresh() {
+            this.props.ChangePage(null);
+        }
+
+        render() {
+            let rows = this.props.searchData.data.map(row => 
+                <tr key={row.transId}>
+                    <th scope="row">{row.transId}</th>
+                    <td>{i18n["lbl_DepositType" + row.depositType]}</td>
+                    <td className="text-right">{number_format(row.amount)}</td>                    
+                    <td>{row.accountNo}</td>
+                    <td>{row.accountName}</td>
+                    <td>{moment(row.createTime).format('l LTS')}</td>
+                    <td>{DepositStatusOp[row.status]}</td>
+                    <td>{row.refId}</td>
+                    <td>{moment(row.depositTime).format('l LTS')}</td>
+                </tr>
+            );
+
+            return (
+                <div className="table">                    
+                    <div className="table-options">
+                        <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>                            
+                            Refresh
+                        </button>
+                    </div>
+                    <table className="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Trxn.ID</th>
+                                <th scope="col">Deposit Type</th>
+                                <th scope="col" className="text-right">Amount</th>
+                                <th scope="col">To Acc. NO.</th>
+                                <th scope="col">To Acc. Name</th>                                
+                                <th scope="col">CreateTime {moment().format('(Z)')}</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">RefId</th>
+                                <th scope="col">DepositTime {moment().format('(Z)')}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rows}
+                        </tbody>
+                    </table>
+                    <Pagination Data={{...this.props.searchData}} ChangePage={this.props.ChangePage}/>
+                </div>
+            )
+        }
+    }
+
+    class DepositInfo extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = {};
+
+            this.startDate = React.createRef();
+            this.endDate = React.createRef();
+        }
+
+        componentDidMount() {
+            $(this.startDate.current).datepicker({
+                format: 'mm/dd/yyyy', autoclose:true
+            }); 
+
+            $(this.endDate.current).datepicker({
+                format: 'mm/dd/yyyy', autoclose:true
+            });
+        }
+
+        onStartDate(){
+            $(this.startDate.current).focus();
+        }
+
+        onEndDate(){
+            $(this.endDate.current).focus();
+        }        
+
+        handleSubmit(event) {
+            event.preventDefault();
+            this.props.onChangeValue("DepositList", {StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix()-1});
+            this.props.GetDepositListByCust(1);
+        }
+
+        render() {
+            let depositInfo = this.props.DepositList;
+            let searchData = this.props.searchData;
+            return (
+                <div>
+                    <form className="filter" onSubmit={this.handleSubmit.bind(this)}>
+                        <div className="input-item">
+                            <span className="label">From Date</span>
+                            <div className="date">
+                                <input type="text" ref={this.startDate} name="StartDate" className="dateselect" required="required" data-date-end-date="0d" autoComplete="off" value={depositInfo&&depositInfo.StartDate ? moment.unix(depositInfo.StartDate).format("MM/DD/YYYY"):""} />
+                                <i className="icon-calendar dateselect" onClick={this.onStartDate.bind(this)} />
+                            </div>                            
+                        </div>     
+                        <div className="input-item date">
+                            <span className="label">To Date</span>
+                            <div className="date">
+                                <input type="text" ref={this.endDate} name="EndDate" required="required" data-date-end-date="0d" autoComplete="off" value={depositInfo&&depositInfo.EndDate ? moment.unix(depositInfo.EndDate).format("MM/DD/YYYY"):""}/>
+                                <i className="icon-calendar dateselect" onClick={this.onEndDate.bind(this)} />
+                            </div>                            
+                        </div>
+                        <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
+                    </form>
+                    {searchData!=null ? <DepositList searchData={searchData} ChangePage={this.props.GetDepositListByCust} /> : null}
+                </div>
+            )
+        }
+    }
+
+    class FinancialLogList extends React.Component {
+        constructor(props) {
+            super(props);
+
+        }
+
+        onCheckDetail(id) {
+            this.props.onCheckDetail(id);
+        }
+
+        onRefresh() {
+            this.props.ChangePage(null);
+        }
+
+        ChangePage(pageNumber) {
+            this.props.ChangePage(pageNumber);
+        }
+
+        render() {
+            let rows = this.props.searchData.data.map(row => 
+                <tr key={row.id}>
+                    <td>{moment(row.createTime).format('l LTS')}</td>
+                    <td>{row.typeName}</td>
+                    <td>{row.direction}</td>
+                    <td className="text-right">{number_format(row.changeAmount)}</td>
+                    <td className="text-right">{number_format(row.beforeAmount)}</td>                    
+                    <td className="text-right">{number_format(row.afterAmount)}</td>
+                    <td>{row.memo}</td>                    
+                    <td>{row.refTransId}</td>
+                </tr>
+            );
+
+            return (
+                <div className="table">                    
+                    <div className="table-options">
+                        <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>                            
+                            Refresh
+                        </button>
+                    </div>
+                    <table className="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Time {moment().format('(Z)')}</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">direction</th>
+                                <th scope="col" className="text-right">Change Amount</th>
+                                <th scope="col" className="text-right">Before Amount</th>
+                                <th scope="col" className="text-right">After Amount</th>
+                                <th scope="col">Memo</th>
+                                <th scope="col">Ref TransId</th>                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rows}
+                        </tbody>
+                    </table>
+                    <Pagination Data={{...this.props.searchData}} ChangePage={this.props.ChangePage}/>
+                </div>
+            )
+        }
+    }
+
+    class FinancialLog extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = {};
+
+            this.startDate = React.createRef();
+            this.endDate = React.createRef();
+        }
+
+        componentDidMount() {
+            $(this.startDate.current).datepicker({
+                format: 'mm/dd/yyyy', autoclose:true
+            }); 
+
+            $(this.endDate.current).datepicker({
+                format: 'mm/dd/yyyy', autoclose:true
+            });
+        }
+
+        onStartDate(){
+            $(this.startDate.current).focus();
+        }
+
+        onEndDate(){
+            $(this.endDate.current).focus();
+        }        
+
+        /*onChange(e) {
+            this.props.onChange(e, "FinancialLog");
+        }*/
+
+        handleSubmit(event) {
+            event.preventDefault();
+            this.props.onChangeValue("FinancialLog", {StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix()-1});
+            this.props.GetFinancialLog(1);
+        }
+
+        render() {
+            let financialLog = this.props.FinancialLog;
+            let searchData = this.props.searchData;
+            return (
+                <div>
+                    <form className="filter" onSubmit={this.handleSubmit.bind(this)}>
+                        <div className="input-item">
+                            <span className="label">From Date</span>
+                            <div className="date">
+                                <input type="text" ref={this.startDate} name="StartDate" className="dateselect" required="required" data-date-end-date="0d" autoComplete="off" value={financialLog&&financialLog.StartDate ? moment.unix(financialLog.StartDate).format("MM/DD/YYYY"):""} />
+                                <i className="icon-calendar dateselect" onClick={this.onStartDate.bind(this)} />
+                            </div>                            
+                        </div>     
+                        <div className="input-item date">
+                            <span className="label">To Date</span>
+                            <div className="date">
+                                <input type="text" ref={this.endDate} name="EndDate" required="required" data-date-end-date="0d" autoComplete="off" value={financialLog&&financialLog.EndDate ? moment.unix(financialLog.EndDate).format("MM/DD/YYYY"):""}/>
+                                <i className="icon-calendar dateselect" onClick={this.onEndDate.bind(this)} />
+                            </div>                            
+                        </div>
+                        <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
+                    </form>
+                    {searchData!=null ? <FinancialLogList searchData={searchData} ChangePage={this.props.GetFinancialLog} /> : null}
+                </div>
+            )
+        }
+    }
+
     class CustInfo extends React.Component {
         constructor(props) {
             super(props);
@@ -67,7 +338,7 @@
                     alert(error);
                 }.bind(this));            
             }
-        }        
+        }
 
         render() {
             let data = this.props.CustInfoData;
@@ -129,7 +400,7 @@
                                     <th scope="row">IsTest</th>
                                     <td>
                                         <span>{data.isTest ? "Yes" : "No"}</span>
-                                        {/*<div class="switch__container">
+                                        {/*<div className="switch__container">
                                             <input id="switch-isTest" className="switch switch--flat" type="checkbox"/>
                                             <label htmlFor="switch-isTest"></label>
                                         </div>*/}
@@ -139,7 +410,7 @@
                                     <th scope="row">IsKyc</th>
                                     <td>
                                         {data.isKyc ? "Yes" : "No"}
-                                        <div class="switch__container">
+                                        <div className="switch__container">
                                             <input id="switch-isKyc" className="switch switch--flat" checked={data.isKyc} type="checkbox" onChange={this.onKycChange.bind(this)}/>
                                             <label htmlFor="switch-isKyc"></label>
                                         </div>
@@ -148,7 +419,7 @@
                                 <tr>
                                     <th scope="row">IsRisk</th>
                                     <td>{data.isRisk ? "Yes" : "No"}
-                                        <div class="switch__container">
+                                        <div className="switch__container">
                                             <input id="switch-isRisk" className="switch switch--flat" checked={data.isRisk} type="checkbox" onChange={this.onRiskChange.bind(this)}/>
                                             <label htmlFor="switch-isRisk"></label>
                                         </div>
@@ -209,7 +480,7 @@
 
         constructor(props) {
             super(props);
-            this.state = { CustInfoData: null, TabIdx: 0 };
+            this.state = { CustInfoData: null, TabIdx: 0, FinancialLog:{}};
         }
 
         onTab(idx) {
@@ -219,6 +490,42 @@
         componentDidMount() {
             this.onGetCustInfoDetail();
         }
+
+        GetFinancialLog(PageNumber) {
+            let pageNumber = PageNumber||this.state.FinancialLogData.pageNumber;
+
+            axios.post('/api/Payment/GetFinancialLog', {...this.state.FinancialLog, CustId: this.state.CustInfoData.custId, PageNumber: pageNumber})
+            .then(function (response) {
+                //Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    this.setState({FinancialLogData: result});
+                } else {
+                    alert(result.message);
+                }
+            }.bind(this)).catch(function (error) {
+                //Loading.UnLoading();
+                alert(error);
+            }.bind(this));            
+        }
+
+        GetDepositListByCust(PageNumber) {
+            let pageNumber = PageNumber||this.state.DepositListData.pageNumber;
+
+            axios.post('/api/Deposit/GetDepositListByCust', {...this.state.DepositList, CustId: this.state.CustInfoData.custId, PageNumber: pageNumber})
+            .then(function (response) {
+                //Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    this.setState({DepositListData: result});
+                } else {
+                    alert(result.message);
+                }
+            }.bind(this)).catch(function (error) {
+                //Loading.UnLoading();
+                alert(error);
+            }.bind(this));            
+        }        
 
         onGetCustInfoDetail(){
             let CustId = getUrlParameter("custId");
@@ -240,13 +547,32 @@
             }
         }
 
+        onChange(e, TabName) {
+            let Obj = this.state[TabName];
+            Obj[event.target.name]=event.target.value;
+
+            let obj=this.state;
+            obj[TabName]=Obj;
+            this.setState(obj);
+        }
+
+        onChangeValue(TabName, Obj) {
+            let obj=this.state;
+            obj[TabName]=Obj;
+            this.setState(obj);
+        }        
+
         render() {
             let dataContainer = null;
             let TabIdx = this.state.TabIdx;
-            if(TabIdx == 0){
-                dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)}/>
-            } else {
 
+
+            if(TabIdx == 0){
+                dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)}/>;
+            } else if(TabIdx == 1){
+                dataContainer = <FinancialLog GetFinancialLog={this.GetFinancialLog.bind(this)} searchData={this.state.FinancialLogData} FinancialLog={this.state.FinancialLog} onChangeValue={this.onChangeValue.bind(this)}/>;
+            } else if(TabIdx == 2){
+                dataContainer = <DepositInfo  GetDepositListByCust={this.GetDepositListByCust.bind(this)} searchData={this.state.DepositListData} DepositList={this.state.DepositList} onChangeValue={this.onChangeValue.bind(this)} />;
             }
 
             var tabBtn = this._Tabs.map(function(item, index){

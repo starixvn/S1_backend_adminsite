@@ -5,6 +5,7 @@
 @inject SelLangBLL selLangBLL
 @section Style {
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Poppins&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.css">
     <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
     <link href="~/css/page/CusInfo.css" rel="stylesheet" asp-append-version="true" />
 }
@@ -19,10 +20,24 @@
         if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
+
+    for (int i = 0; i <= 7; i++)
+    {
+        if (!i18n.ContainsKey($"lbl_DepositStatus{i}"))
+            i18n.Add($"lbl_DepositStatus{i}", selLangBLL.GetResourceValue($"lbl_DepositStatus{i}"));
+    }
+    i18n.Add($"lbl_DepositStatus{99}", selLangBLL.GetResourceValue($"lbl_DepositStatus{99}"));
+
+    for (int i = 1; i <= 3; i++)
+    {
+        if (!i18n.ContainsKey($"lbl_DepositType{i}"))
+            i18n.Add($"lbl_DepositType{i}", selLangBLL.GetResourceValue($"lbl_DepositType{i}"));
+    }
 }
 @section Scripts {
     <script type="text/javascript">
         $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
     </script>
     <script src="~/js/component/CustManage/CustInfo.min.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
 }

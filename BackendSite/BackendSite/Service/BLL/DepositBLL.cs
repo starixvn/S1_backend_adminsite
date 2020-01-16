@@ -27,6 +27,11 @@ namespace BackendSite.Service.BLL
             var serverInfo = serverInfoService.GetModel();
             return depositService.GetDepositRequestList(depositType, startDate, endDate, serverInfo.SiteId, DepositId, UserName, currencyId, status, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
+
+        public IEnumerable<DepositRequest> GetDepositListByCust(int CustId,string TransId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        {
+            return depositService.GetDepositListByCust(CustId, TransId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+        }
         public DepositRequest GetDepositRequest(string transId)
         {
             var serverInfo = serverInfoService.GetModel();

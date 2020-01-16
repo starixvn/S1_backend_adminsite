@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Data;
+using BackendSite.Service.Model;
 
 namespace BackendSite.Service.DAL
 {
@@ -40,6 +41,21 @@ namespace BackendSite.Service.DAL
         public int SetBankOffDummy(int siteId, int sysId, string accountNo, int currencyId, decimal amount, MySqlConnection conn, MySqlTransaction trans)
         {
             return conn.Execute("BankOffDummy_Set", new { SiteId = siteId, SysId = sysId, AccountNo = accountNo, CurrencyId = currencyId, Amount = amount }, trans, commandType: CommandType.StoredProcedure);
+        }
+        public IEnumerable<FinancialLog> GetFinancialLog(int CustId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        {
+            var p = new DynamicParameters(new { CustId = CustId, StartDate = startDate, EndDate = endDate, PageSize = pageSize });
+            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var depositList = conn.Query<FinancialLog>("Admin_FinancialLogList_Get", p, commandType: CommandType.StoredProcedure);
+            pageNumber = p.Get<int?>("PageNumber") ?? 0;
+            totalPages = p.Get<int?>("TotalPages") ?? 0;
+            rowCount = p.Get<int?>("RowCount") ?? 0;
+            return depositList;
         }
     }
 }

@@ -58,6 +58,32 @@ namespace BackendSite.Controllers.Api
 
             return apiListResult;
         }
+
+        public class DepositListReq1
+        {
+            public int PageNumber { get; set; }
+            public int CustId { get; set; }
+            public string TransId { get; set; }
+            public long startDate { get; set; }
+            public long endDate { get; set; }
+        }
+
+        [HttpPost]
+        public ApiListResult<DepositRequest> GetDepositListByCust(DepositListReq1 depositListReq)
+        {
+            var apiListResult = new ApiListResult<DepositRequest>();
+            int pageNumber = depositListReq.PageNumber;
+            int totalPages = 0;
+            int rowCount = 0;
+            var depositRequestList = depositBLL.GetDepositListByCust(depositListReq.CustId, depositListReq.TransId, depositListReq.startDate, depositListReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
+            apiListResult.Data = depositRequestList;
+            apiListResult.ErrorCode = 0;
+            apiListResult.PageNumber = pageNumber;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.RowCount = rowCount;
+
+            return apiListResult;
+        }
         public class DepositReq
         {
             public string TransId { get; set; }
