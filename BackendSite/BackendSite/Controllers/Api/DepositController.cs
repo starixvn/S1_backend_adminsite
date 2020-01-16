@@ -105,9 +105,9 @@ namespace BackendSite.Controllers.Api
                 {
                     PendingFund pendingFund = new PendingFund();
                     pendingFund.CustId = depositConfirmReuslt;
-                    Task<bool> tmp = Process(pendingFund);
+                    Task<ApiResult<TransferResult>> tmp = Process(pendingFund);
 
-                    if (!tmp.Result)
+                    if (tmp.Result.ErrorCode != 0)
                     {
                         depositConfirmReuslt = -4;
                     }
@@ -171,10 +171,9 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        public async Task<bool> Process(PendingFund pendingFund)
+        public async Task<ApiResult<TransferResult>> Process(PendingFund pendingFund)
         {
-            bool result = await pendingFundBLL.ProcessAsync(pendingFund);
-            return result;
+            return await pendingFundBLL.ProcessAsync(pendingFund);
         }
     }
 }
