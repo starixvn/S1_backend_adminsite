@@ -120,11 +120,11 @@ import {number_format} from '../commJS/common';
                                 <label className="col-form-label d-block">Option</label>
                                 <div className="custom-control custom-radio custom-control-inline">
                                     <input type="radio" id="Debit" name="Option" className="custom-control-input" value={1} onChange={this.onChange.bind(this)}/>
-                                    <label className="custom-control-label" htmlFor="Debit">Debit</label>
+                                    <label className="custom-control-label" htmlFor="Debit">Credit</label>
                                 </div>
                                 <div className="custom-control custom-radio custom-control-inline">
                                     <input type="radio" id="Credit" name="Option" className="custom-control-input" value={2} onChange={this.onChange.bind(this)}/>
-                                    <label className="custom-control-label" htmlFor="Credit">Credit</label>
+                                    <label className="custom-control-label" htmlFor="Credit">Debit</label>
                                 </div>
                             </div>
                             <div className="form-group width-200">
