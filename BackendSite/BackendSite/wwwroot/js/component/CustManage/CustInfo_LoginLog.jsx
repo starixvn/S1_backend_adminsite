@@ -35,7 +35,7 @@ class LoginLogList extends React.Component {
                     <thead>
                         <tr>
                             <th scope="col">Login Time {moment().format('(Z)')}</th>                            
-                            <th scope="col">loginIp</th>
+                            <th scope="col">Login IP</th>
                             <th scope="col">From Url</th>
                             <th scope="col">User Agent</th>
                         </tr>
