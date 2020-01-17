@@ -82,7 +82,7 @@ namespace BackendSite
                 //option.AccessDeniedPath
                 option.LoginPath = "/Home/Signin";
                 option.Cookie.Name = ".backend";
-                option.ExpireTimeSpan = TimeSpan.FromMinutes(30);//沒給預設14天
+                option.ExpireTimeSpan = TimeSpan.FromDays(1);//沒給預設14天
             });
             services.AddDataProtection().DisableAutomaticKeyGeneration();
             services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("CookieKeys")).SetApplicationName("SharedCookieApp");
