@@ -497,6 +497,7 @@ import {Notes} from './CustInfo_Notes.jsx';
 
         GetFinancialLog(PageNumber) {
             let pageNumber = PageNumber||this.state.FinancialLogData.pageNumber;
+            let CustId = getUrlParameter("custId");
             if(!isNaN(CustId)) {       
                 let iCustId = parseInt(CustId); 
                 axios.post('/api/Payment/GetFinancialLog', {...this.state.FinancialLog, CustId: iCustId, PageNumber: pageNumber})
@@ -517,7 +518,7 @@ import {Notes} from './CustInfo_Notes.jsx';
 
         GetDepositListByCust(PageNumber) {
             let pageNumber = PageNumber||this.state.DepositListData.pageNumber;
-            let CustId = getUrlParameter("custId");                        
+            let CustId = getUrlParameter("custId");
             if(!isNaN(CustId)) {       
                 let iCustId = parseInt(CustId); 
                 axios.post('/api/Deposit/GetDepositListByCust', {...this.state.DepositList, CustId: iCustId, PageNumber: pageNumber})
