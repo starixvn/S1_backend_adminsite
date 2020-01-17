@@ -120,5 +120,9 @@ namespace BackendSite.Service.BLL
 
             return withdrawalService.SetWithdrawalInfo(transId, serverInfo.SiteId, comment, Operator, forStatus, WithdrawalStatus.Draft, null, (int?)null, out custId, out amount);
         }
+        public IEnumerable<WithdrawalRequest> GetWithdrawalListByCust(int CustId, string TransId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        {
+            return withdrawalService.GetWithdrawalListByCust(CustId, TransId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+        }
     }
 }

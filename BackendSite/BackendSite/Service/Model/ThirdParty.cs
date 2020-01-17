@@ -28,6 +28,17 @@ namespace BackendSite.Service.Model
         public TpDirection direction { set; get; }
         public Dictionary<string, string> inputs { set; get; }
     }
+    public class TpTransferInfo
+    {
+        public DateTime CreateTime { get; set; }
+        public string TpName { get; set; }
+        public string TransId { get; set; }
+        public int Direction { get; set; }
+        public decimal Amount { get; set; }
+        public string ThirdId { get; set; }
+        public string Memo { get; set; }
+        public int Status { get; set; }
+    }
     public enum TpDirection
     {
         ToTp = 1,

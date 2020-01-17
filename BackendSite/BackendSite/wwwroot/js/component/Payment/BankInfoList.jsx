@@ -75,9 +75,9 @@ import {number_format} from '../commJS/common';
                             <button className="btn btn-save" onClick={this.onSaveBankCard.bind(this)}>
                                 <i className="icon-save" />
                             </button>
-                            <button className="btn btn-cancel" onClick={this.onCancel.bind(this, row.bankId)}>
+                            <button className="btn btn-icon-cancel" onClick={this.onCancel.bind(this, row.bankId)}>
                                 <i className="icon-cancel" />
-                                </button>
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -120,9 +120,9 @@ import {number_format} from '../commJS/common';
                             <button className="btn btn-edit" onClick={this.onEdit.bind(this, row.bankId)}>
                                 <i className="icon-edit" />
                             </button>
-                            <button className="btn btn-delete" onClick={this.onDelete.bind(this, row.bankId)}>
+                            <button className="btn btn-icon-delete" onClick={this.onDelete.bind(this, row.bankId)}>
                                 <i className="icon-delete" />
-                                </button>
+                            </button>
                         </div>
                     </td>
                 </tr>

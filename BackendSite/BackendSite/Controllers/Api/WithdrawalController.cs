@@ -300,5 +300,31 @@ namespace BackendSite.Controllers.Api
                 return t.ToString().GetHashCode();
             }
         }
+
+        public class WithdrawalReq4
+        {
+            public int PageNumber { get; set; }
+            public int CustId { get; set; }
+            public string TransId { get; set; }
+            public long startDate { get; set; }
+            public long endDate { get; set; }
+        }
+
+        [HttpPost]
+        public ApiListResult<WithdrawalRequest> GetWithdrawalListByCust(WithdrawalReq4 withdrawalReq)
+        {
+            var apiListResult = new ApiListResult<WithdrawalRequest>();
+            int pageNumber = withdrawalReq.PageNumber;
+            int totalPages = 0;
+            int rowCount = 0;
+            var withdrawalList = withdrawalBLL.GetWithdrawalListByCust(withdrawalReq.CustId, withdrawalReq.TransId, withdrawalReq.startDate, withdrawalReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
+            apiListResult.Data = withdrawalList;
+            apiListResult.ErrorCode = 0;
+            apiListResult.PageNumber = pageNumber;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.RowCount = rowCount;
+
+            return apiListResult;
+        }
     }
 }

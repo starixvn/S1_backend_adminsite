@@ -33,6 +33,19 @@
         if (!i18n.ContainsKey($"lbl_DepositType{i}"))
             i18n.Add($"lbl_DepositType{i}", selLangBLL.GetResourceValue($"lbl_DepositType{i}"));
     }
+
+    for (int i = 0; i <= 7; i++)
+    {
+        if (!i18n.ContainsKey($"lbl_WithdrawalStatus{i}"))
+            i18n.Add($"lbl_WithdrawalStatus{i}", selLangBLL.GetResourceValue($"lbl_WithdrawalStatus{i}"));
+    }
+    i18n.Add($"lbl_WithdrawalStatus{99}", selLangBLL.GetResourceValue($"lbl_WithdrawalStatus{99}"));
+
+    for (int i = 0; i <= 2; i++)
+    {
+        if (!i18n.ContainsKey($"lbl_WithdrawalType{i}"))
+            i18n.Add($"lbl_WithdrawalType{i}", selLangBLL.GetResourceValue($"lbl_WithdrawalType{i}"));
+    }
 }
 @section Scripts {
     <script type="text/javascript">

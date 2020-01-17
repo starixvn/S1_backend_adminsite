@@ -24,7 +24,10 @@ namespace BackendSite.Service.BLL
             this.thirdPartyService = thirdPartyService;
             this.cache = cache;
         }
-
+        public IEnumerable<TpTransferInfo> GetTpTransferInfoByCust(int CustId, string TransId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        {
+            return thirdPartyService.GetTpTransferInfoByCust(CustId, TransId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+        }
         public async Task<IEnumerable<TpWallet>> GetTpWalletAsync(int custId)
         {
             string sKey = $"TpWallet_{custId}";

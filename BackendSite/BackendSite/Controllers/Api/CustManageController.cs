@@ -112,5 +112,30 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
+        public class LoginLogReq
+        {
+            public int PageNumber { get; set; }
+            public int CustId { get; set; }
+            public long startDate { get; set; }
+            public long endDate { get; set; }
+        }
+
+        [HttpPost]
+        public ApiListResult<LoginLog> GetLoginLogByCust(LoginLogReq loginLogReq)
+        {
+            var apiListResult = new ApiListResult<LoginLog>();
+            int pageNumber = loginLogReq.PageNumber;
+            int totalPages = 0;
+            int rowCount = 0;
+            var withdrawalList = custInfoBLL.GetLoginLogByCust(loginLogReq.CustId, loginLogReq.startDate, loginLogReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
+            apiListResult.Data = withdrawalList;
+            apiListResult.ErrorCode = 0;
+            apiListResult.PageNumber = pageNumber;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.RowCount = rowCount;
+
+            return apiListResult;
+        }
     }
 }

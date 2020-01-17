@@ -60,4 +60,13 @@ namespace BackendSite.Service.Model
         public string PicFileName { get; set; }
         public byte[] PhotoIdPic { get; set; }
     }
+
+    public class LoginLog
+    {
+        public int Id { get; set; }
+        public DateTime LoginTime { get; set; }
+        public string LoginIp { get; set; }
+        public string FromUrl { get; set; }
+        public string UserAgent { get; set; }
+    }
 }

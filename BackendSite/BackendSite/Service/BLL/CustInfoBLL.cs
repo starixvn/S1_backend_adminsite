@@ -89,5 +89,9 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.DelCustPhotoId(custId);
         }
+        public IEnumerable<LoginLog> GetLoginLogByCust(int CustId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        {
+            return custInfoService.GetLoginLogByCust(CustId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+        }
     }
 }

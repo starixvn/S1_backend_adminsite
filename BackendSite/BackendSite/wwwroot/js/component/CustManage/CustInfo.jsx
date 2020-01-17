@@ -1,5 +1,8 @@
 ﻿import {number_format, getUrlParameter} from '../commJS/common';
 import {Pagination} from '../commJS/Pagination.jsx';
+import {TpTransferInfo} from './CustInfo_TpTransferInfo.jsx';
+import {WithdrawalInfo} from './CustInfo_WithdrawalInfo.jsx';
+import {LoginLog } from './CustInfo_LoginLog.jsx';
 
 (function ($, React, ReactDOM, i18n, axios) {
     const CustStatusOp = {
@@ -50,12 +53,12 @@ import {Pagination} from '../commJS/Pagination.jsx';
         render() {
             let rows = this.props.searchData.data.map(row => 
                 <tr key={row.transId}>
+                    <td>{moment(row.createTime).format('l LTS')}</td>                
                     <th scope="row">{row.transId}</th>
                     <td>{i18n["lbl_DepositType" + row.depositType]}</td>
                     <td className="text-right">{number_format(row.amount)}</td>                    
                     <td>{row.accountNo}</td>
                     <td>{row.accountName}</td>
-                    <td>{moment(row.createTime).format('l LTS')}</td>
                     <td>{DepositStatusOp[row.status]}</td>
                     <td>{row.refId}</td>
                     <td>{moment(row.depositTime).format('l LTS')}</td>
@@ -72,12 +75,12 @@ import {Pagination} from '../commJS/Pagination.jsx';
                     <table className="table table-striped">
                         <thead>
                             <tr>
+                                <th scope="col">CreateTime {moment().format('(Z)')}</th>                            
                                 <th scope="col">Trxn.ID</th>
                                 <th scope="col">Deposit Type</th>
                                 <th scope="col" className="text-right">Amount</th>
                                 <th scope="col">To Acc. NO.</th>
                                 <th scope="col">To Acc. Name</th>                                
-                                <th scope="col">CreateTime {moment().format('(Z)')}</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">RefId</th>
                                 <th scope="col">DepositTime {moment().format('(Z)')}</th>
@@ -525,6 +528,60 @@ import {Pagination} from '../commJS/Pagination.jsx';
                 //Loading.UnLoading();
                 alert(error);
             }.bind(this));            
+        }
+
+        GetWithdrawalListByCust(PageNumber) {
+            let pageNumber = PageNumber||this.state.WithdrawalListData.pageNumber;
+
+            axios.post('/api/Withdrawal/GetWithdrawalListByCust', {...this.state.WithdrawalInfo, CustId: this.state.CustInfoData.custId, PageNumber: pageNumber})
+            .then(function (response) {
+                //Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    this.setState({WithdrawalListData: result});
+                } else {
+                    alert(result.message);
+                }
+            }.bind(this)).catch(function (error) {
+                //Loading.UnLoading();
+                alert(error);
+            }.bind(this));            
+        }                 
+
+        GetTpTransferInfoByCust(PageNumber) {
+            let pageNumber = PageNumber||this.state.TpTransferInfoData.pageNumber;
+
+            axios.post('/api/Tp/GetTpTransferInfoByCust', {...this.state.TpTransferInfo, CustId: this.state.CustInfoData.custId, PageNumber: pageNumber})
+            .then(function (response) {
+                //Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    this.setState({TpTransferInfoData: result});
+                } else {
+                    alert(result.message);
+                }
+            }.bind(this)).catch(function (error) {
+                //Loading.UnLoading();
+                alert(error);
+            }.bind(this));            
+        }
+
+        GetLoginLogByCust(PageNumber) {
+            let pageNumber = PageNumber||this.state.LoginLogData.pageNumber;
+
+            axios.post('/api/CustManage/GetLoginLogByCust', {...this.state.LoginLog, CustId: this.state.CustInfoData.custId, PageNumber: pageNumber})
+            .then(function (response) {
+                //Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    this.setState({LoginLogData: result});
+                } else {
+                    alert(result.message);
+                }
+            }.bind(this)).catch(function (error) {
+                //Loading.UnLoading();
+                alert(error);
+            }.bind(this));            
         }        
 
         onGetCustInfoDetail(){
@@ -546,6 +603,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                 }.bind(this));
             }
         }
+        
 
         onChange(e, TabName) {
             let Obj = this.state[TabName];
@@ -573,6 +631,12 @@ import {Pagination} from '../commJS/Pagination.jsx';
                 dataContainer = <FinancialLog GetFinancialLog={this.GetFinancialLog.bind(this)} searchData={this.state.FinancialLogData} FinancialLog={this.state.FinancialLog} onChangeValue={this.onChangeValue.bind(this)}/>;
             } else if(TabIdx == 2){
                 dataContainer = <DepositInfo  GetDepositListByCust={this.GetDepositListByCust.bind(this)} searchData={this.state.DepositListData} DepositList={this.state.DepositList} onChangeValue={this.onChangeValue.bind(this)} />;
+            } else if(TabIdx == 3){
+                dataContainer = <TpTransferInfo GetTpTransferInfoByCust={this.GetTpTransferInfoByCust.bind(this)} searchData={this.state.TpTransferInfoData} TpTransferInfo={this.state.TpTransferInfo} onChangeValue={this.onChangeValue.bind(this)} />;
+            } else if(TabIdx == 4){
+                dataContainer = <WithdrawalInfo GetWithdrawalListByCust={this.GetWithdrawalListByCust.bind(this)} searchData={this.state.WithdrawalListData} WithdrawalInfo={this.state.WithdrawalInfo} onChangeValue={this.onChangeValue.bind(this)} />;
+            } else if(TabIdx == 5){
+                dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
             }
 
             var tabBtn = this._Tabs.map(function(item, index){
