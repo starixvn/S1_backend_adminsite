@@ -69,4 +69,13 @@ namespace BackendSite.Service.Model
         public string FromUrl { get; set; }
         public string UserAgent { get; set; }
     }
+
+    public class CustNote
+    {
+        public int Id { get; set; }
+        public int CustId { get; set; }
+        public string Note { get; set; }
+        public DateTime CreateTime { get; set; }
+        public string Operator { get; set; }
+    }
 }

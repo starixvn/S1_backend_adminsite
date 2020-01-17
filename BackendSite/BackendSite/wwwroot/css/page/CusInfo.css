@@ -225,3 +225,104 @@ body {
 
 .table-detail tr th {
   width: 200px; }
+
+.edit-note {
+  display: none; }
+
+.wrapper-note {
+  width: 600px; }
+  .wrapper-note .form-add {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; }
+  .wrapper-note p {
+    margin-bottom: 0; }
+
+.add-note-field {
+  width: calc(100% - 80px);
+  height: 31px;
+  border: 1px solid #e1e1e1;
+  border-radius: 2px;
+  padding-left: 5px; }
+
+.note-list ul {
+  margin: 0;
+  padding: 0;
+  list-style: none; }
+  .note-list ul li {
+    display: flex;
+    border-bottom: 1px solid #e1e1e1;
+    position: relative;
+    align-items: center;
+    padding: 10px 0; }
+  .note-list ul .author {
+    box-sizing: border-box;
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+    flex-basis: 180px;
+    max-width: 180px; }
+  .note-list ul #fonts-wrapper {
+    box-sizing: border-box;
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+    flex-basis: 70px;
+    max-width: 70px; }
+  .note-list ul .content {
+    box-sizing: border-box;
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+    -webkit-box-flex: 1;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+    -ms-flex-preferred-size: 0;
+    flex-basis: 0;
+    max-width: 100%; }
+  .note-list ul .content-edit {
+    position: absolute;
+    left: 0;
+    width: 416px;
+    height: 31px;
+    border: 1px solid #e1e1e1;
+    border-radius: 2px;
+    padding-left: 5px; }
+
+.note-list .fa-edit, .note-list .fa-trash {
+  padding: 0;
+  width: 25px;
+  height: 25px;
+  border: 1px solid;
+  margin: 0 5px;
+  transition: .2s ease;
+  font-size: 13px;
+  border-radius: 3px;
+  line-height: 25px;
+  text-align: center;
+  cursor: pointer; }
+
+.note-list .fa-edit {
+  color: #007bff;
+  border-color: #007bff; }
+
+.note-list .fa-trash {
+  padding: 0;
+  width: 25px;
+  height: 25px;
+  border: 1px solid;
+  margin: 0 5px;
+  transition: .2s ease;
+  color: #dc3545;
+  border-color: #dc3545; }
+
+.note-list .author {
+  display: flex;
+  justify-content: space-between; }
+  .note-list .author .user {
+    color: #007bff;
+    font-weight: bold;
+    padding-left: 10px; }
+  .note-list .author .date {
+    color: #888;
+    font-style: italic; }

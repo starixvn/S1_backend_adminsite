@@ -3,6 +3,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
 import {TpTransferInfo} from './CustInfo_TpTransferInfo.jsx';
 import {WithdrawalInfo} from './CustInfo_WithdrawalInfo.jsx';
 import {LoginLog } from './CustInfo_LoginLog.jsx';
+import {Notes} from './CustInfo_Notes.jsx';
 
 (function ($, React, ReactDOM, i18n, axios) {
     const CustStatusOp = {
@@ -479,11 +480,11 @@ import {LoginLog } from './CustInfo_LoginLog.jsx';
     }
     
     class CustInfoPanel extends React.Component {
-        _Tabs=["Customer Info","Financial Log","Deposit Info","Transfer Info","Withdrawal Info","Login Log", "Note"];
+        _Tabs=["Customer Info","Financial Log","Deposit Info","Transfer Info","Withdrawal Info","Login Log", "Notes"];
 
         constructor(props) {
             super(props);
-            this.state = { CustInfoData: null, TabIdx: 0, FinancialLog:{}};
+            this.state = { CustInfoData: null, TabIdx: 0, FinancialLog:{}, Notes:null};
         }
 
         onTab(idx) {
@@ -496,92 +497,146 @@ import {LoginLog } from './CustInfo_LoginLog.jsx';
 
         GetFinancialLog(PageNumber) {
             let pageNumber = PageNumber||this.state.FinancialLogData.pageNumber;
-
-            axios.post('/api/Payment/GetFinancialLog', {...this.state.FinancialLog, CustId: this.state.CustInfoData.custId, PageNumber: pageNumber})
-            .then(function (response) {
-                //Loading.UnLoading();
-                let result = response.data;
-                if (result.errorCode == 0) {
-                    this.setState({FinancialLogData: result});
-                } else {
-                    alert(result.message);
-                }
-            }.bind(this)).catch(function (error) {
-                //Loading.UnLoading();
-                alert(error);
-            }.bind(this));            
+            if(!isNaN(CustId)) {       
+                let iCustId = parseInt(CustId); 
+                axios.post('/api/Payment/GetFinancialLog', {...this.state.FinancialLog, CustId: iCustId, PageNumber: pageNumber})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.setState({FinancialLogData: result});
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+            }     
         }
 
         GetDepositListByCust(PageNumber) {
             let pageNumber = PageNumber||this.state.DepositListData.pageNumber;
-
-            axios.post('/api/Deposit/GetDepositListByCust', {...this.state.DepositList, CustId: this.state.CustInfoData.custId, PageNumber: pageNumber})
-            .then(function (response) {
-                //Loading.UnLoading();
-                let result = response.data;
-                if (result.errorCode == 0) {
-                    this.setState({DepositListData: result});
-                } else {
-                    alert(result.message);
-                }
-            }.bind(this)).catch(function (error) {
-                //Loading.UnLoading();
-                alert(error);
-            }.bind(this));            
+            let CustId = getUrlParameter("custId");                        
+            if(!isNaN(CustId)) {       
+                let iCustId = parseInt(CustId); 
+                axios.post('/api/Deposit/GetDepositListByCust', {...this.state.DepositList, CustId: iCustId, PageNumber: pageNumber})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.setState({DepositListData: result});
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+            }
         }
 
         GetWithdrawalListByCust(PageNumber) {
             let pageNumber = PageNumber||this.state.WithdrawalListData.pageNumber;
-
-            axios.post('/api/Withdrawal/GetWithdrawalListByCust', {...this.state.WithdrawalInfo, CustId: this.state.CustInfoData.custId, PageNumber: pageNumber})
-            .then(function (response) {
-                //Loading.UnLoading();
-                let result = response.data;
-                if (result.errorCode == 0) {
-                    this.setState({WithdrawalListData: result});
-                } else {
-                    alert(result.message);
-                }
-            }.bind(this)).catch(function (error) {
-                //Loading.UnLoading();
-                alert(error);
-            }.bind(this));            
+            let CustId = getUrlParameter("custId");                        
+            if(!isNaN(CustId)) {       
+                let iCustId = parseInt(CustId); 
+                axios.post('/api/Withdrawal/GetWithdrawalListByCust', {...this.state.WithdrawalInfo, CustId: iCustId, PageNumber: pageNumber})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.setState({WithdrawalListData: result});
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+            }
         }                 
 
         GetTpTransferInfoByCust(PageNumber) {
             let pageNumber = PageNumber||this.state.TpTransferInfoData.pageNumber;
-
-            axios.post('/api/Tp/GetTpTransferInfoByCust', {...this.state.TpTransferInfo, CustId: this.state.CustInfoData.custId, PageNumber: pageNumber})
-            .then(function (response) {
-                //Loading.UnLoading();
-                let result = response.data;
-                if (result.errorCode == 0) {
-                    this.setState({TpTransferInfoData: result});
-                } else {
-                    alert(result.message);
-                }
-            }.bind(this)).catch(function (error) {
-                //Loading.UnLoading();
-                alert(error);
-            }.bind(this));            
+            let CustId = getUrlParameter("custId");                        
+            if(!isNaN(CustId)) {       
+                let iCustId = parseInt(CustId); 
+                axios.post('/api/Tp/GetTpTransferInfoByCust', {...this.state.TpTransferInfo, CustId: iCustId, PageNumber: pageNumber})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.setState({TpTransferInfoData: result});
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+            }        
         }
 
         GetLoginLogByCust(PageNumber) {
             let pageNumber = PageNumber||this.state.LoginLogData.pageNumber;
+            let CustId = getUrlParameter("custId");                        
+            if(!isNaN(CustId)) {       
+                let iCustId = parseInt(CustId); 
+                axios.post('/api/CustManage/GetLoginLogByCust', {...this.state.LoginLog, CustId: iCustId, PageNumber: pageNumber})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.setState({LoginLogData: result});
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+            }
+        }
 
-            axios.post('/api/CustManage/GetLoginLogByCust', {...this.state.LoginLog, CustId: this.state.CustInfoData.custId, PageNumber: pageNumber})
-            .then(function (response) {
-                //Loading.UnLoading();
-                let result = response.data;
-                if (result.errorCode == 0) {
-                    this.setState({LoginLogData: result});
-                } else {
-                    alert(result.message);
-                }
-            }.bind(this)).catch(function (error) {
-                //Loading.UnLoading();
-                alert(error);
-            }.bind(this));            
+        AddCustNote(note) {
+            let CustId = getUrlParameter("custId");                        
+            if(!isNaN(CustId)) {            
+                let iCustId = parseInt(CustId);            
+                axios.post('/api/CustManage/AddCustNote', {CustId: iCustId, Note: note})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.GetCustNotes();
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+            }
+        }
+
+        GetCustNotes() {
+            let CustId = getUrlParameter("custId");            
+            if(!isNaN(CustId)) {            
+                let iCustId = parseInt(CustId);
+                axios.post('/api/CustManage/GetCustNotes', {CustId: iCustId})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.setState({Notes: result.data});
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));            
+            }
         }        
 
         onGetCustInfoDetail(){
@@ -624,7 +679,6 @@ import {LoginLog } from './CustInfo_LoginLog.jsx';
             let dataContainer = null;
             let TabIdx = this.state.TabIdx;
 
-
             if(TabIdx == 0){
                 dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)}/>;
             } else if(TabIdx == 1){
@@ -637,6 +691,8 @@ import {LoginLog } from './CustInfo_LoginLog.jsx';
                 dataContainer = <WithdrawalInfo GetWithdrawalListByCust={this.GetWithdrawalListByCust.bind(this)} searchData={this.state.WithdrawalListData} WithdrawalInfo={this.state.WithdrawalInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if(TabIdx == 5){
                 dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
+            } else if(TabIdx == 6) {
+                dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)}/>;
             }
 
             var tabBtn = this._Tabs.map(function(item, index){

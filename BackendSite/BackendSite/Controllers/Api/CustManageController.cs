@@ -41,7 +41,7 @@ namespace BackendSite.Controllers.Api
             int totalPages = 0, rowCount = 0;
             int pageNumber = custInfoListReq.PageNumber;
 
-            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.UserName, custInfoListReq.TransId, custInfoListReq.PageSize, ref pageNumber, out totalPages,out rowCount);
+            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.UserName, custInfoListReq.TransId, custInfoListReq.PageSize, ref pageNumber, out totalPages, out rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;
@@ -70,6 +70,29 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<bool>();
             apiResult.Data = custInfoBLL.DelCustPhotoId(custInfoReq.CustId);
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
+        }
+
+        public class AddCustNoteReq
+        {
+            public int CustId { get; set; }
+            public string Note { get; set; }
+        }
+
+        public ApiResult<bool> AddCustNote(AddCustNoteReq addCustNoteReq)
+        {
+            var apiResult = new ApiResult<bool>();
+            apiResult.Data = custInfoBLL.AddCustNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name);
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
+        }
+        public ApiResult<IEnumerable<CustNote>> GetCustNotes(AddCustNoteReq addCustNoteReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<CustNote>>();
+            apiResult.Data = custInfoBLL.GetCustNotes(addCustNoteReq.CustId);
             apiResult.ErrorCode = 0;
 
             return apiResult;

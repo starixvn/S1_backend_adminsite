@@ -89,6 +89,14 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.DelCustPhotoId(custId);
         }
+        public bool AddCustNote(int custId, string Note, string Operator)
+        {
+            return custInfoService.AddCustNote(custId, Note, Operator);
+        }
+        public IEnumerable<CustNote> GetCustNotes(int custId)
+        {
+            return custInfoService.GetCustNotes(custId);
+        }
         public IEnumerable<LoginLog> GetLoginLogByCust(int CustId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             return custInfoService.GetLoginLogByCust(CustId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);

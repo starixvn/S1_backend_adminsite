@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\css\fonts\fonts\icomoon.svg" />
     <None Include="wwwroot\css\fonts\icomoon.svg" />
     <None Include="wwwroot\css\main.css.map" />
     <None Include="wwwroot\js\site.js" />
