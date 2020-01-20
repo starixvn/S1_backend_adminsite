@@ -451,6 +451,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
 
     class WithdrawalPanel extends React.Component {
         _myTimer;
+        _timeInterval = 60;
         constructor(props) {
             super(props);
             this.f_trigger_Start = React.createRef();
@@ -458,7 +459,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
             this.f_trigger_End = React.createRef();
             this.selectdate_end = React.createRef();
 
-            this.state={selectType:"", selectCurrency:"", selectStatus:"1", SelectUser:"", SelectWithdrawalID:"", ShowDetial: false, timeInterval:60 ,IsRefresh: false };
+            this.state={selectType:"", selectCurrency:"", selectStatus:"1", SelectUser:"", SelectWithdrawalID:"", ShowDetial: false, timeInterval:this._timeInterval ,IsRefresh: false };
         }
 
         onRefresh() {
@@ -505,15 +506,15 @@ import {Pagination} from '../commJS/Pagination.jsx';
                 this.AutoRefresh();                
                 let result = response.data;
                 if (result.errorCode == 0) {
-                    this.setState({searchData: result, GetData: true, IsRefresh:false, timeInterval: 60});
+                    this.setState({searchData: result, GetData: true, IsRefresh:false, timeInterval: this._timeInterval});
                 } else {
                     alert(result.message);
-                    this.setState({IsRefresh:false,timeInterval: 60});
+                    this.setState({IsRefresh:false,timeInterval: this._timeInterval});
                 }
             }.bind(this)).catch(function (error) {
                 this.AutoRefresh();
                 //Loading.UnLoading();
-                this.setState({IsRefresh:false,timeInterval: 60});
+                this.setState({IsRefresh:false,timeInterval: this._timeInterval});
                 alert(error);
             }.bind(this));
         }

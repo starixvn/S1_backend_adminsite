@@ -41,6 +41,14 @@ namespace BackendSite.Service.Model
         public string BankCode { set; get; }
         public string PayName { set; get; }
         public string PicFileName { set; get; }
+        public string CalCode =>
+            DepositType switch
+            {
+                1 => $"{SiteName}-{BankCode}",
+                2 => $"{SiteName}-{BankCode}",
+                3 => $"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
+                _ => null
+            };
 
         //public virtual IEnumerable<Comments> Comments { get; set; }
 

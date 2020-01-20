@@ -40,13 +40,13 @@ import {Pagination} from '../commJS/Pagination.jsx';
             let rows = this.props.searchData.data.map(row => 
                 <tr key={row.transId}>
                     <th scope="row"><a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a></th>
+                    <td>{row.calCode}</td>
                     <td>{i18n["lbl_DepositType" + row.depositType]}</td>
                     <td><a href={"/CustManage/CustInfo?UserName="+row.userName+"&custId="+ row.custId +"&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
                     <td>{i18n["lbl_Currency"+row.currencyId]}</td>
                     <td className="text-right">{number_format(row.amount)}</td>                    
                     <td>{row.accountNo}</td>
                     <td>{row.accountName}</td>
-                    <td>{row.memo}</td>
                     <td>{moment(row.createTime).format('l LTS')}</td>
                     <td>{DepositStatusOp[row.status]}</td>
                 </tr>
@@ -72,13 +72,13 @@ import {Pagination} from '../commJS/Pagination.jsx';
                         <thead>
                             <tr>
                                 <th scope="col">Trxn.ID</th>
+                                <th scope="col">Calvin Code</th>                                
                                 <th scope="col">{i18n.lbl_DepositType}</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
                                 <th scope="col">CCY</th>
                                 <th scope="col" className="text-right">{i18n.lbl_Amount}</th>
                                 <th scope="col">To Acc. NO.</th>
                                 <th scope="col">To Acc. Name</th>                                
-                                <th scope="col">{i18n.lbl_Memo}</th>
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{i18n.lbl_Status}</th>
                             </tr>
@@ -345,6 +345,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
 
     class DepositPanel extends React.Component {
         _myTimer;
+        _timeInterval = 60;
         constructor(props) {
             super(props);
             this.f_trigger_Start = React.createRef();
@@ -352,7 +353,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
             this.f_trigger_End = React.createRef();
             this.selectdate_end = React.createRef();
 
-            this.state={selectType:"", selectCurrency:"", selectStatus:"1", SelectUser:"", SelectDepositID:"", ShowDetial: false, timeInterval:60 ,IsRefresh: false };
+            this.state={selectType:"", selectCurrency:"", selectStatus:"1", SelectUser:"", SelectDepositID:"", ShowDetial: false, timeInterval:this._timeInterval ,IsRefresh: false };
         }
 
         onRefresh() {
@@ -399,16 +400,16 @@ import {Pagination} from '../commJS/Pagination.jsx';
                 this.AutoRefresh();                
                 let result = response.data;
                 if (result.errorCode == 0) {
-                    this.setState({searchData: result, GetData: true, IsRefresh:false, timeInterval: 60});
+                    this.setState({searchData: result, GetData: true, IsRefresh:false, timeInterval: this._timeInterval});
                 } else {
                     alert(result.message);
-                    this.setState({IsRefresh:false,timeInterval: 60});
+                    this.setState({IsRefresh:false,timeInterval: this._timeInterval});
                 }
             }.bind(this)).catch(function (error) {
                 //Loading.UnLoading();
                 this.AutoRefresh();
                 alert(error);
-                this.setState({IsRefresh:false,timeInterval: 60});
+                this.setState({IsRefresh:false,timeInterval: this._timeInterval});
             }.bind(this));
         }
 
