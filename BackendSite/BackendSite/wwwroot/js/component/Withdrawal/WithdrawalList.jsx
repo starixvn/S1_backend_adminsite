@@ -52,12 +52,20 @@ import {Pagination} from '../commJS/Pagination.jsx';
                 </tr>
             );
 
+            let RefreshBtn = null;
+            if(this.props.onRefresh == null) {
+                RefreshBtn = <button type="button" className="btn btn-refresh" disabled={true} onClick={null}>
+                            Loading
+                        </button>;
+            } else {
+                RefreshBtn = <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>
+                            Refresh <span>({this.props.timeInterval})</span>
+                        </button>;
+            }
             return (
                 <div className="table">
                     <div className="table-options">
-                        <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>
-                            Refresh
-                        </button>
+                        {RefreshBtn}
                     </div>
                     
                     <table className="table table-striped">
@@ -442,6 +450,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
     }    
 
     class WithdrawalPanel extends React.Component {
+        _myTimer;
         constructor(props) {
             super(props);
             this.f_trigger_Start = React.createRef();
@@ -449,7 +458,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
             this.f_trigger_End = React.createRef();
             this.selectdate_end = React.createRef();
 
-            this.state={selectType:"", selectCurrency:"", selectStatus:"1", SelectUser:"", SelectWithdrawalID:"", ShowDetial: false};
+            this.state={selectType:"", selectCurrency:"", selectStatus:"1", SelectUser:"", SelectWithdrawalID:"", ShowDetial: false, timeInterval:60 ,IsRefresh: false };
         }
 
         onRefresh() {
@@ -464,6 +473,10 @@ import {Pagination} from '../commJS/Pagination.jsx';
         }
 
         onSearch(pageNumber) {
+            this.setState({IsRefresh:true});
+            if(this._myTimer!= null){
+                clearTimeout(this._myTimer);
+            }
             //Loading.OnLoading();
             let data = {StartDate: this.state.StartDate, EndDate: this.state.EndDate, PageNumber: pageNumber};
             if(this.state.SelectWithdrawalID!=""){
@@ -489,14 +502,18 @@ import {Pagination} from '../commJS/Pagination.jsx';
             axios.post('/api/Withdrawal/GetWithdrawalRequestList', data)
             .then(function (response) {
                 //Loading.UnLoading();
+                this.AutoRefresh();                
                 let result = response.data;
                 if (result.errorCode == 0) {
-                    this.setState({searchData: result, GetData: true});
+                    this.setState({searchData: result, GetData: true, IsRefresh:false, timeInterval: 60});
                 } else {
                     alert(result.message);
+                    this.setState({IsRefresh:false,timeInterval: 60});
                 }
             }.bind(this)).catch(function (error) {
+                this.AutoRefresh();
                 //Loading.UnLoading();
+                this.setState({IsRefresh:false,timeInterval: 60});
                 alert(error);
             }.bind(this));
         }
@@ -510,6 +527,19 @@ import {Pagination} from '../commJS/Pagination.jsx';
             this.setState(data, function(){
                 this.onSearch(1);
             }.bind(this));
+        }
+
+        AutoRefresh() {
+            if(this.state.timeInterval==0){
+                this.onRefresh();
+            } else {
+                let timeInterval = this.state.timeInterval;
+                timeInterval--;
+                this.setState({timeInterval:timeInterval});
+                this._myTimer = setTimeout(function(){
+                    this.AutoRefresh();
+                }.bind(this), 1000);
+            }
         }
 
         componentDidMount() {
@@ -532,6 +562,8 @@ import {Pagination} from '../commJS/Pagination.jsx';
                 button: f_trigger_Start,  // trigger for the calendar (button ID)
                 singleClick: true              // double-click mode
             });
+
+            //setTimeout(thisAutoRefresh, 2000);
         }
 
         onCheckDetail(id) {
@@ -631,7 +663,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                             </div>
                         </div>
                     </form> : null}
-                    {searchData !=null && !this.state.ShowDetial ? <WithdrawalList searchData={searchData} ChangePage={this.onSearch.bind(this)} onCheckDetail={this.onCheckDetail.bind(this)} onRefresh={this.onRefresh.bind(this)} /> : null}
+                    {searchData !=null && !this.state.ShowDetial ? <WithdrawalList timeInterval={this.state.timeInterval} searchData={searchData} ChangePage={this.onSearch.bind(this)} onCheckDetail={this.onCheckDetail.bind(this)} onRefresh={!this.state.IsRefresh ? this.onRefresh.bind(this) : null} /> : null}
                     {this.state.transId != null && this.state.ShowDetial ? <WithdrawalDetail transId={this.state.transId} onBack={this.onBack.bind(this)}/> : null}
                 </div>
             )
