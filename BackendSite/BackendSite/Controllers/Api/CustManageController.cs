@@ -160,5 +160,19 @@ namespace BackendSite.Controllers.Api
 
             return apiListResult;
         }
+
+        [HttpPost]
+        public ApiResult<string> SetResetPwd(CustInfoReq custInfoReq)
+        {
+            ApiResult<string> apiResult = new ApiResult<string>();
+            string NewPwd = "";
+            if (custInfoBLL.SetResetPwd(custInfoReq.CustId, out NewPwd))
+            {
+                apiResult.Data = NewPwd;
+                apiResult.ErrorCode = 0;
+            }
+
+            return apiResult;
+        }
     }
 }

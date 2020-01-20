@@ -34,6 +34,7 @@ namespace BackendSite
             services.AddSingleton<Tools>();
             services.AddSingleton<Common>();
             services.AddSingleton<CourierAdapter>();
+            services.AddSingleton<CodeGenerator>();
 
             /*DAL*/
             services.AddSingleton<ServerInfoService>();

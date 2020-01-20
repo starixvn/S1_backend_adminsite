@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Microsoft.Extensions.Caching.Memory;
 using System;
@@ -15,14 +16,18 @@ namespace BackendSite.Service.BLL
         private readonly IMemoryCache cache;
         private readonly TpBLL tpBLL;
         private readonly WalletService walletService;
+        private readonly Tools tools;
+        private readonly CodeGenerator codeGenerator;
 
-        public CustInfoBLL(IMemoryCache cache, WalletService walletService, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL, TpBLL tpBLL)
+        public CustInfoBLL(IMemoryCache cache, WalletService walletService, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL, TpBLL tpBLL, Tools tools, CodeGenerator codeGenerator)
         {
             this.custInfoService = custInfoService;
             this.serverInfoBLL = serverInfoBLL;
             this.cache = cache;
             this.tpBLL = tpBLL;
             this.walletService = walletService;
+            this.tools = tools;
+            this.codeGenerator = codeGenerator;
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -100,6 +105,15 @@ namespace BackendSite.Service.BLL
         public IEnumerable<LoginLog> GetLoginLogByCust(int CustId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             return custInfoService.GetLoginLogByCust(CustId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+        }
+        public bool SetResetPwd(int CustId, out string NewPassword)
+        {
+            codeGenerator.Maximum = 8;
+            codeGenerator.Minimum = 6;
+            codeGenerator.RepeatCharacters = true;
+            NewPassword = codeGenerator.Generate();
+            string md5NewPassword = tools.MD5Encrypt(NewPassword);
+            return custInfoService.SetResetPwd(CustId, md5NewPassword);
         }
     }
 }

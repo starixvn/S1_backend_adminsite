@@ -4,6 +4,7 @@ import {TpTransferInfo} from './CustInfo_TpTransferInfo.jsx';
 import {WithdrawalInfo} from './CustInfo_WithdrawalInfo.jsx';
 import {LoginLog } from './CustInfo_LoginLog.jsx';
 import {Notes} from './CustInfo_Notes.jsx';
+import {ResetPwd} from './CustInfo_ResetPwd.jsx';
 
 (function ($, React, ReactDOM, i18n, axios) {
     const CustStatusOp = {
@@ -480,7 +481,7 @@ import {Notes} from './CustInfo_Notes.jsx';
     }
     
     class CustInfoPanel extends React.Component {
-        _Tabs=["Customer Info","Financial Log","Deposit Info","Transfer Info","Withdrawal Info","Login Log", "Notes"];
+        _Tabs=["Customer Info","Financial Log","Deposit Info","Transfer Info","Withdrawal Info","Login Log", "Reset Password", "Notes"];
 
         constructor(props) {
             super(props);
@@ -693,6 +694,8 @@ import {Notes} from './CustInfo_Notes.jsx';
             } else if(TabIdx == 5){
                 dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if(TabIdx == 6) {
+                dataContainer = <ResetPwd />;
+            } else if(TabIdx == 7) {
                 dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)}/>;
             }
 
