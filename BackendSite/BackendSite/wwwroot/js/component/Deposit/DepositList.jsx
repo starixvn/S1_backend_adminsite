@@ -284,7 +284,11 @@ import {Pagination} from '../commJS/Pagination.jsx';
                     <tr>
                         <th scope="row">Transaction No.</th>
                         <td>{data.transId}</td>
-                    </tr>                
+                    </tr>
+                    <tr>
+                        <th scope="row">Calvin Code</th>
+                        <td>{data.calCode}</td>
+                    </tr>                                    
                     <tr>
                         <th scope="row">Status</th>
                         <td>{i18n["lbl_DepositStatus"+data.status]}</td>
