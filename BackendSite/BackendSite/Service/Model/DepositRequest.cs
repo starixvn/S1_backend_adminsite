@@ -79,9 +79,9 @@ namespace BackendSite.Service.Model
         public string CalCode =>
             DepositType switch
             {
-                1 => $"{SiteName}-{BankCode}",
-                2 => $"{SiteName}-{BankCode}",
-                3 => $"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
+                (int)enums.DepositType.OnlineBanking => $"{SiteName}-{BankCode}",
+                (int)enums.DepositType.MobilePayment => $"{SiteName}-{BankCode}",
+                (int)enums.DepositType.WireTransfer => $"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
                 _ => null
             };
 

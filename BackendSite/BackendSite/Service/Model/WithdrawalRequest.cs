@@ -69,4 +69,35 @@ namespace BackendSite.Service.Model
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int? CurrencyId { set; get; }
     }
+    public class WithdrawalInfoForExport
+    {
+        public int WithdrawalId { set; get; }
+        public string TransId { set; get; }
+        public int WithdrawalType { set; get; }
+        public int CustId { set; get; }
+        public string UserName { set; get; }
+        public int CurrencyId { set; get; }
+        public decimal Amount { set; get; }
+        public string BankName { set; get; }
+        public string BankCode { set; get; }
+        public string AccountNo { set; get; }
+        public string AccountName { set; get; }
+        public DateTime CreateTime { set; get; }
+        public int Status { set; get; }
+        public string SiteName { set; get; }
+        public string FromBankName { set; get; }
+        public string FromBankCode { set; get; }
+        public string FromAccountNo { set; get; }
+        public string FromAccountName { set; get; }
+        public string PayName { set; get; }
+        public string RefId { set; get; }
+
+        public string CalCode =>
+        WithdrawalType switch
+        {
+            (int)enums.WithdrawalType.LocalBank => $"{SiteName}-{FromBankCode}-{FromAccountName?.Replace(" ", string.Empty)}-{FromAccountNo?.Substring(FromAccountNo.Length > 4 ? FromAccountNo.Length - 4 : 0)}",
+            (int)enums.WithdrawalType.OnlinePayment => $"{SiteName}-{FromBankCode}",
+            _ => null
+        };
+    }
 }

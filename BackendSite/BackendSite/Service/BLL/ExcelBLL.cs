@@ -25,8 +25,8 @@ namespace BackendSite.Service.BLL
             if (t.Any())
             {
                 var propertyInfo = t.FirstOrDefault().GetType().GetProperties();
-                ExportHeader(ws, propertyInfo);
                 ExportBody(ws, t, propertyInfo);
+                ExportHeader(ws, propertyInfo);
             }
             p.Save();
             return ms.ToArray();
@@ -75,6 +75,7 @@ namespace BackendSite.Service.BLL
                 cell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
                 cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                ws.Column(i + 1).AutoFit();
             }
         }
     }

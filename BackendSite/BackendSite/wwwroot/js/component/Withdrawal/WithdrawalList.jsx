@@ -36,6 +36,10 @@ import {Pagination} from '../commJS/Pagination.jsx';
             this.props.onRefresh();
         }
 
+        onExport() {
+            this.props.onExport();
+        }        
+
         render() {
             let rows = this.props.searchData.data.map(row => 
                 <tr key={row.transId}>
@@ -65,7 +69,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
             return (
                 <div className="table">
                     <div className="table-options">
-                        {RefreshBtn}
+                        {RefreshBtn}<button type="button" className="btn btn-approved" onClick={this.onExport.bind(this)}>Export Excel</button>
                     </div>
                     
                     <table className="table table-striped">
@@ -458,6 +462,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
             this.selectdate_start = React.createRef();
             this.f_trigger_End = React.createRef();
             this.selectdate_end = React.createRef();
+            this.ExportForm = React.createRef();
 
             this.state={selectType:"", selectCurrency:"", selectStatus:"1", SelectUser:"", SelectWithdrawalID:"", ShowDetial: false, timeInterval:this._timeInterval ,IsRefresh: false };
         }
@@ -518,6 +523,40 @@ import {Pagination} from '../commJS/Pagination.jsx';
                 alert(error);
             }.bind(this));
         }
+
+        onExport() {
+            let data = {StartDate: this.state.StartDate, EndDate: this.state.EndDate};
+            if(this.state.SelectWithdrawalID!=""){
+                data.WithdrawalId = this.state.SelectWithdrawalID;
+            }
+
+            if(this.state.selectType!=""){
+                data.withdrawalType = parseInt(this.state.selectType);
+            }
+
+            if(this.state.selectStatus!=""){
+                data.status = parseInt(this.state.selectStatus);
+            }
+
+            if(this.state.SelectUser!=""){
+                data.UserName = this.state.SelectUser;
+            }
+
+            if(this.state.selectCurrency!=""){
+                data.CurrencyID = parseInt(this.state.selectCurrency);
+            }
+
+            let ExportParam = [];
+             for (var prop in data) {
+                 ExportParam.push(<input key={prop} type="hidden" name={prop} value={data[prop]}/>);
+            }
+
+            ExportParam = <form method="post" action={'/Finance/ExportWithdrawalList'} ref={this.ExportForm}>{ExportParam}</form>;
+
+            this.setState({ExportParam,ExportParam},function (){
+                this.ExportForm.current.submit();
+            }.bind(this));
+        }        
 
         handleSubmit(event) {
             event.preventDefault();
@@ -664,8 +703,11 @@ import {Pagination} from '../commJS/Pagination.jsx';
                             </div>
                         </div>
                     </form> : null}
-                    {searchData !=null && !this.state.ShowDetial ? <WithdrawalList timeInterval={this.state.timeInterval} searchData={searchData} ChangePage={this.onSearch.bind(this)} onCheckDetail={this.onCheckDetail.bind(this)} onRefresh={!this.state.IsRefresh ? this.onRefresh.bind(this) : null} /> : null}
+                    {searchData !=null && !this.state.ShowDetial ? <WithdrawalList onExport={this.onExport.bind(this)} timeInterval={this.state.timeInterval} searchData={searchData} ChangePage={this.onSearch.bind(this)} onCheckDetail={this.onCheckDetail.bind(this)} onRefresh={!this.state.IsRefresh ? this.onRefresh.bind(this) : null} /> : null}
                     {this.state.transId != null && this.state.ShowDetial ? <WithdrawalDetail transId={this.state.transId} onBack={this.onBack.bind(this)}/> : null}
+                    <div style={{display: 'none'}}>
+                        {this.state.ExportParam}
+                    </div>
                 </div>
             )
         }

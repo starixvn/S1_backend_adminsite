@@ -124,5 +124,10 @@ namespace BackendSite.Service.BLL
         {
             return withdrawalService.GetWithdrawalListByCust(CustId, TransId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
+
+        public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(int? withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, int? currencyId, int? status)
+        {
+            return withdrawalService.GetWithdrawalExportList(withdrawalType, startDate, endDate, WithdrawalId, UserName, currencyId, status);
+        }
     }
 }

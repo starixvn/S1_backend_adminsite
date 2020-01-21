@@ -151,5 +151,20 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return depositList;
         }
+
+        public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(int? withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, int? currencyId, int? status)
+        {
+            int withdrawalId = 0;
+            if (!string.IsNullOrWhiteSpace(WithdrawalId))
+            {
+                Match m = Regex.Match(WithdrawalId, @"\d+");
+                int.TryParse(m.Value, out withdrawalId);
+            }
+            var p = new DynamicParameters(new { WithdrawalType = withdrawalType, StartDate = startDate, EndDate = endDate, WithdrawalId = withdrawalId, TransId = WithdrawalId, UserName, CurrencyId = currencyId, Status = status });
+
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var depositList = conn.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExport_Get", p, commandType: CommandType.StoredProcedure);
+            return depositList;
+        }
     }
 }
