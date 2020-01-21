@@ -170,5 +170,19 @@ namespace BackendSite.Service.DAL
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.QueryFirstOrDefault<DepositReceipt>("DepositReceipt_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(int? depositType, long startDate, long endDate, string DepositId, string UserName, int? currencyId, int? status)
+        {
+            int depositId = 0;
+            if (!string.IsNullOrWhiteSpace(DepositId))
+            {
+                Match m = Regex.Match(DepositId, @"\d+");
+                int.TryParse(m.Value, out depositId);
+            }
+            var p = new DynamicParameters(new { DepositType = depositType, StartDate = startDate, EndDate = endDate, DepositId = depositId, TransId = DepositId, UserName, CurrencyId = currencyId, Status = status });
+
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var depositList = conn.Query<DepositInfoForExport>("Admin_DepositListForExport_Get", p, commandType: CommandType.StoredProcedure);
+            return depositList;
+        }
     }
 }

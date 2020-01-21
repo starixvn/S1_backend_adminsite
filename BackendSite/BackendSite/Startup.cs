@@ -67,6 +67,7 @@ namespace BackendSite
             services.AddSingleton<MarketingBLL>();			
             services.AddSingleton<PaymentBLL>();
             services.AddSingleton<TpBLL>();
+            services.AddSingleton<ExcelBLL>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {

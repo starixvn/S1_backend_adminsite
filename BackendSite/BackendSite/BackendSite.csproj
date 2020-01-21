@@ -57,9 +57,10 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.30" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.0" />
+    <PackageReference Include="EPPlus" Version="4.5.3.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0" />
-    <PackageReference Include="MySql.Data" Version="8.0.18" />
+    <PackageReference Include="MySql.Data" Version="8.0.19" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties app_3data_4menu_1json__JsonSchema="http://json-schema.org/draft-04/schema" /></VisualStudio></ProjectExtensions>

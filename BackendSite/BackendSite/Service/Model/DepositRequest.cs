@@ -55,6 +55,41 @@ namespace BackendSite.Service.Model
         //public virtual string DepositTypeString { get; set; }
         //public virtual string StatusString { get; set; }
     }
+
+    public class DepositInfoForExport
+    {
+        public string TransId { set; get; }
+        public int DepositType { set; get; }
+        public int CurrencyId { get; set; }
+        public int CustId { set; get; }
+        public string UserName { set; get; }
+        public string SiteName { set; get; }
+        public decimal Amount { set; get; }
+        public string Comment { set; get; }
+        public DateTime CreateTime { set; get; }
+        public bool FirstDeposit { set; get; }
+        public DateTime DepositTime { set; get; }
+        public string RefId { set; get; }
+        public int Status { set; get; }
+        public string AccountName { set; get; }
+        public string AccountNo { set; get; }
+        public string BankName { set; get; }
+        public string BankCode { set; get; }
+        public string PayName { set; get; }
+        public string CalCode =>
+            DepositType switch
+            {
+                1 => $"{SiteName}-{BankCode}",
+                2 => $"{SiteName}-{BankCode}",
+                3 => $"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
+                _ => null
+            };
+
+        //public virtual IEnumerable<Comments> Comments { get; set; }
+
+        //public virtual string DepositTypeString { get; set; }
+        //public virtual string StatusString { get; set; }
+    }
     public interface IDepositInfo
     {
         int Ver { get; set; }

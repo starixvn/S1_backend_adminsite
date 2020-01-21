@@ -113,7 +113,7 @@ export class AdjustmentInfo extends React.Component {
                     </div>
                     <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
                 </form>
-                {searchData!=null ? <TpTransferInfoList searchData={searchData} ChangePage={this.props.GetTpTransferInfoByCust} /> : null}
+                {searchData!=null ? <AdjustmentInfoList searchData={searchData} ChangePage={this.props.GetTpTransferInfoByCust} /> : null}
             </div>
         )
     }

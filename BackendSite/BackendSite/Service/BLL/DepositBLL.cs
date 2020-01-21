@@ -105,5 +105,9 @@ namespace BackendSite.Service.BLL
             var serverInfo = serverInfoService.GetModel();
             return depositService.GetDepositReceipt(depositId, serverInfo.SiteId);
         }
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(int? depositType, long startDate, long endDate, string DepositId, string UserName, int? currencyId, int? status)
+        {
+            return depositService.GetDepositExportList(depositType, startDate, endDate, DepositId, UserName, currencyId, status);
+        }
     }
 }
