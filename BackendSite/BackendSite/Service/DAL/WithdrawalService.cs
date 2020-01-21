@@ -105,11 +105,11 @@ namespace BackendSite.Service.DAL
                             else if (status == WithdrawalStatus.Approved)
                             {
                                 var withdrawalInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<WithdrawalInfo>(WithdrawalInfo);
-                                if (withdrawalType == 1)
+                                if (withdrawalType == (int)WithdrawalType.OnlinePayment)
                                 {
                                     result = walletService.SetPayDummy(siteId, withdrawalInfo.PayId ?? 0, withdrawalInfo.CurrencyId ?? 0, -1 * amount, conn, trans);
                                 }
-                                else if (withdrawalType == 2)
+                                else if (withdrawalType == (int)WithdrawalType.LocalBank)
                                 {
                                     result = walletService.SetBankOffDummy(siteId, withdrawalInfo.FromSysId ?? 0, withdrawalInfo.FromAccountNo, withdrawalInfo.CurrencyId ?? 0, -1 * amount, conn, trans);
                                 }

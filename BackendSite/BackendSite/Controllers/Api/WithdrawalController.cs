@@ -151,11 +151,11 @@ namespace BackendSite.Controllers.Api
             else if (withdrawalReq.Action == (int)WithdrawalStatus.Process)
             {
                 var withdrawalInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalReq.WithdrawalInfo);
-                if (withdrawalReq.WithdrawalType == 1)
+                if (withdrawalReq.WithdrawalType == (int)WithdrawalType.OnlinePayment)
                 {
                     withdrawalInfo.PayId = withdrawalReq.SelId;
                 }
-                else if (withdrawalReq.WithdrawalType == 2)
+                else if (withdrawalReq.WithdrawalType == (int)WithdrawalType.LocalBank)
                 {
                     var bankInfoOff = bankDetailBLL.GetBankInfoOff().Where(x => x.BankId == withdrawalReq.SelId).FirstOrDefault();
 
@@ -168,7 +168,7 @@ namespace BackendSite.Controllers.Api
                     }
                 }
 
-                if (withdrawalReq.WithdrawalType == null || withdrawalReq.WithdrawalType == 0)
+                if (withdrawalReq.WithdrawalType == null || withdrawalReq.WithdrawalType == (int)WithdrawalType.Undefine)
                 {
                     apiResult.ErrorCode = 1101;
                     apiResult.Message = "Select 1 Type of Withdrawal Please.";
@@ -180,7 +180,7 @@ namespace BackendSite.Controllers.Api
                     decimal amount = 0m;
                     withdrawConfirmReuslt = withdrawalBLL.WithdrawalProcess(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name, Newtonsoft.Json.JsonConvert.SerializeObject(withdrawalInfo), withdrawalReq.WithdrawalType, out custId, out amount);
 
-                    if (withdrawConfirmReuslt > 0 && withdrawalReq.WithdrawalType == 1)
+                    if (withdrawConfirmReuslt > 0 && withdrawalReq.WithdrawalType == (int)WithdrawalType.OnlinePayment)
                     {
                         var reqWithdrawalOnline = new ReqWithdrawalOnline
                         {

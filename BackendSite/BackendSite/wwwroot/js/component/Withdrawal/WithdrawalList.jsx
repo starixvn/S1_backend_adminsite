@@ -40,13 +40,13 @@ import {Pagination} from '../commJS/Pagination.jsx';
             let rows = this.props.searchData.data.map(row => 
                 <tr key={row.transId}>
                     <th scope="row"><a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a></th>
+                    <td>{row.calCode}</td>
                     <td>{i18n["lbl_WithdrawalType" + row.withdrawalType]}</td>
                     <td><a href={"/CustManage/CustInfo?UserName="+row.userName+"&custId="+ row.custId +"&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
                     <td>{i18n["lbl_Currency"+row.currencyId]}</td>
                     <td className="text-right">{number_format(row.amount)}</td>                    
                     <td>{row.accountNo}</td>
                     <td>{row.accountName}</td>
-                    <td>{row.memo}</td>
                     <td>{moment(row.createTime).format('l LTS')}</td>
                     <td>{WithdrawalStatusOp[row.status]}</td>
                 </tr>
@@ -72,13 +72,13 @@ import {Pagination} from '../commJS/Pagination.jsx';
                         <thead>
                             <tr>
                                 <th scope="col">Trxn.ID</th>
+                                <th scope="col">Calvin Code</th>
                                 <th scope="col">{i18n.lbl_WithdrawalType}</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
                                 <th scope="col">CCY</th>
                                 <th scope="col" className="text-right">{i18n.lbl_Amount}</th>
                                 <th scope="col">To Acc. NO.</th>
                                 <th scope="col">To Acc. Name</th>                                
-                                <th scope="col">{i18n.lbl_Memo}</th>
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{i18n.lbl_Status}</th>
                             </tr>

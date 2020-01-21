@@ -28,6 +28,8 @@ namespace BackendSite.Service.Model
         public string BankCode { set; get; }
         public string FromBankName { set; get; }
         public string FromBankCode { set; get; }
+        public string FromAccountNo { set; get; }
+        public string FromAccountName { set; get; }
         public string PayName { set; get; }
         public int SysId { set; get; }
         public int PayId { set; get; }
@@ -35,6 +37,14 @@ namespace BackendSite.Service.Model
         public string AccountNo { set; get; }
         public string AccountName { set; get; }
         public string RefId { set; get; }
+
+        public string CalCode =>
+    WithdrawalType switch
+    {
+        (int)enums.WithdrawalType.LocalBank => $"{SiteName}-{FromBankCode}-{FromAccountName?.Replace(" ", string.Empty)}-{FromAccountNo?.Substring(FromAccountNo.Length > 4 ? FromAccountNo.Length - 4 : 0)}",
+        (int)enums.WithdrawalType.OnlinePayment => $"{SiteName}-{FromBankCode}",
+        _ => null
+    };
 
         //public virtual IEnumerable<Comments> Comments { get; set; }
     }

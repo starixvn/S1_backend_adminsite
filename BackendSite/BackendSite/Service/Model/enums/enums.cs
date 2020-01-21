@@ -31,10 +31,9 @@ namespace BackendSite.Service.Model.enums
     public enum WithdrawalType
     {
         Undefine = 0,
-        LocalBank = 1,
-        OnlinePayment = 2,
+        OnlinePayment = 1,
+        LocalBank = 2,
     }
-    
     /// <summary>
      /// 
      /// </summary>
