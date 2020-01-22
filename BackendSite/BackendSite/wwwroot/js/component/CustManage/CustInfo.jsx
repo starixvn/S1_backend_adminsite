@@ -292,6 +292,10 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
             this.state = {};
         }
 
+        componentDidMount() {
+            let _clipboard = new ClipboardJS(".js-copy");
+        }
+        
         onKycChange(e) {
             let data = this.props.CustInfoData;
             axios.post('/api/CustManage/SetCustStatusSwitch', {CustId: data.custId, OP:1})
@@ -350,9 +354,9 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
             let tpWallet= null;
             if(data!=null && data.tpWallet!=null) {
                 tpWallet = <ul className="wallet-wrap">{data.tpWallet.map(function(wallet) { 
-                    return <li key={wallet.tpId} className="wallet-item">
+                    return <li key={wallet.tpId} className="wallet-item table-detail">
                                 <span>{wallet.tpName}</span>
-                                <span>{wallet.tpUserName}</span>
+                                <table><tbody><tr><td><span>{wallet.tpUserName}</span></td><td><button type="button" className="btn btn-copy js-copy" data-clipboard-text={wallet.tpUserName}>Copy</button></td></tr></tbody></table>
                                 <span className={wallet.balance <0 ? "negative-num":"positive-num"}>{number_format(wallet.balance)}</span>
                             </li>;
                 }.bind(this))}</ul>;
@@ -650,7 +654,9 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
                     //Loading.UnLoading();
                     let result = response.data;
                     if (result.errorCode == 0) {
-                        this.setState({CustInfoData: result.data});
+                        this.setState({CustInfoData: result.data}, function(){
+                            let _clipboard = new ClipboardJS(".js-copy");
+                        });
                     } else {
                         alert(result.message);
                     }
