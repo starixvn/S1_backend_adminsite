@@ -24,13 +24,15 @@ namespace BackendSite.Controllers.Api
         private readonly AuthorizeBLL authorizeBLL;
         private readonly Tools tools;
         private readonly ServerInfoBLL serverInfoBLL;
+        private readonly AdminBLL adminBLL;
 
-        public HomeController(SelLangBLL selLangBLL, AuthorizeBLL authorizeBLL, Tools tools, ServerInfoBLL serverInfoBLL)
+        public HomeController(SelLangBLL selLangBLL, AuthorizeBLL authorizeBLL, Tools tools, ServerInfoBLL serverInfoBLL, AdminBLL adminBLL)
         {
             this.selLangBLL = selLangBLL;
             this.authorizeBLL = authorizeBLL;
             this.tools = tools;
             this.serverInfoBLL = serverInfoBLL;
+            this.adminBLL = adminBLL;
         }
         public class LoginModel
         {
@@ -112,6 +114,33 @@ namespace BackendSite.Controllers.Api
             apiResult.Data = serverInfoBLL.GetSiteList();
             apiResult.ErrorCode = 0;
 
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult ChangePwd([FromBody]ChangePwd changePwd)
+        {
+            int response = 0;
+            bool result = adminBLL.ChangePwd(changePwd, out response);
+            var apiResult = new ApiResult();
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                if (response == 8)
+                {
+                    apiResult.ErrorCode = 8;
+                    apiResult.Message = selLangBLL.GetMsg("msg_OldpwdNotMatch");
+                }
+                else
+                {
+                    apiResult.ErrorCode = 9;
+                    apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+                }
+            }
             return apiResult;
         }
     }
