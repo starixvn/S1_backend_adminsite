@@ -64,7 +64,7 @@ namespace BackendSite.Controllers.Api
                             if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
                             {
                                 apiResult.ErrorCode = 1001;
-                                apiResult.Message = $"{balance.ToString("#,##0")}<{adjustmentInfo.Amount.ToString("#,##0")}";
+                                apiResult.Message = $"{balance.ToString("#,##0.##")}<{adjustmentInfo.Amount.ToString("#,##0.##")}";
                                 return apiResult;
                             }
 
@@ -77,10 +77,13 @@ namespace BackendSite.Controllers.Api
                             //}
                         }
                     }
-                    else
+
+                    balance = custInfoBLL.GetBalance(custInfo.CustId);
+
+                    if (balance < adjustmentInfo.Amount)
                     {
-                        apiResult.ErrorCode = 1001;
-                        apiResult.Message = $"{balance.ToString("#,##0")}<{adjustmentInfo.Amount.ToString("#,##0")}";
+                        apiResult.ErrorCode = 1002;
+                        apiResult.Message = $"{balance.ToString("#,##0.##")} < {adjustmentInfo.Amount.ToString("#,##0.##")}";
                         return apiResult;
                     }
                 }

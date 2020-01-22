@@ -304,7 +304,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                     btnGroup.push(<button key={0} type="button" className="btn btn-draft" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
                 if (data.status == 1 || data.status == 3)
                     btnGroup.push(<button key={2} type="button" className="btn btn-hold" onClick={this.onConfirm.bind(this, 2)}>On Hold(Risk Check)</button>);
-                if (data.status == 1 || data.status == 2 || data.status == 4)
+                if ((data.status == 1 || data.status == 2 || data.status == 4) && data.withdrawalType != 1)
                     btnGroup.push(<button key={3} type="button" className="btn btn-verify" onClick={this.onConfirm.bind(this, 3)}>Verify</button>);
                 if (data.status == 3)
                     btnGroup.push(<button key={4} type="button" className="btn btn-process" onClick={this.onConfirm.bind(this, 4)}>Process</button>);

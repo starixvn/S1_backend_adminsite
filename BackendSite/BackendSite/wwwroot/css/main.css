@@ -747,3 +747,6 @@ body {
     opacity: 1; }
     .nav-tabs .closeTab:hover {
       background: #E15F00; }
+.table .table-options .btn:last-child {
+    margin-left: 5px;
+}
