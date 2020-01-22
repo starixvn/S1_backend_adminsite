@@ -353,7 +353,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
 
     class DepositPanel extends React.Component {
         _myTimer;
-        _timeInterval = 60;
+        _timeInterval = 15;
         constructor(props) {
             super(props);
             this.f_trigger_Start = React.createRef();
