@@ -46,13 +46,19 @@ namespace BackendSite.Service.BLL
                 {
                     var prop = propertyInfo.ElementAt(j);
                     var propValue = prop.GetValue(bt, null);
-                    ws.Cells[currentRow, j + 1].Value = propValue;
-                    if (propValue != null && propValue.GetType().Name == "DateTime")
+
+                    if (propValue != null && propValue.GetType().Name == "DateTime" && ((DateTime)propValue).Year > 1)
                     {
+                        var time = new DateTimeOffset((DateTime)propValue);
+                        ws.Cells[currentRow, j + 1].Value = time.ToOffset(TimeSpan.FromHours(8)).DateTime;
                         ws.Cells[currentRow, j + 1].Style.Numberformat.Format = "mm/dd/yyyy h:mm:ss\\ AM/PM";
                     }
+                    else
+                    {
+                        ws.Cells[currentRow, j + 1].Value = propValue;
+                    }
                     //ws.Cells[currentRow, j + 1].
-                        //.Style.Numberformat.Format = "mm/dd/yyyy";
+                    //.Style.Numberformat.Format = "mm/dd/yyyy";
                 }
 
                 currentRow++;
