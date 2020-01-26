@@ -13,6 +13,8 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public int CustId { set; get; }
         public string UserName { set; get; }
+        public string Email { set; get; }
+        public string RealName { set; get; }
         public int SiteId { set; get; }
         public string SiteName { set; get; }
         public string DepositInfo { set; get; }

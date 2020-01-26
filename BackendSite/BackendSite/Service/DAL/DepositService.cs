@@ -68,7 +68,7 @@ namespace BackendSite.Service.DAL
         public DepositRequest GetDepositRequest(int depositId, int siteId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.QueryFirstOrDefault<DepositRequest>("DepositRequestTransID_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            return conn.QueryFirstOrDefault<DepositRequest>("Admin_DepositRequestTransID_Get", new { DepositId = depositId/*, SiteId = siteId*/ }, commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<Comments> GetDepositRequestComment(int depositId, int siteId)

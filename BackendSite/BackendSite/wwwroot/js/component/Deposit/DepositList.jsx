@@ -302,9 +302,13 @@ import {Pagination} from '../commJS/Pagination.jsx';
                         <td><a href={"/CustManage/CustInfo?UserName="+data.userName+"&custId="+ data.custId +"&TransId=" + data.transId} target="_blank">{data.userName}</a></td>
                     </tr>
                     <tr>
+                        <th scope="row">Real Name</th>
+                        <td>{data.realName}</td>
+                    </tr>
+                    <tr>
                         <th scope="row">E-mail</th>
                         <td>{data.email}</td>
-                    </tr>                    
+                    </tr>                                     
                     <tr>
                         <th scope="row">{"Date" + " (" + moment().format('Z') + ")"}</th>
                         <td>{moment(data.createTime).format('l LTS')}</td>
