@@ -42,7 +42,7 @@
       {
         "Key": "lbl_BankCardList",
         "Title": "Bank Card Management",
-        "Controller": "Finance",
+        "Controller": "Finance2",
         "Action": "BankInfoList",
         "Icon": "",
         "Roles": null,
@@ -69,7 +69,7 @@
       {
         "Key": "",
         "Title": "Payment Adjustment",
-        "Controller": "Finance",
+        "Controller": "Finance2",
         "Action": "PaymentAdjustment",
         "Icon": "",
         "Roles": null,

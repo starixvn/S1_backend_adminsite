@@ -1,0 +1,44 @@
+﻿@model IEnumerable<BackendSite.Service.Model.BankDetail>
+    @using Microsoft.AspNetCore.Hosting
+    @using BackendSite.Service.BLL
+    @using BackendSite.Service.Model
+    @inject IWebHostEnvironment environment
+    @inject SelLangBLL selLangBLL
+    @inject ServerInfoBLL serverInfoBLL
+    @inject AuthorizeBLL authorizeBLL
+    @inject IWebHostEnvironment environment
+    @section Style {
+        <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Poppins&display=swap" rel="stylesheet">
+        <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
+    }
+    @{
+    Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
+    ViewData["Title"] = @selLangBLL.GetResourceValue("lbl_BankCardList");
+    }
+    @{
+    var i18n = new Dictionary<string, string>();
+    string[] lbl_Txts = new string[] { "lbl_Enable", "lbl_Disable" };
+    foreach (var lbl_Txt in lbl_Txts)
+    {
+        if (!i18n.ContainsKey(lbl_Txt))
+            i18n.Add(lbl_Txt, selLangBLL.GetResourceValue(lbl_Txt));
+    }
+
+    //var serverInfo = serverInfoBLL.GetServerInfo();
+
+    for (var currency = 1; currency <= 51; currency++)
+    {
+        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
+            i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+    }
+    }
+    <h4 class="page-name">@selLangBLL.GetResourceValue("lbl_BankCardList")</h4>
+    <div id="BankCardInfoPanel"></div>
+    @section Scripts {
+        <script>
+        $('.collapse').collapse();
+        $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
+        </script>
+        <script src="~/lib/runtime.min.js"></script>
+        <script src="~/js/component/Payment/BankInfoList.min.js" asp-append-version="true"></script>
+    }
