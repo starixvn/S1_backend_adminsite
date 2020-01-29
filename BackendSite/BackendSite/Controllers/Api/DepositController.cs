@@ -94,10 +94,18 @@ namespace BackendSite.Controllers.Api
         public ApiResult<DepositRequest> GetDepositRequest(DepositReq depositReq)
         {
             var apiResult = new ApiResult<DepositRequest>();
-            var depositRequest = depositBLL.GetDepositRequest(depositReq.TransId);
+            try
+            {
+                var depositRequest = depositBLL.GetDepositRequest(depositReq.TransId);
 
-            apiResult.Data = depositRequest;
-            apiResult.ErrorCode = 0;
+                apiResult.Data = depositRequest;
+                apiResult.ErrorCode = 0;
+            }
+            catch(Exception ex)
+            {
+                apiResult.RawMessage = ex.Message;
+            }
+
             return apiResult;
         }
 

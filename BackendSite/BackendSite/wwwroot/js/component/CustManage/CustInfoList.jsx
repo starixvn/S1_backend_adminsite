@@ -1,6 +1,6 @@
 ﻿import {Pagination} from '../commJS/Pagination.jsx';
 
-(function ($, React, ReactDOM, i18n, axios) {
+(function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
         1:<span className="status status-active">Running</span>,
         2:<span className="status status-suspend">Suspend</span>,
@@ -18,6 +18,7 @@
                     <td>{i18n["lbl_Currency"+data.currencyId]}</td>
                     <td>{data.agent}</td>
                     <td>{data.isTest.toString()}</td>
+                    <td>{moment(data.regTime).format('l LTS')}</td>
                     <td>{CustStatusOp[data.status]}</td>
                 </tr>
             )
@@ -52,6 +53,7 @@
                                 <th scope="col">Currency</th>
                                 <th scope="col">Agent</th>
                                 <th scope="col">IsTest</th>
+                                <th scope="col">Registration time</th>
                                 <th scope="col">Status</th>
                             </tr>
                         </thead>
@@ -140,4 +142,4 @@
     }
 
     ReactDOM.render(<CustInfoPanel/>,document.getElementById('Panel'));
-})(jQuery, React, ReactDOM, i18n, axios);
+})(jQuery, React, ReactDOM, i18n, axios, moment);

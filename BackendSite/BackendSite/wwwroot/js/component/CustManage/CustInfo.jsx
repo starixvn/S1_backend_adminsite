@@ -6,7 +6,7 @@ import {LoginLog } from './CustInfo_LoginLog.jsx';
 import {Notes} from './CustInfo_Notes.jsx';
 import {ResetPwd} from './CustInfo_ResetPwd.jsx';
 
-(function ($, React, ReactDOM, i18n, axios) {
+(function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
         1:<span className="status status-active">Running</span>,
         2:<span className="status status-suspend">Suspend</span>,
@@ -738,4 +738,4 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
     }
 
     ReactDOM.render(<CustInfoPanel/>,document.getElementById('Panel'));
-})(jQuery, React, ReactDOM, i18n, axios);
+})(jQuery, React, ReactDOM, i18n, axios, moment);
