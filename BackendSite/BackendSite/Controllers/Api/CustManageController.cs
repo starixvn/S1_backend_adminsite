@@ -30,6 +30,7 @@ namespace BackendSite.Controllers.Api
         {
             public string UserName { get; set; }
             public string TransId { get; set; }
+            public string TpUserName { get; set; }
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
         }
@@ -41,7 +42,7 @@ namespace BackendSite.Controllers.Api
             int totalPages = 0, rowCount = 0;
             int pageNumber = custInfoListReq.PageNumber;
 
-            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.UserName, custInfoListReq.TransId, custInfoListReq.PageSize, ref pageNumber, out totalPages, out rowCount);
+            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.UserName, custInfoListReq.TransId, custInfoListReq.TpUserName, custInfoListReq.PageSize, ref pageNumber, out totalPages, out rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;

@@ -64,9 +64,9 @@ namespace BackendSite.Service.BLL
 
             return vipLevelCache;
         }
-        public IEnumerable<CustInfoDetail> GetCustInfoList(string userName, string transId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<CustInfoDetail> GetCustInfoList(string userName, string transId, string TpUserName, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            return custInfoService.GetCustInfoList(userName, transId, pageSize, ref pageNumber, out totalPages, out rowCount);
+            return custInfoService.GetCustInfoList(userName, transId, TpUserName, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
 
         public async Task<CustInfoDetail> GetCustInfoDetailAsync(int custId, string userName)

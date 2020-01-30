@@ -11,7 +11,7 @@
         render() {
             let data=this.props.dataRow;
             return (
-                <tr>
+                <tr key={data.custId}>
                     <td>{data.siteName}</td>
                     <td><a href={"/CustManage/CustInfo?UserName="+data.userName+"&custId="+ data.custId +"&TransId=" + (this.props.transId||"")} target="_blank">{data.userName}</a></td>
                     <td>{data.userLevel}</td>
@@ -19,6 +19,7 @@
                     <td>{data.agent}</td>
                     <td>{data.isTest.toString()}</td>
                     <td>{moment(data.regTime).format('l LTS')}</td>
+                    <td>{data.sabaID}</td>
                     <td>{CustStatusOp[data.status]}</td>
                 </tr>
             )
@@ -54,6 +55,7 @@
                                 <th scope="col">Agent</th>
                                 <th scope="col">IsTest</th>
                                 <th scope="col">Registration time</th>
+                                <th scope="col">Saba ID</th>
                                 <th scope="col">Status</th>
                             </tr>
                         </thead>
@@ -76,14 +78,14 @@
         handleSubmit(event) {
             event.preventDefault();
             this._Search = true;
-            this.setState({sUserName: this.state.UserName,sTransId:this.state.TransId, Loading: true}, function() {
+            this.setState({sUserName: this.state.UserName,sTransId:this.state.TransId, sTpUserName: this.state.TpUserName, Loading: true}, function() {
                 this.onSearch(1);
             }.bind(this));
         }
 
         onSearch(pageNumber) {
 
-            let data = {UserName: this.state.sUserName=="" ? null:this.state.sUserName, TransId: this.state.sTransId=="" ? null:this.state.sTransId,PageNumber: pageNumber, PageSize: this._PageSize};
+            let data = {UserName: this.state.sUserName=="" ? null:this.state.sUserName, TransId: this.state.sTransId=="" ? null:this.state.sTransId, TpUserName: this.state.sTpUserName=="" ? null:this.state.sTpUserName ,PageNumber: pageNumber, PageSize: this._PageSize};
 
             axios.post('/api/CustManage/GetCustInfoList', data)
             .then(function (response) {
@@ -108,6 +110,13 @@
             this.setState({TransId: e.target.value});
         }
 
+        onChange(event) {
+            console.log(event.target.value);
+            let obj={};
+            obj[event.target.name]=event.target.value;
+            this.setState(obj);
+        }
+
         render() {
 
             return (
@@ -129,6 +138,12 @@
                                         <input type="text" placeholder="Transaction ID" autoComplete="off" value={this.state.TransId} onChange={this.onTransIdChange.bind(this)} />
                                     </div>
                                 </div>
+                                <div className="input-item">
+                                    <label htmlFor="TransId" className="label">Saba ID</label>
+                                    <div className="field">
+                                        <input type="text" placeholder="Saba ID" autoComplete="off" name="TpUserName" value={this.state.TpUserName} onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>                                
                                 <div className="button-group">
                                     <button type="submit" className="btn btn-primary">Search</button>
                                 </div>

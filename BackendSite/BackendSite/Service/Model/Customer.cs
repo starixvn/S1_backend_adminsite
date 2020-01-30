@@ -51,6 +51,7 @@ namespace BackendSite.Service.Model
         public string CountryCode { get; set; }
         public string AreaCode { get; set; }
         public string PhoneNo { get; set; }
+        public string SabaID { get; set; }
         public IEnumerable<TpWallet> tpWallet { get; set; }
     }
 

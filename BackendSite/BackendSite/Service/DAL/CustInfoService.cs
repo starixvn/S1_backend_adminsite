@@ -24,10 +24,11 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.QueryFirstOrDefault<Customer>("Customer_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
         }
-        public IEnumerable<CustInfoDetail> GetCustInfoList(string userName, string transId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+
+        public IEnumerable<CustInfoDetail> GetCustInfoList(string userName, string transId, string TpUserName, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             totalPages = 0;
-            var p = new DynamicParameters(new { UserName = userName, TransId = transId, PageSize = pageSize });
+            var p = new DynamicParameters(new { UserName = userName, TransId = transId, TpUserName = TpUserName, PageSize = pageSize });
             p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
