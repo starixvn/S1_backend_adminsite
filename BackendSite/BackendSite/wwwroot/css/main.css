@@ -689,7 +689,7 @@ body {
     border-radius: 2px;
     border: 1px solid #007bff;
     padding: 10px 0;
-    width: 140px;
+    width: 180px;
     text-align: center;
     background: #fff;
     margin-bottom: 10px; }
@@ -749,4 +749,16 @@ body {
       background: #E15F00; }
 .table .table-options .btn:last-child {
     margin-left: 5px;
+}
+.wallet-item .wallet-name {
+    display: block;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+}
+
+.wallet-item .name {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
 }

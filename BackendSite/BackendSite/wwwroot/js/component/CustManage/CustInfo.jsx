@@ -355,8 +355,8 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
             if(data!=null && data.tpWallet!=null) {
                 tpWallet = <ul className="wallet-wrap">{data.tpWallet.map(function(wallet) { 
                     return <li key={wallet.tpId} className="wallet-item table-detail">
-                                <span>{wallet.tpName}</span>
-                                <table><tbody><tr><td><span>{wallet.tpUserName}</span></td><td><button type="button" className="btn btn-copy js-copy" data-clipboard-text={wallet.tpUserName}>Copy</button></td></tr></tbody></table>
+                                <span className="wallet-name">{wallet.tpName}</span>
+                                <div class="name"><span>{wallet.tpUserName}</span><button type="button" className="btn btn-copy js-copy" data-clipboard-text={wallet.tpUserName}>Copy</button></div>
                                 <span className={wallet.balance <0 ? "negative-num":"positive-num"}>{number_format(wallet.balance)}</span>
                             </li>;
                 }.bind(this))}</ul>;
