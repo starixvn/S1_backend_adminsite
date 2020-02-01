@@ -115,5 +115,13 @@ namespace BackendSite.Service.BLL
             string md5NewPassword = tools.MD5Encrypt(NewPassword);
             return custInfoService.SetResetPwd(CustId, md5NewPassword);
         }
+        public bool ResetProfile(int CustId)
+        {
+            return custInfoService.ResetProfile(CustId);
+        }
+        public bool ResetCustBankInfo(int CustId)
+        {
+            return custInfoService.ResetCustBankInfo(CustId);
+        }
     }
 }

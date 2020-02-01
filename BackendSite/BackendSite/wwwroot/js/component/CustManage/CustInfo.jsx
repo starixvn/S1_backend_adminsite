@@ -349,6 +349,44 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
             }
         }
 
+        onResetProfile() {
+            if(confirm('Are you sure?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/api/CustManage/ResetProfile', {CustId: data.custId})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.props.onGetCustInfoDetail();
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));            
+            }
+        }
+        
+        onResetCustBankInfo() {
+            if(confirm('Are you sure?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/api/CustManage/ResetCustBankInfo', {CustId: data.custId})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.props.onGetCustInfoDetail();
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));            
+            }
+        }             
+
         render() {
             let data = this.props.CustInfoData;
             let tpWallet= null;
@@ -356,7 +394,7 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
                 tpWallet = <ul className="wallet-wrap">{data.tpWallet.map(function(wallet) { 
                     return <li key={wallet.tpId} className="wallet-item table-detail">
                                 <span className="wallet-name">{wallet.tpName}</span>
-                                <div class="name"><span>{wallet.tpUserName}</span><button type="button" className="btn btn-copy js-copy" data-clipboard-text={wallet.tpUserName}>Copy</button></div>
+                                <div className="name"><span>{wallet.tpUserName}</span><button type="button" className="btn btn-copy js-copy" data-clipboard-text={wallet.tpUserName}>Copy</button></div>
                                 <span className={wallet.balance <0 ? "negative-num":"positive-num"}>{number_format(wallet.balance)}</span>
                             </li>;
                 }.bind(this))}</ul>;
@@ -369,6 +407,8 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
                     </div>
                 </div> : 
                 <div>
+                    <button className="btn btn-primary" onClick={this.onResetProfile.bind(this)}>Reset Profile</button>
+                    <button className="btn btn-primary" onClick={this.onResetCustBankInfo.bind(this)}>Reset Customer Bank Info.</button>
                     <div className="flex-wrap">
                         <table className="table table-detail">
                             <tbody>

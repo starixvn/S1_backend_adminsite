@@ -1,5 +1,6 @@
 import {number_format} from '../commJS/common';
 import {Pagination} from '../commJS/Pagination.jsx';
+import * as Loading from '../commJS/Loading.jsx';
 
 (function ($, React, ReactDOM, i18n, axios, moment, Calendar) {
     const DepositStatus = {
@@ -200,11 +201,12 @@ import {Pagination} from '../commJS/Pagination.jsx';
 
         onConfirm(action){
             if((action != 0 && confirm('Are you sure?')) || action==0) {
+                Loading.OnLoading();
                 let data = { transId: this.props.transId, Comment : this.state.Comment, Action:action, ActualDeposit : this.state.Data.amount};
 
                 axios.post('/api/Deposit/DepositConfirm', data)
                 .then(function (response) {
-                    //Loading.UnLoading();
+                    Loading.UnLoading();
                     let result = response.data;
                     if (result.errorCode == 0) {
                         alert(result.message);
@@ -218,7 +220,7 @@ import {Pagination} from '../commJS/Pagination.jsx';
                         this.onGetComment();
                     }
                 }.bind(this)).catch(function (error) {
-                    //Loading.UnLoading();
+                    Loading.UnLoading();
                     alert(error);
                 }.bind(this));
             } 

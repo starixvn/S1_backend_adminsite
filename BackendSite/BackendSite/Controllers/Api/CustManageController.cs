@@ -175,5 +175,28 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
+        [HttpPost]
+        public ApiResult ResetProfile(CustInfoReq custInfoReq)
+        {
+            ApiResult apiResult = new ApiResult();
+            if (custInfoBLL.ResetProfile(custInfoReq.CustId))
+            {
+                apiResult.ErrorCode = 0;
+            }
+
+            return apiResult;
+        }
+        [HttpPost]
+        public ApiResult ResetCustBankInfo(CustInfoReq custInfoReq)
+        {
+            ApiResult apiResult = new ApiResult();
+            if (custInfoBLL.ResetCustBankInfo(custInfoReq.CustId))
+            {
+                apiResult.ErrorCode = 0;
+            }
+
+            return apiResult;
+        }
     }
 }
