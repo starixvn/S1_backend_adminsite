@@ -407,8 +407,8 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
                     </div>
                 </div> : 
                 <div>
-                    <button className="btn btn-primary" onClick={this.onResetProfile.bind(this)}>Reset Profile</button>
-                    <button className="btn btn-primary" onClick={this.onResetCustBankInfo.bind(this)}>Reset Customer Bank Info.</button>
+                    <div className="button-block"><button className="btn btn-primary" onClick={this.onResetProfile.bind(this)}>Reset Profile</button>
+                    <button className="btn btn-primary" onClick={this.onResetCustBankInfo.bind(this)}>Reset Customer Bank Info.</button></div>
                     <div className="flex-wrap">
                         <table className="table table-detail">
                             <tbody>
