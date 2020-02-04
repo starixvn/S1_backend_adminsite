@@ -5,7 +5,7 @@ using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data;
 
-namespace BackendSite.Service.BLL
+namespace BackendSite.Service.DAL
 {
     public class BankDetailService
     {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
@@ -37,37 +38,51 @@ namespace BackendSite
             services.AddSingleton<CodeGenerator>();
 
             /*DAL*/
-            services.AddSingleton<ServerInfoService>();
-            services.AddSingleton<PendingFundService>();
-            services.AddSingleton<AdminService>();
-            services.AddSingleton<DepositService>();
-            services.AddSingleton<WithdrawalService>();
-            services.AddSingleton<WalletService>();
-            services.AddSingleton<BankDetailService>();
-            services.AddSingleton<AdminUserService>();
-            services.AddSingleton<MessageService>();
-            services.AddSingleton<MenuService>();
-            services.AddSingleton<CustInfoService>();
-            services.AddSingleton<LocalBankService>();
-            services.AddSingleton<AdjustmentService>();
-            services.AddSingleton<ThirdPartyService>();
-			services.AddSingleton<MarketingService>();
+            //         services.AddSingleton<ServerInfoService>();
+            //         services.AddSingleton<PendingFundService>();
+            //         services.AddSingleton<AdminService>();
+            //         services.AddSingleton<DepositService>();
+            //         services.AddSingleton<WithdrawalService>();
+            //         services.AddSingleton<WalletService>();
+            //         services.AddSingleton<BankDetailService>();
+            //         services.AddSingleton<AdminUserService>();
+            //         services.AddSingleton<MessageService>();
+            //         services.AddSingleton<MenuService>();
+            //         services.AddSingleton<CustInfoService>();
+            //         services.AddSingleton<LocalBankService>();
+            //         services.AddSingleton<AdjustmentService>();
+            //         services.AddSingleton<ThirdPartyService>();
+            //services.AddSingleton<MarketingService>();
+            foreach (var s in AppDomain.CurrentDomain.GetAssemblies()
+                       .SelectMany(t => t.GetTypes())
+                       .Where(t => t.IsClass && t.Namespace == "BackendSite.Service.DAL"))
+            {
+                services.AddSingleton(s);
+            }
+
 
             /*BLL*/
-            services.AddSingleton<ServerInfoBLL>();
-            services.AddSingleton<PendingFundBLL>();
-            services.AddSingleton<AdminBLL>();
-            services.AddSingleton<SelLangBLL>();
-            services.AddSingleton<DepositBLL>();
-            services.AddSingleton<WithdrawalBLL>();
-            services.AddSingleton<BankDetailBLL>();
-            services.AddSingleton<MessageBLL>();
-            services.AddSingleton<AuthorizeBLL>();
-            services.AddSingleton<CustInfoBLL>();
-            services.AddSingleton<MarketingBLL>();			
-            services.AddSingleton<PaymentBLL>();
-            services.AddSingleton<TpBLL>();
-            services.AddSingleton<ExcelBLL>();
+            //services.AddSingleton<ServerInfoBLL>();
+            //services.AddSingleton<PendingFundBLL>();
+            //services.AddSingleton<AdminBLL>();
+            //services.AddSingleton<SelLangBLL>();
+            //services.AddSingleton<DepositBLL>();
+            //services.AddSingleton<WithdrawalBLL>();
+            //services.AddSingleton<BankDetailBLL>();
+            //services.AddSingleton<MessageBLL>();
+            //services.AddSingleton<AuthorizeBLL>();
+            //services.AddSingleton<CustInfoBLL>();
+            //services.AddSingleton<MarketingBLL>();			
+            //services.AddSingleton<PaymentBLL>();
+            //services.AddSingleton<TpBLL>();
+            //services.AddSingleton<ExcelBLL>();
+
+            foreach (var s in AppDomain.CurrentDomain.GetAssemblies()
+           .SelectMany(t => t.GetTypes())
+           .Where(t => t.IsClass && t.Namespace == "BackendSite.Service.BLL"))
+            {
+                services.AddSingleton(s);
+            }
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
