@@ -18,13 +18,15 @@ namespace BackendSite.Service.DAL
         private readonly IConfiguration configuration;
         private readonly WalletService walletService;
         private readonly Common common;
+        private readonly RollOverService rollOverService;
         private int payTypePosition = 100;
 
-        public DepositService(IConfiguration configuration, WalletService walletService, Common common)
+        public DepositService(IConfiguration configuration, WalletService walletService, Common common, RollOverService rollOverService)
         {
             this.configuration = configuration;
             this.walletService = walletService;
             this.common = common;
+            this.rollOverService = rollOverService;
         }
 
         public IEnumerable<DepositRequest> GetDepositRequestList(int? depositType, long startDate, long endDate, int siteId, string DepositId, string UserName, int? currencyId, int? status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
@@ -116,6 +118,12 @@ namespace BackendSite.Service.DAL
                                 int custId = p.Get<int?>("CustId") ?? 0;
                                 string UserName = p.Get<string>("UserName");
                                 result = walletService.SetBalance(custId, siteId, UserName, actualDeposit, type, $"Deposit Approved: {actualDeposit}", transId, out afterAmount, out is1stDepoist, conn, trans);
+
+                                //if (result > 0)
+                                //{
+                                //    decimal afterRollOver = 0;
+                                //    result = rollOverService.SetRollOver(custId, siteId, UserName, RollOverType.Deposit, "", actualDeposit, $"Deposit RollOver: {actualDeposit}", transId, out afterRollOver, conn, trans);
+                                //}
 
                                 if (is1stDepoist == 1 && result > 0)
                                 {

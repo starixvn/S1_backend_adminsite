@@ -27,13 +27,16 @@
     }
 
     class CustInfoList extends React.Component {
+        onExport() {
+            this.props.onExport();
+        }
 
         render() {
             let data = this.props.searchData&&this.props.searchData.data;
             let custInfoRows = null;
             let TransId = this.props.TransId;
             if(data!=null){
-                custInfoRows = <tbody>{data.map(x => <CustInfoRow transId={TransId} key={x.CustId} dataRow={x}/>)}</tbody>;
+                custInfoRows = <tbody>{data.map(x => <CustInfoRow transId={TransId} key={x.custId} dataRow={x}/>)}</tbody>;
             }
 
             return (
@@ -45,6 +48,9 @@
                 </div>
                 : 
                 <div className="table-responsive-md">
+                    <div className="table-options">
+                       <button type="button" className="btn btn-approved" onClick={this.onExport.bind(this)}>Export Excel</button>
+                    </div>
                     <table className="table table-striped">
                         <thead>
                             <tr>
@@ -73,6 +79,8 @@
         constructor(props) {
             super(props);
             this.state = { searchData : null, UserName: "", TransId: "", Loading: false};
+            
+            this.ExportForm = React.createRef();
         }
 
         handleSubmit(event) {
@@ -102,6 +110,22 @@
             }.bind(this));
         }
 
+        onExport() {
+            let data = {UserName: this.state.sUserName=="" ? null:this.state.sUserName, TransId: this.state.sTransId=="" ? null:this.state.sTransId, TpUserName: this.state.sTpUserName=="" ? null:this.state.sTpUserName};
+
+            let ExportParam = [];
+             for (var prop in data) {
+                 ExportParam.push(<input key={prop} type="hidden" name={prop} value={data[prop]}/>);
+            }
+
+            ExportParam = <form method="post" action={'/CustManage/ExportCustInfoList'} ref={this.ExportForm}>{ExportParam}</form>;
+
+            this.setState({ExportParam,ExportParam},function (){
+                this.ExportForm.current.submit();
+            }.bind(this));
+
+            //axios.post('/Finance/ExportDepositList', data, {responseType: 'blob'});
+        }
         onUserNameChange(e){
             this.setState({UserName: e.target.value});
         }
@@ -150,7 +174,10 @@
                             </div>
                         </div>
                     </form>
-                    {this._Search && this.state.searchData !=null ? <CustInfoList searchData={this.state.searchData} TransId={this.state.sTransId} ChangePage={this.onSearch.bind(this)}/>: null}     
+                    {this._Search && this.state.searchData !=null ? <CustInfoList onExport={this.onExport.bind(this)} searchData={this.state.searchData} TransId={this.state.sTransId} ChangePage={this.onSearch.bind(this)}/>: null}     
+                    <div style={{display: 'none'}}>
+                        {this.state.ExportParam}
+                    </div>                    
                 </div>                
             )
         }

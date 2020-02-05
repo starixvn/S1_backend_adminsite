@@ -10,10 +10,12 @@ namespace BackendSite.Controllers
     public class CustManageController : Controller
     {
         private readonly CustInfoBLL custInfoBLL;
+        private readonly ExcelBLL excelBLL;
 
-        public CustManageController(CustInfoBLL custInfoBLL)
+        public CustManageController(CustInfoBLL custInfoBLL, ExcelBLL excelBLL)
         {
             this.custInfoBLL = custInfoBLL;
+            this.excelBLL = excelBLL;
         }
 
         [HttpGet]
@@ -37,6 +39,22 @@ namespace BackendSite.Controllers
             }
             var image = custPhotoId.PhotoIdPic;
             return File(image, "image/jpeg");
+        }
+
+        public class CustInfoReq
+        {
+            public string UserName { get; set; }
+            public string TransId { get; set; }
+            public string TpUserName { get; set; }
+        }
+
+        [HttpPost]
+        public IActionResult ExportCustInfoList(CustInfoReq custInfoReq)
+        {
+            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(custInfoReq.UserName, custInfoReq.TransId, custInfoReq.TpUserName);
+
+            var stream = excelBLL.Export(ExportCustInfo);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportCustInfo)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
     }
 }

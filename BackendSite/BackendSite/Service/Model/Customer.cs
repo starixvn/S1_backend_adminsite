@@ -55,6 +55,23 @@ namespace BackendSite.Service.Model
         public IEnumerable<TpWallet> tpWallet { get; set; }
     }
 
+    public class CustInfoDetailForExport
+    {
+        public string SiteName { get; set; }
+        public string UserName { get; set; }
+        public string Email { get; set; }
+        public string RealName { get; set; }
+        public string CountryCode { get; set; }
+        public string AreaCode { get; set; }
+        public string PhoneNo { get; set; }
+        public int CurrencyId { get; set; }
+        public int UserLevel { get; set; }
+        public string Agent { get; set; }
+        public DateTime RegTime { get; set; }
+        public int Status { get; set; }
+        public string SabaID { get; set; }
+    }
+
     public class CustPhotoId
     {
         public int CustId { get; set; }

@@ -69,6 +69,11 @@ namespace BackendSite.Service.BLL
             return custInfoService.GetCustInfoList(userName, transId, TpUserName, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
 
+        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(string userName, string transId, string TpUserName)
+        {
+            return custInfoService.GetCustInfoExportList(userName, transId, TpUserName);
+        }
+
         public async Task<CustInfoDetail> GetCustInfoDetailAsync(int custId, string userName)
         {
             var custInfoDetail = custInfoService.GetCustInfoDetail(custId, userName);

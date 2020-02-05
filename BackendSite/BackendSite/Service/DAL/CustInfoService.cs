@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace BackendSite.Service.DAL
@@ -40,6 +41,15 @@ namespace BackendSite.Service.DAL
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return result;
+        }
+
+        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(string userName, string transId, string TpUserName)
+        {
+            var p = new DynamicParameters(new { UserName = userName, TpUserName = TpUserName, TransId = transId });
+
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get", p, commandType: CommandType.StoredProcedure);
+            return custInfoDetailList;
         }
 
         public int GetVipLevel(int custId)
