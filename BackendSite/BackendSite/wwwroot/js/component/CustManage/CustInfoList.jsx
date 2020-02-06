@@ -47,7 +47,7 @@
                     </div>
                 </div>
                 : 
-                <div className="table-responsive-md">
+                <div className="table-responsive-md table">
                     <div className="table-options">
                        <button type="button" className="btn btn-approved" onClick={this.onExport.bind(this)}>Export Excel</button>
                     </div>
