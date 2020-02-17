@@ -149,6 +149,8 @@ namespace BackendSite.Controllers.Api
                     }
                     else
                     {
+                        var depositRequest = depositBLL.GetDepositRequest(depositReq.TransId);
+                        var userLang = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId).UserLang;
                         // Send message to player
                         string result = selLangBLL.GetResourceValue("lbl_Approved");
                         string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender");
