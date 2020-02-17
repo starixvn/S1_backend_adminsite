@@ -54,6 +54,7 @@ namespace BackendSite
             services.AddSingleton<ThirdPartyService>();
             services.AddSingleton<MarketingService>();
             services.AddSingleton<RollOverService>();
+            services.AddSingleton<WithdrawalLimitService>();
             //var dal = AppDomain.CurrentDomain.GetAssemblies()
             //           .SelectMany(t => t.GetTypes())
             //           .Where(t => t.IsClass && t.Namespace == "BackendSite.Service.DAL");
