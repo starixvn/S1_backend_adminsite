@@ -363,14 +363,8 @@
   <data name="lbl_MessageDepoistWithdrawalSender" xml:space="preserve">
     <value>System</value>
   </data>
-  <data name="lbl_MessageDepositContent" xml:space="preserve">
-    <value>Your deposit request {0}  has been {1}. Please check with CSD if you have any concern.</value>
-  </data>
   <data name="lbl_MessageDepositTitle" xml:space="preserve">
     <value>Your Deposit {0} has been {1}</value>
-  </data>
-  <data name="lbl_MessageWithdrawalContent" xml:space="preserve">
-    <value>Your withdrawal request {0} has been {1}. Please check with CSD if you have any concern.</value>
   </data>
   <data name="lbl_MessageWithdrawalTitle" xml:space="preserve">
     <value>Your Withdrawal {0}  has been {1}</value>
@@ -530,5 +524,29 @@
   </data>
   <data name="lbl_Success" xml:space="preserve">
     <value>Success</value>
+  </data>
+  <data name="lbl_DepositApprovedContent" xml:space="preserve">
+    <value>Congratulation! Your deposit {0} has been approved! Amount is now credited to your account. Wish you best of the luck in your betting!</value>
+  </data>
+  <data name="lbl_DepositApprovedTitle" xml:space="preserve">
+    <value>Your deposit {0} has been approved!</value>
+  </data>
+  <data name="lbl_DepositRejectContent" xml:space="preserve">
+    <value>Sorry to inform that your deposit {0} has been rejected. Should you have further query, kindly contact CSD for more details.</value>
+  </data>
+  <data name="lbl_DepositRejectTitle" xml:space="preserve">
+    <value>Your deposit {0} has been rejected!</value>
+  </data>
+  <data name="lbl_WithdrawalApprovedContent" xml:space="preserve">
+    <value>Thank you for playing with us! Your withdrawal {0} has been approved, we hope to see you again next time!</value>
+  </data>
+  <data name="lbl_WithdrawalApprovedTitle" xml:space="preserve">
+    <value>Your withdrawal {0} has been approved!</value>
+  </data>
+  <data name="lbl_WithdrawalRejectContent" xml:space="preserve">
+    <value>Sorry to inform that your withdrawal {0} has been rejected. Should you have further query, kindly contact CSD for more details.</value>
+  </data>
+  <data name="lbl_WithdrawalRejectTitle" xml:space="preserve">
+    <value>Yur deposit {0} has been rejected!</value>
   </data>
 </root>

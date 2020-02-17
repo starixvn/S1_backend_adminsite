@@ -119,12 +119,11 @@ namespace BackendSite.Controllers.Api
                 if (withdrawConfirmReuslt > 0)
                 {
                     // Send message to player
-                    string result = selLangBLL.GetResourceValue("lbl_Approved");
                     string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender");
-                    string title = selLangBLL.GetResourceValue("lbl_MessageWithdrawalTitle");
-                    title = string.Format(title, withdrawalReq.TransId, result);
-                    string content = selLangBLL.GetResourceValue("lbl_MessageWithdrawalContent");
-                    content = string.Format(content, withdrawalReq.TransId, result);
+                    string title = selLangBLL.GetResourceValue("lbl_WithdrawalApprovedTitle");
+                    title = string.Format(title, withdrawalReq.TransId);
+                    string content = selLangBLL.GetResourceValue("lbl_WithdrawalApprovedContent");
+                    content = string.Format(content, withdrawalReq.TransId);
                     messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
                 }
             }
@@ -135,12 +134,11 @@ namespace BackendSite.Controllers.Api
                 if (withdrawConfirmReuslt > 0)
                 {
                     // Send message to player
-                    string result = selLangBLL.GetResourceValue("lbl_Rejected");
                     string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender");
-                    string title = selLangBLL.GetResourceValue("lbl_MessageWithdrawalTitle");
-                    title = string.Format(title, withdrawalReq.TransId, result);
-                    string content = selLangBLL.GetResourceValue("lbl_MessageWithdrawalContent");
-                    content = string.Format(content, withdrawalReq.TransId, result);
+                    string title = selLangBLL.GetResourceValue("lbl_WithdrawalRejectTitle");
+                    title = string.Format(title, withdrawalReq.TransId);
+                    string content = selLangBLL.GetResourceValue("lbl_WithdrawalRejectContent");
+                    content = string.Format(content, withdrawalReq.TransId);
                     messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
                 }
             }
