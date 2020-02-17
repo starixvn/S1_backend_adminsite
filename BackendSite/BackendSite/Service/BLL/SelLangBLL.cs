@@ -162,6 +162,18 @@ namespace BackendSite.Service.BLL
 
             return labelString;
         }
+        public string GetResourceValue(string key,string lang)
+        {
+            string labelString = GetResourceValue(key, "lan", lang);
+
+            return labelString;
+        }
+        public string GetMsg(string key,string lang)
+        {
+            string labelString = GetResourceValue(key, "msg", lang);
+
+            return labelString;
+        }
         public string GetErrMsg(int code)
         {
             string labelString = GetResourceValue($"Code_{code}", "GameMsg_lan", GetLangId());

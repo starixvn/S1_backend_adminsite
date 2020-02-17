@@ -21,15 +21,17 @@ namespace BackendSite.Controllers.Api
         private readonly WithdrawalBLL withdrawalBLL;
         private readonly SelLangBLL selLangBLL;
         private readonly MessageBLL messageBLL;
+        private readonly CustInfoBLL custInfoBLL;
         private readonly BankDetailBLL bankDetailBLL;
         private readonly static BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
         private readonly string payApiUrl;
         private readonly CourierAdapter courierAdapter;
-        public WithdrawalController(IConfiguration configuration, CourierAdapter courierAdapter, WithdrawalBLL withdrawalBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, BankDetailBLL bankDetailBLL)
+        public WithdrawalController(IConfiguration configuration, CourierAdapter courierAdapter, WithdrawalBLL withdrawalBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL)
         {
             this.withdrawalBLL = withdrawalBLL;
             this.selLangBLL = selLangBLL;
             this.messageBLL = messageBLL;
+            this.custInfoBLL = custInfoBLL;
             this.bankDetailBLL = bankDetailBLL;
             payApiUrl = configuration.GetValue<string>("PayService");
             this.courierAdapter = courierAdapter;
@@ -118,11 +120,13 @@ namespace BackendSite.Controllers.Api
 
                 if (withdrawConfirmReuslt > 0)
                 {
+                    var depositRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
+                    var userLang = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId).UserLang;
                     // Send message to player
-                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender");
-                    string title = selLangBLL.GetResourceValue("lbl_WithdrawalApprovedTitle");
+                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender", userLang);
+                    string title = selLangBLL.GetResourceValue("lbl_WithdrawalApprovedTitle", userLang);
                     title = string.Format(title, withdrawalReq.TransId);
-                    string content = selLangBLL.GetResourceValue("lbl_WithdrawalApprovedContent");
+                    string content = selLangBLL.GetResourceValue("lbl_WithdrawalApprovedContent", userLang);
                     content = string.Format(content, withdrawalReq.TransId);
                     messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
                 }
@@ -133,11 +137,13 @@ namespace BackendSite.Controllers.Api
 
                 if (withdrawConfirmReuslt > 0)
                 {
+                    var depositRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
+                    var userLang = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId).UserLang;
                     // Send message to player
-                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender");
-                    string title = selLangBLL.GetResourceValue("lbl_WithdrawalRejectTitle");
+                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender", userLang);
+                    string title = selLangBLL.GetResourceValue("lbl_WithdrawalRejectTitle", userLang);
                     title = string.Format(title, withdrawalReq.TransId);
-                    string content = selLangBLL.GetResourceValue("lbl_WithdrawalRejectContent");
+                    string content = selLangBLL.GetResourceValue("lbl_WithdrawalRejectContent", userLang);
                     content = string.Format(content, withdrawalReq.TransId);
                     messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
                 }

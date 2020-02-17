@@ -152,11 +152,10 @@ namespace BackendSite.Controllers.Api
                         var depositRequest = depositBLL.GetDepositRequest(depositReq.TransId);
                         var userLang = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId).UserLang;
                         // Send message to player
-                        string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender");
-                        string title = selLangBLL.GetResourceValue("lbl_DepositApprovedTitle");
+                        string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender", userLang);
+                        string title = selLangBLL.GetResourceValue("lbl_DepositApprovedTitle", userLang);
                         title = string.Format(title, depositReq.TransId);
-                        string content = selLangBLL.GetResourceValue("lbl_DepositApprovedContent");
-                        content = selLangBLL.GetResourceValue("lbl_DepositReject");
+                        string content = selLangBLL.GetResourceValue("lbl_DepositApprovedContent", userLang);
                         content = string.Format(content, depositReq.TransId);
                         messageBLL.SendMessageToPlayer(sender, title, content, depositConfirmReuslt);
                     }
@@ -168,11 +167,13 @@ namespace BackendSite.Controllers.Api
 
                 if (depositConfirmReuslt > 0)
                 {
+                    var depositRequest = depositBLL.GetDepositRequest(depositReq.TransId);
+                    var userLang = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId).UserLang;
                     // Send message to player
-                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender");
-                    string title = selLangBLL.GetResourceValue("lbl_DepositRejectTitle");
+                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender", userLang);
+                    string title = selLangBLL.GetResourceValue("lbl_DepositRejectTitle", userLang);
                     title = string.Format(title, depositReq.TransId);
-                    string content = selLangBLL.GetResourceValue("lbl_DepositRejectContent");
+                    string content = selLangBLL.GetResourceValue("lbl_DepositRejectContent", userLang);
                     content = string.Format(content, depositReq.TransId);
                     messageBLL.SendMessageToPlayer(sender, title, content, depositConfirmReuslt);
                 }
