@@ -19,8 +19,9 @@ namespace BackendSite.Service.BLL
         private readonly Tools tools;
         private readonly CodeGenerator codeGenerator;
         private readonly PromotionService promotionService;
+        private readonly RolloverService rolloverService;
 
-        public CustInfoBLL(IMemoryCache cache, WalletService walletService, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL, TpBLL tpBLL, Tools tools, CodeGenerator codeGenerator, PromotionService promotionService)
+        public CustInfoBLL(IMemoryCache cache, WalletService walletService, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL, TpBLL tpBLL, Tools tools, CodeGenerator codeGenerator, PromotionService promotionService,RolloverService rolloverService)
         {
             this.custInfoService = custInfoService;
             this.serverInfoBLL = serverInfoBLL;
@@ -30,6 +31,7 @@ namespace BackendSite.Service.BLL
             this.tools = tools;
             this.codeGenerator = codeGenerator;
             this.promotionService = promotionService;
+            this.rolloverService = rolloverService;
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -83,6 +85,13 @@ namespace BackendSite.Service.BLL
             {
                 custInfoDetail.tpWallet = await tpBLL.GetTpWalletAsync(custInfoDetail.CustId);
                 custInfoDetail.promotions = promotionService.GetPromotionListByCustId(custInfoDetail.CustId);
+                if (custInfoDetail.promotions != null)
+                {
+                    foreach(var promotion in custInfoDetail.promotions)
+                    {
+                        promotion.custRollOver = rolloverService.GetCustRollOver(custInfoDetail.CustId, promotion.BonusCode);
+                    }
+                }
             }
             return custInfoDetail;
         }
@@ -136,6 +145,10 @@ namespace BackendSite.Service.BLL
         public decimal GetWithdrawalAvailableBalance(int custId)
         {
             return custInfoService.GetWithdrawalAvailableBalance(custId);
+        }
+        public int CancelBonusByBonusId(int bonusId)
+        {
+            return promotionService.CancelBonusByBonusId(bonusId);
         }
     }
 }

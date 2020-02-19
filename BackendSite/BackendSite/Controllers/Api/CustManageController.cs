@@ -198,5 +198,18 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+        public class BonusReq
+        {
+            public int BonusId { get; set; }
+        }
+        [HttpPost]
+        public ApiResult CancelBonusByBonusId(BonusReq bonusReq)
+        {
+            ApiResult apiResult = new ApiResult();
+            custInfoBLL.CancelBonusByBonusId(bonusReq.BonusId);
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
+        }
     }
 }

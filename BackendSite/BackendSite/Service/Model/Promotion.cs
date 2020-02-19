@@ -8,6 +8,7 @@ namespace BackendSite.Service.Model
 {
     public class Promotion
     {
+        public int BonusId { get; set; }
         public string BonusCode { get; set; }
         public string Description { get; set; }
         public PromotionType PromotionType { get; set; }

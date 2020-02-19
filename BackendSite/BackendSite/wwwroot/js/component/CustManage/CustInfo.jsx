@@ -38,6 +38,13 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
         7:<span className="status status-hold">{i18n["lbl_DepositStatus7"]}</span>,
     } 
 
+    const BonusInfoStatus = {
+        1:<span className="status status-active">Running</span>,
+        2:<span className="status status-suspend">Canceled</span>,
+        3:<span className="status status-closed">Expired</span>,
+        4:<span className="status status-initial">Reached</span>,        
+    }        
+
     class DepositList extends React.Component {
         constructor(props) {
             super(props);
@@ -286,6 +293,60 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
         }
     }
 
+    class PromotionRow extends React.Component {
+        CancelBonus(BonusId){
+            this.props.CancelBonus(BonusId)
+        }
+
+        render() {
+            let data=this.props.Promotion;
+            return (
+                <tr>
+                    <td>{data.bonusCode}</td>
+                    <td>{data.description}</td>
+                    <td>{number_format(data.bonusAmount)}</td>
+                    <td>{number_format(data.lockedAmount)}</td>
+                    <td>{number_format(data.custRollOver.rollOver)}</td>
+                    <td>{number_format(data.custRollOver.turnOver)}</td>                    
+                    <td>{BonusInfoStatus[data.bonusInfoStatus]}</td>
+                    <td>{data.bonusInfoStatus ==1 ? <button className="btn btn-primary" onClick={this.CancelBonus.bind(this, data.bonusId)}>Cancel Bonus</button> : null}</td>
+                </tr>
+            )
+        }
+    }
+
+    class Promotion extends React.Component {
+
+        render() {
+            let Promotions = this.props.Promotions;
+            let promotionRows = null;
+
+            if(Promotions!=null){
+                promotionRows = <tbody>{Promotions.map(x => <PromotionRow key={x.bonusCode} Promotion={x} CancelBonus={this.props.CancelBonus} />)}</tbody>;
+            }
+
+            return (
+                <div className="table-responsive-md table">
+                    <table className="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">BonusCode</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Bonus Amount</th>
+                                <th scope="col">Locked Amount</th>
+                                <th scope="col">Rollover</th>
+                                <th scope="col">Turnover</th>
+                                <th scope="col">Status</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        {promotionRows}
+                    </table>
+                </div>
+            )
+        }
+    }
+
     class CustInfo extends React.Component {
         constructor(props) {
             super(props);
@@ -385,12 +446,31 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
                     alert(error);
                 }.bind(this));            
             }
-        }             
+        }
+
+        cancelBonus(bonusId) {
+            if(confirm('Are you sure?')) {            
+                axios.post('/api/CustManage/CancelBonusByBonusId', {BonusId: bonusId})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.props.onGetCustInfoDetail();
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+            }
+        }
 
         render() {
             let data = this.props.CustInfoData;
             let tpWallet= null;
             let elgibleWithdrawal = 0;
+            let promotions = null;
             if(data!=null) {
                 elgibleWithdrawal=data.withdrawalLimit-data.turnOver;
                 if(elgibleWithdrawal<0) {
@@ -410,6 +490,10 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
                     for(let i=0;i<data.tpWallet.length;i++){
                         elgibleWithdrawal += data.tpWallet[i].balance;
                     }
+                }
+
+                if(data.promotions!=null) {
+                    promotions = <Promotion Promotions={data.promotions} CancelBonus={this.cancelBonus.bind(this)} />;
                 }
             }
 
@@ -545,7 +629,7 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
                                 </tr>                                
                             </tbody>
                         </table>
-                        
+                        {promotions}
                         {data.hasPhotoId ? <div className="id-image">
                             <img src={"/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" />
                             <button className="btn btn-delete" disabled={data.isKyc} onClick={!data.isKyc ? this.onAskReupload.bind(this) : null}>Ask Re-Upload</button>
@@ -739,7 +823,6 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
                 }.bind(this));
             }
         }
-        
 
         onChange(e, TabName) {
             let Obj = this.state[TabName];

@@ -53,7 +53,7 @@ namespace BackendSite
             services.AddSingleton<AdjustmentService>();
             services.AddSingleton<ThirdPartyService>();
             services.AddSingleton<MarketingService>();
-            services.AddSingleton<RollOverService>();
+            services.AddSingleton<RolloverService>();
             services.AddSingleton<WithdrawalLimitService>();
             services.AddSingleton<PromotionService>();
             //var dal = AppDomain.CurrentDomain.GetAssemblies()
