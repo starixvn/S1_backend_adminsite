@@ -102,9 +102,4 @@ namespace BackendSite.Service.Model.enums
         Running = 1,
         Fulfill = 2
     }
-    public enum RollOverType
-    {
-        Deposit = 1,
-        Bonus = 2
-    }
 }

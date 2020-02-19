@@ -19,9 +19,9 @@ namespace BackendSite.Service.BLL
         private readonly Tools tools;
         private readonly CodeGenerator codeGenerator;
         private readonly PromotionService promotionService;
-        private readonly RolloverService rolloverService;
+        private readonly RollOverService rolloverService;
 
-        public CustInfoBLL(IMemoryCache cache, WalletService walletService, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL, TpBLL tpBLL, Tools tools, CodeGenerator codeGenerator, PromotionService promotionService,RolloverService rolloverService)
+        public CustInfoBLL(IMemoryCache cache, WalletService walletService, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL, TpBLL tpBLL, Tools tools, CodeGenerator codeGenerator, PromotionService promotionService,RollOverService rolloverService)
         {
             this.custInfoService = custInfoService;
             this.serverInfoBLL = serverInfoBLL;
