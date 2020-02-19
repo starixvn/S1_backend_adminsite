@@ -135,7 +135,6 @@
         }
 
         onChange(event) {
-            console.log(event.target.value);
             let obj={};
             obj[event.target.name]=event.target.value;
             this.setState(obj);

@@ -390,14 +390,27 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
         render() {
             let data = this.props.CustInfoData;
             let tpWallet= null;
-            if(data!=null && data.tpWallet!=null) {
-                tpWallet = <ul className="wallet-wrap">{data.tpWallet.map(function(wallet) { 
-                    return <li key={wallet.tpId} className="wallet-item table-detail">
-                                <span className="wallet-name">{wallet.tpName}</span>
-                                <div className="name"><span>{wallet.tpUserName}</span><button type="button" className="btn btn-copy js-copy" data-clipboard-text={wallet.tpUserName}>Copy</button></div>
-                                <span className={wallet.balance <0 ? "negative-num":"positive-num"}>{number_format(wallet.balance)}</span>
-                            </li>;
-                }.bind(this))}</ul>;
+            let elgibleWithdrawal = 0;
+            if(data!=null) {
+                elgibleWithdrawal=data.withdrawalLimit-data.turnOver;
+                if(elgibleWithdrawal<0) {
+                    elgibleWithdrawal = 0;
+                }
+                elgibleWithdrawal = data.balance - elgibleWithdrawal;
+
+                if(data.tpWallet!=null) {
+                    tpWallet = <ul className="wallet-wrap">{data.tpWallet.map(function(wallet) { 
+                        return <li key={wallet.tpId} className="wallet-item table-detail">
+                                    <span className="wallet-name">{wallet.tpName}</span>
+                                    <div className="name"><span>{wallet.tpUserName}</span><button type="button" className="btn btn-copy js-copy" data-clipboard-text={wallet.tpUserName}>Copy</button></div>
+                                    <span className={wallet.balance <0 ? "negative-num":"positive-num"}>{number_format(wallet.balance)}</span>
+                                </li>;
+                    }.bind(this))}</ul>;
+
+                    for(let i=0;i<data.tpWallet.length;i++){
+                        elgibleWithdrawal += data.tpWallet[i].balance;
+                    }
+                }
             }
 
             return (
@@ -510,6 +523,26 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
                                     <th scope="row">Effective Betting Summary</th>
                                     <td>{number_format(data.effectiveBetSum)}</td>
                                 </tr>
+                                <tr>
+                                    <th scope="row">Winnings</th>
+                                    <td>{number_format(data.winnings)}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Losses</th>
+                                    <td>{number_format(data.losses)}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">WithdrawalLimit</th>
+                                    <td>{number_format(data.withdrawalLimit)}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">TurnOver</th>
+                                    <td>{number_format(data.turnOver)}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Elgible Withdrawal</th>
+                                    <td>{number_format(elgibleWithdrawal)}</td>
+                                </tr>                                
                             </tbody>
                         </table>
                         

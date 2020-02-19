@@ -18,8 +18,9 @@ namespace BackendSite.Service.BLL
         private readonly WalletService walletService;
         private readonly Tools tools;
         private readonly CodeGenerator codeGenerator;
+        private readonly PromotionService promotionService;
 
-        public CustInfoBLL(IMemoryCache cache, WalletService walletService, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL, TpBLL tpBLL, Tools tools, CodeGenerator codeGenerator)
+        public CustInfoBLL(IMemoryCache cache, WalletService walletService, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL, TpBLL tpBLL, Tools tools, CodeGenerator codeGenerator, PromotionService promotionService)
         {
             this.custInfoService = custInfoService;
             this.serverInfoBLL = serverInfoBLL;
@@ -28,6 +29,7 @@ namespace BackendSite.Service.BLL
             this.walletService = walletService;
             this.tools = tools;
             this.codeGenerator = codeGenerator;
+            this.promotionService = promotionService;
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -78,7 +80,10 @@ namespace BackendSite.Service.BLL
         {
             var custInfoDetail = custInfoService.GetCustInfoDetail(custId, userName);
             if (custInfoDetail != null)
+            {
                 custInfoDetail.tpWallet = await tpBLL.GetTpWalletAsync(custInfoDetail.CustId);
+                custInfoDetail.promotions = promotionService.GetPromotionListByCustId(custInfoDetail.CustId);
+            }
             return custInfoDetail;
         }
 
@@ -127,6 +132,10 @@ namespace BackendSite.Service.BLL
         public bool ResetCustBankInfo(int CustId)
         {
             return custInfoService.ResetCustBankInfo(CustId);
+        }
+        public decimal GetWithdrawalAvailableBalance(int custId)
+        {
+            return custInfoService.GetWithdrawalAvailableBalance(custId);
         }
     }
 }

@@ -52,7 +52,12 @@ namespace BackendSite.Service.Model
         public string AreaCode { get; set; }
         public string PhoneNo { get; set; }
         public string SabaID { get; set; }
+        public decimal Winnings { get; set; }
+        public decimal Losses { get; set; }
+        public decimal WithdrawalLimit { get; set; }
+        public decimal TurnOver { get; set; }
         public IEnumerable<TpWallet> tpWallet { get; set; }
+        public IEnumerable<Promotion> promotions { get; set; }
     }
 
     public class CustInfoDetailForExport
@@ -95,5 +100,10 @@ namespace BackendSite.Service.Model
         public string Note { get; set; }
         public DateTime CreateTime { get; set; }
         public string Operator { get; set; }
+    }
+    public class CustRollOver
+    {
+        public decimal RollOver { get; set; }
+        public decimal TurnOver { get; set; }
     }
 }
