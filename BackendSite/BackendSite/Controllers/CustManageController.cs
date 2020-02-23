@@ -46,12 +46,14 @@ namespace BackendSite.Controllers
             public string UserName { get; set; }
             public string TransId { get; set; }
             public string TpUserName { get; set; }
+            public string Email { get; set; }
+            public string PhoneNo { get; set; }
         }
 
         [HttpPost]
         public IActionResult ExportCustInfoList(CustInfoReq custInfoReq)
         {
-            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(custInfoReq.UserName, custInfoReq.TransId, custInfoReq.TpUserName);
+            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(custInfoReq.UserName, custInfoReq.TransId, custInfoReq.TpUserName, custInfoReq.Email, custInfoReq.PhoneNo);
 
             var stream = excelBLL.Export(ExportCustInfo);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportCustInfo)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

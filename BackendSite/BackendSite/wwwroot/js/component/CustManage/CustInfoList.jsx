@@ -1,4 +1,5 @@
 ﻿import {Pagination} from '../commJS/Pagination.jsx';
+import * as Loading from '../commJS/Loading.jsx';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -86,17 +87,29 @@
         handleSubmit(event) {
             event.preventDefault();
             this._Search = true;
-            this.setState({sUserName: this.state.UserName,sTransId:this.state.TransId, sTpUserName: this.state.TpUserName, Loading: true}, function() {
+            this.setState({sUserName: this.state.UserName, 
+                sTransId:this.state.TransId, 
+                sTpUserName: this.state.TpUserName, 
+                sEmail: this.state.Email, 
+                sPhoneNo: this.state.PhoneNo, 
+                Loading: true}, function() {
                 this.onSearch(1);
             }.bind(this));
         }
 
         onSearch(pageNumber) {
-
-            let data = {UserName: this.state.sUserName=="" ? null:this.state.sUserName, TransId: this.state.sTransId=="" ? null:this.state.sTransId, TpUserName: this.state.sTpUserName=="" ? null:this.state.sTpUserName ,PageNumber: pageNumber, PageSize: this._PageSize};
+            Loading.OnLoading();
+            let data = {UserName: this.state.sUserName=="" ? null:this.state.sUserName, 
+                TransId: this.state.sTransId=="" ? null:this.state.sTransId, 
+                TpUserName: this.state.sTpUserName=="" ? null:this.state.sTpUserName, 
+                Email: this.state.sEmail=="" ? null:this.state.sEmail, 
+                PhoneNo: this.state.sPhoneNo=="" ? null:this.state.sPhoneNo, 
+                PageNumber: pageNumber, 
+                PageSize: this._PageSize};
 
             axios.post('/api/CustManage/GetCustInfoList', data)
             .then(function (response) {
+                Loading.UnLoading();
                 let result = response.data;
                 if (result.errorCode == 0) {
                     this.setState({searchData: result, Loading: false});
@@ -105,13 +118,19 @@
                     this.setState({Loading: false});
                 }
             }.bind(this)).catch(function (error) {
+                Loading.UnLoading();
                 alert(error);
                 this.setState({Loading: false});
             }.bind(this));
         }
 
         onExport() {
-            let data = {UserName: this.state.sUserName=="" ? null:this.state.sUserName, TransId: this.state.sTransId=="" ? null:this.state.sTransId, TpUserName: this.state.sTpUserName=="" ? null:this.state.sTpUserName};
+            let data = {UserName: this.state.sUserName=="" ? null:this.state.sUserName, 
+                TransId: this.state.sTransId=="" ? null:this.state.sTransId, 
+                TpUserName: this.state.sTpUserName=="" ? null:this.state.sTpUserName,
+                Email: this.state.sEmail=="" ? null:this.state.sEmail, 
+                PhoneNo: this.state.sPhoneNo=="" ? null:this.state.sPhoneNo,             
+            };
 
             let ExportParam = [];
              for (var prop in data) {
@@ -150,21 +169,33 @@
                         <div className="filter">
                             <div className="row-flex">
                                 <div className="input-item">
-                                    <label htmlFor="UserName" className="label">User Name</label>
+                                    <label className="label">User Name</label>
                                     <div className="field">
                                         <input type="text" placeholder="User Name" autoComplete="off" value={this.state.UserName} onChange={this.onUserNameChange.bind(this)} />
                                     </div>
                                 </div>
                                 <div className="input-item">
-                                    <label htmlFor="TransId" className="label">Transaction ID</label>
+                                    <label className="label">Transaction ID</label>
                                     <div className="field">
                                         <input type="text" placeholder="Transaction ID" autoComplete="off" value={this.state.TransId} onChange={this.onTransIdChange.bind(this)} />
                                     </div>
                                 </div>
                                 <div className="input-item">
-                                    <label htmlFor="TransId" className="label">Saba ID</label>
+                                    <label className="label">Saba ID</label>
                                     <div className="field">
                                         <input type="text" placeholder="Saba ID" autoComplete="off" name="TpUserName" value={this.state.TpUserName} onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>    
+                                <div className="input-item">
+                                    <label className="label">E-Mail</label>
+                                    <div className="field">
+                                        <input type="text" placeholder="E-Mail" autoComplete="off" name="Email" value={this.state.Email} onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <label className="label">Phone No</label>
+                                    <div className="field">
+                                        <input type="text" placeholder="Phone No" autoComplete="off" name="PhoneNo" value={this.state.PhoneNo} onChange={this.onChange.bind(this)} />
                                     </div>
                                 </div>                                
                                 <div className="button-group">
