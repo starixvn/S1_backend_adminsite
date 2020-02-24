@@ -8,6 +8,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace BackendSite.Controllers.Api
 {
@@ -22,8 +23,9 @@ namespace BackendSite.Controllers.Api
         private readonly PendingFundBLL pendingFundBLL;
         private readonly CustInfoBLL custInfoBLL;
         private readonly BankDetailBLL bankDetailBLL;
+        private readonly int mainWalletType;
 
-        public DepositController(DepositBLL depositBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, PendingFundBLL pendingFundBLL, CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL)
+        public DepositController(IConfiguration configuration, DepositBLL depositBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, PendingFundBLL pendingFundBLL, CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL)
         {
             this.depositBLL = depositBLL;
             this.selLangBLL = selLangBLL;
@@ -31,6 +33,7 @@ namespace BackendSite.Controllers.Api
             this.pendingFundBLL = pendingFundBLL;
             this.custInfoBLL = custInfoBLL;
             this.bankDetailBLL = bankDetailBLL;
+            mainWalletType = configuration.GetValue<int>("MainWalletType");
         }
         public class DepositListReq
         {
@@ -127,7 +130,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult DepositConfirm(DepositReq1 depositReq)
+        public async Task<ApiResult> DepositConfirmAsync(DepositReq1 depositReq)
         {
             var apiResult = new ApiResult(selLangBLL);
             var depositConfirmReuslt = -1;
@@ -139,11 +142,19 @@ namespace BackendSite.Controllers.Api
 
                 if (depositConfirmReuslt > 0)
                 {
-                    PendingFund pendingFund = new PendingFund();
-                    pendingFund.CustId = depositConfirmReuslt;
-                    Task<ApiResult<TransferResult>> tmp = Process(pendingFund);
+                    ApiResult<TransferResult> tmp = new ApiResult<TransferResult>();
+                    if (mainWalletType == 2)
+                    {
+                        PendingFund pendingFund = new PendingFund();
+                        pendingFund.CustId = depositConfirmReuslt;
+                        tmp = await Process(pendingFund);
+                    }
+                    else
+                    {
+                        tmp.ErrorCode = 0;
+                    }
 
-                    if (tmp.Result.ErrorCode != 0)
+                    if (tmp.ErrorCode != 0)
                     {
                         depositConfirmReuslt = -4;
                     }
