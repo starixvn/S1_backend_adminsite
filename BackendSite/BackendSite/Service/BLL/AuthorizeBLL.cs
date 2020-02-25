@@ -18,14 +18,16 @@ namespace BackendSite.Service.BLL
         private readonly AdminUserService adminUserService;
         private readonly Tools tools;
         private readonly MenuService menuService;
+        private readonly PermissionService permissionService;
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public AuthorizeBLL(IHttpContextAccessor httpContextAccessor, ServerInfoBLL serverInfoBLL, AdminUserService adminUserService, Tools tools, MenuService menuService)
+        public AuthorizeBLL(IHttpContextAccessor httpContextAccessor, ServerInfoBLL serverInfoBLL, AdminUserService adminUserService, Tools tools, MenuService menuService, PermissionService permissionService)
         {
             this.serverInfoBLL = serverInfoBLL;
             this.adminUserService = adminUserService;
             this.tools = tools;
             this.menuService = menuService;
+            this.permissionService = permissionService;
             this.httpContextAccessor = httpContextAccessor;
         }
         public int UserLogin(string userName, string pwd, string ip, string fromUrl, string userAgent, ref AdminUser adminUser)

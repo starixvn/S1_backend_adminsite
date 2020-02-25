@@ -56,6 +56,8 @@ namespace BackendSite
             services.AddSingleton<RollOverService>();
             services.AddSingleton<WithdrawalLimitService>();
             services.AddSingleton<PromotionService>();
+            services.AddSingleton<PermissionService>();
+            services.AddSingleton<AdminGroupService>();
             //var dal = AppDomain.CurrentDomain.GetAssemblies()
             //           .SelectMany(t => t.GetTypes())
             //           .Where(t => t.IsClass && t.Namespace == "BackendSite.Service.DAL");
@@ -80,6 +82,8 @@ namespace BackendSite
             services.AddSingleton<PaymentBLL>();
             services.AddSingleton<TpBLL>();
             services.AddSingleton<ExcelBLL>();
+            services.AddSingleton<AdminGroupBLL>();
+            services.AddSingleton<PermissionBLL>();
             // var bll = AppDomain.CurrentDomain.GetAssemblies()
             //.SelectMany(t => t.GetTypes())
             //.Where(t => t.IsClass && t.Namespace == "BackendSite.Service.BLL");

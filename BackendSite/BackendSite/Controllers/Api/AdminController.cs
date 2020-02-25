@@ -15,15 +15,15 @@ namespace BackendSite.Controllers.Api
     public class AdminController : Controller
     {
         private readonly SelLangBLL selLangBLL;
-        private readonly AuthorizeBLL authorizeBLL;
+        private readonly PermissionBLL permissionBLL;
         private readonly AdminBLL adminBLL;
 
 
-        public AdminController(AdminBLL adminBLL, SelLangBLL selLangBLL, AuthorizeBLL authorizeBLL)
+        public AdminController(AdminBLL adminBLL, SelLangBLL selLangBLL, PermissionBLL permissionBLL)
         {
             this.adminBLL = adminBLL;
             this.selLangBLL = selLangBLL;
-            this.authorizeBLL = authorizeBLL;
+            this.permissionBLL = permissionBLL;
         }
 
         [HttpPost]
@@ -77,6 +77,17 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = 9;
                 apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
             }
+            return apiResult;
+        }
+
+        public ApiListResult<FuncPermissionModel> GetPermissionDatas()
+        {
+            var apiResult = new ApiListResult<FuncPermissionModel>()
+            {
+                Data = permissionBLL.GetPermissionJSONData(),
+                ErrorCode = 0
+            };
+
             return apiResult;
         }
     }

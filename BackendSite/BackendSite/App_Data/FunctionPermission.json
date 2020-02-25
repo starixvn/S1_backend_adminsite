@@ -1,0 +1,122 @@
+[
+  {
+    "DisplayKey": "Reports",
+    "Settings": [
+      {
+        "DisplayKey": "Test1",
+        "FunctionKey": "XXXX222",
+        "Enable": false
+      }
+    ]
+  },
+  {
+    "DisplayKey": "CSD",
+    "Settings": [
+      {
+        "DisplayKey": "Customer Administration",
+        "FunctionKey": "CustManage/CustInfoList",
+        "Enable": false
+      }
+    ]
+  },
+  {
+    "DisplayKey": "Finance",
+    "Settings": [
+      {
+        "DisplayKey": "Bank Card List",
+        "FunctionKey": "Finance2/BankInfoList",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Deposit Request",
+        "FunctionKey": "Finance/DepositList",
+        "Enable": false,
+        "FunctionKeys": [
+          {
+            "DisplayKey": "Online Banking",
+            "FunctionKey": "Online Banking",
+            "InputBoxType": "checkbox",
+            "SubFunctionKeys": [
+              {
+                "DisplayKey": "Draft",
+                "FunctionKey": "Draft"
+              },
+              {
+                "DisplayKey": "Rejected",
+                "FunctionKey": "Rejected"
+              }
+            ]
+          },
+          {
+            "DisplayKey": "Local Bank",
+            "FunctionKey": "LocalBank",
+            "InputBoxType": "checkbox",
+            "SubFunctionKeys": [
+              {
+                "DisplayKey": "Draft",
+                "FunctionKey": "Draft"
+              },
+              {
+                "DisplayKey": "On Hold(Risk Check)",
+                "FunctionKey": "OnHold"
+              },
+              {
+                "DisplayKey": "Approve",
+                "FunctionKey": "Approve"
+              },
+              {
+                "DisplayKey": "Rejected",
+                "FunctionKey": "Rejected"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "DisplayKey": "Withdrawal Request",
+        "FunctionKey": "Finance/WithdrawalList",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Payment Adjustment",
+        "FunctionKey": "Finance2/PaymentAdjustment",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Pending Funds",
+        "FunctionKey": "Finance/PendingFund",
+        "Enable": false
+      }
+    ]
+  },
+  {
+    "DisplayKey": "Administration",
+    "Settings": [
+      {
+        "DisplayKey": "Group Setting",
+        "FunctionKey": "Admin/GroupAuthoritySetting",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Add Account",
+        "FunctionKey": "Admin/AddAccount",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Account List",
+        "FunctionKey": "Admin/AccountList",
+        "Enable": false
+      }
+    ]
+  },
+  {
+    "DisplayKey": "Marketing",
+    "Settings": [
+      {
+        "DisplayKey": "Point Level Management",
+        "FunctionKey": "Marketing/PointLevelManagement",
+        "Enable": false
+      }
+    ]
+  }
+]
