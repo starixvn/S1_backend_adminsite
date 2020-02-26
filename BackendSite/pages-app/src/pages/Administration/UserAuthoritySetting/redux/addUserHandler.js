@@ -15,34 +15,24 @@ export function AddUserHandler(state, action){
                         IsOpen:true
                     }
                 })
-        case ActionTypes.UPDATE_CURRENCY_LIST:
+        case ActionTypes.UPDATE_SITE_LIST:
                 return Object.assign({}, state, {
                     ...state,
                     AddUserPopbox: {
                         ...state.AddUserPopbox,
-                        CurrencyList:action.currencyList
-                    }
-                })
-        case ActionTypes.UPDATE_GROUP_LIST:
-                return Object.assign({}, state, {
-                    ...state,
-                    AddUserPopbox: {
-                        ...state.AddUserPopbox,
-                        GroupList:action.groupList
+                        SiteList:action.siteList
                     }
                 })
         case ActionTypes.CLOSE_ADD_USER_POPBOX:
                 return Object.assign({}, state, {
                     ...state,
                     AddUserPopbox:{
-                        CurrencyList:[],
+                        SiteList:[],
                         GroupList:[],
                         AddUserDataModel:{
-                            [reducerPropDefines.AddUserDataModelProperty.UserID]: "",
-                            [reducerPropDefines.AddUserDataModelProperty.UserName]: "", 
-                            [reducerPropDefines.AddUserDataModelProperty.UserPWD]: "",
-                            [reducerPropDefines.AddUserDataModelProperty.Email]: "", 
-                            [reducerPropDefines.AddUserDataModelProperty.Currency]:[]  
+                            [reducerPropDefines.AddUserDataModelProperty.userName]: "", 
+                            [reducerPropDefines.AddUserDataModelProperty.userPWD]: "",
+                            [reducerPropDefines.AddUserDataModelProperty.sites]:[]  
                         }
                     },
                     PopboxInfo: {
@@ -66,14 +56,12 @@ export function AddUserHandler(state, action){
                 return Object.assign({}, state, {
                     ...state,
                     AddUserPopbox:{
-                        CurrencyList:[],
+                        SiteList:[],
                         GroupList:[],
                         AddUserDataModel:{
-                            [reducerPropDefines.AddUserDataModelProperty.UserID]: "",
-                            [reducerPropDefines.AddUserDataModelProperty.UserName]: "", 
-                            [reducerPropDefines.AddUserDataModelProperty.UserPWD]: "",
-                            [reducerPropDefines.AddUserDataModelProperty.Email]: "", 
-                            [reducerPropDefines.AddUserDataModelProperty.Currency]:[]  
+                            [reducerPropDefines.AddUserDataModelProperty.userName]: "", 
+                            [reducerPropDefines.AddUserDataModelProperty.userPWD]: "",
+                            [reducerPropDefines.AddUserDataModelProperty.sites]:[]  
                         }
                     },
                     Datas: {

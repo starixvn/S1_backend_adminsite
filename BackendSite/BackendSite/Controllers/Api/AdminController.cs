@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize(Roles = "Admin")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class AdminController : Controller

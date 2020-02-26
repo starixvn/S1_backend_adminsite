@@ -26,7 +26,7 @@ namespace BackendSite.Service.BLL
             this.permissionBLL = permissionBLL;
         }
 
-        public IEnumerable<AdminGroup> GroupList()
+        public IEnumerable<AdminGroup> GetGroupList()
         {
             return adminGroupService.GetGroupList();
         }

@@ -23,7 +23,11 @@ namespace BackendSite.Service.DAL
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                var p = new DynamicParameters(new { SiteId = siteId, adminUser.UserName, adminUser.Userpwd, adminUser.Role });
+                var p = new DynamicParameters(new { 
+                    SiteId = siteId, 
+                    adminUser.UserName, 
+                    adminUser.Userpwd
+                });
                 p.Add("UserId", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 return conn.Execute("AdminAccount_Ins", p, commandType: CommandType.StoredProcedure) >0;
             }
@@ -49,7 +53,11 @@ namespace BackendSite.Service.DAL
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.Execute("AdminAccountId_Set", new { SiteId = siteId, UserId = adminUser.UserId, Role = adminUser.Role, Status = adminUser.Status }, commandType: CommandType.StoredProcedure)>0;
+                return conn.Execute("AdminAccountId_Set", new { 
+                    SiteId = siteId, 
+                    UserId = adminUser.UserId,
+                    Status = adminUser.Status 
+                }, commandType: CommandType.StoredProcedure)>0;
             }
         }
         

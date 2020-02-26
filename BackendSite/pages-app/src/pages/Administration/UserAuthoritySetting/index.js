@@ -20,12 +20,10 @@ class Panel extends Component{
         switch(popboxName){
             case reducerPropDefines.PopboxNames.AddUser:
                 return this.props[reducerActions.AddUserActionTypes.CLOSE_ADD_USER_POPBOX]                
-            case reducerPropDefines.PopboxNames.AssignIndividualPermission:
-                return this.props[reducerActions.AssignIndividualPermissionActionTypes.CLOSE_POPUP_ASSIGN_USER_PERMISSION]
             case reducerPropDefines.PopboxNames.AssignGroup:
                 return this.props[reducerActions.AssignGroupActionTypes.CLOSE_POPUP_ASSIGN_GROUP]
-            case reducerPropDefines.PopboxNames.AssignCurrency:
-                return this.props[reducerActions.AssignCurrencyActionTypes.CLOSE_POPUP_ASSIGN_CURRENCY]
+            case reducerPropDefines.PopboxNames.AssignSites:
+                return this.props[reducerActions.AssignSitesActionTypes.CLOSE_POPUP_ASSIGN_SITES]
             case reducerPropDefines.PopboxNames.ResetPassword:
                 return this.props[reducerActions.ResetPasswordActionTypes.CLOSE_POPUP_RESET_PASSWORD]
             default:
@@ -65,9 +63,8 @@ const Main = (props)=>{
                 ResultDatas={props.Datas.UserList}
                 ClickEnableUser={props[reducerActions.UserAuthoritySettingActionTypes.CLICK_ENABLE_USER]}
                 ClickAssignGroup={props[reducerActions.AssignGroupActionTypes.OPEN_POPUP_ASSIGN_GROUP]}
-                ClickAssignUserPermission={props[reducerActions.AssignIndividualPermissionActionTypes.OPEN_POPUP_ASSIGN_USER_PERMISSION]}
                 ClickResetPassword={props[reducerActions.ResetPasswordActionTypes.OPEN_POPUP_RESET_PASSWORD]}
-                ClickAssignCurrency={props[reducerActions.AssignCurrencyActionTypes.OPEN_POPUP_ASSIGN_CURRENCY]}
+                ClickAssignSites={props[reducerActions.AssignSitesActionTypes.OPEN_POPUP_ASSIGN_SITES]}
                 ClickDeleteUser={props[reducerActions.UserAuthoritySettingActionTypes.CLICK_DELETE_USER]}
             />
         </div>

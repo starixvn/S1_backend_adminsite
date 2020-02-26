@@ -1,9 +1,8 @@
 import React from 'react'
 import { reducerPropDefines, reducerActions } from './redux/actionsAndDataProperties'
 import {AddUserPopboxContent} from './PopboxContentAddUser'
-import {IndividualPermissionPopboxContent} from './PopboxContentIndividualPermission'
 import {AssignGroupContent} from './PopboxContentAssignGroup'
-import {AssignCurrnecyContent} from './PopboxContentAssignCurrency'
+import {AssignSiteContent} from './PopboxContentAssignSites'
 import {ResetPasswordContent} from './PopboxContentResetpwd'
 
 export default (props)=>{
@@ -17,21 +16,10 @@ export default (props)=>{
                         CloseTips={props[reducerActions.PopboxActionTypes.CLOSE_TIPS]}
                         ExecutingStatus={props.PopboxInfo.ExecutingStatus}                   
                         AddUserDataModel={props.AddUserPopbox.AddUserDataModel}
-                        CurrencyList={props.AddUserPopbox.CurrencyList}
+                        SiteList={props.AddUserPopbox.SiteList}
                         EditField={props[reducerActions.AddUserActionTypes.EDIT_FIELD]}
                         GroupList={props.AddUserPopbox.GroupList}
                         />
-            break;
-        case reducerPropDefines.PopboxNames.AssignIndividualPermission:
-            content = props.Datas.UserPermissions ? <IndividualPermissionPopboxContent
-                        ResetToGroupSetting={props[reducerActions.AssignIndividualPermissionActionTypes.RESET_TO_GROUP_SETTING]} 
-                        SaveUserPermission={props[reducerActions.AssignIndividualPermissionActionTypes.ASSIGN_USER_PERMISSION]} 
-                        ClosePopbox={props[reducerActions.AssignIndividualPermissionActionTypes.CLOSE_POPUP_ASSIGN_USER_PERMISSION]}
-                        Datas={props.Datas.UserPermissions}
-                        EnableOrDisableFuncItem={props[reducerActions.AssignIndividualPermissionActionTypes.ENABLE_OR_DISABLE_FUNCTIONITEM]}
-                        EnableOrDisableSubOptionsItem={props[reducerActions.AssignIndividualPermissionActionTypes.ENABLE_OR_DISABLE_SUBOPTION]}
-                        OpenOrCloseList={props[reducerActions.AssignIndividualPermissionActionTypes.OPEN_OR_CLOSE_MAIN_LIST]}
-                        /> : null
             break;
         case reducerPropDefines.PopboxNames.AssignGroup:
             content = <AssignGroupContent
@@ -39,22 +27,19 @@ export default (props)=>{
                         ClosePopbox={props[reducerActions.AssignGroupActionTypes.CLOSE_POPUP_ASSIGN_GROUP]}
                         CloseTips={props[reducerActions.PopboxActionTypes.CLOSE_TIPS]}
                         ExecutingStatus={props.PopboxInfo.ExecutingStatus}                   
-                        
                         GroupList={props.AssignGroupPopbox.GroupList}
-                        CurrentGroupSEQ={props.AssignGroupPopbox.CurrentGroupSEQ}
+                        CurrentSelected={props.AssignGroupPopbox.CurrentSelected}
                         OnSelect={props[reducerActions.AssignGroupActionTypes.ON_SELECT_GROUP]}
                         />
             break;
-        case reducerPropDefines.PopboxNames.AssignCurrency:
-            content = <AssignCurrnecyContent
-                        ClickSubmit={props[reducerActions.AssignCurrencyActionTypes.ASSIGN_CURRENCY]} 
-                        ClosePopbox={props[reducerActions.AssignCurrencyActionTypes.CLOSE_POPUP_ASSIGN_CURRENCY]}
+        case reducerPropDefines.PopboxNames.AssignSites:
+            content = <AssignSiteContent
+                        ClickSubmit={props[reducerActions.AssignSitesActionTypes.ASSIGN_SITES]} 
+                        ClosePopbox={props[reducerActions.AssignSitesActionTypes.CLOSE_POPUP_ASSIGN_SITES]}
                         CloseTips={props[reducerActions.PopboxActionTypes.CLOSE_TIPS]}
-                        ExecutingStatus={props.PopboxInfo.ExecutingStatus}                   
-                        
-                        SelectedValue={props.AssignCurrencyPopbox.SelectedCurr}
-                        DataList={props.AssignCurrencyPopbox.CurrencyList}
-                        OnSelect={props[reducerActions.AssignCurrencyActionTypes.ON_SELECT_CURRENCY]}
+                        ExecutingStatus={props.PopboxInfo.ExecutingStatus}
+                        DataList={props.AssignSitesPopbox.SiteList}
+                        OnSelect={props[reducerActions.AssignSitesActionTypes.ON_SELECT_SITES]}
                         />
             break;
         case reducerPropDefines.PopboxNames.ResetPassword:

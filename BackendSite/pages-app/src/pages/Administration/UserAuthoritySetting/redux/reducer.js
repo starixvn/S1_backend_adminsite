@@ -4,9 +4,8 @@ import {PopboxHandler} from './popboxHandler'
 import { AddUserHandler } from './addUserHandler';
 import {InitDataModel} from './actionsAndDataProperties'
 import {UserAuthoritySettingHandler} from './userAuthoritySettingHandler'
-import {AssignIndividualPermissionHandler} from './assignIndividualPermissionHandler'
 import {AssignGroupHandler} from './assignGroupHandler'
-import {AssignCurrencyHandler} from './assignCurrencyHandler'
+import {AssignSitesHandler} from './assignSitesHandler'
 import {ResetPasswordHandler} from './resetPasswordHandler'
 
 if(process.env.NODE_ENV!=='production'){
@@ -24,8 +23,7 @@ const initPopboxInfo = {
 
 const initCommonModel = {
     Datas:{
-        UserList:null,
-        UserPermissions:InitDataModel.UserPermissions
+        UserList:null
     },
     AddUserPopbox:Object.assign({}, InitDataModel.AddUserDataModel, {
         ...InitDataModel.AddUserDataModel
@@ -33,8 +31,8 @@ const initCommonModel = {
     AssignGroupPopbox:{
         ...InitDataModel.AssignGroupDataModel
     },
-    AssignCurrencyPopbox:{
-        ...InitDataModel.AssignCurrencyDataModel
+    AssignSitesPopbox:{
+        ...InitDataModel.AssignSitesDataModel
     },
     ResetPasswordPopbox:{
         ...InitDataModel.ResetPasswordDataModel
@@ -47,9 +45,8 @@ export const DefineHandlers = {
     'PopboxHandler':'PopboxHandler',
     'AddUserHandler':'AddUserHandler',
     'UserAuthoritySettingHandler':'UserAuthoritySettingHandler',
-    'AssignIndividualPermissionHandler':'AssignIndividualPermissionHandler',
     'AssignGroupHandler':'AssignGroupHandler',
-    'AssignCurrencyHandler':'AssignCurrencyHandler',
+    'AssignSitesHandler':'AssignSitesHandler',
     'ResetPasswordHandler':'ResetPasswordHandler'
 }
 
@@ -63,12 +60,10 @@ function CombineHandler(state=initCommonModel, action){
             return AddUserHandler(state, action)
         case DefineHandlers.UserAuthoritySettingHandler:
             return UserAuthoritySettingHandler(state, action)
-        case DefineHandlers.AssignIndividualPermissionHandler:
-            return AssignIndividualPermissionHandler(state, action)
         case DefineHandlers.AssignGroupHandler:
             return AssignGroupHandler(state, action)
-        case DefineHandlers.AssignCurrencyHandler:
-            return AssignCurrencyHandler(state, action)
+        case DefineHandlers.AssignSitesHandler:
+            return AssignSitesHandler(state, action)
         case DefineHandlers.ResetPasswordHandler:
             return ResetPasswordHandler(state, action)
         default:

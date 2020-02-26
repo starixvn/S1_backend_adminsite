@@ -28,7 +28,6 @@
             <thead>
                 <tr>
                     <th scope="col">@selLangBLL.GetResourceValue("lbl_UserName")</th>
-                    <th scope="col">@selLangBLL.GetResourceValue("lbl_Role")</th>
                     <th scope="col">@selLangBLL.GetResourceValue("lbl_Status")</th>
                     <th scope="col">@selLangBLL.GetResourceValue("lbl_CreatTime")</th>
                     <th></th>
@@ -39,7 +38,6 @@
                 {
                     <tr>
                         <th scope="row">@item.UserName</th>
-                        <td>@item.Role</td>
                         <td>@item.Status</td>
                         <td>@item.CreateTime</td>
                         <!--<td>@Html.ActionLink(@selLangBLL.GetResourceValue("lbl_Edit"), "AccountEdit", "Admin", new { UserId = @item.UserId })</td>-->

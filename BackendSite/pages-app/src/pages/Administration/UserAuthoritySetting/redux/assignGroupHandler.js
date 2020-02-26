@@ -1,4 +1,4 @@
-import {reducerActions, InitDataModel, reducerPropDefines} from './actionsAndDataProperties'
+import {reducerActions, InitDataModel} from './actionsAndDataProperties'
 
 const ActionTypes = reducerActions.AssignGroupActionTypes
 const initDataModel = InitDataModel.AssignGroupDataModel
@@ -10,9 +10,8 @@ export function AssignGroupHandler(state, action){
                     ...state,
                     AssignGroupPopbox: {
                         ...state.AssignGroupPopbox,
-                        CurrentGroupSEQ:action.currentGroupSEQ,
                         GroupList:action.groupList,
-                        CurrentGroupName:action.currentGroupName
+                        CurrentSelected:action.currSelectedId
                     },
                     PopboxInfo: {
                         ...state.PopboxInfo,
@@ -30,8 +29,7 @@ export function AssignGroupHandler(state, action){
                     ...state,
                     AssignGroupPopbox: {
                         ...state.AssignGroupPopbox,
-                        CurrentGroupSEQ:action.currentGroupSEQ,
-                        CurrentGroupName:action.currentGroupName
+                        CurrentSelected:action.currSelectedId
                     }
                 })
         case ActionTypes.ASSIGN_GROUP:

@@ -1,57 +1,36 @@
 export const webAPIUrl = {
-    GET_USER_LIST:'Admin/GetUserList',
-    CLICK_ENABLE_USER:'Admin/EnabledOrDisableUser',
-    GET_GROUP_LIST:'Admin/GetAssignGroupList',
-    ASSIGN_GROUP:'Admin/AssignGroup',
-    GET_CURRENCY_LIST:'Admin/GetAssignCurrencyList',
-    ASSIGN_CURRENCY:'Admin/AssignCurrnecy',
-    RESET_PASSWORD:'Admin/ChangePassword',
-    ADD_USER:'Admin/AddUser',
-    GET_USER_PERMISSION:'Admin/GetUserPermission',
-    AssignIndividualPermission:'Admin/AssignUserPermission',
-    GET_GROUP_LIST_FROM_ADDUSER:'Admin/GetGroupListFROMAddUser',
-    GET_USER_LIST_BY_CURRENCY:'Admin/GetUserListByCurrency',
-    GET_LOGIN_USER_CURRENCY:'Admin/GetLoginUserCurrency',
-    ADD_CURRENCY:'Admin/AddCurrency',
-    REMOVE_CURRENCY:'Admin/RemoveCurrency',
-    DELETE_USER:'Admin/DeleteUser'
+    GET_USER_LIST:'AdminUser/GetUserList',
+    GET_SITE_LIST:'AdminUser/GetSiteList',
+    ASSIGN_SITES:'AdminUser/AssignSiteList',
+    GET_GROUP_LIST:'AdminUser/GetGroupList',
+    ASSIGN_GROUP:'AdminUser/AssignGroup',
+    RESET_PASSWORD:'AdminUser/UpdatePassword',
+    CLICK_ENABLE_USER:'AdminUser/UpdateStatus',
+    GET_ALL_SITE_LIST:'AdminUser/GetAllSiteList',
+    ADD_USER:'AdminUser/AddUser'
 }
-
 
 export const reducerPropDefines = {
     PopboxNames:{
         'AddUser':'AddUser',
         'AssignGroup':'AssignGroup',
-        'AssignIndividualPermission':'AssignIndividualPermission',
-        'AssignCurrency':'AssignCurrency',
+        'AssignSites':'AssignSites',
         'ResetPassword':'ResetPassword'
     },
     AddUserDataModelProperty: {
-        'UserID':'UserID',
-        'UserName':'UserName',
-        'UserPWD':'UserPWD',
-        'Email':'Email',
-        'Currency':'Currency',
-        'GroupName':'GroupName'
+        'userName':'userName',
+        'userPWD':'userPWD',
+        'sites':'sites'
     }
 }
 
-export const InitDataModel = {
-    UserPermissions:{
-        PermissionDatas:null,
-        HandleList:{
-            CloseList_MainItemIdx:[],
-            OpenList_ItemFuncKeys:[]
-        }        
-    },
+export const InitDataModel = {    
     AddUserDataModel:{
-        CurrencyList:[],
+        SiteList:[],
         AddUserDataModel:{
-            [reducerPropDefines.AddUserDataModelProperty.UserID]: "",
-            [reducerPropDefines.AddUserDataModelProperty.UserName]: "", 
-            [reducerPropDefines.AddUserDataModelProperty.UserPWD]: "",
-            [reducerPropDefines.AddUserDataModelProperty.Email]: "", 
-            [reducerPropDefines.AddUserDataModelProperty.Currency]:[]  
+            [reducerPropDefines.AddUserDataModelProperty.userName]: "", 
+            [reducerPropDefines.AddUserDataModelProperty.userPWD]: "",
+            [reducerPropDefines.AddUserDataModelProperty.sites]:[]  
         }      
     },
     AssignGroupDataModel:{
@@ -59,9 +38,9 @@ export const InitDataModel = {
         CurrentGroupSEQ:null,
         CurrentGroupName:null
     },
-    AssignCurrencyDataModel:{
-        SelectedCurr:[],
-        CurrencyList:null
+    AssignSitesDataModel:{
+        SelectedSites:[],
+        SiteList:null
     },
     ResetPasswordDataModel:{
         NewPassword:''
@@ -84,9 +63,7 @@ export const reducerActions = {
         'CLOSE_ADD_USER_POPBOX':'CLOSE_ADD_USER_POPBOX',
         'ADD_USER':'ADD_USER',
         'EDIT_FIELD':'EDIT_FIELD',
-        'UPDATE_CURRENCY_LIST':'UPDATE_CURRENCY_LIST',
-        'UPDATE_GROUP_LIST':'UPDATE_GROUP_LIST',
-        'UPDATE_WHITE_LABEL_LIST':'UPDATE_WHITE_LABEL_LIST'
+        'UPDATE_SITE_LIST':'UPDATE_SITE_LIST',
     },
     AssignGroupActionTypes:{
         'ASSIGN_GROUP':'ASSIGN_GROUP',
@@ -94,20 +71,11 @@ export const reducerActions = {
         'CLOSE_POPUP_ASSIGN_GROUP':'CLOSE_POPUP_ASSIGN_GROUP',
         'OPEN_POPUP_ASSIGN_GROUP':'OPEN_POPUP_ASSIGN_GROUP'
     },
-    AssignIndividualPermissionActionTypes:{
-        'OPEN_POPUP_ASSIGN_USER_PERMISSION':'OPEN_POPUP_ASSIGN_USER_PERMISSION',
-        'OPEN_OR_CLOSE_MAIN_LIST':'OPEN_OR_CLOSE_MAIN_LIST',
-        'ENABLE_OR_DISABLE_FUNCTIONITEM':'ENABLE_OR_DISABLE_FUNCTIONITEM',
-        'ENABLE_OR_DISABLE_SUBOPTION':'ENABLE_OR_DISABLE_SUBOPTION',
-        'ASSIGN_USER_PERMISSION':'ASSIGN_USER_PERMISSION',
-        'RESET_TO_GROUP_SETTING':'RESET_TO_GROUP_SETTING',
-        'CLOSE_POPUP_ASSIGN_USER_PERMISSION':'CLOSE_POPUP_ASSIGN_USER_PERMISSION'
-    },
-    AssignCurrencyActionTypes:{
-        'OPEN_POPUP_ASSIGN_CURRENCY':'OPEN_POPUP_ASSIGN_CURRENCY',
-        'ON_SELECT_CURRENCY':'ON_SELECT_CURRENCY',
-        'ASSIGN_CURRENCY':'ASSIGN_CURRENCY',
-        'CLOSE_POPUP_ASSIGN_CURRENCY':'CLOSE_POPUP_ASSIGN_CURRENCY',
+    AssignSitesActionTypes:{
+        'OPEN_POPUP_ASSIGN_SITES':'OPEN_POPUP_ASSIGN_SITES',
+        'ON_SELECT_SITES':'ON_SELECT_SITES',
+        'ASSIGN_SITES':'ASSIGN_SITES',
+        'CLOSE_POPUP_ASSIGN_SITES':'CLOSE_POPUP_ASSIGN_SITES',
     },
     ResetPasswordActionTypes:{
         'OPEN_POPUP_RESET_PASSWORD':'OPEN_POPUP_RESET_PASSWORD',

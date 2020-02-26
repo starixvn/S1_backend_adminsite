@@ -289,7 +289,7 @@ const TableBodyRows = (props)=>{
             let condition = colInfo.ReplaceValue.Condition;
             matchTargetValue = condition && datas[condition.DataColumn].Value === condition.TargetValue
         }
-        
+
         if(matchTargetValue){
             let value = colInfo.ReplaceValue.NewValueColumns.map(col=>{
                 return datas[col].Value
@@ -439,7 +439,7 @@ const IconButton = (props)=>{
 const convertToHeaderRows = (headers, level)=>{
     let result = [];
     let rows = [];
-    headers.forEach(h=>{
+    headers.filter(h=>{return h.HideColumn !== true}).forEach(h=>{
         rows.push(h);
         if(h.SubRows){            
             result.push({level:level+1, rows:convertToHeaderRows(h.SubRows, level+1)});
@@ -456,9 +456,9 @@ const convertToHeaderRows = (headers, level)=>{
     }    
 }
 
-const getAllHeaders = (headers)=>{
+const getAllHeaders = (headers, getHide=false)=>{
     let rows = [];
-    headers.forEach(d=>{        
+    headers.filter(d=>{return getHide ? true : d.HideColumn !== true}).forEach(d=>{        
         if(d.SubRows){
             rows = rows.concat(getAllHeaders(d.SubRows));
         }else{
@@ -493,7 +493,7 @@ function HeaderMappingOrderBy(_headers, SortingInfo){
 }
 
 export function convertToTableResult(tableName, defineTableHeaders, resultDatas, sortingInfo=null){
-    let _headerColumns = getAllHeaders(defineTableHeaders);
+    let _headerColumns = getAllHeaders(defineTableHeaders, true);
     let _combineFields = [];
     let _body = resultDatas && resultDatas.map((data)=>{
         let result = {};

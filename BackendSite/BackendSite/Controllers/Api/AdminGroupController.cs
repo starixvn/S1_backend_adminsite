@@ -9,27 +9,22 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize(Roles = "Admin")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class AdminGroupController : Controller
     {
-        private readonly SelLangBLL selLangBLL;
-        private readonly AuthorizeBLL authorizeBLL;
         private readonly AdminGroupBLL adminGroupBLL;
 
-        public AdminGroupController(AdminGroupBLL adminGroupBLL, SelLangBLL selLangBLL, AuthorizeBLL authorizeBLL)
+        public AdminGroupController(AdminGroupBLL adminGroupBLL)
         {
             this.adminGroupBLL = adminGroupBLL;
-            this.selLangBLL = selLangBLL;
-            this.authorizeBLL = authorizeBLL;
         }
 
         [HttpPost]
         public ApiListResult<AdminGroup> GetGroupList()
         {
             var apiResult = new ApiListResult<AdminGroup>();
-            var result = adminGroupBLL.GroupList();
+            var result = adminGroupBLL.GetGroupList();
             apiResult.Data = result;
             apiResult.ErrorCode = 0;
             return apiResult;
@@ -50,7 +45,7 @@ namespace BackendSite.Controllers.Api
                 try
                 {
                     adminGroupBLL.AddGroup(GroupInfo);
-                    var result = adminGroupBLL.GroupList();
+                    var result = adminGroupBLL.GetGroupList();
                     apiResult.Data = result;
                     apiResult.ErrorCode = 0;
                 }

@@ -1,17 +1,16 @@
 import {reducerActions, InitDataModel} from './actionsAndDataProperties'
 
-const ActionTypes = reducerActions.AssignCurrencyActionTypes
-const initDataModel = InitDataModel.AssignCurrencyDataModel
+const ActionTypes = reducerActions.AssignSitesActionTypes
+const initDataModel = InitDataModel.AssignSitesDataModel
 
-export function AssignCurrencyHandler(state, action){
+export function AssignSitesHandler(state, action){
     switch(action.type){
-        case ActionTypes.OPEN_POPUP_ASSIGN_CURRENCY:
+        case ActionTypes.OPEN_POPUP_ASSIGN_SITES:
                 return Object.assign({}, state, {
                     ...state,
-                    AssignCurrencyPopbox: {
-                        ...state.AssignCurrencyPopbox,
-                        SelectedCurr:action.selectedValue,
-                        CurrencyList:action.currencyList
+                    AssignSitesPopbox: {
+                        ...state.AssignSitesPopbox,
+                        SiteList:action.siteList
                     },
                     PopboxInfo: {
                         ...state.PopboxInfo,
@@ -22,17 +21,17 @@ export function AssignCurrencyHandler(state, action){
                         IdentityKey:action.identityKey
                     }
                 })
-        case ActionTypes.CLOSE_POPUP_ASSIGN_CURRENCY:
+        case ActionTypes.CLOSE_POPUP_ASSIGN_SITES:
             return ClosePopup(state, action)
-        case ActionTypes.ON_SELECT_CURRENCY:
+        case ActionTypes.ON_SELECT_SITES:
                 return Object.assign({}, state, {
                     ...state,
-                    AssignCurrencyPopbox: {
-                        ...state.AssignCurrencyPopbox,
-                        SelectedCurr:action.selectedValue
+                    AssignSitesPopbox: {
+                        ...state.AssignSitesPopbox,
+                        SiteList:action.siteList
                     }
                 })
-        case ActionTypes.ASSIGN_CURRENCY:
+        case ActionTypes.ASSIGN_SITES:
             return ClosePopup(state, action);
         default:
             return state
@@ -42,7 +41,7 @@ export function AssignCurrencyHandler(state, action){
 function ClosePopup(state, action){
     return Object.assign({}, state, {
         ...state,
-        AssignCurrencyPopbox: {
+        AssignSitesPopbox: {
             ...initDataModel
         },
         PopboxInfo: {

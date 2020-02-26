@@ -88,7 +88,7 @@ namespace BackendSite.Service.DAL
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.Query<AdminGroup>("Admin_Group_Get", new { SEQ = GroupSEQ, SelectAll = 0 }, commandType: CommandType.StoredProcedure).FirstOrDefault();
+                return conn.QueryFirstOrDefault<AdminGroup>("Admin_Group_Get", new { SEQ = GroupSEQ, SelectAll = 0 }, commandType: CommandType.StoredProcedure);
             }
         }
 

@@ -14,8 +14,8 @@ export class AssignGroupContent  extends Component{
         return(
             <div className="popup__body" ref="popup_body">
                 <Content
+                    CurrentSelected={this.props.CurrentSelected}
                     GroupList={this.props.GroupList}
-                    CurrentGroupSEQ={this.props.CurrentGroupSEQ}
                     OnSelect={this.props.OnSelect}                    
                 />
                 <div className="popup__row">
@@ -38,16 +38,16 @@ export class AssignGroupContent  extends Component{
 const Content = (props)=>{
     let radioGroup = 'AssignGroup'
     let rows = props.GroupList && props.GroupList.map(group=>{
-        let checked = props.CurrentGroupSEQ===group.SEQ
+        let checked = props.CurrentSelected !== null && (Number(props.CurrentSelected) === group.id);
         return (
-            <div className="form__group" key={`AssignGroup-${group.SEQ}`}>
+            <div className="form__group" key={`AssignGroup-${group.id}`}>
                 <RadioBox
                     ClassName={RadioBoxClassName.checkbox_checked}
                     RadioGroup={radioGroup}
-                    DisplayText={group.GroupName}
-                    Value={group.SEQ}
+                    DisplayText={group.displayText}
+                    Value={group.id}
                     Checked={checked}
-                    BindingValue={group.GroupName}
+                    BindingValue={group.displayText}
                     HandleClick={props.OnSelect}
                 />
             </div>

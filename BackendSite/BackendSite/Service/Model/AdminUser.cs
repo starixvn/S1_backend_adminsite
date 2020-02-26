@@ -8,13 +8,13 @@ namespace BackendSite.Service.Model
     public class AdminUser
     {
         public int UserId { set; get; }
-        public int SiteId { set; get; }
         public string UserName { set; get; }
         public string Userpwd { set; get; }
         public bool IsSuper { set; get; }
         public int Status { set; get; }
-        public string Role { set; get; }
         public DateTime CreateTime { set; get; }
+        public int? GroupSEQ { get; set; }
+        public string GroupName { get; set; }
     }
 
     public class AuthData
@@ -33,5 +33,17 @@ namespace BackendSite.Service.Model
 
         /*public string Token { set; get; }
         public string LangId { set; get; }*/
+    }
+
+    public class AssignSites
+    {
+        public int UserId { get; set; }
+        public int SiteId { set; get; }
+    }
+
+    public class AssignGroups
+    {
+        public int UserId { get; set; }
+        public int GroupSEQ { get; set; }
     }
 }

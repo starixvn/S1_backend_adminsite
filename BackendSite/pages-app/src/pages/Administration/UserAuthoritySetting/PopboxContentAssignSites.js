@@ -4,7 +4,7 @@ import Lang from '../../../resource/Administration/AuthoritySetting/LangAPI'
 import { BtnBar } from '../../../component/buttons'
 import $ from 'jquery'
 
-export class AssignCurrnecyContent  extends Component{
+export class AssignSiteContent extends Component{
     componentDidMount=()=>{
         if(process.env.NODE_ENV === 'production'){
             $(this.refs.popup_body).overlayScrollbars({});
@@ -15,7 +15,6 @@ export class AssignCurrnecyContent  extends Component{
             <div className="popup__body" ref="popup_body">
                 <Content
                     DataList={this.props.DataList}
-                    SelectedValue={this.props.SelectedValue}
                     OnSelect={this.props.OnSelect}                    
                 />
                 <div className="popup__row">
@@ -36,16 +35,16 @@ export class AssignCurrnecyContent  extends Component{
 }
 
 const Content = (props)=>{
-    let rows = props.DataList && props.DataList.map(data=>{
-        let checked = props.SelectedValue.indexOf(data.CurrencyId)!==-1;
+    let rows = props.DataList && props.DataList.map((data, idx)=>{
+        let checked = data.selected;
         return (
-            <div className="form__group" key={`AssignCurrency-${data.CurrencyId}`}>
+            <div className="form__group" key={`AssignSite-${data.id}-${idx}`}>
                 <CheckBox
                     ClassName={CheckBoxClassName.checkbox_checked}
                     Checked={checked}
                     HandleClick={props.OnSelect}
-                    DisplayText={data.CurrencyName}
-                    Value={data.CurrencyId}
+                    DisplayText={data.displayText}
+                    Value={idx}
                 />
             </div>
         );
