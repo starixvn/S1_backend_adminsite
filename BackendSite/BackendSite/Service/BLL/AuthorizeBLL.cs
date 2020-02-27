@@ -42,7 +42,7 @@ namespace BackendSite.Service.BLL
             {
                 return -2;
             }
-            else if (adminUser.Status == (int)AdminUserStatus.Suspend || adminUser.Status == (int)AdminUserStatus.Closed)
+            else if (adminUser.Status != (int)AdminUserStatus.Running)
             {
                 return -3;
             }

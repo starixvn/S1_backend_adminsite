@@ -1,0 +1,14 @@
+﻿
+@{
+    Layout = null;
+}
+
+<script>
+    window.onload = () => {
+        if (parent.Reload === undefined) {
+            window.location.replace(`${window.location.protocol}//${window.location.host}`);
+        }else{
+            parent.Reload();
+        }
+    }
+</script>

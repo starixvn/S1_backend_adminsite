@@ -148,6 +148,10 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="~/lib/metisMenu.min.js"></script>
     <script type="text/javascript">
+        function Reload(){
+            window.parent.location.replace(`${window.location.protocol}//${window.location.host}`);
+        }
+
         $(function () {
             $('.menubox h2').on('click', function () {
                 $(this).siblings('ul').slideToggle(300, function () {

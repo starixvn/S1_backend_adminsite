@@ -32,43 +32,40 @@ namespace BackendSite.Attributes
 
         public void OnAuthorization(AuthorizationFilterContext filterContext)
         {
-            var authorizeResult = filterContext.Result;
-            var isAuthorized = true;
-            if (authorizeResult is RedirectToRouteResult)
+            if (!string.IsNullOrEmpty(FuncKey))
             {
-                var temp = authorizeResult as RedirectToRouteResult;
-                temp.RouteValues.TryGetValue("controller", out var objFromController);
-                var fromController = objFromController == null ? "" : objFromController as string;
-                isAuthorized = !string.Equals(fromController, "auth", StringComparison.OrdinalIgnoreCase);
-            }
-
-            if (isAuthorized && !string.IsNullOrEmpty(FuncKey) && filterContext.HttpContext.User.Identity.IsAuthenticated)
-            {
-                var authInfo = authorizeBLL.GetAuthData();
-                var loginUser = adminUserService.GetUser(authInfo.UserId);
-                if (!loginUser.IsSuper)
+                if (filterContext.HttpContext.User.Identity.IsAuthenticated)
                 {
-                    if (loginUser.Status == 0)
+                    var authInfo = authorizeBLL.GetAuthData();
+                    var loginUser = adminUserService.GetUser(authInfo.UserId);
+                    if (!loginUser.IsSuper)
                     {
-                        filterContext.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                        filterContext.Result = new RedirectResult("~/Home/RefreshPage");
-                    }
-                    else if (loginUser.GroupSEQ == null)
-                    {
-                        ContentResult result = new ContentResult();
-                        result.Content = "Permission denied.";
-                        filterContext.Result = result;
-                    }
-                    else
-                    {
-                        var permissions = permissionBLL.GetUserPermission((int)loginUser.GroupSEQ);
-                        if(!permissions.Any(x=> string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase)))
+                        if (loginUser.Status == 0)
+                        {
+                            filterContext.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                            filterContext.Result = new RedirectResult("~/AccessDenied/RefreshPage");
+                        }
+                        else if (loginUser.GroupSEQ == null)
                         {
                             ContentResult result = new ContentResult();
                             result.Content = "Permission denied.";
                             filterContext.Result = result;
                         }
+                        else
+                        {
+                            var permissions = permissionBLL.GetUserPermission((int)loginUser.GroupSEQ);
+                            if (!permissions.Any(x => string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase)))
+                            {
+                                ContentResult result = new ContentResult();
+                                result.Content = "Permission denied.";
+                                filterContext.Result = result;
+                            }
+                        }
                     }
+                }
+                else
+                {
+                    filterContext.Result = new RedirectResult("~/AccessDenied/RefreshPage");
                 }
             }
         }
