@@ -98,7 +98,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public ApiListResult<DisplayList> GetGroupList(AdminUser UserInfo)
+        public ApiListResult<DisplayList> GetAllGroupList()
         {
             var apiResult = new ApiListResult<DisplayList>();
             try
@@ -177,12 +177,12 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public ApiListResult<AdminUser> AddUser([FromForm]string UserName, [FromForm]string Userpwd, [FromForm]int[] SiteList)
+        public ApiListResult<AdminUser> AddUser([FromForm]string UserName, [FromForm]string Userpwd, [FromForm]int[] SiteList, [FromForm]int? GroupSEQ)
         {
             var apiResult = new ApiListResult<AdminUser>();
             try
             {
-                var newUserList = adminUserBLL.AddUser(UserName, Userpwd, SiteList);
+                var newUserList = adminUserBLL.AddUser(UserName, Userpwd, SiteList, GroupSEQ);
                 if(newUserList != null)
                 {
                     apiResult.Data = adminUserBLL.GetUserList();

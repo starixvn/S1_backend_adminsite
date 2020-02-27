@@ -1,4 +1,4 @@
-import axios from '../../node_modules/axios';
+import axios from 'axios';
 
 export default class WidgetApi {
     static GetWebAPI(actionUrl){
@@ -21,5 +21,11 @@ export default class WidgetApi {
         let _rootUrl = window.RootUrl;
         const url = _rootUrl + '/' + param.Url;
         return axios.post(url, data);
+    }
+
+    static MultiPostData(params){
+        return axios.all(params.map(param=>{
+            return WidgetApi.PostData(param);
+        }));
     }
 }

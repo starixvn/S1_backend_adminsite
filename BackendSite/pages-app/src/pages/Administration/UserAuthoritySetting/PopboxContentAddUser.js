@@ -1,10 +1,11 @@
-import React from 'react'
+import React, {Component} from 'react'
 import {DropdownBox} from '../../../component/dropdownBox'
 import {InputBox} from '../../../component/inputField'
 import {CheckList} from '../../../component/checkBox'
 import Lang from '../../../resource/Administration/AuthoritySetting/LangAPI'
 import { BtnBar } from '../../../component/buttons'
 import {RuleType} from '../../../module/ValidFieldValue'
+import $ from 'jquery'
 
 const ElemType = {
     'Inputbox':'Inputbox',
@@ -54,48 +55,57 @@ export function GetAddUserDefineElement(site_options, groups){
             }
         },
         {
+            DataColumn:"group" , DisplayText:Lang.getLang(window.LangCode,"lbl_role"), ElemType:ElemType.Dropdownbox, Options:groups
+        },
+        {
             DataColumn:'sites', DisplayText:Lang.getLang(window.LangCode,"lbl_site"), ElemType:ElemType.Checkbox, Options:site_options
         }
     ]
 }
 
-export const AddUserPopboxContent = (props)=>{
-    return(
-        <div className="popup__body">
-            <Content
-                Datas={props.AddUserDataModel}
-                EditField={props.EditField}
-                SiteList={props.SiteList}
-                GroupList={props.GroupList}
-            />
-            <div className="popup__row">
-                <BtnBar
-                    SubmitDisplayText={Lang.getLang(window.LangCode,"lbl_Submit")}
-                    CancelDisplayText={Lang.getLang(window.LangCode,"lbl_Cancel")}
-                    SuccessAlert={Lang.getLang(window.LangCode,"msgSuccessAlert")}
-                    ErrorAlert={Lang.getLang(window.LangCode,"msgErrorAlert")} 
-                    Close={props.ClosePopbox}
-                    CloseTips={props.CloseTips}
-                    ClickSubmit={props.ClickSubmit}
-                    ExecutingStatus={props.ExecutingStatus}
+export class AddUserPopboxContent extends Component{
+    componentDidMount=()=>{
+        if(process.env.NODE_ENV === 'production'){
+            $(this.refs.popup_body).overlayScrollbars({});
+        }
+    }
+    render(){
+        return(
+            <div className="popup__body" ref="popup_body">
+                <Content
+                    Datas={this.props.AddUserDataModel}
+                    EditField={this.props.EditField}
+                    SiteList={this.props.SiteList}
+                    GroupList={this.props.GroupList}
                 />
+                <div className="popup__row">
+                    <BtnBar
+                        SubmitDisplayText={Lang.getLang(window.LangCode,"lbl_Submit")}
+                        CancelDisplayText={Lang.getLang(window.LangCode,"lbl_Cancel")}
+                        SuccessAlert={Lang.getLang(window.LangCode,"msgSuccessAlert")}
+                        ErrorAlert={Lang.getLang(window.LangCode,"msgErrorAlert")} 
+                        Close={this.props.ClosePopbox}
+                        CloseTips={this.props.CloseTips}
+                        ClickSubmit={this.props.ClickSubmit}
+                        ExecutingStatus={this.props.ExecutingStatus}
+                    />
+                </div>
             </div>
-        </div>
-    )    
+        )
+    }    
 }
 
 const SetGroupList = (GroupList)=>{
     return GroupList && GroupList.map(x=>{
         return {
-            SEQ: x.SEQ,
-            DisplayText: x.GroupName
+            Id: x.id,
+            DisplayText: x.displayText
         }
     })
 }
 
 const Content = (props)=>{
     let AddUserModel = GetAddUserDefineElement(props.SiteList, SetGroupList(props.GroupList));
-    
     let Datas = props.Datas;
     const Content = AddUserModel.map(colInfo=>{
         let key = 'add_user_'+colInfo.DataColumn;
@@ -127,7 +137,7 @@ const Content = (props)=>{
             default:
                 _content = (
                     <InputBox 
-                        MainKey={key} 
+                        Key={key} 
                         OnBlur={props.EditField}
                         DataColumn={colInfo.DataColumn}
                         Value={Datas[colInfo.DataColumn]}

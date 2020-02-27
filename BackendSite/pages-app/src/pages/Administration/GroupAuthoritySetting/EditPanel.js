@@ -28,12 +28,14 @@ export default class Panel extends Component {
                     IsUserAuthPage={false}
                     IsFullPage={true}
                 />
-                <BtnBar
-                    SubmitDisplayText={Lang.getLang(window.LangCode,"lbl_Submit")}
-                    CancelDisplayText={Lang.getLang(window.LangCode,"lbl_Cancel")}
-                    Close={this.props.BtnBar.ClickCancel}
-                    ClickSubmit={this.props.BtnBar.ClickSubmit}
-                />
+                <div className="panel__row">
+                    <BtnBar
+                        SubmitDisplayText={Lang.getLang(window.LangCode,"lbl_Submit")}
+                        CancelDisplayText={Lang.getLang(window.LangCode,"lbl_Cancel")}
+                        Close={this.props.BtnBar.ClickCancel}
+                        ClickSubmit={this.props.BtnBar.ClickSubmit}
+                    />
+                </div>
             </div>
         )
     }
@@ -89,7 +91,7 @@ class GroupInfo extends Component{
                 default:
                     _content = (
                         <InputBox 
-                            MainKey={key} 
+                            Key={key} 
                             OnBlur={this.props.EditField}
                             DataColumn={colInfo.DataColumn}
                             Value={Datas[colInfo.DataColumn]}

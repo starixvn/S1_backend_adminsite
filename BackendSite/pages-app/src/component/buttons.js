@@ -43,7 +43,7 @@ export const IconButton = (props)=>{
 
 export const BtnBar = ({SubmitTextToUpperCase=false, CancelTextToUpperCase=false, ...props})=>{
     let tips = null;
-    if(props.ExecutingStatus!==null){
+    if(props.ExecutingStatus!==null && props.ExecutingStatus !== undefined){
         tips = <BtnTips ExecutingStatus={props.ExecutingStatus} {...props}/>
     }
 
@@ -90,7 +90,7 @@ class BtnTips extends Component{
             this.intervalID = setInterval(this.props.Close, success_msg_stop_ms);
         }else{
             this.intervalID = setInterval(this.props.CloseTips, failure_msg_stop_ms)
-        }        
+        }
 
         let content = null;
         switch(this.props.ExecutingStatus){

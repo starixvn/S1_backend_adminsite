@@ -113,7 +113,7 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public IEnumerable<AdminUser> AddUser(string UserName, string MD5Pwd, int[] SiteList)
+        public IEnumerable<AdminUser> AddUser(string UserName, string MD5Pwd, int[] SiteList, int? GroupSEQ)
         {
             IEnumerable<AdminUser> userList = null;
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
@@ -134,10 +134,18 @@ namespace BackendSite.Service.DAL
 
                     if(UserId != null)
                     {
-
-                        foreach(var SiteId in SiteList)
+                        if (GroupSEQ != null)
                         {
-                            conn.Execute("Admin_AuthorSite_Ins", new { UserId, SiteId }, tran, commandType: CommandType.StoredProcedure);
+                            string SpName = "Admin_AuthorGroup_Set";
+                            conn.Execute(SpName, new { UserId, GroupSEQ }, tran, commandType: CommandType.StoredProcedure);
+                        }
+
+                        if (SiteList != null)
+                        {
+                            foreach (var SiteId in SiteList)
+                            {
+                                conn.Execute("Admin_AuthorSite_Ins", new { UserId, SiteId }, tran, commandType: CommandType.StoredProcedure);
+                            }
                         }
 
                         userList = conn.Query<AdminUser>("Admin_User_GetAll", transaction: tran, commandType: CommandType.StoredProcedure);

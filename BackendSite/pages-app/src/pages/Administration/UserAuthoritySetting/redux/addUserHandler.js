@@ -7,6 +7,16 @@ export function AddUserHandler(state, action){
         case ActionTypes.OPEN_ADD_USER_POPBOX:
                 return Object.assign({}, state, {
                     ...state,
+                    AddUserPopbox:{
+                        SiteList:[],
+                        GroupList:[],
+                        AddUserDataModel:{
+                            [reducerPropDefines.AddUserDataModelProperty.userName]: "", 
+                            [reducerPropDefines.AddUserDataModelProperty.userPWD]: "",
+                            [reducerPropDefines.AddUserDataModelProperty.sites]:[],
+                            [reducerPropDefines.AddUserDataModelProperty.group]:[]
+                        }
+                    },
                     PopboxInfo: {
                         ...state.PopboxInfo,
                         PopboxName:action.popboxName,
@@ -23,6 +33,14 @@ export function AddUserHandler(state, action){
                         SiteList:action.siteList
                     }
                 })
+        case ActionTypes.UPDATE_GROUP_LIST:
+                return Object.assign({}, state, {
+                    ...state,
+                    AddUserPopbox: {
+                        ...state.AddUserPopbox,
+                        GroupList:action.groupList
+                    }
+                })
         case ActionTypes.CLOSE_ADD_USER_POPBOX:
                 return Object.assign({}, state, {
                     ...state,
@@ -32,7 +50,8 @@ export function AddUserHandler(state, action){
                         AddUserDataModel:{
                             [reducerPropDefines.AddUserDataModelProperty.userName]: "", 
                             [reducerPropDefines.AddUserDataModelProperty.userPWD]: "",
-                            [reducerPropDefines.AddUserDataModelProperty.sites]:[]  
+                            [reducerPropDefines.AddUserDataModelProperty.sites]:[],
+                            [reducerPropDefines.AddUserDataModelProperty.group]:[]
                         }
                     },
                     PopboxInfo: {
@@ -55,26 +74,13 @@ export function AddUserHandler(state, action){
         case ActionTypes.ADD_USER:
                 return Object.assign({}, state, {
                     ...state,
-                    AddUserPopbox:{
-                        SiteList:[],
-                        GroupList:[],
-                        AddUserDataModel:{
-                            [reducerPropDefines.AddUserDataModelProperty.userName]: "", 
-                            [reducerPropDefines.AddUserDataModelProperty.userPWD]: "",
-                            [reducerPropDefines.AddUserDataModelProperty.sites]:[]  
-                        }
-                    },
                     Datas: {
                         ...state.Datas,
                         UserList:action.datas
                     },
                     PopboxInfo: {
-                        PopboxName:null,
-                        Title:null,
-                        Content:null,
-                        ExecutingStatus:null,
-                        IsOpen:false,
-                        IdentityKey:null
+                        ...state.PopboxInfo,
+                        ExecutingStatus:'success'
                     }
                 })
         default:

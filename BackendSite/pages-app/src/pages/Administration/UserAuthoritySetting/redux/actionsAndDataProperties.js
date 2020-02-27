@@ -2,7 +2,7 @@ export const webAPIUrl = {
     GET_USER_LIST:'AdminUser/GetUserList',
     GET_SITE_LIST:'AdminUser/GetSiteList',
     ASSIGN_SITES:'AdminUser/AssignSiteList',
-    GET_GROUP_LIST:'AdminUser/GetGroupList',
+    GET_ALL_GROUP_LIST:'AdminUser/GetAllGroupList',
     ASSIGN_GROUP:'AdminUser/AssignGroup',
     RESET_PASSWORD:'AdminUser/UpdatePassword',
     CLICK_ENABLE_USER:'AdminUser/UpdateStatus',
@@ -18,6 +18,7 @@ export const reducerPropDefines = {
         'ResetPassword':'ResetPassword'
     },
     AddUserDataModelProperty: {
+        'group':'group',
         'userName':'userName',
         'userPWD':'userPWD',
         'sites':'sites'
@@ -27,6 +28,7 @@ export const reducerPropDefines = {
 export const InitDataModel = {    
     AddUserDataModel:{
         SiteList:[],
+        GroupList:[],
         AddUserDataModel:{
             [reducerPropDefines.AddUserDataModelProperty.userName]: "", 
             [reducerPropDefines.AddUserDataModelProperty.userPWD]: "",
@@ -64,6 +66,7 @@ export const reducerActions = {
         'ADD_USER':'ADD_USER',
         'EDIT_FIELD':'EDIT_FIELD',
         'UPDATE_SITE_LIST':'UPDATE_SITE_LIST',
+        'UPDATE_GROUP_LIST':'UPDATE_GROUP_LIST'
     },
     AssignGroupActionTypes:{
         'ASSIGN_GROUP':'ASSIGN_GROUP',

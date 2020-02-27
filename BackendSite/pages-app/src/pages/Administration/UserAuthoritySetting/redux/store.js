@@ -7,6 +7,7 @@ import Lang from '../../../../resource/Administration/AuthoritySetting/LangAPI'
 import {GetAddUserDefineElement} from '../PopboxContentAddUser'
 import {VaildFieldValues} from '../../../../module/ValidFieldValue';
 import qs from 'qs';
+import axios from 'axios';
 
 export let store = process.env.NODE_ENV==='production' ? createStore(Reducer) : createStore(Reducer, composeWithDevTools());
 
@@ -29,22 +30,38 @@ function AddUserProps(dispatch){
                 popboxName:reducerPropDefines.PopboxNames.AddUser
             });
 
-            let param = {
-                Url: webAPIUrl.GET_SITE_LIST
+            let paramGetGroupList = {
+                Url: webAPIUrl.GET_ALL_GROUP_LIST
+            }
+
+            let paramGetSiteList = {
+                Url: webAPIUrl.GET_ALL_SITE_LIST
             };
 
-            WebAPI.PostData(param).then((res) => {
-                if (res.data.errorCode === 0) {
-                    let siteList = res.data.data;
+            WebAPI.MultiPostData([paramGetGroupList, paramGetSiteList])
+            .then(axios.spread((resGroup, resSites)=> {
+                if (resGroup.data.errorCode === 0) {
+                    let groupList = resGroup.data.data;
+                    dispatch({
+                        handler:DefineHandlers.AddUserHandler,
+                        type:reducerActions.AddUserActionTypes.UPDATE_GROUP_LIST,
+                        groupList:groupList
+                    });
+                } else {
+                    alert(resGroup.data.message)
+                }
+
+                if (resSites.data.errorCode === 0) {
+                    let siteList = resSites.data.data;
                     dispatch({
                         handler:DefineHandlers.AddUserHandler,
                         type:reducerActions.AddUserActionTypes.UPDATE_SITE_LIST,
                         siteList:siteList
                     });
                 } else {
-                    alert(res.data.message)
+                    alert(resSites.data.message)
                 }
-            });
+            }));
         },
         [reducerActions.AddUserActionTypes.CLOSE_ADD_USER_POPBOX]:()=>{
             dispatch({
@@ -81,9 +98,9 @@ function AddUserProps(dispatch){
         },
         [reducerActions.AddUserActionTypes.ADD_USER]:()=>{
             let newUser = store.getState().CommonHandler.AddUserPopbox.AddUserDataModel;
-
             let defineElems = GetAddUserDefineElement();
-            let checked = VaildFieldValues(newUser, defineElems)
+            let checked = VaildFieldValues(newUser, defineElems);
+
             if(checked){
                 let param = {
                     Url: webAPIUrl.ADD_USER,
@@ -91,6 +108,7 @@ function AddUserProps(dispatch){
                         UserName:newUser.userName,
                         Userpwd:newUser.userPWD,                        
                         SiteList:newUser.sites,
+                        GroupSEQ:newUser.group ? newUser.group.Id : null
                     })
                 };
 
@@ -117,7 +135,7 @@ function UserAuthoritySettingProps(dispatch){
                 Url: webAPIUrl.GET_USER_LIST
             };
 
-            WebAPI.PostData(param).then((res) => {
+            WebAPI.PostData(param).then((res)=> {
                 if (res.data.errorCode === 0) {
                     dispatch({
                         handler:DefineHandlers.UserAuthoritySettingHandler,
@@ -153,32 +171,6 @@ function UserAuthoritySettingProps(dispatch){
                     alert(res.data.message)
                 }
             })
-        },
-        [reducerActions.UserAuthoritySettingActionTypes.CLICK_DELETE_USER]:(tableName, idx)=>{
-            let datas = store.getState().CommonHandler.Datas;
-            
-            if(window.confirm(Lang.getLang(window.LangCode,"msg_delete_user", [datas.UserList[idx].userName]))){
-                let userSEQ = datas.UserList[idx].UserSEQ;    
-                let param = {
-                    Url: webAPIUrl.DELETE_USER,
-                    Data: {
-                        UserSEQ:userSEQ,
-                    }
-                };
-
-                WebAPI.PostData(param).then((res) => {
-                    if (res.data.errorCode === 0) {
-                        let UserList = datas.UserList;
-                        dispatch({
-                            handler:DefineHandlers.UserAuthoritySettingHandler,
-                            type:reducerActions.UserAuthoritySettingActionTypes.CLICK_DELETE_USER,
-                            UserList:UserList
-                        });
-                    } else {
-                        alert(res.data.message)
-                    }
-                });
-            }
         }
     }
 }
@@ -320,10 +312,7 @@ function AssignGroupProps(dispatch){
             let datas = store.getState().CommonHandler.Datas.UserList;
             
             let param = {
-                Url: webAPIUrl.GET_GROUP_LIST,
-                Data: {
-                    UserId:datas[idx].userId
-                }
+                Url: webAPIUrl.GET_ALL_GROUP_LIST
             };
 
             WebAPI.PostData(param).then((res) => {
