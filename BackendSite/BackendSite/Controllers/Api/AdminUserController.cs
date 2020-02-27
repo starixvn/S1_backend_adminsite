@@ -8,9 +8,11 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Newtonsoft.Json;
 using System.Text;
+using BackendSite.Attributes;
 
 namespace BackendSite.Controllers.Api
 {
+    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Admin/UserAuthoritySetting" })]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class AdminUserController : Controller

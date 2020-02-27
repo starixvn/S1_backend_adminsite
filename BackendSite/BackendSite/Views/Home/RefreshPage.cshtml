@@ -1,0 +1,15 @@
+﻿
+@{
+    Layout = null;
+}
+
+<script>
+    window.onload = function() {
+      document.getElementById("iframe").onload = function() {
+        window.top.location.reload();
+        window.parent.location.reload();
+        window.parent.location = document.referrer;
+        parent.location.reload();
+      }
+    }
+</script>

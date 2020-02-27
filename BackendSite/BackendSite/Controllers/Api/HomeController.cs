@@ -84,12 +84,6 @@ namespace BackendSite.Controllers.Api
                     //new Claim("LangId",? ),
             };
 
-            //List<string> roleList = JsonConvert.DeserializeObject<List<string>>(adminUser.Role);
-            //foreach (var item in roleList)
-            //{
-            //    claims.Add(new Claim(ClaimTypes.Role, item.ToString()));
-            //}
-
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
             apiResult.Message = Url.Action("Index", "Home");

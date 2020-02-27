@@ -32,18 +32,18 @@ class Panel extends Component{
     }
     render(){
         return (
-            <div className="newwrapper">
-                <Popbox
-                    Title={this.props.PopboxInfo.Title}
-                    Content={<PopboxContent {...this.props}/>}
-                    ClickClose={this.getPopboxCloseFunc()}
-                    IsOpen={this.props.PopboxInfo.IsOpen}
-                />
-                <Header OpenAddUserPanel={this.props[reducerActions.AddUserActionTypes.OPEN_ADD_USER_POPBOX]}/>
-                {
-                    this.props.Datas.UserList === null || this.props.Datas.UserList === undefined ? <LoadingImage />  : <Main {...this.props}/>
-                }   
-            </div>
+            this.props.Datas.UserList === null || this.props.Datas.UserList === undefined ? <LoadingImage />  : (
+                <div className="newwrapper">
+                    <Popbox
+                        Title={this.props.PopboxInfo.Title}
+                        Content={<PopboxContent {...this.props}/>}
+                        ClickClose={this.getPopboxCloseFunc()}
+                        IsOpen={this.props.PopboxInfo.IsOpen}
+                    />
+                    <Header OpenAddUserPanel={this.props[reducerActions.AddUserActionTypes.OPEN_ADD_USER_POPBOX]}/>
+                    <Main {...this.props}/>
+                </div>
+            )
         )
     }
 }

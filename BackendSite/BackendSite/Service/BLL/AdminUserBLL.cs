@@ -34,9 +34,9 @@ namespace BackendSite.Service.BLL
             adminUserService.AssignSiteList(UserId, SiteIds);
         }
 
-        public IEnumerable<AssignGroups> GetAssignGroupList(int UserId)
+        public AssignGroups GetAssignGroup(int UserId)
         {
-            return adminUserService.GetAssignGroupList(UserId);
+            return adminUserService.GetAssignGroup(UserId);
         }
 
         public void AssignGroup(int UserId, int? GroupSEQ)

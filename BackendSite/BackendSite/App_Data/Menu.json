@@ -8,6 +8,7 @@
       {
         "Key": "",
         "Title": "Test1",
+        "FuncKey": "XXXX222",
         "Controller": "XXXX222",
         "Action": "",
         "Icon": "",
@@ -25,6 +26,7 @@
       {
         "Key": "lbl_CustomerAdministration",
         "Title": "Customer Administration",
+        "FuncKey": "CustManage/CustInfoList",
         "Controller": "CustManage",
         "Action": "CustInfoList",
         "Icon": "",
@@ -42,7 +44,8 @@
       {
         "Key": "lbl_BankCardList",
         "Title": "Bank Card Management",
-        "Controller": "Finance2",
+        "FuncKey": "Finance/BankInfoList",
+        "Controller": "Finance",
         "Action": "BankInfoList",
         "Icon": "",
         "Roles": null,
@@ -51,6 +54,7 @@
       {
         "Key": "lbl_DepositRequest",
         "Title": "Deposit Request",
+        "FuncKey": "Finance/DepositList",
         "Controller": "Finance",
         "Action": "DepositList",
         "Icon": "",
@@ -60,6 +64,7 @@
       {
         "Key": "lbl_WithdrawalRequest",
         "Title": "Withdrawal Request",
+        "FuncKey": "Finance/WithdrawalList",
         "Controller": "Finance",
         "Action": "WithdrawalList",
         "Icon": "",
@@ -69,7 +74,8 @@
       {
         "Key": "",
         "Title": "Payment Adjustment",
-        "Controller": "Finance2",
+        "FuncKey": "Finance/PaymentAdjustment",
+        "Controller": "Finance",
         "Action": "PaymentAdjustment",
         "Icon": "",
         "Roles": null,
@@ -78,6 +84,7 @@
       {
         "Key": "",
         "Title": "Pending Funds",
+        "FuncKey": "Finance/PendingFund",
         "Controller": "Finance",
         "Action": "PendingFund",
         "Icon": "",
@@ -93,19 +100,21 @@
     "Roles": null,
     "Childs": [
       {
-        "Key": "lbl_AddAccount",
-        "Title": "Add Account",
+        "Key": "lbl_GroupSetting",
+        "Title": "Group Setting",
+        "FuncKey": "Admin/GroupAuthoritySetting",
         "Controller": "Admin",
-        "Action": "AddAccount",
+        "Action": "GroupAuthoritySetting",
         "Icon": "",
         "Roles": null,
         "Childs": null
       },
       {
-        "Key": "lbl_AccountList",
-        "Title": "Account List",
+        "Key": "lbl_UserSetting",
+        "Title": "User Setting",
+        "FuncKey": "Admin/UserAuthoritySetting",
         "Controller": "Admin",
-        "Action": "AccountList",
+        "Action": "UserAuthoritySetting",
         "Icon": "",
         "Roles": null,
         "Childs": null
@@ -121,6 +130,7 @@
       {
         "Key": "PointLevelManagement",
         "Title": "Point Level Management",
+        "FuncKey": "Marketing/PointLevelManagement",
         "Controller": "Marketing",
         "Action": "PointLevelManagement",
         "Icon": "",

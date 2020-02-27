@@ -14,26 +14,25 @@ namespace BackendSite.Service.BLL
 {
     public class AuthorizeBLL
     {
-        private readonly ServerInfoBLL serverInfoBLL;
         private readonly AdminUserService adminUserService;
         private readonly Tools tools;
-        private readonly MenuService menuService;
-        private readonly PermissionService permissionService;
         private readonly IHttpContextAccessor httpContextAccessor;
-
-        public AuthorizeBLL(IHttpContextAccessor httpContextAccessor, ServerInfoBLL serverInfoBLL, AdminUserService adminUserService, Tools tools, MenuService menuService, PermissionService permissionService)
+        
+        public AuthorizeBLL()
         {
-            this.serverInfoBLL = serverInfoBLL;
+
+        }
+
+        public AuthorizeBLL(IHttpContextAccessor httpContextAccessor, AdminUserService adminUserService, Tools tools)
+        {
             this.adminUserService = adminUserService;
             this.tools = tools;
-            this.menuService = menuService;
-            this.permissionService = permissionService;
             this.httpContextAccessor = httpContextAccessor;
         }
+
         public int UserLogin(string userName, string pwd, string ip, string fromUrl, string userAgent, ref AdminUser adminUser)
         {
-            var serverInfo = serverInfoBLL.GetServerInfo();
-            adminUser = adminUserService.GetAdminUserByUserName(userName, serverInfo.SiteId);
+            adminUser = adminUserService.GetAdminUserByUserName(userName);
 
             if (adminUser == null)
             {
@@ -51,10 +50,6 @@ namespace BackendSite.Service.BLL
             {
                 return 0;
             }
-        }
-        public IEnumerable<MenuItem> GetMenuData()
-        {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<MenuItem>>(menuService.GetMenuData());
         }
 
         public AuthData GetAuthData()

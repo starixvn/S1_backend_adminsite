@@ -4,13 +4,10 @@
 @inject IWebHostEnvironment environment
 @inject SelLangBLL selLangBLL
 @inject ServerInfoBLL serverInfoBLL
-@inject AuthorizeBLL authorizeBLL
+@inject MenuBLL menuBLL
 @{
     ViewData["Title"] = "Home Page";
     Layout = null;
-
-    var menuList = authorizeBLL.GetMenuData();
-
 }
 @functions {
     private void MenuComponent(MenuItem menuItem)
@@ -67,7 +64,7 @@
             <div class="main-menu">
                 <nav>
                     <ul class="metismenu" id="menu">
-                        @foreach (var menuItem in authorizeBLL.GetMenuData())
+                        @foreach (var menuItem in menuBLL.GetMenuData())
                         {
                             MenuComponent(menuItem);
                         }

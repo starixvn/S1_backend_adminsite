@@ -18,7 +18,6 @@ namespace BackendSite.Controllers.Api
         public int CurrencyId { get; set; }
     }
 
-    [Authorize(Roles = "Admin")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class MarketingController : ControllerBase

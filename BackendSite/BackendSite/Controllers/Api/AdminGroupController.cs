@@ -6,18 +6,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Attributes;
 
 namespace BackendSite.Controllers.Api
 {
+    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Admin/GroupAuthoritySetting" })]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class AdminGroupController : Controller
     {
         private readonly AdminGroupBLL adminGroupBLL;
+        private readonly PermissionBLL permissionBLL;
 
-        public AdminGroupController(AdminGroupBLL adminGroupBLL)
+        public AdminGroupController(AdminGroupBLL adminGroupBLL, PermissionBLL permissionBLL)
         {
             this.adminGroupBLL = adminGroupBLL;
+            this.permissionBLL = permissionBLL;
         }
 
         [HttpPost]
@@ -89,10 +93,10 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<FuncPermissionModel>();
             try
             {
-                apiResult.Data = adminGroupBLL.GetGroupPermissions((int)GroupInfo.GroupSEQ);
+                apiResult.Data = permissionBLL.GetGroupPermissionModel((int)GroupInfo.GroupSEQ);
                 apiResult.ErrorCode = 0;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong";

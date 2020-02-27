@@ -55,9 +55,9 @@ namespace BackendSite.Service.DAL
                         SpName = "Admin_GroupFunc_Ins";
                         foreach (var data in GroupInfo.Permission)
                         {
-                            string Json_SubFunctionKeys = JsonConvert.SerializeObject(data.SubFunctionKeys);
+                            string Json_SubFunctionKeys = JsonConvert.SerializeObject(data.SubFuncKeys);
                             string SubFunctionKeys = Json_SubFunctionKeys == "null" ? null : Json_SubFunctionKeys;
-                            conn.Execute(SpName, new { GroupSEQ = SEQ, FuncKey = data.FunctionKey, SubFuncKey = SubFunctionKeys }, tran, commandType: CommandType.StoredProcedure);
+                            conn.Execute(SpName, new { GroupSEQ = SEQ, data.FuncKey, SubFuncKeys = SubFunctionKeys }, tran, commandType: CommandType.StoredProcedure);
                         }
                     }
 
@@ -115,9 +115,9 @@ namespace BackendSite.Service.DAL
                         SpName = "Admin_GroupFunc_Ins";
                         foreach (var data in GroupInfo.Permission)
                         {
-                            string Json_SubFunctionKeys = JsonConvert.SerializeObject(data.SubFunctionKeys);
+                            string Json_SubFunctionKeys = JsonConvert.SerializeObject(data.SubFuncKeys);
                             string SubFunctionKeys = Json_SubFunctionKeys == "null" ? null : Json_SubFunctionKeys;
-                            conn.Execute(SpName, new { GroupInfo.GroupSEQ, FuncKey = data.FunctionKey, SubFuncKey = SubFunctionKeys }, tran, commandType: CommandType.StoredProcedure);
+                            conn.Execute(SpName, new { GroupInfo.GroupSEQ, data.FuncKey, SubFuncKeys = SubFunctionKeys }, tran, commandType: CommandType.StoredProcedure);
                         }
                     }
 

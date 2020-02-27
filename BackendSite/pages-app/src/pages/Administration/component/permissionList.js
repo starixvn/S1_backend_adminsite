@@ -97,9 +97,9 @@ const TopItem = (props)=>{
 const ListItems = (props)=>{
     let datas = props.Datas;        
     let rows = null;
-    if(datas.functionKeys){
+    if(datas.funcKeys){
         rows = <FunctionKeys {...props} Datas={datas} />
-    }else if(datas.subFunctionKeys){
+    }else if(datas.subFuncKeys){
         rows = <SubFunctionKeys {...props}  Datas={datas}/>
     }else{
         rows = <Item {...props}  Datas={datas} />
@@ -120,7 +120,7 @@ const Item = (props)=>{
                 DisplayText={Lang.getLang(window.LangCode, "lbl_allowed")}
                 Checked={datas.enable ? true : false} 
                 OnChange={props.EnableOrDisableFuncItem}
-                BindingValue={GetBindingValueObject(datas.functionKey, props.MainIdx)}
+                BindingValue={GetBindingValueObject(datas.funcKey, props.MainIdx)}
             />
         </div>
     )
@@ -128,17 +128,17 @@ const Item = (props)=>{
 
 const FunctionKeys = (props)=>{
     let datas = props.Datas;
-    let rows = datas.functionKeys && datas.functionKeys.map(items=>{
-        let key = `Permission-FuncList-${items.functionKey}`
-        if(items.functionKeys){
+    let rows = datas.funcKeys && datas.funcKeys.map(items=>{
+        let key = `Permission-FuncList-${items.funcKey}`
+        if(items.funcKeys){
             return <FunctionKeysSubList key={key} {...props} Datas={items} />
-        }else if(items.subFunctionKeys){
+        }else if(items.subFuncKeys){
             return <SubFunctionKeysList key={key} {...props} Datas={items} />
         }else{
             return <ListItemsWithButtons key={key} {...props} Datas={items} />
         }
     });
-    let isOpen = IsListOpen(props.HandleList, datas.functionKey, datas.enable);
+    let isOpen = IsListOpen(props.HandleList, datas.funcKey, datas.enable);
     return (
         <div className={`list__item`}>
             <div className="list__title">
@@ -149,7 +149,7 @@ const FunctionKeys = (props)=>{
                 DisplayText={Lang.getLang(window.LangCode, "lbl_allowed")}
                 Checked={datas.enable ? true : false} 
                 OnChange={props.EnableOrDisableFuncItem}
-                BindingValue={GetBindingValueObject(datas.functionKey, props.MainIdx)}
+                BindingValue={GetBindingValueObject(datas.funcKey, props.MainIdx)}
             />
             <div className={`list${isOpen}`}>
                 {rows}
@@ -160,18 +160,18 @@ const FunctionKeys = (props)=>{
 
 const FunctionKeysSubList = (props)=>{
     let datas = props.Datas;
-    let rows = datas.functionKeys && datas.functionKeys.map(items=>{
-        let key = `Permission-FuncList-${items.functionKey}`
-        if(items.functionKeys){
+    let rows = datas.funcKeys && datas.funcKeys.map(items=>{
+        let key = `Permission-FuncList-${items.funcKey}`
+        if(items.funcKeys){
             return <FunctionKeysSubList key={key} {...props}  Datas={items}/>
-        }else if(items.subFunctionKeys){
+        }else if(items.subFuncKeys){
             return <SubFunctionKeysList key={key} {...props}  Datas={items}/>
         }else{
             return <ListItemsWithButtons key={key} {...props}  Datas={items} />
         }
     });
     
-    let isOpen = IsListOpen(props.HandleList, datas.functionKey, datas.enable);
+    let isOpen = IsListOpen(props.HandleList, datas.funcKey, datas.enable);
     return(
         <div className={`list__item`}>
             <div className="list__btn">
@@ -180,7 +180,7 @@ const FunctionKeysSubList = (props)=>{
                     DisplayText={datas.displayKey} 
                     Checked={datas.enable ? true : false} 
                     OnChange={props.EnableOrDisableFuncItem}
-                    BindingValue={GetBindingValueObject(datas.functionKey, props.MainIdx)}
+                    BindingValue={GetBindingValueObject(datas.funcKey, props.MainIdx)}
                 />
             </div>
             <div className={`list${isOpen}`}>
@@ -200,7 +200,7 @@ const ListItemsWithButtons = (props)=>{
                     DisplayText={datas.displayKey} 
                     Checked={datas.enable ? true : false} 
                     OnChange={props.EnableOrDisableFuncItem}
-                    BindingValue={GetBindingValueObject(datas.functionKey, props.MainIdx)}
+                    BindingValue={GetBindingValueObject(datas.funcKey, props.MainIdx)}
                 />
             </div>
         </div>
@@ -222,7 +222,7 @@ function IsSelectSubOption(OptionsIdx, userCheckedIndex, groupCheckedIndex){
 
 const SubFunctionKeys = (props)=>{
     let datas = props.Datas;
-    let isOpen = IsListOpen(props.HandleList, datas.functionKey, datas.enable);
+    let isOpen = IsListOpen(props.HandleList, datas.funcKey, datas.enable);
 
     return(
         <div className={`list__item`}>
@@ -234,7 +234,7 @@ const SubFunctionKeys = (props)=>{
                 DisplayText={Lang.getLang(window.LangCode, "lbl_allowed")}
                 Checked={datas.enable ? true : false} 
                 OnChange={props.EnableOrDisableFuncItem}
-                BindingValue={GetBindingValueObject(datas.functionKey, props.MainIdx)}
+                BindingValue={GetBindingValueObject(datas.funcKey, props.MainIdx)}
             />
             <SubOptions {...props} IsOpen={isOpen}/>
         </div>
@@ -243,7 +243,7 @@ const SubFunctionKeys = (props)=>{
 
 const SubFunctionKeysList  = (props)=>{
     let datas = props.Datas;
-    let isOpen = IsListOpen(props.HandleList, datas.functionKey, datas.enable);
+    let isOpen = IsListOpen(props.HandleList, datas.funcKey, datas.enable);
 
     return(
         <div className={`list__item`}>
@@ -253,7 +253,7 @@ const SubFunctionKeysList  = (props)=>{
                     DisplayText={datas.displayKey} 
                     Checked={datas.enable ? true : false} 
                     OnChange={props.EnableOrDisableFuncItem}
-                    BindingValue={GetBindingValueObject(datas.functionKey, props.MainIdx)}
+                    BindingValue={GetBindingValueObject(datas.funcKey, props.MainIdx)}
                 />
             </div>
             <SubOptions {...props} IsOpen={isOpen}/>
@@ -263,12 +263,12 @@ const SubFunctionKeysList  = (props)=>{
 
 const SubOptions = (props)=>{
     let datas = props.Datas;
-    let disableAll = datas.inputBoxType === 'radio' && props.isUserAuthPage && datas.subFunctionKeys.filter((d, idx)=>{
+    let disableAll = datas.inputBoxType === 'radio' && props.isUserAuthPage && datas.subFuncKeys.filter((d, idx)=>{
         return IsSelectSubOption(idx, datas.userCheckedIndex, datas.groupCheckedIndex).isGroupSetting;
     }).length > 0;
     
-    let rows = datas.subFunctionKeys.map((item, idx)=>{
-        let key = `Permission-${item.functionKey}-suboptions-${item.SubFunctionKey}`
+    let rows = datas.subFuncKeys.map((item, idx)=>{
+        let key = `Permission-${item.funcKey}-suboptions-${item.SubFunctionKey}`
         let checkedResult = IsSelectSubOption(idx, datas.userCheckedIndex, datas.groupCheckedIndex);
         return(
             <SubOption key={key}
@@ -276,9 +276,9 @@ const SubOptions = (props)=>{
                 InputBoxType={datas.inputBoxType}
                 Checked={checkedResult.checked}
                 DisplayText={item.displayKey} 
-                BindingValue={GetBindingValueObject(datas.functionKey, props.MainIdx)}
+                BindingValue={GetBindingValueObject(datas.funcKey, props.MainIdx)}
                 HandleClick={props.EnableOrDisableSubOptionsItem}
-                ParentFunctionKey={datas.functionKey}
+                ParentFunctionKey={datas.funcKey}
                 OptionIdx={idx}
             />
         )

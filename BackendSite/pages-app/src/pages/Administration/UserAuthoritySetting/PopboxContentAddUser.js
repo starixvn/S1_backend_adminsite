@@ -1,10 +1,9 @@
-import React, {Component} from 'react'
+import React from 'react'
 import {DropdownBox} from '../../../component/dropdownBox'
 import {InputBox} from '../../../component/inputField'
 import {CheckList} from '../../../component/checkBox'
 import Lang from '../../../resource/Administration/AuthoritySetting/LangAPI'
 import { BtnBar } from '../../../component/buttons'
-import { Span, SpanClassName } from '../../../component/span'
 import {RuleType} from '../../../module/ValidFieldValue'
 
 const ElemType = {

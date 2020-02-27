@@ -10,11 +10,13 @@ namespace BackendSite.Service.BLL
 {
     public class PermissionBLL
     {
+        private readonly AdminGroupService adminGroupService;
         private readonly PermissionService permissionService;
 
-        public PermissionBLL(PermissionService permissionService)
+        public PermissionBLL(PermissionService permissionService, AdminGroupService adminGroupService)
         {
             this.permissionService = permissionService;
+            this.adminGroupService = adminGroupService;
         }
 
         public IEnumerable<FuncPermissionModel> GetPermissionJSONData()
@@ -23,7 +25,28 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public List<FuncPermissionSettings> SetPermissions(IEnumerable<FuncPermissionSettings> Settings, IEnumerable<GroupPermisison> GroupPermissions, IEnumerable<UserPermission> UserPermissions)
+        public IEnumerable<GroupPermisison> GetUserPermission(int GroupSEQ)
+        {
+            var permission = adminGroupService.GetGroupPermissions(GroupSEQ);
+            return permission;
+        }
+
+        public IEnumerable<FuncPermissionModel> GetGroupPermissionModel(int GroupSEQ)
+        {
+            var result = GetPermissionJSONData();
+            var permissions = adminGroupService.GetGroupPermissions(GroupSEQ);
+            if (permissions.Any())
+            {
+                foreach (var item in result)
+                {
+                    item.Settings = SetPermissions(item.Settings, permissions, null);
+                }
+            }
+
+            return result;
+        }
+
+        private List<FuncPermissionSettings> SetPermissions(IEnumerable<FuncPermissionSettings> Settings, IEnumerable<GroupPermisison> GroupPermissions, IEnumerable<UserPermission> UserPermissions)
         {
             List<FuncPermissionSettings> result = new List<FuncPermissionSettings>();
             foreach (var setting in Settings)
@@ -36,25 +59,25 @@ namespace BackendSite.Service.BLL
 
         private FuncPermissionSettings SetPermissions(FuncPermissionSettings Setting, IEnumerable<GroupPermisison> GroupPermissions, IEnumerable<UserPermission> UserPermissions)
         {
-            if (Setting.FunctionKeys != null && Setting.FunctionKeys.Any())
+            if (Setting.FuncKeys != null && Setting.FuncKeys.Any())
             {
                 List<FuncPermissionSettings> functionkeys = new List<FuncPermissionSettings>();
-                foreach (var funckeys in Setting.FunctionKeys)
+                foreach (var funckeys in Setting.FuncKeys)
                 {
                     functionkeys.Add(SetPermissions(funckeys, GroupPermissions, UserPermissions));
                 }
                 Setting.Enable = functionkeys.Any(x => x.Enable);
-                Setting.FunctionKeys = functionkeys;
+                Setting.FuncKeys = functionkeys;
                 Setting.IsGroupSetting = functionkeys.Any(x => x.IsGroupSetting);
             }
             else
             {
-                var funcByUser = UserPermissions?.SingleOrDefault(i => i.FuncKey == Setting.FunctionKey);
-                var funcByGroup = GroupPermissions?.SingleOrDefault(x => x.FuncKey == Setting.FunctionKey);
+                var funcByUser = UserPermissions?.SingleOrDefault(i => i.FuncKey == Setting.FuncKey);
+                var funcByGroup = GroupPermissions?.SingleOrDefault(x => x.FuncKey == Setting.FuncKey);
 
                 Setting = SetGroupPermission(Setting, funcByGroup);
 
-                if (Setting.InputBoxType == "radio" && funcByGroup != null && funcByUser != null && funcByUser.SubFuncKey != funcByGroup.SubFuncKey)
+                if (Setting.InputBoxType == "radio" && funcByGroup != null && funcByUser != null && funcByUser.SubFuncKeys != funcByGroup.SubFuncKeys)
                 {
 
                 }
@@ -73,15 +96,15 @@ namespace BackendSite.Service.BLL
             {
                 Setting.IsGroupSetting = true;
                 Setting.Enable = true;
-                if (GroupPermission.SubFuncKey != null && Setting.InputBoxType != null && Setting.SubFunctionKeys.Any())
+                if (GroupPermission.SubFuncKeys != null && Setting.InputBoxType != null && Setting.SubFuncKeys.Any())
                 {
-                    var userSubPermission = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(GroupPermission.SubFuncKey);
+                    var userSubPermission = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(GroupPermission.SubFuncKeys);
                     if (userSubPermission != null && userSubPermission.Any())
                     {
                         var checkedIndexItemList = new List<int>();
                         foreach (var subFuncKey in userSubPermission)
                         {
-                            int idx = Setting.SubFunctionKeys.FindIndex(i => i.FunctionKey.ToUpper() == subFuncKey.ToUpper());
+                            int idx = Setting.SubFuncKeys.FindIndex(i => i.FuncKey.ToUpper() == subFuncKey.ToUpper());
                             if (idx >= 0) checkedIndexItemList.Add(idx);
                         }
 
@@ -98,15 +121,15 @@ namespace BackendSite.Service.BLL
             if (UserPermission != null)
             {
                 Setting.Enable = true;
-                if (Setting.Enable && UserPermission.SubFuncKey != null && Setting.InputBoxType != null)
+                if (Setting.Enable && UserPermission.SubFuncKeys != null && Setting.InputBoxType != null)
                 {
-                    var userSubPermission = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(UserPermission.SubFuncKey);
+                    var userSubPermission = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(UserPermission.SubFuncKeys);
                     if (userSubPermission != null && userSubPermission.Any())
                     {
                         var checkedIndexItemList = new List<int>();
                         foreach (var subFuncKey in userSubPermission)
                         {
-                            int idx = Setting.SubFunctionKeys.FindIndex(i => i.FunctionKey.ToUpper() == subFuncKey.ToUpper());
+                            int idx = Setting.SubFuncKeys.FindIndex(i => i.FuncKey.ToUpper() == subFuncKey.ToUpper());
                             if (idx >= 0) checkedIndexItemList.Add(idx);
                         }
 

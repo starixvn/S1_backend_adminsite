@@ -18,11 +18,11 @@ namespace BackendSite.Service.DAL
         {
             this.configuration = configuration;
         }
-        public AdminUser GetAdminUserByUserName(string userName, int siteId)
+        public AdminUser GetAdminUserByUserName(string userName)
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.QueryFirstOrDefault<AdminUser>("LoginAdminUser_Get", new { UserName = userName, SiteId = siteId }, commandType: CommandType.StoredProcedure);
+                return conn.QueryFirstOrDefault<AdminUser>("LoginAdminUser_Get", new { UserName = userName }, commandType: CommandType.StoredProcedure);
             }
         }
 
@@ -30,7 +30,7 @@ namespace BackendSite.Service.DAL
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.Query<AdminUser>("Admin_User_Get", commandType: CommandType.StoredProcedure);
+                return conn.Query<AdminUser>("Admin_User_GetAll", commandType: CommandType.StoredProcedure);
             }
         }
 
@@ -66,11 +66,11 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public IEnumerable<AssignGroups> GetAssignGroupList(int UserId)
+        public AssignGroups GetAssignGroup(int UserId)
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.Query<AssignGroups>("Admin_AuthorGroup_Get", new { UserId }, commandType: CommandType.StoredProcedure);
+                return conn.QueryFirst<AssignGroups>("Admin_AuthorGroup_Get", new { UserId }, commandType: CommandType.StoredProcedure);
             }
         }
 
@@ -140,7 +140,7 @@ namespace BackendSite.Service.DAL
                             conn.Execute("Admin_AuthorSite_Ins", new { UserId, SiteId }, tran, commandType: CommandType.StoredProcedure);
                         }
 
-                        userList = conn.Query<AdminUser>("Admin_User_Get", transaction: tran, commandType: CommandType.StoredProcedure);
+                        userList = conn.Query<AdminUser>("Admin_User_GetAll", transaction: tran, commandType: CommandType.StoredProcedure);
                     }
 
                     tran.Commit();
@@ -148,6 +148,14 @@ namespace BackendSite.Service.DAL
             }
 
             return userList;
+        }
+
+        public AdminUser GetUser(int UserId)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.QueryFirst<AdminUser>("Admin_User_Get", new { UserId }, commandType: CommandType.StoredProcedure);
+            }
         }
     }
 }

@@ -4,7 +4,7 @@
     "Settings": [
       {
         "DisplayKey": "Test1",
-        "FunctionKey": "XXXX222",
+        "FuncKey": "XXXX222",
         "Enable": false
       }
     ]
@@ -14,7 +14,7 @@
     "Settings": [
       {
         "DisplayKey": "Customer Administration",
-        "FunctionKey": "CustManage/CustInfoList",
+        "FuncKey": "CustManage/CustInfoList",
         "Enable": false
       }
     ]
@@ -24,49 +24,49 @@
     "Settings": [
       {
         "DisplayKey": "Bank Card List",
-        "FunctionKey": "Finance2/BankInfoList",
+        "FuncKey": "Finance/BankInfoList",
         "Enable": false
       },
       {
         "DisplayKey": "Deposit Request",
-        "FunctionKey": "Finance/DepositList",
+        "FuncKey": "Finance/DepositList",
         "Enable": false,
-        "FunctionKeys": [
+        "FuncKeys": [
           {
             "DisplayKey": "Online Banking",
-            "FunctionKey": "Online Banking",
+            "FuncKey": "Online Banking",
             "InputBoxType": "checkbox",
-            "SubFunctionKeys": [
+            "SubFuncKeys": [
               {
                 "DisplayKey": "Draft",
-                "FunctionKey": "Draft"
+                "FuncKey": "Draft"
               },
               {
                 "DisplayKey": "Rejected",
-                "FunctionKey": "Rejected"
+                "FuncKey": "Rejected"
               }
             ]
           },
           {
             "DisplayKey": "Local Bank",
-            "FunctionKey": "LocalBank",
+            "FuncKey": "LocalBank",
             "InputBoxType": "checkbox",
-            "SubFunctionKeys": [
+            "SubFuncKeys": [
               {
                 "DisplayKey": "Draft",
-                "FunctionKey": "Draft"
+                "FuncKey": "Draft"
               },
               {
                 "DisplayKey": "On Hold(Risk Check)",
-                "FunctionKey": "OnHold"
+                "FuncKey": "OnHold"
               },
               {
                 "DisplayKey": "Approve",
-                "FunctionKey": "Approve"
+                "FuncKey": "Approve"
               },
               {
                 "DisplayKey": "Rejected",
-                "FunctionKey": "Rejected"
+                "FuncKey": "Rejected"
               }
             ]
           }
@@ -74,17 +74,17 @@
       },
       {
         "DisplayKey": "Withdrawal Request",
-        "FunctionKey": "Finance/WithdrawalList",
+        "FuncKey": "Finance/WithdrawalList",
         "Enable": false
       },
       {
         "DisplayKey": "Payment Adjustment",
-        "FunctionKey": "Finance2/PaymentAdjustment",
+        "FuncKey": "Finance/PaymentAdjustment",
         "Enable": false
       },
       {
         "DisplayKey": "Pending Funds",
-        "FunctionKey": "Finance/PendingFund",
+        "FuncKey": "Finance/PendingFund",
         "Enable": false
       }
     ]
@@ -94,17 +94,12 @@
     "Settings": [
       {
         "DisplayKey": "Group Setting",
-        "FunctionKey": "Admin/GroupAuthoritySetting",
+        "FuncKey": "Admin/GroupAuthoritySetting",
         "Enable": false
       },
       {
-        "DisplayKey": "Add Account",
-        "FunctionKey": "Admin/AddAccount",
-        "Enable": false
-      },
-      {
-        "DisplayKey": "Account List",
-        "FunctionKey": "Admin/AccountList",
+        "DisplayKey": "User Setting",
+        "FuncKey": "Admin/UserAuthoritySetting",
         "Enable": false
       }
     ]
@@ -114,7 +109,7 @@
     "Settings": [
       {
         "DisplayKey": "Point Level Management",
-        "FunctionKey": "Marketing/PointLevelManagement",
+        "FuncKey": "Marketing/PointLevelManagement",
         "Enable": false
       }
     ]

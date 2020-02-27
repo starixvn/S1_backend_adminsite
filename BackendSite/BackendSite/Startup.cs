@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using BackendSite.Attributes;
 
 namespace BackendSite
 {
@@ -31,6 +32,10 @@ namespace BackendSite
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
+
+            /*Attributes*/
+            services.AddSingleton<AuthorizeByFuncAttribute>();
+
             /*Library*/
             services.AddSingleton<Tools>();
             services.AddSingleton<Common>();
@@ -85,6 +90,7 @@ namespace BackendSite
             services.AddSingleton<AdminGroupBLL>();
             services.AddSingleton<PermissionBLL>();
             services.AddSingleton<AdminUserBLL>();
+            services.AddSingleton<MenuBLL>();
             // var bll = AppDomain.CurrentDomain.GetAssemblies()
             //.SelectMany(t => t.GetTypes())
             //.Where(t => t.IsClass && t.Namespace == "BackendSite.Service.BLL");

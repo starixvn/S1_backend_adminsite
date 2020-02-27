@@ -21,9 +21,9 @@ namespace BackendSite.Service.Model
 
     public class FunctionPermission
     {
-        public string FunctionKey { get; set; }
+        public string FuncKey { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public string[] SubFunctionKeys { get; set; }
+        public string[] SubFuncKeys { get; set; }
     }
 }

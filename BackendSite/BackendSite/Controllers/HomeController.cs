@@ -36,5 +36,10 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        public IActionResult RefreshPage()
+        {
+            return View();
+        }
     }
 }

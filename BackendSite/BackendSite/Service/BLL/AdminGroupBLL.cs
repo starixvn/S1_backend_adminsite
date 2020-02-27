@@ -52,21 +52,6 @@ namespace BackendSite.Service.BLL
             return adminGroupService.GetGroup(GroupSEQ);
         }
 
-        public IEnumerable<FuncPermissionModel> GetGroupPermissions(int GroupSEQ)
-        {
-            var result = permissionBLL.GetPermissionJSONData();
-            var permissions = adminGroupService.GetGroupPermissions(GroupSEQ);
-            if (permissions.Any())
-            {
-                foreach (var item in result)
-                {
-                    item.Settings = permissionBLL.SetPermissions(item.Settings, permissions, null);
-                }
-            }
-
-            return result;
-        }
-
         public void UpdateGroup(GroupWithPermission GroupInfo)
         {
             adminGroupService.UpdateGroup(GroupInfo);

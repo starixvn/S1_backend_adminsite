@@ -181,8 +181,7 @@ function GroupAuthorityProps(dispatch){
 
                 let data = store.getState().CommonHandler.Datas.Permissions.PermissionDatas;
                 let selected = SetSelectedPermissionDatas(data);
-                console.log(data);
-                console.log(selected);
+                
                 let param = {
                     Url: webAPIUrl.UpdateGroup,
                     Data:{
@@ -235,24 +234,24 @@ function SetSelectedFunctionKeys(settings){
     for(let s in settings){
         let setting = settings[s];
         if(setting.enable){
-            if(setting.functionKeys){
-                let funckeys = SetSelectedFunctionKeys(setting.functionKeys);
+            if(setting.funcKeys){
+                let funckeys = SetSelectedFunctionKeys(setting.funcKeys);
                 if(funckeys && funckeys.length > 0){
-                    result.push({functionKey:setting.functionKey, subFunctionKeys:null})
+                    result.push({funckey:setting.funcKey, subFuncKeys:null})
                     result = result.concat(funckeys)
                 }
             }else{
                 let subOptions = [];                
-                if(setting.subFunctionKeys){
+                if(setting.subFuncKeys){
                     setting.groupCheckedIndex && setting.groupCheckedIndex.forEach(idx=>{
-                        subOptions.push(setting.subFunctionKeys[idx].functionKey)
+                        subOptions.push(setting.subFuncKeys[idx].funcKey)
                     });
 
                     if(subOptions.length!==0){
-                        result.push({functionKey:setting.functionKey, subFunctionKeys:subOptions});    
+                        result.push({funcKey:setting.funcKey, subFuncKeys:subOptions});    
                     }                    
                 }else{
-                    result.push({functionKey:setting.functionKey, subFunctionKeys:null});                    
+                    result.push({funcKey:setting.funcKey, subFuncKeys:null});                    
                 }
             }
         }
@@ -265,7 +264,7 @@ function SetSelectedFunctionKeys(settings){
 function EnableOrDisableAllFunctionKeys(datas, checked, isUserAuthPage){
     for(let i in datas){
         let setting = datas[i]
-        if(isUserAuthPage && setting.isGroupSetting && !setting.functionKeys){
+        if(isUserAuthPage && setting.isGroupSetting && !setting.funcKeys){
             continue;
         }
 
@@ -275,8 +274,8 @@ function EnableOrDisableAllFunctionKeys(datas, checked, isUserAuthPage){
         }else{
             setting.groupCheckedIndex = !checked ? [] : setting.groupCheckedIndex
         }
-        if(setting.functionKeys){
-            setting.functionKeys = EnableOrDisableAllFunctionKeys(setting.functionKeys, checked, isUserAuthPage);
+        if(setting.funcKeys){
+            setting.funcKeys = EnableOrDisableAllFunctionKeys(setting.funcKeys, checked, isUserAuthPage);
         }
     }
 
@@ -286,13 +285,13 @@ function EnableOrDisableAllFunctionKeys(datas, checked, isUserAuthPage){
 function EnableOrDisableFunctionKeys(datas, checked, FuncKey, isUserAuthPage){
     for(let i in datas){
         let setting = datas[i]
-        if(isUserAuthPage && setting.isGroupSetting && !setting.functionKeys){
+        if(isUserAuthPage && setting.isGroupSetting && !setting.funcKeys){
             continue
         }
         
-        if(setting.functionKey===FuncKey){
+        if(setting.funcKey===FuncKey){
             setting.enable = isUserAuthPage && setting.isGroupSetting ? setting.enable : checked
-            setting.functionKeys = !checked && setting.functionKeys ? EnableOrDisableAllFunctionKeys(setting.functionKeys, checked, isUserAuthPage) : setting.functionKeys
+            setting.funcKeys = !checked && setting.funcKeys ? EnableOrDisableAllFunctionKeys(setting.funcKeys, checked, isUserAuthPage) : setting.funcKeys
             
             if(isUserAuthPage){
                 setting.userCheckedIndex = !checked ? [] : setting.userCheckedIndex
@@ -301,8 +300,8 @@ function EnableOrDisableFunctionKeys(datas, checked, FuncKey, isUserAuthPage){
             }
             
             break;
-        }else if(setting.functionKeys){
-            setting.functionKeys = EnableOrDisableFunctionKeys(setting.functionKeys, checked, FuncKey, isUserAuthPage)
+        }else if(setting.funcKeys){
+            setting.funcKeys = EnableOrDisableFunctionKeys(setting.funcKeys, checked, FuncKey, isUserAuthPage)
         }
     }
 
@@ -312,10 +311,11 @@ function EnableOrDisableFunctionKeys(datas, checked, FuncKey, isUserAuthPage){
 function EnableOrDisableSubOption(datas, optIdx, FuncKey, isUserAuthPage){
     for(let i in datas){
         let setting = datas[i]
-        if(setting.functionKey===FuncKey){
+        if(setting.funcKey===FuncKey){
             let targetFiled = isUserAuthPage ? 'userCheckedIndex' : 'groupCheckedIndex'
             if(setting.inputBoxType==='radio' && setting.isGroupSetting && isUserAuthPage) continue;
-            let find_idx = setting[targetFiled] && setting[targetFiled].indexOf(optIdx)
+            setting[targetFiled] = setting[targetFiled] === undefined ? [] : setting[targetFiled];
+            let find_idx = setting[targetFiled] && setting[targetFiled].indexOf(optIdx);
             if(find_idx===-1){
                 if(setting.inputBoxType==='radio'){
                     setting[targetFiled]=[optIdx]
@@ -333,8 +333,8 @@ function EnableOrDisableSubOption(datas, optIdx, FuncKey, isUserAuthPage){
             }
             
             break;
-        }else if(setting.functionKeys){
-            setting.functionKeys = EnableOrDisableSubOption(setting.functionKeys, optIdx, FuncKey, isUserAuthPage)
+        }else if(setting.funcKeys){
+            setting.funcKeys = EnableOrDisableSubOption(setting.funcKeys, optIdx, FuncKey, isUserAuthPage)
         }
     }
 
@@ -369,11 +369,11 @@ function PermissionListProps(dispatch){
                     datas[topItemidx].enable = checked
                     for(let i in datas[topItemidx].settings){
                         let setting = datas[topItemidx].settings[i]
-                        if(isUserAuthPage && setting.isGroupSetting && !setting.functionKeys){
+                        if(isUserAuthPage && setting.isGroupSetting && !setting.funcKeys){
                             continue;
                         }
                         setting.enable = isUserAuthPage && setting.isGroupSetting ? setting.enable : checked
-                        setting.functionKeys = setting.functionKeys ? EnableOrDisableAllFunctionKeys(setting.functionKeys, checked, isUserAuthPage) : setting.functionKeys;
+                        setting.funcKeys = setting.funcKeys ? EnableOrDisableAllFunctionKeys(setting.funcKeys, checked, isUserAuthPage) : setting.funcKeys;
                     }
                 }else{
                     datas[topItemidx].settings = EnableOrDisableFunctionKeys(datas[topItemidx].settings, checked, param.FuncKey, isUserAuthPage)

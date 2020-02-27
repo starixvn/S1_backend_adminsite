@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers
 {
-    [Authorize(Roles = "Admin, Finance")]
     public class FinanceController : Controller
     {
         private readonly DepositBLL depositBLL;

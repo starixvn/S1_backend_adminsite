@@ -1,0 +1,71 @@
+const path = require('path');
+//const webpack = require('webpack');
+//const bundleAnalyzer = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+
+module.exports = {
+    mode:'production',
+    optimization: {
+        mangleWasmImports: true,
+        nodeEnv: 'production'
+    },
+    //devtool: 'source-map',
+    externals:{
+        'react': 'React',
+        'react-dom': 'ReactDOM',
+        'moment':'moment',
+        'jquery':'$'
+    },
+    entry: {
+        "Administration/UserAuthoritySetting.min":[
+            '@babel/polyfill',
+            './src/pages/Administration/UserAuthoritySetting/index.js'
+        ],
+        "Administration/GroupAuthoritySetting.min":[
+            '@babel/polyfill',
+            './src/pages/Administration/GroupAuthoritySetting/index.js'
+        ]
+    },
+    plugins:[
+        // new webpack.ProvidePlugin({
+        //     'react': 'React',
+        //     'react-dom': 'ReactDOM',
+        //     'moment':'moment',
+        //     '$':'jquery'
+        // }),
+        // new bundleAnalyzer({
+        //     analyzerMode: "static",
+        //     reportFilename: "report.html",
+        //     openAnalyzer: true
+        // })
+    ],
+    output:{
+        path:  path.resolve(__dirname,'../BackendSite/wwwroot/js/component/'),
+        filename:"[name].js"
+    },
+    resolve: {
+        extensions: ['.js', '.jsx']
+    },
+    module:{
+        rules:[
+            {
+                test: /\.(js|jsx)$/,
+                exclude: /(node_modules)/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [
+                            ['@babel/preset-env',{
+                                    "corejs": "3",
+                                    useBuiltIns: 'entry'
+                                },
+                            ],
+                            '@babel/preset-react',{
+                                'plugins': ['@babel/plugin-proposal-class-properties']
+                            }
+                        ]
+                    }
+                }
+            }
+        ]        
+    }
+}

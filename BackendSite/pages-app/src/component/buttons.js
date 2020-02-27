@@ -78,8 +78,8 @@ export const BtnBarWithRightAndLeftGroup = (props)=>{
     )    
 }
 
-const success_msg_stop_ms = 2500;
-const failure_msg_stop_ms = 2500;
+const success_msg_stop_ms = 1500;
+const failure_msg_stop_ms = 1500;
 class BtnTips extends Component{
     intervalID = 0;
     componentWillUnmount(){
