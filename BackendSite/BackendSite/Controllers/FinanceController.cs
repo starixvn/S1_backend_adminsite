@@ -27,18 +27,18 @@ namespace BackendSite.Controllers
         {
             return View();
         }
-        //public IActionResult BankInfoList()
-        //{
-        //    return View();
-        //}
+        public IActionResult BankInfoList()
+        {
+            return View();
+        }
         public IActionResult DepositList()
         {
             return View();
         }
-        //public IActionResult PaymentAdjustment()
-        //{
-        //    return View();
-        //}
+        public IActionResult PaymentAdjustment()
+        {
+            return View();
+        }
         public IActionResult PendingFund()
         {
             IEnumerable<PendingFund> pendingFund = pendingFundBLL.PendingFundList();

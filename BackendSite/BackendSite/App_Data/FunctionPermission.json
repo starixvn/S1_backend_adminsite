@@ -30,7 +30,7 @@
       {
         "DisplayKey": "Deposit Request",
         "FuncKey": "Finance/DepositList",
-        "Enable": false,
+        "Enable": false/*,
         "FuncKeys": [
           {
             "DisplayKey": "Online Banking",
@@ -68,7 +68,7 @@
                 "DisplayKey": "Rejected",
                 "FuncKey": "Rejected"
               }
-            ]
+            ]*/
           }
         ]
       },

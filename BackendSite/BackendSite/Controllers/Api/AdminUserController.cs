@@ -27,9 +27,9 @@ namespace BackendSite.Controllers.Api
             this.adminGroupBLL = adminGroupBLL;
         }
 
-        public ApiListResult<AdminUser> GetUserList()
+        public ApiResult<IEnumerable<AdminUser>> GetUserList()
         {
-            var apiResult = new ApiListResult<AdminUser>();
+            var apiResult = new ApiResult<IEnumerable<AdminUser>>();
             try
             {
                 apiResult.Data = adminUserBLL.GetUserList();
@@ -44,9 +44,9 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public ApiListResult<DisplayList> GetSiteList([FromForm]int UserId)
+        public ApiResult<IEnumerable<DisplayList>> GetSiteList([FromForm]int UserId)
         {
-            var apiResult = new ApiListResult<DisplayList>();
+            var apiResult = new ApiResult<IEnumerable<DisplayList>>();
             try
             {
                 var assignSites = adminUserBLL.GetAssignSiteList(UserId);
@@ -59,17 +59,17 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong.";
             }
-            
+
             return apiResult;
         }
 
-        public ApiListResult<DisplayList> GetAllSiteList()
+        public ApiResult<IEnumerable<DisplayList>> GetAllSiteList()
         {
-            var apiResult = new ApiListResult<DisplayList>();
+            var apiResult = new ApiResult<IEnumerable<DisplayList>>();
             try
             {
                 var allSiteList = serverInfoBLL.GetSiteList();
-                apiResult.Data = allSiteList.Select(x => new DisplayList() { Id = x.SiteId, DisplayText = x.SiteName});
+                apiResult.Data = allSiteList.Select(x => new DisplayList() { Id = x.SiteId, DisplayText = x.SiteName });
                 apiResult.ErrorCode = 0;
             }
             catch (Exception)
@@ -98,9 +98,9 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public ApiListResult<DisplayList> GetAllGroupList()
+        public ApiResult<IEnumerable<DisplayList>> GetAllGroupList()
         {
-            var apiResult = new ApiListResult<DisplayList>();
+            var apiResult = new ApiResult<IEnumerable<DisplayList>>();
             try
             {
                 var groupList = adminGroupBLL.GetGroupList();
@@ -177,13 +177,13 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public ApiListResult<AdminUser> AddUser([FromForm]string UserName, [FromForm]string Userpwd, [FromForm]int[] SiteList, [FromForm]int? GroupSEQ)
+        public ApiResult<IEnumerable<AdminUser>> AddUser([FromForm]string UserName, [FromForm]string Userpwd, [FromForm]int[] SiteList, [FromForm]int? GroupSEQ)
         {
-            var apiResult = new ApiListResult<AdminUser>();
+            var apiResult = new ApiResult<IEnumerable<AdminUser>>();
             try
             {
                 var newUserList = adminUserBLL.AddUser(UserName, Userpwd, SiteList, GroupSEQ);
-                if(newUserList != null)
+                if (newUserList != null)
                 {
                     apiResult.Data = adminUserBLL.GetUserList();
                     apiResult.ErrorCode = 0;
@@ -199,7 +199,7 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong.";
             }
-            
+
             return apiResult;
         }
 

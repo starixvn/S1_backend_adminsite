@@ -25,11 +25,10 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiListResult<AdminGroup> GetGroupList()
+        public ApiResult<IEnumerable<AdminGroup>> GetGroupList()
         {
-            var apiResult = new ApiListResult<AdminGroup>();
-            var result = adminGroupBLL.GetGroupList();
-            apiResult.Data = result;
+            var apiResult = new ApiResult<IEnumerable<AdminGroup>>();
+            apiResult.Data = adminGroupBLL.GetGroupList();
             apiResult.ErrorCode = 0;
             return apiResult;
         }
