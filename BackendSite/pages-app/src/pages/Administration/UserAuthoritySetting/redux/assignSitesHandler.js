@@ -32,7 +32,13 @@ export function AssignSitesHandler(state, action){
                     }
                 })
         case ActionTypes.ASSIGN_SITES:
-            return ClosePopup(state, action);
+                return Object.assign({}, state, {
+                    ...state,
+                    PopboxInfo: {
+                        ...state.PopboxInfo,
+                        ExecutingStatus:'success'
+                    }
+                })
         default:
             return state
     }

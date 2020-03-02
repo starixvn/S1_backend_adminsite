@@ -39,16 +39,9 @@ export function AssignGroupHandler(state, action){
                         ...state.Datas,
                         UserList:action.UserList
                     },
-                    AssignGroupPopbox: {
-                        ...initDataModel
-                    },
                     PopboxInfo: {
-                        PopboxName:null,
-                        Title:null,
-                        Content:null,
-                        ExecutingStatus:null,
-                        IsOpen:false,
-                        IdentityKey:null
+                        ...state.PopboxInfo,
+                        ExecutingStatus:'success'
                     }
                 })
         default:

@@ -34,9 +34,9 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult AddGroup(GroupWithPermission GroupInfo)
+        public ApiResult<IEnumerable<AdminGroup>> AddGroup(GroupWithPermission GroupInfo)
         {
-            var apiResult = new ApiListResult<AdminGroup>();
+            var apiResult = new ApiResult<IEnumerable<AdminGroup>>();
             GroupInfo.GroupSEQ = null;
             if (adminGroupBLL.CheckGroupIsExists(GroupInfo.GroupName, GroupInfo.GroupSEQ))
             {
@@ -56,6 +56,7 @@ namespace BackendSite.Controllers.Api
                 {
                     apiResult.ErrorCode = 999;
                     apiResult.Message = "something went wrong.";
+                    apiResult.RawMessage = ex.Message;
                 }
             }
 
@@ -83,13 +84,14 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
             }
             return apiResult;
         }
 
-        public ApiResult GetEditGroup(AdminGroup GroupInfo)
+        public ApiResult<IEnumerable<FuncPermissionModel>> GetEditGroup(AdminGroup GroupInfo)
         {
-            var apiResult = new ApiListResult<FuncPermissionModel>();
+            var apiResult = new ApiResult<IEnumerable<FuncPermissionModel>>();
             try
             {
                 apiResult.Data = permissionBLL.GetGroupPermissionModel((int)GroupInfo.GroupSEQ);
@@ -99,6 +101,7 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong";
+                apiResult.RawMessage = ex.Message;
             }
 
             return apiResult;
@@ -123,6 +126,7 @@ namespace BackendSite.Controllers.Api
                 {
                     apiResult.ErrorCode = 999;
                     apiResult.Message = "something went wrong";
+                    apiResult.RawMessage = ex.Message;
                 }
             }
 

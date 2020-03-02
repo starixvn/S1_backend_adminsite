@@ -140,5 +140,30 @@ namespace BackendSite.Service.BLL
 
             return Setting;
         }
+
+        public bool CheckPermission(int GroupSEQ, string FuncKey, string SubFuncKey)
+        {
+            bool result = false;
+            var permissions = GetUserPermission(GroupSEQ);
+            if (permissions != null && permissions.Any())
+            {
+                var funcItem = permissions.FirstOrDefault(x => string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase));
+                var subItem = funcItem.SubFuncKeys == null ? new string[] { } : Newtonsoft.Json.JsonConvert.DeserializeObject <string[]>(funcItem.SubFuncKeys);
+
+                if(!string.IsNullOrEmpty(SubFuncKey))
+                {
+                    if (subItem.Any())
+                    {
+                        result = subItem.Any(s => string.Equals(s, SubFuncKey, StringComparison.OrdinalIgnoreCase));
+                    }
+                }
+                else
+                {
+                    result = funcItem != null;
+                }
+            }
+
+            return result;
+        }
     }
 }

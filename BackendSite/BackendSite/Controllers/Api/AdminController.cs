@@ -79,9 +79,9 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public ApiListResult<FuncPermissionModel> GetPermissionDatas()
+        public ApiResult<IEnumerable<FuncPermissionModel>> GetPermissionDatas()
         {
-            var apiResult = new ApiListResult<FuncPermissionModel>()
+            var apiResult = new ApiResult<IEnumerable<FuncPermissionModel>>()
             {
                 Data = permissionBLL.GetPermissionJSONData(),
                 ErrorCode = 0

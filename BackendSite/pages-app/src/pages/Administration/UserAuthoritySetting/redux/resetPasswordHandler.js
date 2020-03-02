@@ -32,7 +32,13 @@ export function ResetPasswordHandler(state, action){
                     }
                 })
         case ActionTypes.RESET_PASSWORD:
-            return ClosePopup(state, action);
+            return Object.assign({}, state, {
+                    ...state,
+                    PopboxInfo: {
+                        ...state.PopboxInfo,
+                        ExecutingStatus:'success'
+                    }
+                })
         default:
             return state
     }
