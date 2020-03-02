@@ -39,6 +39,7 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
             }
 
             return apiResult;
@@ -54,10 +55,11 @@ namespace BackendSite.Controllers.Api
                 apiResult.Data = allSiteList.Select(x => new DisplayList() { Id = x.SiteId, DisplayText = x.SiteName, Selected = assignSites.Any(y => y.SiteId == x.SiteId) });
                 apiResult.ErrorCode = 0;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
             }
 
             return apiResult;
@@ -72,10 +74,11 @@ namespace BackendSite.Controllers.Api
                 apiResult.Data = allSiteList.Select(x => new DisplayList() { Id = x.SiteId, DisplayText = x.SiteName });
                 apiResult.ErrorCode = 0;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
             }
 
             return apiResult;
@@ -93,6 +96,7 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
             }
 
             return apiResult;
@@ -107,10 +111,11 @@ namespace BackendSite.Controllers.Api
                 apiResult.Data = groupList.Select(g => new DisplayList() { Id = (int)g.GroupSEQ, DisplayText = g.GroupName });
                 apiResult.ErrorCode = 0;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
             }
             return apiResult;
         }
@@ -127,6 +132,7 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
             }
 
             return apiResult;
@@ -152,6 +158,7 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
             }
 
             return apiResult;
@@ -172,6 +179,7 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
             }
 
             return apiResult;
@@ -198,6 +206,7 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
             }
 
             return apiResult;
