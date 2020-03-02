@@ -89,8 +89,7 @@ namespace BackendSite.Service.BLL
         }
         public IEnumerable<BankInfoPay> GetBankInfoPay()
         {
-            var serverInfo = serverInfoService.GetModel();
-            string sBankInfoPayListKey = $"BankInfoPayList_{serverInfo.SiteId}";
+            string sBankInfoPayListKey = "BankInfoPayForPayout";
             var BankInfoPayList = cache.Get<IEnumerable<BankInfoPay>>(sBankInfoPayListKey);
             if (BankInfoPayList == null)
             {
