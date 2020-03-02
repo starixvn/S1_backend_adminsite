@@ -18,9 +18,7 @@ namespace BackendSite.Service.Model
         public string Memo { get; set; }
         public int BSort { get; set; }
         public int CurrencyId { get; set; }
-        public int Method { get; set; }
         public string BankCode { get; set; }
-        public string BankPayoutCode { get; set; }
         public string BankName { get; set; }
         public string BankLogo { get; set; }
         public string BankSite { get; set; }

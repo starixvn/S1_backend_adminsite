@@ -27,7 +27,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<BankInfoPay> GetBankInfoPayList()
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<BankInfoPay>("BankInfoPay_Get", commandType: CommandType.StoredProcedure);
+            return conn.Query<BankInfoPay>("Common_BankInfoPayForPayout_Get", commandType: CommandType.StoredProcedure);
         }
     }
 }
