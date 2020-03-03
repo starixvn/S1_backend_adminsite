@@ -168,7 +168,7 @@ namespace BackendSite.Controllers.Api
                         title = string.Format(title, depositReq.TransId);
                         string content = selLangBLL.GetResourceValue("lbl_DepositApprovedContent", userLang);
                         content = string.Format(content, depositReq.TransId);
-                        messageBLL.SendMessageToPlayer(sender, title, content, depositConfirmReuslt);
+                        messageBLL.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
                     }
                 }
             }
@@ -186,7 +186,7 @@ namespace BackendSite.Controllers.Api
                     title = string.Format(title, depositReq.TransId);
                     string content = selLangBLL.GetResourceValue("lbl_DepositRejectContent", userLang);
                     content = string.Format(content, depositReq.TransId);
-                    messageBLL.SendMessageToPlayer(sender, title, content, depositConfirmReuslt);
+                    messageBLL.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
                 }
             }
             else if (depositReq.Action == (int)DepositStatus.Draft)
