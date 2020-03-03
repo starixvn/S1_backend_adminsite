@@ -17,6 +17,7 @@ namespace BackendSite.Service.Model
         public string Email { set; get; }
         public string WithdrawalInfo { set; get; }
         public int CurrencyId { set; get; }
+        public int SiteId { set; get; }
         public decimal Amount { set; get; }
         public decimal ChargeFee { set; get; }
         public string Memo { set; get; }
