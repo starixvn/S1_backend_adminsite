@@ -24,8 +24,8 @@ namespace BackendSite.Service.BLL
         }
         public IEnumerable<DepositRequest> GetDepositRequestList(int? depositType, long startDate, long endDate, string DepositId, string UserName, int? currencyId, int? status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            var serverInfo = serverInfoService.GetModel();
-            return depositService.GetDepositRequestList(depositType, startDate, endDate, serverInfo.SiteId, DepositId, UserName, currencyId, status, pageSize, ref pageNumber, out totalPages, out rowCount);
+            var serverInfo = serverInfoService.GetModel();/*Check SiteID By Permission*/
+            return depositService.GetDepositRequestList(depositType, startDate, endDate, serverInfo.SiteId/*Not require*/, DepositId, UserName, currencyId, status, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
 
         public IEnumerable<DepositRequest> GetDepositListByCust(int CustId,string TransId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
@@ -39,7 +39,7 @@ namespace BackendSite.Service.BLL
 
             Match m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out depositId);
-            return depositService.GetDepositRequest(depositId, serverInfo.SiteId);
+            return depositService.GetDepositRequest(depositId, serverInfo.SiteId/*Not require*/);/*Check SiteID By Permission*/
         }
 
         public IEnumerable<Comments> GetDepositRequestComment(string transId)
@@ -49,61 +49,58 @@ namespace BackendSite.Service.BLL
 
             Match m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out depositId);
-            return depositService.GetDepositRequestComment(depositId, serverInfo.SiteId);
+            var depositRequest = GetDepositRequest(transId);
+            return depositService.GetDepositRequestComment(depositId, depositRequest.SiteId);
         }
 
         public int DepositApproved(string transId, decimal actualDeposit, string comment, string Operator)
         {
-            var serverInfo = serverInfoService.GetModel();
-            int depositId = 0;
-
-            Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out depositId);
-
             List<int> forStatus = new List<int>();
             forStatus.Add((int)DepositStatus.Pending);
-            var depositRequest = depositService.GetDepositRequest(depositId, serverInfo.SiteId);
+            var depositRequest = GetDepositRequest(transId);
 
-            return depositService.SetDepositInfo(transId, serverInfo.SiteId, depositRequest.Amount, comment, Operator, forStatus, DepositStatus.Approved, depositRequest);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, depositRequest.Amount, comment, Operator, forStatus, DepositStatus.Approved, depositRequest);
         }
 
         public int DepositRejectd(string transId, decimal actualDeposit, string comment, string Operator)
         {
-            var serverInfo = serverInfoService.GetModel();
             List<int> forStatus = new List<int>();
             forStatus.Add((int)DepositStatus.Pending);
-            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.Rejected, null);
+
+            var depositRequest = GetDepositRequest(transId);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.Rejected, null);
         }
 
         public int DepositDraft(string transId, decimal actualDeposit, string comment, string Operator)
         {
-            var serverInfo = serverInfoService.GetModel();
             List<int> forStatus = new List<int>();
             forStatus.Add((int)DepositStatus.Pending);
             forStatus.Add((int)DepositStatus.OnHold);
-            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.Draft, null);
+
+            var depositRequest = GetDepositRequest(transId);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.Draft, null);
         }
         public int DepositOnHold(string transId, decimal actualDeposit, string comment, string Operator)
         {
-            var serverInfo = serverInfoService.GetModel();
             List<int> forStatus = new List<int>();
             forStatus.Add((int)DepositStatus.Pending);
-            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.OnHold, null);
+            var depositRequest = GetDepositRequest(transId);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.OnHold, null);
         }
         public int DepositPending(string transId, decimal actualDeposit, string comment, string Operator)
         {
-            var serverInfo = serverInfoService.GetModel();
             List<int> forStatus = new List<int>();
             forStatus.Add((int)DepositStatus.OnHold);
-            return depositService.SetDepositInfo(transId, serverInfo.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.Pending, null);
+            var depositRequest = GetDepositRequest(transId);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.Pending, null);
         }
         public DepositReceipt GetDepositReceipt(string transId)
         {
             int depositId = 0;
             Match m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out depositId);
-            var serverInfo = serverInfoService.GetModel();
-            return depositService.GetDepositReceipt(depositId, serverInfo.SiteId);
+            var depositRequest = GetDepositRequest(transId);
+            return depositService.GetDepositReceipt(depositId, depositRequest.SiteId);
         }
         public IEnumerable<DepositInfoForExport> GetDepositExportList(int? depositType, long startDate, long endDate, string DepositId, string UserName, int? currencyId, int? status)
         {

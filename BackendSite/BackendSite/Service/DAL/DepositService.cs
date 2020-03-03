@@ -89,68 +89,64 @@ namespace BackendSite.Service.DAL
             int result = 0;
             try
             {
-                using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+                using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+                conn.Open();
+                using var trans = conn.BeginTransaction();
+                string sForStatus = Newtonsoft.Json.JsonConvert.SerializeObject(forStatus);
+                var p = new DynamicParameters(new { DepositId = depositId, SiteId = siteId, ActualDeposit = actualDeposit, Comment = comment, ForStatus = sForStatus, Status = (int)status, ThirdId = (string)null });
+                p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
+                result = conn.Execute("DepositInfo_Set", p, trans, commandType: CommandType.StoredProcedure);
+
+                if (result > 0)
                 {
-                    conn.Open();
-                    using (var trans = conn.BeginTransaction())
+                    SetDepositLog(depositId, siteId, comment, (int)status, actualDeposit, Operator);
+
+                    if (status == DepositStatus.Approved)
                     {
-                        string sForStatus = Newtonsoft.Json.JsonConvert.SerializeObject(forStatus);
-                        var p = new DynamicParameters(new { DepositId = depositId, SiteId = siteId, ActualDeposit = actualDeposit, Comment = comment, ForStatus = sForStatus, Status = (int)status, ThirdId = (string)null });
-                        p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                        p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
-                        result = conn.Execute("DepositInfo_Set", p, trans, commandType: CommandType.StoredProcedure);
+                        if (depositRequest.DepositType != 3)
+                        {
+                            var pay = (IPay)depositRequest.oDepositInfo;
+                            type = payTypePosition + pay.PayId;
+                        }
+
+                        byte is1stDepoist = 0;
+                        decimal afterAmount = 0;
+
+                        int custId = p.Get<int?>("CustId") ?? 0;
+                        string UserName = p.Get<string>("UserName");
+                        result = walletService.SetBalance(custId, siteId, UserName, actualDeposit, type, $"Deposit Approved: {actualDeposit}", transId, out afterAmount, out is1stDepoist, conn, trans);
 
                         if (result > 0)
                         {
-                            SetDepositLog(depositId, siteId, comment, (int)status, actualDeposit, Operator);
+                            decimal withdrawalLimit = 0;
+                            result = withdrawalLimitService.SetWithdrawalLimit(custId, UserName, siteId, actualDeposit, $"WithdrawalLimit: {actualDeposit}", transId, out withdrawalLimit, conn, trans);
+                        }
 
-                            if (status == DepositStatus.Approved)
+                        if (is1stDepoist == 1 && result > 0)
+                        {
+                            result = SetDepositInfoFirstDeposit(depositId, siteId, conn, trans);
+                        }
+
+                        if (result > 0)
+                        {
+                            if (depositRequest.DepositType == 3)
                             {
-                                if (depositRequest.DepositType != 3)
-                                {
-                                    var pay = (IPay)depositRequest.oDepositInfo;
-                                    type = payTypePosition + pay.PayId;
-                                }
-
-                                byte is1stDepoist = 0;
-                                decimal afterAmount = 0;
-
-                                int custId = p.Get<int?>("CustId") ?? 0;
-                                string UserName = p.Get<string>("UserName");
-                                result = walletService.SetBalance(custId, siteId, UserName, actualDeposit, type, $"Deposit Approved: {actualDeposit}", transId, out afterAmount, out is1stDepoist, conn, trans);
-
-                                if (result > 0)
-                                {
-                                    decimal withdrawalLimit = 0;
-                                    result = withdrawalLimitService.SetWithdrawalLimit(custId, UserName, siteId, actualDeposit, $"WithdrawalLimit: {actualDeposit}", transId, out withdrawalLimit, conn, trans);
-                                }
-
-                                if (is1stDepoist == 1 && result > 0)
-                                {
-                                    result = SetDepositInfoFirstDeposit(depositId, siteId, conn, trans);
-                                }
-
-                                if (result > 0)
-                                {
-                                    if (depositRequest.DepositType == 3)
-                                    {
-                                        var depositInfo3 = (DepositInfo3_1)depositRequest.oDepositInfo;
-                                        result = walletService.SetBankOffDummy(depositRequest.SiteId, depositInfo3.SysId, depositInfo3.AccountNo, depositInfo3.CurrencyId, actualDeposit, conn, trans);
-                                    }
-                                    else if (depositRequest.oDepositInfo is IPay)
-                                    {
-                                        var pay = (IPay)depositRequest.oDepositInfo;
-                                        result = walletService.SetPayDummy(depositRequest.SiteId, pay.PayId, pay.CurrencyId, actualDeposit, conn, trans);
-                                    }
-                                }
+                                var depositInfo3 = (DepositInfo3_1)depositRequest.oDepositInfo;
+                                result = walletService.SetBankOffDummy(depositRequest.SiteId, depositInfo3.SysId, depositInfo3.AccountNo, depositInfo3.CurrencyId, actualDeposit, conn, trans);
                             }
-
-                            if (result > 0)
+                            else if (depositRequest.oDepositInfo is IPay)
                             {
-                                trans.Commit();
-                                result = p.Get<int?>("CustId") ?? result;
+                                var pay = (IPay)depositRequest.oDepositInfo;
+                                result = walletService.SetPayDummy(depositRequest.SiteId, pay.PayId, pay.CurrencyId, actualDeposit, conn, trans);
                             }
                         }
+                    }
+
+                    if (result > 0)
+                    {
+                        trans.Commit();
+                        result = p.Get<int?>("CustId") ?? result;
                     }
                 }
             }
