@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "ReportSummarize": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
