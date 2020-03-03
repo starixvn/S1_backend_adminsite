@@ -13,22 +13,19 @@ namespace BackendSite.Service.BLL
 {
     public class SelLangBLL : ISelLang
     {
-        private readonly ServerInfoBLL serverInfoBLL;
         private readonly IHttpContextAccessor httpContextAccessor;
         private ConcurrentDictionary<string, ResourceManager> rm = new ConcurrentDictionary<string, ResourceManager>();
         private string sLangId;
 
-        public SelLangBLL(IHttpContextAccessor httpContextAccessor, ServerInfoBLL serverInfoBLL)
+        public SelLangBLL(IHttpContextAccessor httpContextAccessor)
         {
-            this.serverInfoBLL = serverInfoBLL;
             this.httpContextAccessor = httpContextAccessor;
             this.sLangId = null;
         }
 
-        public IEnumerable<SiteLanguage> GetLangIdList()
+        public IEnumerable<SiteLanguage> GetLangIdList(ServerInfo serverInfo)
         {
             List<SiteLanguage> list = new List<SiteLanguage>();
-            var serverInfo = serverInfoBLL.GetServerInfo();
 
             foreach (var langId in serverInfo.ILangList)
             {
@@ -40,76 +37,6 @@ namespace BackendSite.Service.BLL
 
             return list;
         }
-
-        /// <summary>
-        /// Get Language ID
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public string GetLangId()
-        {
-            string langId = null;
-
-            var serverInfo = serverInfoBLL.GetServerInfo();
-            var context = httpContextAccessor.HttpContext;
-            if (context.User.Identity.IsAuthenticated)
-            {
-                langId = context.User.Claims.FirstOrDefault(m => m.Type == "LangId")?.Value;
-            }
-            else
-            {
-                langId = context.Request.Cookies[$"LangId_{serverInfo.SiteId}"];
-            }
-
-            if (string.IsNullOrEmpty(langId))
-            {
-                var routes = httpContextAccessor.HttpContext.GetRouteData();
-                var routeDataLandId = routes.Values["LangId"] as string;
-                if (!string.IsNullOrEmpty(routeDataLandId) && serverInfo.ILangList.Contains(routeDataLandId))
-                {
-                    langId = routeDataLandId;
-
-                    /*CookieOptions option = new CookieOptions();
-                    option.Expires = DateTime.Now.AddDays(10);
-                    context.Response.Cookies.Append($"LangId_{serverInfo.SiteId}", langId, option);*/
-                }
-            }
-
-            string userLangs = context.Request.Headers["Accept-Language"].ToString();
-            string firstLang = userLangs.Split(',').FirstOrDefault();
-
-            if (string.IsNullOrEmpty(langId) && !string.IsNullOrEmpty(firstLang))
-            {
-                if (firstLang.StartsWith("th", StringComparison.OrdinalIgnoreCase))
-                {
-                    langId = "th";
-                }
-                else if (firstLang.StartsWith("vi", StringComparison.OrdinalIgnoreCase))
-                {
-                    langId = "vn";
-                }
-                else if (firstLang.StartsWith("en", StringComparison.OrdinalIgnoreCase))
-                {
-                    langId = "en";
-                }
-                else
-                {
-                    langId = serverInfo.DefLang;
-                }
-            }
-
-            if (string.IsNullOrEmpty(langId))
-            {
-                langId = serverInfo.DefLang;
-            }
-            else if (!serverInfo.ILangList.Contains(langId))
-            {
-                langId = serverInfo.DefLang;
-            }
-
-            return langId;
-        }
-
         private string GetLan_Info(string key)
         {
             //
@@ -152,13 +79,13 @@ namespace BackendSite.Service.BLL
         }
         public string GetResourceValue(string key)
         {
-            string labelString = GetResourceValue(key, "lan", GetLangId());
+            string labelString = GetResourceValue(key, "lan", "en");
 
             return labelString;
         }
         public string GetMsg(string key)
         {
-            string labelString = GetResourceValue(key, "msg", GetLangId());
+            string labelString = GetResourceValue(key, "msg", "en");
 
             return labelString;
         }
@@ -176,7 +103,7 @@ namespace BackendSite.Service.BLL
         }
         public string GetErrMsg(int code)
         {
-            string labelString = GetResourceValue($"Code_{code}", "GameMsg_lan", GetLangId());
+            string labelString = GetResourceValue($"Code_{code}", "GameMsg_lan", "en");
 
             return labelString;
         }

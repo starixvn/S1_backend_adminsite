@@ -4,7 +4,6 @@
 @using BackendSite.Service.Model
 @inject IWebHostEnvironment environment
 @inject SelLangBLL selLangBLL
-@inject ServerInfoBLL serverInfoBLL
 @inject AuthorizeBLL authorizeBLL
 @inject IWebHostEnvironment environment
 @section Style {
@@ -23,8 +22,6 @@
         if (!i18n.ContainsKey(lbl_Txt))
             i18n.Add(lbl_Txt, selLangBLL.GetResourceValue(lbl_Txt));
     }
-
-    //var serverInfo = serverInfoBLL.GetServerInfo();
 
     for (var currency = 1; currency <= 51; currency++)
     {

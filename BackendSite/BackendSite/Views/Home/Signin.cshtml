@@ -2,11 +2,9 @@
 @using BackendSite.Service.BLL
 @inject IWebHostEnvironment environment
 @inject SelLangBLL selLangBLL
-@inject ServerInfoBLL serverInfoBLL
 @inject AuthorizeBLL authorizeBLL
 @{
     Layout = null;
-    var serverInfo = serverInfoBLL.GetServerInfo();
 }
 
 <!DOCTYPE html>
