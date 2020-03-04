@@ -33,7 +33,7 @@ const Panel = (props)=>{
                         selectdate:props.refInfo.selectdate_end,
                         trigger:props.refInfo.f_trigger_End
                     }}
-                    defaultValue={props.filterInfo.StartDate != null ? moment.unix(props.filterInfo.StartDate).format('l') : moment().add(-10, 'days').format('l')}
+                    defaultValue={props.filterInfo.EndDate != null ? moment.unix(props.filterInfo.EndDate).format('l') : moment().format('l')}
                 />
                 <div className="button-group">
                     <button className="btn btn-submit" type="submit" onClick={props.ClickSubmit}>Submit</button>
