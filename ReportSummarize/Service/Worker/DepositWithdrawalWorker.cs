@@ -26,11 +26,11 @@ namespace ReportSummarize.Service.Worker
                 {
                     depositWithdrawalBLL.SyncDailyReport();
                     _logger.LogInformation("DepositWithdrawalWorker done running at: {time}", DateTimeOffset.Now);
-                    await Task.Delay(5000, stoppingToken);
+                    await Task.Delay(10000, stoppingToken);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"WinLostWorker exception at: {DateTimeOffset.Now}, {ex.Message}");
+                    _logger.LogError($"DepositWithdrawalWorker exception at: {DateTimeOffset.Now}, {ex.Message}");
                 }
             }
         }

@@ -26,7 +26,7 @@ namespace ReportSummarize.Service.Worker
                 {
                     winLostBLL.SyncDailyReport();
                     _logger.LogInformation("WinLostWorker done running at: {time}", DateTimeOffset.Now);
-                    await Task.Delay(5000, stoppingToken);
+                    await Task.Delay(10000, stoppingToken);
                 }
                 catch (Exception ex)
                 {
