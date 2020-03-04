@@ -1,10 +1,12 @@
 import React from 'react';
-import GroupAuthoritySetting from './pages/Administration/GroupAuthoritySetting/index'
-import UserAuthoritySetting from './pages/Administration/UserAuthoritySetting/index'
+import GroupAuthoritySetting from './pages/Administration/GroupAuthoritySetting/index';
+import UserAuthoritySetting from './pages/Administration/UserAuthoritySetting/index';
+import LicWinLostReport from './pages/Report/LicenseeWinLost/index'
 
-export const defaultPage = "UserAuthoritySetting";
+export const defaultPage = "LicWinLostReport";
 
 export const pages = {
   'GroupAuthoritySetting':<GroupAuthoritySetting />,
-  'UserAuthoritySetting':<UserAuthoritySetting />
+  'UserAuthoritySetting':<UserAuthoritySetting />,
+  'LicWinLostReport':<LicWinLostReport />
 }

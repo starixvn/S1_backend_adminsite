@@ -14,12 +14,16 @@ namespace BackendSite.Service.BLL
         //private ConcurrentDictionary<int, ServerInfo> rm = new ConcurrentDictionary<int, ResourceManager>();
         private ServerInfo serverInfo;/*Single Site*/
         private IMemoryCache cache;
+        private readonly AdminUserService adminUserService;
+        private readonly AuthorizeBLL authorizeBLL;
 
-        public ServerInfoBLL(IMemoryCache cache, ServerInfoService serverInfoService)
+        public ServerInfoBLL(IMemoryCache cache, ServerInfoService serverInfoService, AdminUserService adminUserService, AuthorizeBLL authorizeBLL)
         {
             this.serverInfoService = serverInfoService;
             this.serverInfo = null;
             this.cache = cache;
+            this.adminUserService = adminUserService;
+            this.authorizeBLL = authorizeBLL;
         }
 
         public ServerInfo GetServerInfoWithSiteId(int siteId)
@@ -50,6 +54,56 @@ namespace BackendSite.Service.BLL
             }
 
             return SiteList;
+        }
+
+        public IEnumerable<ServerInfo> GetSiteListByLoginUser()
+        {
+            var authData = authorizeBLL.GetAuthData();
+            if(authData != null)
+            {
+                string sServerInfoListKey = $"ServerInfoList_UserId_{authData.UserId}";
+                var UserSiteList = cache.Get<IEnumerable<ServerInfo>>(sServerInfoListKey);
+                if (UserSiteList == null)
+                {
+                    var loginUser = adminUserService.GetUser(authData.UserId);
+                    if (loginUser.IsSuper)
+                    {
+                        UserSiteList = serverInfoService.GetSiteList();
+                    }
+                    else
+                    {
+                        var assignSites = adminUserService.GetAssignSiteList(authData.UserId);
+                        UserSiteList = assignSites != null && assignSites.Any() ? serverInfoService.GetSiteList().Where(x => assignSites.Any(y => y.SiteId == x.SiteId)) : null;
+                    }
+
+                    if (UserSiteList != null)
+                    {
+                        cache.Set(sServerInfoListKey, UserSiteList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
+                    }
+                }
+
+                return UserSiteList;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public IEnumerable<int> GetCurrencyList()
+        {
+            List<int> result = new List<int>();
+            var siteList = GetSiteListByLoginUser();
+            if(siteList != null)
+            {
+                foreach(var siteInfo in siteList)
+                {
+                    var currencies = siteInfo.ICurrencyList.Where(x=> !result.Any(y=> x == y));
+                    result.AddRange(currencies);
+                }
+            }
+
+            return result;
         }
     }
 }

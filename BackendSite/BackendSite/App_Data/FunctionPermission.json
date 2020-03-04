@@ -3,8 +3,8 @@
     "DisplayKey": "Reports",
     "Settings": [
       {
-        "DisplayKey": "Test1",
-        "FuncKey": "XXXX222",
+        "DisplayKey": "Licensee Win Lost",
+        "FuncKey": "LicWinLost/Report",
         "Enable": false
       }
     ]
@@ -30,47 +30,7 @@
       {
         "DisplayKey": "Deposit Request",
         "FuncKey": "Finance/DepositList",
-        "Enable": false /*,
-        "FuncKeys": [
-          {
-            "DisplayKey": "Online Banking",
-            "FuncKey": "Online Banking",
-            "InputBoxType": "checkbox",
-            "SubFuncKeys": [
-              {
-                "DisplayKey": "Draft",
-                "FuncKey": "Draft"
-              },
-              {
-                "DisplayKey": "Rejected",
-                "FuncKey": "Rejected"
-              }
-            ]
-          },
-          {
-            "DisplayKey": "Local Bank",
-            "FuncKey": "LocalBank",
-            "InputBoxType": "checkbox",
-            "SubFuncKeys": [
-              {
-                "DisplayKey": "Draft",
-                "FuncKey": "Draft"
-              },
-              {
-                "DisplayKey": "On Hold(Risk Check)",
-                "FuncKey": "OnHold"
-              },
-              {
-                "DisplayKey": "Approve",
-                "FuncKey": "Approve"
-              },
-              {
-                "DisplayKey": "Rejected",
-                "FuncKey": "Rejected"
-              }
-            ]
-          }
-        ]*/
+        "Enable": false
       },
       {
         "DisplayKey": "Withdrawal Request",
