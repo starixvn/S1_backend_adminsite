@@ -16,13 +16,17 @@ module.exports = {
         'jquery':'$'
     },
     entry: {
-        "Administration/UserAuthoritySetting.min":[
+        // "Administration/UserAuthoritySetting.min":[
+        //     '@babel/polyfill',
+        //     './src/pages/Administration/UserAuthoritySetting/index.js'
+        // ],
+        // "Administration/GroupAuthoritySetting.min":[
+        //     '@babel/polyfill',
+        //     './src/pages/Administration/GroupAuthoritySetting/index.js'
+        // ],
+        "Report/LicenseeWinLost.min":[
             '@babel/polyfill',
-            './src/pages/Administration/UserAuthoritySetting/index.js'
-        ],
-        "Administration/GroupAuthoritySetting.min":[
-            '@babel/polyfill',
-            './src/pages/Administration/GroupAuthoritySetting/index.js'
+            './src/pages/Report/LicenseeWinLost/index.js'
         ]
     },
     plugins:[
@@ -65,6 +69,10 @@ module.exports = {
                         ]
                     }
                 }
+            },
+            {
+                test: /\.css$/i,
+                use: ['style-loader', 'css-loader'],
             }
         ]        
     }

@@ -33,7 +33,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<ServerInfo> GetSiteList()
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<ServerInfo>("ServerInfoList_Get", commandType: CommandType.StoredProcedure);
+            return conn.Query<ServerInfo>("Admin_ServerInfoList_Get", commandType: CommandType.StoredProcedure);
         }
     }
 }

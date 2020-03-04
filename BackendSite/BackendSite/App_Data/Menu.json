@@ -7,10 +7,10 @@
     "Childs": [
       {
         "Key": "",
-        "Title": "Test1",
-        "FuncKey": "XXXX222",
-        "Controller": "XXXX222",
-        "Action": "",
+        "Title": "Licensee Win Lost",
+        "FuncKey": "LicWinLost/Report",
+        "Controller": "Report",
+        "Action": "LicWinLost",
         "Icon": "",
         "Roles": null,
         "Childs": null

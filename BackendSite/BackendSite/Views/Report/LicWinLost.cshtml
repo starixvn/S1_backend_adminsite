@@ -1,0 +1,53 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Hosting
+@using BackendSite.Service.BLL
+@inject IWebHostEnvironment environment
+@inject SelLangBLL selLangBLL
+@inject ServerInfoBLL serverInfoBLL
+@inject AuthorizeBLL authorizeBLL
+@{
+    Layout = null;
+    ViewData["Title"] = "LicenseeWinLost";
+}
+@{
+    var currencyList = serverInfoBLL.GetCurrencyList();
+    var i18n = new Dictionary<string, string>();
+
+    foreach (var currency in currencyList)
+    {
+        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
+            i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Backend 3.0</title>
+    <link href="~/css/page/report/LicenseeWinLost.css" asp-append-version="true" rel="stylesheet" />
+    <link href="~/lib/Oneworks/jscalendar/calendar-blue.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="content" style="height:100%">
+    </div>
+
+    <script src="~/lib/axios.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/moment.min.js"></script>
+    <script src="~/lib/Oneworks/jscalendar/calendar.js"></script>
+    <script src="~/lib/Oneworks/jscalendar/lang/calendar-en.js"></script>
+    <script src="~/lib/Oneworks/jscalendar/calendar-setup.js"></script>
+    <script src="~/lib/react.production.min.js"></script>
+    <script src="~/lib/react-dom.production.min.js"></script>
+    <script type="text/javascript">
+        window.i18n = {};
+        $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
+
+        window.RootUrl = '@Url.Content("~/api")'
+        window.LangCode = 'en'
+        window.gCurrencyList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(currencyList));
+    </script>
+    <script src="~/js/component/Report/LicenseeWinLost.min.js" asp-append-version="true"></script>
+</body>
+</html>
