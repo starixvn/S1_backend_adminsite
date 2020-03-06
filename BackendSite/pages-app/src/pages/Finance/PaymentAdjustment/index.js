@@ -94,7 +94,7 @@ const App = ()=>{
                     }
                 )
             }else{
-                alert(res.data.message)
+                alert(res.data.message ?? 'failed to get data.');
             }
         })
     }
@@ -124,7 +124,7 @@ const App = ()=>{
                     Datas:[...res.data.data],
                 });
             }else{
-                alert(res.data.message)
+                alert(res.data.message ?? 'failed to get data.');
             }
         })
     }

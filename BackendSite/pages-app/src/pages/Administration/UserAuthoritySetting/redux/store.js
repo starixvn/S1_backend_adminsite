@@ -120,7 +120,7 @@ function AddUserProps(dispatch){
                             datas:res.data.data
                         })
                     } else {
-                        alert(res.data.message)
+                        alert(res.data.message ?? 'failed to get data.');
                     }
                 });
             }            
@@ -143,7 +143,7 @@ function UserAuthoritySettingProps(dispatch){
                         datas:res.data.data
                     })
                 } else {
-                    alert(res.data.message)
+                    alert(res.data.message ?? 'failed to get data.');
                 }
             })
         },
@@ -168,7 +168,7 @@ function UserAuthoritySettingProps(dispatch){
                         UserList:datas
                     })
                 } else {
-                    alert(res.data.message)
+                    alert(res.data.message ?? 'failed to get data.');
                 }
             })
         }
@@ -225,7 +225,7 @@ function ResetPasswordProps(dispatch){
                             type:reducerActions.ResetPasswordActionTypes.RESET_PASSWORD,
                         })
                     } else {
-                        alert(res.data.message)
+                        alert(res.data.message ?? 'failed to get data.');
                     }
                 });
             }
@@ -257,7 +257,7 @@ function AssignSitesProps(dispatch){
                         identityKey:{idx:idx}
                     });
                 } else {
-                    alert(res.data.message)
+                    alert(res.data.message ?? 'failed to get data.');
                 }
             })
         },
@@ -298,7 +298,7 @@ function AssignSitesProps(dispatch){
                             type:reducerActions.AssignSitesActionTypes.ASSIGN_SITES,
                         })
                     } else {
-                        alert(res.data.message)
+                        alert(res.data.message ?? 'failed to get data.');
                     }
                 })
             }
@@ -329,7 +329,7 @@ function AssignGroupProps(dispatch){
                         currSelectedId:datas[idx].groupSEQ
                     })
                 } else {
-                    alert(res.data.message)
+                    alert(res.data.message ?? 'failed to get data.');
                 }
             })
         },
@@ -378,7 +378,7 @@ function AssignGroupProps(dispatch){
                                 UserList:datas
                             })
                         } else {
-                            alert(res.data.message)
+                            alert(res.data.message ?? 'failed to get data.');
                         }
                     })
                 }

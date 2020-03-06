@@ -41,7 +41,7 @@ function GetPermissionDataModel(IsEdit, dispatch, WhiteLabel=null){
             }
             window.scrollTo(0, 0)
         } else {
-            alert(res.data.message)
+            alert(res.data.message ?? 'failed to get data.');
         }
     })
 }
@@ -61,7 +61,7 @@ function GroupAuthorityProps(dispatch){
                         datas:res.data.data === null ? [] : res.data.data
                     })
                 } else {
-                    alert(res.data.message)
+                    alert(res.data.message ?? 'failed to get data.');
                 }
             })
         },
@@ -87,7 +87,7 @@ function GroupAuthorityProps(dispatch){
                             initDatas:InitDatas
                         })
                     }else{
-                        alert(res.data.message)
+                        alert(res.data.message ?? 'failed to get data.');
                     }
                 })
             }
@@ -125,7 +125,7 @@ function GroupAuthorityProps(dispatch){
                         })
                         alert(Lang.getLang(window.LangCode,"msgSuccessAlert"))
                     } else {
-                        alert(res.data.message)
+                        alert(res.data.message ?? 'failed to get data.');
                     }
                 });
             }
@@ -167,7 +167,7 @@ function GroupAuthorityProps(dispatch){
                     })
                     window.scrollTo(0, 0)
                 } else {
-                    alert(res.data.message)
+                    alert(res.data.message ?? 'failed to get data.');
                 }
             })
         },
@@ -208,7 +208,7 @@ function GroupAuthorityProps(dispatch){
                         
                         alert(Lang.getLang(window.LangCode,"msgSuccessAlert"))
                     } else {
-                        alert(res.data.message)
+                        alert(res.data.message ?? 'failed to get data.');
                     }
                 });
             }

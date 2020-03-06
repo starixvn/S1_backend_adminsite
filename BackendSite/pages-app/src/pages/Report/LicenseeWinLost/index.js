@@ -135,7 +135,7 @@ const App = ()=>{
                     GameList:[...gameList]
                 });
             }else{
-                alert(res.data.message)
+                alert(res.data.message ?? 'failed to get data.');
             }
         });
     }
