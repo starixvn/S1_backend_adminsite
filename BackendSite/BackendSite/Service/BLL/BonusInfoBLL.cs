@@ -1,0 +1,110 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using BackendSite.Service.DAL;
+using BackendSite.Service.Model;
+
+namespace BackendSite.Service.BLL
+{
+    public class BonusInfoBLL
+    {
+        private readonly ServerInfoBLL serverInfoBLL;
+        private readonly SelLangBLL selLangBLL;
+        private readonly BonusInfoService bonusInfoService;
+
+        public BonusInfoBLL(BonusInfoService bonusInfoService, ServerInfoBLL serverInfoBLL, SelLangBLL selLangBLL)
+        {
+            this.bonusInfoService = bonusInfoService;
+            this.serverInfoBLL = serverInfoBLL;
+            this.selLangBLL = selLangBLL;
+        }
+
+        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        {
+            var siteList = serverInfoBLL.GetSiteListByLoginUser();
+            var datas = bonusInfoService.GetBonusInfoReport(
+                    TransId,
+                    Currency,
+                    UserName,
+                    PromotionType,
+                    siteList?.Select(x => x.SiteId),
+                    StartDate,
+                    EndDate,
+                    PageSize,
+                    ref PageNumber,
+                    ref TotalPages,
+                    ref RowCount
+                );
+
+            List<BonusInfoFrontEnd> result = new List<BonusInfoFrontEnd>();
+            if (datas != null && datas.Any())
+            {
+                foreach (var row in datas)
+                {
+                    result.Add(new BonusInfoFrontEnd
+                    {
+                        TransId = row.TransId,
+                        CurrencyName = selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}"),
+                        PromotionName = selLangBLL.GetResourceValue($"lbl_PromotionType{row.PromotionType}"),
+                        SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
+                        UserName = row.UserName,
+                        CreateTime = row.CreateTime,
+                        StatusName = selLangBLL.GetResourceValue($"lbl_BonusStatus{row.Status}"),
+                        Bonus = row.Bonus,
+                        BonusAmount = row.BonusAmount,
+                        BonusCode = row.BonusCode,
+                        ExpiryTime = row.ExpiryTime,
+                        LockedAmount = row.LockedAmount,
+                        MaxBonus = row.MaxBonus,
+                        RollOver = row.RollOver
+                    });
+                }
+            }
+
+            return result;
+        }
+
+        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoExportReport(string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate)
+        {
+            var siteList = serverInfoBLL.GetSiteListByLoginUser();
+            var datas = bonusInfoService.GetBonusInfoExportReport(
+                    TransId,
+                    Currency,
+                    UserName,
+                    PromotionType,
+                    siteList?.Select(x => x.SiteId),
+                    StartDate,
+                    EndDate
+                );
+
+            List<BonusInfoFrontEnd> result = new List<BonusInfoFrontEnd>();
+            if (datas != null && datas.Any())
+            {
+                foreach (var row in datas)
+                {
+                    result.Add(new BonusInfoFrontEnd
+                    {
+                        TransId = row.TransId,
+                        CurrencyName = selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}"),
+                        PromotionName = selLangBLL.GetResourceValue($"lbl_PromotionType{row.PromotionType}"),
+                        SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
+                        UserName = row.UserName,
+                        CreateTime = row.CreateTime,
+                        StatusName = selLangBLL.GetResourceValue($"lbl_BonusStatus{row.Status}"),
+                        Bonus = row.Bonus,
+                        BonusAmount = row.BonusAmount,
+                        BonusCode = row.BonusCode,
+                        ExpiryTime = row.ExpiryTime,
+                        LockedAmount = row.LockedAmount,
+                        MaxBonus = row.MaxBonus,
+                        RollOver = row.RollOver
+                    });
+                }
+            }
+
+            return result;
+        }
+
+    }
+}

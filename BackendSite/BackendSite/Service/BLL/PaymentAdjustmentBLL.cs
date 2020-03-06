@@ -51,7 +51,7 @@ namespace BackendSite.Service.BLL
                         UserName = row.UserName,
                         Amount = row.Amount,
                         CreateTime = row.CreateTime,
-                        StatusName = selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.AdjustType}")
+                        StatusName = selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}")
                     });
                 }
             }
@@ -86,7 +86,7 @@ namespace BackendSite.Service.BLL
                         UserName = row.UserName,
                         Amount = row.Amount,
                         CreateTime = row.CreateTime,
-                        StatusName = selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.AdjustType}")
+                        StatusName = selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}")
                     });
                 }
             }

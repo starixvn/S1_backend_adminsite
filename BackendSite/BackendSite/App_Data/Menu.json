@@ -136,6 +136,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "BonusInfoReport",
+        "Title": "Bonus Report",
+        "FuncKey": "Marketing/BonusInfoReport",
+        "Controller": "Marketing",
+        "Action": "BonusInfoReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   }

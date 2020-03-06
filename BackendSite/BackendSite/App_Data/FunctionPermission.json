@@ -71,6 +71,11 @@
         "DisplayKey": "Point Level Management",
         "FuncKey": "Marketing/PointLevelManagement",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Bonus Report",
+        "FuncKey": "Marketing/BonusInfoReport",
+        "Enable": false
       }
     ]
   }

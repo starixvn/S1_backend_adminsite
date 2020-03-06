@@ -567,4 +567,28 @@
   <data name="lbl_AdjustmentType3" xml:space="preserve">
     <value>Bonus</value>
   </data>
+  <data name="lbl_BonusStatus1" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="lbl_BonusStatus2" xml:space="preserve">
+    <value>Canceled</value>
+  </data>
+  <data name="lbl_BonusStatus3" xml:space="preserve">
+    <value>Expiry</value>
+  </data>
+  <data name="lbl_BonusStatus4" xml:space="preserve">
+    <value>Fulfill</value>
+  </data>
+  <data name="lbl_PromotionType1" xml:space="preserve">
+    <value>First Deposit</value>
+  </data>
+  <data name="lbl_PromotionType2" xml:space="preserve">
+    <value>Re-Deposit</value>
+  </data>
+  <data name="lbl_PromotionType3" xml:space="preserve">
+    <value>Rebate</value>
+  </data>
+  <data name="lbl_PromotionType4" xml:space="preserve">
+    <value>Special</value>
+  </data>
 </root>

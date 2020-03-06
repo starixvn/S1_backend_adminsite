@@ -65,6 +65,7 @@ namespace BackendSite
             services.AddSingleton<AdminGroupService>();
             services.AddSingleton<WinLostReportService>();
             services.AddSingleton<PaymentAdjustmentService>();
+            services.AddSingleton<BonusInfoService>();
             //var dal = AppDomain.CurrentDomain.GetAssemblies()
             //           .SelectMany(t => t.GetTypes())
             //           .Where(t => t.IsClass && t.Namespace == "BackendSite.Service.DAL");
@@ -95,6 +96,7 @@ namespace BackendSite
             services.AddSingleton<MenuBLL>();
             services.AddSingleton<WinLostReportBLL>();
             services.AddSingleton<PaymentAdjustmentBLL>();
+            services.AddSingleton<BonusInfoBLL>();
             // var bll = AppDomain.CurrentDomain.GetAssemblies()
             //.SelectMany(t => t.GetTypes())
             //.Where(t => t.IsClass && t.Namespace == "BackendSite.Service.BLL");

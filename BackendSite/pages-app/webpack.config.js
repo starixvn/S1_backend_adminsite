@@ -15,21 +15,25 @@ module.exports = {
         'jquery':'$'
     },
     entry: {
-        "Administration/UserAuthoritySetting.min":[
+        // "Administration/UserAuthoritySetting.min":[
+        //     // '@babel/polyfill',
+        //     './src/pages/Administration/UserAuthoritySetting/index.js'
+        // ],
+        // "Administration/GroupAuthoritySetting.min":[
+        //     // '@babel/polyfill',
+        //     './src/pages/Administration/GroupAuthoritySetting/index.js'
+        // ],
+        // "Report/LicenseeWinLost.min":[
+        //     // '@babel/polyfill',
+        //     './src/pages/Report/LicenseeWinLost/index.js'
+        // ],
+        // "Finance/PaymentAdjustment.min":[
+        //     // '@babel/polyfill',
+        //     './src/pages/Finance/PaymentAdjustment/index.js'
+        // ],
+        "Marketing/BonusInfoReport.min":[
             // '@babel/polyfill',
-            './src/pages/Administration/UserAuthoritySetting/index.js'
-        ],
-        "Administration/GroupAuthoritySetting.min":[
-            // '@babel/polyfill',
-            './src/pages/Administration/GroupAuthoritySetting/index.js'
-        ],
-        "Report/LicenseeWinLost.min":[
-            // '@babel/polyfill',
-            './src/pages/Report/LicenseeWinLost/index.js'
-        ],
-        "Finance/PaymentAdjustment.min":[
-            // '@babel/polyfill',
-            './src/pages/Finance/PaymentAdjustment/index.js'
+            './src/pages/Marketing/BonusInfoReport/index.js'
         ]
     },
     output:{

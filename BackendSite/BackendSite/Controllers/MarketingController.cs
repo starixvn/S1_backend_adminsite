@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,12 @@ namespace BackendSite.Controllers
         }
 
         public IActionResult PointLevelManagement()
+        {
+            return View();
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusInfoReport" })]
+        public IActionResult BonusInfoReport()
         {
             return View();
         }
