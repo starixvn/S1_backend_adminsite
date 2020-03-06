@@ -1,0 +1,286 @@
+/*
+ *
+ *  Version: 2018/11/09
+ *  Editer: Change
+ *  Last Edition: add mobile view media (top:98px)
+ *
+ */
+.side-nav {
+  width: 260px;
+  box-shadow: none;
+  background: #314453;
+  top: 64px;
+  z-index: 997;
+}
+
+@media only screen and (min-device-width: 320px) and (max-device-width: 568px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait) {
+  .side-nav {
+    top: 98px;
+  }
+}
+
+.side-nav .logo-block {
+  display: none;
+}
+
+.side-nav .site-menu {
+  padding-bottom: 7rem;
+}
+
+@media only screen and (min-device-width: 375px) and (max-device-width: 667px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait) {
+  .side-nav .site-menu {
+    padding-bottom: 17rem;
+  }
+}
+
+@media only screen and (min-device-width: 320px) and (max-device-width: 568px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait) {
+  .side-nav .site-menu {
+    padding-bottom: 17rem;
+  }
+}
+
+.side-nav.fixed .collapsible-header {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+          align-items: center;
+  padding: 0 1.6rem;
+  min-height: 3.5rem;
+  line-height: 3.5rem;
+  text-transform: uppercase;
+  color: #dbdbdb;
+}
+
+.side-nav.fixed .collapsible-header:hover {
+  background: none;
+}
+
+.side-nav.fixed .collapsible-header .icon-arrow {
+  font-size: 9px;
+  width: initial;
+  -webkit-transform: rotate(-90deg);
+          transform: rotate(-90deg);
+  color: inherit;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.side-nav.fixed .collapsible-header .menu-icon {
+  margin-right: 10px;
+  color: inherit;
+  height: auto;
+  line-height: auto;
+}
+
+.side-nav.fixed .collapsible-header .menu-title + .icon-error_outline {
+  margin-left: .5rem;
+  color: #ff7c3e;
+}
+
+.side-nav.fixed .collapsible-header .menu-title + .tag {
+  margin-left: .5rem;
+}
+
+.side-nav.fixed .collapsible-header .tag {
+  text-transform: none;
+  font-weight: normal;
+}
+
+.side-nav.fixed .menu-item:not(.active) .collapsible-header i.icon-arrow {
+  transition: none;
+}
+
+.side-nav.fixed .menu-item.active {
+  background: rgba(0, 0, 0, 0.1);
+  /*.collapsible-body li {
+                    background: #f05b1f;
+                }*/
+}
+
+.side-nav.fixed .menu-item.active > .collapsible-header {
+  color: #f05b1f;
+}
+
+.side-nav.fixed .menu-item.active > .collapsible-header i.icon-arrow {
+  -webkit-transform: rotate(0);
+          transform: rotate(0);
+  transition: 0.3s all ease;
+}
+
+.side-nav.fixed .collapsible-body {
+  background: transparent;
+  padding-bottom: 7px;
+}
+
+.side-nav.fixed .collapsible-body li {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+          align-items: center;
+  padding: 0 0 0 20px;
+  line-height: 24px;
+  position: relative;
+}
+
+.side-nav.fixed .collapsible-body li a {
+  display: inline-block;
+  vertical-align: middle;
+  padding-right: 0;
+  height: 25px;
+  line-height: 25px;
+  color: #dbdbdb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /*&:hover {
+                        color: #f05b1f;
+                    }*/
+}
+
+.side-nav.fixed .collapsible-body li:hover a {
+  color: #f05b1f;
+}
+
+.side-nav.fixed .collapsible-body li img {
+  vertical-align: middle;
+}
+
+.side-nav.fixed .collapsible-body li.active {
+  background: #f05b1f;
+}
+
+.side-nav.fixed .collapsible-body li.active a {
+  color: #fff;
+}
+
+.side-nav.fixed .collapsible-body li:last-child {
+  border-bottom: none;
+}
+
+.side-nav.fixed .collapsible-body li > .menu-icon {
+  position: absolute;
+  left: 24px;
+  top: 3px;
+  color: white;
+  font-size: 18px;
+}
+
+.side-nav.fixed .collapsible-body li > .icon-error_outline {
+  color: #ff7c3e;
+}
+
+.side-nav.fixed .collapsible-body li.active .icon-error_outline {
+  color: white;
+}
+
+.side-nav a {
+  font-size: 1.3rem;
+}
+
+.side-nav a:hover {
+  background: none;
+}
+
+.site-menubar-fold .mCSB_container, .site-menubar-fold .mCustomScrollBox {
+  overflow: visible;
+}
+
+.site-menubar-fold .side-nav {
+  width: 70px;
+  overflow: visible;
+}
+
+.site-menubar-fold .side-nav .site-menu {
+  overflow: visible;
+}
+
+.site-menubar-fold .side-nav .site-menu .menu-item {
+  font-size: 14px;
+  position: relative;
+  transition: 0.1s ease all;
+}
+
+.site-menubar-fold .side-nav .site-menu .menu-item > a {
+  line-height: 50px;
+  height: 50px;
+  transition: 0.1s ease all;
+}
+
+.site-menubar-fold .side-nav .site-menu .menu-item > a .menu-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 70px;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  visibility: visible;
+  opacity: 1;
+  font-size: 20px;
+  margin-right: 0;
+}
+
+.site-menubar-fold .side-nav .site-menu .menu-item > a .menu-title {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 70px;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.site-menubar-fold .side-nav .site-menu .menu-item > a .icon-arrow {
+  visibility: hidden;
+}
+
+.site-menubar-fold .side-nav .site-menu .menu-item .collapsible-body {
+  position: absolute !important;
+  top: 0;
+  left: 6.9rem;
+  background: #2c3d4b;
+  width: 24rem;
+  overflow: auto;
+  max-height: 300px;
+}
+
+.site-menubar-fold .side-nav .site-menu .menu-item .collapsible-body > li > a {
+  padding: 0;
+}
+
+@media screen and (max-height: 800px) {
+  .site-menubar-fold .side-nav .site-menu .menu-item .collapsible-body {
+    max-height: 25rem;
+  }
+}
+
+.site-menubar-fold .side-nav .site-menu .menu-item .collapsible-body .mCSB_container, .site-menubar-fold .side-nav .site-menu .menu-item .collapsible-body .mCustomScrollBox {
+  overflow: hidden;
+}
+
+.site-menubar-fold .side-nav.fixed .collapsible-body li {
+  padding: 0;
+}
+
+.site-menubar-fold .side-nav.fixed .collapsible-body li a {
+  padding: 0 16px;
+  width: 100%;
+}
+
+.site-menubar-fold main {
+  padding-left: 70px;
+}
+
+@media (max-width: 992px) {
+  .site-menubar-fold main {
+    padding-left: 0;
+  }
+}
+
+#sidenav-overlay {
+  z-index: 996;
+}
+
+/*# sourceMappingURL=sideBar.css.map */

@@ -1,0 +1,152 @@
+.page-title .title {
+  font-size: 16px;
+  color: #4060a4;
+  text-transform: uppercase;
+  margin: 0;
+  padding-top: 2rem;
+  padding-bottom: 0.5rem;
+}
+
+.page-title .sub-title {
+  font-size: 1.2rem;
+}
+
+.page-results .collapsible {
+  box-shadow: none;
+  border: 0;
+  overflow: auto;
+}
+
+.page-form {
+  margin: 1.5rem 1.5rem 0;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.page-form .row {
+  margin-bottom: 0;
+}
+
+.page-form .row .col {
+  padding: 0 1.5rem;
+}
+
+.page-form .input-field {
+  font-size: 1.3rem;
+}
+
+.page-form .input-field label {
+  left: 1.5rem;
+  font-size: 1.2rem;
+  color: #808080;
+}
+
+.page-form .input-field input[type=text] {
+  height: 3.5rem;
+  line-height: 3.5rem;
+  border-color: #ccc;
+  font-size: 1.3rem;
+  color: #2c2c2c;
+  margin-bottom: 10px;
+}
+
+.page-form .input-field input[type=text][readonly="readonly"] {
+  border-bottom: 1px solid #ccc;
+}
+
+.page-form .input-field input[type=text][readonly="readonly"] + label {
+  color: #808080;
+}
+
+.page-form .input-field input[type=text]:focus:not([readonly]) {
+  border-color: #549cba;
+}
+
+.page-form .input-field input[type=text]:focus:not([readonly]) + label {
+  color: #549cba;
+}
+
+.page-form .input-field ::-webkit-input-placeholder {
+  /* Chrome/Opera/Safari */
+  color: #2c2c2c;
+}
+
+.page-form .input-field.input label {
+  top: 14px;
+}
+
+.page-form .input-field .icon-calendar {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+  font-size: 16px;
+  color: #4d6273;
+}
+
+.page-form .dropdown-content {
+  margin-top: 5px;
+}
+
+.page-form .dropdown-content li > a, .page-form .dropdown-content li > span {
+  font-size: 1.3rem;
+  color: #2c2c2c;
+}
+
+.page-form .select-wrapper {
+  /*span.caret {
+            color: $blue-light;
+        }*/
+}
+
+.page-form .select-wrapper input.select-dropdown {
+  height: 3.5rem;
+  line-height: 3.5rem;
+  border-color: #ccc;
+  font-size: 1.3rem;
+  color: #2c2c2c;
+  margin-bottom: 10px;
+}
+
+.table-title {
+  background: #8aa4b8;
+  padding: 4px 15px;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.panel-heading {
+  background: #4C6375;
+  border-radius: 0;
+  padding: 0;
+}
+
+.panel-heading .panel-title {
+  color: #fff;
+  padding: 5px 15px;
+  font-size: 13px;
+}
+
+.panel-heading .panel-title .icon-arrow {
+  margin: 0;
+  font-size: 13px;
+  -webkit-transform: rotate(-90deg);
+          transform: rotate(-90deg);
+  transition: 0.3s ease all;
+}
+
+.panel-heading .panel-title:hover, .panel-heading .panel-title:active, .panel-heading .panel-title:focus {
+  color: #fff;
+}
+
+.panel-heading + .panel-collapse > .panel-body {
+  border-top: none !important;
+}
+
+.panel-heading.active .panel-title .icon-arrow {
+  -webkit-transform: rotate(0);
+          transform: rotate(0);
+}
+
+/*# sourceMappingURL=liveReport.css.map */

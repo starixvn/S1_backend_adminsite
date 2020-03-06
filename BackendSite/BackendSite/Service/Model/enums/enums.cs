@@ -62,6 +62,7 @@ namespace BackendSite.Service.Model.enums
         Rejected = 7,
         Error = 99
     }
+
     public enum AdjustStatus
     {
         Draft = 0,
@@ -70,6 +71,13 @@ namespace BackendSite.Service.Model.enums
         Rejected = 3,
         OnHold = 4,
         Error = 99
+    }
+
+    public enum AdjustType
+    {
+        Debit = 1,
+        Credit = 2,
+        Bonus = 3
     }
 
     public enum AdminUserStatus

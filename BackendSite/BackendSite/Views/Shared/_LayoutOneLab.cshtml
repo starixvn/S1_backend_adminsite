@@ -10,15 +10,10 @@
     @RenderSection("Style", required: false)
 </head>
 <body>
-    <div class="container-fluid" id="Panel">
-        @RenderBody()
-    </div>
+    @RenderBody()    
     <script src="~/lib/axios.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/moment.min.js"></script>
-    <script>
-        var i18n = {};
-    </script>
     <script src="~/lib/react.production.min.js"></script>
     <script src="~/lib/react-dom.production.min.js"></script>    
     @RenderSection("Scripts", required: false)

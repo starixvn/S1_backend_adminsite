@@ -13,8 +13,6 @@
 // $Id: calendar.js,v 1.11 2003/07/08 18:51:41 mishoo Exp $
 
 /** The Calendar object constructor. */
-
-/*eslint-disable */
 Calendar = function (mondayFirst, dateStr, onSelected, onClose) {
 	// member variables
 	this.activeDiv = null;
@@ -1379,4 +1377,3 @@ Date.prototype.print = function (frm) {
 
 // global object that remembers the calendar
 window.calendar = null;
-/*eslint-enable */

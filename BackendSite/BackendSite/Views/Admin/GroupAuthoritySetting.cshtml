@@ -8,13 +8,14 @@
     <link type="text/css" href="~/common/css/vendor/OverlayScrollbars/OverlayScrollbars.min.css" rel="stylesheet" />
 }
 
-<div id="content">
+<div class="container-fluid" id="content">
+
 </div>
 
 @section Scripts {
     <script type="text/javascript">
-        window.RootUrl = '@Url.Content("~/api")'
-        window.LangCode = 'en';
+    window.RootUrl = '@Url.Content("~/api")'
+    window.LangCode = 'en';
     </script>
     <script src="~/common/js/component/scrollbar/jquery.overlayScrollbars.min.js"></script>
     <script src="~/js/component/Administration/GroupAuthoritySetting.min.js" asp-append-version="true"></script>

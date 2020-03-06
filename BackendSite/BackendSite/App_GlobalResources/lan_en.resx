@@ -549,4 +549,22 @@
   <data name="lbl_WithdrawalRejectTitle" xml:space="preserve">
     <value>Your deposit {0} has been rejected!</value>
   </data>
+  <data name="lbl_AdjustmentStatus1" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="lbl_AdjustmentStatus2" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="lbl_AdjustmentStatus3" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="lbl_AdjustmentType1" xml:space="preserve">
+    <value>Debit</value>
+  </data>
+  <data name="lbl_AdjustmentType2" xml:space="preserve">
+    <value>Credit</value>
+  </data>
+  <data name="lbl_AdjustmentType3" xml:space="preserve">
+    <value>Bonus</value>
+  </data>
 </root>

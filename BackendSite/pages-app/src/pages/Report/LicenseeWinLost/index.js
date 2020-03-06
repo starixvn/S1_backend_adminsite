@@ -5,7 +5,7 @@ import Result from './Result';
 import WebAPI from '../../../module/WebAPI';
 import moment from 'moment';
 import qs from 'qs';
-import {number_format, number_toFixed} from '../../../module/Formatting/NumberFormat'
+import {number_format, number_toFixed} from '../../../module/Formatting/NumberFormat';
 
 const App = ()=>{
     const [stateData, setData] = useState({

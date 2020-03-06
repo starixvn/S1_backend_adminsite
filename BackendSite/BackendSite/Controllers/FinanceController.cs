@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -35,6 +36,8 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustment" })]
         public IActionResult PaymentAdjustment()
         {
             return View();
@@ -85,6 +88,7 @@ namespace BackendSite.Controllers
             public long endDate { get; set; }
             public int? status { get; set; }
         }
+
         [HttpPost]
         public IActionResult ExportWithdrawalList(WithdrawalListReq withdrawalListReq)
         {

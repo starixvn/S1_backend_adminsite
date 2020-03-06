@@ -1,12 +1,35 @@
-import React from 'react';
-import GroupAuthoritySetting from './pages/Administration/GroupAuthoritySetting/index';
-import UserAuthoritySetting from './pages/Administration/UserAuthoritySetting/index';
-import LicWinLostReport from './pages/Report/LicenseeWinLost/index'
+import React, {lazy, Suspense} from 'react';
 
-export const defaultPage = "LicWinLostReport";
+const LicWinLostReport = lazy(()=> import('./pages/Report/LicenseeWinLost/index'));
+const GroupAuthoritySetting = lazy(()=> import('./pages/Administration/GroupAuthoritySetting/index'));
+const UserAuthoritySetting = lazy(()=> import('./pages/Administration/UserAuthoritySetting/index'));
+const PaymentAdjustment = lazy(()=> import('./pages/Finance/PaymentAdjustment/index'));
+
+export const defaultPage = 'PaymentAdjustment';
+export const layoutType = {
+  N88:'N88',
+  LAP:'LAP'
+}
 
 export const pages = {
-  'GroupAuthoritySetting':<GroupAuthoritySetting />,
-  'UserAuthoritySetting':<UserAuthoritySetting />,
-  'LicWinLostReport':<LicWinLostReport />
+  'GroupAuthoritySetting':{
+    comp:<Suspense fallback="loading..."><GroupAuthoritySetting /></Suspense>,
+    css:['./fonts//main-font/style.css', './css/common.css'],
+    layout:layoutType.LAP
+  },
+  'UserAuthoritySetting':{
+    comp:<Suspense fallback="loading..."><UserAuthoritySetting /></Suspense>,
+    css:['./fonts//main-font/style.css', './css/common.css'],
+    layout:layoutType.LAP
+  },
+  'LicWinLostReport':{
+    comp:<Suspense fallback="loading..."><LicWinLostReport /></Suspense>,
+    css:['./css/pages/report/LicenseeWinLost.css', './lib/Oneworks/jscalendar/calendar-blue.css'],
+    layout:layoutType.N88
+  },
+  'PaymentAdjustment':{
+    comp: <Suspense fallback="loading..."><PaymentAdjustment /></Suspense>,
+    css:['./lib/bootstrap/dist/css/bootstrap.min.css', './css/main.css', './lib/Oneworks/jscalendar/calendar-blue.css'],
+    layout:layoutType.N88
+  }
 }

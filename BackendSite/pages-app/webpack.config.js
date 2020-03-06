@@ -8,7 +8,6 @@ module.exports = {
         mangleWasmImports: true,
         nodeEnv: 'production'
     },
-    //devtool: 'source-map',
     externals:{
         'react': 'React',
         'react-dom': 'ReactDOM',
@@ -16,32 +15,23 @@ module.exports = {
         'jquery':'$'
     },
     entry: {
-        // "Administration/UserAuthoritySetting.min":[
-        //     '@babel/polyfill',
-        //     './src/pages/Administration/UserAuthoritySetting/index.js'
-        // ],
-        // "Administration/GroupAuthoritySetting.min":[
-        //     '@babel/polyfill',
-        //     './src/pages/Administration/GroupAuthoritySetting/index.js'
-        // ],
+        "Administration/UserAuthoritySetting.min":[
+            // '@babel/polyfill',
+            './src/pages/Administration/UserAuthoritySetting/index.js'
+        ],
+        "Administration/GroupAuthoritySetting.min":[
+            // '@babel/polyfill',
+            './src/pages/Administration/GroupAuthoritySetting/index.js'
+        ],
         "Report/LicenseeWinLost.min":[
-            '@babel/polyfill',
+            // '@babel/polyfill',
             './src/pages/Report/LicenseeWinLost/index.js'
+        ],
+        "Finance/PaymentAdjustment.min":[
+            // '@babel/polyfill',
+            './src/pages/Finance/PaymentAdjustment/index.js'
         ]
     },
-    plugins:[
-        // new webpack.ProvidePlugin({
-        //     'react': 'React',
-        //     'react-dom': 'ReactDOM',
-        //     'moment':'moment',
-        //     '$':'jquery'
-        // }),
-        // new bundleAnalyzer({
-        //     analyzerMode: "static",
-        //     reportFilename: "report.html",
-        //     openAnalyzer: true
-        // })
-    ],
     output:{
         path:  path.resolve(__dirname,'../BackendSite/wwwroot/js/component/'),
         filename:"[name].js"
@@ -71,9 +61,10 @@ module.exports = {
                 }
             },
             {
-                test: /\.css$/i,
+                test: /\.css$/,
+                // exclude: /(node_modules)/,
                 use: ['style-loader', 'css-loader'],
             }
-        ]        
+        ]
     }
 }

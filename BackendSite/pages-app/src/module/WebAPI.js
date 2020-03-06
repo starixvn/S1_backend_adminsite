@@ -28,4 +28,43 @@ export default class WidgetApi {
             return WidgetApi.PostData(param);
         }));
     }
+
+    static DownloadData(param){
+        let data = param.Data || {};
+        let _rootUrl = window.RootUrl;
+        const url = _rootUrl + '/' + param.Url;
+        
+        axios({
+            method: "post",
+            params: data,
+            url: url,
+            responseType: "blob"
+        }).then((response) => {
+            let blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+            downloadUrl = window.URL.createObjectURL(blob),
+            filename = "",
+            disposition = response.headers["content-disposition"];
+            
+            if (disposition && disposition.indexOf("attachment") !== -1) {
+                let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
+                    matches = filenameRegex.exec(disposition);
+        
+                if (matches != null && matches[1]) {
+                    filename = matches[1].replace(/['"]/g, "");
+                }
+            }
+        
+            let a = document.createElement("a");
+            if (typeof a.download === "undefined") {
+                window.location.href = downloadUrl;
+            } else {
+                a.href = downloadUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+            }
+        }).catch(error=>{
+            console.log(error);
+        })
+    }
 }
