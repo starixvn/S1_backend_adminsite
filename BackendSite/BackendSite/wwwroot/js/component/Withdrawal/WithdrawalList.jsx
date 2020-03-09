@@ -168,7 +168,7 @@ import * as Loading from '../commJS/Loading.jsx';
 
                     if(result.data.status==3) {
                         await this.onGetPayList(result.data.currencyId, result.data.sysId);
-                        await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId);
+                        await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId, result.data.siteId);
                     }
                     
                     let SelId = null;
@@ -257,9 +257,9 @@ import * as Loading from '../commJS/Loading.jsx';
             this.setState({selectType: parseInt(event.target.value), SelId: SelId});
         }
 
-        async onGetBankInfoOffList(currencyId, sysId) {
+        async onGetBankInfoOffList(currencyId, sysId, siteId) {
             let data = this.state.Data;
-            await axios.post('/api/Withdrawal/GetBankInfoOffList', { CurrencyId: currencyId, SysId: sysId})
+            await axios.post('/api/Withdrawal/GetBankInfoOffList', { CurrencyId: currencyId, SysId: sysId, SiteId: siteId})
             .then(function (response) {
                 //Loading.UnLoading();
                 let result = response.data;

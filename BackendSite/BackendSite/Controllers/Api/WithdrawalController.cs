@@ -120,8 +120,8 @@ namespace BackendSite.Controllers.Api
 
                 if (withdrawConfirmReuslt > 0)
                 {
-                    var depositRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
-                    var userLang = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId).UserLang;
+                    var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
+                    var userLang = custInfoBLL.GetCustInfoWithCache(withdrawalRequest.CustId).UserLang;
                     // Send message to player
                     string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender", userLang);
                     string title = selLangBLL.GetResourceValue("lbl_WithdrawalApprovedTitle", userLang);
@@ -161,7 +161,8 @@ namespace BackendSite.Controllers.Api
                 }
                 else if (withdrawalReq.WithdrawalType == (int)WithdrawalType.LocalBank)
                 {
-                    var bankInfoOff = bankDetailBLL.GetBankInfoOff().Where(x => x.BankId == withdrawalReq.SelId).FirstOrDefault();
+                    var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
+                    var bankInfoOff = bankDetailBLL.GetBankInfoOff(withdrawalRequest.SiteId).Where(x => x.BankId == withdrawalReq.SelId).FirstOrDefault();
 
                     if (bankInfoOff != null)
                     {
@@ -255,13 +256,14 @@ namespace BackendSite.Controllers.Api
         {
             public int CurrencyId { get; set; }
             public int SysId { get; set; }
+            public int SiteId { get; set; }
         }
 
         [HttpPost]
         public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffList(WithdrawalReq3 withdrawalReq)
         {
             var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
-            var bankInfoOff = bankDetailBLL.GetBankInfoOff();
+            var bankInfoOff = bankDetailBLL.GetBankInfoOff(withdrawalReq.SiteId);
             bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == withdrawalReq.CurrencyId && (x.Purpose & 2) > 0).OrderBy(x => x.BSort);
             apiResult.Data = bankInfoOff;
             apiResult.ErrorCode = 0;

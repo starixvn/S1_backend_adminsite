@@ -83,8 +83,8 @@
       },
       {
         "Key": "",
-        "Title": "Payment Adjustment Report",
-        "FuncKey": "Finance/PaymentAdjustmentReport",
+        "Title": "Adjustment Report",
+        "FuncKey": "Finance/AdjustmentReport",
         "Controller": "Finance",
         "Action": "PaymentAdjustmentReport",
         "Icon": "",
