@@ -64,7 +64,7 @@ const App = ()=>{
         let endDate = moment(stateRef.selectdate_end.current.value).add(1, 'days').unix()-1;
         
         let param = {
-            Url: 'PaymentAdjustment/GetPaymentAdjustmentReport',
+            Url: 'PaymentAdjustmentReport/GetPaymentAdjustmentReport',
             Data:qs.stringify({
                 AdjustType:stateFilter.Type,
                 CurrencyId:stateFilter.Currency,
@@ -101,7 +101,7 @@ const App = ()=>{
 
     const Result_ChangePage = (PageNumber)=>{
         let param = {
-            Url: 'PaymentAdjustment/GetPaymentAdjustmentReport',
+            Url: 'PaymentAdjustmentReport/GetPaymentAdjustmentReport',
             Data:qs.stringify({
                 AdjustType:stateDatas.FilterInfo.Type,
                 CurrencyId:stateDatas.FilterInfo.Currency,
@@ -131,7 +131,7 @@ const App = ()=>{
 
     const Result_ExportToExcel = ()=>{
         let param = {
-            Url: 'PaymentAdjustment/ExportPaymentAdjustmentReport',
+            Url: 'PaymentAdjustmentReport/ExportPaymentAdjustmentReport',
             Data:{
                 AdjustType:stateDatas.FilterInfo.Type,
                 CurrencyId:stateDatas.FilterInfo.Currency,

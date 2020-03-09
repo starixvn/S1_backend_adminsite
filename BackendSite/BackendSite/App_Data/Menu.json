@@ -83,6 +83,16 @@
       },
       {
         "Key": "",
+        "Title": "Payment Adjustment Report",
+        "FuncKey": "Finance/PaymentAdjustmentReport",
+        "Controller": "Finance",
+        "Action": "PaymentAdjustmentReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
         "Title": "Pending Funds",
         "FuncKey": "Finance/PendingFund",
         "Controller": "Finance",

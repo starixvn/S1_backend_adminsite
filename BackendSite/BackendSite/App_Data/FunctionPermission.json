@@ -43,6 +43,11 @@
         "Enable": false
       },
       {
+        "DisplayKey": "Payment Adjustment Report",
+        "FuncKey": "Finance/PaymentAdjustmentReport",
+        "Enable": false
+      },
+      {
         "DisplayKey": "Pending Funds",
         "FuncKey": "Finance/PendingFund",
         "Enable": false

@@ -9,15 +9,15 @@ using BackendSite.Attributes;
 
 namespace BackendSite.Controllers.Api
 {
-    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustment" })]
+    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustmentReport" })]
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class PaymentAdjustmentController : Controller
+    public class PaymentAdjustmentReportController : Controller
     {
-        private readonly PaymentAdjustmentBLL paymentAdjustmentBLL;
+        private readonly PaymentAdjustmentReportBLL paymentAdjustmentBLL;
         private readonly ExcelBLL excelBLL;
 
-        public PaymentAdjustmentController(PaymentAdjustmentBLL paymentAdjustmentBLL, ExcelBLL excelBLL)
+        public PaymentAdjustmentReportController(PaymentAdjustmentReportBLL paymentAdjustmentBLL, ExcelBLL excelBLL)
         {
             this.paymentAdjustmentBLL = paymentAdjustmentBLL;
             this.excelBLL = excelBLL;
@@ -52,7 +52,7 @@ namespace BackendSite.Controllers.Api
         {
             var ExportData = paymentAdjustmentBLL.GetPaymentAdjustmentExportReport(TransId, CurrencyId, UserName, AdjustType, StartDate, EndDate);
             var stream = excelBLL.Export(ExportData);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"PaymentAdjustment_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"PaymentAdjustmentReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
     }
 }

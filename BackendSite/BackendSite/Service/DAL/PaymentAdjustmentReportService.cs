@@ -11,10 +11,10 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
-    public class PaymentAdjustmentService
+    public class PaymentAdjustmentReportService
     {
         private readonly IConfiguration configuration;
-        public PaymentAdjustmentService(IConfiguration configuration)
+        public PaymentAdjustmentReportService(IConfiguration configuration)
         {
             this.configuration = configuration;
         }

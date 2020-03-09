@@ -7,13 +7,13 @@ using BackendSite.Service.Model;
 
 namespace BackendSite.Service.BLL
 {
-    public class PaymentAdjustmentBLL
+    public class PaymentAdjustmentReportBLL
     {
-        private readonly PaymentAdjustmentService paymentAdjustmentService;
+        private readonly PaymentAdjustmentReportService paymentAdjustmentService;
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly SelLangBLL selLangBLL;
 
-        public PaymentAdjustmentBLL(PaymentAdjustmentService paymentAdjustmentService, ServerInfoBLL serverInfoBLL, SelLangBLL selLangBLL)
+        public PaymentAdjustmentReportBLL(PaymentAdjustmentReportService paymentAdjustmentService, ServerInfoBLL serverInfoBLL, SelLangBLL selLangBLL)
         {
             this.paymentAdjustmentService = paymentAdjustmentService;
             this.serverInfoBLL = serverInfoBLL;

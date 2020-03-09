@@ -37,11 +37,17 @@ namespace BackendSite.Controllers
             return View();
         }
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustment" })]
         public IActionResult PaymentAdjustment()
         {
             return View();
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustmentReport" })]
+        public IActionResult PaymentAdjustmentReport()
+        {
+            return View();
+        }
+
         public IActionResult PendingFund()
         {
             IEnumerable<PendingFund> pendingFund = pendingFundBLL.PendingFundList();
