@@ -14,7 +14,7 @@
     ViewData["Title"] = @selLangBLL.GetResourceValue("lbl_WithdrawalRequest");
 }
 @{
-    var serverInfo = serverInfoBLL.GetServerInfo();
+    var currencyList = new int[] { 2, 4, 13, 15, 51 };
     var i18n = new Dictionary<string, string>();
 
     for (var currency = 1; currency <= 51; currency++)
@@ -57,7 +57,7 @@
     <script src="~/lib/Oneworks/jscalendar/calendar-setup.js"></script>
     <script type="text/javascript">
         $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
-        var CurrencyList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(serverInfo.ICurrencyList));
+        var CurrencyList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(currencyList));
     </script>
     <script src="~/js/component/Withdrawal/WithdrawalList.min.js" asp-append-version="true"></script>
     @if (environment.EnvironmentName == "Development")
