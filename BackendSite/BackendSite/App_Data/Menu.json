@@ -93,6 +93,16 @@
       },
       {
         "Key": "",
+        "Title": "Payment Management",
+        "FuncKey": "Finance/PaymentManage",
+        "Controller": "Finance",
+        "Action": "PaymentManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
         "Title": "Pending Funds",
         "FuncKey": "Finance/PendingFund",
         "Controller": "Finance",

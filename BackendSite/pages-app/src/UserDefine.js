@@ -43,8 +43,8 @@ export const pages = {
     comp: <Suspense fallback="loading..."><PaymentManagement /></Suspense>,
     css:[
       './lib/bootstrap/dist/css/bootstrap.min.css', 
-      // './css/main.css', 
-      './lib/Oneworks/jscalendar/calendar-blue.css'],
+      './css/main.css'
+    ],
     layout:layoutType.N88
   }
 }

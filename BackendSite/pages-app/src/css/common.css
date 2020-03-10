@@ -1923,7 +1923,7 @@ a.btn-disabled:focus {
 
 .btn_sequence a {
   display: inline-block;
-  background: url("../images/spinlabel.png") no-repeat 0 0;
+  background: url("../../common/images/spinlabel.png") no-repeat 0 0;
   width: 10px;
   height: 15px;
 }

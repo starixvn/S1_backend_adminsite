@@ -48,6 +48,11 @@
         "Enable": false
       },
       {
+        "DisplayKey": "Payment Management",
+        "FuncKey": "Finance/PaymentManage",
+        "Enable": false
+      },
+      {
         "DisplayKey": "Pending Funds",
         "FuncKey": "Finance/PendingFund",
         "Enable": false

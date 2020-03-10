@@ -42,6 +42,12 @@ namespace BackendSite.Controllers
             return View();
         }
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
+        public IActionResult PaymentManagement()
+        {
+            return View();
+        }
+
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustmentReport" })]
         public IActionResult PaymentAdjustmentReport()
         {
