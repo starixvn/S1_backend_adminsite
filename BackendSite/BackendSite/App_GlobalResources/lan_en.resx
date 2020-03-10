@@ -559,10 +559,10 @@
     <value>Rejected</value>
   </data>
   <data name="lbl_AdjustmentType1" xml:space="preserve">
-    <value>Debit</value>
+    <value>Credit</value>
   </data>
   <data name="lbl_AdjustmentType2" xml:space="preserve">
-    <value>Credit</value>
+    <value>Debit</value>
   </data>
   <data name="lbl_AdjustmentType3" xml:space="preserve">
     <value>Bonus</value>
