@@ -448,6 +448,25 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
             }
         }
 
+        onSetCustStatus(status) {
+            if(confirm('Are you sure?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/api/CustManage/SetCustStatus', {CustId: data.custId, Status: status})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.props.onGetCustInfoDetail();
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));            
+            }
+        }
+
         cancelBonus(bonusId) {
             if(confirm('Are you sure?')) {            
                 axios.post('/api/CustManage/CancelBonusByBonusId', {BonusId: bonusId})
@@ -504,8 +523,13 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
                     </div>
                 </div> : 
                 <div>
-                    <div className="button-block"><button className="btn btn-primary" onClick={this.onResetProfile.bind(this)}>Reset Profile</button>
-                    <button className="btn btn-primary" onClick={this.onResetCustBankInfo.bind(this)}>Reset Customer Bank Info.</button></div>
+                    <div className="button-block">
+                        <button className="btn btn-primary" onClick={this.onResetProfile.bind(this)}>Reset Profile</button>
+                        <button className="btn btn-primary" onClick={this.onResetCustBankInfo.bind(this)}>Reset Customer Bank Info.</button>
+                        {data.status==1 && data.agent != null ? <button className="btn btn-primary" onClick={this.onSetCustStatus.bind(this, 2)}>Suspend</button> : null}
+                        {(data.status==1 || data.status==2) && data.agent != null ? <button className="btn btn-primary" onClick={this.onSetCustStatus.bind(this, 3)}>Closed</button> : null}
+                        {data.status==2 && data.agent != null ? <button className="btn btn-primary" onClick={this.onSetCustStatus.bind(this, 1)}>Unlock</button> : null}
+                    </div>
                     <div className="flex-wrap">
                         <table className="table table-detail">
                             <tbody>

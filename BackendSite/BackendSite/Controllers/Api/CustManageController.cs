@@ -200,6 +200,24 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
+        public class SetCustStatusReq
+        {
+            public int CustId { get; set; }
+            public int Status { get; set; }
+        }
+
+        [HttpPost]
+        public ApiResult SetCustStatus(SetCustStatusReq setCustStatusReq)
+        {
+            ApiResult apiResult = new ApiResult();
+            if (custInfoBLL.SetCustStatus(setCustStatusReq.CustId, setCustStatusReq.Status))
+            {
+                apiResult.ErrorCode = 0;
+            }
+
+            return apiResult;
+        }
         public class BonusReq
         {
             public int BonusId { get; set; }
