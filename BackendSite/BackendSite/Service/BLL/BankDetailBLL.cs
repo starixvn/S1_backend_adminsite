@@ -70,14 +70,13 @@ namespace BackendSite.Service.BLL
             return sysBankList;
         }
 
-        public IEnumerable<BankInfoOff> GetBankInfoOff()
+        public IEnumerable<BankInfoOff> GetBankInfoOff(int siteId)
         {
-            var serverInfo = serverInfoService.GetModel();
-            string sBankInfoOffListKey = $"BankInfoOffList_{serverInfo.SiteId}";
+            string sBankInfoOffListKey = $"BankInfoOffList_{siteId}";
             var BankInfoOffList = cache.Get<IEnumerable<BankInfoOff>>(sBankInfoOffListKey);
             if (BankInfoOffList == null)
             {
-                BankInfoOffList = localBankService.GetBankAccountOff(serverInfo.SiteId);
+                BankInfoOffList = localBankService.GetBankAccountOff(siteId);
                 if (BankInfoOffList != null)
                 {
                     cache.Set(sBankInfoOffListKey, BankInfoOffList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30)));

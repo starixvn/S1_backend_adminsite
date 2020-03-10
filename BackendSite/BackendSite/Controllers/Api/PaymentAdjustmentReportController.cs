@@ -9,7 +9,7 @@ using BackendSite.Attributes;
 
 namespace BackendSite.Controllers.Api
 {
-    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustmentReport" })]
+    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/AdjustmentReport" })]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class PaymentAdjustmentReportController : Controller

@@ -43,8 +43,8 @@
         "Enable": false
       },
       {
-        "DisplayKey": "Payment Adjustment Report",
-        "FuncKey": "Finance/PaymentAdjustmentReport",
+        "DisplayKey": "Adjustment Report",
+        "FuncKey": "Finance/AdjustmentReport",
         "Enable": false
       },
       {
