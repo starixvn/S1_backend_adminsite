@@ -27,14 +27,18 @@ module.exports = {
         //     // '@babel/polyfill',
         //     './src/pages/Report/LicenseeWinLost/index.js'
         // ],
-        "Finance/PaymentAdjustmentReport.min":[
-            // '@babel/polyfill',
-            './src/pages/Finance/PaymentAdjustmentReport/index.js'
-        ],
+        // "Finance/PaymentAdjustmentReport.min":[
+        //     // '@babel/polyfill',
+        //     './src/pages/Finance/PaymentAdjustmentReport/index.js'
+        // ],
         // "Marketing/BonusInfoReport.min":[
         //     // '@babel/polyfill',
         //     './src/pages/Marketing/BonusInfoReport/index.js'
-        // ]
+        // ],
+        "Finance/PaymentManagement.min":[
+            // '@babel/polyfill',
+            './src/pages/Finance/PaymentManagement/index.js'
+        ],
     },
     output:{
         path:  path.resolve(__dirname,'../BackendSite/wwwroot/js/component/'),

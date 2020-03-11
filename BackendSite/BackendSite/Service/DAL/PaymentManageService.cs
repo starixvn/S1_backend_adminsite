@@ -74,5 +74,41 @@ namespace BackendSite.Service.DAL
                 return conn.Query<PayCurrency>(SpName, new { ChannelId = 0 }, commandType: CommandType.StoredProcedure);
             }
         }
+
+        public void UpdatePayList(int PayId, int Status)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                string SpName = "Admin_PayList_Set";
+                conn.Execute(SpName, new { PayId, Status }, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public void UpdatePayChannel(int ChannelId, int Sort, int Status, int Mode)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                string SpName = "Admin_PayChannel_Set";
+                conn.Execute(SpName, new { ChannelId, Sort, Status, Mode }, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public void UpdatePayCurrency(int ChannelId, int CurrencyId, decimal MinAmount, decimal MaxAmount, int AmountRule, string AmountShow)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                string SpName = "Admin_PayCurrency_Set";
+                conn.Execute(SpName, new { ChannelId, CurrencyId, MinAmount, MaxAmount, AmountRule, AmountShow }, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public void UpdatePayCurrencyAmount(int ChannelId, int CurrencyId, decimal MinAmount, decimal MaxAmount)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                string SpName = "Admin_PayCurrency_SetAmount";
+                conn.Execute(SpName, new { ChannelId, CurrencyId, MinAmount, MaxAmount}, commandType: CommandType.StoredProcedure);
+            }
+        }
     }
 }

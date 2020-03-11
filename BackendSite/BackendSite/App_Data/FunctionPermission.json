@@ -50,7 +50,14 @@
       {
         "DisplayKey": "Payment Management",
         "FuncKey": "Finance/PaymentManage",
-        "Enable": false
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit Amount Rule",
+            "FuncKey": "f_pm_editAmountRule"
+          }
+        ]
       },
       {
         "DisplayKey": "Pending Funds",

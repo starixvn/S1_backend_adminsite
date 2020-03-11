@@ -44,7 +44,7 @@ namespace BackendSite.Controllers
 
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
-        public IActionResult PaymentManagement()
+        public IActionResult PaymentManage()
         {
             return View();
         }

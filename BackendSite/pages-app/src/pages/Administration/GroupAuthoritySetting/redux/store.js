@@ -226,6 +226,7 @@ function SetSelectedPermissionDatas(datas){
         }
     }
 
+    console.log(result);
     return result;
 }
 
@@ -249,7 +250,9 @@ function SetSelectedFunctionKeys(settings){
 
                     if(subOptions.length!==0){
                         result.push({funcKey:setting.funcKey, subFuncKeys:subOptions});    
-                    }                    
+                    }else{
+                        result.push({funcKey:setting.funcKey, subFuncKeys:null});
+                    }
                 }else{
                     result.push({funcKey:setting.funcKey, subFuncKeys:null});                    
                 }

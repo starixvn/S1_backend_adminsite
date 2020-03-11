@@ -1,0 +1,47 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using BackendSite.Service.BLL
+@using BackendSite.Service.DAL
+@using Newtonsoft.Json
+@inject AuthorizeBLL authorizeBLL
+@inject AdminUserService adminUserService
+@inject PermissionBLL permissionBLL
+@section Style {
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
+}
+@{
+    Layout = "~/Views/Shared/_LayoutOneLab.cshtml";
+    ViewData["Title"] = "Payment Management";
+}
+@{
+    var authData = authorizeBLL.GetAuthData();
+    var loginUser = adminUserService.GetUser(authData.UserId);
+
+    List<string> subFuncKeys = new List<string>();
+    if (loginUser.IsSuper)
+    {
+        subFuncKeys = new List<string>()
+{
+            "f_pm_editAmountRule"
+        };
+    }
+    else if (loginUser.GroupSEQ != null)
+    {
+        var permission = permissionBLL.GetUserPermission((int)loginUser.GroupSEQ, "Finance/PaymentManage");
+        subFuncKeys = permission != null && permission.SubFuncKeys != null ? JsonConvert.DeserializeObject<List<string>>(permission.SubFuncKeys) : subFuncKeys;
+    }
+}
+
+<div id="content"></div>
+
+
+@section Scripts {
+    <script>
+        window.RootUrl = '@Url.Content("~/api")';
+        window.LangCode = 'en'
+        window.subFuncKeys = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(subFuncKeys))
+    </script>
+    <script src="~/lib/runtime.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/js/component/Finance/PaymentManagement.min.js" asp-append-version="true"></script>
+}

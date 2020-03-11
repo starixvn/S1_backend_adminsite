@@ -109,10 +109,11 @@ export const SelectBox = (props)=>{
 export const InputBox = (props)=>{
     const onChange = (e)=>{
         if(props.onChange){
+            
             props.onChange(e.target.value, props.dataColumn, props.idxArr);
         }
     }
     return(
-        <input className={props.className ?? ''} type={props.format} defaultValue={props.value} onChange={onChange}/>
+        <input className={props.className ?? ''} type={props.attrFormat} defaultValue={props.value} onChange={onChange}/>
     )
 }

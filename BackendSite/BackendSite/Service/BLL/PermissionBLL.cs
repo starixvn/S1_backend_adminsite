@@ -12,11 +12,15 @@ namespace BackendSite.Service.BLL
     {
         private readonly AdminGroupService adminGroupService;
         private readonly PermissionService permissionService;
+        private readonly AuthorizeBLL authorizeBLL;
+        private readonly AdminUserService adminUserService;
 
-        public PermissionBLL(PermissionService permissionService, AdminGroupService adminGroupService)
+        public PermissionBLL(PermissionService permissionService, AdminGroupService adminGroupService, AuthorizeBLL authorizeBLL, AdminUserService adminUserService)
         {
             this.permissionService = permissionService;
             this.adminGroupService = adminGroupService;
+            this.authorizeBLL = authorizeBLL;
+            this.adminUserService = adminUserService;
         }
 
         public IEnumerable<FuncPermissionModel> GetPermissionJSONData()
@@ -28,6 +32,12 @@ namespace BackendSite.Service.BLL
         public IEnumerable<GroupPermisison> GetUserPermission(int GroupSEQ)
         {
             var permission = adminGroupService.GetGroupPermissions(GroupSEQ);
+            return permission;
+        }
+
+        public GroupPermisison GetUserPermission(int GroupSEQ, string FuncKey)
+        {
+            var permission = adminGroupService.GetGroupPermissions(GroupSEQ)?.FirstOrDefault(x=> string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase));
             return permission;
         }
 
@@ -141,16 +151,61 @@ namespace BackendSite.Service.BLL
             return Setting;
         }
 
+        public bool CheckPermission(string FuncKey, string SubFuncKey)
+        {
+            var authData = authorizeBLL.GetAuthData();
+            var loginUser = adminUserService.GetUser(authData.UserId);
+
+            bool result = false;
+            if (loginUser.IsSuper)
+            {
+                result = true;
+            }
+            else
+            {
+                if(loginUser.GroupSEQ == null)
+                {
+                    result = false;
+                }
+                else
+                {
+                    var permissions = GetUserPermission((int)loginUser.GroupSEQ);
+                    if (permissions != null && permissions.Any())
+                    {
+                        var funcItem = permissions.FirstOrDefault(x => string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase));
+                        var subItem = funcItem.SubFuncKeys == null ? new string[] { } : Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(funcItem.SubFuncKeys);
+
+                        if (!string.IsNullOrEmpty(SubFuncKey))
+                        {
+                            if (subItem.Any())
+                            {
+                                result = subItem.Any(s => string.Equals(s, SubFuncKey, StringComparison.OrdinalIgnoreCase));
+                            }
+                        }
+                        else
+                        {
+                            result = funcItem != null;
+                        }
+                    }
+                }
+            }
+            
+            return result;
+        }
+
         public bool CheckPermission(int GroupSEQ, string FuncKey, string SubFuncKey)
         {
+            var authData = authorizeBLL.GetAuthData();
+            var loginUser = adminUserService.GetUser(authData.UserId);
+
             bool result = false;
             var permissions = GetUserPermission(GroupSEQ);
             if (permissions != null && permissions.Any())
             {
                 var funcItem = permissions.FirstOrDefault(x => string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase));
-                var subItem = funcItem.SubFuncKeys == null ? new string[] { } : Newtonsoft.Json.JsonConvert.DeserializeObject <string[]>(funcItem.SubFuncKeys);
+                var subItem = funcItem.SubFuncKeys == null ? new string[] { } : Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(funcItem.SubFuncKeys);
 
-                if(!string.IsNullOrEmpty(SubFuncKey))
+                if (!string.IsNullOrEmpty(SubFuncKey))
                 {
                     if (subItem.Any())
                     {

@@ -10,15 +10,11 @@ namespace BackendSite.Service.BLL
     public class PaymentManageBLL
     {
         private readonly PaymentManageService paymentManageService;
-        public PaymentManageBLL(PaymentManageService paymentManageService)
+
+        public PaymentManageBLL(PaymentManageService paymentManageService, PermissionBLL permissionBLL, AuthorizeBLL authorizeBLL, AdminUserService adminUserService)
         {
             this.paymentManageService = paymentManageService;
         }
-
-        //public IEnumerable<PayList> GetPayInfoList()
-        //{
-        //    return paymentManageService.GetPayInfoList();
-        //}
 
         public FrontEndDatas GetPayInfoList()
         {
@@ -28,6 +24,27 @@ namespace BackendSite.Service.BLL
                 CurrencyList = paymentManageService.GetPayCurrencyList(),
                 PayList = paymentManageService.GetPayList()
             };
+        }
+
+        public void UpdatePayList(int PayId, int Status)
+        {
+            paymentManageService.UpdatePayList(PayId, Status);
+        }
+
+        public void UpdatePayChannel(int ChannelId, int Sort, int Status, int Mode)
+        {
+            paymentManageService.UpdatePayChannel(ChannelId, Sort, Status, Mode);
+        }
+
+        public void UpdatePayCurrency(int ChannelId, int CurrencyId, decimal MinAmount, decimal MaxAmount, int AmountRule, string AmountShow)
+        {
+            AmountShow = string.IsNullOrEmpty(AmountShow) ? null : AmountShow;
+            paymentManageService.UpdatePayCurrency(ChannelId, CurrencyId, MinAmount, MaxAmount, AmountRule, AmountShow);
+        }
+
+        public void UpdatePayCurrency(int ChannelId, int CurrencyId, decimal MinAmount, decimal MaxAmount)
+        {
+            paymentManageService.UpdatePayCurrencyAmount(ChannelId, CurrencyId, MinAmount, MaxAmount);
         }
     }
 }

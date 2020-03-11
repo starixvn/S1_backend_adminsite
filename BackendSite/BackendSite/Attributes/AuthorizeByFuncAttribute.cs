@@ -11,6 +11,7 @@ using BackendSite.Service.DAL;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using Newtonsoft.Json;
 
 namespace BackendSite.Attributes
 {
@@ -18,16 +19,18 @@ namespace BackendSite.Attributes
     public class AuthorizeByFuncAttribute : Attribute, IAuthorizationFilter
     {
         public string FuncKey { get; set; }
+        public string SubFuncKey { get; set; }
         private readonly AuthorizeBLL authorizeBLL;
         private readonly AdminUserService adminUserService;
         private readonly PermissionBLL permissionBLL;
         
-        public AuthorizeByFuncAttribute(AuthorizeBLL authorizeBLL, AdminUserService adminUserService, PermissionBLL permissionBLL, string FuncKey = null)
+        public AuthorizeByFuncAttribute(AuthorizeBLL authorizeBLL, AdminUserService adminUserService, PermissionBLL permissionBLL, string FuncKey = null, string SubFuncKey=null)
         {
             this.authorizeBLL = authorizeBLL;
             this.adminUserService = adminUserService;
             this.permissionBLL = permissionBLL;
             this.FuncKey = FuncKey;
+            this.SubFuncKey = SubFuncKey;
         }
 
         private bool IsJsonResult(string ContentType)
@@ -58,7 +61,17 @@ namespace BackendSite.Attributes
                         else
                         {
                             var permissions = permissionBLL.GetUserPermission((int)loginUser.GroupSEQ);
-                            pageStatus = !permissions.Any(x => string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase)) ? PageStaus.deniedReturnResult : PageStaus.allow;
+                            if (string.IsNullOrEmpty(SubFuncKey))
+                            {
+                                pageStatus = !permissions.Any(x => string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase)) ? PageStaus.deniedReturnResult : PageStaus.allow;
+                            }
+                            else
+                            {
+                                pageStatus = !permissions.Any(x => 
+                                    string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase) 
+                                    && JsonConvert.DeserializeObject<string[]>(x.SubFuncKeys).Any(s=> string.Equals(s, SubFuncKey, StringComparison.OrdinalIgnoreCase))
+                                    ) ? PageStaus.deniedReturnResult : PageStaus.allow;
+                            }
                         }
                     }
                 }

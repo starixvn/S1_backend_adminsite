@@ -1,5 +1,6 @@
 import React from "react";
 import {ActionButtons, SwitchBtn, SelectBox, InputBox, ElemType, AmountRule, InputBoxFormat}  from './components';
+import {number_format, number_toFixed} from '../../../module/Formatting/NumberFormat';
 
 export const CurrencylInfoHeader = (props)=>{
     return(
@@ -8,7 +9,7 @@ export const CurrencylInfoHeader = (props)=>{
 }
 
 const columnDefs = (props)=>{
-    return [
+    return window.subFuncKeys && window.subFuncKeys.includes('f_pm_editAmountRule') ? [
         {
             dataColumn:'payCurrencyId', columnTitle:'Currency'
         },
@@ -18,8 +19,9 @@ const columnDefs = (props)=>{
                 EditMode:{
                     ElemType: ElemType.inputBox,
                     ElemClass: 'input-large',
-                    Format:InputBoxFormat.number
-                }
+                    AttrFormat:InputBoxFormat.number
+                },
+                format:numberFormat
             }
         },
         {
@@ -28,8 +30,9 @@ const columnDefs = (props)=>{
                 EditMode:{
                     ElemType: ElemType.inputBox,
                     ElemClass: 'input-large',
-                    Format:InputBoxFormat.text
-                }
+                    AttrFormat:InputBoxFormat.text
+                },
+                format:numberFormat
             }
         },
         {
@@ -39,7 +42,8 @@ const columnDefs = (props)=>{
                     ElemType: ElemType.selectBox,
                     ElemClass: 'custom-select',
                     Options:[...Object.keys(AmountRule).map(key=>{return {value:key, displayText:AmountRule[key]}})]
-                }
+                },
+                format:amountRuleFormat
             }
         },
         {
@@ -48,8 +52,45 @@ const columnDefs = (props)=>{
                 EditMode:{
                     ElemType: ElemType.inputBox,
                     ElemClass: 'input-large',
-                    Format:InputBoxFormat.text
+                    AttrFormat:InputBoxFormat.text
                 }
+            }
+        },
+        {
+            columnTitle:'Action',
+            header:{
+                attr:{
+                    className:'width-85'
+                }
+            },
+            body:{
+                SpecialItem:ElemType.actionBtn
+            }
+        }
+    ] : [
+        {
+            dataColumn:'payCurrencyId', columnTitle:'Currency'
+        },
+        {
+            dataColumn:'minAmount', columnTitle:'MinAmount',
+            body:{
+                EditMode:{
+                    ElemType: ElemType.inputBox,
+                    ElemClass: 'input-large',
+                    AttrFormat:InputBoxFormat.number
+                },
+                format:numberFormat
+            }
+        },
+        {
+            dataColumn:'maxAmount', columnTitle:'MaxAmount',
+            body:{
+                EditMode:{
+                    ElemType: ElemType.inputBox,
+                    ElemClass: 'input-large',
+                    AttrFormat:InputBoxFormat.text
+                },
+                format:numberFormat
             }
         },
         {
@@ -103,7 +144,7 @@ export const CurrencyResultTable = (props)=>{
                                     idxArr={[...props.idxArr, cIdx]} 
                                     onChange={props.EditField}
                                     options={col.body.EditMode.Options}
-                                    selectedValue={data.editValue ? data.editValue[col.dataColumn].value : ""}
+                                    selectedValue={data.editValue ? data.editValue[col.dataColumn] : ""}
                                     className={col.body.EditMode.ElemClass}
                                 />
                             );
@@ -117,7 +158,7 @@ export const CurrencyResultTable = (props)=>{
                                         onChange={props.EditField}
                                         value={data.editValue ? data.editValue[col.dataColumn] : ""}
                                         className={col.body.EditMode.ElemClass}
-                                        format={col.body.EditMode.Format}
+                                        attrFormat={col.body.EditMode.AttrFormat}
                                     />
                                 )
                             break;
@@ -126,8 +167,8 @@ export const CurrencyResultTable = (props)=>{
                                 body_content = (
                                     <SwitchBtn 
                                         SwitchBtnKey={[...props.idxArr, cIdx].join('-')}
-                                        checked={data.editValue ? data.editValue[col.dataColumn].value===1 : false}
-                                        onChange={props.EditField.bind(null, data.editValue[col.dataColumn].value===1 ? 2 : 1, col.dataColumn, [...props.idxArr, cIdx])}
+                                        checked={data.editValue ? data.editValue[col.dataColumn]===1 : false}
+                                        onChange={props.EditField.bind(null, data.editValue[col.dataColumn]===1 ? 2 : 1, col.dataColumn, [...props.idxArr, cIdx])}
                                     />
                                 )
                             break;
@@ -136,7 +177,7 @@ export const CurrencyResultTable = (props)=>{
                             break;
                     }
                 }else{
-                    body_content = data[col.dataColumn] && data[col.dataColumn].displayText ? data[col.dataColumn].displayText : data[col.dataColumn];
+                    body_content = col.body && col.body.format ? col.body.format(data[col.dataColumn]) : data[col.dataColumn];
                 }
             }
 
@@ -164,6 +205,10 @@ export const CurrencyResultTable = (props)=>{
     )
 }
 
-// export const CurrencylInfoContent = (props)=>{
-//     return <ResultTable columnDefs={columnDefs()} {...props} />
-// }
+const numberFormat = (number)=>{
+    return number_format(number_toFixed(number, 2));
+}
+
+const amountRuleFormat = (amountRule)=>{
+    return AmountRule[amountRule];
+}
