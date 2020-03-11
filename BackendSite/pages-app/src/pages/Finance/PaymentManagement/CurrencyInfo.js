@@ -41,18 +41,18 @@ const columnDefs = (props)=>{
                 EditMode:{
                     ElemType: ElemType.selectBox,
                     ElemClass: 'custom-select',
-                    Options:[...Object.keys(AmountRule).map(key=>{return {value:key, displayText:AmountRule[key]}})]
+                    Options:[...Object.keys(AmountRule).map(key=>{return {value:key, displayText:AmountRule[key]}})],
+                    SubElem:{
+                        ElemType: ElemType.inputBox,
+                        dataColumn:'amountShow',
+                        AttrFormat:InputBoxFormat.text,
+                        MatchParentValue:3
+                    }
                 },
-                format:amountRuleFormat
-            }
-        },
-        {
-            dataColumn:'amountShow', columnTitle:'AmountShow',
-            body:{
-                EditMode:{
-                    ElemType: ElemType.inputBox,
-                    ElemClass: 'input-large',
-                    AttrFormat:InputBoxFormat.text
+                format:amountRuleFormat,
+                subElem:{
+                    dataColumn:'amountShow',
+                    columnTitle:'AmountShow'
                 }
             }
         },
@@ -138,15 +138,33 @@ export const CurrencyResultTable = (props)=>{
                 if(data.isEdit && col.body && col.body.EditMode){
                     switch (col.body.EditMode.ElemType) {
                         case ElemType.selectBox:
+                            let currentValue = data.editValue ? data.editValue[col.dataColumn] : "";
+                            let subElem = null;
+                            if(col.body.EditMode.SubElem && col.body.EditMode.SubElem.MatchParentValue == currentValue){
+                                subElem=(
+                                    <InputBox 
+                                        dataColumn={col.body.EditMode.SubElem.dataColumn}
+                                        idxArr={[...props.idxArr, cIdx]} 
+                                        onChange={props.EditField}
+                                        value={data.editValue ? data.editValue[col.body.EditMode.SubElem.dataColumn] : ""}
+                                        className={col.body.EditMode.SubElem.ElemClass}
+                                        attrFormat={col.body.EditMode.SubElem.AttrFormat}
+                                    />
+                                )
+                            }
+
                             body_content = (
-                                <SelectBox
-                                    dataColumn={col.dataColumn}
-                                    idxArr={[...props.idxArr, cIdx]} 
-                                    onChange={props.EditField}
-                                    options={col.body.EditMode.Options}
-                                    selectedValue={data.editValue ? data.editValue[col.dataColumn] : ""}
-                                    className={col.body.EditMode.ElemClass}
-                                />
+                                <>
+                                    <SelectBox
+                                        dataColumn={col.dataColumn}
+                                        idxArr={[...props.idxArr, cIdx]} 
+                                        onChange={props.EditField}
+                                        options={col.body.EditMode.Options}
+                                        selectedValue={currentValue}
+                                        className={col.body.EditMode.ElemClass}
+                                    />
+                                    {subElem}
+                                </>
                             );
                             break;
 
@@ -177,7 +195,7 @@ export const CurrencyResultTable = (props)=>{
                             break;
                     }
                 }else{
-                    body_content = col.body && col.body.format ? col.body.format(data[col.dataColumn]) : data[col.dataColumn];
+                    body_content = col.body && col.body.format ? col.body.format(data[col.dataColumn], col.body && col.body.subElem ? data[col.body.subElem.dataColumn] : null) : data[col.dataColumn];
                 }
             }
 
@@ -209,6 +227,6 @@ const numberFormat = (number)=>{
     return number_format(number_toFixed(number, 2));
 }
 
-const amountRuleFormat = (amountRule)=>{
-    return AmountRule[amountRule];
+const amountRuleFormat = (amountRule, subData)=>{
+    return subData ? `${AmountRule[amountRule]} - ${subData}` : AmountRule[amountRule];
 }

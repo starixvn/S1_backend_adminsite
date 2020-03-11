@@ -8,8 +8,8 @@ export const ElemType = {
 }
 
 export const Status = {
-    1:'open',
-    2:'disable'
+    1:'Open',
+    2:'Disable'
 }
 
 export const InputBoxFormat = {
@@ -32,6 +32,11 @@ export const AmountRule = {
     1:'Integer',
     2:'Decima',
     3:'Fixed'
+}
+
+export const statusFormat = (status)=>{
+    let className = status == 1 ? 'status-active' : 'status-suspend';
+    return <span className={`status ${className}`}>{Status[status]}</span>;
 }
 
 export const OuterPanel = (props)=>{

@@ -46,6 +46,13 @@ namespace BackendSite.Service.Model
         public IEnumerable<PayList> PayList { get; set; }
         public IEnumerable<PayChannel> ChannelList { get; set; }
         public IEnumerable<PayCurrency> CurrencyList { get; set; }
+    }
 
+    public class PayListBankInfoSys
+    {
+        public int Id { get; set; }
+        public string BankCode { get; set; }
+        public string BankName { get; set; }
+        public int Status { get; set; }
     }
 }

@@ -3,6 +3,7 @@
 @using BackendSite.Service.BLL
 @inject IWebHostEnvironment environment
 @inject SelLangBLL selLangBLL
+@inject PermissionBLL permissionBLL
 @section Style {
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Poppins&display=swap" rel="stylesheet">
     <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
@@ -18,10 +19,14 @@
         if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
+
+    IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("CustManage/CustInfoList");
+    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
 }
 @section Scripts {
     <script type="text/javascript">
         $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
+        var subFuncKeys = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(subFuncKeys));
     </script>
     <script src="~/js/component/CustManage/CustInfoList.min.js" asp-append-version="true"></script>
 }

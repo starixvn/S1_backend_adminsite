@@ -30,8 +30,15 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<GroupPermisison> GetGroupPermissions(int SEQ)
         {
+            string FuncKey = null;
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<GroupPermisison>("Admin_GroupFunc_Get", new { SEQ }, commandType: CommandType.StoredProcedure);
+            return conn.Query<GroupPermisison>("Admin_GroupFunc_Get", new { SEQ, FuncKey }, commandType: CommandType.StoredProcedure);
+        }
+
+        public GroupPermisison GetGroupPermissions(int SEQ, string FuncKey)
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Query<GroupPermisison>("Admin_GroupFunc_Get", new { SEQ, FuncKey }, commandType: CommandType.StoredProcedure).FirstOrDefault();
         }
 
         public void AddGroup(GroupWithPermission GroupInfo)

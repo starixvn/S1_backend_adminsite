@@ -25,6 +25,7 @@ export const PayInfoContent = (props)=>{
                         ClickCancel={props.ClickCancel}
                         ClickSave={props.ClickSave}
                         EditField={props.EditField}
+                        ContentOnClick={props.ContentOnClick}
                     />
                 }
             />

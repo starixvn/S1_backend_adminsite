@@ -17,19 +17,8 @@
     var authData = authorizeBLL.GetAuthData();
     var loginUser = adminUserService.GetUser(authData.UserId);
 
-    List<string> subFuncKeys = new List<string>();
-    if (loginUser.IsSuper)
-    {
-        subFuncKeys = new List<string>()
-{
-            "f_pm_editAmountRule"
-        };
-    }
-    else if (loginUser.GroupSEQ != null)
-    {
-        var permission = permissionBLL.GetUserPermission((int)loginUser.GroupSEQ, "Finance/PaymentManage");
-        subFuncKeys = permission != null && permission.SubFuncKeys != null ? JsonConvert.DeserializeObject<List<string>>(permission.SubFuncKeys) : subFuncKeys;
-    }
+    IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("Finance/PaymentManage");
+    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
 }
 
 <div id="content"></div>
@@ -39,7 +28,7 @@
     <script>
         window.RootUrl = '@Url.Content("~/api")';
         window.LangCode = 'en'
-        window.subFuncKeys = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(subFuncKeys))
+        window.subFuncKeys = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(subFuncKeys));
     </script>
     <script src="~/lib/runtime.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>

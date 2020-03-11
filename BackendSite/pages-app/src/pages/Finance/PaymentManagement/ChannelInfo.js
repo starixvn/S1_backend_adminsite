@@ -1,6 +1,6 @@
 import React from "react";
 import {CurrencyResultTable} from './CurrencyInfo';
-import {ElemType, Mode, InputBoxFormat, Type, Status, ActionButtons, SwitchBtn, SelectBox, InputBox}  from './components';
+import {ElemType, Mode, InputBoxFormat, Type, statusFormat, ActionButtons, SwitchBtn, SelectBox, InputBox}  from './components';
 
 export const ChannelInfoHeader = (props)=>{
     return(
@@ -12,7 +12,7 @@ export const ChannelInfoContent = (props)=>{
     let {currencyList, ...channelInfo} = props;
     return(
         <div className="table">
-            <ResultTable columnDefs={columnDefs()} {...channelInfo} />
+            <ResultTable {...channelInfo} ContentOnClick={props.ContentOnClick}/>
             <div className="table-options"/>
             
             <CurrencyResultTable 
@@ -27,12 +27,13 @@ export const ChannelInfoContent = (props)=>{
     )
 }
 
-const columnDefs = ()=>{
+const columnDefs = (props)=>{
     return [
         {
             dataColumn:'type', columnTitle:'Type',
             body:{
-                format:typeFormat
+                format:typeFormat,
+                onClick:props.ContentOnClick
             }
         },
         {
@@ -80,20 +81,16 @@ const columnDefs = ()=>{
     ]
 }
 
-const typeFormat = (type)=>{
-    return Type[type];
+const typeFormat = (type, onClick)=>{
+    return type === 1 ? <a style={{cursor:'pointer'}} data-toggle="modal" data-target="#ModalScrollable" onClick={onClick ? onClick : ()=>{}}><u>{Type[type]}</u></a> : Type[type];
 }
 
 const modeFormat = (mode)=>{
     return Mode[mode];
 }
 
-const statusFormat = (status)=>{
-    return Status[status];
-}
-
 const ResultTable = (props)=>{
-    let columns = props.columnDefs;
+    let columns = columnDefs(props);
     let headers = [];
     let bodyRows = [];
 
@@ -159,7 +156,8 @@ const ResultTable = (props)=>{
                         break;
                 }
             }else{
-                body_content = col.body && col.body.format ? col.body.format(props[col.dataColumn]) : props[col.dataColumn];
+                let func = col.body && col.body.format && col.body.onClick ? col.body.onClick.bind(null, col.dataColumn, props.idxArr) : null;
+                body_content = col.body && col.body.format ? col.body.format(props[col.dataColumn], func) : props[col.dataColumn];
             }
         }
 
@@ -185,4 +183,3 @@ const ResultTable = (props)=>{
         </table>
     )
 }
-

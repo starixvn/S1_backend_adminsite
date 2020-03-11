@@ -220,5 +220,54 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+
+        public IEnumerable<string> GetSubFunckeys(string FuncKey)
+        {
+            var authData = authorizeBLL.GetAuthData();
+            var loginUser = adminUserService.GetUser(authData.UserId);
+            IEnumerable<string> result = null;
+            if (loginUser.IsSuper)
+            {
+                var initDatas = GetPermissionJSONData();
+                foreach(var func in initDatas)
+                {
+                    var item = GetFuncItem(func.Settings, FuncKey);
+                    if (item != null)
+                    {
+                        result = item.SubFuncKeys.Select(x => x.FuncKey);
+                        break;
+                    }
+                }
+            }
+            else if(loginUser.GroupSEQ != null)
+            {
+                var permissions = GetUserPermission((int)loginUser.GroupSEQ, FuncKey);
+                if(permissions != null && permissions.SubFuncKeys != null)
+                {
+                    result = Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<string>>(permissions.SubFuncKeys);
+                }
+            }
+
+            return result;
+        }
+
+        private FuncPermissionSettings GetFuncItem(List<FuncPermissionSettings> Settings, string FuncKey)
+        {
+            FuncPermissionSettings result = null;
+            foreach (var func in Settings)
+            {
+                if (string.Equals(func.FuncKey, FuncKey))
+                {
+                    result = func;
+                    break;
+                }
+                else if (func.FuncKeys != null && func.FuncKey.Any())
+                {
+                    return GetFuncItem(func.FuncKeys, FuncKey);
+                }
+            }
+
+            return result;
+        }
     }
 }

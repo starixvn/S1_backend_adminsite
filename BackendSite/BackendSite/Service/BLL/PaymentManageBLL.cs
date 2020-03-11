@@ -46,5 +46,15 @@ namespace BackendSite.Service.BLL
         {
             paymentManageService.UpdatePayCurrencyAmount(ChannelId, CurrencyId, MinAmount, MaxAmount);
         }
+
+        public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int PayId)
+        {
+            return paymentManageService.GetBankSysInfoList(PayId);
+        }
+
+        public void UpdateBankInfo(int PayId, int SysId, int Status)
+        {
+            paymentManageService.UpdateBankInfo(PayId, SysId, Status);
+        }
     }
 }

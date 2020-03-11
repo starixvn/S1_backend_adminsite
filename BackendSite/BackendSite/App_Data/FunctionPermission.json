@@ -15,7 +15,22 @@
       {
         "DisplayKey": "Customer Administration",
         "FuncKey": "CustManage/CustInfoList",
-        "Enable": false
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Unlock",
+            "FuncKey": "ca_unlock"
+          },
+          {
+            "DisplayKey": "A/C Locked",
+            "FuncKey": "ca_acc_lock"
+          },
+          {
+            "DisplayKey": "A/C Closed",
+            "FuncKey": "ca_acc_close"
+          }
+        ]
       }
     ]
   },

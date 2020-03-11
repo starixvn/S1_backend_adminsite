@@ -110,5 +110,23 @@ namespace BackendSite.Service.DAL
                 conn.Execute(SpName, new { ChannelId, CurrencyId, MinAmount, MaxAmount}, commandType: CommandType.StoredProcedure);
             }
         }
+
+        public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int PayId)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                string SpName = "Admin_BankInfoSys_Get";
+                return conn.Query<PayListBankInfoSys>(SpName, new { PayId }, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public void UpdateBankInfo(int PayId, int SysId, int Status)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                string SpName = "Admin_BankInfoPay_Set";
+                conn.Execute(SpName, new { PayId, SysId, Status }, commandType: CommandType.StoredProcedure);
+            }
+        }
     }
 }

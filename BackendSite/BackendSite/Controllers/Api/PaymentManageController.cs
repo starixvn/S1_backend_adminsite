@@ -116,5 +116,43 @@ namespace BackendSite.Controllers.Api
 
             return result;
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
+        public ApiResult GetBankSysInfoList([FromForm]int PayId)
+        {
+            var result = new ApiResult<IEnumerable<PayListBankInfoSys>>();
+            try
+            {
+                result.Data = paymentManageBLL.GetBankSysInfoList(PayId);
+                result.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                result.ErrorCode = 999;
+                result.Message = "something went wrong.";
+                result.RawMessage = ex.ToString();
+            }
+
+            return result;
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
+        public ApiResult UpdateBankInfo([FromForm]int PayId, [FromForm]int SysId, [FromForm]int Status)
+        {
+            var result = new ApiResult<IEnumerable<PayListBankInfoSys>>();
+            try
+            {
+                paymentManageBLL.UpdateBankInfo(PayId, SysId, Status);
+                result.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                result.ErrorCode = 999;
+                result.Message = "something went wrong.";
+                result.RawMessage = ex.ToString();
+            }
+
+            return result;
+        }
     }
 }

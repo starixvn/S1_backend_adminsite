@@ -3,7 +3,12 @@ import ReactDOM from 'react-dom';
 import {OuterPanel}  from './components';
 import {PayInfoHeader, PayInfoContent} from './PayInfo';
 import WebAPI from '../../../module/WebAPI';
+import {BankInfoContent} from './BankInfo';
 import qs from 'qs';
+
+if(process.env.NODE_ENV!=='production'){
+    window.subFuncKeys = ["f_pm_editAmountRule"];
+}
 
 const App = ()=>{
     return(
@@ -24,11 +29,17 @@ const webAPIUrl = {
     'UpdatePayList':'PaymentManage/UpdatePayList',
     'UpdatePayChannel':'PaymentManage/UpdatePayChannel',
     'UpdatePayCurrency':'PaymentManage/UpdatePayCurrency',
-    'UpdatePayCurrencyAmount':'PaymentManage/UpdatePayCurrencyAmount'
+    'UpdatePayCurrencyAmount':'PaymentManage/UpdatePayCurrencyAmount',
+    'GetBankSysInfoList':'PaymentManage/GetBankSysInfoList',
+    'UpdateBankInfo':'PaymentManage/UpdateBankInfo'
 }
 
 const PayInfoList = (props)=>{
     const [stateDatas, updateDatas] = useState();
+    const [stateBankInfo, updateBankInfo] = useState({
+        payName:'xxxx',
+        bankList:[]
+    });
 
     useEffect(() => {
         const fetchData = async () => {
@@ -125,16 +136,14 @@ const PayInfoList = (props)=>{
     }
 
     const ClickCancel = (idxArr)=>{
-        if(window.confirm('cancel modify?')){
-            let elem = stateDatas;
-            idxArr.forEach((ArrIdx, idx) => {
-                elem = level[idx] ? elem[level[idx]][ArrIdx] : elem[ArrIdx];
-            });
+        let elem = stateDatas;
+        idxArr.forEach((ArrIdx, idx) => {
+            elem = level[idx] ? elem[level[idx]][ArrIdx] : elem[ArrIdx];
+        });
 
-            elem.isEdit = false;
-            elem['editValue'] = {};
-            updateDatas([...stateDatas]);
-        }
+        elem.isEdit = false;
+        elem['editValue'] = {};
+        updateDatas([...stateDatas]);
     }
 
     const EditField = (value, dataColumn, idxArr)=>{
@@ -215,6 +224,49 @@ const PayInfoList = (props)=>{
         }
     }
 
+    const Result_ContentOnClick = (dataColumn, idxArr)=>{
+        updateBankInfo(null);
+
+        let param = {
+            Url: webAPIUrl.GetBankSysInfoList,
+            Data: qs.stringify({
+                PayId:stateDatas[idxArr[0]].id
+            })
+        };
+
+        WebAPI.PostData(param).then((res) => {
+            if (res.data.errorCode === 0) {
+                updateBankInfo({
+                    payId:stateDatas[idxArr[0]].id,
+                    payName:stateDatas[idxArr[0]].payName,
+                    bankList:[...res.data.data]
+                });
+            } else {
+                alert(res.data.message ?? 'failed to fetch data from server.');
+            }
+        })
+    }
+
+    const Modal_EditField = (value, dataColumn, idx)=>{
+        let param = {
+            Url: webAPIUrl.UpdateBankInfo,
+            Data: qs.stringify({
+                PayId:stateBankInfo.payId,
+                SysId:stateBankInfo.bankList[idx].id,
+                Status:value
+            })
+        };
+
+        WebAPI.PostData(param).then((res) => {
+            if (res.data.errorCode === 0) {
+                stateBankInfo.bankList[idx][dataColumn] = value;
+                updateBankInfo({...stateBankInfo});
+            } else {
+                alert(res.data.message ?? 'failed to fetch data from server.');
+            }
+        });
+    }
+
     let payList = stateDatas ? stateDatas.map((item, idx)=>{
         let id =`PayInfo-${idx}`;
         return(
@@ -238,13 +290,48 @@ const PayInfoList = (props)=>{
                         ClickCancel={ClickCancel}
                         ClickSave={ClickSave}
                         EditField={EditField}
+                        ContentOnClick={Result_ContentOnClick}
                     />
                 }
             />
         );
     }) : <div></div>;
 
-    return payList
+    return (
+        <>
+            <Modal 
+                {...stateBankInfo} 
+                EditField={Modal_EditField}
+            />
+            {payList}
+        </>
+    );
+}
+
+const Modal = (props)=>{
+    return(
+        <div className="modal fade" id="ModalScrollable" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+            <div className="modal-dialog modal-dialog-scrollable" role="document">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title" id="exampleModalScrollableTitle">{props.payName} - Bank Info</h5>
+                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div className="modal-body">
+                        <BankInfoContent
+                            BankList={props.bankList}
+                            EditField={props.EditField}
+                        />
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
 }
 
 export default App;
