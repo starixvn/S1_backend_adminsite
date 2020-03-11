@@ -13,7 +13,8 @@ const App = ()=>{
         'StartDate':null,
         'EndDate':null,
         'User':'',
-        'Type':0
+        'Type':0,
+        'CustId':0
     });
 
     const [stateRef] = useState({

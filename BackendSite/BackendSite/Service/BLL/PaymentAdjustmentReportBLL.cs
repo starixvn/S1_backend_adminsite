@@ -44,6 +44,7 @@ namespace BackendSite.Service.BLL
                 {
                     result.Add(new PaymentAdjustmentFrontEnd
                     {
+                        CustId = row.CustId,
                         TransId = row.TransId,
                         CurrencyName = selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}"),
                         AdjustTypeName = selLangBLL.GetResourceValue($"lbl_AdjustmentType{row.AdjustType}"),

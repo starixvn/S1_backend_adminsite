@@ -15,10 +15,12 @@ namespace BackendSite.Service.Model
         public decimal Amount { get; set; }
         public DateTime CreateTime { get; set; }
         public int Status { get; set; }
+        public int CustId { get; set; }
     }
 
     public class PaymentAdjustmentFrontEnd
     {
+        public int CustId { get; set; }
         public string SiteName { get; set; }
         public string TransId { get; set; }
 
