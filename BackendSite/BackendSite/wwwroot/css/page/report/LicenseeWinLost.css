@@ -161,3 +161,24 @@ body {
     text-align: center;
   }
   
+  .ag-theme-blue .ag-header {
+    background: #303641 !important;
+  }
+
+  .ag-theme-blue .ag-header-group-cell {
+    border-right: 1px solid #d5d5d5 !important;
+  }
+
+  .ag-theme-blue .ag-header-cell, .ag-theme-blue .ag-header-group-cell {
+    border-color: #d5d5d5 !important;
+  }
+
+  .ag-theme-blue .ag-icon-contracted:before, .ag-theme-blue .ag-icon-expanded:before {
+    color: white !important;
+  }
+
+  .ag-theme-blue .ag-root {
+    border: 1px solid #d5d5d5 !important;
+  }
+ 
+  
