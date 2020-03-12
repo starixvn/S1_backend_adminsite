@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
@@ -207,11 +208,47 @@ namespace BackendSite.Controllers.Api
             public int Status { get; set; }
         }
 
+        //[HttpPost]
+        //public ApiResult SetCustStatus(SetCustStatusReq setCustStatusReq)
+        //{
+        //    ApiResult apiResult = new ApiResult();
+        //    if (custInfoBLL.SetCustStatus(setCustStatusReq.CustId, setCustStatusReq.Status))
+        //    {
+        //        apiResult.ErrorCode = 0;
+        //    }
+
+        //    return apiResult;
+        //}
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_unlock" })]
         [HttpPost]
-        public ApiResult SetCustStatus(SetCustStatusReq setCustStatusReq)
+        public ApiResult SetUnlock(CustInfoReq setCustStatusReq)
         {
             ApiResult apiResult = new ApiResult();
-            if (custInfoBLL.SetCustStatus(setCustStatusReq.CustId, setCustStatusReq.Status))
+            if (custInfoBLL.SetCustStatus(setCustStatusReq.CustId, 1))
+            {
+                apiResult.ErrorCode = 0;
+            }
+
+            return apiResult;
+        }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_lock" })]
+        [HttpPost]
+        public ApiResult SetLock(CustInfoReq setCustStatusReq)
+        {
+            ApiResult apiResult = new ApiResult();
+            if (custInfoBLL.SetCustStatus(setCustStatusReq.CustId, 2))
+            {
+                apiResult.ErrorCode = 0;
+            }
+
+            return apiResult;
+        }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_close" })]
+        [HttpPost]
+        public ApiResult SetClose(CustInfoReq setCustStatusReq)
+        {
+            ApiResult apiResult = new ApiResult();
+            if (custInfoBLL.SetCustStatus(setCustStatusReq.CustId, 3))
             {
                 apiResult.ErrorCode = 0;
             }

@@ -3,6 +3,7 @@
 @using BackendSite.Service.BLL
 @inject IWebHostEnvironment environment
 @inject SelLangBLL selLangBLL
+@inject PermissionBLL permissionBLL
 @section Style {
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Poppins&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.css">
@@ -47,11 +48,15 @@
         if (!i18n.ContainsKey($"lbl_WithdrawalType{i}"))
             i18n.Add($"lbl_WithdrawalType{i}", selLangBLL.GetResourceValue($"lbl_WithdrawalType{i}"));
     }
+
+    IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("CustManage/CustInfoList");
+    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
 }
 @section Scripts {
     <script src="~/lib/clipboard.min.js"></script>
     <script type="text/javascript">
         $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
+        var subFuncKeys = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(subFuncKeys));
     </script>
     <script src="~/js/component/CustManage/CustInfo.min.js" asp-append-version="true"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>

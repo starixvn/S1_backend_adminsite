@@ -448,10 +448,10 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
             }
         }
 
-        onSetCustStatus(status) {
+        onUnlock() {
             if(confirm('Are you sure?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetCustStatus', {CustId: data.custId, Status: status})
+                axios.post('/api/CustManage/SetUnlock', {CustId: data.custId})
                 .then(function (response) {
                     //Loading.UnLoading();
                     let result = response.data;
@@ -466,6 +466,44 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
                 }.bind(this));            
             }
         }
+
+        onLock() {
+            if(confirm('Are you sure?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/api/CustManage/SetLock', {CustId: data.custId})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.props.onGetCustInfoDetail();
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));            
+            }
+        } 
+
+        onClose() {
+            if(confirm('Are you sure?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/api/CustManage/SetClose', {CustId: data.custId})
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.props.onGetCustInfoDetail();
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));            
+            }
+        }                  
 
         cancelBonus(bonusId) {
             if(confirm('Are you sure?')) {            
@@ -526,9 +564,9 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
                     <div className="button-block">
                         <button className="btn btn-primary" onClick={this.onResetProfile.bind(this)}>Reset Profile</button>
                         <button className="btn btn-primary" onClick={this.onResetCustBankInfo.bind(this)}>Reset Customer Bank Info.</button>
-                        {data.status==1 && data.agent != null ? <button className="btn btn-primary" onClick={this.onSetCustStatus.bind(this, 2)}>Suspend</button> : null}
-                        {(data.status==1 || data.status==2) && data.agent != null ? <button className="btn btn-primary" onClick={this.onSetCustStatus.bind(this, 3)}>Closed</button> : null}
-                        {data.status==2 && data.agent != null ? <button className="btn btn-primary" onClick={this.onSetCustStatus.bind(this, 1)}>Unlock</button> : null}
+                        {data.status==1 && data.agent != null && subFuncKeys.indexOf("ca_acc_lock") >-1 ? <button className="btn btn-primary" onClick={this.onLock.bind(this)}>Lock</button> : null}
+                        {(data.status==1 || data.status==2) && data.agent != null && subFuncKeys.indexOf("ca_acc_close") >-1 ? <button className="btn btn-primary" onClick={this.onClose.bind(this)}>Closed</button> : null}
+                        {data.status==2 && data.agent != null && subFuncKeys.indexOf("ca_unlock") >-1  ? <button className="btn btn-primary" onClick={this.onUnlock.bind(this)}>Unlock</button> : null}
                     </div>
                     <div className="flex-wrap">
                         <table className="table table-detail">
