@@ -69,6 +69,7 @@ namespace BackendSite.Attributes
                             {
                                 pageStatus = !permissions.Any(x => 
                                     string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase) 
+                                    && !string.IsNullOrEmpty(x.SubFuncKeys) 
                                     && JsonConvert.DeserializeObject<string[]>(x.SubFuncKeys).Any(s=> string.Equals(s, SubFuncKey, StringComparison.OrdinalIgnoreCase))
                                     ) ? PageStaus.deniedReturnResult : PageStaus.allow;
                             }
