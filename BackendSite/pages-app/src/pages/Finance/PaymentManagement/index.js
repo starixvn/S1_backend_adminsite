@@ -95,25 +95,33 @@ const PayInfoList = (props)=>{
 
     const UpdatePayInfoStatus = (idx)=>{
         let status = stateDatas[idx].status === 1 ? 2 : 1;
-        if(window.confirm(`${status===1 ? "Open?" : "Disable"} ${stateDatas[idx].payName}?`)){
-            stateDatas[idx].status = status;
-
-            let param = {
-                Url: webAPIUrl.UpdatePayList,
-                Data: qs.stringify({
-                    PayId:stateDatas[idx].id,
-                    Status: status
-                })
-            };
-
-            WebAPI.PostData(param).then((res) => {
-                if (res.data.errorCode === 0) {
-                    updateDatas([...stateDatas]);      
-                } else {
-                    alert(res.data.message ?? 'failed to fetch data from server.');
-                }
+        stateDatas[idx].status = status;
+        let param = {
+            Url: webAPIUrl.UpdatePayList,
+            Data: qs.stringify({
+                PayId:stateDatas[idx].id,
+                Status: status
             })
-        }
+        };
+
+        WebAPI.PostData(param).then((res) => {
+            if (res.data.errorCode === 0) {
+                updateDatas([...stateDatas]);      
+            } else {
+                alert(res.data.message ?? 'failed to fetch data from server.');
+            }
+        })
+    }
+
+    const HandleCollaps = (idxArr)=>{
+        let elem = stateDatas;
+        idxArr.forEach((ArrIdx, idx) => {
+            elem = level[idx] ? elem[level[idx]][ArrIdx] : elem[ArrIdx];
+        });
+
+        elem['isCollaps'] = elem['isCollaps'] === undefined ? true : !elem['isCollaps'];
+
+        updateDatas([...stateDatas]);
     }
 
     const ClickEdit = (idxArr)=>{
@@ -142,7 +150,7 @@ const PayInfoList = (props)=>{
         });
 
         elem.isEdit = false;
-        elem['editValue'] = {};
+        elem['editValue'] = null;
         updateDatas([...stateDatas]);
     }
 
@@ -152,8 +160,30 @@ const PayInfoList = (props)=>{
             elem = level[idx] ? elem[level[idx]][ArrIdx] : elem[ArrIdx];
         });
 
-        elem.editValue[dataColumn] = value;
-        updateDatas([...stateDatas]);
+        if(dataColumn==='status' && !elem.editValue){
+            
+            let param = {
+                Url: webAPIUrl.UpdatePayChannel,
+                Data: qs.stringify({
+                    ChannelId:elem.id,
+                    Sort:elem.sort,
+                    Status:value,
+                    Mode:elem.mode
+                })
+            };
+            
+            WebAPI.PostData(param).then((res) => {
+                if (res.data.errorCode === 0) {
+                    elem[dataColumn] = value;
+                    updateDatas([...stateDatas]);
+                } else {
+                    alert(res.data.message ?? 'failed to fetch data from server.');
+                }
+            });
+        }else{
+            elem.editValue[dataColumn] = value;
+            updateDatas([...stateDatas]);
+        }
     }
 
     const ClickSave = (idxArr)=>{
@@ -185,7 +215,7 @@ const PayInfoList = (props)=>{
                         ...elem,
                         ...elem.editValue,
                         isEdit:false,
-                        editValue:{}
+                        editValue:null
                     };
 
                     updateDatas([...stateDatas]);
@@ -271,26 +301,32 @@ const PayInfoList = (props)=>{
         let id =`PayInfo-${idx}`;
         return(
             <OuterPanel
+                HandleCollaps={HandleCollaps}
+                idxArr={[idx]}
+                isCollaps={item.isCollaps}
                 key={`payInfoList-${idx}`}
                 Id={id}
                 HeaderContent={
-                    <PayInfoHeader Name={item.payName}/>
-                }
-                Content={
-                    <PayInfoContent
-                        idxArr={[idx]}
-                        MainId={id}
+                    <PayInfoHeader 
+                        Name={item.payName} 
                         switchBtn={{
                             Status:item.status,
                             onChange:UpdatePayInfoStatus.bind(null, idx),
                             SwitchBtnKey:`payInfo-status-switch-${idx}`
                         }}
+                    />
+                }
+                Content={
+                    <PayInfoContent
+                        idxArr={[idx]}
+                        MainId={id}                        
                         ChannelList={item.channelList}
                         ClickEdit={ClickEdit}
                         ClickCancel={ClickCancel}
                         ClickSave={ClickSave}
                         EditField={EditField}
                         ContentOnClick={Result_ContentOnClick}
+                        HandleCollaps={HandleCollaps}
                     />
                 }
             />

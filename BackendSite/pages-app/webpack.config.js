@@ -12,29 +12,30 @@ module.exports = {
         'react': 'React',
         'react-dom': 'ReactDOM',
         'moment':'moment',
-        'jquery':'$'
+        'jquery':'$',
+        'axios':'axios'
     },
     entry: {
-        // "Administration/UserAuthoritySetting.min":[
-        //     // '@babel/polyfill',
-        //     './src/pages/Administration/UserAuthoritySetting/index.js'
-        // ],
-        // "Administration/GroupAuthoritySetting.min":[
-        //     // '@babel/polyfill',
-        //     './src/pages/Administration/GroupAuthoritySetting/index.js'
-        // ],
-        // "Report/LicenseeWinLost.min":[
-        //     // '@babel/polyfill',
-        //     './src/pages/Report/LicenseeWinLost/index.js'
-        // ],
-        // "Finance/PaymentAdjustmentReport.min":[
-        //     // '@babel/polyfill',
-        //     './src/pages/Finance/PaymentAdjustmentReport/index.js'
-        // ],
-        // "Marketing/BonusInfoReport.min":[
-        //     // '@babel/polyfill',
-        //     './src/pages/Marketing/BonusInfoReport/index.js'
-        // ],
+        "Administration/UserAuthoritySetting.min":[
+            // '@babel/polyfill',
+            './src/pages/Administration/UserAuthoritySetting/index.js'
+        ],
+        "Administration/GroupAuthoritySetting.min":[
+            // '@babel/polyfill',
+            './src/pages/Administration/GroupAuthoritySetting/index.js'
+        ],
+        "Report/LicenseeWinLost.min":[
+            // '@babel/polyfill',
+            './src/pages/Report/LicenseeWinLost/index.js'
+        ],
+        "Finance/PaymentAdjustmentReport.min":[
+            // '@babel/polyfill',
+            './src/pages/Finance/PaymentAdjustmentReport/index.js'
+        ],
+        "Marketing/BonusInfoReport.min":[
+            // '@babel/polyfill',
+            './src/pages/Marketing/BonusInfoReport/index.js'
+        ],
         "Finance/PaymentManagement.min":[
             // '@babel/polyfill',
             './src/pages/Finance/PaymentManagement/index.js'

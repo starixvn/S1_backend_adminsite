@@ -1,10 +1,13 @@
 import React from "react";
 import {CurrencyResultTable} from './CurrencyInfo';
-import {ElemType, Mode, InputBoxFormat, Type, statusFormat, ActionButtons, SwitchBtn, SelectBox, InputBox}  from './components';
+import {ElemType, Mode, InputBoxFormat, Type, ActionButtons, SwitchBtn, SelectBox, InputBox}  from './components';
 
 export const ChannelInfoHeader = (props)=>{
     return(
-        <span style={{'color':'white'}}>{props.Name}</span>
+        <>
+            <span style={{color:'white'}}>{props.Name}</span>
+            <SwitchBtn Title="Status" SwitchBtnKey={props.idxArr.join('-')} checked={props.Status===1} onChange={props.EditField.bind(null, props.Status===1 ? 2 : 1, 'status', props.idxArr)}/>
+        </>
     );
 }
 
@@ -44,16 +47,6 @@ const columnDefs = (props)=>{
                     ElemClass: 'input-large',
                     AttrFormat:InputBoxFormat.number
                 }
-            }
-        },
-        {
-            dataColumn:'status', columnTitle:'Status',
-            body:{
-                EditMode:{
-                    ElemType: ElemType.switchBtn,
-                    ElemClass: 'input-large'
-                },
-                format:statusFormat
             }
         },
         {
@@ -138,16 +131,6 @@ const ResultTable = (props)=>{
                                     value={props.editValue ? props.editValue[col.dataColumn] : ""}
                                     className={col.body.EditMode.ElemClass}
                                     format={col.body.EditMode.Format}
-                                />
-                            )
-                        break;
-
-                    case ElemType.switchBtn:
-                            body_content = (
-                                <SwitchBtn 
-                                    SwitchBtnKey={props.idxArr.join('-')}
-                                    checked={props.editValue ? props.editValue[col.dataColumn]===1 : false}
-                                    onChange={props.EditField.bind(null, props.editValue[col.dataColumn]===1 ? 2 : 1, col.dataColumn, props.idxArr)}
                                 />
                             )
                         break;

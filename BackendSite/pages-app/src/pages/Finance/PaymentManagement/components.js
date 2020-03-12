@@ -40,15 +40,23 @@ export const statusFormat = (status)=>{
 }
 
 export const OuterPanel = (props)=>{
-    let id = `l_${props.Id}`;
+    let header_class = "";
+    let body_class = "";
+    if(props.isCollaps){
+        header_class = "panel-title";
+        body_class = "collapse show";
+    }else{
+        header_class = "panel-title collapsed";
+        body_class = "collapse";
+    }
     return(
         <div className="panel mt-20">
-            <a className={`panel-title collapsed`} data-toggle="collapse" href={`#${id}`} aria-expanded="false">
+            <a style={{"justifyContent": "space-between"}} className={header_class} onClick={props.HandleCollaps.bind(null, props.idxArr)}>
                 {props.HeaderContent}
             </a>
             {props.OuterContent}
             <div className="panel-body">
-                <div className={`collapse`} id={id}>
+                <div className={body_class}>
                     {props.Content}
                 </div>
             </div>
@@ -58,13 +66,13 @@ export const OuterPanel = (props)=>{
 
 export const SwitchBtn = (props)=>{
     return props.Title ? (
-        <>
-            <label style={{marginRight:'10px'}}>{props.Title}:</label>
+        <div style={{marginRight: "25px"}}>
+            <span style={{padding: "0 10px", color:'white'}}>{props.Title}:</span>
             <div className="switch__container">
                 <input id={props.SwitchBtnKey} className="switch switch--flat" type="checkbox" checked={props.checked} onChange={props.onChange}/>
                 <label htmlFor={props.SwitchBtnKey}></label>
             </div>
-        </>
+        </div>
     ) : (
         <div className="switch__container">
             <input id={props.SwitchBtnKey} className="switch switch--flat" type="checkbox" checked={props.checked} onChange={props.onChange}/>
