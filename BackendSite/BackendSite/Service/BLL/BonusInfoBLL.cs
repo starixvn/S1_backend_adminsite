@@ -44,6 +44,7 @@ namespace BackendSite.Service.BLL
                 {
                     result.Add(new BonusInfoFrontEnd
                     {
+                        CustId = row.CustId,
                         TransId = row.TransId,
                         CurrencyName = selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}"),
                         PromotionName = selLangBLL.GetResourceValue($"lbl_PromotionType{row.PromotionType}"),

@@ -7,6 +7,7 @@ namespace BackendSite.Service.Model
 {
     public class BonusInfo
     {
+        public int CustId { get; set; }
         public string TransId { get; set; }
         public int PromotionType { get; set; }
         public string BonusCode { get; set; }
@@ -26,6 +27,7 @@ namespace BackendSite.Service.Model
     public class BonusInfoFrontEnd
     {
         public string SiteName { get; set; }
+        public int CustId { get; set; }
         public string TransId { get; set; }
         public string PromotionName { get; set; }
         public string BonusCode { get; set; }

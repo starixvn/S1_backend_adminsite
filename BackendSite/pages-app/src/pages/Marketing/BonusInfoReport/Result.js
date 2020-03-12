@@ -12,7 +12,13 @@ const dataColumnDefs = ()=>{
             columnTitle:'PromotionName'
         },
         {dataColumn:'bonusCode', columnTitle:'BonusCode'},
-        {dataColumn:'userName', columnTitle:'UserName'},
+        {
+            dataColumn:'userName', columnTitle:'UserName',
+            body:{
+                format:userNameFormat,
+                subData:['custId', 'transId']
+            }
+        },
         {dataColumn:'currencyName', columnTitle:'Currency'},
         {
             dataColumn:'bonus',
@@ -117,9 +123,13 @@ const Panel = (props)=>{
 
     let bodyRows = props.Datas.map((data, idx)=>{
         let row = columnDefs.map((element, idx) => {
-           return ( 
+            let subData = {};
+            if(element.body && element.body.subData){
+                element.body.subData.forEach(s=>{ subData[s]=data[s]});
+            }
+            return ( 
                 <td key={`td-${element.dataColumn}-${idx}`} className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}>
-                    {element.body && element.body.format ? element.body.format(data[element.dataColumn]) : data[element.dataColumn]}
+                    {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
                 </td>
             );
         });
@@ -164,6 +174,10 @@ const dateFormat = (createTime)=>{
 
 const numberFormat = (number)=>{
     return number_format(number_toFixed(number, 2));
+}
+
+const userNameFormat = (userName, subData)=>{
+    return <a href={"/CustManage/CustInfo?UserName="+userName+"&custId="+ subData.custId +"&TransId=" + subData.transId} target="_blank">{userName}</a>
 }
 
 export default Panel;
