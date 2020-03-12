@@ -1,5 +1,5 @@
 import React from "react";
-import {OuterPanel, SwitchBtn}  from './components';
+import {OuterPanel, SwitchBtn, PanelClass}  from './components';
 import {ChannelInfoHeader, ChannelInfoContent} from './ChannelInfo';
 
 export const PayInfoHeader = (props)=>{
@@ -16,6 +16,7 @@ export const PayInfoContent = (props)=>{
         let idxArr=[...props.idxArr, idx];
         return(
             <OuterPanel
+                PanelClass={PanelClass.mt5}
                 HandleCollaps={props.HandleCollaps}
                 idxArr={idxArr}
                 isCollaps={channel.isCollaps}
@@ -46,9 +47,6 @@ export const PayInfoContent = (props)=>{
 
     return(
         <div className="table">
-            {/* <div className="table-options">
-                <SwitchBtn Title="Status" checked={props.switchBtn.Status===1} onChange={props.switchBtn.onChange} SwitchBtnKey={props.switchBtn.SwitchBtnKey}/>                
-            </div> */}
             {channelList}
         </div>
     )

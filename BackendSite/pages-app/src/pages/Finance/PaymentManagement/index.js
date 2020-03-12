@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import ReactDOM from 'react-dom';
-import {OuterPanel}  from './components';
+import {OuterPanel, PanelClass}  from './components';
 import {PayInfoHeader, PayInfoContent} from './PayInfo';
 import WebAPI from '../../../module/WebAPI';
 import {BankInfoContent} from './BankInfo';
@@ -301,6 +301,7 @@ const PayInfoList = (props)=>{
         let id =`PayInfo-${idx}`;
         return(
             <OuterPanel
+                PanelClass={PanelClass.mt20}
                 HandleCollaps={HandleCollaps}
                 idxArr={[idx]}
                 isCollaps={item.isCollaps}

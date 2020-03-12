@@ -15,9 +15,7 @@ export const ChannelInfoContent = (props)=>{
     let {currencyList, ...channelInfo} = props;
     return(
         <div className="table">
-            <ResultTable {...channelInfo} ContentOnClick={props.ContentOnClick}/>
-            <div className="table-options"/>
-            
+            <ResultTable {...channelInfo} ContentOnClick={props.ContentOnClick}/>            
             <CurrencyResultTable 
                 CurrencyList={currencyList} 
                 idxArr={props.idxArr} 

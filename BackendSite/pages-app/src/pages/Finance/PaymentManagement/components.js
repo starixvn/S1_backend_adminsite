@@ -34,6 +34,11 @@ export const AmountRule = {
     3:'Fixed'
 }
 
+export const PanelClass = {
+    mt20: "panel mt-20",
+    mt5: "panel mt-05"
+}
+
 export const statusFormat = (status)=>{
     let className = status == 1 ? 'status-active' : 'status-suspend';
     return <span className={`status ${className}`}>{Status[status]}</span>;
@@ -50,7 +55,7 @@ export const OuterPanel = (props)=>{
         body_class = "collapse";
     }
     return(
-        <div className="panel mt-20">
+        <div className={props.PanelClass}>
             <a style={{"justifyContent": "space-between"}} className={header_class} onClick={props.HandleCollaps.bind(null, props.idxArr)}>
                 {props.HeaderContent}
             </a>

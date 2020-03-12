@@ -210,7 +210,7 @@ export const CurrencyResultTable = (props)=>{
     })
 
     return(
-        <table className="table table-striped">
+        <table className="table table-striped mt-05">
             <thead>
                 <tr>
                     {headers}
