@@ -6953,8 +6953,8 @@ th.hover {
 }
 
 .list--2nd > .list__item > .list {
-  margin-left: 180px;
-  width: calc( 100% - 180px);
+  /* margin-left: 180px;
+  width: calc( 100% - 180px); */
 }
 
 .list--2nd > .list__item:not(:last-child) {
@@ -6962,7 +6962,7 @@ th.hover {
 }
 
 .list--2nd .list .list__item {
-  padding-left: 4rem;
+  /* padding-left: 4rem; */
 }
 
 .list--tighten .checkbox,
