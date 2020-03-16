@@ -49,7 +49,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int PayId)
         {
-            return paymentManageService.GetBankSysInfoList(PayId);
+            return paymentManageService.GetBankSysInfoList(PayId).OrderBy(x=>x.CurrencyId);
         }
 
         public void UpdateBankInfo(int PayId, int SysId, int Status)

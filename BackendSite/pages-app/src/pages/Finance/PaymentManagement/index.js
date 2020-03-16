@@ -243,7 +243,7 @@ const PayInfoList = (props)=>{
                         ...elem,
                         ...elem.editValue,
                         isEdit:false,
-                        editValue:{}
+                        editValue:null
                     }
 
                     updateDatas([...stateDatas]);
@@ -301,7 +301,7 @@ const PayInfoList = (props)=>{
         let id =`PayInfo-${idx}`;
         return(
             <OuterPanel
-                PanelClass={PanelClass.mt20}
+                PanelClass={PanelClass.level1_mt20}
                 HandleCollaps={HandleCollaps}
                 idxArr={[idx]}
                 isCollaps={item.isCollaps}

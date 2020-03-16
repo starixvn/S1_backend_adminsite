@@ -54,5 +54,7 @@ namespace BackendSite.Service.Model
         public string BankCode { get; set; }
         public string BankName { get; set; }
         public int Status { get; set; }
+
+        public int CurrencyId { get; set; }
     }
 }

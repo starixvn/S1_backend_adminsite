@@ -14,12 +14,10 @@ namespace BackendSite.Controllers.Api
     public class PaymentManageController : Controller
     {
         private readonly PaymentManageBLL paymentManageBLL;
-        private readonly PermissionBLL permissionBLL;
-
+        
         public PaymentManageController(PaymentManageBLL paymentManageBLL, PermissionBLL permissionBLL)
         {
             this.paymentManageBLL = paymentManageBLL;
-            this.permissionBLL = permissionBLL;
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]

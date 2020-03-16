@@ -5,6 +5,8 @@
 @inject AuthorizeBLL authorizeBLL
 @inject AdminUserService adminUserService
 @inject PermissionBLL permissionBLL
+@inject SelLangBLL selLangBLL
+@inject ServerInfoBLL serverInfoBLL
 @section Style {
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
@@ -19,6 +21,15 @@
 
     IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("Finance/PaymentManage");
     subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
+
+    var currencyList = serverInfoBLL.GetCurrencyList();
+    var i18n = new Dictionary<string, string>();
+
+    foreach (var currency in currencyList)
+    {
+        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
+            i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+    }
 }
 
 <div id="content"></div>
@@ -26,6 +37,7 @@
 
 @section Scripts {
     <script>
+        window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
         window.RootUrl = '@Url.Content("~/api")';
         window.LangCode = 'en'
         window.subFuncKeys = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(subFuncKeys));

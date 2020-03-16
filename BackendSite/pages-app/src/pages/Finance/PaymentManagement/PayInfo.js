@@ -16,7 +16,7 @@ export const PayInfoContent = (props)=>{
         let idxArr=[...props.idxArr, idx];
         return(
             <OuterPanel
-                PanelClass={PanelClass.mt5}
+                PanelClass={PanelClass.level2_mt05}
                 HandleCollaps={props.HandleCollaps}
                 idxArr={idxArr}
                 isCollaps={channel.isCollaps}

@@ -431,10 +431,6 @@ body {
     width: 50px;
 }
 
-.mt-05 {
-    margin-top: 5px;
-}
-
 .mt-10 {
     margin-top: 10px;
 }
@@ -762,7 +758,7 @@ body {
 }
 
 .panel {
-    border: 1px solid #303641;
+    border: 1px solid #ddd;
     border-radius: 3px;
 }
 
@@ -777,6 +773,14 @@ body {
         border-top-right-radius: 2px;
         font-size: 14px;
         font-weight: bold;
+    }
+
+    .panel.level-1 .panel-title {
+      background: #4A9DD9;
+    }
+
+    .panel.level-2 .panel-title {
+      background: #7B8BAE;
     }
 
         .panel .panel-title::after {

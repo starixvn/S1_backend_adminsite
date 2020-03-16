@@ -1,6 +1,10 @@
 import React from "react";
 import {ElemType, SwitchBtn}  from './components';
 
+if(process.env.NODE_ENV!=='production'){
+    window.i18n = {"lbl_Currency2":"MYR","lbl_Currency4":"THB","lbl_Currency13":"RMB","lbl_Currency15":"IDR","lbl_Currency51":"VND"};
+}
+
 const columnDefs = ()=>{
     return [
         {
@@ -8,6 +12,12 @@ const columnDefs = ()=>{
         },
         {
             dataColumn:'bankName', columnTitle:'BankName'
+        },
+        {
+            dataColumn:'currencyId', columnTitle:'Currency', 
+            body:{
+                format:currency_format
+            }
         },
         {
             dataColumn:'status', columnTitle:'Status',
@@ -80,4 +90,8 @@ export const BankInfoContent = (props)=>{
             </table>
         );
     }
+}
+
+const currency_format = (currencyId)=>{
+    return window.i18n["lbl_Currency"+currencyId]
 }

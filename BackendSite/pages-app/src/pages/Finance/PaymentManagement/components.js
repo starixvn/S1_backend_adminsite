@@ -35,7 +35,8 @@ export const AmountRule = {
 }
 
 export const PanelClass = {
-    mt20: "panel mt-20",
+    level1_mt20: "panel level-1 mt-20",
+    level2_mt05: "panel level-2 mt-05",
     mt5: "panel mt-05"
 }
 
