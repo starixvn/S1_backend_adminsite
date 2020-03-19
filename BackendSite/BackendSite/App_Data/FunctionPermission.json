@@ -29,6 +29,10 @@
           {
             "DisplayKey": "A/C Closed",
             "FuncKey": "ca_acc_close"
+          },
+          {
+            "DisplayKey": "Reset Password",
+            "FuncKey": "ca_resetpwd"
           }
         ]
       }
