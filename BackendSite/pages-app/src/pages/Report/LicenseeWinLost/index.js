@@ -143,7 +143,7 @@ const App = ()=>{
     return (
         <div style={{ width: "100%", height: "100%", padding: "15px" }}>
             <div className="page-title">
-                Licensee Win Lost
+                Win Lost Report
             </div>
             <Filter filterInfo={stateFilter} refInfo={stateRef} onChange={Filter_OnChange} ClickSubmit={Filter_Submit}/>
             {stateData.Datas === null ? null : <Result {...stateData} />}

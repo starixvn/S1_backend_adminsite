@@ -3,7 +3,7 @@
     "DisplayKey": "Reports",
     "Settings": [
       {
-        "DisplayKey": "Licensee Win Lost",
+        "DisplayKey": "Win Lost Report",
         "FuncKey": "LicWinLost/Report",
         "Enable": false
       }

@@ -7,7 +7,7 @@
     "Childs": [
       {
         "Key": "",
-        "Title": "Licensee Win Lost",
+        "Title": "Win Lost Report",
         "FuncKey": "LicWinLost/Report",
         "Controller": "Report",
         "Action": "LicWinLost",
