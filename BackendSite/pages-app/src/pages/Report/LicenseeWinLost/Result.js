@@ -82,7 +82,7 @@ const Panel = (props)=>{
     return(
         <div id="myGrid" className="ag-theme-blue table">
             <div className="table-options">
-                <span className="text-bold">Licensee Win Lost from {props.SearchInfo.StartDate} to {props.SearchInfo.EndDate} in {currency}</span>
+                <span className="text-bold">Win Lost from {props.SearchInfo.StartDate} to {props.SearchInfo.EndDate} in {currency}</span>
                 {/* <button type="button" className="btn btn-excel">Export Excel</button> */}
             </div>
             <AgGridReact
