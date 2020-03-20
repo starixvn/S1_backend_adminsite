@@ -232,8 +232,7 @@ const PayInfoList = (props)=>{
                 Data: qs.stringify({
                     ChannelId:elem.id,
                     Sort:elem.editValue.sort,
-                    Status:elem.editValue.status,
-                    Mode:elem.editValue.mode
+                    Status:elem.editValue.status
                 })
             };
             

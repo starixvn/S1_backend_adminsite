@@ -18,36 +18,6 @@ namespace BackendSite.Service.DAL
             this.configuration = configuration;
         }
 
-        //public IEnumerable<PayList> GetPayInfoList()
-        //{
-        //    IEnumerable<PayList> payList = null;
-        //    using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-        //    {
-        //        conn.Open();
-        //        using (var tran = conn.BeginTransaction())
-        //        {
-        //            string SpName = "Admin_PayList_Get";
-        //            payList = conn.Query<PayList>(SpName, null, tran, commandType: CommandType.StoredProcedure);
-
-        //            foreach (PayList payInfo in payList)
-        //            {
-        //                SpName = "Admin_PayChannel_Get";
-        //                payInfo.ChannelList = conn.Query<PayChannel>(SpName, new { PayId = payInfo.Id }, tran, commandType: CommandType.StoredProcedure);
-
-        //                foreach (PayChannel channel in payInfo.ChannelList)
-        //                {
-        //                    SpName = "Admin_PayCurrency_Get";
-        //                    channel.CurrencyList = conn.Query<PayCurrency>(SpName, new { ChannelId = channel.Id }, tran, commandType: CommandType.StoredProcedure);
-        //                }
-        //            }
-
-        //            tran.Commit();
-        //        }
-        //    }
-
-        //    return payList;
-        //}
-
         public IEnumerable<PayList> GetPayList()
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
@@ -84,12 +54,12 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public void UpdatePayChannel(int ChannelId, int Sort, int Status, int Mode)
+        public void UpdatePayChannel(int ChannelId, int Sort, int Status)
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 string SpName = "Admin_PayChannel_Set";
-                conn.Execute(SpName, new { ChannelId, Sort, Status, Mode }, commandType: CommandType.StoredProcedure);
+                conn.Execute(SpName, new { ChannelId, Sort, Status }, commandType: CommandType.StoredProcedure);
             }
         }
 

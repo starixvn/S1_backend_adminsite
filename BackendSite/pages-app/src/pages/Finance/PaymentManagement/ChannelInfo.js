@@ -50,11 +50,6 @@ const columnDefs = (props)=>{
         {
             dataColumn:'mode', columnTitle:'Mode',
             body:{
-                EditMode:{
-                    ElemType: ElemType.selectBox,
-                    ElemClass: 'custom-select',
-                    Options:[...Object.keys(Mode).map(key=>{return {value:key, displayText:Mode[key]}})]
-                },
                 format:modeFormat
             }
         },

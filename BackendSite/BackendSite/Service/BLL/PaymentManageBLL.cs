@@ -31,9 +31,9 @@ namespace BackendSite.Service.BLL
             paymentManageService.UpdatePayList(PayId, Status);
         }
 
-        public void UpdatePayChannel(int ChannelId, int Sort, int Status, int Mode)
+        public void UpdatePayChannel(int ChannelId, int Sort, int Status)
         {
-            paymentManageService.UpdatePayChannel(ChannelId, Sort, Status, Mode);
+            paymentManageService.UpdatePayChannel(ChannelId, Sort, Status);
         }
 
         public void UpdatePayCurrency(int ChannelId, int CurrencyId, decimal MinAmount, decimal MaxAmount, int AmountRule, string AmountShow)
