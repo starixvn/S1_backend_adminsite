@@ -45,5 +45,22 @@ namespace BackendSite.Controllers.Api
 
             return apiListResult;
         }
+        public class FixNegativeReq
+        {
+            public int CustId { get; set; }
+        }
+
+
+        public async Task<ApiResult> FixNegativeAsync(FixNegativeReq fixNegativeReq)
+        {
+            TpInfo tpInfo = new TpInfo
+            {
+                CustId = fixNegativeReq.CustId,
+                TpId = 1
+            };
+
+            var apiResult = await tpBLL.FixNegativeAsync(tpInfo);
+            return apiResult;
+        }
     }
 }

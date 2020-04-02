@@ -5,6 +5,7 @@ import {WithdrawalInfo} from './CustInfo_WithdrawalInfo.jsx';
 import {LoginLog } from './CustInfo_LoginLog.jsx';
 import {Notes} from './CustInfo_Notes.jsx';
 import {ResetPwd} from './CustInfo_ResetPwd.jsx';
+import * as Loading from '../commJS/Loading.jsx';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -523,6 +524,26 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
             }
         }
 
+        onFixNegative() {
+            if(confirm('Are you sure?')) {
+                Loading.OnLoading();
+                let data = this.props.CustInfoData;
+                axios.post('/api/Tp/FixNegative', {CustId: data.custId})
+                .then(function (response) {
+                    Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.props.onGetCustInfoDetail();
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    Loading.UnLoading();
+                    alert(error);
+                }.bind(this));            
+            }
+        }        
+
         render() {
             let data = this.props.CustInfoData;
             let tpWallet= null;
@@ -541,6 +562,11 @@ import {ResetPwd} from './CustInfo_ResetPwd.jsx';
                                     <span className="wallet-name">{wallet.tpName}</span>
                                     <div className="name"><span>{wallet.tpUserName}</span><button type="button" className="btn btn-copy js-copy" data-clipboard-text={wallet.tpUserName}>Copy</button></div>
                                     <span className={wallet.balance <0 ? "negative-num":"positive-num"}>{number_format(wallet.balance)}</span>
+                                    {wallet.tpId == 1 && wallet.balance < 0 ? 
+                                    <div className="button-block">                                    
+                                        <button className="btn btn-primary" onClick={this.onFixNegative.bind(this)}>Fix Negative</button>
+                                    </div>
+                                    : null}
                                 </li>;
                     }.bind(this))}</ul>;
 

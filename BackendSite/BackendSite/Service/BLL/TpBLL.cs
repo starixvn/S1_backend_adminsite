@@ -104,5 +104,20 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+        public async Task<ApiResult> FixNegativeAsync(TpInfo inInfo)
+        {
+            Dictionary<string, string> input = new Dictionary<string, string>();
+            var myUrl = $"{apiUrl}FixNegative";
+            var oTpInfo = new TpInfo
+            {
+                TpId = inInfo.TpId,
+                CustId = inInfo.CustId,
+                inputs = input
+            };
+
+            var result = await courierAdapter.MyPostAsync<bool, TpInfo>(myUrl, oTpInfo);
+
+            return result;
+        }
     }
 }
