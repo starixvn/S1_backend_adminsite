@@ -4,6 +4,7 @@ import Result from './Result';
 import WebAPI from '../../../module//WebAPI';
 import EditPanel from './Edit';
 import moment from 'moment';
+import qs from 'qs';
 
 const defaultModel = {
     startTime:'',
@@ -77,15 +78,19 @@ const App = ()=>{
         
         let param = {
             Url: isAdd ? 'Message/AddAnnouncement' : 'Message/UpdateAnnouncement',
-            Data: {
-                ...newDatas, 
-                Subject:JSON.stringify(datas.subject),
-                Content:JSON.stringify(datas.content),
-                StartTime:moment(datas.startTime).toJSON(),
-                EndTime:moment(datas.endTime).toJSON(),
-                LastUpdateTime:moment(new Date()).toJSON(),
-                CreateTime:moment(datas.createTime).toJSON()
-            }
+            Data:  qs.stringify({
+                Datas:{
+                    ...newDatas, 
+                    Subject:JSON.stringify(datas.subject),
+                    Content:JSON.stringify(datas.content),
+                    StartTime:moment(datas.startTime).toJSON(),
+                    EndTime:moment(datas.endTime).toJSON(),
+                    LastUpdateTime:moment(datas.lastUpdateTime).toJSON(),
+                    CreateTime:moment(datas.createTime).toJSON()
+                },
+                _StartTime:moment(datas.startTime).unix(),
+                _EndTime:moment(datas.endTime).unix(),
+            })
         };
 
         WebAPI.PostData(param).then((res) => {
@@ -101,7 +106,7 @@ const App = ()=>{
                         ...appendDatas
                     });
 
-                    tmpDatas = tmpDatas.sort((a, b)=>{return a.id - b.id});
+                    tmpDatas = tmpDatas.sort((a, b)=>{return b.id - a.id});
                 }else{
                     tmpDatas[stateDatas.CurrentIdx] = {
                         ...datas,

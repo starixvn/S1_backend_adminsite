@@ -54,7 +54,7 @@ namespace BackendSite.Service.DAL
             return conn.Query<Announcement>("Admin_Announcement_GetById", new { Id }, commandType: CommandType.StoredProcedure).FirstOrDefault();
         }
 
-        public Announcement AddAnnouncement(Announcement Datas, string Creator, int CreatorId)
+        public Announcement AddAnnouncement(Announcement Datas, string Creator, int CreatorId, long _StartTime, long _EndTime)
         {
             Announcement result = new Announcement();
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
@@ -66,8 +66,8 @@ namespace BackendSite.Service.DAL
                     DynamicParameters param = new DynamicParameters();
                     param.Add("@Id", dbType: DbType.Int32, direction: ParameterDirection.Output);
                     param.Add("@SiteId", 0);
-                    param.Add("@StartTime", Datas.StartTime);
-                    param.Add("@EndTime", Datas.EndTime);
+                    param.Add("@StartTime", _StartTime);
+                    param.Add("@EndTime", _EndTime);
                     param.Add("@Subject", Datas.Subject);
                     param.Add("@Content", Datas.Content);
                     param.Add("@Status", Datas.Status);
@@ -90,7 +90,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public Announcement UpdateAnnouncement(Announcement Datas, string LastUpdater, int LastUpdaterId)
+        public Announcement UpdateAnnouncement(Announcement Datas, string LastUpdater, int LastUpdaterId, long _StartTime, long _EndTime)
         {
             Announcement result = new Announcement();
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
@@ -102,8 +102,8 @@ namespace BackendSite.Service.DAL
                     DynamicParameters param = new DynamicParameters();
                     param.Add("@Id", Datas.Id);
                     param.Add("@SiteId", 0);
-                    param.Add("@StartTime", Datas.StartTime);
-                    param.Add("@EndTime", Datas.EndTime);
+                    param.Add("@StartTime", _StartTime);
+                    param.Add("@EndTime", _EndTime);
                     param.Add("@Subject", Datas.Subject);
                     param.Add("@Content", Datas.Content);
                     param.Add("@Status", Datas.Status);

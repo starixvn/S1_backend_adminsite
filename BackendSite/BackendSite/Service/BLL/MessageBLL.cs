@@ -33,14 +33,14 @@ namespace BackendSite.Service.BLL
             return messageService.GetAnnouncementById(Id);
         }
 
-        public Announcement AddAnnouncement(Announcement Datas, string Creator, int CreatorId)
+        public Announcement AddAnnouncement(Announcement Datas, string Creator, int CreatorId, long _StartTime, long _EndTime)
         {
-            return messageService.AddAnnouncement(Datas, Creator, CreatorId);
+            return messageService.AddAnnouncement(Datas, Creator, CreatorId, _StartTime, _EndTime);
         }
 
-        public Announcement UpdateAnnouncement(Announcement Datas, string LastUpdater, int LastUpdaterId)
+        public Announcement UpdateAnnouncement(Announcement Datas, string LastUpdater, int LastUpdaterId, long _StartTime, long _EndTime)
         {
-            return messageService.UpdateAnnouncement(Datas, LastUpdater, LastUpdaterId);
+            return messageService.UpdateAnnouncement(Datas, LastUpdater, LastUpdaterId, _StartTime, _EndTime);
         }
 
         public void DeleteAnnouncement(int Id)

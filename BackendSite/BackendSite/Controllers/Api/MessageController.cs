@@ -69,14 +69,14 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult AddAnnouncement(Announcement Datas)
+        public ApiResult AddAnnouncement([FromForm]Announcement Datas, [FromForm]long _StartTime, [FromForm]long _EndTime)
         {
             var apiResult = new ApiResult<dynamic>();
 
             try
             {
                 var authData = authorizeBLL.GetAuthData();
-                var result = messageBLL.AddAnnouncement(Datas, authData.UserName, authData.UserId);
+                var result = messageBLL.AddAnnouncement(Datas, authData.UserName, authData.UserId, _StartTime, _EndTime);
                 apiResult.Data = new { result.CreateTime, result.Creator, result.Id };
                 apiResult.ErrorCode = 0;
             }
@@ -90,14 +90,14 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult UpdateAnnouncement(Announcement Datas)
+        public ApiResult UpdateAnnouncement([FromForm]Announcement Datas, [FromForm]long _StartTime, [FromForm]long _EndTime)
         {
             var apiResult = new ApiResult<dynamic>();
 
             try
             {
                 var authData = authorizeBLL.GetAuthData();
-                var result = messageBLL.UpdateAnnouncement(Datas, authData.UserName, authData.UserId);
+                var result = messageBLL.UpdateAnnouncement(Datas, authData.UserName, authData.UserId, _StartTime, _EndTime);
                 apiResult.Data = new { result.LastUpdater, result.LastUpdateTime };
                 apiResult.ErrorCode = 0;
             }
