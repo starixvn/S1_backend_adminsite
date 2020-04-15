@@ -84,9 +84,9 @@ const EditPanel = (props)=>{
                     columnTitle={col.columnTitle}
                     dateTimePickerProps={{
                         defaultValue:props.IsAdd ? '' : moment(stateData[col.datacolumn]).format('l LTS'),
-                        onChange:(e)=>{
+                        onBlur:(e)=>{
                             try {
-                                EditFiled(e.format('l LTS'), col.datacolumn)
+                                EditFiled(moment(e).format('l LTS'), col.datacolumn)
                             } catch (ex) {}
                         }
                     }}
@@ -160,7 +160,7 @@ const SettingContent = (props)=>{
             </div>
             <div className="form-group">
                 <label>Content</label>
-                <textarea className="form-control" rows="3" defaultValue={props.content} onBlur={(e)=>{ props.EditFiled(e.target.value, 'content', {lang:props.lang})}}></textarea>
+                <textarea className="form-control" rows="8" defaultValue={props.content} onBlur={(e)=>{ props.EditFiled(e.target.value, 'content', {lang:props.lang})}}></textarea>
             </div>
         </div>
     )

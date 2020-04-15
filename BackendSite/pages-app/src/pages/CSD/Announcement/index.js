@@ -62,7 +62,8 @@ const App = ()=>{
                         ...res.data.data
                     },
                     CurrentIdx:idx,
-                    ShowSettingPanel:true
+                    ShowSettingPanel:true,
+                    IsAdd:false
                 });
             }else{
                 alert(res.data.message ?? 'failed to get data.');
