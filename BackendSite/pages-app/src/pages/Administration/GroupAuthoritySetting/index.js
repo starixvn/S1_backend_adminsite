@@ -6,7 +6,7 @@ import { Provider, connect } from 'react-redux'
 import ResultTable from './ResultPanel'
 import EditPanel from './EditPanel'
 import Lang from '../../../resource/Administration/AuthoritySetting/LangAPI'
-import {Button, buttonClass} from '../../../component/buttons'
+import {Button, buttonClass} from '../../../component/LAP/buttons'
 
 class Panel extends Component{
     constructor(props){

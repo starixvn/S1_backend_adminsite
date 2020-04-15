@@ -3,12 +3,12 @@ import ReactDOM from 'react-dom'
 import { reducerPropDefines, reducerActions } from './redux/actionsAndDataProperties'
 import {store, mapStateToProps, mapDispatchToProps, } from './redux/store'
 import { Provider, connect } from 'react-redux'
-import {Popbox} from '../../../component/popbox'
+import {Popbox} from '../../../component/LAP/popbox'
 import ResultTable from './ResultPanel'
 import Lang from '../../../resource/Administration/AuthoritySetting/LangAPI'
 import PopboxContent from './PopboxContent'
-import {Button, buttonClass} from '../../../component/buttons'
-import LoadingImage from '../../../component/preloader'
+import {Button, buttonClass} from '../../../component/LAP/buttons'
+import LoadingImage from '../../../component/LAP/preloader'
 
 class Panel extends Component{
     constructor(props){

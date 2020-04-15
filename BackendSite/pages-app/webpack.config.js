@@ -40,6 +40,9 @@ module.exports = {
             // '@babel/polyfill',
             './src/pages/Finance/PaymentManagement/index.js'
         ],
+        "CSD/Announcement.min":[
+            './src/pages/CSD/Announcement/index.js'
+        ],
     },
     output:{
         path:  path.resolve(__dirname,'../BackendSite/wwwroot/js/component/'),

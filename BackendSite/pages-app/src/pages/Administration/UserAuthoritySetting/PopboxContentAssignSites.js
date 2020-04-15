@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import {CheckBox, CheckBoxClassName} from '../../../component/checkBox'
+import {CheckBox, CheckBoxClassName} from '../../../component/LAP/checkBox'
 import Lang from '../../../resource/Administration/AuthoritySetting/LangAPI'
-import { BtnBar } from '../../../component/buttons'
+import { BtnBar } from '../../../component/LAP/buttons'
 import $ from 'jquery'
 
 export class AssignSiteContent extends Component{

@@ -1,7 +1,7 @@
 import React from 'react'
-import {InputBox} from '../../../component/inputField'
+import {InputBox} from '../../../component/LAP/inputField'
 import Lang from '../../../resource/Administration/AuthoritySetting/LangAPI'
-import { BtnBar } from '../../../component/buttons'
+import { BtnBar } from '../../../component/LAP/buttons'
 
 export const ResetPasswordContent = (props)=>{
     return(

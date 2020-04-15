@@ -1,5 +1,5 @@
 import React from 'react';
-import {Table, convertToTableResult, align, tableSize, tableType, fieldContent, tableColumnSize, tableClassName} from '../../../component/table'
+import {Table, convertToTableResult, align, tableSize, tableType, fieldContent, tableColumnSize, tableClassName} from '../../../component/LAP/table'
 import Lang from '../../../resource/Administration/AuthoritySetting/LangAPI'
 
 const DefineTableHeaders=(props)=>{

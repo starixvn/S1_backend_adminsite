@@ -22,5 +22,30 @@ namespace BackendSite.Service.BLL
             var customer = custInfoBLL.GetCustInfoWithCache(custId);
             return messageService.SendMessageToPlayer(customer.SiteId, sender, title, content, custId, customer.UserName, customer.UserLang);
         }
+
+        public IEnumerable<Announcement> GetAnnouncements(int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        {
+            return messageService.GetAnnouncements(PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+        }
+
+        public Announcement GetAnnouncementById(int Id)
+        {
+            return messageService.GetAnnouncementById(Id);
+        }
+
+        public Announcement AddAnnouncement(Announcement Datas, string Creator, int CreatorId)
+        {
+            return messageService.AddAnnouncement(Datas, Creator, CreatorId);
+        }
+
+        public Announcement UpdateAnnouncement(Announcement Datas, string LastUpdater, int LastUpdaterId)
+        {
+            return messageService.UpdateAnnouncement(Datas, LastUpdater, LastUpdaterId);
+        }
+
+        public void DeleteAnnouncement(int Id)
+        {
+            messageService.DeleteAnnouncement(Id);
+        }
     }
 }

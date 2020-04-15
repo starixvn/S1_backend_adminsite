@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import Lang from '../../../resource/Administration/AuthoritySetting/LangAPI'
-import {DropdownBox} from '../../../component/dropdownBox'
-import {InputBox} from '../../../component/inputField'
-import { BtnBar } from '../../../component/buttons'
+import {DropdownBox} from '../../../component/LAP/dropdownBox'
+import {InputBox} from '../../../component/LAP/inputField'
+import { BtnBar } from '../../../component/LAP/buttons'
 import {RuleType} from '../../../module/ValidFieldValue'
 import Permissions from '../component/permissionList'
 

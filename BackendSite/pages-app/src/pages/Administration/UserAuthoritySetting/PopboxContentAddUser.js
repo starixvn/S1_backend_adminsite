@@ -1,9 +1,9 @@
 import React, {Component} from 'react'
-import {DropdownBox} from '../../../component/dropdownBox'
-import {InputBox} from '../../../component/inputField'
-import {CheckList} from '../../../component/checkBox'
+import {DropdownBox} from '../../../component/LAP/dropdownBox'
+import {InputBox} from '../../../component/LAP/inputField'
+import {CheckList} from '../../../component/LAP/checkBox'
 import Lang from '../../../resource/Administration/AuthoritySetting/LangAPI'
-import { BtnBar } from '../../../component/buttons'
+import { BtnBar } from '../../../component/LAP/buttons'
 import {RuleType} from '../../../module/ValidFieldValue'
 import $ from 'jquery'
 

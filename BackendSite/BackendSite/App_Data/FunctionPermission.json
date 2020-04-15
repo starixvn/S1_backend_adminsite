@@ -35,6 +35,11 @@
             "FuncKey": "ca_resetpwd"
           }
         ]
+      },
+      {
+        "DisplayKey": "Announcement",
+        "FuncKey": "Message/Announcement",
+        "Enable": false
       }
     ]
   },

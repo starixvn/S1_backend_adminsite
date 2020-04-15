@@ -2,7 +2,7 @@ if(process.env.NODE_ENV!=='production'){
   Promise.all([
     import('react-dom'),
     import('react'),
-    import('./component/dropdownBox'),
+    import('./component/LAP/dropdownBox'),
     import('./UserDefine'),
   ]).then(([ReactDOM, React, elem, UserDefine])=>{
     const pages = UserDefine.pages;

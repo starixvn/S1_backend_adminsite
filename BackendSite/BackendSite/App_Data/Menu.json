@@ -32,6 +32,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "lbl_Announcement",
+        "Title": "Announcement",
+        "FuncKey": "Message/Announcement",
+        "Controller": "Message",
+        "Action": "Announcement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

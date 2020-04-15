@@ -620,6 +620,10 @@ body {
         border: 1px solid #d5d5d5;
         padding: 8px 5px;
         vertical-align: middle;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 311px;
+        white-space: nowrap;
     }
 
     .table .button-action {

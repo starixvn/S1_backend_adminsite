@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import {RadioBox, RadioBoxClassName} from '../../../component/radioBox'
+import {RadioBox, RadioBoxClassName} from '../../../component/LAP/radioBox'
 import Lang from '../../../resource/Administration/AuthoritySetting/LangAPI'
-import { BtnBar } from '../../../component/buttons'
+import { BtnBar } from '../../../component/LAP/buttons'
 import $ from 'jquery'
 
 export class AssignGroupContent  extends Component{

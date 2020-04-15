@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import {Span} from './span'
 import {InputBox} from './inputField'
 import {DropdownBox} from './dropdownBox'
-import DateFormat from '../module/Formatting/DateFormat'
-import TimeZone from '../module/TimeZone'
+import DateFormat from '../../module/Formatting/DateFormat'
+import TimeZone from '../../module/TimeZone'
 import {CheckBox} from './checkBox'
 import $ from 'jquery'
 

@@ -1,6 +1,6 @@
 import React from 'react'
-import {CheckBox, CheckBoxClassName} from '../../../component/checkBox'
-import {RadioBox, RadioBoxClassName} from '../../../component/radioBox'
+import {CheckBox, CheckBoxClassName} from '../../../component/LAP/checkBox'
+import {RadioBox, RadioBoxClassName} from '../../../component/LAP/radioBox'
 import Lang from '../../../resource/Administration/AuthoritySetting/LangAPI'
 
 function IsListOpen(HandleList, key, IsEnable=false, IsTopItem=false){
