@@ -76,6 +76,7 @@ const App = ()=>{
             newDatas[key.charAt(0).toUpperCase() + key.slice(1)] = datas[key];
         });
         
+        let lastUpdTime = datas.lastUpdater ? datas.lastUpdateTime : new Date();
         let param = {
             Url: isAdd ? 'Message/AddAnnouncement' : 'Message/UpdateAnnouncement',
             Data:  qs.stringify({
@@ -85,7 +86,7 @@ const App = ()=>{
                     Content:JSON.stringify(datas.content),
                     StartTime:moment(datas.startTime).toJSON(),
                     EndTime:moment(datas.endTime).toJSON(),
-                    LastUpdateTime:moment(datas.lastUpdateTime).toJSON(),
+                    LastUpdateTime:moment(lastUpdTime).toJSON(),
                     CreateTime:moment(datas.createTime).toJSON()
                 },
                 _StartTime:moment(datas.startTime).unix(),
