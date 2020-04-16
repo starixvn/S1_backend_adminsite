@@ -65,7 +65,7 @@ const App = ()=>{
         let endDate = stateRef.selectdate_end.current.value;
 
         let param = {
-            Url: 'WinLostReport/GetLicWinLostReport',
+            Url: 'WinLostReport/GetWinLostReport',
             Data:qs.stringify({
                 StartDate:startDate,
                 EndDate:endDate,
@@ -81,6 +81,7 @@ const App = ()=>{
 
         WebAPI.PostData(param).then((res) => {
             if (res.data.errorCode === 0) {
+                let totalResult = [];
                 let result = [];
                 let gameList = [];
                 if(res.data.data.length!==0){
@@ -112,6 +113,23 @@ const App = ()=>{
                                 [gameWinLostColDef]:elem.winlostAmount                           
                             });
                         }
+
+                        let getTotalItem = totalResult.find(x=> x.currencyId === elem.currencyId);
+                        if(getTotalItem){
+                            getTotalItem.stakeSummary += elem.stakeSummary;
+                            getTotalItem.winlostAmount += elem.winlostAmount;
+                            getTotalItem[gameStakeColDef] = getTotalItem[gameStakeColDef] ? getTotalItem[gameStakeColDef] + elem.stakeSummary : elem.stakeSummary;
+                            getTotalItem[gameWinLostColDef] = getTotalItem[gameWinLostColDef] ? getTotalItem[gameWinLostColDef] + elem.winlostAmount : elem.winlostAmount;
+                        }else{
+                            totalResult.push({
+                                'currencyId':elem.currencyId,
+                                'currencyName':elem.currencyName,
+                                'stakeSummary':elem.stakeSummary,
+                                'winlostAmount':elem.winlostAmount,
+                                [gameStakeColDef]:elem.stakeSummary,
+                                [gameWinLostColDef]:elem.winlostAmount
+                            })
+                        }
                     });
                 }
 
@@ -122,7 +140,19 @@ const App = ()=>{
                         StartDate:startDate,
                         EndDate:endDate
                     },
-                    Datas:[...result.map(item=>{
+                    Datas:[
+                        ...result.map(item=>{
+                            Object.keys(item).forEach(key => {
+                                if(key.startsWith('stake') || key.startsWith('winlost')){
+                                    item[key] = number_format(number_toFixed(item[key], 2));
+                                }
+                            });
+
+                            return {...item}
+                        })
+                    ],
+                    TotalDatas:[
+                        ...totalResult.map(item=>{
                             Object.keys(item).forEach(key => {
                                 if(key.startsWith('stake') || key.startsWith('winlost')){
                                     item[key] = number_format(number_toFixed(item[key], 2));
@@ -140,13 +170,26 @@ const App = ()=>{
         });
     }
 
+    const ExportToExcel = ()=>{
+        let param = {
+            Url: 'WinLostReport/ExportReport',
+            Data:{
+                StartDate:stateData.SearchInfo.StartDate,
+                EndDate:stateData.SearchInfo.EndDate,
+                Currency:stateData.SearchInfo.Currency
+            }
+        };
+
+        WebAPI.DownloadData(param);
+    }
+
     return (
         <div style={{ width: "100%", height: "100%", padding: "15px" }}>
             <div className="page-title">
                 Win Lost Report
             </div>
             <Filter filterInfo={stateFilter} refInfo={stateRef} onChange={Filter_OnChange} ClickSubmit={Filter_Submit}/>
-            {stateData.Datas === null ? null : <Result {...stateData} />}
+            {stateData.Datas === null ? null : <Result {...stateData} ExportToExcel={ExportToExcel} />}
         </div>
     );
 }

@@ -20,10 +20,10 @@ namespace BackendSite.Service.BLL
             this.selLangBLL = selLangBLL;
         }
 
-        public IEnumerable<LicWinLostReport> GetLicWinLostReport(DateTime StartDate, DateTime EndDate, int Currency)
+        public IEnumerable<WinLostReport> GetWinLostReport(DateTime StartDate, DateTime EndDate, int Currency)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
-            var report = winLostReportService.GetLicWinLostReport(StartDate, EndDate, siteList?.Select(x=>x.SiteId), Currency);
+            var report = winLostReportService.GetWinLostReport(StartDate, EndDate, siteList?.Select(x=>x.SiteId), Currency);
             if(report != null && report.Any())
             {
                 var gameTypeList = winLostReportService.GetAllGameType();

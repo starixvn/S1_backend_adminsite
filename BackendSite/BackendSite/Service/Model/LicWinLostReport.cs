@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Service.Model
 {
-    public class LicWinLostReport
+    public class WinLostReport
     {
         public DateTime SettledDate { get; set; }
         public int GameType { get; set; }

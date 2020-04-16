@@ -19,11 +19,11 @@ namespace BackendSite.Service.DAL
             this.configuration = configuration;
         }
 
-        public IEnumerable<LicWinLostReport> GetLicWinLostReport(DateTime StartDate, DateTime EndDate, IEnumerable<int> SiteList, int Currency)
+        public IEnumerable<WinLostReport> GetWinLostReport(DateTime StartDate, DateTime EndDate, IEnumerable<int> SiteList, int Currency)
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.Query<LicWinLostReport>("Report_WinLost_Get", new { StartDate, EndDate, SiteIds=JsonConvert.SerializeObject(SiteList), Currency}, commandType: CommandType.StoredProcedure);
+                return conn.Query<WinLostReport>("Report_WinLost_Get", new { StartDate, EndDate, SiteIds=JsonConvert.SerializeObject(SiteList), Currency}, commandType: CommandType.StoredProcedure);
             }
         }
 

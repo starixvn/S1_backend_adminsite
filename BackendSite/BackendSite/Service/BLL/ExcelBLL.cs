@@ -9,11 +9,74 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
+    public class ExportDataToExcel
+    {
+        public string SheetName { get; set; }
+        public IEnumerable<Dictionary<string, dynamic>> Content { get; set; }
+        public List<string> Titles { get; set; }
+    }
+
     public class ExcelBLL
     {
         public ExcelBLL()
         {
 
+        }
+
+        public byte[] ExportToMultiSheet(List<ExportDataToExcel> t)
+        {
+            using var ms = new MemoryStream();
+            using var p = new ExcelPackage(ms);
+            if (t.Any())
+            {
+                foreach(var s in t)
+                {
+                    var ws = p.Workbook.Worksheets.Add(s.SheetName);
+                    if (s.Content.Any())
+                    {
+                        ExportBody(ws, s.Content, s.Titles);
+                        ExportHeader(ws, s.Titles);
+                    }
+                }
+            }
+            
+            p.Save();
+            return ms.ToArray();
+        }
+
+        private void ExportBody(ExcelWorksheet ws, IEnumerable<Dictionary<string, dynamic>> data, List<string> titles)
+        {
+            var currentRow = 2;
+            for (var i = 0; i < data.Count(); i++)
+            {
+                var bt = data.ElementAt(i);
+                foreach (var item in bt)
+                {
+                    var value = item.Value;
+                    var colName = item.Key;
+                    if (titles.Any(x=> string.Equals(x, colName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        var colIdx = titles.IndexOf(colName)+1;
+                        if (value != null && colName == "DateTime" && ((DateTime)value).Year > 1)
+                        {
+                            var time = new DateTimeOffset((DateTime)value);
+                            ws.Cells[currentRow, colIdx].Value = time.ToOffset(TimeSpan.FromHours(8)).DateTime;
+                            ws.Cells[currentRow, colIdx].Style.Numberformat.Format = "mm/dd/yyyy h:mm:ss\\ AM/PM";
+                        }
+                        else
+                        {
+                            ws.Cells[currentRow, colIdx].Value = value;
+                        }
+                    }
+                }
+
+                currentRow++;
+            }
+        }
+
+        private void ExportHeader(ExcelWorksheet ws, IEnumerable<string> titles)
+        {
+            SetHeader(ws, titles, 1);
         }
 
         public byte[] Export<T>(IEnumerable<T> t) where T : notnull, new()
