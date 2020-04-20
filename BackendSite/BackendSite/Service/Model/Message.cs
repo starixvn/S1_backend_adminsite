@@ -20,4 +20,25 @@ namespace BackendSite.Service.Model
 
         public int IsTest { get; set; }
     }
+
+    public class CustLang
+    {
+        public string UserLang { get; set; }
+    }
+
+    public class PersonalMsg
+    {
+        public int Id { get; set; }
+        public int Type { get; set; }
+        public int SiteId { get; set; }
+        public string LangId { get; set; }
+        public string Recipient { get; set; }
+        public string Sender { get; set; }
+        public string Title { get; set; }
+        public string Content { get; set; }
+        public DateTime CreateTime { get; set; }
+        public int Status { get; set; }
+        public bool Flag { get; set; }
+
+    }
 }

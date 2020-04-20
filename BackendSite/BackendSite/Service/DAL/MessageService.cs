@@ -25,6 +25,12 @@ namespace BackendSite.Service.DAL
             return conn.Execute("Msg_Ins", new { Type = 99, siteId = siteId, LangId = lang, RecipientCustId = custId, Recipient = CustUserName, SenderCustId = siteId, Sender = sender, Title = title, Content = content, MainId = 0 }, commandType: CommandType.StoredProcedure);
         }
 
+        public int SendMessageToPlayer(int siteId, string sender, string title, string content, int custId, string CustUserName, string lang, int SenderCustId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Msg_Ins", new { Type = 99, siteId = siteId, LangId = lang, RecipientCustId = custId, Recipient = CustUserName, SenderCustId = SenderCustId, Sender = sender, Title = title, Content = content, MainId = 0 }, commandType: CommandType.StoredProcedure);
+        }
+
         public IEnumerable<Announcement> GetAnnouncements(int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
             IEnumerable<Announcement> result = null;
@@ -74,7 +80,7 @@ namespace BackendSite.Service.DAL
                     param.Add("@Creator", Creator);
                     param.Add("@CreatorId", CreatorId);
                     param.Add("@IsTest", Datas.IsTest);
-                    
+
                     conn.Execute(SpName, param, tran, commandType: CommandType.StoredProcedure);
 
                     int? Id = param.Get<int?>("@Id");
@@ -124,6 +130,42 @@ namespace BackendSite.Service.DAL
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Execute("Admin_Announcement_Del", new { Id }, commandType: CommandType.StoredProcedure);
+        }
+
+        public IEnumerable<PersonalMsg> GetPersonalMsg(int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        {
+            IEnumerable<PersonalMsg> result = null;
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                conn.Open();
+                string SpName = "Admin_PersonalMessage_Get";
+                DynamicParameters props = new DynamicParameters();
+                props.Add("@CustId", CustId, dbType: DbType.Int32);
+                props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+                props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                props.Add("@PageSize", PageSize);
+
+                result = conn.Query<PersonalMsg>(SpName, props, commandType: CommandType.StoredProcedure);
+                PageNumber = props.Get<int?>("@PageNumber") ?? 0;
+                TotalPages = props.Get<int?>("@TotalPages") ?? 0;
+                RowCount = props.Get<int?>("@RowCount") ?? 0;
+            }
+
+            return result;
+        }
+
+        public CustLang GetCustLang(int CustId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Query<CustLang>("Admin_CustLang_Get", new { CustId }, commandType: CommandType.StoredProcedure).FirstOrDefault();
+        }
+
+        public void DeletePersonalMsg(int Id, int CustId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Execute("Admin_PersonalMsg_Del", new { Id, CustId }, commandType: CommandType.StoredProcedure);
         }
     }
 }

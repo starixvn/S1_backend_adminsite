@@ -23,6 +23,12 @@ namespace BackendSite.Service.BLL
             return messageService.SendMessageToPlayer(customer.SiteId, sender, title, content, custId, customer.UserName, customer.UserLang);
         }
 
+        public int SendMessageToPlayer(string sender, string title, string content, int custId, int SenderCustId)
+        {
+            var customer = custInfoBLL.GetCustInfoWithCache(custId);
+            return messageService.SendMessageToPlayer(customer.SiteId, sender, title, content, custId, customer.UserName, customer.UserLang, SenderCustId);
+        }
+
         public IEnumerable<Announcement> GetAnnouncements(int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
             return messageService.GetAnnouncements(PageSize, ref PageNumber, ref TotalPages, ref RowCount);
@@ -46,6 +52,21 @@ namespace BackendSite.Service.BLL
         public void DeleteAnnouncement(int Id)
         {
             messageService.DeleteAnnouncement(Id);
+        }
+
+        public IEnumerable<PersonalMsg> GetPersonalMsg(int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        {
+            return messageService.GetPersonalMsg(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+        }
+
+        public CustLang GetCustLang(int CustId)
+        {
+            return messageService.GetCustLang(CustId);
+        }
+
+        public void DeletePersonalMsg(int Id, int CustId)
+        {
+            messageService.DeletePersonalMsg(Id, CustId);
         }
     }
 }

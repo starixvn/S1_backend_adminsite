@@ -6,6 +6,7 @@ import {LoginLog } from './CustInfo_LoginLog.jsx';
 import {Notes} from './CustInfo_Notes.jsx';
 import {ResetPwd} from './CustInfo_ResetPwd.jsx';
 import * as Loading from '../commJS/Loading.jsx';
+import PersonalMsg from './PersonalMsg/CustInfo_PersonalMsg';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -730,7 +731,7 @@ import * as Loading from '../commJS/Loading.jsx';
     }
     
     class CustInfoPanel extends React.Component {
-        _Tabs=["Customer Info","Financial Log","Deposit Info","Transfer Info","Withdrawal Info","Login Log", "Reset Password", "Notes"];
+        _Tabs=["Customer Info","Financial Log","Deposit Info","Transfer Info","Withdrawal Info","Login Log", "Reset Password", "Notes", "Personal Message"];
 
         constructor(props) {
             super(props);
@@ -947,9 +948,13 @@ import * as Loading from '../commJS/Loading.jsx';
                 dataContainer = <ResetPwd />;
             } else if(TabIdx == 7) {
                 dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)}/>;
+            } else if(TabIdx == 8 && subFuncKeys.includes("ca_personalMsg")) {
+                dataContainer = <PersonalMsg />
             }
 
-            var tabBtn = this._Tabs.map(function(item, index){
+            var tabBtn = this._Tabs.filter(item=>{
+                return item=='Personal Message' ? subFuncKeys.includes("ca_personalMsg") : true;
+            }).map(function(item, index){
                 return <li className="nav-item" key={index}>
                 <a className={"nav-link"+ (index==TabIdx? " active":"")} href="javascript:void(0);" onClick={index==TabIdx ? null: this.onTab.bind(this, index)}>{item}</a>
             </li>;

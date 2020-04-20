@@ -151,6 +151,30 @@ const App = ()=>{
         }
     }
 
+    const Result_ChangePage = (PageNumber)=>{
+        let param = {
+            Url: 'Message/GetAnnouncement',
+            Data: `PageNumber=${PageNumber}`
+        };
+
+        WebAPI.PostData(param).then((res) => {
+            if (res.data.errorCode === 0) {
+                updateDatas(
+                    {
+                        PageInfo:{
+                            totalPages:res.data.totalPages,
+                            pageNumber:PageNumber,
+                            rowCount:res.data.rowCount
+                        },
+                        Datas:[...res.data.data]
+                    }
+                )
+            }else{
+                alert(res.data.message ?? 'failed to get data.');
+            }
+        });
+    }
+
     return(
         <div className="container-fluid">
             <h4 className="page-name">{`${stateDatas.ShowSettingPanel ? stateDatas.IsAdd ? 'Add ': 'Edit ' : ''}Announcement`}</h4>
@@ -165,7 +189,7 @@ const App = ()=>{
                 ) : (
                     <>
                         <button className="btn btn-add" style={{marginBottom: '20px'}} onClick={()=>{updateDatas({...stateDatas, SettingDatas:{...defaultModel}, ShowSettingPanel:true, IsAdd:true})}}>Add Announcement</button>
-                        {stateDatas.Datas === null ? null : <Result Datas={stateDatas.Datas} PageInfo={stateDatas.PageInfo} ClickEdit={EditAnnouncement} ClickDelete={DeleteAnnouncement}/>}
+                        {stateDatas.Datas === null ? null : <Result Datas={stateDatas.Datas} PageInfo={stateDatas.PageInfo} ClickEdit={EditAnnouncement} ClickDelete={DeleteAnnouncement} ChangePage={Result_ChangePage}/>}
                     </>
                 )
             }

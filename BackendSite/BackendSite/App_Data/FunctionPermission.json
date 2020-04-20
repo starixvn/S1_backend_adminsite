@@ -33,6 +33,10 @@
           {
             "DisplayKey": "Reset Password",
             "FuncKey": "ca_resetpwd"
+          },
+          {
+            "DisplayKey": "Perosnal Message",
+            "FuncKey": "ca_personalMsg"
           }
         ]
       },
