@@ -78,13 +78,28 @@ const App = ()=>{
         });
         
         let lastUpdTime = datas.lastUpdater ? datas.lastUpdateTime : new Date();
+
+        let subject = {};
+        Object.keys(datas.subject).forEach(k=>{
+            if(datas.subject[k]!==''){
+                subject[k] = datas.subject[k];
+            }
+        });
+
+        let content = {};
+        Object.keys(datas.content).forEach(k=>{
+            if(datas.content[k] !== ''){
+                content[k] = datas.content[k];
+            }
+        });
+
         let param = {
             Url: isAdd ? 'Message/AddAnnouncement' : 'Message/UpdateAnnouncement',
             Data:  qs.stringify({
                 Datas:{
                     ...newDatas, 
-                    Subject:JSON.stringify(datas.subject),
-                    Content:JSON.stringify(datas.content),
+                    Subject:JSON.stringify(subject),
+                    Content:JSON.stringify(content),
                     StartTime:moment(datas.startTime).toJSON(),
                     EndTime:moment(datas.endTime).toJSON(),
                     LastUpdateTime:moment(lastUpdTime).toJSON(),
