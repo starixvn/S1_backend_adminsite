@@ -71,6 +71,11 @@
         "Enable": false
       },
       {
+        "DisplayKey": "WithdrawalLimit Adjustment",
+        "FuncKey": "Finance/WithdrawalLimitAdjust",
+        "Enable": false
+      },
+      {
         "DisplayKey": "Adjustment Report",
         "FuncKey": "Finance/AdjustmentReport",
         "Enable": false

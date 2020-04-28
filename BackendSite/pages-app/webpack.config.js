@@ -43,6 +43,9 @@ module.exports = {
         "CSD/Announcement.min":[
             './src/pages/CSD/Announcement/index.js'
         ],
+        "Finance/WithdrawalLimitAdjust.min":[
+            './src/pages/Finance/WithdrawalLimitAdjust/index.js'
+        ],
     },
     output:{
         path:  path.resolve(__dirname,'../BackendSite/wwwroot/js/component/'),

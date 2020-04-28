@@ -18,12 +18,14 @@ namespace BackendSite.Service.DAL
         private readonly IConfiguration configuration;
         private readonly Common common;
         private readonly WalletService walletService;
+        private readonly WithdrawalLimitService withdrawalLimitService;
 
-        public AdjustmentService(IConfiguration configuration, Common common, WalletService walletService)
+        public AdjustmentService(IConfiguration configuration, Common common, WalletService walletService, WithdrawalLimitService withdrawalLimitService)
         {
             this.configuration = configuration;
             this.common = common;
             this.walletService = walletService;
+            this.withdrawalLimitService = withdrawalLimitService;
         }
         public int PaymentAdjustment(AdjustmentInfo adjustmentInfo, string Operator, out string transId)
         {
@@ -116,6 +118,90 @@ namespace BackendSite.Service.DAL
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("AdjustmentLog_Ins", new { AdjustId = adjustId, SiteId = siteId, Comment = comment, Action = status, Operator = Operator }, commandType: CommandType.StoredProcedure);
+        }
+
+        public IEnumerable<AdjustWithdrawalLimit> GetAdjustWithdrawalLimitsLog(int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        {
+            IEnumerable<AdjustWithdrawalLimit> result = null;
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                string SpName = "Admin_AdjustWithdrawalLimitInfo_Get";
+                DynamicParameters props = new DynamicParameters();
+                props.Add("@CustId", CustId);
+                props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+                props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                props.Add("@PageSize", PageSize);
+                
+                result = conn.Query<AdjustWithdrawalLimit>(SpName, props, commandType: CommandType.StoredProcedure);
+                PageNumber = props.Get<int?>("@PageNumber") ?? 0;
+                TotalPages = props.Get<int?>("@TotalPages") ?? 0;
+                RowCount = props.Get<int?>("@RowCount") ?? 0;
+            }
+
+            return result;
+        }
+
+        public int SetAdjustWithdrawalLimit(AdjustWithdrawalLimit withdrawalLimitInfo, string UserName, int CurrencyId, int SiteId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
+            var walletInfo = conn.Query<WithdrawalLimitInfo>("Member_CustWithdrawalLimit_Get", new { withdrawalLimitInfo.CustId }, trans, commandType: CommandType.StoredProcedure).FirstOrDefault();
+            decimal deduction = 0;
+            if (walletInfo != null)
+            {
+                decimal Balance = walletInfo.Balance;
+                decimal tmpDeduction = walletInfo.WithdrawalLimit - walletInfo.TurnOver;
+                deduction = tmpDeduction < 0 ? 0 : tmpDeduction;
+                decimal tmpAvailableBalance = walletInfo.Balance - (deduction);
+            }
+
+            if (withdrawalLimitInfo.AdjustType == 2 && deduction < withdrawalLimitInfo.Amount)
+            {
+                trans.Commit();
+                return 21;
+            }
+            else
+            {
+                var p = new DynamicParameters(new
+                {
+                    AdjustType = withdrawalLimitInfo.AdjustType,
+                    CustId = withdrawalLimitInfo.CustId,
+                    UserName = UserName,
+                    Operator = withdrawalLimitInfo.Operator,
+                    CurrencyId = CurrencyId,
+                    SiteId = SiteId,
+                    Amount = withdrawalLimitInfo.Amount,
+                    Memo = withdrawalLimitInfo.Memo,
+                    Prefix = $"L{common.GetEnv()}"
+                }); ;
+                p.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
+
+                conn.Execute("Admin_AdjustWithdrawalLimitInfo_Ins", p, trans, commandType: CommandType.StoredProcedure);
+                string transId = p.Get<string>("TransId");
+
+                if (string.IsNullOrEmpty(transId))
+                {
+                    trans.Rollback();
+                    return 22;
+                }
+                else
+                {
+                    decimal amount = withdrawalLimitInfo.AdjustType == 2 ? withdrawalLimitInfo.Amount * -1 : withdrawalLimitInfo.Amount;
+                    withdrawalLimitService.SetWithdrawalLimit(withdrawalLimitInfo.CustId, UserName, SiteId, amount, withdrawalLimitInfo.Memo, transId, out decimal AfterAmount, conn, trans);
+                    trans.Commit();
+                    return 0;
+                }
+            }
+        }
+
+        public WithdrawalLimitInfo GetWithdrawalLimitInfo(int CustId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Query<WithdrawalLimitInfo>("Member_CustWithdrawalLimit_Get", new { CustId }, commandType: CommandType.StoredProcedure).FirstOrDefault();
         }
     }
 }

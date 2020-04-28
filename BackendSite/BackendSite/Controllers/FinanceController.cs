@@ -24,6 +24,13 @@ namespace BackendSite.Controllers
             this.excelBLL = excelBLL;
             this.withdrawalBLL = withdrawalBLL;
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitAdjust" })]
+        public IActionResult WithdrawalLimitAdjust()
+        {
+            return View();
+        }
+
         public IActionResult WithdrawalList()
         {
             return View();
