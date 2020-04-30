@@ -7,8 +7,9 @@ const PaymentAdjustmentReport = lazy(()=> import('./pages/Finance/PaymentAdjustm
 const BonusInfoReport = lazy(()=> import('./pages/Marketing/BonusInfoReport/index'));
 const PaymentManagement = lazy(()=> import('./pages/Finance/PaymentManagement/index'));
 const Announcement = lazy(()=> import('./pages/CSD/Announcement/index'));
+const WithdrawalLimitAdjust = lazy(()=> import('./pages/Finance/WithdrawalLimitAdjust/index'));
 
-export const defaultPage = 'Announcement';
+export const defaultPage = 'WithdrawalLimitAdjust';
 export const layoutType = {
   N88:'N88',
   LAP:'LAP'
@@ -54,6 +55,14 @@ export const pages = {
       './lib/bootstrap/dist/css/bootstrap.min.css',
       './css/main.css',
       './css/vendor/DateTimePicker/DateTimePicker.css'
+    ],
+    layout:layoutType.N88
+  },
+  'WithdrawalLimitAdjust':{
+    comp: <Suspense fallback="loading..."><WithdrawalLimitAdjust /></Suspense>,
+    css:[
+      './lib/bootstrap/dist/css/bootstrap.min.css',
+      './css/main.css'
     ],
     layout:layoutType.N88
   }

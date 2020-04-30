@@ -99,6 +99,7 @@ namespace BackendSite
             services.AddSingleton<PaymentAdjustmentReportBLL>();
             services.AddSingleton<BonusInfoBLL>();
             services.AddSingleton<PaymentManageBLL>();
+            services.AddSingleton<AdjustWithdrawalLimitBLL>();
             // var bll = AppDomain.CurrentDomain.GetAssemblies()
             //.SelectMany(t => t.GetTypes())
             //.Where(t => t.IsClass && t.Namespace == "BackendSite.Service.BLL");

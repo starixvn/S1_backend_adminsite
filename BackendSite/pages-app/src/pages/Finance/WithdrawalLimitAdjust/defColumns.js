@@ -1,0 +1,22 @@
+export const adjustType = {
+    1:'Credit',
+    2:'Debit'
+}
+
+export const StatusList = {
+    1:'Panding',
+    2:'Approved',
+    3:'Rejected'
+}
+
+export const adjustTypeOpt = Object.keys(adjustType).map((key)=>{return {displayText:adjustType[key], value:key}});
+
+export const FilterColumns = {
+    userName:{ dataColumns:'UserName' }
+}
+
+export const SettingColumns = {
+    actionType:{dataColumns:'actionType', displayText:'ActionType'},
+    amount:{dataColumns:'amount', displayText:'Amount'},
+    note:{dataColumns:'note', displayText:'Note'}
+}

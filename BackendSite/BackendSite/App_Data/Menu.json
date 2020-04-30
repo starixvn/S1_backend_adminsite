@@ -93,6 +93,16 @@
       },
       {
         "Key": "",
+        "Title": "WithdrawalLimit Adjustment",
+        "FuncKey": "Finance/WithdrawalLimitAdjust",
+        "Controller": "Finance",
+        "Action": "WithdrawalLimitAdjust",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
         "Title": "Adjustment Report",
         "FuncKey": "Finance/AdjustmentReport",
         "Controller": "Finance",
