@@ -1068,3 +1068,35 @@ body {
         transform: translate(0,0);
     }
 }
+
+.checkBoxTitle{
+    color: #656A7B;
+    width: 100%;
+}
+.checkBoxTitle ~ .label{
+    display: inline-flex;
+    align-items: center;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    color: #656A7B;
+}
+.checkBoxTitle ~ .label .checkbox{
+    display: inline-flex;
+    margin-bottom: 0;
+    margin-right: 5px;
+}
+.checkBoxTitle ~ .label .checkbox input{
+    width: 0;
+    height: 0;
+    margin: 0;
+    opacity: 0;
+    appearance: none;
+    -webkit-appearance: none;
+}
+.checkBoxTitle ~ .label .checkbox .icon-checkbox {
+    font-size: 18px;
+}
+.checkbox input:checked ~ .icon-checkbox {
+    color: #50ba62;
+}

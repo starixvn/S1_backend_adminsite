@@ -27,11 +27,11 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public Dictionary<int, string> GetAllGameType()
+        public IEnumerable<GameType> GetAllGameType()
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.Query("Admin_TpGameType_Get", commandType: CommandType.StoredProcedure).ToDictionary(row => (int)row.Type, row => (string)row.TypeName);
+                return conn.Query<GameType>("Admin_TpGameType_Get", commandType: CommandType.StoredProcedure);
             }
         }
     }

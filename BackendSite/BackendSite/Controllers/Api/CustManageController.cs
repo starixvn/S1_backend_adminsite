@@ -9,6 +9,8 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.Api
 {
@@ -20,12 +22,14 @@ namespace BackendSite.Controllers.Api
         private readonly CustInfoBLL custInfoBLL;
         private readonly BankDetailBLL bankDetailBLL;
         private readonly TpBLL tpBLL;
+        private readonly WinLostReportService winLostReportService;
 
-        public CustManageController(CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, TpBLL tpBLL)
+        public CustManageController(CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, TpBLL tpBLL, WinLostReportService winLostReportService)
         {
             this.custInfoBLL = custInfoBLL;
             this.bankDetailBLL = bankDetailBLL;
             this.tpBLL = tpBLL;
+            this.winLostReportService = winLostReportService;
         }
         public class CustInfoListReq
         {
@@ -267,6 +271,46 @@ namespace BackendSite.Controllers.Api
             apiResult.ErrorCode = 0;
 
             return apiResult;
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_turnoverReport" })]
+        public ApiResult GetCustTurnOverReport([FromForm]int CustId, [FromForm]int StartTime, [FromForm]int EndTime, [FromForm]string GameTypes)
+        {
+            var result = new ApiResult<dynamic>();
+            try
+            {
+                string[] gameTypes = GameTypes == null ? new string[] { } : GameTypes.Split(",");
+                var data = custInfoBLL.GetCustTurnover(CustId, gameTypes, StartTime, EndTime);
+                result.Data = data.Select(x => new { x.GameName, x.Stake, x.UserName });
+                result.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                result.ErrorCode = 999;
+                result.RawMessage = ex.ToString();
+            }
+
+            return result;
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_turnoverReport" })]
+        public ApiResult GetAllGameTypeList()
+        {
+            var result = new ApiResult<IEnumerable<GameType>>();
+            try
+            {
+                result.Data = winLostReportService.GetAllGameType();
+                result.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                result.ErrorCode = 999;
+                result.RawMessage = ex.ToString();
+            }
+
+            return result;
         }
     }
 }

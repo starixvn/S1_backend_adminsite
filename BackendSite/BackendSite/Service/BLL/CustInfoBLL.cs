@@ -20,8 +20,9 @@ namespace BackendSite.Service.BLL
         private readonly CodeGenerator codeGenerator;
         private readonly PromotionService promotionService;
         private readonly RollOverService rolloverService;
+        private readonly CustTurnoverService custTurnoverService;
 
-        public CustInfoBLL(IMemoryCache cache, WalletService walletService, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL, TpBLL tpBLL, Tools tools, CodeGenerator codeGenerator, PromotionService promotionService,RollOverService rolloverService)
+        public CustInfoBLL(IMemoryCache cache, WalletService walletService, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL, TpBLL tpBLL, Tools tools, CodeGenerator codeGenerator, PromotionService promotionService,RollOverService rolloverService, CustTurnoverService custTurnoverService)
         {
             this.custInfoService = custInfoService;
             this.serverInfoBLL = serverInfoBLL;
@@ -32,6 +33,7 @@ namespace BackendSite.Service.BLL
             this.codeGenerator = codeGenerator;
             this.promotionService = promotionService;
             this.rolloverService = rolloverService;
+            this.custTurnoverService = custTurnoverService;
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -153,6 +155,28 @@ namespace BackendSite.Service.BLL
         public int CancelBonusByBonusId(int bonusId)
         {
             return promotionService.CancelBonusByBonusId(bonusId);
+        }
+
+        public List<CustTurnover> GetCustTurnover(int CustId, string[] GameTypes, int StartTime, int EndTime)
+        {
+            var datas = custTurnoverService.GetCustTurnover(CustId, GameTypes, StartTime, EndTime);
+
+            var result = new List<CustTurnover>();
+
+            foreach(CustTurnover data in datas)
+            {
+                var item = result.FirstOrDefault(x => x.GameType == data.GameType);
+                if(item==null)
+                {
+                    result.Add(data);
+                }
+                else
+                {
+                    item.Stake += data.Stake;
+                }
+            }
+
+            return result;
         }
     }
 }

@@ -67,6 +67,7 @@ namespace BackendSite
             services.AddSingleton<PaymentAdjustmentReportService>();
             services.AddSingleton<BonusInfoService>();
             services.AddSingleton<PaymentManageService>();
+            services.AddSingleton<CustTurnoverService>();
             //var dal = AppDomain.CurrentDomain.GetAssemblies()
             //           .SelectMany(t => t.GetTypes())
             //           .Where(t => t.IsClass && t.Namespace == "BackendSite.Service.DAL");
