@@ -46,6 +46,9 @@ module.exports = {
         "Finance/WithdrawalLimitAdjust.min":[
             './src/pages/Finance/WithdrawalLimitAdjust/index.js'
         ],
+        "CSD/PersonalMsgBatch.min":[
+            './src/pages/CSD/PersonalMsgBatch/index.js'
+        ]
     },
     output:{
         path:  path.resolve(__dirname,'../BackendSite/wwwroot/js/component/'),

@@ -226,7 +226,6 @@ function SetSelectedPermissionDatas(datas){
         }
     }
 
-    console.log(result);
     return result;
 }
 

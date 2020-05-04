@@ -14,5 +14,10 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        public IActionResult PersonalMsgBatch()
+        {
+            return View();
+        }
     }
 }
