@@ -2,12 +2,11 @@ import {number_format} from '../../commJS/common';
 const Result = (props)=>{
     let total_stake = 0;
     let total_winLost = 0;
-    let rows = props.Datas.length === 0 ? <tr><td>No Data.</td><td></td><td></td></tr> : props.Datas.map((d, dIdx)=>{
+    let rows = props.Datas.length === 0 ? <tr><td>No Data.</td><td/><td/></tr> : props.Datas.map((d, dIdx)=>{
         total_stake += d.stake;
         total_winLost +=d.winlostAmount;
         return(
             <tr key={`result-${dIdx}`}>
-                <td>{d.userName}</td>
                 <td>{d.gameName}</td>
                 <td>{number_format(d.stake)}</td>
                 <td>{number_format(d.winlostAmount)}</td>
@@ -34,7 +33,6 @@ const Result = (props)=>{
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th>UserName</th>
                             <th>GameName</th>
                             <th>Turnover</th>
                             <th>WinLost</th>
