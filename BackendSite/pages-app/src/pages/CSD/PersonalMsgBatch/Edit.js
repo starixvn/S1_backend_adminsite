@@ -103,7 +103,7 @@ const EditPanel = ()=>{
         return(
             <OuterPanel
                 key={`set-panel-${lang}`}
-                HeaderContent={<span style={{color:'white'}}>{lang}</span>}
+                HeaderContent={<span style={{color:'white'}}>{`${lang}${lang==='en'? '  ( required )' : ''}`}</span>}
                 Content={<SettingContent subject={stateData.subject[lang] === undefined ? '' : stateData.subject[lang]} content={stateData.content[lang] === undefined ? '' : stateData.content[lang]} lang={lang} EditFiled={EditFiled}/>}
             />
         );
