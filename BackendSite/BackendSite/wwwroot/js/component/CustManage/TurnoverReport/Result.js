@@ -20,7 +20,7 @@ const Result = (props)=>{
                     <thead>
                         <tr>
                             <th>Total - Turnover</th>
-                            <th>Total - Winlost</th>
+                            <th>Total - WinLoss</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -35,7 +35,7 @@ const Result = (props)=>{
                         <tr>
                             <th>GameName</th>
                             <th>Turnover</th>
-                            <th>WinLost</th>
+                            <th>WinLoss</th>
                         </tr>
                     </thead>
                     <tbody>
