@@ -114,5 +114,6 @@ namespace BackendSite.Service.Model
         public int GameType { get; set; }
         public string GameName { get; set; }
         public decimal Stake { get; set; }
+        public decimal WinlostAmount { get; set; }
     }
 }

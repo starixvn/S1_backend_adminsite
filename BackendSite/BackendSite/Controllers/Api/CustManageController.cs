@@ -282,7 +282,7 @@ namespace BackendSite.Controllers.Api
             {
                 string[] gameTypes = GameTypes == null ? new string[] { } : GameTypes.Split(",");
                 var data = custInfoBLL.GetCustTurnover(CustId, gameTypes, StartTime, EndTime);
-                result.Data = data.Select(x => new { x.GameName, x.Stake, x.UserName });
+                result.Data = data.Select(x => new { x.GameName, x.Stake, x.UserName, x.WinlostAmount });
                 result.ErrorCode = 0;
             }
             catch (Exception ex)

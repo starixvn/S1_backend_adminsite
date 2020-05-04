@@ -173,6 +173,7 @@ namespace BackendSite.Service.BLL
                 else
                 {
                     item.Stake += data.Stake;
+                    item.WinlostAmount += data.WinlostAmount;
                 }
             }
 
