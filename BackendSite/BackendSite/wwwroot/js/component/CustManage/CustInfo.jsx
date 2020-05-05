@@ -956,6 +956,7 @@ import TurnoverReport from './TurnoverReport/index';
             }
 
             let authSubKeys = {
+                6: 'ca_resetpwd',
                 8: 'ca_personalMsg',
                 9: 'ca_turnoverReport'
             }

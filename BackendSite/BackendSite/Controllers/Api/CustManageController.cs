@@ -170,6 +170,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_resetpwd" })]
         public ApiResult<string> SetResetPwd(CustInfoReq custInfoReq)
         {
             ApiResult<string> apiResult = new ApiResult<string>();
