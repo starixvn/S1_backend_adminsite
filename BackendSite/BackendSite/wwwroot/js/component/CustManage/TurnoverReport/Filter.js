@@ -109,7 +109,7 @@ const GameList = (props)=>{
                 <CheckBox
                     Key={`Game-all`}
                     checked={props.SelectedGames.selectAll}
-                    onChange={props.OnSelectGame}
+                    onChange={props.OnSelectGame.bind(null, -1)}
                     Title="All"
                     Value={-1}
                 />
@@ -120,7 +120,7 @@ const GameList = (props)=>{
                             key={`cb-game-${g.type}`}
                             Key={`Game-${g.type}`}
                             checked={props.SelectedGames.selected.includes(g.type)}
-                            onChange={props.OnSelectGame}
+                            onChange={props.OnSelectGame.bind(null, g.type)}
                             Title={g.typeName}
                             Value={g.type}
                         />
@@ -141,8 +141,12 @@ const DateTimePickerElem = (props)=>{
 }
 
 const CheckBox = (props)=>{
+    const OnChange = (e)=>{
+        e.preventDefault();
+        props.onChange();
+    }
     return (
-        <span className="label" style={{'cursor':'pointer'}} onClick={props.onChange.bind(null, props.Value)}>
+        <span className="label" style={{'cursor':'pointer'}} onClick={OnChange}>
             <label className="checkbox">
                 <input type="checkbox" value={props.Value} />
                 <i className="icon icon-checkbox">{props.checked ? '☑' : '☐'}</i>
