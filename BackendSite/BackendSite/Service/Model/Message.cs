@@ -26,7 +26,7 @@ namespace BackendSite.Service.Model
         public string UserLang { get; set; }
     }
 
-    public class PersonalMsg
+    public class PersonalMsg : PersonalMsgBase
     {
         public int Id { get; set; }
         public int Type { get; set; }
@@ -34,11 +34,14 @@ namespace BackendSite.Service.Model
         public string LangId { get; set; }
         public string Recipient { get; set; }
         public string Sender { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; }
         public DateTime CreateTime { get; set; }
         public int Status { get; set; }
         public bool Flag { get; set; }
 
+    }
+    public class PersonalMsgBase
+    {
+        public string Title { get; set; }
+        public string Content { get; set; }
     }
 }

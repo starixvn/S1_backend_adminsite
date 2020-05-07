@@ -8,8 +8,9 @@ const BonusInfoReport = lazy(()=> import('./pages/Marketing/BonusInfoReport/inde
 const PaymentManagement = lazy(()=> import('./pages/Finance/PaymentManagement/index'));
 const Announcement = lazy(()=> import('./pages/CSD/Announcement/index'));
 const WithdrawalLimitAdjust = lazy(()=> import('./pages/Finance/WithdrawalLimitAdjust/index'));
+const PersonalMsgBatch = lazy(()=> import('./pages/CSD/PersonalMsgBatch/index'));
 
-export const defaultPage = 'WithdrawalLimitAdjust';
+export const defaultPage = 'PersonalMsgBatch';
 export const layoutType = {
   N88:'N88',
   LAP:'LAP'
@@ -65,5 +66,17 @@ export const pages = {
       './css/main.css'
     ],
     layout:layoutType.N88
+<<<<<<< HEAD
+=======
+  },
+  'PersonalMsgBatch':{
+    comp: <Suspense fallback="loading..."><PersonalMsgBatch /></Suspense>,
+    css:[
+      './lib/bootstrap/dist/css/bootstrap.min.css',
+      './css/main.css',
+      './css/vendor/DateTimePicker/DateTimePicker.css'
+    ],
+    layout:layoutType.N88
+>>>>>>> DEV
   }
 }

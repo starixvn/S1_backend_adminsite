@@ -6,6 +6,7 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
+using Ubiety.Dns.Core.Records.NotUsed;
 
 namespace BackendSite.Controllers.Api
 {
@@ -234,6 +235,26 @@ namespace BackendSite.Controllers.Api
             }
 
             return apiResult;
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        public ApiResult SendMessageBatch([FromForm]IDictionary<string, PersonalMsgBase> personalMsg, [FromForm]IEnumerable<string> custList)
+        {
+            var result = new ApiResult<int>();
+
+            try
+            {
+                var authData = authorizeBLL.GetAuthData();
+                result.Data = messageBLL.SendMessageBatch(personalMsg, custList, authData.UserName);
+                result.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                result.ErrorCode = 999;
+                result.RawMessage = ex.ToString();
+            }
+
+            return result;
         }
     }
 }

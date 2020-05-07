@@ -68,5 +68,10 @@ namespace BackendSite.Service.BLL
         {
             messageService.DeletePersonalMsg(Id, CustId);
         }
+
+        public int SendMessageBatch(IDictionary<string, PersonalMsgBase> personalMsg, IEnumerable<string> custList, string sender)
+        {
+            return messageService.SendMessageBatch(personalMsg, custList, sender);
+        }
     }
 }

@@ -7,6 +7,7 @@ import {Notes} from './CustInfo_Notes.jsx';
 import {ResetPwd} from './CustInfo_ResetPwd.jsx';
 import * as Loading from '../commJS/Loading.jsx';
 import PersonalMsg from './PersonalMsg/CustInfo_PersonalMsg';
+import TurnoverReport from './TurnoverReport/index';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -731,15 +732,15 @@ import PersonalMsg from './PersonalMsg/CustInfo_PersonalMsg';
     }
     
     class CustInfoPanel extends React.Component {
-        _Tabs=["Customer Info","Financial Log","Deposit Info","Transfer Info","Withdrawal Info","Login Log", "Reset Password", "Notes", "Personal Message"];
+        _Tabs=["Customer Info","Financial Log","Deposit Info","Transfer Info","Withdrawal Info","Login Log", "Reset Password", "Notes", "Personal Message", "Turnover"];
 
         constructor(props) {
             super(props);
-            this.state = { CustInfoData: null, TabIdx: 0, FinancialLog:{}, Notes:null};
+            this.state = { CustInfoData: null, TabIdx: 0, FinancialLog:{}, Notes:null, TabName:this._Tabs[0]};
         }
 
-        onTab(idx) {
-            this.setState({TabIdx: idx});
+        onTab(idx, tabName) {
+            this.setState({TabIdx: idx, TabName:tabName});
         }
 
         componentDidMount() {
@@ -931,32 +932,40 @@ import PersonalMsg from './PersonalMsg/CustInfo_PersonalMsg';
         render() {
             let dataContainer = null;
             let TabIdx = this.state.TabIdx;
-
-            if(TabIdx == 0){
+            let TabName = this.state.TabName;
+            if(TabName == this._Tabs[0]){
                 dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)}/>;
-            } else if(TabIdx == 1){
+            } else if(TabName == this._Tabs[1]){
                 dataContainer = <FinancialLog GetFinancialLog={this.GetFinancialLog.bind(this)} searchData={this.state.FinancialLogData} FinancialLog={this.state.FinancialLog} onChangeValue={this.onChangeValue.bind(this)}/>;
-            } else if(TabIdx == 2){
+            } else if(TabName == this._Tabs[2]){
                 dataContainer = <DepositInfo  GetDepositListByCust={this.GetDepositListByCust.bind(this)} searchData={this.state.DepositListData} DepositList={this.state.DepositList} onChangeValue={this.onChangeValue.bind(this)} />;
-            } else if(TabIdx == 3){
+            } else if(TabName == this._Tabs[3]){
                 dataContainer = <TpTransferInfo GetTpTransferInfoByCust={this.GetTpTransferInfoByCust.bind(this)} searchData={this.state.TpTransferInfoData} TpTransferInfo={this.state.TpTransferInfo} onChangeValue={this.onChangeValue.bind(this)} />;
-            } else if(TabIdx == 4){
+            } else if(TabName == this._Tabs[4]){
                 dataContainer = <WithdrawalInfo GetWithdrawalListByCust={this.GetWithdrawalListByCust.bind(this)} searchData={this.state.WithdrawalListData} WithdrawalInfo={this.state.WithdrawalInfo} onChangeValue={this.onChangeValue.bind(this)} />;
-            } else if(TabIdx == 5){
+            } else if(TabName == this._Tabs[5]){
                 dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
-            } else if(TabIdx == 6) {
+            } else if(TabName == this._Tabs[6]) {
                 dataContainer = <ResetPwd />;
-            } else if(TabIdx == 7) {
+            } else if(TabName == this._Tabs[7]) {
                 dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)}/>;
-            } else if(TabIdx == 8 && subFuncKeys.includes("ca_personalMsg")) {
+            } else if(TabName == this._Tabs[8]) {
                 dataContainer = <PersonalMsg />
+            }  else if(TabName == this._Tabs[9]) {
+                dataContainer = <TurnoverReport />
             }
 
-            var tabBtn = this._Tabs.filter(item=>{
-                return item=='Personal Message' ? subFuncKeys.includes("ca_personalMsg") : true;
+            let authSubKeys = {
+                6: 'ca_resetpwd',
+                8: 'ca_personalMsg',
+                9: 'ca_turnoverReport'
+            }
+
+            var tabBtn = this._Tabs.filter((item, index)=>{
+                return authSubKeys[index] === undefined || subFuncKeys.includes(authSubKeys[index]);
             }).map(function(item, index){
                 return <li className="nav-item" key={index}>
-                <a className={"nav-link"+ (index==TabIdx? " active":"")} href="javascript:void(0);" onClick={index==TabIdx ? null: this.onTab.bind(this, index)}>{item}</a>
+                <a className={"nav-link"+ (index==TabIdx? " active":"")} href="javascript:void(0);" onClick={index==TabIdx ? null: this.onTab.bind(this, index, item)}>{item}</a>
             </li>;
             }.bind(this));                        
 

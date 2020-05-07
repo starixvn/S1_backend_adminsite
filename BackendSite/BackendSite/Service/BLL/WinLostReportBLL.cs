@@ -26,7 +26,7 @@ namespace BackendSite.Service.BLL
             var report = winLostReportService.GetWinLostReport(StartDate, EndDate, siteList?.Select(x=>x.SiteId), Currency);
             if(report != null && report.Any())
             {
-                var gameTypeList = winLostReportService.GetAllGameType();
+                var gameTypeList = winLostReportService.GetAllGameType().ToDictionary(row => (int)row.Type, row => (string)row.TypeName);
                 foreach (var row in report)
                 {
                     row.CurrencyName = selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}");

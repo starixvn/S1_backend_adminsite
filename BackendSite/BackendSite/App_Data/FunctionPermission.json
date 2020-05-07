@@ -37,12 +37,21 @@
           {
             "DisplayKey": "Perosnal Message",
             "FuncKey": "ca_personalMsg"
+          },
+          {
+            "DisplayKey": "Turnover",
+            "FuncKey": "ca_turnoverReport"
           }
         ]
       },
       {
         "DisplayKey": "Announcement",
         "FuncKey": "Message/Announcement",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Personal Msg Batch",
+        "FuncKey": "Message/PersonalMsgBatch",
         "Enable": false
       }
     ]

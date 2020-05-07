@@ -1,85 +1,91 @@
-const path = require('path');
+const path = require("path");
 //const webpack = require('webpack');
 //const bundleAnalyzer = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 module.exports = {
-    mode:'production',
+    mode: "production",
     optimization: {
         mangleWasmImports: true,
-        nodeEnv: 'production'
+        nodeEnv: "production",
     },
-    externals:{
-        'react': 'React',
-        'react-dom': 'ReactDOM',
-        'moment':'moment',
-        'jquery':'$',
-        'axios':'axios'
+    externals: {
+        react: "React",
+        "react-dom": "ReactDOM",
+        moment: "moment",
+        jquery: "$",
+        axios: "axios",
     },
     entry: {
-        "Administration/UserAuthoritySetting.min":[
+        "Administration/UserAuthoritySetting.min": [
             // '@babel/polyfill',
-            './src/pages/Administration/UserAuthoritySetting/index.js'
+            "./src/pages/Administration/UserAuthoritySetting/index.js",
         ],
-        "Administration/GroupAuthoritySetting.min":[
+        "Administration/GroupAuthoritySetting.min": [
             // '@babel/polyfill',
-            './src/pages/Administration/GroupAuthoritySetting/index.js'
+            "./src/pages/Administration/GroupAuthoritySetting/index.js",
         ],
-        "Report/LicenseeWinLost.min":[
+        "Report/LicenseeWinLost.min": [
             // '@babel/polyfill',
-            './src/pages/Report/LicenseeWinLost/index.js'
+            "./src/pages/Report/LicenseeWinLost/index.js",
         ],
-        "Finance/PaymentAdjustmentReport.min":[
+        "Finance/PaymentAdjustmentReport.min": [
             // '@babel/polyfill',
-            './src/pages/Finance/PaymentAdjustmentReport/index.js'
+            "./src/pages/Finance/PaymentAdjustmentReport/index.js",
         ],
-        "Marketing/BonusInfoReport.min":[
+        "Marketing/BonusInfoReport.min": [
             // '@babel/polyfill',
-            './src/pages/Marketing/BonusInfoReport/index.js'
+            "./src/pages/Marketing/BonusInfoReport/index.js",
         ],
-        "Finance/PaymentManagement.min":[
+        "Finance/PaymentManagement.min": [
             // '@babel/polyfill',
-            './src/pages/Finance/PaymentManagement/index.js'
+            "./src/pages/Finance/PaymentManagement/index.js",
         ],
-        "CSD/Announcement.min":[
-            './src/pages/CSD/Announcement/index.js'
+        "CSD/Announcement.min": ["./src/pages/CSD/Announcement/index.js"],
+        "Finance/WithdrawalLimitAdjust.min": [
+            "./src/pages/Finance/WithdrawalLimitAdjust/index.js",
         ],
-        "Finance/WithdrawalLimitAdjust.min":[
-            './src/pages/Finance/WithdrawalLimitAdjust/index.js'
+        "CSD/PersonalMsgBatch.min": [
+            "./src/pages/CSD/PersonalMsgBatch/index.js",
         ],
     },
-    output:{
-        path:  path.resolve(__dirname,'../BackendSite/wwwroot/js/component/'),
-        filename:"[name].js"
+    output: {
+        path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
+        filename: "[name].js",
     },
     resolve: {
-        extensions: ['.js', '.jsx']
+        extensions: [".js", ".jsx"],
     },
-    module:{
-        rules:[
+    module: {
+        rules: [
             {
                 test: /\.(js|jsx)$/,
                 exclude: /(node_modules)/,
                 use: {
-                    loader: 'babel-loader',
+                    loader: "babel-loader",
                     options: {
                         presets: [
-                            ['@babel/preset-env',{
-                                    "corejs": "3",
-                                    useBuiltIns: 'entry'
+                            [
+                                "@babel/preset-env",
+                                {
+                                    corejs: "3",
+                                    useBuiltIns: "entry",
                                 },
                             ],
-                            '@babel/preset-react',{
-                                'plugins': ['@babel/plugin-proposal-class-properties']
-                            }
-                        ]
-                    }
-                }
+                            "@babel/preset-react",
+                            {
+                                plugins: [
+                                    "@babel/plugin-proposal-class-properties",
+                                ],
+                            },
+                        ],
+                    },
+                },
             },
             {
                 test: /\.css$/,
                 // exclude: /(node_modules)/,
-                use: ['style-loader', 'css-loader'],
-            }
-        ]
-    }
-}
+                use: ["style-loader", "css-loader"],
+            },
+        ],
+    },
+};
