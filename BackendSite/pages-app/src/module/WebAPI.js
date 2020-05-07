@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+export const api = process.env.NODE_ENV === "production" ? axios : axios.create({ baseURL: `http://localhost:9158/` });
+
 export default class WidgetApi {
     static GetWebAPI(actionUrl){
         let lapRootUrl = window.RootUrl;

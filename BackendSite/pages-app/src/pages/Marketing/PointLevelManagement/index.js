@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from 'react-dom';
 import { CurrencyInfo } from './CurrencyInfo';
-import axios from 'axios';
+import {api} from '../../../module/WebAPI';
 
 const App = () => {
     return (
@@ -23,7 +23,7 @@ const PointInfoList = () => {
     let radio = "";
 
     useEffect(() => {
-        axios.get('http://localhost:9158/api/Marketing/GetAllSites')
+        api.get('/api/Marketing/GetAllSites')
             .then(function (response) {
                 if (response.data.errorCode === 0) {
                     setSite(response.data === null ? [] : response.data);

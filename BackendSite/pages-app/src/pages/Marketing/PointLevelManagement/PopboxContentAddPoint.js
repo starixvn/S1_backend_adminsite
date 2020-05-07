@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import axios from 'axios';
-
+import {api} from '../../../module/WebAPI';
 export const PopBoxContentAddPoint = (props) => {
     let lastList = props.BankList.length === 0 ? [] : props.BankList[props.BankList.length - 1];
     let siteId = props.SiteId, currencyId = props.CurrencyId, pointLevel = 1, depositLeast = 1, betLeast = 1;
@@ -21,7 +20,7 @@ export const PopBoxContentAddPoint = (props) => {
         if (lastList.pointLevel >= Point) { return (alert("err1")) };
         if (lastList.depositLeast >= DepositLeast) { return (alert("Deposit least too small")) };
         if (lastList.betLeast >= BetLeast) { return (alert("Bet least too small")) };
-        axios.post('http://localhost:9158/api/Marketing/AddPointLevelInfo', { siteId: siteId, currencyId: currencyId, pointLevel: Point, depositLeast: DepositLeast, betLeast: BetLeast })
+        api.post('/api/Marketing/AddPointLevelInfo', { siteId: siteId, currencyId: currencyId, pointLevel: Point, depositLeast: DepositLeast, betLeast: BetLeast })
             .then(function (response) {
                 if (response.data.errorCode === 0) {
                     props.ClickSave(newBankList);

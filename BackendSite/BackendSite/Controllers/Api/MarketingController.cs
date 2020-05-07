@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -54,6 +55,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PointLevelManagement" })]
         public ApiResult<IEnumerable<PointLevelInfo>> GetPointLevelInfos(PointLevelModel pointLevelModel)
         {
             var apiResult = new ApiResult<IEnumerable<PointLevelInfo>>();
@@ -64,6 +66,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PointLevelManagement" })]
         public ApiResult AddPointLevelInfo(PointLevelInfo pointLevelInfo)
         {
             var result = marketingBLL.AddPointLevel(pointLevelInfo);
@@ -82,6 +85,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PointLevelManagement" })]
         public ApiResult EditPointLevelInfo(PointLevelInfo pointLevelInfo)
         {
             var result = marketingBLL.EditPointLevel(pointLevelInfo);
@@ -99,6 +103,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PointLevelManagement" })]
         [HttpPost]
         public ApiResult DeletePointLevelInfo(PointLevelInfo pointLevelInfo)
         {

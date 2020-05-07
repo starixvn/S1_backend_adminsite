@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BankInfo } from "./BankInfo";
 import { PopBoxContentAddPoint } from "./PopboxContentAddPoint";
-import axios from 'axios';
+import {api} from '../../../module/WebAPI';
 
 if(process.env.NODE_ENV !== 'production'){
     window.i18n = {
@@ -63,7 +63,7 @@ const Result = (props) => {
 
     const handleDelete = (idx) => {
         if (window.confirm("您真的確定要刪除嗎？\n\n請確認！") === true) {
-            axios.post('http://localhost:9158/api/Marketing/DeletePointLevelInfo', { siteId: bankList[idx].siteId, currencyId: bankList[idx].currencyId, pointLevel: bankList[idx].pointLevel })
+            api.post('/api/Marketing/DeletePointLevelInfo', { siteId: bankList[idx].siteId, currencyId: bankList[idx].currencyId, pointLevel: bankList[idx].pointLevel })
                 .then(function (response) {
                     if (response.data.errorCode === 0) {
                         handleSetBankList(idx, "Delete");
@@ -81,7 +81,7 @@ const Result = (props) => {
         if (editValue !== null) {
             let depositLeast = typeof editValue.depositLeast === "undefined" ? bankList[idx].depositLeast : editValue.depositLeast;
             let betLeast = typeof editValue.betLeast === "undefined" ? bankList[idx].betLeast : editValue.betLeast;
-            axios.post('http://localhost:9158/api/Marketing/EditPointLevelInfo', { siteId: bankList[idx].siteId, currencyId: bankList[idx].currencyId, pointLevel: bankList[idx].pointLevel, betLeast: parseInt(betLeast), depositLeast: parseInt(depositLeast) })
+            api.post('/api/Marketing/EditPointLevelInfo', { siteId: bankList[idx].siteId, currencyId: bankList[idx].currencyId, pointLevel: bankList[idx].pointLevel, betLeast: parseInt(betLeast), depositLeast: parseInt(depositLeast) })
                 .then(function (response) {
                     if (response.data.errorCode === 0) {
                         handleSetBankList(idx, "Update", depositLeast, betLeast);
@@ -105,7 +105,7 @@ const Result = (props) => {
     }
 
     useEffect(() => {
-        axios.post('http://localhost:9158/api/Marketing/GetPointLevelInfos', { siteId: props.siteId, currencyId: props.currId })
+        api.post('/api/Marketing/GetPointLevelInfos', { siteId: props.siteId, currencyId: props.currId })
             .then(function (response) {
                 if (response.data.errorCode === 0) {
                     setBankList(response.data === null ? [] : response.data.data);
