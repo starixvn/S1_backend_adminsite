@@ -9,8 +9,9 @@ const PaymentManagement = lazy(()=> import('./pages/Finance/PaymentManagement/in
 const Announcement = lazy(()=> import('./pages/CSD/Announcement/index'));
 const WithdrawalLimitAdjust = lazy(()=> import('./pages/Finance/WithdrawalLimitAdjust/index'));
 const PersonalMsgBatch = lazy(()=> import('./pages/CSD/PersonalMsgBatch/index'));
+const PointLevelManagement = lazy(() => import('./pages/Marketing/PointLevelManagement/index'));
 
-export const defaultPage = 'PersonalMsgBatch';
+export const defaultPage = 'PointLevelManagement';
 export const layoutType = {
   N88:'N88',
   LAP:'LAP'
@@ -75,5 +76,14 @@ export const pages = {
       './css/vendor/DateTimePicker/DateTimePicker.css'
     ],
     layout:layoutType.N88
+  },
+  'PointLevelManagement': {
+    comp: <Suspense fallback="loading..."><PointLevelManagement /></Suspense>,
+    css: [
+      './lib/bootstrap/dist/css/bootstrap.min.css',
+      './css/main.css',
+      './css/pages/Marketing.css'
+    ],
+    layout: layoutType.N88
   }
 }
