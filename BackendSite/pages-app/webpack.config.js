@@ -47,6 +47,12 @@ module.exports = {
         "CSD/PersonalMsgBatch.min": [
             "./src/pages/CSD/PersonalMsgBatch/index.js",
         ],
+        "CSD/PersonalMsgBatch.min":[
+            './src/pages/CSD/PersonalMsgBatch/index.js'
+        ],
+	    "Marketing/PointLevelList.min":[
+            './src/pages/Marketing/PointLevelManagement/index.js'
+	    ],
     },
     output: {
         path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

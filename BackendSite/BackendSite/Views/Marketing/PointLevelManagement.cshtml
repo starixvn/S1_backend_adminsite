@@ -22,12 +22,12 @@
             i18n.Add(lbl_Txt, selLangBLL.GetResourceValue(lbl_Txt));
     }
 }
-<div id="point-management">
+<div id="content">
 </div>
 @section Scripts {
-    <script src="~/js/component/Marketing/PointLevelList.min.js"></script>
+    <script src="~/js/component/Marketing/PointLevelList.min.js" asp-append-version="true"></script>
     <script type="text/javascript">
-        $('.collapse').collapse();
-        $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
+        //$('.collapse').collapse();
+        window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
     </script>
 }
