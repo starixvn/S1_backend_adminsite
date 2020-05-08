@@ -105,16 +105,20 @@ const Result = (props) => {
     }
 
     useEffect(() => {
+        let mounted = true;
         api.post('/api/Marketing/GetPointLevelInfos', { siteId: props.siteId, currencyId: props.currId })
             .then(function (response) {
                 if (response.data.errorCode === 0) {
-                    setBankList(response.data === null ? [] : response.data.data);
+                    if(mounted){
+                        setBankList(response.data === null ? [] : response.data.data);
+                    }
                 } else {
                     // alert(response.message);
                 }
             }).catch(function (error) {
                 alert(error);
             })
+        return ()=> mounted = false;
     }, []);
 
     if (bankList === null) {
