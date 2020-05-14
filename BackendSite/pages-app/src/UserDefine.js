@@ -10,8 +10,9 @@ const Announcement = lazy(()=> import('./pages/CSD/Announcement/index'));
 const WithdrawalLimitAdjust = lazy(()=> import('./pages/Finance/WithdrawalLimitAdjust/index'));
 const PersonalMsgBatch = lazy(()=> import('./pages/CSD/PersonalMsgBatch/index'));
 const PointLevelManagement = lazy(() => import('./pages/Marketing/PointLevelManagement/index'));
+const CashBackBonus = lazy(()=>import('./pages/Marketing/CashBackBonus/index'));
 
-export const defaultPage = 'PointLevelManagement';
+export const defaultPage = 'CashBackBonus';
 export const layoutType = {
     N88: "N88",
     LAP: "LAP",
@@ -20,34 +21,34 @@ export const layoutType = {
 export const pages = {
   'GroupAuthoritySetting':{
     comp:<Suspense fallback="loading..."><GroupAuthoritySetting /></Suspense>,
-    css:['./fonts//main-font/style.css', './css/common.css'],
+    css:['./css/common/fonts/main-font/style.css', './css/common/css/common.css'],
     layout:layoutType.LAP
   },
   'UserAuthoritySetting':{
     comp:<Suspense fallback="loading..."><UserAuthoritySetting /></Suspense>,
-    css:['./fonts//main-font/style.css', './css/common.css'],
+    css:['./css/common/fonts/main-font/style.css', './css/common/css/common.css'],
     layout:layoutType.LAP
   },
   'LicWinLostReport':{
     comp:<Suspense fallback="loading..."><LicWinLostReport /></Suspense>,
-    css:['./css/pages/report/LicenseeWinLost.css', './lib/Oneworks/jscalendar/calendar-blue.css'],
+    css:['./css/css/pages/report/LicenseeWinLost.css', './lib/Oneworks/jscalendar/calendar-blue.css'],
     layout:layoutType.N88
   },
   'PaymentAdjustmentReport':{
     comp: <Suspense fallback="loading..."><PaymentAdjustmentReport /></Suspense>,
-    css:['./lib/bootstrap/dist/css/bootstrap.min.css', './css/main.css', './lib/Oneworks/jscalendar/calendar-blue.css'],
+    css:['./lib/bootstrap/dist/css/bootstrap.min.css', './css/css/main.css', './lib/Oneworks/jscalendar/calendar-blue.css'],
     layout:layoutType.N88
   },
   'BonusReport':{
     comp: <Suspense fallback="loading..."><BonusInfoReport /></Suspense>,
-    css:['./lib/bootstrap/dist/css/bootstrap.min.css', './css/main.css', './lib/Oneworks/jscalendar/calendar-blue.css'],
+    css:['./lib/bootstrap/dist/css/bootstrap.min.css', './css/css/main.css', './lib/Oneworks/jscalendar/calendar-blue.css'],
     layout:layoutType.N88
   },
   'PaymentManagement':{
     comp: <Suspense fallback="loading..."><PaymentManagement /></Suspense>,
     css:[
       './lib/bootstrap/dist/css/bootstrap.min.css', 
-      './css/main.css'
+      './css/css/main.css'
     ],
     layout:layoutType.N88
   },
@@ -55,8 +56,8 @@ export const pages = {
     comp: <Suspense fallback="loading..."><Announcement /></Suspense>,
     css:[
       './lib/bootstrap/dist/css/bootstrap.min.css',
-      './css/main.css',
-      './css/vendor/DateTimePicker/DateTimePicker.css'
+      './css/css/main.css',
+      './css/css/vendor/DateTimePicker/DateTimePicker.css'
     ],
     layout:layoutType.N88
   },
@@ -64,7 +65,7 @@ export const pages = {
     comp: <Suspense fallback="loading..."><WithdrawalLimitAdjust /></Suspense>,
     css:[
       './lib/bootstrap/dist/css/bootstrap.min.css',
-      './css/main.css'
+      './css/css/main.css'
     ],
     layout:layoutType.N88
   },
@@ -72,8 +73,8 @@ export const pages = {
     comp: <Suspense fallback="loading..."><PersonalMsgBatch /></Suspense>,
     css:[
       './lib/bootstrap/dist/css/bootstrap.min.css',
-      './css/main.css',
-      './css/vendor/DateTimePicker/DateTimePicker.css'
+      './css/css/main.css',
+      './css/css/vendor/DateTimePicker/DateTimePicker.css'
     ],
     layout:layoutType.N88
   },
@@ -81,8 +82,27 @@ export const pages = {
     comp: <Suspense fallback="loading..."><PointLevelManagement /></Suspense>,
     css: [
       './lib/bootstrap/dist/css/bootstrap.min.css',
-      './css/main.css',
-      './css/pages/Marketing.css'
+      './css/css/main.css',
+      './css/css/pages/Marketing.css'
+    ],
+    layout: layoutType.N88
+  },
+  'PointLevelManagement': {
+    comp: <Suspense fallback="loading..."><PointLevelManagement /></Suspense>,
+    css: [
+      './lib/bootstrap/dist/css/bootstrap.min.css',
+      './css/css/main.css',
+      './css/css/pages/Marketing.css'
+    ],
+    layout: layoutType.N88
+  },
+  'CashBackBonus': {
+    comp: <Suspense fallback="loading..."><CashBackBonus /></Suspense>,
+    css: [
+      './lib/bootstrap/dist/css/bootstrap.min.css',
+      './css/css/main.css',
+      './css/common/fonts/main-font/style.css', './css/common/css/common.css',
+      '.css/css/page/CusInfo.css'
     ],
     layout: layoutType.N88
   }

@@ -620,6 +620,10 @@ body {
         border: 1px solid #d5d5d5;
         padding: 8px 5px;
         vertical-align: middle;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 311px;
+        white-space: nowrap;
     }
 
     .table .button-action {
@@ -1063,4 +1067,122 @@ body {
     100% {
         transform: translate(0,0);
     }
+}
+
+.checkBoxTitle{
+    color: #656A7B;
+    width: 100%;
+}
+.checkBoxTitle ~ .label{
+    display: inline-flex;
+    align-items: center;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    color: #656A7B;
+}
+.checkBoxTitle ~ .label .checkbox{
+    display: inline-flex;
+    margin-bottom: 0;
+    margin-right: 5px;
+}
+.checkBoxTitle ~ .label .checkbox input{
+    width: 0;
+    height: 0;
+    margin: 0;
+    opacity: 0;
+    appearance: none;
+    -webkit-appearance: none;
+}
+.checkBoxTitle ~ .label .checkbox .icon-checkbox {
+    font-size: 18px;
+}
+.checkbox input:checked ~ .icon-checkbox {
+    color: #50ba62;
+}
+/*0508*/
+.bule-bold{
+    font-weight: bold;
+    color: #007bff;
+    margin-left: 5px;
+}
+.filter .input-item.no-wrap-370{
+    width: 370px;
+}
+.input-margin-left{
+    margin-left: 10px;
+}
+.no-padding{
+    padding: 0;
+}
+.no-margin-buttom .checkbox{
+    margin-bottom: 0;
+    min-width: 135px;
+    justify-content: flex-start;
+}
+.no-margin-buttom .list__item{
+    align-items: center;
+    padding: 0.2rem 0;
+}
+table.revert-style{
+    table-layout: initial;
+}
+table.revert-style > tbody tr:first-child td{
+    border-top: initial;
+}
+[type=radio].revert-style + label{
+    overflow: initial;
+    line-height: initial;
+    padding-left: initial;
+}
+[type=radio].revert-style + label:before, [type=radio].revert-style + label:after{
+    margin: 0;
+    width: 1rem;
+    height: 1rem;
+    background: no-repeat 50%/50% 50%;
+}
+[type=radio].revert-style:not(:checked) + label:after{
+    border: 0;
+}
+[type=radio].revert-style:checked + label:after{
+    border: 0;
+}
+[type=radio].revert-style:not(:checked) + label:before{
+    border: #adb5bd solid 1px;
+}
+.Cashback-disabled.checkbox .text{
+    color: #ccc;
+}
+.field.ratio{
+    position: relative;
+}
+.ratio{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.ratio:after{
+    content: '%';
+    display: block;
+    position: absolute;
+    right: -15px;
+}
+[type="checkbox"].switch--flat + label:before{
+    border: 0;
+    width: auto;
+    height: auto;
+    top: 2px;
+    left: 2px;
+}
+[type="checkbox"]:not(.filled-in).switch--flat + label:after{
+    border: 0;
+    width: 12px;
+    height: auto;
+}
+[type="checkbox"]:checked.switch--flat{
+    position: absolute;
+}
+.Cashback-Period-Setting {
+    padding-right: 15px;
+    padding-left: 15px;
 }

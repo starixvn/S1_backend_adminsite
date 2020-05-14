@@ -52,7 +52,10 @@ module.exports = {
         ],
 	    "Marketing/PointLevelList.min":[
             './src/pages/Marketing/PointLevelManagement/index.js'
-	    ],
+        ],
+        "Marketing/CashBackBonus.min":[
+            './src/pages/Marketing/CashBackBonus/index.jsx'
+	    ]
     },
     output: {
         path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
