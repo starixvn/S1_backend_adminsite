@@ -130,16 +130,6 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      },
-      {
-        "Key": "",
-        "Title": "Pending Funds",
-        "FuncKey": "Finance/PendingFund",
-        "Controller": "Finance",
-        "Action": "PendingFund",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
       }
     ]
   },

@@ -100,11 +100,6 @@
             "FuncKey": "f_pm_editAmountRule"
           }
         ]
-      },
-      {
-        "DisplayKey": "Pending Funds",
-        "FuncKey": "Finance/PendingFund",
-        "Enable": false
       }
     ]
   },
