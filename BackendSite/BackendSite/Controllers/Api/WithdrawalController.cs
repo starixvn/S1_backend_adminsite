@@ -166,6 +166,7 @@ namespace BackendSite.Controllers.Api
 
                     if (bankInfoOff != null)
                     {
+                        withdrawalInfo.PayId = null;
                         withdrawalInfo.FromAccountNo = bankInfoOff.AccountNo;
                         withdrawalInfo.FromAccountName = bankInfoOff.AccountName;
                         withdrawalInfo.FromSysId = bankInfoOff.SysId;
