@@ -64,11 +64,28 @@ namespace BackendSite.Controllers.Api
             public int Op { get; set; }
         }
 
+        public class CustStatusLevel
+        {
+            public int CustId { get; set; }
+            public int Level { get; set; }
+        }
+
         [HttpPost]
         public ApiResult<bool> SetCustStatusSwitch(CustStatusSwitch custStatusSwitch)
         {
             var apiResult = new ApiResult<bool>();
             apiResult.Data = custInfoBLL.SetCustStatusSwitch(custStatusSwitch.CustId, custStatusSwitch.Op) > 0;
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_userlevel" })]
+        [HttpPost]
+        public ApiResult<bool> SetCustStatusLevel(CustStatusLevel custStatusLevel)
+        {
+            var apiResult = new ApiResult<bool>();
+            apiResult.Data = custInfoBLL.SetCustStatusLevel(custStatusLevel.CustId, custStatusLevel.Level) > 0;
             apiResult.ErrorCode = 0;
 
             return apiResult;

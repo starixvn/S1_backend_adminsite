@@ -1100,3 +1100,7 @@ body {
 .checkbox input:checked ~ .icon-checkbox {
     color: #50ba62;
 }
+.float-right{
+    display: inline-flex;
+    float: right;
+}

@@ -41,6 +41,10 @@
           {
             "DisplayKey": "Turnover",
             "FuncKey": "ca_turnoverReport"
+          },
+          {
+            "DisplayKey": "User Level",
+            "FuncKey": "ca_userlevel"
           }
         ]
       },

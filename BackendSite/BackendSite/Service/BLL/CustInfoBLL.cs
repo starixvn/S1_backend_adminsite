@@ -22,7 +22,7 @@ namespace BackendSite.Service.BLL
         private readonly RollOverService rolloverService;
         private readonly CustTurnoverService custTurnoverService;
 
-        public CustInfoBLL(IMemoryCache cache, WalletService walletService, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL, TpBLL tpBLL, Tools tools, CodeGenerator codeGenerator, PromotionService promotionService,RollOverService rolloverService, CustTurnoverService custTurnoverService)
+        public CustInfoBLL(IMemoryCache cache, WalletService walletService, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL, TpBLL tpBLL, Tools tools, CodeGenerator codeGenerator, PromotionService promotionService, RollOverService rolloverService, CustTurnoverService custTurnoverService)
         {
             this.custInfoService = custInfoService;
             this.serverInfoBLL = serverInfoBLL;
@@ -89,7 +89,7 @@ namespace BackendSite.Service.BLL
                 custInfoDetail.promotions = promotionService.GetPromotionListByCustId(custInfoDetail.CustId);
                 if (custInfoDetail.promotions != null)
                 {
-                    foreach(var promotion in custInfoDetail.promotions)
+                    foreach (var promotion in custInfoDetail.promotions)
                     {
                         promotion.custRollOver = rolloverService.GetCustRollOver(custInfoDetail.CustId, promotion.BonusCode);
                     }
@@ -106,7 +106,10 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.SetCustStatusSwitch(custId, Op);
         }
-
+        public int SetCustStatusLevel(int custId, int Level)
+        {
+            return custInfoService.SetCustStatusLevel(custId, Level);
+        }
         public CustPhotoId GetCustPhotoId(int custId)
         {
             return custInfoService.GetCustPhotoId(custId);
@@ -163,10 +166,10 @@ namespace BackendSite.Service.BLL
 
             var result = new List<CustTurnover>();
 
-            foreach(CustTurnover data in datas)
+            foreach (CustTurnover data in datas)
             {
                 var item = result.FirstOrDefault(x => x.GameType == data.GameType);
-                if(item==null)
+                if (item == null)
                 {
                     result.Add(data);
                 }
