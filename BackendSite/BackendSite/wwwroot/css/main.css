@@ -1185,4 +1185,7 @@ table.revert-style > tbody tr:first-child td{
 .Cashback-Period-Setting {
     padding-right: 15px;
     padding-left: 15px;
+.float-right{
+    display: inline-flex;
+    float: right;
 }
