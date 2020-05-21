@@ -54,12 +54,12 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public void UpdatePayChannel(int ChannelId, int Sort, int Status)
+        public void UpdatePayChannel(int ChannelId, int Sort, int Status, int PointLevel)
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 string SpName = "Admin_PayChannel_Set";
-                conn.Execute(SpName, new { ChannelId, Sort, Status }, commandType: CommandType.StoredProcedure);
+                conn.Execute(SpName, new { ChannelId, Sort, Status, PointLevel }, commandType: CommandType.StoredProcedure);
             }
         }
 

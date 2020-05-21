@@ -59,12 +59,12 @@ namespace BackendSite.Controllers.Api
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
-        public ApiResult UpdatePayChannel([FromForm]int ChannelId, [FromForm]int Sort, [FromForm]int Status)
+        public ApiResult UpdatePayChannel([FromForm]int ChannelId, [FromForm]int Sort, [FromForm]int Status, [FromForm]int PointLevel)
         {
             var result = new ApiResult();
             try
             {
-                paymentManageBLL.UpdatePayChannel(ChannelId, Sort, Status);
+                paymentManageBLL.UpdatePayChannel(ChannelId, Sort, Status, PointLevel);
                 result.ErrorCode = 0;
             }
             catch (Exception ex)
