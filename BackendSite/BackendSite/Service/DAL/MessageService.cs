@@ -72,7 +72,7 @@ namespace BackendSite.Service.DAL
                     string SpName = "Admin_Announcement_Ins";
                     DynamicParameters param = new DynamicParameters();
                     param.Add("@Id", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                    param.Add("@SiteId", 0);
+                    param.Add("@SiteId", Datas.SiteId);
                     param.Add("@StartTime", _StartTime);
                     param.Add("@EndTime", _EndTime);
                     param.Add("@Subject", Datas.Subject);
@@ -108,7 +108,7 @@ namespace BackendSite.Service.DAL
                     string SpName = "Admin_Announcement_Upd";
                     DynamicParameters param = new DynamicParameters();
                     param.Add("@Id", Datas.Id);
-                    param.Add("@SiteId", 0);
+                    param.Add("@SiteId", Datas.SiteId);
                     param.Add("@StartTime", _StartTime);
                     param.Add("@EndTime", _EndTime);
                     param.Add("@Subject", Datas.Subject);

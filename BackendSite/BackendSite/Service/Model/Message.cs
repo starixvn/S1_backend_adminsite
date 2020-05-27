@@ -8,6 +8,8 @@ namespace BackendSite.Service.Model
     public class Announcement
     {
         public int Id { get; set; }
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public string Subject { get; set; }

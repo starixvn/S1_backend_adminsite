@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
 using Ubiety.Dns.Core.Records.NotUsed;
+using System.Security.Policy;
 
 namespace BackendSite.Controllers.Api
 {
@@ -16,11 +17,13 @@ namespace BackendSite.Controllers.Api
     {
         private readonly MessageBLL messageBLL;
         private readonly AuthorizeBLL authorizeBLL;
+        private readonly ServerInfoBLL serverInfoBLL;
 
-        public MessageController(MessageBLL messageBLL, AuthorizeBLL authorizeBLL)
+        public MessageController(MessageBLL messageBLL, AuthorizeBLL authorizeBLL, ServerInfoBLL serverInfoBLL)
         {
             this.messageBLL = messageBLL;
             this.authorizeBLL = authorizeBLL;
+            this.serverInfoBLL = serverInfoBLL;
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
@@ -33,7 +36,19 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<Announcement>();
             try
             {
-                apiResult.Data = messageBLL.GetAnnouncements(PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                Dictionary<int, string> siteList = serverInfoBLL.GetSiteList().ToDictionary(x => x.SiteId, y => y.SiteName);
+                if (!siteList.ContainsKey(0))
+                {
+                    siteList.Add(0, "All");
+                }
+
+                var result = messageBLL.GetAnnouncements(PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                foreach(var r in result)
+                {
+                    siteList.TryGetValue(r.SiteId, out string siteName);
+                    r.SiteName = siteName;
+                }
+                apiResult.Data = result;
                 apiResult.ErrorCode = 0;
 
                 apiResult.PageNumber = PageNumber;
