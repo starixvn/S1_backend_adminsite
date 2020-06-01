@@ -653,6 +653,12 @@ import TurnoverReport from './TurnoverReport/index';
                                         <td>{data.accountName}</td>
                                     </tr>
                                     <tr>
+                                        <th scope="row">Birthday</th>
+                                        <td>
+                                            {(!isNaN(data.birth_y) && !isNaN(data.birth_m) && !isNaN(data.birth_d)) ? data.birth_m + '/' + data.birth_d + '/' + data.birth_y : "N/A"}
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <th scope="row">Country Code</th>
                                         <td>{data.countryCode}</td>
                                     </tr>
@@ -993,10 +999,10 @@ import TurnoverReport from './TurnoverReport/index';
                                 //Loading.UnLoading();
                                 alert(error);
                             }.bind(this));
-                    }else{
+                    } else {
                         this.setState({
                             isEdit: false,
-                            newLevel:null
+                            newLevel: null
                         })
                     }
                 }
