@@ -655,7 +655,7 @@ import TurnoverReport from './TurnoverReport/index';
                                     <tr>
                                         <th scope="row">Birthday</th>
                                         <td>
-                                            {(!isNaN(data.birth_y) && !isNaN(data.birth_m) && !isNaN(data.birth_d)) ? data.birth_m + '/' + data.birth_d + '/' + data.birth_y : ""}
+                                            {(!isNaN(data.birth_y) && !isNaN(data.birth_m) && !isNaN(data.birth_d)) ? data.birth_m + '/' + data.birth_d + '/' + data.birth_y : "N/A"}
                                         </td>
                                     </tr>
                                     <tr>
