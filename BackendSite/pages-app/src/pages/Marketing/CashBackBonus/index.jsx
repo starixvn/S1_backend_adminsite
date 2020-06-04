@@ -283,7 +283,7 @@ const Panel = ()=>{
                 />
             </Section>
 
-            <Section Title={"Cashback Limit Amount"}>
+            {/* <Section Title={"Cashback Limit Amount"}>
                 <MinMaxAmount
                     MinAmountTitle="Min Limit Cashback Amount"
                     MaxAmountTitle="Max Limit Cashback Amount"
@@ -301,7 +301,7 @@ const Panel = ()=>{
                     HandleStateData={HandleBetLimit}
                     isEdit={isEdit}
                 />
-            </Section>
+            </Section> */}
 
             <Section Title={"Cashback Game Rules"}>
                 <GameRules
