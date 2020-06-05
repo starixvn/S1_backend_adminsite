@@ -19,13 +19,15 @@ namespace BackendSite.Controllers.Api
         private readonly PaymentBLL paymentBLL;
         private readonly CustInfoBLL custInfoBLL;
         private readonly TpBLL tpBLL;
+        private readonly AuthorizeBLL authorizeBLL;
         private readonly int mainWalletType;
 
-        public PaymentController(IConfiguration configuration, PaymentBLL paymentBLL, CustInfoBLL custInfoBLL, TpBLL tpBLL)
+        public PaymentController(IConfiguration configuration, PaymentBLL paymentBLL, CustInfoBLL custInfoBLL, TpBLL tpBLL, AuthorizeBLL authorizeBLL)
         {
             this.paymentBLL = paymentBLL;
             this.custInfoBLL = custInfoBLL;
             this.tpBLL = tpBLL;
+            this.authorizeBLL = authorizeBLL;
             mainWalletType = configuration.GetValue<int>("MainWalletType");
         }
         public class PaymentAdjustmentReq
@@ -34,6 +36,13 @@ namespace BackendSite.Controllers.Api
             public int Option { get; set; }
             public decimal Amount { get; set; }
         }
+
+        public class AdjustmentAndWithdrawalLimitReq : PaymentAdjustmentReq
+        {
+            public decimal WithdrawalLimitAmount { get; set; }
+            public int WithdrawalLimitOption { get; set; }
+        }
+
         [HttpPost]
         public async Task<ApiResult> PaymentAdjustmentAsync(PaymentAdjustmentReq paymentAdjustmentReq)
         {
@@ -134,6 +143,92 @@ namespace BackendSite.Controllers.Api
             apiListResult.RowCount = rowCount;
 
             return apiListResult;
+        }
+        [HttpPost]
+        public async Task<ApiResult> AdjustmentAndWithdrawalLimitAsync(AdjustmentAndWithdrawalLimitReq adjustmentAndWithdrawalLimitReq)
+        {
+            ApiResult apiResult = new ApiResult();
+            AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit();
+            try
+            {
+                var authData = authorizeBLL.GetAuthData();
+                var custInfo = custInfoBLL.GetCustInfoWithCache(adjustmentAndWithdrawalLimitReq.CustId);
+                if (custInfo != null)
+                {
+                    adjustmentAndWithdrawalLimit.CustId = custInfo.CustId;
+                    adjustmentAndWithdrawalLimit.CurrencyId = custInfo.CurrencyId;
+                    adjustmentAndWithdrawalLimit.UserName = custInfo.UserName;
+                    adjustmentAndWithdrawalLimit.SiteId = custInfo.SiteId;
+                    adjustmentAndWithdrawalLimit.Amount = adjustmentAndWithdrawalLimitReq.Amount;
+                    adjustmentAndWithdrawalLimit.AdjustType = adjustmentAndWithdrawalLimitReq.Option;
+                    adjustmentAndWithdrawalLimit.SiteName = custInfo.SiteName;
+                    adjustmentAndWithdrawalLimit.Operator = authData.UserName;
+                    adjustmentAndWithdrawalLimit.WithdrawalLimitAmount = adjustmentAndWithdrawalLimitReq.WithdrawalLimitAmount;
+                    adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType = adjustmentAndWithdrawalLimitReq.WithdrawalLimitOption;
+
+
+
+                    string transId = null;
+                    if (adjustmentAndWithdrawalLimit.AdjustType == 2)
+                    {
+                        var balance = custInfoBLL.GetBalance(custInfo.CustId);
+                        if (balance < adjustmentAndWithdrawalLimit.Amount)
+                        {
+                            if (mainWalletType == 2)
+                            {
+                                var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
+                                TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = deAmount, CustId = custInfo.CustId, direction = TpDirection.ToMain };
+
+                                var acc = await tpBLL.TransferAsync(inTpTransfer);
+                                if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
+                                {
+                                    apiResult.ErrorCode = 1001;
+                                    apiResult.Message = $"{balance.ToString("#,##0.##")}<{adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}";
+                                    return apiResult;
+                                }
+                            }
+                        }
+
+                        balance = custInfoBLL.GetBalance(custInfo.CustId);
+
+                        if (balance < adjustmentAndWithdrawalLimit.Amount)
+                        {
+                            apiResult.ErrorCode = 1002;
+                            apiResult.Message = $"{balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}";
+                            return apiResult;
+                        }
+                    }
+
+                    if (paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, User.Identity.Name, out transId) > 0)
+                    {
+                        if (mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
+                        {
+                            var balance = custInfoBLL.GetBalance(custInfo.CustId);
+                            TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = balance, CustId = custInfo.CustId, direction = TpDirection.ToTp };
+
+                            var acc = await tpBLL.TransferAsync(inTpTransfer);
+                            if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
+                            {
+                                apiResult.ErrorCode = 0;
+                                apiResult.Message = $"Success. ID is {transId}";
+                            }
+                        }
+                        else
+                        {
+                            apiResult.ErrorCode = 0;
+                            apiResult.Message = $"Success. ID is {transId}";
+                        }
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.ToString();
+            }
+
+            return apiResult;
         }
     }
 }

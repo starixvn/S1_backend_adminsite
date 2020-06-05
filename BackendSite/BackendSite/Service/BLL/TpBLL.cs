@@ -98,7 +98,17 @@ namespace BackendSite.Service.BLL
                 inputs = input
             };
 
-            var data = await courierAdapter.MyPostAsync<UserBalance, TpInfo>(myUrl, oTpInfo);
+            ApiResult<UserBalance> data = new ApiResult<UserBalance>();
+
+            try
+            {
+                data = await courierAdapter.MyPostAsync<UserBalance, TpInfo>(myUrl, oTpInfo);
+            }
+            catch (Exception ex)
+            {
+                data.ErrorCode = 9000;
+                data.Message = ex.ToString();
+            }
 
             ApiResult<UserBalance> result = data;
 
