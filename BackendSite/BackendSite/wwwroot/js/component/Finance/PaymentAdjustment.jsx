@@ -145,7 +145,7 @@ import qs from 'qs';
                                     <div className="form-group">
                                         <div className="custom-control custom-checkbox custom-control-inline">
                                             <input className="custom-control-input" id="checkwd" type="checkbox" name="Checkwd" checked={this.state.Checkwd} onChange={this.onCheck.bind(this, this.state.Checkwd)} />
-                                            <label className="custom-control-label" htmlFor="checkwd">Withdraw Condition(Cashback Amount X Times):</label>
+                                            <label className="custom-control-label" htmlFor="checkwd">Withdraw Condition(Balance Amount X Times):</label>
                                         </div>
                                         <input className="form-control width-200" type="number" name="Withdrawal" onChange={this.onChange.bind(this)} pattern="[0-9]*" value={this.state.Withdrawal} />
                                     </div>
