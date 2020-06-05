@@ -25,5 +25,9 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetFinancialLog(CustId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
+        public int AdjustmentAndWithdrawalLimit(AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit, string Operator, out string transId)
+        {
+            return adjustmentService.SetAdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, Operator, out transId);
+        }
     }
 }
