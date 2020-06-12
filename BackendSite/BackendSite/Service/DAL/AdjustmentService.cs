@@ -133,7 +133,7 @@ namespace BackendSite.Service.DAL
                 props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 props.Add("@PageSize", PageSize);
-                
+
                 result = conn.Query<AdjustWithdrawalLimit>(SpName, props, commandType: CommandType.StoredProcedure);
                 PageNumber = props.Get<int?>("@PageNumber") ?? 0;
                 TotalPages = props.Get<int?>("@TotalPages") ?? 0;
@@ -202,6 +202,96 @@ namespace BackendSite.Service.DAL
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.Query<WithdrawalLimitInfo>("Member_CustWithdrawalLimit_Get", new { CustId }, commandType: CommandType.StoredProcedure).FirstOrDefault();
+        }
+
+        public int SetAdjustmentAndWithdrawalLimit(AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit, string Operator, out string Adjustment_transId)
+        {
+            Adjustment_transId = null;
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            var Adjustment_p = new DynamicParameters(new { adjustmentAndWithdrawalLimit.AdjustType, adjustmentAndWithdrawalLimit.CustId, adjustmentAndWithdrawalLimit.UserName, adjustmentAndWithdrawalLimit.CurrencyId, adjustmentAndWithdrawalLimit.SiteId, adjustmentAndWithdrawalLimit.AdjustIdInfo, adjustmentAndWithdrawalLimit.Amount, Prefix = $"A{common.GetEnv()}" });
+            Adjustment_p.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
+
+            var result = conn.Execute("Adjustment_Ins", Adjustment_p, transaction: trans, commandType: CommandType.StoredProcedure);
+            Adjustment_transId = Adjustment_p.Get<string>("TransId");
+            if (result > 0)
+            {
+                List<int> forStatus = new List<int>();
+                forStatus.Add((int)AdjustStatus.Pending);
+                result = SetAdjustmentInfo(Adjustment_transId, adjustmentAndWithdrawalLimit.SiteId, $"Payment Adjustment: {adjustmentAndWithdrawalLimit.Amount * (adjustmentAndWithdrawalLimit.AdjustType == 1 ? 1 : -1)}", Operator, forStatus, AdjustStatus.Approved, adjustmentAndWithdrawalLimit, conn, trans);
+
+                if (result > 0)
+                {
+                    Adjustment_transId = Adjustment_p.Get<string>("TransId");
+
+                    if (adjustmentAndWithdrawalLimit.AdjustType == 1 && adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType == 1 && adjustmentAndWithdrawalLimit.WithdrawalLimitAmount > 0)
+                    {
+                        var walletInfo = conn.Query<WithdrawalLimitInfo>("Member_CustWithdrawalLimit_Get", new { adjustmentAndWithdrawalLimit.CustId }, trans, commandType: CommandType.StoredProcedure).FirstOrDefault();
+                        decimal deduction = 0;
+                        if (walletInfo != null)
+                        {
+                            decimal Balance = walletInfo.Balance;
+                            decimal tmpDeduction = walletInfo.WithdrawalLimit - walletInfo.TurnOver;
+                            deduction = tmpDeduction < 0 ? 0 : tmpDeduction;
+                            decimal tmpAvailableBalance = walletInfo.Balance - (deduction);
+                        }
+
+                        if (adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType == 2 && deduction < adjustmentAndWithdrawalLimit.WithdrawalLimitAmount)
+                        {
+                            //return 21;
+                            result = 0;
+                        }
+                        else
+                        {
+                            var WithdrawalLimit_p = new DynamicParameters(new
+                            {
+                                AdjustType = adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType,
+                                CustId = adjustmentAndWithdrawalLimit.CustId,
+                                UserName = adjustmentAndWithdrawalLimit.UserName,
+                                Operator = adjustmentAndWithdrawalLimit.Operator,
+                                CurrencyId = adjustmentAndWithdrawalLimit.CurrencyId,
+                                SiteId = adjustmentAndWithdrawalLimit.SiteId,
+                                Amount = adjustmentAndWithdrawalLimit.WithdrawalLimitAmount,
+                                Memo = adjustmentAndWithdrawalLimit.Memo,
+                                Prefix = $"L{common.GetEnv()}"
+                            }); ;
+                            WithdrawalLimit_p.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
+
+                            conn.Execute("Admin_AdjustWithdrawalLimitInfo_Ins", WithdrawalLimit_p, trans, commandType: CommandType.StoredProcedure);
+                            string transId = WithdrawalLimit_p.Get<string>("TransId");
+
+                            if (string.IsNullOrEmpty(transId))
+                            {
+                                //return 22;
+                                result = 0;
+                            }
+                            else
+                            {
+                                decimal amount = adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType == 2 ? adjustmentAndWithdrawalLimit.WithdrawalLimitAmount * -1 : adjustmentAndWithdrawalLimit.WithdrawalLimitAmount;
+                                result = withdrawalLimitService.SetWithdrawalLimit(adjustmentAndWithdrawalLimit.CustId, adjustmentAndWithdrawalLimit.UserName, adjustmentAndWithdrawalLimit.SiteId, amount, adjustmentAndWithdrawalLimit.Memo, transId, out decimal AfterAmount, conn, trans);
+
+                                //return 0;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    result = 0;
+                }
+
+                if (result > 0)
+                {
+                    trans.Commit();
+                }
+                else
+                {
+                    trans.Rollback();
+                }
+
+            }
+            return result;
         }
     }
 }

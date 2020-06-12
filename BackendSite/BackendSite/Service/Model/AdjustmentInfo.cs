@@ -22,4 +22,15 @@ namespace BackendSite.Service.Model
         public string Comment { set; get; }
         public int Status { set; get; }
     }
+    public class AdjustmentAndWithdrawalLimit : AdjustmentInfo
+    {
+        public string SiteName { get; set; }
+        public string Operator { get; set; }
+        public decimal WithdrawalLimitAmount { set; get; }
+        public int WithdrawalLimitAmountAdjustType { set; get; }
+    }
+   
 }
+
+
+
