@@ -93,7 +93,7 @@
       },
       {
         "Key": "",
-        "Title": "Payment Adjustment",
+        "Title": "Balance Adjustment",
         "FuncKey": "Finance/PaymentAdjustment",
         "Controller": "Finance",
         "Action": "PaymentAdjustment",

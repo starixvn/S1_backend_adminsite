@@ -79,7 +79,7 @@
         "Enable": false
       },
       {
-        "DisplayKey": "Payment Adjustment",
+        "DisplayKey": "Balance Adjustment",
         "FuncKey": "Finance/PaymentAdjustment",
         "Enable": false
       },
