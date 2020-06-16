@@ -130,6 +130,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Deposit Limit Management",
+        "FuncKey": "Finance/DepositLimitManage",
+        "Controller": "Finance",
+        "Action": "DepositLimitManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
@@ -183,6 +193,16 @@
         "FuncKey": "Marketing/BonusInfoReport",
         "Controller": "Marketing",
         "Action": "BonusInfoReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "BonusCashBack",
+        "Title": "Bonus Cash Back",
+        "FuncKey": "Marketing/BonusCashBack",
+        "Controller": "Marketing",
+        "Action": "BonusCashBack",
         "Icon": "",
         "Roles": null,
         "Childs": null

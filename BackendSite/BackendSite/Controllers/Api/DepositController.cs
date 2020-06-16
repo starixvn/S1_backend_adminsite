@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -224,5 +225,75 @@ namespace BackendSite.Controllers.Api
         {
             return await pendingFundBLL.ProcessAsync(pendingFund);
         }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
+        public ApiResult<IEnumerable<DepositLimitInfo>> GetDepositLimitInfos(DepositLimit depositLimit)
+        {
+            var apiResult = new ApiResult<IEnumerable<DepositLimitInfo>>();
+            var depositLimitInfos = depositBLL.GetDepositLimitInfos(depositLimit.SiteId, depositLimit.CurrencyId);
+            apiResult.Data = depositLimitInfos;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
+        public ApiResult AddDepositLimitInfo(DepositLimitInfo depositLimitInfo)
+        {
+            var result = depositBLL.AddDepositLimit(depositLimitInfo);
+            var apiResult = new ApiResult();
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
+        public ApiResult EditDepositLimitInfo(DepositLimitInfo depositLimitInfo)
+        {
+            var result = depositBLL.EditDepositLimit(depositLimitInfo);
+            var apiResult = new ApiResult();
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
+        [HttpPost]
+        public ApiResult DeleteDepositLimitInfo(DepositLimitInfo depositLimitInfo)
+        {
+            var result = depositBLL.DeleteDepositLimit(depositLimitInfo);
+            var apiResult = new ApiResult();
+            if (result > 0)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+
+
     }
 }
