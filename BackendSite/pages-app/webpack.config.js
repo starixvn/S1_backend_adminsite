@@ -55,6 +55,9 @@ module.exports = {
 		],
 		"Finance/DepositLimitManagement.min": [
 			"./src/pages/Finance/DepositLimitManagement/index.js"
+		],
+		"Finance/WithdrawalLimitManagement.min": [
+			"./src/pages/Finance/WithdrawalLimitManagement/index.js"
 		]
 	},
 	output: {
