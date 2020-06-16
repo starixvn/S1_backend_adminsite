@@ -11,8 +11,9 @@ const WithdrawalLimitAdjust = lazy(()=> import('./pages/Finance/WithdrawalLimitA
 const PersonalMsgBatch = lazy(()=> import('./pages/CSD/PersonalMsgBatch/index'));
 const PointLevelManagement = lazy(() => import('./pages/Marketing/PointLevelManagement/index'));
 const CashBackBonus = lazy(()=>import('./pages/Marketing/CashBackBonus/index'));
+const DepositLimitManagement = lazy(()=>import('./pages/Finance/DepositLimitManagement/index'));
 
-export const defaultPage = 'CashBackBonus';
+export const defaultPage = 'DepositLimitManagement';
 export const layoutType = {
     N88: "N88",
     LAP: "LAP",
@@ -103,6 +104,15 @@ export const pages = {
       './css/css/main.css',
       './css/common/fonts/main-font/style.css', './css/common/css/common.css',
       '.css/css/page/CusInfo.css'
+    ],
+    layout: layoutType.N88
+  },
+  'DepositLimitManagement': {
+    comp: <Suspense fallback="loading..."><DepositLimitManagement /></Suspense>,
+    css: [
+      './lib/bootstrap/dist/css/bootstrap.min.css',
+      './css/css/main.css',
+      './css/css/pages/Marketing.css'
     ],
     layout: layoutType.N88
   }

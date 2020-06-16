@@ -104,6 +104,11 @@
             "FuncKey": "f_pm_editAmountRule"
           }
         ]
+      },
+      {
+        "DisplayKey": "Deposit Limit Management",
+        "FuncKey": "Finance/DepositLimitManage",
+        "Enable": false
       }
     ]
   },

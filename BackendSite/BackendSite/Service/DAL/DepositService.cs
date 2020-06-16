@@ -188,5 +188,62 @@ namespace BackendSite.Service.DAL
             var depositList = conn.Query<DepositInfoForExport>("Admin_DepositListForExport_Get", p, commandType: CommandType.StoredProcedure);
             return depositList;
         }
+
+        public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(int siteId, int currencyId)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.Query<DepositLimitInfo>("Admin_DepositLimitInfo_Get", new { SiteId = siteId, CurrencyId = currencyId }, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public bool AddDepositLimitInfo(DepositLimitInfo depositLimitInfo)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                var param = new
+                {
+                    depositLimitInfo.SiteId,
+                    depositLimitInfo.CurrencyId,
+                    depositLimitInfo.VipLevel,
+                    depositLimitInfo.DepositMin,
+                    depositLimitInfo.DepositMax
+                };
+                return conn.Execute("Admin_DepositLimitInfo_Ins", param, commandType: CommandType.StoredProcedure) > 0;
+            }
+        }
+
+        public bool EditDepositLimitInfo(DepositLimitInfo depositLimitInfo)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                var param = new
+                {
+                    depositLimitInfo.SiteId,
+                    depositLimitInfo.CurrencyId,
+                    depositLimitInfo.VipLevel,
+                    depositLimitInfo.DepositMin,
+                    depositLimitInfo.DepositMax
+                };
+                return conn.Execute("Admin_DepositLimitInfo_Set", param, commandType: CommandType.StoredProcedure) > 0;
+            }
+        }
+
+        public DepositLimitInfo GetDepositLimitInfo(int siteId, int currencyId, int viplevel)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.QueryFirstOrDefault<DepositLimitInfo>("Admin_DepositLimitInfoDetail_Get", new { SiteId = siteId, CurrencyId = currencyId, VipLevel = viplevel }, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public int DeleteDepositLimitInfo(DepositLimitInfo depositLimitInfo)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.Execute("Admin_DepositLimitInfo_Del", new { SiteId = depositLimitInfo.SiteId, CurrencyId = depositLimitInfo.CurrencyId, VipLevel = depositLimitInfo.VipLevel }, commandType: CommandType.StoredProcedure);
+            }
+        }
+
     }
 }

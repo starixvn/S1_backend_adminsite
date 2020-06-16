@@ -154,4 +154,24 @@ namespace BackendSite.Service.Model
         public string PicFileName { get; set; }
         public byte[] DepositPic { get; set; }
     }
+
+    public class DepositLimit
+    {
+        public int SiteId { get; set; }
+
+        public int CurrencyId { get; set; }
+    }
+
+    public class DepositLimitInfo
+    {
+        public int SiteId { get; set; }
+
+        public int CurrencyId { get; set; }
+
+        public int VipLevel { get; set; }
+
+        public double DepositMin { get; set; }
+
+        public double DepositMax { get; set; }
+    }
 }
