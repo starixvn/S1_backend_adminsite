@@ -117,5 +117,11 @@ namespace BackendSite.Controllers
             var stream = excelBLL.Export(ExportWithdrawal);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportWithdrawal)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
+        public IActionResult DepositLimitManagement()
+        {
+            return View();
+        }
     }
 }

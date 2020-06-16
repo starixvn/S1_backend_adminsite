@@ -130,6 +130,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Deposit Limit Management",
+        "FuncKey": "Finance/DepositLimitManage",
+        "Controller": "Finance",
+        "Action": "DepositLimitManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
