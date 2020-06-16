@@ -109,6 +109,11 @@
         "DisplayKey": "Deposit Limit Management",
         "FuncKey": "Finance/DepositLimitManage",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Withdrawl Limit Management",
+        "FuncKey": "Finance/WithdrawlLimitManage",
+        "Enable": false
       }
     ]
   },

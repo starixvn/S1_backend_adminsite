@@ -53,9 +53,11 @@ module.exports = {
 		"Marketing/CashBackBonus.min": [
 			"./src/pages/Marketing/CashBackBonus/index.jsx"
 		],
-
 		"Finance/DepositLimitManagement.min": [
 			"./src/pages/Finance/DepositLimitManagement/index.js"
+		],
+		"Finance/WithdrawalLimitManagement.min": [
+			"./src/pages/Finance/WithdrawalLimitManagement/index.js"
 		]
 	},
 	output: {

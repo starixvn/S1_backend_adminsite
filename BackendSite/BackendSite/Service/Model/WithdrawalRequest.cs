@@ -101,4 +101,24 @@ namespace BackendSite.Service.Model
             _ => null
         };
     }
+
+    public class WithdrawalLimit
+    {
+        public int SiteId { get; set; }
+
+        public int CurrencyId { get; set; }
+    }
+
+    public class WithdrawalLimitInfoManage
+    {
+        public int SiteId { get; set; }
+
+        public int CurrencyId { get; set; }
+
+        public int VipLevel { get; set; }
+
+        public double WithdrawalMin { get; set; }
+
+        public double WithdrawalMax { get; set; }
+    }
 }
