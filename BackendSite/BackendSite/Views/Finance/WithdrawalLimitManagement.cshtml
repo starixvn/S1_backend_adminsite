@@ -2,7 +2,7 @@
 @inject SelLangBLL selLangBLL
 @{
     Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
-    ViewData["Title"] = "Point level management";
+    ViewData["Title"] = "Withdrawal Limit Management";
 }
 <link href="~/css/main.css" rel="stylesheet" />
 <link href="~/css/page/Marketing.css" rel="stylesheet" asp-append-version="true" />
@@ -25,7 +25,7 @@
 <div id="content">
 </div>
 @section Scripts {
-    <script src="~/js/component/Finance/WithdrawlLimitManagement.min.js" asp-append-version="true"></script>
+    <script src="~/js/component/Finance/WithdrawalLimitManagement.min.js" asp-append-version="true"></script>
     <script type="text/javascript">
         //$('.collapse').collapse();
         window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));

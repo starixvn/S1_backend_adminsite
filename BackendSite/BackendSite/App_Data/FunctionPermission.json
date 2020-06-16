@@ -111,8 +111,8 @@
         "Enable": false
       },
       {
-        "DisplayKey": "Withdrawl Limit Management",
-        "FuncKey": "Finance/WithdrawlLimitManage",
+        "DisplayKey": "Withdrawal Limit Management",
+        "FuncKey": "Finance/WithdrawalLimitManage",
         "Enable": false
       }
     ]
