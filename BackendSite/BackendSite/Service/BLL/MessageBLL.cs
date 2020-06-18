@@ -73,5 +73,9 @@ namespace BackendSite.Service.BLL
         {
             return messageService.SendMessageBatch(personalMsg, custList, sender);
         }
+        public int ChangeVipLevelBatch(IEnumerable<string> custList, int vipLevel, string Operator)
+        {
+            return messageService.ChangeVipLevelBatch(custList, vipLevel, Operator);
+        }
     }
 }

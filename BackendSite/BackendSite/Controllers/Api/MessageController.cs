@@ -271,5 +271,24 @@ namespace BackendSite.Controllers.Api
 
             return result;
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/ChangeVipLevelBatch" })]
+        public ApiResult ChangeVipLevelBatch([FromForm] IEnumerable<string> custList, [FromForm] int vipLevel)
+        {
+            var result = new ApiResult<int>();
+            try
+            {
+                var authData = authorizeBLL.GetAuthData();
+                result.Data = messageBLL.ChangeVipLevelBatch(custList, vipLevel, authData.UserName);
+                result.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                result.ErrorCode = 999;
+                result.RawMessage = ex.ToString();
+            }
+
+            return result;
+        }
     }
 }

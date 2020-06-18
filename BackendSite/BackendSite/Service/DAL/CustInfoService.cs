@@ -71,10 +71,10 @@ namespace BackendSite.Service.DAL
             var result = conn.Execute("Admin_CustStatusSwitch_Set", new { CustId = custId, Op }, commandType: CommandType.StoredProcedure);
             return result;
         }
-        public int SetCustStatusLevel(int custId, int Level)
+        public int SetCustStatusLevel(int custId, int Level, string Operator)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var result = conn.Execute("Admin_CustStatusLevel_Set", new { CustId = custId, Level }, commandType: CommandType.StoredProcedure);
+            var result = conn.Execute("Admin_CustStatusLevel_Set", new { CustId = custId, Level , Operator }, commandType: CommandType.StoredProcedure);
             return result;
         }
         public CustPhotoId GetCustPhotoId(int CustId)

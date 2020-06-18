@@ -13,8 +13,10 @@ const PointLevelManagement = lazy(() => import('./pages/Marketing/PointLevelMana
 const CashBackBonus = lazy(()=>import('./pages/Marketing/CashBackBonus/index'));
 const DepositLimitManagement = lazy(()=>import('./pages/Finance/DepositLimitManagement/index'));
 const WithdrawalLimitManagement = lazy(()=>import('./pages/Finance/WithdrawalLimitManagement/index'));
+const ChangeVipLevelBatch = lazy(()=>import('./pages/CSD/ChangeVipLevelBatch/index'));
+const WithdrawalKYCControl = lazy(()=>import('./pages/CSD/WithdrawalKYCControl/index'));
 
-export const defaultPage = 'WithdrawalLimitManagement';
+export const defaultPage = 'WithdrawalKYCControl';
 export const layoutType = {
     N88: "N88",
     LAP: "LAP",
@@ -89,15 +91,6 @@ export const pages = {
     ],
     layout: layoutType.N88
   },
-  'PointLevelManagement': {
-    comp: <Suspense fallback="loading..."><PointLevelManagement /></Suspense>,
-    css: [
-      './lib/bootstrap/dist/css/bootstrap.min.css',
-      './css/css/main.css',
-      './css/css/pages/Marketing.css'
-    ],
-    layout: layoutType.N88
-  },
   'CashBackBonus': {
     comp: <Suspense fallback="loading..."><CashBackBonus /></Suspense>,
     css: [
@@ -119,6 +112,24 @@ export const pages = {
   },
   'WithdrawalLimitManagement': {
     comp: <Suspense fallback="loading..."><WithdrawalLimitManagement /></Suspense>,
+    css: [
+      './lib/bootstrap/dist/css/bootstrap.min.css',
+      './css/css/main.css',
+      './css/css/pages/Marketing.css'
+    ],
+    layout: layoutType.N88
+  },
+  'ChangeVipLevelBatch': {
+    comp: <Suspense fallback="loading..."><ChangeVipLevelBatch /></Suspense>,
+    css: [
+      './lib/bootstrap/dist/css/bootstrap.min.css',
+      './css/css/main.css',
+      './css/css/pages/Marketing.css'
+    ],
+    layout: layoutType.N88
+  },
+  'WithdrawalKYCControl': {
+    comp: <Suspense fallback="loading..."><WithdrawalKYCControl /></Suspense>,
     css: [
       './lib/bootstrap/dist/css/bootstrap.min.css',
       './css/css/main.css',
