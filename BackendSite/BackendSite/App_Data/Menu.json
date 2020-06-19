@@ -52,6 +52,26 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Change Vip Level (Batch)",
+        "FuncKey": "Message/ChangeVipLevelBatch",
+        "Controller": "Message",
+        "Action": "ChangeVipLevelBatch",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Withdrawal KYC Control",
+        "FuncKey": "Message/WithdrawalKYCControl",
+        "Controller": "Message",
+        "Action": "WithdrawalKYCControl",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

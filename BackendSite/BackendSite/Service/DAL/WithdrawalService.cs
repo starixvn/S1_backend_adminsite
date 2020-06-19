@@ -162,5 +162,19 @@ namespace BackendSite.Service.DAL
             var depositList = conn.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExport_Get", p, commandType: CommandType.StoredProcedure);
             return depositList;
         }
+
+        public IEnumerable<WithdrawalKYC> GetWithdrawalKYC(int SiteId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var withdrawalKYCList = conn.Query<WithdrawalKYC>("Admin_WithdrawalKyc_Get", new { SiteId }, commandType: CommandType.StoredProcedure);
+            return withdrawalKYCList;
+        }
+
+        public bool EditWithdrawalKYC(WithdrawalKYC withdrawalKYC)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_WithdrawalKyc_Set", new { withdrawalKYC.SiteId, withdrawalKYC.CurrencyId, withdrawalKYC.Amount }, commandType: CommandType.StoredProcedure) > 0;
+        }
+
     }
 }

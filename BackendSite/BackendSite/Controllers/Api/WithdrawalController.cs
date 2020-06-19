@@ -402,5 +402,36 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/WithdrawalKYCControl" })]
+        [HttpPost]
+        public ApiResult<IEnumerable<WithdrawalKYC>> WithdrawalKYCList(WithdrawalKYC withdrawalKYC)
+        {
+            var result = withdrawalBLL.GetWithdrawalKYCList(withdrawalKYC.SiteId);
+            var apiResult = new ApiResult<IEnumerable<WithdrawalKYC>>();
+
+            apiResult.Data = result;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/WithdrawalKYCControl" })]
+        [HttpPost]
+        public ApiResult EditWithdrawalKYCList(WithdrawalKYC withdrawalKYC)
+        {
+            var result = withdrawalBLL.EditWithdrawalKYCList(withdrawalKYC);
+            var apiResult = new ApiResult();
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
     }
 }

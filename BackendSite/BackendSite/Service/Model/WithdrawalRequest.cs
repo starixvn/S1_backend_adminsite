@@ -121,4 +121,12 @@ namespace BackendSite.Service.Model
 
         public double WithdrawalMax { get; set; }
     }
+
+    public class WithdrawalKYC
+    {
+        public int CurrencyId { get; set; }
+        public int SiteId { get; set; }
+        public double Amount { get; set; }
+
+    }
 }

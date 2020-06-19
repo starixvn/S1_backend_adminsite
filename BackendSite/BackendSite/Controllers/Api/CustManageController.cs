@@ -85,7 +85,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult<bool> SetCustStatusLevel(CustStatusLevel custStatusLevel)
         {
             var apiResult = new ApiResult<bool>();
-            apiResult.Data = custInfoBLL.SetCustStatusLevel(custStatusLevel.CustId, custStatusLevel.Level) > 0;
+            apiResult.Data = custInfoBLL.SetCustStatusLevel(custStatusLevel.CustId, custStatusLevel.Level, User.Identity.Name) > 0;
             apiResult.ErrorCode = 0;
 
             return apiResult;
@@ -293,7 +293,7 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_turnoverReport" })]
-        public ApiResult GetCustTurnOverReport([FromForm]int CustId, [FromForm]int StartTime, [FromForm]int EndTime, [FromForm]string GameTypes)
+        public ApiResult GetCustTurnOverReport([FromForm] int CustId, [FromForm] int StartTime, [FromForm] int EndTime, [FromForm] string GameTypes)
         {
             var result = new ApiResult<dynamic>();
             try

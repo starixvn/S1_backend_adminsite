@@ -202,5 +202,15 @@ namespace BackendSite.Service.BLL
 
             return withdrawalLimitService.DeleteWithdrawalLimitInfo(withdrawalLimitInfoManage);
         }
+        public IEnumerable<WithdrawalKYC> GetWithdrawalKYCList(int SiteId)
+        {
+            return withdrawalService.GetWithdrawalKYC(SiteId);
+        }
+
+        public bool EditWithdrawalKYCList(WithdrawalKYC withdrawalKYC)
+        {
+            return withdrawalService.EditWithdrawalKYC(withdrawalKYC);
+        }
+
     }
 }
