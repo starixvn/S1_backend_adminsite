@@ -5,7 +5,8 @@ import * as Loading from '../commJS/Loading.jsx';
 (function ($, React, ReactDOM, i18n, axios, moment, Calendar) {
     const WithdrawalStatus = {
         Pending:1,
-        OnHold :2,
+        ToKyc:8,
+        OnHold:2,
         Verify:3,
         Process:4,
         Cancelled:5,
@@ -21,6 +22,7 @@ import * as Loading from '../commJS/Loading.jsx';
         5:<span className="status status-cancelled">{i18n["lbl_WithdrawalStatus5"]}</span>,
         6:<span className="status status-approved">{i18n["lbl_WithdrawalStatus6"]}</span>,
         7:<span className="status status-rejected">{i18n["lbl_WithdrawalStatus7"]}</span>,
+        8:<span className="status status-hold">{i18n["lbl_WithdrawalStatus8"]}</span>,
     }
 
     class WithdrawalList extends React.Component {
@@ -53,7 +55,7 @@ import * as Loading from '../commJS/Loading.jsx';
                     <td>{row.accountNo}</td>
                     <td>{row.accountName}</td>
                     <td>{moment(row.createTime).format('l LTS')}</td>
-                    <td>{WithdrawalStatusOp[row.status]}</td>
+                    <td>{WithdrawalStatusOp[row.status]}{row.status == 8 && row.hasPhotoId ? <span>(Uploaded PhothId)</span> : null} </td>
                 </tr>
             );
 
@@ -159,10 +161,10 @@ import * as Loading from '../commJS/Loading.jsx';
         }
 
         onGetData() {
-            //Loading.OnLoading();
+            Loading.OnLoading();
             axios.post('/api/Withdrawal/GetWithdrawalRequest', { transId: this.props.transId})
             .then(async function (response) {
-                //Loading.UnLoading();
+                Loading.UnLoading();
                 let result = response.data;
                 if (result.errorCode == 0) {
 
@@ -183,7 +185,7 @@ import * as Loading from '../commJS/Loading.jsx';
                     alert(result.message);
                 }
             }.bind(this)).catch(function (error) {
-                //Loading.UnLoading();
+                Loading.UnLoading();
                 alert(error);
             }.bind(this));
         }
@@ -199,7 +201,7 @@ import * as Loading from '../commJS/Loading.jsx';
         onGetComment(){
             axios.post('/api/Withdrawal/GetWithdrawalRequestComment', { transId: this.props.transId})
             .then(function (response) {
-                //Loading.UnLoading();
+                Loading.UnLoading();
                 let result = response.data;
                 if (result.errorCode == 0) {
                     this.setState({Comments: result.data, GetData: true});
@@ -207,7 +209,7 @@ import * as Loading from '../commJS/Loading.jsx';
                     alert(result.message);
                 }
             }.bind(this)).catch(function (error) {
-                //Loading.UnLoading();
+                Loading.UnLoading();
                 alert(error);
             }.bind(this));    
         }
@@ -304,15 +306,15 @@ import * as Loading from '../commJS/Loading.jsx';
             if (data != null) {
                 if (data.status == 1 || data.status == 2 || data.status == 3 || data.status == 4)
                     btnGroup.push(<button key={0} type="button" className="btn btn-draft" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
-                if (data.status == 1 || data.status == 3)
+                if (data.status == 1 || data.status == 3 || data.status == 8)
                     btnGroup.push(<button key={2} type="button" className="btn btn-hold" onClick={this.onConfirm.bind(this, 2)}>On Hold(Risk Check)</button>);
-                if ((data.status == 1 || data.status == 2 || data.status == 4) && data.withdrawalType != 1)
+                if ((data.status == 1 || data.status == 2 || data.status == 4 || data.status == 8) && data.withdrawalType != 1)
                     btnGroup.push(<button key={3} type="button" className="btn btn-verify" onClick={this.onConfirm.bind(this, 3)}>Verify</button>);
                 if (data.status == 3)
                     btnGroup.push(<button key={4} type="button" className="btn btn-process" onClick={this.onConfirm.bind(this, 4)}>Process</button>);
                 if (data.status == 4 && data.withdrawalType != 1)
                     btnGroup.push(<button key={6} type="button" className="btn btn-aprroved" onClick={this.onConfirm.bind(this, 6)}>Approved</button>);
-                if ((data.status == 3 || data.status == 2))
+                if ((data.status == 3 || data.status == 2 || data.status == 8))
                     btnGroup.push(<button key={7} type="button" className="btn btn-rejected" onClick={this.onConfirm.bind(this, 7)}>Rejected</button>);
 
                 selectType = i18n["lbl_WithdrawalType" +data.withdrawalType];
@@ -673,6 +675,7 @@ import * as Loading from '../commJS/Loading.jsx';
                                         <select name="selectStatus" onChange={this.onChange.bind(this)} value={this.state.selectStatus}>
                                             <option value="">All</option>
                                             <option value="1">Pending</option>
+                                            <option value="8">To KYC</option>
                                             <option value="2">On Hold</option>
                                             <option value="3">Verify</option>
                                             <option value="4">Process</option>
