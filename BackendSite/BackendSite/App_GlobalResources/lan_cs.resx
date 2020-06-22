@@ -133,7 +133,7 @@
     <value>感谢您在我司网站进行投注！您的提款交易 {0} 已完成审核！欢迎您下次再游览我司网站！</value>
   </data>
   <data name="lbl_WithdrawalApprovedTitle" xml:space="preserve">
-    <value>您的提款交易 {0} 已被取消！</value>
+    <value>您的提款交易 {0} 已完成审核！</value>
   </data>
   <data name="lbl_WithdrawalRejectContent" xml:space="preserve">
     <value>非常遗憾的通知您，您的提款交易 {0} 已被取消。请联系客服专员以了解详情。</value>
