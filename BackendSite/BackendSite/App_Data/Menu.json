@@ -52,7 +52,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      },
+      }/*,
       {
         "Key": "",
         "Title": "Change Vip Level (Batch)",
@@ -62,7 +62,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      },
+      }*/,
       {
         "Key": "",
         "Title": "Withdrawal KYC Control",
@@ -150,7 +150,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      },
+      }/*,
       {
         "Key": "",
         "Title": "Deposit Limit Management",
@@ -170,7 +170,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      }
+      }*/
     ]
   },
   {
