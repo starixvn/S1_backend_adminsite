@@ -26,5 +26,11 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusCashBack" })]
+        public IActionResult BonusCashBack()
+        {
+            return View();
+        }
     }
 }

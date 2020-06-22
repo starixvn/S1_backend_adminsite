@@ -47,9 +47,6 @@ module.exports = {
 		"CSD/PersonalMsgBatch.min": [
 			"./src/pages/CSD/PersonalMsgBatch/index.js"
 		],
-		"CSD/PersonalMsgBatch.min": [
-			"./src/pages/CSD/PersonalMsgBatch/index.js"
-		],
 		"Marketing/PointLevelList.min": [
 			"./src/pages/Marketing/PointLevelManagement/index.js"
 		],
@@ -58,6 +55,12 @@ module.exports = {
 		],
 		"Finance/DepositLimitManagement.min": [
 			"./src/pages/Finance/DepositLimitManagement/index.js"
+		],
+		"Finance/WithdrawalLimitManagement.min": [
+			"./src/pages/Finance/WithdrawalLimitManagement/index.js"
+		],
+		"CSD/WithdrawalKYCControl.min": [
+			"./src/pages/CSD/WithdrawalKYCControl/index.js"
 		]
 	},
 	output: {

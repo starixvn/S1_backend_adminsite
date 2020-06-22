@@ -5,6 +5,7 @@ import qs from 'qs';
     class PaymentAdjustment extends React.Component {
         constructor(props) {
             super(props);
+
             this.state = { UserName: "", CustData: null, Checkwd: false, Withdrawal: 1 };
         }
 
@@ -13,20 +14,20 @@ import qs from 'qs';
             this.onGetCustInfoForPayAdjust();
         }
 
-        onGetCustInfoForPayAdjust(){
-            axios.post('/api/CustManage/GetCustInfoDetail', {CustId:0, UserName: this.state.UserName})
-            .then(function (response) {
-                //Loading.UnLoading();
-                let result = response.data;
-                if (result.errorCode == 0) {
-                    this.setState({CustData: result.data});
-                } else {
-                    alert(result.message);
-                }
-            }.bind(this)).catch(function (error) {
-                //Loading.UnLoading();
-                alert(error);
-            }.bind(this));
+        onGetCustInfoForPayAdjust() {
+            axios.post('/api/CustManage/GetCustInfoDetail', { CustId: 0, UserName: this.state.UserName })
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.setState({ CustData: result.data });
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
         }
 
         onSumbitPaymentAdjustment(event) {
@@ -43,10 +44,15 @@ import qs from 'qs';
                 return;
             }
 
-            if(isNaN(amount)) {
+            if (isNaN(amount)) {
                 alert('Please select one Bank Care Account.');
                 return;
-            }     
+            }
+
+            if (parseInt(option) === 1 && checkwd === 1 && withdrawalamount === 0) {
+                alert('Please Enter Withdrawal Limit');
+                return;
+            }
 
             if (parseInt(option) === 1 && checkwd === 1 && withdrawalamount === 0) {
                 alert('Please Enter Withdrawal Limit');
@@ -70,8 +76,8 @@ import qs from 'qs';
         }
 
         onChange(event) {
-            let obj=this.state;
-            obj[event.target.name]=event.target.value;
+            let obj = this.state;
+            obj[event.target.name] = event.target.value;
             this.setState(obj);
         }
 
@@ -80,14 +86,14 @@ import qs from 'qs';
         }
 
         render() {
-            let custData=this.state.CustData;
-            let tpWallet= null;
-            if(custData!=null && custData.tpWallet!=null) {
-                tpWallet = <ul className="wallet-wrap">{custData.tpWallet.map(function(wallet) { 
+            let custData = this.state.CustData;
+            let tpWallet = null;
+            if (custData != null && custData.tpWallet != null) {
+                tpWallet = <ul className="wallet-wrap">{custData.tpWallet.map(function (wallet) {
                     return <li key={wallet.tpId} className="wallet-item">
-                                <span>{wallet.tpName}</span>
-                                <span className={wallet.balance <0 ? "negative-num":"positive-num"}>{number_format(wallet.balance)}</span>
-                            </li>;
+                        <span>{wallet.tpName}</span>
+                        <span className={wallet.balance < 0 ? "negative-num" : "positive-num"}>{number_format(wallet.balance)}</span>
+                    </li>;
                 }.bind(this))}</ul>;
             }
             return (
@@ -102,33 +108,33 @@ import qs from 'qs';
                                 <div className="button-group">
                                     <button type="submit" className="btn btn-primary">Submit</button>
                                 </div>
-                            </div>                            
+                            </div>
                         </form>
                     </div>
-                {custData != null ? 
-                    <div>
-                        <h4 className="page-name">Cust Info</h4>
-                        <form method="post" onSubmit={this.onSumbitPaymentAdjustment.bind(this)}>
-                            <table className="table table-detail">
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">SiteName</th>
-                                        <td>{custData.siteName}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">User Name</th>
-                                        <td>{custData.userName}</td>
-                                    </tr>                                    
-                                    <tr>
-                                        <th scope="row">Currency</th>
-                                        <td>{i18n["lbl_Currency"+custData.currencyId]}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Withdrawable Amount</th>
-                                        <td>{number_format(custData.balance)}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    {custData != null ?
+                        <div>
+                            <h4 className="page-name">Cust Info</h4>
+                            <form method="post" onSubmit={this.onSumbitPaymentAdjustment.bind(this)}>
+                                <table className="table table-detail">
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row">SiteName</th>
+                                            <td>{custData.siteName}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">User Name</th>
+                                            <td>{custData.userName}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Currency</th>
+                                            <td>{i18n["lbl_Currency" + custData.currencyId]}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Withdrawable Amount</th>
+                                            <td>{number_format(custData.balance)}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                                 {tpWallet}
                                 <div className="form-group">
                                     <label className="col-form-label d-block">Option</label>
@@ -163,6 +169,6 @@ import qs from 'qs';
             )
         }
     }
-    
-ReactDOM.render(<PaymentAdjustment/>,document.getElementById('App'));
+
+    ReactDOM.render(<PaymentAdjustment />, document.getElementById('App'));
 })(jQuery, React, ReactDOM, i18n, axios, moment);

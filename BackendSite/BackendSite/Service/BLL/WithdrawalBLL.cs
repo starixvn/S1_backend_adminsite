@@ -13,11 +13,13 @@ namespace BackendSite.Service.BLL
     {
         private readonly WithdrawalService withdrawalService;
         private readonly ServerInfoService serverInfoService;
+        private readonly WithdrawalLimitService withdrawalLimitService;
 
-        public WithdrawalBLL(WithdrawalService withdrawalService, ServerInfoService serverInfoService)
+        public WithdrawalBLL(WithdrawalService withdrawalService, ServerInfoService serverInfoService, WithdrawalLimitService withdrawalLimitService)
         {
             this.withdrawalService = withdrawalService;
             this.serverInfoService = serverInfoService;
+            this.withdrawalLimitService = withdrawalLimitService;
         }
 
         public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(int? withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, int? currencyId, int? status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
@@ -150,5 +152,69 @@ namespace BackendSite.Service.BLL
         {
             return withdrawalService.GetWithdrawalExportList(withdrawalType, startDate, endDate, WithdrawalId, UserName, currencyId, status);
         }
+        public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(int siteId, int currencyId) => withdrawalLimitService.GetWithdrawalLimitInfos(siteId, currencyId);
+
+        public bool AddWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        {
+            if (withdrawalLimitInfoManage.VipLevel > 1)
+            {
+                var currentMaxLevel = withdrawalLimitService.GetWithdrawalLimitInfo(withdrawalLimitInfoManage.SiteId, withdrawalLimitInfoManage.CurrencyId, withdrawalLimitInfoManage.VipLevel - 1);
+
+                if (withdrawalLimitInfoManage.WithdrawalMin <= currentMaxLevel.WithdrawalMin || withdrawalLimitInfoManage.WithdrawalMax <= currentMaxLevel.WithdrawalMax)
+                    return false;
+            }
+            else
+            {
+                if (withdrawalLimitInfoManage.WithdrawalMin <= 0 || withdrawalLimitInfoManage.WithdrawalMax <= 0)
+                    return false;
+            }
+
+            return withdrawalLimitService.AddWithdrawalLimitInfo(withdrawalLimitInfoManage);
+        }
+
+        public bool EditWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        {
+            var currentBelowLevel = withdrawalLimitService.GetWithdrawalLimitInfo(withdrawalLimitInfoManage.SiteId, withdrawalLimitInfoManage.CurrencyId, withdrawalLimitInfoManage.VipLevel - 1);
+            var currentUpperLevel = withdrawalLimitService.GetWithdrawalLimitInfo(withdrawalLimitInfoManage.SiteId, withdrawalLimitInfoManage.CurrencyId, withdrawalLimitInfoManage.VipLevel + 1);
+
+            if (currentBelowLevel != null)
+            {
+                if (withdrawalLimitInfoManage.WithdrawalMin <= currentBelowLevel.WithdrawalMin || withdrawalLimitInfoManage.WithdrawalMax <= currentBelowLevel.WithdrawalMax)
+                    return false;
+            }
+            else
+            {
+                if (withdrawalLimitInfoManage.WithdrawalMin <= 0 || withdrawalLimitInfoManage.WithdrawalMax <= 0)
+                    return false;
+            }
+
+            if (currentUpperLevel != null)
+            {
+                if (withdrawalLimitInfoManage.WithdrawalMin >= currentUpperLevel.WithdrawalMin || withdrawalLimitInfoManage.WithdrawalMax >= currentUpperLevel.WithdrawalMax)
+                    return false;
+            }
+
+            return withdrawalLimitService.EditWithdrawalLimitInfo(withdrawalLimitInfoManage);
+        }
+
+        public int DeleteWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        {
+            var currentUpperPoint = withdrawalLimitService.GetWithdrawalLimitInfo(withdrawalLimitInfoManage.SiteId, withdrawalLimitInfoManage.CurrencyId, withdrawalLimitInfoManage.VipLevel + 1);
+
+            if (currentUpperPoint != null)
+                return 0;
+
+            return withdrawalLimitService.DeleteWithdrawalLimitInfo(withdrawalLimitInfoManage);
+        }
+        public IEnumerable<WithdrawalKYC> GetWithdrawalKYCList(int SiteId)
+        {
+            return withdrawalService.GetWithdrawalKYC(SiteId);
+        }
+
+        public bool EditWithdrawalKYCList(WithdrawalKYC withdrawalKYC)
+        {
+            return withdrawalService.EditWithdrawalKYC(withdrawalKYC);
+        }
+
     }
 }

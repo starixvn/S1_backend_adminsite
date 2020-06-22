@@ -52,6 +52,26 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Change Vip Level (Batch)",
+        "FuncKey": "Message/ChangeVipLevelBatch",
+        "Controller": "Message",
+        "Action": "ChangeVipLevelBatch",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Withdrawal KYC Control",
+        "FuncKey": "Message/WithdrawalKYCControl",
+        "Controller": "Message",
+        "Action": "WithdrawalKYCControl",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
@@ -137,6 +157,16 @@
         "FuncKey": "Finance/DepositLimitManage",
         "Controller": "Finance",
         "Action": "DepositLimitManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Withdrawal Limit Management",
+        "FuncKey": "Finance/WithdrawalLimitManage",
+        "Controller": "Finance",
+        "Action": "WithdrawalLimitManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null

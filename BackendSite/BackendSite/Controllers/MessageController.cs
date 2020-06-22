@@ -19,5 +19,13 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        public IActionResult ChangeVipLevelBatch()
+        {
+            return View();
+        }
+        public IActionResult WithdrawalKYCControl()
+        {
+            return View();
+        }
     }
 }

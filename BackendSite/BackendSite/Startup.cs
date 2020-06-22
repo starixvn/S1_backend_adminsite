@@ -68,6 +68,7 @@ namespace BackendSite
             services.AddSingleton<BonusInfoService>();
             services.AddSingleton<PaymentManageService>();
             services.AddSingleton<CustTurnoverService>();
+            services.AddSingleton<BonusCashBackService>();
             //var dal = AppDomain.CurrentDomain.GetAssemblies()
             //           .SelectMany(t => t.GetTypes())
             //           .Where(t => t.IsClass && t.Namespace == "BackendSite.Service.DAL");
@@ -101,6 +102,7 @@ namespace BackendSite
             services.AddSingleton<BonusInfoBLL>();
             services.AddSingleton<PaymentManageBLL>();
             services.AddSingleton<AdjustWithdrawalLimitBLL>();
+            services.AddSingleton<BonusCashBackBLL>();
             // var bll = AppDomain.CurrentDomain.GetAssemblies()
             //.SelectMany(t => t.GetTypes())
             //.Where(t => t.IsClass && t.Namespace == "BackendSite.Service.BLL");

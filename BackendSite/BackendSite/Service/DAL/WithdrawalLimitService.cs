@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using BackendSite.Service.Model;
+using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System;
@@ -24,6 +25,61 @@ namespace BackendSite.Service.DAL
             var result = conn.Execute("Common_WithdrawalLimit_Set", p, transaction: trans, commandType: CommandType.StoredProcedure);
             afterWithdrawalLimit = p.Get<decimal?>("AfterWithdrawalLimit") ?? 0;
             return result;
+        }
+        public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(int siteId, int currencyId)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.Query<WithdrawalLimitInfoManage>("Admin_WithdrawalLimitInfo_Get", new { SiteId = siteId, CurrencyId = currencyId }, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public bool AddWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                var param = new
+                {
+                    withdrawalLimitInfoManage.SiteId,
+                    withdrawalLimitInfoManage.CurrencyId,
+                    withdrawalLimitInfoManage.VipLevel,
+                    withdrawalLimitInfoManage.WithdrawalMin,
+                    withdrawalLimitInfoManage.WithdrawalMax
+                };
+                return conn.Execute("Admin_WithdrawalLimitInfo_Ins", param, commandType: CommandType.StoredProcedure) > 0;
+            }
+        }
+
+        public bool EditWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                var param = new
+                {
+                    withdrawalLimitInfoManage.SiteId,
+                    withdrawalLimitInfoManage.CurrencyId,
+                    withdrawalLimitInfoManage.VipLevel,
+                    withdrawalLimitInfoManage.WithdrawalMin,
+                    withdrawalLimitInfoManage.WithdrawalMax
+                };
+                return conn.Execute("Admin_WithdrawalLimitInfo_Set", param, commandType: CommandType.StoredProcedure) > 0;
+            }
+        }
+
+        public WithdrawalLimitInfoManage GetWithdrawalLimitInfo(int siteId, int currencyId, int viplevel)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.QueryFirstOrDefault<WithdrawalLimitInfoManage>("Admin_WithdrawalLimitInfoDetail_Get", new { SiteId = siteId, CurrencyId = currencyId, VipLevel = viplevel }, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public int DeleteWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.Execute("Admin_WithdrawalLimitInfo_Del", new { SiteId = withdrawalLimitInfoManage.SiteId, CurrencyId = withdrawalLimitInfoManage.CurrencyId, VipLevel = withdrawalLimitInfoManage.VipLevel }, commandType: CommandType.StoredProcedure);
+            }
         }
     }
 }
