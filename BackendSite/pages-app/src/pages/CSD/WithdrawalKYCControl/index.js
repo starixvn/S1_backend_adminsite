@@ -102,20 +102,33 @@ const WithdrawalKYCInfo = () => {
             )
         });
     }
-
     return (
         <>
             <div className="form-group">
                 <label className="col-form-label d-block">Site Name</label>
                 {radio}
             </div>
-            {(kycList) ? <KycInfo kycList={kycList}
-                HandleEdit={handleEdit}
-                HandleUpdate={handleUpdate}
-                StateEdit={stateEdit}
-                EditValue={editValue}
-                ChangeData={ChangeData}
-            /> : null}
+            <table className="table table-striped">
+                <thead>
+                    {(kycList) ?
+                        <tr>
+                            <th scope="col">Currency</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                        : null
+                    }
+                </thead>
+                <tbody>
+                    {(kycList) ? <KycInfo kycList={kycList}
+                        HandleEdit={handleEdit}
+                        HandleUpdate={handleUpdate}
+                        StateEdit={stateEdit}
+                        EditValue={editValue}
+                        ChangeData={ChangeData}
+                    /> : null}
+                </tbody>
+            </table>
         </>
     )
 }
