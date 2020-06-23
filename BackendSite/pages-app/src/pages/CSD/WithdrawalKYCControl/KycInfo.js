@@ -16,35 +16,15 @@ export const KycInfo = (props) => {
             let isEdit = props.StateEdit[idx] === true;
             let _editValue = editValue !== null && idx === editValue.idx ? editValue.amount : value.amount;
             return (
-                <div key={`CurrencyInfo-${value.currencyId}`} className="panel mt-20">
-                    <a className="panel-title" data-toggle="collapse" href={`#collapseExample-${value.currencyId}`} role="button" aria-expanded="true" aria-controls="collapseExample">
-                        {window.i18n["lbl_Currency" + value.currencyId]}
-                    </a>
-                    <div className="panel-body" >
-                        <div className="collapse show" id={`collapseExample-${value.currencyId}`}>
-                            <div className="table">
-                                <table className="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Amount</th>
-                                            <th scope="col">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><InputBox isEdit={isEdit} defaultValue={_editValue} onChange={props.ChangeData.bind(null, idx, "amount")} /></td>
-                                            <td>
-                                                <div className="button-action">
-                                                    <ActionButtons isEdit={isEdit} ClickEdit={props.HandleEdit.bind(null, idx)} HandleUpdate={props.HandleUpdate.bind(null, idx)} />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                <tr key={`CurrencyInfo-${value.currencyId}`}>
+                    <td>{window.i18n["lbl_Currency" + value.currencyId]}</td>
+                    <td><InputBox isEdit={isEdit} defaultValue={_editValue} onChange={props.ChangeData.bind(null, idx, "amount")} /></td>
+                    <td>
+                        <div className="button-action">
+                            <ActionButtons isEdit={isEdit} ClickEdit={props.HandleEdit.bind(null, idx)} HandleUpdate={props.HandleUpdate.bind(null, idx)} />
                         </div>
-                    </div >
-                </div>
+                    </td>
+                </tr>
             )
         })
         return (

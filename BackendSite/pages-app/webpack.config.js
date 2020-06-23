@@ -56,11 +56,11 @@ module.exports = {
 		"Finance/DepositLimitManagement.min": [
 			"./src/pages/Finance/DepositLimitManagement/index.js"
 		],
-		"Finance/WithdrawalLimitManagement.min": [
-			"./src/pages/Finance/WithdrawalLimitManagement/index.js"
-		],
 		"CSD/WithdrawalKYCControl.min": [
 			"./src/pages/CSD/WithdrawalKYCControl/index.js"
+		],
+		"HOME/DashBoard.min": [
+			"./src/pages/Home/DashBoard/index.js"
 		]
 	},
 	output: {
