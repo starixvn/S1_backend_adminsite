@@ -86,7 +86,7 @@ const DashBoardInfo = () => {
 const App = () => {
     return (
         <div className="container-fluid">
-            <h4 className="page-name">Dash Board</h4>
+            <h4 className="page-name">Dashboard</h4>
             <div>
                 <DashBoardInfo />
             </div>

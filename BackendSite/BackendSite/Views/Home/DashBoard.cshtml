@@ -2,7 +2,7 @@
 @inject SelLangBLL selLangBLL
 @{
     Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
-    ViewData["Title"] = "Dash Board";
+    ViewData["Title"] = "Dashboard";
 }
 <link type="text/css" rel="stylesheet" href="~/common/fonts/main-font/style.css" asp-append-version="true" />
 <link type="text/css" href="~/common/css/common.css" rel="stylesheet" asp-append-version="true" />
@@ -27,7 +27,7 @@
 </div>
 @section Scripts {
     <script src="~/common/js/component/scrollbar/jquery.overlayScrollbars.min.js"></script>
-    <script src="~/js/Home/DashBoard.min.js"></script>
+    <script src="~/js/component/Home/DashBoard.min.js"></script>
     <script type="text/javascript">
         $('.collapse').collapse();
         $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
