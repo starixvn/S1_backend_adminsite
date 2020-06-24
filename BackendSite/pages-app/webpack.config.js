@@ -59,7 +59,7 @@ module.exports = {
 		"CSD/WithdrawalKYCControl.min": [
 			"./src/pages/CSD/WithdrawalKYCControl/index.js"
 		],
-		"HOME/DashBoard.min": [
+		"Home/DashBoard.min": [
 			"./src/pages/Home/DashBoard/index.js"
 		]
 	},
