@@ -98,6 +98,11 @@ namespace BackendSite.Service.BLL
             return custInfoDetail;
         }
 
+        public CustInfoDetail GetCustInfoDetails(int? custId, string userName, int? siteId)
+        {
+            return custInfoService.GetCustInfos(custId, userName, siteId);
+        }
+
         public decimal GetBalance(int custId)
         {
             return walletService.GetBalance(custId);
