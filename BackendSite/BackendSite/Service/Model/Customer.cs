@@ -27,6 +27,7 @@ namespace BackendSite.Service.Model
     public class CustInfoDetail
     {
         public string SiteName { get; set; }
+        public int SiteId { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
         public int CurrencyId { get; set; }

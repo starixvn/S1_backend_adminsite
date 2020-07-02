@@ -16,8 +16,9 @@ const WithdrawalLimitManagement = lazy(() => import('./pages/Finance/WithdrawalL
 const ChangeVipLevelBatch = lazy(() => import('./pages/CSD/ChangeVipLevelBatch/index'));
 const WithdrawalKYCControl = lazy(() => import('./pages/CSD/WithdrawalKYCControl/index'));
 const DashBoard = lazy(() => import('./pages/Home/DashBoard/index'));
+const BalanceAdjustmentBatch = lazy(() => import('./pages/Finance/BalanceAdjustmentBatch/index'));
 
-export const defaultPage = 'DashBoard';
+export const defaultPage = 'BalanceAdjustmentBatch';
 export const layoutType = {
   N88: "N88",
   LAP: "LAP",
@@ -143,6 +144,15 @@ export const pages = {
     css: [
       './lib/bootstrap/dist/css/bootstrap.min.css',
       './css/css/main.css'
+    ],
+    layout: layoutType.N88
+  },
+  'BalanceAdjustmentBatch': {
+    comp: <Suspense fallback="loading..."><BalanceAdjustmentBatch /></Suspense>,
+    css: [
+      './lib/bootstrap/dist/css/bootstrap.min.css',
+      './css/css/main.css',
+      './css/css/pages/Marketing.css'
     ],
     layout: layoutType.N88
   }

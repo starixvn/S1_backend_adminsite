@@ -5,11 +5,7 @@ import qs from 'qs';
     class PaymentAdjustment extends React.Component {
         constructor(props) {
             super(props);
-<<<<<<< HEAD
-            this.state = { UserName: "", CustData: null, Checkwd: false };
-=======
             this.state = { UserName: "", CustData: null, Checkwd: false, Withdrawal: 1 };
->>>>>>> DEV
         }
 
         handleSubmit(event) {
@@ -57,14 +53,6 @@ import qs from 'qs';
                 return;
             }
 
-<<<<<<< HEAD
-=======
-            if (parseInt(option) === 1 && checkwd === 1 && withdrawalamount === 0) {
-                alert('Please Enter Withdrawal Limit');
-                return;
-            }
-
->>>>>>> DEV
             axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount })
                 .then(function (response) {
                     //Loading.UnLoading();
@@ -157,15 +145,9 @@ import qs from 'qs';
                                     <div className="form-group">
                                         <div className="custom-control custom-checkbox custom-control-inline">
                                             <input className="custom-control-input" id="checkwd" type="checkbox" name="Checkwd" checked={this.state.Checkwd} onChange={this.onCheck.bind(this, this.state.Checkwd)} />
-<<<<<<< HEAD
-                                            <label className="custom-control-label" htmlFor="checkwd">Withdraw Condition(Cashback Amount X Times):</label>
-                                        </div>
-                                        <input className="form-control width-200" type="number" name="Withdrawal" onChange={this.onChange.bind(this)} pattern="[0-9]*" />
-=======
                                             <label className="custom-control-label" htmlFor="checkwd">Withdraw Condition(Balance Amount X Times):</label>
                                         </div>
-                                        <input className="form-control width-200" type="number" name="Withdrawal" onChange={this.onChange.bind(this)} pattern="[0-9]*" value={this.state.Withdrawal} />
->>>>>>> DEV
+                                        <input className="form-control width-200" type="number" name="Withdrawal" pattern="[0-9]*" value={this.state.Withdrawal} disabled />
                                     </div>
                                     : null}
                                 <div className="form-group width-200">

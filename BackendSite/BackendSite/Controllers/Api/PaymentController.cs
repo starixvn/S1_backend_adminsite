@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -228,6 +229,99 @@ namespace BackendSite.Controllers.Api
                 apiResult.Message = ex.ToString();
             }
 
+            return apiResult;
+        }
+
+        public class BonusCashBackInfoListDetail
+        {
+            public int errorCode { set; get; }
+            public string custName { set; get; }
+            public string massage { set; get; }
+            public decimal WinlostAmountCountCalculation { set; get; }
+            public decimal Percentage { set; get; }
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BalanceAdjustmentBatch" })]
+        public async Task<List<ApiResult>> BalanceAdjustmentBatch([FromForm] IEnumerable<string> custList, [FromForm] int option, [FromForm] int withdrawalLimitOption, [FromForm] decimal withdrawalLimitAmount, [FromForm] decimal amount)
+        {
+            var apiResult = new List<ApiResult>();
+            foreach (string cust in custList)
+            {
+                var custInfoDetail = custInfoBLL.GetCustInfoDetailAsync(0, cust);
+                if (custInfoDetail.Result != null)
+                {
+                    try
+                    {
+                        AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit();
+                        var authData = authorizeBLL.GetAuthData();
+
+                        adjustmentAndWithdrawalLimit.CustId = custInfoDetail.Result.CustId;
+                        adjustmentAndWithdrawalLimit.CurrencyId = custInfoDetail.Result.CurrencyId;
+                        adjustmentAndWithdrawalLimit.UserName = custInfoDetail.Result.UserName;
+                        adjustmentAndWithdrawalLimit.SiteId = custInfoDetail.Result.SiteId;
+                        adjustmentAndWithdrawalLimit.Amount = amount;
+                        adjustmentAndWithdrawalLimit.AdjustType = option;
+                        adjustmentAndWithdrawalLimit.SiteName = custInfoDetail.Result.SiteName;
+                        adjustmentAndWithdrawalLimit.Operator = authData.UserName;
+                        adjustmentAndWithdrawalLimit.WithdrawalLimitAmount = withdrawalLimitAmount;
+                        adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType = withdrawalLimitOption;
+
+                        string transId = null;
+                        if (adjustmentAndWithdrawalLimit.AdjustType == 2)
+                        {
+                            var balance = custInfoBLL.GetBalance(custInfoDetail.Result.CustId);
+                            if (balance < adjustmentAndWithdrawalLimit.Amount)
+                            {
+                                if (mainWalletType == 2)
+                                {
+                                    var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
+                                    TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = deAmount, CustId = custInfoDetail.Result.CustId, direction = TpDirection.ToMain };
+
+                                    var acc = await tpBLL.TransferAsync(inTpTransfer);
+                                    if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
+                                    {
+                                        apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Cust:{cust}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                    }
+                                }
+                            }
+
+                            balance = custInfoBLL.GetBalance(custInfoDetail.Result.CustId);
+
+                            if (balance < adjustmentAndWithdrawalLimit.Amount)
+                            {
+                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Cust:{cust}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                            }
+                        }
+
+                        if (paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, User.Identity.Name, out transId) > 0)
+                        {
+                            if (mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
+                            {
+                                var balance = custInfoBLL.GetBalance(custInfoDetail.Result.CustId);
+                                TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = balance, CustId = custInfoDetail.Result.CustId, direction = TpDirection.ToTp };
+
+                                var acc = await tpBLL.TransferAsync(inTpTransfer);
+                                if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
+                                {
+                                    apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Cust:{cust}. ID is {transId}." });
+                                }
+                            }
+                            else
+                            {
+                                apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Cust:{cust}. ID is {transId}." });
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Cust:{cust}. {ex.ToString()}" });
+                    }
+                }
+                else
+                {
+                    apiResult.Add(new ApiResult() { ErrorCode = -1, Message = $"Not found {cust}" });
+                }
+            }
             return apiResult;
         }
     }

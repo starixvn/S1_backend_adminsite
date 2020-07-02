@@ -61,7 +61,13 @@ module.exports = {
 		],
 		"Home/DashBoard.min": [
 			"./src/pages/Home/DashBoard/index.js"
-		]
+		],
+		"Finance/BalanceAdjustmentBatch.min": [
+			"./src/pages/Finance/BalanceAdjustmentBatch/index.js"
+		],
+		"CSD/ChangeVipLevelBatch.min": [
+			"./src/pages/CSD/ChangeVipLevelBatch/index.js"
+		],
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
