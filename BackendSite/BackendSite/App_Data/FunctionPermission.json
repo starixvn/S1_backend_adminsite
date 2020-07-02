@@ -58,11 +58,11 @@
         "FuncKey": "Message/PersonalMsgBatch",
         "Enable": false
       },
-      {
+      /*{
         "DisplayKey": "Change Vip Level (Batch)",
         "FuncKey": "Message/ChangeVipLevelBatch",
         "Enable": false
-      },
+      },*/
       {
         "DisplayKey": "Withdrawal KYC Control",
         "FuncKey": "Message/WithdrawalKYCControl",
@@ -114,7 +114,7 @@
             "FuncKey": "f_pm_editAmountRule"
           }
         ]
-      },
+      } /*,
       {
         "DisplayKey": "Deposit Limit Management",
         "FuncKey": "Finance/DepositLimitManage",
@@ -124,7 +124,7 @@
         "DisplayKey": "Withdrawal Limit Management",
         "FuncKey": "Finance/WithdrawalLimitManage",
         "Enable": false
-      }
+      }*/
     ]
   },
   {
