@@ -591,4 +591,7 @@
   <data name="lbl_PromotionType4" xml:space="preserve">
     <value>Special</value>
   </data>
+  <data name="lbl_WithdrawalStatus8" xml:space="preserve">
+    <value>To KYC</value>
+  </data>
 </root>

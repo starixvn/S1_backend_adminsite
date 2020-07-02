@@ -68,6 +68,7 @@ namespace BackendSite.Service.BLL
             List<int> forStatus = new List<int>();
             forStatus.Add((int)WithdrawalStatus.OnHold);
             forStatus.Add((int)WithdrawalStatus.Verify);
+            forStatus.Add((int)WithdrawalStatus.ToKyc);
             int custId = 0;
             decimal amount = 0m;
             int withdrawalId = 0;
@@ -85,6 +86,7 @@ namespace BackendSite.Service.BLL
             forStatus.Add((int)WithdrawalStatus.Pending);
             forStatus.Add((int)WithdrawalStatus.OnHold);
             forStatus.Add((int)WithdrawalStatus.Process);
+            forStatus.Add((int)WithdrawalStatus.ToKyc);
             int custId = 0;
             decimal amount = 0m;
             int withdrawalId = 0;
@@ -113,6 +115,7 @@ namespace BackendSite.Service.BLL
             List<int> forStatus = new List<int>();
             forStatus.Add((int)WithdrawalStatus.Verify);
             forStatus.Add((int)WithdrawalStatus.Pending);
+            forStatus.Add((int)WithdrawalStatus.ToKyc);
             int custId = 0;
             decimal amount = 0m;
             int withdrawalId = 0;
@@ -130,6 +133,7 @@ namespace BackendSite.Service.BLL
             forStatus.Add((int)WithdrawalStatus.OnHold);
             forStatus.Add((int)WithdrawalStatus.Verify);
             forStatus.Add((int)WithdrawalStatus.Process);
+            forStatus.Add((int)WithdrawalStatus.ToKyc);
             int custId = 0;
             decimal amount = 0m;
             int withdrawalId = 0;

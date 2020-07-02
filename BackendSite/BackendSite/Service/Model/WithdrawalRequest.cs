@@ -38,6 +38,7 @@ namespace BackendSite.Service.Model
         public string AccountNo { set; get; }
         public string AccountName { set; get; }
         public string RefId { set; get; }
+        public bool HasPhotoId { set; get; }
 
         public string CalCode =>
     WithdrawalType switch
