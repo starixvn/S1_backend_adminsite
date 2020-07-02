@@ -5,10 +5,6 @@ import qs from 'qs';
     class PaymentAdjustment extends React.Component {
         constructor(props) {
             super(props);
-<<<<<<< HEAD
-=======
-
->>>>>>> PRD
             this.state = { UserName: "", CustData: null, Checkwd: false, Withdrawal: 1 };
         }
 
