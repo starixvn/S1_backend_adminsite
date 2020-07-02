@@ -248,20 +248,20 @@ namespace BackendSite.Controllers.Api
             var authData = authorizeBLL.GetAuthData();
             foreach (string custUsername in custList)
             {
-                var custInfoDetail = custInfoBLL.GetCustInfoDetailAsync(0, custUsername);
-                if (custInfoDetail.Result != null)
+                var custInfoDetail = custInfoBLL.GetCustInfoDetails(null, custUsername, null);
+                if (custInfoDetail != null)
                 {
                     try
                     {
                         AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit
                         {
-                            CustId = custInfoDetail.Result.CustId,
-                            CurrencyId = custInfoDetail.Result.CurrencyId,
-                            UserName = custInfoDetail.Result.UserName,
-                            SiteId = custInfoDetail.Result.SiteId,
+                            CustId = custInfoDetail.CustId,
+                            CurrencyId = custInfoDetail.CurrencyId,
+                            UserName = custInfoDetail.UserName,
+                            SiteId = custInfoDetail.SiteId,
                             Amount = amount,
                             AdjustType = option,
-                            SiteName = custInfoDetail.Result.SiteName,
+                            SiteName = custInfoDetail.SiteName,
                             Operator = authData.UserName,
                             WithdrawalLimitAmount = withdrawalLimitAmount,
                             WithdrawalLimitAmountAdjustType = withdrawalLimitOption
@@ -270,23 +270,24 @@ namespace BackendSite.Controllers.Api
                         string transId = null;
                         if (adjustmentAndWithdrawalLimit.AdjustType == 2)
                         {
-                            var balance = custInfoBLL.GetBalance(custInfoDetail.Result.CustId);
+                            var balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
                             if (balance < adjustmentAndWithdrawalLimit.Amount)
                             {
                                 if (mainWalletType == 2)
                                 {
                                     var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
-                                    TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = deAmount, CustId = custInfoDetail.Result.CustId, direction = TpDirection.ToMain };
+                                    TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = deAmount, CustId = custInfoDetail.CustId, direction = TpDirection.ToMain };
 
                                     var acc = await tpBLL.TransferAsync(inTpTransfer);
                                     if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
                                     {
                                         apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Username:{custUsername}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                        continue;
                                     }
                                 }
                             }
 
-                            balance = custInfoBLL.GetBalance(custInfoDetail.Result.CustId);
+                            balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
 
                             if (balance < adjustmentAndWithdrawalLimit.Amount)
                             {
@@ -299,8 +300,8 @@ namespace BackendSite.Controllers.Api
                         {
                             if (mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
                             {
-                                var balance = custInfoBLL.GetBalance(custInfoDetail.Result.CustId);
-                                TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = balance, CustId = custInfoDetail.Result.CustId, direction = TpDirection.ToTp };
+                                var balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
+                                TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = balance, CustId = custInfoDetail.CustId, direction = TpDirection.ToTp };
 
                                 var acc = await tpBLL.TransferAsync(inTpTransfer);
                                 if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)

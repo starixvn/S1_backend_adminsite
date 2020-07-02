@@ -65,6 +65,13 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
+        public CustInfoDetail GetCustInfos(int? custId, string userName, int? siteId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfo_Get", new { CustId = custId, UserName = userName, SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            return result;
+        }
+
         public int SetCustStatusSwitch(int custId, int Op)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
@@ -74,7 +81,7 @@ namespace BackendSite.Service.DAL
         public int SetCustStatusLevel(int custId, int Level, string Operator)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var result = conn.Execute("Admin_CustStatusLevel_Set", new { CustId = custId, Level , Operator }, commandType: CommandType.StoredProcedure);
+            var result = conn.Execute("Admin_CustStatusLevel_Set", new { CustId = custId, Level, Operator }, commandType: CommandType.StoredProcedure);
             return result;
         }
         public CustPhotoId GetCustPhotoId(int CustId)
