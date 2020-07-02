@@ -94,6 +94,11 @@
         "Enable": false
       },
       {
+        "DisplayKey": "Balance Adjustment (Batch)",
+        "FuncKey": "Finance/BalanceAdjustmentBatch",
+        "Enable": false
+      },
+      {
         "DisplayKey": "WithdrawalLimit Adjustment",
         "FuncKey": "Finance/WithdrawalLimitAdjust",
         "Enable": false

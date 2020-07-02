@@ -52,11 +52,11 @@ const App = () => {
     return (
         <div className="container-fluid">
             <h4 className="page-name">Change Vip Level Batch</h4>
-            <div class="form-group">
+            <div className="form-group">
                 <label>User Name</label>
                 <textarea style={{ 'width': '250px' }} className="form-control" rows="10" value={stateData.userName} onChange={(e) => { EditFiled(e.target.value, 'userName') }}></textarea>
             </div>
-            <div class="form-group">
+            <div className="form-group">
                 <label>Vip Level</label>
                 <input type="number" style={{ 'width': '100px' }} className="form-control" value={stateData.viplevel} onChange={(e) => { EditFiled(e.target.value, 'viplevel') }} />
             </div>

@@ -123,6 +123,16 @@
       },
       {
         "Key": "",
+        "Title": "Balance Adjustment (Batch)",
+        "FuncKey": "Finance/BalanceAdjustmentBatch",
+        "Controller": "Finance",
+        "Action": "BalanceAdjustmentBatch",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
         "Title": "WithdrawalLimit Adjustment",
         "FuncKey": "Finance/WithdrawalLimitAdjust",
         "Controller": "Finance",

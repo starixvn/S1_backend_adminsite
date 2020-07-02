@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authentication;
@@ -11,7 +6,10 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
@@ -25,14 +23,16 @@ namespace BackendSite.Controllers.Api
         private readonly Tools tools;
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly AdminBLL adminBLL;
+        private readonly HomeBLL homeBLL;
 
-        public HomeController(SelLangBLL selLangBLL, AuthorizeBLL authorizeBLL, Tools tools, ServerInfoBLL serverInfoBLL, AdminBLL adminBLL)
+        public HomeController(SelLangBLL selLangBLL, AuthorizeBLL authorizeBLL, Tools tools, ServerInfoBLL serverInfoBLL, AdminBLL adminBLL, HomeBLL homeBLL)
         {
             this.selLangBLL = selLangBLL;
             this.authorizeBLL = authorizeBLL;
             this.tools = tools;
             this.serverInfoBLL = serverInfoBLL;
             this.adminBLL = adminBLL;
+            this.homeBLL = homeBLL;
         }
         public class LoginModel
         {
@@ -42,7 +42,7 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ApiResult> Signin([FromBody]LoginModel loginModel)
+        public async Task<ApiResult> Signin([FromBody] LoginModel loginModel)
         {
             var apiResult = new ApiResult(selLangBLL);
             string userName = loginModel.txtID;
@@ -112,7 +112,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult ChangePwd([FromBody]ChangePwd changePwd)
+        public ApiResult ChangePwd([FromBody] ChangePwd changePwd)
         {
             int response = 0;
             bool result = adminBLL.ChangePwd(changePwd, out response);
@@ -135,6 +135,44 @@ namespace BackendSite.Controllers.Api
                     apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
                 }
             }
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<int> RegisteredCustomers([FromForm] int SiteId, [FromForm] long StartDate, [FromForm] long EndDate)
+        {
+            var result = homeBLL.GetRegisteredCustomers(SiteId, StartDate, EndDate);
+            var apiResult = new ApiResult<int>();
+
+            if (result >= 0)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Data = result;
+            }
+            else
+            {
+                apiResult.ErrorCode = 999;
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<int> DepositCustomers([FromForm] int SiteId, [FromForm] long StartDate, [FromForm] long EndDate)
+        {
+            var result = homeBLL.GetepositCustomers(SiteId, StartDate, EndDate);
+            var apiResult = new ApiResult<int>();
+
+            if (result >= 0)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Data = result;
+            }
+            else
+            {
+                apiResult.ErrorCode = 999;
+            }
+
             return apiResult;
         }
     }
