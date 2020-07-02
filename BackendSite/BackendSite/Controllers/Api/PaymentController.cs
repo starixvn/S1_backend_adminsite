@@ -245,26 +245,27 @@ namespace BackendSite.Controllers.Api
         public async Task<List<ApiResult>> BalanceAdjustmentBatch([FromForm] IEnumerable<string> custList, [FromForm] int option, [FromForm] int withdrawalLimitOption, [FromForm] decimal withdrawalLimitAmount, [FromForm] decimal amount)
         {
             var apiResult = new List<ApiResult>();
-            foreach (string cust in custList)
+            var authData = authorizeBLL.GetAuthData();
+            foreach (string custUsername in custList)
             {
-                var custInfoDetail = custInfoBLL.GetCustInfoDetailAsync(0, cust);
+                var custInfoDetail = custInfoBLL.GetCustInfoDetailAsync(0, custUsername);
                 if (custInfoDetail.Result != null)
                 {
                     try
                     {
-                        AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit();
-                        var authData = authorizeBLL.GetAuthData();
-
-                        adjustmentAndWithdrawalLimit.CustId = custInfoDetail.Result.CustId;
-                        adjustmentAndWithdrawalLimit.CurrencyId = custInfoDetail.Result.CurrencyId;
-                        adjustmentAndWithdrawalLimit.UserName = custInfoDetail.Result.UserName;
-                        adjustmentAndWithdrawalLimit.SiteId = custInfoDetail.Result.SiteId;
-                        adjustmentAndWithdrawalLimit.Amount = amount;
-                        adjustmentAndWithdrawalLimit.AdjustType = option;
-                        adjustmentAndWithdrawalLimit.SiteName = custInfoDetail.Result.SiteName;
-                        adjustmentAndWithdrawalLimit.Operator = authData.UserName;
-                        adjustmentAndWithdrawalLimit.WithdrawalLimitAmount = withdrawalLimitAmount;
-                        adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType = withdrawalLimitOption;
+                        AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit
+                        {
+                            CustId = custInfoDetail.Result.CustId,
+                            CurrencyId = custInfoDetail.Result.CurrencyId,
+                            UserName = custInfoDetail.Result.UserName,
+                            SiteId = custInfoDetail.Result.SiteId,
+                            Amount = amount,
+                            AdjustType = option,
+                            SiteName = custInfoDetail.Result.SiteName,
+                            Operator = authData.UserName,
+                            WithdrawalLimitAmount = withdrawalLimitAmount,
+                            WithdrawalLimitAmountAdjustType = withdrawalLimitOption
+                        };
 
                         string transId = null;
                         if (adjustmentAndWithdrawalLimit.AdjustType == 2)
@@ -280,7 +281,7 @@ namespace BackendSite.Controllers.Api
                                     var acc = await tpBLL.TransferAsync(inTpTransfer);
                                     if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
                                     {
-                                        apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Cust:{cust}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                        apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Username:{custUsername}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
                                     }
                                 }
                             }
@@ -289,11 +290,12 @@ namespace BackendSite.Controllers.Api
 
                             if (balance < adjustmentAndWithdrawalLimit.Amount)
                             {
-                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Cust:{cust}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                continue;
                             }
                         }
 
-                        if (paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, User.Identity.Name, out transId) > 0)
+                        if (paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, authData.UserName, out transId) > 0)
                         {
                             if (mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
                             {
@@ -303,23 +305,23 @@ namespace BackendSite.Controllers.Api
                                 var acc = await tpBLL.TransferAsync(inTpTransfer);
                                 if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
                                 {
-                                    apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Cust:{cust}. ID is {transId}." });
+                                    apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. ID is {transId}." });
                                 }
                             }
                             else
                             {
-                                apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Cust:{cust}. ID is {transId}." });
+                                apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. ID is {transId}." });
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Cust:{cust}. {ex.ToString()}" });
+                        apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Username:{custUsername}. {ex}" });
                     }
                 }
                 else
                 {
-                    apiResult.Add(new ApiResult() { ErrorCode = -1, Message = $"Not found {cust}" });
+                    apiResult.Add(new ApiResult() { ErrorCode = -1, Message = $"Not found {custUsername}" });
                 }
             }
             return apiResult;
