@@ -129,5 +129,10 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BalanceAdjustmentBatch" })]
+        public IActionResult BalanceAdjustmentBatch()
+        {
+            return View();
+        }
     }
 }
