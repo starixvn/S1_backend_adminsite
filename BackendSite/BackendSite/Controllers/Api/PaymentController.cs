@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using OfficeOpenXml;
 
 namespace BackendSite.Controllers.Api
 {
@@ -242,90 +243,116 @@ namespace BackendSite.Controllers.Api
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BalanceAdjustmentBatch" })]
-        public async Task<List<ApiResult>> BalanceAdjustmentBatch([FromForm] IEnumerable<string> custList, [FromForm] int option, [FromForm] int withdrawalLimitOption, [FromForm] decimal withdrawalLimitAmount, [FromForm] decimal amount)
+        public async Task<List<ApiResult>> BalanceAdjustmentBatch([FromForm] int option, [FromForm] int withdrawalLimitOption, [FromForm] IFormFile excelUpload)
         {
             var apiResult = new List<ApiResult>();
             var authData = authorizeBLL.GetAuthData();
-            foreach (string custUsername in custList)
+
+            if (excelUpload.ContentType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || excelUpload.ContentType == "application/vnd.ms-excel")
             {
-                var custInfoDetail = custInfoBLL.GetCustInfoDetails(null, custUsername, null);
-                if (custInfoDetail != null)
+                ExcelPackage excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
+                ExcelWorksheet sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
+                bool isLastRow = false;
+                int RowId = 2;   // 因為有標題列，所以從第2列開始讀起
+
+                do  // 讀取資料，直到讀到空白列為止
                 {
-                    try
+                    string custUsername = sheet.Cells[RowId, 1].Text;
+                    //amount = sheet.Cells[RowId, 2].Text;
+                    decimal.TryParse(sheet.Cells[RowId, 2].Text, out decimal amount);
+                    if (string.IsNullOrEmpty(custUsername))
                     {
-                        AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit
+                        isLastRow = true;
+                    }
+                    else
+                    {
+                        var custInfoDetail = custInfoBLL.GetCustInfoDetails(null, custUsername, null);
+                        if (custInfoDetail != null)
                         {
-                            CustId = custInfoDetail.CustId,
-                            CurrencyId = custInfoDetail.CurrencyId,
-                            UserName = custInfoDetail.UserName,
-                            SiteId = custInfoDetail.SiteId,
-                            Amount = amount,
-                            AdjustType = option,
-                            SiteName = custInfoDetail.SiteName,
-                            Operator = authData.UserName,
-                            WithdrawalLimitAmount = withdrawalLimitAmount,
-                            WithdrawalLimitAmountAdjustType = withdrawalLimitOption
-                        };
-
-                        string transId = null;
-                        if (adjustmentAndWithdrawalLimit.AdjustType == 2)
-                        {
-                            var balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
-                            if (balance < adjustmentAndWithdrawalLimit.Amount)
+                            try
                             {
-                                if (mainWalletType == 2)
+                                decimal withdrawalLimitAmount = (withdrawalLimitOption == 1) ? amount : 0;
+                                AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit
                                 {
-                                    var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
-                                    TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = deAmount, CustId = custInfoDetail.CustId, direction = TpDirection.ToMain };
+                                    CustId = custInfoDetail.CustId,
+                                    CurrencyId = custInfoDetail.CurrencyId,
+                                    UserName = custInfoDetail.UserName,
+                                    SiteId = custInfoDetail.SiteId,
+                                    Amount = amount,
+                                    AdjustType = option,
+                                    SiteName = custInfoDetail.SiteName,
+                                    Operator = authData.UserName,
+                                    WithdrawalLimitAmount = withdrawalLimitAmount,
+                                    WithdrawalLimitAmountAdjustType = withdrawalLimitOption
+                                };
 
-                                    var acc = await tpBLL.TransferAsync(inTpTransfer);
-                                    if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
+                                string transId = null;
+                                if (adjustmentAndWithdrawalLimit.AdjustType == 2)
+                                {
+                                    var balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
+                                    if (balance < adjustmentAndWithdrawalLimit.Amount)
                                     {
-                                        apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Username:{custUsername}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                        if (mainWalletType == 2)
+                                        {
+                                            var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
+                                            TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = deAmount, CustId = custInfoDetail.CustId, direction = TpDirection.ToMain };
+
+                                            var acc = await tpBLL.TransferAsync(inTpTransfer);
+                                            if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
+                                            {
+                                                apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Username:{custUsername}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                                continue;
+                                            }
+                                        }
+                                    }
+
+                                    balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
+
+                                    if (balance < adjustmentAndWithdrawalLimit.Amount)
+                                    {
+                                        apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
                                         continue;
                                     }
                                 }
-                            }
 
-                            balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
-
-                            if (balance < adjustmentAndWithdrawalLimit.Amount)
-                            {
-                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
-                                continue;
-                            }
-                        }
-
-                        if (paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, authData.UserName, out transId) > 0)
-                        {
-                            if (mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
-                            {
-                                var balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
-                                TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = balance, CustId = custInfoDetail.CustId, direction = TpDirection.ToTp };
-
-                                var acc = await tpBLL.TransferAsync(inTpTransfer);
-                                if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
+                                if (paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, authData.UserName, out transId) > 0)
                                 {
-                                    apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. ID is {transId}." });
+                                    if (mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
+                                    {
+                                        var balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
+                                        TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = balance, CustId = custInfoDetail.CustId, direction = TpDirection.ToTp };
+
+                                        var acc = await tpBLL.TransferAsync(inTpTransfer);
+                                        if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
+                                        {
+                                            apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. ID is {transId}." });
+                                        }
+                                    }
+                                    else
+                                    {
+                                        apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. ID is {transId}." });
+                                    }
                                 }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. ID is {transId}." });
+                                apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Username:{custUsername}. {ex}" });
                             }
                         }
+                        else
+                        {
+                            apiResult.Add(new ApiResult() { ErrorCode = -1, Message = $"Not found {custUsername}" });
+                        }
+                        RowId += 1;
                     }
-                    catch (Exception ex)
-                    {
-                        apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Username:{custUsername}. {ex}" });
-                    }
-                }
-                else
-                {
-                    apiResult.Add(new ApiResult() { ErrorCode = -1, Message = $"Not found {custUsername}" });
-                }
+                } while (!isLastRow);
+                return apiResult;
             }
-            return apiResult;
+            else
+            {
+                apiResult.Add(new ApiResult() { ErrorCode = -1, Message = "File Type Error" });
+                return apiResult;
+            }
         }
     }
 }

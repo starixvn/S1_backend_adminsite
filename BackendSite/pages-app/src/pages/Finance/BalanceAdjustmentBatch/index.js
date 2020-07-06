@@ -6,12 +6,10 @@ import qs from 'qs';
 const App = () => {
     const [stateSend, updateSend] = useState(false);
     const [stateData, updateData] = useState({
-        userName: '',
         option: null,
         checkwd: false,
         withdrawal: 1,
-        amount: 0,
-        withdrawalamount: 0
+        file: ''
     });
     const [sendData, updateSendData] = useState([]);
 
@@ -21,31 +19,22 @@ const App = () => {
     const SetMsg = () => {
         let msg = "";
         let check = true;
-        if (!stateData.userName) {
-            check = false;
-            msg = "Please input userName.";
-        } else if (!stateData.option) {
+
+        if (!stateData.option) {
             check = false;
             msg = "Please check Option.";
-        } else if (stateData.option === 1 && stateData.checkwd && stateData.withdrawal <= 0) {
-            check = false;
-            msg = "Withdraw must over 0.";
-        } else if (stateData.amount <= 0) {
-            check = false;
-            msg = "Please input Amount.";
         }
 
         if (check) {
-            let param = qs.stringify({
-                custList: stateData.userName.trim().split(/\r?\n/).map(u => { return u.trim() }),
-                option: parseInt(stateData.option),
-                withdrawalLimitOption: (stateData.checkwd) ? 1 : 0,
-                withdrawalLimitAmount: isNaN(parseFloat(stateData.amount) * stateData.withdrawal) ? 0 : parseFloat(stateData.amount) * stateData.withdrawal,
-                amount: parseFloat(stateData.amount),
-            })
+            let settings = { headers: { 'content-type': 'multipart/form-data' } }
+            let file = document.getElementById("uploadfile").files[0];
+            let formData = new FormData();
+            formData.append("excelUpload", file, file.name);
+            formData.append('option', parseInt(stateData.option));
+            formData.append('withdrawalLimitOption', (stateData.checkwd) ? 1 : 0);
             if (!stateSend) {
                 updateSend(true);
-                api.post('/api/Payment/BalanceAdjustmentBatch', param)
+                api.post('/api/Payment/BalanceAdjustmentBatch', formData, settings)
                     .then(function (response) {
                         updateSend(false);
                         if (response.data) {
@@ -66,10 +55,10 @@ const App = () => {
     let result = sendData.map((value, key) => { return <p key={`result-${key}`}>{value.message}</p> })
     return (
         <div className="container-fluid">
-            <h4 className="page-name">Balance AdjustmentBatch(Batch)</h4>
+            <h4 className="page-name">Balance Adjustment Batch(Batch)</h4>
             <div className="form-group">
-                <label>User Name</label>
-                <textarea style={{ 'width': '250px' }} className="form-control" rows="10" value={stateData.userName} onChange={(e) => { EditFiled(e.target.value, 'userName') }} disabled={stateSend}></textarea>
+                <label className="col-form-label d-block">Download Template File </label>
+                <a className="btn btn-danger" role="button" href="../../../resource/examplefile/BalanceAdjustmentBatch.xlsx" download="TemplateFile.xlsx">Template File</a>
             </div>
             <div className="form-group">
                 <label className="col-form-label d-block">Option</label>
@@ -82,18 +71,16 @@ const App = () => {
                     <label className="custom-control-label" htmlFor="Debit">Debit</label>
                 </div>
             </div>
-            {stateData.option === 1 ?
-                <div className="form-group">
-                    <div className="custom-control custom-checkbox custom-control-inline">
-                        <input className="custom-control-input" id="checkwd" type="checkbox" onChange={(e) => { EditFiled(e.target.checked, 'checkwd') }} disabled={stateSend} />
-                        <label className="custom-control-label" htmlFor="checkwd">Withdraw Condition(Balance Amount X Times):</label>
-                    </div>
-                    <input className="form-control width-200" type="number" defaultValue={stateData.withdrawal} disabled />
+            <div className="form-group">
+                <div className="custom-control custom-checkbox custom-control-inline">
+                    <input className="custom-control-input" id="checkwd" type="checkbox" onChange={(e) => { EditFiled(e.target.checked, 'checkwd') }} disabled={stateSend} />
+                    <label className="custom-control-label" htmlFor="checkwd">Withdraw Condition(Balance Amount X Times):</label>
                 </div>
-                : null}
+                <input className="form-control width-200" type="number" defaultValue={stateData.withdrawal} disabled />
+            </div>
             <div className="form-group width-200">
-                <label className="col-form-label">Amount</label>
-                <input className="form-control" type="number" onChange={(e) => { EditFiled(e.target.value, 'amount') }} step="1" min="1" disabled={stateSend} />
+                <label className="col-form-label">Upload File</label>
+                <input id="uploadfile" className="form-control" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" onChange={(e) => { EditFiled(e.target.value, 'file') }} disabled={stateSend} />
             </div>
             <button className="btn btn-add" style={{ marginTop: '20px', marginBottom: '40px' }} onClick={SetMsg}>Submit</button>
             <div className="form-group">{result}</div>
