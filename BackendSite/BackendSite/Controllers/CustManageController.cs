@@ -44,6 +44,8 @@ namespace BackendSite.Controllers
         public class CustInfoReq
         {
             public string UserName { get; set; }
+            public string AccountName { get; set; }
+            public string LoginIp { get; set; }
             public string TransId { get; set; }
             public string TpUserName { get; set; }
             public string Email { get; set; }
@@ -53,7 +55,7 @@ namespace BackendSite.Controllers
         [HttpPost]
         public IActionResult ExportCustInfoList(CustInfoReq custInfoReq)
         {
-            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(custInfoReq.UserName, custInfoReq.TransId, custInfoReq.TpUserName, custInfoReq.Email, custInfoReq.PhoneNo);
+            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(custInfoReq.UserName, custInfoReq.AccountName, custInfoReq.LoginIp, custInfoReq.TransId, custInfoReq.TpUserName, custInfoReq.Email, custInfoReq.PhoneNo);
 
             var stream = excelBLL.Export(ExportCustInfo);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportCustInfo)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

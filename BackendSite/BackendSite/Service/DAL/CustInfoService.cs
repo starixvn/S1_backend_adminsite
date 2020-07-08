@@ -43,9 +43,9 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(string userName, string transId, string TpUserName, string Email, string PhoneNo)
+        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo)
         {
-            var p = new DynamicParameters(new { UserName = userName, TpUserName = TpUserName, TransId = transId, Email = Email, PhoneNo = PhoneNo });
+            var p = new DynamicParameters(new { UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TpUserName = TpUserName, TransId = transId, Email = Email, PhoneNo = PhoneNo });
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get", p, commandType: CommandType.StoredProcedure);
