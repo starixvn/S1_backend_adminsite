@@ -264,8 +264,13 @@ namespace BackendSite.Controllers.Api
                     string sabaId = sheet.Cells[RowId, 2].Text.Trim();
                     if (sabaId.IndexOf("_") > -1)
                     {
-                        sabaId = sabaId.Substring(sabaId.IndexOf("_"), sabaId.Length - sabaId.IndexOf("_"));
+                        sabaId = sabaId.Substring(sabaId.LastIndexOf("_"), sabaId.Length - sabaId.LastIndexOf("_"));
                     }
+                    else if (sabaId.IndexOf("x") > -1)
+                    {
+                        sabaId = sabaId.Substring(sabaId.LastIndexOf("x"), sabaId.Length - sabaId.LastIndexOf("x"));
+                    }
+
                     Match m = Regex.Match(sabaId, @"\d+");
                     int? _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
                     decimal.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out decimal amount);
