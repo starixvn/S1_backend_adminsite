@@ -260,14 +260,17 @@ namespace BackendSite.Controllers.Api
                 {
                     string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text;
 
-                    int custId = 0;
-                    string sabaId = sheet.Cells[RowId, 2].Text;
+                    int custId;
+                    string sabaId = sheet.Cells[RowId, 2].Text.Trim();
+                    if (sabaId.IndexOf("_") > -1)
+                    {
+                        sabaId = sabaId.Substring(sabaId.IndexOf("_"), sabaId.Length - sabaId.IndexOf("_"));
+                    }
                     Match m = Regex.Match(sabaId, @"\d+");
                     int? _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
-
-                    decimal.TryParse(sheet.Cells[RowId, 3].Text, out decimal amount);
-                    string memo = sheet.Cells[RowId, 4].Text;
-                    if (string.IsNullOrEmpty(custUsername))
+                    decimal.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out decimal amount);
+                    string memo = sheet.Cells[RowId, 4].Text.Trim();
+                    if (string.IsNullOrEmpty(custUsername) && _custId == null)
                     {
                         isLastRow = true;
                     }
@@ -308,7 +311,7 @@ namespace BackendSite.Controllers.Api
                                             var acc = await tpBLL.TransferAsync(inTpTransfer);
                                             if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
                                             {
-                                                apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Username:{custUsername}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                                apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
                                                 continue;
                                             }
                                         }
@@ -318,7 +321,7 @@ namespace BackendSite.Controllers.Api
 
                                     if (balance < adjustmentAndWithdrawalLimit.Amount)
                                     {
-                                        apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                        apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
                                         continue;
                                     }
                                 }
@@ -333,23 +336,23 @@ namespace BackendSite.Controllers.Api
                                         var acc = await tpBLL.TransferAsync(inTpTransfer);
                                         if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
                                         {
-                                            apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. ID is {transId}." });
+                                            apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. SabaId:{sabaId}. ID is {transId}." });
                                         }
                                     }
                                     else
                                     {
-                                        apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. ID is {transId}." });
+                                        apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. SabaId:{sabaId}. ID is {transId}." });
                                     }
                                 }
                             }
                             catch (Exception ex)
                             {
-                                apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Username:{custUsername}. {ex}" });
+                                apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {ex}" });
                             }
                         }
                         else
                         {
-                            apiResult.Add(new ApiResult() { ErrorCode = -1, Message = $"Not found {custUsername}" });
+                            apiResult.Add(new ApiResult() { ErrorCode = -1, Message = $"Not found Username:{custUsername}. SabaId:{sabaId}." });
                         }
                         RowId += 1;
                     }
