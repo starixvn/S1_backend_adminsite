@@ -36,7 +36,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new { adjustmentInfo.AdjustType, adjustmentInfo.CustId, adjustmentInfo.UserName, adjustmentInfo.CurrencyId, adjustmentInfo.SiteId, AdjustIdInfo = adjustmentInfo.AdjustIdInfo, adjustmentInfo.Amount, Prefix = $"A{common.GetEnv()}" });
             p.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
-            var result = conn.Execute("Adjustment_Ins", p, transaction: trans, commandType: CommandType.StoredProcedure);
+            var result = conn.Execute("Admin_Adjustment_Ins", p, transaction: trans, commandType: CommandType.StoredProcedure);
             transId = p.Get<string>("TransId");
             if (result > 0)
             {
@@ -213,7 +213,7 @@ namespace BackendSite.Service.DAL
             var Adjustment_p = new DynamicParameters(new { adjustmentAndWithdrawalLimit.AdjustType, adjustmentAndWithdrawalLimit.CustId, adjustmentAndWithdrawalLimit.UserName, adjustmentAndWithdrawalLimit.CurrencyId, adjustmentAndWithdrawalLimit.SiteId, adjustmentAndWithdrawalLimit.AdjustIdInfo, adjustmentAndWithdrawalLimit.Amount, Prefix = $"A{common.GetEnv()}", adjustmentAndWithdrawalLimit.Memo });
             Adjustment_p.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
-            var result = conn.Execute("Adjustment_Ins", Adjustment_p, transaction: trans, commandType: CommandType.StoredProcedure);
+            var result = conn.Execute("Admin_Adjustment_Ins", Adjustment_p, transaction: trans, commandType: CommandType.StoredProcedure);
             Adjustment_transId = Adjustment_p.Get<string>("TransId");
             if (result > 0)
             {
