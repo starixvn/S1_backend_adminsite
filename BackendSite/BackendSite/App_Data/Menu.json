@@ -1,6 +1,16 @@
 [
   {
     "Key": "",
+    "Title": "Dashboard",
+    "Icon": "icon-reports",
+    "Roles": null,
+    "FuncKey": "Home/Dashboard",
+    "Controller": "Home",
+    "Action": "Dashboard",
+    "NoAuth":  true
+  },
+  {
+    "Key": "",
     "Title": "Reports",
     "Icon": "icon-reports",
     "Roles": null,
@@ -52,7 +62,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      }/*,
+      } /*,
       {
         "Key": "",
         "Title": "Change Vip Level (Batch)",
@@ -160,7 +170,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      }/*,
+      } /*,
       {
         "Key": "",
         "Title": "Deposit Limit Management",

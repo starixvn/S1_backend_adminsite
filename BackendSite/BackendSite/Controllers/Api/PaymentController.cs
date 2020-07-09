@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
@@ -43,6 +44,7 @@ namespace BackendSite.Controllers.Api
         {
             public decimal WithdrawalLimitAmount { get; set; }
             public int WithdrawalLimitOption { get; set; }
+            public string Memo { set; get; }
         }
 
         [HttpPost]
@@ -167,8 +169,7 @@ namespace BackendSite.Controllers.Api
                     adjustmentAndWithdrawalLimit.Operator = authData.UserName;
                     adjustmentAndWithdrawalLimit.WithdrawalLimitAmount = adjustmentAndWithdrawalLimitReq.WithdrawalLimitAmount;
                     adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType = adjustmentAndWithdrawalLimitReq.WithdrawalLimitOption;
-
-
+                    adjustmentAndWithdrawalLimit.Memo = adjustmentAndWithdrawalLimitReq.Memo;
 
                     string transId = null;
                     if (adjustmentAndWithdrawalLimit.AdjustType == 2)
@@ -243,7 +244,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BalanceAdjustmentBatch" })]
-        public async Task<List<ApiResult>> BalanceAdjustmentBatch([FromForm] int option, [FromForm] int withdrawalLimitOption, [FromForm] IFormFile excelUpload)
+        public async Task<List<ApiResult>> BalanceAdjustmentBatch([FromForm] int option, [FromForm] int optSite, [FromForm] int withdrawalLimitOption, [FromForm] IFormFile excelUpload)
         {
             var apiResult = new List<ApiResult>();
             var authData = authorizeBLL.GetAuthData();
@@ -257,16 +258,22 @@ namespace BackendSite.Controllers.Api
 
                 do  // 讀取資料，直到讀到空白列為止
                 {
-                    string custUsername = sheet.Cells[RowId, 1].Text;
-                    //amount = sheet.Cells[RowId, 2].Text;
-                    decimal.TryParse(sheet.Cells[RowId, 2].Text, out decimal amount);
+                    string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text;
+
+                    int custId = 0;
+                    string sabaId = sheet.Cells[RowId, 2].Text;
+                    Match m = Regex.Match(sabaId, @"\d+");
+                    int? _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
+
+                    decimal.TryParse(sheet.Cells[RowId, 3].Text, out decimal amount);
+                    string memo = sheet.Cells[RowId, 4].Text;
                     if (string.IsNullOrEmpty(custUsername))
                     {
                         isLastRow = true;
                     }
                     else
                     {
-                        var custInfoDetail = custInfoBLL.GetCustInfoDetails(null, custUsername, null);
+                        var custInfoDetail = custInfoBLL.GetCustInfoDetails(_custId, custUsername, optSite);
                         if (custInfoDetail != null)
                         {
                             try
@@ -283,7 +290,8 @@ namespace BackendSite.Controllers.Api
                                     SiteName = custInfoDetail.SiteName,
                                     Operator = authData.UserName,
                                     WithdrawalLimitAmount = withdrawalLimitAmount,
-                                    WithdrawalLimitAmountAdjustType = withdrawalLimitOption
+                                    WithdrawalLimitAmountAdjustType = withdrawalLimitOption,
+                                    Memo = memo
                                 };
 
                                 string transId = null;

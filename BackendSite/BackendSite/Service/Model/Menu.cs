@@ -7,6 +7,7 @@ namespace BackendSite.Service.Model
 {
     public class MenuItem
     {
+        public bool NoAuth { get; set; }
         public string Key { get; set; }
         public string Title { get; set; }
         public string Controller { get; set; }

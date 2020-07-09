@@ -52,7 +52,8 @@ namespace BackendSite.Service.BLL
                         UserName = row.UserName,
                         Amount = row.Amount,
                         CreateTime = row.CreateTime,
-                        StatusName = selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}")
+                        StatusName = selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
+                        Memo = row.Memo
                     });
                 }
             }
@@ -60,7 +61,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentExportReport(string TransId, int Currency, string UserName, int AdjustType, long StartDate, long EndDate)
+        public List<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentExportReport(string TransId, int Currency, string UserName, int AdjustType, long StartDate, long EndDate)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
             var datas = paymentAdjustmentService.GetPaymentAdjustmentExportReport(
@@ -87,7 +88,8 @@ namespace BackendSite.Service.BLL
                         UserName = row.UserName,
                         Amount = row.Amount,
                         CreateTime = row.CreateTime,
-                        StatusName = selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}")
+                        StatusName = selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
+                        Memo = row.Memo
                     });
                 }
             }

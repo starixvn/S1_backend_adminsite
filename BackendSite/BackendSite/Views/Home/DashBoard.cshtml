@@ -23,13 +23,14 @@
             i18n.Add(lbl_Txt, selLangBLL.GetResourceValue(lbl_Txt));
     }
 }
-<div id="point-management">
+<div id="content">
 </div>
 @section Scripts {
     <script src="~/common/js/component/scrollbar/jquery.overlayScrollbars.min.js"></script>
-    <script src="~/js/component/Home/DashBoard.min.js"></script>
+    <script src="~/js/component/Home/DashBoard.min.js" asp-append-version="true"></script>
     <script type="text/javascript">
         $('.collapse').collapse();
+        window.RootUrl = '@Url.Content("~/api")';
         $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
     </script>
 }

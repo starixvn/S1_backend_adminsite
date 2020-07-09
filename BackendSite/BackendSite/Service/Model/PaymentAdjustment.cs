@@ -16,6 +16,7 @@ namespace BackendSite.Service.Model
         public DateTime CreateTime { get; set; }
         public int Status { get; set; }
         public int CustId { get; set; }
+        public string Memo { set; get; }
     }
 
     public class PaymentAdjustmentFrontEnd
@@ -34,5 +35,6 @@ namespace BackendSite.Service.Model
         public DateTime CreateTime { get; set; }
 
         public string StatusName { get; set; }
+        public string Memo { set; get; }
     }
 }

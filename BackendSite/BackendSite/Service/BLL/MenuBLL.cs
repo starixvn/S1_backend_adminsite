@@ -15,7 +15,7 @@ namespace BackendSite.Service.BLL
         private readonly AdminUserService adminUserService;
         private readonly AuthorizeBLL authorizeBLL;
 
-        public MenuBLL(AdminGroupService adminGroupService, MenuService menuService, AuthorizeBLL authorizeBLL, AdminUserService adminUserService) 
+        public MenuBLL(AdminGroupService adminGroupService, MenuService menuService, AuthorizeBLL authorizeBLL, AdminUserService adminUserService)
         {
             this.adminGroupService = adminGroupService;
             this.menuService = menuService;
@@ -50,19 +50,26 @@ namespace BackendSite.Service.BLL
             var result = new List<MenuItem>();
             foreach (var item in Menu)
             {
-                if(item.Childs != null && item.Childs.Any())
-                {
-                    var childs = CheckMenuPermission(item.Childs, groupPermisisons);
-                    if(childs != null && childs.Any())
-                    {
-                        item.Childs = childs;
-                        result.Add(item);
-                    }
-                }
-
-                if(item.Childs == null && !string.IsNullOrEmpty(item.FuncKey) && groupPermisisons.Any(x => string.Equals(x.FuncKey, item.FuncKey, StringComparison.OrdinalIgnoreCase)))
+                if (item.NoAuth)
                 {
                     result.Add(item);
+                }
+                else
+                {
+                    if (item.Childs != null && item.Childs.Any())
+                    {
+                        var childs = CheckMenuPermission(item.Childs, groupPermisisons);
+                        if (childs != null && childs.Any())
+                        {
+                            item.Childs = childs;
+                            result.Add(item);
+                        }
+                    }
+
+                    if (item.Childs == null && !string.IsNullOrEmpty(item.FuncKey) && groupPermisisons.Any(x => string.Equals(x.FuncKey, item.FuncKey, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        result.Add(item);
+                    }
                 }
             }
 

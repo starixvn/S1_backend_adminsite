@@ -37,6 +37,7 @@ import qs from 'qs';
             let checkwd = (this.state.Checkwd) ? 1 : 0;
             let withdrawal = parseFloat(this.state.Withdrawal);
             let withdrawalamount = isNaN(parseFloat(amount) * withdrawal) ? 0 : parseFloat(amount) * withdrawal;
+            let memo = this.state.Memo;
 
             if (option == null) {
                 alert('Please select one Option.');
@@ -53,7 +54,7 @@ import qs from 'qs';
                 return;
             }
 
-            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount })
+            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount,Memo:memo })
                 .then(function (response) {
                     //Loading.UnLoading();
                     let result = response.data;
@@ -141,18 +142,20 @@ import qs from 'qs';
                                         <label className="custom-control-label" htmlFor="Debit">Debit</label>
                                     </div>
                                 </div>
-                                {this.state.Option == 1 ?
-                                    <div className="form-group">
-                                        <div className="custom-control custom-checkbox custom-control-inline">
-                                            <input className="custom-control-input" id="checkwd" type="checkbox" name="Checkwd" checked={this.state.Checkwd} onChange={this.onCheck.bind(this, this.state.Checkwd)} />
-                                            <label className="custom-control-label" htmlFor="checkwd">Withdraw Condition(Balance Amount X Times):</label>
-                                        </div>
-                                        <input className="form-control width-200" type="number" name="Withdrawal" pattern="[0-9]*" value={this.state.Withdrawal} disabled />
+                                <div className="form-group">
+                                    <div className="custom-control custom-checkbox custom-control-inline">
+                                        <input className="custom-control-input" id="checkwd" type="checkbox" name="Checkwd" checked={this.state.Checkwd} onChange={this.onCheck.bind(this, this.state.Checkwd)} />
+                                        <label className="custom-control-label" htmlFor="checkwd">Withdraw Condition(Balance Amount X Times):</label>
                                     </div>
-                                    : null}
+                                    <input className="form-control width-200" type="number" name="Withdrawal" pattern="[0-9]*" value={this.state.Withdrawal} disabled />
+                                </div>
                                 <div className="form-group width-200">
                                     <label className="col-form-label">Amount</label>
                                     <input className="form-control" type="number" name="Amount" onChange={this.onChange.bind(this)} step="1" min="1" />
+                                </div>
+                                <div className="form-group width-200">
+                                    <label className="col-form-label">Memo</label>
+                                    <textarea className="form-control" name="Memo" onChange={this.onChange.bind(this)} />
                                 </div>
                                 <div className="button-group mt-10">
                                     <button type="submit" className="btn btn-primary">Submit</button>
