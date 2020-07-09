@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
@@ -43,6 +44,7 @@ namespace BackendSite.Controllers.Api
         {
             public decimal WithdrawalLimitAmount { get; set; }
             public int WithdrawalLimitOption { get; set; }
+            public string Memo { set; get; }
         }
 
         [HttpPost]
@@ -167,8 +169,7 @@ namespace BackendSite.Controllers.Api
                     adjustmentAndWithdrawalLimit.Operator = authData.UserName;
                     adjustmentAndWithdrawalLimit.WithdrawalLimitAmount = adjustmentAndWithdrawalLimitReq.WithdrawalLimitAmount;
                     adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType = adjustmentAndWithdrawalLimitReq.WithdrawalLimitOption;
-
-
+                    adjustmentAndWithdrawalLimit.Memo = adjustmentAndWithdrawalLimitReq.Memo;
 
                     string transId = null;
                     if (adjustmentAndWithdrawalLimit.AdjustType == 2)
@@ -243,7 +244,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BalanceAdjustmentBatch" })]
-        public async Task<List<ApiResult>> BalanceAdjustmentBatch([FromForm] int option, [FromForm] int withdrawalLimitOption, [FromForm] IFormFile excelUpload)
+        public async Task<List<ApiResult>> BalanceAdjustmentBatch([FromForm] int option, [FromForm] int optSite, [FromForm] int withdrawalLimitOption, [FromForm] IFormFile excelUpload)
         {
             var apiResult = new List<ApiResult>();
             var authData = authorizeBLL.GetAuthData();
@@ -257,16 +258,25 @@ namespace BackendSite.Controllers.Api
 
                 do  // 讀取資料，直到讀到空白列為止
                 {
-                    string custUsername = sheet.Cells[RowId, 1].Text;
-                    //amount = sheet.Cells[RowId, 2].Text;
-                    decimal.TryParse(sheet.Cells[RowId, 2].Text, out decimal amount);
-                    if (string.IsNullOrEmpty(custUsername))
+                    string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text;
+
+                    int custId;
+                    string sabaId = sheet.Cells[RowId, 2].Text.Trim();
+                    if (sabaId.IndexOf("_") > -1)
+                    {
+                        sabaId = sabaId.Substring(sabaId.IndexOf("_"), sabaId.Length - sabaId.IndexOf("_"));
+                    }
+                    Match m = Regex.Match(sabaId, @"\d+");
+                    int? _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
+                    decimal.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out decimal amount);
+                    string memo = sheet.Cells[RowId, 4].Text.Trim();
+                    if (string.IsNullOrEmpty(custUsername) && _custId == null)
                     {
                         isLastRow = true;
                     }
                     else
                     {
-                        var custInfoDetail = custInfoBLL.GetCustInfoDetails(null, custUsername, null);
+                        var custInfoDetail = custInfoBLL.GetCustInfoDetails(_custId, custUsername, optSite);
                         if (custInfoDetail != null)
                         {
                             try
@@ -283,7 +293,8 @@ namespace BackendSite.Controllers.Api
                                     SiteName = custInfoDetail.SiteName,
                                     Operator = authData.UserName,
                                     WithdrawalLimitAmount = withdrawalLimitAmount,
-                                    WithdrawalLimitAmountAdjustType = withdrawalLimitOption
+                                    WithdrawalLimitAmountAdjustType = withdrawalLimitOption,
+                                    Memo = memo
                                 };
 
                                 string transId = null;
@@ -300,7 +311,7 @@ namespace BackendSite.Controllers.Api
                                             var acc = await tpBLL.TransferAsync(inTpTransfer);
                                             if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
                                             {
-                                                apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Username:{custUsername}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                                apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
                                                 continue;
                                             }
                                         }
@@ -310,7 +321,7 @@ namespace BackendSite.Controllers.Api
 
                                     if (balance < adjustmentAndWithdrawalLimit.Amount)
                                     {
-                                        apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                        apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
                                         continue;
                                     }
                                 }
@@ -325,23 +336,23 @@ namespace BackendSite.Controllers.Api
                                         var acc = await tpBLL.TransferAsync(inTpTransfer);
                                         if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
                                         {
-                                            apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. ID is {transId}." });
+                                            apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. SabaId:{sabaId}. ID is {transId}." });
                                         }
                                     }
                                     else
                                     {
-                                        apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. ID is {transId}." });
+                                        apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. SabaId:{sabaId}. ID is {transId}." });
                                     }
                                 }
                             }
                             catch (Exception ex)
                             {
-                                apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Username:{custUsername}. {ex}" });
+                                apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {ex}" });
                             }
                         }
                         else
                         {
-                            apiResult.Add(new ApiResult() { ErrorCode = -1, Message = $"Not found {custUsername}" });
+                            apiResult.Add(new ApiResult() { ErrorCode = -1, Message = $"Not found Username:{custUsername}. SabaId:{sabaId}." });
                         }
                         RowId += 1;
                     }

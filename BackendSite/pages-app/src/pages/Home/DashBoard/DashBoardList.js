@@ -3,7 +3,6 @@ import { DashBoardTable } from "./DashBoardTable";
 
 export const DashBoardList = (props) => {
     let list = Object.keys(props.siteDatas).map((siteDatasKey) => {
-        console.log()
         return (<div key={`site-${siteDatasKey}`} className="panel mt-20">
             <a className="panel-title" data-toggle="collapse" href={`#collapseExample-${siteDatasKey}`} role="button" aria-expanded="true" aria-controls="collapseExample">
                 {props.siteDatas[siteDatasKey].siteName}

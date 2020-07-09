@@ -23,7 +23,7 @@ namespace BackendSite.Controllers.Api
             this.excelBLL = excelBLL;
         }
 
-        public ApiListResult<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport([FromForm]string TransId, [FromForm]int CurrencyId, [FromForm]string UserName, [FromForm]int AdjustType, [FromForm]long StartDate, [FromForm]long EndDate, [FromForm]int PageNumber)
+        public ApiListResult<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport([FromForm] string TransId, [FromForm] int CurrencyId, [FromForm] string UserName, [FromForm] int AdjustType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)
         {
             var result = new ApiListResult<PaymentAdjustmentFrontEnd>();
             try
