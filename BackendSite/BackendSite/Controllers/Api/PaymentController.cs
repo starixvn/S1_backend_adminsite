@@ -249,7 +249,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new List<ApiResult>();
             var authData = authorizeBLL.GetAuthData();
 
-            if (excelUpload.ContentType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || excelUpload.ContentType == "application/vnd.ms-excel")
+            if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
             {
                 ExcelPackage excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
                 ExcelWorksheet sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
