@@ -194,12 +194,24 @@ namespace BackendSite.Controllers.Api
 
             if (custInfosDetail != null)
             {
-                apiResult.Data = custInfosDetail;
-                apiResult.ErrorCode = 0;
+                if (custInfosDetail.Status == 1)
+                {
+                    apiResult.Data = custInfosDetail;
+                    apiResult.ErrorCode = 0;
+                }
+                else if (custInfosDetail.Status == 2) {
+                    apiResult.Message = "Suspend Status.";
+                    apiResult.ErrorCode = 999;
+                }
+                else 
+                {
+                    apiResult.Message = "Closed Status.";
+                    apiResult.ErrorCode = 999;
+                }
             }
             else
             {
-                apiResult.Message = "";
+                apiResult.Message = "No find";
             }
 
             return apiResult;
