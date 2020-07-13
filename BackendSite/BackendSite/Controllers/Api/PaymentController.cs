@@ -284,75 +284,86 @@ namespace BackendSite.Controllers.Api
                         var custInfoDetail = custInfoBLL.GetCustInfoDetails(_custId, custUsername, optSite);
                         if (custInfoDetail != null)
                         {
-                            try
+                            if (custInfoDetail.Status == 1)
                             {
-                                decimal withdrawalLimitAmount = (withdrawalLimitOption == 1) ? amount : 0;
-                                AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit
+                                try
                                 {
-                                    CustId = custInfoDetail.CustId,
-                                    CurrencyId = custInfoDetail.CurrencyId,
-                                    UserName = custInfoDetail.UserName,
-                                    SiteId = custInfoDetail.SiteId,
-                                    Amount = amount,
-                                    AdjustType = option,
-                                    SiteName = custInfoDetail.SiteName,
-                                    Operator = authData.UserName,
-                                    WithdrawalLimitAmount = withdrawalLimitAmount,
-                                    WithdrawalLimitAmountAdjustType = withdrawalLimitOption,
-                                    Memo = memo
-                                };
-
-                                string transId = null;
-                                if (adjustmentAndWithdrawalLimit.AdjustType == 2)
-                                {
-                                    var balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
-                                    if (balance < adjustmentAndWithdrawalLimit.Amount)
+                                    decimal withdrawalLimitAmount = (withdrawalLimitOption == 1) ? amount : 0;
+                                    AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit
                                     {
-                                        if (mainWalletType == 2)
-                                        {
-                                            var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
-                                            TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = deAmount, CustId = custInfoDetail.CustId, direction = TpDirection.ToMain };
+                                        CustId = custInfoDetail.CustId,
+                                        CurrencyId = custInfoDetail.CurrencyId,
+                                        UserName = custInfoDetail.UserName,
+                                        SiteId = custInfoDetail.SiteId,
+                                        Amount = amount,
+                                        AdjustType = option,
+                                        SiteName = custInfoDetail.SiteName,
+                                        Operator = authData.UserName,
+                                        WithdrawalLimitAmount = withdrawalLimitAmount,
+                                        WithdrawalLimitAmountAdjustType = withdrawalLimitOption,
+                                        Memo = memo
+                                    };
 
-                                            var acc = await tpBLL.TransferAsync(inTpTransfer);
-                                            if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
+                                    string transId = null;
+                                    if (adjustmentAndWithdrawalLimit.AdjustType == 2)
+                                    {
+                                        var balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
+                                        if (balance < adjustmentAndWithdrawalLimit.Amount)
+                                        {
+                                            if (mainWalletType == 2)
                                             {
-                                                apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
-                                                continue;
+                                                var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
+                                                TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = deAmount, CustId = custInfoDetail.CustId, direction = TpDirection.ToMain };
+
+                                                var acc = await tpBLL.TransferAsync(inTpTransfer);
+                                                if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
+                                                {
+                                                    apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                                    continue;
+                                                }
                                             }
+                                        }
+
+                                        balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
+
+                                        if (balance < adjustmentAndWithdrawalLimit.Amount)
+                                        {
+                                            apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                            continue;
                                         }
                                     }
 
-                                    balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
-
-                                    if (balance < adjustmentAndWithdrawalLimit.Amount)
+                                    if (paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, authData.UserName, out transId) > 0)
                                     {
-                                        apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
-                                        continue;
-                                    }
-                                }
+                                        if (mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
+                                        {
+                                            var balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
+                                            TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = balance, CustId = custInfoDetail.CustId, direction = TpDirection.ToTp };
 
-                                if (paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, authData.UserName, out transId) > 0)
-                                {
-                                    if (mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
-                                    {
-                                        var balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
-                                        TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = balance, CustId = custInfoDetail.CustId, direction = TpDirection.ToTp };
-
-                                        var acc = await tpBLL.TransferAsync(inTpTransfer);
-                                        if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
+                                            var acc = await tpBLL.TransferAsync(inTpTransfer);
+                                            if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
+                                            {
+                                                apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. SabaId:{sabaId}. ID is {transId}." });
+                                            }
+                                        }
+                                        else
                                         {
                                             apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. SabaId:{sabaId}. ID is {transId}." });
                                         }
                                     }
-                                    else
-                                    {
-                                        apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. SabaId:{sabaId}. ID is {transId}." });
-                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {ex}" });
                                 }
                             }
-                            catch (Exception ex)
+                            else if (custInfoDetail.Status == 2)
                             {
-                                apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {ex}" });
+                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. Suspend Status." });
+                            }
+                            else
+                            {
+                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. Closed Status." });
                             }
                         }
                         else
