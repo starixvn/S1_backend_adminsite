@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
@@ -143,6 +144,11 @@ namespace BackendSite.Controllers.Api
             public decimal MinAmount { get; set; }
             public decimal MaxAmount { get; set; }
         }
+        public class CustInfosReq : CustInfoReq
+        {
+            public string sabaId { get; set; }
+            public int SiteId { get; set; }
+        }
 
         [HttpPost]
         public async Task<ApiResult<CustInfoDetail>> GetCustInfoDetailAsync(CustInfoReq custInfoReq)
@@ -153,6 +159,42 @@ namespace BackendSite.Controllers.Api
             if (custInfoDetail != null)
             {
                 apiResult.Data = custInfoDetail;
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.Message = "";
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<CustInfoDetail> GetCustInfoDetails(CustInfosReq custInfosReq)
+        {
+            var apiResult = new ApiResult<CustInfoDetail>();
+
+            string custUsername = string.IsNullOrEmpty(custInfosReq.UserName) ? null : custInfosReq.UserName;
+
+            int custId;
+            string sabaId = custInfosReq.sabaId;
+            if (sabaId.IndexOf("_") > -1)
+            {
+                sabaId = sabaId.Substring(sabaId.LastIndexOf("_"), sabaId.Length - sabaId.LastIndexOf("_"));
+            }
+            else if (sabaId.IndexOf("x") > -1)
+            {
+                sabaId = sabaId.Substring(sabaId.LastIndexOf("x"), sabaId.Length - sabaId.LastIndexOf("x"));
+            }
+
+            Match m = Regex.Match(sabaId, @"\d+");
+            int? _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
+
+            var custInfosDetail = custInfoBLL.GetCustInfoDetails(_custId, custUsername, custInfosReq.SiteId);
+
+            if (custInfosDetail != null)
+            {
+                apiResult.Data = custInfosDetail;
                 apiResult.ErrorCode = 0;
             }
             else
