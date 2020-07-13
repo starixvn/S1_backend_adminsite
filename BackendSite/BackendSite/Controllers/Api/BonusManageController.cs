@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class BonusManageController : Controller

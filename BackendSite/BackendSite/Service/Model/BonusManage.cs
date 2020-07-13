@@ -11,11 +11,11 @@ namespace BackendSite.Service.Model
         public string Description { get; set; }
         public int PromotionType { get; set; }
         public int CategoryId { get; set; }
-        public DateTime PeriodFrom { get; set; }
-        public DateTime PeriodTo { get; set; }
+        public long PeriodFrom { get; set; }
+        public long PeriodTo { get; set; }
         public int Sort { get; set; }
         public int Status { get; set; }
-        public DateTime? LastUpateTime { get; set; }
+        public long? LastUpateTime { get; set; }
         public string LastUpdateUser { get; set; }
     }
 
