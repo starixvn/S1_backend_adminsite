@@ -23,10 +23,9 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> GetPromotionList([FromForm]string BonusCode)
+        public ApiResult<IEnumerable<PromotionInfo>> GetPromotionList()
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
-
             try
             {
                 apiResult.Data = bonusManageBLL.GetPromotionList();

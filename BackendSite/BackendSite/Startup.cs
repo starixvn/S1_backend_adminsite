@@ -16,11 +16,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using BackendSite.Attributes;
+using Microsoft.AspNetCore.Http;
 
 namespace BackendSite
 {
     public class Startup
     {
+        private readonly string AllowSpecificOrigins = "AllowAllOriginsPolicy";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -132,9 +134,21 @@ namespace BackendSite
                 option.LoginPath = "/Home/Signin";
                 option.Cookie.Name = ".backend";
                 option.ExpireTimeSpan = TimeSpan.FromDays(1);//沒給預設14天
+                option.Cookie.SameSite = SameSiteMode.None;
             });
             services.AddDataProtection().DisableAutomaticKeyGeneration();
             services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("CookieKeys")).SetApplicationName("SharedCookieApp");
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: AllowSpecificOrigins,
+                                  builder =>
+                                  {
+                                      builder.WithOrigins("http://localhost:3000", "http://localhost:3001")
+                                      .AllowAnyHeader()
+                                        .AllowAnyMethod()
+                                        .AllowCredentials();
+                                  });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -151,6 +165,7 @@ namespace BackendSite
 
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseCors(AllowSpecificOrigins);
             app.UseAuthentication();
             app.UseAuthorization();
 
