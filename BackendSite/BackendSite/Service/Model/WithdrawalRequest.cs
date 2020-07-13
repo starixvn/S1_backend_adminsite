@@ -47,7 +47,11 @@ namespace BackendSite.Service.Model
         (int)enums.WithdrawalType.OnlinePayment => $"{SiteName}-{FromBankCode}",
         _ => null
     };
-
+        public int IsKyc { set; get; }
+        public int IsRisk { set; get; }
+        public int WithdrawlCnt { set; get; }
+        public int Flag { set; get; }
+        public DateTime UpdateTime { set; get; }
         //public virtual IEnumerable<Comments> Comments { get; set; }
     }
     public class WithdrawalInfo
@@ -101,6 +105,11 @@ namespace BackendSite.Service.Model
             (int)enums.WithdrawalType.OnlinePayment => $"{SiteName}-{FromBankCode}",
             _ => null
         };
+        public int IsKyc { set; get; }
+        public int IsRisk { set; get; }
+        public int WithdrawlCnt { set; get; }
+        public string Operator { set; get; }
+        public DateTime UpdateTime { set; get; }
     }
 
     public class WithdrawalLimit
