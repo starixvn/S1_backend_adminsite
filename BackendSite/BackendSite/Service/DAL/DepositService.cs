@@ -44,7 +44,7 @@ namespace BackendSite.Service.DAL
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var depositList = conn.Query<DepositRequest>("DepositList_Get", p, commandType: CommandType.StoredProcedure);
+            var depositList = conn.Query<DepositRequest>("Admin_DepositList_Get", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -93,10 +93,10 @@ namespace BackendSite.Service.DAL
                 conn.Open();
                 using var trans = conn.BeginTransaction();
                 string sForStatus = Newtonsoft.Json.JsonConvert.SerializeObject(forStatus);
-                var p = new DynamicParameters(new { DepositId = depositId, SiteId = siteId, ActualDeposit = actualDeposit, Comment = comment, ForStatus = sForStatus, Status = (int)status, ThirdId = (string)null });
+                var p = new DynamicParameters(new { DepositId = depositId, SiteId = siteId, ActualDeposit = actualDeposit, Comment = comment, ForStatus = sForStatus, Status = (int)status, ThirdId = (string)null, Operator = Operator });
                 p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
-                result = conn.Execute("DepositInfo_Set", p, trans, commandType: CommandType.StoredProcedure);
+                result = conn.Execute("Admin_DepositInfo_Set", p, trans, commandType: CommandType.StoredProcedure);
 
                 if (result > 0)
                 {

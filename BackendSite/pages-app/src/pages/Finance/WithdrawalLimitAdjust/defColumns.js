@@ -1,6 +1,6 @@
 export const adjustType = {
-    1:'Credit',
-    2:'Debit'
+    1:'Debit',
+    2:'Credit'
 }
 
 export const StatusList = {
