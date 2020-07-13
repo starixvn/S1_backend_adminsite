@@ -1,28 +1,28 @@
-﻿import {number_format} from '../commJS/common';
-import {Pagination} from '../commJS/Pagination.jsx';
+﻿import { number_format } from '../commJS/common';
+import { Pagination } from '../commJS/Pagination.jsx';
 import * as Loading from '../commJS/Loading.jsx';
 
 (function ($, React, ReactDOM, i18n, axios, moment, Calendar) {
     const WithdrawalStatus = {
-        Pending:1,
-        ToKyc:8,
-        OnHold:2,
-        Verify:3,
-        Process:4,
-        Cancelled:5,
-        Approved:6,
-        Rejected :7
+        Pending: 1,
+        ToKyc: 8,
+        OnHold: 2,
+        Verify: 3,
+        Process: 4,
+        Cancelled: 5,
+        Approved: 6,
+        Rejected: 7
     };
 
     const WithdrawalStatusOp = {
-        1:<span className="status status-pending">{i18n["lbl_WithdrawalStatus1"]}</span>,
-        2:<span className="status status-hold">{i18n["lbl_WithdrawalStatus2"]}</span>,
-        3:<span className="status status-verify">{i18n["lbl_WithdrawalStatus3"]}</span>,
-        4:<span className="status status-process">{i18n["lbl_WithdrawalStatus4"]}</span>,
-        5:<span className="status status-cancelled">{i18n["lbl_WithdrawalStatus5"]}</span>,
-        6:<span className="status status-approved">{i18n["lbl_WithdrawalStatus6"]}</span>,
-        7:<span className="status status-rejected">{i18n["lbl_WithdrawalStatus7"]}</span>,
-        8:<span className="status status-hold">{i18n["lbl_WithdrawalStatus8"]}</span>,
+        1: <span className="status status-pending">{i18n["lbl_WithdrawalStatus1"]}</span>,
+        2: <span className="status status-hold">{i18n["lbl_WithdrawalStatus2"]}</span>,
+        3: <span className="status status-verify">{i18n["lbl_WithdrawalStatus3"]}</span>,
+        4: <span className="status status-process">{i18n["lbl_WithdrawalStatus4"]}</span>,
+        5: <span className="status status-cancelled">{i18n["lbl_WithdrawalStatus5"]}</span>,
+        6: <span className="status status-approved">{i18n["lbl_WithdrawalStatus6"]}</span>,
+        7: <span className="status status-rejected">{i18n["lbl_WithdrawalStatus7"]}</span>,
+        8: <span className="status status-hold">{i18n["lbl_WithdrawalStatus8"]}</span>,
     }
 
     class WithdrawalList extends React.Component {
@@ -41,52 +41,67 @@ import * as Loading from '../commJS/Loading.jsx';
 
         onExport() {
             this.props.onExport();
-        }        
+        }
 
         render() {
-            let rows = this.props.searchData.data.map(row => 
-                <tr key={row.transId}>
-                    <th scope="row"><a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a></th>
-                    <td>{row.calCode}</td>
-                    <td>{i18n["lbl_WithdrawalType" + row.withdrawalType]}</td>
-                    <td><a href={"/CustManage/CustInfo?UserName="+row.userName+"&custId="+ row.custId +"&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
-                    <td>{i18n["lbl_Currency"+row.currencyId]}</td>
-                    <td className="text-right">{number_format(row.amount)}</td>                    
-                    <td>{row.accountNo}</td>
-                    <td>{row.accountName}</td>
-                    <td>{moment(row.createTime).format('l LTS')}</td>
-                    <td>{WithdrawalStatusOp[row.status]}{row.status == 8 && row.hasPhotoId ? <span>(Uploaded PhothId)</span> : null} </td>
-                </tr>
+
+            let rows = this.props.searchData.data.map(row => {
+                let styleblod = (row.flag === 0) ? { fontWeight: 'bold' } : {};
+                return (
+                    <tr key={row.transId} style={styleblod}>
+                        <th scope="row"><a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a></th>
+                        {/* <td>{row.calCode}</td> */}
+                        <td>{i18n["lbl_WithdrawalType" + row.withdrawalType]}</td>
+                        <td>{row.isKyc === 1 ? "YES" : "NO"}</td>
+                        <td>{row.isRisk === 1 ? "YES" : "NO"}</td>
+                        <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
+                        <td>{i18n["lbl_Currency" + row.currencyId]}</td>
+                        <td className="text-right">{number_format(row.amount)}</td>
+                        <td>{row.bankName}</td>
+                        <td>{row.accountNo}</td>
+                        <td>{row.accountName}</td>
+                        <td>{moment(row.createTime).format('l LTS')}</td>
+                        <td>{row.updateTime ? moment(row.updateTime).format('l LTS') : null}</td>
+                        <td>{row.withdrawlCnt}</td>
+                        <td>{WithdrawalStatusOp[row.status]}{row.status == 8 && row.hasPhotoId ? <span>(Uploaded PhothId)</span> : null} </td>
+                    </tr>
+                )
+            }
             );
 
             let RefreshBtn = null;
-            if(this.props.onRefresh == null) {
+            if (this.props.onRefresh == null) {
                 RefreshBtn = <button type="button" className="btn btn-refresh" disabled={true} onClick={null}>
-                            Loading
+                    Loading
                         </button>;
             } else {
                 RefreshBtn = <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>
-                            Refresh <span>({this.props.timeInterval})</span>
-                        </button>;
+                    Refresh <span>({this.props.timeInterval})</span>
+                </button>;
             }
             return (
                 <div className="table">
                     <div className="table-options">
                         {RefreshBtn}<button type="button" className="btn btn-approved" onClick={this.onExport.bind(this)}>Export Excel</button>
                     </div>
-                    
+
                     <table className="table table-striped">
                         <thead>
                             <tr>
                                 <th scope="col">Trxn.ID</th>
-                                <th scope="col">Calvin Code</th>
+                                {/* <th scope="col">Calvin Code</th> */}
                                 <th scope="col">{i18n.lbl_WithdrawalType}</th>
+                                <th scope="col">Is Kyc</th>
+                                <th scope="col">Is Risk</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
                                 <th scope="col">CCY</th>
                                 <th scope="col" className="text-right">{i18n.lbl_Amount}</th>
+                                <th scope="col">Bank Name</th>
                                 <th scope="col">To Acc. NO.</th>
-                                <th scope="col">To Acc. Name</th>                                
+                                <th scope="col">To Acc. Name</th>
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
+                                <th scope="col">{"Update Time (" + moment().format('Z') + ")"}</th>
+                                <th scope="col">Total Deposit Count</th>
                                 <th scope="col">{i18n.lbl_Status}</th>
                             </tr>
                         </thead>
@@ -94,13 +109,13 @@ import * as Loading from '../commJS/Loading.jsx';
                             {rows}
                         </tbody>
                     </table>
-                    <Pagination Data={{...this.props.searchData}} ChangePage={this.props.ChangePage}/>
+                    <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
                 </div>
             )
         }
     }
 
-    class WithdrawalRequestComment  extends React.Component {
+    class WithdrawalRequestComment extends React.Component {
         constructor(props) {
             super(props);
         }
@@ -108,43 +123,43 @@ import * as Loading from '../commJS/Loading.jsx';
             let data = this.props.Data;
             let i = 1;
             let rows = null;
-            if(data !=null) {
-                rows = data.map(function(obj) { 
+            if (data != null) {
+                rows = data.map(function (obj) {
                     return <tr key={i}>
-                                    <td scope="row">{i++}</td>
-                                    <td>{moment(obj.createTime).format('l LTS')}</td>
-                                    <td>{obj.comment}</td>
-                                    <td>{i18n["lbl_WithdrawalStatus"+obj.action]}</td>
-                                    <td>{obj.operator}</td>
-                                </tr>;
+                        <td scope="row">{i++}</td>
+                        <td>{moment(obj.createTime).format('l LTS')}</td>
+                        <td>{obj.comment}</td>
+                        <td>{i18n["lbl_WithdrawalStatus" + obj.action]}</td>
+                        <td>{obj.operator}</td>
+                    </tr>;
                 });
             }
 
             return (
-                data !=null ? 
-        <table className="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">{i18n.lbl_No}</th>
-                    <th scope="col">{i18n.lbl_CreateTime}</th>
-                    <th scope="col">{i18n.lbl_Comment}</th>
-                    <th scope="col">{i18n.lbl_Action}</th>
-                    <th scope="col">Operator</th>
-                </tr>
-            </thead>
-            <tbody>
-                {rows}
-            </tbody>
-        </table> : null
+                data != null ?
+                    <table className="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">{i18n.lbl_No}</th>
+                                <th scope="col">{i18n.lbl_CreateTime}</th>
+                                <th scope="col">{i18n.lbl_Comment}</th>
+                                <th scope="col">{i18n.lbl_Action}</th>
+                                <th scope="col">Operator</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rows}
+                        </tbody>
+                    </table> : null
             )
         }
-    }            
+    }
 
     class WithdrawalDetail extends React.Component {
-        _clipboard=null;
+        _clipboard = null;
         constructor(props) {
             super(props);
-            this.state={Data:null};
+            this.state = { Data: null };
         }
 
         componentDidMount() {
@@ -152,42 +167,42 @@ import * as Loading from '../commJS/Loading.jsx';
             this.onGetComment();
             this._clipboard = new ClipboardJS(".js-copy");
 
-            this._clipboard.on('success', function(e) {
+            this._clipboard.on('success', function (e) {
                 //console.log(e);
             });
-            this._clipboard.on('error', function(e) {
+            this._clipboard.on('error', function (e) {
                 //console.log(e);
-            });            
+            });
         }
 
         onGetData() {
             Loading.OnLoading();
-            axios.post('/api/Withdrawal/GetWithdrawalRequest', { transId: this.props.transId})
-            .then(async function (response) {
-                Loading.UnLoading();
-                let result = response.data;
-                if (result.errorCode == 0) {
+            axios.post('/api/Withdrawal/GetWithdrawalRequest', { transId: this.props.transId })
+                .then(async function (response) {
+                    Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
 
-                    if(result.data.status==3) {
-                        await this.onGetPayList(result.data.currencyId, result.data.sysId);
-                        await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId, result.data.siteId);
-                    }
-                    
-                    let SelId = null;
-                    if(result.data.withdrawalType==1) {
-                        SelId = result.data.payId;
-                    } else if (result.data.withdrawalType==2) {
-                        SelId = result.data.bankId;
-                    }
+                        if (result.data.status == 3) {
+                            await this.onGetPayList(result.data.currencyId, result.data.sysId);
+                            await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId, result.data.siteId);
+                        }
 
-                    this.setState({Data: result.data, selectType: result.data.withdrawalType, GetData: true,SelId: SelId,Comment: result.data.comment});
-                } else {
-                    alert(result.message);
-                }
-            }.bind(this)).catch(function (error) {
-                Loading.UnLoading();
-                alert(error);
-            }.bind(this));
+                        let SelId = null;
+                        if (result.data.withdrawalType == 1) {
+                            SelId = result.data.payId;
+                        } else if (result.data.withdrawalType == 2) {
+                            SelId = result.data.bankId;
+                        }
+
+                        this.setState({ Data: result.data, selectType: result.data.withdrawalType, GetData: true, SelId: SelId, Comment: result.data.comment });
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
         }
 
         onBack() {
@@ -195,106 +210,130 @@ import * as Loading from '../commJS/Loading.jsx';
         }
 
         setComment(event) {
-            this.setState({Comment: event.target.value});
+            this.setState({ Comment: event.target.value });
         }
 
-        onGetComment(){
-            axios.post('/api/Withdrawal/GetWithdrawalRequestComment', { transId: this.props.transId})
-            .then(function (response) {
-                Loading.UnLoading();
-                let result = response.data;
-                if (result.errorCode == 0) {
-                    this.setState({Comments: result.data, GetData: true});
-                } else {
-                    alert(result.message);
-                }
-            }.bind(this)).catch(function (error) {
-                Loading.UnLoading();
-                alert(error);
-            }.bind(this));    
+        onGetComment() {
+            axios.post('/api/Withdrawal/GetWithdrawalRequestComment', { transId: this.props.transId })
+                .then(function (response) {
+                    Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.setState({ Comments: result.data, GetData: true });
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
         }
 
-        onConfirm(action){
-            if((action != 0 && confirm('Are you sure?')) || action==0) {
+        onConfirm(action) {
+            let confirmstring = "Are you sure";
+            switch (action) {
+                case 0:
+                    confirmstring += " Draft ?";
+                    break;
+                case 2:
+                    confirmstring += " On Hold(Risk Check) ?";
+                    break;
+                case 3:
+                    confirmstring += " Verify ?";
+                    break;
+                case 4:
+                    confirmstring += " Process ?";
+                    break;
+                case 6:
+                    confirmstring += " Approved ?";
+                    break;
+                case 7:
+                    confirmstring += " Rejected ?";
+                    break;
+                default:
+                    confirmstring += " ?";
+                    break;
+            }
+            if ((action != 0 && confirm(confirmstring)) || action == 0) {
                 Loading.OnLoading();
-                let data = { transId: this.props.transId, Comment : this.state.Comment, Action:action};
-                
-                if(action == 4) {
+                let data = { transId: this.props.transId, Comment: this.state.Comment, Action: action };
+
+                if (action == 4) {
                     data.WithdrawalInfo = this.state.Data.withdrawalInfo;
                     data.SelId = parseInt(this.state.SelId);
                     data.WithdrawalType = this.state.selectType;
                 }
 
                 axios.post('/api/Withdrawal/WithdrawalConfirm', data)
-                .then(function (response) {
-                    Loading.UnLoading();
-                    let result = response.data;
-                    if (result.errorCode == 0) {
-                        alert(result.message);
-                        if(action!=0) {
-                            this.onBack();
+                    .then(function (response) {
+                        Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            alert(result.message);
+                            if (action != 0) {
+                                this.onBack();
+                            } else {
+                                this.onGetComment();
+                            }
                         } else {
+                            alert(result.message);
                             this.onGetComment();
                         }
-                    } else {
-                        alert(result.message);
-                        this.onGetComment();
-                    }
-                }.bind(this)).catch(function (error) {
-                    Loading.UnLoading();
-                    alert(error);
-                }.bind(this));
-            } 
+                    }.bind(this)).catch(function (error) {
+                        Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
         }
 
         onSelectType(event) {
-            let SelId=null;
+            let SelId = null;
 
-            if(parseInt(event.target.value)==1 && this.state.PayList.length>0) {
-                SelId=this.state.PayList[0].payId;
-            } else if(parseInt(event.target.value)==2 && this.state.BankInfoOffList.length>0) {
-                SelId=this.state.BankInfoOffList[0].bankId;
+            if (parseInt(event.target.value) == 1 && this.state.PayList.length > 0) {
+                SelId = this.state.PayList[0].payId;
+            } else if (parseInt(event.target.value) == 2 && this.state.BankInfoOffList.length > 0) {
+                SelId = this.state.BankInfoOffList[0].bankId;
             }
 
-            this.setState({selectType: parseInt(event.target.value), SelId: SelId});
+            this.setState({ selectType: parseInt(event.target.value), SelId: SelId });
         }
 
         async onGetBankInfoOffList(currencyId, sysId, siteId) {
             let data = this.state.Data;
-            await axios.post('/api/Withdrawal/GetBankInfoOffList', { CurrencyId: currencyId, SysId: sysId, SiteId: siteId})
-            .then(function (response) {
-                //Loading.UnLoading();
-                let result = response.data;
-                if (result.errorCode == 0) {
-                    this.setState({BankInfoOffList: result.data});
-                } else {
-                    alert(result.message);
-                }
-            }.bind(this)).catch(function (error) {
-                //Loading.UnLoading();
-                alert(error);
-            }.bind(this));
+            await axios.post('/api/Withdrawal/GetBankInfoOffList', { CurrencyId: currencyId, SysId: sysId, SiteId: siteId })
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.setState({ BankInfoOffList: result.data });
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
         }
 
         async onGetPayList(currencyId, sysId) {
             let data = this.state.Data;
-            await axios.post('/api/Withdrawal/GetPayList', { CurrencyId: currencyId, SysId: sysId})
-            .then(function (response) {
-                //Loading.UnLoading();
-                let result = response.data;
-                if (result.errorCode == 0) {
-                    this.setState({PayList: result.data});
-                } else {
-                    alert(result.message);
-                }
-            }.bind(this)).catch(function (error) {
-                //Loading.UnLoading();
-                alert(error);
-            }.bind(this));
-        }        
+            await axios.post('/api/Withdrawal/GetPayList', { CurrencyId: currencyId, SysId: sysId })
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.setState({ PayList: result.data });
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+        }
 
         onSelId(event) {
-            this.setState({SelId: event.target.value });
+            this.setState({ SelId: event.target.value });
         }
 
         render() {
@@ -317,45 +356,45 @@ import * as Loading from '../commJS/Loading.jsx';
                 if ((data.status == 3 || data.status == 2 || data.status == 8))
                     btnGroup.push(<button key={7} type="button" className="btn btn-rejected" onClick={this.onConfirm.bind(this, 7)}>Rejected</button>);
 
-                selectType = i18n["lbl_WithdrawalType" +data.withdrawalType];
+                selectType = i18n["lbl_WithdrawalType" + data.withdrawalType];
 
-                if(data.status==3) {
+                if (data.status == 3) {
                     let selectOp = [];
                     selectOp.push(<option key={0} value="0">Undefine</option>);
-                     if(this.state.PayList.length > 0)
+                    if (this.state.PayList.length > 0)
                         selectOp.push(<option key={1} value="1">Online Payment</option>);
-                     if(this.state.BankInfoOffList.length > 0)
+                    if (this.state.BankInfoOffList.length > 0)
                         selectOp.push(<option key={2} value="2">Local Bank</option>);
                     selectType = <select className="form-control" onChange={this.onSelectType.bind(this)} value={this.state.selectType}>
                         {selectOp}
                     </select>;
 
                     selectPay = null;
-                    if(this.state.selectType==1) {
+                    if (this.state.selectType == 1) {
                         selectPay = this.state.PayList.map(row => <option key={row.payId} value={row.payId}>{row.payName}</option>);
                         /*if(this.state.PayList.length>0) {
                             this.state.SelId=this.state.PayList[0];
-                        }*/                       
-                    } else if(this.state.selectType==2) {
-                        selectPay = this.state.BankInfoOffList.map(row => <option key={row.bankId} value={row.bankId}>{row.bankCode + "-"  + row.accountName + "-" + row.accountNo}</option>);
+                        }*/
+                    } else if (this.state.selectType == 2) {
+                        selectPay = this.state.BankInfoOffList.map(row => <option key={row.bankId} value={row.bankId}>{row.bankCode + "-" + row.accountName + "-" + row.accountNo}</option>);
                         /*if(this.state.BankInfoOffList.length>0) {
                             this.state.SelId=this.state.BankInfoOffList[0];
                         }*/
                     }
 
-                    if(selectPay!=null){
+                    if (selectPay != null) {
                         selectPay = <tr>
                             <th scope="row">select Pay</th>
                             <td><select className="form-control" value={this.state.SelId} onChange={this.onSelId.bind(this)}>{selectPay}</select></td>
                         </tr>;
                     }
                 } else {
-                    if(data.payId > 0) {
+                    if (data.payId > 0) {
                         PayFrom.push(<tr key={1}>
                             <th scope="row">Payment</th>
                             <td>{data.payName}</td>
                         </tr>);
-                    } else if(data.bankId > 0) {
+                    } else if (data.bankId > 0) {
                         PayFrom.push(<tr key={1}>
                             <th scope="row">From Bank Code</th>
                             <td>{data.fromBankCode}</td>
@@ -366,14 +405,14 @@ import * as Loading from '../commJS/Loading.jsx';
                             <td>{data.fromBankName}</td>
                         </tr>);
                         let bankInfoObj = JSON.parse(data.withdrawalInfo);
-                       PayFrom.push(<tr key={3}>
+                        PayFrom.push(<tr key={3}>
                             <th scope="row">From Account Name</th>
                             <td>{bankInfoObj.FromAccountName}</td>
                         </tr>);
-                       PayFrom.push(<tr key={4}>
+                        PayFrom.push(<tr key={4}>
                             <th scope="row">From Account No</th>
                             <td>{bankInfoObj.FromAccountNo}</td>
-                        </tr>);                                     
+                        </tr>);
                     }
                 }
             }
@@ -395,8 +434,16 @@ import * as Loading from '../commJS/Loading.jsx';
                                 <td>{i18n["lbl_WithdrawalStatus" + data.status]}</td>
                             </tr>
                             <tr>
+                                <th scope="row">Is Kyc</th>
+                                <td>{data.isKyc === 1 ? "YES" : "NO"}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Is Risk</th>
+                                <td>{data.isRisk === 1 ? "YES" : "NO"}</td>
+                            </tr>
+                            <tr>
                                 <th scope="row">Username</th>
-                                <td><a href={"/CustManage/CustInfo?UserName="+data.userName+"&custId="+ data.custId +"&TransId=" + data.transId} target="_blank">{data.userName}</a></td>
+                                <td><a href={"/CustManage/CustInfo?UserName=" + data.userName + "&custId=" + data.custId + "&TransId=" + data.transId} target="_blank">{data.userName}</a></td>
                             </tr>
                             <tr>
                                 <th scope="row">E-mail</th>
@@ -439,6 +486,14 @@ import * as Loading from '../commJS/Loading.jsx';
                                 <th scope="row">Ref ID</th>
                                 <td>{data.refId}</td>
                             </tr>
+                            <tr>
+                                <th scope="row">Total Withdrawl Count</th>
+                                <td>{data.withdrawlCnt}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">{"Update Time (" + moment().format('Z') + ")"}</th>
+                                <td>{data.updateTime ? moment(data.updateTime).format('l LTS') : null}</td>
+                            </tr>
                         </tbody>
                     </table>
                     <WithdrawalRequestComment Data={this.state.Comments} />
@@ -451,11 +506,11 @@ import * as Loading from '../commJS/Loading.jsx';
                         <div className="pull-right">{btnGroup}</div>
                         <div className="clearfix"></div>
                     </div>
-                    
+
                 </div> : null
             )
         }
-    }    
+    }
 
     class WithdrawalPanel extends React.Component {
         _myTimer;
@@ -468,7 +523,7 @@ import * as Loading from '../commJS/Loading.jsx';
             this.selectdate_end = React.createRef();
             this.ExportForm = React.createRef();
 
-            this.state={selectType:"", selectCurrency:"", selectStatus:"1", SelectUser:"", SelectWithdrawalID:"", ShowDetial: false, timeInterval:this._timeInterval ,IsRefresh: false };
+            this.state = { selectType: "", selectCurrency: "", selectStatus: "1", SelectUser: "", SelectWithdrawalID: "", ShowDetial: false, timeInterval: this._timeInterval, IsRefresh: false };
         }
 
         onRefresh() {
@@ -477,110 +532,110 @@ import * as Loading from '../commJS/Loading.jsx';
         }
 
         onChange(event) {
-            let obj={};
-            obj[event.target.name]=event.target.value;
+            let obj = {};
+            obj[event.target.name] = event.target.value;
             this.setState(obj);
         }
 
         onSearch(pageNumber) {
-            this.setState({IsRefresh:true});
-            if(this._myTimer!= null){
+            this.setState({ IsRefresh: true });
+            if (this._myTimer != null) {
                 clearTimeout(this._myTimer);
             }
             //Loading.OnLoading();
-            let data = {StartDate: this.state.StartDate, EndDate: this.state.EndDate, PageNumber: pageNumber};
-            if(this.state.SelectWithdrawalID!=""){
+            let data = { StartDate: this.state.StartDate, EndDate: this.state.EndDate, PageNumber: pageNumber };
+            if (this.state.SelectWithdrawalID != "") {
                 data.WithdrawalId = this.state.SelectWithdrawalID;
             }
 
-            if(this.state.selectType!=""){
+            if (this.state.selectType != "") {
                 data.withdrawalType = parseInt(this.state.selectType);
             }
 
-            if(this.state.selectStatus!=""){
+            if (this.state.selectStatus != "") {
                 data.status = parseInt(this.state.selectStatus);
             }
 
-            if(this.state.SelectUser!=""){
+            if (this.state.SelectUser != "") {
                 data.UserName = this.state.SelectUser;
             }
 
-            if(this.state.selectCurrency!=""){
+            if (this.state.selectCurrency != "") {
                 data.CurrencyID = parseInt(this.state.selectCurrency);
             }
 
             axios.post('/api/Withdrawal/GetWithdrawalRequestList', data)
-            .then(function (response) {
-                //Loading.UnLoading();
-                this.AutoRefresh();                
-                let result = response.data;
-                if (result.errorCode == 0) {
-                    this.setState({searchData: result, GetData: true, IsRefresh:false, timeInterval: this._timeInterval});
-                } else {
-                    alert(result.message);
-                    this.setState({IsRefresh:false,timeInterval: this._timeInterval});
-                }
-            }.bind(this)).catch(function (error) {
-                this.AutoRefresh();
-                //Loading.UnLoading();
-                this.setState({IsRefresh:false,timeInterval: this._timeInterval});
-                alert(error);
-            }.bind(this));
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    this.AutoRefresh();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.setState({ searchData: result, GetData: true, IsRefresh: false, timeInterval: this._timeInterval });
+                    } else {
+                        alert(result.message);
+                        this.setState({ IsRefresh: false, timeInterval: this._timeInterval });
+                    }
+                }.bind(this)).catch(function (error) {
+                    this.AutoRefresh();
+                    //Loading.UnLoading();
+                    this.setState({ IsRefresh: false, timeInterval: this._timeInterval });
+                    alert(error);
+                }.bind(this));
         }
 
         onExport() {
-            let data = {StartDate: this.state.StartDate, EndDate: this.state.EndDate};
-            if(this.state.SelectWithdrawalID!=""){
+            let data = { StartDate: this.state.StartDate, EndDate: this.state.EndDate };
+            if (this.state.SelectWithdrawalID != "") {
                 data.WithdrawalId = this.state.SelectWithdrawalID;
             }
 
-            if(this.state.selectType!=""){
+            if (this.state.selectType != "") {
                 data.withdrawalType = parseInt(this.state.selectType);
             }
 
-            if(this.state.selectStatus!=""){
+            if (this.state.selectStatus != "") {
                 data.status = parseInt(this.state.selectStatus);
             }
 
-            if(this.state.SelectUser!=""){
+            if (this.state.SelectUser != "") {
                 data.UserName = this.state.SelectUser;
             }
 
-            if(this.state.selectCurrency!=""){
+            if (this.state.selectCurrency != "") {
                 data.CurrencyID = parseInt(this.state.selectCurrency);
             }
 
             let ExportParam = [];
-             for (var prop in data) {
-                 ExportParam.push(<input key={prop} type="hidden" name={prop} value={data[prop]}/>);
+            for (var prop in data) {
+                ExportParam.push(<input key={prop} type="hidden" name={prop} value={data[prop]} />);
             }
 
             ExportParam = <form method="post" action={'/Finance/ExportWithdrawalList'} ref={this.ExportForm}>{ExportParam}</form>;
 
-            this.setState({ExportParam,ExportParam},function (){
+            this.setState({ ExportParam, ExportParam }, function () {
                 this.ExportForm.current.submit();
             }.bind(this));
-        }        
+        }
 
         handleSubmit(event) {
             event.preventDefault();
             //this._Search = true;
-            let endDate = moment(this.selectdate_end.current.value).add(1, 'days').unix()-1;
-            let data = {StartDate: moment(this.selectdate_start.current.value).unix(), EndDate: endDate};
+            let endDate = moment(this.selectdate_end.current.value).add(1, 'days').unix() - 1;
+            let data = { StartDate: moment(this.selectdate_start.current.value).unix(), EndDate: endDate };
 
-            this.setState(data, function(){
+            this.setState(data, function () {
                 this.onSearch(1);
             }.bind(this));
         }
 
         AutoRefresh() {
-            if(this.state.timeInterval==0){
+            if (this.state.timeInterval == 0) {
                 this.onRefresh();
             } else {
                 let timeInterval = this.state.timeInterval;
                 timeInterval--;
-                this.setState({timeInterval:timeInterval});
-                this._myTimer = setTimeout(function(){
+                this.setState({ timeInterval: timeInterval });
+                this._myTimer = setTimeout(function () {
                     this.AutoRefresh();
                 }.bind(this), 1000);
             }
@@ -592,7 +647,7 @@ import * as Loading from '../commJS/Loading.jsx';
             let selectdate_end = this.selectdate_end.current;
             let selectdate_start = this.selectdate_start.current;
 
-                //selectdate_start.value
+            //selectdate_start.value
             Calendar.setup({
                 inputField: selectdate_end, // id of the input field
                 ifFormat: "mm/dd/y",        // format of the input field
@@ -611,20 +666,20 @@ import * as Loading from '../commJS/Loading.jsx';
         }
 
         onCheckDetail(id) {
-            this.setState({transId: id, ShowDetial: true});
+            this.setState({ transId: id, ShowDetial: true });
         }
 
         onBack() {
-            this.setState({ShowDetial: false});
+            this.setState({ ShowDetial: false });
             this.onRefresh();
         }
 
         render() {
-            let selectCurrency = CurrencyList.map(function(obj) { 
-                return <option key={obj} value={obj}>{i18n["lbl_Currency"+obj]}</option>;
+            let selectCurrency = CurrencyList.map(function (obj) {
+                return <option key={obj} value={obj}>{i18n["lbl_Currency" + obj]}</option>;
             });
 
-            selectCurrency.splice(0 ,0 , <option key={""} value={""}>{"All"}</option>)
+            selectCurrency.splice(0, 0, <option key={""} value={""}>{"All"}</option>)
             selectCurrency = <select name="selectCurrency" onChange={this.onChange.bind(this)} value={this.state.selectCurrency}>{selectCurrency}</select>;
             let searchData = this.state.searchData;
             let StartDate = this.state.StartDate;
@@ -708,16 +763,15 @@ import * as Loading from '../commJS/Loading.jsx';
                             </div>
                         </div>
                     </form> : null}
-                    {searchData !=null && !this.state.ShowDetial ? <WithdrawalList onExport={this.onExport.bind(this)} timeInterval={this.state.timeInterval} searchData={searchData} ChangePage={this.onSearch.bind(this)} onCheckDetail={this.onCheckDetail.bind(this)} onRefresh={!this.state.IsRefresh ? this.onRefresh.bind(this) : null} /> : null}
-                    {this.state.transId != null && this.state.ShowDetial ? <WithdrawalDetail transId={this.state.transId} onBack={this.onBack.bind(this)}/> : null}
-                    <div style={{display: 'none'}}>
+                    {searchData != null && !this.state.ShowDetial ? <WithdrawalList onExport={this.onExport.bind(this)} timeInterval={this.state.timeInterval} searchData={searchData} ChangePage={this.onSearch.bind(this)} onCheckDetail={this.onCheckDetail.bind(this)} onRefresh={!this.state.IsRefresh ? this.onRefresh.bind(this) : null} /> : null}
+                    {this.state.transId != null && this.state.ShowDetial ? <WithdrawalDetail transId={this.state.transId} onBack={this.onBack.bind(this)} /> : null}
+                    <div style={{ display: 'none' }}>
                         {this.state.ExportParam}
                     </div>
                 </div>
             )
         }
     }
-    
-    ReactDOM.render(<WithdrawalPanel/>,document.getElementById('searchForm'));
-    })(jQuery, React, ReactDOM, i18n, axios, moment, Calendar);
-    
+
+    ReactDOM.render(<WithdrawalPanel />, document.getElementById('searchForm'));
+})(jQuery, React, ReactDOM, i18n, axios, moment, Calendar);

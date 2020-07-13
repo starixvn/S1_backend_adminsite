@@ -283,7 +283,7 @@ namespace BackendSite.Controllers.Api
                         else
                         {
                             var custInfoDetail = custInfoBLL.GetCustInfoDetails(_custId, custUsername, optSite);
-                            if (custInfoDetail != null)
+                            if (custInfoDetail.Status == 1)
                             {
                                 try
                                 {
@@ -356,9 +356,13 @@ namespace BackendSite.Controllers.Api
                                     apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {ex}" });
                                 }
                             }
+                            else if (custInfoDetail.Status == 2)
+                            {
+                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. Suspend Status." });
+                            }
                             else
                             {
-                                apiResult.Add(new ApiResult() { ErrorCode = -1, Message = $"Not found Username:{custUsername}. SabaId:{sabaId}." });
+                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. Closed Status." });
                             }
                             RowId += 1;
                         }
