@@ -49,19 +49,37 @@ import qs from 'qs';
         }
 
         onGetCustInfoForPayAdjust() {
-            axios.post('/api/CustManage/GetCustInfoDetails', { SabaId: this.state.SabaId, UserName: this.state.UserName, SiteId: this.state.SiteId })
-                .then(function (response) {
-                    //Loading.UnLoading();
-                    let result = response.data;
-                    if (result.errorCode == 0) {
-                        this.setState({ CustData: result.data });
-                    } else {
-                        alert(result.message);
-                    }
-                }.bind(this)).catch(function (error) {
-                    //Loading.UnLoading();
-                    alert(error);
-                }.bind(this));
+            let msg = "";
+            let check = true;
+
+            if (!this.state.SabaId && !this.state.UserName) {
+                check = false;
+                msg = "Please input SabaId or UserName.";
+            }
+
+            if (!this.state.SiteId) {
+                check = false;
+                msg = "Please select Site.";
+            }
+           
+            if (check) {
+                axios.post('/api/CustManage/GetCustInfoDetails', { SabaId: this.state.SabaId, UserName: this.state.UserName, SiteId: this.state.SiteId })
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({ CustData: result.data });
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+            else {
+                alert(msg);
+            }
         }
 
         onSumbitPaymentAdjustment(event) {
