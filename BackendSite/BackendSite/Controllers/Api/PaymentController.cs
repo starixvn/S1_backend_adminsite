@@ -248,42 +248,41 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new List<ApiResult>();
             var authData = authorizeBLL.GetAuthData();
-
-            if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
+            try
             {
-                ExcelPackage excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
-                ExcelWorksheet sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
-                bool isLastRow = false;
-                int RowId = 2;   // 因為有標題列，所以從第2列開始讀起
-
-                do  // 讀取資料，直到讀到空白列為止
+                if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
                 {
-                    string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text;
+                    ExcelPackage excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
+                    ExcelWorksheet sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
+                    bool isLastRow = false;
+                    int RowId = 2;   // 因為有標題列，所以從第2列開始讀起
 
-                    int custId;
-                    string sabaId = sheet.Cells[RowId, 2].Text.Trim();
-                    if (sabaId.IndexOf("_") > -1)
+                    do  // 讀取資料，直到讀到空白列為止
                     {
-                        sabaId = sabaId.Substring(sabaId.LastIndexOf("_"), sabaId.Length - sabaId.LastIndexOf("_"));
-                    }
-                    else if (sabaId.IndexOf("x") > -1)
-                    {
-                        sabaId = sabaId.Substring(sabaId.LastIndexOf("x"), sabaId.Length - sabaId.LastIndexOf("x"));
-                    }
+                        string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text;
 
-                    Match m = Regex.Match(sabaId, @"\d+");
-                    int? _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
-                    decimal.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out decimal amount);
-                    string memo = sheet.Cells[RowId, 4].Text.Trim();
-                    if (string.IsNullOrEmpty(custUsername) && _custId == null)
-                    {
-                        isLastRow = true;
-                    }
-                    else
-                    {
-                        var custInfoDetail = custInfoBLL.GetCustInfoDetails(_custId, custUsername, optSite);
-                        if (custInfoDetail != null)
+                        int custId;
+                        string sabaId = sheet.Cells[RowId, 2].Text.Trim();
+                        if (sabaId.IndexOf("_") > -1)
                         {
+                            sabaId = sabaId.Substring(sabaId.LastIndexOf("_"), sabaId.Length - sabaId.LastIndexOf("_"));
+                        }
+                        else if (sabaId.IndexOf("x") > -1)
+                        {
+                            sabaId = sabaId.Substring(sabaId.LastIndexOf("x"), sabaId.Length - sabaId.LastIndexOf("x"));
+                        }
+
+                        Match m = Regex.Match(sabaId, @"\d+");
+                        int? _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
+                        decimal.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out decimal amount);
+                        string memo = sheet.Cells[RowId, 4].Text.Trim();
+                        if (string.IsNullOrEmpty(custUsername) && _custId == null)
+                        {
+                            isLastRow = true;
+                        }
+                        else
+                        {
+                            var custInfoDetail = custInfoBLL.GetCustInfoDetails(_custId, custUsername, optSite);
                             if (custInfoDetail.Status == 1)
                             {
                                 try
@@ -365,19 +364,20 @@ namespace BackendSite.Controllers.Api
                             {
                                 apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. Closed Status." });
                             }
+                            RowId += 1;
                         }
-                        else
-                        {
-                            apiResult.Add(new ApiResult() { ErrorCode = -1, Message = $"Not found Username:{custUsername}. SabaId:{sabaId}." });
-                        }
-                        RowId += 1;
-                    }
-                } while (!isLastRow);
-                return apiResult;
+                    } while (!isLastRow);
+                    return apiResult;
+                }
+                else
+                {
+                    apiResult.Add(new ApiResult() { ErrorCode = -1, Message = "File Type Error" });
+                    return apiResult;
+                }
             }
-            else
+            catch(Exception ex)
             {
-                apiResult.Add(new ApiResult() { ErrorCode = -1, Message = "File Type Error" });
+                apiResult.Add(new ApiResult() { ErrorCode = -1, Message = ex.ToString() });
                 return apiResult;
             }
         }

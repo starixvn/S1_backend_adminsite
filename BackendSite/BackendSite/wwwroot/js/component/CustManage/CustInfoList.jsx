@@ -90,6 +90,8 @@ import * as Loading from '../commJS/Loading.jsx';
             this.setState({sUserName: this.state.UserName, 
                 sTransId:this.state.TransId, 
                 sTpUserName: this.state.TpUserName, 
+                sAccountName: this.state.AccountName, 
+                sLoginIp: this.state.LoginIp,                                 
                 sEmail: this.state.Email, 
                 sPhoneNo: this.state.PhoneNo, 
                 Loading: true}, function() {
@@ -102,6 +104,8 @@ import * as Loading from '../commJS/Loading.jsx';
             let data = {UserName: this.state.sUserName=="" ? null:this.state.sUserName, 
                 TransId: this.state.sTransId=="" ? null:this.state.sTransId, 
                 TpUserName: this.state.sTpUserName=="" ? null:this.state.sTpUserName, 
+                AccountName: this.state.sAccountName=="" ? null : this.state.sAccountName, 
+                LoginIp: this.state.sLoginIp=="" ? null : this.state.sLoginIp,                
                 Email: this.state.sEmail=="" ? null:this.state.sEmail, 
                 PhoneNo: this.state.sPhoneNo=="" ? null:this.state.sPhoneNo, 
                 PageNumber: pageNumber, 
@@ -125,8 +129,10 @@ import * as Loading from '../commJS/Loading.jsx';
         }
 
         onExport() {
-            let data = {UserName: this.state.sUserName=="" ? null:this.state.sUserName, 
-                TransId: this.state.sTransId=="" ? null:this.state.sTransId, 
+            let data = {UserName: this.state.sUserName=="" ? null : this.state.sUserName, 
+                TransId: this.state.sTransId=="" ? null : this.state.sTransId, 
+                AccountName: this.state.sAccountName=="" ? null : this.state.sAccountName, 
+                LoginIp: this.state.sLoginIp=="" ? null : this.state.sLoginIp,
                 TpUserName: this.state.sTpUserName=="" ? null:this.state.sTpUserName,
                 Email: this.state.sEmail=="" ? null:this.state.sEmail, 
                 PhoneNo: this.state.sPhoneNo=="" ? null:this.state.sPhoneNo,             
@@ -175,6 +181,18 @@ import * as Loading from '../commJS/Loading.jsx';
                                     </div>
                                 </div>
                                 <div className="input-item">
+                                    <label className="label">Real Name</label>
+                                    <div className="field">
+                                        <input type="text" placeholder="Real Name" autoComplete="off" name="AccountName" value={this.state.AccountName} onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <label className="label">Login Ip</label>
+                                    <div className="field">
+                                        <input type="text" placeholder="Login Ip" autoComplete="off" name="LoginIp" value={this.state.LoginIp} onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>                                
+                                <div className="input-item">
                                     <label className="label">Transaction ID</label>
                                     <div className="field">
                                         <input type="text" placeholder="Transaction ID" autoComplete="off" value={this.state.TransId} onChange={this.onTransIdChange.bind(this)} />
@@ -197,7 +215,7 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <div className="field">
                                         <input type="text" placeholder="Phone No" autoComplete="off" name="PhoneNo" value={this.state.PhoneNo} onChange={this.onChange.bind(this)} />
                                     </div>
-                                </div>                                
+                                </div>
                                 <div className="button-group">
                                     <button type="submit" className="btn btn-primary">Search</button>
                                 </div>
