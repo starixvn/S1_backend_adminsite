@@ -248,125 +248,132 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new List<ApiResult>();
             var authData = authorizeBLL.GetAuthData();
-
-            if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
+            try
             {
-                ExcelPackage excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
-                ExcelWorksheet sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
-                bool isLastRow = false;
-                int RowId = 2;   // 因為有標題列，所以從第2列開始讀起
-
-                do  // 讀取資料，直到讀到空白列為止
+                if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
                 {
-                    string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text;
+                    ExcelPackage excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
+                    ExcelWorksheet sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
+                    bool isLastRow = false;
+                    int RowId = 2;   // 因為有標題列，所以從第2列開始讀起
 
-                    int custId;
-                    string sabaId = sheet.Cells[RowId, 2].Text.Trim();
-                    if (sabaId.IndexOf("_") > -1)
+                    do  // 讀取資料，直到讀到空白列為止
                     {
-                        sabaId = sabaId.Substring(sabaId.LastIndexOf("_"), sabaId.Length - sabaId.LastIndexOf("_"));
-                    }
-                    else if (sabaId.IndexOf("x") > -1)
-                    {
-                        sabaId = sabaId.Substring(sabaId.LastIndexOf("x"), sabaId.Length - sabaId.LastIndexOf("x"));
-                    }
+                        string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text;
 
-                    Match m = Regex.Match(sabaId, @"\d+");
-                    int? _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
-                    decimal.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out decimal amount);
-                    string memo = sheet.Cells[RowId, 4].Text.Trim();
-                    if (string.IsNullOrEmpty(custUsername) && _custId == null)
-                    {
-                        isLastRow = true;
-                    }
-                    else
-                    {
-                        var custInfoDetail = custInfoBLL.GetCustInfoDetails(_custId, custUsername, optSite);
-                        if (custInfoDetail != null)
+                        int custId;
+                        string sabaId = sheet.Cells[RowId, 2].Text.Trim();
+                        if (sabaId.IndexOf("_") > -1)
                         {
-                            try
+                            sabaId = sabaId.Substring(sabaId.LastIndexOf("_"), sabaId.Length - sabaId.LastIndexOf("_"));
+                        }
+                        else if (sabaId.IndexOf("x") > -1)
+                        {
+                            sabaId = sabaId.Substring(sabaId.LastIndexOf("x"), sabaId.Length - sabaId.LastIndexOf("x"));
+                        }
+
+                        Match m = Regex.Match(sabaId, @"\d+");
+                        int? _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
+                        decimal.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out decimal amount);
+                        string memo = sheet.Cells[RowId, 4].Text.Trim();
+                        if (string.IsNullOrEmpty(custUsername) && _custId == null)
+                        {
+                            isLastRow = true;
+                        }
+                        else
+                        {
+                            var custInfoDetail = custInfoBLL.GetCustInfoDetails(_custId, custUsername, optSite);
+                            if (custInfoDetail != null)
                             {
-                                decimal withdrawalLimitAmount = (withdrawalLimitOption == 1) ? amount : 0;
-                                AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit
+                                try
                                 {
-                                    CustId = custInfoDetail.CustId,
-                                    CurrencyId = custInfoDetail.CurrencyId,
-                                    UserName = custInfoDetail.UserName,
-                                    SiteId = custInfoDetail.SiteId,
-                                    Amount = amount,
-                                    AdjustType = option,
-                                    SiteName = custInfoDetail.SiteName,
-                                    Operator = authData.UserName,
-                                    WithdrawalLimitAmount = withdrawalLimitAmount,
-                                    WithdrawalLimitAmountAdjustType = withdrawalLimitOption,
-                                    Memo = memo
-                                };
-
-                                string transId = null;
-                                if (adjustmentAndWithdrawalLimit.AdjustType == 2)
-                                {
-                                    var balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
-                                    if (balance < adjustmentAndWithdrawalLimit.Amount)
+                                    decimal withdrawalLimitAmount = (withdrawalLimitOption == 1) ? amount : 0;
+                                    AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit
                                     {
-                                        if (mainWalletType == 2)
-                                        {
-                                            var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
-                                            TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = deAmount, CustId = custInfoDetail.CustId, direction = TpDirection.ToMain };
+                                        CustId = custInfoDetail.CustId,
+                                        CurrencyId = custInfoDetail.CurrencyId,
+                                        UserName = custInfoDetail.UserName,
+                                        SiteId = custInfoDetail.SiteId,
+                                        Amount = amount,
+                                        AdjustType = option,
+                                        SiteName = custInfoDetail.SiteName,
+                                        Operator = authData.UserName,
+                                        WithdrawalLimitAmount = withdrawalLimitAmount,
+                                        WithdrawalLimitAmountAdjustType = withdrawalLimitOption,
+                                        Memo = memo
+                                    };
 
-                                            var acc = await tpBLL.TransferAsync(inTpTransfer);
-                                            if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
+                                    string transId = null;
+                                    if (adjustmentAndWithdrawalLimit.AdjustType == 2)
+                                    {
+                                        var balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
+                                        if (balance < adjustmentAndWithdrawalLimit.Amount)
+                                        {
+                                            if (mainWalletType == 2)
                                             {
-                                                apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
-                                                continue;
+                                                var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
+                                                TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = deAmount, CustId = custInfoDetail.CustId, direction = TpDirection.ToMain };
+
+                                                var acc = await tpBLL.TransferAsync(inTpTransfer);
+                                                if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
+                                                {
+                                                    apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                                    continue;
+                                                }
                                             }
+                                        }
+
+                                        balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
+
+                                        if (balance < adjustmentAndWithdrawalLimit.Amount)
+                                        {
+                                            apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                            continue;
                                         }
                                     }
 
-                                    balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
-
-                                    if (balance < adjustmentAndWithdrawalLimit.Amount)
+                                    if (paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, authData.UserName, out transId) > 0)
                                     {
-                                        apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
-                                        continue;
-                                    }
-                                }
+                                        if (mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
+                                        {
+                                            var balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
+                                            TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = balance, CustId = custInfoDetail.CustId, direction = TpDirection.ToTp };
 
-                                if (paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, authData.UserName, out transId) > 0)
-                                {
-                                    if (mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
-                                    {
-                                        var balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
-                                        TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = balance, CustId = custInfoDetail.CustId, direction = TpDirection.ToTp };
-
-                                        var acc = await tpBLL.TransferAsync(inTpTransfer);
-                                        if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
+                                            var acc = await tpBLL.TransferAsync(inTpTransfer);
+                                            if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
+                                            {
+                                                apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. SabaId:{sabaId}. ID is {transId}." });
+                                            }
+                                        }
+                                        else
                                         {
                                             apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. SabaId:{sabaId}. ID is {transId}." });
                                         }
                                     }
-                                    else
-                                    {
-                                        apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. SabaId:{sabaId}. ID is {transId}." });
-                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {ex}" });
                                 }
                             }
-                            catch (Exception ex)
+                            else
                             {
-                                apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {ex}" });
+                                apiResult.Add(new ApiResult() { ErrorCode = -1, Message = $"Not found Username:{custUsername}. SabaId:{sabaId}." });
                             }
+                            RowId += 1;
                         }
-                        else
-                        {
-                            apiResult.Add(new ApiResult() { ErrorCode = -1, Message = $"Not found Username:{custUsername}. SabaId:{sabaId}." });
-                        }
-                        RowId += 1;
-                    }
-                } while (!isLastRow);
-                return apiResult;
+                    } while (!isLastRow);
+                    return apiResult;
+                }
+                else
+                {
+                    apiResult.Add(new ApiResult() { ErrorCode = -1, Message = "File Type Error" });
+                    return apiResult;
+                }
             }
-            else
+            catch(Exception ex)
             {
-                apiResult.Add(new ApiResult() { ErrorCode = -1, Message = "File Type Error" });
+                apiResult.Add(new ApiResult() { ErrorCode = -1, Message = ex.ToString() });
                 return apiResult;
             }
         }
