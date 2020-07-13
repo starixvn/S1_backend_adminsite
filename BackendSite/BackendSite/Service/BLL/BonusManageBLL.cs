@@ -11,9 +11,11 @@ namespace BackendSite.Service.BLL
     public class BonusManageBLL
     {
         private readonly BonusManageService bonusManageService;
-        public BonusManageBLL(BonusManageService bonusManageService)
+        private readonly ServerInfoBLL serverInfoBLL;
+        public BonusManageBLL(BonusManageService bonusManageService, ServerInfoBLL serverInfoBLL)
         {
             this.bonusManageService = bonusManageService;
+            this.serverInfoBLL = serverInfoBLL;
         }
 
         public IEnumerable<PromotionInfo> GetPromotionList()

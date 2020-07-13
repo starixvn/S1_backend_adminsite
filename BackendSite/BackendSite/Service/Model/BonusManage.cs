@@ -17,6 +17,10 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public long? LastUpateTime { get; set; }
         public string LastUpdateUser { get; set; }
+
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
+        public int BeenUsed { get; set; }
     }
 
     public class PromotionSpecific
