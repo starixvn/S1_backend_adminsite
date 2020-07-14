@@ -15,11 +15,12 @@ namespace BackendSite.Controllers.Api
     public class BonusManageController : Controller
     {
         private readonly BonusManageBLL bonusManageBLL;
+        private readonly ServerInfoBLL serverInfoBLL;
 
-
-        public BonusManageController(BonusManageBLL bonusManageBLL)
+        public BonusManageController(BonusManageBLL bonusManageBLL, ServerInfoBLL serverInfoBLL)
         {
             this.bonusManageBLL = bonusManageBLL;
+            this.serverInfoBLL = serverInfoBLL;
         }
 
         [HttpPost]
@@ -55,6 +56,25 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
                 apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<dynamic>> GetSiteListByLoginUser()
+        {
+            var apiResult = new ApiResult<IEnumerable<dynamic>>();
+            try
+            {
+                apiResult.Data = serverInfoBLL.GetSiteListByLoginUser()?.Select(x => new { x.SiteName, x.SiteId, CurrencyList = x.ICurrencyList });
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
             }
 
             return apiResult;

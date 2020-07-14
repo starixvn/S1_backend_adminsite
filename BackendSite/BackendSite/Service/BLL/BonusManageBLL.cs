@@ -26,7 +26,6 @@ namespace BackendSite.Service.BLL
 
         public PromotionInfo GetPromotion(string BonusCode)
         {
-            var serverInfo = serverInfoBLL.GetServerInfo();
             return bonusManageService.GetPromotion(BonusCode);
         }
     }
