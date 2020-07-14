@@ -21,7 +21,7 @@ namespace BackendSite.Service.DAL
             this.configuration = configuration;
         }
 
-        public IEnumerable<PromotionInfo> GetPromotion(string BonusCode)
+        public IEnumerable<PromotionInfo> GetPromotionList(string BonusCode)
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
@@ -30,13 +30,18 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public IEnumerable<PromotionSpecific> GetPromotionSpecific(string BonusCode)
+        public PromotionInfo GetPromotion(string BonusCode)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            var promotion = conn.Query<PromotionInfo>("Admin_Promotion_Get", new { BonusCode }, transaction: trans, commandType: CommandType.StoredProcedure).FirstOrDefault();
+            if (promotion != null)
             {
-                string SpName = "Admin_PromotionSpecific_Get";
-                return conn.Query<PromotionSpecific>(SpName, new { BonusCode }, commandType: CommandType.StoredProcedure);
+                promotion.Specific = conn.Query<PromotionSpecific>("Admin_PromotionSpecific_Get", new { BonusCode }, transaction: trans, commandType: CommandType.StoredProcedure);
             }
+            trans.Commit();
+            return promotion;
         }
     }
 }

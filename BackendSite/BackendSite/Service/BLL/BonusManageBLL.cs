@@ -20,10 +20,14 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<PromotionInfo> GetPromotionList()
         {
-            var result = bonusManageService.GetPromotion(null);
+            var result = bonusManageService.GetPromotionList(null);
             return result;
         }
 
-
+        public PromotionInfo GetPromotion(string BonusCode)
+        {
+            var serverInfo = serverInfoBLL.GetServerInfo();
+            return bonusManageService.GetPromotion(BonusCode);
+        }
     }
 }

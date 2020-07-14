@@ -42,12 +42,12 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> GetPromotion([FromForm]string BonusCode)
+        public ApiResult<PromotionInfo> GetPromotion([FromForm]string BonusCode)
         {
-            var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
+            var apiResult = new ApiResult<PromotionInfo>();
             try
             {
-                apiResult.Data = bonusManageBLL.GetPromotionList();
+                apiResult.Data = bonusManageBLL.GetPromotion(BonusCode);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
