@@ -59,15 +59,16 @@ module.exports = {
 		"CSD/WithdrawalKYCControl.min": [
 			"./src/pages/CSD/WithdrawalKYCControl/index.js"
 		],
-		"Home/DashBoard.min": [
-			"./src/pages/Home/DashBoard/index.js"
-		],
+		"Home/DashBoard.min": ["./src/pages/Home/DashBoard/index.js"],
 		"Finance/BalanceAdjustmentBatch.min": [
 			"./src/pages/Finance/BalanceAdjustmentBatch/index.js"
 		],
 		"CSD/ChangeVipLevelBatch.min": [
 			"./src/pages/CSD/ChangeVipLevelBatch/index.js"
 		],
+		"Marketing/PendingBonus.min": [
+			"./src/pages/Marketing/PendingBonus/index.jsx"
+		]
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

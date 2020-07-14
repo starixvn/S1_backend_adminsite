@@ -73,5 +73,14 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+
+        public IEnumerable<PendingBonus> GetPendingBonusList()
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                string SpName = "Admin_PendingBonusList_Get";
+                return conn.Query<PendingBonus>(SpName, commandType: CommandType.StoredProcedure);
+            }
+        }
     }
 }

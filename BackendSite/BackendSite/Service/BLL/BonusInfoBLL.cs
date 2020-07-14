@@ -107,5 +107,10 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
+        public IEnumerable<PendingBonus> GetPendingBonusList()
+        {
+            return bonusInfoService.GetPendingBonusList();
+        }
+
     }
 }

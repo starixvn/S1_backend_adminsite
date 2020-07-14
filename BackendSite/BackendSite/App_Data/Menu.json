@@ -256,6 +256,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "PendingBonus",
+        "Title": "Pending Bonus",
+        "FuncKey": "Marketing/PendingBonus",
+        "Controller": "Marketing",
+        "Action": "PendingBonus",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   }
