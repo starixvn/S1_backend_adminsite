@@ -65,5 +65,45 @@ namespace BackendSite.Service.BLL
 
             return apiResult;
         }
+
+        public class TpBonusTransfer
+        {
+            public int TpId { set; get; }
+            public int CustId { set; get; }
+            public decimal Bonus { set; get; }
+            public decimal BonusAmount { set; get; }
+            public decimal LockedAmount { set; get; }
+            public decimal RolloverAmount { set; get; }
+            public long ExpiryTime { set; get; }
+            public Dictionary<string, string> inputs { set; get; }
+        }
+        public async Task<ApiResult<TransferResult>> BonusTransferAsync(int custId)
+        {
+            var apiResult = new ApiResult<TransferResult>();
+
+            var tpBonusTransfer = new TpBonusTransfer
+            {
+                TpId = 1,
+                CustId = custId,
+                inputs = new Dictionary<string, string>()
+            };
+
+            var myUrl = $"{apiUrl}BonusTransfer";
+            apiResult = await courierAdapter.MyPostAsync<TransferResult, TpBonusTransfer>(myUrl, tpBonusTransfer);
+
+            return apiResult;
+        }
+        public ApiResult<TransferResult> BonusCancel(int bonusId)
+        {
+            var apiResult = new ApiResult<TransferResult>();
+
+            return apiResult;
+        }
+        public ApiResult<TransferResult> BonusTransferAll()
+        {
+            var apiResult = new ApiResult<TransferResult>();
+
+            return apiResult;
+        }
     }
 }

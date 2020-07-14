@@ -45,5 +45,60 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
+        public class Req
+        {
+            public int CustId { set; get; }
+        }
+        [HttpPost]
+        public async Task<ApiResult> BonusTransferAsync(Req req)
+        {
+            var apiResult = await pendingFundBLL.BonusTransferAsync(req.CustId);
+
+            if (apiResult.ErrorCode == 0)
+            {
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+
+        public class Req1
+        {
+            public int bonusId { set; get; }
+        }
+
+        [HttpPost]
+        public ApiResult BonusCancel(Req1 req)
+        {
+            var apiResult = pendingFundBLL.BonusCancel(req.bonusId);
+
+            if (apiResult.ErrorCode == 0)
+            {
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+        [HttpPost]
+        public ApiResult BonusTransferAll()
+        {
+            var apiResult = pendingFundBLL.BonusTransferAll();
+
+            if (apiResult.ErrorCode == 0)
+            {
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
     }
 }
