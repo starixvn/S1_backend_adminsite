@@ -30,15 +30,6 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public IEnumerable<PromotionDetails> GetPromotionDetails(string BonusCode)
-        {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                string SpName = "Admin_PromotionDetail_Get";
-                return conn.Query<PromotionDetails>(SpName, new { BonusCode }, commandType: CommandType.StoredProcedure);
-            }
-        }
-
         public IEnumerable<PromotionSpecific> GetPromotionSpecific(string BonusCode)
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))

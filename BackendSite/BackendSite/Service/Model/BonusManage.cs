@@ -18,15 +18,13 @@ namespace BackendSite.Service.Model
         public DateTime? LastUpateTime { get; set; }
         public string LastUpdateUser { get; set; }
 
-        public int SiteId { get; set; }
-        public string SiteName { get; set; }
-        public int BeenUsed { get; set; }
+        public IEnumerable<PromotionSpecific> Specific { get; set; }
     }
 
     public class PromotionSpecific
     {
         public string BonusCode { get; set; }
-        public IEnumerable<int> CurrencyId { get; set; }
+        public int CurrencyId { get; set; }
         public int SiteId { get; set; }
 
         public int Usage { get; set; }
@@ -36,12 +34,6 @@ namespace BackendSite.Service.Model
         public decimal Bonus { get; set; }
         public int BonusType { get; set; }
         public decimal MaxBonus { get; set; }
-    }
-
-    public class PromotionDetails
-    { 
-        public string BonusCode { get; set; }
         public string Details { get; set; }
-        public string Banner { get; set; }
     }
 }

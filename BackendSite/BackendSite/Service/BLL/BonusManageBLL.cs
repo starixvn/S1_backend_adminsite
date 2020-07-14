@@ -24,14 +24,6 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        //public IEnumerable<PromotionDetails> GetPromotionDetails(string BonusCode)
-        //{
-            
-        //}
 
-        //public IEnumerable<PromotionSpecific> GetPromotionSpecific(string BonusCode)
-        //{
-            
-        //}
     }
 }
