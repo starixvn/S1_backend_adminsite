@@ -45,14 +45,10 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
-        public class Req
-        {
-            public int CustId { set; get; }
-        }
         [HttpPost]
-        public async Task<ApiResult> BonusTransferAsync(Req req)
+        public async Task<ApiResult> BonusTransferAsync([FromForm]int CustId)
         {
-            var apiResult = await pendingFundBLL.BonusTransferAsync(req.CustId);
+            var apiResult = await pendingFundBLL.BonusTransferAsync(CustId);
 
             if (apiResult.ErrorCode == 0)
             {
@@ -64,16 +60,10 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
-
-        public class Req1
-        {
-            public int bonusId { set; get; }
-        }
-
         [HttpPost]
-        public ApiResult BonusCancel(Req1 req)
+        public ApiResult BonusCancel([FromForm]int bonusId)
         {
-            var apiResult = pendingFundBLL.BonusCancel(req.bonusId);
+            var apiResult = pendingFundBLL.BonusCancel(bonusId);
 
             if (apiResult.ErrorCode == 0)
             {
