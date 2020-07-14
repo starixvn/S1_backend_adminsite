@@ -76,9 +76,9 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         [HttpPost]
-        public ApiResult BonusTransferAll()
+        public async Task<ApiResult> BonusTransferAllAsync()
         {
-            var apiResult = pendingFundBLL.BonusTransferAll();
+            var apiResult = await pendingFundBLL.BonusTransferAllAsync();
 
             if (apiResult.ErrorCode == 0)
             {

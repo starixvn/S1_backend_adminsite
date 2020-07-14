@@ -22,14 +22,16 @@ namespace BackendSite.Service.BLL
         private readonly ServerInfoService serverInfoService;
         private readonly string apiUrl;
         private readonly WalletService walletService;
+        private readonly BonusInfoService bonusInfoService;
 
-        public PendingFundBLL(CourierAdapter courierAdapter, IConfiguration configuration, Tools tools, PendingFundService pendingFundService, ServerInfoService serverInfoService, WalletService walletService)
+        public PendingFundBLL(CourierAdapter courierAdapter, IConfiguration configuration, Tools tools, PendingFundService pendingFundService, ServerInfoService serverInfoService, WalletService walletService, BonusInfoService bonusInfoService)
         {
             this.courierAdapter = courierAdapter;
             this.configuration = configuration;
             this.pendingFundService = pendingFundService;
             this.serverInfoService = serverInfoService;
             this.walletService = walletService;
+            this.bonusInfoService = bonusInfoService;
             apiUrl = configuration.GetValue<string>("TpService");
         }
 
@@ -93,15 +95,39 @@ namespace BackendSite.Service.BLL
 
             return apiResult;
         }
-        public ApiResult<TransferResult> BonusCancel(int bonusId)
+        public ApiResult BonusCancel(int bonusId)
         {
-            var apiResult = new ApiResult<TransferResult>();
+            var apiResult = new ApiResult();
+
+            var result = bonusInfoService.CancelBonusByBonusId(bonusId);
+            if (result > 0)
+            {
+                apiResult.ErrorCode = 0;
+            }
 
             return apiResult;
         }
-        public ApiResult<TransferResult> BonusTransferAll()
+        public async Task<ApiResult> BonusTransferAllAsync()
         {
-            var apiResult = new ApiResult<TransferResult>();
+            var apiResult = new ApiResult();
+            List<string> errorMsg = new List<string>();
+            foreach (var pendingBonus in bonusInfoService.GetPendingBonusList())
+            {
+                var tpBonusTransfer = new TpBonusTransfer
+                {
+                    TpId = 1,
+                    CustId = pendingBonus.CustId,
+                    inputs = new Dictionary<string, string>()
+                };
+
+                var myUrl = $"{apiUrl}BonusTransfer";
+                apiResult = await courierAdapter.MyPostAsync<TransferResult, TpBonusTransfer>(myUrl, tpBonusTransfer);
+
+                if (apiResult.ErrorCode != 0)
+                    errorMsg.Add($"{pendingBonus.UserName}: {apiResult.RawMessage}");
+            }
+
+            apiResult.Message = string.Join("\n\r", errorMsg);
 
             return apiResult;
         }

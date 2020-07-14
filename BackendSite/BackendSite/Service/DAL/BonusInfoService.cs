@@ -14,10 +14,14 @@ namespace BackendSite.Service.DAL
     public class BonusInfoService
     {
         private readonly IConfiguration configuration;
+        private readonly WalletService walletService;
+        private readonly WithdrawalLimitService withdrawalLimitService;
 
-        public BonusInfoService(IConfiguration configuration)
+        public BonusInfoService(IConfiguration configuration, WalletService walletService, WithdrawalLimitService withdrawalLimitService)
         {
             this.configuration = configuration;
+            this.walletService = walletService;
+            this.withdrawalLimitService = withdrawalLimitService;
         }
 
         public IEnumerable<BonusInfo> GetBonusInfoReport(string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
@@ -81,6 +85,50 @@ namespace BackendSite.Service.DAL
                 string SpName = "Admin_PendingBonusList_Get";
                 return conn.Query<PendingBonus>(SpName, commandType: CommandType.StoredProcedure);
             }
+        }
+        public int CancelBonusByBonusId(int bonusId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            var p = new DynamicParameters(new { BonusId = bonusId });
+            p.Add("SiteId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
+            p.Add("LockedAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            p.Add("BonusAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            p.Add("Bonus", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            int result = conn.Execute("Common_CancelBonusByBonusId_SetV2", p, transaction: trans, commandType: CommandType.StoredProcedure);
+
+            int siteId = p.Get<int?>("SiteId") ?? 0;
+            int custId = p.Get<int?>("CustId") ?? 0;
+            string userName = p.Get<string>("UserName");
+            decimal lockedAmount = p.Get<decimal?>("LockedAmount") ?? 0;
+            decimal bonusAmount = p.Get<decimal?>("BonusAmount") ?? 0;
+            decimal bonus = p.Get<decimal?>("Bonus") ?? 0;
+
+            decimal backAmount = 0;
+            if (bonus >= lockedAmount + bonusAmount)
+            {
+                backAmount = lockedAmount;
+            }
+            else
+            {
+                backAmount = bonus - bonusAmount;
+            }
+
+            if (backAmount > 0)
+            {
+                result = walletService.SetBalance(custId, siteId, userName, backAmount, 7, $"Cancel Bonus({bonus.ToString("#,##0.##")}), Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out decimal afterAmount, out byte is1stDepoist, conn, trans);
+
+                if (result > 0)
+                    result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, $"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out decimal afterWithdrawalLimit, conn, trans);
+            }
+
+            if (result > 0)
+                trans.Commit();
+
+            return result;
         }
     }
 }
