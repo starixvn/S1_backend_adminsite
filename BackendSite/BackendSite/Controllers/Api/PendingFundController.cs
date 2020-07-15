@@ -54,6 +54,10 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
             }
+            else
+            {
+                apiResult.Message = apiResult.RawMessage;
+            }
 
             return apiResult;
         }
