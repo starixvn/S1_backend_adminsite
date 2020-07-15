@@ -54,25 +54,31 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
             }
-            else
-            {
-                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
-            }
+
             return apiResult;
         }
         [HttpPost]
         public ApiResult BonusCancel([FromForm]int bonusId)
         {
-            var apiResult = pendingFundBLL.BonusCancel(bonusId);
+            var apiResult = new ApiResult();
+            try
+            {
+                apiResult = pendingFundBLL.BonusCancel(bonusId);
 
-            if (apiResult.ErrorCode == 0)
-            {
-                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+                if (apiResult.ErrorCode == 0)
+                {
+                    apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+                }
+                else
+                {
+                    apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+                apiResult.Message = ex.ToString();
             }
+
             return apiResult;
         }
         [HttpPost]
@@ -84,10 +90,7 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
             }
-            else
-            {
-                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
-            }
+
             return apiResult;
         }
     }
