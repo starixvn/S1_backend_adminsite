@@ -40,6 +40,7 @@ namespace BackendSite.Controllers.Api
 
         public class WithdrawalListReq
         {
+            public IEnumerable<int> SelectSite { get; set; }
             public int PageNumber { get; set; }
             public string WithdrawalId { get; set; }
             public string UserName { get; set; }
@@ -57,7 +58,7 @@ namespace BackendSite.Controllers.Api
             int pageNumber = withdrawalListReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
-            var withdrawalRequestList = withdrawalBLL.GetWithdrawalRequestList(withdrawalListReq.withdrawalType, withdrawalListReq.startDate, withdrawalListReq.endDate, withdrawalListReq.WithdrawalId, withdrawalListReq.UserName, withdrawalListReq.CurrencyId, withdrawalListReq.status, 10, ref pageNumber, out totalPages, out rowCount);
+            var withdrawalRequestList = withdrawalBLL.GetWithdrawalRequestList(withdrawalListReq.SelectSite, withdrawalListReq.withdrawalType, withdrawalListReq.startDate, withdrawalListReq.endDate, withdrawalListReq.WithdrawalId, withdrawalListReq.UserName, withdrawalListReq.CurrencyId, withdrawalListReq.status, 10, ref pageNumber, out totalPages, out rowCount);
             apiListResult.Data = withdrawalRequestList;
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;

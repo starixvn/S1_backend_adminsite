@@ -81,12 +81,26 @@
       {
         "DisplayKey": "Deposit Request",
         "FuncKey": "Finance/DepositList",
-        "Enable": false
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Execute",
+            "FuncKey": "f_dp_execute"
+          }
+        ]
       },
       {
         "DisplayKey": "Withdrawal Request",
         "FuncKey": "Finance/WithdrawalList",
-        "Enable": false
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Execute",
+            "FuncKey": "f_wd_execute"
+          }
+        ]
       },
       {
         "DisplayKey": "Balance Adjustment",
@@ -159,7 +173,7 @@
         "DisplayKey": "Bonus Report",
         "FuncKey": "Marketing/BonusInfoReport",
         "Enable": false
-      },
+      }/*,
       {
         "DisplayKey": "Bonus Cash Back",
         "FuncKey": "Marketing/BonusCashBack",
@@ -169,7 +183,7 @@
         "DisplayKey": "Pending Bonus",
         "FuncKey": "Marketing/PendingBonus",
         "Enable": false
-      }
+      }*/
     ]
   }
 ]

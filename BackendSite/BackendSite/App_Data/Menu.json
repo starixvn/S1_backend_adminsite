@@ -246,7 +246,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      },
+      }/*,
       {
         "Key": "BonusCashBack",
         "Title": "Bonus Cash Back",
@@ -266,7 +266,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      }
+      }*/
     ]
   }
 ]
