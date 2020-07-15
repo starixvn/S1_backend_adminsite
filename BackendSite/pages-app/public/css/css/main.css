@@ -1123,6 +1123,7 @@ body {
 }
 .checkbox input:checked ~ .icon-checkbox {
     color: #50ba62;
+    border-color: #50ba62;/*0715*/
 }
 /*0508*/
 .bule-bold{
@@ -1212,4 +1213,28 @@ table.revert-style > tbody tr:first-child td{
     text-align: right;
     width: 100%;
     margin-bottom: 0;
+}
+/*0715*/
+.checkbox input{
+    width: 0;
+    height: 0;
+    margin: 0;
+    opacity: 0;
+    appearance: none;
+    -webkit-appearance: none;
+}
+.checkbox-checked input:checked ~ .text{
+    color: #50ba62;
+}
+.checkbox{
+    display: -webkit-inline-flex;
+    display: inline-flex;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    vertical-align: middle;
+    padding: .125rem .5rem .125rem 0;
+    min-height: 32px;
+    cursor: pointer;
 }
