@@ -6,6 +6,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 namespace BackendSite.Controllers.Api
 {
@@ -75,6 +76,47 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong.";
                 apiResult.RawMessage = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<PromotionInfo>> SetPromotion([FromForm]bool IsAdd, PromotionInfo Promotion)
+        {
+            var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
+            try
+            {
+                var result = bonusManageBLL.SetPromotion(IsAdd, Promotion);
+                apiResult.ErrorCode = result;
+                if (result == 0)
+                {
+                    apiResult.Data = bonusManageBLL.GetPromotionList();
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult UpdatePromotionStatus([FromForm]string BonusCode, int Status)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                apiResult.ErrorCode = bonusManageBLL.SetPromotionStatus(BonusCode, Status);
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
             }
 
             return apiResult;

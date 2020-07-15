@@ -13,8 +13,11 @@ namespace BackendSite.Service.Model
         public int CategoryId { get; set; }
         public DateTime PeriodFrom { get; set; }
         public DateTime PeriodTo { get; set; }
+        public long? UnixPeriodFrom { get; set; }
+        public long? UnixPeriodTo { get; set; }
         public int Sort { get; set; }
         public int Status { get; set; }
+        public int ExpiryDays { get; set; }
         public DateTime? LastUpateTime { get; set; }
         public string LastUpdateUser { get; set; }
 
@@ -35,5 +38,6 @@ namespace BackendSite.Service.Model
         public int BonusType { get; set; }
         public decimal MaxBonus { get; set; }
         public string Details { get; set; }
+        public int Status { get; set; }
     }
 }

@@ -43,5 +43,75 @@ namespace BackendSite.Service.DAL
             trans.Commit();
             return promotion;
         }
+
+        public int SetPromotion(bool IsAdd, PromotionInfo promotion)
+        {
+            int errorCode = 0;
+            try
+            {
+                using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+                conn.Open();
+                using var trans = conn.BeginTransaction();
+                conn.Execute("Admin_Promotion_InsUpd", new
+                {
+                    promotion.BonusCode,
+                    promotion.Description,
+                    promotion.PromotionType,
+                    promotion.CategoryId,
+                    PeriodFrom = promotion.UnixPeriodFrom,
+                    PeriodTo = promotion.UnixPeriodTo,
+                    promotion.ExpiryDays,
+                    promotion.Sort,
+                    Status = 0,
+                    promotion.LastUpdateUser,
+                    IsAdd
+                }, transaction: trans, commandType: CommandType.StoredProcedure);
+
+
+                foreach (var specific in promotion.Specific)
+                {
+                    conn.Execute("Admin_PromotionSpecific_InsUpd", new
+                    {
+                        specific.BonusCode,
+                        specific.CurrencyId,
+                        specific.SiteId,
+                        specific.RollOver,
+                        specific.Bonus,
+                        specific.BonusType,
+                        specific.MaxBonus,
+                        specific.Status,
+                        IsAdd,
+                        specific.Details
+                    }, transaction: trans, commandType: CommandType.StoredProcedure);
+                }
+
+                trans.Commit();
+            }
+            catch (Exception ex)
+            {
+                errorCode = 999;
+            }
+
+            return errorCode;
+        }
+
+        public int SetPromotionStatus(string BonusCode, int Status, string LastUpdateUser)
+        {
+            int errorCode = 0;
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+                {
+                    string SpName = "Admin_Promotion_SetStatus";
+                    conn.Execute(SpName, new { BonusCode, Status, LastUpdateUser }, commandType: CommandType.StoredProcedure);
+                }
+            }
+            catch (Exception)
+            {
+                errorCode = 999;
+            }
+
+            return errorCode;
+        }
     }
 }
