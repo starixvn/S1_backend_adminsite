@@ -60,7 +60,7 @@ namespace BackendSite.Service.Model
         public int IsRisk { set; get; }
         public int DepositCnt { set; get; }
         public int Flag { set; get; }
-        public DateTime UpdateTime { set; get; }
+        public DateTime? UpdateTime { set; get; }
         
     }
 
@@ -101,7 +101,7 @@ namespace BackendSite.Service.Model
         public int IsRisk { set; get; }
         public int DepositCnt { set; get; }
         public string Operator { set; get; }
-        public DateTime UpdateTime { set; get; }
+        public DateTime? UpdateTime { set; get; }
     }
     public interface IDepositInfo
     {
