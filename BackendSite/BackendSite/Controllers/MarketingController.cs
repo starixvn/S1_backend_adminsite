@@ -32,5 +32,10 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        public IActionResult BonusManage()
+        {
+            return View();
+        }
     }
 }

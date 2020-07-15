@@ -590,6 +590,26 @@ body {
     .filter .currency select {
         visibility: visible !important;
     }
+    .filter.noBGcolor{
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    .filter.noBGcolor.tag{
+        padding-bottom: 0;
+        margin-top: 3px;
+    }
+    .filter.noBGcolor.tag button{
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        margin-right: 2px;
+        background-color: #0069d9;
+    }
+    .filter.noBGcolor.tag button:hover,.filter.noBGcolor.tag button.active{
+        background-color: #007bff;
+    }
 
 .button-group .btn:not(:last-child) {
     margin-right: 10px;
@@ -809,6 +829,10 @@ body {
 
     .panel .panel-body {
         padding: 10px;
+    }
+    
+    .panel .panel-title.no-arrow:after{
+        display: none;
     }
 
 .collapsed + .panel-body {
@@ -1099,6 +1123,7 @@ body {
 }
 .checkbox input:checked ~ .icon-checkbox {
     color: #50ba62;
+    border-color: #50ba62;/*0715*/
 }
 /*0508*/
 .bule-bold{
@@ -1164,8 +1189,7 @@ table.revert-style > tbody tr:first-child td{
 .ratio:after{
     content: '%';
     display: block;
-    position: absolute;
-    right: -15px;
+    margin-left: 5px;
 }
 [type="checkbox"].switch--flat + label:before{
     border: 0;
@@ -1182,10 +1206,35 @@ table.revert-style > tbody tr:first-child td{
 [type="checkbox"]:checked.switch--flat{
     position: absolute;
 }
-.Cashback-Period-Setting {
-    padding-right: 15px;
-    padding-left: 15px;
-.float-right{
+
+.float-btn-group{
+    position: fixed;
+    bottom: 0;
+    text-align: right;
+    width: 100%;
+    margin-bottom: 0;
+}
+/*0715*/
+.checkbox input{
+    width: 0;
+    height: 0;
+    margin: 0;
+    opacity: 0;
+    appearance: none;
+    -webkit-appearance: none;
+}
+.checkbox-checked input:checked ~ .text{
+    color: #50ba62;
+}
+.checkbox{
+    display: -webkit-inline-flex;
     display: inline-flex;
-    float: right;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    vertical-align: middle;
+    padding: .125rem .5rem .125rem 0;
+    min-height: 32px;
+    cursor: pointer;
 }

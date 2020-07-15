@@ -256,6 +256,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "BonusManage",
+        "Title": "Bonus Management",
+        "FuncKey": "Marketing/BonusManage",
+        "Controller": "Marketing",
+        "Action": "BonusManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   }

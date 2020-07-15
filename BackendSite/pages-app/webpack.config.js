@@ -16,58 +16,60 @@ module.exports = {
 		axios: "axios"
 	},
 	entry: {
-		"Administration/UserAuthoritySetting.min": [
-			// '@babel/polyfill',
-			"./src/pages/Administration/UserAuthoritySetting/index.js"
-		],
-		"Administration/GroupAuthoritySetting.min": [
-			// '@babel/polyfill',
-			"./src/pages/Administration/GroupAuthoritySetting/index.js"
-		],
-		"Report/LicenseeWinLost.min": [
-			// '@babel/polyfill',
-			"./src/pages/Report/LicenseeWinLost/index.js"
-		],
-		"Finance/PaymentAdjustmentReport.min": [
-			// '@babel/polyfill',
-			"./src/pages/Finance/PaymentAdjustmentReport/index.js"
-		],
-		"Marketing/BonusInfoReport.min": [
-			// '@babel/polyfill',
-			"./src/pages/Marketing/BonusInfoReport/index.js"
-		],
-		"Finance/PaymentManagement.min": [
-			// '@babel/polyfill',
-			"./src/pages/Finance/PaymentManagement/index.js"
-		],
-		"CSD/Announcement.min": ["./src/pages/CSD/Announcement/index.js"],
-		"Finance/WithdrawalLimitAdjust.min": [
-			"./src/pages/Finance/WithdrawalLimitAdjust/index.js"
-		],
-		"CSD/PersonalMsgBatch.min": [
-			"./src/pages/CSD/PersonalMsgBatch/index.js"
-		],
-		"Marketing/PointLevelList.min": [
-			"./src/pages/Marketing/PointLevelManagement/index.js"
-		],
-		"Marketing/CashBackBonus.min": [
-			"./src/pages/Marketing/CashBackBonus/index.jsx"
-		],
-		"Finance/DepositLimitManagement.min": [
-			"./src/pages/Finance/DepositLimitManagement/index.js"
-		],
-		"CSD/WithdrawalKYCControl.min": [
-			"./src/pages/CSD/WithdrawalKYCControl/index.js"
-		],
-		"Home/DashBoard.min": [
-			"./src/pages/Home/DashBoard/index.js"
-		],
-		"Finance/BalanceAdjustmentBatch.min": [
-			"./src/pages/Finance/BalanceAdjustmentBatch/index.js"
-		],
-		"CSD/ChangeVipLevelBatch.min": [
-			"./src/pages/CSD/ChangeVipLevelBatch/index.js"
-		],
+		// "Administration/UserAuthoritySetting.min": [
+		// 	// '@babel/polyfill',
+		// 	"./src/pages/Administration/UserAuthoritySetting/index.js"
+		// ],
+		// "Administration/GroupAuthoritySetting.min": [
+		// 	// '@babel/polyfill',
+		// 	"./src/pages/Administration/GroupAuthoritySetting/index.js"
+		// ],
+		// "Report/LicenseeWinLost.min": [
+		// 	// '@babel/polyfill',
+		// 	"./src/pages/Report/LicenseeWinLost/index.js"
+		// ],
+		// "Finance/PaymentAdjustmentReport.min": [
+		// 	// '@babel/polyfill',
+		// 	"./src/pages/Finance/PaymentAdjustmentReport/index.js"
+		// ],
+		// "Marketing/BonusInfoReport.min": [
+		// 	// '@babel/polyfill',
+		// 	"./src/pages/Marketing/BonusInfoReport/index.js"
+		// ],
+		// "Finance/PaymentManagement.min": [
+		// 	// '@babel/polyfill',
+		// 	"./src/pages/Finance/PaymentManagement/index.js"
+		// ],
+		// "CSD/Announcement.min": ["./src/pages/CSD/Announcement/index.js"],
+		// "Finance/WithdrawalLimitAdjust.min": [
+		// 	"./src/pages/Finance/WithdrawalLimitAdjust/index.js"
+		// ],
+		// "CSD/PersonalMsgBatch.min": [
+		// 	"./src/pages/CSD/PersonalMsgBatch/index.js"
+		// ],
+		// "Marketing/PointLevelList.min": [
+		// 	"./src/pages/Marketing/PointLevelManagement/index.js"
+		// ],
+		// "Marketing/CashBackBonus.min": [
+		// 	"./src/pages/Marketing/CashBackBonus/index.jsx"
+		// ],
+		// "Finance/DepositLimitManagement.min": [
+		// 	"./src/pages/Finance/DepositLimitManagement/index.js"
+		// ],
+		// "CSD/WithdrawalKYCControl.min": [
+		// 	"./src/pages/CSD/WithdrawalKYCControl/index.js"
+		// ],
+		// "Home/DashBoard.min": ["./src/pages/Home/DashBoard/index.js"],
+		// "Finance/BalanceAdjustmentBatch.min": [
+		// 	"./src/pages/Finance/BalanceAdjustmentBatch/index.js"
+		// ],
+		// "CSD/ChangeVipLevelBatch.min": [
+		// 	"./src/pages/CSD/ChangeVipLevelBatch/index.js"
+		// ],
+		"Marketing/BonusManage.min": [
+			"@babel/polyfill",
+			"./src/pages/Marketing/BonusManage/index.jsx"
+		]
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

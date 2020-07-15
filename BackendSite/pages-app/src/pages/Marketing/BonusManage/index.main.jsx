@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import moment from "moment";
 
 const SpecialItemType = {
@@ -6,7 +6,18 @@ const SpecialItemType = {
 	statusBtn: "statusBtn"
 };
 
-const StatusBtn = ({checked, onChange}) => {
+const defPromotionType = {
+	1: "First Deposit",
+	2: "Re-Deposit",
+	3: "Rebate",
+	4: "Special"
+};
+
+const promotionTypeFormat = type => {
+	return defPromotionType[type];
+};
+
+const StatusBtn = ({ checked, onChange }) => {
 	return (
 		<div className="switch__container">
 			<input
@@ -27,8 +38,13 @@ const dateFormat = createTime => {
 
 const titleData = [
 	{ dataColumn: "bonusCode", columnTitle: "BonusCode" },
-	{ dataColumn: "promotionType", columnTitle: "PromotionType" },
-	{ dataColumn: "categoryId", columnTitle: "CategoryId" },
+	{ dataColumn: "siteName", columnTitle: "SiteName" },
+	{
+		dataColumn: "promotionType",
+		columnTitle: "PromotionType",
+		body: { format: promotionTypeFormat }
+	},
+	{ dataColumn: "description", columnTitle: "Description" },
 	{
 		dataColumn: "periodFrom",
 		columnTitle: "PeriodFrom",
@@ -39,7 +55,6 @@ const titleData = [
 		columnTitle: "PeriodTo",
 		body: { format: dateFormat }
 	},
-	{ dataColumn: "sort", columnTitle: "Sort" },
 	{
 		dataColumn: "status",
 		columnTitle: "Status",
@@ -52,7 +67,12 @@ const titleData = [
 	}
 ];
 
-export default ({ClickCreateBonus, ClickEdit, promotionList, UpdatePromotionStatus})=>{
+export default ({
+	ClickCreateBonus,
+	ClickEdit,
+	promotionList,
+	UpdatePromotionStatus
+}) => {
 	let headerRows = [];
 	titleData.forEach((e, i) => {
 		headerRows.push(<th key={`title-${i}`}>{e.columnTitle}</th>);
@@ -68,10 +88,12 @@ export default ({ClickCreateBonus, ClickEdit, promotionList, UpdatePromotionStat
 							clickEdit={ClickEdit.bind(null, d_idx)}
 						/>
 					);
-				}else if(element.body.SpecialItem === SpecialItemType.statusBtn ){
+				} else if (
+					element.body.SpecialItem === SpecialItemType.statusBtn
+				) {
 					body_content = (
 						<StatusBtn
-							checked={_data[element.dataColumn]===1}
+							checked={_data[element.dataColumn] === 1}
 							onChange={UpdatePromotionStatus.bind(null, d_idx)}
 						/>
 					);
@@ -89,31 +111,27 @@ export default ({ClickCreateBonus, ClickEdit, promotionList, UpdatePromotionStat
 		return <tr key={`body-${d_idx}`}>{arr}</tr>;
 	});
 
-	return(
-		<div className="table">
-			<div className="table-options">
-				<button
-					type="button"
-					className="btn btn-approved"
-					onClick={ClickCreateBonus}>
-					Create Bonus
-				</button>
+	return (
+		<div className="container-fluid">
+			<h4 className="page-name">Bonus Management</h4>
+			<button className="btn btn-add" style={{"marginBottom": "20px"}} onClick={ClickCreateBonus}>Create Bonus</button>
+			<div className="table">
+				<table className="table table-striped">
+					<thead>
+						<tr>{headerRows}</tr>
+					</thead>
+					<tbody>{bodyRows}</tbody>
+				</table>
 			</div>
-			<table className="table table-striped">
-				<thead>
-					<tr>{headerRows}</tr>
-				</thead>
-				<tbody>{bodyRows}</tbody>
-			</table>
 		</div>
-	)
-}
+	);
+};
 
 const ActionButtons = props => {
 	return (
 		<div className="button-action" onClick={props.clickEdit}>
 			<button className="btn btn-edit">
-				<i className="icon icon-mode_edit"></i>
+				<i className="icon-edit"></i>
 			</button>
 		</div>
 	);

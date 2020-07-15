@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useReducer } from "react";
+import ReactDOM from 'react-dom'
 import WebAPI from "../../../module/WebAPI";
 import moment from "moment";
 import Edit from "./Edit";
@@ -11,7 +12,7 @@ import {
 } from "./index.reducer";
 import Main from "./index.main";
 
-export default () => {
+const App = () => {
 	const [state, dispatch] = useReducer(reducer, initState);
 	const isMountedRef = useRef(null);
 	useEffect(() => {
@@ -212,3 +213,9 @@ export default () => {
 		/>
 	);
 };
+
+export default App;
+
+if(process.env.NODE_ENV==='production'){
+    ReactDOM.render(<App />, document.getElementById('content'))
+}
