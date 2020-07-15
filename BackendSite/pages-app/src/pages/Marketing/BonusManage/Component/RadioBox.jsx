@@ -13,10 +13,14 @@ export default ({Title, Options, Selected, OnChange, dataColumn})=>{
     });
 
     return(
-        <div className="input-item">
-            <div className="checkBoxTitle">{Title}</div>
-            {opt}
-        </div>
+        <>
+            <div className="row-flex">
+                <div className="input-item">
+                    <label className="label">{Title}</label>
+                </div>
+            </div>
+            <div className="row-flex">{opt}</div>
+        </>
     )
 }
 

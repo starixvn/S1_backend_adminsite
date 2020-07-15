@@ -1,314 +1,130 @@
-import React, { useState, useReducer } from "react";
-import InputBox from "./Component/InputBox";
-import SelectBox from "./Component/SelectBox";
-import DateTimePickerElem from "./Component/DateTimePicker";
-import moment from "moment";
-import Checkbox from "./Component/Checkbox";
-import RadioBox from './Component/RadioBox';
+import React,{useState, useEffect} from 'react';
+import WebAPI from '../../../module/WebAPI';
+import moment from 'moment';
+import Edit from './Edit';
 
-const initialState = {
-	dataByLang: { banner: {}, detail: {}, title:{} },
-	bonusCode: "",
-	promotionType: 1,
-	periodFrom: undefined,
-	periodTo: undefined,
-	expiryDays: "",
-	currencies: [],
-	availableSites: [],
-	usage: "0",
-    rollover: "",
-    bonus:'',
-    bonusAmountType:1
+const SpecialItemType = {
+	actionBtn: "actionBtn"
 };
 
-const initPromotionType = [
-	{ value: 1, displayText: "1st Deposit" },
-	{ value: 2, displayText: "Re-Deposit" }
-];
-
-const initCurrency = [
-	{ value: 1, displayText: "MYR" },
-	{ value: 2, displayText: "THB" },
-	{ value: 3, displayText: "IDR" }
-];
-
-const initSites = [
-	{ value: 1, displayText: "Nova88" },
-	{ value: 2, displayText: "Bwing" },
-	{ value: 3, displayText: "Goal123" }
-];
-
-const initBonusAmountType = [
-    {value:1, displayText:'Percentage'},
-    {value:2, displayText:'Amount'}
-]
-
-const defActionType = {
-	EDIT_BY_LANG: "EDIT_BY_LANG",
-	EDIT_INPUTBOX: "EDIT_INPUTBOX",
-	EDIT_CHECKBOX: "EDIT_CHECKBOX"
-};
-
-function reducer(state, action) {
-	switch (action.type) {
-		case defActionType.EDIT_BY_LANG:
-			return {
-				...state,
-				dataByLang: {
-					...state.dataByLang,
-					[action.dataColumn]: {
-						...state[action.dataColumn],
-						[action.lang]: action.value
-					}
-				}
-			};
-		case defActionType.EDIT_INPUTBOX:
-			return {
-				...state,
-				[action.dataColumn]: action.value
-			};
-		case defActionType.EDIT_CHECKBOX:
-			return state[action.dataColumn].includes(action.value)
-				? {
-						...state,
-						[action.dataColumn]: state[
-							action.dataColumn
-						].filter(v => v !== action.value)
-				  }
-				: {
-						...state,
-						[action.dataColumn]: [
-							...state[action.dataColumn],
-							action.value
-						]
-				  };
-
-		default:
-			throw new Error();
-	}
+const _titleData = () => {
+    return [
+        { dataColumn:"bonusCode", columnTitle: "BonusCode"},
+        { dataColumn:"promotionType", columnTitle:"PromotionType" },
+        { dataColumn:"categoryId", columnTitle: "CategoryId"},
+        { dataColumn:"periodFrom", columnTitle: "PeriodFrom", body: { format: dateFormat }},
+        { dataColumn:"periodTo", columnTitle: "PeriodTo", body: { format: dateFormat }},
+        { dataColumn:"sort", columnTitle: "Sort"},
+        { dataColumn:"status", columnTitle: "Status", body: { format: statusFomat }},
+        { dataColumn:"edit", columnTitle:"Edit",  body: { SpecialItem: SpecialItemType.actionBtn }}, 
+    ]
 }
 
-export default props => {
-    const [state, dispatch] = useReducer(reducer, initialState);
-    const ClickSubmit = ()=>{
-        console.log('submit');
-    }
+export default (props) => {
+    const titleData = _titleData();
+    const [isEdit, setIsEdit] = useState(false);
+    const [data, setData] = useState([]);
+    const [stateData, updateData] = useState({});
 
-	return <Panel dispatch={dispatch} state={state} action={{ClickSubmit}}/>;
-};
+    useEffect(() => {
+        let param = {
+            Url: 'BonusManage/GetPromotionList',
+        };
+        WebAPI.PostData(param).then((res) => {
+            if (res.data.errorCode === 0) {
+                setData(res.data.data)
+            }else{
+                alert(res.data.message ?? 'failed to get data.');
+            }
+        })
+    },[])
 
-const Panel = ({ IsAdd, dispatch, state, action }) => {
-	const EditInputBox = (value, dataColumn) => {
-		dispatch({ type: defActionType.EDIT_INPUTBOX, value, dataColumn });
-    };
-
-    const EditCheckBox = (value, dataColumn)=>{
-        dispatch({ type: defActionType.EDIT_CHECKBOX, value, dataColumn });
-    }
+    const clickEdit = (idx) => {
+        let param = {
+            Url: 'BonusManage/GetPromotion',
+            bonusCode: data[idx].bonusCode
+        };
+        WebAPI.PostData(param).then((res) => {
+            if (res.data.errorCode === 0) {
+                updateData(res.data.data);
+                setIsEdit(true);
+            }else{
+                alert(res.data.message ?? 'failed to get data.');
+            }
+        })
     
-	return (
-		<div className="container-fluid">
-			<h4 className="page-name">Create Bonus</h4>
-			<InputBox
-				Title="BonusCode"
-				OnChange={EditInputBox}
-				dataColumn="bonusCode"
-				value={state.bonusCode}
-			/>
-			<SelectBox
-				Title="PromotionType"
-				Options={initPromotionType}
-                HandleChange={EditInputBox}
-                dataColumn="promotionType"
-				SelectedValue={state.promotionType}
-			/>
-			<DateTimePickerElem
-				columnTitle="From"
-				dateTimePickerProps={{
-					defaultValue: IsAdd
-						? ""
-						: moment(state.periodFrom).format("l LTS"),
-					onBlur: e => {
-						try {
-							EditInputBox(moment(e).format("l LTS"), "periodFrom");
-						} catch (ex) {}
-					}
-				}}
-			/>
-			<DateTimePickerElem
-				columnTitle="To"
-				dateTimePickerProps={{
-					defaultValue: IsAdd
-						? ""
-						: moment(state.periodTo).format("l LTS"),
-					onBlur: e => {
-						try {
-							EditInputBox(moment(e).format("l LTS"), "periodTo");
-						} catch (ex) {}
-					}
-				}}
-			/>
-			<InputBox
-				Title="ExpiryDays"
-				OnChange={EditInputBox}
-				dataColumn="expiryDays"
-				value={state.expiryDays}
-			/>
-			<Checkbox
-				Title="Currency"
-				Options={initCurrency}
-                OnChange={EditCheckBox}
-                dataColumn="currencies"
-				Selected={state.currencies}
-			/>
-			<Checkbox
-				Title="Available Sites"
-				Options={initSites}
-                OnChange={EditCheckBox}
-                dataColumn="availableSites"
-				Selected={state.availableSites}
-			/>
-			<InputBox
-				Type="Number"
-				Title="Usage"
-				OnChange={EditInputBox}
-				dataColumn="usage"
-				value={state.usage}
-			/>
-			<InputBox
-				Title="Rollover"
-				OnChange={EditInputBox}
-				dataColumn="rollover"
-				value={state.rollover}
-			/>
-            <hr />
-            <RadioBox 
-                Title="Bonus Amount Type"
-				Options={initBonusAmountType}
-                OnChange={EditInputBox}
-                dataColumn="bonusAmountType"
-				Selected={state.bonusAmountType}
-            />
-            <InputBox
-				Type="Number"
-				Title="Bonus"
-				OnChange={EditInputBox}
-				dataColumn="bonus"
-				value={state.bonus}
-			/>
-            <InputBox
-				Type="Number"
-				Title="Max Bonus"
-				OnChange={EditInputBox}
-				dataColumn="maxBonus"
-				value={state.maxBonus}
-			/>
-            <hr />
-			<LangPanel
-				dataByLang={state.dataByLang}
-				EditFiled={(value, dataColumn, lang) =>
-					dispatch({
-						type: defActionType.EDIT_BY_LANG,
-						value,
-						dataColumn,
-						lang
-					})
-				}
-			/>
-            <div className="button-group">
-            <button className="btn btn-add" style={{marginTop: '20px', marginBottom: '40px', float: 'right'}} onClick={action.ClickSubmit}>Submit</button>
+    }
+
+    let headerRows = [];
+    titleData.forEach((e, i)=>{
+        headerRows.push(
+            <th key={`title-${i}`}>{e.columnTitle}</th>
+        )
+    })
+
+    let bodyRows = data.map((_data, d_idx) => {
+        let arr=titleData.map((element, t_idx)=>{
+            let body_content = null;
+            if (element.body && element.body.SpecialItem) {
+                if (element.body.SpecialItem === SpecialItemType.actionBtn) {
+                    body_content = (
+                        <ActionButtons clickEdit={clickEdit.bind(null, d_idx)}/>
+                    )
+                }
+            } else{
+                body_content = element.body && element.body.format ? element.body.format(_data[element.dataColumn]) : _data[element.dataColumn]
+            }
+
+            return(
+                <td key={`td-${t_idx}`}>
+                    {body_content}
+                </td> 
+            )
+        })
+
+        return(
+            <tr key={`body-${d_idx}`}>{arr}</tr>
+        )
+    })
+
+    const DataColumn = titleData.map(e => {
+        return e.dataColumn
+    })
+
+    return isEdit ? <Edit Datas={stateData} DataColumn={DataColumn}/> : (
+        <div className="table">
+            <div className="table-options">
+                <button type="button" className="btn btn-approved" onClick={()=>{setIsEdit(true)}}>Create Bonus</button>
             </div>
-		</div>
-	);
-};
+            <table className="table table-striped">
+                <thead>
+                    <tr>{headerRows}</tr>
+                </thead>
+                <tbody>{bodyRows}</tbody>
+            </table>
+        </div>
+    )
+}
 
-const allLang = ["en", "cs", "th", "id", "vn"];
-const LangPanel = ({ dataByLang, EditFiled }) => {
-	return allLang.map(lang => {
-		return (
-			<OuterPanel
-				key={`set-panel-${lang}`}
-				HeaderContent={
-					<span style={{ color: "white" }}>{`${lang}${
-						lang === "en" ? "  ( required )" : ""
-					}`}</span>
-				}
-				Content={
-					<SettingContent
-						banner={
-							dataByLang.banner[lang] === undefined
-								? ""
-								: dataByLang.banner[lang]
-                        }
-                        title={
-                            dataByLang.title[lang] === undefined
-								? ""
-								: dataByLang.title[lang]
-                        }
-						detail={
-							dataByLang.detail[lang] === undefined
-								? ""
-								: dataByLang.detail[lang]
-						}
-						lang={lang}
-						EditFiled={EditFiled}
-					/>
-				}
-			/>
-		);
-	});
-};
+const statusFomat = (checked, subData) => {    
+    return(
+        <div className="switch__container">
+            <input id="switch-bonus" className="switch switch--flat" type="checkbox" checked={checked} onChange={()=>null}/>
+            <label htmlFor="switch-bonus"></label>
+        </div>
+    )
+}
 
-const OuterPanel = props => {
-	return (
-		<div className="panel level-1 mt-20">
-			<a
-				style={{ justifyContent: "space-between" }}
-				className="panel-title">
-				{props.HeaderContent}
-			</a>
-			<div className="panel-body">
-				<div className="collapse show">{props.Content}</div>
-			</div>
-		</div>
-	);
-};
+const dateFormat = (createTime) => {
+    return moment(createTime).format('l LTS');
+}
 
-const SettingContent = props => {
-	return (
-		<div className="panel-body">
-			<div className="form-group">
-				<label>BannerUrl</label>
-				<input
-					type="text"
-					className="form-control"
-					value={props.banner}
-					onChange={e => {
-						props.EditFiled(e.target.value, "banner", props.lang);
-					}}
-				/>
-			</div>
-            <div className="form-group">
-				<label>Title</label>
-				<input
-					type="text"
-					className="form-control"
-					value={props.title}
-					onChange={e => {
-						props.EditFiled(e.target.value, "title", props.lang);
-					}}
-				/>
-			</div>
-			<div className="form-group">
-				<label>Detail</label>
-				<textarea
-					className="form-control"
-					rows="8"
-					value={props.detail}
-					onChange={e => {
-						props.EditFiled(e.target.value, "detail", props.lang);
-					}}></textarea>
-			</div>
-		</div>
-	);
-};
+const ActionButtons = (props) => {
+    return(
+        <div className="button-action" onClick={props.clickEdit}>
+            <button className="btn btn-edit">
+                <i className="icon icon-mode_edit"></i>
+            </button>    
+        </div>
+    )
+}
