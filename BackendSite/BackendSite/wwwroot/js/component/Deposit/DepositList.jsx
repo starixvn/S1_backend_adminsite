@@ -44,9 +44,12 @@ import * as Loading from '../commJS/Loading.jsx';
         render() {
             let rows = this.props.searchData.data.map(row => {
                 let styleblod = (row.flag === 0) ? { fontWeight: 'bold' } : {};
+                let showbankname = (row.depositType === 1) ? row.bankName + " ( " + row.payName + " ) " : (row.depositType === 2) ? row.payName : (row.depositType === 3) ? row.bankName : null;
                 return (
                     <tr key={row.transId} style={styleblod}>
-                        <th scope="row"><a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a></th>
+                        <th scope="row">
+                            {(subFuncKeys.indexOf("f_dp_readOnly") > -1) ? <a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a> : row.transId}
+                        </th>
                         {/* <td>{row.calCode}</td> */}
                         <td>{i18n["lbl_DepositType" + row.depositType]}</td>
                         <td>{row.isKyc === 1 ? "YES" : "NO"}</td>
@@ -54,6 +57,7 @@ import * as Loading from '../commJS/Loading.jsx';
                         <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
                         <td className="text-right">{number_format(row.amount)}</td>
+                        <td>{showbankname}</td>
                         <td>{row.accountNo}</td>
                         <td>{row.accountName}</td>
                         <td>{moment(row.createTime).format('l LTS')}</td>
@@ -92,6 +96,7 @@ import * as Loading from '../commJS/Loading.jsx';
                                 <th scope="col">{i18n.lbl_UserName}</th>
                                 <th scope="col">CCY</th>
                                 <th scope="col" className="text-right">{i18n.lbl_Amount}</th>
+                                <th scope="col">Bank Name</th>
                                 <th scope="col">To Acc. NO.</th>
                                 <th scope="col">To Acc. Name</th>
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
@@ -417,13 +422,14 @@ import * as Loading from '../commJS/Loading.jsx';
             this.f_trigger_End = React.createRef();
             this.selectdate_end = React.createRef();
             this.ExportForm = React.createRef();
-
-            this.state = { selectType: "", selectCurrency: "", selectStatus: "1", SelectUser: "", SelectDepositID: "", ShowDetial: false, timeInterval: this._timeInterval, IsRefresh: false };
+            this.state = { SiteList: [], selectSite: [], selectType: "", selectCurrency: "", selectStatus: "1", SelectUser: "", SelectDepositID: "", ShowDetial: false, timeInterval: this._timeInterval, IsRefresh: false, MutiSelRefresh: false };
+            this.searchFilter = {};
         }
 
         onRefresh() {
             let searchData = this.state.searchData;
             this.onSearch(searchData.pageNumber);
+
         }
 
         onChange(event) {
@@ -438,31 +444,30 @@ import * as Loading from '../commJS/Loading.jsx';
                 clearTimeout(this._myTimer);
             }
             //Loading.OnLoading();
-            let data = { StartDate: this.state.StartDate, EndDate: this.state.EndDate, PageNumber: pageNumber };
-            if (this.state.SelectDepositID != "") {
-                data.DepositId = this.state.SelectDepositID;
+            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, PageNumber: pageNumber, SelectSite: this.searchFilter.selectSite };
+
+            if (this.searchFilter.SelectDepositID != "") {
+                data.DepositId = this.searchFilter.SelectDepositID;
             }
 
-            if (this.state.selectType != "") {
-                data.DepositType = parseInt(this.state.selectType);
+            if (this.searchFilter.selectType != "") {
+                data.DepositType = parseInt(this.searchFilter.selectType);
             }
 
-            if (this.state.selectStatus != "") {
-                data.status = parseInt(this.state.selectStatus);
+            if (this.searchFilter.selectStatus != "") {
+                data.status = parseInt(this.searchFilter.selectStatus);
             }
 
-            if (this.state.SelectUser != "") {
-                data.UserName = this.state.SelectUser;
+            if (this.searchFilter.SelectUser != "") {
+                data.UserName = this.searchFilter.SelectUser;
             }
 
-            if (this.state.selectCurrency != "") {
-                data.CurrencyID = parseInt(this.state.selectCurrency);
+            if (this.searchFilter.selectCurrency != "") {
+                data.CurrencyID = parseInt(this.searchFilter.selectCurrency);
             }
-
             axios.post('/api/Deposit/GetDepositRequestList', data)
                 .then(function (response) {
                     //Loading.UnLoading();
-                    this.AutoRefresh();
                     let result = response.data;
                     if (result.errorCode == 0) {
                         this.setState({ searchData: result, GetData: true, IsRefresh: false, timeInterval: this._timeInterval });
@@ -470,34 +475,36 @@ import * as Loading from '../commJS/Loading.jsx';
                         alert(result.message);
                         this.setState({ IsRefresh: false, timeInterval: this._timeInterval });
                     }
+                    this.AutoRefresh();
                 }.bind(this)).catch(function (error) {
                     //Loading.UnLoading();
-                    this.AutoRefresh();
+
                     alert(error);
                     this.setState({ IsRefresh: false, timeInterval: this._timeInterval });
+                    this.AutoRefresh();
                 }.bind(this));
         }
 
         onExport() {
-            let data = { StartDate: this.state.StartDate, EndDate: this.state.EndDate };
-            if (this.state.SelectDepositID != "") {
-                data.DepositId = this.state.SelectDepositID;
+            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, SelectSite: this.searchFilter.selectSite };
+            if (this.searchFilter.SelectDepositID != "") {
+                data.DepositId = this.searchFilter.SelectDepositID;
             }
 
-            if (this.state.selectType != "") {
-                data.DepositType = parseInt(this.state.selectType);
+            if (this.searchFilter.selectType != "") {
+                data.DepositType = parseInt(this.searchFilter.selectType);
             }
 
-            if (this.state.selectStatus != "") {
-                data.status = parseInt(this.state.selectStatus);
+            if (this.searchFilter.selectStatus != "") {
+                data.status = parseInt(this.searchFilter.selectStatus);
             }
 
-            if (this.state.SelectUser != "") {
-                data.UserName = this.state.SelectUser;
+            if (this.searchFilter.SelectUser != "") {
+                data.UserName = this.searchFilter.SelectUser;
             }
 
-            if (this.state.selectCurrency != "") {
-                data.CurrencyID = parseInt(this.state.selectCurrency);
+            if (this.searchFilter.selectCurrency != "") {
+                data.CurrencyID = parseInt(this.searchFilter.selectCurrency);
             }
 
             let ExportParam = [];
@@ -516,11 +523,16 @@ import * as Loading from '../commJS/Loading.jsx';
 
         handleSubmit(event) {
             event.preventDefault();
+            if (this.state.selectSite.length == 0) {
+                alert("Please Choose at least one Site")
+                return;
+            }
             //this._Search = true;
             let endDate = moment(this.selectdate_end.current.value).add(1, 'days').unix() - 1;
             let data = { StartDate: moment(this.selectdate_start.current.value).unix(), EndDate: endDate };
 
             this.setState(data, function () {
+                this.searchFilter = JSON.parse(JSON.stringify(this.state));
                 this.onSearch(1);
             }.bind(this));
         }
@@ -535,6 +547,61 @@ import * as Loading from '../commJS/Loading.jsx';
                 this._myTimer = setTimeout(function () {
                     this.AutoRefresh();
                 }.bind(this), 1000);
+            }
+        }
+
+        getSiteList() {
+            let state = this.state;
+            //Loading.OnLoading();
+            axios.post('/api/Common/AdminUserSiteList')
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        state.selectSite.length = 0;
+                        this.setState({ SiteList: result.data });
+                        this.buildSelectSite();
+
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+        }
+
+        buildSelectSite = () => {
+            let state = this.state;
+            $("#selectSite").multiselect({
+                includeSelectAllOption: true,
+                selectAllText: 'Check all!',
+                onSelectAll: function () {
+                    state.selectSite.length = 0;
+                    state.SiteList.forEach(function (obj) {
+                        state.selectSite.push(obj.siteId);
+                    });
+                },
+                onDeselectAll: function () {
+                    state.selectSite.length = 0;
+                },
+                onChange: function (option, checked, select) {
+                    let val = parseInt($(option).val()), index = state.selectSite.indexOf(val);
+                    (checked) ? state.selectSite.push(val) : (index > -1) ? state.selectSite.splice(index, 1) : state.selectSite;
+                    state.selectSite.sort();
+                }
+            });
+            (this.state.MutiSelRefresh) ? $('#selectSite').multiselect('select', this.searchFilter.selectSite) : $('#selectSite').multiselect('selectAll', false);
+            $('#selectSite').multiselect('updateButtonText');
+            state.SiteList.forEach(function (obj) {
+                state.selectSite.push(obj.siteId);
+            });
+        }
+
+        componentDidUpdate() {
+            if (this.state.MutiSelRefresh) {
+                this.buildSelectSite();
+                this.setState({ MutiSelRefresh: false });
             }
         }
 
@@ -558,6 +625,7 @@ import * as Loading from '../commJS/Loading.jsx';
                 button: f_trigger_Start,  // trigger for the calendar (button ID)
                 singleClick: true              // double-click mode
             });
+            this.getSiteList();
         }
 
         onCheckDetail(id) {
@@ -565,7 +633,7 @@ import * as Loading from '../commJS/Loading.jsx';
         }
 
         onBack() {
-            this.setState({ ShowDetial: false });
+            this.setState({ ShowDetial: false, MutiSelRefresh: true });
             this.onRefresh();
         }
 
@@ -579,11 +647,21 @@ import * as Loading from '../commJS/Loading.jsx';
             let searchData = this.state.searchData;
             let StartDate = this.state.StartDate;
             let EndDate = this.state.EndDate;
+            let siteList = this.state.SiteList.map(function (obj) {
+                return <option key={obj.siteId} value={obj.siteId}>{obj.siteName}</option>;
+            }.bind(this));
+            siteList = <select id="selectSite" name="selectSite[]" multiple="multiple">{siteList}</select>;
             return (
                 <div>
                     {!this.state.ShowDetial ? <form method="post" onSubmit={this.handleSubmit.bind(this)}>
                         <div className="filter">
                             <div className="row-flex">
+                                <div className="input-item">
+                                    <span className="label">Site</span>
+                                    <div className="field">
+                                        {siteList}
+                                    </div>
+                                </div>
                                 <div className="input-item">
                                     <span className="label">Type</span>
                                     <div className="field">
@@ -659,6 +737,5 @@ import * as Loading from '../commJS/Loading.jsx';
             )
         }
     }
-
     ReactDOM.render(<DepositPanel />, document.getElementById('searchForm'));
 })(jQuery, React, ReactDOM, i18n, axios, moment, Calendar);

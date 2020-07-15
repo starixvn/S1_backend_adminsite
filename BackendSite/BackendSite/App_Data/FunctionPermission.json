@@ -81,12 +81,26 @@
       {
         "DisplayKey": "Deposit Request",
         "FuncKey": "Finance/DepositList",
-        "Enable": false
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Ready Only",
+            "FuncKey": "f_dp_readOnly"
+          }
+        ]
       },
       {
         "DisplayKey": "Withdrawal Request",
         "FuncKey": "Finance/WithdrawalList",
-        "Enable": false
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Ready Only",
+            "FuncKey": "f_wd_readOnly"
+          }
+        ]
       },
       {
         "DisplayKey": "Balance Adjustment",

@@ -4,6 +4,7 @@ using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -29,15 +30,16 @@ namespace BackendSite.Service.DAL
             this.withdrawalLimitService = withdrawalLimitService;
         }
 
-        public IEnumerable<DepositRequest> GetDepositRequestList(int? depositType, long startDate, long endDate, int siteId, string DepositId, string UserName, int? currencyId, int? status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, int? depositType, long startDate, long endDate, int siteId, string DepositId, string UserName, int? currencyId, int? status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
+            var SelectSite = JsonConvert.SerializeObject(selectSite);
             int depositId = 0;
             if (!string.IsNullOrWhiteSpace(DepositId))
             {
                 Match m = Regex.Match(DepositId, @"\d+");
                 int.TryParse(m.Value, out depositId);
             }
-            var p = new DynamicParameters(new { DepositType = depositType, StartDate = startDate, EndDate = endDate, SiteId = siteId, DepositId = depositId, TransId = DepositId, UserName, CurrencyId = currencyId, Status = status, PageSize = pageSize });
+            var p = new DynamicParameters(new { SelectSite, DepositType = depositType, StartDate = startDate, EndDate = endDate, SiteId = siteId, DepositId = depositId, TransId = DepositId, UserName, CurrencyId = currencyId, Status = status, PageSize = pageSize });
             p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -174,15 +176,16 @@ namespace BackendSite.Service.DAL
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.QueryFirstOrDefault<DepositReceipt>("DepositReceipt_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(int? depositType, long startDate, long endDate, string DepositId, string UserName, int? currencyId, int? status)
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(IEnumerable<int> selectSite, int? depositType, long startDate, long endDate, string DepositId, string UserName, int? currencyId, int? status)
         {
+            var SelectSite = JsonConvert.SerializeObject(selectSite);
             int depositId = 0;
             if (!string.IsNullOrWhiteSpace(DepositId))
             {
                 Match m = Regex.Match(DepositId, @"\d+");
                 int.TryParse(m.Value, out depositId);
             }
-            var p = new DynamicParameters(new { DepositType = depositType, StartDate = startDate, EndDate = endDate, DepositId = depositId, TransId = DepositId, UserName, CurrencyId = currencyId, Status = status });
+            var p = new DynamicParameters(new { SelectSite, DepositType = depositType, StartDate = startDate, EndDate = endDate, DepositId = depositId, TransId = DepositId, UserName, CurrencyId = currencyId, Status = status });
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var depositList = conn.Query<DepositInfoForExport>("Admin_DepositListForExport_Get", p, commandType: CommandType.StoredProcedure);
