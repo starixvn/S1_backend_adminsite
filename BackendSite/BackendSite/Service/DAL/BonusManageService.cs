@@ -64,7 +64,8 @@ namespace BackendSite.Service.DAL
                     promotion.Sort,
                     Status = 0,
                     promotion.LastUpdateUser,
-                    IsAdd
+                    IsAdd,
+                    promotion.SiteId
                 }, transaction: trans, commandType: CommandType.StoredProcedure);
 
 
@@ -72,9 +73,9 @@ namespace BackendSite.Service.DAL
                 {
                     conn.Execute("Admin_PromotionSpecific_InsUpd", new
                     {
-                        specific.BonusCode,
+                        promotion.BonusCode,
                         specific.CurrencyId,
-                        specific.SiteId,
+                        promotion.SiteId,
                         specific.RollOver,
                         specific.Bonus,
                         specific.BonusType,
@@ -95,7 +96,7 @@ namespace BackendSite.Service.DAL
             return errorCode;
         }
 
-        public int SetPromotionStatus(string BonusCode, int Status, string LastUpdateUser)
+        public int SetPromotionStatus(string BonusCode, int SiteId, int Status, string LastUpdateUser)
         {
             int errorCode = 0;
             try
@@ -103,7 +104,7 @@ namespace BackendSite.Service.DAL
                 using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
                 {
                     string SpName = "Admin_Promotion_SetStatus";
-                    conn.Execute(SpName, new { BonusCode, Status, LastUpdateUser }, commandType: CommandType.StoredProcedure);
+                    conn.Execute(SpName, new { BonusCode, SiteId, Status, LastUpdateUser }, commandType: CommandType.StoredProcedure);
                 }
             }
             catch (Exception)

@@ -105,12 +105,12 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult UpdatePromotionStatus([FromForm]string BonusCode, int Status)
+        public ApiResult UpdatePromotionStatus([FromForm]string BonusCode, [FromForm]int SiteId, [FromForm]int Status)
         {
             var apiResult = new ApiResult();
             try
             {
-                apiResult.ErrorCode = bonusManageBLL.SetPromotionStatus(BonusCode, Status);
+                apiResult.ErrorCode = bonusManageBLL.SetPromotionStatus(BonusCode, SiteId, Status);
             }
             catch (Exception ex)
             {

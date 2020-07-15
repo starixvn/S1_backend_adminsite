@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
@@ -35,12 +36,13 @@ namespace BackendSite.Service.BLL
         public int SetPromotion(bool IsAdd, PromotionInfo promotion)
         {
             promotion.LastUpdateUser = IsAdd ? "" : authorizeBLL.GetAuthData().UserName;
+            promotion.SiteId = IsAdd ?  serverInfoBLL.GetServerInfo().SiteId : promotion.SiteId;
             return bonusManageService.SetPromotion(IsAdd, promotion);
         }
 
-        public int SetPromotionStatus(string BonusCode, int Status)
+        public int SetPromotionStatus(string BonusCode, int SiteId, int Status)
         {
-            return bonusManageService.SetPromotionStatus(BonusCode, Status, authorizeBLL.GetAuthData().UserName);
+            return bonusManageService.SetPromotionStatus(BonusCode, SiteId, Status, authorizeBLL.GetAuthData().UserName);
         }
     }
 }

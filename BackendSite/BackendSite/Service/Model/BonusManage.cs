@@ -22,6 +22,8 @@ namespace BackendSite.Service.Model
         public string LastUpdateUser { get; set; }
 
         public IEnumerable<PromotionSpecific> Specific { get; set; }
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
     }
 
     public class PromotionSpecific
@@ -29,9 +31,7 @@ namespace BackendSite.Service.Model
         public string BonusCode { get; set; }
         public int CurrencyId { get; set; }
         public int SiteId { get; set; }
-
         public int Usage { get; set; }
-
         public int BeenUsed { get; set; }
         public int RollOver { get; set; }
         public decimal Bonus { get; set; }
