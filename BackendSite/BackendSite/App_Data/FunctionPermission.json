@@ -85,8 +85,8 @@
         "InputBoxType": "checkbox",
         "SubFuncKeys": [
           {
-            "DisplayKey": "Ready Only",
-            "FuncKey": "f_dp_readOnly"
+            "DisplayKey": "Execute",
+            "FuncKey": "f_dp_execute"
           }
         ]
       },
@@ -97,8 +97,8 @@
         "InputBoxType": "checkbox",
         "SubFuncKeys": [
           {
-            "DisplayKey": "Ready Only",
-            "FuncKey": "f_wd_readOnly"
+            "DisplayKey": "Execute",
+            "FuncKey": "f_wd_execute"
           }
         ]
       },

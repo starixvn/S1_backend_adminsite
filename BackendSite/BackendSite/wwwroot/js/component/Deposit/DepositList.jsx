@@ -48,7 +48,7 @@ import * as Loading from '../commJS/Loading.jsx';
                 return (
                     <tr key={row.transId} style={styleblod}>
                         <th scope="row">
-                            {(subFuncKeys.indexOf("f_dp_readOnly") > -1) ? <a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a> : row.transId}
+                            {(subFuncKeys.indexOf("f_dp_execute") > -1) ? <a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a> : row.transId}
                         </th>
                         {/* <td>{row.calCode}</td> */}
                         <td>{i18n["lbl_DepositType" + row.depositType]}</td>
