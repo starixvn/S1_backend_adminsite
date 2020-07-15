@@ -1,16 +1,16 @@
 export const defActionType = {
-	SET_PROMOTION_LIST: "SET_PROMOTION_LIST",
-	GOTO_ADD_BONUS: "GOTO_ADD_BONUS",
-	SET_PROMOTION: "SET_PROMOTION",
-	EDIT_PROMOTION: "EDIT_PROMOTION",
-	CLICK_BACK: "CLICK_BACK",
-	UPDATE_PROMOTION_STATUS: "UPDATE_PROMOTION_STATUS"
+	SET_PROMOTION_LIST: 'SET_PROMOTION_LIST',
+	GOTO_ADD_BONUS: 'GOTO_ADD_BONUS',
+	SET_PROMOTION: 'SET_PROMOTION',
+	EDIT_PROMOTION: 'EDIT_PROMOTION',
+	CLICK_BACK: 'CLICK_BACK',
+	UPDATE_PROMOTION_STATUS: 'UPDATE_PROMOTION_STATUS'
 };
 
 export const defPanelType = {
-	Main: "Main",
-	Edit: "Edit",
-	Add: "Add"
+	Main: 'Main',
+	Edit: 'Edit',
+	Add: 'Add'
 };
 
 export const initState = {
@@ -31,7 +31,9 @@ export function reducer(state, action) {
 		case defActionType.GOTO_ADD_BONUS:
 			return {
 				...state,
-				siteList: action.siteList,
+				siteList: action.siteList.sort((a, b) => {
+					return a.siteId > b.siteId ? 1 : -1;
+				}),
 				panelType: defPanelType.Add
 			};
 
@@ -46,7 +48,9 @@ export function reducer(state, action) {
 			return {
 				...state,
 				promotionData: action.promotionData,
-				siteList: action.siteList,
+				siteList: action.siteList.sort((a, b) => {
+					return a.siteId > b.siteId ? 1 : -1;
+				}),
 				panelType: defPanelType.Edit
 			};
 
