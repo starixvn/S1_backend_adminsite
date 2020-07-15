@@ -62,7 +62,7 @@ namespace BackendSite.Service.DAL
                     PeriodTo = promotion.UnixPeriodTo,
                     promotion.ExpiryDays,
                     promotion.Sort,
-                    Status = 0,
+                    promotion.Status,
                     promotion.LastUpdateUser,
                     IsAdd,
                     promotion.SiteId
