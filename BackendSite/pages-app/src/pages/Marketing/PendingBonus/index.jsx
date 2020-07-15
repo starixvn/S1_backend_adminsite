@@ -33,12 +33,15 @@ const Panel = () => {
 				if (isMountedRef.current) {
 					if (res.data.errorCode === 0) {
 						setData(res.data.data);
+					}else{
+						alert(res.data.message);
 					}
 					setProcessing(false);
 				}
 			},
 			err => {
 				if (isMountedRef.current) {
+					alert('API Server error.');
 					setProcessing(false);
 				}
 			}
@@ -58,11 +61,15 @@ const Panel = () => {
 						if (isMountedRef.current) {
 							if (res.data.errorCode === 0) {
 								GetPendingBonus();
+							}else{
+								alert(res.data.message);
+								setProcessing(false);
 							}
 						}
 					},
 					err => {
 						if (isMountedRef.current) {
+							alert('API Server error.');
 							setProcessing(false);
 						}
 					}
@@ -84,11 +91,15 @@ const Panel = () => {
 					if (isMountedRef.current) {
 						if (res.data.errorCode === 0) {
 							GetPendingBonus();
+						}else{
+							alert(res.data.message);
+							setProcessing(false);
 						}
 					}
 				},
 				err => {
 					if (isMountedRef.current) {
+						alert('API Server error.');
 						setProcessing(false);
 					}
 				}
@@ -108,11 +119,15 @@ const Panel = () => {
 						if (isMountedRef.current) {
 							if (res.data.errorCode === 0) {
 								GetPendingBonus();
+							}else{
+								alert(res.data.message);
+								setProcessing(false);
 							}
 						}
 					},
 					err => {
 						if (isMountedRef.current) {
+							alert('API Server error.');
 							setProcessing(false);
 						}
 					}
