@@ -1,145 +1,214 @@
-import React,{useState, useEffect} from 'react';
-import WebAPI from '../../../module/WebAPI';
-import moment from 'moment';
-import Edit from './Edit';
+import React, { useEffect, useRef, useReducer } from "react";
+import WebAPI from "../../../module/WebAPI";
+import moment from "moment";
+import Edit from "./Edit";
+import qs from "qs";
+import {
+	defActionType,
+	defPanelType,
+	reducer,
+	initState
+} from "./index.reducer";
+import Main from "./index.main";
 
-const SpecialItemType = {
-	actionBtn: "actionBtn"
+export default () => {
+	const [state, dispatch] = useReducer(reducer, initState);
+	const isMountedRef = useRef(null);
+	useEffect(() => {
+		isMountedRef.current = true;
+		return () => (isMountedRef.current = false);
+	});
+
+	useEffect(() => {
+		let param = {
+			Url: "BonusManage/GetPromotionList"
+		};
+		WebAPI.PostData(param).then(res => {
+			if (isMountedRef.current) {
+				if (res.data.errorCode === 0) {
+					dispatch({
+						type: defActionType.SET_PROMOTION_LIST,
+						promotionList: res.data.data
+					});
+				} else {
+					alert(res.data.message ?? "failed to get data.");
+				}
+			}
+		});
+	}, []);
+
+	const ClickCreateBonus = () => {
+		let param = {
+			Url: "BonusManage/GetSiteListByLoginUser"
+		};
+		WebAPI.PostData(param).then(res => {
+			if (isMountedRef.current) {
+				if (res.data.errorCode === 0) {
+					dispatch({
+						type: defActionType.GOTO_ADD_BONUS,
+						siteList: res.data.data
+					});
+				} else {
+					alert(res.data.message ?? "failed to get data.");
+				}
+			}
+		});
+	};
+
+	const SetPromotion = promotion => {
+		let _specific = Object.keys(promotion.specific).map(s => {
+			return {
+				CurrencyId: s,
+				Usage: s.usage ? Number(s.usage) : 0,
+				Rollover: Number(s.rollover),
+				Bonus: Number(s.bonus),
+				BonusType: s.bonusAmountType,
+				MaxBonus: Number(s.maxBonus),
+				Details: JSON.stringify({
+					Title: s.title,
+					BannerUrl: s.bannerUrl,
+					Detail: s.detail
+				}),
+				Status: s.status
+			};
+		});
+
+		let _promo = {
+			BonusCode: promotion.bonusCode,
+			Description: promotion.description,
+			PromotionType: promotion.promotionType,
+			UnixPeriodFrom: moment(promotion.periodFrom).unix(),
+			UnixPeriodTo: moment(promotion.periodTo).unix(),
+			Status: promotion.status,
+			ExpiryDays: Number(promotion.expiryDays),
+			SiteId: promotion.siteId,
+			Specific: _specific
+		};
+
+		let param = {
+			Url: "BonusManage/SetPromotion",
+			Data: qs.stringify({
+				IsAdd: state.panelType === defPanelType.Add,
+				Promotion: _promo
+			})
+		};
+		WebAPI.PostData(param).then(
+			res => {
+				if (isMountedRef.current) {
+					if (res.data.errorCode === 0) {
+						dispatch({
+							type: defActionType.SET_PROMOTION,
+							promotionList: res.data.data
+						});
+					} else {
+						alert(res.data.message ?? "failed to get data.");
+					}
+				}
+			},
+			err => {
+				alert("API Server Error.");
+			}
+		);
+	};
+
+	const ClickEdit = async idx => {
+		const promotionData = await WebAPI.PostData({
+			Url: "BonusManage/GetPromotion",
+			Data: qs.stringify({
+				BonusCode: state.promotionList[idx].bonusCode
+			})
+		}).then(
+			res => {
+				return {
+					errorCode: res.data.errorCode,
+					data: res.data.data,
+					msg: res.data.message
+				};
+			},
+			err => {
+				return { errorCode: 991 };
+			}
+		);
+
+		const siteList = await WebAPI.PostData({
+			Url: "BonusManage/GetSiteListByLoginUser",
+			Data: qs.stringify({ SiteId: state.promotionList[idx].siteId })
+		}).then(
+			res => {
+				return {
+					errorCode: res.data.errorCode,
+					data: res.data.data,
+					msg: res.data.message
+				};
+			},
+			err => {
+				return { errorCode: 991 };
+			}
+		);
+
+		if (promotionData.errorCode === 0 && siteList.errorCode === 0) {
+			dispatch({
+				type: defActionType.EDIT_PROMOTION,
+				promotionData: promotionData.data,
+				siteList: siteList.data
+			});
+		} else {
+			let msg =
+				promotionData.errorCode === 991 && siteList.errorCode === 991
+					? "API Server Error."
+					: [promotionData.msg, siteList.msg].join(", ");
+			alert(msg);
+		}
+	};
+
+	const UpdatePromotionStatus = idx => {
+		let _promo = state.promotionList[idx];
+		let msg =
+			_promo.status === 1
+				? "Disable this promotion?"
+				: "Enable this promotion?";
+		if (_promo && window.confirm(msg)) {
+			let newStatus = _promo.status === 1 ? 2 : 1;
+			let param = {
+				Url: "BonusManage/UpdatePromotionStatus",
+				Data: qs.stringify({
+					BonusCode: _promo.bonusCode,
+					SiteId: _promo.siteId,
+					Status: newStatus
+				})
+			};
+			WebAPI.PostData(param).then(res => {
+				if (isMountedRef.current) {
+					if (res.data.errorCode === 0) {
+						dispatch({
+							type: defActionType.UPDATE_PROMOTION_STATUS,
+							idx: idx,
+							status: newStatus
+						});
+					} else {
+						alert(res.data.message ?? "failed to get data.");
+					}
+				}
+			});
+		}
+	};
+
+	const ClickBack = () => {
+		dispatch({ type: defActionType.CLICK_BACK });
+	};
+
+	return state.panelType === defPanelType.Main ? (
+		<Main
+			ClickCreateBonus={ClickCreateBonus}
+			ClickEdit={ClickEdit}
+			UpdatePromotionStatus={UpdatePromotionStatus}
+			promotionList={state.promotionList}
+		/>
+	) : (
+		<Edit
+			Datas={state.promotionData}
+			SiteList={state.siteList}
+			Action={{ SetPromotion, ClickBack }}
+		/>
+	);
 };
-
-const _titleData = () => {
-    return [
-        { dataColumn:"bonusCode", columnTitle: "BonusCode"},
-        { dataColumn:"promotionType", columnTitle:"PromotionType" },
-        { dataColumn:"categoryId", columnTitle: "CategoryId"},
-        { dataColumn:"periodFrom", columnTitle: "PeriodFrom", body: { format: dateFormat }},
-        { dataColumn:"periodTo", columnTitle: "PeriodTo", body: { format: dateFormat }},
-        { dataColumn:"sort", columnTitle: "Sort"},
-        { dataColumn:"status", columnTitle: "Status", body: { format: statusFomat }},
-        { dataColumn:"edit", columnTitle:"Edit",  body: { SpecialItem: SpecialItemType.actionBtn }}, 
-    ]
-}
-
-export default (props) => {
-    const titleData = _titleData();
-    const [isEdit, setIsEdit] = useState(false);
-    const [data, setData] = useState([]);
-    const [stateData, updateData] = useState({});
-    const [siteList, setSiteList] = useState([]);
-
-    useEffect(() => {
-        let param = {
-            Url: 'BonusManage/GetPromotionList',
-        };
-        WebAPI.PostData(param).then((res) => {
-            if (res.data.errorCode === 0) {
-                setData(res.data.data)
-            }else{
-                alert(res.data.message ?? 'failed to get data.');
-            }
-        })
-    },[])
-
-    const clickCreateBonus = () => {
-        let param = {
-            Url: 'BonusManage/GetSiteListByLoginUser',
-        };
-        WebAPI.PostData(param).then((res) => {
-            if (res.data.errorCode === 0) {
-                setSiteList(res.data.data)
-                setIsEdit(true);
-            }else{
-                alert(res.data.message ?? 'failed to get data.');
-            }
-        })
-    }
-
-    const clickEdit = (idx) => {
-        let param = {
-            Url: 'BonusManage/GetPromotion',
-            bonusCode: data[idx].bonusCode
-        };
-        WebAPI.PostData(param).then((res) => {
-            if (res.data.errorCode === 0) {
-                updateData(res.data.data);
-                setIsEdit(true);
-            }else{
-                alert(res.data.message ?? 'failed to get data.');
-            }
-        })
-    
-    }
-
-    let headerRows = [];
-    titleData.forEach((e, i)=>{
-        headerRows.push(
-            <th key={`title-${i}`}>{e.columnTitle}</th>
-        )
-    })
-
-    let bodyRows = data.map((_data, d_idx) => {
-        let arr=titleData.map((element, t_idx)=>{
-            let body_content = null;
-            if (element.body && element.body.SpecialItem) {
-                if (element.body.SpecialItem === SpecialItemType.actionBtn) {
-                    body_content = (
-                        <ActionButtons clickEdit={clickEdit.bind(null, d_idx)}/>
-                    )
-                }
-            } else{
-                body_content = element.body && element.body.format ? element.body.format(_data[element.dataColumn]) : _data[element.dataColumn]
-            }
-
-            return(
-                <td key={`td-${t_idx}`}>
-                    {body_content}
-                </td> 
-            )
-        })
-
-        return(
-            <tr key={`body-${d_idx}`}>{arr}</tr>
-        )
-    })
-
-    const DataColumn = titleData.map(e => {
-        return e.dataColumn
-    })
-
-    return isEdit ? <Edit Datas={stateData} SiteList={siteList}/> : (
-        <div className="table">
-            <div className="table-options">
-                <button type="button" className="btn btn-approved" onClick={clickCreateBonus}>Create Bonus</button>
-            </div>
-            <table className="table table-striped">
-                <thead>
-                    <tr>{headerRows}</tr>
-                </thead>
-                <tbody>{bodyRows}</tbody>
-            </table>
-        </div>
-    )
-}
-
-const statusFomat = (checked, subData) => {    
-    return(
-        <div className="switch__container">
-            <input id="switch-bonus" className="switch switch--flat" type="checkbox" checked={checked} onChange={()=>null}/>
-            <label htmlFor="switch-bonus"></label>
-        </div>
-    )
-}
-
-const dateFormat = (createTime) => {
-    return moment(createTime).format('l LTS');
-}
-
-const ActionButtons = (props) => {
-    return(
-        <div className="button-action" onClick={props.clickEdit}>
-            <button className="btn btn-edit">
-                <i className="icon icon-mode_edit"></i>
-            </button>    
-        </div>
-    )
-}

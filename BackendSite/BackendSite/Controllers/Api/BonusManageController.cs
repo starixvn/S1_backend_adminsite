@@ -63,12 +63,16 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<dynamic>> GetSiteListByLoginUser()
+        public ApiResult<IEnumerable<dynamic>> GetSiteListByLoginUser([FromForm]int? SiteId)
         {
             var apiResult = new ApiResult<IEnumerable<dynamic>>();
             try
             {
                 apiResult.Data = serverInfoBLL.GetSiteListByLoginUser()?.Select(x => new { x.SiteName, x.SiteId, CurrencyList = x.ICurrencyList });
+                if(SiteId != null && apiResult.Data != null && apiResult.Data.Any())
+                {
+                    apiResult.Data = apiResult.Data.Where(s => s.SiteId == SiteId);
+                }
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
