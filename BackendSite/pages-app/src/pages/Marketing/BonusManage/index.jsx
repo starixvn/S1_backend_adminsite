@@ -25,6 +25,7 @@ export default (props) => {
     const [isEdit, setIsEdit] = useState(false);
     const [data, setData] = useState([]);
     const [stateData, updateData] = useState({});
+    const [siteList, setSiteList] = useState([]);
 
     useEffect(() => {
         let param = {
@@ -38,6 +39,20 @@ export default (props) => {
             }
         })
     },[])
+
+    const clickCreateBonus = () => {
+        let param = {
+            Url: 'BonusManage/GetSiteListByLoginUser',
+        };
+        WebAPI.PostData(param).then((res) => {
+            if (res.data.errorCode === 0) {
+                setSiteList(res.data.data)
+                setIsEdit(true);
+            }else{
+                alert(res.data.message ?? 'failed to get data.');
+            }
+        })
+    }
 
     const clickEdit = (idx) => {
         let param = {
@@ -91,10 +106,10 @@ export default (props) => {
         return e.dataColumn
     })
 
-    return isEdit ? <Edit Datas={stateData} DataColumn={DataColumn}/> : (
+    return isEdit ? <Edit Datas={stateData} SiteList={siteList}/> : (
         <div className="table">
             <div className="table-options">
-                <button type="button" className="btn btn-approved" onClick={()=>{setIsEdit(true)}}>Create Bonus</button>
+                <button type="button" className="btn btn-approved" onClick={clickCreateBonus}>Create Bonus</button>
             </div>
             <table className="table table-striped">
                 <thead>
