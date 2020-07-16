@@ -6,6 +6,7 @@
 @inject SelLangBLL selLangBLL
 @inject AuthorizeBLL authorizeBLL
 @inject IWebHostEnvironment environment
+@inject PermissionBLL permissionBLL
 @section Style {
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Poppins&display=swap" rel="stylesheet">
     <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
@@ -28,6 +29,8 @@
         if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
+    IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("Finance/BankInfoList");
+    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
 }
 <h4 class="page-name">@selLangBLL.GetResourceValue("lbl_BankCardList")</h4>
 <div id="BankCardInfoPanel"></div>
@@ -35,6 +38,7 @@
     <script>
         //$('.collapse').collapse();
         $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
+        var subFuncKeys = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(subFuncKeys));
     </script>
     <script src="~/lib/runtime.min.js"></script>
     <script src="~/js/component/Payment/BankInfoList.min.js" asp-append-version="true"></script>
