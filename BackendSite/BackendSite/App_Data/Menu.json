@@ -7,7 +7,7 @@
     "FuncKey": "Home/Dashboard",
     "Controller": "Home",
     "Action": "Dashboard",
-    "NoAuth":  true
+    "NoAuth": true
   },
   {
     "Key": "",
@@ -247,7 +247,7 @@
         "Roles": null,
         "Childs": null
       },
-      {
+      /*{
         "Key": "BonusCashBack",
         "Title": "Bonus Cash Back",
         "FuncKey": "Marketing/BonusCashBack",
@@ -266,7 +266,18 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },*/
+      {
+        "Key": "PendingBonus",
+        "Title": "Pending Bonus",
+        "FuncKey": "Marketing/PendingBonus",
+        "Controller": "Marketing",
+        "Action": "PendingBonus",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
+
     ]
   }
 ]

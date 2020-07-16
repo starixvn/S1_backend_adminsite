@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,5 +43,22 @@ namespace BackendSite.Service.Model
         public DateTime ExpiryTime { get; set; }
         public DateTime CreateTime { get; set; }
         public string StatusName { get; set; }   
+    }
+
+    public class PendingBonus
+    {
+        public string BonusCode { get; set; }
+        public int PromotionType { get; set; }
+        public string SiteId { get; set; }
+        public string SiteName { get; set; }
+        public string UserName { get; set; }
+        public int BonusId { get; set; }
+        public decimal LockedAmount { get; set; }
+        public decimal BonusAmount { get; set; }
+        public decimal Bonus { get; set; }
+        public decimal Rollover { get; set; }
+        public DateTime ExpiryTime { get; set; }
+        public DateTime CreateTime { get; set; }
+        public int CustId { get; set; }
     }
 }

@@ -234,7 +234,7 @@ import TurnoverReport from './TurnoverReport/index';
     class FinancialLog extends React.Component {
         constructor(props) {
             super(props);
-            this.state = {};
+            this.state = { RefTransId: "" };
 
             this.startDate = React.createRef();
             this.endDate = React.createRef();
@@ -258,13 +258,15 @@ import TurnoverReport from './TurnoverReport/index';
             $(this.endDate.current).focus();
         }
 
-        /*onChange(e) {
-            this.props.onChange(e, "FinancialLog");
-        }*/
+        onChange(event) {
+            let obj = this.state;
+            obj[event.target.name] = event.target.value;
+            this.setState(obj);
+        }
 
         handleSubmit(event) {
             event.preventDefault();
-            this.props.onChangeValue("FinancialLog", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1 });
+            this.props.onChangeValue("FinancialLog", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, RefTransId: this.state.RefTransId.trim() == '' ? null : this.state.RefTransId });
             this.props.GetFinancialLog(1);
         }
 
@@ -277,15 +279,21 @@ import TurnoverReport from './TurnoverReport/index';
                         <div className="input-item">
                             <span className="label">From Date</span>
                             <div className="date">
-                                <input type="text" ref={this.startDate} name="StartDate" className="dateselect" required="required" data-date-end-date="0d" autoComplete="off" value={financialLog && financialLog.StartDate ? moment.unix(financialLog.StartDate).format("MM/DD/YYYY") : ""} />
+                                <input type="text" ref={this.startDate} name="StartDate" className="dateselect" data-date-end-date="0d" autoComplete="off" value={financialLog && financialLog.StartDate ? moment.unix(financialLog.StartDate).format("MM/DD/YYYY") : ""} />
                                 <i className="icon-calendar dateselect" onClick={this.onStartDate.bind(this)} />
                             </div>
                         </div>
                         <div className="input-item date">
                             <span className="label">To Date</span>
                             <div className="date">
-                                <input type="text" ref={this.endDate} name="EndDate" required="required" data-date-end-date="0d" autoComplete="off" value={financialLog && financialLog.EndDate ? moment.unix(financialLog.EndDate).format("MM/DD/YYYY") : ""} />
+                                <input type="text" ref={this.endDate} name="EndDate" data-date-end-date="0d" autoComplete="off" value={financialLog && financialLog.EndDate ? moment.unix(financialLog.EndDate).format("MM/DD/YYYY") : ""} />
                                 <i className="icon-calendar dateselect" onClick={this.onEndDate.bind(this)} />
+                            </div>
+                        </div>
+                        <div className="input-item">
+                            <span className="label">Ref TransId</span>
+                            <div className="">
+                                <input type="text" onChange={this.onChange.bind(this)} placeholder="Ref TransId" name="RefTransId" autoComplete="off" value={this.state.RefTransId} />
                             </div>
                         </div>
                         <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
@@ -786,13 +794,14 @@ import TurnoverReport from './TurnoverReport/index';
         }
 
         GetFinancialLog(PageNumber) {
+            Loading.OnLoading();
             let pageNumber = PageNumber || this.state.FinancialLogData.pageNumber;
             let CustId = getUrlParameter("custId");
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
                 axios.post('/api/Payment/GetFinancialLog', { ...this.state.FinancialLog, CustId: iCustId, PageNumber: pageNumber })
                     .then(function (response) {
-                        //Loading.UnLoading();
+                        Loading.UnLoading();
                         let result = response.data;
                         if (result.errorCode == 0) {
                             this.setState({ FinancialLogData: result });
@@ -800,7 +809,7 @@ import TurnoverReport from './TurnoverReport/index';
                             alert(result.message);
                         }
                     }.bind(this)).catch(function (error) {
-                        //Loading.UnLoading();
+                        Loading.UnLoading();
                         alert(error);
                     }.bind(this));
             }

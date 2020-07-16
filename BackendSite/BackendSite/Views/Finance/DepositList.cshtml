@@ -4,9 +4,11 @@
 @inject SelLangBLL selLangBLL
 @inject ServerInfoBLL serverInfoBLL
 @inject AuthorizeBLL authorizeBLL
+@inject PermissionBLL permissionBLL
 @section Style {
     <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
     <link href="~/lib/Oneworks/jscalendar/calendar-blue.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap-multiselect/bootstrap-multiselect-modify.css" rel="stylesheet"/>
 }
 @{
     Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
@@ -45,6 +47,8 @@
             i18n.Add($"lbl_DepositType{i}", selLangBLL.GetResourceValue($"lbl_DepositType{i}"));
     }
 
+    IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("Finance/DepositList");
+    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
 }
 <h4 class="page-name">@selLangBLL.GetResourceValue("lbl_DepositRequest")</h4>
 
@@ -55,9 +59,11 @@
     <script src="~/lib/Oneworks/jscalendar/calendar.js"></script>
     <script src="~/lib/Oneworks/jscalendar/lang/calendar-en.js"></script>
     <script src="~/lib/Oneworks/jscalendar/calendar-setup.js"></script>
+    <script src="~/lib/bootstrap-multiselect/bootstrap-multiselect.js"></script>
     <script type="text/javascript">
         $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
         var CurrencyList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(currencyList));
+        var subFuncKeys = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(subFuncKeys));
     </script>
     <script src="~/js/component/Deposit/DepositList.min.js" asp-append-version="true"></script>
     @if (environment.EnvironmentName == "Development")

@@ -5,7 +5,11 @@ import qs from 'qs';
     class PaymentAdjustment extends React.Component {
         constructor(props) {
             super(props);
-            this.state = { UserName: "", CustData: null, Checkwd: false, Withdrawal: 1 };
+            this.state = { UserName: "", CustData: null, Checkwd: false, Withdrawal: 1, SiteList: [], SiteId: null, SabaId: "" };
+        }
+
+        componentDidMount = () => {
+            this.getSiteList();
         }
 
         handleSubmit(event) {
@@ -13,13 +17,14 @@ import qs from 'qs';
             this.onGetCustInfoForPayAdjust();
         }
 
-        onGetCustInfoForPayAdjust() {
-            axios.post('/api/CustManage/GetCustInfoDetail', { CustId: 0, UserName: this.state.UserName })
+        getSiteList() {
+            //Loading.OnLoading();
+            axios.post('/api/Common/AdminUserSiteList')
                 .then(function (response) {
                     //Loading.UnLoading();
                     let result = response.data;
                     if (result.errorCode == 0) {
-                        this.setState({ CustData: result.data });
+                        this.setState({ SiteList: result.data });
                     } else {
                         alert(result.message);
                     }
@@ -27,6 +32,54 @@ import qs from 'qs';
                     //Loading.UnLoading();
                     alert(error);
                 }.bind(this));
+        }
+
+        onSiteChanged(e) {
+            let siteId = parseInt(e.target.value);
+            let SelSite = null;
+            for (let i = 0; i < this.state.SiteList.length; i++) {
+                let site = this.state.SiteList[i];
+                if (site.siteId == siteId) {
+                    SelSite = site;
+                    break;
+                }
+            }
+
+            this.setState({ SiteId: siteId, SelSite: SelSite });
+        }
+
+        onGetCustInfoForPayAdjust() {
+            let msg = "";
+            let check = true;
+
+            if (!this.state.SabaId && !this.state.UserName) {
+                check = false;
+                msg = "Please input SabaId or UserName.";
+            }
+
+            if (!this.state.SiteId) {
+                check = false;
+                msg = "Please select Site.";
+            }
+           
+            if (check) {
+                axios.post('/api/CustManage/GetCustInfoDetails', { SabaId: this.state.SabaId, UserName: this.state.UserName, SiteId: this.state.SiteId })
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({ CustData: result.data });
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+            else {
+                alert(msg);
+            }
         }
 
         onSumbitPaymentAdjustment(event) {
@@ -54,7 +107,7 @@ import qs from 'qs';
                 return;
             }
 
-            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount,Memo:memo })
+            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount, Memo: memo })
                 .then(function (response) {
                     //Loading.UnLoading();
                     let result = response.data;
@@ -91,15 +144,32 @@ import qs from 'qs';
                     </li>;
                 }.bind(this))}</ul>;
             }
+
+
+            let siteList = this.state.SiteList.map(function (obj) {
+                return <div key={obj.siteId} className="custom-control custom-radio custom-control-inline">
+                    <input type="radio" id={"SiteId_" + obj.siteId} name="SiteList" className="custom-control-input" checked={this.state.SiteId === obj.siteId} value={obj.siteId} onChange={this.onSiteChanged.bind(this)} />
+                    <label className="custom-control-label" htmlFor={"SiteId_" + obj.siteId}>{obj.siteName}</label>
+                </div>;
+            }.bind(this));
+
             return (
                 <div>
                     <div className="filter">
                         <form method="post" onSubmit={this.handleSubmit.bind(this)}>
+                            <div className="form-group">
+                                <label className="col-form-label d-block">Site Name</label>
+                                {siteList}
+                            </div>
+                            <div className="input-item">
+                                <label className="col-form-label label">UserName</label>
+                                <input className="form-control" style={{ 'width': '250px' }} type="text" name="UserName" onChange={this.onChange.bind(this)} />
+                            </div>
+                            <div className="input-item">
+                                <label className="col-form-label label">SabaId</label>
+                                <input className="form-control" style={{ 'width': '250px' }} type="text" name="SabaId" onChange={this.onChange.bind(this)} />
+                            </div>
                             <div className="row-flex">
-                                <div className="input-item">
-                                    <label className="col-form-label label">UserName</label>
-                                    <input className="form-control" type="text" name="UserName" onChange={this.onChange.bind(this)} />
-                                </div>
                                 <div className="button-group">
                                     <button type="submit" className="btn btn-primary">Submit</button>
                                 </div>

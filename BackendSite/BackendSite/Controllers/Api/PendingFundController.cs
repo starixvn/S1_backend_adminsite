@@ -45,5 +45,57 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
+        [HttpPost]
+        public async Task<ApiResult> BonusTransferAsync([FromForm]int CustId)
+        {
+            var apiResult = await pendingFundBLL.BonusTransferAsync(CustId);
+
+            if (apiResult.ErrorCode == 0)
+            {
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.Message = apiResult.RawMessage;
+            }
+
+            return apiResult;
+        }
+        [HttpPost]
+        public ApiResult BonusCancel([FromForm]int bonusId)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                apiResult = pendingFundBLL.BonusCancel(bonusId);
+
+                if (apiResult.ErrorCode == 0)
+                {
+                    apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+                }
+                else
+                {
+                    apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.Message = ex.ToString();
+            }
+
+            return apiResult;
+        }
+        [HttpPost]
+        public async Task<ApiResult> BonusTransferAllAsync()
+        {
+            var apiResult = await pendingFundBLL.BonusTransferAllAsync();
+
+            if (apiResult.ErrorCode == 0)
+            {
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+
+            return apiResult;
+        }
     }
 }

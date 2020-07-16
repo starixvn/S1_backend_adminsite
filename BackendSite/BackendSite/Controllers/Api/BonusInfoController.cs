@@ -9,7 +9,6 @@ using BackendSite.Attributes;
 
 namespace BackendSite.Controllers.Api
 {
-    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusInfoReport" })]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class BonusInfoController : Controller
@@ -23,6 +22,7 @@ namespace BackendSite.Controllers.Api
             this.bonusInfoBLL = bonusInfoBLL;
         }
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusInfoReport" })]
         public ApiListResult<BonusInfoFrontEnd> GetBonusInfoReport([FromForm]string TransId, [FromForm]int CurrencyId, [FromForm]string UserName, [FromForm]int PromotionType, [FromForm]long StartDate, [FromForm]long EndDate, [FromForm]int PageNumber)
         {
             var result = new ApiListResult<BonusInfoFrontEnd>();
@@ -47,12 +47,22 @@ namespace BackendSite.Controllers.Api
             return result;
         }
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusInfoReport" })]
         [HttpPost]
         public IActionResult ExportBonusInfoReport(string TransId, int CurrencyId, string UserName, int PromotionType, long StartDate, long EndDate)
         {
             var ExportData = bonusInfoBLL.GetBonusInfoExportReport(TransId, CurrencyId, UserName, PromotionType, StartDate, EndDate);
             var stream = excelBLL.Export(ExportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<PendingBonus>> GetPendingBonusList()
+        {
+            var apiResult = new ApiResult<IEnumerable<PendingBonus>>();
+            apiResult.Data = bonusInfoBLL.GetPendingBonusList();
+            apiResult.ErrorCode = 0;
+            return apiResult;
         }
     }
 }

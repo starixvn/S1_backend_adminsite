@@ -32,8 +32,13 @@ namespace BackendSite.Controllers
         {
             return View();
         }
-
         public IActionResult BonusManage()
+        {
+            return View();
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PendingBonus" })]
+        public IActionResult PendingBonus()
         {
             return View();
         }

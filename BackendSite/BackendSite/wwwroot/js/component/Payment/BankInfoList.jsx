@@ -337,7 +337,7 @@ import {number_format} from '../commJS/common';
 
         getSiteList() {
             //Loading.OnLoading();
-            axios.post('/api/Home/GetSiteList')
+            axios.post('/api/Common/AdminUserSiteList')
             .then(function (response) {
                 //Loading.UnLoading();
                 let result = response.data;
@@ -487,7 +487,7 @@ import {number_format} from '../commJS/common';
 
         getSiteList() {
             //Loading.OnLoading();
-            axios.post('/api/Home/GetSiteList')
+            axios.post('/api/Common/AdminUserSiteList')
             .then(function (response) {
                 //Loading.UnLoading();
                 let result = response.data;

@@ -47,9 +47,15 @@ const DashBoard = lazy(() => import("./pages/Home/DashBoard/index"));
 const BalanceAdjustmentBatch = lazy(() =>
 	import("./pages/Finance/BalanceAdjustmentBatch/index")
 );
+
 const BonusManage = lazy(() => import("./pages/Marketing/BonusManage/index"));
 
 export const defaultPage = "BonusManage";
+
+const PendingBonus = lazy(() => import("./pages/Marketing/PendingBonus/index"));
+
+// export const defaultPage = "PendingBonus";
+
 export const layoutType = {
 	N88: "N88",
 	LAP: "LAP"
@@ -273,16 +279,27 @@ export const pages = {
 		],
 		layout: layoutType.N88
 	},
+<<<<<<< HEAD
 	BonusManage: {
 		comp: (
 			<Suspense fallback="loading...">
 				<BonusManage />
+=======
+	PendingBonus: {
+		comp: (
+			<Suspense fallback="loading...">
+				<PendingBonus />
+>>>>>>> PRD
 			</Suspense>
 		),
 		css: [
 			"./lib/bootstrap/dist/css/bootstrap.min.css",
+<<<<<<< HEAD
 			"./css/css/main.css",
 			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
+=======
+			"./css/css/main.css"
+>>>>>>> PRD
 		],
 		layout: layoutType.N88
 	}

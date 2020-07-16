@@ -69,7 +69,10 @@ module.exports = {
 		"Marketing/BonusManage.min": [
 			"@babel/polyfill",
 			"./src/pages/Marketing/BonusManage/index.jsx"
-		]
+		],
+		// "Marketing/PendingBonus.min": [
+		// 	"./src/pages/Marketing/PendingBonus/index.jsx"
+		// ]
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
