@@ -266,7 +266,7 @@ import TurnoverReport from './TurnoverReport/index';
 
         handleSubmit(event) {
             event.preventDefault();
-            this.props.onChangeValue("FinancialLog", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, RefTransId: this.state.RefTransId });
+            this.props.onChangeValue("FinancialLog", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, RefTransId: this.state.RefTransId.trim() == '' ? null : this.state.RefTransId });
             this.props.GetFinancialLog(1);
         }
 
