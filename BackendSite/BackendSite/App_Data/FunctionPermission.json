@@ -173,12 +173,12 @@
         "DisplayKey": "Bonus Report",
         "FuncKey": "Marketing/BonusInfoReport",
         "Enable": false
-      },
+      }/*,
       {
         "DisplayKey": "Bonus Cash Back",
         "FuncKey": "Marketing/BonusCashBack",
         "Enable": false
-      }
+      }*/
     ]
   }
 ]
