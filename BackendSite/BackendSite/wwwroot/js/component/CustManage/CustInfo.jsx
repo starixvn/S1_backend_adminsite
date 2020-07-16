@@ -794,13 +794,14 @@ import TurnoverReport from './TurnoverReport/index';
         }
 
         GetFinancialLog(PageNumber) {
+            Loading.OnLoading();
             let pageNumber = PageNumber || this.state.FinancialLogData.pageNumber;
             let CustId = getUrlParameter("custId");
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
                 axios.post('/api/Payment/GetFinancialLog', { ...this.state.FinancialLog, CustId: iCustId, PageNumber: pageNumber })
                     .then(function (response) {
-                        //Loading.UnLoading();
+                        Loading.UnLoading();
                         let result = response.data;
                         if (result.errorCode == 0) {
                             this.setState({ FinancialLogData: result });
@@ -808,7 +809,7 @@ import TurnoverReport from './TurnoverReport/index';
                             alert(result.message);
                         }
                     }.bind(this)).catch(function (error) {
-                        //Loading.UnLoading();
+                        Loading.UnLoading();
                         alert(error);
                     }.bind(this));
             }
