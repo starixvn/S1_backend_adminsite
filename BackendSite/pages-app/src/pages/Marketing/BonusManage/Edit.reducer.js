@@ -1,23 +1,24 @@
 export const defActionType = {
-	CURRENCY_SET_VALUE: 'CURRENCY_SET_VALUE',
-	MAIN_SET_VALUE: 'MAIN_SET_VALUE',
-	MAIN_SET_CHECKBOX: 'MAIN_SET_CHECKBOX',
-	MAIN_SET_SITE: 'MAIN_SET_SITE'
+	CURRENCY_SET_VALUE: "CURRENCY_SET_VALUE",
+	MAIN_SET_VALUE: "MAIN_SET_VALUE",
+	MAIN_SET_CHECKBOX: "MAIN_SET_CHECKBOX",
+	MAIN_SET_SITE: "MAIN_SET_SITE"
 };
 
 export const initialState = (IsAdd, datas, siteList) => {
 	if (IsAdd) {
 		let _specific = SetSpecific(siteList[0].currencyList, null);
 		return {
-			bonusCode: '',
+			bonusCode: "",
 			promotionType: 1,
 			periodFrom: undefined,
 			periodTo: undefined,
-			expiryDays: '',
-			description: '',
+			expiryDays: "",
+			description: "",
 			status: 2,
 			siteId: siteList[0].siteId,
 			chooseCurrencies: [],
+			currentTab: siteList[0]?.currencyList?.[0],
 			specific: _specific
 		};
 	} else {
@@ -31,6 +32,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 			description: datas.description,
 			status: datas.status,
 			siteId: datas.siteId,
+			currentTab: siteList[0]?.currencyList?.[0],
 			chooseCurrencies: Object.keys(datas.specific).map(c => {
 				return c;
 			}),
@@ -40,14 +42,14 @@ export const initialState = (IsAdd, datas, siteList) => {
 };
 
 const initSpecific = {
-	usage: '0',
-	rollOver: '',
+	usage: "0",
+	rollOver: "",
 	bonusAmountType: 1,
-	bonus: '',
-	maxBonus: '',
-	bannerUrl: '',
-	title: '',
-	detail: '',
+	bonus: "",
+	maxBonus: "",
+	bannerUrl: "",
+	title: "",
+	detail: "",
 	status: 2
 };
 
@@ -61,10 +63,10 @@ const SetSpecific = (currencyList, data) => {
 		data.forEach(d => {
 			let _newData = {};
 			Object.keys(initSpecific).forEach(k => {
-				if (k === 'bonusAmountType') {
+				if (k === "bonusAmountType") {
 					_newData[k] = d.bonusType;
 				} else {
-					_newData[k] = d[k] ?? '';
+					_newData[k] = d[k] ?? "";
 				}
 			});
 			_specific[d.currencyId] = _newData;
