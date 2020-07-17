@@ -69,7 +69,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<dynamic>>();
             try
             {
-                apiResult.Data = serverInfoBLL.GetSiteListByLoginUser()?.Select(x => new { x.SiteName, x.SiteId, CurrencyList = x.ICurrencyList });
+                apiResult.Data = serverInfoBLL.GetSiteListByLoginUser()?.Select(x => new { x.SiteName, x.SiteId, CurrencyList = x.ICurrencyList, LangList = x.LangList });
                 if(SiteId != null && apiResult.Data != null && apiResult.Data.Any())
                 {
                     apiResult.Data = apiResult.Data.Where(s => s.SiteId == SiteId);
