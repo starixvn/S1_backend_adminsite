@@ -2,7 +2,6 @@ import React from 'react'
 
 export default ({Title, Options, Selected=[], OnChange, dataColumn, mainKey})=>{
     let opt = Options.map(o=>{
-        console.log(Selected.includes(o.value), o.value)
         return <CheckBox key={`${Title}-${o.value}${mainKey === null ? '': `-${mainKey}`}`} onChange={OnChange} Title={o.displayText} checked={Selected.includes(o.value)} Value={o.value} dataColumn={dataColumn}/>
     });
     return(

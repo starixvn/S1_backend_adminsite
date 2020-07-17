@@ -1,53 +1,65 @@
-import React from 'react'
-import InputBox from './Component/InputBox';
-import CheckBox from './Component/Checkbox';
-import SelectBox from './Component/SelectBox';
-import DateTimePickerElem from './Component/DateTimePicker';
-import { defActionType } from './Edit.reducer';
-import moment from 'moment';
-import RadioBox from './Component/RadioBox';
+import React from "react";
+import InputBox from "./Component/InputBox";
+import CheckBox from "./Component/Checkbox";
+import SelectBox from "./Component/SelectBox";
+import DateTimePickerElem from "./Component/DateTimePicker";
+import { defActionType } from "./Edit.reducer";
+import moment from "moment";
+import RadioBox from "./Component/RadioBox";
 
 const initPromotionType = [
-	{ value: 1, displayText: '1st Deposit' },
-	{ value: 2, displayText: 'Re-Deposit' }
+	{ value: 1, displayText: "1st Deposit" },
+	{ value: 2, displayText: "Re-Deposit" }
 ];
 
 const initBonusAmountType = [
-	{ value: 1, displayText: 'Percentage' },
-	{ value: 2, displayText: 'Amount' }
+	{ value: 1, displayText: "Percentage" },
+	{ value: 2, displayText: "Amount" }
 ];
 
-
 export default ({ IsAdd, state, action, siteList }) => {
-	console.log(state)
+	console.log(action);
 	let _options_site = siteList.map(s => {
 		return { value: s.siteId, displayText: s.siteName };
 	});
 
 	const currencyList = Object.keys(state.specific);
-	const currencyOptions = [];
-	let arr = currencyList.map(i => {
+    const currencyOptions = [];
+    currencyList.map(i => {
 		currencyOptions.push({
 			value: i,
 			displayText: window.i18n[`lbl_Currency${i}`]
-		});
-		return (
-			<div className="panel level-1 mt-20" key={`currencyList-${i}`}>
-				<SubPanel
-					state={state}
-					EditInputBox={action.EditByCurrency}
-					displayText={window.i18n[`lbl_Currency${i}`]}
-					currencyId={i}
-					_options_site={_options_site}
-				/>
-			</div>
-		);
-	});
+        });
+    });
+    
+	// let arr = state.selectedCurrencies.map(i => {
+	// 	// currencyOptions.push({
+	// 	// 	value: i,
+	// 	// 	displayText: window.i18n[`lbl_Currency${i}`]
+    //     // });
 
-	let tabArr = currencyOptions.map(item => {
+	// 	return (
+	// 		<div className="panel level-1 mt-20" key={`currencyList-${i}`}>
+	// 			<SubPanel
+	// 				state={state}
+	// 				EditMainValue={action.EditCurrencyPanel.bind(this, i)}
+	// 				displayText={window.i18n[`lbl_Currency${i}`]}
+	// 				currencyId={i}
+	// 				_options_site={_options_site}
+	// 				action={action}
+	// 			/>
+	// 		</div>
+	// 	);
+    // });
+
+	let tabArr = state.selectedCurrencies.map(item => {
 		return (
-			<button key={`${state.siteId}-tab-${item.value}`} className="btn btn-add active">
-				{window.i18n[`lbl_Currency${item.value}`]}
+			<button
+				key={`${state.siteId}-tab-${item}`}
+                className="btn btn-add active"
+                onClick={action.EditMainValue.bind(this, item, "currentTab")}
+                >
+				{window.i18n[`lbl_Currency${item}`]}
 			</button>
 		);
 	});
@@ -58,8 +70,8 @@ export default ({ IsAdd, state, action, siteList }) => {
 			<div className="panel level-1 mt-20">
 				<div
 					className="panel-title no-arrow"
-					style={{ justifyContent: 'space-between' }}>
-					<span style={{ color: 'white' }}>Bonus Info</span>
+					style={{ justifyContent: "space-between" }}>
+					<span style={{ color: "white" }}>Bonus Info</span>
 					<div className="switch__container">
 						<input
 							id="switch1"
@@ -76,14 +88,14 @@ export default ({ IsAdd, state, action, siteList }) => {
 					<div className="row-flex">
 						<InputBox
 							Title="BonusCode"
-							OnChange={EditInputBox}
+							OnChange={action.EditMainValue}
 							dataColumn="bonusCode"
 							value={state.bonusCode}
 						/>
 						<SelectBox
 							Title="PromotionType"
 							Options={initPromotionType}
-							HandleChange={EditInputBox}
+							HandleChange={action.EditMainValue}
 							dataColumn="promotionType"
 							SelectedValue={state.promotionType}
 						/>
@@ -92,14 +104,14 @@ export default ({ IsAdd, state, action, siteList }) => {
 						<DateTimePickerElem
 							columnTitle="From"
 							dateTimePickerProps={{
-								defaultValue: IsAdd
-									? ''
-									: moment(state.periodFrom).format('l LTS'),
+								defaultValue: moment(state.periodFrom).format(
+									"l LTS"
+								),
 								onBlur: e => {
 									try {
-										EditInputBox(
-											moment(e).format('l LTS'),
-											'periodFrom'
+										action.EditMainValue(
+											moment(e).format("l LTS"),
+											"periodFrom"
 										);
 									} catch (ex) {}
 								}
@@ -108,14 +120,14 @@ export default ({ IsAdd, state, action, siteList }) => {
 						<DateTimePickerElem
 							columnTitle="To"
 							dateTimePickerProps={{
-								defaultValue: IsAdd
-									? ''
-									: moment(state.periodTo).format('l LTS'),
+								defaultValue: moment(state.periodTo).format(
+									"l LTS"
+								),
 								onBlur: e => {
 									try {
-										EditInputBox(
-											moment(e).format('l LTS'),
-											'periodTo'
+										action.EditMainValue(
+											moment(e).format("l LTS"),
+											"periodTo"
 										);
 									} catch (ex) {}
 								}
@@ -123,17 +135,25 @@ export default ({ IsAdd, state, action, siteList }) => {
 						/>
 						<InputBox
 							Title="ExpiryDays"
-							OnChange={EditInputBox}
+							OnChange={action.EditMainValue}
 							dataColumn="expiryDays"
 							value={state.expiryDays}
 						/>
 					</div>
+					<InputBox
+						Title="Description"
+						ClassName="form-group"
+						inputClass="form-control"
+						OnChange={action.EditMainValue}
+						dataColumn="description"
+						value={state.description}
+					/>
 				</div>
 				<div className="filter noBGcolor">
 					<CheckBox
 						Options={currencyOptions}
 						Title="Available Currency"
-						OnChange={EditCheckBox}
+						OnChange={action.EditCheckBox}
 						dataColumn="selectedCurrencies"
 						Selected={state.selectedCurrencies}
 						mainKey={state.siteId}
@@ -141,7 +161,10 @@ export default ({ IsAdd, state, action, siteList }) => {
 				</div>
 
 				<div className="filter noBGcolor tag">{tabArr}</div>
-				<div className="filter">{arr}</div>
+				<div className="filter">
+                    {/* {arr} */}
+                    {state.currentTab ? <SubPanel />: null}
+                    </div>
 			</div>
 			<div className="filter float-btn-group">
 				<button className="btn btn-back" onClick={action.ClickBack}>
@@ -160,13 +183,14 @@ const SubPanel = props => {
 		<>
 			<a
 				className="panel-title no-arrow"
-				style={{ justifyContent: 'space-between' }}>
-				<span style={{ color: 'white' }}>{props.displayText}</span>
+				style={{ justifyContent: "space-between" }}>
+				<span style={{ color: "white" }}>{props.displayText}</span>
 				<div className="switch__container">
 					<input
 						id="switch2"
 						className="switch switch--flat"
-						type="checkbox"
+                        type="checkbox"
+                        onChange={props.EditMainValue.bind(this, props.state.specific[props.currencyId].status, "status")}
 					/>
 					<label htmlFor="switch2"></label>
 				</div>
@@ -176,21 +200,21 @@ const SubPanel = props => {
 					<InputBox
 						Type="Number"
 						Title="Usage"
-						OnChange={props.EditInputBox}
+						OnChange={props.EditMainValue}
 						dataColumn="usage"
-						value={props.state.usage}
+						value={props.state.specific[props.currencyId].usage}
 					/>
 					<InputBox
 						Title="rollOver"
-						OnChange={props.EditInputBox}
+						OnChange={props.EditMainValue}
 						dataColumn="rollOver"
-						value={props.state.rollOver}
+						value={props.state.specific[props.currencyId].rollOver}
 					/>
 				</div>
 				<RadioBox
 					Title="Bonus Amount Type"
 					Options={initBonusAmountType}
-					OnChange={props.EditInputBox}
+					OnChange={props.EditMainValue}
 					dataColumn="bonusAmountType"
 					Selected={
 						props.state.specific[props.currencyId].bonusAmountType
@@ -201,16 +225,16 @@ const SubPanel = props => {
 					<InputBox
 						Type="Number"
 						Title="Bonus"
-						OnChange={props.EditInputBox}
+						OnChange={props.EditMainValue}
 						dataColumn="bonus"
-						value={props.state.bonus}
+						value={props.state.specific[props.currencyId].bonus}
 					/>
 					<InputBox
 						Type="Number"
 						Title="Max Bonus"
-						OnChange={props.EditInputBox}
+						OnChange={props.EditMainValue}
 						dataColumn="maxBonus"
-						value={props.state.maxBonus}
+						value={props.state.specific[props.currencyId].maxBonus}
 					/>
 				</div>
 				<div className="row-flex"></div>
@@ -218,25 +242,27 @@ const SubPanel = props => {
 					Title="Banner Url"
 					ClassName="form-group"
 					inputClass="form-control"
-					OnChange={props.EditInputBox}
+					OnChange={props.EditMainValue}
 					dataColumn="bannerUrl"
-					value={props.state.specific.bannerUrl}
+					value={props.state.specific[props.currencyId].bannerUrl}
 				/>
 				<InputBox
 					Title="Title"
 					ClassName="form-group"
 					inputClass="form-control"
-					OnChange={props.EditInputBox}
+					OnChange={props.EditMainValue}
 					dataColumn="title"
-					value={props.state.specific.title}
+					value={props.state.specific[props.currencyId].title}
 				/>
 				<div className="form-group">
 					<label>Detail</label>
 					<textarea
 						className="form-control"
 						rows="8"
-						onChange={props.EditInputBox}
-						value={props.state.specific.detail}></textarea>
+						onChange={props.EditMainValue}
+						value={
+							props.state.specific[props.currencyId].detail
+						}></textarea>
 				</div>
 			</div>
 		</>
