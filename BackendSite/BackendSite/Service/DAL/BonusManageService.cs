@@ -82,6 +82,7 @@ namespace BackendSite.Service.DAL
                         specific.MaxBonus,
                         specific.Status,
                         IsAdd,
+                        specific.Usage,
                         specific.Details
                     }, transaction: trans, commandType: CommandType.StoredProcedure);
                 }
