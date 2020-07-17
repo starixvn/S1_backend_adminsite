@@ -1,7 +1,8 @@
-export const initialState = (IsAdd, newState, siteList) => {
-	if (IsAdd) {
-		let _specific = SetSpecific(siteList[0].currencyList);
+import { _ } from "ag-grid-community";
 
+export const initialState = (IsAdd, datas, siteList) => {
+	if (IsAdd) {
+		let _specific = SetSpecific(siteList[0].currencyList, null);
 		return {
 			bonusCode: "",
 			promotionType: 1,
@@ -11,38 +12,55 @@ export const initialState = (IsAdd, newState, siteList) => {
 			description: "",
 			status: 2,
 			siteId: siteList[0].siteId,
+			chooseCurrencies: [],
 			specific: _specific
 		};
 	} else {
+		let _specific = SetSpecific(siteList[0].currencyList, datas.specific);
 		return {
-			bonusCode: newState.bonusCode,
-			promotionType: newState.promotionType,
-			periodFrom: newState.periodFrom,
-			periodTo: newState.periodTo,
-			expiryDays: newState.expiryDays,
-			description: newState.description,
-			status: newState.status,
-			siteId: newState.siteId,
-			specific: {}
+			bonusCode: datas.bonusCode,
+			promotionType: datas.promotionType,
+			periodFrom: datas.periodFrom,
+			periodTo: datas.periodTo,
+			expiryDays: datas.expiryDays,
+			description: datas.description,
+			status: datas.status,
+			siteId: datas.siteId,
+			chooseCurrencies: Object.keys(datas.specific).map(c => {
+				return c;
+			}),
+			specific: _specific
 		};
 	}
 };
 
-const SetSpecific = currencyList => {
+const initSpecific = {
+	usage: "0",
+	rollover: "",
+	bonusAmountType: 1,
+	bonus: "",
+	maxBonus: "",
+	bannerUrl: "",
+	title: "",
+	detail: "",
+	status: 2
+};
+
+const SetSpecific = (currencyList, data) => {
 	let _specific = {};
 	currencyList.forEach(currency => {
-		_specific[currency] = {
-			usage: "0",
-			rollover: "",
-			bonusAmountType: 1,
-			bonus: "",
-			maxBonus: "",
-			bannerUrl: "",
-			title: "",
-			detail: "",
-			status: 2
-		};
+		_specific[currency] = { ...initSpecific };
 	});
+
+	if (data !== null) {
+		data.forEach(s => {
+			let _newData = {};
+			Object.keys(initSpecific).forEach(k => {
+				_newData[k] = data[k];
+			});
+			_specific[s.currencyId] = _newData;
+		});
+	}
 
 	return _specific;
 };
@@ -50,7 +68,8 @@ const SetSpecific = currencyList => {
 export const defActionType = {
 	EDIT_BY_CURRENCY: "EDIT_BY_CURRENCY",
 	EDIT_INPUTBOX: "EDIT_INPUTBOX",
-	EDIT_CHECKBOX: "EDIT_CHECKBOX"
+	EDIT_CHECKBOX: "EDIT_CHECKBOX",
+	SET_CHOOSE_SITE: "SET_CHOOSE_SITE"
 };
 
 export function reducer(state, action) {
@@ -88,12 +107,10 @@ export function reducer(state, action) {
 							action.value
 						]
 				  };
-		case "setChooseSite":
-			//siteId
-			//specific => SetSpecific(currencyList)
+		case defActionType.SET_CHOOSE_SITE:
 			return {
 				...state,
-				siteId: 1,
+				siteId: action.siteId,
 				specific: SetSpecific(action.currencyList)
 			};
 
