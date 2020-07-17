@@ -2,7 +2,7 @@ import moment from "moment";
 export const defActionType = {
 	CURRENCY_SET_VALUE: "CURRENCY_SET_VALUE",
 	MAIN_SET_VALUE: "MAIN_SET_VALUE",
-	MAIN_SET_CHECKBOX: "MAIN_SET_CHECKBOX",
+	MAIN_SET_CURRENCY_CHECKBOX: "MAIN_SET_CURRENCY_CHECKBOX",
 	MAIN_SET_SITE: "MAIN_SET_SITE"
 };
 
@@ -19,7 +19,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 			status: 2,
 			siteId: siteList[0].siteId,
 			selectedCurrencies: [],
-			currentTab: siteList[0]?.currencyList?.[0],
+			currentTab: null,
 			specific: _specific
 		};
 	} else {
@@ -36,7 +36,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 			selectedCurrencies: Object.keys(datas.specific).map(c => {
 				return c;
 			}),
-			currentTab: siteList[0]?.currencyList?.[0],
+			currentTab: null,
 			specific: _specific
 		};
 	}
@@ -97,7 +97,7 @@ export function reducer(state, action) {
 				[action.dataColumn]: action.value
 			};
 
-		case defActionType.MAIN_SET_CHECKBOX:
+		case defActionType.MAIN_SET_CURRENCY_CHECKBOX:
 			return state[action.dataColumn].includes(action.value)
 				? {
 						...state,
@@ -116,7 +116,7 @@ export function reducer(state, action) {
 			return {
 				...state,
 				siteId: action.siteId,
-				currentTab: action.currencyList?.[0],
+				currentTab: null,
 				selectedCurrencies: [],
 				specific: SetSpecific(action.currencyList, null)
 			};

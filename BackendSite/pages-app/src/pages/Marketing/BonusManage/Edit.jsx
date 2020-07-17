@@ -66,8 +66,8 @@ export default props => {
 		dispatch({ type: defActionType.MAIN_SET_VALUE, value, dataColumn });
 	};
 
-	const EditCheckBox = (value, dataColumn) => {
-		dispatch({ type: defActionType.MAIN_SET_CHECKBOX, value, dataColumn });
+	const EditCurrencyCheckBox = (value, dataColumn) => {
+		dispatch({ type: defActionType.MAIN_SET_CURRENCY_CHECKBOX, value, dataColumn });
 	};
 
 	const EditCurrencyPanel = (currencyId, value, dataColumn) => {
@@ -93,7 +93,7 @@ export default props => {
 			<Panel
 				dispatch={dispatch}
 				state={state}
-				action={{ ClickSubmit, EditMainValue, EditCheckBox, EditCurrencyPanel, ClickBack:props.action.ClickBack }}
+				action={{ ClickSubmit, EditMainValue, EditCurrencyCheckBox, EditCurrencyPanel, ClickBack:props.action.ClickBack }}
 				siteList={props.SiteList}
 			/>
 		</>

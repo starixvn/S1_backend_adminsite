@@ -18,25 +18,25 @@ const initBonusAmountType = [
 ];
 
 export default ({ IsAdd, state, action, siteList }) => {
-	console.log(action);
-	let _options_site = siteList.map(s => {
-		return { value: s.siteId, displayText: s.siteName };
-	});
+	console.log(state);
+	// let _options_site = siteList.map(s => {
+	// 	return { value: s.siteId, displayText: s.siteName };
+	// });
 
 	const currencyList = Object.keys(state.specific);
-    const currencyOptions = [];
-    currencyList.map(i => {
+	const currencyOptions = [];
+	currencyList.map(i => {
 		currencyOptions.push({
 			value: i,
 			displayText: window.i18n[`lbl_Currency${i}`]
-        });
-    });
-    
+		});
+	});
+
 	// let arr = state.selectedCurrencies.map(i => {
 	// 	// currencyOptions.push({
 	// 	// 	value: i,
 	// 	// 	displayText: window.i18n[`lbl_Currency${i}`]
-    //     // });
+	//     // });
 
 	// 	return (
 	// 		<div className="panel level-1 mt-20" key={`currencyList-${i}`}>
@@ -50,15 +50,14 @@ export default ({ IsAdd, state, action, siteList }) => {
 	// 			/>
 	// 		</div>
 	// 	);
-    // });
+	// });
 
 	let tabArr = state.selectedCurrencies.map(item => {
 		return (
 			<button
 				key={`${state.siteId}-tab-${item}`}
-                className="btn btn-add active"
-                onClick={action.EditMainValue.bind(this, item, "currentTab")}
-                >
+				className="btn btn-add active"
+				onClick={action.EditMainValue.bind(this, item, "currentTab")}>
 				{window.i18n[`lbl_Currency${item}`]}
 			</button>
 		);
@@ -153,18 +152,33 @@ export default ({ IsAdd, state, action, siteList }) => {
 					<CheckBox
 						Options={currencyOptions}
 						Title="Available Currency"
-						OnChange={action.EditCheckBox}
+						OnChange={action.EditCurrencyCheckBox}
 						dataColumn="selectedCurrencies"
 						Selected={state.selectedCurrencies}
 						mainKey={state.siteId}
 					/>
 				</div>
 
-				<div className="filter noBGcolor tag">{tabArr}</div>
+				<div className="filter noBGcolor tag">
+					{tabArr}
+				</div>
 				<div className="filter">
-                    {/* {arr} */}
-                    {state.currentTab ? <SubPanel />: null}
-                    </div>
+					{/* {arr} */}
+					{state.selectedCurrencies.length > 0 && state.currentTab !== null ? (
+                        <div className="panel level-1 mt-20">
+						<SubPanel
+							state={state}
+							displayText={
+								window.i18n[`lbl_Currency${state.currentTab}`]
+							}
+							EditMainValue={action.EditCurrencyPanel.bind(
+								this,
+								state.currentTab
+							)}
+							currencyId={state.currentTab}
+						/></div>
+					) : null}
+				</div>
 			</div>
 			<div className="filter float-btn-group">
 				<button className="btn btn-back" onClick={action.ClickBack}>
@@ -189,8 +203,12 @@ const SubPanel = props => {
 					<input
 						id="switch2"
 						className="switch switch--flat"
-                        type="checkbox"
-                        onChange={props.EditMainValue.bind(this, props.state.specific[props.currencyId].status, "status")}
+						type="checkbox"
+						onChange={props.EditMainValue.bind(
+							this,
+							props.state.specific[props.currencyId].status,
+							"status"
+						)}
 					/>
 					<label htmlFor="switch2"></label>
 				</div>
