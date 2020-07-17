@@ -117,6 +117,7 @@ export function reducer(state, action) {
 				...state,
 				siteId: action.siteId,
 				currentTab: action.currencyList?.[0],
+				selectedCurrencies: [],
 				specific: SetSpecific(action.currencyList, null)
 			};
 
