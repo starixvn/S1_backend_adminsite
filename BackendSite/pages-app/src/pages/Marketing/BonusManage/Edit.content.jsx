@@ -18,23 +18,8 @@ const initBonusAmountType = [
 ];
 
 
-export default ({ IsAdd, dispatch, state, action, siteList }) => {
+export default ({ IsAdd, state, action, siteList }) => {
 	console.log(state)
-	const EditInputBox = (value, dataColumn) => {
-		dispatch({ type: defActionType.EDIT_INPUTBOX, value, dataColumn });
-	};
-	const EditCheckBox = (value, dataColumn) => {
-		dispatch({ type: defActionType.MAIN_SET_CHECKBOX, value, dataColumn });
-	};
-
-	const EditByCurrency = (value, dataColumn, currencyId) => {
-		dispatch({
-			type: defActionType.EDIT_BY_LANG,
-			value,
-			dataColumn,
-			currencyId
-		});
-	};
 	let _options_site = siteList.map(s => {
 		return { value: s.siteId, displayText: s.siteName };
 	});
@@ -50,7 +35,7 @@ export default ({ IsAdd, dispatch, state, action, siteList }) => {
 			<div className="panel level-1 mt-20" key={`currencyList-${i}`}>
 				<SubPanel
 					state={state}
-					EditInputBox={EditByCurrency}
+					EditInputBox={action.EditByCurrency}
 					displayText={window.i18n[`lbl_Currency${i}`]}
 					currencyId={i}
 					_options_site={_options_site}

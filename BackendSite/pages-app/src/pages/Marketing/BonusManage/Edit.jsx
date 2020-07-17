@@ -26,6 +26,22 @@ export default props => {
 		});
 	};
 
+	const EditMainValue = (value, dataColumn) => {
+		dispatch({ type: defActionType.MAIN_SET_VALUE, value, dataColumn });
+	};
+	const EditCheckBox = (value, dataColumn) => {
+		dispatch({ type: defActionType.MAIN_SET_CHECKBOX, value, dataColumn });
+	};
+
+	const EditByCurrency = (value, dataColumn, currencyId) => {
+		dispatch({
+			type: defActionType.CURRENCY_SET_VALUE,
+			value,
+			dataColumn,
+			currencyId
+		});
+	};
+
 	return (
 		<>
 			<div className="filter noBGcolor">
@@ -40,7 +56,7 @@ export default props => {
 			<Panel
 				dispatch={dispatch}
 				state={state}
-				action={{ ClickSubmit, ...props.Action }}
+				action={{ ClickSubmit, EditMainValue, EditCheckBox, EditByCurrency }}
 				siteList={props.SiteList}
 			/>
 		</>
