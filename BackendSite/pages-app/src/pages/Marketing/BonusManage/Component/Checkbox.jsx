@@ -20,20 +20,13 @@ export default ({Title, Options, Selected=[], OnChange, dataColumn, mainKey})=>{
 
 const CheckBox = (props)=>{    
     const OnChange = (e)=>{
-        e.preventDefault();
         props.onChange(props.Value, props.dataColumn);
     }
     return (
-        // <span className="label" style={{'cursor':'pointer'}} onClick={OnChange}>
-        //     <label className="checkbox">
-        //         <input type="checkbox" value={props.Value} />
-        //         <i className="icon icon-checkbox">{props.checked ? '☑' : '☐'}</i>
-        //     </label>{props.Title}
-        // </span>
-            <label className="checkbox checkbox-checked" >
-                <input type="checkbox" value={props.Value} checked={props.checked} onChange={OnChange}/>
-                <i className="icon icon-checkbox"></i>
-                <span className="text">{props.Title}</span>
-            </label>
+        <label className="checkbox checkbox-checked" >
+            <input type="checkbox" value={props.Value} checked={props.checked} onChange={OnChange}/>
+            <i className="icon icon-checkbox"></i>
+            <span className="text">{props.Title}</span>
+        </label>
     )
 }
