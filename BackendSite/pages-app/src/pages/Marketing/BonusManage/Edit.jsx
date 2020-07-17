@@ -10,14 +10,50 @@ export default props => {
 	);
 
 	const ClickSubmit = () => {
-		console.log('submit');
+		let checked = true;
+		for(let key in state){
+			if(key === 'specific'){
+				for(let c_key in state[key]){
+					if(state.selectedCurrencies.includes(c_key)){
+						for(let f_key in state[key][c_key]){
+							let column = state[key][c_key][f_key];
+							if(column===null || column===undefined || column===''){
+								alert(`${window.i18n[`lbl_Currency${c_key}`]}'s ${f_key} does not allow null.`);
+								checked=false;
+								break;
+							}
+						}
+					}
+
+					if(!checked){
+						break;
+					}
+				}
+			}else if(state[key]===null || state[key]===undefined || state[key]===''){
+				alert(`${key} does not allow null.`);
+				checked = false;
+				break;
+			}else if(key==='selectedCurrencies' && state[key].length === 0){
+				alert("Please select at least one currency.");
+				checked = false;
+				break;
+			}
+
+			if(!checked){
+				break;
+			}
+		}
+
+		if(checked){
+			props.action.SetPromotion(state);
+		}
 	};
 
 	let _options_site = props.SiteList.map(s => {
 		return { value: s.siteId, displayText: s.siteName };
 	});
 
-	const OnChange = val => {
+	const SelectSite = val => {
 		let site = props.SiteList.find(s => s.siteId === val);
 		dispatch({
 			type: defActionType.MAIN_SET_SITE,
@@ -29,11 +65,12 @@ export default props => {
 	const EditMainValue = (value, dataColumn) => {
 		dispatch({ type: defActionType.MAIN_SET_VALUE, value, dataColumn });
 	};
+
 	const EditCheckBox = (value, dataColumn) => {
 		dispatch({ type: defActionType.MAIN_SET_CHECKBOX, value, dataColumn });
 	};
 
-	const EditByCurrency = (value, dataColumn, currencyId) => {
+	const EditCurrencyPanel = (currencyId, value, dataColumn) => {
 		dispatch({
 			type: defActionType.CURRENCY_SET_VALUE,
 			value,
@@ -48,7 +85,7 @@ export default props => {
 				<RadioBox
 					Title="Available Sites"
 					Options={_options_site}
-					OnChange={OnChange}
+					OnChange={SelectSite}
 					dataColumn="availableSites"
 					Selected={state.siteId}
 				/>
@@ -56,7 +93,7 @@ export default props => {
 			<Panel
 				dispatch={dispatch}
 				state={state}
-				action={{ ClickSubmit, EditMainValue, EditCheckBox, EditByCurrency }}
+				action={{ ClickSubmit, EditMainValue, EditCheckBox, EditCurrencyPanel, ClickBack:props.action.ClickBack }}
 				siteList={props.SiteList}
 			/>
 		</>

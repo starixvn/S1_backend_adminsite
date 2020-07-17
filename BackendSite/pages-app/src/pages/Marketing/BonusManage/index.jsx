@@ -209,7 +209,7 @@ const App = () => {
 		<Edit
 			Datas={state.promotionData}
 			SiteList={state.siteList}
-            Action={{ SetPromotion, ClickBack }}
+            action={{ SetPromotion, ClickBack }}
             IsAdd={state.panelType === defPanelType.Add}
 		/>
 	);

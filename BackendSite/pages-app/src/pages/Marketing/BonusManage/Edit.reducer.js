@@ -1,3 +1,4 @@
+import moment from "moment";
 export const defActionType = {
 	CURRENCY_SET_VALUE: "CURRENCY_SET_VALUE",
 	MAIN_SET_VALUE: "MAIN_SET_VALUE",
@@ -11,8 +12,8 @@ export const initialState = (IsAdd, datas, siteList) => {
 		return {
 			bonusCode: "",
 			promotionType: 1,
-			periodFrom: undefined,
-			periodTo: undefined,
+			periodFrom: moment(),
+			periodTo: moment(),
 			expiryDays: "",
 			description: "",
 			status: 2,
@@ -84,7 +85,7 @@ export function reducer(state, action) {
 				specific: {
 					...state.specific,
 					[action.currencyId]: {
-						...state[action.currencyId],
+						...state.specific[action.currencyId],
 						[action.dataColumn]: action.value
 					}
 				}
