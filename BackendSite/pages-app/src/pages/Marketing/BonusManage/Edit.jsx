@@ -58,7 +58,8 @@ export default props => {
 		dispatch({
 			type: defActionType.MAIN_SET_SITE,
 			siteId: val,
-			currencyList: site.currencyList
+			currencyList: site.currencyList,
+			langList: site.langList
 		});
 	};
 

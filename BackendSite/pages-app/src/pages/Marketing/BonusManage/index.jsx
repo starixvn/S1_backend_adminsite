@@ -66,11 +66,7 @@ const App = () => {
 				Bonus: Number(info.bonus),
 				BonusType: info.bonusAmountType,
 				MaxBonus: Number(info.maxBonus),
-				Details: JSON.stringify({
-					Title: info.title,
-					BannerUrl: info.bannerUrl,
-					Detail: info.detail
-				}),
+				Details: JSON.stringify(info.lang),
 				Status: info.status
 			};
 		});

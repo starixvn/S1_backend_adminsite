@@ -3,12 +3,17 @@ export const defActionType = {
 	CURRENCY_SET_VALUE: "CURRENCY_SET_VALUE",
 	MAIN_SET_VALUE: "MAIN_SET_VALUE",
 	MAIN_SET_CURRENCY_CHECKBOX: "MAIN_SET_CURRENCY_CHECKBOX",
-	MAIN_SET_SITE: "MAIN_SET_SITE"
+	MAIN_SET_SITE: "MAIN_SET_SITE",
+	CURRENCY_LANG_SET_VALUE: "CURRENCY_LANG_SET_VALUE"
 };
 
 export const initialState = (IsAdd, datas, siteList) => {
 	if (IsAdd) {
-		let _specific = SetSpecific(siteList[0].currencyList, null);
+		let _specific = SetSpecific(
+			siteList[0].currencyList,
+			siteList[0].langList,
+			null
+		);
 		return {
 			bonusCode: "",
 			promotionType: 1,
@@ -23,7 +28,11 @@ export const initialState = (IsAdd, datas, siteList) => {
 			specific: _specific
 		};
 	} else {
-		let _specific = SetSpecific(siteList[0].currencyList, datas.specific);
+		let _specific = SetSpecific(
+			siteList[0].currencyList,
+			siteList[0].langList,
+			datas.specific
+		);
 		let _selectedCurrencies = datas.specific.map(s => {
 			return s.currencyId;
 		});
@@ -43,37 +52,61 @@ export const initialState = (IsAdd, datas, siteList) => {
 	}
 };
 
+const initLang = {
+	bannerUrl: "bannerUrl",
+	title: "title",
+	detail: "detail"
+};
+
 const initSpecific = {
 	usage: "0",
 	rollOver: "",
 	bonusAmountType: 1,
 	bonus: "",
 	maxBonus: "",
-	bannerUrl: "",
-	title: "",
-	detail: "",
-	status: 2
+	status: 2,
+	selectedLang: [],
+	lang: {
+		en: { ...initLang }
+	}
 };
 
-const jsonField = ["title", "bannerUrl", "detail"];
+//const jsonField = ["title", "bannerUrl", "detail"];
 
-const SetSpecific = (currencyList, data) => {
+const SetSpecific = (currencyList, langList, data) => {
 	let _specific = {};
 	currencyList.forEach(currency => {
 		_specific[currency] = { ...initSpecific };
+		let lang = {};
+		langList.forEach(l => {
+			lang = {
+				...lang,
+				[l]: { ...initLang }
+			};
+		});
+		_specific[currency].lang = lang;
 	});
 
 	if (data !== null) {
 		data.forEach(d => {
 			let _newData = {};
-			let _details = JSON.parse(d.details);
-			d = { ...d, ..._details };
+			let lang = JSON.parse(d.details);
+			d["lang"] = lang;
+			d["selectedLang"] = Object.keys(lang);
+			langList
+				.filter(l => {
+					return !d["selectedLang"].includes(l);
+				})
+				.forEach(l => {
+					d.lang = {
+						...d.lang,
+						[l]: { ...initLang }
+					};
+				});
+
 			Object.keys(initSpecific).forEach(k => {
 				if (k === "bonusAmountType") {
 					_newData[k] = d.bonusType;
-				} else if (jsonField.includes(k)) {
-					let key = `${k[0].toUpperCase()}${k.substring(1)}`;
-					_newData[k] = d[key] ?? "";
 				} else {
 					_newData[k] = d[k] ?? "";
 				}
@@ -95,6 +128,26 @@ export function reducer(state, action) {
 					[action.currencyId]: {
 						...state.specific[action.currencyId],
 						[action.dataColumn]: action.value
+					}
+				}
+			};
+
+		case defActionType.CURRENCY_LANG_SET_VALUE:
+			return {
+				...state,
+				specific: {
+					...state.specific,
+					[action.currencyId]: {
+						...state.specific[action.currencyId],
+						lang: {
+							...state.specific[action.currencyId].lang,
+							[action.lang]: {
+								...state.specific[action.currencyId].lang[
+									action.lang
+								],
+								[action.dataColumn]: action.value
+							}
+						}
 					}
 				}
 			};
@@ -128,7 +181,11 @@ export function reducer(state, action) {
 				siteId: action.siteId,
 				currentTab: null,
 				selectedCurrencies: [],
-				specific: SetSpecific(action.currencyList, null)
+				specific: SetSpecific(
+					action.currencyList,
+					action.langList,
+					null
+				)
 			};
 
 		default:
