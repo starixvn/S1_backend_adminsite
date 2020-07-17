@@ -91,11 +91,15 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
             try
             {
-                var result = bonusManageBLL.SetPromotion(IsAdd, Promotion);
-                apiResult.ErrorCode = result;
-                if (result == 0)
+                var ErrorCode = bonusManageBLL.SetPromotion(IsAdd, Promotion);
+                apiResult.ErrorCode = ErrorCode;
+                if (ErrorCode == 0)
                 {
                     apiResult.Data = bonusManageBLL.GetPromotionList();
+                }
+                if(ErrorCode == 1062)
+                {
+                    apiResult.Message = "Duplicate Bonus Code.";
                 }
             }
             catch (Exception ex)

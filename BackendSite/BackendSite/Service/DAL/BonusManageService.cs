@@ -89,7 +89,12 @@ namespace BackendSite.Service.DAL
 
                 trans.Commit();
             }
-            catch (Exception ex)
+            catch (MySqlException ex)
+            {
+                var sqlException = ex as MySqlException;
+                errorCode = sqlException.Number;
+            }
+            catch(Exception ex)
             {
                 errorCode = 999;
             }
