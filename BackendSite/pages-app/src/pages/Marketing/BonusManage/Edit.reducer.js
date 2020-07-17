@@ -66,6 +66,7 @@ const initSpecific = {
 	maxBonus: "",
 	status: 2,
 	selectedLang: [],
+	currentLang: null,
 	lang: {
 		en: { ...initLang }
 	}

@@ -80,6 +80,10 @@ export default props => {
 		});
 	};
 
+	const EditCurrencyLangPanelValue = (value, dataColumn) =>{
+
+	}
+
 	return (
 		<>
 			<div className="filter noBGcolor">
@@ -94,7 +98,7 @@ export default props => {
 			<Panel
 				dispatch={dispatch}
 				state={state}
-				action={{ ClickSubmit, EditMainValue, EditCurrencyCheckBox, EditCurrencyPanel, ClickBack:props.action.ClickBack }}
+				action={{ ClickSubmit, EditMainValue, EditCurrencyCheckBox, EditCurrencyPanel, ClickBack:props.action.ClickBack, EditCurrencyLangPanelValue}}
 				siteList={props.SiteList}
 				IsAdd={props.IsAdd}
 			/>
