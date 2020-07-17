@@ -17,7 +17,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 			description: '',
 			status: 2,
 			siteId: siteList[0].siteId,
-			chooseCurrencies: [],
+			selectedCurrencies: [],
 			specific: _specific
 		};
 	} else {
@@ -31,7 +31,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 			description: datas.description,
 			status: datas.status,
 			siteId: datas.siteId,
-			chooseCurrencies: Object.keys(datas.specific).map(c => {
+			selectedCurrencies: Object.keys(datas.specific).map(c => {
 				return c;
 			}),
 			specific: _specific

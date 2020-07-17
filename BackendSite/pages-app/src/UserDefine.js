@@ -1,64 +1,64 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense } from 'react';
 
 const LicWinLostReport = lazy(() =>
-	import("./pages/Report/LicenseeWinLost/index")
+	import('./pages/Report/LicenseeWinLost/index')
 );
 const GroupAuthoritySetting = lazy(() =>
-	import("./pages/Administration/GroupAuthoritySetting/index")
+	import('./pages/Administration/GroupAuthoritySetting/index')
 );
 const UserAuthoritySetting = lazy(() =>
-	import("./pages/Administration/UserAuthoritySetting/index")
+	import('./pages/Administration/UserAuthoritySetting/index')
 );
 const PaymentAdjustmentReport = lazy(() =>
-	import("./pages/Finance/PaymentAdjustmentReport/index")
+	import('./pages/Finance/PaymentAdjustmentReport/index')
 );
 const BonusInfoReport = lazy(() =>
-	import("./pages/Marketing/BonusInfoReport/index")
+	import('./pages/Marketing/BonusInfoReport/index')
 );
 const PaymentManagement = lazy(() =>
-	import("./pages/Finance/PaymentManagement/index")
+	import('./pages/Finance/PaymentManagement/index')
 );
-const Announcement = lazy(() => import("./pages/CSD/Announcement/index"));
+const Announcement = lazy(() => import('./pages/CSD/Announcement/index'));
 const WithdrawalLimitAdjust = lazy(() =>
-	import("./pages/Finance/WithdrawalLimitAdjust/index")
+	import('./pages/Finance/WithdrawalLimitAdjust/index')
 );
 const PersonalMsgBatch = lazy(() =>
-	import("./pages/CSD/PersonalMsgBatch/index")
+	import('./pages/CSD/PersonalMsgBatch/index')
 );
 const PointLevelManagement = lazy(() =>
-	import("./pages/Marketing/PointLevelManagement/index")
+	import('./pages/Marketing/PointLevelManagement/index')
 );
 const CashBackBonus = lazy(() =>
-	import("./pages/Marketing/CashBackBonus/index")
+	import('./pages/Marketing/CashBackBonus/index')
 );
 const DepositLimitManagement = lazy(() =>
-	import("./pages/Finance/DepositLimitManagement/index")
+	import('./pages/Finance/DepositLimitManagement/index')
 );
 const WithdrawalLimitManagement = lazy(() =>
-	import("./pages/Finance/WithdrawalLimitManagement/index")
+	import('./pages/Finance/WithdrawalLimitManagement/index')
 );
 const ChangeVipLevelBatch = lazy(() =>
-	import("./pages/CSD/ChangeVipLevelBatch/index")
+	import('./pages/CSD/ChangeVipLevelBatch/index')
 );
 const WithdrawalKYCControl = lazy(() =>
-	import("./pages/CSD/WithdrawalKYCControl/index")
+	import('./pages/CSD/WithdrawalKYCControl/index')
 );
-const DashBoard = lazy(() => import("./pages/Home/DashBoard/index"));
+const DashBoard = lazy(() => import('./pages/Home/DashBoard/index'));
 const BalanceAdjustmentBatch = lazy(() =>
-	import("./pages/Finance/BalanceAdjustmentBatch/index")
+	import('./pages/Finance/BalanceAdjustmentBatch/index')
 );
 
-const BonusManage = lazy(() => import("./pages/Marketing/BonusManage/index"));
+const BonusManage = lazy(() => import('./pages/Marketing/BonusManage/index'));
 
-export const defaultPage = "BonusManage";
+export const defaultPage = 'BonusManage';
 
-const PendingBonus = lazy(() => import("./pages/Marketing/PendingBonus/index"));
+const PendingBonus = lazy(() => import('./pages/Marketing/PendingBonus/index'));
 
 // export const defaultPage = "PendingBonus";
 
 export const layoutType = {
-	N88: "N88",
-	LAP: "LAP"
+	N88: 'N88',
+	LAP: 'LAP'
 };
 
 export const pages = {
@@ -69,8 +69,8 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./css/common/fonts/main-font/style.css",
-			"./css/common/css/common.css"
+			'./css/common/fonts/main-font/style.css',
+			'./css/common/css/common.css'
 		],
 		layout: layoutType.LAP
 	},
@@ -81,8 +81,8 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./css/common/fonts/main-font/style.css",
-			"./css/common/css/common.css"
+			'./css/common/fonts/main-font/style.css',
+			'./css/common/css/common.css'
 		],
 		layout: layoutType.LAP
 	},
@@ -93,8 +93,8 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./css/css/pages/report/LicenseeWinLost.css",
-			"./lib/Oneworks/jscalendar/calendar-blue.css"
+			'./css/css/pages/report/LicenseeWinLost.css',
+			'./lib/Oneworks/jscalendar/calendar-blue.css'
 		],
 		layout: layoutType.N88
 	},
@@ -105,9 +105,9 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./lib/bootstrap/dist/css/bootstrap.min.css",
-			"./css/css/main.css",
-			"./lib/Oneworks/jscalendar/calendar-blue.css"
+			'./lib/bootstrap/dist/css/bootstrap.min.css',
+			'./css/css/main.css',
+			'./lib/Oneworks/jscalendar/calendar-blue.css'
 		],
 		layout: layoutType.N88
 	},
@@ -118,9 +118,9 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./lib/bootstrap/dist/css/bootstrap.min.css",
-			"./css/css/main.css",
-			"./lib/Oneworks/jscalendar/calendar-blue.css"
+			'./lib/bootstrap/dist/css/bootstrap.min.css',
+			'./css/css/main.css',
+			'./lib/Oneworks/jscalendar/calendar-blue.css'
 		],
 		layout: layoutType.N88
 	},
@@ -131,8 +131,8 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./lib/bootstrap/dist/css/bootstrap.min.css",
-			"./css/css/main.css"
+			'./lib/bootstrap/dist/css/bootstrap.min.css',
+			'./css/css/main.css'
 		],
 		layout: layoutType.N88
 	},
@@ -143,9 +143,9 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./lib/bootstrap/dist/css/bootstrap.min.css",
-			"./css/css/main.css",
-			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
+			'./lib/bootstrap/dist/css/bootstrap.min.css',
+			'./css/css/main.css',
+			'./css/css/vendor/DateTimePicker/DateTimePicker.css'
 		],
 		layout: layoutType.N88
 	},
@@ -156,8 +156,8 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./lib/bootstrap/dist/css/bootstrap.min.css",
-			"./css/css/main.css"
+			'./lib/bootstrap/dist/css/bootstrap.min.css',
+			'./css/css/main.css'
 		],
 		layout: layoutType.N88
 	},
@@ -168,9 +168,9 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./lib/bootstrap/dist/css/bootstrap.min.css",
-			"./css/css/main.css",
-			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
+			'./lib/bootstrap/dist/css/bootstrap.min.css',
+			'./css/css/main.css',
+			'./css/css/vendor/DateTimePicker/DateTimePicker.css'
 		],
 		layout: layoutType.N88
 	},
@@ -181,9 +181,9 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./lib/bootstrap/dist/css/bootstrap.min.css",
-			"./css/css/main.css",
-			"./css/css/pages/Marketing.css"
+			'./lib/bootstrap/dist/css/bootstrap.min.css',
+			'./css/css/main.css',
+			'./css/css/pages/Marketing.css'
 		],
 		layout: layoutType.N88
 	},
@@ -194,11 +194,11 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./lib/bootstrap/dist/css/bootstrap.min.css",
-			"./css/css/main.css",
-			"./css/common/fonts/main-font/style.css",
-			"./css/common/css/common.css",
-			".css/css/page/CusInfo.css"
+			'./lib/bootstrap/dist/css/bootstrap.min.css',
+			'./css/css/main.css',
+			'./css/common/fonts/main-font/style.css',
+			'./css/common/css/common.css',
+			'.css/css/page/CusInfo.css'
 		],
 		layout: layoutType.N88
 	},
@@ -209,9 +209,9 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./lib/bootstrap/dist/css/bootstrap.min.css",
-			"./css/css/main.css",
-			"./css/css/pages/Marketing.css"
+			'./lib/bootstrap/dist/css/bootstrap.min.css',
+			'./css/css/main.css',
+			'./css/css/pages/Marketing.css'
 		],
 		layout: layoutType.N88
 	},
@@ -222,9 +222,9 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./lib/bootstrap/dist/css/bootstrap.min.css",
-			"./css/css/main.css",
-			"./css/css/pages/Marketing.css"
+			'./lib/bootstrap/dist/css/bootstrap.min.css',
+			'./css/css/main.css',
+			'./css/css/pages/Marketing.css'
 		],
 		layout: layoutType.N88
 	},
@@ -235,9 +235,9 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./lib/bootstrap/dist/css/bootstrap.min.css",
-			"./css/css/main.css",
-			"./css/css/pages/Marketing.css"
+			'./lib/bootstrap/dist/css/bootstrap.min.css',
+			'./css/css/main.css',
+			'./css/css/pages/Marketing.css'
 		],
 		layout: layoutType.N88
 	},
@@ -248,9 +248,9 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./lib/bootstrap/dist/css/bootstrap.min.css",
-			"./css/css/main.css",
-			"./css/css/pages/Marketing.css"
+			'./lib/bootstrap/dist/css/bootstrap.min.css',
+			'./css/css/main.css',
+			'./css/css/pages/Marketing.css'
 		],
 		layout: layoutType.N88
 	},
@@ -261,8 +261,8 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./lib/bootstrap/dist/css/bootstrap.min.css",
-			"./css/css/main.css"
+			'./lib/bootstrap/dist/css/bootstrap.min.css',
+			'./css/css/main.css'
 		],
 		layout: layoutType.N88
 	},
@@ -273,9 +273,9 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./lib/bootstrap/dist/css/bootstrap.min.css",
-			"./css/css/main.css",
-			"./css/css/pages/Marketing.css"
+			'./lib/bootstrap/dist/css/bootstrap.min.css',
+			'./css/css/main.css',
+			'./css/css/pages/Marketing.css'
 		],
 		layout: layoutType.N88
 	},
@@ -286,9 +286,10 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./lib/bootstrap/dist/css/bootstrap.min.css",
-			"./css/css/main.css",
-			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
+			'./lib/bootstrap/dist/css/bootstrap.min.css',
+			'./css/css/main.css',
+			'./css/common/fonts/main-font/style.css',
+			'./css/css/vendor/DateTimePicker/DateTimePicker.css'
 		],
 		layout: layoutType.N88
 	},
@@ -299,9 +300,9 @@ export const pages = {
 			</Suspense>
 		),
 		css: [
-			"./lib/bootstrap/dist/css/bootstrap.min.css",
-			"./css/css/main.css",
-			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
+			'./lib/bootstrap/dist/css/bootstrap.min.css',
+			'./css/css/main.css',
+			'./css/css/vendor/DateTimePicker/DateTimePicker.css'
 		],
 		layout: layoutType.N88
 	}

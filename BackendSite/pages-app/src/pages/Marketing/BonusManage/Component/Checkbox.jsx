@@ -1,8 +1,9 @@
 import React from 'react'
 
-export default ({Title, Options, Selected=[], OnChange, dataColumn})=>{
+export default ({Title, Options, Selected=[], OnChange, dataColumn, mainKey})=>{
     let opt = Options.map(o=>{
-        return <CheckBox key={`${Title}-${o.value}`} onChange={OnChange} Title={o.displayText} checked={Selected.includes(o.value)} Value={o.value} dataColumn={dataColumn}/>
+        console.log(Selected.includes(o.value), o.value)
+        return <CheckBox key={`${Title}-${o.value}${mainKey === null ? '': `-${mainKey}`}`} onChange={OnChange} Title={o.displayText} checked={Selected.includes(o.value)} Value={o.value} dataColumn={dataColumn}/>
     });
     return(
         <>
@@ -30,11 +31,10 @@ const CheckBox = (props)=>{
         //         <i className="icon icon-checkbox">{props.checked ? '☑' : '☐'}</i>
         //     </label>{props.Title}
         // </span>
-        <div className="custom-radio custom-control-inline" >
             <label className="checkbox checkbox-checked" >
                 <input type="checkbox" value={props.Value} checked={props.checked} onChange={OnChange}/>
+                <i className="icon icon-checkbox"></i>
                 <span className="text">{props.Title}</span>
             </label>
-        </div>
     )
 }
