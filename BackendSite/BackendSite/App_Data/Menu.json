@@ -256,7 +256,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      },
+      },*/
       {
         "Key": "BonusManage",
         "Title": "Bonus Management",
@@ -266,7 +266,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      },*/
+      },
       {
         "Key": "PendingBonus",
         "Title": "Pending Bonus",

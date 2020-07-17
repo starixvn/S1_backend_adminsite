@@ -30,7 +30,7 @@
 
 [class^="icon-"], [class*=" icon-"] {
     /* use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'icomoon' !important;
+    font-family: 'iconfont' !important;
     speak: none;
     font-style: normal;
     font-weight: normal;
@@ -1124,6 +1124,9 @@ body {
 .checkbox input:checked ~ .icon-checkbox {
     color: #50ba62;
     border-color: #50ba62;/*0715*/
+}
+.checkbox input:checked ~ .icon-checkbox:before{
+    transform: translate3d(-2px, -3px, 0);
 }
 /*0508*/
 .bule-bold{
