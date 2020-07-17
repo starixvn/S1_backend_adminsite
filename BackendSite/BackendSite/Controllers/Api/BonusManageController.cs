@@ -6,6 +6,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MySql.Data.MySqlClient;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 namespace BackendSite.Controllers.Api
@@ -91,23 +92,23 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
             try
             {
-                var ErrorCode = bonusManageBLL.SetPromotion(IsAdd, Promotion);
-                apiResult.ErrorCode = ErrorCode;
-                if (ErrorCode == 0)
-                {
-                    apiResult.Data = bonusManageBLL.GetPromotionList();
-                }
-                if(ErrorCode == 1062)
-                {
-                    apiResult.Message = "Duplicate Bonus Code.";
-                }
+                bonusManageBLL.SetPromotion(IsAdd, Promotion);
+                apiResult.Data = bonusManageBLL.GetPromotionList();
+                apiResult.ErrorCode = 0;
+            }
+            catch (MySqlException ex)
+            {
+                var sqlException = ex as MySqlException;
+                apiResult.ErrorCode = sqlException.Number;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
             }
             catch (Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
                 apiResult.RawMessage = ex.ToString();
-            }
+            }            
 
             return apiResult;
         }

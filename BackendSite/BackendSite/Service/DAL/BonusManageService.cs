@@ -44,62 +44,55 @@ namespace BackendSite.Service.DAL
             return promotion;
         }
 
-        public int SetPromotion(bool IsAdd, PromotionInfo promotion)
+        public void SetPromotion(bool IsAdd, PromotionInfo promotion)
         {
-            int errorCode = 0;
-            try
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            conn.Execute("Admin_Promotion_InsUpd", new
             {
-                using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-                conn.Open();
-                using var trans = conn.BeginTransaction();
-                conn.Execute("Admin_Promotion_InsUpd", new
+                promotion.BonusCode,
+                promotion.Description,
+                promotion.PromotionType,
+                promotion.CategoryId,
+                PeriodFrom = promotion.UnixPeriodFrom,
+                PeriodTo = promotion.UnixPeriodTo,
+                promotion.ExpiryDays,
+                promotion.Sort,
+                promotion.Status,
+                promotion.LastUpdateUser,
+                IsAdd,
+                promotion.SiteId
+            }, transaction: trans, commandType: CommandType.StoredProcedure);
+
+            if (!IsAdd && !string.IsNullOrEmpty(promotion.BonusCode))
+            {
+                conn.Execute("Admin_PromotionSpecific_Del", new
                 {
                     promotion.BonusCode,
-                    promotion.Description,
-                    promotion.PromotionType,
-                    promotion.CategoryId,
-                    PeriodFrom = promotion.UnixPeriodFrom,
-                    PeriodTo = promotion.UnixPeriodTo,
-                    promotion.ExpiryDays,
-                    promotion.Sort,
-                    promotion.Status,
-                    promotion.LastUpdateUser,
-                    IsAdd,
                     promotion.SiteId
                 }, transaction: trans, commandType: CommandType.StoredProcedure);
+            }
 
-
-                foreach (var specific in promotion.Specific)
+            foreach (var specific in promotion.Specific)
+            {
+                conn.Execute("Admin_PromotionSpecific_Ins", new
                 {
-                    conn.Execute("Admin_PromotionSpecific_InsUpd", new
-                    {
-                        promotion.BonusCode,
-                        specific.CurrencyId,
-                        promotion.SiteId,
-                        specific.RollOver,
-                        specific.Bonus,
-                        specific.BonusType,
-                        specific.MaxBonus,
-                        specific.Status,
-                        IsAdd,
-                        specific.Usage,
-                        specific.Details
-                    }, transaction: trans, commandType: CommandType.StoredProcedure);
-                }
-
-                trans.Commit();
-            }
-            catch (MySqlException ex)
-            {
-                var sqlException = ex as MySqlException;
-                errorCode = sqlException.Number;
-            }
-            catch(Exception ex)
-            {
-                errorCode = 999;
+                    promotion.BonusCode,
+                    specific.CurrencyId,
+                    promotion.SiteId,
+                    specific.RollOver,
+                    specific.Bonus,
+                    specific.BonusType,
+                    specific.MaxBonus,
+                    specific.Status,
+                    IsAdd,
+                    specific.Usage,
+                    specific.Details
+                }, transaction: trans, commandType: CommandType.StoredProcedure);
             }
 
-            return errorCode;
+            trans.Commit();
         }
 
         public int SetPromotionStatus(string BonusCode, int SiteId, int Status, string LastUpdateUser)

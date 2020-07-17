@@ -33,7 +33,7 @@ namespace BackendSite.Service.BLL
             return bonusManageService.GetPromotion(BonusCode);
         }
 
-        public int SetPromotion(bool IsAdd, PromotionInfo promotion)
+        public void SetPromotion(bool IsAdd, PromotionInfo promotion)
         {
             promotion.LastUpdateUser = IsAdd ? "" : authorizeBLL.GetAuthData().UserName;
             if (IsAdd)
@@ -44,7 +44,7 @@ namespace BackendSite.Service.BLL
                 promotion.Status = 2;
             }
             
-            return bonusManageService.SetPromotion(IsAdd, promotion);
+            bonusManageService.SetPromotion(IsAdd, promotion);
         }
 
         public int SetPromotionStatus(string BonusCode, int SiteId, int Status)

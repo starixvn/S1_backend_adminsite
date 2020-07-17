@@ -57,7 +57,7 @@ const App = () => {
 	};
 
 	const SetPromotion = promotion => {
-		let _specific = Object.keys(promotion.specific).filter(c=>{return promotion.selectedCurrencies.includes(c)}).map(s => {
+		let _specific = Object.keys(promotion.specific).filter(c=>{return promotion.selectedCurrencies.includes(Number(c))}).map(s => {
 			let info = promotion.specific[s];
 			return {
 				CurrencyId: s,
@@ -102,8 +102,10 @@ const App = () => {
 							type: defActionType.SET_PROMOTION,
 							promotionList: res.data.data
 						});
-					} else {
-						alert(res.data.message ?? "failed to get data.");
+					} else if(res.data.errorCode===1062){
+						alert("Duplicate Bonus Code.");
+					}else{
+						alert(res.data.message ?? "failed to set data.");
 					}
 				}
 			},
