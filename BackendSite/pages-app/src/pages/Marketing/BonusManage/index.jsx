@@ -57,20 +57,21 @@ const App = () => {
 	};
 
 	const SetPromotion = promotion => {
-		let _specific = Object.keys(promotion.specific).map(s => {
+		let _specific = Object.keys(promotion.specific).filter(c=>{return promotion.selectedCurrencies.includes(c)}).map(s => {
+			let info = promotion.specific[s];
 			return {
 				CurrencyId: s,
-				Usage: s.usage ? Number(s.usage) : 0,
-				Rollover: Number(s.rollover),
-				Bonus: Number(s.bonus),
-				BonusType: s.bonusAmountType,
-				MaxBonus: Number(s.maxBonus),
+				Usage: s.usage ? Number(info.usage) : 0,
+				Rollover: Number(info.rollOver),
+				Bonus: Number(info.bonus),
+				BonusType: info.bonusAmountType,
+				MaxBonus: Number(info.maxBonus),
 				Details: JSON.stringify({
-					Title: s.title,
-					BannerUrl: s.bannerUrl,
-					Detail: s.detail
+					Title: info.title,
+					BannerUrl: info.bannerUrl,
+					Detail: info.detail
 				}),
-				Status: s.status
+				Status: info.status
 			};
 		});
 

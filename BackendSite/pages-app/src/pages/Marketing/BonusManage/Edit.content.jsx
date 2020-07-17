@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import InputBox from "./Component/InputBox";
 import CheckBox from "./Component/Checkbox";
 import SelectBox from "./Component/SelectBox";
@@ -19,38 +19,14 @@ const initBonusAmountType = [
 
 export default ({ IsAdd, state, action, siteList }) => {
 	console.log(state);
-	// let _options_site = siteList.map(s => {
-	// 	return { value: s.siteId, displayText: s.siteName };
-	// });
 
 	const currencyList = Object.keys(state.specific);
-	const currencyOptions = [];
-	currencyList.map(i => {
-		currencyOptions.push({
+	const currencyOptions = currencyList.map(i => {
+		return {
 			value: i,
 			displayText: window.i18n[`lbl_Currency${i}`]
-		});
+		};
 	});
-
-	// let arr = state.selectedCurrencies.map(i => {
-	// 	// currencyOptions.push({
-	// 	// 	value: i,
-	// 	// 	displayText: window.i18n[`lbl_Currency${i}`]
-	//     // });
-
-	// 	return (
-	// 		<div className="panel level-1 mt-20" key={`currencyList-${i}`}>
-	// 			<SubPanel
-	// 				state={state}
-	// 				EditMainValue={action.EditCurrencyPanel.bind(this, i)}
-	// 				displayText={window.i18n[`lbl_Currency${i}`]}
-	// 				currencyId={i}
-	// 				_options_site={_options_site}
-	// 				action={action}
-	// 			/>
-	// 		</div>
-	// 	);
-	// });
 
 	let tabArr = state.selectedCurrencies.map(item => {
 		return (
@@ -76,6 +52,13 @@ export default ({ IsAdd, state, action, siteList }) => {
 							id="switch1"
 							className="switch switch--flat"
 							type="checkbox"
+							onChange={action.EditMainValue.bind(
+								this,
+								state.status === 1 ? 2 : 1,
+								"status"
+							)}
+							value={state.status}
+							checked={state.status === 1}
 						/>
 						<label htmlFor="switch1"></label>
 					</div>
@@ -159,26 +142,27 @@ export default ({ IsAdd, state, action, siteList }) => {
 					/>
 				</div>
 
-				<div className="filter noBGcolor tag">
-					{tabArr}
-				</div>
-				<div className="filter">
-					{/* {arr} */}
-					{state.selectedCurrencies.length > 0 && state.currentTab !== null ? (
-                        <div className="panel level-1 mt-20">
-						<SubPanel
-							state={state}
-							displayText={
-								window.i18n[`lbl_Currency${state.currentTab}`]
-							}
-							EditMainValue={action.EditCurrencyPanel.bind(
-								this,
-								state.currentTab
-							)}
-							currencyId={state.currentTab}
-						/></div>
-					) : null}
-				</div>
+				<div className="filter noBGcolor tag">{tabArr}</div>
+				{state.selectedCurrencies.length > 0 &&
+				state.currentTab !== null ? (
+					<div className="filter">
+						<div className="panel level-1 mt-20">
+							<SubPanel
+								state={state}
+								displayText={
+									window.i18n[
+										`lbl_Currency${state.currentTab}`
+									]
+								}
+								EditMainValue={action.EditCurrencyPanel.bind(
+									this,
+									state.currentTab
+								)}
+								currencyId={state.currentTab}
+							/>
+						</div>
+					</div>
+				) : null}
 			</div>
 			<div className="filter float-btn-group">
 				<button className="btn btn-back" onClick={action.ClickBack}>
@@ -193,6 +177,12 @@ export default ({ IsAdd, state, action, siteList }) => {
 };
 
 const SubPanel = props => {
+    const EditDetail = (e)=>{
+        props.EditMainValue(
+            e.target.value,
+            "detail"
+        )
+    }
 	return (
 		<>
 			<a
@@ -206,9 +196,15 @@ const SubPanel = props => {
 						type="checkbox"
 						onChange={props.EditMainValue.bind(
 							this,
-							props.state.specific[props.currencyId].status,
+							props.state.specific[props.currencyId].status === 1
+								? 2
+								: 1,
 							"status"
 						)}
+						value={props.state.specific[props.currencyId].status}
+						checked={
+							props.state.specific[props.currencyId].status === 1
+						}
 					/>
 					<label htmlFor="switch2"></label>
 				</div>
@@ -246,6 +242,12 @@ const SubPanel = props => {
 						OnChange={props.EditMainValue}
 						dataColumn="bonus"
 						value={props.state.specific[props.currencyId].bonus}
+						iptSubClass={
+							props.state.specific[props.currencyId]
+								.bonusAmountType === 1
+								? "ratio"
+								: null
+						}
 					/>
 					<InputBox
 						Type="Number"
@@ -277,7 +279,7 @@ const SubPanel = props => {
 					<textarea
 						className="form-control"
 						rows="8"
-						onChange={props.EditMainValue}
+						onChange={EditDetail}
 						value={
 							props.state.specific[props.currencyId].detail
 						}></textarea>

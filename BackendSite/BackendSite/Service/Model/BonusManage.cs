@@ -10,12 +10,12 @@ namespace BackendSite.Service.Model
         public string BonusCode { get; set; }
         public string Description { get; set; }
         public int PromotionType { get; set; }
-        public int CategoryId { get; set; }
-        public DateTime PeriodFrom { get; set; }
-        public DateTime PeriodTo { get; set; }
+        public int? CategoryId { get; set; }
+        public DateTime? PeriodFrom { get; set; }
+        public DateTime? PeriodTo { get; set; }
         public long? UnixPeriodFrom { get; set; }
         public long? UnixPeriodTo { get; set; }
-        public int Sort { get; set; }
+        public int? Sort { get; set; }
         public int Status { get; set; }
         public int ExpiryDays { get; set; }
         public DateTime? LastUpateTime { get; set; }
@@ -32,7 +32,7 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public int SiteId { get; set; }
         public int Usage { get; set; }
-        public int BeenUsed { get; set; }
+        public int? BeenUsed { get; set; }
         public int RollOver { get; set; }
         public decimal Bonus { get; set; }
         public int BonusType { get; set; }

@@ -86,7 +86,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> SetPromotion([FromForm]bool IsAdd, PromotionInfo Promotion)
+        public ApiResult<IEnumerable<PromotionInfo>> SetPromotion([FromForm]bool IsAdd, [FromForm]PromotionInfo Promotion)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
             try
