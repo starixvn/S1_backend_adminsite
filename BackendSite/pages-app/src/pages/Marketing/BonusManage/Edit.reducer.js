@@ -98,20 +98,22 @@ export function reducer(state, action) {
 			};
 
 		case defActionType.MAIN_SET_CURRENCY_CHECKBOX:
-			return state[action.dataColumn].includes(action.value)
-				? {
-						...state,
-						[action.dataColumn]: state[action.dataColumn].filter(
-							v => v !== action.value
-						)
-				  }
-				: {
-						...state,
-						[action.dataColumn]: [
-							...state[action.dataColumn],
-							action.value
-						]
-				  };
+			let newCurrencies = state[action.dataColumn].includes(action.value)
+				? state[action.dataColumn].filter(v => v !== action.value)
+				: [...state[action.dataColumn], action.value];
+
+			let currentTab = state.currentTab;
+			if (newCurrencies.length === 0) {
+				currentTab = null;
+			} else if (currentTab === null) {
+				currentTab = newCurrencies[0];
+			}
+
+			return {
+				...state,
+				[action.dataColumn]: newCurrencies,
+				currentTab: currentTab
+			};
 		case defActionType.MAIN_SET_SITE:
 			return {
 				...state,
