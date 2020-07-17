@@ -95,6 +95,7 @@ export default props => {
 				state={state}
 				action={{ ClickSubmit, EditMainValue, EditCurrencyCheckBox, EditCurrencyPanel, ClickBack:props.action.ClickBack }}
 				siteList={props.SiteList}
+				IsAdd={props.IsAdd}
 			/>
 		</>
 	);

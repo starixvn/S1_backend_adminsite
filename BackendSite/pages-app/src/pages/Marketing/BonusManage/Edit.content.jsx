@@ -3,7 +3,6 @@ import InputBox from "./Component/InputBox";
 import CheckBox from "./Component/Checkbox";
 import SelectBox from "./Component/SelectBox";
 import DateTimePickerElem from "./Component/DateTimePicker";
-import { defActionType } from "./Edit.reducer";
 import moment from "moment";
 import RadioBox from "./Component/RadioBox";
 
@@ -17,7 +16,7 @@ const initBonusAmountType = [
 	{ value: 2, displayText: "Amount" }
 ];
 
-export default ({ IsAdd, state, action, siteList }) => {
+export default ({ state, siteList, action, IsAdd }) => {
 	const currencyList = Object.keys(state.specific);
 	const currencyOptions = currencyList.map(i => {
 		return {
@@ -36,7 +35,6 @@ export default ({ IsAdd, state, action, siteList }) => {
 			</button>
 		);
 	});
-
 	return (
 		<div className="container-fluid" id="Panel">
 			<div className="filter noBGcolor"></div>
@@ -62,7 +60,6 @@ export default ({ IsAdd, state, action, siteList }) => {
 					</div>
 				</div>
 			</div>
-
 			<div id="searchForm">
 				<div className="filter">
 					<div className="row-flex">
@@ -71,6 +68,7 @@ export default ({ IsAdd, state, action, siteList }) => {
 							OnChange={action.EditMainValue}
 							dataColumn="bonusCode"
 							value={state.bonusCode}
+							Disabled={!IsAdd}
 						/>
 						<SelectBox
 							Title="PromotionType"
@@ -175,12 +173,9 @@ export default ({ IsAdd, state, action, siteList }) => {
 };
 
 const SubPanel = props => {
-    const EditDetail = (e)=>{
-        props.EditMainValue(
-            e.target.value,
-            "detail"
-        )
-    }
+	const EditDetail = e => {
+		props.EditMainValue(e.target.value, "detail");
+	};
 	return (
 		<>
 			<a
