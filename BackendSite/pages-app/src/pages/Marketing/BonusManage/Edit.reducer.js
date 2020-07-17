@@ -1,4 +1,9 @@
-import { _ } from "ag-grid-community";
+export const defActionType = {
+	CURRENCY_SET_VALUE: "CURRENCY_SET_VALUE",
+	MAIN_SET_VALUE: "MAIN_SET_VALUE",
+	MAIN_SET_CHECKBOX: "MAIN_SET_CHECKBOX",
+	MAIN_SET_SITE: "MAIN_SET_SITE"
+};
 
 export const initialState = (IsAdd, datas, siteList) => {
 	if (IsAdd) {
@@ -36,7 +41,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 
 const initSpecific = {
 	usage: "0",
-	rollover: "",
+	rollOver: "",
 	bonusAmountType: 1,
 	bonus: "",
 	maxBonus: "",
@@ -53,28 +58,25 @@ const SetSpecific = (currencyList, data) => {
 	});
 
 	if (data !== null) {
-		data.forEach(s => {
+		data.forEach(d => {
 			let _newData = {};
 			Object.keys(initSpecific).forEach(k => {
-				_newData[k] = data[k];
+				if (k === "bonusAmountType") {
+					_newData[k] = d.bonusType;
+				} else {
+					_newData[k] = d[k] ?? "";
+				}
 			});
-			_specific[s.currencyId] = _newData;
+			_specific[d.currencyId] = _newData;
 		});
 	}
 
 	return _specific;
 };
 
-export const defActionType = {
-	EDIT_BY_CURRENCY: "EDIT_BY_CURRENCY",
-	EDIT_INPUTBOX: "EDIT_INPUTBOX",
-	EDIT_CHECKBOX: "EDIT_CHECKBOX",
-	SET_CHOOSE_SITE: "SET_CHOOSE_SITE"
-};
-
 export function reducer(state, action) {
 	switch (action.type) {
-		case defActionType.EDIT_BY_CURRENCY:
+		case defActionType.CURRENCY_SET_VALUE:
 			return {
 				...state,
 				specific: {
@@ -86,13 +88,13 @@ export function reducer(state, action) {
 				}
 			};
 
-		case defActionType.EDIT_INPUTBOX:
+		case defActionType.MAIN_SET_VALUE:
 			return {
 				...state,
 				[action.dataColumn]: action.value
 			};
 
-		case defActionType.EDIT_CHECKBOX:
+		case defActionType.MAIN_SET_CHECKBOX:
 			return state[action.dataColumn].includes(action.value)
 				? {
 						...state,
@@ -107,7 +109,7 @@ export function reducer(state, action) {
 							action.value
 						]
 				  };
-		case defActionType.SET_CHOOSE_SITE:
+		case defActionType.MAIN_SET_SITE:
 			return {
 				...state,
 				siteId: action.siteId,
