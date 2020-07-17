@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import InputBox from "./Component/InputBox";
 import CheckBox from "./Component/Checkbox";
 import SelectBox from "./Component/SelectBox";
@@ -18,12 +18,10 @@ const initBonusAmountType = [
 ];
 
 export default ({ IsAdd, state, action, siteList }) => {
-	console.log(state);
-
 	const currencyList = Object.keys(state.specific);
 	const currencyOptions = currencyList.map(i => {
 		return {
-			value: i,
+			value: Number(i),
 			displayText: window.i18n[`lbl_Currency${i}`]
 		};
 	});

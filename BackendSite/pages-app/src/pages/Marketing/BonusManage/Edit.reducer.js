@@ -24,6 +24,9 @@ export const initialState = (IsAdd, datas, siteList) => {
 		};
 	} else {
 		let _specific = SetSpecific(siteList[0].currencyList, datas.specific);
+		let _selectedCurrencies = datas.specific.map(s => {
+			return s.currencyId;
+		});
 		return {
 			bonusCode: datas.bonusCode,
 			promotionType: datas.promotionType,
@@ -33,10 +36,8 @@ export const initialState = (IsAdd, datas, siteList) => {
 			description: datas.description,
 			status: datas.status,
 			siteId: datas.siteId,
-			selectedCurrencies: Object.keys(datas.specific).map(c => {
-				return c;
-			}),
-			currentTab: null,
+			selectedCurrencies: _selectedCurrencies,
+			currentTab: _selectedCurrencies[0],
 			specific: _specific
 		};
 	}
@@ -54,6 +55,8 @@ const initSpecific = {
 	status: 2
 };
 
+const jsonField = ["title", "bannerUrl", "detail"];
+
 const SetSpecific = (currencyList, data) => {
 	let _specific = {};
 	currencyList.forEach(currency => {
@@ -63,9 +66,14 @@ const SetSpecific = (currencyList, data) => {
 	if (data !== null) {
 		data.forEach(d => {
 			let _newData = {};
+			let _details = JSON.parse(d.details);
+			d = { ...d, ..._details };
 			Object.keys(initSpecific).forEach(k => {
 				if (k === "bonusAmountType") {
 					_newData[k] = d.bonusType;
+				} else if (jsonField.includes(k)) {
+					let key = `${k[0].toUpperCase()}${k.substring(1)}`;
+					_newData[k] = d[key] ?? "";
 				} else {
 					_newData[k] = d[k] ?? "";
 				}
