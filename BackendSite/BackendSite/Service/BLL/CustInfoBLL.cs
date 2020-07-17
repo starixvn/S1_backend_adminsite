@@ -70,14 +70,14 @@ namespace BackendSite.Service.BLL
 
             return vipLevelCache;
         }
-        public IEnumerable<CustInfoDetail> GetCustInfoList(string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<CustInfoDetail> GetCustInfoList(int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            return custInfoService.GetCustInfoList(userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, pageSize, ref pageNumber, out totalPages, out rowCount);
+            return custInfoService.GetCustInfoList(birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
 
-        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo)
+        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo)
         {
-            return custInfoService.GetCustInfoExportList(userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo);
+            return custInfoService.GetCustInfoExportList(birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo);
         }
 
         public async Task<CustInfoDetail> GetCustInfoDetailAsync(int custId, string userName)
