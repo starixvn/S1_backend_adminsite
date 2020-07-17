@@ -18,9 +18,7 @@ export default ({Title, Options, Selected=[], OnChange, dataColumn})=>{
     )
 }
 
-const CheckBox = (props)=>{
-console.log(props.checked, props.Title)
-    
+const CheckBox = (props)=>{    
     const OnChange = (e)=>{
         e.preventDefault();
         props.onChange(props.Value, props.dataColumn);

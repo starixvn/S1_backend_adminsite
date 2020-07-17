@@ -1,17 +1,18 @@
 import React from 'react';
 
-export default ({Title, Options, Selected, OnChange, dataColumn})=>{
+export default ({Title, Options, Selected, OnChange, dataColumn, mainKey=null})=>{
     let opt = Options.map(o=>{
+        let key = `${Title}-${o.value}${mainKey === null ? '': `-${mainKey}`}`;
         return <RadioBtn 
-            key={`${Title}-${o.value}`} 
-            Id={`${Title}-${o.value}`} 
+            key={key}
+            Id={key}
             DisplayText={o.displayText}
-            Value={o.value} dataColumn={dataColumn}
-            Name={Title}
-            OnChange={OnChange.bind(this, o.value, dataColumn)}
+            Value={`${o.value}${mainKey === null ? '': `-${mainKey}`}`} 
+            dataColumn={dataColumn}
+            Name={`${Title}${mainKey === null ? '': `-${mainKey}`}`}
+            OnChange={OnChange.bind(this, o.value, dataColumn, mainKey)}
             Checked={Selected === o.value} />
     });
-
     return(
         <>
             <div className="row-flex">

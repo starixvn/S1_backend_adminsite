@@ -17,7 +17,7 @@ const InputBox = (props)=>{
                 {
                     props.SubTitle ? <span className="bule-bold">{props.SubTitle}</span> : null
                 }
-                <input type={props.type ? props.type : 'text'} value={props.value === null || props.value === undefined ? '' : props.value} onChange={OnChange} disabled={props.Disabled === true} />
+                <input type={props.type ? props.type : 'text'} value={props.value === null || props.value === undefined ? '' : props.value} onChange={OnChange} disabled={props.Disabled === true} className={props.inputClass ? props.inputClass : ''}/>
             </div>
         </div>
     )
