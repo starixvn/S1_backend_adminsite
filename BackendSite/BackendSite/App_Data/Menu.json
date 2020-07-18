@@ -170,7 +170,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      } /*,
+      },
       {
         "Key": "",
         "Title": "Deposit Limit Management",
@@ -190,7 +190,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      }*/
+      }
     ]
   },
   {
@@ -246,8 +246,8 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      }/*,
-      {
+      },
+      /*{
         "Key": "BonusCashBack",
         "Title": "Bonus Cash Back",
         "FuncKey": "Marketing/BonusCashBack",
@@ -256,7 +256,28 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      }*/
+      },
+      {
+        "Key": "BonusManage",
+        "Title": "Bonus Management",
+        "FuncKey": "Marketing/BonusManage",
+        "Controller": "Marketing",
+        "Action": "BonusManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },*/
+      {
+        "Key": "PendingBonus",
+        "Title": "Pending Bonus",
+        "FuncKey": "Marketing/PendingBonus",
+        "Controller": "Marketing",
+        "Action": "PendingBonus",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      }
+
     ]
   }
 ]
