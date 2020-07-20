@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useReducer, useState } from "react";
-import ReactDOM from 'react-dom'
+import ReactDOM from "react-dom";
 import WebAPI from "../../../module/WebAPI";
 import moment from "moment";
 import Edit from "./Edit";
@@ -14,7 +14,7 @@ import Main from "./index.main";
 
 const App = () => {
 	const [state, dispatch] = useReducer(reducer, initState);
-	const [processing ,setProcessing] = useState(false);
+	const [processing, setProcessing] = useState(false);
 
 	const isMountedRef = useRef(null);
 	useEffect(() => {
@@ -41,130 +41,164 @@ const App = () => {
 	}, []);
 
 	const ClickCreateBonus = () => {
-		let param = {
-			Url: "BonusManage/GetSiteListByLoginUser"
-		};
-		WebAPI.PostData(param).then(res => {
+		if(!processing){
 			if (isMountedRef.current) {
-				if (res.data.errorCode === 0) {
-					dispatch({
-						type: defActionType.GOTO_ADD_BONUS,
-						siteList: res.data.data
-					});
-				} else {
-					alert(res.data.message ?? "failed to get data.");
-				}
+				setProcessing(true);
 			}
-		});
-	};
-
-	const SetPromotion = promotion => {
-		let _specific = Object.keys(promotion.specific).filter(c=>{return promotion.selectedCurrencies.includes(Number(c))}).map(s => {
-			let info = promotion.specific[s];
-			let lang = {};
-			info.selectedLang.forEach(l=>{
-				lang[l] = info.lang[l];
-			});
-
-			return {
-				CurrencyId: s,
-				Usage: s.usage ? Number(info.usage) : 0,
-				Rollover: Number(info.rollOver),
-				Bonus: Number(info.bonus),
-				BonusType: info.bonusAmountType,
-				MaxBonus: Number(info.maxBonus),
-				Details: JSON.stringify(lang),
-				Status: info.status
+			let param = {
+				Url: "BonusManage/GetSiteListByLoginUser"
 			};
-		});
-
-		let _promo = {
-			BonusCode: promotion.bonusCode,
-			Description: promotion.description,
-			PromotionType: promotion.promotionType,
-			UnixPeriodFrom: moment(promotion.periodFrom).unix(),
-			UnixPeriodTo: moment(promotion.periodTo).unix(),
-			Status: promotion.status,
-			ExpiryDays: Number(promotion.expiryDays),
-			SiteId: promotion.siteId,
-			Specific: _specific
-		};
-
-		let param = {
-			Url: "BonusManage/SetPromotion",
-			Data: qs.stringify({
-				IsAdd: state.panelType === defPanelType.Add,
-				Promotion: _promo
-			})
-		};
-		WebAPI.PostData(param).then(
-			res => {
+			WebAPI.PostData(param).then(res => {
 				if (isMountedRef.current) {
 					if (res.data.errorCode === 0) {
 						dispatch({
-							type: defActionType.SET_PROMOTION,
-							promotionList: res.data.data
+							type: defActionType.GOTO_ADD_BONUS,
+							siteList: res.data.data
 						});
-					} else if(res.data.errorCode===1062){
-						alert("Duplicate Bonus Code.");
-					}else{
-						alert(res.data.message ?? "failed to set data.");
+					} else {
+						alert(res.data.message ?? "failed to get data.");
+					}
+					setProcessing(false);
+				}
+			}, err=>{
+				if(isMountedRef.current){
+				alert("API Server Error.");
+				setProcessing(false);}
+			});
+		}
+		
+	};
+
+	const SetPromotion = promotion => {
+		if (!processing) {
+			if (isMountedRef.current) {
+				setProcessing(true);
+			}
+			let _specific = Object.keys(promotion.specific)
+				.filter(c => {
+					return promotion.selectedCurrencies.includes(Number(c));
+				})
+				.map(s => {
+					let info = promotion.specific[s];
+					let lang = {};
+					info.selectedLang.forEach(l => {
+						lang[l] = info.lang[l];
+					});
+
+					return {
+						CurrencyId: s,
+						Usage: s.usage ? Number(info.usage) : 0,
+						Rollover: Number(info.rollOver),
+						Bonus: Number(info.bonus),
+						BonusType: info.bonusAmountType,
+						MaxBonus: Number(info.maxBonus),
+						Details: JSON.stringify(lang),
+						Status: info.status
+					};
+				});
+
+			let _promo = {
+				BonusCode: promotion.bonusCode,
+				Description: promotion.description,
+				PromotionType: promotion.promotionType,
+				UnixPeriodFrom: moment(promotion.periodFrom).unix(),
+				UnixPeriodTo: moment(promotion.periodTo).unix(),
+				Status: promotion.status,
+				ExpiryDays: Number(promotion.expiryDays),
+				SiteId: promotion.siteId,
+				Specific: _specific
+			};
+
+			let param = {
+				Url: "BonusManage/SetPromotion",
+				Data: qs.stringify({
+					IsAdd: state.panelType === defPanelType.Add,
+					Promotion: _promo
+				})
+			};
+			WebAPI.PostData(param).then(
+				res => {
+					if (isMountedRef.current) {
+						if (res.data.errorCode === 0) {
+							dispatch({
+								type: defActionType.SET_PROMOTION,
+								promotionList: res.data.data
+							});
+						} else if (res.data.errorCode === 1062) {
+							alert("Duplicate Bonus Code.");
+						} else {
+							alert(res.data.message ?? "failed to set data.");
+						}
+						setProcessing(false);
+					}
+				},
+				err => {
+					if (isMountedRef.current) {
+						alert("API Server Error.");
+						setProcessing(false);
 					}
 				}
-			},
-			err => {
-				alert("API Server Error.");
-			}
-		);
+			);
+		}
 	};
 
 	const ClickEdit = async idx => {
-		const promotionData = await WebAPI.PostData({
-			Url: "BonusManage/GetPromotion",
-			Data: qs.stringify({
-				BonusCode: state.promotionList[idx].bonusCode
-			})
-		}).then(
-			res => {
-				return {
-					errorCode: res.data.errorCode,
-					data: res.data.data,
-					msg: res.data.message
-				};
-			},
-			err => {
-				return { errorCode: 991 };
+		if (!processing) {
+			if (isMountedRef.current) {
+				setProcessing(true);
 			}
-		);
+			const promotionData = await WebAPI.PostData({
+				Url: "BonusManage/GetPromotion",
+				Data: qs.stringify({
+					BonusCode: state.promotionList[idx].bonusCode
+				})
+			}).then(
+				res => {
+					return {
+						errorCode: res.data.errorCode,
+						data: res.data.data,
+						msg: res.data.message
+					};
+				},
+				err => {
+					return { errorCode: 991 };
+				}
+			);
 
-		const siteList = await WebAPI.PostData({
-			Url: "BonusManage/GetSiteListByLoginUser",
-			Data: qs.stringify({ SiteId: state.promotionList[idx].siteId })
-		}).then(
-			res => {
-				return {
-					errorCode: res.data.errorCode,
-					data: res.data.data,
-					msg: res.data.message
-				};
-			},
-			err => {
-				return { errorCode: 991 };
+			const siteList = await WebAPI.PostData({
+				Url: "BonusManage/GetSiteListByLoginUser",
+				Data: qs.stringify({ SiteId: state.promotionList[idx].siteId })
+			}).then(
+				res => {
+					return {
+						errorCode: res.data.errorCode,
+						data: res.data.data,
+						msg: res.data.message
+					};
+				},
+				err => {
+					return { errorCode: 991 };
+				}
+			);
+
+			if (promotionData.errorCode === 0 && siteList.errorCode === 0) {
+				dispatch({
+					type: defActionType.EDIT_PROMOTION,
+					promotionData: promotionData.data,
+					siteList: siteList.data
+				});
+			} else {
+				let msg =
+					promotionData.errorCode === 991 &&
+					siteList.errorCode === 991
+						? "API Server Error."
+						: [promotionData.msg, siteList.msg].join(", ");
+				alert(msg);
 			}
-		);
 
-		if (promotionData.errorCode === 0 && siteList.errorCode === 0) {
-			dispatch({
-				type: defActionType.EDIT_PROMOTION,
-				promotionData: promotionData.data,
-				siteList: siteList.data
-			});
-		} else {
-			let msg =
-				promotionData.errorCode === 991 && siteList.errorCode === 991
-					? "API Server Error."
-					: [promotionData.msg, siteList.msg].join(", ");
-			alert(msg);
+			if(isMountedRef.current){
+				setProcessing(false);
+			}
 		}
 	};
 
@@ -215,7 +249,7 @@ const App = () => {
 		<Edit
 			Datas={state.promotionData}
 			SiteList={state.siteList}
-            action={{ SetPromotion, ClickBack }}
+			action={{ SetPromotion, ClickBack }}
 			IsAdd={state.panelType === defPanelType.Add}
 			processing={processing}
 		/>
@@ -224,6 +258,6 @@ const App = () => {
 
 export default App;
 
-if(process.env.NODE_ENV==='production'){
-    ReactDOM.render(<App />, document.getElementById('content'))
+if (process.env.NODE_ENV === "production") {
+	ReactDOM.render(<App />, document.getElementById("content"));
 }
