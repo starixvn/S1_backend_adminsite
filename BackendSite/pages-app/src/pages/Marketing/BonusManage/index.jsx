@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useReducer, useState } from "react";
-import ReactDOM from 'react-dom'
+import ReactDOM from "react-dom";
 import WebAPI from "../../../module/WebAPI";
 import moment from "moment";
 import Edit from "./Edit";
@@ -14,7 +14,7 @@ import Main from "./index.main";
 
 const App = () => {
 	const [state, dispatch] = useReducer(reducer, initState);
-	const [processing ,setProcessing] = useState(false);
+	const [processing, setProcessing] = useState(false);
 
 	const isMountedRef = useRef(null);
 	useEffect(() => {
@@ -59,24 +59,28 @@ const App = () => {
 	};
 
 	const SetPromotion = promotion => {
-		let _specific = Object.keys(promotion.specific).filter(c=>{return promotion.selectedCurrencies.includes(Number(c))}).map(s => {
-			let info = promotion.specific[s];
-			let lang = {};
-			info.selectedLang.forEach(l=>{
-				lang[l] = info.lang[l];
-			});
+		let _specific = Object.keys(promotion.specific)
+			.filter(c => {
+				return promotion.selectedCurrencies.includes(Number(c));
+			})
+			.map(s => {
+				let info = promotion.specific[s];
+				let lang = {};
+				info.selectedLang.forEach(l => {
+					lang[l] = info.lang[l];
+				});
 
-			return {
-				CurrencyId: s,
-				Usage: s.usage ? Number(info.usage) : 0,
-				Rollover: Number(info.rollOver),
-				Bonus: Number(info.bonus),
-				BonusType: info.bonusAmountType,
-				MaxBonus: Number(info.maxBonus),
-				Details: JSON.stringify(lang),
-				Status: info.status
-			};
-		});
+				return {
+					CurrencyId: s,
+					Usage: s.usage ? Number(info.usage) : 0,
+					Rollover: Number(info.rollOver),
+					Bonus: Number(info.bonus),
+					BonusType: info.bonusAmountType,
+					MaxBonus: Number(info.maxBonus),
+					Details: JSON.stringify(lang),
+					Status: info.status
+				};
+			});
 
 		let _promo = {
 			BonusCode: promotion.bonusCode,
@@ -97,27 +101,31 @@ const App = () => {
 				Promotion: _promo
 			})
 		};
-		WebAPI.PostData(param).then(
-			res => {
-				if (isMountedRef.current) {
-					if (res.data.errorCode === 0) {
-						dispatch({
-							type: defActionType.SET_PROMOTION,
-							promotionList: res.data.data
-						});
-					} else if(res.data.errorCode===1062){
-						alert("Duplicate Bonus Code.");
-					}else{
-						alert(res.data.message ?? "failed to set data.");
+		if (!processing) {
+			setProcessing(true);
+			WebAPI.PostData(param).then(
+				res => {
+					if (isMountedRef.current) {
+						if (res.data.errorCode === 0) {
+							dispatch({
+								type: defActionType.SET_PROMOTION,
+								promotionList: res.data.data
+							});
+						} else if (res.data.errorCode === 1062) {
+							alert("Duplicate Bonus Code.");
+						} else {
+							alert(res.data.message ?? "failed to set data.");
+						}
+						setProcessing(false);
 					}
+				},
+				err => {
+					alert("API Server Error.");
+					setProcessing(false);
 				}
-			},
-			err => {
-				alert("API Server Error.");
-			}
-		);
+			);
+		}
 	};
-
 	const ClickEdit = async idx => {
 		const promotionData = await WebAPI.PostData({
 			Url: "BonusManage/GetPromotion",
@@ -215,7 +223,7 @@ const App = () => {
 		<Edit
 			Datas={state.promotionData}
 			SiteList={state.siteList}
-            action={{ SetPromotion, ClickBack }}
+			action={{ SetPromotion, ClickBack }}
 			IsAdd={state.panelType === defPanelType.Add}
 			processing={processing}
 		/>
@@ -224,6 +232,6 @@ const App = () => {
 
 export default App;
 
-if(process.env.NODE_ENV==='production'){
-    ReactDOM.render(<App />, document.getElementById('content'))
+if (process.env.NODE_ENV === "production") {
+	ReactDOM.render(<App />, document.getElementById("content"));
 }
