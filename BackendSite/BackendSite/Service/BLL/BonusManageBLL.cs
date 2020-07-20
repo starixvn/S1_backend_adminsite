@@ -28,9 +28,9 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public PromotionInfo GetPromotion(string BonusCode)
+        public PromotionInfo GetPromotion(string BonusCode, int SiteId)
         {
-            return bonusManageService.GetPromotion(BonusCode);
+            return bonusManageService.GetPromotion(BonusCode, SiteId);
         }
 
         public void SetPromotion(bool IsAdd, PromotionInfo promotion)

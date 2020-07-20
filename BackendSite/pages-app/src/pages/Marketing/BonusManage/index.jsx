@@ -149,7 +149,8 @@ const App = () => {
 			const promotionData = await WebAPI.PostData({
 				Url: "BonusManage/GetPromotion",
 				Data: qs.stringify({
-					BonusCode: state.promotionList[idx].bonusCode
+					BonusCode: state.promotionList[idx].bonusCode,
+					SiteId: state.promotionList[idx].siteId
 				})
 			}).then(
 				res => {

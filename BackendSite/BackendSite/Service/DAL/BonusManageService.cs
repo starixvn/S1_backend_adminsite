@@ -25,20 +25,21 @@ namespace BackendSite.Service.DAL
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
+                int? SiteId = null;
                 string SpName = "Admin_Promotion_Get";
-                return conn.Query<PromotionInfo>(SpName, new { BonusCode }, commandType: CommandType.StoredProcedure);
+                return conn.Query<PromotionInfo>(SpName, new { BonusCode, SiteId }, commandType: CommandType.StoredProcedure);
             }
         }
 
-        public PromotionInfo GetPromotion(string BonusCode)
+        public PromotionInfo GetPromotion(string BonusCode, int SiteId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var promotion = conn.Query<PromotionInfo>("Admin_Promotion_Get", new { BonusCode }, transaction: trans, commandType: CommandType.StoredProcedure).FirstOrDefault();
+            var promotion = conn.Query<PromotionInfo>("Admin_Promotion_Get", new { BonusCode, SiteId }, transaction: trans, commandType: CommandType.StoredProcedure).FirstOrDefault();
             if (promotion != null)
             {
-                promotion.Specific = conn.Query<PromotionSpecific>("Admin_PromotionSpecific_Get", new { BonusCode }, transaction: trans, commandType: CommandType.StoredProcedure);
+                promotion.Specific = conn.Query<PromotionSpecific>("Admin_PromotionSpecific_Get", new { BonusCode, SiteId }, transaction: trans, commandType: CommandType.StoredProcedure);
             }
             trans.Commit();
             return promotion;
