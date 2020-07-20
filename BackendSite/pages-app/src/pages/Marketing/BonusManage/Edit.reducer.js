@@ -54,9 +54,9 @@ export const initialState = (IsAdd, datas, siteList) => {
 };
 
 const initLang = {
-	bannerUrl: "bannerUrl",
-	title: "title",
-	detail: "detail"
+	bannerUrl: "",
+	title: "",
+	detail: ""
 };
 
 const initSpecific = {
