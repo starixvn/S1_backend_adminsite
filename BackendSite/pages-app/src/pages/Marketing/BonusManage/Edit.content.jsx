@@ -17,7 +17,7 @@ const initBonusAmountType = [
 	{ value: 2, displayText: "Amount" }
 ];
 
-export default ({ state, siteList, action, IsAdd }) => {
+export default ({ state, siteList, action, IsAdd, processing }) => {
 	const currencyList = Object.keys(state.specific);
 	const currencyOptions = currencyList.map(i => {
 		return {
@@ -167,10 +167,10 @@ export default ({ state, siteList, action, IsAdd }) => {
 				) : null}
 			</div>
 			<div className="filter float-btn-group">
-				<button className="btn btn-back" onClick={action.ClickBack}>
+				<button className="btn btn-back" onClick={action.ClickBack} disabled={processing}>
 					Back
 				</button>
-				<button className="btn btn-add" onClick={action.ClickSubmit}>
+				<button className="btn btn-add" onClick={action.ClickSubmit} disabled={processing}>
 					Submit
 				</button>
 			</div>

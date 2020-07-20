@@ -141,7 +141,6 @@ const App = () => {
 			);
 		}
 	};
-
 	const ClickEdit = async idx => {
 		if (!processing) {
 			if (isMountedRef.current) {
