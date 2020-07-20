@@ -78,6 +78,7 @@ export default ({ state, siteList, action, IsAdd, processing }) => {
 							HandleChange={action.EditMainValue}
 							dataColumn="promotionType"
 							SelectedValue={state.promotionType}
+							Disabled={!IsAdd}
 						/>
 					</div>
 					<div className="row-flex">
@@ -348,6 +349,18 @@ const LangPanel = props => {
 						props.state.specific[props.currencyId].lang[
 							props.langId
 						].title
+					}
+				/>
+				<InputBox
+					Title="Description"
+					ClassName="form-group"
+					inputClass="form-control"
+					OnChange={props.EditMainValue}
+					dataColumn="description"
+					value={
+						props.state.specific[props.currencyId].lang[
+							props.langId
+						].description
 					}
 				/>
 				<RichText
