@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Threading.Tasks;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -11,9 +13,10 @@ using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 namespace BackendSite.Controllers.Api
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusManage" })]
     public class BonusManageController : Controller
     {
         private readonly BonusManageBLL bonusManageBLL;
@@ -31,7 +34,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
             try
             {
-                apiResult.Data = bonusManageBLL.GetPromotionList();
+                var siteList = serverInfoBLL.GetSiteListByLoginUser();
+                apiResult.Data = bonusManageBLL.GetPromotionList().Where(b=> siteList.Any(s=> s.SiteId == b.SiteId));
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
