@@ -112,6 +112,7 @@ export default props => {
 				action={{ ClickSubmit, EditMainValue, EditCurrencyCheckBox, EditCurrencyPanel, ClickBack:props.action.ClickBack, EditCurrencyLangPanelValue, EditCurrencyLangCheckBox}}
 				siteList={props.SiteList}
 				IsAdd={props.IsAdd}
+				processing={props.processing}
 			/>
 		</>
 	);

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useReducer } from "react";
+import React, { useEffect, useRef, useReducer, useState } from "react";
 import ReactDOM from 'react-dom'
 import WebAPI from "../../../module/WebAPI";
 import moment from "moment";
@@ -14,6 +14,8 @@ import Main from "./index.main";
 
 const App = () => {
 	const [state, dispatch] = useReducer(reducer, initState);
+	const [processing ,setProcessing] = useState(false);
+
 	const isMountedRef = useRef(null);
 	useEffect(() => {
 		isMountedRef.current = true;
@@ -214,7 +216,8 @@ const App = () => {
 			Datas={state.promotionData}
 			SiteList={state.siteList}
             action={{ SetPromotion, ClickBack }}
-            IsAdd={state.panelType === defPanelType.Add}
+			IsAdd={state.panelType === defPanelType.Add}
+			processing={processing}
 		/>
 	);
 };
