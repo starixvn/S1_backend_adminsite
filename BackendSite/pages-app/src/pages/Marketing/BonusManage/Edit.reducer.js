@@ -184,9 +184,9 @@ export function reducer(state, action) {
 				: [...selLangs, action.value];
 
 			let currLang = state.specific[selCurr].currentLang;
-			if (selLangs.length === 0) {
+			if (newLangs.length === 0) {
 				currLang = null;
-			} else if (currentTab === null) {
+			} else if (currLang === null) {
 				currLang = newLangs[0];
 			}
 
