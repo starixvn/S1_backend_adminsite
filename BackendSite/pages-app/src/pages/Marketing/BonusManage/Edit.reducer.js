@@ -4,7 +4,8 @@ export const defActionType = {
 	MAIN_SET_VALUE: "MAIN_SET_VALUE",
 	MAIN_SET_CURRENCY_CHECKBOX: "MAIN_SET_CURRENCY_CHECKBOX",
 	MAIN_SET_SITE: "MAIN_SET_SITE",
-	CURRENCY_LANG_SET_VALUE: "CURRENCY_LANG_SET_VALUE"
+	CURRENCY_LANG_SET_VALUE: "CURRENCY_LANG_SET_VALUE",
+	CURRENCY_SET_LANG_CHECKBOX: "CURRENCY_SET_LANG_CHECKBOX"
 };
 
 export const initialState = (IsAdd, datas, siteList) => {
@@ -134,6 +135,7 @@ export function reducer(state, action) {
 			};
 
 		case defActionType.CURRENCY_LANG_SET_VALUE:
+			console.log(action);
 			let selCurrency = state.currentTab;
 			let selLang = state.specific[selCurrency].currentLang;
 			return {
@@ -176,6 +178,9 @@ export function reducer(state, action) {
 				[action.dataColumn]: newCurrencies,
 				currentTab: currentTab
 			};
+
+		case defActionType.CURRENCY_SET_LANG_CHECKBOX:
+			return {};
 		case defActionType.MAIN_SET_SITE:
 			return {
 				...state,

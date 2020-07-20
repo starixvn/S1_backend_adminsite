@@ -88,6 +88,10 @@ export default props => {
 		});
 	}
 
+	const EditCurrencyLangCheckBox = (value, dataColumn) =>{
+		dispatch({type:defActionType.CURRENCY_SET_LANG_CHECKBOX, value, dataColumn});
+	}
+
 	return (
 		<>
 			<div className="filter noBGcolor">
