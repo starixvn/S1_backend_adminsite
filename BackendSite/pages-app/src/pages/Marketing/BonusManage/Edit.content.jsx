@@ -167,7 +167,7 @@ export default ({ state, siteList, action, IsAdd, processing }) => {
 				) : null}
 			</div>
 			<div className="filter float-btn-group">
-				<button className="btn btn-back" onClick={action.ClickBack}disabled={processing}>
+				<button className="btn btn-back" onClick={action.ClickBack} disabled={processing}>
 					Back
 				</button>
 				<button className="btn btn-add" onClick={action.ClickSubmit} disabled={processing}>

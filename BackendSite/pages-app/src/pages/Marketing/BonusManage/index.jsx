@@ -101,30 +101,25 @@ const App = () => {
 				Promotion: _promo
 			})
 		};
-		if (!processing) {
-			setProcessing(true);
-			WebAPI.PostData(param).then(
-				res => {
-					if (isMountedRef.current) {
-						if (res.data.errorCode === 0) {
-							dispatch({
-								type: defActionType.SET_PROMOTION,
-								promotionList: res.data.data
-							});
-						} else if (res.data.errorCode === 1062) {
-							alert("Duplicate Bonus Code.");
-						} else {
-							alert(res.data.message ?? "failed to set data.");
-						}
-						setProcessing(false);
+		WebAPI.PostData(param).then(
+			res => {
+				if (isMountedRef.current) {
+					if (res.data.errorCode === 0) {
+						dispatch({
+							type: defActionType.SET_PROMOTION,
+							promotionList: res.data.data
+						});
+					} else if (res.data.errorCode === 1062) {
+						alert("Duplicate Bonus Code.");
+					} else {
+						alert(res.data.message ?? "failed to set data.");
 					}
-				},
-				err => {
-					alert("API Server Error.");
-					setProcessing(false);
 				}
-			);
-		}
+			},
+			err => {
+				alert("API Server Error.");
+			}
+		);
 	};
 	const ClickEdit = async idx => {
 		const promotionData = await WebAPI.PostData({
