@@ -1,15 +1,15 @@
 import React from 'react';
 
-//<RichText EditDetail={EditDetail} Value={props.state.specific[props.currencyId].detail} CurrencyId={props.currencyId}/>
-
 class App extends React.Component {
     constructor(props){
         super(props);
-        this.state = {CurrencyId:this.props.CurrencyId};
+        this.state = {key:`${this.props.CurrencyId}-${this.props.LangId}`};
     }
     static getDerivedStateFromProps(props, state){
-        if(props.CurrencyId !== state.CurrencyId){
+        let key = `${props.CurrencyId}-${props.LangId}`
+        if(key !== state.key){
             let _funcOnChange = props.EditDetail;
+            
             let value = props.Value ?? "";
             /* eslint-disable */
             tinymce.remove("#richText");
@@ -32,7 +32,7 @@ class App extends React.Component {
                 }
             });
             /* eslint-enable */
-            return {CurrencyId: props.CurrencyId}
+            return {key: key}
         }else{
             return null;
         }
