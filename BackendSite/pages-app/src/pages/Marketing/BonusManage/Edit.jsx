@@ -106,7 +106,7 @@ export default props => {
 			<Panel
 				dispatch={dispatch}
 				state={state}
-				action={{ ClickSubmit, EditMainValue, EditCurrencyCheckBox, EditCurrencyPanel, ClickBack:props.action.ClickBack, EditCurrencyLangPanelValue}}
+				action={{ ClickSubmit, EditMainValue, EditCurrencyCheckBox, EditCurrencyPanel, ClickBack:props.action.ClickBack, EditCurrencyLangPanelValue, EditCurrencyLangCheckBox}}
 				siteList={props.SiteList}
 				IsAdd={props.IsAdd}
 			/>
