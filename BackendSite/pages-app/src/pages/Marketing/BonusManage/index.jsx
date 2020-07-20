@@ -59,6 +59,11 @@ const App = () => {
 	const SetPromotion = promotion => {
 		let _specific = Object.keys(promotion.specific).filter(c=>{return promotion.selectedCurrencies.includes(Number(c))}).map(s => {
 			let info = promotion.specific[s];
+			let lang = {};
+			info.selectedLang.forEach(l=>{
+				lang[l] = info.lang[l];
+			});
+
 			return {
 				CurrencyId: s,
 				Usage: s.usage ? Number(info.usage) : 0,
@@ -66,7 +71,7 @@ const App = () => {
 				Bonus: Number(info.bonus),
 				BonusType: info.bonusAmountType,
 				MaxBonus: Number(info.maxBonus),
-				Details: JSON.stringify(info.lang),
+				Details: JSON.stringify(lang),
 				Status: info.status
 			};
 		});
