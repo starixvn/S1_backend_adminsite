@@ -73,8 +73,6 @@ const initSpecific = {
 	}
 };
 
-//const jsonField = ["title", "bannerUrl", "detail"];
-
 const SetSpecific = (currencyList, langList, data) => {
 	let _specific = {};
 	currencyList.forEach(currency => {
@@ -135,7 +133,6 @@ export function reducer(state, action) {
 			};
 
 		case defActionType.CURRENCY_LANG_SET_VALUE:
-			console.log(action);
 			let selCurrency = state.currentTab;
 			let selLang = state.specific[selCurrency].currentLang;
 			return {
@@ -180,7 +177,31 @@ export function reducer(state, action) {
 			};
 
 		case defActionType.CURRENCY_SET_LANG_CHECKBOX:
-			return {};
+			let selCurr = state.currentTab;
+			let selLangs = state.specific[selCurr].selectedLang;
+			let newLangs = selLangs.includes(action.value)
+				? selLangs.filter(v => v !== action.value)
+				: [...selLangs, action.value];
+
+			let currLang = state.specific[selCurr].currentLang;
+			if (selLangs.length === 0) {
+				currLang = null;
+			} else if (currentTab === null) {
+				currLang = newLangs[0];
+			}
+
+			return {
+				...state,
+				specific: {
+					...state.specific,
+					[selCurr]: {
+						...state.specific[selCurr],
+						selectedLang: newLangs,
+						currentLang: currLang
+					}
+				}
+			};
+
 		case defActionType.MAIN_SET_SITE:
 			return {
 				...state,
