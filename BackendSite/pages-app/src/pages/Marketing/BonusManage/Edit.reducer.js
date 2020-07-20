@@ -103,7 +103,7 @@ const SetSpecific = (currencyList, langList, data) => {
 						[l]: { ...initLang }
 					};
 				});
-
+			d["currentLang"] = d["selectedLang"][0] ?? "";
 			Object.keys(initSpecific).forEach(k => {
 				if (k === "bonusAmountType") {
 					_newData[k] = d.bonusType;
@@ -159,7 +159,8 @@ export function reducer(state, action) {
 			};
 
 		case defActionType.MAIN_SET_CURRENCY_CHECKBOX:
-			let newCurrencies = state[action.dataColumn].includes(action.value)
+			let isRemove = state[action.dataColumn].includes(action.value);
+			let newCurrencies = isRemove
 				? state[action.dataColumn].filter(v => v !== action.value)
 				: [...state[action.dataColumn], action.value];
 
@@ -168,6 +169,11 @@ export function reducer(state, action) {
 				currentTab = null;
 			} else if (currentTab === null) {
 				currentTab = newCurrencies[0];
+			}
+
+			if (isRemove && !newCurrencies.includes(currentTab)) {
+				currentTab =
+					newCurrencies.length === 0 ? null : newCurrencies[0];
 			}
 
 			return {
@@ -179,15 +185,20 @@ export function reducer(state, action) {
 		case defActionType.CURRENCY_SET_LANG_CHECKBOX:
 			let selCurr = state.currentTab;
 			let selLangs = state.specific[selCurr].selectedLang;
-			let newLangs = selLangs.includes(action.value)
+			let isLangRemove = selLangs.includes(action.value);
+			let newLangs = isLangRemove
 				? selLangs.filter(v => v !== action.value)
 				: [...selLangs, action.value];
 
 			let currLang = state.specific[selCurr].currentLang;
 			if (newLangs.length === 0) {
 				currLang = null;
-			} else if (currLang === null) {
+			} else if (currLang === null || currLang === "") {
 				currLang = newLangs[0];
+			}
+
+			if (isLangRemove && !newLangs.includes(currLang)) {
+				currLang = newLangs.length === 0 ? null : newLangs[0];
 			}
 
 			return {

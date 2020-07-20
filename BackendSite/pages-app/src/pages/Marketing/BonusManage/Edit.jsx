@@ -3,6 +3,8 @@ import RadioBox from './Component/RadioBox';
 import { reducer, defActionType, initialState } from './Edit.reducer';
 import Panel from './Edit.content'
 
+const skipField = ['currentLang'];
+
 export default props => {
 	const [state, dispatch] = useReducer(
 		reducer,
@@ -14,8 +16,9 @@ export default props => {
 		for(let key in state){
 			if(key === 'specific'){
 				for(let c_key in state[key]){
-					if(state.selectedCurrencies.includes(c_key)){
+					if(state.selectedCurrencies.includes(Number(c_key))){
 						for(let f_key in state[key][c_key]){
+							if(skipField.includes(f_key)) continue;
 							let column = state[key][c_key][f_key];
 							if(column===null || column===undefined || column===''){
 								alert(`${window.i18n[`lbl_Currency${c_key}`]}'s ${f_key} does not allow null.`);

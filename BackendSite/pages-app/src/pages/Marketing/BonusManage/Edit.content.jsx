@@ -5,6 +5,7 @@ import SelectBox from "./Component/SelectBox";
 import DateTimePickerElem from "./Component/DateTimePicker";
 import moment from "moment";
 import RadioBox from "./Component/RadioBox";
+import RichText from "./Component/RichText.jsx";
 
 const initPromotionType = [
 	{ value: 1, displayText: "1st Deposit" },
@@ -35,6 +36,7 @@ export default ({ state, siteList, action, IsAdd }) => {
 			</button>
 		);
 	});
+
 	return (
 		<div className="container-fluid" id="Panel">
 			<div className="filter noBGcolor"></div>
@@ -154,7 +156,11 @@ export default ({ state, siteList, action, IsAdd }) => {
 									this,
 									state.currentTab
 								)}
+								EditCurrencyLangPanelValue={
+									action.EditCurrencyLangPanelValue
+								}
 								currencyId={state.currentTab}
+								action={action}
 							/>
 						</div>
 					</div>
@@ -173,9 +179,31 @@ export default ({ state, siteList, action, IsAdd }) => {
 };
 
 const SubPanel = props => {
-	const EditDetail = e => {
-		props.EditMainValue(e.target.value, "detail");
-	};
+	const langList = Object.keys(props.state.specific[props.currencyId].lang);
+	const langOptions = langList.map((lang, i) => {
+		return {
+			value: lang,
+			displayText: lang
+		};
+	});
+	let langId = props.state.specific[props.currencyId].currentLang;
+	let tabArr = props.state.specific[props.currencyId].selectedLang.map(
+		item => {
+			return (
+				<button
+					key={`${props.currencyId}-tab-${item}`}
+					className="btn btn-add active"
+					onClick={props.EditMainValue.bind(
+						this,
+						item,
+						"currentLang"
+					)}>
+					{item}
+				</button>
+			);
+		}
+	);
+
 	return (
 		<>
 			<a
@@ -250,14 +278,65 @@ const SubPanel = props => {
 						value={props.state.specific[props.currencyId].maxBonus}
 					/>
 				</div>
-				<div className="row-flex"></div>
+				<div className="filter noBGcolor">
+					<CheckBox
+						Options={langOptions}
+						Title="Available Languages"
+						OnChange={props.action.EditCurrencyLangCheckBox}
+						dataColumn="selectedLang"
+						Selected={
+							props.state.specific[props.currencyId].selectedLang
+						}
+						mainKey={props.state.currencyId}
+					/>
+				</div>
+				<div className="filter noBGcolor tag">{tabArr}</div>
+				{props.state.specific[props.currencyId].selectedLang.length >
+					0 &&
+				langId !== null &&
+				langId !== "" ? (
+					<div className="filter">
+						<div className="panel level-1 mt-20">
+							<LangPanel
+								state={props.state}
+								currencyId={props.currencyId}
+								EditMainValue={
+									props.action.EditCurrencyLangPanelValue
+								}
+								action={props.action}
+								langId={langId}
+							/>
+						</div>
+					</div>
+				) : null}
+			</div>
+		</>
+	);
+};
+
+const LangPanel = props => {
+	const EditDetail = value => {
+		props.EditMainValue(value, "detail");
+	};
+	return (
+		<>
+			<a
+				className="panel-title no-arrow"
+				style={{ justifyContent: "space-between" }}>
+				<span style={{ color: "white" }}>{props.langId}</span>
+			</a>
+			<div className="panel-body">
 				<InputBox
 					Title="Banner Url"
 					ClassName="form-group"
 					inputClass="form-control"
 					OnChange={props.EditMainValue}
 					dataColumn="bannerUrl"
-					value={props.state.specific[props.currencyId].bannerUrl}
+					value={
+						props.state.specific[props.currencyId].lang[
+							props.langId
+						].bannerUrl
+					}
 				/>
 				<InputBox
 					Title="Title"
@@ -265,18 +344,22 @@ const SubPanel = props => {
 					inputClass="form-control"
 					OnChange={props.EditMainValue}
 					dataColumn="title"
-					value={props.state.specific[props.currencyId].title}
+					value={
+						props.state.specific[props.currencyId].lang[
+							props.langId
+						].title
+					}
 				/>
-				<div className="form-group">
-					<label>Detail</label>
-					<textarea
-						className="form-control"
-						rows="8"
-						onChange={EditDetail}
-						value={
-							props.state.specific[props.currencyId].detail
-						}></textarea>
-				</div>
+				<RichText
+					EditDetail={EditDetail}
+					Value={
+						props.state.specific[props.currencyId].lang[
+							props.langId
+						].detail
+					}
+					CurrencyId={props.currencyId}
+					LangId={props.langId}
+				/>
 			</div>
 		</>
 	);
