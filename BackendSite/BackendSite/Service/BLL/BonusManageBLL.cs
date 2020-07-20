@@ -38,7 +38,7 @@ namespace BackendSite.Service.BLL
             promotion.LastUpdateUser = IsAdd ? "" : authorizeBLL.GetAuthData().UserName;
             if (IsAdd)
             {
-                promotion.SiteId = serverInfoBLL.GetServerInfo().SiteId;
+                //promotion.SiteId = serverInfoBLL.GetServerInfo().SiteId;
                 promotion.CategoryId = 1;
                 promotion.Sort = 1;
                 promotion.Status = 2;
