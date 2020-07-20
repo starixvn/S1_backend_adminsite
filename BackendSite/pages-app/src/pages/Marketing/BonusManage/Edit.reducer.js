@@ -134,18 +134,18 @@ export function reducer(state, action) {
 			};
 
 		case defActionType.CURRENCY_LANG_SET_VALUE:
+			let selCurrency = state.currentTab;
+			let selLang = state.specific[selCurrency].currentLang;
 			return {
 				...state,
 				specific: {
 					...state.specific,
-					[action.currencyId]: {
-						...state.specific[action.currencyId],
+					[selCurrency]: {
+						...state.specific[selCurrency],
 						lang: {
-							...state.specific[action.currencyId].lang,
-							[action.lang]: {
-								...state.specific[action.currencyId].lang[
-									action.lang
-								],
+							...state.specific[selCurrency].lang,
+							[selLang]: {
+								...state.specific[selCurrency].lang[selLang],
 								[action.dataColumn]: action.value
 							}
 						}

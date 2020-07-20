@@ -81,7 +81,11 @@ export default props => {
 	};
 
 	const EditCurrencyLangPanelValue = (value, dataColumn) =>{
-
+		dispatch({
+			type: defActionType.CURRENCY_LANG_SET_VALUE,
+			value,
+			dataColumn
+		});
 	}
 
 	return (
