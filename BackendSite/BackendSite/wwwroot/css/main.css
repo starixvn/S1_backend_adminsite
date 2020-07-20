@@ -8,6 +8,14 @@
 }
 
 @font-face {
+    font-family: "iconfont";
+    src: url("/css/fonts/iconfont.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+  }
+
+@font-face {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: normal;
@@ -30,7 +38,7 @@
 
 [class^="icon-"], [class*=" icon-"] {
     /* use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'iconfont' !important;
+    font-family: 'icomoon' !important;
     speak: none;
     font-style: normal;
     font-weight: normal;
@@ -1127,6 +1135,22 @@ body {
 }
 .checkbox input:checked ~ .icon-checkbox:before{
     transform: translate3d(-2px, -3px, 0);
+}
+:checked ~ .icon-checkbox::before{
+    content: '\EA28';
+}
+.icon.icon-checkbox{
+    font-family: 'iconfont' !important;    
+    width: 15px;
+    height: 15px;
+    border: 1px solid #424242;
+    background-color: white;
+    font-size: 18px;
+    border-radius: 2px;
+    display: inline-flex;
+}
+.icon.icon-checkbox + span{
+    margin-left: .5rem;
 }
 /*0508*/
 .bule-bold{
