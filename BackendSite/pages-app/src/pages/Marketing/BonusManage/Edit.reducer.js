@@ -93,7 +93,7 @@ const SetSpecific = (currencyList, langList, data) => {
 	if (data !== null) {
 		data.forEach(d => {
 			let _newData = {};
-			let lang = JSON.parse(d.details);
+			let lang = JSON.parse(d.details ?? "{}");
 			d["lang"] = lang;
 			d["selectedLang"] = Object.keys(lang);
 			langList
