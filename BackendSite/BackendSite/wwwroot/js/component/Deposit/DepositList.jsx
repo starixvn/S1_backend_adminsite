@@ -62,7 +62,7 @@ import * as Loading from '../commJS/Loading.jsx';
                         <td>{row.accountName}</td>
                         <td>{moment(row.createTime).format('l LTS')}</td>
                         <td>{row.updateTime ? moment(row.updateTime).format('l LTS') : null}</td>
-                        <td>{row.depositCnt}</td>
+                        <td className="text-right">{row.depositCnt}</td>
                         <td>{DepositStatusOp[row.status]}</td>
                     </tr>
                 )

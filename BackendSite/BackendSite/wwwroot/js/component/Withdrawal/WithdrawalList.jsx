@@ -64,7 +64,7 @@ import * as Loading from '../commJS/Loading.jsx';
                         <td>{row.accountName}</td>
                         <td>{moment(row.createTime).format('l LTS')}</td>
                         <td>{row.updateTime ? moment(row.updateTime).format('l LTS') : null}</td>
-                        <td>{row.withdrawlCnt}</td>
+                        <td className="text-right">{row.withdrawlCnt}</td>
                         <td>{WithdrawalStatusOp[row.status]}{row.status == 8 && row.hasPhotoId ? <span>(Uploaded PhothId)</span> : null} </td>
                     </tr>
                 )
@@ -103,7 +103,7 @@ import * as Loading from '../commJS/Loading.jsx';
                                 <th scope="col">To Acc. Name</th>
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Update Time (" + moment().format('Z') + ")"}</th>
-                                <th scope="col">Total Deposit Count</th>
+                                <th scope="col">Total Withdrawl Count</th>
                                 <th scope="col">{i18n.lbl_Status}</th>
                             </tr>
                         </thead>
