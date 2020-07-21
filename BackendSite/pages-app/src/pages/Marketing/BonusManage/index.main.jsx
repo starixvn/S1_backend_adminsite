@@ -74,6 +74,7 @@ const titleData = [
 		columnTitle: "LastUpdateTime",
 		body: { format: lastUpdateTimeFormat }
 	},
+	{ dataColumn: "sort", columnTitle: "Sort" },
 	{
 		dataColumn: "status",
 		columnTitle: "Status",

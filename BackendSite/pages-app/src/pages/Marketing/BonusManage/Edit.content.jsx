@@ -121,6 +121,12 @@ export default ({ state, siteList, action, IsAdd, processing }) => {
 							dataColumn="expiryDays"
 							value={state.expiryDays}
 						/>
+						<InputBox
+							Title="Sort"
+							OnChange={action.EditMainValue}
+							dataColumn="sort"
+							value={state.sort}
+						/>
 					</div>
 					<InputBox
 						Title="Description"
