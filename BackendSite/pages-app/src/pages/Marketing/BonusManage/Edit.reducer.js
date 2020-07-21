@@ -26,6 +26,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 			siteId: siteList[0].siteId,
 			selectedCurrencies: [],
 			currentTab: null,
+			sort: "",
 			specific: _specific
 		};
 	} else {
@@ -46,6 +47,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 			description: datas.description,
 			status: datas.status,
 			siteId: datas.siteId,
+			sort: datas.sort,
 			selectedCurrencies: _selectedCurrencies,
 			currentTab: _selectedCurrencies[0],
 			specific: _specific
