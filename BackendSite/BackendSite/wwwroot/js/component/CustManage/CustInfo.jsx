@@ -8,6 +8,7 @@ import { ResetPwd } from './CustInfo_ResetPwd.jsx';
 import * as Loading from '../commJS/Loading.jsx';
 import PersonalMsg from './PersonalMsg/CustInfo_PersonalMsg';
 import TurnoverReport from './TurnoverReport/index';
+import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -46,6 +47,11 @@ import TurnoverReport from './TurnoverReport/index';
         2: <span className="status status-suspend">Canceled</span>,
         3: <span className="status status-closed">Expired</span>,
         4: <span className="status status-initial">Reached</span>,
+    }
+
+    const Direction = {
+        1: "+",
+        2: "-"
     }
 
     class DepositList extends React.Component {
@@ -192,8 +198,7 @@ import TurnoverReport from './TurnoverReport/index';
                 <tr key={row.id}>
                     <td>{moment(row.createTime).format('l LTS')}</td>
                     <td>{row.typeName}</td>
-                    <td>{row.direction}</td>
-                    <td className="text-right">{number_format(row.changeAmount)}</td>
+                    <td className="text-right">{Direction[row.direction] + number_format(row.changeAmount)}</td>
                     <td className="text-right">{number_format(row.beforeAmount)}</td>
                     <td className="text-right">{number_format(row.afterAmount)}</td>
                     <td>{row.memo}</td>
@@ -213,7 +218,6 @@ import TurnoverReport from './TurnoverReport/index';
                             <tr>
                                 <th scope="col">Time {moment().format('(Z)')}</th>
                                 <th scope="col">Type</th>
-                                <th scope="col">direction</th>
                                 <th scope="col" className="text-right">Change Amount</th>
                                 <th scope="col" className="text-right">Before Amount</th>
                                 <th scope="col" className="text-right">After Amount</th>
@@ -778,7 +782,7 @@ import TurnoverReport from './TurnoverReport/index';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Financial Log", "Deposit Info", "Transfer Info", "Withdrawal Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover"];
+        _Tabs = ["Customer Info", "Financial Log", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover"];
 
         constructor(props) {
             super(props);
@@ -873,6 +877,28 @@ import TurnoverReport from './TurnoverReport/index';
                         }
                     }.bind(this)).catch(function (error) {
                         //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
+        GetAdjustmentInfoByCust(PageNumber) {
+            Loading.OnLoading();
+            let pageNumber = PageNumber || this.state.AdjustmentInfoData.pageNumber;
+            let CustId = getUrlParameter("custId");
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                axios.post('/api/PaymentAdjustmentReport/GetAdjustmentInfoByCust', { ...this.state.AdjustmentInfo, CustId: iCustId, PageNumber: pageNumber })
+                    .then(function (response) {
+                        Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({ AdjustmentInfoData: result });
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        Loading.UnLoading();
                         alert(error);
                     }.bind(this));
             }
@@ -1041,21 +1067,23 @@ import TurnoverReport from './TurnoverReport/index';
             } else if (TabName == this._Tabs[4]) {
                 dataContainer = <WithdrawalInfo GetWithdrawalListByCust={this.GetWithdrawalListByCust.bind(this)} searchData={this.state.WithdrawalListData} WithdrawalInfo={this.state.WithdrawalInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[5]) {
-                dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <AdjustmentInfo GetAdjustmentInfoByCust={this.GetAdjustmentInfoByCust.bind(this)} searchData={this.state.AdjustmentInfoData} AdjustmentInfo={this.state.AdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[6]) {
-                dataContainer = <ResetPwd />;
+                dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[7]) {
-                dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)} />;
+                dataContainer = <ResetPwd />;
             } else if (TabName == this._Tabs[8]) {
-                dataContainer = <PersonalMsg />
+                dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)} />;
             } else if (TabName == this._Tabs[9]) {
+                dataContainer = <PersonalMsg />
+            } else if (TabName == this._Tabs[10]) {
                 dataContainer = <TurnoverReport />
             }
 
             let authSubKeys = {
-                6: 'ca_resetpwd',
-                8: 'ca_personalMsg',
-                9: 'ca_turnoverReport'
+                7: 'ca_resetpwd',
+                9: 'ca_personalMsg',
+                10: 'ca_turnoverReport'
             }
 
             var tabBtn = this._Tabs.filter((item, index) => {
