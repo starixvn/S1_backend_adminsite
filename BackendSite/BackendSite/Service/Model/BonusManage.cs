@@ -18,7 +18,7 @@ namespace BackendSite.Service.Model
         public int? Sort { get; set; }
         public int Status { get; set; }
         public int ExpiryDays { get; set; }
-        public DateTime? LastUpateTime { get; set; }
+        public DateTime? LastUpdateTime { get; set; }
         public string LastUpdateUser { get; set; }
 
         public IEnumerable<PromotionSpecific> Specific { get; set; }
