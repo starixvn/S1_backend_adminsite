@@ -224,7 +224,9 @@ const App = () => {
 						dispatch({
 							type: defActionType.UPDATE_PROMOTION_STATUS,
 							idx: idx,
-							status: newStatus
+							status: newStatus,
+							lastUpdateUser: res.data.data.lastUpdateUser,
+							lastUpdateTime: res.data.data.lastUpdateTime
 						});
 					} else {
 						alert(res.data.message ?? "failed to get data.");

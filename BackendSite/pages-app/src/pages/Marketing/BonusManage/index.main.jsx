@@ -37,6 +37,14 @@ const dateFormat = createTime => {
 	return moment(createTime).format("l LTS");
 };
 
+const lastUpdateUserFormat = userName =>{
+	return userName ?? "-";
+}
+
+const lastUpdateTimeFormat = lastUpdTime =>{
+	return lastUpdTime ? moment(lastUpdTime).format("l LTS") : '-';
+}
+
 const titleData = [
 	{ dataColumn: "bonusCode", columnTitle: "BonusCode" },
 	{ dataColumn: "siteName", columnTitle: "SiteName" },
@@ -55,6 +63,16 @@ const titleData = [
 		dataColumn: "periodTo",
 		columnTitle: "PeriodTo",
 		body: { format: dateFormat }
+	},
+	{
+		dataColumn: "lastUpdateUser",
+		columnTitle: "LastUpdateUser",
+		body: { format: lastUpdateUserFormat }
+	},
+	{
+		dataColumn: "lastUpdateTime",
+		columnTitle: "LastUpdateTime",
+		body: { format: lastUpdateTimeFormat }
 	},
 	{
 		dataColumn: "status",

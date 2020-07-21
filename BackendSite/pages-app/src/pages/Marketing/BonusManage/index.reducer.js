@@ -1,16 +1,16 @@
 export const defActionType = {
-	SET_PROMOTION_LIST: 'SET_PROMOTION_LIST',
-	GOTO_ADD_BONUS: 'GOTO_ADD_BONUS',
-	SET_PROMOTION: 'SET_PROMOTION',
-	EDIT_PROMOTION: 'EDIT_PROMOTION',
-	CLICK_BACK: 'CLICK_BACK',
-	UPDATE_PROMOTION_STATUS: 'UPDATE_PROMOTION_STATUS'
+	SET_PROMOTION_LIST: "SET_PROMOTION_LIST",
+	GOTO_ADD_BONUS: "GOTO_ADD_BONUS",
+	SET_PROMOTION: "SET_PROMOTION",
+	EDIT_PROMOTION: "EDIT_PROMOTION",
+	CLICK_BACK: "CLICK_BACK",
+	UPDATE_PROMOTION_STATUS: "UPDATE_PROMOTION_STATUS"
 };
 
 export const defPanelType = {
-	Main: 'Main',
-	Edit: 'Edit',
-	Add: 'Add'
+	Main: "Main",
+	Edit: "Edit",
+	Add: "Add"
 };
 
 export const initState = {
@@ -63,6 +63,8 @@ export function reducer(state, action) {
 		case defActionType.UPDATE_PROMOTION_STATUS:
 			let newList = [...state.promotionList];
 			newList[action.idx].status = action.status;
+			newList[action.idx].lastUpdateUser = action.lastUpdateUser;
+			newList[action.idx].lastUpdateTime = action.lastUpdateTime;
 			return {
 				...state,
 				promotionList: newList
