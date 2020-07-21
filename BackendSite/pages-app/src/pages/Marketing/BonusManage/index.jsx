@@ -106,6 +106,7 @@ const App = () => {
 				Status: promotion.status,
 				ExpiryDays: Number(promotion.expiryDays),
 				SiteId: promotion.siteId,
+				Sort:promotion.sort,
 				Specific: _specific
 			};
 
