@@ -40,7 +40,7 @@ namespace BackendSite.Service.BLL
             {
                 //promotion.SiteId = serverInfoBLL.GetServerInfo().SiteId;
                 promotion.CategoryId = 1;
-                promotion.Sort = 1;
+                //promotion.Sort = 1;
                 promotion.Status = 2;
             }
             
