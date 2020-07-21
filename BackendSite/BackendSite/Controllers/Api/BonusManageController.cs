@@ -118,12 +118,14 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult UpdatePromotionStatus([FromForm]string BonusCode, [FromForm]int SiteId, [FromForm]int Status)
+        public ApiResult<dynamic> UpdatePromotionStatus([FromForm]string BonusCode, [FromForm]int SiteId, [FromForm]int Status)
         {
-            var apiResult = new ApiResult();
+            var apiResult = new ApiResult<dynamic>();
             try
             {
                 apiResult.ErrorCode = bonusManageBLL.SetPromotionStatus(BonusCode, SiteId, Status);
+                var promotion = bonusManageBLL.GetPromotion(BonusCode, SiteId);
+                apiResult.Data = new { promotion.LastUpdateUser, promotion.LastUpdateTime };
             }
             catch (Exception ex)
             {
