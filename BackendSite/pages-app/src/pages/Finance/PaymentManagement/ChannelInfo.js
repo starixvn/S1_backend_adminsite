@@ -15,17 +15,19 @@ export const ChannelInfoHeader = props => {
 	return (
 		<>
 			<span style={{ color: "white" }}>{props.Name}</span>
-			<SwitchBtn
-				Title="Status"
-				SwitchBtnKey={props.idxArr.join("-")}
-				checked={props.Status === 1}
-				onChange={props.EditField.bind(
-					null,
-					props.Status === 1 ? 2 : 1,
-					"status",
-					props.idxArr
-				)}
-			/>
+			{window.subFuncKeys.includes('f_pm_edit') ?
+				<SwitchBtn
+					Title="Status"
+					SwitchBtnKey={props.idxArr.join("-")}
+					checked={props.Status === 1}
+					onChange={props.EditField.bind(
+						null,
+						props.Status === 1 ? 2 : 1,
+						"status",
+						props.idxArr
+					)}
+				/>
+				: null}
 		</>
 	);
 };
@@ -51,7 +53,7 @@ export const ChannelInfoContent = props => {
 };
 
 const columnDefs = props => {
-	return [
+	return window.subFuncKeys.includes('f_pm_edit') ? [
 		{
 			dataColumn: "type",
 			columnTitle: "Type",
@@ -100,7 +102,44 @@ const columnDefs = props => {
 				SpecialItem: ElemType.actionBtn
 			}
 		}
-	];
+	] : [
+			{
+				dataColumn: "type",
+				columnTitle: "Type",
+				body: {
+					format: typeFormat
+				}
+			},
+			{
+				dataColumn: "sort",
+				columnTitle: "Sort",
+				body: {
+					EditMode: {
+						ElemType: ElemType.inputBox,
+						ElemClass: "input-large",
+						AttrFormat: InputBoxFormat.number
+					}
+				}
+			},
+			{
+				dataColumn: "pointLevel",
+				columnTitle: "Point Level",
+				body: {
+					EditMode: {
+						ElemType: ElemType.inputBox,
+						ElemClass: "input-large",
+						AttrFormat: InputBoxFormat.number
+					}
+				}
+			},
+			{
+				dataColumn: "mode",
+				columnTitle: "Mode",
+				body: {
+					format: modeFormat
+				}
+			}
+		];
 };
 
 const typeFormat = (type, onClick) => {
@@ -109,12 +148,12 @@ const typeFormat = (type, onClick) => {
 			style={{ cursor: "pointer" }}
 			data-toggle="modal"
 			data-target="#ModalScrollable"
-			onClick={onClick ? onClick : () => {}}>
+			onClick={onClick ? onClick : () => { }}>
 			<u>{Type[type]}</u>
 		</a>
 	) : (
-		Type[type]
-	);
+			Type[type]
+		);
 };
 
 const modeFormat = mode => {
@@ -198,10 +237,10 @@ const ResultTable = props => {
 				let func =
 					col.body && col.body.format && col.body.onClick
 						? col.body.onClick.bind(
-								null,
-								col.dataColumn,
-								props.idxArr
-						  )
+							null,
+							col.dataColumn,
+							props.idxArr
+						)
 						: null;
 				body_content =
 					col.body && col.body.format

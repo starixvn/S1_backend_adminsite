@@ -1,9 +1,8 @@
-import {Pagination} from '../commJS/Pagination.jsx';
-import {number_format} from '../commJS/common';
+import { Pagination } from '../commJS/Pagination.jsx';
+import { number_format } from '../commJS/common';
 class AdjustmentInfoList extends React.Component {
     constructor(props) {
         super(props);
-
     }
 
     onCheckDetail(id) {
@@ -15,36 +14,41 @@ class AdjustmentInfoList extends React.Component {
     }
 
     render() {
-        let rows = this.props.searchData.data.map(row => 
+        const AdjustmentInfoStatus = {
+            1: "Pending",
+            2: "Approved",
+            3: "Rejected"
+        }
+
+        const Direction = {
+            1: "+",
+            2: "-"
+        }
+
+        let rows = this.props.searchData.data.map(row =>
             <tr key={row.transId}>
-                <td>{moment(row.createTime).format('l LTS')}</td>                
+                <td>{moment(row.createTime).format('l LTS')}</td>
                 <th scope="row">{row.transId}</th>
-                <td>{row.tpName}</td>
-                <td>{row.direction}</td>                
-                <td className="text-right">{number_format(row.amount)}</td>                    
-                <td>{row.thirdId}</td>
-                <td>{row.Memo}</td>
-                <td>{row.status}</td>
+                <td>{i18n["lbl_Currency" + row.currencyId]}</td>
+                <td className="text-right">{Direction[row.adjustType] + number_format(row.amount)}</td>
+                <td>{AdjustmentInfoStatus[row.status]}</td>
             </tr>
         );
 
         return (
-            <div className="table">                    
+            <div className="table">
                 <div className="table-options">
-                    <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>                            
+                    <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>
                         Refresh
                     </button>
                 </div>
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">CreateTime {moment().format('(Z)')}</th>                            
-                            <th scope="col">Trxn.ID</th>
-                            <th scope="col">Third-Party Name</th>
-                            <th scope="col">Direction</th>                            
+                            <th scope="col">CreateTime {moment().format('(Z)')}</th>
+                            <th scope="col">TransId</th>
+                            <th scope="col">Currency</th>
                             <th scope="col" className="text-right">Amount</th>
-                            <th scope="col">Third-Party ID</th>
-                            <th scope="col">Memo</th>                            
                             <th scope="col">Status</th>
                         </tr>
                     </thead>
@@ -52,7 +56,7 @@ class AdjustmentInfoList extends React.Component {
                         {rows}
                     </tbody>
                 </table>
-                <Pagination Data={{...this.props.searchData}} ChangePage={this.props.ChangePage}/>
+                <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
             </div>
         )
     }
@@ -69,30 +73,30 @@ export class AdjustmentInfo extends React.Component {
 
     componentDidMount() {
         $(this.startDate.current).datepicker({
-            format: 'mm/dd/yyyy', autoclose:true
-        }); 
+            format: 'mm/dd/yyyy', autoclose: true
+        });
 
         $(this.endDate.current).datepicker({
-            format: 'mm/dd/yyyy', autoclose:true
+            format: 'mm/dd/yyyy', autoclose: true
         });
     }
 
-    onStartDate(){
+    onStartDate() {
         $(this.startDate.current).focus();
     }
 
-    onEndDate(){
+    onEndDate() {
         $(this.endDate.current).focus();
-    }        
+    }
 
     handleSubmit(event) {
         event.preventDefault();
-        this.props.onChangeValue("TpTransferInfo", {StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix()-1});
-        this.props.GetTpTransferInfoByCust(1);
+        this.props.onChangeValue("AdjustmentInfo", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1 });
+        this.props.GetAdjustmentInfoByCust(1);
     }
 
     render() {
-        let tpTransferInfo = this.props.TpTransferInfo;
+        let adjustmentInfo = this.props.AdjustmentInfo;
         let searchData = this.props.searchData;
         return (
             <div>
@@ -100,20 +104,20 @@ export class AdjustmentInfo extends React.Component {
                     <div className="input-item">
                         <span className="label">From Date</span>
                         <div className="date">
-                            <input type="text" ref={this.startDate} name="StartDate" className="dateselect" required="required" data-date-end-date="0d" autoComplete="off" value={tpTransferInfo&&tpTransferInfo.StartDate ? moment.unix(tpTransferInfo.StartDate).format("MM/DD/YYYY"):""} />
+                            <input type="text" ref={this.startDate} name="StartDate" className="dateselect" required="required" data-date-end-date="0d" autoComplete="off" value={adjustmentInfo && adjustmentInfo.StartDate ? moment.unix(adjustmentInfo.StartDate).format("MM/DD/YYYY") : ""} />
                             <i className="icon-calendar dateselect" onClick={this.onStartDate.bind(this)} />
-                        </div>                            
-                    </div>     
+                        </div>
+                    </div>
                     <div className="input-item date">
                         <span className="label">To Date</span>
                         <div className="date">
-                            <input type="text" ref={this.endDate} name="EndDate" required="required" data-date-end-date="0d" autoComplete="off" value={tpTransferInfo&&tpTransferInfo.EndDate ? moment.unix(tpTransferInfo.EndDate).format("MM/DD/YYYY"):""}/>
+                            <input type="text" ref={this.endDate} name="EndDate" required="required" data-date-end-date="0d" autoComplete="off" value={adjustmentInfo && adjustmentInfo.EndDate ? moment.unix(adjustmentInfo.EndDate).format("MM/DD/YYYY") : ""} />
                             <i className="icon-calendar dateselect" onClick={this.onEndDate.bind(this)} />
-                        </div>                            
+                        </div>
                     </div>
                     <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
                 </form>
-                {searchData!=null ? <AdjustmentInfoList searchData={searchData} ChangePage={this.props.GetTpTransferInfoByCust} /> : null}
+                {searchData != null ? <AdjustmentInfoList searchData={searchData} ChangePage={this.props.GetAdjustmentInfoByCust} /> : null}
             </div>
         )
     }

@@ -76,7 +76,14 @@
       {
         "DisplayKey": "Bank Card List",
         "FuncKey": "Finance/BankInfoList",
-        "Enable": false
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Execute",
+            "FuncKey": "f_bil_execute"
+          }
+        ]
       },
       {
         "DisplayKey": "Deposit Request",
@@ -129,11 +136,15 @@
         "InputBoxType": "checkbox",
         "SubFuncKeys": [
           {
+            "DisplayKey": "Edit",
+            "FuncKey": "f_pm_edit"
+          },
+          {
             "DisplayKey": "Edit Amount Rule",
             "FuncKey": "f_pm_editAmountRule"
           }
         ]
-      } /*,
+      },
       {
         "DisplayKey": "Deposit Limit Management",
         "FuncKey": "Finance/DepositLimitManage",
@@ -143,7 +154,7 @@
         "DisplayKey": "Withdrawal Limit Management",
         "FuncKey": "Finance/WithdrawalLimitManage",
         "Enable": false
-      }*/
+      }
     ]
   },
   {
