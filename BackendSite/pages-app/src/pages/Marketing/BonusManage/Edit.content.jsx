@@ -18,6 +18,7 @@ const initBonusAmountType = [
 ];
 
 export default ({ state, siteList, action, IsAdd, processing }) => {
+	const bonusCodeSwitch = `${state.siteId}-${state.bonusCode}`
 	const currencyList = Object.keys(state.specific);
 	const currencyOptions = currencyList.map(i => {
 		return {
@@ -47,7 +48,7 @@ export default ({ state, siteList, action, IsAdd, processing }) => {
 					<span style={{ color: "white" }}>Bonus Info</span>
 					<div className="switch__container">
 						<input
-							id="switch1"
+							id={bonusCodeSwitch}
 							className="switch switch--flat"
 							type="checkbox"
 							onChange={action.EditMainValue.bind(
@@ -58,7 +59,7 @@ export default ({ state, siteList, action, IsAdd, processing }) => {
 							value={state.status}
 							checked={state.status === 1}
 						/>
-						<label htmlFor="switch1"></label>
+						<label htmlFor={bonusCodeSwitch}></label>
 					</div>
 				</div>
 			</div>
@@ -180,6 +181,7 @@ export default ({ state, siteList, action, IsAdd, processing }) => {
 };
 
 const SubPanel = props => {
+	const currencySwitch = `${props.state.siteId}-${props.state.bonusCode}-${props.currencyId}`
 	const langList = Object.keys(props.state.specific[props.currencyId].lang);
 	const langOptions = langList.map((lang, i) => {
 		return {
@@ -213,7 +215,7 @@ const SubPanel = props => {
 				<span style={{ color: "white" }}>{props.displayText}</span>
 				<div className="switch__container">
 					<input
-						id="switch2"
+						id={currencySwitch}
 						className="switch switch--flat"
 						type="checkbox"
 						onChange={props.EditMainValue.bind(
@@ -228,7 +230,7 @@ const SubPanel = props => {
 							props.state.specific[props.currencyId].status === 1
 						}
 					/>
-					<label htmlFor="switch2"></label>
+					<label htmlFor={currencySwitch}></label>
 				</div>
 			</a>
 			<div className="panel-body">
