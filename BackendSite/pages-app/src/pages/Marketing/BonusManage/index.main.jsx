@@ -17,17 +17,18 @@ const promotionTypeFormat = type => {
 	return defPromotionType[type];
 };
 
-const StatusBtn = ({ checked, onChange }) => {
+const StatusBtn = ({ checked, onChange, mainKey }) => {
+	let id = `switch-${mainKey}`
 	return (
 		<div className="switch__container">
 			<input
-				id="switch-bonus"
+				id={id}
 				className="switch switch--flat"
 				type="checkbox"
 				checked={checked}
 				onChange={onChange}
 			/>
-			<label htmlFor="switch-bonus"></label>
+			<label htmlFor={id}></label>
 		</div>
 	);
 };
@@ -93,8 +94,9 @@ export default ({
 				) {
 					body_content = (
 						<StatusBtn
+							mainKey={`${_data.siteId}-${_data.bonusCode}`}
 							checked={_data[element.dataColumn] === 1}
-							onChange={UpdatePromotionStatus.bind(null, d_idx)}
+							onChange={UpdatePromotionStatus.bind(this, d_idx)}
 						/>
 					);
 				}
