@@ -111,9 +111,9 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.SetCustStatusSwitch(custId, Op);
         }
-        public int SetCustStatusLevel(int custId, int Level, string Operator)
+        public int SetCustInfo(int custId, int? Level, string FullName, int? Birthday_Y, int? Birthday_M, int? Birthday_D, string PhoneNumber, string EMail, string Operator)
         {
-            return custInfoService.SetCustStatusLevel(custId, Level, Operator);
+            return custInfoService.SetCustInfo(custId, Level, FullName, Birthday_Y, Birthday_M, Birthday_D, PhoneNumber, EMail, Operator);
         }
         public CustPhotoId GetCustPhotoId(int custId)
         {

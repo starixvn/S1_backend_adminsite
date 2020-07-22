@@ -70,10 +70,16 @@ namespace BackendSite.Controllers.Api
             public int Op { get; set; }
         }
 
-        public class CustStatusLevel
+        public class CustStatus
         {
             public int CustId { get; set; }
-            public int Level { get; set; }
+            public int? Level { get; set; }
+            public string FullName { get; set; }
+            public int? Birthday_Y { get; set; }
+            public int? Birthday_M { get; set; }
+            public int? Birthday_D { get; set; }
+            public string PhoneNumber { get; set; }
+            public string EMail { get; set; }
         }
 
         [HttpPost]
@@ -86,12 +92,12 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_userlevel" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_userEdit" })]
         [HttpPost]
-        public ApiResult<bool> SetCustStatusLevel(CustStatusLevel custStatusLevel)
+        public ApiResult<bool> SetCustInfo(CustStatus custStatus)
         {
             var apiResult = new ApiResult<bool>();
-            apiResult.Data = custInfoBLL.SetCustStatusLevel(custStatusLevel.CustId, custStatusLevel.Level, User.Identity.Name) > 0;
+            apiResult.Data = custInfoBLL.SetCustInfo(custStatus.CustId, custStatus.Level, custStatus.FullName, custStatus.Birthday_Y, custStatus.Birthday_M, custStatus.Birthday_D, custStatus.PhoneNumber, custStatus.EMail, User.Identity.Name) > 0;
             apiResult.ErrorCode = 0;
 
             return apiResult;
@@ -202,11 +208,12 @@ namespace BackendSite.Controllers.Api
                     apiResult.Data = custInfosDetail;
                     apiResult.ErrorCode = 0;
                 }
-                else if (custInfosDetail.Status == 2) {
+                else if (custInfosDetail.Status == 2)
+                {
                     apiResult.Message = "Suspend Status.";
                     apiResult.ErrorCode = 999;
                 }
-                else 
+                else
                 {
                     apiResult.Message = "Closed Status.";
                     apiResult.ErrorCode = 999;

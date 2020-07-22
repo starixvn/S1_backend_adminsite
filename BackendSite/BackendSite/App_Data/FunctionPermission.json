@@ -43,8 +43,8 @@
             "FuncKey": "ca_turnoverReport"
           },
           {
-            "DisplayKey": "User Level",
-            "FuncKey": "ca_userlevel"
+            "DisplayKey": "User Edit",
+            "FuncKey": "ca_userEdit"
           }
         ]
       },
