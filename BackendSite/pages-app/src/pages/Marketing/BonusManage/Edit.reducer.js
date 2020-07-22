@@ -26,6 +26,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 			siteId: siteList[0].siteId,
 			selectedCurrencies: [],
 			currentTab: null,
+			sort: "",
 			specific: _specific
 		};
 	} else {
@@ -46,6 +47,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 			description: datas.description,
 			status: datas.status,
 			siteId: datas.siteId,
+			sort: datas.sort,
 			selectedCurrencies: _selectedCurrencies,
 			currentTab: _selectedCurrencies[0],
 			specific: _specific
@@ -63,7 +65,7 @@ const initLang = {
 const initSpecific = {
 	usage: "0",
 	rollOver: "",
-	bonusAmountType: 1,
+	bonusAmountType: null,
 	bonus: "",
 	maxBonus: "",
 	status: 2,
@@ -91,7 +93,7 @@ const SetSpecific = (currencyList, langList, data) => {
 	if (data !== null) {
 		data.forEach(d => {
 			let _newData = {};
-			let lang = JSON.parse(d.details);
+			let lang = JSON.parse(d.details ?? "{}");
 			d["lang"] = lang;
 			d["selectedLang"] = Object.keys(lang);
 			langList

@@ -9,7 +9,7 @@ const SpecialItemType = {
 const defPromotionType = {
 	1: "First Deposit",
 	2: "Re-Deposit",
-	3: "Rebate",
+	3: "FreeBet",
 	4: "Special"
 };
 
@@ -74,6 +74,7 @@ const titleData = [
 		columnTitle: "LastUpdateTime",
 		body: { format: lastUpdateTimeFormat }
 	},
+	{ dataColumn: "sort", columnTitle: "Sort" },
 	{
 		dataColumn: "status",
 		columnTitle: "Status",
