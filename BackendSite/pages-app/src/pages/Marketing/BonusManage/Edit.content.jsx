@@ -9,13 +9,18 @@ import RichText from "./Component/RichText.jsx";
 
 const initPromotionType = [
 	{ value: 1, displayText: "1st Deposit" },
-	{ value: 2, displayText: "Re-Deposit" }
+	//{ value: 2, displayText: "Re-Deposit" },
+	{ value: 3, displayText: "FreeBet" }
 ];
 
-const initBonusAmountType = [
-	{ value: 1, displayText: "Percentage" },
-	{ value: 2, displayText: "Amount" }
-];
+const initBonusAmountType = (promoType)=>{
+	return Number(promoType) === 3 ? [
+		{ value: 2, displayText: "Amount" }
+	] : [
+		{ value: 1, displayText: "Percentage" },
+		{ value: 2, displayText: "Amount" }
+	]
+};
 
 export default ({ state, siteList, action, IsAdd, processing }) => {
 	const bonusCodeSwitch = `${state.siteId}-${state.bonusCode}`
@@ -257,7 +262,7 @@ const SubPanel = props => {
 				</div>
 				<RadioBox
 					Title="Bonus Amount Type"
-					Options={initBonusAmountType}
+					Options={initBonusAmountType(props.state.promotionType)}
 					OnChange={props.EditMainValue}
 					dataColumn="bonusAmountType"
 					Selected={

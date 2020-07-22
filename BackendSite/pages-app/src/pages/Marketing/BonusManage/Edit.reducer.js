@@ -65,7 +65,7 @@ const initLang = {
 const initSpecific = {
 	usage: "0",
 	rollOver: "",
-	bonusAmountType: 1,
+	bonusAmountType: null,
 	bonus: "",
 	maxBonus: "",
 	status: 2,
