@@ -622,14 +622,14 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
                                     <tr>
                                         <th scope="row">User Level</th>
                                         {
-                                            this.props.isEdit ? (
+                                            this.props.isEdit.Level ? (
                                                 <td>
-                                                    <input type="number" min="1" defaultValue={data.userLevel} onChange={(e) => this.props.levelOnChange(e.target.value)} />
+                                                    <input type="number" min="1" defaultValue={data.userLevel} onChange={(e) => this.props.editOnChange(e.target.value, "Level")} />
                                                     <div className="button-action float-right">
-                                                        <button className="btn btn-save" onClick={this.props.levelUpdate}>
+                                                        <button className="btn btn-save" onClick={this.props.editUpdate}>
                                                             <i className="icon-save"></i>
                                                         </button>
-                                                        <button className="btn btn-icon-cancel" onClick={this.props.levelClickEdit.bind(null, this.props.isEdit)}>
+                                                        <button className="btn btn-icon-cancel" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Level, "Level")}>
                                                             <i className="icon-cancel"></i>
                                                         </button>
                                                     </div>
@@ -638,9 +638,9 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
                                                     <td>
                                                         {data.userLevel}
                                                         {
-                                                            subFuncKeys.includes('ca_userlevel') ? (
+                                                            subFuncKeys.includes('ca_userEdit') ? (
                                                                 <div className="button-action float-right">
-                                                                    <button className="btn btn-edit" onClick={this.props.levelClickEdit.bind(null, this.props.isEdit)}>
+                                                                    <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Level, "Level")}>
                                                                         <i className="icon-edit"></i>
                                                                     </button>
                                                                 </div >
@@ -662,13 +662,68 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
                                     </tr>
                                     <tr>
                                         <th scope="row">Full Name</th>
-                                        <td>{data.accountName}</td>
+                                        {
+                                            this.props.isEdit.FullName ? (
+                                                <td>
+                                                    <input type="text" defaultValue={data.accountName} onChange={(e) => this.props.editOnChange(e.target.value, "FullName")} />
+                                                    <div className="button-action float-right">
+                                                        <button className="btn btn-save" onClick={this.props.editUpdate}>
+                                                            <i className="icon-save"></i>
+                                                        </button>
+                                                        <button className="btn btn-icon-cancel" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.FullName, "FullName")}>
+                                                            <i className="icon-cancel"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            ) : (
+                                                    <td>
+                                                        {data.accountName}
+                                                        {
+                                                            subFuncKeys.includes('ca_userEdit') ? (
+                                                                <div className="button-action float-right">
+                                                                    <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.FullName, "FullName")}>
+                                                                        <i className="icon-edit"></i>
+                                                                    </button>
+                                                                </div >
+                                                            ) : null
+                                                        }
+                                                    </td>
+                                                )
+                                        }
                                     </tr>
                                     <tr>
-                                        <th scope="row">Birthday</th>
-                                        <td>
-                                            {(!isNaN(data.birth_y) && !isNaN(data.birth_m) && !isNaN(data.birth_d)) ? data.birth_m + '/' + data.birth_d + '/' + data.birth_y : "N/A"}
-                                        </td>
+                                        <th scope="row">Birthday (M/D/Y)</th>
+
+                                        {
+                                            this.props.isEdit.Birthday ? (
+                                                <td>
+                                                    <input type="text" style={{ width: "50px", marginRight: "5px" }} maxLength="2" placeholder="M" defaultValue={data.birth_m} onChange={(e) => this.props.editOnChange(e.target.value, "Birthday_M")} />
+                                                    <input type="text" style={{ width: "50px", marginRight: "5px" }} maxLength="2" placeholder="D" defaultValue={data.birth_d} onChange={(e) => this.props.editOnChange(e.target.value, "Birthday_D")} />
+                                                    <input type="text" style={{ width: "50px", marginRight: "5px" }} maxLength="4" placeholder="Y" defaultValue={data.birth_y} onChange={(e) => this.props.editOnChange(e.target.value, "Birthday_Y")} />
+                                                    <div className="button-action float-right">
+                                                        <button className="btn btn-save" onClick={this.props.editUpdate}>
+                                                            <i className="icon-save"></i>
+                                                        </button>
+                                                        <button className="btn btn-icon-cancel" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Birthday, "Birthday")}>
+                                                            <i className="icon-cancel"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            ) : (
+                                                    <td>
+                                                        {(!isNaN(data.birth_y) && !isNaN(data.birth_m) && !isNaN(data.birth_d)) ? data.birth_m + '/' + data.birth_d + '/' + data.birth_y : "N/A"}
+                                                        {
+                                                            subFuncKeys.includes('ca_userEdit') ? (
+                                                                <div className="button-action float-right">
+                                                                    <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Birthday, "Birthday")}>
+                                                                        <i className="icon-edit"></i>
+                                                                    </button>
+                                                                </div >
+                                                            ) : null
+                                                        }
+                                                    </td>
+                                                )
+                                        }
                                     </tr>
                                     <tr>
                                         <th scope="row">Country Code</th>
@@ -676,7 +731,34 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
                                     </tr>
                                     <tr>
                                         <th scope="row">Phone Number</th>
-                                        <td>{"(" + data.areaCode + ") " + data.phoneNo}</td>
+                                        {
+                                            this.props.isEdit.PhoneNumber ? (
+                                                <td>
+                                                    {"(" + data.areaCode + ") "}<input type="text" defaultValue={data.phoneNo} onChange={(e) => this.props.editOnChange(e.target.value, "PhoneNumber")} />
+                                                    <div className="button-action float-right">
+                                                        <button className="btn btn-save" onClick={this.props.editUpdate}>
+                                                            <i className="icon-save"></i>
+                                                        </button>
+                                                        <button className="btn btn-icon-cancel" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.PhoneNumber, "PhoneNumber")}>
+                                                            <i className="icon-cancel"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            ) : (
+                                                    <td>
+                                                        {"(" + data.areaCode + ") " + data.phoneNo}
+                                                        {
+                                                            subFuncKeys.includes('ca_userEdit') ? (
+                                                                <div className="button-action float-right">
+                                                                    <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.PhoneNumber, "PhoneNumber")}>
+                                                                        <i className="icon-edit"></i>
+                                                                    </button>
+                                                                </div >
+                                                            ) : null
+                                                        }
+                                                    </td>
+                                                )
+                                        }
                                     </tr>
                                     <tr>
                                         <th scope="row">Act Status</th>
@@ -729,7 +811,34 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
                                     </tr>
                                     <tr>
                                         <th scope="row">E-Mail</th>
-                                        <td>{data.email}</td>
+                                        {
+                                            this.props.isEdit.EMail ? (
+                                                <td>
+                                                    <input type="text" defaultValue={data.email} onChange={(e) => this.props.editOnChange(e.target.value, "EMail")} />
+                                                    <div className="button-action float-right">
+                                                        <button className="btn btn-save" onClick={this.props.editUpdate}>
+                                                            <i className="icon-save"></i>
+                                                        </button>
+                                                        <button className="btn btn-icon-cancel" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.EMail, "EMail")}>
+                                                            <i className="icon-cancel"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            ) : (
+                                                    <td>
+                                                        {data.email}
+                                                        {
+                                                            subFuncKeys.includes('ca_userEdit') ? (
+                                                                <div className="button-action float-right">
+                                                                    <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.EMail, "EMail")}>
+                                                                        <i className="icon-edit"></i>
+                                                                    </button>
+                                                                </div >
+                                                            ) : null
+                                                        }
+                                                    </td>
+                                                )
+                                        }
                                     </tr>
                                     <tr>
                                         <th scope="row">Mail Wallet Amount</th>
@@ -783,10 +892,11 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
 
     class CustInfoPanel extends React.Component {
         _Tabs = ["Customer Info", "Financial Log", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover"];
-
+        _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false };
+        _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
         constructor(props) {
             super(props);
-            this.state = { CustInfoData: null, TabIdx: 0, FinancialLog: {}, Notes: null, TabName: this._Tabs[0], isEdit: false, newLevel: null };
+            this.state = { CustInfoData: null, TabIdx: 0, FinancialLog: {}, Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData) };
         }
 
         onTab(idx, tabName) {
@@ -1002,30 +1112,65 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
             this.setState(obj);
         }
 
-        levelClickEdit = (isEdit) => {
-            this.setState({
-                isEdit: !isEdit
-            });
+        onClickEdit = (isEdit, Col) => {
+            let obj = this.state.isEdit;
+            obj[Col] = !isEdit;
+            this.setState(obj);
+            if (isEdit) {
+                let obj1 = this.state.newData;
+                if (Col === "Birthday") {
+                    obj1["Birthday_D"] = null;
+                    obj1["Birthday_M"] = null;
+                    obj1["Birthday_Y"] = null;
+                } else {
+                    obj1[Col] = null;
+                }
+                this.setState(obj1)
+            }
         }
 
-        levelUpdate = () => {
-            let CustId = getUrlParameter("custId");
-            let Level = parseInt(this.state.newLevel);
-            if (!isNaN(CustId) && Level > 0) {
+        editOnChange = (value, Col) => {
+            let obj = this.state.newData;
+            obj[Col] = value.trim() ? value.trim() : null;
+            this.setState(obj);
+        }
+        editUpdate = () => {
+            let CustId = getUrlParameter("custId"),
+                data = this.state.CustInfoData;
+            if (!isNaN(CustId)) {
+
+                if (this.state.newData.Level && this.state.newData.Level <= 0) return alert("Minimum is 1");
+
                 if (confirm('Are you sure?')) {
-                    if (Level != this.state.CustInfoData.userLevel) {
-                        let iCustId = parseInt(CustId);
-                        axios.post('/api/CustManage/SetCustStatusLevel', { CustId: iCustId, Level: Level })
+                    let Level = (this.state.newData.Level) ? parseInt(this.state.newData.Level, 10) : null,
+                        FullName = this.state.newData.FullName,
+                        Birthday_D = (this.state.newData.Birthday_D) ? parseInt(this.state.newData.Birthday_D, 10) : null,
+                        Birthday_M = (this.state.newData.Birthday_M) ? parseInt(this.state.newData.Birthday_M, 10) : null,
+                        Birthday_Y = (this.state.newData.Birthday_Y) ? parseInt(this.state.newData.Birthday_Y, 10) : null,
+                        PhoneNumber = this.state.newData.PhoneNumber,
+                        EMail = this.state.newData.EMail,
+                        iCustId = parseInt(CustId, 10),
+                        _isEdit = Object.assign({}, this._isEdit),
+                        _newData = Object.assign({}, this._newData);
+
+                    if (Level != data.userLevel || FullName != data.accountName || Birthday_D != data.birth_d || Birthday_M != data.birth_m || Birthday_Y != data.birth_y || PhoneNumber != data.phoneNo || EMail != data.email) {
+                        axios.post('/api/CustManage/SetCustInfo', { CustId: iCustId, Level: Level, FullName: FullName, Birthday_Y: Birthday_Y, Birthday_M: Birthday_M, Birthday_D: Birthday_D, PhoneNumber: PhoneNumber, EMail: EMail })
                             .then(function (response) {
                                 //Loading.UnLoading();
                                 let result = response.data;
                                 if (result.errorCode == 0) {
                                     let newCustInfo = { ...this.state.CustInfoData };
-                                    newCustInfo['userLevel'] = Level;
+                                    newCustInfo['userLevel'] = (Level) ? Level : data.userLevel;
+                                    newCustInfo['accountName'] = (FullName) ? FullName : data.accountName;
+                                    newCustInfo['birth_d'] = (Birthday_D) ? Birthday_D : data.birth_d;
+                                    newCustInfo['birth_m'] = (Birthday_M) ? Birthday_M : data.birth_m;
+                                    newCustInfo['birth_y'] = (Birthday_Y) ? Birthday_Y : data.birth_y;
+                                    newCustInfo['phoneNo'] = (PhoneNumber) ? PhoneNumber : data.phoneNo;
+                                    newCustInfo['email'] = (EMail) ? EMail : data.email;
                                     this.setState({
-                                        isEdit: false,
+                                        isEdit: _isEdit,
                                         CustInfoData: newCustInfo,
-                                        newLevel: null
+                                        newData: _newData
                                     })
                                 } else {
                                     alert(result.message);
@@ -1036,8 +1181,8 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
                             }.bind(this));
                     } else {
                         this.setState({
-                            isEdit: false,
-                            newLevel: null
+                            isEdit: _isEdit,
+                            newData: _newData
                         })
                     }
                 }
@@ -1046,18 +1191,14 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
             }
         }
 
-        levelOnChange = (value) => {
-            this.setState({
-                newLevel: value
-            })
-        }
+
 
         render() {
             let dataContainer = null;
             let TabIdx = this.state.TabIdx;
             let TabName = this.state.TabName;
             if (TabName == this._Tabs[0]) {
-                dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)} isEdit={this.state.isEdit} levelClickEdit={this.levelClickEdit} levelOnChange={this.levelOnChange} levelUpdate={this.levelUpdate} />;
+                dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)} isEdit={this.state.isEdit} onClickEdit={this.onClickEdit} editOnChange={this.editOnChange} editUpdate={this.editUpdate} />;
             } else if (TabName == this._Tabs[1]) {
                 dataContainer = <FinancialLog GetFinancialLog={this.GetFinancialLog.bind(this)} searchData={this.state.FinancialLogData} FinancialLog={this.state.FinancialLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[2]) {

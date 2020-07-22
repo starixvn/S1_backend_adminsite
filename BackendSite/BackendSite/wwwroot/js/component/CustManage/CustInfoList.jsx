@@ -188,14 +188,6 @@ import * as Loading from '../commJS/Loading.jsx';
                         <div className="filter">
                             <div className="row-flex">
                                 <div className="input-item">
-                                    <label className="label">Birthday</label>
-                                    <div className="field" style={{display: 'inline-flex'}}>
-                                        <input type="text" placeholder="Date" autoComplete="off" name="BirDate" value={this.state.BirDate} style={{ marginRight: '5px' }} onChange={this.onChange.bind(this)} />
-                                        <input type="text" placeholder="Month" autoComplete="off" name="BirMonth" value={this.state.BirMonth} style={{ marginRight: '5px' }} onChange={this.onChange.bind(this)} />
-                                        <input type="text" placeholder="Year" autoComplete="off" name="BirYear" value={this.state.BirYear} onChange={this.onChange.bind(this)} />
-                                    </div>
-                                </div>
-                                <div className="input-item">
                                     <label className="label">User Name</label>
                                     <div className="field">
                                         <input type="text" placeholder="User Name" autoComplete="off" value={this.state.UserName} onChange={this.onUserNameChange.bind(this)} />
@@ -235,6 +227,14 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <label className="label">Phone No</label>
                                     <div className="field">
                                         <input type="text" placeholder="Phone No" autoComplete="off" name="PhoneNo" value={this.state.PhoneNo} onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <label className="label">Birthday</label>
+                                    <div className="field" style={{display: 'inline-flex'}}>
+                                        <input type="text" placeholder="Date" autoComplete="off" name="BirDate" value={this.state.BirDate} style={{ marginRight: '5px' }} onChange={this.onChange.bind(this)} />
+                                        <input type="text" placeholder="Month" autoComplete="off" name="BirMonth" value={this.state.BirMonth} style={{ marginRight: '5px' }} onChange={this.onChange.bind(this)} />
+                                        <input type="text" placeholder="Year" autoComplete="off" name="BirYear" value={this.state.BirYear} onChange={this.onChange.bind(this)} />
                                     </div>
                                 </div>
                                 <div className="button-group">
