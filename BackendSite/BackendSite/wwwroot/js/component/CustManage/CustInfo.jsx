@@ -1158,9 +1158,7 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
                             .then(function (response) {
                                 //Loading.UnLoading();
                                 let result = response.data;
-                                console.log(1);
                                 if (result.errorCode == 0) {
-                                    console.log(2);
                                     let newCustInfo = { ...this.state.CustInfoData };
                                     newCustInfo['userLevel'] = (Level) ? Level : data.userLevel;
                                     newCustInfo['accountName'] = (FullName) ? FullName : data.accountName;
@@ -1174,12 +1172,6 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
                                         CustInfoData: newCustInfo,
                                         newData: _newData
                                     })
-                                    console.log(_isEdit);
-                                    console.log(this.state.isEdit);
-                                    console.log(_newData);
-                                    console.log(this.state.newData);
-                                    console.log(newCustInfo);
-                                    console.log(this.state.CustInfoData);
                                 } else {
                                     alert(result.message);
                                 }
