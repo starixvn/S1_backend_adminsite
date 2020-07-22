@@ -1075,6 +1075,26 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
             }
         }
 
+        SetCustNote(id, note, type) {
+            let CustId = getUrlParameter("custId");
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                axios.post('/api/CustManage/AddCustNote', { CustId: iCustId, Note: note, Id: id, Type: type })
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.GetCustNotes();
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
         onGetCustInfoDetail() {
             let CustId = getUrlParameter("custId");
             if (!isNaN(CustId)) {
@@ -1214,7 +1234,7 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
             } else if (TabName == this._Tabs[7]) {
                 dataContainer = <ResetPwd />;
             } else if (TabName == this._Tabs[8]) {
-                dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)} />;
+                dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)} SetCustNote={this.SetCustNote.bind(this)} />;
             } else if (TabName == this._Tabs[9]) {
                 dataContainer = <PersonalMsg />
             } else if (TabName == this._Tabs[10]) {

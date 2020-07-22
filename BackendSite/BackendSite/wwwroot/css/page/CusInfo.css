@@ -365,7 +365,7 @@ body {
     }
 
     .note-list ul .content-edit {
-        position: absolute;
+        /* position: absolute; */
         left: 0;
         width: 416px;
         height: 31px;
@@ -374,7 +374,7 @@ body {
         padding-left: 5px;
     }
 
-.note-list .fa-edit, .note-list .fa-trash {
+.note-list .fa-edit, .note-list .fa-trash .fa-window-close .fa-check-square .fa-trash-alt {
     padding: 0;
     width: 25px;
     height: 25px;
@@ -393,15 +393,19 @@ body {
     border-color: #007bff;
 }
 
-.note-list .fa-trash {
-    padding: 0;
-    width: 25px;
-    height: 25px;
-    border: 1px solid;
-    margin: 0 5px;
-    transition: .2s ease;
+.note-list .fa-trash .fa-trash-alt{
     color: #dc3545;
     border-color: #dc3545;
+}
+
+.note-list .fa-check-square{
+    color: #ffc107;
+    border-color: #ffc107;
+}
+
+.note-list .fa-window-close{
+    color: #6c757d;
+    border-color: #6c757d;
 }
 
 .note-list .author {
