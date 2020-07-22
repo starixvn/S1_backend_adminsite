@@ -103,7 +103,7 @@ import * as Loading from '../commJS/Loading.jsx';
                                 <th scope="col">To Acc. Name</th>
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Update Time (" + moment().format('Z') + ")"}</th>
-                                <th scope="col">Total Withdrawl Count</th>
+                                <th scope="col" className="text-right">Total Withdrawl Count</th>
                                 <th scope="col">{i18n.lbl_Status}</th>
                             </tr>
                         </thead>

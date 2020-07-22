@@ -200,6 +200,12 @@ import * as Loading from '../commJS/Loading.jsx';
                                     </div>
                                 </div>
                                 <div className="input-item">
+                                    <label className="label">Saba ID</label>
+                                    <div className="field">
+                                        <input type="text" placeholder="Saba ID" autoComplete="off" name="TpUserName" value={this.state.TpUserName} onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>                                
+                                <div className="input-item">
                                     <label className="label">Login Ip</label>
                                     <div className="field">
                                         <input type="text" placeholder="Login Ip" autoComplete="off" name="LoginIp" value={this.state.LoginIp} onChange={this.onChange.bind(this)} />
@@ -209,12 +215,6 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <label className="label">Transaction ID</label>
                                     <div className="field">
                                         <input type="text" placeholder="Transaction ID" autoComplete="off" value={this.state.TransId} onChange={this.onTransIdChange.bind(this)} />
-                                    </div>
-                                </div>
-                                <div className="input-item">
-                                    <label className="label">Saba ID</label>
-                                    <div className="field">
-                                        <input type="text" placeholder="Saba ID" autoComplete="off" name="TpUserName" value={this.state.TpUserName} onChange={this.onChange.bind(this)} />
                                     </div>
                                 </div>
                                 <div className="input-item">
