@@ -13,6 +13,7 @@ export class Notes extends React.Component {
     handleSubmit(event) {
         event.preventDefault();
         this.props.AddCustNote(this.state.note);
+        this.setState({ note: "" });
     }
 
     onChange(event) {
