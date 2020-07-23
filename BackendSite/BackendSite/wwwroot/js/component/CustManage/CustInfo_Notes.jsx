@@ -59,22 +59,26 @@ export class Notes extends React.Component {
                                     <span className="user" style={{ paddingRight: "10px" }}>{note.operator}</span>
                                     <span className="date">{(note.updateTime) ? moment(note.updateTime).format('l LTS (Z)') : moment(note.createTime).format('l LTS (Z)')}</span>
                                 </p>
-                                {
+                                <p id="fonts-wrapper">
+                                    {
 
-                                    subFuncKeys.includes('ca_noteEdit') ? (
-                                        this.state.isEdit[note.id] ? (
-                                            <p id="fonts-wrapper">
-                                                <i className="fa fa-check-square" onClick={this.handleUpdate.bind(this, note.id, 1)}></i>
-                                                <i className="fa fa-window-close" onClick={this.handleEdit.bind(this, note.id)}></i>
-                                            </p>
-                                        ) : (
-                                                <p id="fonts-wrapper">
+                                        subFuncKeys.includes('ca_noteEdit') ? (
+                                            this.state.isEdit[note.id] ? (
+                                                <>
+                                                    <i className="fa fa-check-square" onClick={this.handleUpdate.bind(this, note.id, 1)}></i>
+                                                    <i className="fa fa-window-close" onClick={this.handleEdit.bind(this, note.id)}></i>
+                                                </>
+                                            ) : (
                                                     <i className="fa fa-edit" onClick={this.handleEdit.bind(this, note.id)}></i>
-                                                    <i className="fa fa-trash-alt" onClick={this.handleUpdate.bind(this, note.id, 2)}></i>
-                                                </p >
-                                            )
-                                    ) : null
-                                }
+                                                )
+                                        ) : null
+                                    }
+                                    {
+                                        subFuncKeys.includes('ca_noteDelete') ? (
+                                            <i className="fa fa-trash-alt" onClick={this.handleUpdate.bind(this, note.id, 2)}></i>
+                                        ) : null
+                                    }
+                                </p>
                             </li>
                         )
                     })}

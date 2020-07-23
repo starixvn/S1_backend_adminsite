@@ -49,6 +49,10 @@
           {
             "DisplayKey": "Note Edit",
             "FuncKey": "ca_noteEdit"
+          },
+          {
+            "DisplayKey": "Note Delete",
+            "FuncKey": "ca_noteDelete"
           }
         ]
       },
