@@ -131,6 +131,10 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.GetCustNotes(custId);
         }
+        public bool SetCustNotes(int custId, int noteId, string note, int type, string Operator)
+        {
+            return custInfoService.SetCustNotes(custId, noteId, note, type, Operator);
+        }
         public IEnumerable<LoginLog> GetLoginLogByCust(int CustId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             return custInfoService.GetLoginLogByCust(CustId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);

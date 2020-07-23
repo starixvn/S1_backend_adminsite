@@ -118,6 +118,12 @@ namespace BackendSite.Controllers.Api
             public string Note { get; set; }
         }
 
+        public class SetCustNoteReq : AddCustNoteReq
+        {
+            public int NoteId { get; set; }
+            public int Type { get; set; }
+        }
+
         public ApiResult<bool> AddCustNote(AddCustNoteReq addCustNoteReq)
         {
             var apiResult = new ApiResult<bool>();
@@ -130,6 +136,16 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<CustNote>>();
             apiResult.Data = custInfoBLL.GetCustNotes(addCustNoteReq.CustId);
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
+        }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_noteEdit" })]
+        [HttpPost]
+        public ApiResult<bool> SetCustNotes(SetCustNoteReq setCustNoteReq)
+        {
+            var apiResult = new ApiResult<bool>();
+            apiResult.Data = custInfoBLL.SetCustNotes(setCustNoteReq.CustId, setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
             apiResult.ErrorCode = 0;
 
             return apiResult;
