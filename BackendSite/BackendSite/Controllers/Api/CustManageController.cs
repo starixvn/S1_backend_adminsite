@@ -24,13 +24,15 @@ namespace BackendSite.Controllers.Api
         private readonly BankDetailBLL bankDetailBLL;
         private readonly TpBLL tpBLL;
         private readonly WinLostReportService winLostReportService;
+        private readonly PermissionBLL permissionBLL;
 
-        public CustManageController(CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, TpBLL tpBLL, WinLostReportService winLostReportService)
+        public CustManageController(CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, TpBLL tpBLL, WinLostReportService winLostReportService, PermissionBLL permissionBLL)
         {
             this.custInfoBLL = custInfoBLL;
             this.bankDetailBLL = bankDetailBLL;
             this.tpBLL = tpBLL;
             this.winLostReportService = winLostReportService;
+            this.permissionBLL = permissionBLL;
         }
         public class CustInfoListReq
         {
@@ -140,14 +142,25 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_noteEdit" })]
         [HttpPost]
         public ApiResult<bool> SetCustNotes(SetCustNoteReq setCustNoteReq)
         {
             var apiResult = new ApiResult<bool>();
-            apiResult.Data = custInfoBLL.SetCustNotes(setCustNoteReq.CustId, setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
-            apiResult.ErrorCode = 0;
-
+            if (setCustNoteReq.Type == 1 && !permissionBLL.CheckPermission("CustManage/CustInfoList", "ca_noteEdit"))
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "No Edit Permission";
+            }
+            if (setCustNoteReq.Type == 2 && !permissionBLL.CheckPermission("CustManage/CustInfoList", "ca_noteDelete"))
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "No Delete Permission";
+            }
+            else
+            {
+                apiResult.Data = custInfoBLL.SetCustNotes(setCustNoteReq.CustId, setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
+                apiResult.ErrorCode = 0;
+            }
             return apiResult;
         }
 

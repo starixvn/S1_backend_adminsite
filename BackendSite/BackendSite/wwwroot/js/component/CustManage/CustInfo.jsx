@@ -1037,7 +1037,7 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
 
         AddCustNote(note) {
             let CustId = getUrlParameter("custId");
-            if (!isNaN(CustId)) {
+            if (!isNaN(CustId) && note.trim()) {
                 let iCustId = parseInt(CustId);
                 axios.post('/api/CustManage/AddCustNote', { CustId: iCustId, Note: note })
                     .then(function (response) {
