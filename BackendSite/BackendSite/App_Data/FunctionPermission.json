@@ -45,6 +45,10 @@
           {
             "DisplayKey": "User Edit",
             "FuncKey": "ca_userEdit"
+          },
+          {
+            "DisplayKey": "Note Edit",
+            "FuncKey": "ca_noteEdit"
           }
         ]
       },

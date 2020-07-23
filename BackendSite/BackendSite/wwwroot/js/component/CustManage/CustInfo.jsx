@@ -1076,10 +1076,10 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
         }
 
         SetCustNote(id, note, type) {
-            let CustId = getUrlParameter("custId");
-            if (!isNaN(CustId)) {
-                let iCustId = parseInt(CustId);
-                axios.post('/api/CustManage/AddCustNote', { CustId: iCustId, Note: note, Id: id, Type: type })
+            let CustId = getUrlParameter("custId"), confirminfo = (type === 1) ? 'Are you sure edit?' : 'Are you sure delete?';
+            if (!isNaN(CustId) && confirm(confirminfo)) {
+                let iCustId = parseInt(CustId), noteId = parseInt(id), action = parseInt(type);
+                axios.post('/api/CustManage/SetCustNotes', { CustId: iCustId, Note: note, NoteId: noteId, Type: type })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;

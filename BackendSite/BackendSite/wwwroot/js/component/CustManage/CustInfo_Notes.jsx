@@ -23,7 +23,17 @@ export class Notes extends React.Component {
 
     handleEdit(index) {
         let obj = this.state.isEdit;
-        obj[index] = obj[index] === true ? false : true;
+        Object.keys(obj).map((val) => {
+            obj[val] = (val == index) ? obj[val] === true ? false : true : false;
+        })
+        this.setState({ newNote: null })
+        this.setState(obj);
+    };
+
+    handleUpdate(index, type) {
+        let obj = this.state.isEdit;
+        this.props.SetCustNote(index, this.state.newNote, type);
+        (type === 1) ? obj[index] = obj[index] === true ? false : true : null;
         this.setState({ newNote: null })
         this.setState(obj);
     };
@@ -35,12 +45,10 @@ export class Notes extends React.Component {
             notesList =
                 <ul>
                     {notes.map((note) => {
-                        let isEdit = this.state.isEdit[note.id] === true;
-                        console.log(note.id);
-                        console.log(isEdit);
+                        this.state.isEdit[note.id] = this.state.isEdit[note.id] === true;
                         return (
                             <li key={note.id}>
-                                {isEdit ? (
+                                {this.state.isEdit[note.id] && subFuncKeys.includes('ca_noteEdit') ? (
                                     <input className="content-edit" type="text" onChange={this.onChange.bind(this)} name="newNote" />
 
                                 ) : (
@@ -48,19 +56,24 @@ export class Notes extends React.Component {
                                     )}
                                 <p className="author">
                                     <span className="user" style={{ paddingRight: "10px" }}>{note.operator}</span>
-                                    <span className="date">{(note.createTime) ? moment(note.createTime).format('l LTS (Z)') : moment(note.createTime).format('l LTS (Z)')}</span>
+                                    <span className="date">{(note.updateTime) ? moment(note.updateTime).format('l LTS (Z)') : moment(note.createTime).format('l LTS (Z)')}</span>
                                 </p>
-                                {isEdit ? (
-                                    <p id="fonts-wrapper">
-                                        <i className="fa fa-check-square" onClick={null}></i>
-                                        <i className="fa fa-window-close" onClick={this.handleEdit.bind(this, note.id)}></i>
-                                    </p>
-                                ) : (
-                                        <p id="fonts-wrapper">
-                                            <i className="fa fa-edit" onClick={this.handleEdit.bind(this, note.id)}></i>
-                                            <i className="fa fa-trash-alt" onClick={null}></i>
-                                        </p >
-                                    )}
+                                {
+
+                                    subFuncKeys.includes('ca_noteEdit') ? (
+                                        this.state.isEdit[note.id] ? (
+                                            <p id="fonts-wrapper">
+                                                <i className="fa fa-check-square" onClick={this.handleUpdate.bind(this, note.id, 1)}></i>
+                                                <i className="fa fa-window-close" onClick={this.handleEdit.bind(this, note.id)}></i>
+                                            </p>
+                                        ) : (
+                                                <p id="fonts-wrapper">
+                                                    <i className="fa fa-edit" onClick={this.handleEdit.bind(this, note.id)}></i>
+                                                    <i className="fa fa-trash-alt" onClick={this.handleUpdate.bind(this, note.id, 2)}></i>
+                                                </p >
+                                            )
+                                    ) : null
+                                }
                             </li>
                         )
                     })}

@@ -374,7 +374,7 @@ body {
         padding-left: 5px;
     }
 
-.note-list .fa-edit, .note-list .fa-trash .fa-window-close .fa-check-square .fa-trash-alt {
+.note-list .fa-edit, .fa-trash, .fa-window-close, .fa-check-square, .fa-trash-alt {
     padding: 0;
     width: 25px;
     height: 25px;
@@ -393,7 +393,7 @@ body {
     border-color: #007bff;
 }
 
-.note-list .fa-trash .fa-trash-alt{
+.note-list .fa-trash, .fa-trash-alt{
     color: #dc3545;
     border-color: #dc3545;
 }
