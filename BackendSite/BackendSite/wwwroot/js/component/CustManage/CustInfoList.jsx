@@ -181,6 +181,25 @@ import * as Loading from '../commJS/Loading.jsx';
         }
 
         render() {
+            let inputStyle = {
+                marginRight: "10px",
+                width: 'calc(100% / 3 - 5px)',
+                fallbacks: [
+                    { width: '-moz-calc(100% / 3 - 5px)' },
+                    { width: '-webkit-calc(100% / 3 - 5px)' },
+                    { width: '-o-calc(100% / 3 - 5px)' }
+                ]
+            }
+
+            let inputStyle2 = {
+                width: 'calc(100% / 3 - 10px)',
+                fallbacks: [
+                    { width: '-moz-calc(100% / 3 - 10px)' },
+                    { width: '-webkit-calc(100% / 3 - 10px)' },
+                    { width: '-o-calc(100% / 3 - 10px)' }
+                ]
+            }
+
             return (
                 <div>
                     <h4 className="page-name">Customer Search</h4>
@@ -204,7 +223,7 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <div className="field">
                                         <input type="text" placeholder="Saba ID" autoComplete="off" name="TpUserName" value={this.state.TpUserName} onChange={this.onChange.bind(this)} />
                                     </div>
-                                </div>                                
+                                </div>
                                 <div className="input-item">
                                     <label className="label">Login Ip</label>
                                     <div className="field">
@@ -229,12 +248,12 @@ import * as Loading from '../commJS/Loading.jsx';
                                         <input type="text" placeholder="Phone No" autoComplete="off" name="PhoneNo" value={this.state.PhoneNo} onChange={this.onChange.bind(this)} />
                                     </div>
                                 </div>
-                                <div className="input-item" style={{ width: "fit-content" }}>
+                                <div className="input-item">
                                     <label className="label">Birthday</label>
                                     <div className="field" style={{ display: 'inline-flex' }}>
-                                        <input type="text" placeholder="Date" autoComplete="off" name="BirDate" value={this.state.BirDate} style={{ marginRight: '5px' }} onChange={this.onChange.bind(this)} />
-                                        <input type="text" placeholder="Month" autoComplete="off" name="BirMonth" value={this.state.BirMonth} style={{ marginRight: '5px' }} onChange={this.onChange.bind(this)} />
-                                        <input type="text" placeholder="Year" autoComplete="off" name="BirYear" value={this.state.BirYear} onChange={this.onChange.bind(this)} />
+                                        <input type="text" placeholder="Date" maxLength="2" autoComplete="off" name="BirDate" value={this.state.BirDate} style={inputStyle} onChange={this.onChange.bind(this)} />
+                                        <input type="text" placeholder="Month" maxLength="2" autoComplete="off" name="BirMonth" value={this.state.BirMonth} style={inputStyle} onChange={this.onChange.bind(this)} />
+                                        <input type="text" placeholder="Year" maxLength="4" autoComplete="off" name="BirYear" value={this.state.BirYear} style={inputStyle2} onChange={this.onChange.bind(this)} />
                                     </div>
                                 </div>
                                 <div className="button-group">
