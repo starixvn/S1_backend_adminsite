@@ -251,10 +251,9 @@ import * as Loading from '../commJS/Loading.jsx';
                                 <div className="input-item">
                                     <label className="label">Birthday</label>
                                     <div className="field" style={{ display: 'inline-flex' }}>
-
-                                        <input type="text" placeholder="Date" autoComplete="off" name="BirDate" value={this.state.BirDate} style={inputStyle} onChange={this.onChange.bind(this)} />
-                                        <input type="text" placeholder="Month" autoComplete="off" name="BirMonth" value={this.state.BirMonth} style={inputStyle} onChange={this.onChange.bind(this)} />
-                                        <input type="text" placeholder="Year" autoComplete="off" name="BirYear" value={this.state.BirYear} style={inputStyle2} onChange={this.onChange.bind(this)} />
+                                        <input type="text" placeholder="Date" maxLength="2" autoComplete="off" name="BirDate" value={this.state.BirDate} style={inputStyle} onChange={this.onChange.bind(this)} />
+                                        <input type="text" placeholder="Month" maxLength="2" autoComplete="off" name="BirMonth" value={this.state.BirMonth} style={inputStyle} onChange={this.onChange.bind(this)} />
+                                        <input type="text" placeholder="Year" maxLength="4" autoComplete="off" name="BirYear" value={this.state.BirYear} style={inputStyle2} onChange={this.onChange.bind(this)} />
                                     </div>
                                 </div>
                                 <div className="button-group">
