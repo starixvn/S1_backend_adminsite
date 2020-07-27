@@ -8,9 +8,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.DAL
 {
@@ -191,12 +189,18 @@ namespace BackendSite.Service.DAL
             var depositList = conn.Query<DepositInfoForExport>("Admin_DepositListForExport_Get", p, commandType: CommandType.StoredProcedure);
             return depositList;
         }
-
-        public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(int siteId, int currencyId)
+        public IEnumerable<DepositLimitCurrencyInfo> GetDepositLimitCurrencyList(int siteId, int depositType)
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.Query<DepositLimitInfo>("Admin_DepositLimitInfo_Get", new { SiteId = siteId, CurrencyId = currencyId }, commandType: CommandType.StoredProcedure);
+                return conn.Query<DepositLimitCurrencyInfo>("Admin_DepositCurrencyList_Get", new { SiteId = siteId, DepositType = depositType }, commandType: CommandType.StoredProcedure);
+            }
+        }
+        public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(int siteId, int depositType, int currencyId)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.Query<DepositLimitInfo>("Admin_DepositLimitInfo_Get", new { SiteId = siteId, DepositType = depositType, CurrencyId = currencyId }, commandType: CommandType.StoredProcedure);
             }
         }
 
@@ -207,6 +211,7 @@ namespace BackendSite.Service.DAL
                 var param = new
                 {
                     depositLimitInfo.SiteId,
+                    depositLimitInfo.DepositType,
                     depositLimitInfo.CurrencyId,
                     depositLimitInfo.VipLevel,
                     depositLimitInfo.DepositMin,
@@ -223,20 +228,22 @@ namespace BackendSite.Service.DAL
                 var param = new
                 {
                     depositLimitInfo.SiteId,
+                    depositLimitInfo.DepositType,
                     depositLimitInfo.CurrencyId,
                     depositLimitInfo.VipLevel,
                     depositLimitInfo.DepositMin,
-                    depositLimitInfo.DepositMax
+                    depositLimitInfo.DepositMax,
+                    depositLimitInfo.DepositStatus
                 };
                 return conn.Execute("Admin_DepositLimitInfo_Set", param, commandType: CommandType.StoredProcedure) > 0;
             }
         }
 
-        public DepositLimitInfo GetDepositLimitInfo(int siteId, int currencyId, int viplevel)
+        public DepositLimitInfo GetDepositLimitInfo(int siteId, int depositType, int currencyId, int viplevel)
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.QueryFirstOrDefault<DepositLimitInfo>("Admin_DepositLimitInfoDetail_Get", new { SiteId = siteId, CurrencyId = currencyId, VipLevel = viplevel }, commandType: CommandType.StoredProcedure);
+                return conn.QueryFirstOrDefault<DepositLimitInfo>("Admin_DepositLimitInfoDetail_Get", new { SiteId = siteId, DepositType = depositType, CurrencyId = currencyId, VipLevel = viplevel }, commandType: CommandType.StoredProcedure);
             }
         }
 

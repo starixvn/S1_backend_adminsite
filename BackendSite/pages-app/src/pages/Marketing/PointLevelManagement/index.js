@@ -23,7 +23,7 @@ const PointInfoList = () => {
     let radio = "";
 
     useEffect(() => {
-        api.get('/api/Common/AdminUserSiteList')
+        api.post('/api/Common/AdminUserSiteList')
             .then(function (response) {
                 if (response.data.errorCode === 0) {
                     setSite(response.data === null ? [] : response.data);
