@@ -71,7 +71,6 @@ const DepositLimitInfo = () => {
                                 response.data.data.map((value) => {
                                     return optCurrencyList.push(value.currencyId);
                                 })
-                                console.log(optCurrencyList);
                                 setOpt({ ...opt, siteCurrencyList: optCurrencyList });
                             } else {
                                 alert(response.message);
