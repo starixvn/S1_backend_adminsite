@@ -62,6 +62,7 @@ const DepositLimitInfo = () => {
         let mounted = true;
         if (opt.siteId !== 0 && opt.depositType !== 0 && !loading) {
             setLoading(true);
+            setOpt({ ...opt, siteCurrencyList: [] });
             api.post('/api/Deposit/GetDepositLimitCurrencyList', { SiteId: opt.siteId, DepositType: opt.depositType })
                 .then(function (response) {
                     if (mounted) {
@@ -73,7 +74,7 @@ const DepositLimitInfo = () => {
                                 })
                                 setOpt({ ...opt, siteCurrencyList: optCurrencyList });
                             } else {
-                                alert(response.message);
+                                // alert(response.message);
                             }
                         }
                         setLoading(false);
@@ -95,7 +96,7 @@ const DepositLimitInfo = () => {
         siteRadio = site.data.map((value) => {
             return (
                 <div key={`SiteOpt-${value.siteId}`} className="custom-control custom-radio custom-control-inline">
-                    <input type="radio" id={`SiteId_${value.siteId}`} name="SiteList" className="custom-control-input" value={value.siteId} onChange={optSite.bind(null, value.siteId)} />
+                    <input type="radio" id={`SiteId_${value.siteId}`} name="SiteList" className="custom-control-input" value={value.siteId} checked={(value.siteId === opt.siteId) ? true : false} onChange={optSite.bind(null, value.siteId)} />
                     <label className="custom-control-label" htmlFor={`SiteId_${value.siteId}`}>{value.siteName}</label>
                 </div>
             )
@@ -104,7 +105,7 @@ const DepositLimitInfo = () => {
         depositRadio = deposit.data.map((value) => {
             return (
                 <div key={`DepositOpt-${value.value}`} className="custom-control custom-radio custom-control-inline">
-                    <input type="radio" id={`DepositOpt${value.value}`} name="DepositList" className="custom-control-input" value={value.value} onChange={optDeposit.bind(null, value.value)} />
+                    <input type="radio" id={`DepositOpt${value.value}`} name="DepositList" className="custom-control-input" value={value.value} checked={(value.value === opt.depositType) ? true : false} onChange={optDeposit.bind(null, value.value)} />
                     <label className="custom-control-label" htmlFor={`DepositOpt${value.value}`}>{value.name}</label>
                 </div>
             )
