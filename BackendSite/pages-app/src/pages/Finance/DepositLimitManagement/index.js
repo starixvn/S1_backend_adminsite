@@ -19,9 +19,18 @@ const DepositLimitInfo = () => {
         siteId: 0, depositType: 0, siteCurrencyList: []
     });
     const [site, setSite] = useState([]);
-    const optSite = (siteId) => { setOpt({ ...opt, siteId: siteId }); }
+    const optSite = (siteId) => {
+        if (siteId !== opt.siteId && !loading) {
+            setOpt({ ...opt, siteId: siteId });
+        }
+    }
     const [deposit, setdeposit] = useState([]);
-    const optDeposit = (depositType) => { setOpt({ ...opt, depositType: depositType }); }
+    const optDeposit = (depositType) => {
+        if (opt.depositType !== depositType && !loading) {
+            setOpt({ ...opt, depositType: depositType });
+        }
+    }
+    const [loading, setLoading] = useState();
 
     let siteRadio = "", depositRadio = "";
 
@@ -50,24 +59,35 @@ const DepositLimitInfo = () => {
     }, []);
 
     useEffect(() => {
-        if (opt.siteId !== 0 && opt.depositType !== 0) {
+        let mounted = true;
+        if (opt.siteId !== 0 && opt.depositType !== 0 && !loading) {
+            setLoading(true);
             api.post('/api/Deposit/GetDepositLimitCurrencyList', { SiteId: opt.siteId, DepositType: opt.depositType })
                 .then(function (response) {
-                    if (response.data.errorCode === 0) {
-                        if (response.data.data.length !== 0) {
-                            let optCurrencyList = [];
-                            response.data.data.map((value) => {
-                                return optCurrencyList.push(value.currencyId);
-                            })
-                            setOpt({ ...opt, siteCurrencyList: optCurrencyList });
+                    if (mounted) {
+                        if (response.data.errorCode === 0) {
+                            if (response.data.data.length !== 0) {
+                                let optCurrencyList = [];
+                                response.data.data.map((value) => {
+                                    return optCurrencyList.push(value.currencyId);
+                                })
+                                console.log(optCurrencyList);
+                                setOpt({ ...opt, siteCurrencyList: optCurrencyList });
+                            } else {
+                                alert(response.message);
+                            }
                         }
-                    } else {
-                        // alert(response.message);
+                        setLoading(false);
                     }
                 }).catch(function (error) {
-                    alert(error);
+                    if (mounted) {
+                        setLoading(false);
+                        alert(error);
+                    }
                 })
         }
+
+        return () => mounted = false;
     }, [opt.siteId, opt.depositType])
 
     if (site.length === 0 || deposit.length === 0) {
@@ -102,7 +122,7 @@ const DepositLimitInfo = () => {
                 <label className="col-form-label d-block">Deposit Type</label>
                 {depositRadio}
             </div>
-            {opt.siteCurrencyList.length === 0 ? null : <CurrencyInfo optSite={opt} />}
+            {opt.siteCurrencyList.length === 0 ? null : loading ? 'Loading...' : <CurrencyInfo optSite={opt} />}
         </>
     )
 }
