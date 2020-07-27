@@ -12,34 +12,18 @@ const initData = {
 }
 
 const App = () => {
+    let _site = [];
     const [site, setSite] = useState([]);
     const [stateSend, updateSend] = useState(false);
     const [stateData, updateData] = useState({ ...initData });
     const [sendData, updateSendData] = useState([]);
-
-    const EditFiled = (v, datacolumn) => {
-        updateData({ ...stateData, [datacolumn]: v });
-    };
-    let _site = [];
-
+    const EditFiled = (v, datacolumn) => { updateData({ ...stateData, [datacolumn]: v }); };
     const SetMsg = () => {
         let msg = "";
         let check = true;
-        if (!stateData.file) {
-            check = false;
-            msg = "Please choose excel file.";
-        }
-
-        if (!stateData.option) {
-            check = false;
-            msg = "Please check Option.";
-        }
-
-        if (!stateData.optSite) {
-            check = false;
-            msg = "Please check Site.";
-        }
-
+        if (!stateData.file) { check = false; msg = "Please choose excel file."; }
+        if (!stateData.option) { check = false; msg = "Please check Option."; }
+        if (!stateData.optSite) { check = false; msg = "Please check Site."; }
         if (check && window.confirm("Are you sure to import data to " + _site[stateData.optSite] + "?")) {
             let settings = { headers: { 'content-type': 'multipart/form-data' } }
             let file = document.getElementById("uploadfile").files[0];
@@ -63,7 +47,6 @@ const App = () => {
                         updateSend(false);
                         alert(error);
                     })
-
                 updateData({ ...initData });
             }
         } else {
@@ -101,15 +84,15 @@ const App = () => {
     let result = sendData.map((value, key) => { return <p key={`result-${key}`}>{value.message}</p> })
     return (
         <>
-            <div className="form-group">
-                <label className="col-form-label d-block">Site Name</label>
-                {radio}
-            </div>
             <div className="container-fluid">
                 <h4 className="page-name">Balance Adjustment Batch(Batch)</h4>
                 <div className="form-group">
+                    <label className="col-form-label d-block">Site Name</label>
+                    {radio}
+                </div>
+                <div className="form-group">
                     <label className="col-form-label d-block">Download Template File </label>
-                    <a className="btn btn-danger" role="button" href="../../../resource/examplefile/BalanceAdjustmentBatch.xlsx" download="TemplateFile.xlsx">Template File</a>
+                    <a className="btn btn-danger" role="button" href="../../../resource/examplefile/BalanceAdjustmentBatch.xlsx" download="BalanceAdjustmentTemplateFile.xlsx">Template File</a>
                 </div>
                 <div className="form-group">
                     <label className="col-form-label d-block">Option</label>

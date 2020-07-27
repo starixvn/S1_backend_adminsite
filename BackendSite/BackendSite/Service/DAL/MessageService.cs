@@ -173,10 +173,10 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_Msg_Batch_Ins", new { Sender = sender, CustList = JsonConvert.SerializeObject(custList), PersonalMsg = JsonConvert.SerializeObject(personalMsg) }, commandType: CommandType.StoredProcedure);
         }
-        public int ChangeVipLevelBatch(IEnumerable<string> custList, int vipLevel, string Operator)
+        public int ChangeVipLevelBatch(int siteId, int custId, string userName, int vipLevel, string memo, string Operator)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_Change_VipLevel_Batch", new { Operator = Operator, CustList = JsonConvert.SerializeObject(custList), VipLevel = vipLevel }, commandType: CommandType.StoredProcedure);
+            return conn.Execute("Admin_Change_VipLevel_Batch", new { SiteId = siteId, CustId = custId, UserName = userName, VipLevel = vipLevel, Memo = memo, Operator = Operator }, commandType: CommandType.StoredProcedure);
         }
     }
 }
