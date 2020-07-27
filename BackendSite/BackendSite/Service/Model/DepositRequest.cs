@@ -1,8 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.Model
 {
@@ -61,7 +58,7 @@ namespace BackendSite.Service.Model
         public int DepositCnt { set; get; }
         public int Flag { set; get; }
         public DateTime? UpdateTime { set; get; }
-        
+
     }
 
     public class DepositInfoForExport
@@ -89,7 +86,7 @@ namespace BackendSite.Service.Model
             {
                 (int)enums.DepositType.OnlineBanking => $"{SiteName}-{BankCode}",
                 (int)enums.DepositType.MobilePayment => $"{SiteName}-{BankCode}",
-                (int)enums.DepositType.WireTransfer => $"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
+                (int)enums.DepositType.LocalBank => $"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
                 _ => null
             };
 
@@ -169,20 +166,24 @@ namespace BackendSite.Service.Model
     public class DepositLimit
     {
         public int SiteId { get; set; }
-
+        public int DepositType { get; set; }
         public int CurrencyId { get; set; }
     }
 
-    public class DepositLimitInfo
+    public class DepositLimitInfo : DepositLimit
     {
-        public int SiteId { get; set; }
-
-        public int CurrencyId { get; set; }
-
         public int VipLevel { get; set; }
 
         public double DepositMin { get; set; }
 
         public double DepositMax { get; set; }
+        public int DepositStatus { get; set; }
+    }
+
+    public class DepositLimitCurrencyInfo
+    {
+        public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
+        public string Note { get; set; }
     }
 }

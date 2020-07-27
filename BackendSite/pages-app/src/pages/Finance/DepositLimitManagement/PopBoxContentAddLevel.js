@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { api } from '../../../module/WebAPI';
 export const PopBoxContentAddLevel = (props) => {
     let lastList = props.LevelList.length === 0 ? [] : props.LevelList[props.LevelList.length - 1];
-    let siteId = props.SiteId, currencyId = props.CurrencyId, vipLevel = 1, depositMin = 1, depositMax = 1;
+    let siteId = props.SiteId, depositType = props.DepositType, currencyId = props.CurrencyId, vipLevel = 1, depositMin = 1, depositMax = 1, depositStatus = 1;
 
     if (lastList.length !== 0) {
         vipLevel = parseInt(lastList.vipLevel) + 1;
@@ -13,14 +13,14 @@ export const PopBoxContentAddLevel = (props) => {
     const [Level, setLevel] = useState(vipLevel);
     const [DepositMin, setDepositMin] = useState(depositMin);
     const [DepositMax, setDepositMax] = useState(depositMax);
-    let newLevelList = { siteId: siteId, currencyId: currencyId, vipLevel: Level, depositMin: DepositMin, depositMax: DepositMax }
+    let newLevelList = { siteId: siteId, depositType: depositType, currencyId: currencyId, vipLevel: Level, depositMin: DepositMin, depositMax: DepositMax, depositStatus: depositStatus }
     const handleSave = (e) => {
         e.preventDefault();
 
         if (lastList.vipLevel >= Level) { return (alert("err1")) };
         if (lastList.depositMin >= DepositMin) { return (alert("Deposit Min too small")) };
         if (lastList.depositMax >= DepositMax) { return (alert("Deposit Max too small")) };
-        api.post('/api/Deposit/AddDepositLimitInfo', { siteId: siteId, currencyId: currencyId, vipLevel: Level, depositMin: DepositMin, depositMax: DepositMax })
+        api.post('/api/Deposit/AddDepositLimitInfo', { siteId: siteId, depositType: depositType, currencyId: currencyId, vipLevel: Level, depositMin: DepositMin, depositMax: DepositMax, depositStatus: depositStatus })
             .then(function (response) {
                 if (response.data.errorCode === 0) {
                     props.ClickSave(newLevelList);

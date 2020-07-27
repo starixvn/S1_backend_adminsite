@@ -264,16 +264,17 @@ namespace BackendSite.Controllers.Api
 
                         int custId;
                         string sabaId = sheet.Cells[RowId, 2].Text.Trim();
+                        string _sabaId = "";
                         if (sabaId.IndexOf("_") > -1)
                         {
-                            sabaId = sabaId.Substring(sabaId.LastIndexOf("_"), sabaId.Length - sabaId.LastIndexOf("_"));
+                            _sabaId = sabaId.Substring(sabaId.LastIndexOf("_"), sabaId.Length - sabaId.LastIndexOf("_"));
                         }
                         else if (sabaId.IndexOf("x") > -1)
                         {
-                            sabaId = sabaId.Substring(sabaId.LastIndexOf("x"), sabaId.Length - sabaId.LastIndexOf("x"));
+                            _sabaId = sabaId.Substring(sabaId.LastIndexOf("x"), sabaId.Length - sabaId.LastIndexOf("x"));
                         }
 
-                        Match m = Regex.Match(sabaId, @"\d+");
+                        Match m = Regex.Match(_sabaId, @"\d+");
                         int? _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
                         decimal.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out decimal amount);
                         string memo = sheet.Cells[RowId, 4].Text.Trim();
@@ -284,7 +285,11 @@ namespace BackendSite.Controllers.Api
                         else
                         {
                             var custInfoDetail = custInfoBLL.GetCustInfoDetails(_custId, custUsername, optSite);
-                            if (custInfoDetail.Status == 1)
+                            if (custInfoDetail == null)
+                            {
+                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Not fund. Username: {custUsername}. SabaId: {sabaId}." });
+                            }
+                            else if (custInfoDetail.Status == 1)
                             {
                                 try
                                 {
@@ -318,7 +323,8 @@ namespace BackendSite.Controllers.Api
                                                 var acc = await tpBLL.TransferAsync(inTpTransfer);
                                                 if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
                                                 {
-                                                    apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                                    apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                                    RowId += 1;
                                                     continue;
                                                 }
                                             }
@@ -328,7 +334,8 @@ namespace BackendSite.Controllers.Api
 
                                         if (balance < adjustmentAndWithdrawalLimit.Amount)
                                         {
-                                            apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                            apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                            RowId += 1;
                                             continue;
                                         }
                                     }
@@ -343,27 +350,27 @@ namespace BackendSite.Controllers.Api
                                             var acc = await tpBLL.TransferAsync(inTpTransfer);
                                             if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
                                             {
-                                                apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. SabaId:{sabaId}. ID is {transId}." });
+                                                apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. ID is {transId}." });
                                             }
                                         }
                                         else
                                         {
-                                            apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username:{custUsername}. SabaId:{sabaId}. ID is {transId}." });
+                                            apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. ID is {transId}." });
                                         }
                                     }
                                 }
                                 catch (Exception ex)
                                 {
-                                    apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. {ex}" });
+                                    apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {ex}" });
                                 }
                             }
                             else if (custInfoDetail.Status == 2)
                             {
-                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. Suspend Status." });
+                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Suspend Status." });
                             }
                             else
                             {
-                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username:{custUsername}. SabaId:{sabaId}. Closed Status." });
+                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Closed Status." });
                             }
                             RowId += 1;
                         }

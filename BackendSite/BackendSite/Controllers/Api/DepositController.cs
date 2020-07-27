@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
@@ -229,10 +227,21 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
+        public ApiResult<IEnumerable<DepositLimitCurrencyInfo>> GetDepositLimitCurrencyList(DepositLimit depositLimit)
+        {
+            var apiResult = new ApiResult<IEnumerable<DepositLimitCurrencyInfo>>();
+            var depositLimitCurrencyList = depositBLL.GetDepositLimitCurrencyList(depositLimit.SiteId, depositLimit.DepositType);
+            apiResult.Data = depositLimitCurrencyList;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         public ApiResult<IEnumerable<DepositLimitInfo>> GetDepositLimitInfos(DepositLimit depositLimit)
         {
             var apiResult = new ApiResult<IEnumerable<DepositLimitInfo>>();
-            var depositLimitInfos = depositBLL.GetDepositLimitInfos(depositLimit.SiteId, depositLimit.CurrencyId);
+            var depositLimitInfos = depositBLL.GetDepositLimitInfos(depositLimit.SiteId, depositLimit.DepositType, depositLimit.CurrencyId);
             apiResult.Data = depositLimitInfos;
             apiResult.ErrorCode = 0;
             return apiResult;
