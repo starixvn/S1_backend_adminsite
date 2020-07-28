@@ -30,13 +30,13 @@ namespace BackendSite.Controllers.Api
             this.custInfoService = custInfoService;
         }
 
-        public ApiResult<dynamic> GetCustAndWalletInfoAsync([FromForm]string UserName)
+        public ApiResult<dynamic> GetCustAndWalletInfoAsync([FromForm] string UserName)
         {
             var result = new ApiResult<dynamic>();
             try
             {
-                var custInfo = custInfoService.GetCustInfoDetail(0, UserName);
-                if(custInfo != null)
+                var custInfo = custInfoService.GetCustInfos(null, UserName, null);
+                if (custInfo != null)
                 {
                     var walletInfo = adjustWithdrawalLimitBLL.GetCustWalletInfo(custInfo.CustId);
 
@@ -67,7 +67,7 @@ namespace BackendSite.Controllers.Api
             return result;
         }
 
-        public ApiListResult<AdjustWithdrawalLimit> GetAdjustWithdrawalLimitsLog([FromForm]int CustId, [FromForm]int PageNumber)
+        public ApiListResult<AdjustWithdrawalLimit> GetAdjustWithdrawalLimitsLog([FromForm] int CustId, [FromForm] int PageNumber)
         {
             int PageSize = 10;
             int TotalPages = 0;
@@ -92,7 +92,7 @@ namespace BackendSite.Controllers.Api
             return result;
         }
 
-        public ApiResult SetAdjustWithdrawalLimit([FromForm]int CustId, [FromForm]AdjustWithdrawalLimit adjustWithdrawalLimit)
+        public ApiResult SetAdjustWithdrawalLimit([FromForm] int CustId, [FromForm] AdjustWithdrawalLimit adjustWithdrawalLimit)
         {
             var result = new ApiResult();
             try
@@ -103,7 +103,7 @@ namespace BackendSite.Controllers.Api
                 adjustWithdrawalLimit.Operator = authData.UserName;
                 adjustWithdrawalLimit.CustId = CustId;
                 var resultCode = adjustWithdrawalLimitBLL.SetAdjustWithdrawalLimit(adjustWithdrawalLimit, custInfo.UserName, custInfo.CurrencyId, custInfo.SiteId);
-                if(resultCode == 21)
+                if (resultCode == 21)
                 {
                     result.ErrorCode = 21;
                     result.Message = "debit amount can not more then difference amount";
@@ -122,7 +122,7 @@ namespace BackendSite.Controllers.Api
             return result;
         }
 
-        public ApiResult<WalletInfo> GetWalletInfo([FromForm]int CustId)
+        public ApiResult<WalletInfo> GetWalletInfo([FromForm] int CustId)
         {
             var result = new ApiResult<WalletInfo>();
             try
