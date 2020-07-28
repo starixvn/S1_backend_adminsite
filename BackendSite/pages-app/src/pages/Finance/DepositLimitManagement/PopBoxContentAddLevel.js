@@ -18,8 +18,9 @@ export const PopBoxContentAddLevel = (props) => {
         e.preventDefault();
 
         if (lastList.vipLevel >= Level) { return (alert("err1")) };
-        if (lastList.depositMin >= DepositMin) { return (alert("Deposit Min too small")) };
-        if (lastList.depositMax >= DepositMax) { return (alert("Deposit Max too small")) };
+        if (DepositMin >= DepositMax) { return (alert("Deposit Max too small")) };
+        // if (lastList.depositMin >= DepositMin) { return (alert("Deposit Min too small")) };
+        // if (lastList.depositMax >= DepositMax) { return (alert("Deposit Max too small")) };
         api.post('/api/Deposit/AddDepositLimitInfo', { siteId: siteId, depositType: depositType, currencyId: currencyId, vipLevel: Level, depositMin: DepositMin, depositMax: DepositMax, depositStatus: depositStatus })
             .then(function (response) {
                 if (response.data.errorCode === 0) {
@@ -44,11 +45,11 @@ export const PopBoxContentAddLevel = (props) => {
                     </div>
                     <div className="field">
                         <label>Deposit Min</label>
-                        <input type="number" defaultValue={depositMin} onChange={(e) => { setDepositMin(parseInt(e.target.value)) }} />
+                        <input type="number" defaultValue={0} onChange={(e) => { setDepositMin(parseInt(e.target.value)) }} />
                     </div>
                     <div className="field">
                         <label>Deposit Max</label>
-                        <input type="number" defaultValue={depositMax} onChange={(e) => { setDepositMax(parseInt(e.target.value)) }} />
+                        <input type="number" defaultValue={0} onChange={(e) => { setDepositMax(parseInt(e.target.value)) }} />
                     </div>
                     <button className="ui right floated primary button" onClick={handleSave} >Save</button>
                     <button className="ui right floated button" onClick={props.ClickCancel}>Cancel</button>
