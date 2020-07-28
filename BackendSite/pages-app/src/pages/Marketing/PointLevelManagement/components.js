@@ -1,10 +1,10 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 
 export const InputBox = (props) => {
     return props.isEdit ? (
-        <input type="number" defaultValue={props.defaultValue} onChange={(e) => { 
+        <input type="number" defaultValue={props.defaultValue} onChange={(e) => {
             let value = e.target.value;
-            if(!isNaN(value)){
+            if (!isNaN(value)) {
                 props.onChange(e.target.value)
             }
         }} />
@@ -36,4 +36,22 @@ export const ActionButtons = (props) => {
                 }
             </div >
         )
+}
+
+export const SwitchBtn = (props) => {
+    return props.isEdit ?
+        props.Title ? (
+            <div style={{ marginRight: "25px" }}>
+                <span style={{ padding: "0 10px", color: 'white' }}>{props.Title}:</span>
+                <div className="switch__container">
+                    <input id={props.SwitchBtnKey} className="switch switch--flat" type="checkbox" checked={props.checked} onChange={(e) => { props.onChange(e.target.checked); }} />
+                    <label htmlFor={props.SwitchBtnKey}></label>
+                </div>
+            </div>
+        ) : (
+                <div className="switch__container">
+                    <input id={props.SwitchBtnKey} className="switch switch--flat" type="checkbox" checked={props.checked} onChange={(e) => { props.onChange(e.target.checked); }} />
+                    <label htmlFor={props.SwitchBtnKey}></label>
+                </div>
+            ) : (props.checked) ? "V" : "X"
 }

@@ -33,8 +33,9 @@ namespace BackendSite.Service.DAL
                     pointLevelInfo.SiteId,
                     pointLevelInfo.CurrencyId,
                     pointLevelInfo.PointLevel,
-                    pointLevelInfo.DepositLeast,
-                    pointLevelInfo.BetLeast
+                    pointLevelInfo.DepositCnt,
+                    pointLevelInfo.WithdrawalCnt,
+                    pointLevelInfo.IsKyc
                 };
                 return conn.Execute("PointLevelInfo_Ins", param, commandType: CommandType.StoredProcedure) > 0;
             }
@@ -49,8 +50,9 @@ namespace BackendSite.Service.DAL
                     pointLevelInfo.SiteId,
                     pointLevelInfo.CurrencyId,
                     pointLevelInfo.PointLevel,
-                    pointLevelInfo.DepositLeast,
-                    pointLevelInfo.BetLeast
+                    pointLevelInfo.DepositCnt,
+                    pointLevelInfo.WithdrawalCnt,
+                    pointLevelInfo.IsKyc
                 };
                 return conn.Execute("PointLevelInfo_Set", param, commandType: CommandType.StoredProcedure) > 0;
             }
@@ -68,9 +70,7 @@ namespace BackendSite.Service.DAL
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                return conn.Execute("PointLevelInfo_Del",
-                                                new { SiteId = pointLevelInfo.SiteId, CurrencyId = pointLevelInfo.CurrencyId, PointLevel = pointLevelInfo.PointLevel },
-                                                commandType: CommandType.StoredProcedure);
+                return conn.Execute("PointLevelInfo_Del",new { SiteId = pointLevelInfo.SiteId, CurrencyId = pointLevelInfo.CurrencyId, PointLevel = pointLevelInfo.PointLevel },commandType: CommandType.StoredProcedure);
             }
         }
     }

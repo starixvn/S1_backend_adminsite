@@ -21,12 +21,12 @@ namespace BackendSite.Service.BLL
             {
                 var currentMaxPoint = marketingService.GetPointLevelInfo(pointLevelInfo.SiteId, pointLevelInfo.CurrencyId, pointLevelInfo.PointLevel - 1);
 
-                if (pointLevelInfo.BetLeast <= currentMaxPoint.BetLeast || pointLevelInfo.DepositLeast <= currentMaxPoint.DepositLeast)
+                if (pointLevelInfo.DepositCnt <= currentMaxPoint.DepositCnt || pointLevelInfo.WithdrawalCnt <= currentMaxPoint.WithdrawalCnt)
                     return false;
             }
             else
             {
-                if (pointLevelInfo.BetLeast <= 0 || pointLevelInfo.DepositLeast <= 0)
+                if (pointLevelInfo.DepositCnt <= 0 || pointLevelInfo.WithdrawalCnt <= 0)
                     return false;
             }
 
@@ -40,18 +40,18 @@ namespace BackendSite.Service.BLL
 
             if (currentBelowPoint != null)
             {
-                if (pointLevelInfo.BetLeast <= currentBelowPoint.BetLeast || pointLevelInfo.DepositLeast <= currentBelowPoint.DepositLeast)
+                if (pointLevelInfo.DepositCnt <= currentBelowPoint.DepositCnt || pointLevelInfo.WithdrawalCnt <= currentBelowPoint.WithdrawalCnt)
                     return false;
             }
             else
             {
-                if (pointLevelInfo.BetLeast <= 0 || pointLevelInfo.DepositLeast <= 0)
+                if (pointLevelInfo.DepositCnt <= 0 || pointLevelInfo.WithdrawalCnt <= 0)
                     return false;
             }
 
             if (currentUpperPoint != null)
             {
-                if (pointLevelInfo.BetLeast >= currentUpperPoint.BetLeast || pointLevelInfo.DepositLeast >= currentUpperPoint.DepositLeast)
+                if (pointLevelInfo.DepositCnt >= currentUpperPoint.DepositCnt || pointLevelInfo.WithdrawalCnt >= currentUpperPoint.WithdrawalCnt)
                     return false;
             }
 
