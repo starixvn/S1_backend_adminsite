@@ -52,9 +52,9 @@ namespace BackendSite.Service.BLL
             return bonusManageService.SetPromotionStatus(BonusCode, SiteId, Status, authorizeBLL.GetAuthData().UserName);
         }
 
-        public IEnumerable<PromoCategory> GetPromoCategories()
+        public IEnumerable<PromoCategory> GetPromoCategories(int WalletType)
         {
-            return bonusManageService.GetPromoCategories();
+            return bonusManageService.GetPromoCategories(WalletType);
         }
     }
 }

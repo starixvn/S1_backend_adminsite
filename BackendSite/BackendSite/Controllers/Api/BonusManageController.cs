@@ -139,13 +139,13 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<PromoCategory>> GetPromoCategories()
+        public ApiResult<IEnumerable<PromoCategory>> GetPromoCategories([FromForm]int WalletType)
         {
             var apiResult = new ApiResult<IEnumerable<PromoCategory>>();
 
             try
             {
-                apiResult.Data = bonusManageBLL.GetPromoCategories();
+                apiResult.Data = bonusManageBLL.GetPromoCategories(WalletType);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)

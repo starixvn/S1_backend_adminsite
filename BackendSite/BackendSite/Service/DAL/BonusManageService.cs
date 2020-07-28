@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
@@ -63,7 +64,9 @@ namespace BackendSite.Service.DAL
                 promotion.Status,
                 promotion.LastUpdateUser,
                 IsAdd,
-                promotion.SiteId
+                promotion.SiteId,
+                promotion.WalletType,
+                promotion.Products
             }, transaction: trans, commandType: CommandType.StoredProcedure);
 
             if (!IsAdd && !string.IsNullOrEmpty(promotion.BonusCode))
@@ -115,12 +118,12 @@ namespace BackendSite.Service.DAL
             return errorCode;
         }
 
-        public IEnumerable<PromoCategory> GetPromoCategories()
+        public IEnumerable<PromoCategory> GetPromoCategories(int WalletType)
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                string SpName = "Admin_PromotionCategory_Get";
-                return conn.Query<PromoCategory>(SpName, commandType: CommandType.StoredProcedure);
+                string SpName = WalletType == 0 ? "Admin_TpList_Get" : "Admin_PromotionCategory_Get";
+                return conn.Query<PromoCategory>(SpName, new { WalletType }, commandType: CommandType.StoredProcedure);
             }
         }
     }
