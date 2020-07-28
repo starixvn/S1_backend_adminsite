@@ -40,4 +40,10 @@ namespace BackendSite.Service.Model
         public string Details { get; set; }
         public int Status { get; set; }
     }
+
+    public class PromoCategory
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
 }

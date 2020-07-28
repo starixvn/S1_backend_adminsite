@@ -114,5 +114,14 @@ namespace BackendSite.Service.DAL
 
             return errorCode;
         }
+
+        public IEnumerable<PromoCategory> GetPromoCategories()
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                string SpName = "Admin_PromotionCategory_Get";
+                return conn.Query<PromoCategory>(SpName, commandType: CommandType.StoredProcedure);
+            }
+        }
     }
 }

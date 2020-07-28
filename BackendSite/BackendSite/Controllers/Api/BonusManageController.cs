@@ -8,6 +8,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Operations;
 using MySql.Data.MySqlClient;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
@@ -131,6 +132,25 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<PromoCategory>> GetPromoCategories()
+        {
+            var apiResult = new ApiResult<IEnumerable<PromoCategory>>();
+
+            try
+            {
+                apiResult.Data = bonusManageBLL.GetPromoCategories();
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
                 apiResult.RawMessage = ex.ToString();
             }
 

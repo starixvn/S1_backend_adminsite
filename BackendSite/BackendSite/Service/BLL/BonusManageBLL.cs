@@ -51,5 +51,10 @@ namespace BackendSite.Service.BLL
         {
             return bonusManageService.SetPromotionStatus(BonusCode, SiteId, Status, authorizeBLL.GetAuthData().UserName);
         }
+
+        public IEnumerable<PromoCategory> GetPromoCategories()
+        {
+            return bonusManageService.GetPromoCategories();
+        }
     }
 }
