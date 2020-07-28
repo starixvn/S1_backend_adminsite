@@ -618,7 +618,8 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
                                     </tr>
                                     <tr>
                                         <th scope="row">User Name</th>
-                                        <td>{data.userName}</td></tr>
+                                        <td>{data.userName}</td>
+                                    </tr>
                                     <tr>
                                         <th scope="row">User Level</th>
                                         {
@@ -649,6 +650,14 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
                                                     </td>
                                                 )
                                         }
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Point Level</th>
+                                        <td>{data.pointLevel}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Vip Level</th>
+                                        <td>{data.vipLevel}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Currency</th>
