@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { api } from '../../../module/WebAPI';
 export const PopBoxContentAddPoint = (props) => {
     let lastList = props.BankList.length === 0 ? [] : props.BankList[props.BankList.length - 1];
-    let siteId = props.SiteId, currencyId = props.CurrencyId, pointLevel = 1, depositCnt = 1, withdrawalCnt = 1, isKyc = 1;
+    let siteId = props.SiteId, currencyId = props.CurrencyId, pointLevel = 2, depositCnt = 1, withdrawalCnt = 1, isKyc = 1;
 
     if (lastList.length !== 0) {
         pointLevel = parseInt(lastList.pointLevel) + 1;
@@ -19,8 +19,8 @@ export const PopBoxContentAddPoint = (props) => {
         e.preventDefault();
 
         if (lastList.pointLevel >= Point) { return (alert("err1")) };
-        if (lastList.depositCnt >= DepositCnt) { return (alert("Deposit Count too small")) };
-        if (lastList.withdrawalCnt >= WithdrawalCnt) { return (alert("Withdrawal Count too small")) };
+        // if (lastList.depositCnt >= DepositCnt) { return (alert("Deposit Count too small")) };
+        // if (lastList.withdrawalCnt >= WithdrawalCnt) { return (alert("Withdrawal Count too small")) };
         api.post('/api/Marketing/AddPointLevelInfo', newBankList)
             .then(function (response) {
                 if (response.data.errorCode === 0) {
