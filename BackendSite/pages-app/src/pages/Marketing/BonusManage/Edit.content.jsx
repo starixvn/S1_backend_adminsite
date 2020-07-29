@@ -6,6 +6,7 @@ import DateTimePickerElem from "./Component/DateTimePicker";
 import moment from "moment";
 import RadioBox from "./Component/RadioBox";
 import RichText from "./Component/RichText.jsx";
+import {initWalletType} from './defCols'
 
 const initPromotionType = [
 	{ value: 1, displayText: "1st Deposit" },
@@ -13,17 +14,17 @@ const initPromotionType = [
 	{ value: 3, displayText: "FreeBet" }
 ];
 
-const initBonusAmountType = (promoType)=>{
-	return Number(promoType) === 3 ? [
-		{ value: 2, displayText: "Amount" }
-	] : [
-		{ value: 1, displayText: "Percentage" },
-		{ value: 2, displayText: "Amount" }
-	]
+const initBonusAmountType = promoType => {
+	return Number(promoType) === 3
+		? [{ value: 2, displayText: "Amount" }]
+		: [
+				{ value: 1, displayText: "Percentage" },
+				{ value: 2, displayText: "Amount" }
+		  ];
 };
 
 export default ({ state, siteList, action, IsAdd, processing }) => {
-	const bonusCodeSwitch = `${state.siteId}-${state.bonusCode}`
+	const bonusCodeSwitch = `${state.siteId}-${state.bonusCode}`;
 	const currencyList = Object.keys(state.specific);
 	const currencyOptions = currencyList.map(i => {
 		return {
@@ -142,6 +143,26 @@ export default ({ state, siteList, action, IsAdd, processing }) => {
 						value={state.description}
 					/>
 				</div>
+				<div className="filter">
+					<RadioBox
+						Title="Wallet Type"
+						Options={initWalletType()}
+						OnChange={action.GetPromoCategories.bind(this, false, state.walletType)}
+						dataColumn="walletType"
+						Selected={state.walletType}
+					/>
+					{state.walletType !== null &&
+					state.productCategory !== undefined ? (
+						<RadioBox
+							Title="Product Category"
+							Options={state.productCategory}
+							OnChange={action.SelectProducts}
+							dataColumn="products"
+							Selected={state.products?.id}
+						/>
+					) : null}
+				</div>
+
 				<div className="filter noBGcolor">
 					<CheckBox
 						Options={currencyOptions}
@@ -180,10 +201,16 @@ export default ({ state, siteList, action, IsAdd, processing }) => {
 				) : null}
 			</div>
 			<div className="filter float-btn-group">
-				<button className="btn btn-back" onClick={action.ClickBack} disabled={processing}>
+				<button
+					className="btn btn-back"
+					onClick={action.ClickBack}
+					disabled={processing}>
 					Back
 				</button>
-				<button className="btn btn-add" onClick={action.ClickSubmit} disabled={processing}>
+				<button
+					className="btn btn-add"
+					onClick={action.ClickSubmit}
+					disabled={processing}>
 					Submit
 				</button>
 			</div>
@@ -192,7 +219,7 @@ export default ({ state, siteList, action, IsAdd, processing }) => {
 };
 
 const SubPanel = props => {
-	const currencySwitch = `${props.state.siteId}-${props.state.bonusCode}-${props.currencyId}`
+	const currencySwitch = `${props.state.siteId}-${props.state.bonusCode}-${props.currencyId}`;
 	const langList = Object.keys(props.state.specific[props.currencyId].lang);
 	const langOptions = langList.map((lang, i) => {
 		return {

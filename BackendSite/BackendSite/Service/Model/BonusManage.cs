@@ -24,7 +24,7 @@ namespace BackendSite.Service.Model
         public IEnumerable<PromotionSpecific> Specific { get; set; }
         public int SiteId { get; set; }
         public string SiteName { get; set; }
-        public int WalletType { get; set; }
+        public int? WalletType { get; set; }
         public string Products { get; set; }
     }
 

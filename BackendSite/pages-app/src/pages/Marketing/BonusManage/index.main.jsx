@@ -1,6 +1,6 @@
 import React from "react";
 import moment from "moment";
-
+import {defWalletType} from './defCols'
 const SpecialItemType = {
 	actionBtn: "actionBtn",
 	statusBtn: "statusBtn"
@@ -18,7 +18,7 @@ const promotionTypeFormat = type => {
 };
 
 const StatusBtn = ({ checked, onChange, mainKey }) => {
-	let id = `switch-${mainKey}`
+	let id = `switch-${mainKey}`;
 	return (
 		<div className="switch__container">
 			<input
@@ -37,12 +37,16 @@ const dateFormat = createTime => {
 	return moment(createTime).format("l LTS");
 };
 
-const lastUpdateUserFormat = userName =>{
+const lastUpdateUserFormat = userName => {
 	return userName ?? "-";
-}
+};
 
-const lastUpdateTimeFormat = lastUpdTime =>{
-	return lastUpdTime ? moment(lastUpdTime).format("l LTS") : '-';
+const lastUpdateTimeFormat = lastUpdTime => {
+	return lastUpdTime ? moment(lastUpdTime).format("l LTS") : "-";
+};
+
+const walletTypeFormat = walletType =>{
+	return defWalletType[walletType]?.displayText;
 }
 
 const titleData = [
@@ -75,6 +79,11 @@ const titleData = [
 		body: { format: lastUpdateTimeFormat }
 	},
 	{ dataColumn: "sort", columnTitle: "Sort" },
+	{
+		dataColumn: "walletType",
+		columnTitle: "WalletType",
+		body: { format: walletTypeFormat }
+	},
 	{
 		dataColumn: "status",
 		columnTitle: "Status",
@@ -135,7 +144,12 @@ export default ({
 	return (
 		<div className="container-fluid">
 			<h4 className="page-name">Bonus Management</h4>
-			<button className="btn btn-add" style={{"marginBottom": "20px"}} onClick={ClickCreateBonus}>Create Bonus</button>
+			<button
+				className="btn btn-add"
+				style={{ marginBottom: "20px" }}
+				onClick={ClickCreateBonus}>
+				Create Bonus
+			</button>
 			<div className="table">
 				<table className="table table-striped">
 					<thead>

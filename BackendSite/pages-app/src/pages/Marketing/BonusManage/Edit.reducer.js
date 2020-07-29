@@ -5,7 +5,9 @@ export const defActionType = {
 	MAIN_SET_CURRENCY_CHECKBOX: "MAIN_SET_CURRENCY_CHECKBOX",
 	MAIN_SET_SITE: "MAIN_SET_SITE",
 	CURRENCY_LANG_SET_VALUE: "CURRENCY_LANG_SET_VALUE",
-	CURRENCY_SET_LANG_CHECKBOX: "CURRENCY_SET_LANG_CHECKBOX"
+	CURRENCY_SET_LANG_CHECKBOX: "CURRENCY_SET_LANG_CHECKBOX",
+	GET_PROMO_CATEGORIES: "GET_PROMO_CATEGORIES",
+	SET_PRODUCTS: "SET_PRODUCTS"
 };
 
 export const initialState = (IsAdd, datas, siteList) => {
@@ -22,12 +24,15 @@ export const initialState = (IsAdd, datas, siteList) => {
 			periodTo: moment(),
 			expiryDays: "",
 			description: "",
+			walletType: null,
+			products: null,
 			status: 2,
 			siteId: siteList[0].siteId,
 			selectedCurrencies: [],
 			currentTab: null,
 			sort: "",
-			specific: _specific
+			specific: _specific,
+			productCategory: []
 		};
 	} else {
 		let _specific = SetSpecific(
@@ -50,7 +55,10 @@ export const initialState = (IsAdd, datas, siteList) => {
 			sort: datas.sort,
 			selectedCurrencies: _selectedCurrencies,
 			currentTab: _selectedCurrencies[0],
-			specific: _specific
+			specific: _specific,
+			walletType: datas.walletType,
+			products: datas.products ? JSON.parse(datas.products) : null,
+			productCategory: datas.productCategory
 		};
 	}
 };
@@ -227,6 +235,32 @@ export function reducer(state, action) {
 					action.langList,
 					null
 				)
+			};
+
+		case defActionType.GET_PROMO_CATEGORIES:
+			let arr = action.productCategory.map(item => {
+				return {
+					value: item.id,
+					displayText: item.name
+				};
+			});
+			let _value =
+				action.value !== undefined ? action.value : state.walletType;
+
+			let products = action.isInit ? state.products : null;
+			return {
+				...state,
+				walletType: _value,
+				productCategory: arr,
+				products: products
+			};
+
+		case defActionType.SET_PRODUCTS:
+			let _products = { id: action.value };
+
+			return {
+				...state,
+				products: _products
 			};
 
 		default:

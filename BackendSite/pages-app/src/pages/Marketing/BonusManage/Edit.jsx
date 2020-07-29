@@ -1,53 +1,81 @@
-import React, { useReducer } from 'react';
-import RadioBox from './Component/RadioBox';
-import { reducer, defActionType, initialState } from './Edit.reducer';
-import Panel from './Edit.content'
+import React, { useReducer, useEffect, useRef } from "react";
+import RadioBox from "./Component/RadioBox";
+import { reducer, defActionType, initialState } from "./Edit.reducer";
+import WebAPI from "../../../module/WebAPI";
+import qs from "qs";
+import Panel from "./Edit.content";
 
-const skipField = ['currentLang'];
+const skipField = ["currentLang", "productCategory"];
 
 export default props => {
+	const isMountedRef = useRef(null);
+	useEffect(() => {
+		isMountedRef.current = true;
+		return () => (isMountedRef.current = false);
+	});
 	const [state, dispatch] = useReducer(
 		reducer,
 		initialState(props.IsAdd, props.Datas, props.SiteList)
 	);
 
+	useEffect(() => {
+		if (!props.IsAdd) {
+			GetPromoCategories(true, -1, props.Datas.walletType);
+		}
+	}, [props.Datas.walletType, props.IsAdd]);
+
 	const ClickSubmit = () => {
 		let checked = true;
-		for(let key in state){
-			if(key === 'specific'){
-				for(let c_key in state[key]){
-					if(state.selectedCurrencies.includes(Number(c_key))){
-						for(let f_key in state[key][c_key]){
-							if(skipField.includes(f_key)) continue;
+		for (let key in state) {
+			if (key === "specific") {
+				for (let c_key in state[key]) {
+					if (state.selectedCurrencies.includes(Number(c_key))) {
+						for (let f_key in state[key][c_key]) {
+							if (skipField.includes(f_key)) continue;
 							let column = state[key][c_key][f_key];
-							if(column===null || column===undefined || column===''){
-								alert(`${window.i18n[`lbl_Currency${c_key}`]}'s ${f_key} does not allow null.`);
-								checked=false;
+							if (
+								column === null ||
+								column === undefined ||
+								column === ""
+							) {
+								alert(
+									`${
+										window.i18n[`lbl_Currency${c_key}`]
+									}'s ${f_key} does not allow null.`
+								);
+								checked = false;
 								break;
 							}
 						}
 					}
 
-					if(!checked){
+					if (!checked) {
 						break;
 					}
 				}
-			}else if(state[key]===null || state[key]===undefined || state[key]===''){
+			} else if (
+				state[key] === null ||
+				state[key] === undefined ||
+				state[key] === ""
+			) {
 				alert(`${key} does not allow null.`);
 				checked = false;
 				break;
-			}else if(key==='selectedCurrencies' && state[key].length === 0){
+			} else if (
+				key === "selectedCurrencies" &&
+				state[key].length === 0
+			) {
 				alert("Please select at least one currency.");
 				checked = false;
 				break;
 			}
 
-			if(!checked){
+			if (!checked) {
 				break;
 			}
 		}
 
-		if(checked){
+		if (checked) {
 			props.action.SetPromotion(state);
 		}
 	};
@@ -71,7 +99,11 @@ export default props => {
 	};
 
 	const EditCurrencyCheckBox = (value, dataColumn) => {
-		dispatch({ type: defActionType.MAIN_SET_CURRENCY_CHECKBOX, value, dataColumn });
+		dispatch({
+			type: defActionType.MAIN_SET_CURRENCY_CHECKBOX,
+			value,
+			dataColumn
+		});
 	};
 
 	const EditCurrencyPanel = (currencyId, value, dataColumn) => {
@@ -83,17 +115,54 @@ export default props => {
 		});
 	};
 
-	const EditCurrencyLangPanelValue = (value, dataColumn) =>{
+	const EditCurrencyLangPanelValue = (value, dataColumn) => {
 		dispatch({
 			type: defActionType.CURRENCY_LANG_SET_VALUE,
 			value,
 			dataColumn
 		});
-	}
+	};
 
-	const EditCurrencyLangCheckBox = (value, dataColumn) =>{
-		dispatch({type:defActionType.CURRENCY_SET_LANG_CHECKBOX, value, dataColumn});
-	}
+	const EditCurrencyLangCheckBox = (value, dataColumn) => {
+		dispatch({
+			type: defActionType.CURRENCY_SET_LANG_CHECKBOX,
+			value,
+			dataColumn
+		});
+	};
+
+	const GetPromoCategories = (isInit, walletType, value) => {
+		if(walletType !== value){
+			let param = {
+				Url: "BonusManage/GetPromoCategories",
+				Data: qs.stringify({
+					WalletType: value
+				})
+			};
+			WebAPI.PostData(param).then(res => {
+				if (isMountedRef.current) {
+					if (res.data.errorCode === 0) {
+						dispatch({
+							type: defActionType.GET_PROMO_CATEGORIES,
+							value,
+							productCategory: res.data.data,
+							isInit:isInit
+						});
+					} else {
+						alert(res.data.message ?? "failed to get data.");
+					}
+				}
+			});
+		}
+	};
+
+	const SelectProducts = (value, dataColumn) => {
+		dispatch({
+			type: defActionType.SET_PRODUCTS,
+			value,
+			dataColumn
+		});
+	};
 
 	return (
 		<>
@@ -109,7 +178,17 @@ export default props => {
 			<Panel
 				dispatch={dispatch}
 				state={state}
-				action={{ ClickSubmit, EditMainValue, EditCurrencyCheckBox, EditCurrencyPanel, ClickBack:props.action.ClickBack, EditCurrencyLangPanelValue, EditCurrencyLangCheckBox}}
+				action={{
+					ClickSubmit,
+					EditMainValue,
+					EditCurrencyCheckBox,
+					EditCurrencyPanel,
+					ClickBack: props.action.ClickBack,
+					EditCurrencyLangPanelValue,
+					EditCurrencyLangCheckBox,
+					GetPromoCategories,
+					SelectProducts
+				}}
 				siteList={props.SiteList}
 				IsAdd={props.IsAdd}
 				processing={props.processing}

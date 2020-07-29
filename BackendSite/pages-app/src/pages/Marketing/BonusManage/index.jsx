@@ -41,32 +41,35 @@ const App = () => {
 	}, []);
 
 	const ClickCreateBonus = () => {
-		if(!processing){
+		if (!processing) {
 			if (isMountedRef.current) {
 				setProcessing(true);
 			}
 			let param = {
 				Url: "BonusManage/GetSiteListByLoginUser"
 			};
-			WebAPI.PostData(param).then(res => {
-				if (isMountedRef.current) {
-					if (res.data.errorCode === 0) {
-						dispatch({
-							type: defActionType.GOTO_ADD_BONUS,
-							siteList: res.data.data
-						});
-					} else {
-						alert(res.data.message ?? "failed to get data.");
+			WebAPI.PostData(param).then(
+				res => {
+					if (isMountedRef.current) {
+						if (res.data.errorCode === 0) {
+							dispatch({
+								type: defActionType.GOTO_ADD_BONUS,
+								siteList: res.data.data
+							});
+						} else {
+							alert(res.data.message ?? "failed to get data.");
+						}
+						setProcessing(false);
 					}
-					setProcessing(false);
+				},
+				err => {
+					if (isMountedRef.current) {
+						alert("API Server Error.");
+						setProcessing(false);
+					}
 				}
-			}, err=>{
-				if(isMountedRef.current){
-				alert("API Server Error.");
-				setProcessing(false);}
-			});
+			);
 		}
-		
 	};
 
 	const SetPromotion = promotion => {
@@ -106,7 +109,10 @@ const App = () => {
 				Status: promotion.status,
 				ExpiryDays: Number(promotion.expiryDays),
 				SiteId: promotion.siteId,
-				Sort:promotion.sort,
+				Sort: promotion.sort,
+				WalletType: promotion.walletType,
+				ProductCategory: promotion.productCategory,
+				Products: JSON.stringify({id:promotion.products.id}),
 				Specific: _specific
 			};
 
@@ -197,7 +203,7 @@ const App = () => {
 				alert(msg);
 			}
 
-			if(isMountedRef.current){
+			if (isMountedRef.current) {
 				setProcessing(false);
 			}
 		}
