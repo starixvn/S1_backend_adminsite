@@ -122,16 +122,8 @@ namespace BackendSite.Service.DAL
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                if (WalletType == 0)
-                {
-                    string SpName = "Admin_TpList_Get";
-                    return conn.Query<PromoCategory>(SpName, new { WalletType }, commandType: CommandType.StoredProcedure);
-                }
-                else
-                {
-                    string SpName = "Admin_PromotionCategory_Get";
-                    return conn.Query<PromoCategory>(SpName, new { TpId = 0 }, commandType: CommandType.StoredProcedure);
-                }
+                string SpName = "Admin_PromotionCategory_Get";
+                return conn.Query<PromoCategory>(SpName, new { WalletType }, commandType: CommandType.StoredProcedure);
             }
         }
     }
