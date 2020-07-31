@@ -7,6 +7,7 @@ using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,14 +26,16 @@ namespace BackendSite.Controllers.Api
         private readonly TpBLL tpBLL;
         private readonly WinLostReportService winLostReportService;
         private readonly PermissionBLL permissionBLL;
+        private readonly ServerInfoBLL serverInfoBLL;
 
-        public CustManageController(CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, TpBLL tpBLL, WinLostReportService winLostReportService, PermissionBLL permissionBLL)
+        public CustManageController(CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, TpBLL tpBLL, WinLostReportService winLostReportService, PermissionBLL permissionBLL, ServerInfoBLL serverInfoBLL)
         {
             this.custInfoBLL = custInfoBLL;
             this.bankDetailBLL = bankDetailBLL;
             this.tpBLL = tpBLL;
             this.winLostReportService = winLostReportService;
             this.permissionBLL = permissionBLL;
+            this.serverInfoBLL = serverInfoBLL;
         }
         public class CustInfoListReq
         {
@@ -88,7 +91,25 @@ namespace BackendSite.Controllers.Api
         public ApiResult<bool> SetCustStatusSwitch(CustStatusSwitch custStatusSwitch)
         {
             var apiResult = new ApiResult<bool>();
-            apiResult.Data = custInfoBLL.SetCustStatusSwitch(custStatusSwitch.CustId, custStatusSwitch.Op) > 0;
+            bool data = custInfoBLL.SetCustStatusSwitch(custStatusSwitch.CustId, custStatusSwitch.Op) > 0;
+
+            if (data)
+            {
+                string Menu = "CustManage/CustInfoList";
+                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                if (custStatusSwitch.Op == 1)
+                {
+                    Info.Add("Action", "Change IsKyc Status");
+                }
+                else if (custStatusSwitch.Op == 2)
+                {
+                    Info.Add("Action", "Change IsRisk Status");
+                }
+                serverInfoBLL.AdminOperateLog(null, custStatusSwitch.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+            }
+
+            apiResult.Data = data;
             apiResult.ErrorCode = 0;
 
             return apiResult;
@@ -108,7 +129,19 @@ namespace BackendSite.Controllers.Api
         public ApiResult<bool> DelCustPhotoId(CustInfoReq custInfoReq)
         {
             var apiResult = new ApiResult<bool>();
-            apiResult.Data = custInfoBLL.DelCustPhotoId(custInfoReq.CustId);
+
+            bool data = custInfoBLL.DelCustPhotoId(custInfoReq.CustId);
+
+            if (data)
+            {
+                string Menu = "CustManage/CustInfoList";
+                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("Action", "Delete Photo");
+                serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+            }
+
+            apiResult.Data = data;
             apiResult.ErrorCode = 0;
 
             return apiResult;
@@ -129,7 +162,18 @@ namespace BackendSite.Controllers.Api
         public ApiResult<bool> AddCustNote(AddCustNoteReq addCustNoteReq)
         {
             var apiResult = new ApiResult<bool>();
-            apiResult.Data = custInfoBLL.AddCustNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name);
+            bool data = custInfoBLL.AddCustNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name);
+
+            if (data)
+            {
+                string Menu = "CustManage/CustInfoList";
+                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("Action", "Add Note");
+                serverInfoBLL.AdminOperateLog(null, addCustNoteReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+            }
+
+            apiResult.Data = data;
             apiResult.ErrorCode = 0;
 
             return apiResult;
@@ -158,7 +202,26 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                apiResult.Data = custInfoBLL.SetCustNotes(setCustNoteReq.CustId, setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
+                bool data = custInfoBLL.SetCustNotes(setCustNoteReq.CustId, setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
+
+                if (data)
+                {
+
+                    string Menu = "CustManage/CustInfoList";
+                    Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                    Info.Add("MenuName", "Customer Info");
+                    if (setCustNoteReq.Type == 1)
+                    {
+                        Info.Add("Action", "Edit Note");
+                    }
+                    else if (setCustNoteReq.Type == 1)
+                    {
+                        Info.Add("Action", "Delete Note");
+                    }
+                    serverInfoBLL.AdminOperateLog(null, setCustNoteReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                }
+
+                apiResult.Data = data;
                 apiResult.ErrorCode = 0;
             }
             return apiResult;
@@ -302,6 +365,12 @@ namespace BackendSite.Controllers.Api
             ApiResult apiResult = new ApiResult();
             if (custInfoBLL.ResetProfile(custInfoReq.CustId))
             {
+                string Menu = "CustManage/CustInfoList";
+                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("Action", "Reset Profile");
+                serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
                 apiResult.ErrorCode = 0;
             }
 
@@ -313,6 +382,12 @@ namespace BackendSite.Controllers.Api
             ApiResult apiResult = new ApiResult();
             if (custInfoBLL.ResetCustBankInfo(custInfoReq.CustId))
             {
+                string Menu = "CustManage/CustInfoList";
+                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("Action", "Reset Bank Info");
+                serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
                 apiResult.ErrorCode = 0;
             }
 
@@ -343,6 +418,12 @@ namespace BackendSite.Controllers.Api
             ApiResult apiResult = new ApiResult();
             if (custInfoBLL.SetCustStatus(setCustStatusReq.CustId, 1))
             {
+                string Menu = "CustManage/CustInfoList";
+                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("Action", "Set Unlock");
+                serverInfoBLL.AdminOperateLog(null, setCustStatusReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
                 apiResult.ErrorCode = 0;
             }
 
@@ -355,6 +436,12 @@ namespace BackendSite.Controllers.Api
             ApiResult apiResult = new ApiResult();
             if (custInfoBLL.SetCustStatus(setCustStatusReq.CustId, 2))
             {
+                string Menu = "CustManage/CustInfoList";
+                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("Action", "Set Lock");
+                serverInfoBLL.AdminOperateLog(null, setCustStatusReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
                 apiResult.ErrorCode = 0;
             }
 
@@ -367,6 +454,12 @@ namespace BackendSite.Controllers.Api
             ApiResult apiResult = new ApiResult();
             if (custInfoBLL.SetCustStatus(setCustStatusReq.CustId, 3))
             {
+                string Menu = "CustManage/CustInfoList";
+                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("Action", "Set Close");
+                serverInfoBLL.AdminOperateLog(null, setCustStatusReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
                 apiResult.ErrorCode = 0;
             }
 
@@ -374,6 +467,7 @@ namespace BackendSite.Controllers.Api
         }
         public class BonusReq
         {
+            public int CustId { get; set; }
             public int BonusId { get; set; }
         }
         [HttpPost]
@@ -381,6 +475,13 @@ namespace BackendSite.Controllers.Api
         {
             ApiResult apiResult = new ApiResult();
             custInfoBLL.CancelBonusByBonusId(bonusReq.BonusId);
+
+            string Menu = "CustManage/CustInfoList";
+            Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+            Info.Add("MenuName", "Customer Info");
+            Info.Add("Action", "Cancel Bonus");
+            serverInfoBLL.AdminOperateLog(null, bonusReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
             apiResult.ErrorCode = 0;
 
             return apiResult;
