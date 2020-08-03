@@ -9,6 +9,7 @@ import * as Loading from '../commJS/Loading.jsx';
 import PersonalMsg from './PersonalMsg/CustInfo_PersonalMsg';
 import TurnoverReport from './TurnoverReport/index';
 import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
+import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -373,41 +374,45 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
         }
 
         onKycChange(e) {
-            let data = this.props.CustInfoData;
-            axios.post('/api/CustManage/SetCustStatusSwitch', { CustId: data.custId, OP: 1 })
-                .then(function (response) {
-                    //Loading.UnLoading();
-                    let result = response.data;
-                    if (result.errorCode == 0) {
-                        this.props.onGetCustInfoDetail();
-                    } else {
-                        alert(result.message);
-                    }
-                }.bind(this)).catch(function (error) {
-                    //Loading.UnLoading();
-                    alert(error);
-                }.bind(this));
+            if (confirm('Are you sure change IsKyc ?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/api/CustManage/SetCustStatusSwitch', { CustId: data.custId, OP: 1 })
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.props.onGetCustInfoDetail();
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
         }
 
         onRiskChange(e) {
-            let data = this.props.CustInfoData;
-            axios.post('/api/CustManage/SetCustStatusSwitch', { CustId: data.custId, OP: 2 })
-                .then(function (response) {
-                    //Loading.UnLoading();
-                    let result = response.data;
-                    if (result.errorCode == 0) {
-                        this.props.onGetCustInfoDetail();
-                    } else {
-                        alert(result.message);
-                    }
-                }.bind(this)).catch(function (error) {
-                    //Loading.UnLoading();
-                    alert(error);
-                }.bind(this));
+            if (confirm('Are you sure change IsRisk ?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/api/CustManage/SetCustStatusSwitch', { CustId: data.custId, OP: 2 })
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.props.onGetCustInfoDetail();
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
         }
 
         onAskReupload() {
-            if (confirm('Are you sure?')) {
+            if (confirm('Are you sure delete Photo ?')) {
                 let data = this.props.CustInfoData;
                 axios.post('/api/CustManage/DelCustPhotoId', { CustId: data.custId })
                     .then(function (response) {
@@ -426,7 +431,7 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
         }
 
         onResetProfile() {
-            if (confirm('Are you sure?')) {
+            if (confirm('Are you sure reset Profile ?')) {
                 let data = this.props.CustInfoData;
                 axios.post('/api/CustManage/ResetProfile', { CustId: data.custId })
                     .then(function (response) {
@@ -445,7 +450,7 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
         }
 
         onResetCustBankInfo() {
-            if (confirm('Are you sure?')) {
+            if (confirm('Are you sure reset Bank Info ?')) {
                 let data = this.props.CustInfoData;
                 axios.post('/api/CustManage/ResetCustBankInfo', { CustId: data.custId })
                     .then(function (response) {
@@ -464,7 +469,7 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
         }
 
         onUnlock() {
-            if (confirm('Are you sure?')) {
+            if (confirm('Are you sure set Unlock ?')) {
                 let data = this.props.CustInfoData;
                 axios.post('/api/CustManage/SetUnlock', { CustId: data.custId })
                     .then(function (response) {
@@ -483,7 +488,7 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
         }
 
         onLock() {
-            if (confirm('Are you sure?')) {
+            if (confirm('Are you sure set Lock ?')) {
                 let data = this.props.CustInfoData;
                 axios.post('/api/CustManage/SetLock', { CustId: data.custId })
                     .then(function (response) {
@@ -502,7 +507,7 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
         }
 
         onClose() {
-            if (confirm('Are you sure?')) {
+            if (confirm('Are you sure set Close ?')) {
                 let data = this.props.CustInfoData;
                 axios.post('/api/CustManage/SetClose', { CustId: data.custId })
                     .then(function (response) {
@@ -521,8 +526,9 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
         }
 
         cancelBonus(bonusId) {
-            if (confirm('Are you sure?')) {
-                axios.post('/api/CustManage/CancelBonusByBonusId', { BonusId: bonusId })
+            if (confirm('Are you sure Cancel Bonus ?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/api/CustManage/CancelBonusByBonusId', {CustId: data.custId, BonusId: bonusId })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -900,7 +906,7 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Financial Log", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover"];
+        _Tabs = ["Customer Info", "Financial Log", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
         constructor(props) {
@@ -1007,7 +1013,7 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
             let CustId = getUrlParameter("custId");
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
-                axios.post('/api/PaymentAdjustmentReport/GetAdjustmentInfoByCust', { ...this.state.AdjustmentInfo, CustId: iCustId, PageNumber: pageNumber })
+                axios.post('/api/PaymentAdjustmentInfo/GetAdjustmentInfoByCust', { ...this.state.AdjustmentInfo, CustId: iCustId, PageNumber: pageNumber })
                     .then(function (response) {
                         Loading.UnLoading();
                         let result = response.data;
@@ -1034,6 +1040,27 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
                         let result = response.data;
                         if (result.errorCode == 0) {
                             this.setState({ LoginLogData: result });
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
+        GetAdminUserLogByCust(PageNumber) {
+            let pageNumber = PageNumber || this.state.AdminUserLogData.pageNumber;
+            let CustId = getUrlParameter("custId");
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                axios.post('/api/Common/GetAdminOperateLog', { ...this.state.AdminUserLog, CustId: iCustId, PageNumber: pageNumber })
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({ AdminUserLogData: result });
                         } else {
                             alert(result.message);
                         }
@@ -1248,6 +1275,8 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
                 dataContainer = <PersonalMsg />
             } else if (TabName == this._Tabs[10]) {
                 dataContainer = <TurnoverReport />
+            }else if (TabName == this._Tabs[11]) {
+                dataContainer = <AdminUserLog GetAdminUserLogByCust={this.GetAdminUserLogByCust.bind(this)} searchData={this.state.AdminUserLogData} AdminUserLog={this.state.AdminUserLog} onChangeValue={this.onChangeValue.bind(this)} />
             }
 
             let authSubKeys = {
