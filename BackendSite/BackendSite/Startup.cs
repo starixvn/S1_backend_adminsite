@@ -134,7 +134,7 @@ namespace BackendSite
                 option.LoginPath = "/Home/Signin";
                 option.Cookie.Name = ".backend";
                 option.ExpireTimeSpan = TimeSpan.FromDays(1);//沒給預設14天
-                option.Cookie.SameSite = SameSiteMode.None;
+                option.Cookie.SameSite = SameSiteMode.Strict;
             });
             services.AddDataProtection().DisableAutomaticKeyGeneration();
             services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("CookieKeys")).SetApplicationName("SharedCookieApp");
