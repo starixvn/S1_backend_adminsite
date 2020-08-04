@@ -95,7 +95,7 @@ export class AdminUserLog extends React.Component {
     }
 
     render() {
-        let loginLog = this.props.LoginLog;
+        let adminUserLog = this.props.AdminUserLog;
         let searchData = this.props.searchData;
         return (
             <div>
@@ -103,14 +103,14 @@ export class AdminUserLog extends React.Component {
                     <div className="input-item">
                         <span className="label">From Date</span>
                         <div className="date">
-                            <input type="text" ref={this.startDate} name="StartDate" className="dateselect" required="required" data-date-end-date="0d" autoComplete="off" value={loginLog && loginLog.StartDate ? moment.unix(loginLog.StartDate).format("MM/DD/YYYY") : ""} />
+                            <input type="text" ref={this.startDate} name="StartDate" className="dateselect" required="required" data-date-end-date="0d" autoComplete="off" value={adminUserLog && adminUserLog.StartDate ? moment.unix(adminUserLog.StartDate).format("MM/DD/YYYY") : ""} />
                             <i className="icon-calendar dateselect" onClick={this.onStartDate.bind(this)} />
                         </div>
                     </div>
                     <div className="input-item date">
                         <span className="label">To Date</span>
                         <div className="date">
-                            <input type="text" ref={this.endDate} name="EndDate" required="required" data-date-end-date="0d" autoComplete="off" value={loginLog && loginLog.EndDate ? moment.unix(loginLog.EndDate).format("MM/DD/YYYY") : ""} />
+                            <input type="text" ref={this.endDate} name="EndDate" required="required" data-date-end-date="0d" autoComplete="off" value={adminUserLog && adminUserLog.EndDate ? moment.unix(adminUserLog.EndDate).format("MM/DD/YYYY") : ""} />
                             <i className="icon-calendar dateselect" onClick={this.onEndDate.bind(this)} />
                         </div>
                     </div>
