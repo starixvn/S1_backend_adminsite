@@ -120,7 +120,38 @@ namespace BackendSite.Controllers.Api
         public ApiResult<bool> SetCustInfo(CustStatus custStatus)
         {
             var apiResult = new ApiResult<bool>();
-            apiResult.Data = custInfoBLL.SetCustInfo(custStatus.CustId, custStatus.Level, custStatus.FullName, custStatus.Birthday_Y, custStatus.Birthday_M, custStatus.Birthday_D, custStatus.PhoneNumber, custStatus.EMail, User.Identity.Name) > 0;
+            bool data = custInfoBLL.SetCustInfo(custStatus.CustId, custStatus.Level, custStatus.FullName, custStatus.Birthday_Y, custStatus.Birthday_M, custStatus.Birthday_D, custStatus.PhoneNumber, custStatus.EMail, User.Identity.Name) > 0;
+
+            if (data)
+            {
+                string Menu = "CustManage/CustInfoList";
+                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                if (custStatus.Level != null)
+                {
+                    Info.Add("Action", $"Change Level To {custStatus.Level}");
+                }
+                else if (custStatus.FullName != null)
+                {
+                    Info.Add("Action", $"Change Full Name To {custStatus.FullName}");
+                }
+                else if (custStatus.Birthday_Y != null || custStatus.Birthday_M != null || custStatus.Birthday_D != null)
+                {
+                    Info.Add("Action", $"Change Birthday To {custStatus.Birthday_Y}/{custStatus.Birthday_M}/{custStatus.Birthday_D}");
+                }
+                else if (custStatus.PhoneNumber != null)
+                {
+                    Info.Add("Action", $"Change Phone Number To {custStatus.PhoneNumber}");
+                }
+                else if (custStatus.EMail != null)
+                {
+                    Info.Add("Action", $"Change EMail To {custStatus.EMail}");
+                }
+
+                serverInfoBLL.AdminOperateLog(null, custStatus.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+            }
+
+            apiResult.Data = data;
             apiResult.ErrorCode = 0;
 
             return apiResult;
