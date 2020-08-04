@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default ({Title, Options, Selected, OnChange, dataColumn, mainKey=null})=>{
-    let opt = Options.map(o=>{
+    let opt = Options.map((o, oIdx)=>{
         let key = `${Title}-${o.value}${mainKey === null ? '': `-${mainKey}`}`;
         return <RadioBtn 
             key={key}
@@ -10,7 +10,7 @@ export default ({Title, Options, Selected, OnChange, dataColumn, mainKey=null})=
             Value={`${o.value}${mainKey === null ? '': `-${mainKey}`}`} 
             dataColumn={dataColumn}
             Name={`${Title}${mainKey === null ? '': `-${mainKey}`}`}
-            OnChange={OnChange.bind(this, o.value, dataColumn, mainKey)}
+            OnChange={OnChange.bind(this, o.value, dataColumn, mainKey, oIdx)}
             Checked={Selected === o.value} />
     });
     return(

@@ -66,7 +66,7 @@ namespace BackendSite.Service.DAL
                 IsAdd,
                 promotion.SiteId,
                 promotion.WalletType,
-                promotion.Products
+                promotion.TpId
             }, transaction: trans, commandType: CommandType.StoredProcedure);
 
             if (!IsAdd && !string.IsNullOrEmpty(promotion.BonusCode))

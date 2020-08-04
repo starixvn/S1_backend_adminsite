@@ -112,7 +112,8 @@ const App = () => {
 				Sort: promotion.sort,
 				WalletType: promotion.walletType,
 				ProductCategory: promotion.productCategory,
-				Products: JSON.stringify({id:promotion.products.id}),
+				TpId: promotion.tpId,
+				CategoryId: promotion.categoryId,
 				Specific: _specific
 			};
 

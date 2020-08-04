@@ -23,7 +23,7 @@ const initBonusAmountType = promoType => {
 		  ];
 };
 
-export default ({ state, siteList, action, IsAdd, processing }) => {
+export default ({ state, action, IsAdd, processing }) => {
 	const bonusCodeSwitch = `${state.siteId}-${state.bonusCode}`;
 	const currencyList = Object.keys(state.specific);
 	const currencyOptions = currencyList.map(i => {
@@ -156,9 +156,9 @@ export default ({ state, siteList, action, IsAdd, processing }) => {
 						<RadioBox
 							Title="Product Category"
 							Options={state.productCategory}
-							OnChange={action.SelectProducts}
-							dataColumn="products"
-							Selected={state.products?.id}
+							OnChange={action.SelectTpId}
+							dataColumn={state.walletType === 0 ? "tpId" : "categoryId"}
+							Selected={state.walletType === 0 ? state.tpId : state.categoryId}
 						/>
 					) : null}
 				</div>

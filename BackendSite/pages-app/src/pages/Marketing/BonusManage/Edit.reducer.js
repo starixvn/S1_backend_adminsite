@@ -7,7 +7,7 @@ export const defActionType = {
 	CURRENCY_LANG_SET_VALUE: "CURRENCY_LANG_SET_VALUE",
 	CURRENCY_SET_LANG_CHECKBOX: "CURRENCY_SET_LANG_CHECKBOX",
 	GET_PROMO_CATEGORIES: "GET_PROMO_CATEGORIES",
-	SET_PRODUCTS: "SET_PRODUCTS"
+	SET_TPID: "SET_TPID"
 };
 
 export const initialState = (IsAdd, datas, siteList) => {
@@ -25,14 +25,15 @@ export const initialState = (IsAdd, datas, siteList) => {
 			expiryDays: "",
 			description: "",
 			walletType: null,
-			products: null,
+			tpId: null,
 			status: 2,
 			siteId: siteList[0].siteId,
 			selectedCurrencies: [],
 			currentTab: null,
 			sort: "",
 			specific: _specific,
-			productCategory: []
+			productCategory: [],
+			categoryId: null
 		};
 	} else {
 		let _specific = SetSpecific(
@@ -57,8 +58,9 @@ export const initialState = (IsAdd, datas, siteList) => {
 			currentTab: _selectedCurrencies[0],
 			specific: _specific,
 			walletType: datas.walletType,
-			products: datas.products ? JSON.parse(datas.products) : null,
-			productCategory: datas.productCategory
+			tpId: datas.tpId,
+			productCategory: datas.productCategory,
+			categoryId: datas.categoryId
 		};
 	}
 };
@@ -241,26 +243,32 @@ export function reducer(state, action) {
 			let arr = action.productCategory.map(item => {
 				return {
 					value: item.id,
-					displayText: item.name
+					displayText: item.name,
+					tpId: item.tpId
 				};
 			});
 			let _value =
 				action.value !== undefined ? action.value : state.walletType;
 
-			let products = action.isInit ? state.products : null;
+			let tpId = action.isInit ? state.tpId : null;
+			let categoryId = action.isInit ? state.categoryId : null;
 			return {
 				...state,
 				walletType: _value,
 				productCategory: arr,
-				products: products
+				tpId: tpId,
+				categoryId: categoryId
 			};
 
-		case defActionType.SET_PRODUCTS:
-			let _products = { id: action.value };
+		case defActionType.SET_TPID:
+			let categoryInfo = state.productCategory[action.idx];
+			let _tpId = categoryInfo.tpId;
+			let _categoryId = categoryInfo.value;
 
 			return {
 				...state,
-				products: _products
+				tpId: _tpId,
+				categoryId: _categoryId
 			};
 
 		default:

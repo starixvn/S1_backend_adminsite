@@ -156,10 +156,10 @@ export default props => {
 		}
 	};
 
-	const SelectProducts = (value, dataColumn) => {
+	const SelectTpId = (value, dataColumn, mainKey, oIdx) => {
 		dispatch({
-			type: defActionType.SET_PRODUCTS,
-			value,
+			type: defActionType.SET_TPID,
+			idx:oIdx,
 			dataColumn
 		});
 	};
@@ -187,7 +187,7 @@ export default props => {
 					EditCurrencyLangPanelValue,
 					EditCurrencyLangCheckBox,
 					GetPromoCategories,
-					SelectProducts
+					SelectTpId
 				}}
 				siteList={props.SiteList}
 				IsAdd={props.IsAdd}
