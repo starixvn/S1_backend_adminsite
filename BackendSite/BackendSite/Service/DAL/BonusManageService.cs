@@ -46,57 +46,64 @@ namespace BackendSite.Service.DAL
             return promotion;
         }
 
-        public void SetPromotion(bool IsAdd, PromotionInfo promotion)
+        public int SetPromotion(bool IsAdd, PromotionInfo promotion)
         {
+            int errorCode = 0;
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
-            conn.Execute("Admin_Promotion_InsUpd", new
-            {
-                promotion.BonusCode,
-                promotion.Description,
-                promotion.PromotionType,
-                promotion.CategoryId,
-                PeriodFrom = promotion.UnixPeriodFrom,
-                PeriodTo = promotion.UnixPeriodTo,
-                promotion.ExpiryDays,
-                promotion.Sort,
-                promotion.Status,
-                promotion.LastUpdateUser,
-                IsAdd,
-                promotion.SiteId,
-                promotion.WalletType,
-                promotion.TpId
-            }, transaction: trans, commandType: CommandType.StoredProcedure);
+            var p = new DynamicParameters();
+            p.Add("BonusCode", promotion.BonusCode);
+            p.Add("Description", promotion.Description);
+            p.Add("PromotionType", promotion.PromotionType);
+            p.Add("CategoryId", promotion.CategoryId);
+            p.Add("PeriodFrom", promotion.UnixPeriodFrom);
+            p.Add("PeriodTo", promotion.UnixPeriodTo);
+            p.Add("ExpiryDays", promotion.ExpiryDays);
+            p.Add("Sort", promotion.Sort);
+            p.Add("Status", promotion.Status);
+            p.Add("LastUpdateUser", promotion.LastUpdateUser);
+            p.Add("SiteId", promotion.SiteId);
+            p.Add("WalletType", promotion.WalletType);
+            p.Add("TpId", promotion.TpId);
+            p.Add("IsAdd", IsAdd);
+            p.Add("ErrorCode", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            if (!IsAdd && !string.IsNullOrEmpty(promotion.BonusCode))
+            conn.Execute("Admin_Promotion_InsUpd", p, transaction: trans, commandType: CommandType.StoredProcedure);
+            errorCode = p.Get<int>("ErrorCode");
+            if(errorCode == 0)
             {
-                conn.Execute("Admin_PromotionSpecific_Del", new
+                if (!IsAdd && !string.IsNullOrEmpty(promotion.BonusCode))
                 {
-                    promotion.BonusCode,
-                    promotion.SiteId
-                }, transaction: trans, commandType: CommandType.StoredProcedure);
+                    conn.Execute("Admin_PromotionSpecific_Del", new
+                    {
+                        promotion.BonusCode,
+                        promotion.SiteId
+                    }, transaction: trans, commandType: CommandType.StoredProcedure);
+                }
+
+                foreach (var specific in promotion.Specific)
+                {
+                    conn.Execute("Admin_PromotionSpecific_Ins", new
+                    {
+                        promotion.BonusCode,
+                        specific.CurrencyId,
+                        promotion.SiteId,
+                        specific.RollOver,
+                        specific.Bonus,
+                        specific.BonusType,
+                        specific.MaxBonus,
+                        specific.Status,
+                        IsAdd,
+                        specific.Usage,
+                        specific.Details
+                    }, transaction: trans, commandType: CommandType.StoredProcedure);
+                }
+
+                trans.Commit();
             }
 
-            foreach (var specific in promotion.Specific)
-            {
-                conn.Execute("Admin_PromotionSpecific_Ins", new
-                {
-                    promotion.BonusCode,
-                    specific.CurrencyId,
-                    promotion.SiteId,
-                    specific.RollOver,
-                    specific.Bonus,
-                    specific.BonusType,
-                    specific.MaxBonus,
-                    specific.Status,
-                    IsAdd,
-                    specific.Usage,
-                    specific.Details
-                }, transaction: trans, commandType: CommandType.StoredProcedure);
-            }
-
-            trans.Commit();
+            return errorCode;
         }
 
         public int SetPromotionStatus(string BonusCode, int SiteId, int Status, string LastUpdateUser)

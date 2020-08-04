@@ -97,9 +97,10 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
             try
             {
-                bonusManageBLL.SetPromotion(IsAdd, Promotion);
+                var errorCode = bonusManageBLL.SetPromotion(IsAdd, Promotion);
                 apiResult.Data = bonusManageBLL.GetPromotionList();
-                apiResult.ErrorCode = 0;
+                apiResult.ErrorCode = errorCode;
+                apiResult.Message = errorCode ==1 ? "The bonus setting already exists which with same promotion-type & product-category." : "";
             }
             catch (MySqlException ex)
             {
