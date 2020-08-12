@@ -12,7 +12,9 @@ export const StatusList = {
 export const adjustTypeOpt = Object.keys(adjustType).map((key)=>{return {displayText:adjustType[key], value:key}});
 
 export const FilterColumns = {
-    userName:{ dataColumns:'UserName' }
+    siteName:{ dataColumns:'SiteName' },
+    userName:{ dataColumns:'UserName' },
+    sabaId:{ dataColumns:'SabaId' },
 }
 
 export const SettingColumns = {

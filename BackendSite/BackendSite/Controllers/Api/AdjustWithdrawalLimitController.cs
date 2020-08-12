@@ -30,12 +30,13 @@ namespace BackendSite.Controllers.Api
             this.custInfoService = custInfoService;
         }
 
-        public ApiResult<dynamic> GetCustAndWalletInfoAsync([FromForm] string UserName)
+        public ApiResult<dynamic> GetCustAndWalletInfoAsync([FromForm] int SiteId, [FromForm] string UserName, [FromForm] string SabaId)
         {
             var result = new ApiResult<dynamic>();
             try
             {
-                var custInfo = custInfoService.GetCustInfos(null, UserName, null);
+                var custInfo = custInfoBLL.GetCustInfoDetails(null, UserName, SiteId);
+
                 if (custInfo != null)
                 {
                     var walletInfo = adjustWithdrawalLimitBLL.GetCustWalletInfo(custInfo.CustId);

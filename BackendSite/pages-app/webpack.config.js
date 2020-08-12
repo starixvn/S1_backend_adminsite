@@ -41,9 +41,9 @@ module.exports = {
 		// 	"./src/pages/Finance/PaymentManagement/index.js"
 		// ],
 		// "CSD/Announcement.min": ["./src/pages/CSD/Announcement/index.js"],
-		// "Finance/WithdrawalLimitAdjust.min": [
-		// 	"./src/pages/Finance/WithdrawalLimitAdjust/index.js"
-		// ],
+		"Finance/WithdrawalLimitAdjust.min": [
+			"./src/pages/Finance/WithdrawalLimitAdjust/index.js"
+		],
 		// "CSD/PersonalMsgBatch.min": [
 		// 	"./src/pages/CSD/PersonalMsgBatch/index.js"
 		// ],

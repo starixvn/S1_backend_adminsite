@@ -42,7 +42,6 @@ const App = () => {
     });
     let siteRadio = "", tpRadio = "";
     useEffect(() => {
-        // setSite([{ "siteId": 1, "siteName": "Nova88", "langList": "[\"en\", \"cs\", \"ch\", \"th\", \"id\"]", "currencyList": "[2, 4, 13, 15, 51]", "defLang": "en", "iCurrencyList": [2, 4, 13, 15, 51], "iLangList": ["en", "cs", "ch", "th", "id"] }, { "siteId": 2, "siteName": "Goal123", "langList": "[\"en\", \"vn\"]", "currencyList": "[51]", "defLang": "vn", "iCurrencyList": [51], "iLangList": ["en", "vn"] }, { "siteId": 3, "siteName": "Bwing", "langList": "[\"en\", \"vn\"]", "currencyList": "[51]", "defLang": "vn", "iCurrencyList": [51], "iLangList": ["en", "vn"] }]);
         api.post('/api/Common/AdminUserSiteList')
             .then(function (response) {
                 if (response.data.errorCode === 0) {
@@ -61,7 +60,6 @@ const App = () => {
             setTp([]);
             setCustData();
             setSearchData({ ...searchData, optTp: 0, userName: "", userTpId: "" });
-            // setTp([{ "tpId": 1, "tpName": "Saba" }]);
             api.post('/api/Tp/GetTpBySite', qs.stringify({ 'SiteId': searchData.optSite }))
                 .then(function (response) {
                     if (mounted) {

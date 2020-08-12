@@ -51,7 +51,7 @@ const BonusManage = lazy(() => import("./pages/Marketing/BonusManage/index"));
 const PendingBonus = lazy(() => import("./pages/Marketing/PendingBonus/index"));
 const ThirdPartyAdjustment = lazy(() => import("./pages/Finance/ThirdPartyAdjustment/index"));
 
-export const defaultPage = "ThirdPartyAdjustment";
+export const defaultPage = "WithdrawalLimitAdjust";
 
 export const layoutType = {
 	N88: "N88",
