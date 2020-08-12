@@ -37,7 +37,10 @@ const Panel = (props) => {
 
     return (
         <div className="filter">
-            {siteRadio}
+            <div className="form-group">
+                <label className="col-form-label d-block">Site Name</label>
+                {siteRadio}
+            </div>
             <InputField
                 IptType="text"
                 columnTitle="UserName"
