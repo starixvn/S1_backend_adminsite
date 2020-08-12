@@ -162,7 +162,12 @@
         "DisplayKey": "Withdrawal Limit Management",
         "FuncKey": "Finance/WithdrawalLimitManage",
         "Enable": false
-      }*/
+      }*/,
+      {
+        "DisplayKey": "3RD Funds Adjustment",
+        "FuncKey": "Finance/ThirdPartyAdjustment",
+        "Enable": false
+      }
     ]
   },
   {

@@ -129,5 +129,36 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+        public IEnumerable<SiteTpListIfo> GetSiteTpList(int SiteId)
+        {
+            return thirdPartyService.GetSiteTpList(SiteId);
+        }
+        public async Task<ApiResult<TransferResult>> AdminAdjustmentTransferAsync(AdminTpTransfer inadminTpTransfer)
+        {
+            decimal amount = inadminTpTransfer.Amount;
+            if (amount.ToString().IndexOf(".") > -1)
+            {
+                decimal.TryParse(amount.ToString("#.##"), out amount);
+            }
+
+            var adminTpTransfer = new AdminTpTransfer
+            {
+                TpId = inadminTpTransfer.TpId,
+                CustId = inadminTpTransfer.CustId,
+                Amount = amount,
+                direction = inadminTpTransfer.direction,
+                inputs = null,
+                Operator = inadminTpTransfer.Operator,
+                Remarks = inadminTpTransfer.Remarks
+            };
+            var myUrl = $"{apiUrl}AdjustWallet";
+            var data = await courierAdapter.MyPostAsync<TransferResult, TpTransfer>(myUrl, adminTpTransfer);
+
+            return data;
+        }
+        public IEnumerable<AdminTpTransferInfo> GetAdjustmentTpLog(int SiteId, int TpId, int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        {
+            return thirdPartyService.GetAdjustmentTpLog(SiteId, TpId, CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+        }
     }
 }

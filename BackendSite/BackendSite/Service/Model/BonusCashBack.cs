@@ -7,7 +7,7 @@ namespace BackendSite.Service.Model
 {
     public class SiteTpList
     {
-        public int Id { get; set; }
+        public int Type { get; set; }
         public string TpName { get; set; }
     }
 

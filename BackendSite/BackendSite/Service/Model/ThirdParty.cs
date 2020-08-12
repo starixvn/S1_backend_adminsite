@@ -28,6 +28,11 @@ namespace BackendSite.Service.Model
         public TpDirection direction { set; get; }
         public Dictionary<string, string> inputs { set; get; }
     }
+    public class AdminTpTransfer : TpTransfer
+    {
+        public string Operator { set; get; }
+        public string Remarks { set; get; }
+    }
     public class TpTransferInfo
     {
         public DateTime CreateTime { get; set; }
@@ -38,6 +43,13 @@ namespace BackendSite.Service.Model
         public string ThirdId { get; set; }
         public string Memo { get; set; }
         public int Status { get; set; }
+    }
+    public class AdminTpTransferInfo : TpTransferInfo
+    {
+        public string SiteName { set; get; }
+        public string UserName { set; get; }
+        public string Operator { set; get; }
+        public string Remarks { set; get; }
     }
     public enum TpDirection
     {
@@ -63,5 +75,11 @@ namespace BackendSite.Service.Model
         public decimal balance { get; set; }
         public decimal outstanding { get; set; }
         public byte Currency { get; set; }
+    }
+
+    public class SiteTpListIfo
+    {
+        public int TpId { set; get; }
+        public string TpName { set; get; }
     }
 }
