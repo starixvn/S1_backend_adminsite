@@ -1,10 +1,11 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -16,14 +17,16 @@ namespace BackendSite.Service.BLL
         private IMemoryCache cache;
         private readonly AdminUserService adminUserService;
         private readonly AuthorizeBLL authorizeBLL;
+        private readonly PermissionBLL permissionBLL;
 
-        public ServerInfoBLL(IMemoryCache cache, ServerInfoService serverInfoService, AdminUserService adminUserService, AuthorizeBLL authorizeBLL)
+        public ServerInfoBLL(IMemoryCache cache, ServerInfoService serverInfoService, AdminUserService adminUserService, AuthorizeBLL authorizeBLL, PermissionBLL permissionBLL)
         {
             this.serverInfoService = serverInfoService;
             this.serverInfo = null;
             this.cache = cache;
             this.adminUserService = adminUserService;
             this.authorizeBLL = authorizeBLL;
+            this.permissionBLL = permissionBLL;
         }
 
         public ServerInfo GetServerInfoWithSiteId(int siteId)
@@ -59,7 +62,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<ServerInfo> GetSiteListByLoginUser()
         {
             var authData = authorizeBLL.GetAuthData();
-            if(authData != null)
+            if (authData != null)
             {
                 string sServerInfoListKey = $"ServerInfoList_UserId_{authData.UserId}";
                 var UserSiteList = cache.Get<IEnumerable<ServerInfo>>(sServerInfoListKey);
@@ -94,16 +97,81 @@ namespace BackendSite.Service.BLL
         {
             List<int> result = new List<int>();
             var siteList = GetSiteListByLoginUser();
-            if(siteList != null)
+            if (siteList != null)
             {
-                foreach(var siteInfo in siteList)
+                foreach (var siteInfo in siteList)
                 {
-                    var currencies = siteInfo.ICurrencyList.Where(x=> !result.Any(y=> x == y));
+                    var currencies = siteInfo.ICurrencyList.Where(x => !result.Any(y => x == y));
                     result.AddRange(currencies);
                 }
             }
 
             return result;
+        }
+
+        public int AdminOperateLog(int? SiteId, int? CustId, string Menu, ActionType ActionType, Dictionary<string, dynamic> DetailInfo, string Operator)
+        {
+            return AddAdminOperateLog(SiteId, CustId, Menu, ActionType, DetailInfo, null, Operator);
+        }
+        public int AdminOperateLog(int? SiteId, int? CustId, string Menu, ActionType ActionType, string DetailInfo, string Operator)
+        {
+            return AddAdminOperateLog(SiteId, CustId, Menu, ActionType, null, DetailInfo, Operator);
+        }
+
+        private int AddAdminOperateLog(int? SiteId, int? CustId, string Menu, ActionType ActionType, Dictionary<string, dynamic> DetailInfo, string DetailInfos, string Operator)
+        {
+            string newDetailInfo = null;
+            if (DetailInfo != null)
+            {
+                newDetailInfo = JsonSerializer.Serialize(DetailInfo);
+            }
+            else if (DetailInfos != null)
+            {
+                newDetailInfo = DetailInfos;
+            }
+
+            var addAdminOperateLog = new AddAdminOperateLog
+            {
+                SiteId = SiteId,
+                CustId = CustId,
+                Menu = Menu,
+                ActionType = ActionType,
+                DetailInfo = newDetailInfo,
+                Operator = Operator
+            };
+            return serverInfoService.AddAdminOperateLog(addAdminOperateLog);
+        }
+        public IEnumerable<GetAdminOperateLog> GetAdminOperateLog(int? SiteId, int? CustId, string Menu, string Operator, long StartDate, long EndDate, int PageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        {
+            var permissionJson = permissionBLL.GetPermissionJSONData();
+            Dictionary<string, string> dictKeys = new Dictionary<string, string>();
+
+            foreach (var permission in permissionJson)
+            {
+                //dictKeys.Add(permission.FuncKey, permission.DisplayKey);
+                permissionLoop(permission.Settings, ref dictKeys);
+            }
+
+            var returndata = serverInfoService.GetAdminOperateLog(SiteId, CustId, Menu, Operator, StartDate, EndDate, PageSize, ref pageNumber, out totalPages, out rowCount);
+
+            foreach (var data in returndata) {
+                dictKeys.TryGetValue(data.Menu, out string displayKey);
+                data.Menu = displayKey;
+            }
+
+            return returndata;
+        }
+
+        public void permissionLoop(IEnumerable<FuncPermissionSettings> settings, ref Dictionary<string, string> dictKeys)
+        {
+            if (settings != null && settings.Any())
+            {
+                foreach (var s in settings)
+                {
+                    dictKeys.Add(s.FuncKey, s.DisplayKey);
+                    permissionLoop(s.FuncKeys, ref dictKeys);
+                }
+            }
         }
     }
 }

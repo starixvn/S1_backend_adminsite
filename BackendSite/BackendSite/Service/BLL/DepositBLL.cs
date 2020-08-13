@@ -1,12 +1,8 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using MySql.Data.MySqlClient;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
@@ -106,54 +102,56 @@ namespace BackendSite.Service.BLL
         {
             return depositService.GetDepositExportList(selectSite, depositType, startDate, endDate, DepositId, UserName, currencyId, status);
         }
-        public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(int siteId, int currencyId) => depositService.GetDepositLimitInfos(siteId, currencyId);
+        public IEnumerable<DepositLimitCurrencyInfo> GetDepositLimitCurrencyList(int siteId, int depositType) => depositService.GetDepositLimitCurrencyList(siteId, depositType);
+
+        public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(int siteId, int depositType, int currencyId) => depositService.GetDepositLimitInfos(siteId, depositType,currencyId);
 
         public bool AddDepositLimit(DepositLimitInfo depositLimitInfo)
         {
-            if (depositLimitInfo.VipLevel > 1)
-            {
-                var currentMaxLevel = depositService.GetDepositLimitInfo(depositLimitInfo.SiteId, depositLimitInfo.CurrencyId, depositLimitInfo.VipLevel - 1);
+            //if (depositLimitInfo.VipLevel > 1)
+            //{
+            //    var currentMaxLevel = depositService.GetDepositLimitInfo(depositLimitInfo.SiteId, depositLimitInfo.DepositType, depositLimitInfo.CurrencyId, depositLimitInfo.VipLevel - 1);
 
-                if (depositLimitInfo.DepositMin <= currentMaxLevel.DepositMin || depositLimitInfo.DepositMax <= currentMaxLevel.DepositMax)
-                    return false;
-            }
-            else
-            {
-                if (depositLimitInfo.DepositMin <= 0 || depositLimitInfo.DepositMax <= 0)
-                    return false;
-            }
+            //    if (depositLimitInfo.DepositMin <= currentMaxLevel.DepositMin || depositLimitInfo.DepositMax <= currentMaxLevel.DepositMax)
+            //        return false;
+            //}
+            //else
+            //{
+            //    if (depositLimitInfo.DepositMin <= 0 || depositLimitInfo.DepositMax <= 0)
+            //        return false;
+            //}
 
             return depositService.AddDepositLimitInfo(depositLimitInfo);
         }
 
         public bool EditDepositLimit(DepositLimitInfo depositLimitInfo)
         {
-            var currentBelowLevel = depositService.GetDepositLimitInfo(depositLimitInfo.SiteId, depositLimitInfo.CurrencyId, depositLimitInfo.VipLevel - 1);
-            var currentUpperLevel = depositService.GetDepositLimitInfo(depositLimitInfo.SiteId, depositLimitInfo.CurrencyId, depositLimitInfo.VipLevel + 1);
+            //var currentBelowLevel = depositService.GetDepositLimitInfo(depositLimitInfo.SiteId, depositLimitInfo.DepositType, depositLimitInfo.CurrencyId, depositLimitInfo.VipLevel - 1);
+            //var currentUpperLevel = depositService.GetDepositLimitInfo(depositLimitInfo.SiteId, depositLimitInfo.DepositType, depositLimitInfo.CurrencyId, depositLimitInfo.VipLevel + 1);
 
-            if (currentBelowLevel != null)
-            {
-                if (depositLimitInfo.DepositMin <= currentBelowLevel.DepositMin || depositLimitInfo.DepositMax <= currentBelowLevel.DepositMax)
-                    return false;
-            }
-            else
-            {
-                if (depositLimitInfo.DepositMin <= 0 || depositLimitInfo.DepositMax <= 0)
-                    return false;
-            }
+            //if (currentBelowLevel != null)
+            //{
+            //    if (depositLimitInfo.DepositMin <= currentBelowLevel.DepositMin || depositLimitInfo.DepositMax <= currentBelowLevel.DepositMax)
+            //        return false;
+            //}
+            //else
+            //{
+            //    if (depositLimitInfo.DepositMin <= 0 || depositLimitInfo.DepositMax <= 0)
+            //        return false;
+            //}
 
-            if (currentUpperLevel != null)
-            {
-                if (depositLimitInfo.DepositMin >= currentUpperLevel.DepositMin || depositLimitInfo.DepositMax >= currentUpperLevel.DepositMax)
-                    return false;
-            }
+            //if (currentUpperLevel != null)
+            //{
+            //    if (depositLimitInfo.DepositMin >= currentUpperLevel.DepositMin || depositLimitInfo.DepositMax >= currentUpperLevel.DepositMax)
+            //        return false;
+            //}
 
             return depositService.EditDepositLimitInfo(depositLimitInfo);
         }
 
         public int DeleteDepositLimit(DepositLimitInfo depositLimitInfo)
         {
-            var currentUpperPoint = depositService.GetDepositLimitInfo(depositLimitInfo.SiteId, depositLimitInfo.CurrencyId, depositLimitInfo.VipLevel + 1);
+            var currentUpperPoint = depositService.GetDepositLimitInfo(depositLimitInfo.SiteId, depositLimitInfo.DepositType, depositLimitInfo.CurrencyId, depositLimitInfo.VipLevel + 1);
 
             if (currentUpperPoint != null)
                 return 0;

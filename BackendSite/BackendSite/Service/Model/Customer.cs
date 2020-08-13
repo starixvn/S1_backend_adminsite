@@ -32,6 +32,8 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public int CurrencyId { get; set; }
         public int UserLevel { get; set; }
+        public int? PointLevel { get; set; }
+        public int? VipLevel { get; set; }
         public string Agent { get; set; }
         public string UserLang { get; set; }
         public int ActStatus { get; set; }
@@ -110,6 +112,7 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public string Note { get; set; }
         public DateTime CreateTime { get; set; }
+        public DateTime? UpdateTime { get; set; }
         public string Operator { get; set; }
     }
     public class CustRollOver

@@ -35,8 +35,8 @@ namespace BackendSite.Controllers.Api
                 if (cashBackBonus == null)
                 {
                     cashBackBonus = new CashBackBonus();
-                    var tpList = bonusCashBackBLL.GetTpList(serverInfo.SiteId);
-                    cashBackBonus.BonusCashBackGames = tpList.Select(x => new CashBackGames() { Id = x.Id, TpName = x.TpName });
+                    var tpList = bonusCashBackBLL.GetTpList();
+                    cashBackBonus.BonusCashBackGames = tpList.Select(x => new CashBackGames() { Id = x.Type, TpName = x.TpName });
 
                     cashBackBonus.BonusCashBackMinMax = serverInfo.ICurrencyList.Select(x => new CashBackMinMaxAmount() { CurrencyId = x });
                 }

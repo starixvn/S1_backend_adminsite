@@ -1,0 +1,37 @@
+﻿@model IEnumerable<BackendSite.Service.Model.BankDetail>
+@using Microsoft.AspNetCore.Hosting
+@using BackendSite.Service.BLL
+@using BackendSite.Service.Model
+@inject IWebHostEnvironment environment
+@inject SelLangBLL selLangBLL
+@inject ServerInfoBLL serverInfoBLL
+@inject AuthorizeBLL authorizeBLL
+@inject IWebHostEnvironment environment
+@section Style {
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Poppins&display=swap" rel="stylesheet">
+    <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
+}
+@{
+    Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
+    ViewData["Title"] = "3RD Funds Adjustment";
+}
+@{
+    var i18n = new Dictionary<string, string>();
+    
+    for (var currency = 1; currency <= 51; currency++)
+    {
+        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
+            i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+    }
+}
+
+<div id="content"></div>
+@section Scripts {
+    <script>
+        window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
+        window.RootUrl = '@Url.Content("~/api")';
+        window.LangCode = 'en'
+    </script>
+    <script src="~/lib/runtime.min.js"></script>
+    <script src="~/js/component/Finance/ThirdPartyAdjustment.min.js" asp-append-version="true"></script>
+}

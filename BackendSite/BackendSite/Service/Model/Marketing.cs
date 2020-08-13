@@ -8,8 +8,9 @@
 
         public int PointLevel { get; set; }
 
-        public double DepositLeast { get; set; }
+        public int DepositCnt { get; set; }
 
-        public double BetLeast { get; set; }
+        public int WithdrawalCnt { get; set; }
+        public int IsKyc { get; set; }
     }
 }

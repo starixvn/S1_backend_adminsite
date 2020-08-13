@@ -92,6 +92,10 @@ namespace BackendSite.Service.BLL
                     foreach (var promotion in custInfoDetail.promotions)
                     {
                         promotion.custRollOver = rolloverService.GetCustRollOver(custInfoDetail.CustId, promotion.BonusCode);
+                        if (promotion.BonusInfoStatus == 5)
+                        {
+                            promotion.BonusInfoStatus = 1;
+                        }
                     }
                 }
             }
@@ -111,9 +115,9 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.SetCustStatusSwitch(custId, Op);
         }
-        public int SetCustStatusLevel(int custId, int Level, string Operator)
+        public int SetCustInfo(int custId, int? Level, string FullName, int? Birthday_Y, int? Birthday_M, int? Birthday_D, string PhoneNumber, string EMail, string Operator)
         {
-            return custInfoService.SetCustStatusLevel(custId, Level, Operator);
+            return custInfoService.SetCustInfo(custId, Level, FullName, Birthday_Y, Birthday_M, Birthday_D, PhoneNumber, EMail, Operator);
         }
         public CustPhotoId GetCustPhotoId(int custId)
         {
@@ -130,6 +134,10 @@ namespace BackendSite.Service.BLL
         public IEnumerable<CustNote> GetCustNotes(int custId)
         {
             return custInfoService.GetCustNotes(custId);
+        }
+        public bool SetCustNotes(int custId, int noteId, string note, int type, string Operator)
+        {
+            return custInfoService.SetCustNotes(custId, noteId, note, type, Operator);
         }
         public IEnumerable<LoginLog> GetLoginLogByCust(int CustId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {

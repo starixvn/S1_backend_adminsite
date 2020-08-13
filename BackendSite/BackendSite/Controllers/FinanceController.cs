@@ -136,5 +136,10 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/ThirdPartyAdjustment" })]
+        public IActionResult ThirdPartyAdjustment()
+        {
+            return View();
+        }
     }
 }

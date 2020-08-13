@@ -581,6 +581,12 @@ blockquote p {
   transition: all 0.3s ease 0s;
   color: #f1f1f1; }
 
+@media (max-height:800px) {
+    .main-menu {
+        overflow-y: scroll;
+    }
+}
+
 .menu-inner {
   overflow-y: scroll;
   height: 100%; }

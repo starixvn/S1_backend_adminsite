@@ -16,7 +16,7 @@ export const CurrencyInfo = (props) => {
                 <a className="panel-title" data-toggle="collapse" href={`#collapseExample-${value}`} role="button" aria-expanded="true" aria-controls="collapseExample">
                     {window.i18n["lbl_Currency" + value]}
                 </a>
-                <Result siteId={props.optSite.siteId} currId={value} />
+                <Result siteId={props.optSite.siteId} depositType={props.optSite.depositType} currId={value} />
             </div>
         )
     })
@@ -30,6 +30,7 @@ const Result = (props) => {
     const [editValue, setEditValue] = useState(null);
     const [isOpen, setOpen] = useState(false);
     const [levelList, setLevelList] = useState(null);
+    const [statusValue, setstatusValue] = useState({});
     const handleOpen = (_isOpen) => {
         setOpen(_isOpen);
     }
@@ -49,6 +50,28 @@ const Result = (props) => {
         });
     };
 
+    const handleStatusChange = (idx, _newData) => {
+        if (statusValue !== null) {
+            setstatusValue(null);
+        }
+        setstatusValue({ [idx]: _newData });
+        let tmp = [...levelList], status = (_newData) ? 1 : 0;
+        tmp[idx].depositStatus = status;
+        setLevelList(tmp);
+
+        api.post('/api/Deposit/EditDepositLimitInfo', { siteId: levelList[idx].siteId, depositType: levelList[idx].depositType, currencyId: levelList[idx].currencyId, vipLevel: levelList[idx].vipLevel, depositMin: parseInt(levelList[idx].depositMin), depositMax: parseInt(levelList[idx].depositMax), depositStatus: status })
+            .then(function (response) {
+                if (response.data.errorCode === 0) {
+                    alert(response.data.message);
+                } else {
+                    alert(response.data.message);
+                }
+            }).catch(function (error) {
+                alert(error);
+            })
+    }
+
+
     const handleSetLevelList = (idx, status, depositMin, depositMax) => {
         let tmp = [...levelList];
         if (status === "Delete") {
@@ -63,7 +86,7 @@ const Result = (props) => {
 
     const handleDelete = (idx) => {
         if (window.confirm("您真的確定要刪除嗎？\n\n請確認！") === true) {
-            api.post('/api/Deposit/DeleteDepositLimitInfo', { siteId: levelList[idx].siteId, currencyId: levelList[idx].currencyId, vipLevel: levelList[idx].vipLevel })
+            api.post('/api/Deposit/DeleteDepositLimitInfo', { siteId: levelList[idx].siteId, depositType: levelList[idx].depositType, currencyId: levelList[idx].currencyId, vipLevel: levelList[idx].vipLevel })
                 .then(function (response) {
                     if (response.data.errorCode === 0) {
                         handleSetLevelList(idx, "Delete");
@@ -81,7 +104,8 @@ const Result = (props) => {
         if (editValue !== null) {
             let depositMin = typeof editValue.depositMin === "undefined" ? levelList[idx].depositMin : editValue.depositMin;
             let depositMax = typeof editValue.depositMax === "undefined" ? levelList[idx].depositMax : editValue.depositMax;
-            api.post('/api/Deposit/EditDepositLimitInfo', { siteId: levelList[idx].siteId, currencyId: levelList[idx].currencyId, vipLevel: levelList[idx].vipLevel, depositMin: parseInt(depositMin), depositMax: parseInt(depositMax) })
+
+            api.post('/api/Deposit/EditDepositLimitInfo', { siteId: levelList[idx].siteId, depositType: levelList[idx].depositType, currencyId: levelList[idx].currencyId, vipLevel: levelList[idx].vipLevel, depositMin: parseInt(depositMin), depositMax: parseInt(depositMax), depositStatus: levelList[idx].depositStatus })
                 .then(function (response) {
                     if (response.data.errorCode === 0) {
                         handleSetLevelList(idx, "Update", depositMin, depositMax);
@@ -96,6 +120,9 @@ const Result = (props) => {
         }
     }
 
+
+
+
     const ChangeData = (idx, _locate, _newData) => {
         setEditValue({
             ...editValue,
@@ -106,7 +133,7 @@ const Result = (props) => {
 
     useEffect(() => {
         let mounted = true;
-        api.post('/api/Deposit/GetDepositLimitInfos', { siteId: props.siteId, currencyId: props.currId })
+        api.post('/api/Deposit/GetDepositLimitInfos', { siteId: props.siteId, depositType: props.depositType, currencyId: props.currId })
             .then(function (response) {
                 if (response.data.errorCode === 0) {
                     if (mounted) {
@@ -138,9 +165,11 @@ const Result = (props) => {
                             handleDelete={handleDelete}
                             EditValue={stateEdit}
                             ChangeData={ChangeData}
+                            StatusValue={statusValue}
+                            handleStatusChange={handleStatusChange}
                         />
                     </div>
-                    {isOpen ? <PopBoxContentAddLevel ClickCancel={handleOpen.bind(null, false)} LevelList={levelList} SiteId={props.siteId} CurrencyId={props.currId} ClickSave={handleAddLevelList} /> : null}
+                    {isOpen ? <PopBoxContentAddLevel ClickCancel={handleOpen.bind(null, false)} LevelList={levelList} SiteId={props.siteId} CurrencyId={props.currId} DepositType={props.depositType} ClickSave={handleAddLevelList} /> : null}
                 </div>
             </div >
         )

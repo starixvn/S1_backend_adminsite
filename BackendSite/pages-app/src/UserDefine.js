@@ -47,14 +47,11 @@ const DashBoard = lazy(() => import("./pages/Home/DashBoard/index"));
 const BalanceAdjustmentBatch = lazy(() =>
 	import("./pages/Finance/BalanceAdjustmentBatch/index")
 );
-
 const BonusManage = lazy(() => import("./pages/Marketing/BonusManage/index"));
-
-export const defaultPage = "BonusManage";
-
 const PendingBonus = lazy(() => import("./pages/Marketing/PendingBonus/index"));
+const ThirdPartyAdjustment = lazy(() => import("./pages/Finance/ThirdPartyAdjustment/index"));
 
-// export const defaultPage = "PendingBonus";
+export const defaultPage = "WithdrawalLimitAdjust";
 
 export const layoutType = {
 	N88: "N88",
@@ -297,6 +294,19 @@ export const pages = {
 		comp: (
 			<Suspense fallback="loading...">
 				<PendingBonus />
+			</Suspense>
+		),
+		css: [
+			"./lib/bootstrap/dist/css/bootstrap.min.css",
+			"./css/css/main.css",
+			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
+		],
+		layout: layoutType.N88
+	},
+	ThirdPartyAdjustment: {
+		comp: (
+			<Suspense fallback="loading...">
+				<ThirdPartyAdjustment />
 			</Suspense>
 		),
 		css: [

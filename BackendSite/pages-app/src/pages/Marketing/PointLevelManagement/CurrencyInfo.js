@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { BankInfo } from "./BankInfo";
 import { PopBoxContentAddPoint } from "./PopboxContentAddPoint";
-import {api} from '../../../module/WebAPI';
+import { api } from '../../../module/WebAPI';
 
-if(process.env.NODE_ENV !== 'production'){
+if (process.env.NODE_ENV !== 'production') {
     window.i18n = {
-        "lbl_Currency1":"SGD","lbl_Currency2":"MYR","lbl_Currency3":"USD","lbl_Currency4":"THB","lbl_Currency6":"EURO","lbl_Currency9":"AUD","lbl_Currency12":"GBP","lbl_Currency13":"RMB","lbl_Currency15":"IDR","lbl_Currency20":"UUS","lbl_Currency32":"JPY","lbl_Currency40":"WON","lbl_Currency41":"CHF","lbl_Currency45":"WON","lbl_Currency51":"VND","lbl_Save":"Save","lbl_Success":"Success","lbl_Action":"Action","lbl_SelectSite":"Select site","lbl_Point":"Point","lbl_DepositLeast":"Deposit least","lbl_BetLeast":"Bet least","lbl_AddPointLevel":"Add point level","lbl_AddNewPointLevel":"Add new point level","lbl_Delete":"Delete","lbl_AreYouSure":"Are you sure?","lbl_OK":"OK","lbl_Cancel":"Cancel","lbl_Error":"Error"
+        "lbl_Currency1": "SGD", "lbl_Currency2": "MYR", "lbl_Currency3": "USD", "lbl_Currency4": "THB", "lbl_Currency6": "EURO", "lbl_Currency9": "AUD", "lbl_Currency12": "GBP", "lbl_Currency13": "RMB", "lbl_Currency15": "IDR", "lbl_Currency20": "UUS", "lbl_Currency32": "JPY", "lbl_Currency40": "WON", "lbl_Currency41": "CHF", "lbl_Currency45": "WON", "lbl_Currency51": "VND", "lbl_Save": "Save", "lbl_Success": "Success", "lbl_Action": "Action", "lbl_SelectSite": "Select site", "lbl_Point": "Point", "lbl_DepositLeast": "Deposit least", "lbl_BetLeast": "Bet least", "lbl_AddPointLevel": "Add point level", "lbl_AddNewPointLevel": "Add new point level", "lbl_Delete": "Delete", "lbl_AreYouSure": "Are you sure?", "lbl_OK": "OK", "lbl_Cancel": "Cancel", "lbl_Error": "Error"
     };
 }
 
@@ -33,7 +33,7 @@ const Result = (props) => {
     const handleOpen = (_isOpen) => {
         setOpen(_isOpen);
     }
-    
+
     const handleAddBankList = (_newList) => {
         setBankList([...bankList, _newList]);
         setOpen(false);
@@ -49,14 +49,15 @@ const Result = (props) => {
         });
     };
 
-    const handleSetBankList = (idx, status, depositLeast, betLeast) => {
+    const handleSetBankList = (idx, status, depositCnt, withdrawalCnt, isKyc) => {
         let tmp = [...bankList];
         if (status === "Delete") {
             tmp.splice(idx, 1);
             setBankList(tmp);
         } else if (status === "Update") {
-            tmp[idx].depositLeast = depositLeast;
-            tmp[idx].betLeast = betLeast;
+            tmp[idx].depositCnt = depositCnt;
+            tmp[idx].withdrawalCnt = withdrawalCnt;
+            tmp[idx].isKyc = isKyc;
             setBankList(tmp);
         }
     }
@@ -79,12 +80,13 @@ const Result = (props) => {
 
     const handleUpdate = (idx) => {
         if (editValue !== null) {
-            let depositLeast = typeof editValue.depositLeast === "undefined" ? bankList[idx].depositLeast : editValue.depositLeast;
-            let betLeast = typeof editValue.betLeast === "undefined" ? bankList[idx].betLeast : editValue.betLeast;
-            api.post('/api/Marketing/EditPointLevelInfo', { siteId: bankList[idx].siteId, currencyId: bankList[idx].currencyId, pointLevel: bankList[idx].pointLevel, betLeast: parseInt(betLeast), depositLeast: parseInt(depositLeast) })
+            let depositCnt = typeof editValue.depositCnt === "undefined" ? bankList[idx].depositCnt : editValue.depositCnt;
+            let withdrawalCnt = typeof editValue.withdrawalCnt === "undefined" ? bankList[idx].withdrawalCnt : editValue.withdrawalCnt;
+            let isKyc = typeof editValue.isKyc === "undefined" ? bankList[idx].isKyc : (editValue.isKyc) ? 1 : 0;
+            api.post('/api/Marketing/EditPointLevelInfo', { siteId: bankList[idx].siteId, currencyId: bankList[idx].currencyId, pointLevel: bankList[idx].pointLevel, withdrawalCnt: parseInt(withdrawalCnt), depositCnt: parseInt(depositCnt), isKyc: parseInt(isKyc) })
                 .then(function (response) {
                     if (response.data.errorCode === 0) {
-                        handleSetBankList(idx, "Update", depositLeast, betLeast);
+                        handleSetBankList(idx, "Update", depositCnt, withdrawalCnt, isKyc);
                         alert(response.data.message);
                         handleEdit(idx);
                     } else {
@@ -109,7 +111,7 @@ const Result = (props) => {
         api.post('/api/Marketing/GetPointLevelInfos', { siteId: props.siteId, currencyId: props.currId })
             .then(function (response) {
                 if (response.data.errorCode === 0) {
-                    if(mounted){
+                    if (mounted) {
                         setBankList(response.data === null ? [] : response.data.data);
                     }
                 } else {
@@ -118,7 +120,7 @@ const Result = (props) => {
             }).catch(function (error) {
                 alert(error);
             })
-        return ()=> mounted = false;
+        return () => mounted = false;
     }, []);
 
     if (bankList === null) {
@@ -131,12 +133,13 @@ const Result = (props) => {
                         <div className="table-options">
                             <button className="btn btn-add" onClick={handleOpen.bind(null, true)}>Add point level</button>
                         </div>
-                        <BankInfo 
-                            BankList={bankList} 
+                        <BankInfo
+                            BankList={bankList}
                             handleEdit={handleEdit}
                             handleUpdate={handleUpdate}
                             handleDelete={handleDelete}
-                            EditValue={stateEdit}
+                            EditValue={editValue}
+                            StateEdit={stateEdit}
                             ChangeData={ChangeData}
                         />
                     </div>

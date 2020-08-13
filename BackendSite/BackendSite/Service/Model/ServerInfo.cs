@@ -1,8 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.Model
 {
@@ -33,5 +32,35 @@ namespace BackendSite.Service.Model
                 return JsonConvert.DeserializeObject<IEnumerable<string>>(LangList);
             }
         }
+    }
+    public class AdminOperateLog
+    {
+
+        public int? SiteId { set; get; }
+        public int? CustId { set; get; }
+        public string Menu { set; get; }
+        public ActionType ActionType { set; get; }
+        public string DetailInfo { set; get; }
+
+    }
+    public class AddAdminOperateLog : AdminOperateLog
+    {
+        public string DetailInfo { set; get; }
+        public string Operator { set; get; }
+    }
+    public class GetAdminOperateLog : AdminOperateLog
+    {
+        public DateTime CreateTime { set; get; }
+        public string Operator { set; get; }
+    }
+    public class AdminOperateLogReq
+    {
+        public int? SiteId { get; set; }
+        public int? CustId { get; set; }
+        public string Menu { get; set; }
+        public string Operator { get; set; }
+        public long startDate { get; set; }
+        public long endDate { get; set; }
+        public int PageNumber { get; set; }
     }
 }

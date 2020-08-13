@@ -25,7 +25,7 @@ namespace BackendSite.Service.Model.enums
     {
         OnlineBanking = 1,
         MobilePayment = 2,
-        WireTransfer = 3,
+        LocalBank = 3,
     }
 
     public enum WithdrawalType
@@ -35,8 +35,8 @@ namespace BackendSite.Service.Model.enums
         LocalBank = 2,
     }
     /// <summary>
-     /// 
-     /// </summary>
+    /// 
+    /// </summary>
     public enum DepositStatus
     {
         Draft = 0,
@@ -111,5 +111,13 @@ namespace BackendSite.Service.Model.enums
     {
         Running = 1,
         Fulfill = 2
+    }
+
+    public enum ActionType
+    {
+        Create = 1,
+        Read = 2,
+        Update = 3,
+        Delete = 4
     }
 }
