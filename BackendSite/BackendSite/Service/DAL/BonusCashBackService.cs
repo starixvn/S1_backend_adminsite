@@ -18,10 +18,10 @@ namespace BackendSite.Service.DAL
             this.configuration = configuration;
         }
 
-        public IEnumerable<SiteTpList> GetTpList(int SiteId)
+        public IEnumerable<SiteTpList> GetTpList()
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<SiteTpList>("Admin_SiteTpList_Get", new { SiteId }, commandType: CommandType.StoredProcedure);
+            return conn.Query<SiteTpList>("Admin_TpGameType_Get", commandType: CommandType.StoredProcedure);
         }
 
         public CashBackBonus GetCashBackBonus(int SiteId)

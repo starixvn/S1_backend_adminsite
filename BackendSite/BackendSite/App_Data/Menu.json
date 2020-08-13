@@ -180,7 +180,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      }/*,
+      } /*,
       {
         "Key": "",
         "Title": "Withdrawal Limit Management",
@@ -190,7 +190,18 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      }*/
+      }*/,
+      {
+        "Key": "",
+        "Title": "3RD Funds Adjustment",
+        "FuncKey": "Finance/ThirdPartyAdjustment",
+        "Controller": "Finance",
+        "Action": "ThirdPartyAdjustment",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      }
+
     ]
   },
   {

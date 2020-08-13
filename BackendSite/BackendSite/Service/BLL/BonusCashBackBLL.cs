@@ -15,9 +15,9 @@ namespace BackendSite.Service.BLL
             this.bonusCashBackService = bonusCashBackService;
         }
 
-        public IEnumerable<SiteTpList> GetTpList(int SiteId)
+        public IEnumerable<SiteTpList> GetTpList()
         {
-            return bonusCashBackService.GetTpList(SiteId);
+            return bonusCashBackService.GetTpList();
         }
 
         public int? AddCashBackBonus(CashBackBonusBase _CashBackBonus, IEnumerable<CashBackGames> _CashBackGames, IEnumerable<CashBackMinMaxAmount> _CashBackMinMaxAmounts, int SiteId)

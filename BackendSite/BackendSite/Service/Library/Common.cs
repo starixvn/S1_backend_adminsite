@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace BackendSite.Service.Library
 {
@@ -37,6 +35,24 @@ namespace BackendSite.Service.Library
             }
             return "X";
         }
+        public int? TpIdToCustId(string TpId)
+        {
+            int custId;
+            TpId = TpId.Trim();
 
+            if (TpId.IndexOf("_") > -1)
+            {
+                TpId = TpId.Substring(TpId.LastIndexOf("_"), TpId.Length - TpId.LastIndexOf("_"));
+            }
+            else if (TpId.IndexOf("x") > -1)
+            {
+                TpId = TpId.Substring(TpId.LastIndexOf("x"), TpId.Length - TpId.LastIndexOf("x"));
+            }
+
+            Match m = Regex.Match(TpId, @"\d+");
+            int? _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
+
+            return _custId;
+        }
     }
 }
