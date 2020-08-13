@@ -131,6 +131,15 @@ export default props => {
 		});
 	};
 
+	const EditCurrencyAmountValue = (currencyId, value, dataColumn)=>{
+		dispatch({
+			type: defActionType.CURRENCY_SET_AMOUNT_VALUE,
+			value,
+			dataColumn,
+			currencyId
+		});
+	}
+
 	const GetPromoCategories = (isInit, walletType, value) => {
 		if(walletType !== value){
 			let param = {
@@ -187,7 +196,8 @@ export default props => {
 					EditCurrencyLangPanelValue,
 					EditCurrencyLangCheckBox,
 					GetPromoCategories,
-					SelectTpId
+					SelectTpId,
+					EditCurrencyAmountValue
 				}}
 				siteList={props.SiteList}
 				IsAdd={props.IsAdd}

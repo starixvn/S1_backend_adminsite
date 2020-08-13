@@ -6,7 +6,7 @@ import DateTimePickerElem from "./Component/DateTimePicker";
 import moment from "moment";
 import RadioBox from "./Component/RadioBox";
 import RichText from "./Component/RichText.jsx";
-import {initWalletType} from './defCols'
+import { initWalletType } from "./defCols";
 
 const initPromotionType = [
 	{ value: 1, displayText: "1st Deposit" },
@@ -122,12 +122,6 @@ export default ({ state, action, IsAdd, processing }) => {
 							}}
 						/>
 						<InputBox
-							Title="ExpiryDays"
-							OnChange={action.EditMainValue}
-							dataColumn="expiryDays"
-							value={state.expiryDays}
-						/>
-						<InputBox
 							Title="Sort"
 							OnChange={action.EditMainValue}
 							dataColumn="sort"
@@ -144,10 +138,22 @@ export default ({ state, action, IsAdd, processing }) => {
 					/>
 				</div>
 				<div className="filter">
+					<div className="row-flex">
+						<InputBox
+							Title="ExpiryDays"
+							OnChange={action.EditMainValue}
+							dataColumn="expiryDays"
+							value={state.expiryDays}
+						/>
+					</div>
 					<RadioBox
 						Title="Wallet Type"
 						Options={initWalletType()}
-						OnChange={action.GetPromoCategories.bind(this, false, state.walletType)}
+						OnChange={action.GetPromoCategories.bind(
+							this,
+							false,
+							state.walletType
+						)}
 						dataColumn="walletType"
 						Selected={state.walletType}
 					/>
@@ -157,8 +163,14 @@ export default ({ state, action, IsAdd, processing }) => {
 							Title="Product Category"
 							Options={state.productCategory}
 							OnChange={action.SelectTpId}
-							dataColumn={state.walletType === 0 ? "tpId" : "categoryId"}
-							Selected={state.walletType === 0 ? state.tpId : state.categoryId}
+							dataColumn={
+								state.walletType === 0 ? "tpId" : "categoryId"
+							}
+							Selected={
+								state.walletType === 0
+									? state.tpId
+									: state.categoryId
+							}
 						/>
 					) : null}
 				</div>
@@ -192,6 +204,12 @@ export default ({ state, action, IsAdd, processing }) => {
 								)}
 								EditCurrencyLangPanelValue={
 									action.EditCurrencyLangPanelValue
+								}
+								EditCurrencyAmountValue={
+									action.EditCurrencyAmountValue.bind(
+										this,
+										state.currentTab
+									)
 								}
 								currencyId={state.currentTab}
 								action={action}
@@ -290,7 +308,7 @@ const SubPanel = props => {
 				<RadioBox
 					Title="Bonus Amount Type"
 					Options={initBonusAmountType(props.state.promotionType)}
-					OnChange={props.EditMainValue}
+					OnChange={props.EditCurrencyAmountValue}
 					dataColumn="bonusAmountType"
 					Selected={
 						props.state.specific[props.currencyId].bonusAmountType
@@ -311,13 +329,18 @@ const SubPanel = props => {
 								: null
 						}
 					/>
-					<InputBox
-						Type="Number"
-						Title="Max Bonus"
-						OnChange={props.EditMainValue}
-						dataColumn="maxBonus"
-						value={props.state.specific[props.currencyId].maxBonus}
-					/>
+					{props.state.specific[props.currencyId].bonusAmountType ===
+					2 ? null : (
+						<InputBox
+							Type="Number"
+							Title="Max Bonus"
+							OnChange={props.EditMainValue}
+							dataColumn="maxBonus"
+							value={
+								props.state.specific[props.currencyId].maxBonus
+							}
+						/>
+					)}
 				</div>
 				<div className="filter noBGcolor">
 					<CheckBox

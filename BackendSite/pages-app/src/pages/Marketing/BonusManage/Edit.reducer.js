@@ -7,7 +7,8 @@ export const defActionType = {
 	CURRENCY_LANG_SET_VALUE: "CURRENCY_LANG_SET_VALUE",
 	CURRENCY_SET_LANG_CHECKBOX: "CURRENCY_SET_LANG_CHECKBOX",
 	GET_PROMO_CATEGORIES: "GET_PROMO_CATEGORIES",
-	SET_TPID: "SET_TPID"
+	SET_TPID: "SET_TPID",
+	CURRENCY_SET_AMOUNT_VALUE: "CURRENCY_SET_AMOUNT_VALUE"
 };
 
 export const initialState = (IsAdd, datas, siteList) => {
@@ -169,6 +170,19 @@ export function reducer(state, action) {
 			return {
 				...state,
 				[action.dataColumn]: action.value
+			};
+
+		case defActionType.CURRENCY_SET_AMOUNT_VALUE:
+			return {
+				...state,
+				specific: {
+					...state.specific,
+					[action.currencyId]: {
+						...state.specific[action.currencyId],
+						[action.dataColumn]: action.value,
+						maxBonus: action.value === 2 ? 0 : ""
+					}
+				}
 			};
 
 		case defActionType.MAIN_SET_CURRENCY_CHECKBOX:
