@@ -5,7 +5,7 @@ import {number_format, number_toFixed} from '../../../module/Formatting/NumberFo
 const defPromotionType = {
     1:"First Deposit",
     2:"Re-Deposit",
-    3:"Rebate",
+    3:"FreeBet",
     4:"Special"
 }
 
