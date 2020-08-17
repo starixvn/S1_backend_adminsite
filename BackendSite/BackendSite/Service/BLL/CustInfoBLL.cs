@@ -2,6 +2,7 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,6 @@ namespace BackendSite.Service.BLL
         private readonly PromotionService promotionService;
         private readonly RollOverService rolloverService;
         private readonly CustTurnoverService custTurnoverService;
-
         public CustInfoBLL(IMemoryCache cache, WalletService walletService, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL, TpBLL tpBLL, Tools tools, CodeGenerator codeGenerator, PromotionService promotionService, RollOverService rolloverService, CustTurnoverService custTurnoverService)
         {
             this.custInfoService = custInfoService;
@@ -72,12 +72,16 @@ namespace BackendSite.Service.BLL
         }
         public IEnumerable<CustInfoDetail> GetCustInfoList(int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            return custInfoService.GetCustInfoList(birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, pageSize, ref pageNumber, out totalPages, out rowCount);
+            var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
+
+            return custInfoService.GetCustInfoList(birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, pageSize, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList));
         }
 
         public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo)
         {
-            return custInfoService.GetCustInfoExportList(birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo);
+            var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
+
+            return custInfoService.GetCustInfoExportList(birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, JsonConvert.SerializeObject(siteList));
         }
 
         public async Task<CustInfoDetail> GetCustInfoDetailAsync(int custId, string userName)
