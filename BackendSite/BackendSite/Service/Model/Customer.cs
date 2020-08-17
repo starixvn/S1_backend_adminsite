@@ -88,6 +88,7 @@ namespace BackendSite.Service.Model
         public DateTime RegTime { get; set; }
         public int Status { get; set; }
         public string SabaID { get; set; }
+        public string SignupUrl { get; set; }
     }
 
     public class CustPhotoId
