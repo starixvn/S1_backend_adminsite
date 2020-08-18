@@ -88,10 +88,12 @@ namespace BackendSite.Service.DAL
                 p.Add("Amount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
                 result = conn.Execute("Admin_WithdrawalInfo_Set", p, trans, commandType: CommandType.StoredProcedure);
                 custId = p.Get<int?>("CustId") ?? 0;
-                string UserName = p.Get<string>("UserName");
-                amount = p.Get<decimal>("Amount");
+
                 if (result > 0)
                 {
+                    string UserName = p.Get<string>("UserName");
+                    amount = p.Get<decimal>("Amount");
+
                     SetWithdrawalLog(withdrawalId, siteId, comment, (int)status, Operator);
 
                     if (status == WithdrawalStatus.Rejected)
