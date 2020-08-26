@@ -69,9 +69,9 @@ namespace BackendSite.Service.BLL
             messageService.DeletePersonalMsg(Id, CustId);
         }
 
-        public int SendMessageBatch(IDictionary<string, PersonalMsgBase> personalMsg, IEnumerable<string> custList, string sender)
+        public int SendMessageBatch(string personalMsg, int custId, int siteId, string sender)
         {
-            return messageService.SendMessageBatch(personalMsg, custList, sender);
+            return messageService.SendMessageBatch(personalMsg, custId, siteId, sender);
         }
         public int ChangeVipLevelBatch(int siteId, int custId, string userName, int vipLevel, string memo, string Operator)
         {

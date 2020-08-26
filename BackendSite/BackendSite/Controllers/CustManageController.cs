@@ -56,6 +56,7 @@ namespace BackendSite.Controllers
         }
 
         [HttpPost]
+        [RequestSizeLimit(40000000)]
         public IActionResult ExportCustInfoList(CustInfoReq custInfoReq)
         {
             var ExportCustInfo = custInfoBLL.GetCustInfoExportList(custInfoReq.BirDate, custInfoReq.BirMonth, custInfoReq.BirYear, custInfoReq.UserName, custInfoReq.AccountName, custInfoReq.LoginIp, custInfoReq.TransId, custInfoReq.TpUserName, custInfoReq.Email, custInfoReq.PhoneNo);
