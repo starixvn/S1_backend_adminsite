@@ -41,12 +41,12 @@ module.exports = {
 		// 	"./src/pages/Finance/PaymentManagement/index.js"
 		// ],
 		// "CSD/Announcement.min": ["./src/pages/CSD/Announcement/index.js"],
-		"Finance/WithdrawalLimitAdjust.min": [
-			"./src/pages/Finance/WithdrawalLimitAdjust/index.js"
-		],
-		// "CSD/PersonalMsgBatch.min": [
-		// 	"./src/pages/CSD/PersonalMsgBatch/index.js"
+		// "Finance/WithdrawalLimitAdjust.min": [
+		// 	"./src/pages/Finance/WithdrawalLimitAdjust/index.js"
 		// ],
+		"CSD/PersonalMsgBatch.min": [
+			"./src/pages/CSD/PersonalMsgBatch/index.js"
+		],
 		// "Marketing/PointLevelList.min": [
 		// 	"./src/pages/Marketing/PointLevelManagement/index.js"
 		// ],
@@ -76,9 +76,9 @@ module.exports = {
 		// "Marketing/PendingBonus.min": [
 		// 	"./src/pages/Marketing/PendingBonus/index.jsx"
 		// ],
-		"Finance/ThirdPartyAdjustment.min": [
-			"./src/pages/Finance/ThirdPartyAdjustment/index.js"
-		],
+		// "Finance/ThirdPartyAdjustment.min": [
+		// 	"./src/pages/Finance/ThirdPartyAdjustment/index.js"
+		// ],
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

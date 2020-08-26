@@ -1,16 +1,15 @@
-﻿using System;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using BackendSite.Service.Model;
-using Microsoft.AspNetCore.Mvc;
-using BackendSite.Service.BLL;
-using BackendSite.Attributes;
-using Ubiety.Dns.Core.Records.NotUsed;
-using System.Security.Policy;
-using OfficeOpenXml;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
@@ -22,13 +21,15 @@ namespace BackendSite.Controllers.Api
         private readonly AuthorizeBLL authorizeBLL;
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly CustInfoBLL custInfoBLL;
+        private readonly Common common;
 
-        public MessageController(MessageBLL messageBLL, AuthorizeBLL authorizeBLL, ServerInfoBLL serverInfoBLL, CustInfoBLL custInfoBLL)
+        public MessageController(MessageBLL messageBLL, AuthorizeBLL authorizeBLL, ServerInfoBLL serverInfoBLL, CustInfoBLL custInfoBLL, Common common)
         {
             this.messageBLL = messageBLL;
             this.authorizeBLL = authorizeBLL;
             this.serverInfoBLL = serverInfoBLL;
             this.custInfoBLL = custInfoBLL;
+            this.common = common;
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
@@ -256,26 +257,76 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
-        public ApiResult SendMessageBatch([FromForm] IDictionary<string, PersonalMsgBase> personalMsg, [FromForm] IEnumerable<string> custList)
+        [HttpPost]
+        public List<ApiResult> SendMessageBatch([FromForm] int optSite, [FromForm] IFormFile excelUpload, [FromForm] string personalMsg)
         {
-            var result = new ApiResult<int>();
-
+            var apiResult = new List<ApiResult>();
+            var authData = authorizeBLL.GetAuthData();
             try
             {
-                var authData = authorizeBLL.GetAuthData();
-                result.Data = messageBLL.SendMessageBatch(personalMsg, custList, authData.UserName);
-                result.ErrorCode = 0;
+                if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
+                {
+                    ExcelPackage excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
+                    ExcelWorksheet sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
+                    bool isLastRow = false;
+                    int RowId = 2;   // 因為有標題列，所以從第2列開始讀起
+
+                    do  // 讀取資料，直到讀到空白列為止
+                    {
+                        string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text;
+                        string sabaId = sheet.Cells[RowId, 2].Text.Trim();
+                        var custId = (string.IsNullOrEmpty(sabaId)) ? null : common.TpIdToCustId(sabaId);
+
+                        if (string.IsNullOrEmpty(custUsername) && custId == null)
+                        {
+                            isLastRow = true;
+                        }
+                        else
+                        {
+                            var custInfosDetail = custInfoBLL.GetCustInfoDetails(custId, custUsername, optSite);
+                            if (custInfosDetail == null)
+                            {
+                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Not fund. Username: {custUsername}. SabaId: {sabaId}." });
+                            }
+                            else if (custInfosDetail.Status == 1)
+                            {
+                                if (messageBLL.SendMessageBatch(personalMsg, custInfosDetail.CustId, optSite, authData.UserName) > 0)
+                                {
+                                    apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. " });
+                                }
+                                else
+                                {
+                                    apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. " });
+                                }
+                            }
+                            else if (custInfosDetail.Status == 2)
+                            {
+                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Suspend Status." });
+                            }
+                            else
+                            {
+                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Closed Status." });
+                            }
+                            RowId += 1;
+                        }
+                    } while (!isLastRow);
+                    return apiResult;
+                }
+                else
+                {
+                    apiResult.Add(new ApiResult() { ErrorCode = -1, Message = "File Type Error" });
+                    return apiResult;
+                }
             }
             catch (Exception ex)
             {
-                result.ErrorCode = 999;
-                result.RawMessage = ex.ToString();
+                apiResult.Add(new ApiResult() { ErrorCode = -1, Message = ex.ToString() });
+                return apiResult;
             }
-
-            return result;
         }
+
+
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/ChangeVipLevelBatch" })]
         public async Task<List<ApiResult>> ChangeVipLevelBatch([FromForm] int optSite, [FromForm] IFormFile excelUpload)
