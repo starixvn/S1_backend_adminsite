@@ -44,9 +44,9 @@ module.exports = {
 		// "Finance/WithdrawalLimitAdjust.min": [
 		// 	"./src/pages/Finance/WithdrawalLimitAdjust/index.js"
 		// ],
-		"CSD/PersonalMsgBatch.min": [
-			"./src/pages/CSD/PersonalMsgBatch/index.js"
-		],
+		// "CSD/PersonalMsgBatch.min": [
+		// 	"./src/pages/CSD/PersonalMsgBatch/index.js"
+		// ],
 		// "Marketing/PointLevelList.min": [
 		// 	"./src/pages/Marketing/PointLevelManagement/index.js"
 		// ],
@@ -79,6 +79,9 @@ module.exports = {
 		// "Finance/ThirdPartyAdjustment.min": [
 		// 	"./src/pages/Finance/ThirdPartyAdjustment/index.js"
 		// ],
+		"Marketing/NewsManage.min": [
+			"./src/pages/Marketing/NewsManage/index.js"
+		]
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
