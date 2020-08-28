@@ -287,6 +287,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "NewsManage",
+        "Title": "News Management",
+        "FuncKey": "Marketing/NewsManage",
+        "Controller": "Marketing",
+        "Action": "NewsManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   }
