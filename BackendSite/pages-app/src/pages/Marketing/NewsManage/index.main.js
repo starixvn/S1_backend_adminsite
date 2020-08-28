@@ -93,7 +93,7 @@ export default ({ ClickAdd, ClickEdit, dataList, UpdateStatus, siteList }) => {
 				) {
 					body_content = (
 						<StatusBtn
-							mainKey={`${_data.siteId}-${_data.bonusCode}`}
+							mainKey={`${_data.siteId}-${_data.newsId}`}
 							checked={_data[element.dataColumn] === 1}
 							onChange={UpdateStatus.bind(this, d_idx)}
 						/>
