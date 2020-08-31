@@ -118,27 +118,27 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="lbl_DepositApprovedContent" xml:space="preserve">
-    <value>Xin chúc mừng! {0} tiền gửi của bạn đã được phê duyệt! Số tiền hiện đã được ghi có vào tài khoản. Chúc bạn đặt cược may mắn !</value>
+    <value>Xin chúc mừng! Giao dịch gửi tiền {0}  của bạn đã được phê duyệt! Số tiền hiện đã được ghi có vào tài khoản. Chúc bạn đặt cược may mắn !</value>
   </data>
   <data name="lbl_DepositApprovedTitle" xml:space="preserve">
-    <value>Gửi tiền {0} đã được phê duyệt!</value>
+    <value>Giao dịch gửi tiền {0} đã được phê duyệt!</value>
   </data>
   <data name="lbl_DepositRejectContent" xml:space="preserve">
-    <value>Rất tiếc phải thông báo rằng {0} tiền gửi của bạn đã bị từ chối. Nếu bạn có thắc mắc, vui lòng liên hệ với CSKH để biết thêm chi tiết.</value>
+    <value>Rất tiếc phải thông báo rằng giao dịch gửi tiền {0} của bạn đã bị từ chối. Nếu bạn có thắc mắc, vui lòng liên hệ với CSKH để biết thêm chi tiết.</value>
   </data>
   <data name="lbl_DepositRejectTitle" xml:space="preserve">
-    <value>Gửi tiền {0} đã bị từ chối!</value>
+    <value>Giao dịch gửi tiền {0} đã bị từ chối!</value>
   </data>
   <data name="lbl_WithdrawalApprovedContent" xml:space="preserve">
-    <value>Cảm ơn bạn đã tham gia! Rút tiền {0} của bạn đã được phe duyệt, chúng tôi hy vọng sẽ tiếp tục đồng hành cùng bạn!</value>
+    <value>Cảm ơn bạn đã tham gia! Giao dịch rút tiền {0} của bạn đã được phe duyệt, chúng tôi hy vọng sẽ tiếp tục đồng hành cùng bạn!</value>
   </data>
   <data name="lbl_WithdrawalApprovedTitle" xml:space="preserve">
-    <value>Rút tiền {0} đã được phe duyệt!</value>
+    <value>Giao dịch rút tiền {0} đã được phê duyệt!</value>
   </data>
   <data name="lbl_WithdrawalRejectContent" xml:space="preserve">
-    <value>Rất tiếc phải thông báo rằng {0} tiền rút của bạn đã bị từ chối. Nếu bạn có thắc mắc, vui lòng liên hệ với CSKH để biết thêm chi tiết.</value>
+    <value>Rất tiếc phải thông báo rằng giao dịch rút tiền {0} của bạn đã bị từ chối. Nếu bạn có thắc mắc, vui lòng liên hệ với CSKH để biết thêm chi tiết.</value>
   </data>
   <data name="lbl_WithdrawalRejectTitle" xml:space="preserve">
-    <value>Rút tiền {0} đã bị từ chối!</value>
+    <value>Giao dịch rút tiền {0} đã bị từ chối!</value>
   </data>
 </root>
