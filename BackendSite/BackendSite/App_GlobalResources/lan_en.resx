@@ -547,7 +547,7 @@
     <value>Sorry to inform that your withdrawal {0} has been rejected. Should you have further query, kindly contact CSD for more details.</value>
   </data>
   <data name="lbl_WithdrawalRejectTitle" xml:space="preserve">
-    <value>Your deposit {0} has been rejected!</value>
+    <value>Your withdrawal {0} has been rejected!</value>
   </data>
   <data name="lbl_AdjustmentStatus1" xml:space="preserve">
     <value>Pending</value>
