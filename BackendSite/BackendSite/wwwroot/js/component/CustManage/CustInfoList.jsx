@@ -79,16 +79,22 @@ import * as Loading from '../commJS/Loading.jsx';
         _Search = false;
         constructor(props) {
             super(props);
-            this.state = { searchData: null, UserName: "", TransId: "", Loading: false };
-
+            this.state = { SiteList: [], selectSite: [], searchData: null, UserName: "", TransId: "", Loading: false };
+            this.f_trigger_Start = React.createRef();
+            this.selectdate_start = React.createRef();
+            this.f_trigger_End = React.createRef();
+            this.selectdate_end = React.createRef();
             this.ExportForm = React.createRef();
         }
 
         handleSubmit(event) {
             event.preventDefault();
             if ((this.state.BirDate || this.state.BirMonth) && (!this.state.BirDate || !this.state.BirMonth)) { alert("Please fill in at least Date and Month"); return; }
+            let endDate = moment(this.selectdate_end.current.value).add(1, 'days').unix() - 1;
             this._Search = true;
             this.setState({
+                StartDate: moment(this.selectdate_start.current.value).unix(),
+                EndDate: endDate,
                 sBirDate: this.state.BirDate,
                 sBirMonth: this.state.BirMonth,
                 sBirYear: this.state.BirYear,
@@ -108,20 +114,22 @@ import * as Loading from '../commJS/Loading.jsx';
         onSearch(pageNumber) {
             Loading.OnLoading();
             let data = {
-                BirDate: this.state.sBirDate == "" ? null : parseInt(this.state.sBirDate),
-                BirMonth: this.state.sBirMonth == "" ? null : parseInt(this.state.sBirMonth),
-                BirYear: this.state.sBirYear == "" ? null : parseInt(this.state.sBirYear),
-                UserName: this.state.sUserName == "" ? null : this.state.sUserName,
-                TransId: this.state.sTransId == "" ? null : this.state.sTransId,
-                TpUserName: this.state.sTpUserName == "" ? null : this.state.sTpUserName,
-                AccountName: this.state.sAccountName == "" ? null : this.state.sAccountName,
-                LoginIp: this.state.sLoginIp == "" ? null : this.state.sLoginIp,
-                Email: this.state.sEmail == "" ? null : this.state.sEmail,
-                PhoneNo: this.state.sPhoneNo == "" ? null : this.state.sPhoneNo,
+                SelectSite: !this.state.selectSite ? null : this.state.selectSite,
+                StartDate: !this.state.StartDate ? null : this.state.StartDate,
+                EndDate: !this.state.EndDate ? null : this.state.EndDate,
+                BirDate: !this.state.sBirDate ? null : parseInt(this.state.sBirDate),
+                BirMonth: !this.state.sBirMonth ? null : parseInt(this.state.sBirMonth),
+                BirYear: !this.state.sBirYear ? null : parseInt(this.state.sBirYear),
+                UserName: !this.state.sUserName ? null : this.state.sUserName,
+                TransId: !this.state.sTransId ? null : this.state.sTransId,
+                TpUserName: !this.state.sTpUserName ? null : this.state.sTpUserName,
+                AccountName: !this.state.sAccountName ? null : this.state.sAccountName,
+                LoginIp: !this.state.sLoginIp ? null : this.state.sLoginIp,
+                Email: !this.state.sEmail ? null : this.state.sEmail,
+                PhoneNo: !this.state.sPhoneNo ? null : this.state.sPhoneNo,
                 PageNumber: pageNumber,
                 PageSize: this._PageSize
             };
-
             axios.post('/api/CustManage/GetCustInfoList', data)
                 .then(function (response) {
                     Loading.UnLoading();
@@ -141,16 +149,19 @@ import * as Loading from '../commJS/Loading.jsx';
 
         onExport() {
             let data = {
-                BirDate: this.state.sBirDate == "" ? null : parseInt(this.state.sBirDate),
-                BirMonth: this.state.sBirMonth == "" ? null : parseInt(this.state.sBirMonth),
-                BirYear: this.state.sBirYear == "" ? null : parseInt(this.state.sBirYear),
-                UserName: this.state.sUserName == "" ? null : this.state.sUserName,
-                TransId: this.state.sTransId == "" ? null : this.state.sTransId,
-                AccountName: this.state.sAccountName == "" ? null : this.state.sAccountName,
-                LoginIp: this.state.sLoginIp == "" ? null : this.state.sLoginIp,
-                TpUserName: this.state.sTpUserName == "" ? null : this.state.sTpUserName,
-                Email: this.state.sEmail == "" ? null : this.state.sEmail,
-                PhoneNo: this.state.sPhoneNo == "" ? null : this.state.sPhoneNo,
+                SelectSite: !this.state.selectSite ? null : this.state.selectSite,
+                StartDate: !this.state.StartDate ? null : this.state.StartDate,
+                EndDate: !this.state.EndDate ? null : this.state.EndDate,
+                BirDate: !this.state.sBirDate ? null : parseInt(this.state.sBirDate),
+                BirMonth: !this.state.sBirMonth ? null : parseInt(this.state.sBirMonth),
+                BirYear: !this.state.sBirYear ? null : parseInt(this.state.sBirYear),
+                UserName: !this.state.sUserName ? null : this.state.sUserName,
+                TransId: !this.state.sTransId ? null : this.state.sTransId,
+                TpUserName: !this.state.sTpUserName ? null : this.state.sTpUserName,
+                AccountName: !this.state.sAccountName ? null : this.state.sAccountName,
+                LoginIp: !this.state.sLoginIp ? null : this.state.sLoginIp,
+                Email: !this.state.sEmail ? null : this.state.sEmail,
+                PhoneNo: !this.state.sPhoneNo ? null : this.state.sPhoneNo
             };
 
             let ExportParam = [];
@@ -180,6 +191,73 @@ import * as Loading from '../commJS/Loading.jsx';
             this.setState(obj);
         }
 
+        getSiteList() {
+            let state = this.state;
+            //Loading.OnLoading();
+            axios.post('/api/Common/AdminUserSiteList')
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        state.selectSite.length = 0;
+                        this.setState({ SiteList: result.data });
+                        this.buildSelectSite();
+
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+        }
+
+        buildSelectSite = () => {
+            let state = this.state;
+            $("#selectSite").multiselect({
+                includeSelectAllOption: true,
+                selectAllText: 'Check all!',
+                onSelectAll: function () {
+                    state.selectSite.length = 0;
+                    state.SiteList.forEach(function (obj) {
+                        state.selectSite.push(obj.siteId);
+                    });
+                },
+                onDeselectAll: function () {
+                    state.selectSite.length = 0;
+                },
+                onChange: function (option, checked, select) {
+                    let val = parseInt($(option).val()), index = state.selectSite.indexOf(val);
+                    (checked) ? state.selectSite.push(val) : (index > -1) ? state.selectSite.splice(index, 1) : state.selectSite;
+                    state.selectSite.sort();
+                }
+            });
+            $('#selectSite').multiselect('updateButtonText');
+        }
+
+        componentDidMount() {
+            let f_trigger_Start = this.f_trigger_Start.current;
+            let f_trigger_End = this.f_trigger_End.current;
+            let selectdate_end = this.selectdate_end.current;
+            let selectdate_start = this.selectdate_start.current;
+
+            //selectdate_start.value
+            Calendar.setup({
+                inputField: selectdate_end, // id of the input field
+                ifFormat: "mm/dd/y",        // format of the input field
+                button: f_trigger_End,  // trigger for the calendar (button ID)
+                singleClick: true              // double-click mode
+            });
+
+            Calendar.setup({
+                inputField: selectdate_start, // id of the input field
+                ifFormat: "mm/dd/y",        // format of the input field
+                button: f_trigger_Start,  // trigger for the calendar (button ID)
+                singleClick: true              // double-click mode
+            });
+            this.getSiteList();
+        }
+
         render() {
             let inputStyle = {
                 marginRight: "10px",
@@ -199,13 +277,24 @@ import * as Loading from '../commJS/Loading.jsx';
                     { width: '-o-calc(100% / 3 - 10px)' }
                 ]
             }
-
+            let StartDate = this.state.StartDate;
+            let EndDate = this.state.EndDate;
+            let siteList = this.state.SiteList.map(function (obj) {
+                return <option key={obj.siteId} value={obj.siteId}>{obj.siteName}</option>;
+            }.bind(this));
+            siteList = <select id="selectSite" name="selectSite[]" multiple="multiple">{siteList}</select>;
             return (
                 <div>
                     <h4 className="page-name">Customer Search</h4>
                     <form onSubmit={this.state.Loading ? null : this.handleSubmit.bind(this)}>
                         <div className="filter">
                             <div className="row-flex">
+                                <div className="input-item">
+                                    <span className="label">Site</span>
+                                    <div className="field">
+                                        {siteList}
+                                    </div>
+                                </div>
                                 <div className="input-item">
                                     <label className="label">User Name</label>
                                     <div className="field">
@@ -254,6 +343,20 @@ import * as Loading from '../commJS/Loading.jsx';
                                         <input type="text" placeholder="Date" maxLength="2" autoComplete="off" name="BirDate" value={this.state.BirDate} style={inputStyle} onChange={this.onChange.bind(this)} />
                                         <input type="text" placeholder="Month" maxLength="2" autoComplete="off" name="BirMonth" value={this.state.BirMonth} style={inputStyle} onChange={this.onChange.bind(this)} />
                                         <input type="text" placeholder="Year" maxLength="4" autoComplete="off" name="BirYear" value={this.state.BirYear} style={inputStyle2} onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Register Date (From)</span>
+                                    <div className="date">
+                                        <input ref={this.selectdate_start} type="text" defaultValue={!isNaN(StartDate) ? moment.unix(StartDate).format('l') : null} size="8" />
+                                        <a className="icon-calendar" ref={this.f_trigger_Start}>{/*<img ref={this.f_trigger_Start} src="/css/Oneworks/images/icon-calendar.png" />*/}</a>
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Register Date (To)</span>
+                                    <div className="date">
+                                        <input ref={this.selectdate_end} type="text" defaultValue={!isNaN(EndDate) ? moment.unix(EndDate).format('l') : null} size="8" />
+                                        <a className="icon-calendar" ref={this.f_trigger_End}>{/*<img ref={this.f_trigger_End} src="/css/Oneworks/images/icon-calendar.png" />*/}</a>
                                     </div>
                                 </div>
                                 <div className="button-group">
