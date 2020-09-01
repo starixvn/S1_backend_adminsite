@@ -70,18 +70,18 @@ namespace BackendSite.Service.BLL
 
             return vipLevelCache;
         }
-        public IEnumerable<CustInfoDetail> GetCustInfoList(int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
 
-            return custInfoService.GetCustInfoList(birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, pageSize, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList));
+            return custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList));
         }
 
-        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo)
+        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
 
-            return custInfoService.GetCustInfoExportList(birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, JsonConvert.SerializeObject(siteList));
+            return custInfoService.GetCustInfoExportList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, JsonConvert.SerializeObject(siteList));
         }
 
         public async Task<CustInfoDetail> GetCustInfoDetailAsync(int custId, string userName)

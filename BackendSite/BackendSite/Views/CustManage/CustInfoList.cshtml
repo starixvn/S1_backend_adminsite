@@ -7,6 +7,8 @@
 @section Style {
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Poppins&display=swap" rel="stylesheet">
     <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/lib/Oneworks/jscalendar/calendar-blue.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap-multiselect/bootstrap-multiselect-modify.css" rel="stylesheet" />
 }
 @{
     ViewData["Title"] = "CustInfoList";
@@ -24,6 +26,10 @@
     subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
 }
 @section Scripts {
+    <script src="~/lib/Oneworks/jscalendar/calendar.js"></script>
+    <script src="~/lib/Oneworks/jscalendar/lang/calendar-en.js"></script>
+    <script src="~/lib/Oneworks/jscalendar/calendar-setup.js"></script>
+    <script src="~/lib/bootstrap-multiselect/bootstrap-multiselect.js"></script>
     <script type="text/javascript">
         $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
         var subFuncKeys = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(subFuncKeys));
