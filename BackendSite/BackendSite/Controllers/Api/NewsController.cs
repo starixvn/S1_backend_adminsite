@@ -1,0 +1,140 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
+using BackendSite.Attributes;
+using BackendSite.Service.BLL;
+using BackendSite.Service.Model;
+using Microsoft.AspNetCore.Mvc;
+
+namespace BackendSite.Controllers.Api
+{
+    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/NewsManage" })]
+    [Route("api/[controller]/[action]")]
+    [ApiController]
+    public class NewsController : Controller
+    {
+        private readonly NewsBLL newsBLL;
+        private readonly ServerInfoBLL serverInfoBLL;
+        private readonly AuthorizeBLL authorizeBLL;
+
+
+        public NewsController(NewsBLL newsBLL, ServerInfoBLL serverInfoBLL, AuthorizeBLL authorizeBLL)
+        {
+            this.newsBLL = newsBLL;
+            this.serverInfoBLL = serverInfoBLL;
+            this.authorizeBLL = authorizeBLL;
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<dynamic>> GetSiteListByLoginUser()
+        {
+            var apiResult = new ApiResult<IEnumerable<dynamic>>();
+            try
+            {
+                apiResult.Data = serverInfoBLL.GetSiteListByLoginUser()?.Select(x => new { x.SiteName, x.SiteId, LangList = x.ILangList });
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<News>> GetNewsList()
+        {
+            var result = new ApiResult<IEnumerable<News>>();
+
+            try
+            {
+                var siteList = serverInfoBLL.GetSiteListByLoginUser();
+                result.Data = newsBLL.GetNewsList().Where(n=> siteList.Any(s=> s.SiteId == n.SiteId));
+                result.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                result.ErrorCode = 999;
+                result.RawMessage = ex.Message;
+            }
+
+            return result;
+        }
+
+        [HttpPost]
+        public ApiResult<News> GetNewsById([FromForm]int NewsId)
+        {
+            var result = new ApiResult<News>();
+
+            try
+            {
+                var serverInfo = serverInfoBLL.GetServerInfo();
+                result.Data = newsBLL.GetNewsById(NewsId);
+                result.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                result.ErrorCode = 999;
+                result.RawMessage = ex.Message;
+            }
+
+            return result;
+        }
+
+        [HttpPost]
+        public ApiResult SetNews([FromForm] bool IsAdd, [FromForm] News newsDatas)
+        {
+            var result = new ApiResult();
+
+            try
+            {
+                if (!IsAdd)
+                {
+                    newsDatas.LastUpdateUser = authorizeBLL.GetAuthData().UserName;
+                }
+
+                int? newsId = newsBLL.SetNews(IsAdd, newsDatas);
+                if (IsAdd)
+                {
+                    result.ErrorCode = newsId != null && newsId != 0 ? 0 : -1;
+                }
+                else
+                {
+                    result.ErrorCode = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                result.ErrorCode = 999;
+                result.RawMessage = ex.Message;
+            }
+
+            return result;
+        }
+
+        [HttpPost]
+        public ApiResult<dynamic> SetStatus([FromForm]int NewsId, [FromForm]int Status)
+        {
+            var result = new ApiResult<dynamic>();
+            try
+            {
+                newsBLL.SetStatus(NewsId, Status, authorizeBLL.GetAuthData().UserName);
+                var data = newsBLL.GetNewsById(NewsId);
+                result.Data = new { data.LastUpdateUser, data.LastUpdateTime };
+                result.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                result.ErrorCode = 999;
+                result.RawMessage = ex.Message;
+            }
+
+            return result;
+        }
+    }
+}

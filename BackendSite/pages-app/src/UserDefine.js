@@ -49,9 +49,12 @@ const BalanceAdjustmentBatch = lazy(() =>
 );
 const BonusManage = lazy(() => import("./pages/Marketing/BonusManage/index"));
 const PendingBonus = lazy(() => import("./pages/Marketing/PendingBonus/index"));
-const ThirdPartyAdjustment = lazy(() => import("./pages/Finance/ThirdPartyAdjustment/index"));
+const ThirdPartyAdjustment = lazy(() =>
+	import("./pages/Finance/ThirdPartyAdjustment/index")
+);
+const NewsManage = lazy(() => import("./pages/Marketing/NewsManage/index"));
 
-export const defaultPage = "PersonalMsgBatch";
+export const defaultPage = "NewsManage";
 
 export const layoutType = {
 	N88: "N88",
@@ -307,6 +310,19 @@ export const pages = {
 		comp: (
 			<Suspense fallback="loading...">
 				<ThirdPartyAdjustment />
+			</Suspense>
+		),
+		css: [
+			"./lib/bootstrap/dist/css/bootstrap.min.css",
+			"./css/css/main.css",
+			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
+		],
+		layout: layoutType.N88
+	},
+	NewsManage: {
+		comp: (
+			<Suspense fallback="loading...">
+				<NewsManage />
 			</Suspense>
 		),
 		css: [
