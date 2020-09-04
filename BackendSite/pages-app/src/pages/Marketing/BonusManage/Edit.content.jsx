@@ -11,7 +11,8 @@ import { initWalletType } from "./defCols";
 const initPromotionType = [
 	{ value: 1, displayText: "1st Deposit" },
 	//{ value: 2, displayText: "Re-Deposit" },
-	{ value: 3, displayText: "FreeBet" }
+	{ value: 3, displayText: "FreeBet" },
+	{ value: 5, displayText: "Wallet Bonus" }
 ];
 
 const initBonusAmountType = promoType => {
