@@ -96,7 +96,9 @@ namespace BackendSite.Service.DAL
                         specific.Status,
                         IsAdd,
                         specific.Usage,
-                        specific.Details
+                        specific.Details,
+                        specific.RequiredAmount,
+                        specific.LockedType
                     }, transaction: trans, commandType: CommandType.StoredProcedure);
                 }
 

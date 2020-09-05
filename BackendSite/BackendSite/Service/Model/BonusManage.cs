@@ -41,6 +41,8 @@ namespace BackendSite.Service.Model
         public decimal MaxBonus { get; set; }
         public string Details { get; set; }
         public int Status { get; set; }
+        public decimal RequiredAmount { get; set; }
+        public int LockedType { get; set; }
     }
 
     public class PromoCategory

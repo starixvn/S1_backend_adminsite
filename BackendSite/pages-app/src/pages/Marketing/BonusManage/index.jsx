@@ -88,7 +88,10 @@ const App = () => {
 						lang[l] = info.lang[l];
 					});
 
-					let maxBonus = promotion.promotionType === 3 ? Number(info.bonus) : Number(info.maxBonus)
+					let maxBonus =
+						promotion.promotionType === 3
+							? Number(info.bonus)
+							: Number(info.maxBonus);
 					return {
 						CurrencyId: s,
 						Usage: s.usage ? Number(info.usage) : 0,
@@ -97,7 +100,9 @@ const App = () => {
 						BonusType: info.bonusAmountType,
 						MaxBonus: maxBonus,
 						Details: JSON.stringify(lang),
-						Status: info.status
+						Status: info.status,
+						RequiredAmount: Number(info.requiredAmount),
+						LockedType: info.lockedType
 					};
 				});
 
