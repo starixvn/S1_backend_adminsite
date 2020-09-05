@@ -5,7 +5,7 @@ import WebAPI from "../../../module/WebAPI";
 import qs from "qs";
 import Panel from "./Edit.content";
 
-const skipField = ["currentLang", "productCategory"];
+const skipField = ["currentLang", "productCategory", "lockedType"];
 
 export default props => {
 	const isMountedRef = useRef(null);
@@ -131,17 +131,17 @@ export default props => {
 		});
 	};
 
-	const EditCurrencyAmountValue = (currencyId, value, dataColumn)=>{
+	const EditCurrencyAmountValue = (currencyId, value, dataColumn) => {
 		dispatch({
 			type: defActionType.CURRENCY_SET_AMOUNT_VALUE,
 			value,
 			dataColumn,
 			currencyId
 		});
-	}
+	};
 
 	const GetPromoCategories = (isInit, walletType, value) => {
-		if(walletType !== value){
+		if (walletType !== value) {
 			let param = {
 				Url: "BonusManage/GetPromoCategories",
 				Data: qs.stringify({
@@ -155,7 +155,7 @@ export default props => {
 							type: defActionType.GET_PROMO_CATEGORIES,
 							value,
 							productCategory: res.data.data,
-							isInit:isInit
+							isInit: isInit
 						});
 					} else {
 						alert(res.data.message ?? "failed to get data.");
@@ -168,7 +168,7 @@ export default props => {
 	const SelectTpId = (value, dataColumn, mainKey, oIdx) => {
 		dispatch({
 			type: defActionType.SET_TPID,
-			idx:oIdx,
+			idx: oIdx,
 			dataColumn
 		});
 	};

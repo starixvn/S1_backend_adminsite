@@ -1,16 +1,9 @@
 import React from "react";
 import moment from "moment";
-import {defWalletType} from './defCols'
+import { defWalletType, defPromotionType } from "./defCols";
 const SpecialItemType = {
 	actionBtn: "actionBtn",
 	statusBtn: "statusBtn"
-};
-
-const defPromotionType = {
-	1: "First Deposit",
-	2: "Re-Deposit",
-	3: "FreeBet",
-	4: "Special"
 };
 
 const promotionTypeFormat = type => {
@@ -45,9 +38,9 @@ const lastUpdateTimeFormat = lastUpdTime => {
 	return lastUpdTime ? moment(lastUpdTime).format("l LTS") : "-";
 };
 
-const walletTypeFormat = walletType =>{
+const walletTypeFormat = walletType => {
 	return defWalletType[walletType]?.displayText;
-}
+};
 
 const titleData = [
 	{ dataColumn: "bonusCode", columnTitle: "BonusCode" },

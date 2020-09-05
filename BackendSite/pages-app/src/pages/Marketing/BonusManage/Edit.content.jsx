@@ -6,14 +6,7 @@ import DateTimePickerElem from "./Component/DateTimePicker";
 import moment from "moment";
 import RadioBox from "./Component/RadioBox";
 import RichText from "./Component/RichText.jsx";
-import { initWalletType } from "./defCols";
-
-const initPromotionType = [
-	{ value: 1, displayText: "1st Deposit" },
-	//{ value: 2, displayText: "Re-Deposit" },
-	{ value: 3, displayText: "FreeBet" },
-	{ value: 5, displayText: "Wallet Bonus" }
-];
+import { initWalletType, initPromotionType } from "./defCols";
 
 const initBonusAmountType = promoType => {
 	return Number(promoType) === 3
@@ -206,12 +199,10 @@ export default ({ state, action, IsAdd, processing }) => {
 								EditCurrencyLangPanelValue={
 									action.EditCurrencyLangPanelValue
 								}
-								EditCurrencyAmountValue={
-									action.EditCurrencyAmountValue.bind(
-										this,
-										state.currentTab
-									)
-								}
+								EditCurrencyAmountValue={action.EditCurrencyAmountValue.bind(
+									this,
+									state.currentTab
+								)}
 								currencyId={state.currentTab}
 								action={action}
 							/>
@@ -342,6 +333,18 @@ const SubPanel = props => {
 							}
 						/>
 					)}
+				</div>
+				<div className="row-flex">
+					<InputBox
+						Type="Number"
+						Title="Required Amount"
+						OnChange={props.EditMainValue}
+						dataColumn="requiredAmount"
+						value={
+							props.state.specific[props.currencyId]
+								.requiredAmount
+						}
+					/>
 				</div>
 				<div className="filter noBGcolor">
 					<CheckBox
