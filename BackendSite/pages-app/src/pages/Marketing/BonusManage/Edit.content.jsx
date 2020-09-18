@@ -157,13 +157,13 @@ export default ({ state, action, IsAdd, processing }) => {
 							Title="Product Category"
 							Options={state.productCategory}
 							OnChange={action.SelectTpId}
-							dataColumn={
-								state.walletType === 0 ? "tpId" : "categoryId"
+							dataColumn={"categoryId"
+								// state.walletType === 0 ? "tpId" : "categoryId"
 							}
-							Selected={
-								state.walletType === 0
-									? state.tpId
-									: state.categoryId
+							Selected={state.categoryId
+								// state.walletType === 0
+								// 	? state.tpId
+								// 	: state.categoryId
 							}
 						/>
 					) : null}
