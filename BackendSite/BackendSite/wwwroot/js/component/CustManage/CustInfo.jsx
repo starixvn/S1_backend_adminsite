@@ -528,7 +528,7 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
         cancelBonus(bonusId) {
             if (confirm('Are you sure Cancel Bonus ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/CancelBonusByBonusId', {CustId: data.custId, BonusId: bonusId })
+                axios.post('/api/CustManage/CancelBonusByBonusId', { CustId: data.custId, BonusId: bonusId })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -600,7 +600,6 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
                 }
             }
 
-
             return (
                 data == null ? <div className="text-center">
                     <div className="spinner-border" role="status">
@@ -609,7 +608,7 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
                 </div> :
                     <div>
                         <div className="button-block">
-                            <button className="btn btn-primary" onClick={this.onResetProfile.bind(this)}>Reset Profile</button>
+                            {data.phoneVerified || data.emailVerified ? null : <button className="btn btn-primary" onClick={this.onResetProfile.bind(this)}>Reset Profile</button>}
                             <button className="btn btn-primary" onClick={this.onResetCustBankInfo.bind(this)}>Reset Customer Bank Info.</button>
                             {data.status == 1 && data.agent != null && subFuncKeys.indexOf("ca_acc_lock") > -1 ? <button className="btn btn-primary" onClick={this.onLock.bind(this)}>Lock</button> : null}
                             {(data.status == 1 || data.status == 2) && data.agent != null && subFuncKeys.indexOf("ca_acc_close") > -1 ? <button className="btn btn-primary" onClick={this.onClose.bind(this)}>Closed</button> : null}
@@ -747,32 +746,36 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
                                     <tr>
                                         <th scope="row">Phone Number</th>
                                         {
-                                            this.props.isEdit.PhoneNumber ? (
-                                                <td>
-                                                    {"(" + data.areaCode + ") "}<input type="text" defaultValue={data.phoneNo} onChange={(e) => this.props.editOnChange(e.target.value, "PhoneNumber")} />
-                                                    <div className="button-action float-right">
-                                                        <button className="btn btn-save" onClick={this.props.editUpdate}>
-                                                            <i className="icon-save"></i>
-                                                        </button>
-                                                        <button className="btn btn-icon-cancel" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.PhoneNumber, "PhoneNumber")}>
-                                                            <i className="icon-cancel"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            ) : (
+                                            !data.phoneVerified ?
+                                                this.props.isEdit.PhoneNumber ? (
                                                     <td>
-                                                        {"(" + data.areaCode + ") " + data.phoneNo}
-                                                        {
-                                                            subFuncKeys.includes('ca_userEdit') ? (
-                                                                <div className="button-action float-right">
-                                                                    <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.PhoneNumber, "PhoneNumber")}>
-                                                                        <i className="icon-edit"></i>
-                                                                    </button>
-                                                                </div >
-                                                            ) : null
-                                                        }
+                                                        {"(" + ((typeof data.areaCode === 'undefined') ? "N/A" : data.areaCode) + ") "}<input type="text" defaultValue={data.phoneNo} onChange={(e) => this.props.editOnChange(e.target.value, "PhoneNumber")} />
+                                                        <div className="button-action float-right">
+                                                            <button className="btn btn-save" onClick={this.props.editUpdate}>
+                                                                <i className="icon-save"></i>
+                                                            </button>
+                                                            <button className="btn btn-icon-cancel" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.PhoneNumber, "PhoneNumber")}>
+                                                                <i className="icon-cancel"></i>
+                                                            </button>
+                                                        </div>
                                                     </td>
-                                                )
+                                                ) : (
+                                                        <td>
+                                                            {"(" + ((typeof data.areaCode === 'undefined') ? "N/A" : data.areaCode) + ") " + ((typeof data.phoneNo === 'undefined') ? "N/A" : data.phoneNo)}
+                                                            {
+                                                                subFuncKeys.includes('ca_userEdit') ? (
+                                                                    <div className="button-action float-right">
+                                                                        <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.PhoneNumber, "PhoneNumber")}>
+                                                                            <i className="icon-edit"></i>
+                                                                        </button>
+                                                                    </div >
+                                                                ) : null
+                                                            }
+                                                        </td>
+                                                    )
+                                                : <td>
+                                                    {"(" + ((typeof data.areaCode === 'undefined') ? "N/A" : data.areaCode) + ") " + ((typeof data.phoneNo === 'undefined') ? "N/A" : data.phoneNo)}
+                                                </td>
                                         }
                                     </tr>
                                     <tr>
@@ -809,6 +812,18 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
                                         </td>
                                     </tr>
                                     <tr>
+                                        <th scope="row">PhoneVerified</th>
+                                        <td>
+                                            <span>{data.phoneVerified ? "Yes" : "No"}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">EmailVerified</th>
+                                        <td>
+                                            <span>{data.emailVerified ? "Yes" : "No"}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <th scope="row">Status</th>
                                         <td>{CustStatusOp[data.status]}</td>
                                     </tr>
@@ -827,32 +842,36 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
                                     <tr>
                                         <th scope="row">E-Mail</th>
                                         {
-                                            this.props.isEdit.EMail ? (
-                                                <td>
-                                                    <input type="text" defaultValue={data.email} onChange={(e) => this.props.editOnChange(e.target.value, "EMail")} />
-                                                    <div className="button-action float-right">
-                                                        <button className="btn btn-save" onClick={this.props.editUpdate}>
-                                                            <i className="icon-save"></i>
-                                                        </button>
-                                                        <button className="btn btn-icon-cancel" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.EMail, "EMail")}>
-                                                            <i className="icon-cancel"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            ) : (
+                                            !data.emailVerified ?
+                                                this.props.isEdit.EMail ? (
                                                     <td>
-                                                        {data.email}
-                                                        {
-                                                            subFuncKeys.includes('ca_userEdit') ? (
-                                                                <div className="button-action float-right">
-                                                                    <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.EMail, "EMail")}>
-                                                                        <i className="icon-edit"></i>
-                                                                    </button>
-                                                                </div >
-                                                            ) : null
-                                                        }
+                                                        <input type="text" defaultValue={data.email} onChange={(e) => this.props.editOnChange(e.target.value, "EMail")} />
+                                                        <div className="button-action float-right">
+                                                            <button className="btn btn-save" onClick={this.props.editUpdate}>
+                                                                <i className="icon-save"></i>
+                                                            </button>
+                                                            <button className="btn btn-icon-cancel" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.EMail, "EMail")}>
+                                                                <i className="icon-cancel"></i>
+                                                            </button>
+                                                        </div>
                                                     </td>
-                                                )
+                                                ) : (
+                                                        <td>
+                                                            {data.email ? data.email : "N/A"}
+                                                            {
+                                                                subFuncKeys.includes('ca_userEdit') ? (
+                                                                    <div className="button-action float-right">
+                                                                        <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.EMail, "EMail")}>
+                                                                            <i className="icon-edit"></i>
+                                                                        </button>
+                                                                    </div >
+                                                                ) : null
+                                                            }
+                                                        </td>
+                                                    )
+                                                : <td>
+                                                    {data.email ? data.email : "N/A"}
+                                                </td>
                                         }
                                     </tr>
                                     <tr>
@@ -1275,7 +1294,7 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
                 dataContainer = <PersonalMsg />
             } else if (TabName == this._Tabs[10]) {
                 dataContainer = <TurnoverReport />
-            }else if (TabName == this._Tabs[11]) {
+            } else if (TabName == this._Tabs[11]) {
                 dataContainer = <AdminUserLog GetAdminUserLogByCust={this.GetAdminUserLogByCust.bind(this)} searchData={this.state.AdminUserLogData} AdminUserLog={this.state.AdminUserLog} onChangeValue={this.onChangeValue.bind(this)} />
             }
 
