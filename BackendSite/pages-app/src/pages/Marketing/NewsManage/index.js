@@ -65,7 +65,7 @@ const App = () => {
 		let msg =
 			_data.status === 1 ? "Disable this News?" : "Enable this News?";
 		if (_data && window.confirm(msg)) {
-			let newStatus = _data.status === 1 ? 2 : 1;
+			let newStatus = _data.status === 1 ? 0 : 1;
 			let param = {
 				Url: "News/SetStatus",
 				Data: qs.stringify({

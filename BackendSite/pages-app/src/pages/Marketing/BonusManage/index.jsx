@@ -94,7 +94,7 @@ const App = () => {
 							: Number(info.maxBonus);
 					return {
 						CurrencyId: s,
-						Usage: s.usage ? Number(info.usage) : 0,
+						Usage: info.usage ? Number(info.usage) : 0,
 						Rollover: Number(info.rollOver),
 						Bonus: Number(info.bonus),
 						BonusType: info.bonusAmountType,
@@ -102,7 +102,8 @@ const App = () => {
 						Details: JSON.stringify(lang),
 						Status: info.status,
 						RequiredAmount: Number(info.requiredAmount),
-						LockedType: info.lockedType
+						LockedType: info.lockedType,
+						BeenUsed: info.beenUsed
 					};
 				});
 

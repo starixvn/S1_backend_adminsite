@@ -84,6 +84,7 @@ const initSpecific = {
 	currentLang: null,
 	requiredAmount: "",
 	lockedType: 1,
+	beenUsed: 0,
 	lang: {
 		en: { ...initLang }
 	}
