@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,13 +22,15 @@ namespace BackendSite.Controllers.Api
         private readonly AdjustWithdrawalLimitBLL adjustWithdrawalLimitBLL;
         private readonly AuthorizeBLL authorizeBLL;
         private readonly CustInfoService custInfoService;
+        private readonly Common common;
 
-        public AdjustWithdrawalLimitController(CustInfoBLL custInfoBLL, AdjustWithdrawalLimitBLL adjustWithdrawalLimitBLL, AuthorizeBLL authorizeBLL, CustInfoService custInfoService)
+        public AdjustWithdrawalLimitController(CustInfoBLL custInfoBLL, AdjustWithdrawalLimitBLL adjustWithdrawalLimitBLL, AuthorizeBLL authorizeBLL, CustInfoService custInfoService, Common common)
         {
             this.custInfoBLL = custInfoBLL;
             this.adjustWithdrawalLimitBLL = adjustWithdrawalLimitBLL;
             this.authorizeBLL = authorizeBLL;
             this.custInfoService = custInfoService;
+            this.common = common;
         }
 
         public ApiResult<dynamic> GetCustAndWalletInfoAsync([FromForm] int SiteId, [FromForm] string UserName, [FromForm] string SabaId)
@@ -35,7 +38,8 @@ namespace BackendSite.Controllers.Api
             var result = new ApiResult<dynamic>();
             try
             {
-                var custInfo = custInfoBLL.GetCustInfoDetails(null, UserName, SiteId);
+                var custId = (string.IsNullOrEmpty(SabaId)) ? null : common.TpIdToCustId(SabaId);
+                var custInfo = custInfoBLL.GetCustInfoDetails(custId, UserName, SiteId);
 
                 if (custInfo != null)
                 {

@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -24,14 +25,16 @@ namespace BackendSite.Controllers.Api
         private readonly TpBLL tpBLL;
         private readonly AuthorizeBLL authorizeBLL;
         private readonly int mainWalletType;
+        private readonly Common common;
 
-        public PaymentController(IConfiguration configuration, PaymentBLL paymentBLL, CustInfoBLL custInfoBLL, TpBLL tpBLL, AuthorizeBLL authorizeBLL)
+        public PaymentController(IConfiguration configuration, PaymentBLL paymentBLL, CustInfoBLL custInfoBLL, TpBLL tpBLL, AuthorizeBLL authorizeBLL, Common common)
         {
             this.paymentBLL = paymentBLL;
             this.custInfoBLL = custInfoBLL;
             this.tpBLL = tpBLL;
             this.authorizeBLL = authorizeBLL;
             mainWalletType = configuration.GetValue<int>("MainWalletType");
+            this.common = common;
         }
         public class PaymentAdjustmentReq
         {
@@ -262,29 +265,18 @@ namespace BackendSite.Controllers.Api
                     {
                         string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text;
 
-                        int custId;
                         string sabaId = sheet.Cells[RowId, 2].Text.Trim();
-                        string _sabaId = "";
-                        if (sabaId.IndexOf("_") > -1)
-                        {
-                            _sabaId = sabaId.Substring(sabaId.LastIndexOf("_"), sabaId.Length - sabaId.LastIndexOf("_"));
-                        }
-                        else if (sabaId.IndexOf("x") > -1)
-                        {
-                            _sabaId = sabaId.Substring(sabaId.LastIndexOf("x"), sabaId.Length - sabaId.LastIndexOf("x"));
-                        }
+                        var custId = (string.IsNullOrEmpty(sabaId)) ? null : common.TpIdToCustId(sabaId);
 
-                        Match m = Regex.Match(_sabaId, @"\d+");
-                        int? _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
                         decimal.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out decimal amount);
                         string memo = sheet.Cells[RowId, 4].Text.Trim();
-                        if (string.IsNullOrEmpty(custUsername) && _custId == null)
+                        if (string.IsNullOrEmpty(custUsername) && custId == null)
                         {
                             isLastRow = true;
                         }
                         else
                         {
-                            var custInfoDetail = custInfoBLL.GetCustInfoDetails(_custId, custUsername, optSite);
+                            var custInfoDetail = custInfoBLL.GetCustInfoDetails(custId, custUsername, optSite);
                             if (custInfoDetail == null)
                             {
                                 apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Not fund. Username: {custUsername}. SabaId: {sabaId}." });
