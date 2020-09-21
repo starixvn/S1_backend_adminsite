@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
@@ -27,8 +28,9 @@ namespace BackendSite.Controllers.Api
         private readonly WinLostReportService winLostReportService;
         private readonly PermissionBLL permissionBLL;
         private readonly ServerInfoBLL serverInfoBLL;
+        private readonly Common common;
 
-        public CustManageController(CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, TpBLL tpBLL, WinLostReportService winLostReportService, PermissionBLL permissionBLL, ServerInfoBLL serverInfoBLL)
+        public CustManageController(CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, TpBLL tpBLL, WinLostReportService winLostReportService, PermissionBLL permissionBLL, ServerInfoBLL serverInfoBLL, Common common)
         {
             this.custInfoBLL = custInfoBLL;
             this.bankDetailBLL = bankDetailBLL;
@@ -36,6 +38,7 @@ namespace BackendSite.Controllers.Api
             this.winLostReportService = winLostReportService;
             this.permissionBLL = permissionBLL;
             this.serverInfoBLL = serverInfoBLL;
+            this.common = common;
         }
         public class CustInfoListReq
         {
@@ -310,22 +313,9 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<CustInfoDetail>();
 
             string custUsername = string.IsNullOrEmpty(custInfosReq.UserName) ? null : custInfosReq.UserName;
+            var custId = (string.IsNullOrEmpty(custInfosReq.sabaId)) ? null : common.TpIdToCustId(custInfosReq.sabaId);
 
-            int custId;
-            string sabaId = custInfosReq.sabaId;
-            if (sabaId.IndexOf("_") > -1)
-            {
-                sabaId = sabaId.Substring(sabaId.LastIndexOf("_"), sabaId.Length - sabaId.LastIndexOf("_"));
-            }
-            else if (sabaId.IndexOf("x") > -1)
-            {
-                sabaId = sabaId.Substring(sabaId.LastIndexOf("x"), sabaId.Length - sabaId.LastIndexOf("x"));
-            }
-
-            Match m = Regex.Match(sabaId, @"\d+");
-            int? _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
-
-            var custInfosDetail = custInfoBLL.GetCustInfoDetails(_custId, custUsername, custInfosReq.SiteId);
+            var custInfosDetail = custInfoBLL.GetCustInfoDetails(custId, custUsername, custInfosReq.SiteId);
 
             if (custInfosDetail != null)
             {
