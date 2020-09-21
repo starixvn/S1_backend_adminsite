@@ -87,7 +87,7 @@ namespace BackendSite.Service.DAL
                 {
                     if (refPromotion != null && refPromotion.Specific?.Where(x => x.CurrencyId == specific.CurrencyId).FirstOrDefault() != null)
                     {
-                        specific.BeenUsed = refPromotion.Specific?.Where(x => x.CurrencyId == specific.CurrencyId).FirstOrDefault().BeenUsed;
+                        specific.BeenUsed = refPromotion.Specific.Where(x => x.CurrencyId == specific.CurrencyId).FirstOrDefault().BeenUsed;
                     }
 
                     conn.Execute("Admin_PromotionSpecific_Ins", new
