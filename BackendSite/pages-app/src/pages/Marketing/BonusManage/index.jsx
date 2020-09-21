@@ -94,7 +94,7 @@ const App = () => {
 							: Number(info.maxBonus);
 					return {
 						CurrencyId: s,
-						Usage: s.usage ? Number(info.usage) : 0,
+						Usage: info.usage ? Number(info.usage) : 0,
 						Rollover: Number(info.rollOver),
 						Bonus: Number(info.bonus),
 						BonusType: info.bonusAmountType,
