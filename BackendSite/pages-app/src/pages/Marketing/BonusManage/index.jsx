@@ -102,7 +102,8 @@ const App = () => {
 						Details: JSON.stringify(lang),
 						Status: info.status,
 						RequiredAmount: Number(info.requiredAmount),
-						LockedType: info.lockedType
+						LockedType: info.lockedType,
+						BeenUsed: info.beenUsed
 					};
 				});
 
