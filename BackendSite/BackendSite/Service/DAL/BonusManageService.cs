@@ -49,6 +49,7 @@ namespace BackendSite.Service.DAL
         public int SetPromotion(bool IsAdd, PromotionInfo promotion)
         {
             int errorCode = 0;
+            var refPromotion = GetPromotion(promotion.BonusCode, promotion.SiteId);
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
@@ -84,6 +85,11 @@ namespace BackendSite.Service.DAL
 
                 foreach (var specific in promotion.Specific)
                 {
+                    if (refPromotion != null && refPromotion.Specific?.Where(x => x.CurrencyId == specific.CurrencyId).FirstOrDefault() != null)
+                    {
+                        specific.BeenUsed = refPromotion.Specific?.Where(x => x.CurrencyId == specific.CurrencyId).FirstOrDefault().BeenUsed;
+                    }
+
                     conn.Execute("Admin_PromotionSpecific_Ins", new
                     {
                         promotion.BonusCode,
