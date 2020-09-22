@@ -74,40 +74,31 @@ namespace BackendSite.Service.DAL
             errorCode = p.Get<int>("ErrorCode");
             if(errorCode == 0)
             {
-                if (!IsAdd && !string.IsNullOrEmpty(promotion.BonusCode))
-                {
-                    conn.Execute("Admin_PromotionSpecific_Del", new
-                    {
-                        promotion.BonusCode,
-                        promotion.SiteId
-                    }, transaction: trans, commandType: CommandType.StoredProcedure);
-                }
+                List<PromotionSpecific> specificList = new List<PromotionSpecific>();
 
                 foreach (var specific in promotion.Specific)
                 {
-                    if (refPromotion != null && refPromotion.Specific?.Where(x => x.CurrencyId == specific.CurrencyId).FirstOrDefault() != null)
+                    specificList.Add(new PromotionSpecific
                     {
-                        specific.BeenUsed = refPromotion.Specific.Where(x => x.CurrencyId == specific.CurrencyId).FirstOrDefault().BeenUsed;
-                    }
-
-                    conn.Execute("Admin_PromotionSpecific_Ins", new
-                    {
-                        promotion.BonusCode,
-                        specific.CurrencyId,
-                        promotion.SiteId,
-                        specific.RollOver,
-                        specific.Bonus,
-                        specific.BonusType,
-                        specific.MaxBonus,
-                        specific.Status,
-                        IsAdd,
-                        specific.Usage,
-                        specific.Details,
-                        specific.BeenUsed,
-                        specific.RequiredAmount,
-                        specific.LockedType
-                    }, transaction: trans, commandType: CommandType.StoredProcedure);
+                        CurrencyId = specific.CurrencyId,
+                        RollOver = specific.RollOver,
+                        Bonus = specific.Bonus,
+                        BonusType = specific.BonusType,
+                        MaxBonus = specific.MaxBonus,
+                        Status = specific.Status,
+                        Usage = specific.Usage,
+                        Details = specific.Details,
+                        RequiredAmount = specific.RequiredAmount,
+                        LockedType = specific.LockedType
+                    });
                 }
+
+                conn.Execute("Admin_PromotionSpecificV2_Set", new
+                {
+                    promotion.BonusCode,
+                    promotion.SiteId,
+                    SpecificList = JsonConvert.SerializeObject(specificList)
+                }, transaction: trans, commandType: CommandType.StoredProcedure);
 
                 trans.Commit();
             }
