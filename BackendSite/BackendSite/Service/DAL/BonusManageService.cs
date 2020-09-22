@@ -84,7 +84,7 @@ namespace BackendSite.Service.DAL
                         RollOver = specific.RollOver,
                         Bonus = specific.Bonus,
                         BonusType = specific.BonusType,
-                        MaxBonus = specific.MaxBonus,
+                        MaxBonus = specific.BonusType == 2 ? specific.Bonus : specific.MaxBonus,
                         Status = specific.Status,
                         Usage = specific.Usage,
                         Details = specific.Details,
