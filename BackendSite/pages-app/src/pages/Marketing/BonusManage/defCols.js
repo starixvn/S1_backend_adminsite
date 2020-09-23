@@ -19,7 +19,7 @@ export const defPromotionType = {
 
 export const initPromotionType = [
 	{ value: 1, displayText: defPromotionType[1] },
-	//{ value: 2, displayText: "Re-Deposit" },
+	{ value: 2, displayText: defPromotionType[2] },
 	{ value: 3, displayText: defPromotionType[3] },
 	{ value: 5, displayText: defPromotionType[5] }
 ];
