@@ -47,6 +47,11 @@ namespace BackendSite.Service.BLL
             return bonusManageService.SetPromotion(IsAdd, promotion);
         }
 
+        public int DuplicatePromotion(string bonusCode, int siteId, string newBonusCode)
+        {
+            return bonusManageService.DuplicatePromotion(bonusCode, siteId, newBonusCode);
+        }
+
         public int SetPromotionStatus(string BonusCode, int SiteId, int Status)
         {
             return bonusManageService.SetPromotionStatus(BonusCode, SiteId, Status, authorizeBLL.GetAuthData().UserName);

@@ -119,6 +119,42 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        public class DuplicateReq
+        {
+            public string BonusCode { get; set; }
+            public int SiteId { get; set; }
+            public string NewBonusCode { get; set; }
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<PromotionInfo>> DuplicatePromotion(DuplicateReq duplicateReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
+
+            try
+            {
+                var errorCode = bonusManageBLL.DuplicatePromotion(duplicateReq.BonusCode, duplicateReq.SiteId, duplicateReq.NewBonusCode);
+                apiResult.ErrorCode = errorCode;
+                apiResult.Message = errorCode == 1 ? "The bonus setting already exists which with same promotion-type & product-category." : "";
+            }
+            catch (MySqlException ex)
+            {
+                var sqlException = ex as MySqlException;
+                apiResult.ErrorCode = sqlException.Number;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+            apiResult.Data = bonusManageBLL.GetPromotionList();
+
+            return apiResult;
+        }
+
         [HttpPost]
         public ApiResult<dynamic> UpdatePromotionStatus([FromForm]string BonusCode, [FromForm]int SiteId, [FromForm]int Status)
         {

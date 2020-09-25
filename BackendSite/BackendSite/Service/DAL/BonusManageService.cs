@@ -105,7 +105,65 @@ namespace BackendSite.Service.DAL
 
             return errorCode;
         }
+        public int DuplicatePromotion(string bonusCode, int siteId, string newBonusCode)
+        {
+            int errorCode = 0;
+            //var refPromotion = GetPromotion(promotion.BonusCode, promotion.SiteId);
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            //var p = new DynamicParameters();
+            //p.Add("BonusCode", promotion.BonusCode);
+            //p.Add("Description", promotion.Description);
+            //p.Add("PromotionType", promotion.PromotionType);
+            //p.Add("CategoryId", promotion.CategoryId);
+            //p.Add("PeriodFrom", promotion.UnixPeriodFrom);
+            //p.Add("PeriodTo", promotion.UnixPeriodTo);
+            //p.Add("ExpiryDays", promotion.ExpiryDays);
+            //p.Add("Sort", promotion.Sort);
+            //p.Add("Status", promotion.Status);
+            //p.Add("LastUpdateUser", promotion.LastUpdateUser);
+            //p.Add("SiteId", promotion.SiteId);
+            //p.Add("WalletType", promotion.WalletType);
+            //p.Add("TpId", promotion.TpId);
+            //p.Add("IsAdd", IsAdd);
+            //p.Add("ErrorCode", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
+            //conn.Execute("Admin_Promotion_InsUpd", p, transaction: trans, commandType: CommandType.StoredProcedure);
+            //errorCode = p.Get<int>("ErrorCode");
+            if (errorCode == 0)
+            {
+                //List<PromotionSpecific> specificList = new List<PromotionSpecific>();
+
+                //foreach (var specific in promotion.Specific)
+                //{
+                //    specificList.Add(new PromotionSpecific
+                //    {
+                //        CurrencyId = specific.CurrencyId,
+                //        RollOver = specific.RollOver,
+                //        Bonus = specific.Bonus,
+                //        BonusType = specific.BonusType,
+                //        MaxBonus = specific.BonusType == 2 ? specific.Bonus : specific.MaxBonus,
+                //        Status = specific.Status,
+                //        Usage = specific.Usage,
+                //        Details = specific.Details,
+                //        RequiredAmount = specific.RequiredAmount,
+                //        LockedType = specific.LockedType
+                //    });
+                //}
+
+                //conn.Execute("Admin_PromotionSpecificV2_Set", new
+                //{
+                //    promotion.BonusCode,
+                //    promotion.SiteId,
+                //    SpecificList = JsonConvert.SerializeObject(specificList)
+                //}, transaction: trans, commandType: CommandType.StoredProcedure);
+
+                trans.Commit();
+            }
+
+            return errorCode;
+        }
         public int SetPromotionStatus(string BonusCode, int SiteId, int Status, string LastUpdateUser)
         {
             int errorCode = 0;
