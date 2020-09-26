@@ -1,6 +1,7 @@
 import React from "react";
 import moment from "moment";
 import { defWalletType, defPromotionType } from "./defCols";
+import PopBoxContent from "./Component/PopBoxContent";
 const SpecialItemType = {
 	actionBtn: "actionBtn",
 	statusBtn: "statusBtn"
@@ -89,12 +90,19 @@ const titleData = [
 	}
 ];
 
+
+
 export default ({
 	ClickCreateBonus,
 	ClickEdit,
 	promotionList,
-	UpdatePromotionStatus
+	UpdatePromotionStatus,
+	Datas,
+	NewDatas,
+	Action,
+	IsOpen
 }) => {
+
 	let headerRows = [];
 	titleData.forEach((e, i) => {
 		headerRows.push(<th key={`title-${i}`}>{e.columnTitle}</th>);
@@ -108,6 +116,7 @@ export default ({
 					body_content = (
 						<ActionButtons
 							clickEdit={ClickEdit.bind(null, d_idx)}
+							clickClone={Action.ClickClone.bind(null, d_idx)}
 						/>
 					);
 				} else if (
@@ -151,16 +160,34 @@ export default ({
 					<tbody>{bodyRows}</tbody>
 				</table>
 			</div>
+			{
+				IsOpen ?
+					<PopBoxContent
+						Datas={Datas}
+						NewDatas={NewDatas}
+						Action={Action}
+						DefPromotionType={defPromotionType}
+						DefWalletType={defWalletType}
+					/>
+					: null
+			}
 		</div>
 	);
 };
 
 const ActionButtons = props => {
 	return (
-		<div className="button-action" onClick={props.clickEdit}>
-			<button className="btn btn-edit">
-				<i className="icon-edit"></i>
-			</button>
-		</div>
+		<>
+			<div className="button-action" onClick={props.clickEdit}>
+				<button className="btn btn-edit">
+					<i className="icon-edit"></i>
+				</button>
+			</div>
+			<div className="button-action" onClick={props.clickClone}>
+				<button className="btn btn-edit">
+					<i className="fa fa-clone"></i>
+				</button>
+			</div>
+		</>
 	);
 };
