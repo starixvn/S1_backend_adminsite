@@ -5,8 +5,6 @@ import WebAPI from "../../../module/WebAPI";
 import qs from "qs";
 import Panel from "./Edit.content";
 
-const skipField = ["currentLang", "productCategory", "lockedType"];
-
 export default props => {
 	const isMountedRef = useRef(null);
 	useEffect(() => {
@@ -31,7 +29,7 @@ export default props => {
 				for (let c_key in state[key]) {
 					if (state.selectedCurrencies.includes(Number(c_key))) {
 						for (let f_key in state[key][c_key]) {
-							if (skipField.includes(f_key)) continue;
+							if (props.skipField.includes(f_key)) continue;
 							let column = state[key][c_key][f_key];
 							if (
 								column === null ||

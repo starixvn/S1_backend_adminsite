@@ -4,7 +4,10 @@ export const defActionType = {
 	SET_PROMOTION: "SET_PROMOTION",
 	EDIT_PROMOTION: "EDIT_PROMOTION",
 	CLICK_BACK: "CLICK_BACK",
-	UPDATE_PROMOTION_STATUS: "UPDATE_PROMOTION_STATUS"
+	UPDATE_PROMOTION_STATUS: "UPDATE_PROMOTION_STATUS",
+	HANDEL_POPBOX: "HANDEL_POPBOX",
+	CLONE_PROMOTION: "CLONE_PROMOTION",
+	SET_CLONE_VALUE: "SET_CLONE_VALUE"
 };
 
 export const defPanelType = {
@@ -17,7 +20,9 @@ export const initState = {
 	promotionData: [],
 	promotionList: [],
 	siteList: [],
-	panelType: defPanelType.Main
+	panelType: defPanelType.Main,
+	popBoxIsOpen: false,
+	clonePromotionData: [],
 };
 
 export function reducer(state, action) {
@@ -41,7 +46,8 @@ export function reducer(state, action) {
 			return {
 				...state,
 				promotionList: action.promotionList,
-				panelType: defPanelType.Main
+				panelType: defPanelType.Main,
+				popBoxIsOpen: action.popBoxIsOpen
 			};
 
 		case defActionType.EDIT_PROMOTION:
@@ -68,6 +74,27 @@ export function reducer(state, action) {
 			return {
 				...state,
 				promotionList: newList
+			};
+
+		case defActionType.HANDEL_POPBOX:
+			return {
+				...state,
+				popBoxIsOpen: action.popBoxIsOpen,
+				promotionData: action.promotionData,
+				clonePromotionData: { siteId: action.promotionData.siteId, bonusCode: action.promotionData.bonusCode }
+			};
+
+		case defActionType.SET_CLONE_VALUE:
+			return {
+				...state,
+				clonePromotionData: { ...state.clonePromotionData, [action.dataColumn]: action.value }
+			};
+
+		case defActionType.CLONE_PROMOTION:
+			return {
+				...state,
+				popBoxIsOpen: false,
+				promotionList: action.promotionList
 			};
 
 		default:

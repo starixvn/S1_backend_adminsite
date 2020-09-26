@@ -205,7 +205,7 @@ const App = () => {
 			} else {
 				let msg =
 					promotionData.errorCode === 991 &&
-					siteList.errorCode === 991
+						siteList.errorCode === 991
 						? "API Server Error."
 						: [promotionData.msg, siteList.msg].join(", ");
 				alert(msg);
@@ -255,22 +255,93 @@ const App = () => {
 		dispatch({ type: defActionType.CLICK_BACK });
 	};
 
-	return state.panelType === defPanelType.Main ? (
+	const ClickClone = async idx => {
+		dispatch({
+			type: defActionType.HANDEL_POPBOX,
+			popBoxIsOpen: true,
+			promotionData: state.promotionList[idx],
+			clonePromotionData: {
+				bonusCode: state.promotionList[idx].bonusCode,
+				siteId: state.promotionList[idx].siteId
+			}
+		});
+	};
+
+	const SetCloneValue = (value, dataColumn) => {
+		dispatch({ type: defActionType.SET_CLONE_VALUE, value, dataColumn });
+	};
+
+	const ClickCancle = () => {
+		dispatch({
+			type: defActionType.HANDEL_POPBOX,
+			popBoxIsOpen: false,
+			promotionData: []
+		});
+	};
+
+	const SubmitClone = () => {
+		if (!processing && state.clonePromotionData.cloneBonusCode) {
+			if (isMountedRef.current) {
+				setProcessing(true);
+			}
+			let param = {
+				Url: "BonusManage/DuplicatePromotion",
+				Data: {
+					BonusCode: state.clonePromotionData.bonusCode,
+					SiteId: state.clonePromotionData.siteId,
+					NewBonusCode: state.clonePromotionData.cloneBonusCode,
+				}
+			};
+			WebAPI.PostData(param).then(
+				res => {
+					if (isMountedRef.current) {
+						if (res.data.errorCode === 0) {
+							dispatch({
+								type: defActionType.SET_PROMOTION,
+								promotionList: res.data.data,
+								popBoxIsOpen: false,
+							});
+						} else if (res.data.errorCode === 1062) {
+							alert("Duplicate Bonus Code.");
+						} else {
+							alert(res.data.message ?? "failed to set data.");
+						}
+						setProcessing(false);
+					}
+				},
+				err => {
+					if (isMountedRef.current) {
+						alert("API Server Error.");
+						setProcessing(false);
+					}
+				}
+			);
+		}
+	};
+
+	const skipField = ["currentLang", "productCategory", "lockedType"];
+
+	return state.panelType === defPanelType.Main || state.panelType === defPanelType.Copy ? (
 		<Main
 			ClickCreateBonus={ClickCreateBonus}
 			ClickEdit={ClickEdit}
 			UpdatePromotionStatus={UpdatePromotionStatus}
 			promotionList={state.promotionList}
+			Datas={state.promotionData}
+			NewDatas={state.clonePromotionData}
+			Action={{ ClickClone, ClickCancle, SetCloneValue, SubmitClone }}
+			IsOpen={state.popBoxIsOpen}
 		/>
 	) : (
-		<Edit
-			Datas={state.promotionData}
-			SiteList={state.siteList}
-			action={{ SetPromotion, ClickBack }}
-			IsAdd={state.panelType === defPanelType.Add}
-			processing={processing}
-		/>
-	);
+			<Edit
+				Datas={state.promotionData}
+				SiteList={state.siteList}
+				action={{ SetPromotion, ClickBack }}
+				IsAdd={state.panelType === defPanelType.Add}
+				processing={processing}
+				skipField={skipField}
+			/>
+		);
 };
 
 export default App;
