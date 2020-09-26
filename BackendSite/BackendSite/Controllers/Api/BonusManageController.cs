@@ -139,8 +139,7 @@ namespace BackendSite.Controllers.Api
             }
             catch (MySqlException ex)
             {
-                var sqlException = ex as MySqlException;
-                apiResult.ErrorCode = sqlException.Number;
+                apiResult.ErrorCode = ex.Number;
                 apiResult.Message = ex.Message;
                 apiResult.RawMessage = ex.ToString();
             }
