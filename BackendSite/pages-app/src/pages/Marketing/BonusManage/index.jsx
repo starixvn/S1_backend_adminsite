@@ -97,7 +97,7 @@ const App = () => {
 						Usage: info.usage ? Number(info.usage) : 0,
 						Rollover: Number(info.rollOver),
 						Bonus: Number(info.bonus),
-						BonusType: info.bonusAmountType,
+						BonusType: Number(info.bonusAmountType),
 						MaxBonus: maxBonus,
 						Details: JSON.stringify(lang),
 						Status: info.status,
@@ -120,7 +120,7 @@ const App = () => {
 				WalletType: promotion.walletType,
 				ProductCategory: promotion.productCategory,
 				TpId: promotion.tpId,
-				CategoryId: promotion.categoryId,
+				CategoryId: Number(promotion.categoryId),
 				Specific: _specific
 			};
 
@@ -319,7 +319,10 @@ const App = () => {
 		}
 	};
 
-	const skipField = ["currentLang", "productCategory", "lockedType"];
+	const skipField = {
+		"default": ["currentLang", "productCategory", "lockedType"],
+		"8": ["expiryDays","walletType","categoryId","tpId","rollOver","bonusAmountType","bonus","maxBonus","requiredAmount","currentLang", "productCategory", "lockedType"],
+	}
 
 	return state.panelType === defPanelType.Main || state.panelType === defPanelType.Copy ? (
 		<Main
