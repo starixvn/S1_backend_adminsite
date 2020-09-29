@@ -281,7 +281,7 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
             let searchData = this.props.searchData;
             let promotionCategoryData = this.props.PromotionCategoryData;
             let promotionCategoryOption = null;
-            this.state.PromotionCategory = promotionCategoryData[0].id;
+            this.state.PromotionCategory = Object.keys(promotionCategoryData)[0].id;
             if (promotionCategoryData) {
                 promotionCategoryOption = Object.keys(promotionCategoryData).map(i => {
                     let selected = this.state.PromotionCategory == promotionCategoryData[i].id ? "selected" : "";
