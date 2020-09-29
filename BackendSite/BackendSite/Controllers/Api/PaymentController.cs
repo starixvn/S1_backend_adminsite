@@ -180,6 +180,7 @@ namespace BackendSite.Controllers.Api
         {
 
             var apiResult = new ApiResult<IEnumerable<PromotionCategory>>();
+            apiResult.ErrorCode = 0;
             apiResult.Data = paymentBLL.GetPromotionCategory();
             return apiResult;
         }

@@ -176,6 +176,160 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
         }
     }
 
+    class BonusLogList extends React.Component {
+        constructor(props) {
+            super(props);
+
+        }
+
+        onCheckDetail(id) {
+            this.props.onCheckDetail(id);
+        }
+
+        onRefresh() {
+            this.props.ChangePage(null);
+        }
+
+        ChangePage(pageNumber) {
+            this.props.ChangePage(pageNumber);
+        }
+
+        render() {
+            let rows = this.props.searchData.data.map(row =>
+                <tr key={row.id}>
+                    <td>{moment(row.createTime).format('l LTS')}</td>
+                    <td>{row.typeName ? row.typeName : "N/A"}</td>
+                    <td className="text-right">{Direction[row.direction] + number_format(row.changeBonus)}</td>
+                    <td className="text-right">{number_format(row.beforeBonus)}</td>
+                    <td className="text-right">{number_format(row.afterBonus)}</td>
+                    <td>{row.memo}</td>
+                    <td>{row.refTransId}</td>
+                </tr>
+            );
+
+            return (
+                <div className="table">
+                    <div className="table-options">
+                        <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>
+                            Refresh
+                        </button>
+                    </div>
+                    <table className="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Time {moment().format('(Z)')}</th>
+                                <th scope="col">Type</th>
+                                <th scope="col" className="text-right">Change Bonus</th>
+                                <th scope="col" className="text-right">Before Bonus</th>
+                                <th scope="col" className="text-right">After Bonus</th>
+                                <th scope="col">Memo</th>
+                                <th scope="col">Ref TransId</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rows}
+                        </tbody>
+                    </table>
+                    <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                </div>
+            )
+        }
+    }
+
+    class BonusLog extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = { RefTransId: "", PromotionCategory: "" };
+
+            this.startDate = React.createRef();
+            this.endDate = React.createRef();
+        }
+
+        componentDidMount() {
+            $(this.startDate.current).datepicker({
+                format: 'mm/dd/yyyy', autoclose: true
+            });
+
+            $(this.endDate.current).datepicker({
+                format: 'mm/dd/yyyy', autoclose: true
+            });
+            this.props.GetPromotionCategory()
+        }
+
+        onStartDate() {
+            $(this.startDate.current).focus();
+        }
+
+        onEndDate() {
+            $(this.endDate.current).focus();
+        }
+
+        onChange(event) {
+            let obj = this.state;
+            obj[event.target.name] = event.target.value;
+            this.setState(obj);
+        }
+
+        handleSubmit(event) {
+            event.preventDefault();
+            this.props.onChangeValue("BonusLog", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, RefTransId: this.state.RefTransId.trim() == '' ? null : this.state.RefTransId, PromoCategoryId: this.state.PromotionCategory.trim() == '' ? null : parseInt(this.state.PromotionCategory) });
+            this.props.GetBonusLog(1);
+        }
+
+        render() {
+            let bonusLog = this.props.BonusLog;
+            let searchData = this.props.searchData;
+            let promotionCategoryData = this.props.PromotionCategoryData;
+            let promotionCategoryOption = null;
+            if (promotionCategoryData) {
+                promotionCategoryOption = Object.keys(promotionCategoryData).map(i => {
+                    let selected = this.state.PromotionCategory == promotionCategoryData[i].id ? "selected" : "";
+                    return (
+                        <option value={promotionCategoryData[i].id} selected={selected}>{promotionCategoryData[i].name}</option>
+                    )
+                })
+            }
+
+            return (
+                <div>
+                    <form className="filter" onSubmit={this.handleSubmit.bind(this)}>
+                        <div className="input-item">
+                            <span className="label">From Date</span>
+                            <div className="date">
+                                <input type="text" ref={this.startDate} name="StartDate" className="dateselect" data-date-end-date="0d" autoComplete="off" value={bonusLog && bonusLog.StartDate ? moment.unix(bonusLog.StartDate).format("MM/DD/YYYY") : ""} />
+                                <i className="icon-calendar dateselect" onClick={this.onStartDate.bind(this)} />
+                            </div>
+                        </div>
+                        <div className="input-item date">
+                            <span className="label">To Date</span>
+                            <div className="date">
+                                <input type="text" ref={this.endDate} name="EndDate" data-date-end-date="0d" autoComplete="off" value={bonusLog && bonusLog.EndDate ? moment.unix(bonusLog.EndDate).format("MM/DD/YYYY") : ""} />
+                                <i className="icon-calendar dateselect" onClick={this.onEndDate.bind(this)} />
+                            </div>
+                        </div>
+                        <div className="input-item">
+                            <span className="label">Promotion Category</span>
+                            <div className="">
+                                <select onChange={this.onChange.bind(this)} name="PromotionCategory">
+                                    <option value="">---</option>
+                                    {promotionCategoryOption}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="input-item">
+                            <span className="label">Ref TransId</span>
+                            <div className="">
+                                <input type="text" onChange={this.onChange.bind(this)} placeholder="Ref TransId" name="RefTransId" autoComplete="off" value={this.state.RefTransId} />
+                            </div>
+                        </div>
+                        <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
+                    </form>
+                    {searchData != null ? <BonusLogList searchData={searchData} ChangePage={this.props.GetBonusLog} /> : null}
+                </div>
+            )
+        }
+    }
+
     class FinancialLogList extends React.Component {
         constructor(props) {
             super(props);
@@ -925,12 +1079,12 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Financial Log", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
         constructor(props) {
             super(props);
-            this.state = { CustInfoData: null, TabIdx: 0, FinancialLog: {}, Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData) };
+            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData) };
         }
 
         onTab(idx, tabName) {
@@ -939,6 +1093,45 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
 
         componentDidMount() {
             this.onGetCustInfoDetail();
+        }
+
+        GetPromotionCategory() {
+            Loading.OnLoading();
+            axios.post('/api/Payment/GetPromotionCategory')
+                .then(function (response) {
+                    Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.setState({ PromotionCategoryData: result.data });
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+        }
+
+        GetBonusLog(PageNumber) {
+            Loading.OnLoading();
+            let pageNumber = PageNumber || this.state.BonusLogData.pageNumber;
+            let CustId = getUrlParameter("custId");
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                axios.post('/api/Payment/GetBonusLog', { ...this.state.BonusLog, CustId: iCustId, PageNumber: pageNumber })
+                    .then(function (response) {
+                        Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({ BonusLogData: result });
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
         }
 
         GetFinancialLog(PageNumber) {
@@ -1275,33 +1468,35 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
             if (TabName == this._Tabs[0]) {
                 dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)} isEdit={this.state.isEdit} onClickEdit={this.onClickEdit} editOnChange={this.editOnChange} editUpdate={this.editUpdate} />;
             } else if (TabName == this._Tabs[1]) {
-                dataContainer = <FinancialLog GetFinancialLog={this.GetFinancialLog.bind(this)} searchData={this.state.FinancialLogData} FinancialLog={this.state.FinancialLog} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <BonusLog GetPromotionCategory={this.GetPromotionCategory.bind(this)} PromotionCategoryData={this.state.PromotionCategoryData} GetBonusLog={this.GetBonusLog.bind(this)} searchData={this.state.BonusLogData} BonusLog={this.state.BonusLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[2]) {
-                dataContainer = <DepositInfo GetDepositListByCust={this.GetDepositListByCust.bind(this)} searchData={this.state.DepositListData} DepositList={this.state.DepositList} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <FinancialLog GetFinancialLog={this.GetFinancialLog.bind(this)} searchData={this.state.FinancialLogData} FinancialLog={this.state.FinancialLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[3]) {
-                dataContainer = <TpTransferInfo GetTpTransferInfoByCust={this.GetTpTransferInfoByCust.bind(this)} searchData={this.state.TpTransferInfoData} TpTransferInfo={this.state.TpTransferInfo} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <DepositInfo GetDepositListByCust={this.GetDepositListByCust.bind(this)} searchData={this.state.DepositListData} DepositList={this.state.DepositList} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[4]) {
-                dataContainer = <WithdrawalInfo GetWithdrawalListByCust={this.GetWithdrawalListByCust.bind(this)} searchData={this.state.WithdrawalListData} WithdrawalInfo={this.state.WithdrawalInfo} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <TpTransferInfo GetTpTransferInfoByCust={this.GetTpTransferInfoByCust.bind(this)} searchData={this.state.TpTransferInfoData} TpTransferInfo={this.state.TpTransferInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[5]) {
-                dataContainer = <AdjustmentInfo GetAdjustmentInfoByCust={this.GetAdjustmentInfoByCust.bind(this)} searchData={this.state.AdjustmentInfoData} AdjustmentInfo={this.state.AdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <WithdrawalInfo GetWithdrawalListByCust={this.GetWithdrawalListByCust.bind(this)} searchData={this.state.WithdrawalListData} WithdrawalInfo={this.state.WithdrawalInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[6]) {
-                dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <AdjustmentInfo GetAdjustmentInfoByCust={this.GetAdjustmentInfoByCust.bind(this)} searchData={this.state.AdjustmentInfoData} AdjustmentInfo={this.state.AdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[7]) {
-                dataContainer = <ResetPwd />;
+                dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[8]) {
-                dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)} SetCustNote={this.SetCustNote.bind(this)} />;
+                dataContainer = <ResetPwd />;
             } else if (TabName == this._Tabs[9]) {
-                dataContainer = <PersonalMsg />
+                dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)} SetCustNote={this.SetCustNote.bind(this)} />;
             } else if (TabName == this._Tabs[10]) {
-                dataContainer = <TurnoverReport />
+                dataContainer = <PersonalMsg />
             } else if (TabName == this._Tabs[11]) {
+                dataContainer = <TurnoverReport />
+            } else if (TabName == this._Tabs[12]) {
                 dataContainer = <AdminUserLog GetAdminUserLogByCust={this.GetAdminUserLogByCust.bind(this)} searchData={this.state.AdminUserLogData} AdminUserLog={this.state.AdminUserLog} onChangeValue={this.onChangeValue.bind(this)} />
             }
 
             let authSubKeys = {
-                7: 'ca_resetpwd',
-                9: 'ca_personalMsg',
-                10: 'ca_turnoverReport'
+                8: 'ca_resetpwd',
+                10: 'ca_personalMsg',
+                11: 'ca_turnoverReport'
             }
 
             var tabBtn = this._Tabs.filter((item, index) => {

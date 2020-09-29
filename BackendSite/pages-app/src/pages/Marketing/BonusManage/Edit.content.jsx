@@ -12,9 +12,9 @@ const initBonusAmountType = promoType => {
 	return Number(promoType) === 3
 		? [{ value: 2, displayText: "Amount" }]
 		: [
-				{ value: 1, displayText: "Percentage" },
-				{ value: 2, displayText: "Amount" }
-		  ];
+			{ value: 1, displayText: "Percentage" },
+			{ value: 2, displayText: "Amount" }
+		];
 };
 
 export default ({ state, action, IsAdd, processing }) => {
@@ -95,7 +95,7 @@ export default ({ state, action, IsAdd, processing }) => {
 											moment(e).format("l LTS"),
 											"periodFrom"
 										);
-									} catch (ex) {}
+									} catch (ex) { }
 								}
 							}}
 						/>
@@ -111,7 +111,7 @@ export default ({ state, action, IsAdd, processing }) => {
 											moment(e).format("l LTS"),
 											"periodTo"
 										);
-									} catch (ex) {}
+									} catch (ex) { }
 								}
 							}}
 						/>
@@ -131,43 +131,45 @@ export default ({ state, action, IsAdd, processing }) => {
 						value={state.description}
 					/>
 				</div>
-				<div className="filter">
-					<div className="row-flex">
-						<InputBox
-							Title="ExpiryDays"
-							OnChange={action.EditMainValue}
-							dataColumn="expiryDays"
-							value={state.expiryDays}
-						/>
-					</div>
-					<RadioBox
-						Title="Wallet Type"
-						Options={initWalletType()}
-						OnChange={action.GetPromoCategories.bind(
-							this,
-							false,
-							state.walletType
-						)}
-						dataColumn="walletType"
-						Selected={state.walletType}
-					/>
-					{state.walletType !== null &&
-					state.productCategory !== undefined ? (
+				{state.promotionType != 8 ? (
+					<div className="filter">
+						<div className="row-flex">
+							<InputBox
+								Title="ExpiryDays"
+								OnChange={action.EditMainValue}
+								dataColumn="expiryDays"
+								value={state.expiryDays}
+							/>
+						</div>
 						<RadioBox
-							Title="Product Category"
-							Options={state.productCategory}
-							OnChange={action.SelectTpId}
-							dataColumn={"categoryId"
-								// state.walletType === 0 ? "tpId" : "categoryId"
-							}
-							Selected={state.categoryId
-								// state.walletType === 0
-								// 	? state.tpId
-								// 	: state.categoryId
-							}
+							Title="Wallet Type"
+							Options={initWalletType()}
+							OnChange={action.GetPromoCategories.bind(
+								this,
+								false,
+								state.walletType
+							)}
+							dataColumn="walletType"
+							Selected={state.walletType}
 						/>
-					) : null}
-				</div>
+						{state.walletType !== null &&
+							state.productCategory !== undefined ? (
+								<RadioBox
+									Title="Product Category"
+									Options={state.productCategory}
+									OnChange={action.SelectTpId}
+									dataColumn={"categoryId"
+										// state.walletType === 0 ? "tpId" : "categoryId"
+									}
+									Selected={state.categoryId
+										// state.walletType === 0
+										// 	? state.tpId
+										// 	: state.categoryId
+									}
+								/>
+							) : null}
+					</div>
+				) : null}
 
 				<div className="filter noBGcolor">
 					<CheckBox
@@ -182,33 +184,33 @@ export default ({ state, action, IsAdd, processing }) => {
 
 				<div className="filter noBGcolor tag">{tabArr}</div>
 				{state.selectedCurrencies.length > 0 &&
-				state.currentTab !== null ? (
-					<div className="filter">
-						<div className="panel level-1 mt-20">
-							<SubPanel
-								state={state}
-								displayText={
-									window.i18n[
+					state.currentTab !== null ? (
+						<div className="filter">
+							<div className="panel level-1 mt-20">
+								<SubPanel
+									state={state}
+									displayText={
+										window.i18n[
 										`lbl_Currency${state.currentTab}`
-									]
-								}
-								EditMainValue={action.EditCurrencyPanel.bind(
-									this,
-									state.currentTab
-								)}
-								EditCurrencyLangPanelValue={
-									action.EditCurrencyLangPanelValue
-								}
-								EditCurrencyAmountValue={action.EditCurrencyAmountValue.bind(
-									this,
-									state.currentTab
-								)}
-								currencyId={state.currentTab}
-								action={action}
-							/>
+										]
+									}
+									EditMainValue={action.EditCurrencyPanel.bind(
+										this,
+										state.currentTab
+									)}
+									EditCurrencyLangPanelValue={
+										action.EditCurrencyLangPanelValue
+									}
+									EditCurrencyAmountValue={action.EditCurrencyAmountValue.bind(
+										this,
+										state.currentTab
+									)}
+									currencyId={state.currentTab}
+									action={action}
+								/>
+							</div>
 						</div>
-					</div>
-				) : null}
+					) : null}
 			</div>
 			<div className="filter float-btn-group">
 				<button
@@ -282,70 +284,74 @@ const SubPanel = props => {
 				</div>
 			</a>
 			<div className="panel-body">
-				<div className="row-flex">
-					<InputBox
-						Type="Number"
-						Title="Usage"
-						OnChange={props.EditMainValue}
-						dataColumn="usage"
-						value={props.state.specific[props.currencyId].usage}
-					/>
-					<InputBox
-						Title="rollOver"
-						OnChange={props.EditMainValue}
-						dataColumn="rollOver"
-						value={props.state.specific[props.currencyId].rollOver}
-					/>
-				</div>
-				<RadioBox
-					Title="Bonus Amount Type"
-					Options={initBonusAmountType(props.state.promotionType)}
-					OnChange={props.EditCurrencyAmountValue}
-					dataColumn="bonusAmountType"
-					Selected={
-						props.state.specific[props.currencyId].bonusAmountType
-					}
-					mainKey={props.currencyId}
-				/>
-				<div className="row-flex">
-					<InputBox
-						Type="Number"
-						Title="Bonus"
-						OnChange={props.EditMainValue}
-						dataColumn="bonus"
-						value={props.state.specific[props.currencyId].bonus}
-						iptSubClass={
-							props.state.specific[props.currencyId]
-								.bonusAmountType === 1
-								? "ratio"
-								: null
-						}
-					/>
-					{props.state.specific[props.currencyId].bonusAmountType ===
-					2 ? null : (
-						<InputBox
-							Type="Number"
-							Title="Max Bonus"
-							OnChange={props.EditMainValue}
-							dataColumn="maxBonus"
-							value={
-								props.state.specific[props.currencyId].maxBonus
+				{props.state.promotionType != 8 ? (
+					<>
+						<div className="row-flex">
+							<InputBox
+								Type="Number"
+								Title="Usage"
+								OnChange={props.EditMainValue}
+								dataColumn="usage"
+								value={props.state.specific[props.currencyId].usage}
+							/>
+							<InputBox
+								Title="rollOver"
+								OnChange={props.EditMainValue}
+								dataColumn="rollOver"
+								value={props.state.specific[props.currencyId].rollOver}
+							/>
+						</div>
+						<RadioBox
+							Title="Bonus Amount Type"
+							Options={initBonusAmountType(props.state.promotionType)}
+							OnChange={props.EditCurrencyAmountValue}
+							dataColumn="bonusAmountType"
+							Selected={
+								props.state.specific[props.currencyId].bonusAmountType
 							}
+							mainKey={props.currencyId}
 						/>
-					)}
-				</div>
-				<div className="row-flex">
-					<InputBox
-						Type="Number"
-						Title="Required Amount"
-						OnChange={props.EditMainValue}
-						dataColumn="requiredAmount"
-						value={
-							props.state.specific[props.currencyId]
-								.requiredAmount
-						}
-					/>
-				</div>
+						<div className="row-flex">
+							<InputBox
+								Type="Number"
+								Title="Bonus"
+								OnChange={props.EditMainValue}
+								dataColumn="bonus"
+								value={props.state.specific[props.currencyId].bonus}
+								iptSubClass={
+									props.state.specific[props.currencyId]
+										.bonusAmountType === 1
+										? "ratio"
+										: null
+								}
+							/>
+							{props.state.specific[props.currencyId].bonusAmountType ===
+								2 ? null : (
+									<InputBox
+										Type="Number"
+										Title="Max Bonus"
+										OnChange={props.EditMainValue}
+										dataColumn="maxBonus"
+										value={
+											props.state.specific[props.currencyId].maxBonus
+										}
+									/>
+								)}
+						</div>
+						<div className="row-flex">
+							<InputBox
+								Type="Number"
+								Title="Required Amount"
+								OnChange={props.EditMainValue}
+								dataColumn="requiredAmount"
+								value={
+									props.state.specific[props.currencyId]
+										.requiredAmount
+								}
+							/>
+						</div>
+					</>
+				) : null}
 				<div className="filter noBGcolor">
 					<CheckBox
 						Options={langOptions}
@@ -361,22 +367,22 @@ const SubPanel = props => {
 				<div className="filter noBGcolor tag">{tabArr}</div>
 				{props.state.specific[props.currencyId].selectedLang.length >
 					0 &&
-				langId !== null &&
-				langId !== "" ? (
-					<div className="filter">
-						<div className="panel level-1 mt-20">
-							<LangPanel
-								state={props.state}
-								currencyId={props.currencyId}
-								EditMainValue={
-									props.action.EditCurrencyLangPanelValue
-								}
-								action={props.action}
-								langId={langId}
-							/>
+					langId !== null &&
+					langId !== "" ? (
+						<div className="filter">
+							<div className="panel level-1 mt-20">
+								<LangPanel
+									state={props.state}
+									currencyId={props.currencyId}
+									EditMainValue={
+										props.action.EditCurrencyLangPanelValue
+									}
+									action={props.action}
+									langId={langId}
+								/>
+							</div>
 						</div>
-					</div>
-				) : null}
+					) : null}
 			</div>
 		</>
 	);

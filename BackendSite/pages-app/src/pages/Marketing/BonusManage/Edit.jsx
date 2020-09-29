@@ -24,12 +24,13 @@ export default props => {
 
 	const ClickSubmit = () => {
 		let checked = true;
+		let skipField = props.skipField[state.promotionType] ? props.skipField[state.promotionType] : props.skipField.default;
 		for (let key in state) {
 			if (key === "specific") {
 				for (let c_key in state[key]) {
 					if (state.selectedCurrencies.includes(Number(c_key))) {
 						for (let f_key in state[key][c_key]) {
-							if (props.skipField.includes(f_key)) continue;
+							if (skipField.includes(f_key)) continue;
 							let column = state[key][c_key][f_key];
 							if (
 								column === null ||
@@ -37,8 +38,7 @@ export default props => {
 								column === ""
 							) {
 								alert(
-									`${
-										window.i18n[`lbl_Currency${c_key}`]
+									`${window.i18n[`lbl_Currency${c_key}`]
 									}'s ${f_key} does not allow null.`
 								);
 								checked = false;
@@ -56,6 +56,7 @@ export default props => {
 				state[key] === undefined ||
 				state[key] === ""
 			) {
+				if (skipField.includes(key)) continue;
 				alert(`${key} does not allow null.`);
 				checked = false;
 				break;
