@@ -24,9 +24,9 @@ namespace BackendSite.Service.Model
         public DateTime CreateTime { get; set; }
         public string TypeName { get; set; }
         public Direction Direction { get; set; }
-        public decimal ChangeAmount { get; set; }
-        public decimal BeforeAmount { get; set; }
-        public decimal AfterAmount { get; set; }
+        public decimal ChangeBonus { get; set; }
+        public decimal BeforeBonus { get; set; }
+        public decimal AfterBonus { get; set; }
         public string RefTransId { get; set; }
         public string Memo { get; set; }
     }
