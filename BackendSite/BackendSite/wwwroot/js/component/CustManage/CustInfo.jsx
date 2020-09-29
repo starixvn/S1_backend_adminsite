@@ -281,6 +281,7 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
             let searchData = this.props.searchData;
             let promotionCategoryData = this.props.PromotionCategoryData;
             let promotionCategoryOption = null;
+            this.state.PromotionCategory = promotionCategoryData[0].id;
             if (promotionCategoryData) {
                 promotionCategoryOption = Object.keys(promotionCategoryData).map(i => {
                     let selected = this.state.PromotionCategory == promotionCategoryData[i].id ? "selected" : "";
@@ -294,6 +295,14 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
                 <div>
                     <form className="filter" onSubmit={this.handleSubmit.bind(this)}>
                         <div className="input-item">
+                            <span className="label">Promotion Category</span>
+                            <div className="">
+                                <select onChange={this.onChange.bind(this)} name="PromotionCategory">
+                                    {promotionCategoryOption}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="input-item">
                             <span className="label">From Date</span>
                             <div className="date">
                                 <input type="text" ref={this.startDate} name="StartDate" className="dateselect" data-date-end-date="0d" autoComplete="off" value={bonusLog && bonusLog.StartDate ? moment.unix(bonusLog.StartDate).format("MM/DD/YYYY") : ""} />
@@ -305,15 +314,6 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
                             <div className="date">
                                 <input type="text" ref={this.endDate} name="EndDate" data-date-end-date="0d" autoComplete="off" value={bonusLog && bonusLog.EndDate ? moment.unix(bonusLog.EndDate).format("MM/DD/YYYY") : ""} />
                                 <i className="icon-calendar dateselect" onClick={this.onEndDate.bind(this)} />
-                            </div>
-                        </div>
-                        <div className="input-item">
-                            <span className="label">Promotion Category</span>
-                            <div className="">
-                                <select onChange={this.onChange.bind(this)} name="PromotionCategory">
-                                    <option value="">---</option>
-                                    {promotionCategoryOption}
-                                </select>
                             </div>
                         </div>
                         <div className="input-item">
