@@ -243,6 +243,7 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
 
             this.startDate = React.createRef();
             this.endDate = React.createRef();
+
         }
 
         componentDidMount() {
@@ -272,8 +273,14 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
 
         handleSubmit(event) {
             event.preventDefault();
-            this.props.onChangeValue("BonusLog", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, RefTransId: this.state.RefTransId.trim() == '' ? null : this.state.RefTransId, PromoCategoryId: this.state.PromotionCategory.trim() == '' ? null : parseInt(this.state.PromotionCategory) });
+            this.props.onChangeValue("BonusLog", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, RefTransId: this.state.RefTransId.trim() == '' ? null : this.state.RefTransId, PromoCategoryId: this.state.PromotionCategory == '' ? null : parseInt(this.state.PromotionCategory) });
             this.props.GetBonusLog(1);
+        }
+
+        componentDidUpdate(prevProps) {
+            if (this.props.PromotionCategoryData !== prevProps.PromotionCategoryData) {
+                this.setState({ PromotionCategory: this.props.PromotionCategoryData[0].id });
+            }
         }
 
         render() {
@@ -281,12 +288,12 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
             let searchData = this.props.searchData;
             let promotionCategoryData = this.props.PromotionCategoryData;
             let promotionCategoryOption = null;
-            this.state.PromotionCategory = Object.keys(promotionCategoryData)[0].id;
+
             if (promotionCategoryData) {
-                promotionCategoryOption = Object.keys(promotionCategoryData).map(i => {
-                    let selected = this.state.PromotionCategory == promotionCategoryData[i].id ? "selected" : "";
+                promotionCategoryOption = promotionCategoryData.map(i => {
+                    let selected = this.state.PromotionCategory == i.id ? "selected" : "";
                     return (
-                        <option value={promotionCategoryData[i].id} selected={selected}>{promotionCategoryData[i].name}</option>
+                        <option key={i.id} value={i.id} selected={selected}>{i.name}</option>
                     )
                 })
             }
