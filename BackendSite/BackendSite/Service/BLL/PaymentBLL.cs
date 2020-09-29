@@ -25,6 +25,14 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetFinancialLog(CustId, startDate, endDate, refTransId, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
+        public IEnumerable<BonusLog> GetBonusLog(int CustId, int promoCategoryId, long? startDate, long? endDate, string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        {
+            return walletService.GetBonusLog(CustId, promoCategoryId, startDate, endDate, refTransId, pageSize, ref pageNumber, out totalPages, out rowCount);
+        }
+        public IEnumerable<PromotionCategory> GetPromotionCategory()
+        {
+            return walletService.GetPromotionCategory();
+        }
         public int AdjustmentAndWithdrawalLimit(AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit, string Operator, out string transId)
         {
             return adjustmentService.SetAdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, Operator, out transId);

@@ -18,4 +18,21 @@ namespace BackendSite.Service.Model
         public string RefTransId { get; set; }
         public string Memo { get; set; }
     }
+    public class BonusLog
+    {
+        public int Id { get; set; }
+        public DateTime CreateTime { get; set; }
+        public string TypeName { get; set; }
+        public Direction Direction { get; set; }
+        public decimal ChangeAmount { get; set; }
+        public decimal BeforeAmount { get; set; }
+        public decimal AfterAmount { get; set; }
+        public string RefTransId { get; set; }
+        public string Memo { get; set; }
+    }
+    public class PromotionCategory
+    {
+        public int id { get; set; }
+        public string Name { get; set; }
+    }
 }
