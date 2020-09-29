@@ -152,6 +152,37 @@ namespace BackendSite.Controllers.Api
 
             return apiListResult;
         }
+
+        public class GetBonusLogReq
+        {
+            public int CustId { get; set; }
+            public int PromoCategoryId { get; set; }
+            public long? StartDate { get; set; }
+            public long? EndDate { get; set; }
+            public string RefTransId { get; set; }
+            public int PageNumber { get; set; }
+        }
+        public ApiListResult<BonusLog> GetBonusLog(GetBonusLogReq getBonusLogReq)
+        {
+            int pageNumber = getBonusLogReq.PageNumber;
+            int totalPages = 0;
+            int rowCount = 0;
+            var apiListResult = new ApiListResult<BonusLog>();
+            apiListResult.Data = paymentBLL.GetBonusLog(getBonusLogReq.CustId, getBonusLogReq.PromoCategoryId, getBonusLogReq.StartDate, getBonusLogReq.EndDate, getBonusLogReq.RefTransId, 10, ref pageNumber, out totalPages, out rowCount);
+            apiListResult.ErrorCode = 0;
+            apiListResult.PageNumber = pageNumber;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.RowCount = rowCount;
+
+            return apiListResult;
+        }
+        public ApiResult<IEnumerable<PromotionCategory>> GetPromotionCategory()
+        {
+
+            var apiResult = new ApiResult<IEnumerable<PromotionCategory>>();
+            apiResult.Data = paymentBLL.GetPromotionCategory();
+            return apiResult;
+        }
         [HttpPost]
         public async Task<ApiResult> AdjustmentAndWithdrawalLimitAsync(AdjustmentAndWithdrawalLimitReq adjustmentAndWithdrawalLimitReq)
         {
