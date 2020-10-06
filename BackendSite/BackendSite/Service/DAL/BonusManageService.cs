@@ -142,7 +142,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PromoCategory> GetPromoCategories(int WalletType)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
                 string SpName = "Admin_PromotionCategory_Get";
                 return conn.Query<PromoCategory>(SpName, new { WalletType }, commandType: CommandType.StoredProcedure);
