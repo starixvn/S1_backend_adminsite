@@ -102,12 +102,11 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = errorCode;
                 apiResult.Message = errorCode ==1 ? "The bonus setting already exists which with same promotion-type & product-category." : "";
             }
-            catch (MySqlException ex)
+            catch (MySqlException sqlException)
             {
-                var sqlException = ex as MySqlException;
                 apiResult.ErrorCode = sqlException.Number;
-                apiResult.Message = ex.Message;
-                apiResult.RawMessage = ex.ToString();
+                apiResult.Message = sqlException.Message;
+                apiResult.RawMessage = sqlException.ToString();
             }
             catch (Exception ex)
             {
@@ -137,11 +136,11 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = errorCode;
                 apiResult.Message = errorCode == 1 ? "The bonus setting already exists which with same promotion-type & product-category." : "";
             }
-            catch (MySqlException ex)
+            catch (MySqlException sqlException)
             {
-                apiResult.ErrorCode = ex.Number;
-                apiResult.Message = ex.Message;
-                apiResult.RawMessage = ex.ToString();
+                apiResult.ErrorCode = sqlException.Number;
+                apiResult.Message = sqlException.Message;
+                apiResult.RawMessage = sqlException.ToString();
             }
             catch (Exception ex)
             {
@@ -182,6 +181,25 @@ namespace BackendSite.Controllers.Api
             try
             {
                 apiResult.Data = bonusManageBLL.GetPromoCategories(WalletType);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<TpGameType>> GetTpGameList()
+        {
+            var apiResult = new ApiResult<IEnumerable<TpGameType>>();
+
+            try
+            {
+                apiResult.Data = bonusManageBLL.GetTpGameList();
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)

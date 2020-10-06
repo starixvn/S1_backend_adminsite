@@ -148,5 +148,10 @@ namespace BackendSite.Service.DAL
                 return conn.Query<PromoCategory>(SpName, new { WalletType }, commandType: CommandType.StoredProcedure);
             }
         }
+        public IEnumerable<TpGameType> GetTpGameList()
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<TpGameType>("Admin_TpGameType_Get", commandType: CommandType.StoredProcedure);
+        }
     }
 }

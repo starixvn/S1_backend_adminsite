@@ -56,10 +56,13 @@ namespace BackendSite.Service.BLL
         {
             return bonusManageService.SetPromotionStatus(BonusCode, SiteId, Status, authorizeBLL.GetAuthData().UserName);
         }
-
         public IEnumerable<PromoCategory> GetPromoCategories(int WalletType)
         {
             return bonusManageService.GetPromoCategories(WalletType);
+        }
+        public IEnumerable<TpGameType> GetTpGameList()
+        {
+            return bonusManageService.GetTpGameList();
         }
     }
 }
