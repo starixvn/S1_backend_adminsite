@@ -21,7 +21,6 @@ namespace BackendSite.Service.Model
         public DateTime? LastUpdateTime { get; set; }
         public string LastUpdateUser { get; set; }
         public IEnumerable<PromotionSpecific> Specific { get; set; }
-        public IEnumerable<PromotionRebate> RebateList { get; set; }
         public int SiteId { get; set; }
         public string SiteName { get; set; }
         public int? WalletType { get; set; }
@@ -43,6 +42,7 @@ namespace BackendSite.Service.Model
         public int BonusType { get; set; }
         public decimal MaxBonus { get; set; }
         public string Details { get; set; }
+        public IEnumerable<PromotionRebate> RebateList { get; set; }
         public int Status { get; set; }
         public decimal RequiredAmount { get; set; }
         public int LockedType { get; set; }
@@ -58,12 +58,14 @@ namespace BackendSite.Service.Model
         public string Name { get; set; }
         public int TpId { get; set; }
     }
-
     public class PromotionRebate
     {
-        public int CurrencyId { get; set; }
         public int GameType { get; set; }
         public decimal Percentage { get; set; }
         public int Status { get; set; }
+    }
+    public class PromotionRebate1 : PromotionRebate
+    {
+        public int CurrencyId { get; set; }
     }
 }

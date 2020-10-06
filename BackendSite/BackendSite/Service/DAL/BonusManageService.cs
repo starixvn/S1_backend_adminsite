@@ -75,7 +75,7 @@ namespace BackendSite.Service.DAL
 
             conn.Execute("Admin_Promotion_InsUpd", p, transaction: trans, commandType: CommandType.StoredProcedure);
             errorCode = p.Get<int>("ErrorCode");
-            if(errorCode == 0)
+            if (errorCode == 0)
             {
                 List<PromotionSpecific> specificList = new List<PromotionSpecific>();
 
@@ -105,13 +105,29 @@ namespace BackendSite.Service.DAL
 
                 if (promotion.PromotionType == 6 || promotion.PromotionType == 7)
                 {
+                    List<PromotionRebate1> RebateList = new List<PromotionRebate1>();
+                    foreach (var s in promotion.Specific)
+                    {
+                        foreach (var r in s.RebateList)
+                        {
+                            RebateList.Add(new PromotionRebate1
+                            {
+                                CurrencyId = s.CurrencyId,
+                                GameType = r.GameType,
+                                Percentage = r.Percentage,
+                                Status = r.Status,
+                            });
+                        }
+                    }
+
                     conn.Execute("Admin_PromotionRebate_Set", new
                     {
                         promotion.BonusCode,
                         promotion.SiteId,
-                        RebateList = JsonConvert.SerializeObject(promotion.RebateList)
+                        RebateList = JsonConvert.SerializeObject(RebateList)
                     }, transaction: trans, commandType: CommandType.StoredProcedure);
                 }
+
                 trans.Commit();
             }
 
