@@ -68,6 +68,9 @@ namespace BackendSite.Service.DAL
             p.Add("WalletType", promotion.WalletType);
             p.Add("TpId", promotion.TpId);
             p.Add("IsAdd", IsAdd);
+            p.Add("RedeemHours", promotion.RedeemHours);
+            p.Add("PeriodType", promotion.PeriodType);
+            p.Add("PeriodDay", promotion.PeriodDay);
             p.Add("ErrorCode", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             conn.Execute("Admin_Promotion_InsUpd", p, transaction: trans, commandType: CommandType.StoredProcedure);
@@ -98,6 +101,13 @@ namespace BackendSite.Service.DAL
                     promotion.BonusCode,
                     promotion.SiteId,
                     SpecificList = JsonConvert.SerializeObject(specificList)
+                }, transaction: trans, commandType: CommandType.StoredProcedure);
+
+                conn.Execute("Admin_PromotionRebate_Set", new
+                {
+                    promotion.BonusCode,
+                    promotion.SiteId,
+                    RebateList = JsonConvert.SerializeObject(promotion.RebateList)
                 }, transaction: trans, commandType: CommandType.StoredProcedure);
 
                 trans.Commit();

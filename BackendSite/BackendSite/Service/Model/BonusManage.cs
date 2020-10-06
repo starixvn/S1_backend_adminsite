@@ -20,12 +20,15 @@ namespace BackendSite.Service.Model
         public int ExpiryDays { get; set; }
         public DateTime? LastUpdateTime { get; set; }
         public string LastUpdateUser { get; set; }
-
         public IEnumerable<PromotionSpecific> Specific { get; set; }
+        public IEnumerable<PromotionRebate> RebateList { get; set; }
         public int SiteId { get; set; }
         public string SiteName { get; set; }
         public int? WalletType { get; set; }
         public int? TpId { get; set; }
+        public int? RedeemHours { get; set; }
+        public int? PeriodType { get; set; }
+        public int? PeriodDay { get; set; }
     }
 
     public class PromotionSpecific
@@ -44,7 +47,11 @@ namespace BackendSite.Service.Model
         public decimal RequiredAmount { get; set; }
         public int LockedType { get; set; }
     }
-
+    public class TpGameType
+    {
+        public int Type { get; set; }
+        public string TypeName { get; set; }
+    }
     public class PromoCategory
     {
         public int Id { get; set; }
@@ -52,9 +59,11 @@ namespace BackendSite.Service.Model
         public int TpId { get; set; }
     }
 
-    public class TpGameType
+    public class PromotionRebate
     {
-        public int Type { get; set; }
-        public string TypeName { get; set; }
+        public int CurrencyId { get; set; }
+        public int GameType { get; set; }
+        public decimal Percentage { get; set; }
+        public int Status { get; set; }
     }
 }
