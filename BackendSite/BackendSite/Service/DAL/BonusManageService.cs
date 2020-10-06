@@ -103,13 +103,15 @@ namespace BackendSite.Service.DAL
                     SpecificList = JsonConvert.SerializeObject(specificList)
                 }, transaction: trans, commandType: CommandType.StoredProcedure);
 
-                conn.Execute("Admin_PromotionRebate_Set", new
+                if (promotion.PromotionType == 6 || promotion.PromotionType == 7)
                 {
-                    promotion.BonusCode,
-                    promotion.SiteId,
-                    RebateList = JsonConvert.SerializeObject(promotion.RebateList)
-                }, transaction: trans, commandType: CommandType.StoredProcedure);
-
+                    conn.Execute("Admin_PromotionRebate_Set", new
+                    {
+                        promotion.BonusCode,
+                        promotion.SiteId,
+                        RebateList = JsonConvert.SerializeObject(promotion.RebateList)
+                    }, transaction: trans, commandType: CommandType.StoredProcedure);
+                }
                 trans.Commit();
             }
 
