@@ -41,6 +41,15 @@ namespace BackendSite.Service.DAL
             if (promotion != null)
             {
                 promotion.Specific = conn.Query<PromotionSpecific>("Admin_PromotionSpecific_Get", new { BonusCode, SiteId }, transaction: trans, commandType: CommandType.StoredProcedure);
+
+                if (promotion.Specific != null)
+                {
+                    var rebateList = conn.Query<PromotionRebate1>("Admin_PromotionRebate_Get", new { BonusCode, SiteId }, transaction: trans, commandType: CommandType.StoredProcedure);
+                    foreach(var s in promotion.Specific)
+                    {
+                        s.RebateList = rebateList.Where(x => x.CurrencyId == s.CurrencyId);
+                    }
+                }
             }
             trans.Commit();
             return promotion;
