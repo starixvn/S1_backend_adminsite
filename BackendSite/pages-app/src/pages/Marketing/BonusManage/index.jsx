@@ -87,11 +87,19 @@ const App = () => {
 					info.selectedLang.forEach(l => {
 						lang[l] = info.lang[l];
 					});
-
 					let maxBonus =
-						promotion.promotionType === 3
+						promotion.promotionType == 3
 							? Number(info.bonus)
 							: Number(info.maxBonus);
+
+					let tpGame = promotion.promotionType == 6 || promotion.promotionType == 7 ? promotion.tpGameCategory.map(t => {
+						return {
+							GameType: t.value,
+							Percentage: info.tpGames[t.value]?.percentage ? Number(info.tpGames[t.value].percentage) : 0,
+							Status: info.tpGames[t.value]?.status ? Number(info.tpGames[t.value].status) : 0,
+						}
+					}) : null;
+
 					return {
 						CurrencyId: s,
 						Usage: info.usage ? Number(info.usage) : 0,
@@ -103,7 +111,9 @@ const App = () => {
 						Status: info.status,
 						RequiredAmount: Number(info.requiredAmount),
 						LockedType: info.lockedType,
-						BeenUsed: info.beenUsed
+						BeenUsed: info.beenUsed,
+						RebateList: tpGame,
+						MinPayout: Number(info.minPayout)
 					};
 				});
 
@@ -121,9 +131,11 @@ const App = () => {
 				ProductCategory: promotion.productCategory,
 				TpId: promotion.tpId,
 				CategoryId: Number(promotion.categoryId),
-				Specific: _specific
+				Specific: _specific,
+				PeriodType: Number(promotion.periodType) ? Number(promotion.periodType) : 0,
+				PeriodDay: Number(promotion.periodType) === 2 ? Number(promotion.periodWeek) : Number(promotion.periodType) === 3 ? Number(promotion.periodMonth) : 0,
+				RedeemHours: Number(promotion.redeemHours) ? Number(promotion.redeemHours) : 0
 			};
-
 			let param = {
 				Url: "BonusManage/SetPromotion",
 				Data: qs.stringify({
@@ -320,8 +332,10 @@ const App = () => {
 	};
 
 	const skipField = {
-		"default": ["currentLang", "productCategory", "lockedType"],
-		"8": ["expiryDays","walletType","categoryId","tpId","rollOver","bonusAmountType","bonus","maxBonus","requiredAmount","currentLang", "productCategory", "lockedType"],
+		"default": ["currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours", "minPayout"],
+		"6": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType"],
+		"7": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType"],
+		"8": ["expiryDays", "walletType", "categoryId", "tpId", "rollOver", "minPayout", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours"],
 	}
 
 	return state.panelType === defPanelType.Main || state.panelType === defPanelType.Copy ? (
