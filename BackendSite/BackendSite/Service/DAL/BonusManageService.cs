@@ -101,7 +101,8 @@ namespace BackendSite.Service.DAL
                         Usage = specific.Usage,
                         Details = specific.Details,
                         RequiredAmount = specific.RequiredAmount,
-                        LockedType = specific.LockedType
+                        LockedType = specific.LockedType,
+                        MinPayout = specific.MinPayout
                     });
                 }
 

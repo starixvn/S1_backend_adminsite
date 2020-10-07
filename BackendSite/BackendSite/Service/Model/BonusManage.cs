@@ -46,6 +46,7 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public decimal RequiredAmount { get; set; }
         public int LockedType { get; set; }
+        public decimal MinPayout { get; set; }
     }
     public class TpGameType
     {
