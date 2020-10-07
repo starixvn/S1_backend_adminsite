@@ -8,7 +8,9 @@ export const defActionType = {
 	CURRENCY_SET_LANG_CHECKBOX: "CURRENCY_SET_LANG_CHECKBOX",
 	GET_PROMO_CATEGORIES: "GET_PROMO_CATEGORIES",
 	SET_TPID: "SET_TPID",
-	CURRENCY_SET_AMOUNT_VALUE: "CURRENCY_SET_AMOUNT_VALUE"
+	CURRENCY_SET_AMOUNT_VALUE: "CURRENCY_SET_AMOUNT_VALUE",
+	GET_TPGAME_CATEGORIES: "GET_TPGAME_CATEGORIES",
+	CURRENCY_SET_TpGame_VALUE: "CURRENCY_SET_TpGame_VALUE"
 };
 
 export const initialState = (IsAdd, datas, siteList) => {
@@ -34,7 +36,12 @@ export const initialState = (IsAdd, datas, siteList) => {
 			sort: "",
 			specific: _specific,
 			productCategory: [],
-			categoryId: null
+			categoryId: null,
+			periodType: null,
+			periodWeek: 1,
+			periodMonth: 1,
+			redeemHours: "",
+			tpGameCategory: [],
 		};
 	} else {
 		let _specific = SetSpecific(
@@ -61,7 +68,12 @@ export const initialState = (IsAdd, datas, siteList) => {
 			walletType: datas.walletType,
 			tpId: datas.tpId,
 			productCategory: datas.productCategory,
-			categoryId: datas.categoryId
+			categoryId: datas.categoryId,
+			periodType: datas.periodType,
+			periodWeek: datas.periodWeek ? datas.periodWeek : 1,
+			periodMonth: datas.periodMonth ? datas.periodMonth : 1,
+			redeemHours: datas.redeemHours,
+			tpGameCategory: [],
 		};
 	}
 };
@@ -87,7 +99,9 @@ const initSpecific = {
 	beenUsed: 0,
 	lang: {
 		en: { ...initLang }
-	}
+	},
+	tpGames: {},
+	minPayout: "",
 };
 
 const SetSpecific = (currencyList, langList, data) => {
@@ -108,6 +122,7 @@ const SetSpecific = (currencyList, langList, data) => {
 		data.forEach(d => {
 			let _newData = {};
 			let lang = JSON.parse(d.details ?? "{}");
+			let _tpGameData = {};
 			d["lang"] = lang;
 			d["selectedLang"] = Object.keys(lang);
 			langList
@@ -128,10 +143,21 @@ const SetSpecific = (currencyList, langList, data) => {
 					_newData[k] = d[k] ?? "";
 				}
 			});
+
 			_specific[d.currencyId] = _newData;
+
+			if (d.rebateList != null) {
+				_specific[d.currencyId].tpGames = d.rebateList.forEach(r => {
+					_tpGameData[r.gameType] = {
+						percentage: r.percentage,
+						status: r.status
+					}
+
+				});
+				_specific[d.currencyId].tpGames = _tpGameData;
+			}
 		});
 	}
-
 	return _specific;
 };
 
@@ -252,6 +278,7 @@ export function reducer(state, action) {
 				specific: SetSpecific(
 					action.currencyList,
 					action.langList,
+					null,
 					null
 				)
 			};
@@ -286,6 +313,37 @@ export function reducer(state, action) {
 				...state,
 				tpId: _tpId,
 				categoryId: _categoryId
+			};
+
+		case defActionType.GET_TPGAME_CATEGORIES:
+			let tpGameCategory = action.tpGameCategory.map(item => {
+				return {
+					value: item.type,
+					displayText: item.typeName
+				};
+			});
+			return {
+				...state,
+				tpGameCategory: tpGameCategory,
+			};
+
+		case defActionType.CURRENCY_SET_TpGame_VALUE:
+			return {
+				...state,
+				specific: {
+					...state.specific,
+					[action.currencyId]: {
+						...state.specific[action.currencyId],
+						tpGames: {
+							...state.specific[action.currencyId].tpGames,
+							[action.gameType]: {
+								...state.specific[action.currencyId].tpGames[action.gameType],
+								[action.dataColumn]: action.value,
+								gameName: action.gameName,
+							}
+						}
+					}
+				}
 			};
 
 		default:

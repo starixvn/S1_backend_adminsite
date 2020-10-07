@@ -15,9 +15,9 @@ export const defPromotionType = {
 	3: "FreeBet",
 	4: "Special",
 	5: "Wallet Bonus",
-	// 6: "Re-Bet",
-	// 7: "CashBet",
-	// 8: "Advertising"
+	6: "Rebate",
+	7: "CashBack",
+	8: "Advertising"
 };
 
 export const initPromotionType = [
@@ -25,9 +25,41 @@ export const initPromotionType = [
 	{ value: 2, displayText: defPromotionType[2] },
 	{ value: 3, displayText: defPromotionType[3] },
 	{ value: 5, displayText: defPromotionType[5] },
-	// { value: 6, displayText: defPromotionType[6] },
-	// { value: 7, displayText: defPromotionType[7] },
-	// { value: 8, displayText: defPromotionType[8] }
+	{ value: 6, displayText: defPromotionType[6] },
+	{ value: 7, displayText: defPromotionType[7] },
+	{ value: 8, displayText: defPromotionType[8] }
+];
+
+export const periodType = {
+	1: "Daily",
+	2: "Weekly",
+	3: "Monthly",
+}
+
+export const initPeriodType = [
+	{ value: 1, displayText: periodType[1] },
+	{ value: 2, displayText: periodType[2] },
+	{ value: 3, displayText: periodType[3] }
+];
+
+export const weekOptions = {
+	1: 'Monday',
+	2: 'Tuesday',
+	3: 'Wednesday',
+	4: 'Thursday',
+	5: 'Friday',
+	6: 'Saturday',
+	7: 'Sunday'
+}
+
+export const initWeekOptions = [
+	{ value: 1, displayText: weekOptions[1] },
+	{ value: 2, displayText: weekOptions[2] },
+	{ value: 3, displayText: weekOptions[3] },
+	{ value: 4, displayText: weekOptions[4] },
+	{ value: 5, displayText: weekOptions[5] },
+	{ value: 6, displayText: weekOptions[6] },
+	{ value: 7, displayText: weekOptions[7] }
 ];
 
 export const initWalletType = () => Object.values(defWalletType);

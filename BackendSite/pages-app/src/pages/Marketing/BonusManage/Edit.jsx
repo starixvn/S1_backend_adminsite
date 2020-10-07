@@ -17,6 +17,24 @@ export default props => {
 	);
 
 	useEffect(() => {
+		let param = {
+			Url: "BonusManage/GetTpGameList"
+		};
+		WebAPI.PostData(param).then(res => {
+			if (isMountedRef.current) {
+				if (res.data.errorCode === 0) {
+					dispatch({
+						type: defActionType.GET_TPGAME_CATEGORIES,
+						tpGameCategory: res.data.data
+					});
+				} else {
+					alert(res.data.message ?? "failed to get data.");
+				}
+			}
+		});
+	}, []);
+
+	useEffect(() => {
 		if (!props.IsAdd) {
 			GetPromoCategories(true, -1, props.Datas.walletType);
 		}
@@ -32,7 +50,26 @@ export default props => {
 						for (let f_key in state[key][c_key]) {
 							if (skipField.includes(f_key)) continue;
 							let column = state[key][c_key][f_key];
-							if (
+							if (f_key === "tpGames" && (state.promotionType == 6 || state.promotionType == 7)) {
+								if (Object.keys(state[key][c_key][f_key]).length === 0) {
+									alert(
+										`${window.i18n[`lbl_Currency${c_key}`]
+										} Please open at least one TpGame.` );
+									checked = false;
+									break;
+								}
+								for (let t_key in state[key][c_key][f_key]) {
+									let tpcolumn = state[key][c_key][f_key][t_key];
+									if (Boolean(tpcolumn?.status) && !Boolean(tpcolumn?.percentage)) {
+										alert(
+											`${window.i18n[`lbl_Currency${c_key}`]
+											}'s ${f_key} ${tpcolumn.gameName} percentage does not allow null.`
+										);
+										checked = false;
+										break;
+									}
+								}
+							} else if (
 								column === null ||
 								column === undefined ||
 								column === ""
@@ -139,6 +176,17 @@ export default props => {
 		});
 	};
 
+	const EditTpGameCategoryValue = (currencyId, gameName, gameType, value, dataColumn) => {
+		dispatch({
+			type: defActionType.CURRENCY_SET_TpGame_VALUE,
+			value,
+			dataColumn,
+			currencyId,
+			gameName,
+			gameType
+		});
+	};
+
 	const GetPromoCategories = (isInit, walletType, value) => {
 		if (walletType !== value) {
 			let param = {
@@ -196,7 +244,8 @@ export default props => {
 					EditCurrencyLangCheckBox,
 					GetPromoCategories,
 					SelectTpId,
-					EditCurrencyAmountValue
+					EditCurrencyAmountValue,
+					EditTpGameCategoryValue
 				}}
 				siteList={props.SiteList}
 				IsAdd={props.IsAdd}
@@ -205,3 +254,4 @@ export default props => {
 		</>
 	);
 };
+
