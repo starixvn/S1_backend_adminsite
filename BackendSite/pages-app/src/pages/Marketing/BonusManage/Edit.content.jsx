@@ -30,7 +30,7 @@ export default ({ state, action, IsAdd, processing }) => {
 		return (
 			<button
 				key={`${state.siteId}-tab-${item}`}
-				className={`btn btn-add ${state.currentTab === item ? 'active' : ''}`}
+				className={`btn btn-add ${state.currentTab === item ? 'active1' : ''}`}
 				onClick={action.EditMainValue.bind(this, item, "currentTab")}>
 				{window.i18n[`lbl_Currency${item}`]}
 			</button>
@@ -288,7 +288,7 @@ const SubPanel = props => {
 			return (
 				<button
 					key={`${props.currencyId}-tab-${item}`}
-					className={`btn btn-add ${props.state.currentLang === item ? 'active' : ''}`}
+					className={`btn btn-add ${langId === item ? 'active1' : ''}`}
 					onClick={props.EditMainValue.bind(
 						this,
 						item,
@@ -360,9 +360,6 @@ const SubPanel = props => {
 				{(props.state.promotionType == 6 || props.state.promotionType == 7) ?
 					(
 						<>
-							<div className="row-flex ">
-								{tpGameArr}
-							</div>
 							<div className="row-flex">
 								<InputBox
 									Title="Roll Over"
@@ -372,11 +369,28 @@ const SubPanel = props => {
 								/>
 								<InputBox
 									Type="Number"
+									Title="Max Bonus"
+									OnChange={props.EditMainValue}
+									dataColumn="maxBonus"
+									value={
+										props.state.specific[props.currencyId].maxBonus
+									}
+								/>
+								<InputBox
+									Type="Number"
 									Title="Min Payout"
 									OnChange={props.EditMainValue}
 									dataColumn="minPayout"
 									value={props.state.specific[props.currencyId].minPayout}
 								/>
+							</div>
+							<div className="row-flex ">
+								<div class="input-item">
+									<label class="label">Tp Games</label>
+								</div>
+							</div>
+							<div className="row-flex ">
+								{tpGameArr}
 							</div>
 						</>
 					) :
