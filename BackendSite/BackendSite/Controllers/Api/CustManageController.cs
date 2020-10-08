@@ -550,5 +550,20 @@ namespace BackendSite.Controllers.Api
 
             return result;
         }
+        public class BankInfoLogListReq
+        {
+            public int CustId { get; set; }
+        }
+
+        [HttpPost]
+        public ApiListResult<BankInfoLog> GetBankInfoLogList(BankInfoLogListReq bankInfoLogListReq)
+        {
+            var apiListResult = new ApiListResult<BankInfoLog>();
+            var custInfo = custInfoBLL.GetCustInfoWithCache(bankInfoLogListReq.CustId);
+            apiListResult.ErrorCode = 0;
+            var bankInfoPay = bankDetailBLL.GetBankInfoLogList(bankInfoLogListReq.CustId, custInfo.SiteId);
+            apiListResult.Data = bankInfoPay;
+            return apiListResult;
+        }
     }
 }

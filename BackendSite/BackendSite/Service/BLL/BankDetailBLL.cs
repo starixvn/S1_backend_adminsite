@@ -102,5 +102,10 @@ namespace BackendSite.Service.BLL
             //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
             return BankInfoPayList;
         }
+
+        public IEnumerable<BankInfoLog> GetBankInfoLogList(int custId, int siteId)
+        {
+            return localBankService.GetBankInfoLogList(custId, siteId) ;
+        }
     }
 }
