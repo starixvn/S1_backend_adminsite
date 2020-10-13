@@ -42,6 +42,7 @@ namespace BackendSite.Service.Model
         public bool IsRisk { get; set; }
         public bool PhoneVerified { get; set; }
         public bool EmailVerified { get; set; }
+        public string Iovation { get; set; }
         public int Status { get; set; }
         public DateTime LastLoginTime { get; set; }
         public DateTime RegTime { get; set; }

@@ -10,6 +10,8 @@ import PersonalMsg from './PersonalMsg/CustInfo_PersonalMsg';
 import TurnoverReport from './TurnoverReport/index';
 import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
 import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
+import { BankLog } from './CustInfo_BankLog.jsx';
+import DateTimePicker from 'react-datetime';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -21,6 +23,12 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
     const CustActStatusOp = {
         1: <span className="status status-initial">Non-Deposit</span>,
         2: <span className="status status-active">Deposited</span>,
+    }
+
+    const CustIovationOp = {
+        "A": <span className="status status-active">Allow</span>,
+        "R": <span className="status status-suspend">Review</span>,
+        "D": <span className="status status-closed">Deny</span>,
     }
 
     const DepositStatus = {
@@ -407,21 +415,21 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
         }
 
         componentDidMount() {
-            $(this.startDate.current).datepicker({
-                format: 'mm/dd/yyyy', autoclose: true
-            });
+            // $(this.startDate.current).datepicker({
+            //     format: 'mm/dd/yyyy', autoclose: true
+            // });
 
-            $(this.endDate.current).datepicker({
-                format: 'mm/dd/yyyy', autoclose: true
-            });
+            // $(this.endDate.current).datepicker({
+            //     format: 'mm/dd/yyyy', autoclose: true
+            // });
         }
 
         onStartDate() {
-            $(this.startDate.current).focus();
+            // $(this.startDate.current).focus();
         }
 
         onEndDate() {
-            $(this.endDate.current).focus();
+            // $(this.endDate.current).focus();
         }
 
         onChange(event) {
@@ -432,7 +440,7 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
 
         handleSubmit(event) {
             event.preventDefault();
-            this.props.onChangeValue("FinancialLog", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, RefTransId: this.state.RefTransId.trim() == '' ? null : this.state.RefTransId });
+            this.props.onChangeValue("FinancialLog", { StartDate: moment(this.startDate.current.state.inputValue).unix(), EndDate: moment(this.endDate.current.state.inputValue).add(1, 'days').unix() - 1, RefTransId: this.state.RefTransId.trim() == '' ? null : this.state.RefTransId });
             this.props.GetFinancialLog(1);
         }
 
@@ -444,17 +452,11 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
                     <form className="filter" onSubmit={this.handleSubmit.bind(this)}>
                         <div className="input-item">
                             <span className="label">From Date</span>
-                            <div className="date">
-                                <input type="text" ref={this.startDate} name="StartDate" className="dateselect" data-date-end-date="0d" autoComplete="off" value={financialLog && financialLog.StartDate ? moment.unix(financialLog.StartDate).format("MM/DD/YYYY") : ""} />
-                                <i className="icon-calendar dateselect" onClick={this.onStartDate.bind(this)} />
-                            </div>
+                            <DateTimePicker ref={this.startDate} defaultValue={financialLog && financialLog.StartDate ? moment.unix(financialLog.StartDate).format("l LTS") : ""} />
                         </div>
-                        <div className="input-item date">
+                        <div className="input-item">
                             <span className="label">To Date</span>
-                            <div className="date">
-                                <input type="text" ref={this.endDate} name="EndDate" data-date-end-date="0d" autoComplete="off" value={financialLog && financialLog.EndDate ? moment.unix(financialLog.EndDate).format("MM/DD/YYYY") : ""} />
-                                <i className="icon-calendar dateselect" onClick={this.onEndDate.bind(this)} />
-                            </div>
+                            <DateTimePicker ref={this.endDate} defaultValue={financialLog && financialLog.EndDate ? moment.unix(financialLog.EndDate).format("l LTS") : ""} />
                         </div>
                         <div className="input-item">
                             <span className="label">Ref TransId</span>
@@ -985,6 +987,10 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
                                         </td>
                                     </tr>
                                     <tr>
+                                        <th scope="row">Iovation</th>
+                                        <td>{data.iovation ? CustIovationOp[data.iovation] : null}</td>
+                                    </tr>
+                                    <tr>
                                         <th scope="row">Status</th>
                                         <td>{CustStatusOp[data.status]}</td>
                                     </tr>
@@ -1086,12 +1092,12 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Log"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
         constructor(props) {
             super(props);
-            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData) };
+            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, BankLogData: [], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData) };
         }
 
         onTab(idx, tabName) {
@@ -1466,7 +1472,26 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
             }
         }
 
-
+        GetBankLog() {
+            let CustId = getUrlParameter("custId");
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                Loading.OnLoading();
+                axios.post('/api/CustManage/GetBankInfoLogList', { CustId: iCustId })
+                    .then(function (response) {
+                        Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({ BankLogData: result.data });
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
 
         render() {
             let dataContainer = null;
@@ -1498,6 +1523,8 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
                 dataContainer = <TurnoverReport />
             } else if (TabName == this._Tabs[12]) {
                 dataContainer = <AdminUserLog GetAdminUserLogByCust={this.GetAdminUserLogByCust.bind(this)} searchData={this.state.AdminUserLogData} AdminUserLog={this.state.AdminUserLog} onChangeValue={this.onChangeValue.bind(this)} />
+            } else if (TabName == this._Tabs[13]) {
+                dataContainer = <BankLog GetBankLog={this.GetBankLog.bind(this)} searchData={this.state.BankLogData} />
             }
 
             let authSubKeys = {
