@@ -200,5 +200,9 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+        public IEnumerable<CustBankInfoLog> GetCustBankInfoLogList(int custId, int siteId)
+        {
+            return custInfoService.GetCustBankInfoLogList(custId, siteId);
+        }
     }
 }

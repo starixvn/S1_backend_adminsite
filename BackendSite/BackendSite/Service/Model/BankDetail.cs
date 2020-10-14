@@ -37,11 +37,4 @@ namespace BackendSite.Service.Model
         public int PointLevel { set; get; }
         public virtual int SysId { set; get; }
     }
-    public class BankInfoLog
-    {
-        public string AccountName { set; get; }
-        public string BankName { set; get; }
-        public string AccountNum { set; get; }
-        public string CreateTime { set; get; }
-    }
 }
