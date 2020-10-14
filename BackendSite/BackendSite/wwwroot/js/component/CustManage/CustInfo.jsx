@@ -440,7 +440,7 @@ import DateTimePicker from 'react-datetime';
 
         handleSubmit(event) {
             event.preventDefault();
-            this.props.onChangeValue("FinancialLog", { StartDate: moment(this.startDate.current.state.inputValue).unix(), EndDate: moment(this.endDate.current.state.inputValue).add(1, 'days').unix() - 1, RefTransId: this.state.RefTransId.trim() == '' ? null : this.state.RefTransId });
+            this.props.onChangeValue("FinancialLog", { StartDate: moment(this.startDate.current.state.inputValue).unix(), EndDate: moment(this.endDate.current.state.inputValue).unix(), RefTransId: this.state.RefTransId.trim() == '' ? null : this.state.RefTransId });
             this.props.GetFinancialLog(1);
         }
 
