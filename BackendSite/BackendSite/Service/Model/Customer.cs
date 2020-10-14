@@ -133,4 +133,11 @@ namespace BackendSite.Service.Model
         public decimal Stake { get; set; }
         public decimal WinlostAmount { get; set; }
     }
+    public class CustBankInfoLog
+    {
+        public string AccountName { set; get; }
+        public string BankName { set; get; }
+        public string AccountNum { set; get; }
+        public string CreateTime { set; get; }
+    }
 }

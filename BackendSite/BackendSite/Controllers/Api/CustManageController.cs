@@ -23,17 +23,15 @@ namespace BackendSite.Controllers.Api
     public class CustManageController : ControllerBase
     {
         private readonly CustInfoBLL custInfoBLL;
-        private readonly BankDetailBLL bankDetailBLL;
         private readonly TpBLL tpBLL;
         private readonly WinLostReportService winLostReportService;
         private readonly PermissionBLL permissionBLL;
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly Common common;
 
-        public CustManageController(CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, TpBLL tpBLL, WinLostReportService winLostReportService, PermissionBLL permissionBLL, ServerInfoBLL serverInfoBLL, Common common)
+        public CustManageController(CustInfoBLL custInfoBLL, TpBLL tpBLL, WinLostReportService winLostReportService, PermissionBLL permissionBLL, ServerInfoBLL serverInfoBLL, Common common)
         {
             this.custInfoBLL = custInfoBLL;
-            this.bankDetailBLL = bankDetailBLL;
             this.tpBLL = tpBLL;
             this.winLostReportService = winLostReportService;
             this.permissionBLL = permissionBLL;
@@ -556,12 +554,12 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiListResult<BankInfoLog> GetBankInfoLogList(BankInfoLogListReq bankInfoLogListReq)
+        public ApiListResult<CustBankInfoLog> GetBankInfoLogList(BankInfoLogListReq bankInfoLogListReq)
         {
-            var apiListResult = new ApiListResult<BankInfoLog>();
+            var apiListResult = new ApiListResult<CustBankInfoLog>();
             var custInfo = custInfoBLL.GetCustInfoWithCache(bankInfoLogListReq.CustId);
             apiListResult.ErrorCode = 0;
-            var bankInfoPay = bankDetailBLL.GetBankInfoLogList(bankInfoLogListReq.CustId, custInfo.SiteId);
+            var bankInfoPay = custInfoBLL.GetCustBankInfoLogList(bankInfoLogListReq.CustId, custInfo.SiteId);
             apiListResult.Data = bankInfoPay;
             return apiListResult;
         }

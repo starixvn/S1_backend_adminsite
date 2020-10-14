@@ -29,10 +29,5 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.Query<BankInfoPay>("Common_BankInfoPayForPayout_Get", commandType: CommandType.StoredProcedure);
         }
-        public IEnumerable<BankInfoLog> GetBankInfoLogList(int custId, int siteId)
-        {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<BankInfoLog>("Admin_BankInfoLogList_Get", new { CustId = custId, SiteId= siteId }, commandType: CommandType.StoredProcedure);
-        }
     }
 }
