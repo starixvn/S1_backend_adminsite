@@ -18,7 +18,7 @@ namespace BackendSite.Service.BLL
             this.serverInfoService = serverInfoService;
             this.adjustmentService = adjustmentService;
         }
-        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, int? depositType, long startDate, long endDate, string DepositId, string UserName, int? currencyId, int? status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, long startDate, long endDate, string DepositId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             var serverInfo = serverInfoService.GetModel();/*Check SiteID By Permission*/
             return depositService.GetDepositRequestList(selectSite, depositType, startDate, endDate, serverInfo.SiteId/*Not require*/, DepositId, UserName, currencyId, status, pageSize, ref pageNumber, out totalPages, out rowCount);
@@ -98,7 +98,7 @@ namespace BackendSite.Service.BLL
             var depositRequest = GetDepositRequest(transId);
             return depositService.GetDepositReceipt(depositId, depositRequest.SiteId);
         }
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(IEnumerable<int> selectSite, int? depositType, long startDate, long endDate, string DepositId, string UserName, int? currencyId, int? status)
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string depositType, long startDate, long endDate, string DepositId, string UserName, string currencyId, string status)
         {
             return depositService.GetDepositExportList(selectSite, depositType, startDate, endDate, DepositId, UserName, currencyId, status);
         }

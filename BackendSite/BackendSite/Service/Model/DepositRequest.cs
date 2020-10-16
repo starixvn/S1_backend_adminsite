@@ -58,7 +58,7 @@ namespace BackendSite.Service.Model
         public int DepositCnt { set; get; }
         public int Flag { set; get; }
         public DateTime? UpdateTime { set; get; }
-
+        public string ChannelName { set; get; }
     }
 
     public class DepositInfoForExport
@@ -81,6 +81,7 @@ namespace BackendSite.Service.Model
         public string BankName { set; get; }
         public string BankCode { set; get; }
         public string PayName { set; get; }
+        public string ChannelName { set; get; }
         public string CalCode =>
             DepositType switch
             {
@@ -99,6 +100,7 @@ namespace BackendSite.Service.Model
         public int DepositCnt { set; get; }
         public string Operator { set; get; }
         public DateTime? UpdateTime { set; get; }
+        
     }
     public interface IDepositInfo
     {

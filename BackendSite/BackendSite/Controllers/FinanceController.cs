@@ -81,14 +81,14 @@ namespace BackendSite.Controllers
 
         public class DepositListReq
         {
-            public IEnumerable<int> SelectSite { get; set; }
+            public string SelectSite { get; set; }
             public string DepositId { get; set; }
             public string UserName { get; set; }
-            public int? DepositType { get; set; }
-            public int? CurrencyId { get; set; }
+            public string DepositType { get; set; }
+            public string CurrencyId { get; set; }
             public long startDate { get; set; }
             public long endDate { get; set; }
-            public int? status { get; set; }
+            public string status { get; set; }
         }
 
         [HttpPost]
@@ -101,14 +101,14 @@ namespace BackendSite.Controllers
         }
         public class WithdrawalListReq
         {
-            public IEnumerable<int> SelectSite { get; set; }
+            public string SelectSite { get; set; }
             public string WithdrawalId { get; set; }
             public string UserName { get; set; }
-            public int? withdrawalType { get; set; }
-            public int? CurrencyId { get; set; }
+            public string withdrawalType { get; set; }
+            public string CurrencyId { get; set; }
             public long startDate { get; set; }
             public long endDate { get; set; }
-            public int? status { get; set; }
+            public string status { get; set; }
         }
 
         [HttpPost]
