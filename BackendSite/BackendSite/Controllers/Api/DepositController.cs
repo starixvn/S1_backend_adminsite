@@ -40,11 +40,11 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
             public string DepositId { get; set; }
             public string UserName { get; set; }
-            public int? DepositType { get; set; }
-            public int? CurrencyId { get; set; }
+            public IEnumerable<int> DepositType { get; set; }
+            public IEnumerable<int> CurrencyId { get; set; }
             public long startDate { get; set; }
             public long endDate { get; set; }
-            public int? status { get; set; }
+            public IEnumerable<int> status { get; set; }
         }
 
         [HttpPost]

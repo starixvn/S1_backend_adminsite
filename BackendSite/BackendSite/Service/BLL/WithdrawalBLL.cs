@@ -22,7 +22,7 @@ namespace BackendSite.Service.BLL
             this.withdrawalLimitService = withdrawalLimitService;
         }
 
-        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite, int? withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, int? currencyId, int? status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite, IEnumerable<int> withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             var serverInfo = serverInfoService.GetModel();
             return withdrawalService.GetWithdrawalRequestList(selectSite, withdrawalType, startDate, endDate, serverInfo.SiteId/*Not require*/, WithdrawalId, UserName, currencyId, status, pageSize, ref pageNumber, out totalPages, out rowCount);
@@ -148,7 +148,7 @@ namespace BackendSite.Service.BLL
             return withdrawalService.GetWithdrawalListByCust(CustId, TransId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
 
-        public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(IEnumerable<int> selectSite, int? withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, int? currencyId, int? status)
+        public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(string selectSite, string withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, string currencyId, string status)
         {
             return withdrawalService.GetWithdrawalExportList(selectSite, withdrawalType, startDate, endDate, WithdrawalId, UserName, currencyId, status);
         }

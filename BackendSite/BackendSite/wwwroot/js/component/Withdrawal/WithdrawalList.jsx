@@ -1,6 +1,7 @@
 ﻿import { number_format } from '../commJS/common';
 import { Pagination } from '../commJS/Pagination.jsx';
 import * as Loading from '../commJS/Loading.jsx';
+import DateTimePicker from 'react-datetime';
 
 (function ($, React, ReactDOM, i18n, axios, moment, Calendar) {
     const WithdrawalStatus = {
@@ -23,6 +24,23 @@ import * as Loading from '../commJS/Loading.jsx';
         6: <span className="status status-approved">{i18n["lbl_WithdrawalStatus6"]}</span>,
         7: <span className="status status-rejected">{i18n["lbl_WithdrawalStatus7"]}</span>,
         8: <span className="status status-hold">{i18n["lbl_WithdrawalStatus8"]}</span>,
+    }
+
+    const TypeSelectOp = {
+        0: "Undefine",
+        1: "Online Payment",
+        2: "Local Bank"
+    };
+
+    const StatusSelectOp = {
+        1: "Pending",
+        8: "To KYC",
+        2: "On Hold",
+        3: "Verify",
+        4: "Process",
+        5: "Cancelled",
+        6: "Approved",
+        7: "Rejected",
     }
 
     class WithdrawalList extends React.Component {
@@ -519,12 +537,10 @@ import * as Loading from '../commJS/Loading.jsx';
         _timeInterval = 15;
         constructor(props) {
             super(props);
-            this.f_trigger_Start = React.createRef();
             this.selectdate_start = React.createRef();
-            this.f_trigger_End = React.createRef();
             this.selectdate_end = React.createRef();
             this.ExportForm = React.createRef();
-            this.state = { SiteList: [], selectSite: [], selectType: "", selectCurrency: "", selectStatus: "1", SelectUser: "", SelectWithdrawalID: "", ShowDetial: false, timeInterval: this._timeInterval, IsRefresh: false, MutiSelRefresh: false };
+            this.state = { SiteList: [], selectSite: [], selectType: [], selectCurrency: [], selectStatus: [], SelectUser: "", SelectWithdrawalID: "", ShowDetial: false, timeInterval: this._timeInterval, IsRefresh: false, MutiSelRefresh: false };
             this.searchFilter = {};
         }
 
@@ -546,24 +562,25 @@ import * as Loading from '../commJS/Loading.jsx';
             }
             //Loading.OnLoading();
             let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, PageNumber: pageNumber, SelectSite: this.searchFilter.selectSite };
+
             if (this.searchFilter.SelectWithdrawalID != "") {
                 data.WithdrawalId = this.searchFilter.SelectWithdrawalID;
             }
 
-            if (this.searchFilter.selectType != "") {
-                data.withdrawalType = parseInt(this.searchFilter.selectType);
+            if (this.searchFilter.selectType.length != 0) {
+                data.withdrawalType = this.searchFilter.selectType;
             }
 
-            if (this.searchFilter.selectStatus != "") {
-                data.status = parseInt(this.searchFilter.selectStatus);
+            if (this.searchFilter.selectStatus.length != 0) {
+                data.status = this.searchFilter.selectStatus;
             }
 
             if (this.searchFilter.SelectUser != "") {
                 data.UserName = this.searchFilter.SelectUser;
             }
 
-            if (this.searchFilter.selectCurrency != "") {
-                data.CurrencyID = parseInt(this.searchFilter.selectCurrency);
+            if (this.searchFilter.selectCurrency.length != 0) {
+                data.CurrencyID = this.searchFilter.selectCurrency;
             }
 
             axios.post('/api/Withdrawal/GetWithdrawalRequestList', data)
@@ -592,20 +609,20 @@ import * as Loading from '../commJS/Loading.jsx';
                 data.WithdrawalId = this.searchFilter.SelectWithdrawalID;
             }
 
-            if (this.searchFilter.selectType != "") {
-                data.withdrawalType = parseInt(this.searchFilter.selectType);
+            if (this.searchFilter.selectType.length != 0) {
+                data.withdrawalType = this.searchFilter.selectType;
             }
 
-            if (this.searchFilter.selectStatus != "") {
-                data.status = parseInt(this.searchFilter.selectStatus);
+            if (this.searchFilter.selectStatus.length != 0) {
+                data.status = this.searchFilter.selectStatus;
             }
 
             if (this.searchFilter.SelectUser != "") {
                 data.UserName = this.searchFilter.SelectUser;
             }
 
-            if (this.searchFilter.selectCurrency != "") {
-                data.CurrencyID = parseInt(this.searchFilter.selectCurrency);
+            if (this.searchFilter.selectCurrency.length != 0) {
+                data.CurrencyID = this.searchFilter.selectCurrency;
             }
 
             let ExportParam = [];
@@ -626,9 +643,34 @@ import * as Loading from '../commJS/Loading.jsx';
                 alert("Please Choose at least one Site")
                 return;
             }
+
+            if (this.state.selectType.length == 0) {
+                alert("Please Choose at least one Type")
+                return;
+            }
+
+            if (this.state.selectCurrency.length == 0) {
+                alert("Please Choose at least one Currency")
+                return;
+            }
+
+            if (this.state.selectStatus.length == 0) {
+                alert("Please Choose at least one Status")
+                return;
+            }
+
+            if (this.selectdate_start.current.state.inputValue == "") {
+                alert("Please Choose From Date")
+                return;
+            }
+
+            if (this.selectdate_end.current.state.inputValue == "") {
+                alert("Please Choose To Date")
+                return;
+            }
+
             //this._Search = true;
-            let endDate = moment(this.selectdate_end.current.value).add(1, 'days').unix() - 1;
-            let data = { StartDate: moment(this.selectdate_start.current.value).unix(), EndDate: endDate };
+            let data = { StartDate: moment(this.selectdate_start.current.state.inputValue).unix(), EndDate: moment(this.selectdate_end.current.state.inputValue).unix() };
 
             this.setState(data, function () {
                 this.searchFilter = JSON.parse(JSON.stringify(this.state));
@@ -670,7 +712,7 @@ import * as Loading from '../commJS/Loading.jsx';
                 }.bind(this));
         }
 
-        buildSelectSite() {
+        buildSelectSite = () => {
             let state = this.state;
             $("#selectSite").multiselect({
                 includeSelectAllOption: true,
@@ -697,34 +739,99 @@ import * as Loading from '../commJS/Loading.jsx';
             });
         }
 
+        buildTypeSite = () => {
+            let state = this.state;
+            $("#selectType").multiselect({
+                includeSelectAllOption: true,
+                selectAllText: 'Check all!',
+                onSelectAll: function () {
+                    state.selectType.length = 0;
+                    Object.keys(TypeSelectOp).forEach(function (obj) {
+                        state.selectType.push(parseInt(obj));
+                    });
+                },
+                onDeselectAll: function () {
+                    state.selectType.length = 0;
+                },
+                onChange: function (option, checked, select) {
+                    let val = parseInt($(option).val()), index = state.selectType.indexOf(val);
+                    (checked) ? state.selectType.push(val) : (index > -1) ? state.selectType.splice(index, 1) : state.selectType;
+                    state.selectType.sort();
+                }
+            });
+            (this.state.MutiSelRefresh) ? $('#selectType').multiselect('select', this.searchFilter.selectType) : $('#selectType').multiselect('selectAll', false);
+            $('#selectType').multiselect('updateButtonText');
+            Object.keys(TypeSelectOp).forEach(function (obj) {
+                state.selectType.push(parseInt(obj));
+            });
+        }
+
+        buildCurrencySite = () => {
+            let state = this.state;
+            $("#selectCurrency").multiselect({
+                includeSelectAllOption: true,
+                selectAllText: 'Check all!',
+                onSelectAll: function () {
+                    state.selectCurrency.length = 0;
+                    CurrencyList.forEach(function (obj) {
+                        state.selectCurrency.push(parseInt(obj));
+                    });
+                },
+                onDeselectAll: function () {
+                    state.selectCurrency.length = 0;
+                },
+                onChange: function (option, checked, select) {
+                    let val = parseInt($(option).val()), index = state.selectCurrency.indexOf(val);
+                    (checked) ? state.selectCurrency.push(val) : (index > -1) ? state.selectCurrency.splice(index, 1) : state.selectCurrency;
+                    state.selectCurrency.sort();
+                }
+            });
+            (this.state.MutiSelRefresh) ? $('#selectCurrency').multiselect('select', this.searchFilter.selectCurrency) : $('#selectCurrency').multiselect('selectAll', false);
+            $('#selectCurrency').multiselect('updateButtonText');
+            CurrencyList.forEach(function (obj) {
+                state.selectCurrency.push(parseInt(obj));
+            });
+        }
+
+        buildStatusSite = () => {
+            let state = this.state;
+            $("#selectStatus").multiselect({
+                includeSelectAllOption: true,
+                selectAllText: 'Check all!',
+                onSelectAll: function () {
+                    state.selectStatus.length = 0;
+                    Object.keys(StatusSelectOp).forEach(function (obj) {
+                        state.selectStatus.push(parseInt(obj));
+                    });
+                },
+                onDeselectAll: function () {
+                    state.selectStatus.length = 0;
+                },
+                onChange: function (option, checked, select) {
+                    let val = parseInt($(option).val()), index = state.selectStatus.indexOf(val);
+                    (checked) ? state.selectStatus.push(val) : (index > -1) ? state.selectStatus.splice(index, 1) : state.selectStatus;
+                    state.selectStatus.sort();
+                }
+            });
+            (this.state.MutiSelRefresh) ? $('#selectStatus').multiselect('select', this.searchFilter.selectStatus) : $('#selectStatus').multiselect('select', 1);
+            $('#selectStatus').multiselect('updateButtonText');
+            state.selectStatus.push(1);
+        }
         componentDidUpdate() {
             if (this.state.MutiSelRefresh) {
                 this.buildSelectSite();
+                this.buildTypeSite();
+                this.buildCurrencySite();
+                this.buildStatusSite();
                 this.setState({ MutiSelRefresh: false });
             }
         }
 
         componentDidMount() {
-            let f_trigger_Start = this.f_trigger_Start.current;
-            let f_trigger_End = this.f_trigger_End.current;
-            let selectdate_end = this.selectdate_end.current;
-            let selectdate_start = this.selectdate_start.current;
-
-            //selectdate_start.value
-            Calendar.setup({
-                inputField: selectdate_end, // id of the input field
-                ifFormat: "mm/dd/y",        // format of the input field
-                button: f_trigger_End,  // trigger for the calendar (button ID)
-                singleClick: true              // double-click mode
-            });
-
-            Calendar.setup({
-                inputField: selectdate_start, // id of the input field
-                ifFormat: "mm/dd/y",        // format of the input field
-                button: f_trigger_Start,  // trigger for the calendar (button ID)
-                singleClick: true              // double-click mode
-            });
             this.getSiteList();
+	    this.buildTypeSite();
+            this.buildCurrencySite();
+            this.buildStatusSite();
             //setTimeout(thisAutoRefresh, 2000);
         }
 
@@ -733,24 +840,36 @@ import * as Loading from '../commJS/Loading.jsx';
         }
 
         onBack() {
-            this.setState({ ShowDetial: false });
+            this.setState({ ShowDetial: false, MutiSelRefresh: true });
             this.onRefresh();
         }
 
         render() {
-            let selectCurrency = CurrencyList.map(function (obj) {
-                return <option key={obj} value={obj}>{i18n["lbl_Currency" + obj]}</option>;
-            });
 
-            selectCurrency.splice(0, 0, <option key={""} value={""}>{"All"}</option>)
-            selectCurrency = <select name="selectCurrency" onChange={this.onChange.bind(this)} value={this.state.selectCurrency}>{selectCurrency}</select>;
+            let siteList = this.state.SiteList.map(function (obj) {
+                return <option key={`site-list-${obj.siteId}`} value={obj.siteId}>{obj.siteName}</option>;
+            }.bind(this));
+            siteList = <select id="selectSite" name="selectSite[]" multiple="multiple">{siteList}</select>;
+
+            let typeList = Object.keys(TypeSelectOp).map(function (obj) {
+                return <option key={`type-list-${obj}`} value={obj}>{TypeSelectOp[obj]}</option>;
+            }.bind(this));
+            typeList = <select id="selectType" name="selectType[]" multiple="multiple">{typeList}</select>;
+
+            let currencyList = CurrencyList.map(function (obj) {
+                return <option key={`currency-list-${obj}`} value={obj}>{i18n["lbl_Currency" + obj]}</option>;
+            }.bind(this));
+            currencyList = <select id="selectCurrency" name="selectCurrency[]" multiple="multiple">{currencyList}</select>;
+
+            let statusList = Object.keys(StatusSelectOp).map(function (obj) {
+                return <option key={`status-list-${obj}`} value={obj}>{StatusSelectOp[obj]}</option>;
+            }.bind(this));
+            statusList = <select id="selectStatus" name="selectStatus[]" multiple="multiple">{statusList}</select>;
+
             let searchData = this.state.searchData;
             let StartDate = this.state.StartDate;
             let EndDate = this.state.EndDate;
-            let siteList = this.state.SiteList.map(function (obj) {
-                return <option key={obj.siteId} value={obj.siteId}>{obj.siteName}</option>;
-            }.bind(this));
-            siteList = <select id="selectSite" name="selectSite[]" multiple="multiple">{siteList}</select>;
+
             return (
                 <div>
                     {!this.state.ShowDetial ? <form method="post" onSubmit={this.handleSubmit.bind(this)}>
@@ -765,48 +884,31 @@ import * as Loading from '../commJS/Loading.jsx';
                                 <div className="input-item">
                                     <span className="label">Type</span>
                                     <div className="field">
-                                        <select name="selectType" onChange={this.onChange.bind(this)} value={this.state.selectType}>
-                                            <option value="">All</option>
-                                            <option value="0">Undefine</option>
-                                            <option value="1">Online Payment</option>
-                                            <option value="2">Local Bank</option>
-                                        </select>
+                                        {typeList}
                                     </div>
                                 </div>
                                 <div className="input-item">
                                     <span className="label">From Date</span>
                                     <div className="date">
-                                        <input ref={this.selectdate_start} type="text" defaultValue={StartDate != null ? moment.unix(StartDate).format('l') : moment().add(-10, 'days').format('l')} size="8" />
-                                        <a className="icon-calendar" ref={this.f_trigger_Start}>{/*<img ref={this.f_trigger_Start} src="/css/Oneworks/images/icon-calendar.png" />*/}</a>
+                                        <DateTimePicker ref={this.selectdate_start} defaultValue={StartDate != null ? moment.unix(StartDate).format("l LTS") : ""} />
                                     </div>
                                 </div>
                                 <div className="input-item">
                                     <span className="label">To Date</span>
-                                    <div className="field date">
-                                        <input ref={this.selectdate_end} type="text" defaultValue={EndDate != null ? moment.unix(EndDate).format('l') : moment().format('l')} size="8" />
-                                        <a className="icon-calendar" ref={this.f_trigger_End}>{/*<img ref={this.f_trigger_End} src="/css/Oneworks/images/icon-calendar.png" />*/}</a>
+                                    <div className="date">
+                                        <DateTimePicker ref={this.selectdate_end} defaultValue={EndDate != null ? moment.unix(EndDate).format("l LTS") : ""} />
                                     </div>
                                 </div>
                                 <div className="input-item">
                                     <span className="label">Currency</span>
-                                    <div className="field currency">
-                                        {selectCurrency}
+                                    <div className="field">
+                                        {currencyList}
                                     </div>
                                 </div>
                                 <div className="input-item">
                                     <span className="label">Status</span>
                                     <div className="field">
-                                        <select name="selectStatus" onChange={this.onChange.bind(this)} value={this.state.selectStatus}>
-                                            <option value="">All</option>
-                                            <option value="1">Pending</option>
-                                            <option value="8">To KYC</option>
-                                            <option value="2">On Hold</option>
-                                            <option value="3">Verify</option>
-                                            <option value="4">Process</option>
-                                            <option value="5">Cancelled</option>
-                                            <option value="6">Approved</option>
-                                            <option value="7">Rejected</option>
-                                        </select>
+                                        {statusList}
                                     </div>
                                 </div>
                             </div>
