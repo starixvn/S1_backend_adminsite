@@ -564,8 +564,7 @@ import DateTimePicker from 'react-datetime';
             }
 
             //this._Search = true;
-            let data = { StartDate: moment(this.selectdate_start.current.state.inputValue).unix(), EndDate: moment(this.selectdate_end.current.state.inputValue).unix() };
-
+            let data = { StartDate: moment(this.selectdate_start.current.state.inputValue).unix(), EndDate: moment(this.selectdate_end.current.state.inputValue).add(1, 'days').unix() - 1 };
             this.setState(data, function () {
                 this.searchFilter = JSON.parse(JSON.stringify(this.state));
                 this.onSearch(1);
@@ -783,13 +782,13 @@ import DateTimePicker from 'react-datetime';
                                 <div className="input-item">
                                     <span className="label">From Date</span>
                                     <div className="date">
-                                        <DateTimePicker ref={this.selectdate_start} defaultValue={StartDate != null ? moment.unix(StartDate).format("l LTS") : ""} />
+                                        <DateTimePicker ref={this.selectdate_start} timeFormat={false} defaultValue={StartDate != null ? moment.unix(StartDate).format("l") : moment().add(-10, 'days').format('l')} />
                                     </div>
                                 </div>
                                 <div className="input-item">
                                     <span className="label">To Date</span>
                                     <div className="date">
-                                        <DateTimePicker ref={this.selectdate_end} defaultValue={EndDate != null ? moment.unix(EndDate).format("l LTS") : ""} />
+                                        <DateTimePicker ref={this.selectdate_end} timeFormat={false} defaultValue={EndDate != null ? moment.unix(EndDate).format("l") : moment().format('l')} />
                                     </div>
                                 </div>
                                 <div className="input-item">
