@@ -17,6 +17,7 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public int CustId { get; set; }
         public string Memo { set; get; }
+        public int IsTest { set; get; }
     }
 
     public class PaymentAdjustmentFrontEnd
