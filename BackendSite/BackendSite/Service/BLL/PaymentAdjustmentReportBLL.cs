@@ -46,7 +46,7 @@ namespace BackendSite.Service.BLL
                     {
                         CustId = row.CustId,
                         TransId = row.TransId,
-                        CurrencyName = selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}"),
+                        CurrencyName = $"{selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}")}{(row.IsTest == 1 ? "(UUS)" : "")}",
                         AdjustTypeName = selLangBLL.GetResourceValue($"lbl_AdjustmentType{row.AdjustType}"),
                         SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
                         UserName = row.UserName,
@@ -82,7 +82,7 @@ namespace BackendSite.Service.BLL
                     result.Add(new PaymentAdjustmentFrontEnd
                     {
                         TransId = row.TransId,
-                        CurrencyName = selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}"),
+                        CurrencyName = $"{selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}")}{(row.IsTest == 1 ? "(UUS)" : "")}",
                         AdjustTypeName = selLangBLL.GetResourceValue($"lbl_AdjustmentType{row.AdjustType}"),
                         SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
                         UserName = row.UserName,
