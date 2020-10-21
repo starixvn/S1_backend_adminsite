@@ -9,7 +9,8 @@
 @section Style {
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
-    <link href="~/lib/Oneworks/jscalendar/calendar-blue.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap-multiselect/bootstrap-multiselect-modify.css" rel="stylesheet" />
+    <link href="~/css/vendor/DateTimePicker/DateTimePicker.css" rel="stylesheet" />
 }
 @{
     Layout = "~/Views/Shared/_LayoutPagesApp.cshtml";
@@ -29,14 +30,14 @@
     foreach (var value in Enum.GetValues(typeof(PromotionType)))
     {
         var _value = (int)value;
-        typeList.Add(_value, selLangBLL.GetResourceValue($"lbl_PromotionType{_value}") ?? _value.ToString());        
+        typeList.Add(_value, selLangBLL.GetResourceValue($"lbl_PromotionType{_value}") ?? _value.ToString());
     }
 }
 
 <div id="content"></div>
 
 
-@section Scripts {  
+@section Scripts {
     <script>
         window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
         window.RootUrl = '@Url.Content("~/api")';
@@ -44,8 +45,6 @@
         window.gCurrencyList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(currencyList));
         window.gTypeList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(typeList));
     </script>
-    <script src="~/lib/Oneworks/jscalendar/calendar.js"></script>
-    <script src="~/lib/Oneworks/jscalendar/lang/calendar-en.js"></script>
-    <script src="~/lib/Oneworks/jscalendar/calendar-setup.js"></script>
+    <script src="~/lib/bootstrap-multiselect/bootstrap-multiselect.js"></script>
     <script src="~/js/component/Marketing/BonusInfoReport.min.js" asp-append-version="true"></script>
 }

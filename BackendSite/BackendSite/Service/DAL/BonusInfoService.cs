@@ -24,12 +24,12 @@ namespace BackendSite.Service.DAL
             this.withdrawalLimitService = withdrawalLimitService;
         }
 
-        public IEnumerable<BonusInfo> GetBonusInfoReport(string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<BonusInfo> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
             IEnumerable<BonusInfo> result = null;
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                string SpName = "Admin_BonusInfo_Get";
+                string SpName = "Admin_BonusInfoV2_Get";
                 DynamicParameters props = new DynamicParameters();
                 props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
                 props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -38,15 +38,17 @@ namespace BackendSite.Service.DAL
 
                 props.Add("@PageSize", PageSize);
 
+                props.Add("@SelectSite", JsonConvert.SerializeObject(SelectSite));
+                props.Add("@BonusCode", BonusCode);
                 props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
                 props.Add("@PromotionType", PromotionType);
                 props.Add("@Currency", CurrencyId);
                 props.Add("@UserName", UserName);
                 props.Add("@TransID", TransId);
-                
+
                 props.Add("@StartDate", StartDate);
                 props.Add("@EndDate", EndDate);
-                
+
 
                 result = conn.Query<BonusInfo>(SpName, props, commandType: CommandType.StoredProcedure);
                 PageNumber = props.Get<int?>("@PageNumber") ?? 0;
@@ -57,13 +59,15 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<BonusInfo> GetBonusInfoExportReport(string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate)
+        public IEnumerable<BonusInfo> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate)
         {
             IEnumerable<BonusInfo> result = null;
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                string SpName = "Admin_BonusInfoExport_Get";
+                string SpName = "Admin_BonusInfoExportV2_Get";
                 DynamicParameters props = new DynamicParameters();
+                props.Add("@SelectSite", SelectSite);
+                props.Add("@BonusCode", BonusCode);
                 props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
                 props.Add("@PromotionType", PromotionType);
                 props.Add("@Currency", CurrencyId);

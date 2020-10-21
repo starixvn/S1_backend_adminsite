@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from "react";
+import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from 'react-dom';
 import Filter from './Filter';
 import Result from './Result';
@@ -6,73 +6,97 @@ import WebAPI from '../../../module/WebAPI';
 import qs from 'qs';
 import moment from 'moment';
 
-const App = ()=>{
+const App = () => {
     const [stateFilter, setFilter] = useState({
-        'TransId':'',
-        'Currency':0,
-        'StartDate':null,
-        'EndDate':null,
-        'User':'',
-        'Type':0
-    });
-
-    const [stateRef] = useState({
-        f_trigger_Start:useRef(null),
-        f_trigger_End:useRef(null),
-        selectdate_end:useRef(null),
-        selectdate_start:useRef(null),
+        'SelectSite': [],
+        'TransId': '',
+        'Currency': 0,
+        'StartDate': moment().add(-10, 'days').format('l'),
+        'EndDate': moment().format('l'),
+        'User': '',
+        'Type': 0,
+        'BonusCode': ''
     });
 
     const [stateDatas, setDatas] = useState({
-        PageInfo:null,
-        Datas:null,
-        FilterInfo:null
+        PageInfo: null,
+        Datas: null,
+        FilterInfo: null
     });
 
+    const [siteList, setSiteList] = useState();
+
     useEffect(() => {
-        let f_trigger_Start = stateRef.f_trigger_Start.current;
-        let f_trigger_End = stateRef.f_trigger_End.current;
-        let selectdate_end = stateRef.selectdate_end.current;
-        let selectdate_start = stateRef.selectdate_start.current;
-        
-        /*eslint-disable */
-        Calendar.setup({
-            inputField: selectdate_end, // id of the input field
-            ifFormat: "mm/dd/y",        // format of the input field
-            button: f_trigger_End,  // trigger for the calendar (button ID)
-            singleClick: true              // double-click mode
-        });
+        let param = {
+            Url: 'Common/AdminUserSiteList'
+        };
+        WebAPI.PostData(param).then((res) => {
+            if (res.data.errorCode === 0) {
+                setSiteList(res.data.data);
+            } else {
+                alert(res.data.message ?? 'failed to get data.');
+            }
+        })
+    }, []);
 
-        Calendar.setup({
-            inputField: selectdate_start, // id of the input field
-            ifFormat: "mm/dd/y",        // format of the input field
-            button: f_trigger_Start,  // trigger for the calendar (button ID)
-            singleClick: true              // double-click mode
-        });
-        /*eslint-enable */     
-    }, [stateRef]);
-
-    const Filter_OnChange = (v, dataColumn)=>{
+    const Filter_OnChange = (v, dataColumn) => {
         setFilter({
             ...stateFilter,
-            [dataColumn]:v
+            [dataColumn]: v
         });
     }
 
-    const Filter_Submit = ()=>{
-        let startDate = moment(stateRef.selectdate_start.current.value).unix();
-        let endDate = moment(stateRef.selectdate_end.current.value).add(1, 'days').unix()-1;
-        
+    const Filter_CheckBox_OnChange = (v, dataColumn) => {
+        let isRemove = stateFilter[dataColumn].includes(v);
+        let newChecked = isRemove
+            ? stateFilter[dataColumn].filter(value => value !== v)
+            : stateFilter[dataColumn].push(v);
+        let currentTab = stateFilter[dataColumn];
+        if (newChecked.length === 0) {
+            currentTab = [];
+        } else if (currentTab === null) {
+            currentTab = newChecked;
+        }
+
+        if (isRemove && !newChecked.includes(currentTab)) {
+            currentTab = newChecked.length === 0 ? [] : newChecked;
+        }
+        setFilter({
+            ...stateFilter,
+            [dataColumn]: currentTab
+        });
+    }
+
+    const Filter_CheckBox_CheckAll = (v, dataColumn, options) => {
+        if (v !== "All") return false;
+        let currentTab = (stateFilter[dataColumn].length === options.length)
+            ? []
+            : options.map(o => {
+                return o.value
+            })
+        setFilter({
+            ...stateFilter,
+            [dataColumn]: currentTab
+        });
+    }
+
+    const Filter_Submit = () => {
+        if (stateFilter.SelectSite.length === 0) {
+            alert("Please Choose at least one Site")
+            return false;
+        }
         let param = {
             Url: 'BonusInfo/GetBonusInfoReport',
-            Data:qs.stringify({
-                PromotionType:stateFilter.Type,
-                CurrencyId:stateFilter.Currency,
-                StartDate:startDate,
-                EndDate:endDate,
-                UserName:stateFilter.User,
-                TransId:stateFilter.TransId,
-                PageNumber:1
+            Data: qs.stringify({
+                SelectSite: stateFilter.SelectSite,
+                BonusCode: stateFilter.BonusCode,
+                PromotionType: stateFilter.Type,
+                CurrencyId: stateFilter.Currency,
+                StartDate: moment(stateFilter.StartDate).unix(),
+                EndDate: moment(stateFilter.EndDate).add(1, 'days').unix() - 1,
+                UserName: stateFilter.User,
+                TransId: stateFilter.TransId,
+                PageNumber: 1
             })
         };
 
@@ -80,36 +104,40 @@ const App = ()=>{
             if (res.data.errorCode === 0) {
                 setDatas(
                     {
-                        PageInfo:{
-                            totalPages:res.data.totalPages,
-                            pageNumber:1,
-                            rowCount:res.data.rowCount
+                        PageInfo: {
+                            totalPages: res.data.totalPages,
+                            pageNumber: 1,
+                            rowCount: res.data.rowCount
                         },
-                        Datas:[...res.data.data],
-                        FilterInfo:{
-                            ...stateFilter,
-                            StartDate:startDate,
-                            EndDate:endDate
+                        Datas: [...res.data.data],
+                        FilterInfo: {
+                            ...stateFilter
                         }
                     }
                 )
-            }else{
+            } else {
                 alert(res.data.message ?? 'failed to get data.');
             }
         })
     }
 
-    const Result_ChangePage = (PageNumber)=>{
+    const Result_ChangePage = (PageNumber) => {
+        if (stateDatas.FilterInfo.SelectSite.length === 0) {
+            alert("Please Choose at least one Site")
+            return false;
+        }
         let param = {
             Url: 'BonusInfo/GetBonusInfoReport',
-            Data:qs.stringify({
-                PromotionType:stateDatas.FilterInfo.Type,
-                CurrencyId:stateDatas.FilterInfo.Currency,
-                StartDate:stateDatas.FilterInfo.StartDate,
-                EndDate:stateDatas.FilterInfo.EndDate,
-                UserName:stateDatas.FilterInfo.User,
-                TransId:stateDatas.FilterInfo.TransId,
-                PageNumber:PageNumber
+            Data: qs.stringify({
+                SelectSite: stateDatas.FilterInfo.SelectSite,
+                BonusCode: stateDatas.FilterInfo.BonusCode,
+                PromotionType: stateDatas.FilterInfo.Type,
+                CurrencyId: stateDatas.FilterInfo.Currency,
+                StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
+                EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, 'days').unix() - 1,
+                UserName: stateDatas.FilterInfo.User,
+                TransId: stateDatas.FilterInfo.TransId,
+                PageNumber: PageNumber
             })
         };
 
@@ -117,45 +145,50 @@ const App = ()=>{
             if (res.data.errorCode === 0) {
                 setDatas({
                     ...stateDatas,
-                    PageInfo:{
+                    PageInfo: {
                         ...stateDatas.PageInfo,
-                        pageNumber:PageNumber
+                        pageNumber: PageNumber
                     },
-                    Datas:[...res.data.data],
+                    Datas: [...res.data.data],
                 });
-            }else{
+            } else {
                 alert(res.data.message ?? 'failed to get data.');
             }
         })
     }
 
-    const Result_ExportToExcel = ()=>{
+    const Result_ExportToExcel = () => {
+        if (stateDatas.FilterInfo.SelectSite.length === 0) {
+            alert("Please Choose at least one Site")
+            return false;
+        }
         let param = {
             Url: 'BonusInfo/ExportBonusInfoReport',
-            Data:{
-                PromotionType:stateDatas.FilterInfo.Type,
-                CurrencyId:stateDatas.FilterInfo.Currency,
-                StartDate:stateDatas.FilterInfo.StartDate,
-                EndDate:stateDatas.FilterInfo.EndDate,
-                UserName:stateDatas.FilterInfo.User,
-                TransId:stateDatas.FilterInfo.TransId
+            Data: {
+                SelectSite: JSON.stringify(stateDatas.FilterInfo.SelectSite),
+                BonusCode: stateDatas.FilterInfo.BonusCode,
+                PromotionType: stateDatas.FilterInfo.Type,
+                CurrencyId: stateDatas.FilterInfo.Currency,
+                StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
+                EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, 'days').unix() - 1,
+                UserName: stateDatas.FilterInfo.User,
+                TransId: stateDatas.FilterInfo.TransId
             }
         };
 
         WebAPI.DownloadData(param);
     }
-
-    return(
+    return (
         <div className="container-fluid">
             <h4 className="page-name">Bonus Report</h4>
-            <Filter filterInfo={stateFilter} refInfo={stateRef} onChange={Filter_OnChange} ClickSubmit={Filter_Submit}/>
-            {stateDatas.Datas === null ? null : <Result {...stateDatas} ChangePage={Result_ChangePage} ExportToExcel={Result_ExportToExcel}/>}
+            <Filter filterInfo={stateFilter} onChange={Filter_OnChange} onChangeCheckBox={Filter_CheckBox_OnChange} onChangeAllCheckBox={Filter_CheckBox_CheckAll} ClickSubmit={Filter_Submit} SiteList={siteList} />
+            {stateDatas.Datas === null ? null : <Result {...stateDatas} ChangePage={Result_ChangePage} ExportToExcel={Result_ExportToExcel} />}
         </div>
     );
 }
 
 export default App;
 
-if(process.env.NODE_ENV==='production'){
+if (process.env.NODE_ENV === 'production') {
     ReactDOM.render(<App />, document.getElementById('content'))
 }
