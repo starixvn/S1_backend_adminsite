@@ -63,10 +63,17 @@ import DateTimePicker from 'react-datetime';
         2: "-"
     }
 
+    const DepositStatusSelectOp = {
+        1: "Pending",
+        7: "On Hold",
+        3: "Approved",
+        4: "Rejected",
+        5: "Cancelled"
+    }
+
     class DepositList extends React.Component {
         constructor(props) {
             super(props);
-
         }
 
         onCheckDetail(id) {
@@ -126,8 +133,7 @@ import DateTimePicker from 'react-datetime';
     class DepositInfo extends React.Component {
         constructor(props) {
             super(props);
-            this.state = {};
-
+            this.state = { DepositStatus: 0 };
             this.startDate = React.createRef();
             this.endDate = React.createRef();
         }
@@ -150,15 +156,30 @@ import DateTimePicker from 'react-datetime';
             $(this.endDate.current).focus();
         }
 
+        onChange(event) {
+            let obj = this.state;
+            obj[event.target.name] = event.target.value;
+            this.setState(obj);
+        }
+
         handleSubmit(event) {
             event.preventDefault();
-            this.props.onChangeValue("DepositList", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1 });
+            this.props.onChangeValue("DepositList", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, Status: this.state.DepositStatus === 0 ? null : parseInt(this.state.DepositStatus) });
             this.props.GetDepositListByCust(1);
         }
 
         render() {
             let depositInfo = this.props.DepositList;
             let searchData = this.props.searchData;
+            let depositStatusOption = null;
+            if (DepositStatusSelectOp) {
+                depositStatusOption = Object.keys(DepositStatusSelectOp).map(i => {
+                    let selected = this.state.DepositStatus === i ? "selected" : "";
+                    return (
+                        <option key={`Deposit-${i}`} value={i} selected={selected}>{DepositStatusSelectOp[i]}</option>
+                    )
+                })
+            }
             return (
                 <div>
                     <form className="filter" onSubmit={this.handleSubmit.bind(this)}>
@@ -174,6 +195,15 @@ import DateTimePicker from 'react-datetime';
                             <div className="date">
                                 <input type="text" ref={this.endDate} name="EndDate" required="required" data-date-end-date="0d" autoComplete="off" value={depositInfo && depositInfo.EndDate ? moment.unix(depositInfo.EndDate).format("MM/DD/YYYY") : ""} />
                                 <i className="icon-calendar dateselect" onClick={this.onEndDate.bind(this)} />
+                            </div>
+                        </div>
+                        <div className="input-item">
+                            <span className="label">Deposit Status</span>
+                            <div className="">
+                                <select onChange={this.onChange.bind(this)} name="DepositStatus">
+                                    <option value="0" selected="selected">All</option>
+                                    {depositStatusOption}
+                                </select>
                             </div>
                         </div>
                         <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
