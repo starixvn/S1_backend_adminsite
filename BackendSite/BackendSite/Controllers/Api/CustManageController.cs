@@ -563,5 +563,18 @@ namespace BackendSite.Controllers.Api
             apiListResult.Data = bankInfoPay;
             return apiListResult;
         }
+        public class CustBonusReq
+        {
+            public int CustId { get; set; }
+        }
+
+        [HttpPost]
+        public ApiListResult<CustBonus> GetCustBonus(CustBonusReq custBonusReq)
+        {
+            var apiListResult = new ApiListResult<CustBonus>();
+            apiListResult.Data = custInfoBLL.GetCustBonus(custBonusReq.CustId);
+            apiListResult.ErrorCode = 0;
+            return apiListResult;
+        }
     }
 }
