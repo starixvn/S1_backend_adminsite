@@ -181,10 +181,10 @@ namespace BackendSite.Service.DAL
         {
             //var SelectSite = JsonConvert.SerializeObject(selectSite);
 
-            var SelectSite = "[" + selectSite + "]";
-            var DepositType = "[" + depositType + "]";
-            var CurrencyId = "[" + currencyId + "]";
-            var Status = "[" + status + "]";
+            var SelectSite = $"[{selectSite}]";
+            var DepositType = $"[{depositType}]";
+            var CurrencyId = $"[{currencyId}]";
+            var Status = $"[{status}]";
 
             int depositId = 0;
             if (!string.IsNullOrWhiteSpace(DepositId))
