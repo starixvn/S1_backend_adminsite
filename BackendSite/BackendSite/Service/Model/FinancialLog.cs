@@ -30,6 +30,16 @@ namespace BackendSite.Service.Model
         public string RefTransId { get; set; }
         public string Memo { get; set; }
     }
+    public class RebateLog
+    {
+        public string GameName { get; set; }
+        public string RebateTypeName { get; set; }
+        public decimal RedeemAmount { get; set; }
+        public string BonusCode { get; set; }
+        public long RelId { get; set; }
+        public DateTime CreateTime { get; set; }
+      
+    }
     public class PromotionCategory
     {
         public int id { get; set; }

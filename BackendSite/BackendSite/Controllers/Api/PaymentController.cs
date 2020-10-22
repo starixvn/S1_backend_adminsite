@@ -176,6 +176,27 @@ namespace BackendSite.Controllers.Api
 
             return apiListResult;
         }
+        public class GetRebateLogReq
+        {
+            public int CustId { get; set; }
+            public long? StartDate { get; set; }
+            public long? EndDate { get; set; }
+            public int PageNumber { get; set; }
+        }
+        public ApiListResult<RebateLog> GetRebateLog(GetRebateLogReq getRebateLogReq)
+        {
+            int pageNumber = getRebateLogReq.PageNumber;
+            int totalPages = 0;
+            int rowCount = 0;
+            var apiListResult = new ApiListResult<RebateLog>();
+            apiListResult.Data = paymentBLL.GetRebateLog(getRebateLogReq.CustId, getRebateLogReq.StartDate, getRebateLogReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount);
+            apiListResult.ErrorCode = 0;
+            apiListResult.PageNumber = pageNumber;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.RowCount = rowCount;
+
+            return apiListResult;
+        }
         public ApiResult<IEnumerable<PromotionCategory>> GetPromotionCategory()
         {
 
