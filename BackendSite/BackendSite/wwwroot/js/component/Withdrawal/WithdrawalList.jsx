@@ -940,4 +940,4 @@ import DateTimePicker from 'react-datetime';
         }
     }
     ReactDOM.render(<WithdrawalPanel />, document.getElementById('searchForm'));
-})(jQuery, React, ReactDOM, i18n, axios, moment, Calendar);
+})(jQuery, React, ReactDOM, i18n, axios, moment);
