@@ -63,10 +63,17 @@ import DateTimePicker from 'react-datetime';
         2: "-"
     }
 
+    const DepositStatusSelectOp = {
+        1: "Pending",
+        7: "On Hold",
+        3: "Approved",
+        4: "Rejected",
+        5: "Cancelled"
+    }
+
     class DepositList extends React.Component {
         constructor(props) {
             super(props);
-
         }
 
         onCheckDetail(id) {
@@ -126,8 +133,7 @@ import DateTimePicker from 'react-datetime';
     class DepositInfo extends React.Component {
         constructor(props) {
             super(props);
-            this.state = {};
-
+            this.state = { DepositStatus: 0 };
             this.startDate = React.createRef();
             this.endDate = React.createRef();
         }
@@ -150,15 +156,30 @@ import DateTimePicker from 'react-datetime';
             $(this.endDate.current).focus();
         }
 
+        onChange(event) {
+            let obj = this.state;
+            obj[event.target.name] = event.target.value;
+            this.setState(obj);
+        }
+
         handleSubmit(event) {
             event.preventDefault();
-            this.props.onChangeValue("DepositList", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1 });
+            this.props.onChangeValue("DepositList", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, Status: this.state.DepositStatus === 0 ? null : parseInt(this.state.DepositStatus) });
             this.props.GetDepositListByCust(1);
         }
 
         render() {
             let depositInfo = this.props.DepositList;
             let searchData = this.props.searchData;
+            let depositStatusOption = null;
+            if (DepositStatusSelectOp) {
+                depositStatusOption = Object.keys(DepositStatusSelectOp).map(i => {
+                    let selected = this.state.DepositStatus === i ? "selected" : "";
+                    return (
+                        <option key={`Deposit-${i}`} value={i} selected={selected}>{DepositStatusSelectOp[i]}</option>
+                    )
+                })
+            }
             return (
                 <div>
                     <form className="filter" onSubmit={this.handleSubmit.bind(this)}>
@@ -174,6 +195,15 @@ import DateTimePicker from 'react-datetime';
                             <div className="date">
                                 <input type="text" ref={this.endDate} name="EndDate" required="required" data-date-end-date="0d" autoComplete="off" value={depositInfo && depositInfo.EndDate ? moment.unix(depositInfo.EndDate).format("MM/DD/YYYY") : ""} />
                                 <i className="icon-calendar dateselect" onClick={this.onEndDate.bind(this)} />
+                            </div>
+                        </div>
+                        <div className="input-item">
+                            <span className="label">Deposit Status</span>
+                            <div className="">
+                                <select onChange={this.onChange.bind(this)} name="DepositStatus">
+                                    <option value="0" selected="selected">All</option>
+                                    {depositStatusOption}
+                                </select>
                             </div>
                         </div>
                         <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
@@ -340,6 +370,136 @@ import DateTimePicker from 'react-datetime';
                         <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
                     </form>
                     {searchData != null ? <BonusLogList searchData={searchData} ChangePage={this.props.GetBonusLog} /> : null}
+                </div>
+            )
+        }
+    }
+
+    class RebateLogList extends React.Component {
+        constructor(props) {
+            super(props);
+
+        }
+
+        onCheckDetail(id) {
+            this.props.onCheckDetail(id);
+        }
+
+        onRefresh() {
+            this.props.ChangePage(null);
+        }
+
+        ChangePage(pageNumber) {
+            this.props.ChangePage(pageNumber);
+        }
+
+        render() {
+            let rows = this.props.searchData.data.map(row =>
+                <tr key={row.id}>
+                    <td>{moment(row.createTime).format('l LTS')}</td>
+                    <td>{row.gameName ? row.gameName : "N/A"}</td>
+                    <td>{row.rebateTypeName ? row.rebateTypeName : "N/A"}</td>
+                    <td className="text-right">{number_format(row.redeemAmount)}</td>
+                    <td>{row.bonusCode ? row.bonusCode : "N/A"}</td>
+                </tr>
+            );
+
+            return (
+                <div className="table">
+                    <div className="table-options">
+                        <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>
+                            Refresh
+                        </button>
+                    </div>
+                    <table className="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Time {moment().format('(Z)')}</th>
+                                <th scope="col">Game Name</th>
+                                <th scope="col">Rebate Type Name</th>
+                                <th scope="col" className="text-right">Redeem Amount</th>
+                                <th scope="col">Bonus Code</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rows}
+                        </tbody>
+                    </table>
+                    <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                </div>
+            )
+        }
+    }
+
+    class RebateLog extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = {};
+
+            this.startDate = React.createRef();
+            this.endDate = React.createRef();
+
+        }
+
+        componentDidMount() {
+            $(this.startDate.current).datepicker({
+                format: 'mm/dd/yyyy', autoclose: true
+            });
+
+            $(this.endDate.current).datepicker({
+                format: 'mm/dd/yyyy', autoclose: true
+            });
+        }
+
+        onStartDate() {
+            $(this.startDate.current).focus();
+        }
+
+        onEndDate() {
+            $(this.endDate.current).focus();
+        }
+
+        onChange(event) {
+            let obj = this.state;
+            obj[event.target.name] = event.target.value;
+            this.setState(obj);
+        }
+
+        handleSubmit(event) {
+            event.preventDefault();
+            this.props.onChangeValue("RebateLog", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1 });
+            this.props.GetRebateLog(1);
+        }
+
+        componentDidUpdate(prevProps) {
+            if (this.props.PromotionCategoryData !== prevProps.PromotionCategoryData) {
+                this.setState({ PromotionCategory: this.props.PromotionCategoryData[0].id });
+            }
+        }
+
+        render() {
+            let rebateLog = this.props.RebateLog;
+            let searchData = this.props.searchData;
+            return (
+                <div>
+                    <form className="filter" onSubmit={this.handleSubmit.bind(this)}>
+                        <div className="input-item">
+                            <span className="label">From Date</span>
+                            <div className="date">
+                                <input type="text" ref={this.startDate} name="StartDate" className="dateselect" data-date-end-date="0d" autoComplete="off" value={rebateLog && rebateLog.StartDate ? moment.unix(rebateLog.StartDate).format("MM/DD/YYYY") : ""} />
+                                <i className="icon-calendar dateselect" onClick={this.onStartDate.bind(this)} />
+                            </div>
+                        </div>
+                        <div className="input-item date">
+                            <span className="label">To Date</span>
+                            <div className="date">
+                                <input type="text" ref={this.endDate} name="EndDate" data-date-end-date="0d" autoComplete="off" value={rebateLog && rebateLog.EndDate ? moment.unix(rebateLog.EndDate).format("MM/DD/YYYY") : ""} />
+                                <i className="icon-calendar dateselect" onClick={this.onEndDate.bind(this)} />
+                            </div>
+                        </div>
+                        <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
+                    </form>
+                    {searchData != null ? <RebateLogList searchData={searchData} ChangePage={this.props.GetRebateLog} /> : null}
                 </div>
             )
         }
@@ -1092,12 +1252,12 @@ import DateTimePicker from 'react-datetime';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
         constructor(props) {
             super(props);
-            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, BankLogData: [], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData) };
+            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData) };
         }
 
         onTab(idx, tabName) {
@@ -1137,6 +1297,28 @@ import DateTimePicker from 'react-datetime';
                         let result = response.data;
                         if (result.errorCode == 0) {
                             this.setState({ BonusLogData: result });
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
+        GetRebateLog(PageNumber) {
+            Loading.OnLoading();
+            let pageNumber = PageNumber || this.state.RebateLogData.pageNumber;
+            let CustId = getUrlParameter("custId");
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                axios.post('/api/Payment/GetRebateLog', { ...this.state.RebateLog, CustId: iCustId, PageNumber: pageNumber })
+                    .then(function (response) {
+                        Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({ RebateLogData: result });
                         } else {
                             alert(result.message);
                         }
@@ -1504,33 +1686,35 @@ import DateTimePicker from 'react-datetime';
             } else if (TabName == this._Tabs[2]) {
                 dataContainer = <FinancialLog GetFinancialLog={this.GetFinancialLog.bind(this)} searchData={this.state.FinancialLogData} FinancialLog={this.state.FinancialLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[3]) {
-                dataContainer = <DepositInfo GetDepositListByCust={this.GetDepositListByCust.bind(this)} searchData={this.state.DepositListData} DepositList={this.state.DepositList} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <RebateLog GetRebateLog={this.GetRebateLog.bind(this)} searchData={this.state.RebateLogData} RebateLog={this.state.RebateLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[4]) {
-                dataContainer = <TpTransferInfo GetTpTransferInfoByCust={this.GetTpTransferInfoByCust.bind(this)} searchData={this.state.TpTransferInfoData} TpTransferInfo={this.state.TpTransferInfo} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <DepositInfo GetDepositListByCust={this.GetDepositListByCust.bind(this)} searchData={this.state.DepositListData} DepositList={this.state.DepositList} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[5]) {
-                dataContainer = <WithdrawalInfo GetWithdrawalListByCust={this.GetWithdrawalListByCust.bind(this)} searchData={this.state.WithdrawalListData} WithdrawalInfo={this.state.WithdrawalInfo} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <TpTransferInfo GetTpTransferInfoByCust={this.GetTpTransferInfoByCust.bind(this)} searchData={this.state.TpTransferInfoData} TpTransferInfo={this.state.TpTransferInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[6]) {
-                dataContainer = <AdjustmentInfo GetAdjustmentInfoByCust={this.GetAdjustmentInfoByCust.bind(this)} searchData={this.state.AdjustmentInfoData} AdjustmentInfo={this.state.AdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <WithdrawalInfo GetWithdrawalListByCust={this.GetWithdrawalListByCust.bind(this)} searchData={this.state.WithdrawalListData} WithdrawalInfo={this.state.WithdrawalInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[7]) {
-                dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <AdjustmentInfo GetAdjustmentInfoByCust={this.GetAdjustmentInfoByCust.bind(this)} searchData={this.state.AdjustmentInfoData} AdjustmentInfo={this.state.AdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[8]) {
-                dataContainer = <ResetPwd />;
+                dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[9]) {
-                dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)} SetCustNote={this.SetCustNote.bind(this)} />;
+                dataContainer = <ResetPwd />;
             } else if (TabName == this._Tabs[10]) {
-                dataContainer = <PersonalMsg />
+                dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)} SetCustNote={this.SetCustNote.bind(this)} />;
             } else if (TabName == this._Tabs[11]) {
-                dataContainer = <TurnoverReport />
+                dataContainer = <PersonalMsg />
             } else if (TabName == this._Tabs[12]) {
-                dataContainer = <AdminUserLog GetAdminUserLogByCust={this.GetAdminUserLogByCust.bind(this)} searchData={this.state.AdminUserLogData} AdminUserLog={this.state.AdminUserLog} onChangeValue={this.onChangeValue.bind(this)} />
+                dataContainer = <TurnoverReport />
             } else if (TabName == this._Tabs[13]) {
+                dataContainer = <AdminUserLog GetAdminUserLogByCust={this.GetAdminUserLogByCust.bind(this)} searchData={this.state.AdminUserLogData} AdminUserLog={this.state.AdminUserLog} onChangeValue={this.onChangeValue.bind(this)} />
+            } else if (TabName == this._Tabs[14]) {
                 dataContainer = <BankLog GetBankLog={this.GetBankLog.bind(this)} searchData={this.state.BankLogData} />
             }
 
             let authSubKeys = {
-                8: 'ca_resetpwd',
-                10: 'ca_personalMsg',
-                11: 'ca_turnoverReport'
+                9: 'ca_resetpwd',
+                11: 'ca_personalMsg',
+                12: 'ca_turnoverReport'
             }
 
             var tabBtn = this._Tabs.filter((item, index) => {

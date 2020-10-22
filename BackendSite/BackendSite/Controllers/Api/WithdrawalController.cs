@@ -315,6 +315,7 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
             public int CustId { get; set; }
             public string TransId { get; set; }
+            public int? Status { get; set; }
             public long startDate { get; set; }
             public long endDate { get; set; }
         }
@@ -326,7 +327,7 @@ namespace BackendSite.Controllers.Api
             int pageNumber = withdrawalReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
-            var withdrawalList = withdrawalBLL.GetWithdrawalListByCust(withdrawalReq.CustId, withdrawalReq.TransId, withdrawalReq.startDate, withdrawalReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
+            var withdrawalList = withdrawalBLL.GetWithdrawalListByCust(withdrawalReq.CustId, withdrawalReq.TransId, withdrawalReq.Status, withdrawalReq.startDate, withdrawalReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
             apiListResult.Data = withdrawalList;
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;
