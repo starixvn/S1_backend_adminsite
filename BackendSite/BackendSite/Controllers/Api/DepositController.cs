@@ -69,6 +69,7 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
             public int CustId { get; set; }
             public string TransId { get; set; }
+            public int? Status { get; set; }
             public long startDate { get; set; }
             public long endDate { get; set; }
         }
@@ -80,7 +81,7 @@ namespace BackendSite.Controllers.Api
             int pageNumber = depositListReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
-            var depositRequestList = depositBLL.GetDepositListByCust(depositListReq.CustId, depositListReq.TransId, depositListReq.startDate, depositListReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
+            var depositRequestList = depositBLL.GetDepositListByCust(depositListReq.CustId, depositListReq.TransId, depositListReq.Status, depositListReq.startDate, depositListReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
             apiListResult.Data = depositRequestList;
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;
