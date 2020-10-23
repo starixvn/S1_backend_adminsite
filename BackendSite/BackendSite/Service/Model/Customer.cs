@@ -140,4 +140,10 @@ namespace BackendSite.Service.Model
         public string AccountNum { set; get; }
         public string CreateTime { set; get; }
     }
+    public class CustBonus
+    {
+        public string PromotionCategory { set; get; }
+        public string BonusCode { set; get; }
+        public decimal Bonus { get; set; }
+    }
 }

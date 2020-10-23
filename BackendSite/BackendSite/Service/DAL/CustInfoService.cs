@@ -172,5 +172,10 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<CustBankInfoLog>("Admin_BankInfoLogList_Get", new { CustId = custId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
+        public IEnumerable<CustBonus> GetCustBonus(int custId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<CustBonus>("Admin_CustBonus_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+        }
     }
 }

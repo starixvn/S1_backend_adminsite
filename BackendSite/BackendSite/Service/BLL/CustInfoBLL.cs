@@ -204,5 +204,9 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.GetCustBankInfoLogList(custId, siteId);
         }
+        public IEnumerable<CustBonus> GetCustBonus(int custId)
+        {
+            return custInfoService.GetCustBonus(custId);
+        }
     }
 }
