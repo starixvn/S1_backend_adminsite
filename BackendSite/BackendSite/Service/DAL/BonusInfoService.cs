@@ -29,7 +29,7 @@ namespace BackendSite.Service.DAL
             IEnumerable<BonusInfo> result = null;
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                string SpName = "Admin_BonusInfoV2_Get";
+                string SpName = "Admin_BonusInfo_Get";
                 DynamicParameters props = new DynamicParameters();
                 props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
                 props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -64,7 +64,7 @@ namespace BackendSite.Service.DAL
             IEnumerable<BonusInfo> result = null;
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                string SpName = "Admin_BonusInfoExportV2_Get";
+                string SpName = "Admin_BonusInfoExport_Get";
                 DynamicParameters props = new DynamicParameters();
                 props.Add("@SelectSite", SelectSite);
                 props.Add("@BonusCode", BonusCode);
