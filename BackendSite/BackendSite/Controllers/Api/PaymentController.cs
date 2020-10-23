@@ -178,7 +178,7 @@ namespace BackendSite.Controllers.Api
         }
         public class GetRebateLogReq
         {
-            public int CustId { get; set; }
+            public int? CustId { get; set; }
             public long? StartDate { get; set; }
             public long? EndDate { get; set; }
             public int PageNumber { get; set; }
