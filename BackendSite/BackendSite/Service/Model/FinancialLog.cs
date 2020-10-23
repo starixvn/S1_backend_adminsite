@@ -43,6 +43,16 @@ namespace BackendSite.Service.Model
         public DateTime CreateTime { get; set; }
       
     }
+    public class RebateInfo
+    {
+        public string SiteName { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public string BonusCode { get; set; }
+        public string RebateTypeName { get; set; }
+        public DateTime CreateTime { get; set; }
+
+    }
     public class PromotionCategory
     {
         public int id { get; set; }

@@ -197,6 +197,27 @@ namespace BackendSite.Controllers.Api
 
             return apiListResult;
         }
+        public class RebateInfoListReq
+        {
+            public int? RebateType { get; set; }
+            public long? StartDate { get; set; }
+            public long? EndDate { get; set; }
+            public int PageNumber { get; set; }
+        }
+        public ApiListResult<RebateInfo> GetRebateInfoList(RebateInfoListReq rebateInfoListReq)
+        {
+            int pageNumber = rebateInfoListReq.PageNumber;
+            int totalPages = 0;
+            int rowCount = 0;
+            var apiListResult = new ApiListResult<RebateInfo>();
+            apiListResult.Data = paymentBLL.GetRebateInfoList(rebateInfoListReq.RebateType, rebateInfoListReq.StartDate, rebateInfoListReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount);
+            apiListResult.ErrorCode = 0;
+            apiListResult.PageNumber = pageNumber;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.RowCount = rowCount;
+
+            return apiListResult;
+        }
         public ApiResult<IEnumerable<PromotionCategory>> GetPromotionCategory()
         {
 
