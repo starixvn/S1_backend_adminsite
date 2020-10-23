@@ -32,6 +32,9 @@ namespace BackendSite.Service.Model
     }
     public class RebateLog
     {
+        public string SiteName { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
         public string GameName { get; set; }
         public string RebateTypeName { get; set; }
         public decimal RedeemAmount { get; set; }
@@ -39,6 +42,16 @@ namespace BackendSite.Service.Model
         public long RelId { get; set; }
         public DateTime CreateTime { get; set; }
       
+    }
+    public class RebateInfo
+    {
+        public string SiteName { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public string BonusCode { get; set; }
+        public string RebateTypeName { get; set; }
+        public DateTime CreateTime { get; set; }
+
     }
     public class PromotionCategory
     {
