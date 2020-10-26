@@ -26,8 +26,9 @@ namespace BackendSite.Controllers.Api
         private readonly AuthorizeBLL authorizeBLL;
         private readonly int mainWalletType;
         private readonly Common common;
+        private readonly ExcelBLL excelBLL;
 
-        public PaymentController(IConfiguration configuration, PaymentBLL paymentBLL, CustInfoBLL custInfoBLL, TpBLL tpBLL, AuthorizeBLL authorizeBLL, Common common)
+        public PaymentController(IConfiguration configuration, PaymentBLL paymentBLL, CustInfoBLL custInfoBLL, TpBLL tpBLL, AuthorizeBLL authorizeBLL, Common common, ExcelBLL excelBLL)
         {
             this.paymentBLL = paymentBLL;
             this.custInfoBLL = custInfoBLL;
@@ -35,6 +36,7 @@ namespace BackendSite.Controllers.Api
             this.authorizeBLL = authorizeBLL;
             mainWalletType = configuration.GetValue<int>("MainWalletType");
             this.common = common;
+            this.excelBLL = excelBLL;
         }
         public class PaymentAdjustmentReq
         {
@@ -176,20 +178,20 @@ namespace BackendSite.Controllers.Api
 
             return apiListResult;
         }
-        public class GetRebateLogReq
+        public class GetRebateLogByCustReq
         {
-            public int? CustId { get; set; }
+            public int CustId { get; set; }
             public long? StartDate { get; set; }
             public long? EndDate { get; set; }
             public int PageNumber { get; set; }
         }
-        public ApiListResult<RebateLog> GetRebateLog(GetRebateLogReq getRebateLogReq)
+        public ApiListResult<RebateLog> GetRebateLogByCust(GetRebateLogByCustReq getRebateLogByCustReq)
         {
-            int pageNumber = getRebateLogReq.PageNumber;
+            int pageNumber = getRebateLogByCustReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
             var apiListResult = new ApiListResult<RebateLog>();
-            apiListResult.Data = paymentBLL.GetRebateLog(getRebateLogReq.CustId, getRebateLogReq.StartDate, getRebateLogReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount);
+            apiListResult.Data = paymentBLL.GetRebateLogByCust(getRebateLogByCustReq.CustId, getRebateLogByCustReq.StartDate, getRebateLogByCustReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount);
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;
             apiListResult.TotalPages = totalPages;
@@ -197,8 +199,31 @@ namespace BackendSite.Controllers.Api
 
             return apiListResult;
         }
+        public ApiListResult<RebateLog> GetRebateLog([FromForm] IEnumerable<int> SelectSite, [FromForm] string UserName, [FromForm] int RebateType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)
+        {
+            var apiListResult = new ApiListResult<RebateLog>();
+            int PageSize = 10;
+            int TotalPages = 0;
+            int RowCount = 0;
+            apiListResult.Data = paymentBLL.GetRebateLog(SelectSite, UserName, RebateType, StartDate, EndDate, PageSize, ref PageNumber, out TotalPages, out RowCount);
+            apiListResult.PageNumber = PageNumber;
+            apiListResult.RowCount = RowCount;
+            apiListResult.TotalPages = TotalPages;
+            apiListResult.ErrorCode = 0;
+
+            return apiListResult;
+        }
+        [HttpPost]
+        public IActionResult ExportRebateLog(string SelectSite, string UserName, int RebateType, long StartDate, long EndDate)
+        {
+            var ExportData = paymentBLL.GetRebateLogExport(SelectSite, UserName, RebateType, StartDate, EndDate);
+            var stream = excelBLL.Export(ExportData);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
+
         public class RebateInfoListReq
         {
+            public IEnumerable<int> SelectSite { get; set; }
             public int? RebateType { get; set; }
             public long? StartDate { get; set; }
             public long? EndDate { get; set; }
@@ -210,7 +235,7 @@ namespace BackendSite.Controllers.Api
             int totalPages = 0;
             int rowCount = 0;
             var apiListResult = new ApiListResult<RebateInfo>();
-            apiListResult.Data = paymentBLL.GetRebateInfoList(rebateInfoListReq.RebateType, rebateInfoListReq.StartDate, rebateInfoListReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount);
+            apiListResult.Data = paymentBLL.GetRebateInfoList(rebateInfoListReq.SelectSite, rebateInfoListReq.RebateType, rebateInfoListReq.StartDate, rebateInfoListReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount);
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;
             apiListResult.TotalPages = totalPages;

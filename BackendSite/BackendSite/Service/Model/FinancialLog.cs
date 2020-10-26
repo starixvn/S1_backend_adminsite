@@ -39,7 +39,7 @@ namespace BackendSite.Service.Model
         public string RebateTypeName { get; set; }
         public decimal RedeemAmount { get; set; }
         public string BonusCode { get; set; }
-        public long RelId { get; set; }
+        //public long RelId { get; set; }
         public DateTime CreateTime { get; set; }
       
     }

@@ -562,7 +562,7 @@ import DateTimePicker from 'react-datetime';
                 alert("Please Choose To Date")
                 return;
             }
-
+            console.log(this.state);
             //this._Search = true;
             let data = { StartDate: moment(this.selectdate_start.current.state.inputValue).unix(), EndDate: moment(this.selectdate_end.current.state.inputValue).add(1, 'days').unix() - 1 };
             this.setState(data, function () {
@@ -606,7 +606,7 @@ import DateTimePicker from 'react-datetime';
         }
 
         buildSelectSite = () => {
-            let state = this.state;
+            let state = this.state, searchFilter = this.searchFilter;
             $("#selectSite").multiselect({
                 includeSelectAllOption: true,
                 selectAllText: 'Check all!',
@@ -623,17 +623,24 @@ import DateTimePicker from 'react-datetime';
                     let val = parseInt($(option).val()), index = state.selectSite.indexOf(val);
                     (checked) ? state.selectSite.push(val) : (index > -1) ? state.selectSite.splice(index, 1) : state.selectSite;
                     state.selectSite.sort();
+                },
+                onInitialized: function () {
+                    state.selectSite.length = 0;
+                    (searchFilter.selectSite) ?
+                        searchFilter.selectSite.forEach(function (obj) {
+                            state.selectSite.push(parseInt(obj));
+                        })
+                        : state.SiteList.forEach(function (obj) {
+                            state.selectSite.push(parseInt(obj));
+                        });
                 }
             });
-            (this.state.MutiSelRefresh) ? $('#selectSite').multiselect('select', this.searchFilter.selectSite) : $('#selectSite').multiselect('selectAll', false);
+            (state.MutiSelRefresh) ? $('#selectSite').multiselect('select', searchFilter.selectSite) : $('#selectSite').multiselect('selectAll', false);
             $('#selectSite').multiselect('updateButtonText');
-            state.SiteList.forEach(function (obj) {
-                state.selectSite.push(obj.siteId);
-            });
         }
 
         buildTypeSite = () => {
-            let state = this.state;
+            let state = this.state, searchFilter = this.searchFilter;
             $("#selectType").multiselect({
                 includeSelectAllOption: true,
                 selectAllText: 'Check all!',
@@ -650,17 +657,24 @@ import DateTimePicker from 'react-datetime';
                     let val = parseInt($(option).val()), index = state.selectType.indexOf(val);
                     (checked) ? state.selectType.push(val) : (index > -1) ? state.selectType.splice(index, 1) : state.selectType;
                     state.selectType.sort();
+                },
+                onInitialized: function () {
+                    state.selectType.length = 0;
+                    (searchFilter.selectType) ?
+                        searchFilter.selectType.forEach(function (obj) {
+                            state.selectType.push(parseInt(obj));
+                        })
+                        : Object.keys(TypeSelectOp).forEach(function (obj) {
+                            state.selectType.push(parseInt(obj));
+                        });
                 }
             });
-            (this.state.MutiSelRefresh) ? $('#selectType').multiselect('select', this.searchFilter.selectType) : $('#selectType').multiselect('selectAll', false);
+            (state.MutiSelRefresh) ? $('#selectType').multiselect('select', searchFilter.selectType) : $('#selectType').multiselect('selectAll', false);
             $('#selectType').multiselect('updateButtonText');
-            Object.keys(TypeSelectOp).forEach(function (obj) {
-                state.selectType.push(parseInt(obj));
-            });
         }
 
         buildCurrencySite = () => {
-            let state = this.state;
+            let state = this.state, searchFilter = this.searchFilter;
             $("#selectCurrency").multiselect({
                 includeSelectAllOption: true,
                 selectAllText: 'Check all!',
@@ -677,17 +691,24 @@ import DateTimePicker from 'react-datetime';
                     let val = parseInt($(option).val()), index = state.selectCurrency.indexOf(val);
                     (checked) ? state.selectCurrency.push(val) : (index > -1) ? state.selectCurrency.splice(index, 1) : state.selectCurrency;
                     state.selectCurrency.sort();
+                },
+                onInitialized: function () {
+                    state.selectCurrency.length = 0;
+                    (searchFilter.selectCurrency) ?
+                        searchFilter.selectCurrency.forEach(function (obj) {
+                            state.selectCurrency.push(parseInt(obj));
+                        })
+                        : CurrencyList.forEach(function (obj) {
+                            state.selectCurrency.push(parseInt(obj));
+                        });
                 }
             });
-            (this.state.MutiSelRefresh) ? $('#selectCurrency').multiselect('select', this.searchFilter.selectCurrency) : $('#selectCurrency').multiselect('selectAll', false);
+            (state.MutiSelRefresh) ? $('#selectCurrency').multiselect('select', searchFilter.selectCurrency) : $('#selectCurrency').multiselect('selectAll', false);
             $('#selectCurrency').multiselect('updateButtonText');
-            CurrencyList.forEach(function (obj) {
-                state.selectCurrency.push(parseInt(obj));
-            });
         }
 
         buildStatusSite = () => {
-            let state = this.state;
+            let state = this.state, searchFilter = this.searchFilter;
             $("#selectStatus").multiselect({
                 includeSelectAllOption: true,
                 selectAllText: 'Check all!',
@@ -704,15 +725,25 @@ import DateTimePicker from 'react-datetime';
                     let val = parseInt($(option).val()), index = state.selectStatus.indexOf(val);
                     (checked) ? state.selectStatus.push(val) : (index > -1) ? state.selectStatus.splice(index, 1) : state.selectStatus;
                     state.selectStatus.sort();
+                },
+                onInitialized: function () {
+                    state.selectStatus.length = 0;
+                    (searchFilter.selectStatus) ?
+                        searchFilter.selectStatus.forEach(function (obj) {
+                            state.selectStatus.push(parseInt(obj));
+                        })
+                        : state.selectStatus.push(1);
                 }
             });
-            (this.state.MutiSelRefresh) ? $('#selectStatus').multiselect('select', this.searchFilter.selectStatus) : $('#selectStatus').multiselect('select', 1);
+            (state.MutiSelRefresh) ? $('#selectStatus').multiselect('select', searchFilter.selectStatus) : $('#selectStatus').multiselect('select', 1);
             $('#selectStatus').multiselect('updateButtonText');
-            state.selectStatus.push(1);
+
         }
 
         componentDidUpdate() {
+            console.log("didup");
             if (this.state.MutiSelRefresh) {
+                console.log("didup1");
                 this.buildSelectSite();
                 this.buildTypeSite();
                 this.buildCurrencySite();
@@ -722,6 +753,7 @@ import DateTimePicker from 'react-datetime';
         }
 
         componentDidMount() {
+            console.log("didmon");
             this.getSiteList();
             this.buildTypeSite();
             this.buildCurrencySite();
