@@ -271,7 +271,8 @@ namespace BackendSite.Controllers.Api
                     ExcelWorksheet sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
                     bool isLastRow = false;
                     int RowId = 2;   // 因為有標題列，所以從第2列開始讀起
-
+                    int BatchId = 0;
+                    messageBLL.NewBatchMessage(authData.UserName,personalMsg, ref BatchId);
                     do  // 讀取資料，直到讀到空白列為止
                     {
                         string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text;
@@ -291,7 +292,7 @@ namespace BackendSite.Controllers.Api
                             }
                             else if (custInfosDetail.Status == 1)
                             {
-                                if (messageBLL.SendMessageBatch(personalMsg, custInfosDetail.CustId, optSite, authData.UserName) > 0)
+                                if (messageBLL.SendMessageBatch(personalMsg, custInfosDetail.CustId, optSite, authData.UserName, BatchId) > 0)
                                 {
                                     apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. " });
                                 }
@@ -326,7 +327,94 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        [HttpPost]
+        public ApiListResult<BatchMsg> DeleteBatchMessage([FromForm] long? StartDate, [FromForm] long? EndDate, [FromForm] int batchId, [FromForm] int PageNumber)
+        {
+            int PageSize = 10;
+            int TotalPages = 0;
+            int RowCount = 0;
+            var apiResult = new ApiListResult<BatchMsg>();
+            try
+            {
+                messageBLL.DeleteBatchMessage(batchId);
+                apiResult.Data = messageBLL.GetBatchMessageList( StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                apiResult.ErrorCode = 0;
 
+                apiResult.PageNumber = PageNumber;
+                apiResult.RowCount = RowCount;
+                apiResult.TotalPages = TotalPages;
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.ToString();
+                apiResult.ErrorCode = 999;
+            }
+
+            return apiResult;
+        }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        [HttpPost]
+        public ApiResult UpdateBatchMessage([FromForm] int batchId, [FromForm] string personalMsg)
+        {
+            var result = new ApiResult();
+            try
+            {
+                if (messageBLL.UpdateBatchMessage(batchId, personalMsg))
+                    result.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                result.RawMessage = ex.ToString();
+                result.ErrorCode = 999;
+            }
+
+            return result;
+        }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        [HttpPost]
+        public ApiResult GetBatchMessage([FromForm] int batchId)
+        {
+            var result = new ApiResult();
+            try
+            {
+                result.Message = messageBLL.GetBatchMessage(batchId);
+                result.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                result.RawMessage = ex.ToString();
+                result.ErrorCode = 999;
+            }
+            return result;
+        }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        [HttpPost]
+        public ApiListResult<BatchMsg> GetBatchMessageList([FromForm] long? StartDate, [FromForm] long? EndDate, [FromForm] int PageNumber)
+        {
+            int PageSize = 10;
+            int TotalPages = 0;
+            int RowCount = 0;
+            var apiResult = new ApiListResult<BatchMsg>();
+            try
+            {
+                apiResult.Data = messageBLL.GetBatchMessageList(StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                apiResult.ErrorCode = 0;
+
+                apiResult.PageNumber = PageNumber;
+                apiResult.RowCount = RowCount;
+                apiResult.TotalPages = TotalPages;
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.ToString();
+                apiResult.ErrorCode = 999;
+            }
+
+            return apiResult;
+        }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/ChangeVipLevelBatch" })]
         public async Task<List<ApiResult>> ChangeVipLevelBatch([FromForm] int optSite, [FromForm] IFormFile excelUpload)
