@@ -54,7 +54,7 @@ const ThirdPartyAdjustment = lazy(() =>
 );
 const NewsManage = lazy(() => import("./pages/Marketing/NewsManage/index"));
 
-export const defaultPage = "BonusManage";
+export const defaultPage = "BonusInfoReport";
 
 export const layoutType = {
 	N88: "N88",
@@ -111,7 +111,7 @@ export const pages = {
 		],
 		layout: layoutType.N88
 	},
-	BonusReport: {
+	BonusInfoReport: {
 		comp: (
 			<Suspense fallback="loading...">
 				<BonusInfoReport />
@@ -120,7 +120,7 @@ export const pages = {
 		css: [
 			"./lib/bootstrap/dist/css/bootstrap.min.css",
 			"./css/css/main.css",
-			"./lib/Oneworks/jscalendar/calendar-blue.css"
+			"./lib/bootstrap-multiselect/bootstrap-multiselect-modify.css"
 		],
 		layout: layoutType.N88
 	},

@@ -221,28 +221,29 @@ namespace BackendSite.Controllers.Api
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
-        public class RebateInfoListReq
+        public ApiListResult<RebateInfo> GetRebateInfoList([FromForm] IEnumerable<int> SelectSite, [FromForm] string UserName, [FromForm] int RebateType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)
         {
-            public IEnumerable<int> SelectSite { get; set; }
-            public int? RebateType { get; set; }
-            public long? StartDate { get; set; }
-            public long? EndDate { get; set; }
-            public int PageNumber { get; set; }
-        }
-        public ApiListResult<RebateInfo> GetRebateInfoList(RebateInfoListReq rebateInfoListReq)
-        {
-            int pageNumber = rebateInfoListReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
             var apiListResult = new ApiListResult<RebateInfo>();
-            apiListResult.Data = paymentBLL.GetRebateInfoList(rebateInfoListReq.SelectSite, rebateInfoListReq.RebateType, rebateInfoListReq.StartDate, rebateInfoListReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount);
+            int PageSize = 10;
+            int TotalPages = 0;
+            int RowCount = 0;
+            apiListResult.Data = paymentBLL.GetRebateInfoList(SelectSite, UserName, RebateType, StartDate, EndDate, PageSize, ref PageNumber, out TotalPages, out RowCount);
+            apiListResult.PageNumber = PageNumber;
+            apiListResult.RowCount = RowCount;
+            apiListResult.TotalPages = TotalPages;
             apiListResult.ErrorCode = 0;
-            apiListResult.PageNumber = pageNumber;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.RowCount = rowCount;
 
             return apiListResult;
         }
+        [HttpPost]
+        public IActionResult ExportRebateInfo(string SelectSite, string UserName, int RebateType, long StartDate, long EndDate)
+        {
+            var ExportData = paymentBLL.GetRebateInfoExport(SelectSite, UserName, RebateType, StartDate, EndDate);
+            var stream = excelBLL.Export(ExportData);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
+        
+
         public ApiResult<IEnumerable<PromotionCategory>> GetPromotionCategory()
         {
 

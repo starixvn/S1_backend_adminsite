@@ -41,9 +41,17 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetRebateLogExport(selectSite, userName, rebateType, startDate, endDate);
         }
-        public IEnumerable<RebateInfo> GetRebateInfoList(IEnumerable<int> selectSite, int? rebateType, long? startDate, long? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<RebateInfo> GetRebateInfoByCust(int CustId)
         {
-            return walletService.GetRebateInfoList(selectSite, rebateType, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+            return walletService.GetRebateInfoByCust(CustId);
+        }
+        public IEnumerable<RebateInfo> GetRebateInfoList(IEnumerable<int> selectSite, string userName, int rebateType, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        {
+            return walletService.GetRebateInfoList(selectSite, userName, rebateType, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+        }
+        public IEnumerable<RebateInfo> GetRebateInfoExport(string selectSite, string userName, int rebateType, long startDate, long endDate)
+        {
+            return walletService.GetRebateInfoExport(selectSite, userName, rebateType, startDate, endDate);
         }
         public IEnumerable<PromotionCategory> GetPromotionCategory()
         {

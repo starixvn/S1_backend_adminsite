@@ -86,6 +86,10 @@ module.exports = {
 			// '@babel/polyfill',
 			"./src/pages/Marketing/RebateLogReport/index.js"
 		],
+		"Marketing/RebateInfoReport.min": [
+			// '@babel/polyfill',
+			"./src/pages/Marketing/RebateInfoReport/index.js"
+		],
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

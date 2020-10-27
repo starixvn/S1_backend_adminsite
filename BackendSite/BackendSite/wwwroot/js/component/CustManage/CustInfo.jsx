@@ -666,6 +666,7 @@ import DateTimePicker from 'react-datetime';
 
             return (
                 <div className="table-responsive-md table">
+                    <span class="label">Promotion</span>
                     <table className="table table-striped">
                         <thead>
                             <tr>
@@ -708,6 +709,7 @@ import DateTimePicker from 'react-datetime';
                 null;
             return (
                 <div className="table-responsive-md table">
+                    <span class="label">Bonus Wallet</span>
                     <table className="table table-striped">
                         <thead>
                             <tr>
@@ -717,6 +719,45 @@ import DateTimePicker from 'react-datetime';
                             </tr>
                         </thead>
                         {BonusWalletRows != null ? BonusWalletRows : null}
+                    </table>
+                </div>
+            )
+        }
+    }
+
+    class RebateInfo extends React.Component {
+        render() {
+            let RebateInfoRows = this.props.RebateInfo != null ?
+                <tbody>
+                    {
+                        this.props.RebateInfo.map(x => {
+                            return (
+                                <tr>
+                                    <td>{x.bonusCode}</td>
+                                    <td>{x.description}</td>
+                                    <td>{x.rebateTypeName}</td>
+                                    <td>{moment(x.claimTime).format('l LTS')}</td>
+                                </tr>
+                            )
+                        }
+                        )
+                    }
+                </tbody>
+                :
+                null;
+            return (
+                <div className="table-responsive-md table">
+                    <span class="label">Rebate Info</span>
+                    <table className="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Bonus Code</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Rebate Type Name</th>
+                                <th scope="col">Claim Time</th>
+                            </tr>
+                        </thead>
+                        {RebateInfoRows != null ? RebateInfoRows : null}
                     </table>
                 </div>
             )
@@ -1277,8 +1318,9 @@ import DateTimePicker from 'react-datetime';
                                     </tr>
                                 </tbody>
                             </table>
-                            {promotions}
+                            {data.RebateInfo != null ? <RebateInfo RebateInfo={data.RebateInfo} /> : null}
                             {data.BonusWallet != null ? <BonusWallet BonusWallet={data.BonusWallet} /> : null}
+                            {promotions}
                             {data.hasPhotoId ? <div className="id-image">
                                 <img src={"/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" />
                                 <button className="btn btn-delete" disabled={data.isKyc} onClick={!data.isKyc ? this.onAskReupload.bind(this) : null}>Ask Re-Upload</button>
@@ -1590,6 +1632,7 @@ import DateTimePicker from 'react-datetime';
                                 let _clipboard = new ClipboardJS(".js-copy");
                             });
                             this.GetBonusWalletLog();
+                            this.GetRebateInfoLog();
                         } else {
                             alert(result.message);
                         }
@@ -1744,12 +1787,41 @@ import DateTimePicker from 'react-datetime';
             }
         }
 
+        GetRebateInfoLog() {
+            let CustId = getUrlParameter("custId");
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                // Loading.OnLoading();
+                axios.post('/api/CustManage/GetRebateInfoByCust', { CustId: iCustId })
+                    .then(function (response) {
+                        // Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({
+                                ...this.state,
+                                CustInfoData:
+                                {
+                                    ...this.state.CustInfoData,
+                                    RebateInfo: result.data
+                                }
+                            }
+                            );
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        // Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
         render() {
             let dataContainer = null;
             let TabIdx = this.state.TabIdx;
             let TabName = this.state.TabName;
             if (TabName == this._Tabs[0]) {
-                dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} GetBonusWalletLog={this.GetBonusWalletLog.bind(this)} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)} isEdit={this.state.isEdit} onClickEdit={this.onClickEdit} editOnChange={this.editOnChange} editUpdate={this.editUpdate} />;
+                dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)} isEdit={this.state.isEdit} onClickEdit={this.onClickEdit} editOnChange={this.editOnChange} editUpdate={this.editUpdate} />;
             } else if (TabName == this._Tabs[1]) {
                 dataContainer = <BonusLog GetPromotionCategory={this.GetPromotionCategory.bind(this)} PromotionCategoryData={this.state.PromotionCategoryData} GetBonusLog={this.GetBonusLog.bind(this)} searchData={this.state.BonusLogData} BonusLog={this.state.BonusLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[2]) {

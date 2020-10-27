@@ -153,8 +153,6 @@ const App = () => {
             alert("Please Choose at least one Site")
             return false;
         }
-        console.log(stateDatas.FilterInfo.SelectSite);
-        console.log(JSON.stringify(stateDatas.FilterInfo.SelectSite));
         let param = {
             Url: 'Payment/ExportRebateLog',
             Data: {
