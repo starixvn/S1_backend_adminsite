@@ -180,7 +180,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      } /*,
+      } ,
       {
         "Key": "",
         "Title": "Withdrawal Limit Management",
@@ -190,7 +190,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      }*/,
+      },
       {
         "Key": "",
         "Title": "3RD Funds Adjustment",
@@ -259,11 +259,41 @@
         "Childs": null
       },
       {
+        "Key": "BonusCashBack",
+        "Title": "Bonus Cash Back",
+        "FuncKey": "Marketing/BonusCashBack",
+        "Controller": "Marketing",
+        "Action": "BonusCashBack",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
         "Key": "BonusManage",
         "Title": "Bonus Management",
         "FuncKey": "Marketing/BonusManage",
         "Controller": "Marketing",
         "Action": "BonusManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "RebateInfoReport",
+        "Title": "Rebate Info",
+        "FuncKey": "Marketing/RebateInfoReport",
+        "Controller": "Marketing",
+        "Action": "RebateInfoReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "RebateLogReport",
+        "Title": "Rebate Report",
+        "FuncKey": "Marketing/RebateLogReport",
+        "Controller": "Marketing",
+        "Action": "RebateLogReport",
         "Icon": "",
         "Roles": null,
         "Childs": null

@@ -666,6 +666,7 @@ import DateTimePicker from 'react-datetime';
 
             return (
                 <div className="table-responsive-md table">
+                    <span class="label">Promotion</span>
                     <table className="table table-striped">
                         <thead>
                             <tr>
@@ -686,6 +687,83 @@ import DateTimePicker from 'react-datetime';
         }
     }
 
+    class BonusWallet extends React.Component {
+
+        render() {
+            let BonusWalletRows = this.props.BonusWallet != null ?
+                <tbody>
+                    {
+                        this.props.BonusWallet.map(x => {
+                            return (
+                                <tr>
+                                    <td>{x.promotionCategory}</td>
+                                    <td>{x.bonusCode}</td>
+                                    <td>{number_format(x.bonus)}</td>
+                                </tr>
+                            )
+                        }
+                        )
+                    }
+                </tbody>
+                :
+                null;
+            return (
+                <div className="table-responsive-md table">
+                    <span class="label">Bonus Wallet</span>
+                    <table className="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Promotion Category</th>
+                                <th scope="col">Bonus Code</th>
+                                <th scope="col">Bonus</th>
+                            </tr>
+                        </thead>
+                        {BonusWalletRows != null ? BonusWalletRows : null}
+                    </table>
+                </div>
+            )
+        }
+    }
+
+    class RebateInfo extends React.Component {
+        render() {
+            let RebateInfoRows = this.props.RebateInfo != null ?
+                <tbody>
+                    {
+                        this.props.RebateInfo.map(x => {
+                            return (
+                                <tr>
+                                    <td>{x.bonusCode}</td>
+                                    <td>{x.description}</td>
+                                    <td>{x.rebateTypeName}</td>
+                                    <td>{moment(x.claimTime).format('l LTS')}</td>
+                                </tr>
+                            )
+                        }
+                        )
+                    }
+                </tbody>
+                :
+                null;
+            return (
+                <div className="table-responsive-md table">
+                    <span class="label">Rebate Info</span>
+                    <table className="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Bonus Code</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Rebate Type Name</th>
+                                <th scope="col">Claim Time</th>
+                            </tr>
+                        </thead>
+                        {RebateInfoRows != null ? RebateInfoRows : null}
+                    </table>
+                </div>
+            )
+        }
+    }
+
     class CustInfo extends React.Component {
         constructor(props) {
             super(props);
@@ -694,6 +772,7 @@ import DateTimePicker from 'react-datetime';
 
         componentDidMount() {
             let _clipboard = new ClipboardJS(".js-copy");
+
         }
 
         onKycChange(e) {
@@ -1239,6 +1318,8 @@ import DateTimePicker from 'react-datetime';
                                     </tr>
                                 </tbody>
                             </table>
+                            {data.RebateInfo != null ? <RebateInfo RebateInfo={data.RebateInfo} /> : null}
+                            {data.BonusWallet != null ? <BonusWallet BonusWallet={data.BonusWallet} /> : null}
                             {promotions}
                             {data.hasPhotoId ? <div className="id-image">
                                 <img src={"/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" />
@@ -1313,7 +1394,7 @@ import DateTimePicker from 'react-datetime';
             let CustId = getUrlParameter("custId");
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
-                axios.post('/api/Payment/GetRebateLog', { ...this.state.RebateLog, CustId: iCustId, PageNumber: pageNumber })
+                axios.post('/api/Payment/GetRebateLogByCust', { ...this.state.RebateLog, CustId: iCustId, PageNumber: pageNumber })
                     .then(function (response) {
                         Loading.UnLoading();
                         let result = response.data;
@@ -1550,6 +1631,8 @@ import DateTimePicker from 'react-datetime';
                             this.setState({ CustInfoData: result.data }, function () {
                                 let _clipboard = new ClipboardJS(".js-copy");
                             });
+                            this.GetBonusWalletLog();
+                            this.GetRebateInfoLog();
                         } else {
                             alert(result.message);
                         }
@@ -1670,6 +1753,64 @@ import DateTimePicker from 'react-datetime';
                         }
                     }.bind(this)).catch(function (error) {
                         Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
+        GetBonusWalletLog() {
+            let CustId = getUrlParameter("custId");
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                // Loading.OnLoading();
+                axios.post('/api/CustManage/GetCustBonus', { CustId: iCustId })
+                    .then(function (response) {
+                        // Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({
+                                ...this.state,
+                                CustInfoData:
+                                {
+                                    ...this.state.CustInfoData,
+                                    BonusWallet: result.data
+                                }
+                            }
+                            );
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        // Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
+        GetRebateInfoLog() {
+            let CustId = getUrlParameter("custId");
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                // Loading.OnLoading();
+                axios.post('/api/CustManage/GetRebateInfoByCust', { CustId: iCustId })
+                    .then(function (response) {
+                        // Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({
+                                ...this.state,
+                                CustInfoData:
+                                {
+                                    ...this.state.CustInfoData,
+                                    RebateInfo: result.data
+                                }
+                            }
+                            );
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        // Loading.UnLoading();
                         alert(error);
                     }.bind(this));
             }

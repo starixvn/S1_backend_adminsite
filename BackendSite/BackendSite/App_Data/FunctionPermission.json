@@ -157,12 +157,12 @@
         "DisplayKey": "Deposit Limit Management",
         "FuncKey": "Finance/DepositLimitManage",
         "Enable": false
-      } /*,
+      } ,
       {
         "DisplayKey": "Withdrawal Limit Management",
         "FuncKey": "Finance/WithdrawalLimitManage",
         "Enable": false
-      }*/,
+      },
       {
         "DisplayKey": "3RD Funds Adjustment",
         "FuncKey": "Finance/ThirdPartyAdjustment",
@@ -199,8 +199,23 @@
         "Enable": false
       },
       {
+        "DisplayKey": "Rebate Info",
+        "FuncKey": "Marketing/RebateInfoReport",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Rebate Report",
+        "FuncKey": "Marketing/RebateLogReport",
+        "Enable": false
+      },
+      {
         "DisplayKey": "News Management",
         "FuncKey": "Marketing/NewsManage",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Bonus Cash Back",
+        "FuncKey": "Marketing/BonusCashBack",
         "Enable": false
       },
       {

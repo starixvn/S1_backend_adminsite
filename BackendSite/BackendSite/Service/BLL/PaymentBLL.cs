@@ -29,13 +29,29 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetBonusLog(CustId, promoCategoryId, startDate, endDate, refTransId, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
-        public IEnumerable<RebateLog> GetRebateLog(int? CustId, long? startDate, long? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<RebateLog> GetRebateLogByCust(int CustId, long? startDate, long? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            return walletService.GetRebateLog(CustId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+            return walletService.GetRebateLogByCust(CustId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
-        public IEnumerable<RebateInfo> GetRebateInfoList(int? rebateType, long? startDate, long? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<RebateLog> GetRebateLog(IEnumerable<int> selectSite, string userName, int rebateType, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            return walletService.GetRebateInfoList(rebateType, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+            return walletService.GetRebateLog(selectSite, userName, rebateType, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+        }
+        public IEnumerable<RebateLog> GetRebateLogExport(string selectSite, string userName, int rebateType, long startDate, long endDate)
+        {
+            return walletService.GetRebateLogExport(selectSite, userName, rebateType, startDate, endDate);
+        }
+        public IEnumerable<RebateInfo> GetRebateInfoByCust(int CustId)
+        {
+            return walletService.GetRebateInfoByCust(CustId);
+        }
+        public IEnumerable<RebateInfo> GetRebateInfoList(IEnumerable<int> selectSite, string userName, int rebateType, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        {
+            return walletService.GetRebateInfoList(selectSite, userName, rebateType, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+        }
+        public IEnumerable<RebateInfo> GetRebateInfoExport(string selectSite, string userName, int rebateType, long startDate, long endDate)
+        {
+            return walletService.GetRebateInfoExport(selectSite, userName, rebateType, startDate, endDate);
         }
         public IEnumerable<PromotionCategory> GetPromotionCategory()
         {

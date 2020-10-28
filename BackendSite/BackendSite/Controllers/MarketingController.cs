@@ -36,7 +36,16 @@ namespace BackendSite.Controllers
         {
             return View();
         }
-
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateInfoReport" })]
+        public IActionResult RebateInfoReport()
+        {
+            return View();
+        }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateLogReport" })]
+        public IActionResult RebateLogReport()
+        {
+            return View();
+        }
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PendingBonus" })]
         public IActionResult PendingBonus()
         {

@@ -28,8 +28,9 @@ namespace BackendSite.Controllers.Api
         private readonly PermissionBLL permissionBLL;
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly Common common;
+        private readonly PaymentBLL paymentBLL;
 
-        public CustManageController(CustInfoBLL custInfoBLL, TpBLL tpBLL, WinLostReportService winLostReportService, PermissionBLL permissionBLL, ServerInfoBLL serverInfoBLL, Common common)
+        public CustManageController(CustInfoBLL custInfoBLL, TpBLL tpBLL, WinLostReportService winLostReportService, PermissionBLL permissionBLL, ServerInfoBLL serverInfoBLL, Common common, PaymentBLL paymentBLL)
         {
             this.custInfoBLL = custInfoBLL;
             this.tpBLL = tpBLL;
@@ -37,6 +38,7 @@ namespace BackendSite.Controllers.Api
             this.permissionBLL = permissionBLL;
             this.serverInfoBLL = serverInfoBLL;
             this.common = common;
+            this.paymentBLL = paymentBLL;
         }
         public class CustInfoListReq
         {
@@ -64,7 +66,7 @@ namespace BackendSite.Controllers.Api
             int totalPages = 0, rowCount = 0;
             int pageNumber = custInfoListReq.PageNumber;
 
-            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite,custInfoListReq.BirDate, custInfoListReq.BirMonth, custInfoListReq.BirYear, custInfoListReq.UserName, custInfoListReq.AccountName, custInfoListReq.LoginIp, custInfoListReq.TransId, custInfoListReq.TpUserName, custInfoListReq.Email, custInfoListReq.PhoneNo,custInfoListReq.StartDate,custInfoListReq.EndDate, custInfoListReq.PageSize, ref pageNumber, out totalPages, out rowCount);
+            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite, custInfoListReq.BirDate, custInfoListReq.BirMonth, custInfoListReq.BirYear, custInfoListReq.UserName, custInfoListReq.AccountName, custInfoListReq.LoginIp, custInfoListReq.TransId, custInfoListReq.TpUserName, custInfoListReq.Email, custInfoListReq.PhoneNo, custInfoListReq.StartDate, custInfoListReq.EndDate, custInfoListReq.PageSize, ref pageNumber, out totalPages, out rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;
@@ -573,6 +575,15 @@ namespace BackendSite.Controllers.Api
         {
             var apiListResult = new ApiListResult<CustBonus>();
             apiListResult.Data = custInfoBLL.GetCustBonus(custBonusReq.CustId);
+            apiListResult.ErrorCode = 0;
+            return apiListResult;
+        }
+        [HttpPost]
+        public ApiListResult<RebateInfo> GetRebateInfoByCust(CustBonusReq custBonusReq)
+        {
+
+            var apiListResult = new ApiListResult<RebateInfo>();
+            apiListResult.Data = paymentBLL.GetRebateInfoByCust(custBonusReq.CustId);
             apiListResult.ErrorCode = 0;
             return apiListResult;
         }

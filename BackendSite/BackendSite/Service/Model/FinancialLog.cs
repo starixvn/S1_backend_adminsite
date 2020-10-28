@@ -39,7 +39,7 @@ namespace BackendSite.Service.Model
         public string RebateTypeName { get; set; }
         public decimal RedeemAmount { get; set; }
         public string BonusCode { get; set; }
-        public long RelId { get; set; }
+        //public long RelId { get; set; }
         public DateTime CreateTime { get; set; }
       
     }
@@ -49,8 +49,9 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public string UserName { get; set; }
         public string BonusCode { get; set; }
+        public string Description { get; set; }
         public string RebateTypeName { get; set; }
-        public DateTime CreateTime { get; set; }
+        public DateTime ClaimTime { get; set; }
 
     }
     public class PromotionCategory
