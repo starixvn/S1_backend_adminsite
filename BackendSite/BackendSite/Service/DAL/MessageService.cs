@@ -168,15 +168,68 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Execute("Admin_PersonalMsg_Del", new { Id, CustId }, commandType: CommandType.StoredProcedure);
         }
-        public int SendMessageBatch(string personalMsg, int custId, int siteId, string sender)
+        public int SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_Msg_Batch_Ins", new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg }, commandType: CommandType.StoredProcedure);
+            return conn.Execute("Admin_Msg_Batch_InsV2", new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg , BatchId  = batchId }, commandType: CommandType.StoredProcedure);
         }
         public int ChangeVipLevelBatch(int siteId, int custId, string userName, int vipLevel, string memo, string Operator)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_Change_VipLevel_Batch", new { SiteId = siteId, CustId = custId, UserName = userName, VipLevel = vipLevel, Memo = memo, Operator = Operator }, commandType: CommandType.StoredProcedure);
         }
+        public bool NewBatchMessage(string author ,string personalMsg, ref int batchId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var p = new DynamicParameters(new { Author = author, Message = personalMsg });
+            p.Add("BatchId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var result = conn.Execute("Admin_BatchMessage_Ins", p, commandType: CommandType.StoredProcedure);
+            batchId = p.Get<int>("BatchId");
+            return result > 0;
+        }
+        public bool  DeleteBatchMessage(int batchId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_BatchMessage_Del", new { BatchId = batchId }, commandType: CommandType.StoredProcedure) > 0;
+        }
+        public bool UpdateBatchMessage(int batchId, string message)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_BatchMessageUpdate_Set", new { BatchId = batchId, Message = message }, commandType: CommandType.StoredProcedure) > 0;
+        }
+        public string GetBatchMessage(int batchId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var p = new DynamicParameters(new { BatchId = batchId});
+            p.Add("Message", dbType: DbType.String, direction: ParameterDirection.Output);
+            var result = conn.Execute("Admin_BatchMessage_Get", p, commandType: CommandType.StoredProcedure);
+            string Message = p.Get<string>("Message");
+            return Message;
+        }
+        public IEnumerable<BatchMsg> GetBatchMessageList( long? StartDate, long? EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        {
+            IEnumerable<BatchMsg> result = null;
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                conn.Open();
+                string SpName = "Admin_BatchMessageList_Get";
+                DynamicParameters props = new DynamicParameters();
+                props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+                props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                props.Add("@PageSize", PageSize);
+                props.Add("@StartDate", StartDate);
+                props.Add("@EndDate", EndDate);
+
+                result = conn.Query<BatchMsg>(SpName, props, commandType: CommandType.StoredProcedure);
+                PageNumber = props.Get<int?>("@PageNumber") ?? 0;
+                TotalPages = props.Get<int?>("@TotalPages") ?? 0;
+                RowCount = props.Get<int?>("@RowCount") ?? 0;
+            }
+
+            return result;
+        }
+
     }
 }
