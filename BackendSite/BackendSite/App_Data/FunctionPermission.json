@@ -203,11 +203,6 @@
         "FuncKey": "Marketing/NewsManage",
         "Enable": false
       },
-      //{
-      //  "DisplayKey": "Bonus Cash Back",
-      //  "FuncKey": "Marketing/BonusCashBack",
-      //  "Enable": false
-      //},
       {
         "DisplayKey": "Bonus Management",
         "FuncKey": "Marketing/BonusManage",

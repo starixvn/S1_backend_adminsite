@@ -257,17 +257,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      }/*,
-      {
-        "Key": "BonusCashBack",
-        "Title": "Bonus Cash Back",
-        "FuncKey": "Marketing/BonusCashBack",
-        "Controller": "Marketing",
-        "Action": "BonusCashBack",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      }*/,
+      },
       {
         "Key": "BonusManage",
         "Title": "Bonus Management",
