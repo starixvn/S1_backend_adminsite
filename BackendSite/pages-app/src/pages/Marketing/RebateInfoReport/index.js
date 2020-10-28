@@ -128,7 +128,7 @@ const App = () => {
                 StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
                 EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, 'days').unix() - 1,
                 UserName: stateDatas.FilterInfo.User,
-                PageNumber: 1
+                PageNumber: PageNumber
             })
         };
 
