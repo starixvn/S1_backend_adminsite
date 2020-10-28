@@ -183,16 +183,6 @@
       } ,
       {
         "Key": "",
-        "Title": "Withdrawal Limit Management",
-        "FuncKey": "Finance/WithdrawalLimitManage",
-        "Controller": "Finance",
-        "Action": "WithdrawalLimitManagement",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "",
         "Title": "3RD Funds Adjustment",
         "FuncKey": "Finance/ThirdPartyAdjustment",
         "Controller": "Finance",
@@ -201,7 +191,6 @@
         "Roles": null,
         "Childs": null
       }
-
     ]
   },
   {
@@ -254,16 +243,6 @@
         "FuncKey": "Marketing/BonusInfoReport",
         "Controller": "Marketing",
         "Action": "BonusInfoReport",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "BonusCashBack",
-        "Title": "Bonus Cash Back",
-        "FuncKey": "Marketing/BonusCashBack",
-        "Controller": "Marketing",
-        "Action": "BonusCashBack",
         "Icon": "",
         "Roles": null,
         "Childs": null

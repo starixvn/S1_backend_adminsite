@@ -159,11 +159,6 @@
         "Enable": false
       } ,
       {
-        "DisplayKey": "Withdrawal Limit Management",
-        "FuncKey": "Finance/WithdrawalLimitManage",
-        "Enable": false
-      },
-      {
         "DisplayKey": "3RD Funds Adjustment",
         "FuncKey": "Finance/ThirdPartyAdjustment",
         "Enable": false
@@ -211,11 +206,6 @@
       {
         "DisplayKey": "News Management",
         "FuncKey": "Marketing/NewsManage",
-        "Enable": false
-      },
-      {
-        "DisplayKey": "Bonus Cash Back",
-        "FuncKey": "Marketing/BonusCashBack",
         "Enable": false
       },
       {
