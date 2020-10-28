@@ -562,7 +562,6 @@ import DateTimePicker from 'react-datetime';
                 alert("Please Choose To Date")
                 return;
             }
-            console.log(this.state);
             //this._Search = true;
             let data = { StartDate: moment(this.selectdate_start.current.state.inputValue).unix(), EndDate: moment(this.selectdate_end.current.state.inputValue).add(1, 'days').unix() - 1 };
             this.setState(data, function () {
@@ -631,7 +630,7 @@ import DateTimePicker from 'react-datetime';
                             state.selectSite.push(parseInt(obj));
                         })
                         : state.SiteList.forEach(function (obj) {
-                            state.selectSite.push(parseInt(obj));
+                            state.selectSite.push(obj.siteId);
                         });
                 }
             });
@@ -741,9 +740,7 @@ import DateTimePicker from 'react-datetime';
         }
 
         componentDidUpdate() {
-            console.log("didup");
             if (this.state.MutiSelRefresh) {
-                console.log("didup1");
                 this.buildSelectSite();
                 this.buildTypeSite();
                 this.buildCurrencySite();
@@ -753,7 +750,6 @@ import DateTimePicker from 'react-datetime';
         }
 
         componentDidMount() {
-            console.log("didmon");
             this.getSiteList();
             this.buildTypeSite();
             this.buildCurrencySite();
