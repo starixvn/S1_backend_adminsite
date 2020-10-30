@@ -48,10 +48,13 @@ namespace BackendSite.Service.Model
     }
     public class BatchMsg
     {
+        public string SiteName { get; set; }
+        public int SiteId { get; set; }
         public int BatchId { get; set; }
         public string Author { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
+        public string Message { get; set; }
         public DateTime UpdateTime { get; set; }
         public DateTime CreateTime { get; set; }
     }

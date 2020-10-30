@@ -69,7 +69,7 @@ namespace BackendSite.Service.BLL
             messageService.DeletePersonalMsg(Id, CustId);
         }
 
-        public int SendMessageBatch(string personalMsg, int custId, int siteId, string sender ,int batchId)
+        public int SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
         {
             return messageService.SendMessageBatch(personalMsg, custId, siteId, sender, batchId);
         }
@@ -77,25 +77,25 @@ namespace BackendSite.Service.BLL
         {
             return messageService.ChangeVipLevelBatch(siteId, custId, userName, vipLevel, memo, Operator);
         }
-        public bool NewBatchMessage(string author, string personalMsg, ref int batchId)
+        public bool NewBatchMessage(int siteId, string author, string personalMsg, ref int batchId)
         {
-            return messageService.NewBatchMessage( author, personalMsg,ref batchId);
+            return messageService.NewBatchMessage(siteId, author, personalMsg, ref batchId);
         }
         public bool DeleteBatchMessage(int batchId)
         {
-            return messageService.DeleteBatchMessage( batchId);
+            return messageService.DeleteBatchMessage(batchId);
         }
         public bool UpdateBatchMessage(int batchId, string message)
         {
-            return messageService.UpdateBatchMessage( batchId, message);
+            return messageService.UpdateBatchMessage(batchId, message);
         }
-        public string GetBatchMessage(int batchId)
+        public BatchMsg GetBatchMessage(int batchId)
         {
-            return messageService.GetBatchMessage( batchId);
+            return messageService.GetBatchMessage(batchId);
         }
-        public IEnumerable<BatchMsg> GetBatchMessageList(long? StartDate, long? EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<BatchMsg> GetBatchMessageList(IEnumerable<int> SelectSite, long? StartDate, long? EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
-            return messageService.GetBatchMessageList(StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages,  ref RowCount);
+            return messageService.GetBatchMessageList(SelectSite, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
         }
 
 

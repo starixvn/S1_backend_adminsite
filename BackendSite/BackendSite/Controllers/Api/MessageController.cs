@@ -272,7 +272,7 @@ namespace BackendSite.Controllers.Api
                     bool isLastRow = false;
                     int RowId = 2;   // 因為有標題列，所以從第2列開始讀起
                     int BatchId = 0;
-                    messageBLL.NewBatchMessage(authData.UserName,personalMsg, ref BatchId);
+                    messageBLL.NewBatchMessage(optSite, authData.UserName, personalMsg, ref BatchId);
                     do  // 讀取資料，直到讀到空白列為止
                     {
                         string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text;
@@ -329,7 +329,7 @@ namespace BackendSite.Controllers.Api
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiListResult<BatchMsg> DeleteBatchMessage([FromForm] long? StartDate, [FromForm] long? EndDate, [FromForm] int batchId, [FromForm] int PageNumber)
+        public ApiListResult<BatchMsg> DeleteBatchMessage([FromForm] IEnumerable<int> SelectSite, [FromForm] long? StartDate, [FromForm] long? EndDate, [FromForm] int batchId, [FromForm] int PageNumber)
         {
             int PageSize = 10;
             int TotalPages = 0;
@@ -338,7 +338,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 messageBLL.DeleteBatchMessage(batchId);
-                apiResult.Data = messageBLL.GetBatchMessageList( StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                apiResult.Data = messageBLL.GetBatchMessageList(SelectSite, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
 
                 apiResult.PageNumber = PageNumber;
@@ -374,12 +374,12 @@ namespace BackendSite.Controllers.Api
         }
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiResult GetBatchMessage([FromForm] int batchId)
+        public ApiResult<BatchMsg> GetBatchMessage([FromForm] int batchId)
         {
-            var result = new ApiResult();
+            var result = new ApiResult<BatchMsg>();
             try
             {
-                result.Message = messageBLL.GetBatchMessage(batchId);
+                result.Data = messageBLL.GetBatchMessage(batchId);
                 result.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -391,7 +391,7 @@ namespace BackendSite.Controllers.Api
         }
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiListResult<BatchMsg> GetBatchMessageList([FromForm] long? StartDate, [FromForm] long? EndDate, [FromForm] int PageNumber)
+        public ApiListResult<BatchMsg> GetBatchMessageList([FromForm] IEnumerable<int> SelectSite, [FromForm] long? StartDate, [FromForm] long? EndDate, [FromForm] int PageNumber)
         {
             int PageSize = 10;
             int TotalPages = 0;
@@ -399,7 +399,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<BatchMsg>();
             try
             {
-                apiResult.Data = messageBLL.GetBatchMessageList(StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                apiResult.Data = messageBLL.GetBatchMessageList(SelectSite, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
 
                 apiResult.PageNumber = PageNumber;
