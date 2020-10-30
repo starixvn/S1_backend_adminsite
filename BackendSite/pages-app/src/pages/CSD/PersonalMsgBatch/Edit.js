@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { api } from '../../../module/WebAPI';
 
 const EditPanel = (props) => {
@@ -28,6 +28,11 @@ const EditPanel = (props) => {
     const [stateData, updateData] = useState(defaultData);
     const [stateSend, updateSend] = useState(false);
     const [sendData, updateSendData] = useState([]);
+    const isMountedRef = useRef(null);
+    useEffect(() => {
+        isMountedRef.current = true;
+        return () => (isMountedRef.current = false);
+    });
     let _site = [];
 
     let allLang = ['en', 'cs', 'ch', 'th', 'id', 'vn'];
@@ -50,79 +55,85 @@ const EditPanel = (props) => {
     }
 
     const SetMsg = () => {
-        let msg = "";
-        let check = true;
-        if (!stateData.optSite) { check = false; msg = "Please check Site."; }
-        else if (!stateData.file) { check = false; msg = "Please choose upload excel file."; }
-        else if (!stateData.subject || !stateData.subject.en) {
-            check = false;
-            msg = "Please input en subject.";
-        } else if (!stateData.content || !stateData.content.en) {
-            check = false;
-            msg = "Please input en content.";
-        }
-
-        if (check && window.confirm("Are you sure to import data to " + _site[stateData.optSite] + "?")) {
-            let msg = {};
-            allLang.forEach(lang => {
-                msg[lang] = {
-                    Title: stateData.subject.en,
-                    Content: stateData.content.en
-                }
-            });
-
-            Object.keys(stateData.subject).forEach(sKey => {
-                if (stateData.subject[sKey]) {
-                    if (msg[sKey]) {
-                        msg[sKey].Title = stateData.subject[sKey];
-                    } else {
-                        msg[sKey] = {
-                            Title: stateData.subject[sKey],
-                            Content: ''
-                        }
-                    }
-                }
-            });
-
-            Object.keys(stateData.content).forEach(sKey => {
-                if (stateData.content[sKey]) {
-                    if (msg[sKey]) {
-                        msg[sKey].Content = stateData.content[sKey];
-                    } else {
-                        msg[sKey] = {
-                            Title: '',
-                            Content: stateData.content[sKey]
-                        }
-                    }
-                }
-            });
-
-
-            let settings = { headers: { 'content-type': 'multipart/form-data' } }
-            let file = document.getElementById("uploadfile").files[0];
-            let formData = new FormData();
-            formData.append('optSite', parseInt(stateData.optSite));
-            formData.append("excelUpload", file, file.name);
-            formData.append('personalMsg', JSON.stringify(msg));
-            if (!stateSend) {
+        if (!stateSend) {
+            if (isMountedRef.current) {
                 updateSend(true);
+            }
+
+            let msg = "";
+            let check = true;
+            if (!stateData.optSite) { check = false; msg = "Please check Site."; }
+            else if (!stateData.file) { check = false; msg = "Please choose upload excel file."; }
+            else if (!stateData.subject || !stateData.subject.en) {
+                check = false;
+                msg = "Please input en subject.";
+            } else if (!stateData.content || !stateData.content.en) {
+                check = false;
+                msg = "Please input en content.";
+            }
+
+            if (check && window.confirm("Are you sure to import data to " + _site[stateData.optSite] + "?")) {
+                let msg = {};
+                allLang.forEach(lang => {
+                    msg[lang] = {
+                        Title: stateData.subject.en,
+                        Content: stateData.content.en
+                    }
+                });
+
+                Object.keys(stateData.subject).forEach(sKey => {
+                    if (stateData.subject[sKey]) {
+                        if (msg[sKey]) {
+                            msg[sKey].Title = stateData.subject[sKey];
+                        } else {
+                            msg[sKey] = {
+                                Title: stateData.subject[sKey],
+                                Content: ''
+                            }
+                        }
+                    }
+                });
+
+                Object.keys(stateData.content).forEach(sKey => {
+                    if (stateData.content[sKey]) {
+                        if (msg[sKey]) {
+                            msg[sKey].Content = stateData.content[sKey];
+                        } else {
+                            msg[sKey] = {
+                                Title: '',
+                                Content: stateData.content[sKey]
+                            }
+                        }
+                    }
+                });
+
+
+                let settings = { headers: { 'content-type': 'multipart/form-data' } }
+                let file = document.getElementById("uploadfile").files[0];
+                let formData = new FormData();
+                formData.append('optSite', parseInt(stateData.optSite));
+                formData.append("excelUpload", file, file.name);
+                formData.append('personalMsg', JSON.stringify(msg));
+
                 api.post('/api/Message/SendMessageBatch', formData, settings)
                     .then(function (response) {
-                        updateSend(false);
-                        if (response.data) {
-                            updateData({
-                                optSite: '',
-                                file: '',
-                                subject: {},
-                                content: {},
-                                batchId: ''
-                            });
-                            // updateSendData(response.data);
-                            props.SetEditMode(false);
-                            props.FilterSubmit();
-                            alert('sent successfully');
-                        } else {
-                            alert("sent error");
+                        if (isMountedRef.current) {
+                            if (response.data) {
+                                updateData({
+                                    optSite: '',
+                                    file: '',
+                                    subject: {},
+                                    content: {},
+                                    batchId: ''
+                                });
+                                // updateSendData(response.data);
+                                props.SetEditMode(false);
+                                props.FilterSubmit();
+                                alert('sent successfully');
+                            } else {
+                                alert("sent error");
+                            }
+                            updateSend(false);
                         }
                     }).catch(function (error) {
                         updateSend(false);
@@ -135,57 +146,59 @@ const EditPanel = (props) => {
     }
 
     const UpdateMsg = (id) => {
-        let msg = "";
-        let check = true;
-
-        if (!stateData.subject || !stateData.subject.en) {
-            check = false;
-            msg = "Please input en subject.";
-        } else if (!stateData.content || !stateData.content.en) {
-            check = false;
-            msg = "Please input en content.";
-        }
-
-        if (check && window.confirm("Are you sure to update data to " + _site[stateData.optSite] + "?")) {
-            let msg = {};
-            allLang.forEach(lang => {
-                msg[lang] = {
-                    Title: stateData.subject.en,
-                    Content: stateData.content.en
-                }
-            });
-
-            Object.keys(stateData.subject).forEach(sKey => {
-                if (stateData.subject[sKey]) {
-                    if (msg[sKey]) {
-                        msg[sKey].Title = stateData.subject[sKey];
-                    } else {
-                        msg[sKey] = {
-                            Title: stateData.subject[sKey],
-                            Content: ''
-                        }
-                    }
-                }
-            });
-
-            Object.keys(stateData.content).forEach(sKey => {
-                if (stateData.content[sKey]) {
-                    if (msg[sKey]) {
-                        msg[sKey].Content = stateData.content[sKey];
-                    } else {
-                        msg[sKey] = {
-                            Title: '',
-                            Content: stateData.content[sKey]
-                        }
-                    }
-                }
-            });
-            // let settings = { headers: { 'content-type': 'multipart/form-data' } }
-            let formData = new FormData();
-            formData.append('batchId', parseInt(stateData.batchId));
-            formData.append('personalMsg', JSON.stringify(msg));
-            if (!stateSend) {
+        if (!stateSend) {
+            if (isMountedRef.current) {
                 updateSend(true);
+            }
+            let msg = "";
+            let check = true;
+
+            if (!stateData.subject || !stateData.subject.en) {
+                check = false;
+                msg = "Please input en subject.";
+            } else if (!stateData.content || !stateData.content.en) {
+                check = false;
+                msg = "Please input en content.";
+            }
+
+            if (check && window.confirm("Are you sure to update data to " + _site[stateData.optSite] + "?")) {
+                let msg = {};
+                allLang.forEach(lang => {
+                    msg[lang] = {
+                        Title: stateData.subject.en,
+                        Content: stateData.content.en
+                    }
+                });
+
+                Object.keys(stateData.subject).forEach(sKey => {
+                    if (stateData.subject[sKey]) {
+                        if (msg[sKey]) {
+                            msg[sKey].Title = stateData.subject[sKey];
+                        } else {
+                            msg[sKey] = {
+                                Title: stateData.subject[sKey],
+                                Content: ''
+                            }
+                        }
+                    }
+                });
+
+                Object.keys(stateData.content).forEach(sKey => {
+                    if (stateData.content[sKey]) {
+                        if (msg[sKey]) {
+                            msg[sKey].Content = stateData.content[sKey];
+                        } else {
+                            msg[sKey] = {
+                                Title: '',
+                                Content: stateData.content[sKey]
+                            }
+                        }
+                    }
+                });
+                // let settings = { headers: { 'content-type': 'multipart/form-data' } }
+                let formData = new FormData();
+                formData.append('batchId', parseInt(stateData.batchId));
+                formData.append('personalMsg', JSON.stringify(msg));
                 api.post('/api/Message/UpdateBatchMessage', formData)
                     // updateSend(true);
                     // let Data = {
@@ -195,21 +208,23 @@ const EditPanel = (props) => {
 
                     // api.post('/api/Message/UpdateBatchMessage', Data)
                     .then(function (response) {
-                        updateSend(false);
-                        if (response.data) {
-                            updateData({
-                                optSite: '',
-                                file: '',
-                                subject: {},
-                                content: {},
-                                batchId: ''
-                            });
-                            // updateSendData(response.data);
-                            props.SetEditMode(false);
-                            props.FilterSubmit();
-                            alert('sent successfully');
-                        } else {
-                            alert("sent error");
+                        if (isMountedRef.current) {
+                            if (response.data) {
+                                updateData({
+                                    optSite: '',
+                                    file: '',
+                                    subject: {},
+                                    content: {},
+                                    batchId: ''
+                                });
+                                // updateSendData(response.data);
+                                props.SetEditMode(false);
+                                props.FilterSubmit();
+                                alert('sent successfully');
+                            } else {
+                                alert("sent error");
+                            }
+                            updateSend(false);
                         }
                     }).catch(function (error) {
                         updateSend(false);
