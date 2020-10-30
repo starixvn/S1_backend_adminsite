@@ -287,15 +287,34 @@ namespace BackendSite.Controllers.Api
             public string sabaId { get; set; }
             public int SiteId { get; set; }
         }
+        public static string MaskPhone(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
 
+            string pattern = @"(?<=[\w]{3})[\w-\._\+%]*(?=[\w]{3})";
+            return Regex.Replace(input, pattern, m => new string('*', m.Length));
+        }
+        public static string MaskEmail(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            string pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
+            return Regex.Replace(input, pattern, m => new string('*', m.Length));
+        }
         [HttpPost]
         public async Task<ApiResult<CustInfoDetail>> GetCustInfoDetailAsync(CustInfoReq custInfoReq)
         {
             var apiResult = new ApiResult<CustInfoDetail>();
             var custInfoDetail = await custInfoBLL.GetCustInfoDetailAsync(custInfoReq.CustId, custInfoReq.UserName);
-
             if (custInfoDetail != null)
             {
+                if (!permissionBLL.CheckPermission("CustManage/CustInfoList", "ca_readDetail"))
+                {
+                    custInfoDetail.Email = MaskEmail(custInfoDetail.Email);
+                    custInfoDetail.PhoneNo = MaskPhone(custInfoDetail.PhoneNo);
+                }
                 apiResult.Data = custInfoDetail;
                 apiResult.ErrorCode = 0;
             }
