@@ -44,9 +44,9 @@ module.exports = {
 		// "Finance/WithdrawalLimitAdjust.min": [
 		// 	"./src/pages/Finance/WithdrawalLimitAdjust/index.js"
 		// ],
-		// "CSD/PersonalMsgBatch.min": [
-		// 	"./src/pages/CSD/PersonalMsgBatch/index.js"
-		// ],
+		"CSD/PersonalMsgBatch.min": [
+			"./src/pages/CSD/PersonalMsgBatch/index.js"
+		],
 		// "Marketing/PointLevelList.min": [
 		// 	"./src/pages/Marketing/PointLevelManagement/index.js"
 		// ],
@@ -82,14 +82,14 @@ module.exports = {
 		// "Marketing/NewsManage.min": [
 		// 	"./src/pages/Marketing/NewsManage/index.js"
 		// ],
-		"Marketing/RebateLogReport.min": [
-			// '@babel/polyfill',
-			"./src/pages/Marketing/RebateLogReport/index.js"
-		],
-		"Marketing/RebateInfoReport.min": [
-			// '@babel/polyfill',
-			"./src/pages/Marketing/RebateInfoReport/index.js"
-		],
+		// "Marketing/RebateLogReport.min": [
+		// 	// '@babel/polyfill',
+		// 	"./src/pages/Marketing/RebateLogReport/index.js"
+		// ],
+		// "Marketing/RebateInfoReport.min": [
+		// 	// '@babel/polyfill',
+		// 	"./src/pages/Marketing/RebateInfoReport/index.js"
+		// ],
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

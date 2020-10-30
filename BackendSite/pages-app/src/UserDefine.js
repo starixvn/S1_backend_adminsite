@@ -54,7 +54,7 @@ const ThirdPartyAdjustment = lazy(() =>
 );
 const NewsManage = lazy(() => import("./pages/Marketing/NewsManage/index"));
 
-export const defaultPage = "BonusInfoReport";
+export const defaultPage = "PersonalMsgBatch";
 
 export const layoutType = {
 	N88: "N88",
