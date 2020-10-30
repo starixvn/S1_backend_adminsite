@@ -275,7 +275,7 @@ namespace BackendSite.Controllers.Api
                     messageBLL.NewBatchMessage(optSite, authData.UserName, personalMsg, ref BatchId);
                     do  // 讀取資料，直到讀到空白列為止
                     {
-                        string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text;
+                        string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text.Trim();
                         string sabaId = sheet.Cells[RowId, 2].Text.Trim();
                         var custId = (string.IsNullOrEmpty(sabaId)) ? null : common.TpIdToCustId(sabaId);
 
