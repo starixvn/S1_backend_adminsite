@@ -53,6 +53,10 @@
           {
             "DisplayKey": "Note Delete",
             "FuncKey": "ca_noteDelete"
+          },
+          {
+            "DisplayKey": "Read Detail",
+            "FuncKey": "ca_readDetail"
           }
         ]
       },
