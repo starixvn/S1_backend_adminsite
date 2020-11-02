@@ -140,6 +140,7 @@ const EditPanel = (props) => {
                         alert(error);
                     })
             } else {
+                updateSend(false);
                 alert(msg);
             }
         }
@@ -231,6 +232,7 @@ const EditPanel = (props) => {
                         alert(error);
                     })
             } else {
+                updateSend(false);
                 alert(msg);
             }
         }
