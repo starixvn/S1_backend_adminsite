@@ -69,6 +69,9 @@ namespace BackendSite.Service.Model
         public IEnumerable<TpWallet> tpWallet { get; set; }
         public IEnumerable<Promotion> promotions { get; set; }
         public int AffiliateId { get; set; }
+        public DateTime? ReloadTime { get; set; }
+        public string? IP { get; set; }
+
     }
 
     public class CustInfoDetailForExport
