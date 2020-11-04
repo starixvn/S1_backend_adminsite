@@ -54,13 +54,18 @@ import DateTimePicker from 'react-datetime';
         onExport() {
             this.props.onExport();
         }
-
+        onRejectMultiple() {
+            this.props.onRejectMultiple();
+        }
         render() {
-            let rows = this.props.searchData.data.map(row => {
+            // console.log(this.props.searchData);
+            let rows = this.props.searchData.data.map((row, idx) => {
+                // console.log(this.props.rejectChecks.list[idx]);
                 let styleblod = (row.flag === 0) ? { fontWeight: 'bold' } : {};
                 let showbankname = (row.depositType === 1) ? row.bankName + " ( " + row.payName + " ) " : (row.depositType === 2) ? row.channelName + " ( " + row.payName + " ) " : (row.depositType === 3) ? row.bankName : null;
                 return (
                     <tr key={row.transId} style={styleblod}>
+                        {(subFuncKeys.indexOf("f_dp_execute") > -1) ? (row.status === 1) ? <td><input type="checkbox" value={row.transId} checked={this.props.rejectChecks.list[idx].isChecked} onChange={this.props.handleChange.bind(this, row.transId)} /></td> : <td></td> : null}
                         <th scope="row">
                             {(subFuncKeys.indexOf("f_dp_execute") > -1) ? <a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a> : row.transId}
                         </th>
@@ -80,8 +85,7 @@ import DateTimePicker from 'react-datetime';
                         <td>{DepositStatusOp[row.status]}</td>
                     </tr>
                 )
-            }
-            );
+            });
 
             let RefreshBtn = null;
             if (this.props.onRefresh == null) {
@@ -97,11 +101,14 @@ import DateTimePicker from 'react-datetime';
             return (
                 <div className="table">
                     <div className="table-options">
-                        {RefreshBtn}<button type="button" className="btn btn-approved" onClick={this.onExport.bind(this)}>Export Excel</button>
+                        {RefreshBtn}
+                        <button type="button" className="btn btn-approved" onClick={this.onExport.bind(this)}>Export Excel</button>
+                        {(subFuncKeys.indexOf("f_dp_execute") > -1) ? <button type="button" className="btn btn-rejected" onClick={this.onRejectMultiple.bind(this)}>Reject Multiple</button> : null}
                     </div>
                     <table className="table table-striped">
                         <thead>
                             <tr>
+                                {(subFuncKeys.indexOf("f_dp_execute") > -1) ? <th scope="col"><input type="checkbox" checked={this.props.rejectChecks.allChecked} onChange={this.props.handleChange.bind(this, "checkAll")} />Check all</th> : null}
                                 <th scope="col">Trxn.ID</th>
                                 {/* <th scope="col">Calvin Code</th> */}
                                 <th scope="col">{i18n.lbl_DepositType}</th>
@@ -428,20 +435,32 @@ import DateTimePicker from 'react-datetime';
 
     class DepositPanel extends React.Component {
         _myTimer;
-        _timeInterval = 15;
+        _timeInterval = 30;
         constructor(props) {
             super(props);
             this.selectdate_start = React.createRef();
             this.selectdate_end = React.createRef();
             this.ExportForm = React.createRef();
-            this.state = { SiteList: [], selectSite: [], selectType: [], selectCurrency: [], selectStatus: [], SelectUser: "", SelectDepositID: "", ShowDetial: false, timeInterval: this._timeInterval, IsRefresh: false, MutiSelRefresh: false };
+            this.state = {
+                SiteList: [],
+                selectSite: [],
+                selectType: [],
+                selectCurrency: [],
+                selectStatus: [],
+                SelectUser: "",
+                SelectDepositID: "",
+                ShowDetial: false,
+                timeInterval: this._timeInterval,
+                IsRefresh: false,
+                MutiSelRefresh: false,
+                rejectChecks: {}
+            };
             this.searchFilter = {};
         }
 
         onRefresh() {
             let searchData = this.state.searchData;
             this.onSearch(searchData.pageNumber);
-
         }
 
         onChange(event) {
@@ -482,7 +501,20 @@ import DateTimePicker from 'react-datetime';
                     //Loading.UnLoading();
                     let result = response.data;
                     if (result.errorCode == 0) {
-                        this.setState({ searchData: result, GetData: true, IsRefresh: false, timeInterval: this._timeInterval });
+                        this.setState({
+                            searchData: result,
+                            GetData: true,
+                            IsRefresh: false,
+                            timeInterval: this._timeInterval,
+                            rejectChecks: {
+                                allChecked: false,
+                                list: result.data.map(idx => ({
+                                    transId: idx.transId,
+                                    status: idx.status,
+                                    isChecked: false
+                                }))
+                            }
+                        });
                     } else {
                         alert(result.message);
                         this.setState({ IsRefresh: false, timeInterval: this._timeInterval });
@@ -529,6 +561,55 @@ import DateTimePicker from 'react-datetime';
             }.bind(this));
 
             //axios.post('/Finance/ExportDepositList', data, {responseType: 'blob'});
+        }
+
+        handleChange = (idx, e) => {
+            let checked = e.target.checked;
+            this.setState(prevState => {
+                let rejectChecks = prevState.rejectChecks;
+                if (idx === "checkAll") {
+                    rejectChecks.allChecked = checked;
+                    rejectChecks.list = rejectChecks.list.map(item => ({ ...item, isChecked: checked }));
+                } else {
+                    rejectChecks.list = rejectChecks.list.map(item =>
+                        item.transId === idx ? { ...item, isChecked: checked } : item
+                    );
+                    rejectChecks.allChecked = rejectChecks.list.every(item => item.isChecked);
+                }
+                return rejectChecks;
+            });
+        };
+
+        onRejectMultiple() {
+            let rejectChecks = [];
+            this.state.rejectChecks.list.forEach(item => {
+                if (item.status === 1 && item.isChecked === true) rejectChecks.push(item.transId)
+            })
+            let data = { TransId: rejectChecks }, mes = "";
+            axios.post('/api/Deposit/BatchRejectedDeposit', data)
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    result.forEach(item => {
+                        if (item.errorCode !== 0) mes += item.message + "/n";
+                    })
+
+                    if (mes === "") {
+                        alert("successful");
+                        this.onRefresh();
+                    } else {
+                        alert(mes);
+                        this.setState({ IsRefresh: false, timeInterval: this._timeInterval });
+                    }
+                    this.AutoRefresh();
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+
+                    alert(error);
+                    this.setState({ IsRefresh: false, timeInterval: this._timeInterval });
+                    this.AutoRefresh();
+                }.bind(this));
+
         }
 
         handleSubmit(event) {
@@ -787,8 +868,10 @@ import DateTimePicker from 'react-datetime';
             statusList = <select id="selectStatus" name="selectStatus[]" multiple="multiple">{statusList}</select>;
 
             let searchData = this.state.searchData;
+
             let StartDate = this.state.StartDate;
             let EndDate = this.state.EndDate;
+            let rejectChecks = this.state.rejectChecks;
 
             return (
                 <div>
@@ -853,7 +936,22 @@ import DateTimePicker from 'react-datetime';
                             </div>
                         </div>
                     </form> : null}
-                    {searchData != null && !this.state.ShowDetial ? <DepositList onExport={this.onExport.bind(this)} timeInterval={this.state.timeInterval} searchData={searchData} ChangePage={this.onSearch.bind(this)} onCheckDetail={this.onCheckDetail.bind(this)} onRefresh={!this.state.IsRefresh ? this.onRefresh.bind(this) : null} /> : null}
+                    {
+                        searchData != null && !this.state.ShowDetial ?
+                            <DepositList
+                                onExport={this.onExport.bind(this)}
+                                timeInterval={this.state.timeInterval}
+                                searchData={searchData}
+                                ChangePage={this.onSearch.bind(this)}
+                                onCheckDetail={this.onCheckDetail.bind(this)}
+                                onRefresh={!this.state.IsRefresh ? this.onRefresh.bind(this) : null}
+                                handleChange={this.handleChange.bind(this)}
+                                onRejectMultiple={this.onRejectMultiple.bind(this)}
+                                rejectChecks={rejectChecks}
+                            />
+                            :
+                            null
+                    }
                     {this.state.transId != null && this.state.ShowDetial ? <DepositDetail transId={this.state.transId} onBack={this.onBack.bind(this)} /> : null}
                     <div style={{ display: 'none' }}>
                         {this.state.ExportParam}

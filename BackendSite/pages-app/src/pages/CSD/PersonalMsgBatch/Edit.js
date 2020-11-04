@@ -139,9 +139,10 @@ const EditPanel = (props) => {
                         updateSend(false);
                         alert(error);
                     })
+            } else {
+                updateSend(false);
+                alert(msg);
             }
-        } else {
-            alert(msg);
         }
     }
 
@@ -230,9 +231,10 @@ const EditPanel = (props) => {
                         updateSend(false);
                         alert(error);
                     })
+            } else {
+                updateSend(false);
+                alert(msg);
             }
-        } else {
-            alert(msg);
         }
     }
     let radio = "";

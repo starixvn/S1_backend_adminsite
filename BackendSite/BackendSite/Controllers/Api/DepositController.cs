@@ -130,6 +130,7 @@ namespace BackendSite.Controllers.Api
             public int Action { set; get; }
         }
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList", "f_dp_execute" })]
         [HttpPost]
         public async Task<ApiResult> DepositConfirmAsync(DepositReq1 depositReq)
         {
@@ -301,6 +302,51 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = 9;
                 apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+
+        public class BatchRejectedDepositList
+        {
+            public IEnumerable<string> TransId { get; set; }
+        }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList", "f_dp_execute" })]
+        [HttpPost]
+        public List<ApiResult> BatchRejectedDeposit(BatchRejectedDepositList batchRejectedDepositList)
+        {
+            var apiResult = new List<ApiResult>();
+            var depositConfirmReuslt = -1;
+            var Comment = $"{ User.Identity.Name} Rejected Deposit Multiple";
+
+            foreach (string _transId in batchRejectedDepositList.TransId)
+            {
+                var aaa = _transId;
+                depositConfirmReuslt = depositBLL.DepositRejectd(_transId, 0, Comment, User.Identity.Name);
+
+                if (depositConfirmReuslt > 0)
+                {
+                    var depositRequest = depositBLL.GetDepositRequest(_transId);
+                    var userLang = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId).UserLang;
+                    // Send message to player
+                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender", userLang);
+                    string title = selLangBLL.GetResourceValue("lbl_DepositRejectTitle", userLang);
+                    title = string.Format(title, _transId);
+                    string content = selLangBLL.GetResourceValue("lbl_DepositRejectContent", userLang);
+                    content = string.Format(content, _transId);
+                    messageBLL.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
+                }
+                if (depositConfirmReuslt == -4)
+                {
+                    apiResult.Add(new ApiResult(selLangBLL) { ErrorCode = 1102, Message = $"{_transId} {selLangBLL.GetMsg("msg_UpdateFailedtoSB")}" });
+                }
+                else if (depositConfirmReuslt == 0)
+                {
+                    apiResult.Add(new ApiResult(selLangBLL) { ErrorCode = 1101, Message = $"{_transId} {selLangBLL.GetMsg("msg_UpdateFailed")}" });
+                }
+                else
+                {
+                    apiResult.Add(new ApiResult(selLangBLL) { ErrorCode = 0, Message = $"{_transId} {selLangBLL.GetMsg("msg_Updatesuccessful")}" });
+                }
             }
             return apiResult;
         }
