@@ -586,30 +586,31 @@ import DateTimePicker from 'react-datetime';
                 if (item.status === 1 && item.isChecked === true) rejectChecks.push(item.transId)
             })
             let data = { TransId: rejectChecks }, mes = "";
-            axios.post('/api/Deposit/BatchRejectedDeposit', data)
-                .then(function (response) {
-                    //Loading.UnLoading();
-                    let result = response.data;
-                    result.forEach(item => {
-                        if (item.errorCode !== 0) mes += item.message + "/n";
-                    })
+            if (confirm("Are You sure to rejected? ")) {
+                axios.post('/api/Deposit/BatchRejectedDeposit', data)
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        result.forEach(item => {
+                            if (item.errorCode !== 0) mes += item.message + "/n";
+                        })
 
-                    if (mes === "") {
-                        alert("successful");
-                        this.onRefresh();
-                    } else {
-                        alert(mes);
+                        if (mes === "") {
+                            alert("successful");
+                            this.onRefresh();
+                        } else {
+                            alert(mes);
+                            this.setState({ IsRefresh: false, timeInterval: this._timeInterval });
+                        }
+                        this.AutoRefresh();
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+
+                        alert(error);
                         this.setState({ IsRefresh: false, timeInterval: this._timeInterval });
-                    }
-                    this.AutoRefresh();
-                }.bind(this)).catch(function (error) {
-                    //Loading.UnLoading();
-
-                    alert(error);
-                    this.setState({ IsRefresh: false, timeInterval: this._timeInterval });
-                    this.AutoRefresh();
-                }.bind(this));
-
+                        this.AutoRefresh();
+                    }.bind(this));
+            }
         }
 
         handleSubmit(event) {
