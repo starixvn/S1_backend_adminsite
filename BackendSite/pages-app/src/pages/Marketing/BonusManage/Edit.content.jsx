@@ -307,7 +307,7 @@ const SubPanel = props => {
 			let Locked = Boolean(Data[item.value]?.status);
 			let value = Data[item.value]?.percentage;
 			return (
-				<div key={`tpgame-${item.value}`} className="list__item" style={{ alignItems: "center", padding: "0.5rem" }}>
+				<div key={`tpgame-${item.value}`} className="list__item" style={Locked ? { alignItems: "center", padding: "0.5rem", background: "#dcffee" } : { alignItems: "center", padding: "0.5rem" }}>
 					<label className="">
 						<span className="text">{item.displayText}</span>
 					</label>
