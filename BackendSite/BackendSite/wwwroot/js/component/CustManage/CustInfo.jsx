@@ -1316,6 +1316,18 @@ import DateTimePicker from 'react-datetime';
                                         <th scope="row">Elgible Withdrawal</th>
                                         <td>{number_format(elgibleWithdrawal)}</td>
                                     </tr>
+                                    <tr>
+                                        <th scope="row">Vn_Aff</th>
+                                        <td>{(typeof data.affiliateId === 'undefined' || data.affiliateId === 0) ? "N/A" : data.affiliateId}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Last Activity Time</th>
+                                        <td>{(typeof data.reloadTime === 'undefined') ? "N/A" : moment(data.reloadTime).format('l LTS (Z)')}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Last Activity IP</th>
+                                        <td>{(typeof data.ip === 'undefined') ? "N/A" : data.ip}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                             {data.RebateInfo != null ? <RebateInfo RebateInfo={data.RebateInfo} /> : null}
