@@ -586,12 +586,24 @@
     <value>Re-Deposit</value>
   </data>
   <data name="lbl_PromotionType3" xml:space="preserve">
-    <value>Rebate</value>
+    <value>FreeBet</value>
   </data>
   <data name="lbl_PromotionType4" xml:space="preserve">
     <value>Special</value>
   </data>
   <data name="lbl_WithdrawalStatus8" xml:space="preserve">
     <value>To KYC</value>
+  </data>
+  <data name="lbl_PromotionType5" xml:space="preserve">
+    <value>Wallet Bonus</value>
+  </data>
+  <data name="lbl_PromotionType6" xml:space="preserve">
+    <value>Rebate</value>
+  </data>
+  <data name="lbl_PromotionType7" xml:space="preserve">
+    <value>CashBack</value>
+  </data>
+  <data name="lbl_PromotionType8" xml:space="preserve">
+    <value>Advertising</value>
   </data>
 </root>
