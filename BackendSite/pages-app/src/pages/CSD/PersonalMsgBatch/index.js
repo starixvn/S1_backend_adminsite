@@ -167,10 +167,10 @@ const Panel = () => {
                     StartDate: moment(stateFilter.StartDate).unix(),
                     EndDate: moment(stateFilter.EndDate).add(1, 'days').unix() - 1,
                     PageNumber: 1,
-                    batchId:id
+                    batchId: id
                 })
             };
-    
+
             WebAPI.PostData(param).then((res) => {
                 if (res.data.errorCode === 0) {
                     setDatas({
@@ -213,7 +213,7 @@ const Panel = () => {
                 editMode === false ?
                     stateDatas.Datas === null ? null : <Result {...stateDatas} ChangePage={Result_ChangePage} ClickEdit={ClickEdit} ClickDelete={ClickDelete} />
                     :
-                    <EditPanel DetailDatas={detailDatas} SiteList={siteList} SetEditMode={SetEditMode} FilterSubmit={Filter_Submit} />
+                    <EditPanel {...stateDatas} DetailDatas={detailDatas} SiteList={siteList} SetEditMode={SetEditMode} FilterSubmit={Filter_Submit} />
             }
         </div>
     )

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { api } from '../../../module/WebAPI';
 
 const EditPanel = (props) => {
-
     let defaultData = {
         optSite: '',
         file: '',
@@ -128,7 +127,7 @@ const EditPanel = (props) => {
                                 });
                                 // updateSendData(response.data);
                                 props.SetEditMode(false);
-                                props.FilterSubmit();
+                                if (props.FilterInfo) props.FilterSubmit();
                                 alert('sent successfully');
                             } else {
                                 alert("sent error");
@@ -220,7 +219,7 @@ const EditPanel = (props) => {
                                 });
                                 // updateSendData(response.data);
                                 props.SetEditMode(false);
-                                props.FilterSubmit();
+                                if (props.FilterInfo) props.FilterSubmit();
                                 alert('sent successfully');
                             } else {
                                 alert("sent error");
