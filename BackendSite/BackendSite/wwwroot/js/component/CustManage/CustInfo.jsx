@@ -1071,7 +1071,12 @@ import DateTimePicker from 'react-datetime';
                                         <td>{i18n["lbl_Currency" + data.currencyId]}</td></tr>
                                     <tr>
                                         <th scope="row">Agent Name</th>
-                                        <td>{data.agent}</td></tr>
+                                        <td>{data.agent}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Affiliates ID</th>
+                                        <td>{(typeof data.affiliateId === 'undefined' || data.affiliateId === 0) ? "N/A" : data.affiliateId}</td>
+                                    </tr>
                                     <tr>
                                         <th scope="row">Prefer Languages</th>
                                         <td>{data.userLang}</td>
@@ -1244,10 +1249,6 @@ import DateTimePicker from 'react-datetime';
                                     <tr>
                                         <th scope="row">First Deposit Time</th>
                                         <td>{moment(data.firstDepositTime).format('l LTS (Z)')}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Vn_Aff</th>
-                                        <td>{(typeof data.affiliateId === 'undefined' || data.affiliateId === 0) ? "N/A" : data.affiliateId}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Last Activity Time</th>
