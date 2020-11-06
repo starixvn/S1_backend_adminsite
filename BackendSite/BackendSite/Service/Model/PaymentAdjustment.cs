@@ -18,6 +18,7 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public string Memo { set; get; }
         public int IsTest { set; get; }
+        public string SabaID { get; set; }
     }
 
     public class PaymentAdjustmentFrontEnd
@@ -37,5 +38,6 @@ namespace BackendSite.Service.Model
 
         public string StatusName { get; set; }
         public string Memo { set; get; }
+        public string SabaID { get; set; }
     }
 }
