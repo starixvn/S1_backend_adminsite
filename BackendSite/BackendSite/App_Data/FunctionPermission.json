@@ -57,6 +57,10 @@
           {
             "DisplayKey": "Read Detail",
             "FuncKey": "ca_readDetail"
+          },
+          {
+            "DisplayKey": "Export Excel",
+            "FuncKey": "ca_exportExcel"
           }
         ]
       },

@@ -49,9 +49,12 @@ import * as Loading from '../commJS/Loading.jsx';
                     </div>
                     :
                     <div className="table-responsive-md table">
-                        <div className="table-options">
-                            <button type="button" className="btn btn-approved" onClick={this.onExport.bind(this)}>Export Excel</button>
-                        </div>
+                        {subFuncKeys.indexOf("ca_exportExcel") > -1 ?
+                            < div className="table-options">
+                                <button type="button" className="btn btn-approved" onClick={this.onExport.bind(this)}>Export Excel</button>
+                            </div>
+                            : null
+                        }
                         <table className="table table-striped">
                             <thead>
                                 <tr>
@@ -69,7 +72,7 @@ import * as Loading from '../commJS/Loading.jsx';
                             {custInfoRows}
                         </table>
                         <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
-                    </div>
+                    </div >
             )
         }
     }
