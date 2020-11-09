@@ -61,5 +61,21 @@ namespace BackendSite.Service.BLL
         {
             return adjustmentService.SetAdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, Operator, out transId);
         }
+        public IEnumerable<TpBetRecordListOneWeek> GetCustTpBetRecordListOneWeek(int custId)
+        {
+            return walletService.GetCustTpBetRecordListOneWeek(custId);
+        }
+        public IEnumerable<TpBetRecordListOneDay> GetCustTpBetRecordListOneDay(int custId, long selDate)
+        {
+            return walletService.GetCustTpBetRecordListOneDay(custId, selDate);
+        }
+        public IEnumerable<TpBetRecordbyCategoryId> GetCustTpBetRecordListbyCategoryId(int custId, long selDate, int categoryId)
+        {
+            return walletService.GetCustTpBetRecordListbyCategoryId(custId, selDate, categoryId);
+        }
+        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, long selDate, int gameTypeId)
+        {
+            return walletService.GetCustTpBetRecordDetailListbyGameType(custId, selDate, gameTypeId);
+        }
     }
 }

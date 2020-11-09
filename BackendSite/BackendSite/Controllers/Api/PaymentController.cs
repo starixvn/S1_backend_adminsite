@@ -252,6 +252,61 @@ namespace BackendSite.Controllers.Api
             apiResult.Data = paymentBLL.GetPromotionCategory();
             return apiResult;
         }
+        public class CustTpBetRecordListOneWeekReq
+        {
+            public int CustId { get; set; }
+        }
+        [HttpPost]
+        public ApiResult<IEnumerable<TpBetRecordListOneWeek>> GetCustTpBetRecordListOneWeek(CustTpBetRecordListOneWeekReq custTpBetRecordListOneWeekReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneWeek>>();
+            apiResult.ErrorCode = 0;
+            apiResult.Data = paymentBLL.GetCustTpBetRecordListOneWeek(custTpBetRecordListOneWeekReq.CustId);
+            return apiResult;
+        }
+        public class CustTpBetRecordListOneDayReq
+        {
+            public int CustId { get; set; }
+            public long selDate { get; set; }
+        }
+        [HttpPost]
+        public ApiResult<IEnumerable<TpBetRecordListOneDay>> GetCustTpBetRecordListOneDay(CustTpBetRecordListOneDayReq custTpBetRecordListOneDayReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneDay>>();
+            apiResult.ErrorCode = 0;
+            apiResult.Data = paymentBLL.GetCustTpBetRecordListOneDay(custTpBetRecordListOneDayReq.CustId, custTpBetRecordListOneDayReq.selDate);
+            return apiResult;
+        }
+        public class CustTpBetRecordListbyCategoryIdReq
+        {
+            public int CustId { get; set; }
+            public long selDate { get; set; }
+            public int CategoryId { get; set; }
+        }
+        [HttpPost]
+        public ApiResult<IEnumerable<TpBetRecordbyCategoryId>> GetCustTpBetRecordListbyCategoryId(CustTpBetRecordListbyCategoryIdReq custTpBetRecordListbyCategoryIdReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordbyCategoryId>>();
+            apiResult.ErrorCode = 0;
+            apiResult.Data = paymentBLL.GetCustTpBetRecordListbyCategoryId(custTpBetRecordListbyCategoryIdReq.CustId, custTpBetRecordListbyCategoryIdReq.selDate, custTpBetRecordListbyCategoryIdReq.CategoryId);
+
+            return apiResult;
+        }
+        public class CustTpBetRecordDetailListbyGameTypeReq
+        {
+            public int CustId { get; set; }
+            public long selDate { get; set; }
+            public int gameTypeId { get; set; }
+        }
+        [HttpPost]
+        public ApiResult<IEnumerable<TpBetRecordDetailbyGameType>> GetCustTpBetRecordDetailListbyGameType(CustTpBetRecordDetailListbyGameTypeReq custTpBetRecordDetailListbyGameTypeReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordDetailbyGameType>>();
+            apiResult.ErrorCode = 0;
+            apiResult.Data = paymentBLL.GetCustTpBetRecordDetailListbyGameType(custTpBetRecordDetailListbyGameTypeReq.CustId, custTpBetRecordDetailListbyGameTypeReq.selDate, custTpBetRecordDetailListbyGameTypeReq.gameTypeId);
+
+            return apiResult;
+        }
         [HttpPost]
         public async Task<ApiResult> AdjustmentAndWithdrawalLimitAsync(AdjustmentAndWithdrawalLimitReq adjustmentAndWithdrawalLimitReq)
         {
