@@ -19,6 +19,10 @@ const dataColumnDefs = () => {
             }
         },
         {
+            dataColumn: 'sabaID',
+            columnTitle: 'Saba ID',
+        },
+        {
             dataColumn: 'currencyName',
             columnTitle: 'Currency',
         },

@@ -104,6 +104,7 @@ import * as Loading from '../commJS/Loading.jsx';
                 sUserName: this.state.UserName,
                 sTransId: this.state.TransId,
                 sTpUserName: this.state.TpUserName,
+                sAffId: this.state.AffId,
                 sAccountName: this.state.AccountName,
                 sLoginIp: this.state.LoginIp,
                 sEmail: this.state.Email,
@@ -131,7 +132,8 @@ import * as Loading from '../commJS/Loading.jsx';
                 Email: !this.state.sEmail ? null : this.state.sEmail,
                 PhoneNo: !this.state.sPhoneNo ? null : this.state.sPhoneNo,
                 PageNumber: pageNumber,
-                PageSize: this._PageSize
+                PageSize: this._PageSize,
+                AffId: !this.state.sAffId ? null : parseInt(this.state.sAffId)
             };
             axios.post('/api/CustManage/GetCustInfoList', data)
                 .then(function (response) {
@@ -164,7 +166,8 @@ import * as Loading from '../commJS/Loading.jsx';
                 AccountName: !this.state.sAccountName ? null : this.state.sAccountName,
                 LoginIp: !this.state.sLoginIp ? null : this.state.sLoginIp,
                 Email: !this.state.sEmail ? null : this.state.sEmail,
-                PhoneNo: !this.state.sPhoneNo ? null : this.state.sPhoneNo
+                PhoneNo: !this.state.sPhoneNo ? null : this.state.sPhoneNo,
+                AffId: !this.state.sAffId ? null : parseInt(this.state.sAffId)
             };
 
             let ExportParam = [];
@@ -314,6 +317,12 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <label className="label">Saba ID</label>
                                     <div className="field">
                                         <input type="text" placeholder="Saba ID" autoComplete="off" name="TpUserName" value={this.state.TpUserName} onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <label className="label">Affiliates ID</label>
+                                    <div className="field">
+                                        <input type="text" placeholder="Affiliates ID" autoComplete="off" name="AffId" value={this.state.AffId} onChange={this.onChange.bind(this)} />
                                     </div>
                                 </div>
                                 <div className="input-item">

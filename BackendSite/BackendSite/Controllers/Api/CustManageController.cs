@@ -55,6 +55,7 @@ namespace BackendSite.Controllers.Api
             public string TpUserName { get; set; }
             public string Email { get; set; }
             public string PhoneNo { get; set; }
+            public int? AffId { get; set; }
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
         }
@@ -66,7 +67,7 @@ namespace BackendSite.Controllers.Api
             int totalPages = 0, rowCount = 0;
             int pageNumber = custInfoListReq.PageNumber;
 
-            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite, custInfoListReq.BirDate, custInfoListReq.BirMonth, custInfoListReq.BirYear, custInfoListReq.UserName, custInfoListReq.AccountName, custInfoListReq.LoginIp, custInfoListReq.TransId, custInfoListReq.TpUserName, custInfoListReq.Email, custInfoListReq.PhoneNo, custInfoListReq.StartDate, custInfoListReq.EndDate, custInfoListReq.PageSize, ref pageNumber, out totalPages, out rowCount);
+            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite, custInfoListReq.BirDate, custInfoListReq.BirMonth, custInfoListReq.BirYear, custInfoListReq.UserName, custInfoListReq.AccountName, custInfoListReq.LoginIp, custInfoListReq.TransId, custInfoListReq.TpUserName, custInfoListReq.Email, custInfoListReq.PhoneNo, custInfoListReq.StartDate, custInfoListReq.EndDate, custInfoListReq.PageSize, custInfoListReq.AffId, ref pageNumber, out totalPages, out rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;
