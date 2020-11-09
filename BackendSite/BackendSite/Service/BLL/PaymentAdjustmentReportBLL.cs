@@ -53,7 +53,8 @@ namespace BackendSite.Service.BLL
                         Amount = row.Amount,
                         CreateTime = row.CreateTime,
                         StatusName = selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
-                        Memo = row.Memo
+                        Memo = row.Memo,
+                        SabaID = row.SabaID
                     });
                 }
             }
