@@ -9,7 +9,7 @@ const Result = (props) => {
                 <td>{number_format(d.turnOver)}</td>
                 <td>{number_format(d.validBet)}</td>
                 <td>{number_format(d.winlostAmount)}</td>
-                <td><button className="btn btn-add" onClick={props.ClickDetail.bind(null, d.settledDate, d.gameTypeID)}>Details</button></td>
+                <td><button className="btn btn-add" onClick={props.ClickDetail.bind(null, d.settledDate, d.gameTypeID, 1)}>Details</button></td>
             </tr>
         )
     })
