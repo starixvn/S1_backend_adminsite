@@ -9,6 +9,7 @@ const Panel = () => {
     const [stateDayDatas, setDayDatas] = React.useState();
     const [stateCategoryDatas, setCategoryDatas] = React.useState();
     const [stateGameDatas, setGameDatas] = React.useState();
+    const [stateGameInfo, setGameInfo] = React.useState({ Date: null, GameTypeId: null });
     const [stateInfoType, setInfoType] = React.useState();
     let CustId = parseInt(getUrlParameter("custId"));
 
@@ -57,12 +58,20 @@ const Panel = () => {
             });
     }
 
-    const getGameData = (Date, GameTypeId) => {
-        axios.post('/api/Payment/GetCustTpBetRecordDetailListbyGameType', { CustId: CustId, selDate: moment(Date).unix(), gameTypeId: parseInt(GameTypeId) })
+    const getGameData = (Date, GameTypeId, PageNumber) => {
+        axios.post('/api/Payment/GetCustTpBetRecordDetailListbyGameType',
+            {
+                CustId: CustId,
+                selDate: moment(Date).unix(),
+                gameTypeId: parseInt(GameTypeId),
+                PageSize: 15,
+                PageNumber: PageNumber
+            })
             .then((res) => {
                 let result = res.data;
                 if (result.errorCode == 0) {
-                    setGameDatas(result.data);
+                    setGameDatas(result);
+                    setGameInfo({ Date: Date, GameTypeId: GameTypeId })
                     setInfoType("game");
                 } else {
                     alert(result.message);
@@ -81,7 +90,7 @@ const Panel = () => {
             <WeekResult Datas={stateWeekDatas} ClickBack={onClickBack} ClickDetail={getDayData} /> : stateInfoType === "day" ?
                 <DayResult Datas={stateDayDatas} ClickBack={onClickBack} ClickDetail={getCategoryData} /> : stateInfoType === "category" ?
                     <CategoryResult Datas={stateCategoryDatas} ClickBack={onClickBack} ClickDetail={getGameData} /> : stateInfoType === "game" ?
-                        <GameResult Datas={stateGameDatas} ClickBack={onClickBack} /> : null
+                        <GameResult Datas={stateGameDatas} Info={stateGameInfo} ClickBack={onClickBack} ClickDetail={getGameData} /> : null
     )
 }
 
