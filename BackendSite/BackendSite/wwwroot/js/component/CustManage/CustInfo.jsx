@@ -1347,7 +1347,7 @@ import TpBetRecord from './TpBetRecord/index';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Bet Record Log", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Statement Log", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
         constructor(props) {

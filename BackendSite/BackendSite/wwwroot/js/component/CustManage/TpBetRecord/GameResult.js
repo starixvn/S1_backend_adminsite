@@ -18,7 +18,7 @@ const Result = (props) => {
     return (
         <>
             <div className="table">
-                <label class="col-form-label d-block">Bet Record Log By Game</label>
+                <label class="col-form-label d-block">Statement By Game</label>
                 <table className="table table-striped">
                     <thead>
                         <tr>

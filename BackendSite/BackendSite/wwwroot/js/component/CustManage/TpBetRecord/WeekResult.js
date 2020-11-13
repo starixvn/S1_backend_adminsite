@@ -15,7 +15,7 @@ const Result = (props) => {
     return (
         <>
             <div className="table">
-                <label class="col-form-label d-block">Bet Record Log By Week</label>
+                <label class="col-form-label d-block">Statement By Week</label>
                 <table className="table table-striped">
                     <thead>
                         <tr>
