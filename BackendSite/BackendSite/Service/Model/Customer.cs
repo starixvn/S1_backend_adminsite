@@ -70,7 +70,7 @@ namespace BackendSite.Service.Model
         public IEnumerable<Promotion> promotions { get; set; }
         public int AffiliateId { get; set; }
         public DateTime? ReloadTime { get; set; }
-        public string? IP { get; set; }
+        public string IP { get; set; }
 
     }
 
@@ -96,6 +96,7 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public string SabaID { get; set; }
         public string SignupUrl { get; set; }
+        public int AffiliateId { get; set; }
     }
 
     public class CustPhotoId
