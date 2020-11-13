@@ -297,14 +297,24 @@ namespace BackendSite.Controllers.Api
             public int CustId { get; set; }
             public long selDate { get; set; }
             public int gameTypeId { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+
         }
         [HttpPost]
-        public ApiResult<IEnumerable<TpBetRecordDetailbyGameType>> GetCustTpBetRecordDetailListbyGameType(CustTpBetRecordDetailListbyGameTypeReq custTpBetRecordDetailListbyGameTypeReq)
+        public ApiListResult<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(CustTpBetRecordDetailListbyGameTypeReq custTpBetRecordDetailListbyGameTypeReq)
         {
-            var apiResult = new ApiResult<IEnumerable<TpBetRecordDetailbyGameType>>();
-            apiResult.ErrorCode = 0;
-            apiResult.Data = paymentBLL.GetCustTpBetRecordDetailListbyGameType(custTpBetRecordDetailListbyGameTypeReq.CustId, custTpBetRecordDetailListbyGameTypeReq.selDate, custTpBetRecordDetailListbyGameTypeReq.gameTypeId);
+            var apiResult = new ApiListResult<TpBetRecordDetailbyGameType>();
+            int PageSize = custTpBetRecordDetailListbyGameTypeReq.PageSize;
+            int TotalPages = 0;
+            int RowCount = 0;
+            int PageNumber = custTpBetRecordDetailListbyGameTypeReq.PageNumber;
 
+            apiResult.ErrorCode = 0;
+            apiResult.Data = paymentBLL.GetCustTpBetRecordDetailListbyGameType(custTpBetRecordDetailListbyGameTypeReq.CustId, custTpBetRecordDetailListbyGameTypeReq.selDate, custTpBetRecordDetailListbyGameTypeReq.gameTypeId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            apiResult.PageNumber = PageNumber;
+            apiResult.RowCount = RowCount;
+            apiResult.TotalPages = TotalPages;
             return apiResult;
         }
         [HttpPost]
