@@ -1,0 +1,43 @@
+import { number_format } from '../../commJS/common';
+
+const Result = (props) => {
+    let rows = props.Datas.length === 0 ? <tr><td>No Data.</td><td /><td /><td /><td /><td /><td /></tr> : props.Datas.map((d, dIdx) => {
+        return (
+            <tr key={`result-${dIdx}`}>
+                <td>{d.transId}</td>
+                <td>{d.bonusCode}</td>
+                <td>{number_format(d.turnOver)}</td>
+                <td>{number_format(d.validBet)}</td>
+                <td>{number_format(d.winlostAmount)}</td>
+                <td>{moment(d.transTime).format('l LTS')}</td>
+                <td>{moment(d.settledTime).format('l LTS')}</td>
+            </tr>
+        )
+    })
+    return (
+        <>
+            <div className="table">
+                <label class="col-form-label d-block">Bet Record Log By Game</label>
+                <table className="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Trans Id</th>
+                            <th>Bonus Code</th>
+                            <th>Turnover</th>
+                            <th>Valid Bet</th>
+                            <th>WinLoss</th>
+                            <th>Trans Time</th>
+                            <th>Settled Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {rows}
+                    </tbody>
+                </table>
+                <button type="button" className="btn btn-back" onClick={props.ClickBack.bind(null, "category")} style={{ marginTop: '1rem' }}>Back</button>
+            </div>
+        </>
+    )
+}
+
+export default Result;
