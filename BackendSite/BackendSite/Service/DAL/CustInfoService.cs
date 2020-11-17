@@ -20,7 +20,7 @@ namespace BackendSite.Service.DAL
 
         public Customer GetCustInfo(int custId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.QueryFirstOrDefault<Customer>("Customer_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
         }
 
@@ -39,8 +39,8 @@ namespace BackendSite.Service.DAL
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var result = conn.Query<CustInfoDetail>("Admin_CustInfoSearchV2_Get_test", p, commandType: CommandType.StoredProcedure);
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var result = conn.Query<CustInfoDetail>("Admin_CustInfoSearch_Get", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -56,8 +56,8 @@ namespace BackendSite.Service.DAL
             }
             var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TpUserName = TpUserName, TransId = transId, Email = Email, PhoneNo = PhoneNo, StartDate = startDate, EndDate = endDate, SiteList = siteList, AffId });
 
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExportV2_Get_test", p, commandType: CommandType.StoredProcedure);
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get", p, commandType: CommandType.StoredProcedure);
             return custInfoDetailList;
         }
 

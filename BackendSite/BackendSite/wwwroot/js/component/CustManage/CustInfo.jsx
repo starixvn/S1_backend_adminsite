@@ -12,6 +12,7 @@ import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
 import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
 import { BankLog } from './CustInfo_BankLog.jsx';
 import DateTimePicker from 'react-datetime';
+import TpBetRecord from './TpBetRecord/index';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -1346,7 +1347,7 @@ import DateTimePicker from 'react-datetime';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
         constructor(props) {
@@ -1842,33 +1843,35 @@ import DateTimePicker from 'react-datetime';
             } else if (TabName == this._Tabs[3]) {
                 dataContainer = <RebateLog GetRebateLog={this.GetRebateLog.bind(this)} searchData={this.state.RebateLogData} RebateLog={this.state.RebateLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[4]) {
-                dataContainer = <DepositInfo GetDepositListByCust={this.GetDepositListByCust.bind(this)} searchData={this.state.DepositListData} DepositList={this.state.DepositList} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <TpBetRecord />
             } else if (TabName == this._Tabs[5]) {
-                dataContainer = <TpTransferInfo GetTpTransferInfoByCust={this.GetTpTransferInfoByCust.bind(this)} searchData={this.state.TpTransferInfoData} TpTransferInfo={this.state.TpTransferInfo} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <DepositInfo GetDepositListByCust={this.GetDepositListByCust.bind(this)} searchData={this.state.DepositListData} DepositList={this.state.DepositList} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[6]) {
-                dataContainer = <WithdrawalInfo GetWithdrawalListByCust={this.GetWithdrawalListByCust.bind(this)} searchData={this.state.WithdrawalListData} WithdrawalInfo={this.state.WithdrawalInfo} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <TpTransferInfo GetTpTransferInfoByCust={this.GetTpTransferInfoByCust.bind(this)} searchData={this.state.TpTransferInfoData} TpTransferInfo={this.state.TpTransferInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[7]) {
-                dataContainer = <AdjustmentInfo GetAdjustmentInfoByCust={this.GetAdjustmentInfoByCust.bind(this)} searchData={this.state.AdjustmentInfoData} AdjustmentInfo={this.state.AdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <WithdrawalInfo GetWithdrawalListByCust={this.GetWithdrawalListByCust.bind(this)} searchData={this.state.WithdrawalListData} WithdrawalInfo={this.state.WithdrawalInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[8]) {
-                dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <AdjustmentInfo GetAdjustmentInfoByCust={this.GetAdjustmentInfoByCust.bind(this)} searchData={this.state.AdjustmentInfoData} AdjustmentInfo={this.state.AdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[9]) {
-                dataContainer = <ResetPwd />;
+                dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[10]) {
-                dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)} SetCustNote={this.SetCustNote.bind(this)} />;
+                dataContainer = <ResetPwd />;
             } else if (TabName == this._Tabs[11]) {
-                dataContainer = <PersonalMsg />
+                dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)} SetCustNote={this.SetCustNote.bind(this)} />;
             } else if (TabName == this._Tabs[12]) {
-                dataContainer = <TurnoverReport />
+                dataContainer = <PersonalMsg />
             } else if (TabName == this._Tabs[13]) {
-                dataContainer = <AdminUserLog GetAdminUserLogByCust={this.GetAdminUserLogByCust.bind(this)} searchData={this.state.AdminUserLogData} AdminUserLog={this.state.AdminUserLog} onChangeValue={this.onChangeValue.bind(this)} />
+                dataContainer = <TurnoverReport />
             } else if (TabName == this._Tabs[14]) {
+                dataContainer = <AdminUserLog GetAdminUserLogByCust={this.GetAdminUserLogByCust.bind(this)} searchData={this.state.AdminUserLogData} AdminUserLog={this.state.AdminUserLog} onChangeValue={this.onChangeValue.bind(this)} />
+            } else if (TabName == this._Tabs[15]) {
                 dataContainer = <BankLog GetBankLog={this.GetBankLog.bind(this)} searchData={this.state.BankLogData} />
             }
 
             let authSubKeys = {
-                9: 'ca_resetpwd',
-                11: 'ca_personalMsg',
-                12: 'ca_turnoverReport'
+                10: 'ca_resetpwd',
+                12: 'ca_personalMsg',
+                13: 'ca_turnoverReport'
             }
 
             var tabBtn = this._Tabs.filter((item, index) => {

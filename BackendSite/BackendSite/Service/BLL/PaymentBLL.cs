@@ -73,9 +73,9 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetCustTpBetRecordListbyCategoryId(custId, selDate, categoryId);
         }
-        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, long selDate, int gameTypeId)
+        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, long selDate, int gameTypeId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
-            return walletService.GetCustTpBetRecordDetailListbyGameType(custId, selDate, gameTypeId);
+            return walletService.GetCustTpBetRecordDetailListbyGameType(custId, selDate, gameTypeId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
         }
     }
 }
