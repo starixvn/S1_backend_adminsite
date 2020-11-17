@@ -47,6 +47,7 @@ namespace BackendSite.Service.DAL
                     var rebateList = conn.Query<PromotionRebate1>("Admin_PromotionRebate_Get", new { BonusCode, SiteId }, transaction: trans, commandType: CommandType.StoredProcedure);
                     foreach(var s in promotion.Specific)
                     {
+                        s.VN_AffIds = string.Join(',', JsonConvert.DeserializeObject<string[]>(s.VN_AffIds));
                         s.RebateList = rebateList.Where(x => x.CurrencyId == s.CurrencyId);
                     }
                 }
@@ -102,7 +103,8 @@ namespace BackendSite.Service.DAL
                         Details = specific.Details,
                         RequiredAmount = specific.RequiredAmount,
                         LockedType = specific.LockedType,
-                        MinPayout = specific.MinPayout
+                        MinPayout = specific.MinPayout,
+                        VN_AffIds = JsonConvert.SerializeObject(specific.VN_AffIds.Split(","))
                     });
                 }
 
