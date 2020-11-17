@@ -24,7 +24,7 @@ namespace BackendSite.Service.DAL
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                string SpName = "Admin_Currency_Get";
+                string SpName = "Common_Currency_Get";
                 return conn.Query<CurrencyModel>(SpName, commandType: CommandType.StoredProcedure);
             }
         }
