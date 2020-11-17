@@ -44,9 +44,9 @@ module.exports = {
 		// "Finance/WithdrawalLimitAdjust.min": [
 		// 	"./src/pages/Finance/WithdrawalLimitAdjust/index.js"
 		// ],
-		"CSD/PersonalMsgBatch.min": [
-			"./src/pages/CSD/PersonalMsgBatch/index.js"
-		],
+		//"CSD/PersonalMsgBatch.min": [
+		//	"./src/pages/CSD/PersonalMsgBatch/index.js"
+		//],
 		// "Marketing/PointLevelList.min": [
 		// 	"./src/pages/Marketing/PointLevelManagement/index.js"
 		// ],
@@ -90,6 +90,9 @@ module.exports = {
 		// 	// '@babel/polyfill',
 		// 	"./src/pages/Marketing/RebateInfoReport/index.js"
 		// ],
+		"Report/MainFinancialReport.min": [
+			"./src/pages/Report/MainFinancialReport/index.js"
+		],
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
