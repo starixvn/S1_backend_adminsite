@@ -6,12 +6,12 @@ const Result = (props) => {
         return (
             <tr key={`result-${dIdx}`}>
                 <td>{d.transId}</td>
-                <td>{d.bonusCode}</td>
                 <td>{number_format(d.turnOver)}</td>
                 <td>{number_format(d.validBet)}</td>
                 <td>{number_format(d.winlostAmount)}</td>
                 <td>{moment(d.transTime).format('l LTS')}</td>
                 <td>{moment(d.settledTime).format('l LTS')}</td>
+                <td>{d.bonusCode}</td>
             </tr>
         )
     })
@@ -23,12 +23,12 @@ const Result = (props) => {
                     <thead>
                         <tr>
                             <th>Trans Id</th>
-                            <th>Bonus Code</th>
                             <th>Turnover</th>
                             <th>Valid Bet</th>
                             <th>WinLoss</th>
                             <th>Trans Time</th>
                             <th>Settled Time</th>
+                            <th>Bonus Code</th>
                         </tr>
                     </thead>
                     <tbody>
