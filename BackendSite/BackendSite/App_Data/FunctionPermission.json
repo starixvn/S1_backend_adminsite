@@ -6,6 +6,11 @@
         "DisplayKey": "Win Lost Report",
         "FuncKey": "LicWinLost/Report",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Main Financial Report",
+        "FuncKey": "Report/MainFinancialReport",
+        "Enable": false
       }
     ]
   },
@@ -165,7 +170,7 @@
         "DisplayKey": "Deposit Limit Management",
         "FuncKey": "Finance/DepositLimitManage",
         "Enable": false
-      } ,
+      },
       {
         "DisplayKey": "3RD Funds Adjustment",
         "FuncKey": "Finance/ThirdPartyAdjustment",

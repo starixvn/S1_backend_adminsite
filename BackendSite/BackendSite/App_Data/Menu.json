@@ -24,6 +24,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Main Financial Report",
+        "FuncKey": "Report/MainFinancialReport",
+        "Controller": "Report",
+        "Action": "MainFinancialReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
@@ -180,7 +190,7 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      } ,
+      },
       {
         "Key": "",
         "Title": "3RD Funds Adjustment",
