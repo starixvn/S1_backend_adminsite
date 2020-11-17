@@ -128,6 +128,10 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.GetCustPhotoId(custId);
         }
+        public int SetCustPhotoId(int custId, int siteId, string picFileName, byte[] photoIdPic)
+        {
+            return custInfoService.SetCustPhotoId(custId, siteId, picFileName, photoIdPic);
+        }
         public bool DelCustPhotoId(int custId)
         {
             return custInfoService.DelCustPhotoId(custId);
