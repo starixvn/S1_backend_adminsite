@@ -770,6 +770,7 @@ import TpBetRecord from './TpBetRecord/index';
             super(props);
             this.state = {};
         }
+        EditFiled = (v, datacolumn) => { this.setState({ ...this.state, [datacolumn]: v }); };
 
         componentDidMount() {
             let _clipboard = new ClipboardJS(".js-copy");
@@ -828,6 +829,34 @@ import TpBetRecord from './TpBetRecord/index';
                         }
                     }.bind(this)).catch(function (error) {
                         //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
+        onNewUpload() {
+            if (confirm('Are you sure upload New Photo ?')) {
+                if (!this.state.file) { return alert("Please choose one Photo！"); }
+                Loading.OnLoading();
+                let data = this.props.CustInfoData;
+                let settings = { headers: { 'content-type': 'multipart/form-data' } }
+                let file = document.getElementById("uploadfile").files[0];
+                let formData = new FormData();
+                formData.append("File", file, file.name);
+                formData.append('CustId', parseInt(data.custId));
+
+
+                axios.post('/api/CustManage/UploadCustPhotoId', formData, settings)
+                    .then(function (response) {
+                        Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.props.onGetCustInfoDetail();
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        Loading.UnLoading();
                         alert(error);
                     }.bind(this));
             }
@@ -1335,10 +1364,45 @@ import TpBetRecord from './TpBetRecord/index';
                             {data.RebateInfo != null ? <RebateInfo RebateInfo={data.RebateInfo} /> : null}
                             {data.BonusWallet != null ? <BonusWallet BonusWallet={data.BonusWallet} /> : null}
                             {promotions}
-                            {data.hasPhotoId ? <div className="id-image">
-                                <img src={"/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" />
-                                <button className="btn btn-delete" disabled={data.isKyc} onClick={!data.isKyc ? this.onAskReupload.bind(this) : null}>Ask Re-Upload</button>
-                            </div> : null}
+
+                            <div className="table-responsive-md table">
+                                <span class="label">Photo</span>
+                                <table className="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Cust Photo</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {data.hasPhotoId ?
+                                            <tr>
+                                                <td>
+                                                    <div className="id-image">
+                                                        <img src={"/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" />
+
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <button className="btn btn-delete" disabled={data.isKyc} onClick={!data.isKyc ? this.onAskReupload.bind(this) : null}>Ask Re-Upload</button>
+                                                </td>
+                                            </tr>
+                                            :
+                                            <tr>
+                                                <td>
+                                                    <input id="uploadfile" className="form-control" type="file" accept=".png, .jpg, .jpeg" onChange={(e) => { this.EditFiled(e.target.value, 'file') }} disabled={data.isKyc} value={this.state.file} />
+                                                </td>
+                                                <td>
+                                                    <button className="btn btn-add" disabled={data.isKyc} onClick={!data.isKyc ? this.onNewUpload.bind(this) : null}>Upload</button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+
                         </div>
                         {tpWallet}
                     </div>

@@ -16,15 +16,15 @@ module.exports = {
         // "js/component/Finance/PaymentAdjustment.min": [
         //     '../BackendSite/wwwroot/js/component/Finance/PaymentAdjustment.jsx'
         // ],
-        "js/component/CustManage/CustInfo.min": [
-            '../BackendSite/wwwroot/js/component/CustManage/CustInfo.jsx'
-        ],
+        //"js/component/CustManage/CustInfo.min": [
+        //    '../BackendSite/wwwroot/js/component/CustManage/CustInfo.jsx'
+        //],
         // "js/component/CustManage/CustInfoList.min": [
         //     '../BackendSite/wwwroot/js/component/CustManage/CustInfoList.jsx'
         // ],
         // "js/component/Marketing/PointLevelList.min": [
         //     '../BackendSite/wwwroot/js/component/Marketing/PointLevelList.jsx'
-        // ]
+        // ],
     },
     output: {
         path: path.resolve(__dirname, '../BackendSite/wwwroot/'),
