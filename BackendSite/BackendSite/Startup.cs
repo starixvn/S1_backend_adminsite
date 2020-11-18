@@ -74,6 +74,7 @@ namespace BackendSite
             services.AddSingleton<HomeService>();
             services.AddSingleton<BonusManageService>();
             services.AddSingleton<NewsServices>();
+            services.AddSingleton<RebateManageService>();
             //var dal = AppDomain.CurrentDomain.GetAssemblies()
             //           .SelectMany(t => t.GetTypes())
             //           .Where(t => t.IsClass && t.Namespace == "BackendSite.Service.DAL");
@@ -111,6 +112,8 @@ namespace BackendSite
             services.AddSingleton<HomeBLL>();
             services.AddSingleton<BonusManageBLL>();
             services.AddSingleton<NewsBLL>();
+            services.AddSingleton<RebateManageBLL>();
+            
             // var bll = AppDomain.CurrentDomain.GetAssemblies()
             //.SelectMany(t => t.GetTypes())
             //.Where(t => t.IsClass && t.Namespace == "BackendSite.Service.BLL");
