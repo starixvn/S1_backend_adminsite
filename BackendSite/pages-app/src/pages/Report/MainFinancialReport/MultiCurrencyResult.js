@@ -10,35 +10,76 @@ const dataColumnDefs = () => {
         },
         {
             columnTitle: 'Currency',
-            dataColumn: "currencyId"
+            dataColumn: "isoCode"
         },
         {
             columnTitle: 'Deposit',
-            dataColumn: "deposit"
+            body:{
+                attr:{
+                    class:"text-right"
+                },
+                format:numberFormat
+            },
         },
         {
             columnTitle: 'Withdrawal',
-            dataColumn: "withdrawal"
+            dataColumn: "withdrawal",
+            body:{
+                attr:{
+                    class:"text-right"
+                },
+                format:numberFormat
+            }
         },
         {
             columnTitle: 'Bonus',
-            dataColumn: "bonus"
+            dataColumn: "bonus",
+            body:{
+                attr:{
+                    class:"text-right"
+                },
+                format:numberFormat
+            }
         },
         {
             columnTitle: 'Rebate',
-            dataColumn: "rebate"
+            dataColumn: "rebate",
+            body:{
+                attr:{
+                    class:"text-right"
+                },
+                format:numberFormat
+            }
         },
         {
             columnTitle: 'Adjustment',
-            dataColumn: "adjustment"
+            dataColumn: "adjustment",
+            body:{
+                attr:{
+                    class:"text-right"
+                },
+                format:numberFormat
+            }
         },
         {
             columnTitle: 'TurnOver',
-            dataColumn: "turnOver"
+            dataColumn: "turnOver",
+            body:{
+                attr:{
+                    class:"text-right"
+                },
+                format:numberFormat
+            }
         },
         {
             columnTitle: 'WinLoss',
-            dataColumn: "winLoss"
+            dataColumn: "winLoss",
+            body:{
+                attr:{
+                    class:"text-right"
+                },
+                format:numberFormat
+            }
         },
     ]
 }
