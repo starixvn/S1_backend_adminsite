@@ -28,11 +28,11 @@ const App = () => {
 		};
 		WebAPI.PostData(param).then(res => {
 			if (isMountedRef.current) {
-				if (res.data.errorCode === 0) {
+				if (res.data.errorCode === 0) {					
 					dispatch({
 						type: defActionType.SET_PROMOTION_LIST,
 						promotionList: res.data.data
-					});
+					});					
 				} else {
 					alert(res.data.message ?? "failed to get data.");
 				}
@@ -72,7 +72,7 @@ const App = () => {
 		}
 	};
 
-	const SetPromotion = promotion => {
+	const SetPromotion = promotion => {		
 		if (!processing) {
 			if (isMountedRef.current) {
 				setProcessing(true);
@@ -99,7 +99,7 @@ const App = () => {
 							Status: info.tpGames[t.value]?.status ? Number(info.tpGames[t.value].status) : 0,
 						}
 					}) : null;
-
+					
 					return {
 						CurrencyId: s,
 						Usage: info.usage ? Number(info.usage) : 0,
@@ -113,7 +113,8 @@ const App = () => {
 						LockedType: info.lockedType,
 						BeenUsed: info.beenUsed,
 						RebateList: tpGame,
-						MinPayout: Number(info.minPayout)
+						MinPayout: Number(info.minPayout),
+						VN_Affids: info.affid
 					};
 				});
 
@@ -134,7 +135,7 @@ const App = () => {
 				Specific: _specific,
 				PeriodType: Number(promotion.periodType) ? Number(promotion.periodType) : 0,
 				PeriodDay: Number(promotion.periodType) === 2 ? Number(promotion.periodWeek) : Number(promotion.periodType) === 3 ? Number(promotion.periodMonth) : 0,
-				RedeemHours: Number(promotion.redeemHours) ? Number(promotion.redeemHours) : 0
+				RedeemHours: Number(promotion.redeemHours) ? Number(promotion.redeemHours) : 0				
 			};
 			let param = {
 				Url: "BonusManage/SetPromotion",

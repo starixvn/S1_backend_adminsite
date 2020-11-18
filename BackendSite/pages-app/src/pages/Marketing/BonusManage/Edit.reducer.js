@@ -86,6 +86,7 @@ const initLang = {
 };
 
 const initSpecific = {
+	affid: "",
 	usage: "0",
 	rollOver: "",
 	bonusAmountType: null,
@@ -139,6 +140,8 @@ const SetSpecific = (currencyList, langList, data) => {
 			Object.keys(initSpecific).forEach(k => {
 				if (k === "bonusAmountType") {
 					_newData[k] = d.bonusType;
+				}else if (k === "affid") {
+					_newData[k] = d.vN_AffIds;
 				} else {
 					_newData[k] = d[k] ?? "";
 				}
