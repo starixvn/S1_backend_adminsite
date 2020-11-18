@@ -78,9 +78,7 @@ namespace BackendSite.Service.BLL
 
             }
 
-            var adjustmentData = CaculateAdjstmentAmount(reportList["Adjustment"]);
-
-            foreach (var data in adjustmentData)
+            foreach (var data in reportList["Adjustment"])
             {
                 MainFinancialModel mainFinancialModel = null;
 
@@ -148,32 +146,5 @@ namespace BackendSite.Service.BLL
             return Data;
         }
 
-        /// <summary>
-        /// Caculate Adjust
-        /// </summary>
-        /// <param name="partcialSummeries"></param>
-        /// <returns></returns>
-        private List<PartcialSummeryModel> CaculateAdjstmentAmount(IEnumerable<PartcialSummeryModel> partcialSummeries)
-        {
-            List<PartcialSummeryModel> result = new List<PartcialSummeryModel>();
-            var dates = partcialSummeries.Select(x => x.Date).Distinct();
-            var debitData = partcialSummeries.Where(x => x.AdjustType == AdjustType.Debit);
-            var creditData = partcialSummeries.Where(x => x.AdjustType == AdjustType.Credit);
-            int currencyId = partcialSummeries.Select(x => x.CurrencyId).FirstOrDefault();
-
-            foreach (var date in dates)
-            {
-                PartcialSummeryModel partcialSummery = new PartcialSummeryModel();
-                partcialSummery.Date = date;
-                partcialSummery.CurrencyId = currencyId;
-                partcialSummery.Summary = debitData.Where(x => x.Date == date).Select(x => x.Summary).Sum()
-                                       - creditData.Where(x => x.Date == date).Select(x => x.Summary).Sum();
-
-                result.Add(partcialSummery);
-
-            }
-
-            return result;
-        }
     }
 }
