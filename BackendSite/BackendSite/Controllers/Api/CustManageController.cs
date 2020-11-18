@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using LazZiya.ImageResize;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -160,6 +162,70 @@ namespace BackendSite.Controllers.Api
 
             apiResult.Data = data;
             apiResult.ErrorCode = 0;
+
+            return apiResult;
+        }
+
+        private readonly Dictionary<string, System.Drawing.Imaging.ImageFormat> _contentTypesCheck = new Dictionary<string, System.Drawing.Imaging.ImageFormat>(comparer: StringComparer.OrdinalIgnoreCase)
+        {
+            {"image/png",System.Drawing.Imaging.ImageFormat.Png},
+            {"image/jpeg",System.Drawing.Imaging.ImageFormat.Jpeg},
+            { "image/gif",System.Drawing.Imaging.ImageFormat.Gif}
+        };
+
+        [HttpPost]
+        public ApiResult UploadCustPhotoId([FromForm] int CustId, [FromForm] IFormFile File)
+        {
+            decimal xSize = 500m;
+            var apiResult = new ApiResult();
+            var custInfo = custInfoBLL.GetCustInfoWithCache(CustId);
+            decimal xCell = 1;
+            if (_contentTypesCheck.ContainsKey(File.ContentType))
+            {
+                using var fileStream = File.OpenReadStream();
+                using var uploadedImage = Image.FromStream(fileStream);
+                using var ms = new System.IO.MemoryStream();
+
+                if (uploadedImage.Width > xSize || uploadedImage.Height > xSize)
+                {
+
+                    if (uploadedImage.Width > uploadedImage.Height)
+                    {
+                        xCell = xSize / uploadedImage.Width;
+                    }
+                    else
+                    {
+                        xCell = xSize / uploadedImage.Height;
+                    }
+
+                }
+
+                var graphicOptions = new GraphicOptions();
+                graphicOptions.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
+                graphicOptions.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+                var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
+                img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                string fileName = File.FileName;
+                fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
+                fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
+
+                byte[] fileBytes = ms.ToArray();
+                var result = custInfoBLL.SetCustPhotoId(custInfo.CustId, custInfo.SiteId, fileName, fileBytes);
+
+                if (result > 0)
+                {
+                    apiResult.ErrorCode = 0;
+                }
+                else
+                {
+                    apiResult.ErrorCode = -1;
+                }
+            }
+            else
+            {
+
+            }
 
             return apiResult;
         }

@@ -53,8 +53,9 @@ const ThirdPartyAdjustment = lazy(() =>
 	import("./pages/Finance/ThirdPartyAdjustment/index")
 );
 const NewsManage = lazy(() => import("./pages/Marketing/NewsManage/index"));
+const MainFinancialReport = lazy(() => import("./pages/Report/MainFinancialReport/index"));
 
-export const defaultPage = "PersonalMsgBatch";
+export const defaultPage = "MainFinancialReport";
 
 export const layoutType = {
 	N88: "N88",
@@ -331,5 +332,18 @@ export const pages = {
 			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
 		],
 		layout: layoutType.N88
-	}
+	},
+	MainFinancialReport: {
+		comp: (
+			<Suspense fallback="loading...">
+				<MainFinancialReport />
+			</Suspense>
+		),
+		css: [
+			"./lib/bootstrap/dist/css/bootstrap.min.css",
+			"./css/css/main.css",
+			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
+		],
+		layout: layoutType.N88
+	},
 };
