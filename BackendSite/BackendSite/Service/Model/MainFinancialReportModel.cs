@@ -56,17 +56,23 @@ namespace BackendSite.Service.Model
             set;
         }
 
-        //public decimal TurnOver
-        //{
-        //    get;
-        //    set;
-        //}
+        public decimal TurnOverStake
+        {
+            get;
+            set;
+        }
 
-        //public decimal WinLoss
-        //{
-        //    get;
-        //    set;
-        //}
+        public decimal TurnOverValidBet
+        {
+            get;
+            set;
+        }
+
+        public decimal WinLoss
+        {
+            get;
+            set;
+        }
     }
 
     public class PartcialSummeryModel
@@ -83,13 +89,40 @@ namespace BackendSite.Service.Model
             set;
         }
 
-        public AdjustType AdjustType
+        public decimal Summary
+        {
+            get;
+            set;
+        }
+    }
+
+    public class TurnoverAndWinlossSummeryModel
+    {
+        public DateTime Date
         {
             get;
             set;
         }
 
-        public decimal Summary
+        public int CurrencyId
+        {
+            get;
+            set;
+        }
+
+        public decimal StakeSummary
+        {
+            get;
+            set;
+        }
+
+        public decimal ValidBetSummary
+        {
+            get;
+            set;
+        }
+
+        public decimal WinlostSummary
         {
             get;
             set;

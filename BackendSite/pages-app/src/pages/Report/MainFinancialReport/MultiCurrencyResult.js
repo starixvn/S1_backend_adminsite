@@ -62,8 +62,18 @@ const dataColumnDefs = () => {
             }
         },
         {
-            columnTitle: 'TurnOver',
-            dataColumn: "turnOver",
+            columnTitle: 'TurnOver(Stake)',
+            dataColumn: "turnOverStake",
+            body:{
+                attr:{
+                    class:"text-right"
+                },
+                format:numberFormat
+            }
+        },
+        {
+            columnTitle: 'TurnOver(ValidBet)',
+            dataColumn: "turnOverValidBet",
             body:{
                 attr:{
                     class:"text-right"
@@ -133,10 +143,6 @@ const Panel = (props) => {
             </table>
         </div>
     )
-}
-
-const dateFormat = (createTime) => {
-    return moment(createTime).format('l LTS');
 }
 
 const numberFormat = (number) => {
