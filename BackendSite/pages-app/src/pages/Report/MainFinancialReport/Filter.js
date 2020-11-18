@@ -79,11 +79,7 @@ const Panel = (props) => {
                         }
                     }}
                 />
-            </div>
-            <div className="row-flex">
-                <div className="button-group">
-                    <button className="btn btn-search" type="submit" onClick={props.ClickSubmit}>Submit</button>
-                </div>
+                <button className="btn btn-search" type="submit" onClick={props.ClickSubmit}>Submit</button>
             </div>
         </div>
     )

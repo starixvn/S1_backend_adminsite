@@ -33,6 +33,11 @@ namespace BackendSite.Service.BLL
                                                                   startDate,
                                                                   endDate);
 
+            var turnoverAndWinlossList = reportService.GetTurnoverAndWinlossSummary(siteIds,
+                                                                  currencyId,
+                                                                  startDate,
+                                                                  endDate);
+
             var currencyList = reportService.GetCurrencyList();
             ;
             #region Data Combine
@@ -136,6 +141,28 @@ namespace BackendSite.Service.BLL
                 mainFinancialModel = keyValuePairs[$"{dateFormat}-{data.CurrencyId}"];
 
                 mainFinancialModel.Rebate = data.Summary;
+            }
+
+            foreach(var data in turnoverAndWinlossList)
+            {
+                MainFinancialModel mainFinancialModel = null;
+
+                dateFormat = data.Date.ToString("yyyy/MM/dd");
+
+                if (!keyValuePairs.ContainsKey($"{dateFormat}-{data.CurrencyId}"))
+                {
+                    mainFinancialModel = new MainFinancialModel();
+                    keyValuePairs.Add($"{dateFormat}-{data.CurrencyId}", mainFinancialModel);
+                    mainFinancialModel.IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
+                    mainFinancialModel.CurrencyId = data.CurrencyId;
+                    mainFinancialModel.Date = dateFormat;
+                }
+
+                mainFinancialModel = keyValuePairs[$"{dateFormat}-{data.CurrencyId}"];
+
+                mainFinancialModel.TurnOverStake = data.StakeSummary;
+                mainFinancialModel.TurnOverValidBet = data.ValidBetSummary;
+                mainFinancialModel.WinLoss = data.WinlostSummary;
             }
 
             #endregion

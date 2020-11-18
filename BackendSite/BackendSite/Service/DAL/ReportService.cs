@@ -82,5 +82,26 @@ namespace BackendSite.Service.DAL
 
             return partcialSummeryModels;
         }
+
+        public IEnumerable<TurnoverAndWinlossSummeryModel> GetTurnoverAndWinlossSummary(string siteIds,
+                                                                                        int currency,
+                                                                                        long startDate,
+                                                                                        long endDate)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                    SiteIds = siteIds,
+                    Currency = currency,
+                    StartDate = startDate,
+                    EndDate = endDate
+                });
+
+                string SpName = "Admin_ReportTurnOverAndWinlost_GroupByDay_Get";
+                return conn.Query<TurnoverAndWinlossSummeryModel>(SpName, parameters,commandType: CommandType.StoredProcedure);
+            }
+        }
     }
 }

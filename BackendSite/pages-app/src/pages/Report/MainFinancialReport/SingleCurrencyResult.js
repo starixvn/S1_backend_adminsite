@@ -62,26 +62,36 @@ const dataColumnDefs = () => {
                 format:numberFormat
             }
         },
-        // {
-        //     columnTitle: 'TurnOver',
-        //     dataColumn: "turnOver",
-        // body:{
-        //     attr:{
-        //         class:"text-right"
-        //     },
-        //     format:numberFormat
-        // }
-        // },
-        // {
-        //     columnTitle: 'WinLoss',
-        //     dataColumn: "winLoss",
-        // body:{
-        //     attr:{
-        //         class:"text-right"
-        //     },
-        //     format:numberFormat
-        // }
-        // },
+        {
+            columnTitle: 'TurnOver(Stake)',
+            dataColumn: "turnOverStake",
+        body:{
+            attr:{
+                class:"text-right"
+            },
+            format:numberFormat
+        }
+        },
+        {
+            columnTitle: 'TurnOver(ValidBet)',
+            dataColumn: "turnOverValidBet",
+        body:{
+            attr:{
+                class:"text-right"
+            },
+            format:numberFormat
+        }
+        },
+        {
+            columnTitle: 'WinLoss',
+            dataColumn: "winLoss",
+        body:{
+            attr:{
+                class:"text-right"
+            },
+            format:numberFormat
+        }
+        },
     ]
 }
 
@@ -134,10 +144,6 @@ const Panel = (props) => {
             </table>
         </div>
     )
-}
-
-const dateFormat = (createTime) => {
-    return moment(createTime).format('l LTS');
 }
 
 const numberFormat = (number) => {
