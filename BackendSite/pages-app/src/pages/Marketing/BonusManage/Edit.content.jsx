@@ -397,6 +397,14 @@ const SubPanel = props => {
 					(props.state.promotionType == 8) ?
 						null : (
 							<>
+									<InputBox
+										Title="Affid"
+										ClassName="form-group"
+										inputClass="form-control"
+										OnChange={props.EditMainValue}
+										dataColumn="affid"
+										value={props.state.specific[props.currencyId].affid}
+									/>
 								<div className="row-flex">
 									<InputBox
 										Type="Number"
