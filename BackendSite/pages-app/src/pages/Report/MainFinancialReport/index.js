@@ -81,6 +81,10 @@ const App = () => {
             alert("Please Choose at least one Site")
             return false;
         }
+        if (stateFilter.Currency === 0) {
+            alert("Please Choose at least one currency")
+            return false;
+        }
         let param = {
             Url: 'Report/GetMainFinancialReport',
             Data: qs.stringify({

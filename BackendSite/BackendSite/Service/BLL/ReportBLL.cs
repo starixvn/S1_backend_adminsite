@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,7 @@ namespace BackendSite.Service.BLL
                                                                   endDate);
 
             var currencyList = reportService.GetCurrencyList();
-;
+            ;
             #region Data Combine
 
             foreach (var data in reportList["Deposit"])
@@ -144,5 +145,6 @@ namespace BackendSite.Service.BLL
 
             return Data;
         }
+
     }
 }
