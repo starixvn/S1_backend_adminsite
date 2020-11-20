@@ -37,6 +37,7 @@ namespace BackendSite.Service.Model
     {
         public int GroupID { get; set; }
         public string GroupName { get; set; }
+        public int LevelBase { get; set; }
         public decimal Percentage { get; set; }
         public DateTime CreateTime { set; get; }
         public DateTime LastUpdateTime { set; get; }

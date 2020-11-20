@@ -393,7 +393,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var authData = authorizeBLL.GetAuthData();
-                rebateManageBLL.SetRebateCategory(setRebateGameTypeReq.SiteId, setRebateGameTypeReq.GameType, setRebateGameTypeReq.GroupID, setRebateGameTypeReq.Percentage, authData.UserName);
+                rebateManageBLL.SetRebateGameType(setRebateGameTypeReq.SiteId, setRebateGameTypeReq.GameType, setRebateGameTypeReq.GroupID, setRebateGameTypeReq.Percentage, authData.UserName);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -430,15 +430,15 @@ namespace BackendSite.Controllers.Api
         public class DelRebateGameTypeReq
         {
             public int SiteId { get; set; }
-            public int CategoryId { get; set; }
             public int GameType { get; set; }
+            public int GroupID { get; set; }
         }
         public ApiResult DelRebateGameType(DelRebateGameTypeReq delRebateGameTypeReq)
         {
             var apiResult = new ApiResult();
             try
             {
-                rebateManageBLL.DelRebateCategory(delRebateGameTypeReq.SiteId, delRebateGameTypeReq.GameType, delRebateGameTypeReq.GroupID);
+                rebateManageBLL.DelRebateGameType(delRebateGameTypeReq.SiteId, delRebateGameTypeReq.GameType, delRebateGameTypeReq.GroupID);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
