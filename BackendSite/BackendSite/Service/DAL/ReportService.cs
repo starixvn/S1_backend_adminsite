@@ -88,7 +88,7 @@ namespace BackendSite.Service.DAL
                                                                                         long startDate,
                                                                                         long endDate)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
                 var parameters = new DynamicParameters(
                 new
