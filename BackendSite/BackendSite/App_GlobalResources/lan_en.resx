@@ -606,4 +606,7 @@
   <data name="lbl_PromotionType8" xml:space="preserve">
     <value>Advertising</value>
   </data>
+  <data name="Currency_96" xml:space="preserve">
+    <value>USDT</value>
+  </data>
 </root>
