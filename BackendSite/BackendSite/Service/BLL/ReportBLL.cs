@@ -20,8 +20,9 @@ namespace BackendSite.Service.BLL
             this.selLangBLL = selLangBLL;
         }
 
-        public IEnumerable<MainFinancialModel> GetMainFinancialReport(string siteIds,
-                                                                      int currencyId,
+        public IEnumerable<MainFinancialModel> GetMainFinancialReport(IEnumerable<int> CurrencyIds,
+                                                                      string siteIds,
+                                                                      string currencyIds,
                                                                       long startDate,
                                                                       long endDate)
         {
@@ -29,17 +30,17 @@ namespace BackendSite.Service.BLL
             string dateFormat = string.Empty;
 
             var reportList = reportService.GetMainFinancialReport(siteIds,
-                                                                  currencyId,
+                                                                  currencyIds,
                                                                   startDate,
                                                                   endDate);
 
             var turnoverAndWinlossList = reportService.GetTurnoverAndWinlossSummary(siteIds,
-                                                                  currencyId,
+                                                                  currencyIds,
                                                                   startDate,
                                                                   endDate);
 
             var currencyList = reportService.GetCurrencyList();
-            ;
+
             #region Data Combine
 
             foreach (var data in reportList["Deposit"])
@@ -163,6 +164,29 @@ namespace BackendSite.Service.BLL
                 mainFinancialModel.TurnOverStake = data.StakeSummary;
                 mainFinancialModel.TurnOverValidBet = data.ValidBetSummary;
                 mainFinancialModel.WinLoss = data.WinlostSummary;
+            }
+
+            #endregion
+
+            #region 補0
+
+            List<string> dateList = keyValuePairs.Select(s => s.Value).Select(x => x.Date).Distinct().ToList();
+
+            foreach (var curr in CurrencyIds)
+            {
+                foreach(var date in dateList)
+                {
+                    MainFinancialModel mainFinancialModel = null;
+
+                    if (!keyValuePairs.ContainsKey($"{date}-{curr}"))
+                    {
+                        mainFinancialModel = new MainFinancialModel();
+                        keyValuePairs.Add($"{date}-{curr}", mainFinancialModel);
+                        mainFinancialModel.IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+                        mainFinancialModel.CurrencyId = curr;
+                        mainFinancialModel.Date = date;
+                    }
+                }
             }
 
             #endregion

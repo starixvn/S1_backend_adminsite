@@ -19,6 +19,7 @@
     "react-bootstrap-multiselect": "^2.4.1",
     "react-datetime": "^2.16.3",
     "react-dom": "^16.12.0",
+    "react-multi-select-component": "^3.0.7",
     "react-redux": "^7.2.0",
     "react-scripts": "^3.4.1",
     "redux": "^4.0.5",

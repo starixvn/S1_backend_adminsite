@@ -1,14 +1,16 @@
-import React from "react";
+import React,{useState} from "react";
 import moment from 'moment';
 import DateTimePicker from "react-datetime";
+import MultiSelect from "react-multi-select-component";
 
 if (process.env.NODE_ENV !== 'production') {
-    window.gCurrencyList = [2, 4, 13, 15, 51];
+    window.gCurrencyList = [2, 4, 13, 15, 51, 96];
     window.i18n = { "lbl_Currency2": "MYR", 
                     "lbl_Currency4": "THB", 
                     "lbl_Currency13": "RMB", 
                     "lbl_Currency15": "IDR", 
-                    "lbl_Currency51": "VND" };
+                    "lbl_Currency51": "VND",
+                    "lbl_Currency96": "USDT" };
 }
 
 const Panel = (props) => {
@@ -36,13 +38,12 @@ const Panel = (props) => {
                         />
                         : null
                 }
-                <DropDownBox 
-                    columnTitle="Currency"
-                    options={window.gCurrencyList.map(curr=>{return {displayText:window.i18n["lbl_Currency"+curr], value:curr}})}
-                    hasAll={true}
-                    selectedValue={2}
-                    dataColumn="Currency"
-                    onChange={props.onChange}
+                <CurrencyElem
+                columnTitle="Currency"
+                options={window.gCurrencyList.map(curr=>{return {label:window.i18n["lbl_Currency"+curr], value:curr}})}
+                dataColumn="CurrencyIds"
+                onChange={props.onChange}
+                Currencies={props.filterInfo.Currency}
                 />
                 <DateTimePickerElem
                     columnTitle="From Date"
@@ -85,29 +86,44 @@ const Panel = (props) => {
     )
 }
 
-const DropDownBox = (props) => {
-    const onChange = (e) => {
-        if (props.onChange) {
-            props.onChange(e.target.value, props.dataColumn);
-        }
-    }
-    let optionRows = props.options.map(item => {
+const CurrencyElem = ({columnTitle, options, onChange, Currencies}) => {
+
+     const OnSelect = value=>{
+        
+        onChange(value, "Currency");
+        
+     }
+
+     const itemRenderer = ({ checked, option, onClick, disabled }) => {
         return (
-            <option key={`${props.ColumnTitle}-${item.value}`} value={item.value}>{item.displayText}</option>
-        )
-    });
+          <div>
+            <input style={{ height: '15px',width:'20px' }}
+              id={option.label}
+               type="checkbox"
+               onChange={onClick}
+               checked={checked}
+            />
+            <label htmlFor={option.label}>{option.label}</label>
+          </div>
+        );
+      };
+
     return (
-        <div className="input-item">
-            <span className="label">{props.columnTitle}</span>
-            <div className="field">
-                <select defaultValue={props.selectedValue} onChange={onChange}>
-                    {/* {props.hasAll ? <option value="0">Plase Choose...</option> : null} */}
-                    {optionRows}
-                </select>
-            </div>
+      <div className="input-item" style={{width:'200px'}}>
+          <span className="label">{columnTitle}</span>
+          <div className="field">
+          <MultiSelect
+            disableSearch={"true"}
+            options={options}
+            value={Currencies}
+            onChange={OnSelect}
+            labelledBy={"Select"}
+            ItemRenderer={itemRenderer}
+        />
         </div>
-    )
-}
+      </div>
+    );
+  };
 
 const DateTimePickerElem = (props) => {
     return (

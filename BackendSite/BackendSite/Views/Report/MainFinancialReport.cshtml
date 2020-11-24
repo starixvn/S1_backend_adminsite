@@ -1,7 +1,6 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using Microsoft.AspNetCore.Hosting
 @using BackendSite.Service.BLL
-@using BackendSite.Service.Model.enums
 @inject IWebHostEnvironment environment
 @inject SelLangBLL selLangBLL
 @inject ServerInfoBLL serverInfoBLL
@@ -26,16 +25,9 @@
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
 
-    var typeList = new Dictionary<int, string>();
-    foreach (var value in Enum.GetValues(typeof(PromotionType)))
-    {
-        var _value = (int)value;
-        typeList.Add(_value, selLangBLL.GetResourceValue($"lbl_PromotionType{_value}") ?? _value.ToString());
-    }
 }
 
 <div id="content"></div>
-
 
 @section Scripts {
     <script>
@@ -43,7 +35,6 @@
         window.RootUrl = '@Url.Content("~/api")';
         window.LangCode = 'en'
         window.gCurrencyList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(currencyList));
-        window.gTypeList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(typeList));
     </script>
     <script src="~/lib/bootstrap-multiselect/bootstrap-multiselect.js"></script>
     <script src="~/js/component/Report/MainFinancialReport.min.js" asp-append-version="true"></script>

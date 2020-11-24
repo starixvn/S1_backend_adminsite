@@ -1,152 +1,268 @@
-import React from "react";
-import moment from 'moment';
-import { number_format, number_toFixed } from '../../../module/Formatting/NumberFormat';
+import React, { useState } from "react";
+import { AgGridReact } from 'ag-grid-react';
+import { AllCommunityModules } from "@ag-grid-community/all-modules";
+import "@ag-grid-community/all-modules/dist/styles/ag-grid.css";
+import "@ag-grid-community/all-modules/dist/styles/ag-theme-blue.css";
 
-const dataColumnDefs = () => {
+const defaultColDef = {
+    sortable: true
+}
+
+const dataColumnDefs = (props) => {
     return [
         {
-            columnTitle: 'Date',
-            dataColumn: "date"
+            headerName: 'Date',
+            field: "date",
+        },
+        // {
+        //     columnTitle: 'Currency',
+        //     dataColumn: "isoCode"
+        // },
+        {
+            headerName: "Deposit",
+            children: [
+                // {
+                //     headerName: "Total in MYR",
+                //     field: "depositSummary",
+                //     width: 200,
+                //     columnGroupShow: "closed",
+                // },
+                ...props.CurrencyList.map(curr => {
+                    return (
+                        {
+                            headerName: curr.code,
+                            field: `deposit_${curr.id}`,
+                            // columnGroupShow: "open",
+                        }
+                    )
+                })
+            ]
         },
         {
-            columnTitle: 'Currency',
-            dataColumn: "isoCode"
+            headerName: 'Withdrawal',
+            children: [
+                // {
+                //     headerName: "Total in MYR",
+                //     field: "withdrawalSummary",
+                //     width: 200,
+                //     columnGroupShow: "closed",
+                // },
+                ...props.CurrencyList.map(curr => {
+                    return (
+                        {
+                            headerName: curr.code,
+                            field: `withdrawal_${curr.id}`,
+                            // columnGroupShow: "open",
+                        }
+                    )
+                })
+            ]
         },
         {
-            columnTitle: 'Deposit',
-            body:{
-                attr:{
-                    class:"text-right"
-                },
-                format:numberFormat
-            },
+            headerName: "Bonus",
+            children: [
+                // {
+                //     headerName: "Total in MYR",
+                //     field: "bonusSummary",
+                //     width: 200,
+                //     columnGroupShow: "closed",
+                // },
+                ...props.CurrencyList.map(curr => {
+                    return (
+                        {
+                            headerName: curr.code,
+                            field: `bonus_${curr.id}`,
+                            // columnGroupShow: "open",
+                        }
+                    )
+                })
+            ]
         },
         {
-            columnTitle: 'Withdrawal',
-            dataColumn: "withdrawal",
-            body:{
-                attr:{
-                    class:"text-right"
-                },
-                format:numberFormat
-            }
+            headerName: "Rebate",
+            children: [
+                // {
+                //     headerName: "Total in MYR",
+                //     field: "rebateSummary",
+                //     width: 200,
+                //     columnGroupShow: "closed",
+                // },
+                ...props.CurrencyList.map(curr => {
+                    return (
+                        {
+                            headerName: curr.code,
+                            field: `rebate_${curr.id}`,
+                            // columnGroupShow: "open",
+                        }
+                    )
+                })
+            ]
         },
         {
-            columnTitle: 'Bonus',
-            dataColumn: "bonus",
-            body:{
-                attr:{
-                    class:"text-right"
-                },
-                format:numberFormat
-            }
+            headerName: "Adjustment",
+            children: [
+                // {
+                //     headerName: "Total in MYR",
+                //     field: "adjustmentSummary",
+                //     width: 200,
+                //     columnGroupShow: "closed",
+                // },
+                ...props.CurrencyList.map(curr => {
+                    return (
+                        {
+                            headerName: curr.code,
+                            field: `adjustment_${curr.id}`,
+                            // columnGroupShow: "open",
+                        }
+                    )
+                })
+            ]
         },
         {
-            columnTitle: 'Rebate',
-            dataColumn: "rebate",
-            body:{
-                attr:{
-                    class:"text-right"
-                },
-                format:numberFormat
-            }
+            headerName: "TurnOver(Stake)",
+            children: [
+                // {
+                //     headerName: "Total in MYR",
+                //     field: "turnOverStakeSummary",
+                //     width: 200,
+                //     columnGroupShow: "closed",
+                // },
+                ...props.CurrencyList.map(curr => {
+                    return (
+                        {
+                            headerName: curr.code,
+                            field: `turnOverStake_${curr.id}`,
+                            // columnGroupShow: "open",
+                        }
+                    )
+                })
+            ]
         },
         {
-            columnTitle: 'Adjustment',
-            dataColumn: "adjustment",
-            body:{
-                attr:{
-                    class:"text-right"
-                },
-                format:numberFormat
-            }
+            headerName: "TurnOver(ValidBet)",
+            children: [
+                // {
+                //     headerName: "Total in MYR",
+                //     field: "turnOverValidBetSummary",
+                //     width: 200,
+                //     columnGroupShow: "closed",
+                // },
+                ...props.CurrencyList.map(curr => {
+                    return (
+                        {
+                            headerName: curr.code,
+                            field: `turnOverValidBet_${curr.id}`,
+                            // columnGroupShow: "open",
+                        }
+                    )
+                })
+            ]
         },
         {
-            columnTitle: 'TurnOver(Stake)',
-            dataColumn: "turnOverStake",
-            body:{
-                attr:{
-                    class:"text-right"
-                },
-                format:numberFormat
-            }
-        },
-        {
-            columnTitle: 'TurnOver(ValidBet)',
-            dataColumn: "turnOverValidBet",
-            body:{
-                attr:{
-                    class:"text-right"
-                },
-                format:numberFormat
-            }
-        },
-        {
-            columnTitle: 'WinLoss',
-            dataColumn: "winLoss",
-            body:{
-                attr:{
-                    class:"text-right"
-                },
-                format:numberFormat
-            }
-        },
+            headerName: "WinLoss",
+            children: [
+                // {
+                //     headerName: "Total in MYR",
+                //     field: "winLossSummary",
+                //     width: 200,
+                //     columnGroupShow: "closed",
+                // },
+                ...props.CurrencyList.map(curr => {
+                    return (
+                        {
+                            headerName: curr.code,
+                            field: `winLoss_${curr.id}`,
+                            // columnGroupShow: "open",
+                        }
+                    )
+                })
+            ]
+        }
     ]
 }
 
 const Panel = (props) => {
-    const columnDefs = dataColumnDefs();
-    let headerRows = [];
 
-    columnDefs.forEach((element, idx) => {
-        headerRows.push(
-            <th key={`th-${element.dataColumn}-${idx}`} scope="col" className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''}>
-                {element.columnTitle}
-            </th>
-        );
+    // console.log("multi-props",props.Datas);
+
+    // const columnDefs = dataColumnDefs(props);
+    // let headerRows = [];
+
+    // columnDefs.forEach((element, idx) => {
+    //     headerRows.push(
+    //         <th key={`th-${element.dataColumn}-${idx}`} scope="col" className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''}>
+    //             {element.columnTitle}
+    //         </th>
+    //     );
+    // });
+
+    // let bodyRows = props.Datas.map((data, idx) => {
+    //     let row = columnDefs.map((element, idx) => {
+    //         let subData = {};
+    //         if (element.body && element.body.subData) {
+    //             element.body.subData.forEach(s => { subData[s] = data[s] });
+    //         }
+    //         return (
+    //             <td key={`td-${element.dataColumn}-${idx}`} className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}>
+    //                 {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
+    //             </td>
+    //         );
+    //     });
+
+
+
+    //     return (
+    //         <tr key={`result-body-${idx}`}>
+    //             {row}
+    //         </tr>
+    //     )
+    // });
+
+    const [stateData, setData] = useState({
+        Datas: props.Datas,
+        // TotalDatas:props.TotalDatas
     });
-    
-    let bodyRows = props.Datas.map((data, idx) => {
-        let row = columnDefs.map((element, idx) => {
-            let subData = {};
-            if (element.body && element.body.subData) {
-                element.body.subData.forEach(s => { subData[s] = data[s] });
-            }
-            return (
-                <td key={`td-${element.dataColumn}-${idx}`} className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}>
-                    {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
-                </td>
-            );
+
+    // const [gridApi, setGridApi] = useState(null);
+    // const [gridColumnApi, setGridColumnApi] = useState(null);
+    const onGridReady = (params) => {
+        setData({
+            Datas:props.Datas,
+            // TotalDatas:props.TotalDatas
         });
+        // setGridApi(params.api);
+        // setGridColumnApi(params.columnApi);
 
-        return (
-            <tr key={`result-body-${idx}`}>
-                {row}
-            </tr>
-        )
-    });
-
+        // params.api.sizeColumnsToFit();
+        // console.log(params);
+    }
     return (
-        <div className="table">
+        <div id="myGrid" className="ag-theme-blue table" style={{ height: '500px' }}>
             <div className="table-options">
                 <button type="button" className="btn btn-approved" onClick={props.ExportToExcel}>Export Excel</button>
             </div>
-            <table className="table table-striped">
-                <thead>
-                    <tr>
-                        {headerRows}
-                    </tr>
-                </thead>
-                <tbody>
-                    {bodyRows}
-                </tbody>
-            </table>
+            <AgGridReact
+                modules={AllCommunityModules}
+                columnDefs={dataColumnDefs(props)}
+                defaultColDef={defaultColDef}
+                debug={false}
+                rowData={stateData.Datas}
+                onGridReady={onGridReady}
+                minColWidth={150}
+                // rowHeight={20}
+            />
+            {/* <div style={{ height: '50%' }} className="ag-theme-balham">
+                <AgGridReact
+                    modules={AllCommunityModules}
+                    columnDefs={columnTotalDefs(props)}
+                    defaultColDef={defaultColDef}
+                    debug={false}
+                    rowData={stateData.TotalDatas}
+                    onGridReady={onGridReady}
+                />
+            </div> */}
         </div>
     )
-}
-
-const numberFormat = (number) => {
-    return number_format(number_toFixed(number, 2));
 }
 
 export default Panel;

@@ -30,7 +30,7 @@ namespace BackendSite.Service.DAL
         }
 
         public Dictionary<string, IEnumerable<PartcialSummeryModel>> GetMainFinancialReport(string siteIds,
-                                                                      int currency,
+                                                                      string currencyIds,
                                                                       long startDate, 
                                                                       long endDate)
         {
@@ -40,7 +40,7 @@ namespace BackendSite.Service.DAL
                 new
                 {
                     SiteIds = siteIds,
-                    Currency = currency,
+                    CurrencyIds = currencyIds,
                     StartDate = startDate,
                     EndDate = endDate
                 });
@@ -84,7 +84,7 @@ namespace BackendSite.Service.DAL
         }
 
         public IEnumerable<TurnoverAndWinlossSummeryModel> GetTurnoverAndWinlossSummary(string siteIds,
-                                                                                        int currency,
+                                                                                        string currencyIds,
                                                                                         long startDate,
                                                                                         long endDate)
         {
@@ -94,7 +94,7 @@ namespace BackendSite.Service.DAL
                 new
                 {
                     SiteIds = siteIds,
-                    Currency = currency,
+                    CurrencyIds = currencyIds,
                     StartDate = startDate,
                     EndDate = endDate
                 });

@@ -14,6 +14,19 @@ namespace BackendSite.Service.BLL
         public string SheetName { get; set; }
         public IEnumerable<Dictionary<string, dynamic>> Content { get; set; }
         public List<string> Titles { get; set; }
+
+    }
+
+    public class ExportReportDataToExcel : ExportDataToExcel
+    {
+        public List<string> TitlesNameToDisplay { get; set; }
+
+        public List<string> TotalTitles { get; set; }
+
+        public Dictionary<string, int> TitlesToMerge { get; set; }
+
+        public List<string> NotSummaryTitles { get; set; }
+
     }
 
     public class ExcelBLL
@@ -29,24 +42,29 @@ namespace BackendSite.Service.BLL
             using var p = new ExcelPackage(ms);
             if (t.Any())
             {
-                foreach(var s in t)
+                foreach (var s in t)
                 {
                     var ws = p.Workbook.Worksheets.Add(s.SheetName);
                     if (s.Content.Any())
                     {
-                        ExportBody(ws, s.Content, s.Titles);
-                        ExportHeader(ws, s.Titles);
+                        ExportBody(ws, s.Content, s.Titles, 2,totalTitles: new List<string>());
+                        ExportHeader(ws, s.Titles, 1);
                     }
                 }
             }
-            
+
             p.Save();
             return ms.ToArray();
         }
 
-        private void ExportBody(ExcelWorksheet ws, IEnumerable<Dictionary<string, dynamic>> data, List<string> titles)
+        private void ExportBody(ExcelWorksheet ws,
+                                IEnumerable<Dictionary<string, dynamic>> data,
+                                List<string> titles,
+                                int currentRow,
+                                List<string> totalTitles,
+                                bool isSummary = false,
+                                List<string> notSummaryTitles = null)
         {
-            var currentRow = 2;
             for (var i = 0; i < data.Count(); i++)
             {
                 var bt = data.ElementAt(i);
@@ -54,9 +72,9 @@ namespace BackendSite.Service.BLL
                 {
                     var value = item.Value;
                     var colName = item.Key;
-                    if (titles.Any(x=> string.Equals(x, colName, StringComparison.OrdinalIgnoreCase)))
+                    if (titles.Any(x => string.Equals(x, colName, StringComparison.OrdinalIgnoreCase)))
                     {
-                        var colIdx = titles.IndexOf(colName)+1;
+                        var colIdx = titles.IndexOf(colName) + 1;
                         if (value != null && colName == "DateTime" && ((DateTime)value).Year > 1)
                         {
                             var time = new DateTimeOffset((DateTime)value);
@@ -65,19 +83,132 @@ namespace BackendSite.Service.BLL
                         }
                         else
                         {
-                            ws.Cells[currentRow, colIdx].Value = value;
+                            if (totalTitles.Contains(colName))
+                            {
+                                ws.Cells[currentRow, colIdx].Value = value;
+
+                                ws.Cells[currentRow, colIdx].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                ws.Cells[currentRow, colIdx].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#CFCFCF"));
+                            }
+                            else
+                            {
+                                ws.Cells[currentRow, colIdx].Value = value;
+                            }
                         }
                     }
                 }
 
                 currentRow++;
             }
+
+            if (isSummary)
+            {
+                #region Total Data
+
+                Dictionary<string, dynamic> totaldata = new Dictionary<string, dynamic>();
+
+                for (var i = 0; i < data.Count(); i++)
+                {
+                    var bt = data.ElementAt(i);
+
+                    foreach (var item in bt)
+                    {
+                        var value = item.Value;
+                        var colName = item.Key;
+
+                        var getItem = totaldata.TryGetValue(colName, out dynamic total);
+
+                        if (getItem)
+                        {
+                            if (!notSummaryTitles.Contains(colName))
+                            {
+                                totaldata[colName] = (decimal)total + value;
+                            }
+                        }
+                        else
+                        {
+                            totaldata.Add(colName, value);
+                        }
+
+                    }
+                }
+
+                #endregion
+
+                foreach (var item in totaldata)
+                {
+                    var value = item.Value;
+                    var colName = item.Key;
+
+                    if (titles.Any(x => string.Equals(x, colName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        var colIdx = titles.IndexOf(colName) + 1;
+                        if (colIdx == 1)
+                        {
+                            ws.Cells[currentRow, colIdx].Value = "TOTAL：";
+                        }
+                        else
+                        {
+                            ws.Cells[currentRow, colIdx].Value = value;
+                        }
+
+                        ws.Cells[currentRow, colIdx].Style.Border.Bottom.Style = ExcelBorderStyle.Double;
+                        ws.Cells[currentRow, colIdx].Style.Border.Top.Style = ExcelBorderStyle.Medium;
+
+                        ws.Cells[currentRow, colIdx].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        ws.Cells[currentRow, colIdx].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#FFFF80"));
+
+
+                    }
+                }
+            }
         }
 
-        private void ExportHeader(ExcelWorksheet ws, IEnumerable<string> titles)
+        private void ExportHeader(ExcelWorksheet ws,
+                                  IEnumerable<string> titles,
+                                  int currentRow,
+                                  bool isReport = false)
         {
-            SetHeader(ws, titles, 1);
+            if (isReport)
+            {
+                SetHeaderForReport(ws, titles, currentRow);
+            }
+            else
+            {
+                SetHeader(ws, titles, currentRow);
+            }
         }
+
+        public byte[] ExportToMultiSheetForReport(List<ExportReportDataToExcel> t)
+        {
+            using var ms = new MemoryStream();
+            using var p = new ExcelPackage(ms);
+            if (t.Any())
+            {
+                foreach (var s in t)
+                {
+                    var ws = p.Workbook.Worksheets.Add(s.SheetName);
+                    if (s.Content.Any())
+                    {
+                        ExportBody(ws, s.Content, s.Titles, 3, s.TotalTitles,true, s.NotSummaryTitles);
+                        if (s.TitlesNameToDisplay.Any())
+                        {
+                            ExportHeader(ws, s.TitlesNameToDisplay, 2, true);
+                        }
+                        else
+                        {
+                            ExportHeader(ws, s.Titles, 2, true);
+                        }
+                        ExportMergeRowHeader(ws, s.TitlesToMerge);
+                    }
+                }
+            }
+
+            p.Save();
+            return ms.ToArray();
+        }
+
+        #region Export Data Methods
 
         public byte[] Export<T>(IEnumerable<T> t) where T : notnull, new()
         {
@@ -135,6 +266,15 @@ namespace BackendSite.Service.BLL
             //ws.View.FreezePanes(2, 1);
         }
 
+        private void ExportMergeRowHeader(ExcelWorksheet ws, Dictionary<string, int> mergeTitles)
+        {
+            SetMergeHeaderForReport(ws, mergeTitles, 1);
+        }
+
+        #endregion
+
+        #region Set Data Methods
+
         public void SetHeader(ExcelWorksheet ws, IEnumerable<string> titles, int currentRow)
         {
             for (var i = 0; i < titles.Count(); i++)
@@ -147,5 +287,62 @@ namespace BackendSite.Service.BLL
                 ws.Column(i + 1).AutoFit();
             }
         }
+
+        public void SetHeaderForReport(ExcelWorksheet ws, IEnumerable<string> titles, int currentRow)
+        {
+            for (var i = 0; i < titles.Count(); i++)
+            {
+                var cell = ws.Cells[currentRow, i + 1];
+                cell.Value = titles.ElementAt(i);
+
+                cell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+
+                cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+
+                cell.Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
+                cell.Style.Border.Top.Style = ExcelBorderStyle.Medium;
+                cell.Style.Border.Left.Style = ExcelBorderStyle.Medium;
+                cell.Style.Border.Right.Style = ExcelBorderStyle.Medium;
+
+                ws.Column(i + 1).AutoFit();
+            }
+        }
+
+        public void SetMergeHeaderForReport(ExcelWorksheet ws, Dictionary<string, int> mergeTitles, int currentRow)
+        {
+            int cellCount = 1;
+            for (var i = 0; i < mergeTitles.Count(); i++)
+            {
+                var cell = ws.Cells[currentRow, cellCount];
+                cell.Value = mergeTitles.ElementAt(i).Key;
+
+                //Cell Merging
+                ws.Cells[1, cellCount, 1, cellCount + mergeTitles.ElementAt(i).Value - 1].Merge = true;
+
+                //Style  Setting
+                cell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+
+                if (i % 2 == 1)
+                {
+                    cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                }
+                else
+                {
+                    cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#E8C1B7"));
+                }
+
+                cell.Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
+                cell.Style.Border.Top.Style = ExcelBorderStyle.Medium;
+                cell.Style.Border.Left.Style = ExcelBorderStyle.Medium;
+                cell.Style.Border.Right.Style = ExcelBorderStyle.Medium;
+
+                ws.Column(i + 1).AutoFit();
+                cellCount = cellCount + mergeTitles.ElementAt(i).Value;
+            }
+        }
+
+        #endregion
     }
 }
