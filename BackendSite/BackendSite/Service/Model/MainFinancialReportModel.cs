@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BackendSite.Service.Model.enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -55,17 +56,23 @@ namespace BackendSite.Service.Model
             set;
         }
 
-        //public decimal TurnOver
-        //{
-        //    get;
-        //    set;
-        //}
+        public decimal TurnOverStake
+        {
+            get;
+            set;
+        }
 
-        //public decimal WinLoss
-        //{
-        //    get;
-        //    set;
-        //}
+        public decimal TurnOverValidBet
+        {
+            get;
+            set;
+        }
+
+        public decimal WinLoss
+        {
+            get;
+            set;
+        }
     }
 
     public class PartcialSummeryModel
@@ -83,6 +90,39 @@ namespace BackendSite.Service.Model
         }
 
         public decimal Summary
+        {
+            get;
+            set;
+        }
+    }
+
+    public class TurnoverAndWinlossSummeryModel
+    {
+        public DateTime Date
+        {
+            get;
+            set;
+        }
+
+        public int CurrencyId
+        {
+            get;
+            set;
+        }
+
+        public decimal StakeSummary
+        {
+            get;
+            set;
+        }
+
+        public decimal ValidBetSummary
+        {
+            get;
+            set;
+        }
+
+        public decimal WinlostSummary
         {
             get;
             set;

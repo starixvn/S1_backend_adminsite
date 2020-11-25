@@ -30,7 +30,7 @@ namespace BackendSite.Service.DAL
         }
 
         public Dictionary<string, IEnumerable<PartcialSummeryModel>> GetMainFinancialReport(string siteIds,
-                                                                      int currency,
+                                                                      string currencyIds,
                                                                       long startDate, 
                                                                       long endDate)
         {
@@ -40,7 +40,7 @@ namespace BackendSite.Service.DAL
                 new
                 {
                     SiteIds = siteIds,
-                    Currency = currency,
+                    CurrencyIds = currencyIds,
                     StartDate = startDate,
                     EndDate = endDate
                 });
@@ -81,6 +81,27 @@ namespace BackendSite.Service.DAL
             conn.Close();
 
             return partcialSummeryModels;
+        }
+
+        public IEnumerable<TurnoverAndWinlossSummeryModel> GetTurnoverAndWinlossSummary(string siteIds,
+                                                                                        string currencyIds,
+                                                                                        long startDate,
+                                                                                        long endDate)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                    SiteIds = siteIds,
+                    CurrencyIds = currencyIds,
+                    StartDate = startDate,
+                    EndDate = endDate
+                });
+
+                string SpName = "Admin_ReportTurnOverAndWinlost_GroupByDay_Get";
+                return conn.Query<TurnoverAndWinlossSummeryModel>(SpName, parameters,commandType: CommandType.StoredProcedure);
+            }
         }
     }
 }
