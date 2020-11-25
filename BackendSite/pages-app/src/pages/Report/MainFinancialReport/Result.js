@@ -1,6 +1,5 @@
 import React from "react";
 import moment from 'moment';
-import { number_format, number_toFixed } from '../../../module/Formatting/NumberFormat';
 
 const dataGroupColumnDefs = () => {
     return [
@@ -53,7 +52,8 @@ const dataColumnDefs = (props) => {
             dataColumn: "depositSummary",
             body:{
                 attr:{
-                    class:"text-right"
+                    class:"text-right",
+                    bgcolor:"LightGray"
                 },
             }
         },
@@ -73,7 +73,8 @@ const dataColumnDefs = (props) => {
             dataColumn: "withdrawalSummary",
             body:{
                 attr:{
-                    class:"text-right"
+                    class:"text-right",
+                    bgcolor:"LightGray"
                 },
             }
         },
@@ -93,7 +94,8 @@ const dataColumnDefs = (props) => {
             dataColumn: "bonusSummary",
             body:{
                 attr:{
-                    class:"text-right"
+                    class:"text-right",
+                    bgcolor:"LightGray"
                 },
             }
         },
@@ -113,7 +115,8 @@ const dataColumnDefs = (props) => {
             dataColumn: "rebateSummary",
             body:{
                 attr:{
-                    class:"text-right"
+                    class:"text-right",
+                    bgcolor:"LightGray"
                 },
             }
         },
@@ -133,7 +136,8 @@ const dataColumnDefs = (props) => {
             dataColumn: "adjustmentSummary",
             body:{
                 attr:{
-                    class:"text-right"
+                    class:"text-right",
+                    bgcolor:"LightGray"
                 },
             }
         },
@@ -153,7 +157,8 @@ const dataColumnDefs = (props) => {
             dataColumn: "turnOverStakeSummary",
             body:{
                 attr:{
-                    class:"text-right"
+                    class:"text-right",
+                    bgcolor:"LightGray"
                 },
             }
         },
@@ -173,7 +178,8 @@ const dataColumnDefs = (props) => {
             dataColumn: "turnOverValidBetSummary",
             body:{
                 attr:{
-                    class:"text-right"
+                    class:"text-right",
+                    bgcolor:"LightGray"
                 },
             }
         },
@@ -193,172 +199,8 @@ const dataColumnDefs = (props) => {
             dataColumn: "winLossSummary",
             body:{
                 attr:{
-                    class:"text-right"
-                },
-            }
-        },
-    ]
-}
-
-const dataTotalColumnDefs = (props) => {
-    return [
-        ...props.CurrencyList.map(curr=>{
-            return({
-                columnTitle: `${curr.code}`,
-                dataColumn: `deposit_${curr.id}`,
-                body:{
-                    attr:{
-                        class:"text-right"
-                    }
-                }
-            })
-        }),
-        {
-            columnTitle: 'Total in MYR',
-            dataColumn: "depositSummary",
-            body:{
-                attr:{
-                    class:"text-right"
-                },
-            }
-        },
-        ...props.CurrencyList.map(curr=>{
-            return({
-                columnTitle: `${curr.code}`,
-                dataColumn: `withdrawal_${curr.id}`,
-                body:{
-                    attr:{
-                        class:"text-right"
-                    },
-                }
-            })
-        }),
-        {
-            columnTitle: 'Total in MYR',
-            dataColumn: "withdrawalSummary",
-            body:{
-                attr:{
-                    class:"text-right"
-                },
-            }
-        },
-        ...props.CurrencyList.map(curr=>{
-            return({
-                columnTitle: `${curr.code}`,
-                dataColumn: `bonus_${curr.id}`,
-                body:{
-                    attr:{
-                        class:"text-right"
-                    },
-                }
-            })
-        }),
-        {
-            columnTitle: 'Total in MYR',
-            dataColumn: "bonusSummary",
-            body:{
-                attr:{
-                    class:"text-right"
-                },
-            }
-        },
-        ...props.CurrencyList.map(curr=>{
-            return({
-                columnTitle: `${curr.code}`,
-                dataColumn: `rebate_${curr.id}`,
-                body:{
-                    attr:{
-                        class:"text-right"
-                    },
-                }
-            })
-        }),
-        {
-            columnTitle: 'Total in MYR',
-            dataColumn: "rebateSummary",
-            body:{
-                attr:{
-                    class:"text-right"
-                },
-            }
-        },
-        ...props.CurrencyList.map(curr=>{
-            return({
-                columnTitle: `${curr.code}`,
-                dataColumn: `adjustment_${curr.id}`,
-                body:{
-                    attr:{
-                        class:"text-right"
-                    },
-                }
-            })
-        }),
-        {
-            columnTitle: 'Total in MYR',
-            dataColumn: "adjustmentSummary",
-            body:{
-                attr:{
-                    class:"text-right"
-                },
-            }
-        },
-        ...props.CurrencyList.map(curr=>{
-            return({
-                columnTitle: `${curr.code}`,
-                dataColumn: `turnOverStake_${curr.id}`,
-                body:{
-                    attr:{
-                        class:"text-right"
-                    },
-                }
-            })
-        }),
-        {
-            columnTitle: 'Total in MYR',
-            dataColumn: "turnOverStakeSummary",
-            body:{
-                attr:{
-                    class:"text-right"
-                },
-            }
-        },
-        ...props.CurrencyList.map(curr=>{
-            return({
-                columnTitle: `${curr.code}`,
-                dataColumn: `turnOverValidBet_${curr.id}`,
-                body:{
-                    attr:{
-                        class:"text-right"
-                    },
-                }
-            })
-        }),
-        {
-            columnTitle: 'Total in MYR',
-            dataColumn: "turnOverValidBetSummary",
-            body:{
-                attr:{
-                    class:"text-right"
-                },
-            }
-        },
-        ...props.CurrencyList.map(curr=>{
-            return({
-                columnTitle: `${curr.code}`,
-                dataColumn: `winLoss_${curr.id}`,
-                body:{
-                    attr:{
-                        class:"text-right"
-                    },
-                }
-            })
-        }),
-        {
-            columnTitle: 'Total in MYR',
-            dataColumn: "winLossSummary",
-            body:{
-                attr:{
-                    class:"text-right"
+                    class:"text-right",
+                    bgcolor:"LightGray"
                 },
             }
         },
@@ -369,16 +211,16 @@ const Panel = (props) => {
 
     const groupColumnDefs = dataGroupColumnDefs();
     const columnDefs = dataColumnDefs(props);
-    const totalColumnDefs = dataTotalColumnDefs(props);
 
     let groupHeaderRows = [];
     let headerRows = [];
-    let totalRows=[]
-
 
     groupColumnDefs.forEach((element, idx) => {
         groupHeaderRows.push(
-            <th key={`th-${element.dataColumn}-${idx}`} scope="col" className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''} colSpan={props.CurrencyList.length + 1}>
+            <th key={`th-${element.dataColumn}-${idx}`} 
+                scope="col" 
+                className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''} colSpan={props.CurrencyList.length + 1}
+                bgcolor={element.bgcolor}>
                 {element.columnTitle}
             </th>
         );
@@ -391,27 +233,8 @@ const Panel = (props) => {
             </th>
         );
     });
-
-    // let totalRows = props.TotalResult.map((data, idx) => {
-    //     let row = totalColumnDefs.map((element, idx) => {
-    //         let subData = {};
-    //         if (element.body && element.body.subData) {
-    //             element.body.subData.forEach(s => { subData[s] = data[s] });
-    //         }
-    //         return (
-    //             <td key={`td-${element.dataColumn}-${idx}`} className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}>
-    //                 {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
-    //             </td>
-    //         );
-    //     });
-
-    //     return (
-    //         <tr key={`result-body-${idx}`}>
-    //             {row}
-    //         </tr>
-    //     )
-    // });
     
+
     let bodyRows = props.Datas.map((data, idx) => {
         let row = columnDefs.map((element, idx) => {
             let subData = {};
@@ -419,7 +242,9 @@ const Panel = (props) => {
                 element.body.subData.forEach(s => { subData[s] = data[s] });
             }
             return (
-                <td key={`td-${element.dataColumn}-${idx}`} className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}>
+                <td key={`td-${element.dataColumn}-${idx}`} 
+                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                    bgcolor={element.body && element.body.attr && element.body.attr.bgcolor ? element.body.attr.bgcolor : ''}>
                     {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
                 </td>
             );
@@ -432,10 +257,32 @@ const Panel = (props) => {
         )
     });
 
+    let totalRows = props.TotalResult.map((data, idx) => {
+        let row = columnDefs.map((element, idx) => {
+            let subData = {};
+            if (element.body && element.body.subData) {
+                element.body.subData.forEach(s => { subData[s] = data[s] });
+            }
+            return (
+                <th key={`td-${element.dataColumn}-${idx}`} 
+                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                    bgcolor="LemonChiffon">
+                    {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
+                </th>
+            );
+        });
+
+        return (
+            <tr key={`result-body-${idx}`}>
+                {row}
+            </tr>
+        )
+    });
+    
     return (
         <div className="table">
             <div className="table-options">
-                <button type="button" className="btn btn-approved" onClick={props.ExportToExcel}>Export Excel</button>
+                <button type="button" className="btn btn-approved" onClick={props.ExportBtnDisabled ? null : props.ExportToExcel} disabled={props.ExportBtnDisabled}>Export Excel</button>
             </div>
             <table className="table table-striped">
                 <thead>
@@ -449,18 +296,15 @@ const Panel = (props) => {
                 </thead>
                 <tbody>
                     {bodyRows}
-                    {/* <tr>
-                        <th>TOTAL：</th>
-                        {totalRows}
-                    </tr> */}
+                    {totalRows}
                 </tbody>
             </table>
         </div>
     )
 }
 
-const numberFormat = (number) => {
-    return number_format(number_toFixed(number, 2));
-}
+// const numberFormat = (number) => {
+//     return number_format(number_toFixed(number, 2));
+// }
 
 export default Panel;
