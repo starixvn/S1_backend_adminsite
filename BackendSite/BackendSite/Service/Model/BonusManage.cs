@@ -87,5 +87,6 @@ namespace BackendSite.Service.Model
         public Filter[] SiteidFilter { get; set; }
         public Filter[] PromotionTypeFilter { get; set; }
         public bool Status { get; set; }
+        public int[] SiteArray { get; set; }
     }
 }

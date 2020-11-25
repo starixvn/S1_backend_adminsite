@@ -45,11 +45,12 @@ namespace BackendSite.Service.DAL
             }
             string SiteIdFilter = JsonConvert.SerializeObject(SiteIdFilterArray);
             string PromotionTypeFilter = JsonConvert.SerializeObject(PromotionTypeFilterArray);
+            string PermissionSiteIds = JsonConvert.SerializeObject(filterPara.SiteArray);
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 int? SiteId = null;
                 string SpName = "Admin_Promotion_Get";
-                return conn.Query<PromotionInfo>(SpName, new { BonusCode, SiteId, SiteIdFilter, PromotionTypeFilter, Status }, commandType: CommandType.StoredProcedure);
+                return conn.Query<PromotionInfo>(SpName, new { BonusCode, SiteId, SiteIdFilter, PermissionSiteIds, PromotionTypeFilter, Status }, commandType: CommandType.StoredProcedure);
             }
         }
 
@@ -57,11 +58,12 @@ namespace BackendSite.Service.DAL
         {
             string SiteIdFilter = null;
             string PromotionTypeFilter = null;
+            string PermissionSiteIds = null;
             int Status = 0;
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var promotion = conn.Query<PromotionInfo>("Admin_Promotion_Get", new { BonusCode, SiteId, SiteIdFilter, PromotionTypeFilter, Status}, transaction: trans, commandType: CommandType.StoredProcedure).FirstOrDefault();
+            var promotion = conn.Query<PromotionInfo>("Admin_Promotion_Get", new { BonusCode, SiteId, SiteIdFilter, PermissionSiteIds, PromotionTypeFilter, Status}, transaction: trans, commandType: CommandType.StoredProcedure).FirstOrDefault();
             if (promotion != null)
             {
                 promotion.Specific = conn.Query<PromotionSpecific>("Admin_PromotionSpecific_Get", new { BonusCode, SiteId }, transaction: trans, commandType: CommandType.StoredProcedure);

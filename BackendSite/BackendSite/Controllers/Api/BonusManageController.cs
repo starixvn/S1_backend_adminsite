@@ -37,7 +37,9 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var siteList = serverInfoBLL.GetSiteListByLoginUser();
-                apiResult.Data = bonusManageBLL.GetPromotionList(Select).Where(b=> siteList.Any(s=> s.SiteId == b.SiteId));
+                int[] siteArray = siteList.Select(x => x.SiteId).ToArray();
+
+                apiResult.Data = bonusManageBLL.GetPromotionList(siteArray,Select).Where(b=> siteList.Any(s=> s.SiteId == b.SiteId));
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -99,7 +101,9 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var errorCode = bonusManageBLL.SetPromotion(IsAdd, Promotion);
-                apiResult.Data = bonusManageBLL.GetPromotionList();
+                var siteList = serverInfoBLL.GetSiteListByLoginUser();
+                int[] siteArray = siteList.Select(x => x.SiteId).ToArray();
+                apiResult.Data = bonusManageBLL.GetPromotionList(siteArray);
                 apiResult.ErrorCode = errorCode;
                 apiResult.Message = errorCode ==1 ? "The bonus setting already exists which with same promotion-type & product-category." : "";
             }
@@ -149,7 +153,9 @@ namespace BackendSite.Controllers.Api
                 apiResult.Message = ex.Message;
                 apiResult.RawMessage = ex.ToString();
             }
-            apiResult.Data = bonusManageBLL.GetPromotionList();
+            var siteList = serverInfoBLL.GetSiteListByLoginUser();
+            int[] siteArray = siteList.Select(x => x.SiteId).ToArray();
+            apiResult.Data = bonusManageBLL.GetPromotionList(siteArray);
 
             return apiResult;
         }
