@@ -42,6 +42,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 			periodMonth: 1,
 			redeemHours: "",
 			tpGameCategory: [],
+			specialCode:""
 		};
 	} else {
 		let _specific = SetSpecific(
@@ -74,6 +75,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 			periodMonth: datas.periodMonth ? datas.periodMonth : 1,
 			redeemHours: datas.redeemHours,
 			tpGameCategory: [],
+			specialCode:datas.specialCode
 		};
 	}
 };
@@ -118,7 +120,7 @@ const SetSpecific = (currencyList, langList, data) => {
 		});
 		_specific[currency].lang = lang;
 	});
-
+	
 	if (data !== null) {
 		data.forEach(d => {
 			let _newData = {};

@@ -22,22 +22,46 @@ namespace BackendSite.Service.DAL
             this.configuration = configuration;
         }
 
-        public IEnumerable<PromotionInfo> GetPromotionList(string BonusCode)
+        public IEnumerable<PromotionInfo> GetPromotionList(string BonusCode, FilterPara filterPara)
         {
+            int siteidlength = filterPara.SiteidFilter == null ? 0 : filterPara.SiteidFilter.Length;
+            int promotionTypelength = filterPara.PromotionTypeFilter == null ? 0 : filterPara.PromotionTypeFilter.Length;
+            int[] SiteIdFilterArray = new int[siteidlength];
+            int[] PromotionTypeFilterArray = new int[promotionTypelength];
+            int Status = filterPara.Status ? 0 : 2;
+            if (siteidlength > 0)
+            {
+                for (var i = 0; i < filterPara.SiteidFilter.Length; i++)
+                {
+                    SiteIdFilterArray[i] = filterPara.SiteidFilter[i].value;
+                }
+            }
+            if(promotionTypelength > 0)
+            {
+                for (var i = 0; i < filterPara.PromotionTypeFilter.Length; i++)
+                {
+                    PromotionTypeFilterArray[i] = filterPara.PromotionTypeFilter[i].value;
+                }
+            }
+            string SiteIdFilter = JsonConvert.SerializeObject(SiteIdFilterArray);
+            string PromotionTypeFilter = JsonConvert.SerializeObject(PromotionTypeFilterArray);
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 int? SiteId = null;
                 string SpName = "Admin_Promotion_Get";
-                return conn.Query<PromotionInfo>(SpName, new { BonusCode, SiteId }, commandType: CommandType.StoredProcedure);
+                return conn.Query<PromotionInfo>(SpName, new { BonusCode, SiteId, SiteIdFilter, PromotionTypeFilter, Status }, commandType: CommandType.StoredProcedure);
             }
         }
 
         public PromotionInfo GetPromotion(string BonusCode, int SiteId)
         {
+            string SiteIdFilter = null;
+            string PromotionTypeFilter = null;
+            int Status = 0;
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var promotion = conn.Query<PromotionInfo>("Admin_Promotion_Get", new { BonusCode, SiteId }, transaction: trans, commandType: CommandType.StoredProcedure).FirstOrDefault();
+            var promotion = conn.Query<PromotionInfo>("Admin_Promotion_Get", new { BonusCode, SiteId, SiteIdFilter, PromotionTypeFilter, Status}, transaction: trans, commandType: CommandType.StoredProcedure).FirstOrDefault();
             if (promotion != null)
             {
                 promotion.Specific = conn.Query<PromotionSpecific>("Admin_PromotionSpecific_Get", new { BonusCode, SiteId }, transaction: trans, commandType: CommandType.StoredProcedure);
@@ -84,6 +108,7 @@ namespace BackendSite.Service.DAL
             p.Add("RedeemHours", promotion.RedeemHours);
             p.Add("PeriodType", promotion.PeriodType);
             p.Add("PeriodDay", promotion.PeriodDay);
+            p.Add("SpecialCode", promotion.SpecialCode);
             p.Add("ErrorCode", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             conn.Execute("Admin_Promotion_InsUpd", p, transaction: trans, commandType: CommandType.StoredProcedure);

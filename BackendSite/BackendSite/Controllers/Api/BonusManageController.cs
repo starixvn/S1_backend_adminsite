@@ -30,13 +30,14 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> GetPromotionList()
+        public ApiResult<IEnumerable<PromotionInfo>> GetPromotionList([FromForm]PromotionSelect Select)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
+
             try
             {
                 var siteList = serverInfoBLL.GetSiteListByLoginUser();
-                apiResult.Data = bonusManageBLL.GetPromotionList().Where(b=> siteList.Any(s=> s.SiteId == b.SiteId));
+                apiResult.Data = bonusManageBLL.GetPromotionList(Select).Where(b=> siteList.Any(s=> s.SiteId == b.SiteId));
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)

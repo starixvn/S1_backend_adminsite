@@ -209,6 +209,16 @@ export default ({ state, action, IsAdd, processing }) => {
 									/>
 								) : null}
 						</div>)}
+					<div className="filter">
+						<div className="row-flex">
+							<InputBox
+								Title="SpecialCode"
+								OnChange={action.EditMainValue}
+								dataColumn="specialCode"
+								value={state.specialCode}
+							/>	
+						</div>
+					</div>	
 
 				<div className="filter noBGcolor">
 					<CheckBox

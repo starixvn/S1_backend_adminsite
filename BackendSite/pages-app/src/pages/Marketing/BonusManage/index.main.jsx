@@ -2,11 +2,13 @@ import React from "react";
 import moment from "moment";
 import { defWalletType, defPromotionType } from "./defCols";
 import PopBoxContent from "./Component/PopBoxContent";
+import {initPromotionType} from "./defCols";
+import CheckBox from "./Component/Checkbox";
+import MultiSelect from "react-multi-select-component";
 const SpecialItemType = {
 	actionBtn: "actionBtn",
 	statusBtn: "statusBtn"
 };
-
 const promotionTypeFormat = type => {
 	return defPromotionType[type];
 };
@@ -90,19 +92,25 @@ const titleData = [
 	}
 ];
 
-
-
 export default ({
 	ClickCreateBonus,
 	ClickEdit,
 	promotionList,
 	UpdatePromotionStatus,
+	SelectClick,
 	Datas,
 	NewDatas,
 	Action,
-	IsOpen
+	IsOpen,
+	SiteList,
+	StateFilter,
+	SitnemaFilter,
+	PromotionTypeFilter,
+	StatusCheck,
+	SetSitnemaFilter,
+	SetPromotionTypeFilter,
+	StateCheckBox
 }) => {
-
 	let headerRows = [];
 	titleData.forEach((e, i) => {
 		headerRows.push(<th key={`title-${i}`}>{e.columnTitle}</th>);
@@ -143,9 +151,58 @@ export default ({
 		return <tr key={`body-${d_idx}`}>{arr}</tr>;
 	});
 
+	let siteListOptions = "";
+
+    if (StateFilter.SelectSite) {
+        siteListOptions = StateFilter.SelectSite.map(i => {
+            return {
+                value: 1,
+                displayText: "Show ALL"
+            };
+        });
+	};
+
 	return (
-		<div className="container-fluid">
+		<div className="container-fluid">			
 			<h4 className="page-name">Bonus Management</h4>
+			<div className="filter">
+				<div className="row-flex">
+					<pre>  </pre>
+					<p>SiteName</p>
+					<pre>                 </pre>
+					<p>PromotionType</p>
+				</div>
+				<div className="row-flex">
+					<MultiSelect
+						options={GetSelectedSiteName(SiteList)}
+						value={SitnemaFilter}
+						onChange={SetSitnemaFilter}
+						labelledBy={"Select"}
+					/>
+					<pre>              </pre>					
+					<MultiSelect
+						options={GetSelectedPromotionType(initPromotionType)}
+						value={PromotionTypeFilter}
+						onChange={SetPromotionTypeFilter}
+						labelledBy={"Select"}
+					/>
+					<pre>       </pre>
+					<CheckBox
+						Options={siteListOptions}
+						Title=""
+						OnChange={StateCheckBox}
+						dataColumn="checkStatus"
+						Selected={StatusCheck}
+						mainKey={null}
+					/>
+					<button				
+						className="btn btn-search"
+						style={{ marginBottom: "10px" }}
+						onClick={SelectClick}>
+						Search
+					</button>
+				</div>				
+			</div>			
 			<button
 				className="btn btn-add"
 				style={{ marginBottom: "20px" }}
@@ -190,4 +247,24 @@ const ActionButtons = props => {
 			</div>
 		</>
 	);
+};
+const GetSelectedSiteName = (props) =>{
+	let headerRows = [];
+	props.map(x=>{		 
+		headerRows.push({
+			label: x.siteName,
+			value: x.siteId,
+		})
+	 })
+	 return headerRows;
+};
+const GetSelectedPromotionType = (props) =>{
+	let headerRows = [];
+	props.map(x=>{		 
+		headerRows.push({
+			label: x.displayText,
+			value: x.value,
+		})
+	 })
+	 return headerRows;
 };

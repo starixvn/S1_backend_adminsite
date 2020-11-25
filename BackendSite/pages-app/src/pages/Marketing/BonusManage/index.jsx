@@ -15,7 +15,13 @@ import Main from "./index.main";
 const App = () => {
 	const [state, dispatch] = useReducer(reducer, initState);
 	const [processing, setProcessing] = useState(false);
-
+	const [stateFilter, setFilter] = useState({
+        'SelectSite': ['checkStatus']
+	});
+	const [sitnemaFilter,setSitnameFilter] = useState([]);
+	const [promotionTypeFilter,setPromotionTypeFilter] = useState([]);
+	const [statusCheck,setStatusCheck] = useState([]);
+	
 	const isMountedRef = useRef(null);
 	useEffect(() => {
 		isMountedRef.current = true;
@@ -24,7 +30,12 @@ const App = () => {
 
 	useEffect(() => {
 		let param = {
-			Url: "BonusManage/GetPromotionList"
+			Url: "BonusManage/GetPromotionList",
+			Data: qs.stringify({
+				SitnemaFilter: sitnemaFilter,
+				PromotionTypeFilter: promotionTypeFilter,
+				Status: statusCheck
+			})
 		};
 		WebAPI.PostData(param).then(res => {
 			if (isMountedRef.current) {
@@ -32,6 +43,24 @@ const App = () => {
 					dispatch({
 						type: defActionType.SET_PROMOTION_LIST,
 						promotionList: res.data.data
+					});					
+				} else {
+					alert(res.data.message ?? "failed to get data.");
+				}
+			}
+		});
+	}, []);
+
+	useEffect(() => {
+		let param = {
+			Url: "Marketing/GetAllSites"
+		};
+		WebAPI.fetchData(param).then(res => {
+			if (isMountedRef.current) {
+				if (res.data.errorCode === 0) {					
+					dispatch({
+						type: defActionType.SET_SITE_LIST,
+						siteList: res.data.data
 					});					
 				} else {
 					alert(res.data.message ?? "failed to get data.");
@@ -135,7 +164,8 @@ const App = () => {
 				Specific: _specific,
 				PeriodType: Number(promotion.periodType) ? Number(promotion.periodType) : 0,
 				PeriodDay: Number(promotion.periodType) === 2 ? Number(promotion.periodWeek) : Number(promotion.periodType) === 3 ? Number(promotion.periodMonth) : 0,
-				RedeemHours: Number(promotion.redeemHours) ? Number(promotion.redeemHours) : 0				
+				RedeemHours: Number(promotion.redeemHours) ? Number(promotion.redeemHours) : 0,
+				SpecialCode: promotion.specialCode				
 			};
 			let param = {
 				Url: "BonusManage/SetPromotion",
@@ -332,23 +362,65 @@ const App = () => {
 		}
 	};
 
-	const skipField = {
-		"default": ["currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours", "minPayout"],
-		"6": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType"],
-		"7": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType"],
-		"8": ["expiryDays", "walletType", "categoryId", "tpId", "rollOver", "minPayout", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours"],
-	}
+	const StateCheckBox = (value, dataColumn) => {
+		if(statusCheck.length > 0){
+			setStatusCheck([])
+		}
+		else{
+			setStatusCheck([...statusCheck,value])
+		}
+	};
 
+	const SelectClick = () =>{
+		let param = {
+			Url: "BonusManage/GetPromotionList",
+			Data: qs.stringify({
+				SiteidFilter: JSON.stringify(sitnemaFilter),
+				PromotionTypeFilter: JSON.stringify(promotionTypeFilter),
+				Status: statusCheck.length > 0
+			})
+		};
+		WebAPI.PostData(param).then(res => {
+			if (isMountedRef.current) {
+				if (res.data.errorCode === 0) {					
+					dispatch({
+						type: defActionType.SET_PROMOTION_LIST,
+						promotionList: res.data.data
+					});					
+				} else {
+					alert(res.data.message ?? "failed to get data.");
+				}
+			}
+		});
+
+	};
+
+	const skipField = {
+		"default": ["currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours", "minPayout","specialCode"],
+		"6": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType","affid","specialCode"],
+		"7": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType","affid","specialCode"],
+		"8": ["expiryDays", "walletType", "categoryId", "tpId", "rollOver", "minPayout", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours","affid","specialCode"],
+	}
+	
 	return state.panelType === defPanelType.Main || state.panelType === defPanelType.Copy ? (
 		<Main
 			ClickCreateBonus={ClickCreateBonus}
 			ClickEdit={ClickEdit}
 			UpdatePromotionStatus={UpdatePromotionStatus}
+			SelectClick={SelectClick}
 			promotionList={state.promotionList}
 			Datas={state.promotionData}
 			NewDatas={state.clonePromotionData}
 			Action={{ ClickClone, ClickCancle, SetCloneValue, SubmitClone }}
 			IsOpen={state.popBoxIsOpen}
+			SiteList = {state.siteList}
+			StateFilter = {stateFilter}
+			SitnemaFilter = {sitnemaFilter}
+			PromotionTypeFilter = {promotionTypeFilter}
+			StatusCheck = {statusCheck}
+			SetSitnemaFilter = {setSitnameFilter}
+			SetPromotionTypeFilter = {setPromotionTypeFilter}
+			StateCheckBox = {StateCheckBox}
 		/>
 	) : (
 			<Edit
