@@ -14,6 +14,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const Panel = (props) => {
+
     let siteListOptions = "";
     if (props.SiteList) {
         siteListOptions = props.SiteList.map(i => {
@@ -80,7 +81,7 @@ const Panel = (props) => {
                         }
                     }}
                 />
-                <button className="btn btn-search" type="submit" onClick={props.ClickSubmit}>Submit</button>
+                <button className="btn btn-search" type="submit" onClick={props.SubmitBtnDisabled ? null : props.ClickSubmit} disabled={props.SubmitBtnDisabled}>Submit</button>
             </div>
         </div>
     )
@@ -94,7 +95,7 @@ const CurrencyElem = ({columnTitle, options, onChange, Currencies}) => {
         
      }
 
-     const itemRenderer = ({ checked, option, onClick, disabled }) => {
+     const itemRenderer = ({ checked, option, onClick }) => {
         return (
           <div>
             <input style={{ height: '15px',width:'20px' }}
