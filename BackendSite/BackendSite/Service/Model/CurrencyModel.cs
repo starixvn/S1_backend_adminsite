@@ -30,5 +30,11 @@ namespace BackendSite.Service.Model
             set;
         }
 
+        public decimal ActualRate
+        {
+            get;
+            set;
+        }
+
     }
 }

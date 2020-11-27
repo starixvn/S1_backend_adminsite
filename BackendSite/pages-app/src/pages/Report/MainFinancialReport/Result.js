@@ -1,31 +1,61 @@
 import React from "react";
 import moment from 'moment';
 
-const dataGroupColumnDefs = () => {
+const dataGroupColumnDefs = (props) => {
     return [
         {
             columnTitle: 'Deposit',
+            headerStartwith: 'deposit_',
+            colSpan: props.CurrencyList.length + 1,
+            btnText: 'hide'
         },
         {
             columnTitle: 'Withdrawal',
+            headerStartwith: 'withdrawal_',
+            colSpan: props.CurrencyList.length + 1,
+            btnText: 'hide'
+        },
+        {
+            columnTitle: 'Nett',
+            headerStartwith: 'nett_',
+            colSpan: props.CurrencyList.length + 1,
+            btnText: 'hide'
         },
         {
             columnTitle: 'Bonus',
+            headerStartwith: 'bonus_',
+            colSpan: props.CurrencyList.length + 1,
+            btnText: 'hide'
         },
         {
             columnTitle: 'Rebate',
+            headerStartwith: 'rebate_',
+            colSpan: props.CurrencyList.length + 1,
+            btnText: 'hide'
         },
         {
             columnTitle: 'Adjustment',
+            headerStartwith: 'adjustment_',
+            colSpan: props.CurrencyList.length + 1,
+            btnText: 'hide'
         },
         {
             columnTitle: 'TurnOver(Stake)',
+            headerStartwith: 'turnOverStake_',
+            colSpan: props.CurrencyList.length + 1,
+            btnText: 'hide'
         },
         {
             columnTitle: 'TurnOver(ValidBet)',
+            headerStartwith: 'turnOverValidBet_',
+            colSpan: props.CurrencyList.length + 1,
+            btnText: 'hide'
         },
         {
             columnTitle: 'WinLoss',
+            headerStartwith: 'winLoss_',
+            colSpan: props.CurrencyList.length + 1,
+            btnText: 'hide'
         },
     ]
 }
@@ -42,7 +72,8 @@ const dataColumnDefs = (props) => {
                 dataColumn: `deposit_${curr.id}`,
                 body:{
                     attr:{
-                        class:"text-right"
+                        class:"text-right",
+                        hidden:props.HideShowBtn
                     }
                 }
             })
@@ -71,6 +102,27 @@ const dataColumnDefs = (props) => {
         {
             columnTitle: 'Total in MYR',
             dataColumn: "withdrawalSummary",
+            body:{
+                attr:{
+                    class:"text-right",
+                    bgcolor:"LightGray"
+                },
+            }
+        },
+        ...props.CurrencyList.map(curr=>{
+            return({
+                columnTitle: `${curr.code}`,
+                dataColumn: `nett_${curr.id}`,
+                body:{
+                    attr:{
+                        class:"text-right"
+                    },
+                }
+            })
+        }),
+        {
+            columnTitle: 'Total in MYR',
+            dataColumn: "nettSummary",
             body:{
                 attr:{
                     class:"text-right",
@@ -209,31 +261,94 @@ const dataColumnDefs = (props) => {
 
 const Panel = (props) => {
 
-    const groupColumnDefs = dataGroupColumnDefs();
-    const columnDefs = dataColumnDefs(props);
+    const groupColumnDefsDefault = dataGroupColumnDefs(props);
+    const columnDefsDefault = dataColumnDefs(props);
 
     let groupHeaderRows = [];
     let headerRows = [];
 
+    let groupColumnDefs = [];
+    let columnDefs = [];
+
+    if(props.HidenTitles.hiddenTitlesList.length > 0)
+    {
+
+            columnDefsDefault.forEach(elem=>{
+                
+                let flag=true;
+                
+                props.HidenTitles.hiddenTitlesList.forEach(HiddenElem=>{
+                    if(elem.dataColumn.startsWith(HiddenElem.Header))
+                    {
+                        flag=false;
+                    }
+                });
+
+                if(flag)
+                {
+                    columnDefs.push(elem);
+                }
+            });
+            
+            groupColumnDefsDefault.forEach(elem=>{
+
+                       let flag=true;
+
+                        props.HidenTitles.hiddenTitlesList.forEach(HiddenElem=>{
+                            if(elem.columnTitle===HiddenElem.Group)
+                            {
+                                flag=false;
+                            }
+                        });
+
+                        if(flag)
+                        {
+                            groupColumnDefs.push(elem);
+                        }
+                        else
+                        {
+                            groupColumnDefs.push({
+                                columnTitle: elem.columnTitle,
+                                headerStartwith: elem.headerStartwith,
+                                colSpan:  1,
+                                btnText: 'show'
+                            });
+
+                        }
+            });
+        
+    }
+    else
+    {
+        columnDefs = columnDefsDefault;
+        groupColumnDefs = groupColumnDefsDefault;
+    }
+
     groupColumnDefs.forEach((element, idx) => {
         groupHeaderRows.push(
-            <th key={`th-${element.dataColumn}-${idx}`} 
-                scope="col" 
-                className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''} colSpan={props.CurrencyList.length + 1}
+            <th key={`th-${element.dataColumn}-${idx}`}
+                scope="col"
+                className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''} colSpan={element.colSpan}
                 bgcolor={element.bgcolor}>
                 {element.columnTitle}
+                <button type="button" className="btn btn-info pull-right" onClick={() => props.HideShowBtn(element)}>{element.btnText}</button>
+                {/* {<HideShowBtnElem
+                onClick={props.HideShowBtn(element)}
+                />} */}
             </th>
         );
     });
 
+
     columnDefs.forEach((element, idx) => {
         headerRows.push(
-            <th key={`th-${element.dataColumn}-${idx}`} scope="col" className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''}>
+            <th key={`th-${element.dataColumn}-${idx}`} 
+                scope="col"
+                className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''}>
                 {element.columnTitle}
-            </th>
+             </th>
         );
-    });
-    
+     });
 
     let bodyRows = props.Datas.map((data, idx) => {
         let row = columnDefs.map((element, idx) => {
@@ -242,9 +357,10 @@ const Panel = (props) => {
                 element.body.subData.forEach(s => { subData[s] = data[s] });
             }
             return (
-                <td key={`td-${element.dataColumn}-${idx}`} 
+                <td key={`td-${element.dataColumn}-${idx}`}
                     className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
-                    bgcolor={element.body && element.body.attr && element.body.attr.bgcolor ? element.body.attr.bgcolor : ''}>
+                    bgcolor={element.body && element.body.attr && element.body.attr.bgcolor ? element.body.attr.bgcolor : ''}
+                   >
                     {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
                 </td>
             );
@@ -264,7 +380,7 @@ const Panel = (props) => {
                 element.body.subData.forEach(s => { subData[s] = data[s] });
             }
             return (
-                <th key={`td-${element.dataColumn}-${idx}`} 
+                <th key={`td-${element.dataColumn}-${idx}`}
                     className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
                     bgcolor="LemonChiffon">
                     {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
@@ -278,7 +394,7 @@ const Panel = (props) => {
             </tr>
         )
     });
-    
+
     return (
         <div className="table">
             <div className="table-options">
@@ -302,9 +418,5 @@ const Panel = (props) => {
         </div>
     )
 }
-
-// const numberFormat = (number) => {
-//     return number_format(number_toFixed(number, 2));
-// }
 
 export default Panel;

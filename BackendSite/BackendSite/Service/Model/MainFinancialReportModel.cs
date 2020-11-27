@@ -26,6 +26,12 @@ namespace BackendSite.Service.Model
             set;
         }
 
+        public decimal ActualRate
+        {
+            get;
+            set;
+        }
+
         public decimal Deposit
         {
             get;
@@ -33,6 +39,12 @@ namespace BackendSite.Service.Model
         }
 
         public decimal Withdrawal
+        {
+            get;
+            set;
+        }
+
+        public decimal Nett
         {
             get;
             set;
