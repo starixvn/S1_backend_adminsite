@@ -22,7 +22,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<CurrencyModel> GetCurrencyList()
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
                 string SpName = "Common_Currency_Get";
                 return conn.Query<CurrencyModel>(SpName, commandType: CommandType.StoredProcedure);
