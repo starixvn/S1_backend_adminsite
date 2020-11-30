@@ -1380,7 +1380,6 @@ import TpBetRecord from './TpBetRecord/index';
                                                 <td>
                                                     <div className="id-image">
                                                         <img src={"/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" />
-
                                                     </div>
                                                 </td>
                                                 <td>
@@ -1390,7 +1389,7 @@ import TpBetRecord from './TpBetRecord/index';
                                             :
                                             <tr>
                                                 <td>
-                                                    <input id="uploadfile" className="form-control" type="file" accept=".png, .jpg, .jpeg" onChange={(e) => { this.EditFiled(e.target.value, 'file') }} disabled={data.isKyc} value={this.state.file} />
+                                                    <input id="uploadfile" className="form-control" type="file" accept=".png, .jpg, .jpeg" onChange={(e) => { this.EditFiled(e.target.value, 'file') }} disabled={data.isKyc}/>
                                                 </td>
                                                 <td>
                                                     <button className="btn btn-add" disabled={data.isKyc} onClick={!data.isKyc ? this.onNewUpload.bind(this) : null}>Upload</button>
