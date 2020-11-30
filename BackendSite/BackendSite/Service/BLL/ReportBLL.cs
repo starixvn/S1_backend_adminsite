@@ -23,8 +23,8 @@ namespace BackendSite.Service.BLL
         public IEnumerable<MainFinancialModel> GetMainFinancialReport(IEnumerable<int> CurrencyIds,
                                                                       string siteIds,
                                                                       string currencyIds,
-                                                                      long startDate,
-                                                                      long endDate)
+                                                                      string startDate,
+                                                                      string endDate)
         {
             Dictionary<string, MainFinancialModel> keyValuePairs = new Dictionary<string, MainFinancialModel>();
             string dateFormat = string.Empty;
@@ -35,9 +35,9 @@ namespace BackendSite.Service.BLL
                                                                   endDate);
 
             var turnoverAndWinlossList = reportService.GetTurnoverAndWinlossSummary(siteIds,
-                                                                  currencyIds,
-                                                                  startDate,
-                                                                  endDate);
+                                                                                    currencyIds,
+                                                                                    startDate,
+                                                                                    endDate);
 
             var currencyList = reportService.GetCurrencyList();
 
@@ -62,6 +62,7 @@ namespace BackendSite.Service.BLL
                 mainFinancialModel = keyValuePairs[$"{dateFormat}-{data.CurrencyId}"];
 
                 mainFinancialModel.Deposit = data.Summary;
+                mainFinancialModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
             }
 
             foreach (var data in reportList["Withdrawal"])
@@ -83,6 +84,7 @@ namespace BackendSite.Service.BLL
                 mainFinancialModel = keyValuePairs[$"{dateFormat}-{data.CurrencyId}"];
 
                 mainFinancialModel.Withdrawal = data.Summary;
+                mainFinancialModel.WithdrawalInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
 
             }
 
@@ -105,6 +107,8 @@ namespace BackendSite.Service.BLL
                 mainFinancialModel = keyValuePairs[$"{dateFormat}-{data.CurrencyId}"];
 
                 mainFinancialModel.Adjustment = data.Summary;
+                mainFinancialModel.AdjustmentInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+
             }
 
             foreach (var data in reportList["Bonus"])
@@ -126,6 +130,7 @@ namespace BackendSite.Service.BLL
                 mainFinancialModel = keyValuePairs[$"{dateFormat}-{data.CurrencyId}"];
 
                 mainFinancialModel.Bonus = data.Summary;
+                mainFinancialModel.BonusInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
             }
 
             foreach (var data in reportList["Rebate"])
@@ -147,6 +152,7 @@ namespace BackendSite.Service.BLL
                 mainFinancialModel = keyValuePairs[$"{dateFormat}-{data.CurrencyId}"];
 
                 mainFinancialModel.Rebate = data.Summary;
+                mainFinancialModel.RebateInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
             }
 
             foreach (var data in turnoverAndWinlossList)
@@ -170,6 +176,10 @@ namespace BackendSite.Service.BLL
                 mainFinancialModel.TurnOverStake = data.StakeSummary;
                 mainFinancialModel.TurnOverValidBet = data.ValidBetSummary;
                 mainFinancialModel.WinLoss = data.WinlostSummary;
+
+                mainFinancialModel.TurnOverStakeInMYR = Math.Round(data.StakeSummary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+                mainFinancialModel.TurnOverValidBetInMYR = Math.Round(data.ValidBetSummary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+                mainFinancialModel.WinLossInMYR = Math.Round(data.WinlostSummary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
             }
 
             #endregion
@@ -198,6 +208,7 @@ namespace BackendSite.Service.BLL
                         mainFinancialModel = keyValuePairs[$"{date}-{curr}"];
 
                         mainFinancialModel.Nett = mainFinancialModel.Deposit - mainFinancialModel.Withdrawal;
+                        mainFinancialModel.NettInMYR = Math.Round(mainFinancialModel.Nett * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
                     }
                 }
             }
