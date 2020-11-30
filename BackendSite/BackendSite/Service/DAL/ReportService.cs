@@ -31,8 +31,8 @@ namespace BackendSite.Service.DAL
 
         public Dictionary<string, IEnumerable<PartcialSummeryModel>> GetMainFinancialReport(string siteIds,
                                                                       string currencyIds,
-                                                                      long startDate, 
-                                                                      long endDate)
+                                                                      string startDate,
+                                                                      string endDate)
         {
             var partcialSummeryModels = new Dictionary<string, IEnumerable<PartcialSummeryModel>>();   
 
@@ -85,8 +85,8 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<TurnoverAndWinlossSummeryModel> GetTurnoverAndWinlossSummary(string siteIds,
                                                                                         string currencyIds,
-                                                                                        long startDate,
-                                                                                        long endDate)
+                                                                                        string startDate,
+                                                                                        string endDate)
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {

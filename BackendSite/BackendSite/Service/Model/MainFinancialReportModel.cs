@@ -38,7 +38,19 @@ namespace BackendSite.Service.Model
             set;
         }
 
+        public decimal DepositInMYR
+        {
+            get;
+            set;
+        }
+
         public decimal Withdrawal
+        {
+            get;
+            set;
+        }
+
+        public decimal WithdrawalInMYR
         {
             get;
             set;
@@ -50,7 +62,19 @@ namespace BackendSite.Service.Model
             set;
         }
 
+        public decimal NettInMYR
+        {
+            get;
+            set;
+        }
+
         public decimal Bonus
+        {
+            get;
+            set;
+        }
+
+        public decimal BonusInMYR
         {
             get;
             set;
@@ -62,7 +86,19 @@ namespace BackendSite.Service.Model
             set;
         }
 
+        public decimal RebateInMYR
+        {
+            get;
+            set;
+        }
+
         public decimal Adjustment
+        {
+            get;
+            set;
+        }
+
+        public decimal AdjustmentInMYR
         {
             get;
             set;
@@ -74,13 +110,31 @@ namespace BackendSite.Service.Model
             set;
         }
 
+        public decimal TurnOverStakeInMYR
+        {
+            get;
+            set;
+        }
+
         public decimal TurnOverValidBet
         {
             get;
             set;
         }
 
+        public decimal TurnOverValidBetInMYR
+        {
+            get;
+            set;
+        }
+
         public decimal WinLoss
+        {
+            get;
+            set;
+        }
+
+        public decimal WinLossInMYR
         {
             get;
             set;

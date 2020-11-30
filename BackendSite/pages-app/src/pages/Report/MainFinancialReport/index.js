@@ -6,8 +6,9 @@ import WebAPI from '../../../module/WebAPI';
 import qs from 'qs';
 import moment, { isDate } from 'moment';
 import {number_format, number_toFixed} from '../../../module/Formatting/NumberFormat';
-
+// import DateFormat from '../../../module/Formatting/DateFormat';
 const App = () => {
+
     const [stateFilter, setFilter] = useState({
         'SiteIds': [],
         'Currency': [],
@@ -145,10 +146,8 @@ const App = () => {
             Data: qs.stringify({
                 SiteIds: stateFilter.SiteIds,
                 CurrencyIds: currencyIds,
-                // StartDate: stateFilter.StartDate,
-                // EndDate: stateFilter.EndDate,
-                StartDate: moment(stateFilter.StartDate).unix(),
-                EndDate: moment(stateFilter.EndDate).add(1, 'days').unix() - 1
+                StartDate: moment(stateFilter.StartDate).format('YYYY-MM-DD'),
+                EndDate: moment(stateFilter.EndDate).format('YYYY-MM-DD')
             })
         };
 
@@ -223,15 +222,15 @@ const App = () => {
                         let winLossColDef = `winLoss_${elem.currencyId}`;
 
                         if(getItem){
-                            getItem.depositSummary += elem.deposit * elem.actualRate;
-                            getItem.withdrawalSummary += elem.withdrawal * elem.actualRate;
-                            getItem.nettSummary += elem.nett * elem.actualRate;
-                            getItem.bonusSummary += elem.bonus * elem.actualRate;
-                            getItem.rebateSummary += elem.rebate * elem.actualRate;
-                            getItem.adjustmentSummary += elem.adjustment * elem.actualRate;
-                            getItem.turnOverStakeSummary += elem.turnOverStake * elem.actualRate;
-                            getItem.turnOverValidBetSummary += elem.turnOverValidBet * elem.actualRate;
-                            getItem.winLossSummary += elem.winLoss * elem.actualRate;
+                            getItem.depositSummary += elem.depositInMYR;
+                            getItem.withdrawalSummary += elem.withdrawalInMYR;
+                            getItem.nettSummary += elem.nettInMYR;
+                            getItem.bonusSummary += elem.bonusInMYR;
+                            getItem.rebateSummary += elem.rebateInMYR;
+                            getItem.adjustmentSummary += elem.adjustmentInMYR;
+                            getItem.turnOverStakeSummary += elem.turnOverStakeInMYR;
+                            getItem.turnOverValidBetSummary += elem.turnOverValidBetInMYR;
+                            getItem.winLossSummary += elem.winLossInMYR;
 
                             getItem[depositColDef] = elem.deposit;
                             getItem[withdrawalColDef] = elem.withdrawal;
@@ -248,15 +247,15 @@ const App = () => {
                             result.push({
                                 'date':elem.date,
 
-                                'depositSummary':elem.deposit * elem.actualRate,
-                                'withdrawalSummary':elem.withdrawal * elem.actualRate,
-                                'nettSummary':elem.nett * elem.actualRate,
-                                'bonusSummary':elem.bonus * elem.actualRate,
-                                'rebateSummary':elem.rebate * elem.actualRate,
-                                'adjustmentSummary':elem.adjustment * elem.actualRate,
-                                'turnOverStakeSummary':elem.turnOverStake * elem.actualRate,
-                                'turnOverValidBetSummary':elem.turnOverValidBet * elem.actualRate,
-                                'winLossSummary':elem.winLoss * elem.actualRate,
+                                'depositSummary':elem.depositInMYR,
+                                'withdrawalSummary':elem.withdrawalInMYR,
+                                'nettSummary':elem.nettInMYR,
+                                'bonusSummary':elem.bonusInMYR,
+                                'rebateSummary':elem.rebateInMYR,
+                                'adjustmentSummary':elem.adjustmentInMYR,
+                                'turnOverStakeSummary':elem.turnOverStakeInMYR,
+                                'turnOverValidBetSummary':elem.turnOverValidBetInMYR,
+                                'winLossSummary':elem.winLossInMYR,
 
                                 [depositColDef]:elem.deposit,
                                 [withdrawalColDef]:elem.withdrawal,
@@ -270,15 +269,15 @@ const App = () => {
                             });
                         }
 
-                        totalItem.depositSummary = totalItem.depositSummary + elem.deposit * elem.actualRate;
-                        totalItem.withdrawalSummary = totalItem.withdrawalSummary + elem.withdrawal * elem.actualRate;
-                        totalItem.nettSummary = totalItem.nettSummary + elem.nett * elem.actualRate;
-                        totalItem.bonusSummary = totalItem.bonusSummary + elem.bonus * elem.actualRate;
-                        totalItem.rebateSummary = totalItem.rebateSummary + elem.rebate * elem.actualRate;
-                        totalItem.adjustmentSummary = totalItem.adjustmentSummary + elem.adjustment * elem.actualRate;
-                        totalItem.turnOverStakeSummary = totalItem.turnOverStakeSummary + elem.turnOverStake * elem.actualRate;
-                        totalItem.turnOverValidBetSummary = totalItem.turnOverValidBetSummary + elem.turnOverValidBet * elem.actualRate;
-                        totalItem.winLossSummary = totalItem.winLossSummary +elem.winLoss * elem.actualRate;
+                        totalItem.depositSummary = totalItem.depositSummary + elem.depositInMYR;
+                        totalItem.withdrawalSummary = totalItem.withdrawalSummary + elem.withdrawalInMYR;
+                        totalItem.nettSummary = totalItem.nettSummary + elem.nettInMYR;
+                        totalItem.bonusSummary = totalItem.bonusSummary + elem.bonusInMYR;
+                        totalItem.rebateSummary = totalItem.rebateSummary + elem.rebateInMYR;
+                        totalItem.adjustmentSummary = totalItem.adjustmentSummary + elem.adjustmentInMYR;
+                        totalItem.turnOverStakeSummary = totalItem.turnOverStakeSummary + elem.turnOverStakeInMYR;
+                        totalItem.turnOverValidBetSummary = totalItem.turnOverValidBetSummary + elem.turnOverValidBetInMYR;
+                        totalItem.winLossSummary = totalItem.winLossSummary +elem.winLossInMYR;
 
                         totalItem[depositColDef] = totalItem[depositColDef] + elem.deposit;
                         totalItem[withdrawalColDef] = totalItem[withdrawalColDef] + elem.withdrawal;
@@ -377,10 +376,8 @@ const App = () => {
             Data: {
                 SiteIds: JSON.stringify(stateDatas.FilterInfo.SiteIds),
                 CurrencyIds: JSON.stringify(currencyIds),
-                StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
-                EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, 'days').unix() - 1
-                // StartDate: stateDatas.FilterInfo.StartDate,
-                // EndDate: stateDatas.FilterInfo.EndDate
+                StartDate: moment(stateDatas.FilterInfo.StartDate).format('YYYY-MM-DD'),
+                EndDate: moment(stateDatas.FilterInfo.EndDate).format('YYYY-MM-DD')
             }
         };
 
@@ -395,6 +392,7 @@ const App = () => {
         return (
             <div className="container-fluid" style={{ width: "100%", height: "100%", padding: "15px" }}>
                 <h4 className="page-name">Main Financial Report</h4>
+                {/* <div>{new DateFormat("11/16/2020","yyyy-mm-dd")}</div> */}
                 <Filter filterInfo={stateFilter} 
                         onChange={Filter_OnChange} 
                         onChangeCheckBox={Filter_CheckBox_OnChange} 

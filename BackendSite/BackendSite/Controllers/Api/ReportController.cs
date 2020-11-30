@@ -36,9 +36,10 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/MainFinancialReport" })]
         public ApiResult GetMainFinancialReport([FromForm] IEnumerable<int> SiteIds,
                                                 [FromForm] IEnumerable<int> CurrencyIds,
-                                                [FromForm] long StartDate,
-                                                [FromForm] long EndDate)
+                                                [FromForm] string StartDate,
+                                                [FromForm] string EndDate)
         {
+
             var apiResult = new ApiResult<IEnumerable<MainFinancialModel>>();
 
             try
@@ -63,8 +64,8 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public IActionResult ExportMainFinancialReport(string SiteIds,
                                                        string CurrencyIds,
-                                                       long StartDate,
-                                                       long EndDate)
+                                                       string StartDate,
+                                                       string EndDate)
         {
             var currencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(CurrencyIds);
 
@@ -117,31 +118,31 @@ namespace BackendSite.Controllers.Api
                 if (getByDateItem != null)
                 {
                     getByDateItem.TryGetValue("Deposit in MYR", out dynamic deposit);
-                    getByDateItem["Deposit in MYR"] = (decimal)deposit + Math.Round(item.Deposit * item.ActualRate, 2);
+                    getByDateItem["Deposit in MYR"] = (decimal)deposit + item.DepositInMYR;
 
                     getByDateItem.TryGetValue("Withdrawal in MYR", out dynamic withdrawal);
-                    getByDateItem["Withdrawal in MYR"] = (decimal)withdrawal + Math.Round(item.Withdrawal * item.ActualRate, 2);
+                    getByDateItem["Withdrawal in MYR"] = (decimal)withdrawal + item.WithdrawalInMYR;
 
                     getByDateItem.TryGetValue("Nett in MYR", out dynamic nett);
-                    getByDateItem["Nett in MYR"] = (decimal)nett + Math.Round(item.Nett * item.ActualRate, 2);
+                    getByDateItem["Nett in MYR"] = (decimal)nett + item.NettInMYR;
 
                     getByDateItem.TryGetValue("Bonus in MYR", out dynamic bonus);
-                    getByDateItem["Bonus in MYR"] = (decimal)bonus + Math.Round(item.Bonus * item.ActualRate, 2);
+                    getByDateItem["Bonus in MYR"] = (decimal)bonus + item.BonusInMYR;
 
                     getByDateItem.TryGetValue("Rebate in MYR", out dynamic rebate);
-                    getByDateItem["Rebate in MYR"] = (decimal)rebate + Math.Round(item.Rebate * item.ActualRate, 2);
+                    getByDateItem["Rebate in MYR"] = (decimal)rebate + item.RebateInMYR;
 
                     getByDateItem.TryGetValue("Adjustment in MYR", out dynamic adjustment);
-                    getByDateItem["Adjustment in MYR"] = (decimal)adjustment + Math.Round(item.Adjustment * item.ActualRate, 2);
+                    getByDateItem["Adjustment in MYR"] = (decimal)adjustment + item.AdjustmentInMYR;
 
                     getByDateItem.TryGetValue("TurnOver(Stake) in MYR", out dynamic turnOverStake);
-                    getByDateItem["TurnOver(Stake) in MYR"] = (decimal)turnOverStake + Math.Round(item.TurnOverStake * item.ActualRate, 2);
+                    getByDateItem["TurnOver(Stake) in MYR"] = (decimal)turnOverStake + item.TurnOverStakeInMYR;
 
                     getByDateItem.TryGetValue("TurnOver(ValidBet) in MYR", out dynamic turnOverValidBet);
-                    getByDateItem["TurnOver(ValidBet) in MYR"] = (decimal)turnOverValidBet + Math.Round(item.TurnOverValidBet * item.ActualRate, 2);
+                    getByDateItem["TurnOver(ValidBet) in MYR"] = (decimal)turnOverValidBet + item.TurnOverValidBetInMYR;
 
                     getByDateItem.TryGetValue("WinLoss in MYR", out dynamic winLoss);
-                    getByDateItem["WinLoss in MYR"] = (decimal)winLoss + Math.Round(item.WinLoss * item.ActualRate, 2);
+                    getByDateItem["WinLoss in MYR"] = (decimal)winLoss + item.WinLossInMYR;
 
                     //Deposit
                     if (!byDateTitles.ContainsKey(DepositPropName))
@@ -298,15 +299,15 @@ namespace BackendSite.Controllers.Api
                         { TurnOverValidBetPropName, item.TurnOverValidBet },
                         { WinLossPropName, item.WinLoss },
 
-                        { "Deposit in MYR", Math.Round(item.Deposit * item.ActualRate, 2)},
-                        { "Withdrawal in MYR", Math.Round(item.Withdrawal * item.ActualRate, 2) },
-                        { "Nett in MYR", Math.Round(item.Nett * item.ActualRate, 2) },
-                        { "Bonus in MYR", Math.Round(item.Bonus * item.ActualRate, 2)},
-                        { "Rebate in MYR", Math.Round(item.Rebate * item.ActualRate, 2) },
-                        { "Adjustment in MYR", Math.Round(item.Adjustment * item.ActualRate, 2)},
-                        { "TurnOver(Stake) in MYR", Math.Round(item.TurnOverStake * item.ActualRate, 2) },
-                        { "TurnOver(ValidBet) in MYR", Math.Round(item.TurnOverValidBet * item.ActualRate, 2)},
-                        { "WinLoss in MYR", Math.Round(item.WinLoss * item.ActualRate, 2) }
+                        { "Deposit in MYR", item.DepositInMYR },
+                        { "Withdrawal in MYR", item.WithdrawalInMYR },
+                        { "Nett in MYR", item.NettInMYR },
+                        { "Bonus in MYR", item.BonusInMYR},
+                        { "Rebate in MYR", item.RebateInMYR },
+                        { "Adjustment in MYR", item.AdjustmentInMYR},
+                        { "TurnOver(Stake) in MYR", item.TurnOverStakeInMYR },
+                        { "TurnOver(ValidBet) in MYR", item.TurnOverValidBetInMYR },
+                        { "WinLoss in MYR", item.WinLossInMYR }
                     };
 
                     if (!byDateTitles.ContainsKey("Date"))
