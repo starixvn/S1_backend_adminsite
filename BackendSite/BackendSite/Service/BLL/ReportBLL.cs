@@ -23,8 +23,8 @@ namespace BackendSite.Service.BLL
         public IEnumerable<MainFinancialModel> GetMainFinancialReport(IEnumerable<int> CurrencyIds,
                                                                       string siteIds,
                                                                       string currencyIds,
-                                                                      long startDate,
-                                                                      long endDate)
+                                                                      string startDate,
+                                                                      string endDate)
         {
             Dictionary<string, MainFinancialModel> keyValuePairs = new Dictionary<string, MainFinancialModel>();
             string dateFormat = string.Empty;
@@ -35,9 +35,9 @@ namespace BackendSite.Service.BLL
                                                                   endDate);
 
             var turnoverAndWinlossList = reportService.GetTurnoverAndWinlossSummary(siteIds,
-                                                                  currencyIds,
-                                                                  startDate,
-                                                                  endDate);
+                                                                                    currencyIds,
+                                                                                    startDate,
+                                                                                    endDate);
 
             var currencyList = reportService.GetCurrencyList();
 
@@ -55,12 +55,14 @@ namespace BackendSite.Service.BLL
                     keyValuePairs.Add($"{dateFormat}-{data.CurrencyId}", mainFinancialModel);
                     mainFinancialModel.IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
                     mainFinancialModel.CurrencyId = data.CurrencyId;
+                    mainFinancialModel.ActualRate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
                     mainFinancialModel.Date = dateFormat;
                 }
 
                 mainFinancialModel = keyValuePairs[$"{dateFormat}-{data.CurrencyId}"];
 
                 mainFinancialModel.Deposit = data.Summary;
+                mainFinancialModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
             }
 
             foreach (var data in reportList["Withdrawal"])
@@ -75,12 +77,14 @@ namespace BackendSite.Service.BLL
                     keyValuePairs.Add($"{dateFormat}-{data.CurrencyId}", mainFinancialModel);
                     mainFinancialModel.IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
                     mainFinancialModel.CurrencyId = data.CurrencyId;
+                    mainFinancialModel.ActualRate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
                     mainFinancialModel.Date = dateFormat;
                 }
 
                 mainFinancialModel = keyValuePairs[$"{dateFormat}-{data.CurrencyId}"];
 
                 mainFinancialModel.Withdrawal = data.Summary;
+                mainFinancialModel.WithdrawalInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
 
             }
 
@@ -96,12 +100,15 @@ namespace BackendSite.Service.BLL
                     keyValuePairs.Add($"{dateFormat}-{data.CurrencyId}", mainFinancialModel);
                     mainFinancialModel.IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
                     mainFinancialModel.CurrencyId = data.CurrencyId;
+                    mainFinancialModel.ActualRate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
                     mainFinancialModel.Date = dateFormat;
                 }
 
                 mainFinancialModel = keyValuePairs[$"{dateFormat}-{data.CurrencyId}"];
 
                 mainFinancialModel.Adjustment = data.Summary;
+                mainFinancialModel.AdjustmentInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+
             }
 
             foreach (var data in reportList["Bonus"])
@@ -116,12 +123,14 @@ namespace BackendSite.Service.BLL
                     keyValuePairs.Add($"{dateFormat}-{data.CurrencyId}", mainFinancialModel);
                     mainFinancialModel.IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
                     mainFinancialModel.CurrencyId = data.CurrencyId;
+                    mainFinancialModel.ActualRate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
                     mainFinancialModel.Date = dateFormat;
                 }
 
                 mainFinancialModel = keyValuePairs[$"{dateFormat}-{data.CurrencyId}"];
 
                 mainFinancialModel.Bonus = data.Summary;
+                mainFinancialModel.BonusInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
             }
 
             foreach (var data in reportList["Rebate"])
@@ -136,15 +145,17 @@ namespace BackendSite.Service.BLL
                     keyValuePairs.Add($"{dateFormat}-{data.CurrencyId}", mainFinancialModel);
                     mainFinancialModel.IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
                     mainFinancialModel.CurrencyId = data.CurrencyId;
+                    mainFinancialModel.ActualRate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
                     mainFinancialModel.Date = dateFormat;
                 }
 
                 mainFinancialModel = keyValuePairs[$"{dateFormat}-{data.CurrencyId}"];
 
                 mainFinancialModel.Rebate = data.Summary;
+                mainFinancialModel.RebateInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
             }
 
-            foreach(var data in turnoverAndWinlossList)
+            foreach (var data in turnoverAndWinlossList)
             {
                 MainFinancialModel mainFinancialModel = null;
 
@@ -156,6 +167,7 @@ namespace BackendSite.Service.BLL
                     keyValuePairs.Add($"{dateFormat}-{data.CurrencyId}", mainFinancialModel);
                     mainFinancialModel.IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
                     mainFinancialModel.CurrencyId = data.CurrencyId;
+                    mainFinancialModel.ActualRate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
                     mainFinancialModel.Date = dateFormat;
                 }
 
@@ -164,6 +176,10 @@ namespace BackendSite.Service.BLL
                 mainFinancialModel.TurnOverStake = data.StakeSummary;
                 mainFinancialModel.TurnOverValidBet = data.ValidBetSummary;
                 mainFinancialModel.WinLoss = data.WinlostSummary;
+
+                mainFinancialModel.TurnOverStakeInMYR = Math.Round(data.StakeSummary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+                mainFinancialModel.TurnOverValidBetInMYR = Math.Round(data.ValidBetSummary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+                mainFinancialModel.WinLossInMYR = Math.Round(data.WinlostSummary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
             }
 
             #endregion
@@ -174,7 +190,7 @@ namespace BackendSite.Service.BLL
 
             foreach (var curr in CurrencyIds)
             {
-                foreach(var date in dateList)
+                foreach (var date in dateList)
                 {
                     MainFinancialModel mainFinancialModel = null;
 
@@ -184,7 +200,15 @@ namespace BackendSite.Service.BLL
                         keyValuePairs.Add($"{date}-{curr}", mainFinancialModel);
                         mainFinancialModel.IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
                         mainFinancialModel.CurrencyId = curr;
+                        mainFinancialModel.ActualRate = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.ActualRate).FirstOrDefault();
                         mainFinancialModel.Date = date;
+                    }
+                    else
+                    {
+                        mainFinancialModel = keyValuePairs[$"{date}-{curr}"];
+
+                        mainFinancialModel.Nett = mainFinancialModel.Deposit - mainFinancialModel.Withdrawal;
+                        mainFinancialModel.NettInMYR = Math.Round(mainFinancialModel.Nett * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
                     }
                 }
             }

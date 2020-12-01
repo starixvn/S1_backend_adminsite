@@ -22,7 +22,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<CurrencyModel> GetCurrencyList()
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
                 string SpName = "Common_Currency_Get";
                 return conn.Query<CurrencyModel>(SpName, commandType: CommandType.StoredProcedure);
@@ -31,8 +31,8 @@ namespace BackendSite.Service.DAL
 
         public Dictionary<string, IEnumerable<PartcialSummeryModel>> GetMainFinancialReport(string siteIds,
                                                                       string currencyIds,
-                                                                      long startDate, 
-                                                                      long endDate)
+                                                                      string startDate,
+                                                                      string endDate)
         {
             var partcialSummeryModels = new Dictionary<string, IEnumerable<PartcialSummeryModel>>();   
 
@@ -85,8 +85,8 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<TurnoverAndWinlossSummeryModel> GetTurnoverAndWinlossSummary(string siteIds,
                                                                                         string currencyIds,
-                                                                                        long startDate,
-                                                                                        long endDate)
+                                                                                        string startDate,
+                                                                                        string endDate)
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {

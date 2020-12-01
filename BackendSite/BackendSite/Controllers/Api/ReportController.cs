@@ -26,14 +26,6 @@ namespace BackendSite.Controllers.Api
             this.excelBLL = excelBLL;
         }
 
-        public class Req
-        {
-            public IEnumerable<int> SiteIds { set; get; }
-            public int CurrencyId { set; get; }
-            public long StartDate { set; get; }
-            public long EndDate { set; get; }
-        }
-
         public class TitleModel
         {
             public string Name { get; set; }
@@ -44,9 +36,10 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/MainFinancialReport" })]
         public ApiResult GetMainFinancialReport([FromForm] IEnumerable<int> SiteIds,
                                                 [FromForm] IEnumerable<int> CurrencyIds,
-                                                [FromForm] long StartDate,
-                                                [FromForm] long EndDate)
+                                                [FromForm] string StartDate,
+                                                [FromForm] string EndDate)
         {
+
             var apiResult = new ApiResult<IEnumerable<MainFinancialModel>>();
 
             try
@@ -71,8 +64,8 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public IActionResult ExportMainFinancialReport(string SiteIds,
                                                        string CurrencyIds,
-                                                       long StartDate,
-                                                       long EndDate)
+                                                       string StartDate,
+                                                       string EndDate)
         {
             var currencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(CurrencyIds);
 
@@ -89,15 +82,17 @@ namespace BackendSite.Controllers.Api
             List<string> totalTitle = new List<string>
             {
                 "Deposit in MYR", "Withdrawal in MYR",
-                "Bonus in MYR", "Rebate in MYR",
-                "Adjustment in MYR", "TurnOver(Stake) in MYR",
-                "TurnOver(ValidBet) in MYR", "WinLoss in MYR"
+                "Nett in MYR", "Bonus in MYR",
+                "Rebate in MYR", "Adjustment in MYR",
+                "TurnOver(Stake) in MYR", "TurnOver(ValidBet) in MYR",
+                "WinLoss in MYR"
             };
 
             foreach (var item in ExportData)
             {
                 var DepositPropName = $"Deposit-{item.IsoCode}";
                 var WithdrawalPropName = $"Withdrawal-{item.IsoCode}";
+                var NettPropName = $"Nett-{item.IsoCode}";
                 var BonusPropName = $"Bonus-{item.IsoCode}";
                 var RebatePropName = $"Rebate-{item.IsoCode}";
                 var AdjustmentPropName = $"Adjustment-{item.IsoCode}";
@@ -107,12 +102,13 @@ namespace BackendSite.Controllers.Api
 
                 var depositSortId = 100 + item.CurrencyId;
                 var withdrawalSortId = 300 + item.CurrencyId;
-                var bonusSortId = 500 + item.CurrencyId;
-                var rebateSortId = 700 + item.CurrencyId;
-                var adjustmentSortId = 900 + item.CurrencyId;
-                var turnOverStakeSortId = 1100 + item.CurrencyId;
-                var turnOverValidBetSortId = 1300 + item.CurrencyId;
-                var winLossSortId = 1500 + item.CurrencyId;
+                var nettSortId = 500 + item.CurrencyId;
+                var bonusSortId = 700 + item.CurrencyId;
+                var rebateSortId = 900 + item.CurrencyId;
+                var adjustmentSortId = 1100 + item.CurrencyId;
+                var turnOverStakeSortId = 1300 + item.CurrencyId;
+                var turnOverValidBetSortId = 1500 + item.CurrencyId;
+                var winLossSortId = 1700 + item.CurrencyId;
 
                 var getByDateKey = $"{item.Date}";
                 var getByDateItem = byDate.FirstOrDefault(x =>
@@ -122,28 +118,31 @@ namespace BackendSite.Controllers.Api
                 if (getByDateItem != null)
                 {
                     getByDateItem.TryGetValue("Deposit in MYR", out dynamic deposit);
-                    getByDateItem["Deposit in MYR"] = (decimal)deposit + item.Deposit;
+                    getByDateItem["Deposit in MYR"] = (decimal)deposit + item.DepositInMYR;
 
                     getByDateItem.TryGetValue("Withdrawal in MYR", out dynamic withdrawal);
-                    getByDateItem["Withdrawal in MYR"] = (decimal)withdrawal + item.Withdrawal;
+                    getByDateItem["Withdrawal in MYR"] = (decimal)withdrawal + item.WithdrawalInMYR;
+
+                    getByDateItem.TryGetValue("Nett in MYR", out dynamic nett);
+                    getByDateItem["Nett in MYR"] = (decimal)nett + item.NettInMYR;
 
                     getByDateItem.TryGetValue("Bonus in MYR", out dynamic bonus);
-                    getByDateItem["Bonus in MYR"] = (decimal)bonus + item.Bonus;
+                    getByDateItem["Bonus in MYR"] = (decimal)bonus + item.BonusInMYR;
 
                     getByDateItem.TryGetValue("Rebate in MYR", out dynamic rebate);
-                    getByDateItem["Rebate in MYR"] = (decimal)rebate + item.Rebate;
+                    getByDateItem["Rebate in MYR"] = (decimal)rebate + item.RebateInMYR;
 
                     getByDateItem.TryGetValue("Adjustment in MYR", out dynamic adjustment);
-                    getByDateItem["Adjustment in MYR"] = (decimal)adjustment + item.Adjustment;
+                    getByDateItem["Adjustment in MYR"] = (decimal)adjustment + item.AdjustmentInMYR;
 
                     getByDateItem.TryGetValue("TurnOver(Stake) in MYR", out dynamic turnOverStake);
-                    getByDateItem["TurnOver(Stake) in MYR"] = (decimal)turnOverStake + item.TurnOverStake;
+                    getByDateItem["TurnOver(Stake) in MYR"] = (decimal)turnOverStake + item.TurnOverStakeInMYR;
 
                     getByDateItem.TryGetValue("TurnOver(ValidBet) in MYR", out dynamic turnOverValidBet);
-                    getByDateItem["TurnOver(ValidBet) in MYR"] = (decimal)turnOverValidBet + item.TurnOverValidBet;
+                    getByDateItem["TurnOver(ValidBet) in MYR"] = (decimal)turnOverValidBet + item.TurnOverValidBetInMYR;
 
                     getByDateItem.TryGetValue("WinLoss in MYR", out dynamic winLoss);
-                    getByDateItem["WinLoss in MYR"] = (decimal)winLoss + item.WinLoss;
+                    getByDateItem["WinLoss in MYR"] = (decimal)winLoss + item.WinLossInMYR;
 
                     //Deposit
                     if (!byDateTitles.ContainsKey(DepositPropName))
@@ -173,6 +172,21 @@ namespace BackendSite.Controllers.Api
                     else
                     {
                         getByDateItem.Add(WithdrawalPropName, item.Withdrawal);
+                    }
+
+                    //Nett
+                    if (!byDateTitles.ContainsKey(NettPropName))
+                    {
+                        byDateTitles.Add(NettPropName, new TitleModel { Name = item.IsoCode, SortId = nettSortId });
+                    }
+                    if (getByDateItem.ContainsKey(NettPropName))
+                    {
+                        getByDateItem.TryGetValue(NettPropName, out dynamic nettdata);
+                        getByDateItem[NettPropName] = (decimal)nettdata + item.Nett;
+                    }
+                    else
+                    {
+                        getByDateItem.Add(NettPropName, item.Nett);
                     }
 
                     //Bonus
@@ -277,6 +291,7 @@ namespace BackendSite.Controllers.Api
 
                         { DepositPropName,  item.Deposit },
                         { WithdrawalPropName, item.Withdrawal },
+                        { NettPropName, item.Nett },
                         { BonusPropName, item.Bonus },
                         { RebatePropName, item.Rebate },
                         { AdjustmentPropName, item.Adjustment },
@@ -284,14 +299,15 @@ namespace BackendSite.Controllers.Api
                         { TurnOverValidBetPropName, item.TurnOverValidBet },
                         { WinLossPropName, item.WinLoss },
 
-                        { "Deposit in MYR", item.Deposit },
-                        { "Withdrawal in MYR", item.Withdrawal },
-                        { "Bonus in MYR", item.Bonus },
-                        { "Rebate in MYR", item.Rebate },
-                        { "Adjustment in MYR", item.Adjustment },
-                        { "TurnOver(Stake) in MYR", item.TurnOverStake },
-                        { "TurnOver(ValidBet) in MYR", item.TurnOverValidBet },
-                        { "WinLoss in MYR", item.WinLoss }
+                        { "Deposit in MYR", item.DepositInMYR },
+                        { "Withdrawal in MYR", item.WithdrawalInMYR },
+                        { "Nett in MYR", item.NettInMYR },
+                        { "Bonus in MYR", item.BonusInMYR},
+                        { "Rebate in MYR", item.RebateInMYR },
+                        { "Adjustment in MYR", item.AdjustmentInMYR},
+                        { "TurnOver(Stake) in MYR", item.TurnOverStakeInMYR },
+                        { "TurnOver(ValidBet) in MYR", item.TurnOverValidBetInMYR },
+                        { "WinLoss in MYR", item.WinLossInMYR }
                     };
 
                     if (!byDateTitles.ContainsKey("Date"))
@@ -299,12 +315,13 @@ namespace BackendSite.Controllers.Api
                         byDateTitles.Add("Date", new TitleModel { Name = "Date", SortId = 1 });
                         byDateTitles.Add("Deposit in MYR", new TitleModel { Name = "Total in MYR", SortId = 200 });
                         byDateTitles.Add("Withdrawal in MYR", new TitleModel { Name = "Total in MYR", SortId = 400 });
-                        byDateTitles.Add("Bonus in MYR", new TitleModel { Name = "Total in MYR", SortId = 600 });
-                        byDateTitles.Add("Rebate in MYR", new TitleModel { Name = "Total in MYR", SortId = 800 });
-                        byDateTitles.Add("Adjustment in MYR", new TitleModel { Name = "Total in MYR", SortId = 1000 });
-                        byDateTitles.Add("TurnOver(Stake) in MYR", new TitleModel { Name = "Total in MYR", SortId = 1200 });
-                        byDateTitles.Add("TurnOver(ValidBet) in MYR", new TitleModel { Name = "Total in MYR", SortId = 1400 });
-                        byDateTitles.Add("WinLoss in MYR", new TitleModel { Name = "Total in MYR", SortId = 1600 });
+                        byDateTitles.Add("Nett in MYR", new TitleModel { Name = "Total in MYR", SortId = 600 });
+                        byDateTitles.Add("Bonus in MYR", new TitleModel { Name = "Total in MYR", SortId = 800 });
+                        byDateTitles.Add("Rebate in MYR", new TitleModel { Name = "Total in MYR", SortId = 1000 });
+                        byDateTitles.Add("Adjustment in MYR", new TitleModel { Name = "Total in MYR", SortId = 1200 });
+                        byDateTitles.Add("TurnOver(Stake) in MYR", new TitleModel { Name = "Total in MYR", SortId = 1400 });
+                        byDateTitles.Add("TurnOver(ValidBet) in MYR", new TitleModel { Name = "Total in MYR", SortId = 1600 });
+                        byDateTitles.Add("WinLoss in MYR", new TitleModel { Name = "Total in MYR", SortId = 1800 });
                     }
 
                     if (!byDateTitles.ContainsKey(DepositPropName))
@@ -314,6 +331,10 @@ namespace BackendSite.Controllers.Api
                     if (!byDateTitles.ContainsKey(WithdrawalPropName))
                     {
                         byDateTitles.Add(WithdrawalPropName, new TitleModel { Name = item.IsoCode, SortId = withdrawalSortId });
+                    }
+                    if (!byDateTitles.ContainsKey(NettPropName))
+                    {
+                        byDateTitles.Add(NettPropName, new TitleModel { Name = item.IsoCode, SortId = nettSortId });
                     }
                     if (!byDateTitles.ContainsKey(BonusPropName))
                     {
@@ -350,6 +371,7 @@ namespace BackendSite.Controllers.Api
 
             titlesToMerge.Add("Deposit", currencyList.Count() + 1);
             titlesToMerge.Add("Withdrawal", currencyList.Count() + 1);
+            titlesToMerge.Add("Nett", currencyList.Count() + 1);
             titlesToMerge.Add("Bonus", currencyList.Count() + 1);
             titlesToMerge.Add("Rebate", currencyList.Count() + 1);
             titlesToMerge.Add("Adjustment", currencyList.Count() + 1);

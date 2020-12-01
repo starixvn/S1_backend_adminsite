@@ -6,8 +6,9 @@ import WebAPI from '../../../module/WebAPI';
 import qs from 'qs';
 import moment, { isDate } from 'moment';
 import {number_format, number_toFixed} from '../../../module/Formatting/NumberFormat';
-
+// import DateFormat from '../../../module/Formatting/DateFormat';
 const App = () => {
+
     const [stateFilter, setFilter] = useState({
         'SiteIds': [],
         'Currency': [],
@@ -22,10 +23,12 @@ const App = () => {
         TotalResult: null
     });
 
-    const [siteList, setSiteList] = useState();
+    const [siteList, setSiteList] = useState(); 
 
     const [SubmitStatus, setSubmitStatus] = useState(false);
     const [ExportStatus, setExportStatus] = useState(false);
+
+    const [HiddenTitles, setHiddenTitles] = useState({hiddenTitlesList:[]});
 
     useEffect(() => {
         let param = {
@@ -81,6 +84,36 @@ const App = () => {
         });
     }
 
+    const Result_HideShowBtnOnClick = (element) => {
+
+        let list = [];
+        let getItem = HiddenTitles.hiddenTitlesList.find(x=> x.Category === element.columnTitle);
+
+        if(getItem)
+        {
+            HiddenTitles.hiddenTitlesList.forEach(elem=>{
+                if(elem.Category!==getItem.Category)
+                {
+                    list.push(elem);
+                }
+            });
+        }
+        else
+        {
+            list=HiddenTitles.hiddenTitlesList;
+            list.push({
+                'Category':element.columnTitle,
+                'Group':element.columnTitle,
+                'Header':element.headerStartwith
+            });
+        }
+
+        setHiddenTitles({
+            hiddenTitlesList:list
+        });
+
+    }
+
     const Filter_Submit = () => {
         if (stateFilter.SiteIds.length === 0) {
             alert("Please Choose at least one Site")
@@ -91,7 +124,6 @@ const App = () => {
             alert("Please Choose at least one currency")
             return false;
         }
-
         if (!moment(stateFilter.StartDate).unix()) {
             alert("Please Choose Start Date")
             return false;
@@ -114,8 +146,8 @@ const App = () => {
             Data: qs.stringify({
                 SiteIds: stateFilter.SiteIds,
                 CurrencyIds: currencyIds,
-                StartDate: moment(stateFilter.StartDate).unix(),
-                EndDate: moment(stateFilter.EndDate).add(1, 'days').unix() - 1
+                StartDate: moment(stateFilter.StartDate).format('YYYY-MM-DD'),
+                EndDate: moment(stateFilter.EndDate).format('YYYY-MM-DD')
             })
         };
 
@@ -149,6 +181,7 @@ const App = () => {
 
                     'depositSummary':0,
                     'withdrawalSummary':0,
+                    'nettSummary':0,
                     'bonusSummary':0,
                     'rebateSummary':0,
                     'adjustmentSummary':0,
@@ -157,18 +190,19 @@ const App = () => {
                     'winLossSummary':0                          
                 });
 
-                let totalITem=totalResult[0];
+                let totalItem=totalResult[0];
 
                 currencyList.map(curr=>{
 
-                    totalITem[`deposit_${curr.id}`] = 0;
-                    totalITem[`withdrawal_${curr.id}`] = 0;
-                    totalITem[`bonus_${curr.id}`] = 0;
-                    totalITem[`rebate_${curr.id}`] = 0;
-                    totalITem[`adjustment_${curr.id}`] = 0;
-                    totalITem[`turnOverStake_${curr.id}`] = 0;
-                    totalITem[`turnOverValidBet_${curr.id}`] = 0;
-                    totalITem[`winLoss_${curr.id}`] = 0;
+                    totalItem[`deposit_${curr.id}`] = 0;
+                    totalItem[`withdrawal_${curr.id}`] = 0;
+                    totalItem[`nett_${curr.id}`] = 0;
+                    totalItem[`bonus_${curr.id}`] = 0;
+                    totalItem[`rebate_${curr.id}`] = 0;
+                    totalItem[`adjustment_${curr.id}`] = 0;
+                    totalItem[`turnOverStake_${curr.id}`] = 0;
+                    totalItem[`turnOverValidBet_${curr.id}`] = 0;
+                    totalItem[`winLoss_${curr.id}`] = 0;
 
                 });
 
@@ -179,6 +213,7 @@ const App = () => {
                         let getItem = result.find(x=> x.date === elem.date);
                         let depositColDef = `deposit_${elem.currencyId}`;
                         let withdrawalColDef = `withdrawal_${elem.currencyId}`;
+                        let nettColDef = `nett_${elem.currencyId}`;
                         let bonusColDef = `bonus_${elem.currencyId}`;
                         let rebateColDef = `rebate_${elem.currencyId}`;
                         let adjustmentColDef = `adjustment_${elem.currencyId}`;
@@ -187,17 +222,19 @@ const App = () => {
                         let winLossColDef = `winLoss_${elem.currencyId}`;
 
                         if(getItem){
-                            getItem.depositSummary += elem.deposit;
-                            getItem.withdrawalSummary += elem.withdrawal;
-                            getItem.bonusSummary += elem.bonus;
-                            getItem.rebateSummary += elem.rebate;
-                            getItem.adjustmentSummary += elem.adjustment;
-                            getItem.turnOverStakeSummary += elem.turnOverStake;
-                            getItem.turnOverValidBetSummary += elem.turnOverValidBet;
-                            getItem.winLossSummary += elem.winLoss;
+                            getItem.depositSummary += elem.depositInMYR;
+                            getItem.withdrawalSummary += elem.withdrawalInMYR;
+                            getItem.nettSummary += elem.nettInMYR;
+                            getItem.bonusSummary += elem.bonusInMYR;
+                            getItem.rebateSummary += elem.rebateInMYR;
+                            getItem.adjustmentSummary += elem.adjustmentInMYR;
+                            getItem.turnOverStakeSummary += elem.turnOverStakeInMYR;
+                            getItem.turnOverValidBetSummary += elem.turnOverValidBetInMYR;
+                            getItem.winLossSummary += elem.winLossInMYR;
 
                             getItem[depositColDef] = elem.deposit;
                             getItem[withdrawalColDef] = elem.withdrawal;
+                            getItem[nettColDef] = elem.nett;
                             getItem[bonusColDef] = elem.bonus;
                             getItem[rebateColDef] = elem.rebate;
                             getItem[adjustmentColDef] = elem.adjustment;
@@ -210,17 +247,19 @@ const App = () => {
                             result.push({
                                 'date':elem.date,
 
-                                'depositSummary':elem.deposit,
-                                'withdrawalSummary':elem.withdrawal,
-                                'bonusSummary':elem.bonus,
-                                'rebateSummary':elem.rebate,
-                                'adjustmentSummary':elem.adjustment,
-                                'turnOverStakeSummary':elem.turnOverStake,
-                                'turnOverValidBetSummary':elem.turnOverValidBet,
-                                'winLossSummary':elem.winLoss,
+                                'depositSummary':elem.depositInMYR,
+                                'withdrawalSummary':elem.withdrawalInMYR,
+                                'nettSummary':elem.nettInMYR,
+                                'bonusSummary':elem.bonusInMYR,
+                                'rebateSummary':elem.rebateInMYR,
+                                'adjustmentSummary':elem.adjustmentInMYR,
+                                'turnOverStakeSummary':elem.turnOverStakeInMYR,
+                                'turnOverValidBetSummary':elem.turnOverValidBetInMYR,
+                                'winLossSummary':elem.winLossInMYR,
 
                                 [depositColDef]:elem.deposit,
                                 [withdrawalColDef]:elem.withdrawal,
+                                [nettColDef]:elem.nett,
                                 [bonusColDef]:elem.bonus,
                                 [rebateColDef]:elem.rebate,
                                 [adjustmentColDef]:elem.adjustment,
@@ -230,23 +269,25 @@ const App = () => {
                             });
                         }
 
-                        totalITem.depositSummary = totalITem.depositSummary + elem.deposit;
-                        totalITem.withdrawalSummary = totalITem.withdrawalSummary + elem.withdrawal;
-                        totalITem.bonusSummary = totalITem.bonusSummary + elem.bonus;
-                        totalITem.rebateSummary = totalITem.rebateSummary + elem.rebate;
-                        totalITem.adjustmentSummary = totalITem.adjustmentSummary + elem.adjustment;
-                        totalITem.turnOverStakeSummary = totalITem.turnOverStakeSummary + elem.turnOverStake;
-                        totalITem.turnOverValidBetSummary = totalITem.turnOverValidBetSummary + elem.turnOverValidBet;
-                        totalITem.winLossSummary = totalITem.winLossSummary + elem.winLoss;
+                        totalItem.depositSummary = totalItem.depositSummary + elem.depositInMYR;
+                        totalItem.withdrawalSummary = totalItem.withdrawalSummary + elem.withdrawalInMYR;
+                        totalItem.nettSummary = totalItem.nettSummary + elem.nettInMYR;
+                        totalItem.bonusSummary = totalItem.bonusSummary + elem.bonusInMYR;
+                        totalItem.rebateSummary = totalItem.rebateSummary + elem.rebateInMYR;
+                        totalItem.adjustmentSummary = totalItem.adjustmentSummary + elem.adjustmentInMYR;
+                        totalItem.turnOverStakeSummary = totalItem.turnOverStakeSummary + elem.turnOverStakeInMYR;
+                        totalItem.turnOverValidBetSummary = totalItem.turnOverValidBetSummary + elem.turnOverValidBetInMYR;
+                        totalItem.winLossSummary = totalItem.winLossSummary +elem.winLossInMYR;
 
-                        totalITem[depositColDef] = totalITem[depositColDef] + elem.deposit;
-                        totalITem[withdrawalColDef] = totalITem[withdrawalColDef] + elem.withdrawal;
-                        totalITem[bonusColDef] = totalITem[bonusColDef] + elem.bonus;
-                        totalITem[rebateColDef] = totalITem[rebateColDef] + elem.rebate;
-                        totalITem[adjustmentColDef] = totalITem[adjustmentColDef] + elem.adjustment;
-                        totalITem[turnOverStakeColDef] = totalITem[turnOverStakeColDef] + elem.turnOverStake;
-                        totalITem[turnOverValidBetColDef] = totalITem[turnOverValidBetColDef] + elem.turnOverValidBet;
-                        totalITem[winLossColDef] = totalITem[winLossColDef] + elem.winLoss;
+                        totalItem[depositColDef] = totalItem[depositColDef] + elem.deposit;
+                        totalItem[withdrawalColDef] = totalItem[withdrawalColDef] + elem.withdrawal;
+                        totalItem[nettColDef] = totalItem[nettColDef] + elem.nett;
+                        totalItem[bonusColDef] = totalItem[bonusColDef] + elem.bonus;
+                        totalItem[rebateColDef] = totalItem[rebateColDef] + elem.rebate;
+                        totalItem[adjustmentColDef] = totalItem[adjustmentColDef] + elem.adjustment;
+                        totalItem[turnOverStakeColDef] = totalItem[turnOverStakeColDef] + elem.turnOverStake;
+                        totalItem[turnOverValidBetColDef] = totalItem[turnOverValidBetColDef] + elem.turnOverValidBet;
+                        totalItem[winLossColDef] = totalItem[winLossColDef] + elem.winLoss;
 
                     });
                 }
@@ -258,6 +299,7 @@ const App = () => {
                                     Object.keys(item).forEach(key => {
                                         if(key.startsWith('deposit') || 
                                            key.startsWith('withdrawal') ||
+                                           key.startsWith('nett') ||
                                            key.startsWith('bonus') || 
                                            key.startsWith('rebate') ||
                                            key.startsWith('adjustment') || 
@@ -280,6 +322,7 @@ const App = () => {
                             Object.keys(item).forEach(key => {
                                 if(key.startsWith('deposit') || 
                                    key.startsWith('withdrawal') ||
+                                   key.startsWith('nett') ||
                                    key.startsWith('bonus') || 
                                    key.startsWith('rebate') ||
                                    key.startsWith('adjustment') || 
@@ -299,34 +342,6 @@ const App = () => {
                 alert(res.data.message ?? 'failed to get data.');
             }
         })
-    }
-
-    //single currency export
-    const SingleCurrencyResult_ExportToExcel = () => {
-        if (stateDatas.FilterInfo.SiteIds.length === 0) {
-            alert("Please Choose at least one Site")
-            return false;
-        }
-        if (stateDatas.FilterInfo.Currency.length === 0) {
-            alert("Please Choose at least one Currency")
-            return false;
-        }
-
-        const currencyIds=[];
-        stateFilter.Currency.map(o => {
-            currencyIds.push(o.value);
-       });
-        let param = {
-            Url: 'Report/ExportMainFinancialReport',
-            Data: {
-                SiteIds: JSON.stringify(stateDatas.FilterInfo.SiteIds),
-                CurrencyIds: JSON.stringify(currencyIds),
-                StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
-                EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, 'days').unix() - 1
-            }
-        };
-
-        WebAPI.DownloadData(param);
     }
 
     const ExportToExcel = () => {
@@ -361,8 +376,8 @@ const App = () => {
             Data: {
                 SiteIds: JSON.stringify(stateDatas.FilterInfo.SiteIds),
                 CurrencyIds: JSON.stringify(currencyIds),
-                StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
-                EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, 'days').unix() - 1
+                StartDate: moment(stateDatas.FilterInfo.StartDate).format('YYYY-MM-DD'),
+                EndDate: moment(stateDatas.FilterInfo.EndDate).format('YYYY-MM-DD')
             }
         };
 
@@ -377,6 +392,7 @@ const App = () => {
         return (
             <div className="container-fluid" style={{ width: "100%", height: "100%", padding: "15px" }}>
                 <h4 className="page-name">Main Financial Report</h4>
+                {/* <div>{new DateFormat("11/16/2020","yyyy-mm-dd")}</div> */}
                 <Filter filterInfo={stateFilter} 
                         onChange={Filter_OnChange} 
                         onChangeCheckBox={Filter_CheckBox_OnChange} 
@@ -384,7 +400,13 @@ const App = () => {
                         ClickSubmit={Filter_Submit} 
                         SiteList={siteList}
                         SubmitBtnDisabled={SubmitStatus} />
-                {stateDatas.Datas === null ? null : <Result {...stateDatas} ExportToExcel={ExportToExcel} ExportBtnDisabled={ExportStatus}/>}
+                {stateDatas.Datas === null 
+                ? null 
+                : <Result {...stateDatas} 
+                   ExportToExcel={ExportToExcel} 
+                   ExportBtnDisabled={ExportStatus}
+                   HidenTitles={HiddenTitles}
+                   HideShowBtn={Result_HideShowBtnOnClick}/>}
             </div>
         );
 }
