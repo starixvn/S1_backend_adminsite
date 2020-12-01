@@ -204,12 +204,20 @@ import qs from 'qs';
                                 <div className="form-group">
                                     <label className="col-form-label d-block">Option</label>
                                     <div className="custom-control custom-radio custom-control-inline">
-                                        <input type="radio" id="Credit" name="Option" className="custom-control-input" value={1} onChange={this.onChange.bind(this)} />
-                                        <label className="custom-control-label" htmlFor="Credit">Credit</label>
+                                        <input type="radio" id="Option_1" name="Option" className="custom-control-input" value={1} onChange={this.onChange.bind(this)} />
+                                        <label className="custom-control-label" htmlFor="Option_1">Balance(+)</label>
                                     </div>
                                     <div className="custom-control custom-radio custom-control-inline">
-                                        <input type="radio" id="Debit" name="Option" className="custom-control-input" value={2} onChange={this.onChange.bind(this)} />
-                                        <label className="custom-control-label" htmlFor="Debit">Debit</label>
+                                        <input type="radio" id="Option_2" name="Option" className="custom-control-input" value={2} onChange={this.onChange.bind(this)} />
+                                        <label className="custom-control-label" htmlFor="Option_2">Balance(-)</label>
+                                    </div>
+                                    <div className="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="Option_3" name="Option" className="custom-control-input" value={3} onChange={this.onChange.bind(this)} />
+                                        <label className="custom-control-label" htmlFor="Option_3">Bonus(+)</label>
+                                    </div>
+                                    <div className="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="Option_4" name="Option" className="custom-control-input" value={4} onChange={this.onChange.bind(this)} />
+                                        <label className="custom-control-label" htmlFor="Option_4">Bonus(-)</label>
                                     </div>
                                 </div>
                                 <div className="form-group">
