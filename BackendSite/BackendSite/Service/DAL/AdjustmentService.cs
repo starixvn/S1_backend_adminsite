@@ -60,6 +60,16 @@ namespace BackendSite.Service.DAL
         {
             int adjustId = 0;
             int type = 1 + adjustmentInfo.AdjustType;
+
+            if (adjustmentInfo.AdjustType == 3)
+            {
+                type = 8;
+            }
+            else if (adjustmentInfo.AdjustType == 4)
+            {
+                type = 7;
+            }
+
             Match m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out adjustId);
 
@@ -82,10 +92,11 @@ namespace BackendSite.Service.DAL
                         decimal afterAmount = 0;
                         decimal amount = adjustmentInfo.Amount;
 
-                        if (adjustmentInfo.AdjustType == 2)
+                        if (adjustmentInfo.AdjustType == 2 || adjustmentInfo.AdjustType == 4)
                         {
                             amount *= -1;
                         }
+
                         int custId = p.Get<int?>("CustId") ?? 0;
                         string UserName = p.Get<string>("UserName");
                         result = walletService.SetBalance(custId, siteId, UserName, amount, type, $"Payment Adjustment: {amount}", transId, out afterAmount, out is1stDepoist, conn, trans);
