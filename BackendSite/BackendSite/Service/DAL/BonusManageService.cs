@@ -73,6 +73,7 @@ namespace BackendSite.Service.DAL
                     var rebateList = conn.Query<PromotionRebate1>("Admin_PromotionRebate_Get", new { BonusCode, SiteId }, transaction: trans, commandType: CommandType.StoredProcedure);
                     foreach(var s in promotion.Specific)
                     {
+                        s.VN_AffIds = s.VN_AffIds == "null" ? string.Empty : s.VN_AffIds;
                         if (!string.IsNullOrEmpty(s.VN_AffIds))
                         {
                             s.VN_AffIds = string.Join(',', JsonConvert.DeserializeObject<string[]>(s.VN_AffIds));
