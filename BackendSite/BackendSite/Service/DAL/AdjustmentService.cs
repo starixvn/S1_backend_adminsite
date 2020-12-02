@@ -230,13 +230,13 @@ namespace BackendSite.Service.DAL
             {
                 List<int> forStatus = new List<int>();
                 forStatus.Add((int)AdjustStatus.Pending);
-                result = SetAdjustmentInfo(Adjustment_transId, adjustmentAndWithdrawalLimit.SiteId, $"Payment Adjustment: {adjustmentAndWithdrawalLimit.Amount * (adjustmentAndWithdrawalLimit.AdjustType == 1 ? 1 : -1)}", Operator, forStatus, AdjustStatus.Approved, adjustmentAndWithdrawalLimit, conn, trans);
+                result = SetAdjustmentInfo(Adjustment_transId, adjustmentAndWithdrawalLimit.SiteId, $"Payment Adjustment: {adjustmentAndWithdrawalLimit.Amount * (adjustmentAndWithdrawalLimit.AdjustType % 2 == 1/*1, 3(Add)2, 4(Deduct)*/ ? 1 : -1)}", Operator, forStatus, AdjustStatus.Approved, adjustmentAndWithdrawalLimit, conn, trans);
 
                 if (result > 0)
                 {
                     Adjustment_transId = Adjustment_p.Get<string>("TransId");
 
-                    if (adjustmentAndWithdrawalLimit.AdjustType == 1 && adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType == 1 && adjustmentAndWithdrawalLimit.WithdrawalLimitAmount > 0)
+                    if (adjustmentAndWithdrawalLimit.AdjustType % 2 == 1/*1, 3(Add)2, 4(Deduct)*/  && adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType == 1 && adjustmentAndWithdrawalLimit.WithdrawalLimitAmount > 0)
                     {
                         var walletInfo = conn.Query<WithdrawalLimitInfo>("Member_CustWithdrawalLimit_Get", new { adjustmentAndWithdrawalLimit.CustId }, trans, commandType: CommandType.StoredProcedure).FirstOrDefault();
                         decimal deduction = 0;
@@ -266,7 +266,7 @@ namespace BackendSite.Service.DAL
                                 Amount = adjustmentAndWithdrawalLimit.WithdrawalLimitAmount,
                                 Memo = adjustmentAndWithdrawalLimit.Memo,
                                 Prefix = $"L{common.GetEnv()}"
-                            }); ;
+                            });
                             WithdrawalLimit_p.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
                             conn.Execute("Admin_AdjustWithdrawalLimitInfo_Ins", WithdrawalLimit_p, trans, commandType: CommandType.StoredProcedure);
