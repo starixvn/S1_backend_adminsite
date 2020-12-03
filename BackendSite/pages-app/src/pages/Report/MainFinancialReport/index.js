@@ -392,7 +392,6 @@ const App = () => {
         return (
             <div className="container-fluid" style={{ width: "100%", height: "100%", padding: "15px" }}>
                 <h4 className="page-name">Main Financial Report</h4>
-                {/* <div>{new DateFormat("11/16/2020","yyyy-mm-dd")}</div> */}
                 <Filter filterInfo={stateFilter} 
                         onChange={Filter_OnChange} 
                         onChangeCheckBox={Filter_CheckBox_OnChange} 

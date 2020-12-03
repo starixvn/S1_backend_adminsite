@@ -19,7 +19,7 @@ namespace BackendSite.Service.DAL
         {
             this.configuration = configuration;
         }
-
+        
         public IEnumerable<CurrencyModel> GetCurrencyList()
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
@@ -30,9 +30,9 @@ namespace BackendSite.Service.DAL
         }
 
         public Dictionary<string, IEnumerable<PartcialSummeryModel>> GetMainFinancialReport(string siteIds,
-                                                                      string currencyIds,
-                                                                      string startDate,
-                                                                      string endDate)
+                                                                                            string currencyIds,
+                                                                                            string startDate,
+                                                                                            string endDate)
         {
             var partcialSummeryModels = new Dictionary<string, IEnumerable<PartcialSummeryModel>>();   
 
@@ -101,6 +101,26 @@ namespace BackendSite.Service.DAL
 
                 string SpName = "Admin_ReportTurnOverAndWinlost_GroupByDay_Get";
                 return conn.Query<TurnoverAndWinlossSummeryModel>(SpName, parameters,commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public IEnumerable<StatisticalPartcialSummeryModel> GetStatisticalReport(string siteIds,
+                                                                                 string startDate,
+                                                                                 string endDate)
+        {
+
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                    SiteIds = siteIds,
+                    StartDate = startDate,
+                    EndDate = endDate
+                });
+
+                string SpName = "Admin_ReportTurnOverValidBet_Statistical_Get";
+                return conn.Query<StatisticalPartcialSummeryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
     }
