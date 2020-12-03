@@ -18,7 +18,9 @@ const BonusInfoReport = lazy(() =>
 const PaymentManagement = lazy(() =>
 	import("./pages/Finance/PaymentManagement/index")
 );
-const Announcement = lazy(() => import("./pages/CSD/Announcement/index"));
+const Announcement = lazy(() => 
+	import("./pages/CSD/Announcement/index")
+);
 const WithdrawalLimitAdjust = lazy(() =>
 	import("./pages/Finance/WithdrawalLimitAdjust/index")
 );
@@ -43,19 +45,32 @@ const ChangeVipLevelBatch = lazy(() =>
 const WithdrawalKYCControl = lazy(() =>
 	import("./pages/CSD/WithdrawalKYCControl/index")
 );
-const DashBoard = lazy(() => import("./pages/Home/DashBoard/index"));
+const DashBoard = lazy(() => 
+	import("./pages/Home/DashBoard/index")
+);
 const BalanceAdjustmentBatch = lazy(() =>
 	import("./pages/Finance/BalanceAdjustmentBatch/index")
 );
-const BonusManage = lazy(() => import("./pages/Marketing/BonusManage/index"));
-const PendingBonus = lazy(() => import("./pages/Marketing/PendingBonus/index"));
+const BonusManage = lazy(() => 
+	import("./pages/Marketing/BonusManage/index")
+);
+const PendingBonus = lazy(() => 
+	import("./pages/Marketing/PendingBonus/index")
+);
 const ThirdPartyAdjustment = lazy(() =>
 	import("./pages/Finance/ThirdPartyAdjustment/index")
 );
-const NewsManage = lazy(() => import("./pages/Marketing/NewsManage/index"));
-const MainFinancialReport = lazy(() => import("./pages/Report/MainFinancialReport/index"));
+const NewsManage = lazy(() => 
+	import("./pages/Marketing/NewsManage/index")
+);
+const MainFinancialReport = lazy(() => 
+	import("./pages/Report/MainFinancialReport/index")
+);
+const StatisticalReport = lazy(() => 
+	import("./pages/Report/StatisticalReport/index")
+);
 
-export const defaultPage = "MainFinancialReport";
+export const defaultPage = "StatisticalReport";
 
 export const layoutType = {
 	N88: "N88",
@@ -337,6 +352,19 @@ export const pages = {
 		comp: (
 			<Suspense fallback="loading...">
 				<MainFinancialReport />
+			</Suspense>
+		),
+		css: [
+			"./lib/bootstrap/dist/css/bootstrap.min.css",
+			"./css/css/main.css",
+			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
+		],
+		layout: layoutType.N88
+	},
+	StatisticalReport: {
+		comp: (
+			<Suspense fallback="loading...">
+				<StatisticalReport />
 			</Suspense>
 		),
 		css: [
