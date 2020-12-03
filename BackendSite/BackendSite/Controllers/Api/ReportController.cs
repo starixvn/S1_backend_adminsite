@@ -402,5 +402,446 @@ namespace BackendSite.Controllers.Api
                         $"MainFinancialReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/StatisticalReport" })]
+        public ApiResult GetStatisticalReport([FromForm] IEnumerable<int> SiteIds,
+                                              [FromForm] string EndDate)
+        {
+
+            var apiResult = new ApiResult<IEnumerable<StatisticalReportModel>>();
+
+            try
+            {
+                #region Date Caculate
+
+                DateTime endDate = Convert.ToDateTime(EndDate);
+                string StartDate = new DateTime(endDate.Year, endDate.Month, 1).AddMonths(-1).ToString("yyyy-MM-dd");
+
+                #endregion
+
+                apiResult.Data = reportBLL.GetStatisticalReport(JsonConvert.SerializeObject(SiteIds),
+                                                                StartDate,
+                                                                EndDate);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.Message;
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+            }
+
+            return apiResult;
+        }
+
+        public IActionResult ExportStatisticalReport(string SiteIds,
+                                                     string EndDate)
+        {
+
+            #region Date Caculate
+
+            DateTime endDate = Convert.ToDateTime(EndDate);
+            string StartDate = new DateTime(endDate.Year, endDate.Month, 1).AddMonths(-1).ToString("yyyy-MM-dd");
+
+            #endregion
+
+            var ExportData = reportBLL.GetStatisticalReport(SiteIds,
+                                                            StartDate,
+                                                            EndDate);
+
+            List<string> CurrencyList = new List<string>();
+            List<Dictionary<string, dynamic>> turnOverContent = new List<Dictionary<string, dynamic>>();
+            Dictionary<string, TitleModel> turnOverTitles = new Dictionary<string, TitleModel>();
+            List<Dictionary<string, dynamic>> winLossContent = new List<Dictionary<string, dynamic>>();
+            Dictionary<string, TitleModel> winLossTitles = new Dictionary<string, TitleModel>();
+            Dictionary<string, int> titlesToMerge = new Dictionary<string, int>();
+            List<string> notSummaryTitles = new List<string> { "Key", "CurrencyId", "Currency", "CategoryId", "CategoryName", "GameId", "GameName" };
+            List<string> totalTitle = new List<string>
+            {
+                "Today in MYR", "Yesterday in MYR",
+                "LastTwoDays in MYR", "ThisMonth in MYR",
+                "LastMonth in MYR"
+            };
+
+            foreach (var item in ExportData)
+            {
+                var getCurrItem = CurrencyList.FirstOrDefault(x => x.Contains(item.IsoCode));
+                if (getCurrItem == null)
+                {
+                    CurrencyList.Add(item.IsoCode);
+                }
+
+                var TodayPropName = $"Today-{item.IsoCode}";
+                var YesterdayPropName = $"Yesterday-{item.IsoCode}";
+                var LastTwoDaysPropName = $"LastTwoDays-{item.IsoCode}";
+                var ThisMonthPropName = $"ThisMonth-{item.IsoCode}";
+                var LastMonthPropName = $"LastMonth-{item.IsoCode}";
+
+                var todaySortId = 100 + item.CurrencyId;
+                var yesterdaySortId = 300 + item.CurrencyId;
+                var lastTwoDaysSortId = 500 + item.CurrencyId;
+                var thisMonthSortId = 700 + item.CurrencyId;
+                var lastMonthSortId = 900 + item.CurrencyId;
+
+                var getKey = $"{item.CategoryId}-{item.GameId}";
+                var getTurnOverItem = turnOverContent.FirstOrDefault(x =>
+                    x.Any(y => y.Key == "Key" && (string)y.Value == getKey)
+                );
+
+                var getWinLossItem = winLossContent.FirstOrDefault(x =>
+                    x.Any(y => y.Key == "Key" && (string)y.Value == getKey)
+                );
+
+                if (getTurnOverItem != null)
+                {
+                    getTurnOverItem.TryGetValue("Today in MYR", out dynamic today);
+                    getTurnOverItem["Today in MYR"] = (decimal)today + item.TurnOverValidBetTodaySummaryInMYR;
+
+                    getTurnOverItem.TryGetValue("Yesterday in MYR", out dynamic withdrawal);
+                    getTurnOverItem["Yesterday in MYR"] = (decimal)withdrawal + item.TurnOverValidBetYesterdaySummaryInMYR;
+
+                    getTurnOverItem.TryGetValue("LastTwoDays in MYR", out dynamic nett);
+                    getTurnOverItem["LastTwoDays in MYR"] = (decimal)nett + item.TurnOverValidBetLastTwoDaysSummaryInMYR;
+
+                    getTurnOverItem.TryGetValue("ThisMonth in MYR", out dynamic bonus);
+                    getTurnOverItem["ThisMonth in MYR"] = (decimal)bonus + item.TurnOverValidBetThisMonthSummaryInMYR;
+
+                    getTurnOverItem.TryGetValue("LastMonth in MYR", out dynamic rebate);
+                    getTurnOverItem["LastMonth in MYR"] = (decimal)rebate + item.TurnOverValidBetLastMonthSummaryInMYR;
+
+
+                    //Today
+                    if (!turnOverTitles.ContainsKey(TodayPropName))
+                    {
+                        turnOverTitles.Add(TodayPropName, new TitleModel { Name = item.IsoCode, SortId = todaySortId });
+                    }
+                    if (getTurnOverItem.ContainsKey(TodayPropName))
+                    {
+                        getTurnOverItem.TryGetValue(TodayPropName, out dynamic todaydata);
+                        getTurnOverItem[TodayPropName] = (decimal)todaydata + item.TurnOverValidBetTodaySummary;
+                    }
+                    else
+                    {
+                        getTurnOverItem.Add(TodayPropName, item.TurnOverValidBetTodaySummary);
+                    }
+
+                    //Yesterday
+                    if (!turnOverTitles.ContainsKey(YesterdayPropName))
+                    {
+                        turnOverTitles.Add(YesterdayPropName, new TitleModel { Name = item.IsoCode, SortId = yesterdaySortId });
+                    }
+                    if (getTurnOverItem.ContainsKey(YesterdayPropName))
+                    {
+                        getTurnOverItem.TryGetValue(YesterdayPropName, out dynamic yesterdaydata);
+                        getTurnOverItem[YesterdayPropName] = (decimal)yesterdaydata + item.TurnOverValidBetYesterdaySummary;
+                    }
+                    else
+                    {
+                        getTurnOverItem.Add(YesterdayPropName, item.TurnOverValidBetYesterdaySummary);
+                    }
+
+                    //LastTwoDays
+                    if (!turnOverTitles.ContainsKey(LastTwoDaysPropName))
+                    {
+                        turnOverTitles.Add(LastTwoDaysPropName, new TitleModel { Name = item.IsoCode, SortId = lastTwoDaysSortId });
+                    }
+                    if (getTurnOverItem.ContainsKey(LastTwoDaysPropName))
+                    {
+                        getTurnOverItem.TryGetValue(LastTwoDaysPropName, out dynamic lasttwodaysdata);
+                        getTurnOverItem[LastTwoDaysPropName] = (decimal)lasttwodaysdata + item.TurnOverValidBetLastTwoDaysSummary;
+                    }
+                    else
+                    {
+                        getTurnOverItem.Add(LastTwoDaysPropName, item.TurnOverValidBetLastTwoDaysSummary);
+                    }
+
+                    //ThisMonth
+                    if (!turnOverTitles.ContainsKey(ThisMonthPropName))
+                    {
+                        turnOverTitles.Add(ThisMonthPropName, new TitleModel { Name = item.IsoCode, SortId = thisMonthSortId });
+                    }
+                    if (getTurnOverItem.ContainsKey(ThisMonthPropName))
+                    {
+                        getTurnOverItem.TryGetValue(ThisMonthPropName, out dynamic thismonthdata);
+                        getTurnOverItem[ThisMonthPropName] = (decimal)thismonthdata + item.TurnOverValidBetThisMonthSummary;
+                    }
+                    else
+                    {
+                        getTurnOverItem.Add(ThisMonthPropName, item.TurnOverValidBetThisMonthSummary);
+                    }
+
+                    //LastMonth
+                    if (!turnOverTitles.ContainsKey(LastMonthPropName))
+                    {
+                        turnOverTitles.Add(LastMonthPropName, new TitleModel { Name = item.IsoCode, SortId = lastMonthSortId });
+                    }
+                    if (getTurnOverItem.ContainsKey(LastMonthPropName))
+                    {
+                        getTurnOverItem.TryGetValue(LastMonthPropName, out dynamic lastmonthdata);
+                        getTurnOverItem[LastMonthPropName] = (decimal)lastmonthdata + item.TurnOverValidBetLastMonthSummary;
+                    }
+                    else
+                    {
+                        getTurnOverItem.Add(LastMonthPropName, item.TurnOverValidBetLastMonthSummary);
+                    }
+
+                }
+                else
+                {
+                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    {
+                        { "Key", getKey },
+                        { "CurrencyId", item.CurrencyId },
+                        { "Currency", item.IsoCode },
+                        { "CategoryId", item.CategoryId },
+                        { "CategoryName", item.CategoryName },
+                        { "GameId", item.GameId },
+                        { "GameName", item.GameName },
+
+                        { TodayPropName,  item.TurnOverValidBetTodaySummary },
+                        { YesterdayPropName, item.TurnOverValidBetYesterdaySummary },
+                        { LastTwoDaysPropName, item.TurnOverValidBetLastTwoDaysSummary },
+                        { ThisMonthPropName, item.TurnOverValidBetThisMonthSummary },
+                        { LastMonthPropName, item.TurnOverValidBetLastMonthSummary },
+
+                        { "Today in MYR", item.TurnOverValidBetTodaySummaryInMYR },
+                        { "Yesterday in MYR", item.TurnOverValidBetYesterdaySummaryInMYR },
+                        { "LastTwoDays in MYR", item.TurnOverValidBetLastTwoDaysSummaryInMYR },
+                        { "ThisMonth in MYR", item.TurnOverValidBetThisMonthSummaryInMYR},
+                        { "LastMonth in MYR", item.TurnOverValidBetLastMonthSummaryInMYR }
+                    };
+
+                    if (!turnOverTitles.ContainsKey("CategoryName"))
+                    {
+                        turnOverTitles.Add("CategoryName", new TitleModel { Name = "CategoryName", SortId = 1 });
+                        turnOverTitles.Add("GameName", new TitleModel { Name = "GameName", SortId = 2 });
+                        turnOverTitles.Add("Today in MYR", new TitleModel { Name = "Total in MYR", SortId = 200 });
+                        turnOverTitles.Add("Yesterday in MYR", new TitleModel { Name = "Total in MYR", SortId = 400 });
+                        turnOverTitles.Add("LastTwoDays in MYR", new TitleModel { Name = "Total in MYR", SortId = 600 });
+                        turnOverTitles.Add("ThisMonth in MYR", new TitleModel { Name = "Total in MYR", SortId = 800 });
+                        turnOverTitles.Add("LastMonth in MYR", new TitleModel { Name = "Total in MYR", SortId = 1000 });
+                    }
+
+                    if (!turnOverTitles.ContainsKey(TodayPropName))
+                    {
+                        turnOverTitles.Add(TodayPropName, new TitleModel { Name = item.IsoCode, SortId = todaySortId });
+                    }
+                    if (!turnOverTitles.ContainsKey(YesterdayPropName))
+                    {
+                        turnOverTitles.Add(YesterdayPropName, new TitleModel { Name = item.IsoCode, SortId = yesterdaySortId });
+                    }
+                    if (!turnOverTitles.ContainsKey(LastTwoDaysPropName))
+                    {
+                        turnOverTitles.Add(LastTwoDaysPropName, new TitleModel { Name = item.IsoCode, SortId = lastTwoDaysSortId });
+                    }
+                    if (!turnOverTitles.ContainsKey(ThisMonthPropName))
+                    {
+                        turnOverTitles.Add(ThisMonthPropName, new TitleModel { Name = item.IsoCode, SortId = thisMonthSortId });
+                    }
+                    if (!turnOverTitles.ContainsKey(LastMonthPropName))
+                    {
+                        turnOverTitles.Add(LastMonthPropName, new TitleModel { Name = item.IsoCode, SortId = lastMonthSortId });
+                    }
+
+                    turnOverContent.Add(newItem);
+                }
+
+                if (getWinLossItem != null)
+                {
+                    getWinLossItem.TryGetValue("Today in MYR", out dynamic today);
+                    getWinLossItem["Today in MYR"] = (decimal)today + item.WinLossTodaySummaryInMYR;
+
+                    getWinLossItem.TryGetValue("Yesterday in MYR", out dynamic yesterday);
+                    getWinLossItem["Yesterday in MYR"] = (decimal)yesterday + item.TurnOverValidBetYesterdaySummaryInMYR;
+
+                    getWinLossItem.TryGetValue("LastTwoDays in MYR", out dynamic lasttwodays);
+                    getWinLossItem["LastTwoDays in MYR"] = (decimal)lasttwodays + item.WinLossLastTwoDaysSummaryInMYR;
+
+                    getWinLossItem.TryGetValue("ThisMonth in MYR", out dynamic thismonth);
+                    getWinLossItem["ThisMonth in MYR"] = (decimal)thismonth + item.WinLossThisMonthSummaryInMYR;
+
+                    getWinLossItem.TryGetValue("LastMonth in MYR", out dynamic lastmonth);
+                    getWinLossItem["LastMonth in MYR"] = (decimal)lastmonth + item.WinLossLastMonthSummaryInMYR;
+
+
+                    //Today
+                    if (!turnOverTitles.ContainsKey(TodayPropName))
+                    {
+                        turnOverTitles.Add(TodayPropName, new TitleModel { Name = item.IsoCode, SortId = todaySortId });
+                    }
+                    if (getWinLossItem.ContainsKey(TodayPropName))
+                    {
+                        getWinLossItem.TryGetValue(TodayPropName, out dynamic todaydata);
+                        getWinLossItem[TodayPropName] = (decimal)todaydata + item.WinLossTodaySummary;
+                    }
+                    else
+                    {
+                        getWinLossItem.Add(TodayPropName, item.WinLossTodaySummary);
+                    }
+
+                    //Yesterday
+                    if (!turnOverTitles.ContainsKey(YesterdayPropName))
+                    {
+                        turnOverTitles.Add(YesterdayPropName, new TitleModel { Name = item.IsoCode, SortId = yesterdaySortId });
+                    }
+                    if (getWinLossItem.ContainsKey(YesterdayPropName))
+                    {
+                        getWinLossItem.TryGetValue(YesterdayPropName, out dynamic yesterdaydata);
+                        getWinLossItem[YesterdayPropName] = (decimal)yesterdaydata + item.WinLossYesterdaySummary;
+                    }
+                    else
+                    {
+                        getWinLossItem.Add(YesterdayPropName, item.WinLossYesterdaySummary);
+                    }
+
+                    //LastTwoDays
+                    if (!turnOverTitles.ContainsKey(LastTwoDaysPropName))
+                    {
+                        turnOverTitles.Add(LastTwoDaysPropName, new TitleModel { Name = item.IsoCode, SortId = lastTwoDaysSortId });
+                    }
+                    if (getWinLossItem.ContainsKey(LastTwoDaysPropName))
+                    {
+                        getWinLossItem.TryGetValue(LastTwoDaysPropName, out dynamic lasttwodaysdata);
+                        getWinLossItem[LastTwoDaysPropName] = (decimal)lasttwodaysdata + item.WinLossLastTwoDaysSummary;
+                    }
+                    else
+                    {
+                        getWinLossItem.Add(LastTwoDaysPropName, item.WinLossLastTwoDaysSummary);
+                    }
+
+                    //ThisMonth
+                    if (!turnOverTitles.ContainsKey(ThisMonthPropName))
+                    {
+                        turnOverTitles.Add(ThisMonthPropName, new TitleModel { Name = item.IsoCode, SortId = thisMonthSortId });
+                    }
+                    if (getWinLossItem.ContainsKey(ThisMonthPropName))
+                    {
+                        getWinLossItem.TryGetValue(ThisMonthPropName, out dynamic thismonthdata);
+                        getWinLossItem[ThisMonthPropName] = (decimal)thismonthdata + item.WinLossThisMonthSummary;
+                    }
+                    else
+                    {
+                        getWinLossItem.Add(ThisMonthPropName, item.WinLossThisMonthSummary);
+                    }
+
+                    //LastMonth
+                    if (!turnOverTitles.ContainsKey(LastMonthPropName))
+                    {
+                        turnOverTitles.Add(LastMonthPropName, new TitleModel { Name = item.IsoCode, SortId = lastMonthSortId });
+                    }
+                    if (getWinLossItem.ContainsKey(LastMonthPropName))
+                    {
+                        getWinLossItem.TryGetValue(LastMonthPropName, out dynamic lastmonthdata);
+                        getWinLossItem[LastMonthPropName] = (decimal)lastmonthdata + item.WinLossLastMonthSummary;
+                    }
+                    else
+                    {
+                        getWinLossItem.Add(LastMonthPropName, item.WinLossLastMonthSummary);
+                    }
+
+                }
+                else
+                {
+                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    {
+                        { "Key", getKey },
+                        { "CurrencyId", item.CurrencyId },
+                        { "Currency", item.IsoCode },
+                        { "CategoryId", item.CategoryId },
+                        { "CategoryName", item.CategoryName },
+                        { "GameId", item.GameId },
+                        { "GameName", item.GameName },
+
+                        { TodayPropName,  item.WinLossTodaySummary },
+                        { YesterdayPropName, item.WinLossYesterdaySummary },
+                        { LastTwoDaysPropName, item.WinLossLastTwoDaysSummary },
+                        { ThisMonthPropName, item.WinLossThisMonthSummary },
+                        { LastMonthPropName, item.WinLossLastMonthSummary },
+
+                        { "Today in MYR", item.WinLossTodaySummaryInMYR },
+                        { "Yesterday in MYR", item.WinLossYesterdaySummaryInMYR },
+                        { "LastTwoDays in MYR", item.WinLossLastTwoDaysSummaryInMYR },
+                        { "ThisMonth in MYR", item.WinLossThisMonthSummaryInMYR},
+                        { "LastMonth in MYR", item.WinLossLastMonthSummaryInMYR }
+                    };
+
+                    if (!turnOverTitles.ContainsKey("CategoryName"))
+                    {
+                        turnOverTitles.Add("CategoryName", new TitleModel { Name = "CategoryName", SortId = 1 });
+                        turnOverTitles.Add("GameName", new TitleModel { Name = "GameName", SortId = 2 });
+                        turnOverTitles.Add("Today in MYR", new TitleModel { Name = "Total in MYR", SortId = 200 });
+                        turnOverTitles.Add("Yesterday in MYR", new TitleModel { Name = "Total in MYR", SortId = 400 });
+                        turnOverTitles.Add("LastTwoDays in MYR", new TitleModel { Name = "Total in MYR", SortId = 600 });
+                        turnOverTitles.Add("ThisMonth in MYR", new TitleModel { Name = "Total in MYR", SortId = 800 });
+                        turnOverTitles.Add("LastMonth in MYR", new TitleModel { Name = "Total in MYR", SortId = 1000 });
+                    }
+
+                    if (!turnOverTitles.ContainsKey(TodayPropName))
+                    {
+                        turnOverTitles.Add(TodayPropName, new TitleModel { Name = item.IsoCode, SortId = todaySortId });
+                    }
+                    if (!turnOverTitles.ContainsKey(YesterdayPropName))
+                    {
+                        turnOverTitles.Add(YesterdayPropName, new TitleModel { Name = item.IsoCode, SortId = yesterdaySortId });
+                    }
+                    if (!turnOverTitles.ContainsKey(LastTwoDaysPropName))
+                    {
+                        turnOverTitles.Add(LastTwoDaysPropName, new TitleModel { Name = item.IsoCode, SortId = lastTwoDaysSortId });
+                    }
+                    if (!turnOverTitles.ContainsKey(ThisMonthPropName))
+                    {
+                        turnOverTitles.Add(ThisMonthPropName, new TitleModel { Name = item.IsoCode, SortId = thisMonthSortId });
+                    }
+                    if (!turnOverTitles.ContainsKey(LastMonthPropName))
+                    {
+                        turnOverTitles.Add(LastMonthPropName, new TitleModel { Name = item.IsoCode, SortId = lastMonthSortId });
+                    }
+
+                    winLossContent.Add(newItem);
+                }
+            }
+
+            #region Titles To Merge
+
+            titlesToMerge.Add("", 2);
+
+            titlesToMerge.Add("Today", CurrencyList.Count() + 1);
+            titlesToMerge.Add("Yesterday", CurrencyList.Count() + 1);
+            titlesToMerge.Add("Last 2 Days", CurrencyList.Count() + 1);
+            titlesToMerge.Add("This Month", CurrencyList.Count() + 1);
+            titlesToMerge.Add("Last Month", CurrencyList.Count() + 1);
+
+            #endregion
+
+            List<ExportReportDataToExcel> d = new List<ExportReportDataToExcel>()
+            {
+                new ExportReportDataToExcel()
+                {
+                    SheetName = "TurnOver(ValidBet)",
+                    Content = turnOverContent,
+                    Titles = turnOverTitles.OrderBy(x=> x.Value.SortId).Select(x=> x.Key).ToList(),
+                    TotalTitles = totalTitle,
+                    TitlesToMerge = titlesToMerge,
+                    TitlesNameToDisplay = turnOverTitles.OrderBy(x=> x.Value.SortId).Select(x=> x.Value.Name).ToList(),
+                    NotSummaryTitles = notSummaryTitles
+                },
+                new ExportReportDataToExcel()
+                {
+                    SheetName = "WinLoss",
+                    Content = winLossContent,
+                    Titles = turnOverTitles.OrderBy(x=> x.Value.SortId).Select(x=> x.Key).ToList(),
+                    TotalTitles = totalTitle,
+                    TitlesToMerge = titlesToMerge,
+                    TitlesNameToDisplay = turnOverTitles.OrderBy(x=> x.Value.SortId).Select(x=> x.Value.Name).ToList(),
+                    NotSummaryTitles = notSummaryTitles
+                }
+            };
+
+            var stream = excelBLL.ExportToMultiSheetForReport(d);
+
+            return File(stream,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        $"StatisticalReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
+
     }
 }
