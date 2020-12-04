@@ -39,7 +39,7 @@ const turnOverValidBetDataColumnDefs = (props) => {
     return [
         {
             columnTitle: 'Category',
-            dataColumn: "categoryName"
+            dataColumn: "categoryName",
         },
         {
             columnTitle: 'Game',
@@ -307,7 +307,6 @@ const winLossDataColumnDefs = (props) => {
 }
 
 const Panel = (props) => {
-console.log(props);
     const turnOverValidBetGroupColumnDefsDefault = turnOverValidBetDataGroupColumnDefs(props);
     const turnOverValidBetColumnDefsDefault = turnOverValidBetDataColumnDefs(props);
 
@@ -317,6 +316,8 @@ console.log(props);
     let turnOverValidBetGroupColumnDefs = [];
     let turnOverValidBetColumnDefs = [];
 
+    let turnOverValidBetBodyRows=[];
+
     const winLossGroupColumnDefsDefault = winLossDataGroupColumnDefs(props);
     const winLossColumnDefsDefault = winLossDataColumnDefs(props);
 
@@ -325,6 +326,8 @@ console.log(props);
 
     let winLossGroupColumnDefs = [];
     let winLossColumnDefs = [];
+
+    let winLossBodyRows=[];
 
     // if(props.HidenTitles.hiddenTitlesList.length > 0)
     // {
@@ -381,54 +384,197 @@ console.log(props);
         winLossGroupColumnDefs = winLossGroupColumnDefsDefault;
         winLossColumnDefs = winLossColumnDefsDefault;
     // }
+    let turnOverValidBetFilterDatas=[];
+    if(props.HidenTitles.turnOverValidBetHiddenCategoryList.length > 0)
+    {      
+        props.Datas.forEach(data => {
+
+            let flag=true;
+            props.HidenTitles.turnOverValidBetHiddenCategoryList.forEach(category=>{
+
+                if(data.categoryId===category.CategoryId)
+                {
+                    flag=false;
+                }
+
+            });
+
+            if(flag)
+            {
+                turnOverValidBetFilterDatas.push(data);
+            }
+        });
+    }
+    else
+    {
+        
+        turnOverValidBetFilterDatas=props.Datas;
+    }
 
     turnOverValidBetGroupColumnDefs.forEach((element, idx) => {
         turnOverValidBetGroupHeaderRows.push(
             <th key={`th-${element.dataColumn}-${idx}`}
                 scope="col"
+                style={{ position: "sticky", top: "0",height:"36.8px"}}
                 className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''} colSpan={element.colSpan}
-                bgcolor={element.bgcolor}>
+                bgcolor={element.bgcolor}
+                style={{ position: "sticky", top: "0",height:"36.8px"}}>
                 {element.columnTitle}
                 {/* <button type="button" className="btn btn-info pull-right" onClick={() => props.HideShowBtn(element)}>{element.btnText}</button> */}
             </th>
         );
     });
 
-
     turnOverValidBetColumnDefs.forEach((element, idx) => {
         turnOverValidBetHeaderRows.push(
             <th key={`th-${element.dataColumn}-${idx}`} 
                 scope="col"
+                style={{ position: "sticky", top: "36.8px",height:"36.8px"}}
                 className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''}>
                 {element.columnTitle}
              </th>
         );
      });
 
-     let turnOverValidBetBodyRows = props.Datas.map((data, idx) => {
-        let row = turnOverValidBetColumnDefs.map((element, idx) => {
-            let subData = {};
-            if (element.body && element.body.subData) {
-                element.body.subData.forEach(s => { subData[s] = data[s] });
+    // let turnOverValidBetBodyRows = props.Datas.map((data, idx) => {
+    //     let row = turnOverValidBetColumnDefs.map((element, idx) => {
+    //         let subData = {};
+    //         if (element.body && element.body.subData) {
+    //             element.body.subData.forEach(s => { subData[s] = data[s] });
+    //         }
+    //         return (
+    //             <td key={`td-${element.dataColumn}-${idx}`}
+    //                 className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+    //                 bgcolor={ data.gameId == 0 ? 'LightCyan' : ''}
+    //                >
+    //                 {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
+    //             </td>
+    //         );
+    //     });
+
+    //     return (
+    //         <tr key={`result-body-${idx}`}>
+    //             {row}
+    //         </tr>
+    //     )
+    // });
+    props.CategoryGameList.forEach((category,cidx)=>{
+        let flag=true; 
+        category.gameList.forEach((game)=>{
+            
+            let getDataItem = turnOverValidBetFilterDatas.find(x=>x.categoryId===category.categoryId && x.gameId===game.gameId);
+            
+            if(getDataItem)
+            {
+                let idx = turnOverValidBetFilterDatas.indexOf(getDataItem);
+                let row = turnOverValidBetColumnDefs.map((element, idx) => {
+                        let subData = {};
+                        if (element.body && element.body.subData) {
+                            element.body.subData.forEach(s => { subData[s] = getDataItem[s] });
+                        }
+                        if(flag)
+                        {
+                            flag = false;
+                                return (
+                                    <th key={`td-${element.dataColumn}-${idx}`}
+                                        className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                        rowSpan={category.gameList.length + 1}
+                                    >
+                                        {element.body && element.body.format ? element.body.format(getDataItem[element.dataColumn], subData) : getDataItem[element.dataColumn]}
+                                        {/* <button type="button" className="btn btn-info pull-right" onClick={() => props.TurnOverValidBetHideShowBtn(getDataItem['categoryId'])}>hide</button> */}
+                                    </th>
+                                );
+                        }
+                        else
+                        {
+                            if(element.dataColumn!=="categoryName")
+                            {
+                                return (
+                                    <td key={`td-${element.dataColumn}-${idx}`}
+                                        className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                    >
+                                        {element.body && element.body.format ? element.body.format(getDataItem[element.dataColumn], subData) : getDataItem[element.dataColumn]}
+                                    </td>
+                                );
+                            }
+                        }
+                    });
+    
+                turnOverValidBetBodyRows.push(
+                    <tr key={`result-body-data-${idx}`}>
+                        {row}
+                    </tr>
+                );
             }
-            return (
-                <td key={`td-${element.dataColumn}-${idx}`}
-                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
-                    bgcolor={ data.gameId == 0 ? 'LightCyan' : ''}
-                   >
-                    {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
-                </td>
-            );
         });
 
-        return (
-            <tr key={`result-body-${idx}`}>
-                {row}
-            </tr>
-        )
+        let geCategoryItem = props.CategoryTotalResult.find(x=>x.categoryId===category.categoryId);
+            
+        if(geCategoryItem)
+        {
+            let flag=true;
+
+            props.HidenTitles.turnOverValidBetHiddenCategoryList.forEach(id=>{
+
+                if(category.categoryId===id.CategoryId)
+                {
+                    flag=false;
+                }
+            });
+
+            let row = turnOverValidBetColumnDefs.map((element, idx) => {
+                let subData = {};
+                if (element.body && element.body.subData) {
+                    element.body.subData.forEach(s => { subData[s] = geCategoryItem[s] });
+                }
+                    
+                if(flag){
+                        if(element.dataColumn!=="categoryName"){
+                            return (
+                                <th key={`td-${element.dataColumn}-${idx}`}
+                                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                    bgcolor='LightCyan'
+                                >
+                                    {element.body && element.body.format ? element.body.format(geCategoryItem[element.dataColumn], subData) : geCategoryItem[element.dataColumn]}
+                                </th>
+                            );
+                        }
+                }
+                else{
+                        if(element.dataColumn==="categoryName"){
+                            return (
+                                <th key={`td-${element.dataColumn}-${idx}`}
+                                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                    bgcolor='LightCyan'
+                                    style={{ position: "sticky", left: "0"}}
+                                >
+                                     {element.body && element.body.format ? element.body.format(geCategoryItem[element.dataColumn], subData) : geCategoryItem[element.dataColumn]}
+                                     {element.dataColumn==="categoryName" ? <button type="button" className="btn btn-info pull-right" onClick={() => props.TurnOverValidBetHideShowBtn(geCategoryItem['categoryId'])}>show</button> : ''}
+                                 </th>
+                            );
+                        }
+                        else{
+                            return (
+                                <th key={`td-${element.dataColumn}-${idx}`}
+                                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                    bgcolor='LightCyan'
+                                >
+                                     {element.body && element.body.format ? element.body.format(geCategoryItem[element.dataColumn], subData) : geCategoryItem[element.dataColumn]}
+                                 </th>
+                            );
+                        }
+                }
+            });
+    
+            turnOverValidBetBodyRows.push(
+                <tr key={`result-body-category-${cidx}`}>
+                    {row}
+                 </tr>
+            );
+        }
+
     });
-
-
+    
     let turnOverValidBetTotalRows = props.TotalResult.map((data, idx) => {
         let row = turnOverValidBetColumnDefs.map((element, idx) => {
             let subData = {};
@@ -451,52 +597,196 @@ console.log(props);
         )
     });
 
+
     winLossGroupColumnDefs.forEach((element, idx) => {
         winLossGroupHeaderRows.push(
             <th key={`th-${element.dataColumn}-${idx}`}
                 scope="col"
+                style={{ position: "sticky", top: "0",height:"36.8px"}}
                 className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''} colSpan={element.colSpan}
-                bgcolor={element.bgcolor}>
+                bgcolor={element.bgcolor}
+                style={{ position: "sticky", top: "0",height:"36.8px"}}>
                 {element.columnTitle}
                 {/* <button type="button" className="btn btn-info pull-right" onClick={() => props.HideShowBtn(element)}>{element.btnText}</button> */}
             </th>
         );
     });
 
-
     winLossColumnDefs.forEach((element, idx) => {
         winLossHeaderRows.push(
             <th key={`th-${element.dataColumn}-${idx}`} 
                 scope="col"
+                style={{ position: "sticky", top: "36.8px",height:"36.8px"}}
                 className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''}>
                 {element.columnTitle}
              </th>
         );
      });
 
-     let winLossBodyRows = props.Datas.map((data, idx) => {
-        let row = winLossColumnDefs.map((element, idx) => {
-            let subData = {};
-            if (element.body && element.body.subData) {
-                element.body.subData.forEach(s => { subData[s] = data[s] });
+    // let winLossBodyRows = props.Datas.map((data, idx) => {
+    //     let row = winLossColumnDefs.map((element, idx) => {
+    //         let subData = {};
+    //         if (element.body && element.body.subData) {
+    //             element.body.subData.forEach(s => { subData[s] = data[s] });
+    //         }
+    //         return (
+    //             <td key={`td-${element.dataColumn}-${idx}`}
+    //                 className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+    //                 bgcolor={ data.gameId == 0 ? 'LightCyan' : ''}
+    //                >
+    //                 {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
+    //             </td>
+    //         );
+    //     });
+
+    //     return (
+    //         <tr key={`result-body-${idx}`}>
+    //             {row}
+    //         </tr>
+    //     )
+    // });
+    let winLossFilterDatas=[];
+
+    if(props.HidenTitles.winLossHiddenCategoryList.length > 0)
+    {      
+        props.Datas.forEach(data => {
+
+            let flag=true;
+            props.HidenTitles.winLossHiddenCategoryList.forEach(category=>{
+
+                if(data.categoryId===category.CategoryId)
+                {
+                    flag=false;
+                }
+
+            });
+
+            if(flag)
+            {
+                winLossFilterDatas.push(data);
             }
-            return (
-                <td key={`td-${element.dataColumn}-${idx}`}
-                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
-                    bgcolor={ data.gameId == 0 ? 'LightCyan' : ''}
-                   >
-                    {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
-                </td>
-            );
+        });
+    }
+    else
+    {
+        winLossFilterDatas=props.Datas;
+    }
+
+    props.CategoryGameList.forEach((category,cidx)=>{
+        let flag=true; 
+        category.gameList.forEach((game)=>{
+            
+            let getDataItem = winLossFilterDatas.find(x=>x.categoryId===category.categoryId && x.gameId===game.gameId);
+            
+            if(getDataItem)
+            {
+                let idx = winLossFilterDatas.indexOf(getDataItem);
+                let row = winLossColumnDefs.map((element, idx) => {
+                        let subData = {};
+                        if (element.body && element.body.subData) {
+                            element.body.subData.forEach(s => { subData[s] = getDataItem[s] });
+                        }
+                        if(flag)
+                        {
+                            flag = false;
+                                return (
+                                    <td key={`td-${element.dataColumn}-${idx}`}
+                                        className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                        rowSpan={category.gameList.length + 1}
+                                    >
+                                        {element.body && element.body.format ? element.body.format(getDataItem[element.dataColumn], subData) : getDataItem[element.dataColumn]}
+                                        {/* <button type="button" className="btn btn-info pull-right" onClick={() => props.WinLossHideShowBtn(getDataItem['categoryId'])}>hide</button> */}
+                                    </td>
+                                );
+                        }
+                        else
+                        {
+                            if(element.dataColumn!=="categoryName")
+                            {
+                                return (
+                                    <td key={`td-${element.dataColumn}-${idx}`}
+                                        className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                    >
+                                        {element.body && element.body.format ? element.body.format(getDataItem[element.dataColumn], subData) : getDataItem[element.dataColumn]}
+                                    </td>
+                                );
+                            }
+                        }
+                    });
+    
+                winLossBodyRows.push(
+                    <tr key={`result-body-data-${idx}`}>
+                        {row}
+                    </tr>
+                );
+            }
         });
 
-        return (
-            <tr key={`result-body-${idx}`}>
-                {row}
-            </tr>
-        )
-    });
+        let geCategoryItem = props.CategoryTotalResult.find(x=>x.categoryId===category.categoryId);
+            
+        if(geCategoryItem)
+        {
+            let flag=true;
 
+            props.HidenTitles.winLossHiddenCategoryList.forEach(id=>{
+
+                if(category.categoryId===id.CategoryId)
+                {
+                    flag=false;
+                }
+            });
+
+            let row = winLossColumnDefs.map((element, idx) => {
+                let subData = {};
+                if (element.body && element.body.subData) {
+                    element.body.subData.forEach(s => { subData[s] = geCategoryItem[s] });
+                }
+                    
+                if(flag){
+                        if(element.dataColumn!=="categoryName"){
+                            return (
+                                <th key={`td-${element.dataColumn}-${idx}`}
+                                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                    bgcolor='LightCyan'
+                                >
+                                    {element.body && element.body.format ? element.body.format(geCategoryItem[element.dataColumn], subData) : geCategoryItem[element.dataColumn]}
+                                </th>
+                            );
+                        }
+                }
+                else{
+                        if(element.dataColumn==="categoryName"){
+                            return (
+                                <th key={`td-${element.dataColumn}-${idx}`}
+                                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                    bgcolor='LightCyan'
+                                >
+                                     {element.body && element.body.format ? element.body.format(geCategoryItem[element.dataColumn], subData) : geCategoryItem[element.dataColumn]}
+                                     {element.dataColumn==="categoryName" ? <button type="button" className="btn btn-info pull-right" onClick={() => props.WinLossHideShowBtn(geCategoryItem['categoryId'])}>show</button> : ''}
+                                 </th>
+                            );
+                        }
+                        else{
+                            return (
+                                <th key={`td-${element.dataColumn}-${idx}`}
+                                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                    bgcolor='LightCyan'
+                                >
+                                     {element.body && element.body.format ? element.body.format(geCategoryItem[element.dataColumn], subData) : geCategoryItem[element.dataColumn]}
+                                 </th>
+                            );
+                        }
+                }
+            });
+    
+            winLossBodyRows.push(
+                <tr key={`result-body-category-${cidx}`}>
+                    {row}
+                 </tr>
+            );
+        }
+
+    });
 
     let winLossTotalRows = props.TotalResult.map((data, idx) => {
         let row = winLossColumnDefs.map((element, idx) => {
@@ -528,7 +818,7 @@ console.log(props);
             <table className="table table-striped">
                 <thead>
                     <tr>
-                        <th colSpan="2">TurnOver(ValidBet)</th>
+                        <th colSpan="2" style={{ position: "sticky", top: "0",height:"36.8px"}}>TurnOver(ValidBet)</th>
                         {turnOverValidBetGroupHeaderRows}
                     </tr>
                     <tr>
@@ -541,7 +831,7 @@ console.log(props);
                 </tbody>
                 <thead>
                     <tr>
-                        <th colSpan="2">WinLoss</th>
+                        <th colSpan="2" style={{ position: "sticky", top: "0",height:"36.8px"}}>WinLoss</th>
                         {winLossGroupHeaderRows}
                     </tr>
                     <tr>
@@ -554,8 +844,7 @@ console.log(props);
                 </tbody>
             </table>
            
-        </div>
-        
+        </div>  
         
     )
 }

@@ -26,6 +26,12 @@ const App = ()=>{
     const [SubmitStatus, setSubmitStatus] = useState(false);
     const [ExportStatus, setExportStatus] = useState(false);
 
+    const [HiddenTitles, setHiddenTitles] = useState({
+        turnOverValidBetHiddenCategoryList:[],
+        winLossHiddenCategoryList:[],
+        hiddenTitlesList:[]
+    });
+
     useEffect(() => {
         let param = {
             Url: 'Common/AdminUserSiteList'
@@ -80,6 +86,64 @@ const App = ()=>{
         });
     }
 
+    const Result_ValidBetHideShowBtnOnClick = (element) => {
+
+        let turnOverValidBetHiddenlist = [];
+        let getItem = HiddenTitles.turnOverValidBetHiddenCategoryList.find(x=> x.CategoryId === element);
+
+        if(getItem)
+        {
+            HiddenTitles.turnOverValidBetHiddenCategoryList.forEach(elem=>{
+                if(elem.CategoryId!==getItem.CategoryId)
+                {
+                    turnOverValidBetHiddenlist.push(elem);
+                }
+            });
+        }
+        else
+        {
+            turnOverValidBetHiddenlist=HiddenTitles.turnOverValidBetHiddenCategoryList;
+            turnOverValidBetHiddenlist.push({
+                         'CategoryId':element
+            });
+        }
+
+        setHiddenTitles({
+            turnOverValidBetHiddenCategoryList: turnOverValidBetHiddenlist,
+            winLossHiddenCategoryList: HiddenTitles.winLossHiddenCategoryList
+        });
+
+    }
+
+    const Result_WinLossHideShowBtnOnClick = (element) => {
+
+        let winLossHiddenlist = [];
+        let getItem = HiddenTitles.winLossHiddenCategoryList.find(x=> x.CategoryId === element);
+
+        if(getItem)
+        {
+            HiddenTitles.winLossHiddenCategoryList.forEach(elem=>{
+                if(elem.CategoryId!==getItem.CategoryId)
+                {
+                    winLossHiddenlist.push(elem);
+                }
+            });
+        }
+        else
+        {
+            winLossHiddenlist=HiddenTitles.winLossHiddenCategoryList;
+            winLossHiddenlist.push({
+                         'CategoryId':element
+            });
+        }
+
+        setHiddenTitles({
+            turnOverValidBetHiddenCategoryList: HiddenTitles.turnOverValidBetHiddenCategoryList,
+            winLossHiddenCategoryList: winLossHiddenlist
+        });
+
+    }
+
     const Filter_Submit = ()=>{
 
         if (stateFilter.SiteIds.length === 0) {
@@ -114,7 +178,6 @@ const App = ()=>{
 
                 let totalResult = [];
                 let result = [];
-                let resulttest = [];
                 let categoryGameList = [];
                 let currencyList = [];
                 let categoryTotalResult=[];
@@ -359,24 +422,10 @@ const App = ()=>{
                     });
                 }
 
-                //群組巢狀迴圈寫不出來，先在這邊處理資料
-                categoryGameList.forEach(category=>{
-                    category.gameList.forEach(game=>{
-
-                        let resultItem=result.find(x=>x.categoryId===category.categoryId && x.gameId===game.gameId);
-                            
-                        resulttest.push(resultItem);
-
-                    });
-
-                    let categorytItem=categoryTotalResult.find(x=>x.categoryId===category.categoryId);
-                    resulttest.push(categorytItem);
-                });
-
                 setData({
                     ...stateData,
                     Datas:[
-                        ...resulttest.map(item=>{
+                        ...result.map(item=>{
                             Object.keys(item).forEach(key => {
                                 if(key.startsWith('turnOverValidBet') || 
                                    key.startsWith('winLoss'))
@@ -451,9 +500,7 @@ const App = ()=>{
 
     return (
         <div style={{ width: "100%", height: "100%", padding: "15px" }}>
-            <div className="page-title">
-                Statistical Report
-            </div>
+             <h4 className="page-name">Statistical Report</h4>
             <Filter filterInfo={stateFilter} 
                     SiteList={siteList}
                     onChange={Filter_OnChange}
@@ -465,7 +512,10 @@ const App = ()=>{
             ? null 
             : <Result {...stateData}
                 ExportToExcel={ExportToExcel}
-                ExportBtnDisabled={ExportStatus} />}
+                ExportBtnDisabled={ExportStatus}
+                HidenTitles={HiddenTitles}
+                TurnOverValidBetHideShowBtn={Result_ValidBetHideShowBtnOnClick}
+                WinLossHideShowBtn={Result_WinLossHideShowBtnOnClick} />}
         </div>
     );
 }
