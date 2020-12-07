@@ -29,6 +29,7 @@ namespace BackendSite.Service.Model
         public int? PeriodType { get; set; }
         public int? PeriodDay { get; set; }
         public string SpecialCode { get; set; }
+        public bool IsSpecial { get; set; }
     }
 
     public class PromotionSpecific
@@ -49,6 +50,7 @@ namespace BackendSite.Service.Model
         public int LockedType { get; set; }
         public decimal MinPayout { get; set; }
         public string VN_AffIds { get; set; }
+        public string VN_AffCodes { get; set; }
     }
     public class TpGameType
     {

@@ -143,7 +143,7 @@ const App = () => {
 						BeenUsed: info.beenUsed,
 						RebateList: tpGame,
 						MinPayout: Number(info.minPayout),
-						VN_Affids: info.affid
+						VN_AffCodes: info.affid
 					};
 				});
 
@@ -165,7 +165,8 @@ const App = () => {
 				PeriodType: Number(promotion.periodType) ? Number(promotion.periodType) : 0,
 				PeriodDay: Number(promotion.periodType) === 2 ? Number(promotion.periodWeek) : Number(promotion.periodType) === 3 ? Number(promotion.periodMonth) : 0,
 				RedeemHours: Number(promotion.redeemHours) ? Number(promotion.redeemHours) : 0,
-				SpecialCode: promotion.specialCode				
+				SpecialCode: promotion.specialCode,
+				IsSpecial: promotion.isSpecial				
 			};
 			let param = {
 				Url: "BonusManage/SetPromotion",

@@ -30,6 +30,15 @@ export const initPromotionType = [
 	{ value: 8, displayText: defPromotionType[8] }
 ];
 
+export const initSpecialBonusPromotionType = [
+	{ value: 1, displayText: defPromotionType[1] },
+	{ value: 3, displayText: defPromotionType[3] },
+];
+
+export const specialBonusOptions = [
+	{ value: 1, displayText: "SpecialBonus"}
+];
+
 export const periodType = {
 	1: "Daily",
 	2: "Weekly",

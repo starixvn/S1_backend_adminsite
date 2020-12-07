@@ -6,7 +6,8 @@ import DateTimePickerElem from "./Component/DateTimePicker";
 import moment from "moment";
 import RadioBox from "./Component/RadioBox";
 import RichText from "./Component/RichText.jsx";
-import { initWalletType, initPromotionType, initWeekOptions, initPeriodType, weekOptions } from "./defCols";
+import { initWalletType, initPromotionType, initWeekOptions, initPeriodType, weekOptions, initSpecialBonusPromotionType, specialBonusOptions} from "./defCols";
+import { defActionType } from "./Edit.reducer";
 
 const initBonusAmountType = promoType => {
 	return Number(promoType) === 3
@@ -17,7 +18,7 @@ const initBonusAmountType = promoType => {
 		];
 };
 
-export default ({ state, action, IsAdd, processing }) => {
+export default ({ dispatch, state, action, IsAdd, processing }) => {
 	const bonusCodeSwitch = `${state.siteId}-${state.bonusCode}`;
 	const currencyList = Object.keys(state.specific);
 	const currencyOptions = currencyList.map(i => {
@@ -36,6 +37,24 @@ export default ({ state, action, IsAdd, processing }) => {
 			</button>
 		);
 	});
+
+	const SpecialBonusCheckBox = (value, dataColumn) => {
+		if(state.specialBonusCheck.length > 0){
+			dispatch({
+				type: defActionType.SPECIALBONUS_VALUE,
+				specialBonusCheck:[],
+				isSpecial: false
+			});
+		}
+		else{
+			dispatch({
+				type: defActionType.SPECIALBONUS_VALUE,
+				specialBonusCheck:[value],
+				isSpecial: true
+			});
+
+		}
+	};
 
 	return (
 		<div className="container-fluid" id="Panel">
@@ -74,11 +93,19 @@ export default ({ state, action, IsAdd, processing }) => {
 						/>
 						<SelectBox
 							Title="PromotionType"
-							Options={initPromotionType}
+							Options={state.isSpecial ? initSpecialBonusPromotionType:initPromotionType}
 							HandleChange={action.EditMainValue}
 							dataColumn="promotionType"
 							SelectedValue={state.promotionType}
 							Disabled={!IsAdd}
+						/>
+						<CheckBox
+						Options={specialBonusOptions}
+						Title=""
+						OnChange={SpecialBonusCheckBox}
+						dataColumn="specialBonus"
+						Selected={state.specialBonusCheck}
+						mainKey={null}
 						/>
 					</div>
 					<div className="row-flex">
@@ -408,7 +435,7 @@ const SubPanel = props => {
 						null : (
 							<>
 									<InputBox
-										Title="Affid"
+										Title="Affiliate Id"
 										ClassName="form-group"
 										inputClass="form-control"
 										OnChange={props.EditMainValue}

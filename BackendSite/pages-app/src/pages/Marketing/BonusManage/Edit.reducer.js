@@ -10,7 +10,8 @@ export const defActionType = {
 	SET_TPID: "SET_TPID",
 	CURRENCY_SET_AMOUNT_VALUE: "CURRENCY_SET_AMOUNT_VALUE",
 	GET_TPGAME_CATEGORIES: "GET_TPGAME_CATEGORIES",
-	CURRENCY_SET_TpGame_VALUE: "CURRENCY_SET_TpGame_VALUE"
+	CURRENCY_SET_TpGame_VALUE: "CURRENCY_SET_TpGame_VALUE",
+	SPECIALBONUS_VALUE: "SPECIALBONUS_VALUE"
 };
 
 export const initialState = (IsAdd, datas, siteList) => {
@@ -42,7 +43,9 @@ export const initialState = (IsAdd, datas, siteList) => {
 			periodMonth: 1,
 			redeemHours: "",
 			tpGameCategory: [],
-			specialCode:""
+			specialCode:"",
+			isSpecial: false,
+			specialBonusCheck: []
 		};
 	} else {
 		let _specific = SetSpecific(
@@ -75,7 +78,9 @@ export const initialState = (IsAdd, datas, siteList) => {
 			periodMonth: datas.periodMonth ? datas.periodMonth : 1,
 			redeemHours: datas.redeemHours,
 			tpGameCategory: [],
-			specialCode:datas.specialCode
+			specialCode:datas.specialCode,
+			isSpecial: datas.isSpecial,
+			specialBonusCheck: datas.isSpecial ? [1] : []
 		};
 	}
 };
@@ -143,7 +148,7 @@ const SetSpecific = (currencyList, langList, data) => {
 				if (k === "bonusAmountType") {
 					_newData[k] = d.bonusType;
 				}else if (k === "affid") {
-					_newData[k] = d.vN_AffIds;
+					_newData[k] = d.VN_AffCodes;
 				} else {
 					_newData[k] = d[k] ?? "";
 				}
@@ -349,6 +354,13 @@ export function reducer(state, action) {
 						}
 					}
 				}
+			};
+		
+		case defActionType.SPECIALBONUS_VALUE:
+			return{
+				...state,
+				specialBonusCheck:action.specialBonusCheck,
+				isSpecial:action.isSpecial
 			};
 
 		default:
