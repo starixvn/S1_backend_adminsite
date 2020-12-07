@@ -44,6 +44,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "User Online Report",
+        "FuncKey": "Report/UserOnlineReport",
+        "Controller": "Report",
+        "Action": "UserOnlineReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
