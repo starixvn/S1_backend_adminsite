@@ -34,6 +34,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Statistical Report",
+        "FuncKey": "Report/StatisticalReport",
+        "Controller": "Report",
+        "Action": "StatisticalReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

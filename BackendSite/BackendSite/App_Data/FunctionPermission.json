@@ -11,6 +11,11 @@
         "DisplayKey": "Main Financial Report",
         "FuncKey": "Report/MainFinancialReport",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Statistical Report",
+        "FuncKey": "Report/StatisticalReport",
+        "Enable": false
       }
     ]
   },

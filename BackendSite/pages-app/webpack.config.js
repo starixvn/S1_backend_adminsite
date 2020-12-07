@@ -90,10 +90,14 @@ module.exports = {
 		// 	// '@babel/polyfill',
 		// 	"./src/pages/Marketing/RebateInfoReport/index.js"
 		// ],
-		"Report/MainFinancialReport.min": [
-			"./src/pages/Report/MainFinancialReport/index.js"
+		// "Report/MainFinancialReport.min": [
+		// 	"./src/pages/Report/MainFinancialReport/index.js"
+		// ],
+		"Report/StatisticalReport.min": [
+			"./src/pages/Report/StatisticalReport/index.js"
 		],
 	},
+	
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
 		filename: "[name].js"
