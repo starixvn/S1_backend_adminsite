@@ -28,6 +28,8 @@ namespace BackendSite.Service.Model
         public int? RedeemHours { get; set; }
         public int? PeriodType { get; set; }
         public int? PeriodDay { get; set; }
+        public string SpecialCode { get; set; }
+        public bool IsSpecial { get; set; }
     }
 
     public class PromotionSpecific
@@ -48,6 +50,7 @@ namespace BackendSite.Service.Model
         public int LockedType { get; set; }
         public decimal MinPayout { get; set; }
         public string VN_AffIds { get; set; }
+        public string VN_AffCodes { get; set; }
     }
     public class TpGameType
     {
@@ -69,5 +72,23 @@ namespace BackendSite.Service.Model
     public class PromotionRebate1 : PromotionRebate
     {
         public int CurrencyId { get; set; }
+    }
+    public class PromotionSelect
+    {
+        public string SiteidFilter { get; set; }
+        public string PromotionTypeFilter { get; set; }
+        public bool Status { get; set; }
+    }
+    public class Filter
+    {
+        public string label { get; set; }
+        public int value { get; set; }
+    }
+    public class FilterPara
+    {
+        public Filter[] SiteidFilter { get; set; }
+        public Filter[] PromotionTypeFilter { get; set; }
+        public bool Status { get; set; }
+        public int[] SiteArray { get; set; }
     }
 }

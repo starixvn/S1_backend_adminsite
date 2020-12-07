@@ -6,11 +6,11 @@ export default ({Title, Options, Selected=[], OnChange, dataColumn, mainKey})=>{
     });
     return(
         <>
-            <div className="row-flex">
+            {Title !== "" ? <div className="row-flex">
                 <div className="input-item">
                     <label className="label">{Title}</label>
                 </div>
-            </div>
+            </div> : null}
             <div className="row-flex">
                 {opt}
             </div>

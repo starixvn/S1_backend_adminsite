@@ -97,12 +97,20 @@ const App = () => {
                 <div className="form-group">
                     <label className="col-form-label d-block">Option</label>
                     <div className="custom-control custom-radio custom-control-inline">
-                        <input type="radio" id="Credit" name="Option" className="custom-control-input" onChange={(e) => { EditFiled(1, 'option') }} disabled={stateSend} checked={stateData.option === 1} />
-                        <label className="custom-control-label" htmlFor="Credit">Credit</label>
+                        <input type="radio" id="Option_1" name="Option" className="custom-control-input" onChange={(e) => { EditFiled(1, 'option') }} disabled={stateSend} checked={stateData.option === 1} />
+                        <label className="custom-control-label" htmlFor="Option_1">Balance(+)</label>
                     </div>
                     <div className="custom-control custom-radio custom-control-inline">
-                        <input type="radio" id="Debit" name="Option" className="custom-control-input" onChange={(e) => { EditFiled(2, 'option') }} disabled={stateSend} checked={stateData.option === 2} />
-                        <label className="custom-control-label" htmlFor="Debit">Debit</label>
+                        <input type="radio" id="Option_2" name="Option" className="custom-control-input" onChange={(e) => { EditFiled(2, 'option') }} disabled={stateSend} checked={stateData.option === 2} />
+                        <label className="custom-control-label" htmlFor="Option_2">Balance(-)</label>
+                    </div>
+                    <div className="custom-control custom-radio custom-control-inline">
+                        <input type="radio" id="Option_3" name="Option" className="custom-control-input" onChange={(e) => { EditFiled(3, 'option') }} disabled={stateSend} checked={stateData.option === 3} />
+                        <label className="custom-control-label" htmlFor="Option_3">Bonus(+)</label>
+                    </div>
+                    <div className="custom-control custom-radio custom-control-inline">
+                        <input type="radio" id="Option_4" name="Option" className="custom-control-input" onChange={(e) => { EditFiled(4, 'option') }} disabled={stateSend} checked={stateData.option === 4} />
+                        <label className="custom-control-label" htmlFor="Option_4">Bonus(-)</label>
                     </div>
                 </div>
                 <div className="form-group">
