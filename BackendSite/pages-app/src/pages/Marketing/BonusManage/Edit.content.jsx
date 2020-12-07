@@ -243,6 +243,7 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 								OnChange={action.EditMainValue}
 								dataColumn="specialCode"
 								value={state.specialCode}
+								Disabled={!IsAdd}
 							/>	
 						</div>
 					</div>	
