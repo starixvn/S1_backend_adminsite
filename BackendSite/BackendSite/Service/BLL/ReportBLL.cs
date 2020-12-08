@@ -359,7 +359,8 @@ namespace BackendSite.Service.BLL
             return Data;
         }
 
-        public IEnumerable<UserOnlineReportModel> GetUserOnlineReport(string siteIds,
+        public IEnumerable<UserOnlineReportModel> GetUserOnlineReport(IEnumerable<int> siteList,
+                                                                      string siteIds,
                                                                       string selectDate)
         {
             Dictionary<string, UserOnlineReportModel> keyValuePairs = new Dictionary<string, UserOnlineReportModel>();
@@ -373,43 +374,42 @@ namespace BackendSite.Service.BLL
             {
                 UserOnlineReportModel userOnlineReportModel = null;
 
-                dateTimeFormat = data.Time.ToString("yyyy/MM/dd HH");
+                dateTimeFormat = data.Time.ToString("HH:00");
 
-                if (!keyValuePairs.ContainsKey($"{dateTimeFormat}"))
-                {
-                    userOnlineReportModel = new UserOnlineReportModel();
-                    keyValuePairs.Add($"{dateTimeFormat}", userOnlineReportModel);
-                    userOnlineReportModel.LocalTime = $"{dateTimeFormat}";
-                }
-
-                userOnlineReportModel = keyValuePairs[$"{dateTimeFormat}"];
-                userOnlineReportModel.MaxCount += data.MaxCount;
+                userOnlineReportModel = new UserOnlineReportModel();
+                keyValuePairs.Add($"{dateTimeFormat}_{data.SiteId}", userOnlineReportModel);
+                userOnlineReportModel.LocalTime = $"{dateTimeFormat}~{data.Time.AddHours(1).ToString("HH:00")}";
+                userOnlineReportModel.SiteId = data.SiteId;
+                userOnlineReportModel.MaxCount = data.MaxCount;
 
             }
 
             #endregion
 
-            #region 補0 And  Choose Max
-            
-            int iMax = 0;
+            #region 補0
 
-            for (int i = 0; i < 23; i++)
+            for (int i = 0; i < 24; i++)
             {
                 UserOnlineReportModel userOnlineReportModel = null;
 
-                dateTimeFormat = Convert.ToDateTime(selectDate).AddHours(i).ToString("yyyy/MM/dd HH");
-
-                if (!keyValuePairs.ContainsKey($"{dateTimeFormat}"))
+                foreach (int site in siteList)
                 {
-                    userOnlineReportModel = new UserOnlineReportModel();
-                    keyValuePairs.Add($"{dateTimeFormat}", userOnlineReportModel);
-                    userOnlineReportModel.LocalTime = $"{dateTimeFormat}";
+                    dateTimeFormat = Convert.ToDateTime(selectDate).AddHours(i).ToString("HH:00");
+
+                    if (!keyValuePairs.ContainsKey($"{dateTimeFormat}_{site}"))
+                    {
+                        userOnlineReportModel = new UserOnlineReportModel();
+                        keyValuePairs.Add($"{dateTimeFormat}_{site}", userOnlineReportModel);
+                        userOnlineReportModel.LocalTime = $"{dateTimeFormat}~{Convert.ToDateTime(selectDate).AddHours(i + 1).ToString("HH:00")}";
+                        userOnlineReportModel.SiteId = site;
+                    }
                 }
             }
 
             #endregion
 
-            var Data = keyValuePairs.Select(s => s.Value).OrderBy(value => value.LocalTime);
+            var Data = keyValuePairs.Select(s => s.Value).OrderBy(value => value.LocalTime)
+                                                         .ThenBy(value => value.SiteId);
 
             return Data;
         }

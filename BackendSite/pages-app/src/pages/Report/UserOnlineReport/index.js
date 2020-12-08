@@ -15,6 +15,7 @@ const App = () => {
     const [stateDatas, setDatas] = useState({
         Datas: null,
         FilterInfo: null,
+        SiteList: null,
         MaxCount: null
     });
 
@@ -100,14 +101,39 @@ const App = () => {
                 
             if (res.data.errorCode === 0) {
 
-                let GetMaxCount=Math.max.apply(Math, res.data.data.map(function(o) { return o.maxCount; }));
+                let result = [];
+
+                res.data.data.forEach(elem => {
+
+                    let getItem = result.find(x=> x.localTime === elem.localTime);
+                    let onlineCountColDef = `online_${elem.siteId}`;
+
+                    if(getItem){
+                        getItem.onlineSummary += elem.maxCount;
+
+                        getItem[onlineCountColDef] = elem.maxCount;
+                    }
+                    else
+                    {
+                        result.push({
+                            'localTime':elem.localTime,
+
+                            'onlineSummary':elem.maxCount,
+                            [onlineCountColDef]:elem.maxCount,                          
+                        });
+                    }
+
+                });
+
+                let GetMaxCount=Math.max.apply(Math, result.map(function(o) { return o.onlineSummary; }));
 
                 setDatas(
                     {
-                        Datas: [...res.data.data],
+                        Datas: result,
                         FilterInfo: {
                             ...stateFilter
                         },
+                        SiteList: siteList,
                         MaxCount: GetMaxCount
                     }
                 )
@@ -124,7 +150,8 @@ const App = () => {
             onChange={Filter_OnChange} 
             onChangeCheckBox={Filter_CheckBox_OnChange} 
             onChangeAllCheckBox={Filter_CheckBox_CheckAll} 
-            ClickSubmit={Filter_Submit} SiteList={siteList}
+            ClickSubmit={Filter_Submit} 
+            SiteList={siteList}
             SubmitBtnDisabled={SubmitStatus} />
             {stateDatas.Datas === null 
             ? null 
