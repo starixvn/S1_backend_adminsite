@@ -112,9 +112,10 @@ namespace BackendSite.Service.DAL
             p.Add("PeriodType", promotion.PeriodType);
             p.Add("PeriodDay", promotion.PeriodDay);
             p.Add("SpecialCode", promotion.SpecialCode);
+            p.Add("IsSpecial", promotion.IsSpecial);
             p.Add("ErrorCode", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            conn.Execute("Admin_Promotion_InsUpd", p, transaction: trans, commandType: CommandType.StoredProcedure);
+            conn.Execute("Admin_Promotion_Set", p, transaction: trans, commandType: CommandType.StoredProcedure);
             errorCode = p.Get<int>("ErrorCode");
             if (errorCode == 0)
             {
@@ -135,11 +136,12 @@ namespace BackendSite.Service.DAL
                         RequiredAmount = specific.RequiredAmount,
                         LockedType = specific.LockedType,
                         MinPayout = specific.MinPayout,
-                        VN_AffIds = !string.IsNullOrEmpty(specific.VN_AffIds) ? JsonConvert.SerializeObject(specific.VN_AffIds.Split(",")) : null
+                        VN_AffIds = !string.IsNullOrEmpty(specific.VN_AffIds) ? JsonConvert.SerializeObject(specific.VN_AffIds.Split(",")) : null,
+                        VN_AffCodes = !string.IsNullOrEmpty(specific.VN_AffCodes) ? JsonConvert.SerializeObject(specific.VN_AffIds.Split(",")) : null
                     });
                 }
 
-                conn.Execute("Admin_PromotionSpecificV2_Set", new
+                conn.Execute("Admin_PromotionSpecific_Set", new
                 {
                     promotion.BonusCode,
                     promotion.SiteId,
