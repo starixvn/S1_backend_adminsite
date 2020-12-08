@@ -90,8 +90,12 @@ module.exports = {
 		// 	// '@babel/polyfill',
 		// 	"./src/pages/Marketing/RebateInfoReport/index.js"
 		// ],
-		"Report/MainFinancialReport.min": [
-			"./src/pages/Report/MainFinancialReport/index.js"
+		// "Report/MainFinancialReport.min": [
+		// 	"./src/pages/Report/MainFinancialReport/index.js"
+		// ],
+		"Marketing/BannerManage.min": [
+			'@babel/polyfill',
+			"./src/pages/Marketing/BannerManage/index.jsx"
 		],
 	},
 	output: {

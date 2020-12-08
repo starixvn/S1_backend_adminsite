@@ -230,6 +230,11 @@
         "DisplayKey": "Pending Bonus",
         "FuncKey": "Marketing/PendingBonus",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Banner Management",
+        "FuncKey": "Marketing/BannerManage",
+        "Enable": false
       }
     ]
   }

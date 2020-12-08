@@ -54,8 +54,9 @@ const ThirdPartyAdjustment = lazy(() =>
 );
 const NewsManage = lazy(() => import("./pages/Marketing/NewsManage/index"));
 const MainFinancialReport = lazy(() => import("./pages/Report/MainFinancialReport/index"));
+const BannerManage = lazy(() => import("./pages/Marketing/BannerManage/index"));
 
-export const defaultPage = "MainFinancialReport";
+export const defaultPage = "BannerManage";
 
 export const layoutType = {
 	N88: "N88",
@@ -342,6 +343,20 @@ export const pages = {
 		css: [
 			"./lib/bootstrap/dist/css/bootstrap.min.css",
 			"./css/css/main.css",
+			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
+		],
+		layout: layoutType.N88
+	},
+	BannerManage: {
+		comp: (
+			<Suspense fallback="loading...">
+				<BannerManage />
+			</Suspense>
+		),
+		css: [
+			"./lib/bootstrap/dist/css/bootstrap.min.css",
+			"./css/css/main.css",
+			"./css/common/fonts/main-font/style.css",
 			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
 		],
 		layout: layoutType.N88
