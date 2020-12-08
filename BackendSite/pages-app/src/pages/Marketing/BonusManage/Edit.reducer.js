@@ -148,7 +148,7 @@ const SetSpecific = (currencyList, langList, data) => {
 				if (k === "bonusAmountType") {
 					_newData[k] = d.bonusType;
 				}else if (k === "affid") {
-					_newData[k] = d.VN_AffCodes;
+					_newData[k] = d.vN_AffCodes;
 				} else {
 					_newData[k] = d[k] ?? "";
 				}
