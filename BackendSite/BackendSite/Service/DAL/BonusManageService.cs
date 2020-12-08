@@ -73,11 +73,16 @@ namespace BackendSite.Service.DAL
                     var rebateList = conn.Query<PromotionRebate1>("Admin_PromotionRebate_Get", new { BonusCode, SiteId }, transaction: trans, commandType: CommandType.StoredProcedure);
                     foreach(var s in promotion.Specific)
                     {
-                        s.VN_AffIds = s.VN_AffIds == "null" ? string.Empty : s.VN_AffIds;
                         if (!string.IsNullOrEmpty(s.VN_AffIds))
                         {
                             s.VN_AffIds = string.Join(',', JsonConvert.DeserializeObject<string[]>(s.VN_AffIds));
                         }
+
+                        if (!string.IsNullOrEmpty(s.VN_AffCodes))
+                        {
+                            s.VN_AffCodes = string.Join(',', JsonConvert.DeserializeObject<string[]>(s.VN_AffCodes));
+                        }
+
                         s.RebateList = rebateList.Where(x => x.CurrencyId == s.CurrencyId);
                     }
                 }
@@ -137,7 +142,7 @@ namespace BackendSite.Service.DAL
                         LockedType = specific.LockedType,
                         MinPayout = specific.MinPayout,
                         VN_AffIds = !string.IsNullOrEmpty(specific.VN_AffIds) ? JsonConvert.SerializeObject(specific.VN_AffIds.Split(",")) : null,
-                        VN_AffCodes = !string.IsNullOrEmpty(specific.VN_AffCodes) ? JsonConvert.SerializeObject(specific.VN_AffIds.Split(",")) : null
+                        VN_AffCodes = !string.IsNullOrEmpty(specific.VN_AffCodes) ? JsonConvert.SerializeObject(specific.VN_AffCodes.Split(",")) : null
                     });
                 }
 
