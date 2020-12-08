@@ -853,7 +853,8 @@ namespace BackendSite.Controllers.Api
             try
             {
 
-                apiResult.Data = reportBLL.GetUserOnlineReport(JsonConvert.SerializeObject(SiteIds),
+                apiResult.Data = reportBLL.GetUserOnlineReport(SiteIds,
+                                                               JsonConvert.SerializeObject(SiteIds),
                                                                SelectDate);
                 apiResult.ErrorCode = 0;
             }

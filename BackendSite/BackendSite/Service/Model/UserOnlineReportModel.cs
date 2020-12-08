@@ -14,6 +14,12 @@ namespace BackendSite.Service.Model
             set;
         }
 
+        public int SiteId
+        {
+            get;
+            set;
+        }
+
         public int MaxCount
         {
             get;
