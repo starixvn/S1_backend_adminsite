@@ -97,6 +97,12 @@ module.exports = {
 			'@babel/polyfill',
 			"./src/pages/Marketing/BannerManage/index.jsx"
 		],
+		// "Report/StatisticalReport.min": [
+		// 	"./src/pages/Report/StatisticalReport/index.js"
+		// ],
+		"Report/UserOnlineReport.min": [
+			"./src/pages/Report/UserOnlineReport/index.js"
+		],
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

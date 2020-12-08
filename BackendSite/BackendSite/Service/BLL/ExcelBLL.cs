@@ -149,7 +149,10 @@ namespace BackendSite.Service.BLL
                         }
                         else
                         {
-                            ws.Cells[currentRow, colIdx].Value = value;
+                            if(!(item.Value is string))
+                            {
+                                ws.Cells[currentRow, colIdx].Value = value;
+                            }
                         }
 
                         ws.Cells[currentRow, colIdx].Style.Border.Bottom.Style = ExcelBorderStyle.Double;

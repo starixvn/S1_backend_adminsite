@@ -34,6 +34,26 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Statistical Report",
+        "FuncKey": "Report/StatisticalReport",
+        "Controller": "Report",
+        "Action": "StatisticalReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "User Online Report",
+        "FuncKey": "Report/UserOnlineReport",
+        "Controller": "Report",
+        "Action": "UserOnlineReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
