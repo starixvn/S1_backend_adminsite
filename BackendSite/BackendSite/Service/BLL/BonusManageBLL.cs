@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -22,9 +23,21 @@ namespace BackendSite.Service.BLL
             this.authorizeBLL = authorizeBLL;
         }
 
-        public IEnumerable<PromotionInfo> GetPromotionList()
+        public IEnumerable<PromotionInfo> GetPromotionList(int[] siteArray, PromotionSelect Select = null)
         {
-            var result = bonusManageService.GetPromotionList(null);
+            FilterPara filterPara = new FilterPara();
+            if (Select != null)
+            {
+                filterPara = new FilterPara()
+                {
+                    SiteidFilter = Select.SiteidFilter != null? JsonConvert.DeserializeObject<Filter[]>(Select.SiteidFilter) :null,
+                    PromotionTypeFilter = Select.PromotionTypeFilter != null? JsonConvert.DeserializeObject<Filter[]>(Select.PromotionTypeFilter):null,
+                    Status = Select != null ? Select.Status : false,
+                    SiteArray = siteArray
+                };
+            }
+
+            var result = bonusManageService.GetPromotionList(null, filterPara);
             return result;
         }
 

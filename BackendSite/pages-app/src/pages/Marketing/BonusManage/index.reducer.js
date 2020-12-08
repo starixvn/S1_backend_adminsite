@@ -7,7 +7,9 @@ export const defActionType = {
 	UPDATE_PROMOTION_STATUS: "UPDATE_PROMOTION_STATUS",
 	HANDEL_POPBOX: "HANDEL_POPBOX",
 	CLONE_PROMOTION: "CLONE_PROMOTION",
-	SET_CLONE_VALUE: "SET_CLONE_VALUE"
+	SET_CLONE_VALUE: "SET_CLONE_VALUE",
+	SET_SITE_LIST: "SET_SITE_LIST",
+	SET_STATUS:"SET_STATUS"
 };
 
 export const defPanelType = {
@@ -23,6 +25,7 @@ export const initState = {
 	panelType: defPanelType.Main,
 	popBoxIsOpen: false,
 	clonePromotionData: [],
+	statusCheck: []
 };
 
 export function reducer(state, action) {
@@ -96,6 +99,12 @@ export function reducer(state, action) {
 				popBoxIsOpen: false,
 				promotionList: action.promotionList
 			};
+		
+		case defActionType.SET_SITE_LIST:
+		return {
+			...state,
+			siteList: action.siteList
+		};
 
 		default:
 			throw new Error();

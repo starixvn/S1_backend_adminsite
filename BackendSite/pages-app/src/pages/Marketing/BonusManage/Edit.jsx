@@ -70,9 +70,9 @@ export default props => {
 									}
 								}
 							} else if (
-								column === null ||
+								(column === null ||
 								column === undefined ||
-								column === ""
+								column === "") && f_key !== "affid"
 							) {
 								alert(
 									`${window.i18n[`lbl_Currency${c_key}`]
