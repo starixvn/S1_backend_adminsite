@@ -19,7 +19,7 @@ namespace BackendSite.Service.DAL
         {
             this.configuration = configuration;
         }
-        
+
         public IEnumerable<CurrencyModel> GetCurrencyList()
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
@@ -34,7 +34,7 @@ namespace BackendSite.Service.DAL
                                                                                             string startDate,
                                                                                             string endDate)
         {
-            var partcialSummeryModels = new Dictionary<string, IEnumerable<PartcialSummeryModel>>();   
+            var partcialSummeryModels = new Dictionary<string, IEnumerable<PartcialSummeryModel>>();
 
             var parameters = new DynamicParameters(
                 new
@@ -46,23 +46,23 @@ namespace BackendSite.Service.DAL
                 });
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-           
+
             conn.Open();
 
             #region Get Data StoreProcedure
 
-            var reportDepositList = conn.Query<PartcialSummeryModel>("Admin_ReportDeposit_GroupByDay_Get", 
-                                                                     parameters, 
+            var reportDepositList = conn.Query<PartcialSummeryModel>("Admin_ReportDeposit_GroupByDay_Get",
+                                                                     parameters,
                                                                      commandType: CommandType.StoredProcedure);
             partcialSummeryModels.Add("Deposit", reportDepositList);
 
-            var reportWithdrawalList = conn.Query<PartcialSummeryModel>("Admin_ReportWithdrawal_GroupByDay_Get", 
-                                                                        parameters, 
+            var reportWithdrawalList = conn.Query<PartcialSummeryModel>("Admin_ReportWithdrawal_GroupByDay_Get",
+                                                                        parameters,
                                                                         commandType: CommandType.StoredProcedure);
             partcialSummeryModels.Add("Withdrawal", reportWithdrawalList);
 
-            var reportAdjustmentList = conn.Query<PartcialSummeryModel>("Admin_ReportAdjustment_GroupByDay_Get", 
-                                                                        parameters, 
+            var reportAdjustmentList = conn.Query<PartcialSummeryModel>("Admin_ReportAdjustment_GroupByDay_Get",
+                                                                        parameters,
                                                                         commandType: CommandType.StoredProcedure);
             partcialSummeryModels.Add("Adjustment", reportAdjustmentList);
 
@@ -100,7 +100,7 @@ namespace BackendSite.Service.DAL
                 });
 
                 string SpName = "Admin_ReportTurnOverAndWinlost_GroupByDay_Get";
-                return conn.Query<TurnoverAndWinlossSummeryModel>(SpName, parameters,commandType: CommandType.StoredProcedure);
+                return conn.Query<TurnoverAndWinlossSummeryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
 
@@ -137,7 +137,7 @@ namespace BackendSite.Service.DAL
                     SelDate = selectDate
                 });
 
-                string SpName = "Admin_OnlineCount_Get";
+                string SpName = "Admin_OnlineReport_Get";
                 return conn.Query<UserOnlinePartcialSummaryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
