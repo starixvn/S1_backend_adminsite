@@ -843,5 +843,29 @@ namespace BackendSite.Controllers.Api
                         $"StatisticalReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/UserOnlineReport" })]
+        public ApiResult GetUserOnlineReport([FromForm] IEnumerable<int> SiteIds,
+                                             [FromForm] string SelectDate)
+        {
+
+            var apiResult = new ApiResult<IEnumerable<UserOnlineReportModel>>();
+
+            try
+            {
+
+                apiResult.Data = reportBLL.GetUserOnlineReport(SiteIds,
+                                                               JsonConvert.SerializeObject(SiteIds),
+                                                               SelectDate);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.Message;
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+            }
+
+            return apiResult;
+        }
     }
 }
