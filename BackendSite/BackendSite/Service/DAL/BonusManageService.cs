@@ -75,12 +75,12 @@ namespace BackendSite.Service.DAL
                     {
                         if (!string.IsNullOrEmpty(s.VN_AffIds))
                         {
-                            s.VN_AffIds = string.Join(',', JsonConvert.DeserializeObject<string[]>(s.VN_AffIds));
+                            s.VN_AffIds = JsonConvert.DeserializeObject<string[]>(s.VN_AffIds) == null ? null : string.Join(',', JsonConvert.DeserializeObject<string[]>(s.VN_AffIds));
                         }
 
                         if (!string.IsNullOrEmpty(s.VN_AffCodes))
                         {
-                            s.VN_AffCodes = string.Join(',', JsonConvert.DeserializeObject<string[]>(s.VN_AffCodes));
+                            s.VN_AffCodes = JsonConvert.DeserializeObject<string[]>(s.VN_AffCodes) == null ? null : string.Join(',', JsonConvert.DeserializeObject<string[]>(s.VN_AffCodes));
                         }
 
                         s.RebateList = rebateList.Where(x => x.CurrencyId == s.CurrencyId);
