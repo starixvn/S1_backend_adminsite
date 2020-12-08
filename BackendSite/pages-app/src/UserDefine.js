@@ -69,8 +69,11 @@ const MainFinancialReport = lazy(() =>
 const StatisticalReport = lazy(() => 
 	import("./pages/Report/StatisticalReport/index")
 );
+const UserOnlineReport = lazy(() => 
+	import("./pages/Report/UserOnlineReport/index")
+);
 
-export const defaultPage = "StatisticalReport";
+export const defaultPage = "UserOnlineReport";
 
 export const layoutType = {
 	N88: "N88",
@@ -365,6 +368,19 @@ export const pages = {
 		comp: (
 			<Suspense fallback="loading...">
 				<StatisticalReport />
+			</Suspense>
+		),
+		css: [
+			"./lib/bootstrap/dist/css/bootstrap.min.css",
+			"./css/css/main.css",
+			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
+		],
+		layout: layoutType.N88
+	},
+	UserOnlineReport: {
+		comp: (
+			<Suspense fallback="loading...">
+				<UserOnlineReport />
 			</Suspense>
 		),
 		css: [

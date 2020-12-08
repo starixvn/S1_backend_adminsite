@@ -123,5 +123,23 @@ namespace BackendSite.Service.DAL
                 return conn.Query<StatisticalPartcialSummeryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
+
+        public IEnumerable<UserOnlinePartcialSummaryModel> GetUserOnlineReport(string siteIds,
+                                                                               string selectDate)
+        {
+
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                    SiteIds = siteIds,
+                    SelDate = selectDate
+                });
+
+                string SpName = "Admin_OnlineCount_Get";
+                return conn.Query<UserOnlinePartcialSummaryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
     }
 }

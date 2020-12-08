@@ -282,7 +282,7 @@ namespace BackendSite.Service.BLL
                     statisticalReportModel.TurnOverValidBetLastTwoDaysSummaryInMYR = Math.Round(statisticalReportModel.TurnOverValidBetLastTwoDaysSummary * statisticalReportModel.ActualRate, 2, MidpointRounding.AwayFromZero);
                     statisticalReportModel.WinLossLastTwoDaysSummaryInMYR = Math.Round(statisticalReportModel.WinLossLastTwoDaysSummary * statisticalReportModel.ActualRate, 2, MidpointRounding.AwayFromZero);
                 }
-                
+
                 if (data.Date.Month == Convert.ToDateTime(endDate).Month)
                 {
                     statisticalReportModel.TurnOverValidBetThisMonthSummary += data.ValidBetSummary;
@@ -299,19 +299,6 @@ namespace BackendSite.Service.BLL
                     statisticalReportModel.TurnOverValidBetLastMonthSummaryInMYR += Math.Round(data.ValidBetSummary * statisticalReportModel.ActualRate, 2, MidpointRounding.AwayFromZero);
                     statisticalReportModel.WinLossLastMonthSummaryInMYR += Math.Round(data.WinLostSummary * statisticalReportModel.ActualRate, 2, MidpointRounding.AwayFromZero);
                 }
-
-
-                //statisticalReportModel.ValidBetTodaySummaryInMYR += Math.Round(statisticalReportModel.ValidBetTodaySummary * statisticalReportModel.ActualRate, 2, MidpointRounding.AwayFromZero);
-                //statisticalReportModel.ValidBetYesterdaySummaryInMYR += Math.Round(statisticalReportModel.ValidBetYesterdaySummary * statisticalReportModel.ActualRate, 2, MidpointRounding.AwayFromZero);
-                //statisticalReportModel.ValidBetLastTwoDaysSummaryInMYR += Math.Round(statisticalReportModel.ValidBetLastTwoDaysSummary * statisticalReportModel.ActualRate, 2, MidpointRounding.AwayFromZero);
-                //statisticalReportModel.ValidBetThisMonthSummaryInMYR += Math.Round(statisticalReportModel.ValidBetThisMonthSummary * statisticalReportModel.ActualRate, 2, MidpointRounding.AwayFromZero);
-                //statisticalReportModel.ValidBetLastMonthSummaryInMYR += Math.Round(statisticalReportModel.ValidBetLastMonthSummary * statisticalReportModel.ActualRate, 2, MidpointRounding.AwayFromZero);
-
-                //statisticalReportModel.WinLossTodaySummaryInMYR += Math.Round(statisticalReportModel.WinLossTodaySummary * statisticalReportModel.ActualRate, 2, MidpointRounding.AwayFromZero);
-                //statisticalReportModel.WinLossYesterdaySummaryInMYR += Math.Round(statisticalReportModel.WinLossYesterdaySummary * statisticalReportModel.ActualRate, 2, MidpointRounding.AwayFromZero);
-                //statisticalReportModel.WinLossLastTwoDaysSummaryInMYR += Math.Round(statisticalReportModel.WinLossLastTwoDaysSummary * statisticalReportModel.ActualRate, 2, MidpointRounding.AwayFromZero);
-                //statisticalReportModel.WinLossThisMonthSummaryInMYR += Math.Round(statisticalReportModel.WinLossThisMonthSummary * statisticalReportModel.ActualRate, 2, MidpointRounding.AwayFromZero);
-                //statisticalReportModel.WinLossLastMonthSummaryInMYR += Math.Round(statisticalReportModel.WinLossLastMonthSummary * statisticalReportModel.ActualRate, 2, MidpointRounding.AwayFromZero);
             }
 
             #endregion
@@ -319,10 +306,10 @@ namespace BackendSite.Service.BLL
             #region 補0
 
             List<GameModel> gameList = keyValuePairs.Select(s => s.Value).GroupBy(c => new { c.GameId, c.GameName })
-                                    .Select(x => new GameModel 
+                                    .Select(x => new GameModel
                                     {
-                                        GameId= x.Key.GameId,
-                                        GameName=x.Key.GameName
+                                        GameId = x.Key.GameId,
+                                        GameName = x.Key.GameName
                                     }).ToList();
 
             List<CategoryModel> categoryList = keyValuePairs.Select(s => s.Value).GroupBy(c => new { c.CategoryId, c.CategoryName })
@@ -340,7 +327,7 @@ namespace BackendSite.Service.BLL
                                         GameId = x.Key.GameId
                                     }).ToList();
 
-            List<int> currencyIds= keyValuePairs.Select(s => s.Value).Select(x => x.CurrencyId).Distinct().ToList();
+            List<int> currencyIds = keyValuePairs.Select(s => s.Value).Select(x => x.CurrencyId).Distinct().ToList();
 
             foreach (var curr in currencyIds)
             {
@@ -357,7 +344,7 @@ namespace BackendSite.Service.BLL
                         statisticalReportModel.CategoryId = item.CategoryId;
                         statisticalReportModel.CategoryName = categoryList.Where(x => x.CategoryId == item.CategoryId).Select(x => x.CategoryName).FirstOrDefault();
                         statisticalReportModel.GameId = item.GameId;
-                        statisticalReportModel.GameName = gameList.Where(x=>x.GameId==item.GameId).Select(x=>x.GameName).FirstOrDefault();
+                        statisticalReportModel.GameName = gameList.Where(x => x.GameId == item.GameId).Select(x => x.GameName).FirstOrDefault();
                         statisticalReportModel.ActualRate = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.ActualRate).FirstOrDefault();
                     }
                 }
@@ -367,7 +354,62 @@ namespace BackendSite.Service.BLL
 
             var Data = keyValuePairs.Select(s => s.Value).OrderBy(value => value.CategoryId)
                                                          .ThenBy(value => value.GameId)
-                                                         .ThenBy(Value=>Value.CurrencyId);
+                                                         .ThenBy(Value => Value.CurrencyId);
+
+            return Data;
+        }
+
+        public IEnumerable<UserOnlineReportModel> GetUserOnlineReport(IEnumerable<int> siteList,
+                                                                      string siteIds,
+                                                                      string selectDate)
+        {
+            Dictionary<string, UserOnlineReportModel> keyValuePairs = new Dictionary<string, UserOnlineReportModel>();
+            string dateTimeFormat = string.Empty;
+            var userOnlineList = reportService.GetUserOnlineReport(siteIds,
+                                                                   selectDate);
+
+            #region Data Statistical
+
+            foreach (var data in userOnlineList)
+            {
+                UserOnlineReportModel userOnlineReportModel = null;
+
+                dateTimeFormat = data.Time.ToString("HH:00");
+
+                userOnlineReportModel = new UserOnlineReportModel();
+                keyValuePairs.Add($"{dateTimeFormat}_{data.SiteId}", userOnlineReportModel);
+                userOnlineReportModel.LocalTime = $"{dateTimeFormat}~{data.Time.AddHours(1).ToString("HH:00")}";
+                userOnlineReportModel.SiteId = data.SiteId;
+                userOnlineReportModel.MaxCount = data.MaxCount;
+
+            }
+
+            #endregion
+
+            #region 補0
+
+            for (int i = 0; i < 24; i++)
+            {
+                UserOnlineReportModel userOnlineReportModel = null;
+
+                foreach (int site in siteList)
+                {
+                    dateTimeFormat = Convert.ToDateTime(selectDate).AddHours(i).ToString("HH:00");
+
+                    if (!keyValuePairs.ContainsKey($"{dateTimeFormat}_{site}"))
+                    {
+                        userOnlineReportModel = new UserOnlineReportModel();
+                        keyValuePairs.Add($"{dateTimeFormat}_{site}", userOnlineReportModel);
+                        userOnlineReportModel.LocalTime = $"{dateTimeFormat}~{Convert.ToDateTime(selectDate).AddHours(i + 1).ToString("HH:00")}";
+                        userOnlineReportModel.SiteId = site;
+                    }
+                }
+            }
+
+            #endregion
+
+            var Data = keyValuePairs.Select(s => s.Value).OrderBy(value => value.LocalTime)
+                                                         .ThenBy(value => value.SiteId);
 
             return Data;
         }
