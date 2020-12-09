@@ -115,6 +115,8 @@ namespace BackendSite
             services.AddSingleton<NewsBLL>();
             services.AddSingleton<ReportBLL>();
             services.AddSingleton<BannerManageBLL>();
+            services.AddSingleton<ReportExcelBLL>();
+
             // var bll = AppDomain.CurrentDomain.GetAssemblies()
             //.SelectMany(t => t.GetTypes())
             //.Where(t => t.IsClass && t.Namespace == "BackendSite.Service.BLL");

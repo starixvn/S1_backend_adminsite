@@ -16,14 +16,14 @@ namespace BackendSite.Controllers.Api
     [ApiController]
     public class ReportController : ControllerBase
     {
-        private readonly ReportBLL reportBLL;
-        private readonly ExcelBLL excelBLL;
+        private readonly ReportBLL _reportBLL;
+        private readonly ReportExcelBLL _reportExcelBLL;
         public ReportController(IConfiguration configuration,
                                 ReportBLL reportBLL,
-                                ExcelBLL excelBLL)
+                                ReportExcelBLL reportExcelBLL)
         {
-            this.reportBLL = reportBLL;
-            this.excelBLL = excelBLL;
+            this._reportBLL = reportBLL;
+            this._reportExcelBLL = reportExcelBLL;
         }
 
         public class TitleModel
@@ -44,7 +44,7 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                apiResult.Data = reportBLL.GetMainFinancialReport(CurrencyIds,
+                apiResult.Data = _reportBLL.GetMainFinancialReport(CurrencyIds,
                                                                   JsonConvert.SerializeObject(SiteIds),
                                                                   JsonConvert.SerializeObject(CurrencyIds),
                                                                   StartDate,
@@ -69,7 +69,7 @@ namespace BackendSite.Controllers.Api
         {
             var currencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(CurrencyIds);
 
-            var ExportData = reportBLL.GetMainFinancialReport(currencyList,
+            var ExportData = _reportBLL.GetMainFinancialReport(currencyList,
                                                               SiteIds,
                                                               CurrencyIds,
                                                               StartDate,
@@ -77,7 +77,7 @@ namespace BackendSite.Controllers.Api
 
             List<Dictionary<string, dynamic>> byDate = new List<Dictionary<string, dynamic>>();
             Dictionary<string, TitleModel> byDateTitles = new Dictionary<string, TitleModel>();
-            Dictionary<string, int> titlesToMerge = new Dictionary<string, int>();
+            List<Dictionary<string, int>> titlesToMerge = new List<Dictionary<string, int>>();
             List<string> notSummaryTitles = new List<string> { "Key", "Date", "CurrencyId", "Currency" };
             List<string> totalTitle = new List<string>
             {
@@ -367,23 +367,26 @@ namespace BackendSite.Controllers.Api
 
             #region Titles To Merge
 
-            titlesToMerge.Add("", 1);
+            Dictionary<string, int> mergeTitles = new Dictionary<string, int>();
+            mergeTitles.Add("", 1);
 
-            titlesToMerge.Add("Deposit", currencyList.Count() + 1);
-            titlesToMerge.Add("Withdrawal", currencyList.Count() + 1);
-            titlesToMerge.Add("Nett", currencyList.Count() + 1);
-            titlesToMerge.Add("Bonus", currencyList.Count() + 1);
-            titlesToMerge.Add("Rebate", currencyList.Count() + 1);
-            titlesToMerge.Add("Adjustment", currencyList.Count() + 1);
-            titlesToMerge.Add("TurnOver(Stake)", currencyList.Count() + 1);
-            titlesToMerge.Add("TurnOver(ValidBet)", currencyList.Count() + 1);
-            titlesToMerge.Add("WinLoss", currencyList.Count() + 1);
+            mergeTitles.Add("Deposit", currencyList.Count() + 1);
+            mergeTitles.Add("Withdrawal", currencyList.Count() + 1);
+            mergeTitles.Add("Nett", currencyList.Count() + 1);
+            mergeTitles.Add("Bonus", currencyList.Count() + 1);
+            mergeTitles.Add("Rebate", currencyList.Count() + 1);
+            mergeTitles.Add("Adjustment", currencyList.Count() + 1);
+            mergeTitles.Add("TurnOver(Stake)", currencyList.Count() + 1);
+            mergeTitles.Add("TurnOver(ValidBet)", currencyList.Count() + 1);
+            mergeTitles.Add("WinLoss", currencyList.Count() + 1);
+
+            titlesToMerge.Add(mergeTitles);
 
             #endregion
 
-            List<ExportReportDataToExcel> d = new List<ExportReportDataToExcel>()
+            List<ComplexReportExportDataToExcel> d = new List<ComplexReportExportDataToExcel>()
             {
-                new ExportReportDataToExcel()
+                new ComplexReportExportDataToExcel()
                 {
                     SheetName = "ByDate",
                     Content = byDate,
@@ -395,7 +398,7 @@ namespace BackendSite.Controllers.Api
                 }
             };
 
-            var stream = excelBLL.ExportToMultiSheetForReport(d);
+            var stream = _reportExcelBLL.ComplexReportExportToMultiSheet(d);
 
             return File(stream,
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -418,7 +421,7 @@ namespace BackendSite.Controllers.Api
 
                 #endregion
 
-                apiResult.Data = reportBLL.GetStatisticalReport(JsonConvert.SerializeObject(SiteIds),
+                apiResult.Data = _reportBLL.GetStatisticalReport(JsonConvert.SerializeObject(SiteIds),
                                                                 StartDate,
                                                                 EndDate);
                 apiResult.ErrorCode = 0;
@@ -433,6 +436,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        [HttpPost]
         public IActionResult ExportStatisticalReport(string SiteIds,
                                                      string EndDate)
         {
@@ -444,7 +448,7 @@ namespace BackendSite.Controllers.Api
 
             #endregion
 
-            var ExportData = reportBLL.GetStatisticalReport(SiteIds,
+            var ExportData = _reportBLL.GetStatisticalReport(SiteIds,
                                                             StartDate,
                                                             EndDate);
 
@@ -453,7 +457,7 @@ namespace BackendSite.Controllers.Api
             Dictionary<string, TitleModel> turnOverTitles = new Dictionary<string, TitleModel>();
             List<Dictionary<string, dynamic>> winLossContent = new List<Dictionary<string, dynamic>>();
             Dictionary<string, TitleModel> winLossTitles = new Dictionary<string, TitleModel>();
-            Dictionary<string, int> titlesToMerge = new Dictionary<string, int>();
+            List<Dictionary<string, int>> titlesToMerge = new List<Dictionary<string, int>>();
             List<string> notSummaryTitles = new List<string> { "Key", "CurrencyId", "Currency", "CategoryId", "CategoryName", "GameId", "GameName" };
             List<string> totalTitle = new List<string>
             {
@@ -801,20 +805,22 @@ namespace BackendSite.Controllers.Api
             }
 
             #region Titles To Merge
+            Dictionary<string, int> mergeTitles = new Dictionary<string, int>();
+            mergeTitles.Add("", 2);
 
-            titlesToMerge.Add("", 2);
+            mergeTitles.Add("Today", CurrencyList.Count() + 1);
+            mergeTitles.Add("Yesterday", CurrencyList.Count() + 1);
+            mergeTitles.Add("Last 2 Days", CurrencyList.Count() + 1);
+            mergeTitles.Add("This Month", CurrencyList.Count() + 1);
+            mergeTitles.Add("Last Month", CurrencyList.Count() + 1);
 
-            titlesToMerge.Add("Today", CurrencyList.Count() + 1);
-            titlesToMerge.Add("Yesterday", CurrencyList.Count() + 1);
-            titlesToMerge.Add("Last 2 Days", CurrencyList.Count() + 1);
-            titlesToMerge.Add("This Month", CurrencyList.Count() + 1);
-            titlesToMerge.Add("Last Month", CurrencyList.Count() + 1);
+            titlesToMerge.Add(mergeTitles);
 
             #endregion
 
-            List<ExportReportDataToExcel> d = new List<ExportReportDataToExcel>()
+            List<ComplexReportExportDataToExcel> d = new List<ComplexReportExportDataToExcel>()
             {
-                new ExportReportDataToExcel()
+                new ComplexReportExportDataToExcel()
                 {
                     SheetName = "TurnOver(ValidBet)",
                     Content = turnOverContent,
@@ -824,7 +830,7 @@ namespace BackendSite.Controllers.Api
                     TitlesNameToDisplay = turnOverTitles.OrderBy(x=> x.Value.SortId).Select(x=> x.Value.Name).ToList(),
                     NotSummaryTitles = notSummaryTitles
                 },
-                new ExportReportDataToExcel()
+                new ComplexReportExportDataToExcel()
                 {
                     SheetName = "WinLoss",
                     Content = winLossContent,
@@ -836,7 +842,7 @@ namespace BackendSite.Controllers.Api
                 }
             };
 
-            var stream = excelBLL.ExportToMultiSheetForReport(d);
+            var stream = _reportExcelBLL.ComplexReportExportToMultiSheet(d);
 
             return File(stream,
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -853,7 +859,7 @@ namespace BackendSite.Controllers.Api
             try
             {
 
-                apiResult.Data = reportBLL.GetUserOnlineReport(SiteIds,
+                apiResult.Data = _reportBLL.GetUserOnlineReport(SiteIds,
                                                                JsonConvert.SerializeObject(SiteIds),
                                                                SelectDate);
                 apiResult.ErrorCode = 0;
@@ -866,6 +872,137 @@ namespace BackendSite.Controllers.Api
             }
 
             return apiResult;
+        }
+
+        [HttpPost]
+        public IActionResult ExportUserOnlineReport(string SiteIds,
+                                                    string SelectDate)
+        {
+            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(SiteIds);
+
+            var ExportData = _reportBLL.GetUserOnlineReport(siteList,
+                                                           SiteIds,
+                                                           SelectDate);
+
+            int totalMaxCount = ExportData.GroupBy(x => new {
+                LocalTime = x.LocalTime
+            }).Select(x => x.Sum(y => y.MaxCount)).Max();
+
+            List<string> CurrencyList = new List<string>();
+            List<Dictionary<string, dynamic>> Content = new List<Dictionary<string, dynamic>>();
+            Dictionary<string, TitleModel> Titles = new Dictionary<string, TitleModel>();
+            List<Dictionary<string, int>> titlesToMerge = new List<Dictionary<string, int>>();
+            List<string> notSummaryTitles = new List<string> { "Key", "LocalTime", "TotalOnline" };
+            List<string> totalTitle = new List<string>
+            {
+                "TotalOnline",
+            };
+
+            foreach (var item in ExportData)
+            {
+                //var getCurrItem = siteList.FirstOrDefault(Contains(item.SiteId));
+                //if (getCurrItem == null)
+                //{
+                //    siteList.Add(item.SiteId);
+                //}
+
+                var OnlinePropName = $"Online-{item.SiteName}";
+
+                var onlineSortId = 100 + item.SiteId;
+
+                var getKey = $"{item.LocalTime}";
+                var getItem = Content.FirstOrDefault(x =>
+                    x.Any(y => y.Key == "Key" && (string)y.Value == getKey)
+                );
+
+                if (getItem != null)
+                {
+                    getItem.TryGetValue("TotalOnline", out dynamic totalCountdata);
+                    getItem["TotalOnline"] = (int)totalCountdata + item.MaxCount;
+
+                    if (!Titles.ContainsKey(OnlinePropName))
+                    {
+                        Titles.Add(OnlinePropName, new TitleModel { Name = item.SiteName, SortId = onlineSortId });
+                    }
+                    if (getItem.ContainsKey(OnlinePropName))
+                    {
+                        getItem.TryGetValue(OnlinePropName, out dynamic maxCountData);
+                        getItem[OnlinePropName] = (int)maxCountData + item.MaxCount;
+                    }
+                    else
+                    {
+                        getItem.Add(OnlinePropName, item.MaxCount);
+                    }
+
+                    #region
+
+                    if (getItem["TotalOnline"] == totalMaxCount)
+                    {
+                        getItem["MaxCount"] = true;
+                    }
+
+                    #endregion
+
+                }
+                else
+                {
+                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    {
+                        { "Key", getKey },
+                        { "LocalTime", item.LocalTime },
+
+                        { OnlinePropName,  item.MaxCount },
+                        { "TotalOnline", item.MaxCount }
+                    };
+
+                    if (!Titles.ContainsKey("LocalTime"))
+                    {
+                        Titles.Add("LocalTime", new TitleModel { Name = "Local Time(GMT +8)", SortId = 1 });
+                        Titles.Add("TotalOnline", new TitleModel { Name = "Total Online", SortId = 200 });
+
+                    }
+
+                    if (!Titles.ContainsKey(OnlinePropName))
+                    {
+                        Titles.Add(OnlinePropName, new TitleModel { Name = item.SiteName, SortId = onlineSortId });
+                    }
+
+                    Content.Add(newItem);
+                }
+            }
+
+            #region Titles To Merge
+
+            Dictionary<string, int> MergeTitles = new Dictionary<string, int>();
+
+            MergeTitles.Add(SelectDate, 1);
+            MergeTitles.Add("Online Count", siteList.Count() + 1);
+
+            titlesToMerge.Add(MergeTitles);
+
+            #endregion
+
+            List<ComplexReportExportDataToExcel> d = new List<ComplexReportExportDataToExcel>()
+            {
+                new ComplexReportExportDataToExcel()
+                {
+                    SheetName = "User Online Report",
+                    Content = Content,
+                    Titles = Titles.OrderBy(x=> x.Value.SortId).Select(x=> x.Key).ToList(),
+                    TotalTitles = totalTitle,
+                    TitlesToMerge = titlesToMerge,
+                    TitlesNameToDisplay = Titles.OrderBy(x=> x.Value.SortId).Select(x=> x.Value.Name).ToList(),
+                    NotSummaryTitles = notSummaryTitles,
+                    IsSummary = false,
+                    IsTotalTitleMax = true
+                },
+            };
+
+            var stream = _reportExcelBLL.ComplexReportExportToMultiSheet(d);
+
+            return File(stream,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        $"UserOnlineReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
     }
 }

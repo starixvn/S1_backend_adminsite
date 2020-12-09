@@ -20,6 +20,12 @@ namespace BackendSite.Service.Model
             set;
         }
 
+        public string SiteName
+        {
+            get;
+            set;
+        }
+
         public int MaxCount
         {
             get;

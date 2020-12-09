@@ -368,6 +368,8 @@ namespace BackendSite.Service.BLL
             var userOnlineList = reportService.GetUserOnlineReport(siteIds,
                                                                    selectDate);
 
+            var serverInfoList = reportService.GetServerInfoList();
+
             #region Data Statistical
 
             foreach (var data in userOnlineList)
@@ -380,6 +382,7 @@ namespace BackendSite.Service.BLL
                 keyValuePairs.Add($"{dateTimeFormat}_{data.SiteId}", userOnlineReportModel);
                 userOnlineReportModel.LocalTime = $"{dateTimeFormat}~{data.Time.AddHours(1).ToString("HH:00")}";
                 userOnlineReportModel.SiteId = data.SiteId;
+                userOnlineReportModel.SiteName = serverInfoList.Where(y => y.SiteId == data.SiteId).Select(x => x.SiteName).FirstOrDefault();
                 userOnlineReportModel.MaxCount = data.MaxCount;
 
             }
@@ -401,6 +404,7 @@ namespace BackendSite.Service.BLL
                         userOnlineReportModel = new UserOnlineReportModel();
                         keyValuePairs.Add($"{dateTimeFormat}_{site}", userOnlineReportModel);
                         userOnlineReportModel.LocalTime = $"{dateTimeFormat}~{Convert.ToDateTime(selectDate).AddHours(i + 1).ToString("HH:00")}";
+                        userOnlineReportModel.SiteName = serverInfoList.Where(y => y.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
                         userOnlineReportModel.SiteId = site;
                     }
                 }

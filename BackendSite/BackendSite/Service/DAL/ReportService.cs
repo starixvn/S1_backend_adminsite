@@ -141,5 +141,14 @@ namespace BackendSite.Service.DAL
                 return conn.Query<UserOnlinePartcialSummaryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
+
+        public IEnumerable<ServerInfoModel> GetServerInfoList()
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                string SpName = "Admin_ServerInfoList_Get";
+                return conn.Query<ServerInfoModel>(SpName, commandType: CommandType.StoredProcedure);
+            }
+        }
     }
 }
