@@ -28,7 +28,7 @@ namespace BackendSite.Service.DAL
             int promotionTypelength = filterPara.PromotionTypeFilter == null ? 0 : filterPara.PromotionTypeFilter.Length;
             int[] SiteIdFilterArray = new int[siteidlength];
             int[] PromotionTypeFilterArray = new int[promotionTypelength];
-            int Status = filterPara.Status ? 0 : 2;
+
             if (siteidlength > 0)
             {
                 for (var i = 0; i < filterPara.SiteidFilter.Length; i++)
@@ -50,7 +50,7 @@ namespace BackendSite.Service.DAL
             {
                 int? SiteId = null;
                 string SpName = "Admin_Promotion_Get";
-                return conn.Query<PromotionInfo>(SpName, new { BonusCode, SiteId, SiteIdFilter, PermissionSiteIds, PromotionTypeFilter, Status }, commandType: CommandType.StoredProcedure);
+                return conn.Query<PromotionInfo>(SpName, new { BonusCode, SiteId, SiteIdFilter, PermissionSiteIds, PromotionTypeFilter, Status = filterPara.Status }, commandType: CommandType.StoredProcedure);
             }
         }
 

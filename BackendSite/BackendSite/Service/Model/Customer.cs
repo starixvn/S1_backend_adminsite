@@ -68,7 +68,7 @@ namespace BackendSite.Service.Model
         public decimal TurnOver { get; set; }
         public IEnumerable<TpWallet> tpWallet { get; set; }
         public IEnumerable<Promotion> promotions { get; set; }
-        public int AffiliateId { get; set; }
+        public string AffiliateId { get; set; }
         public DateTime? ReloadTime { get; set; }
         public string IP { get; set; }
 
