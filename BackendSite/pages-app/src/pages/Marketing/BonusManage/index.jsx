@@ -58,7 +58,6 @@ const App = () => {
 		WebAPI.fetchData(param1).then(x=> {
 			if (isMountedRef.current) {
 				if (x.data.errorCode === 0) {	
-					
 					let initSitnemaFilter = GetInitSelectedSiteName(x.data.data);
 					let intPromotionTypeFilter = GetInitSelectedPromotionType(initPromotionType);
 					setSitnameFilter(initSitnemaFilter);
@@ -209,11 +208,17 @@ const App = () => {
 				SpecialCode: promotion.specialCode,
 				IsSpecial: promotion.isSpecial				
 			};
+			let _select = {
+				SiteidFilter: JSON.stringify(sitnemaFilter),
+				PromotionTypeFilter: JSON.stringify(promotionTypeFilter),
+				Status: statusCheck.length > 0
+			};
 			let param = {
 				Url: "BonusManage/SetPromotion",
 				Data: qs.stringify({
 					IsAdd: state.panelType === defPanelType.Add,
-					Promotion: _promo
+					Promotion: _promo,
+					Select:　_select
 				})
 			};
 			WebAPI.PostData(param).then(

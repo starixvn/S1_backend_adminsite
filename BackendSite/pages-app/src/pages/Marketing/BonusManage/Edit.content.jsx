@@ -261,6 +261,7 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 									/>
 								) : null}
 						</div>)}
+					{state.specialBonusCheck.length > 0 ? 	
 					<div className="filter">
 						<div className="row-flex">
 							<InputBox
@@ -271,7 +272,7 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 								Disabled={!IsAdd}
 							/>	
 						</div>
-					</div>	
+					</div>:null}	
 
 				<div className="filter noBGcolor">
 					<CheckBox

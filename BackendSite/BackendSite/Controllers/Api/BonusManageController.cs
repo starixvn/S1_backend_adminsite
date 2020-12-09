@@ -95,7 +95,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> SetPromotion([FromForm]bool IsAdd, [FromForm]PromotionInfo Promotion)
+        public ApiResult<IEnumerable<PromotionInfo>> SetPromotion([FromForm]bool IsAdd, [FromForm]PromotionInfo Promotion, [FromForm] PromotionSelect Select)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
             try
@@ -103,7 +103,7 @@ namespace BackendSite.Controllers.Api
                 var errorCode = bonusManageBLL.SetPromotion(IsAdd, Promotion);
                 var siteList = serverInfoBLL.GetSiteListByLoginUser();
                 int[] siteArray = siteList.Select(x => x.SiteId).ToArray();
-                apiResult.Data = bonusManageBLL.GetPromotionList(siteArray);
+                apiResult.Data = bonusManageBLL.GetPromotionList(siteArray, Select);
                 apiResult.ErrorCode = errorCode;
                 apiResult.Message = errorCode ==1 ? "The bonus setting already exists which with same promotion-type & product-category." : "";
             }
