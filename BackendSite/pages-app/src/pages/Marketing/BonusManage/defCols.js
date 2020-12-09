@@ -16,8 +16,7 @@ export const defPromotionType = {
 	4: "Special",
 	5: "Wallet Bonus",
 	6: "Rebate",
-	7: "CashBack",
-	8: "Advertising"
+	7: "CashBack"
 };
 
 export const initPromotionType = [
@@ -26,8 +25,7 @@ export const initPromotionType = [
 	{ value: 3, displayText: defPromotionType[3] },
 	{ value: 5, displayText: defPromotionType[5] },
 	{ value: 6, displayText: defPromotionType[6] },
-	{ value: 7, displayText: defPromotionType[7] },
-	{ value: 8, displayText: defPromotionType[8] }
+	{ value: 7, displayText: defPromotionType[7] }
 ];
 
 export const initSpecialBonusPromotionType = [
