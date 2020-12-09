@@ -56,6 +56,37 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 		}
 	};
 
+	const CheckboxSingal = (Title,Options,Selected,OnChange,dataColumn,mainKey,Disabled=false) =>{
+		let opt = Options.map(o=>{
+			return <CheckboxSingalCheckBox key={`${Title}-${o.value}${mainKey === null ? '': `-${mainKey}`}`} onChange={OnChange} Title={o.displayText} checked={Selected.includes(o.value)} Value={o.value} dataColumn={dataColumn} Disabled={Disabled}/>
+		});
+		return(
+			<>
+				{Title !== "" ? <div className="row-flex">
+					<div className="input-item">
+						<label className="label">{Title}</label>
+					</div>
+				</div> : null}
+				<div className="row-flex">
+					{opt}
+				</div>
+			</>
+		)
+	}
+
+	const CheckboxSingalCheckBox = (props)=>{    
+		const SpecialBonusCheckBoxOnChange = (e)=>{
+			props.onChange(props.Value, props.dataColumn);
+		}
+		return (
+			<label className="checkbox checkbox-checked" >
+				<input type="checkbox" value={props.Value} checked={props.checked} onChange={SpecialBonusCheckBoxOnChange} disabled={props.Disabled}/>
+				<i className="icon icon-checkbox"></i>
+				<span className="text">{props.Title}</span>
+			</label>
+		)
+	}
+
 	return (
 		<div className="container-fluid" id="Panel">
 			<div className="filter noBGcolor"></div>
@@ -90,7 +121,9 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 							dataColumn="bonusCode"
 							value={state.bonusCode}
 							Disabled={!IsAdd}
-						/>
+						/>						
+						{CheckboxSingal("",specialBonusOptions,state.specialBonusCheck,SpecialBonusCheckBox,"specialBonus",null,!IsAdd)}
+						<pre>            </pre>
 						<SelectBox
 							Title="PromotionType"
 							Options={state.isSpecial ? initSpecialBonusPromotionType:initPromotionType}
@@ -98,14 +131,6 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 							dataColumn="promotionType"
 							SelectedValue={state.promotionType}
 							Disabled={!IsAdd}
-						/>
-						<CheckBox
-						Options={specialBonusOptions}
-						Title=""
-						OnChange={SpecialBonusCheckBox}
-						dataColumn="specialBonus"
-						Selected={state.specialBonusCheck}
-						mainKey={null}
 						/>
 					</div>
 					<div className="row-flex">
