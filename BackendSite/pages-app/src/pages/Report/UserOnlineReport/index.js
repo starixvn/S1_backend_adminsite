@@ -21,6 +21,7 @@ const App = () => {
 
     const [siteList, setSiteList] = useState();
     const [SubmitStatus, setSubmitStatus] = useState(false);
+    const [ExportStatus, setExportStatus] = useState(false);
 
     useEffect(() => {
         let param = {
@@ -85,6 +86,7 @@ const App = () => {
             alert("Please Choose Select Date of Report.")
             return false;
         }
+
         let param = {
             Url: 'Report/GetUserOnlineReport',
             Data: qs.stringify({
@@ -94,16 +96,27 @@ const App = () => {
         };
 
         setSubmitStatus(true);
+        setExportStatus(true);
 
         WebAPI.PostData(param).then((res) => {
 
             setSubmitStatus(false);
+            setExportStatus(false);
                 
             if (res.data.errorCode === 0) {
 
                 let result = [];
+                let resultSiteList=[];
 
                 res.data.data.forEach(elem => {
+
+                    if(!resultSiteList.find(x=>x.siteId===elem.siteId))
+                    {
+                        resultSiteList.push({
+                            'siteId':elem.siteId,
+                            'siteName':elem.siteName                         
+                        });
+                    }
 
                     let getItem = result.find(x=> x.localTime === elem.localTime);
                     let onlineCountColDef = `online_${elem.siteId}`;
@@ -133,7 +146,7 @@ const App = () => {
                         FilterInfo: {
                             ...stateFilter
                         },
-                        SiteList: siteList,
+                        SiteList: resultSiteList,
                         MaxCount: GetMaxCount
                     }
                 )
@@ -143,8 +156,39 @@ const App = () => {
         })
     }
 
+    const ExportToExcel = () => {
+        console.log(stateDatas);
+        if (stateDatas.FilterInfo.SiteIds.length === 0) {
+            alert("Please Choose at least one Site.")
+            return false;
+        }
+
+        if (!moment(stateDatas.FilterInfo.SelectDate).unix()) {
+            alert("Please Choose Select Date of Report.")
+            return false;
+        }
+       
+       setSubmitStatus(true);
+       setExportStatus(true);
+
+        let param = {
+            Url: 'Report/ExportUserOnlineReport',
+            Data: {
+                SiteIds: JSON.stringify(stateDatas.FilterInfo.SiteIds),
+                SelectDate: moment(stateDatas.FilterInfo.SelectDate).format('YYYY-MM-DD'),
+            }
+        };
+
+        WebAPI.DownloadData(param);
+
+        setTimeout(() => {
+            setSubmitStatus(false);
+            setExportStatus(false);
+        }, 5000);
+    }
+
     return (
-        <div className="container-fluid">
+        <div className="container-fluid" style={{width:"auto"}}>
             <h4 className="page-name">User Online Report</h4>
             <Filter filterInfo={stateFilter} 
             onChange={Filter_OnChange} 
@@ -155,7 +199,9 @@ const App = () => {
             SubmitBtnDisabled={SubmitStatus} />
             {stateDatas.Datas === null 
             ? null 
-            : <Result {...stateDatas}/>}
+            : <Result {...stateDatas}
+                      ExportToExcel={ExportToExcel} 
+                      ExportBtnDisabled={ExportStatus}/>}
         </div>
     );
 }
