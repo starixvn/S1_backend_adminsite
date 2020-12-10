@@ -6,31 +6,61 @@ const turnOverValidBetDataGroupColumnDefs = (props) => {
             columnTitle: 'Today',
             headerStartwith: 'turnOverValidBetToday_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
         {
             columnTitle: 'Yesterday',
             headerStartwith: 'turnOverValidBetYesterday_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
         {
             columnTitle: 'Last 2 Days',
             headerStartwith: 'turnOverValidBetLastTwoDays_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
         {
             columnTitle: 'This Month',
             headerStartwith: 'turnOverValidBetThisMonth_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
         {
             columnTitle: 'Last Month',
             headerStartwith: 'turnOverValidBetLastMonth_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         }
     ]
 }
@@ -40,10 +70,43 @@ const turnOverValidBetDataColumnDefs = (props) => {
         {
             columnTitle: 'Category',
             dataColumn: "categoryName",
+            body:{
+                categoryBgcolor:"Bisque",
+                style:{
+                    position: "sticky",
+                top: "36.8px",
+                left:"0",
+                height:"36.8px",
+                zIndex:"1"
+                }
+            },
+            style:{
+                position: "sticky",
+                top: "36.8px",
+                left:"0",
+                height:"36.8px",
+                zIndex:"3"
+            }
         },
         {
             columnTitle: 'Game',
-            dataColumn: "gameName"
+            dataColumn: "gameName",
+            body:{
+                categoryBgcolor:"LightCyan",
+                bgcolor:"#e0fff0",
+                style:{
+                    position:"sticky",
+                    left:"88.73px",
+                    zIndex:"1"
+                }
+            },
+            style:{
+                position: "sticky",
+                top: "36.8px",
+                left: "88.73px",
+                height:"36.8px",
+                zIndex:"3"
+            }
         },
         ...props.CurrencyList.map(curr=>{
             return({
@@ -53,7 +116,15 @@ const turnOverValidBetDataColumnDefs = (props) => {
                     attr:{
                         class:"text-right",
                         //hidden:props.HideShowBtn
-                    }
+                    },
+                    categoryBgcolor:"LightCyan",
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "36.8px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -64,6 +135,15 @@ const turnOverValidBetDataColumnDefs = (props) => {
                 attr:{
                     class:"text-right"
                 },
+                categoryBgcolor:"LightCyan",
+                bgcolor:"LightGray",
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "36.8px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
         ...props.CurrencyList.map(curr=>{
@@ -74,7 +154,15 @@ const turnOverValidBetDataColumnDefs = (props) => {
                     attr:{
                         class:"text-right",
                         //hidden:props.HideShowBtn
-                    }
+                    },
+                    categoryBgcolor:"LightCyan",
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "36.8px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -85,6 +173,15 @@ const turnOverValidBetDataColumnDefs = (props) => {
                 attr:{
                     class:"text-right"
                 },
+                categoryBgcolor:"LightCyan",
+                bgcolor:"LightGray",
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "36.8px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
         ...props.CurrencyList.map(curr=>{
@@ -95,7 +192,15 @@ const turnOverValidBetDataColumnDefs = (props) => {
                     attr:{
                         class:"text-right",
                         //hidden:props.HideShowBtn
-                    }
+                    },
+                    categoryBgcolor:"LightCyan",
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "36.8px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -106,6 +211,15 @@ const turnOverValidBetDataColumnDefs = (props) => {
                 attr:{
                     class:"text-right"
                 },
+                categoryBgcolor:"LightCyan",
+                bgcolor:"LightGray",
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "36.8px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
         ...props.CurrencyList.map(curr=>{
@@ -116,7 +230,15 @@ const turnOverValidBetDataColumnDefs = (props) => {
                     attr:{
                         class:"text-right",
                         //hidden:props.HideShowBtn
-                    }
+                    },
+                    categoryBgcolor:"LightCyan",
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "36.8px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -127,6 +249,15 @@ const turnOverValidBetDataColumnDefs = (props) => {
                 attr:{
                     class:"text-right"
                 },
+                categoryBgcolor:"LightCyan",
+                bgcolor:"LightGray",
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "36.8px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
         ...props.CurrencyList.map(curr=>{
@@ -137,7 +268,15 @@ const turnOverValidBetDataColumnDefs = (props) => {
                     attr:{
                         class:"text-right",
                         //hidden:props.HideShowBtn
-                    }
+                    },
+                    categoryBgcolor:"LightCyan",
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "36.8px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -148,6 +287,15 @@ const turnOverValidBetDataColumnDefs = (props) => {
                 attr:{
                     class:"text-right"
                 },
+                categoryBgcolor:"LightCyan",
+                bgcolor:"LightGray",
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "36.8px",
+                height:"36.8px",
+                zIndex:"2"
             }
         }
     ]
@@ -159,31 +307,61 @@ const winLossDataGroupColumnDefs = (props) => {
             columnTitle: 'Today',
             headerStartwith: 'winLossToday_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
         {
             columnTitle: 'Yesterday',
             headerStartwith: 'winLossYesterday_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
         {
             columnTitle: 'Last 2 Days',
             headerStartwith: 'winLossLastTwoDays_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
         {
             columnTitle: 'This Month',
             headerStartwith: 'winLossThisMonth_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
         {
             columnTitle: 'Last Month',
             headerStartwith: 'winLossLastMonth_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         }
     ]
 }
@@ -192,11 +370,44 @@ const winLossDataColumnDefs = (props) => {
     return [
         {
             columnTitle: 'Category',
-            dataColumn: "categoryName"
+            dataColumn: "categoryName",
+            body:{
+                categoryBgcolor:"Bisque",
+                style:{
+                    position: "sticky",
+                top: "36.8px",
+                left:"0",
+                height:"36.8px",
+                zIndex:"1"
+                }
+            },
+            style:{
+                position: "sticky",
+                top: "36.8px",
+                left:"0",
+                height:"36.8px",
+                zIndex:"3"
+            }
         },
         {
             columnTitle: 'Game',
-            dataColumn: "gameName"
+            dataColumn: "gameName",
+            body:{
+                categoryBgcolor:"LightCyan",
+                bgcolor:"#e0fff0",
+                style:{
+                    position:"sticky",
+                    left:"88.73px",
+                    zIndex:"1"
+                }
+            },
+            style:{
+                position: "sticky",
+                top: "36.8px",
+                left: "88.73px",
+                height:"36.8px",
+                zIndex:"3"
+            }
         },
         ...props.CurrencyList.map(curr=>{
             return({
@@ -206,7 +417,15 @@ const winLossDataColumnDefs = (props) => {
                     attr:{
                         class:"text-right",
                         //hidden:props.HideShowBtn
-                    }
+                    },
+                    categoryBgcolor:"LightCyan",
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "36.8px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -217,6 +436,14 @@ const winLossDataColumnDefs = (props) => {
                 attr:{
                     class:"text-right"
                 },
+                categoryBgcolor:"LightCyan",
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "36.8px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
         ...props.CurrencyList.map(curr=>{
@@ -227,7 +454,15 @@ const winLossDataColumnDefs = (props) => {
                     attr:{
                         class:"text-right",
                         //hidden:props.HideShowBtn
-                    }
+                    },
+                    categoryBgcolor:"LightCyan",
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "36.8px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -238,6 +473,14 @@ const winLossDataColumnDefs = (props) => {
                 attr:{
                     class:"text-right"
                 },
+                categoryBgcolor:"LightCyan",
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "36.8px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
         ...props.CurrencyList.map(curr=>{
@@ -248,7 +491,15 @@ const winLossDataColumnDefs = (props) => {
                     attr:{
                         class:"text-right",
                         //hidden:props.HideShowBtn
-                    }
+                    },
+                    categoryBgcolor:"LightCyan",
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "36.8px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -259,6 +510,14 @@ const winLossDataColumnDefs = (props) => {
                 attr:{
                     class:"text-right"
                 },
+                categoryBgcolor:"LightCyan",
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "36.8px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
         ...props.CurrencyList.map(curr=>{
@@ -269,7 +528,15 @@ const winLossDataColumnDefs = (props) => {
                     attr:{
                         class:"text-right",
                         //hidden:props.HideShowBtn
-                    }
+                    },
+                    categoryBgcolor:"LightCyan",
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "36.8px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -280,6 +547,14 @@ const winLossDataColumnDefs = (props) => {
                 attr:{
                     class:"text-right"
                 },
+                categoryBgcolor:"LightCyan",
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "36.8px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
         ...props.CurrencyList.map(curr=>{
@@ -290,7 +565,15 @@ const winLossDataColumnDefs = (props) => {
                     attr:{
                         class:"text-right",
                         //hidden:props.HideShowBtn
-                    }
+                    },
+                    categoryBgcolor:"LightCyan",
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "36.8px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -301,6 +584,14 @@ const winLossDataColumnDefs = (props) => {
                 attr:{
                     class:"text-right"
                 },
+                categoryBgcolor:"LightCyan",
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "36.8px",
+                height:"36.8px",
+                zIndex:"2"
             }
         }
     ]
@@ -384,7 +675,9 @@ const Panel = (props) => {
         winLossGroupColumnDefs = winLossGroupColumnDefsDefault;
         winLossColumnDefs = winLossColumnDefsDefault;
     // }
+
     let turnOverValidBetFilterDatas=[];
+
     if(props.HidenTitles.turnOverValidBetHiddenCategoryList.length > 0)
     {      
         props.Datas.forEach(data => {
@@ -407,18 +700,15 @@ const Panel = (props) => {
     }
     else
     {
-        
         turnOverValidBetFilterDatas=props.Datas;
     }
 
     turnOverValidBetGroupColumnDefs.forEach((element, idx) => {
         turnOverValidBetGroupHeaderRows.push(
-            <th key={`th-${element.dataColumn}-${idx}`}
+            <th key={`th-${element.columnTitle}-${idx}`}
                 scope="col"
-                style={{ position: "sticky", top: "0",height:"36.8px"}}
-                className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''} colSpan={element.colSpan}
-                bgcolor={element.bgcolor}
-                style={{ position: "sticky", top: "0",height:"36.8px"}}>
+                colSpan={element.colSpan}
+                style={element.style ? element.style : ''}>
                 {element.columnTitle}
                 {/* <button type="button" className="btn btn-info pull-right" onClick={() => props.HideShowBtn(element)}>{element.btnText}</button> */}
             </th>
@@ -429,35 +719,12 @@ const Panel = (props) => {
         turnOverValidBetHeaderRows.push(
             <th key={`th-${element.dataColumn}-${idx}`} 
                 scope="col"
-                style={{ position: "sticky", top: "36.8px",height:"36.8px"}}
-                className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''}>
+                style={element.style ? element.style : ''}>
                 {element.columnTitle}
-             </th>
+            </th>
         );
      });
 
-    // let turnOverValidBetBodyRows = props.Datas.map((data, idx) => {
-    //     let row = turnOverValidBetColumnDefs.map((element, idx) => {
-    //         let subData = {};
-    //         if (element.body && element.body.subData) {
-    //             element.body.subData.forEach(s => { subData[s] = data[s] });
-    //         }
-    //         return (
-    //             <td key={`td-${element.dataColumn}-${idx}`}
-    //                 className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
-    //                 bgcolor={ data.gameId == 0 ? 'LightCyan' : ''}
-    //                >
-    //                 {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
-    //             </td>
-    //         );
-    //     });
-
-    //     return (
-    //         <tr key={`result-body-${idx}`}>
-    //             {row}
-    //         </tr>
-    //     )
-    // });
     props.CategoryGameList.forEach((category,cidx)=>{
         let flag=true; 
         category.gameList.forEach((game)=>{
@@ -476,13 +743,15 @@ const Panel = (props) => {
                         {
                             flag = false;
                                 return (
-                                    <th key={`td-${element.dataColumn}-${idx}`}
+                                    <td key={`td-${element.dataColumn}-${idx}`}
                                         className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
                                         rowSpan={category.gameList.length + 1}
+                                        style={{position:"sticky",left:"0",zIndex:"1"}}
+                                        bgcolor={element.body && element.body.categoryBgcolor ? element.body.categoryBgcolor : ''}
                                     >
                                         {element.body && element.body.format ? element.body.format(getDataItem[element.dataColumn], subData) : getDataItem[element.dataColumn]}
                                         {/* <button type="button" className="btn btn-info pull-right" onClick={() => props.TurnOverValidBetHideShowBtn(getDataItem['categoryId'])}>hide</button> */}
-                                    </th>
+                                    </td>
                                 );
                         }
                         else
@@ -492,6 +761,8 @@ const Panel = (props) => {
                                 return (
                                     <td key={`td-${element.dataColumn}-${idx}`}
                                         className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                        style={element.body && element.body.style ? element.body.style : ''}
+                                        bgcolor={element.body && element.body.bgcolor ? element.body.bgcolor : ''}
                                     >
                                         {element.body && element.body.format ? element.body.format(getDataItem[element.dataColumn], subData) : getDataItem[element.dataColumn]}
                                     </td>
@@ -529,40 +800,29 @@ const Panel = (props) => {
                 }
                     
                 if(flag){
-                        if(element.dataColumn!=="categoryName"){
-                            return (
-                                <th key={`td-${element.dataColumn}-${idx}`}
-                                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
-                                    bgcolor='LightCyan'
-                                >
-                                    {element.body && element.body.format ? element.body.format(geCategoryItem[element.dataColumn], subData) : geCategoryItem[element.dataColumn]}
-                                </th>
-                            );
-                        }
+                    if(element.dataColumn!=="categoryName"){
+                        return (
+                            <td key={`td-${element.dataColumn}-${idx}`}
+                                className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                bgcolor={element.body && element.body.categoryBgcolor ? element.body.categoryBgcolor : ''}
+                                style={element.body && element.body.style ? element.body.style : ''}
+                            >
+                                {element.body && element.body.format ? element.body.format(geCategoryItem[element.dataColumn], subData) : geCategoryItem[element.dataColumn]}
+                            </td>
+                        );
+                    }
                 }
                 else{
-                        if(element.dataColumn==="categoryName"){
-                            return (
-                                <th key={`td-${element.dataColumn}-${idx}`}
-                                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
-                                    bgcolor='LightCyan'
-                                    style={{ position: "sticky", left: "0"}}
-                                >
-                                     {element.body && element.body.format ? element.body.format(geCategoryItem[element.dataColumn], subData) : geCategoryItem[element.dataColumn]}
-                                     {element.dataColumn==="categoryName" ? <button type="button" className="btn btn-info pull-right" onClick={() => props.TurnOverValidBetHideShowBtn(geCategoryItem['categoryId'])}>show</button> : ''}
-                                 </th>
-                            );
-                        }
-                        else{
-                            return (
-                                <th key={`td-${element.dataColumn}-${idx}`}
-                                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
-                                    bgcolor='LightCyan'
-                                >
-                                     {element.body && element.body.format ? element.body.format(geCategoryItem[element.dataColumn], subData) : geCategoryItem[element.dataColumn]}
-                                 </th>
-                            );
-                        }
+                        return (
+                            <td key={`td-${element.dataColumn}-${idx}`}
+                                className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                bgcolor={element.body && element.body.categoryBgcolor ? element.body.categoryBgcolor : ''}
+                                style={element.body && element.body.style ? element.body.style : ''}
+                            >
+                                {element.body && element.body.format ? element.body.format(geCategoryItem[element.dataColumn], subData) : geCategoryItem[element.dataColumn]}
+                                {element.dataColumn==="categoryName" ? <button type="button" className="btn btn-info pull-right" onClick={() => props.TurnOverValidBetHideShowBtn(geCategoryItem['categoryId'])}>show</button> : ''}
+                            </td>
+                        );
                 }
             });
     
@@ -584,6 +844,7 @@ const Panel = (props) => {
             return (
                 <th key={`td-${element.dataColumn}-${idx}`}
                     className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                    style={element.body && element.body.style ? element.body.style : ''}
                     bgcolor="LemonChiffon">
                     {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
                 </th>
@@ -602,10 +863,8 @@ const Panel = (props) => {
         winLossGroupHeaderRows.push(
             <th key={`th-${element.dataColumn}-${idx}`}
                 scope="col"
-                style={{ position: "sticky", top: "0",height:"36.8px"}}
-                className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''} colSpan={element.colSpan}
-                bgcolor={element.bgcolor}
-                style={{ position: "sticky", top: "0",height:"36.8px"}}>
+                colSpan={element.colSpan}
+                style={element.style ? element.style : ''}bgcolor={element.bgcolor}>
                 {element.columnTitle}
                 {/* <button type="button" className="btn btn-info pull-right" onClick={() => props.HideShowBtn(element)}>{element.btnText}</button> */}
             </th>
@@ -616,35 +875,12 @@ const Panel = (props) => {
         winLossHeaderRows.push(
             <th key={`th-${element.dataColumn}-${idx}`} 
                 scope="col"
-                style={{ position: "sticky", top: "36.8px",height:"36.8px"}}
-                className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''}>
+                style={element.style ? element.style : ''}>
                 {element.columnTitle}
-             </th>
+            </th>
         );
      });
 
-    // let winLossBodyRows = props.Datas.map((data, idx) => {
-    //     let row = winLossColumnDefs.map((element, idx) => {
-    //         let subData = {};
-    //         if (element.body && element.body.subData) {
-    //             element.body.subData.forEach(s => { subData[s] = data[s] });
-    //         }
-    //         return (
-    //             <td key={`td-${element.dataColumn}-${idx}`}
-    //                 className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
-    //                 bgcolor={ data.gameId == 0 ? 'LightCyan' : ''}
-    //                >
-    //                 {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
-    //             </td>
-    //         );
-    //     });
-
-    //     return (
-    //         <tr key={`result-body-${idx}`}>
-    //             {row}
-    //         </tr>
-    //     )
-    // });
     let winLossFilterDatas=[];
 
     if(props.HidenTitles.winLossHiddenCategoryList.length > 0)
@@ -681,38 +917,42 @@ const Panel = (props) => {
             if(getDataItem)
             {
                 let idx = winLossFilterDatas.indexOf(getDataItem);
-                let row = winLossColumnDefs.map((element, idx) => {
-                        let subData = {};
-                        if (element.body && element.body.subData) {
-                            element.body.subData.forEach(s => { subData[s] = getDataItem[s] });
-                        }
-                        if(flag)
+                let row = turnOverValidBetColumnDefs.map((element, idx) => {
+                    let subData = {};
+                    if (element.body && element.body.subData) {
+                        element.body.subData.forEach(s => { subData[s] = getDataItem[s] });
+                    }
+                    if(flag)
+                    {
+                        flag = false;
+                            return (
+                                <td key={`td-${element.dataColumn}-${idx}`}
+                                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                    rowSpan={category.gameList.length + 1}
+                                    style={{position:"sticky",left:"0",zIndex:"1"}}
+                                    bgcolor={element.body && element.body.categoryBgcolor ? element.body.categoryBgcolor : ''}
+                                >
+                                    {element.body && element.body.format ? element.body.format(getDataItem[element.dataColumn], subData) : getDataItem[element.dataColumn]}
+                                    {/* <button type="button" className="btn btn-info pull-right" onClick={() => props.TurnOverValidBetHideShowBtn(getDataItem['categoryId'])}>hide</button> */}
+                                </td>
+                            );
+                    }
+                    else
+                    {
+                        if(element.dataColumn!=="categoryName")
                         {
-                            flag = false;
-                                return (
-                                    <td key={`td-${element.dataColumn}-${idx}`}
-                                        className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
-                                        rowSpan={category.gameList.length + 1}
-                                    >
-                                        {element.body && element.body.format ? element.body.format(getDataItem[element.dataColumn], subData) : getDataItem[element.dataColumn]}
-                                        {/* <button type="button" className="btn btn-info pull-right" onClick={() => props.WinLossHideShowBtn(getDataItem['categoryId'])}>hide</button> */}
-                                    </td>
-                                );
+                            return (
+                                <td key={`td-${element.dataColumn}-${idx}`}
+                                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                    style={element.body && element.body.style ? element.body.style : ''}
+                                    bgcolor={element.body && element.body.bgcolor ? element.body.bgcolor : ''}
+                                >
+                                    {element.body && element.body.format ? element.body.format(getDataItem[element.dataColumn], subData) : getDataItem[element.dataColumn]}
+                                </td>
+                            );
                         }
-                        else
-                        {
-                            if(element.dataColumn!=="categoryName")
-                            {
-                                return (
-                                    <td key={`td-${element.dataColumn}-${idx}`}
-                                        className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
-                                    >
-                                        {element.body && element.body.format ? element.body.format(getDataItem[element.dataColumn], subData) : getDataItem[element.dataColumn]}
-                                    </td>
-                                );
-                            }
-                        }
-                    });
+                    }
+                });
     
                 winLossBodyRows.push(
                     <tr key={`result-body-data-${idx}`}>
@@ -736,46 +976,36 @@ const Panel = (props) => {
                 }
             });
 
-            let row = winLossColumnDefs.map((element, idx) => {
+            let row = turnOverValidBetColumnDefs.map((element, idx) => {
                 let subData = {};
                 if (element.body && element.body.subData) {
                     element.body.subData.forEach(s => { subData[s] = geCategoryItem[s] });
                 }
                     
                 if(flag){
-                        if(element.dataColumn!=="categoryName"){
-                            return (
-                                <th key={`td-${element.dataColumn}-${idx}`}
-                                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
-                                    bgcolor='LightCyan'
-                                >
-                                    {element.body && element.body.format ? element.body.format(geCategoryItem[element.dataColumn], subData) : geCategoryItem[element.dataColumn]}
-                                </th>
-                            );
-                        }
+                    if(element.dataColumn!=="categoryName"){
+                        return (
+                            <td key={`td-${element.dataColumn}-${idx}`}
+                                className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                bgcolor={element.body && element.body.categoryBgcolor ? element.body.categoryBgcolor : ''}
+                                style={element.body && element.body.style ? element.body.style : ''}
+                            >
+                                {element.body && element.body.format ? element.body.format(geCategoryItem[element.dataColumn], subData) : geCategoryItem[element.dataColumn]}
+                            </td>
+                        );
+                    }
                 }
                 else{
-                        if(element.dataColumn==="categoryName"){
-                            return (
-                                <th key={`td-${element.dataColumn}-${idx}`}
-                                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
-                                    bgcolor='LightCyan'
-                                >
-                                     {element.body && element.body.format ? element.body.format(geCategoryItem[element.dataColumn], subData) : geCategoryItem[element.dataColumn]}
-                                     {element.dataColumn==="categoryName" ? <button type="button" className="btn btn-info pull-right" onClick={() => props.WinLossHideShowBtn(geCategoryItem['categoryId'])}>show</button> : ''}
-                                 </th>
-                            );
-                        }
-                        else{
-                            return (
-                                <th key={`td-${element.dataColumn}-${idx}`}
-                                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
-                                    bgcolor='LightCyan'
-                                >
-                                     {element.body && element.body.format ? element.body.format(geCategoryItem[element.dataColumn], subData) : geCategoryItem[element.dataColumn]}
-                                 </th>
-                            );
-                        }
+                        return (
+                            <td key={`td-${element.dataColumn}-${idx}`}
+                                className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                bgcolor={element.body && element.body.categoryBgcolor ? element.body.categoryBgcolor : ''}
+                                style={element.body && element.body.style ? element.body.style : ''}
+                            >
+                                {element.body && element.body.format ? element.body.format(geCategoryItem[element.dataColumn], subData) : geCategoryItem[element.dataColumn]}
+                                {element.dataColumn==="categoryName" ? <button type="button" className="btn btn-info pull-right" onClick={() => props.TurnOverValidBetHideShowBtn(geCategoryItem['categoryId'])}>show</button> : ''}
+                            </td>
+                        );
                 }
             });
     
@@ -797,6 +1027,7 @@ const Panel = (props) => {
             return (
                 <th key={`td-${element.dataColumn}-${idx}`}
                     className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                    style={element.body && element.body.style ? element.body.style : ''}
                     bgcolor="LemonChiffon">
                     {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
                 </th>
@@ -818,7 +1049,7 @@ const Panel = (props) => {
             <table className="table table-striped">
                 <thead>
                     <tr>
-                        <th colSpan="2" style={{ position: "sticky", top: "0",height:"36.8px"}}>TurnOver(ValidBet)</th>
+                        <th colSpan="2" style={{ position: "sticky", top: "0",left:"0",height:"36.8px",zIndex:"3"}}>TurnOver(ValidBet)</th>
                         {turnOverValidBetGroupHeaderRows}
                     </tr>
                     <tr>
@@ -831,7 +1062,7 @@ const Panel = (props) => {
                 </tbody>
                 <thead>
                     <tr>
-                        <th colSpan="2" style={{ position: "sticky", top: "0",height:"36.8px"}}>WinLoss</th>
+                        <th colSpan="2" style={{ position: "sticky", top: "0",left:"0",height:"36.8px",zIndex:"4"}}>WinLoss</th>
                         {winLossGroupHeaderRows}
                     </tr>
                     <tr>

@@ -198,6 +198,7 @@ const App = ()=>{
                     });
 
                     totalResult.push({
+                        'categoryName':" ",
                         'gameName':"TOTAL：",
     
                         'turnOverValidBetTodaySummary':0,
