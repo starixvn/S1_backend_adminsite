@@ -11,6 +11,7 @@ import {
 	initState
 } from "./index.reducer";
 import Main from "./index.main";
+import { initPromotionType } from "./defCols";
 
 const App = () => {
 	const [state, dispatch] = useReducer(reducer, initState);
@@ -28,27 +29,66 @@ const App = () => {
 		return () => (isMountedRef.current = false);
 	});
 
-	useEffect(() => {
-		let param = {
-			Url: "BonusManage/GetPromotionList",
-			Data: qs.stringify({
-				SitnemaFilter: sitnemaFilter,
-				PromotionTypeFilter: promotionTypeFilter,
-				Status: statusCheck
+	const GetInitSelectedSiteName = (props) =>{
+		let headerRows = [];
+		props.map(x=>{		 
+			headerRows.push({
+				label: x.siteName,
+				value: x.siteId,
 			})
+		 })
+		 return headerRows;
+	};
+	const GetInitSelectedPromotionType = (props) =>{
+		let headerRows = [];
+		props.map(x=>{		 
+			headerRows.push({
+				label: x.displayText,
+				value: x.value,
+			})
+		 })
+		 return headerRows;
+	};
+
+	useEffect(() => {
+		let param1 = {
+			Url: "Marketing/GetAllSites"
 		};
-		WebAPI.PostData(param).then(res => {
+		let aaa = [];
+		WebAPI.fetchData(param1).then(x=> {
 			if (isMountedRef.current) {
-				if (res.data.errorCode === 0) {					
-					dispatch({
-						type: defActionType.SET_PROMOTION_LIST,
-						promotionList: res.data.data
-					});					
+				if (x.data.errorCode === 0) {	
+					let initSitnemaFilter = GetInitSelectedSiteName(x.data.data);
+					let intPromotionTypeFilter = GetInitSelectedPromotionType(initPromotionType);
+					setSitnameFilter(initSitnemaFilter);
+					setPromotionTypeFilter(initPromotionType);				
+					let param = {
+						Url: "BonusManage/GetPromotionList",
+						Data: qs.stringify({
+							SiteidFilter: JSON.stringify(initSitnemaFilter),
+							PromotionTypeFilter: JSON.stringify(intPromotionTypeFilter),
+							Status: statusCheck
+						})
+					};
+					WebAPI.PostData(param).then(res => {
+						if (isMountedRef.current) {
+							if (res.data.errorCode === 0) {					
+								dispatch({
+									type: defActionType.SET_PROMOTION_LIST,
+									promotionList: res.data.data
+								});					
+							} else {
+								alert(res.data.message ?? "failed to get data.");
+							}
+						}
+					});
 				} else {
-					alert(res.data.message ?? "failed to get data.");
+					alert(x.data.message ?? "failed to get data.");
 				}
 			}
 		});
+		
+		
 	}, []);
 
 	useEffect(() => {
@@ -168,11 +208,17 @@ const App = () => {
 				SpecialCode: promotion.specialCode,
 				IsSpecial: promotion.isSpecial				
 			};
+			let _select = {
+				SiteidFilter: JSON.stringify(sitnemaFilter),
+				PromotionTypeFilter: JSON.stringify(promotionTypeFilter),
+				Status: statusCheck.length > 0
+			};
 			let param = {
 				Url: "BonusManage/SetPromotion",
 				Data: qs.stringify({
 					IsAdd: state.panelType === defPanelType.Add,
-					Promotion: _promo
+					Promotion: _promo,
+					Select:　_select
 				})
 			};
 			WebAPI.PostData(param).then(
