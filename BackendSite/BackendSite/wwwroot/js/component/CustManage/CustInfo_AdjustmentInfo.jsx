@@ -22,7 +22,9 @@ class AdjustmentInfoList extends React.Component {
 
         const Direction = {
             1: "+",
-            2: "-"
+            2: "-",
+            3: "+",
+            4: "-"
         }
 
         let rows = this.props.searchData.data.map(row =>
