@@ -7,55 +7,109 @@ const dataGroupColumnDefs = (props) => {
             columnTitle: 'Deposit',
             headerStartwith: 'deposit_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
         {
             columnTitle: 'Withdrawal',
             headerStartwith: 'withdrawal_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
         {
             columnTitle: 'Nett',
             headerStartwith: 'nett_',
             colSpan: props.CurrencyList.length + 1,
             btnText: 'hide'
+            ,style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
         {
             columnTitle: 'Bonus',
             headerStartwith: 'bonus_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
         {
             columnTitle: 'Rebate',
             headerStartwith: 'rebate_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
         {
             columnTitle: 'Adjustment',
             headerStartwith: 'adjustment_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
         {
             columnTitle: 'TurnOver(Stake)',
             headerStartwith: 'turnOverStake_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
         {
             columnTitle: 'TurnOver(ValidBet)',
             headerStartwith: 'turnOverValidBet_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
         {
             columnTitle: 'WinLoss',
             headerStartwith: 'winLoss_',
             colSpan: props.CurrencyList.length + 1,
-            btnText: 'hide'
+            btnText: 'hide',
+            style:{
+                position: "sticky",
+                top: "0",
+                height:"36.8px",
+                zIndex:"2"
+            }
         },
     ]
 }
@@ -64,7 +118,26 @@ const dataColumnDefs = (props) => {
     return [
         {
             columnTitle: 'Date',
-            dataColumn: "date"
+            dataColumn: "date",
+            body:{
+                attr:{
+                    bgcolor:"Bisque"
+                },
+                style:{
+                    position: "sticky",
+                    top: "42.36px",
+                    left:"0",
+                    height:"36.8px",
+                    zIndex:"1"
+                }
+            },
+            style:{
+                position: "sticky",
+                top: "42.36px",
+                left:"0",
+                height:"36.8px",
+                zIndex:"3"
+            }
         },
         ...props.CurrencyList.map(curr=>{
             return({
@@ -73,8 +146,15 @@ const dataColumnDefs = (props) => {
                 body:{
                     attr:{
                         class:"text-right",
-                        hidden:props.HideShowBtn
-                    }
+                        hidden:props.HideShowBtn,
+                    },
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "42.36px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -86,6 +166,13 @@ const dataColumnDefs = (props) => {
                     class:"text-right",
                     bgcolor:"LightGray"
                 },
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "42.36px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
         ...props.CurrencyList.map(curr=>{
@@ -96,6 +183,13 @@ const dataColumnDefs = (props) => {
                     attr:{
                         class:"text-right"
                     },
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "42.36px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -107,6 +201,13 @@ const dataColumnDefs = (props) => {
                     class:"text-right",
                     bgcolor:"LightGray"
                 },
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "42.36px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
         ...props.CurrencyList.map(curr=>{
@@ -117,6 +218,13 @@ const dataColumnDefs = (props) => {
                     attr:{
                         class:"text-right"
                     },
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "42.36px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -128,6 +236,13 @@ const dataColumnDefs = (props) => {
                     class:"text-right",
                     bgcolor:"LightGray"
                 },
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "42.36px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
         ...props.CurrencyList.map(curr=>{
@@ -138,6 +253,13 @@ const dataColumnDefs = (props) => {
                     attr:{
                         class:"text-right"
                     },
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "42.36px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -149,6 +271,13 @@ const dataColumnDefs = (props) => {
                     class:"text-right",
                     bgcolor:"LightGray"
                 },
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "42.36px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
         ...props.CurrencyList.map(curr=>{
@@ -159,6 +288,13 @@ const dataColumnDefs = (props) => {
                     attr:{
                         class:"text-right"
                     },
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "42.36px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -170,6 +306,13 @@ const dataColumnDefs = (props) => {
                     class:"text-right",
                     bgcolor:"LightGray"
                 },
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "42.36px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
         ...props.CurrencyList.map(curr=>{
@@ -180,6 +323,13 @@ const dataColumnDefs = (props) => {
                     attr:{
                         class:"text-right"
                     },
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "42.36px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -191,6 +341,13 @@ const dataColumnDefs = (props) => {
                     class:"text-right",
                     bgcolor:"LightGray"
                 },
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "42.36px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
         ...props.CurrencyList.map(curr=>{
@@ -201,6 +358,13 @@ const dataColumnDefs = (props) => {
                     attr:{
                         class:"text-right"
                     },
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "42.36px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -212,6 +376,13 @@ const dataColumnDefs = (props) => {
                     class:"text-right",
                     bgcolor:"LightGray"
                 },
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "42.36px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
         ...props.CurrencyList.map(curr=>{
@@ -222,6 +393,13 @@ const dataColumnDefs = (props) => {
                     attr:{
                         class:"text-right"
                     },
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "42.36px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -233,6 +411,13 @@ const dataColumnDefs = (props) => {
                     class:"text-right",
                     bgcolor:"LightGray"
                 },
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "42.36px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
         ...props.CurrencyList.map(curr=>{
@@ -243,6 +428,13 @@ const dataColumnDefs = (props) => {
                     attr:{
                         class:"text-right"
                     },
+                    style:{}
+                },
+                style:{
+                    position: "sticky", 
+                    top: "42.36px",
+                    height:"36.8px",
+                    zIndex:"2"
                 }
             })
         }),
@@ -254,6 +446,13 @@ const dataColumnDefs = (props) => {
                     class:"text-right",
                     bgcolor:"LightGray"
                 },
+                style:{}
+            },
+            style:{
+                position: "sticky", 
+                top: "42.36px",
+                height:"36.8px",
+                zIndex:"2"
             }
         },
     ]
@@ -311,7 +510,8 @@ const Panel = (props) => {
                                 columnTitle: elem.columnTitle,
                                 headerStartwith: elem.headerStartwith,
                                 colSpan:  1,
-                                btnText: 'show'
+                                btnText: 'show',
+                                style:elem.style
                             });
 
                         }
@@ -328,23 +528,21 @@ const Panel = (props) => {
         groupHeaderRows.push(
             <th key={`th-${element.dataColumn}-${idx}`}
                 scope="col"
-                className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''} colSpan={element.colSpan}
-                bgcolor={element.bgcolor}>
-                {element.columnTitle}
-                <button type="button" className="btn btn-info pull-right" onClick={() => props.HideShowBtn(element)}>{element.btnText}</button>
-                {/* {<HideShowBtnElem
-                onClick={props.HideShowBtn(element)}
-                />} */}
+                colSpan={element.colSpan}
+                style={element.style ? element.style : ''}>
+                <div>
+                    {element.columnTitle}
+                    <button type="button" onClick={() => props.HideShowBtn(element)}>{element.btnText}</button>
+                </div>
             </th>
         );
     });
 
-
     columnDefs.forEach((element, idx) => {
         headerRows.push(
             <th key={`th-${element.dataColumn}-${idx}`} 
-                scope="col"
-                className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''}>
+            scope="col"
+            style={element.style ? element.style : ''}>
                 {element.columnTitle}
              </th>
         );
@@ -359,6 +557,7 @@ const Panel = (props) => {
             return (
                 <td key={`td-${element.dataColumn}-${idx}`}
                     className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                    style={element.body && element.body.style ? element.body.style : ''}
                     bgcolor={element.body && element.body.attr && element.body.attr.bgcolor ? element.body.attr.bgcolor : ''}
                    >
                     {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
@@ -382,6 +581,7 @@ const Panel = (props) => {
             return (
                 <th key={`td-${element.dataColumn}-${idx}`}
                     className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                    style={element.body && element.body.style ? element.body.style : ''}
                     bgcolor="LemonChiffon">
                     {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
                 </th>
@@ -403,7 +603,7 @@ const Panel = (props) => {
             <table className="table table-striped">
                 <thead>
                     <tr>
-                        <th></th>
+                        <th style={{ position: "sticky", top: "0",left:"0",height:"36.8px",zIndex:"3"}}></th>
                         {groupHeaderRows}
                     </tr>
                     <tr>
