@@ -1,0 +1,179 @@
+import React from "react";
+import moment from "moment";
+import { defBannerType, defActionModeType, defShowIndexType } from "./defCols";
+const SpecialItemType = {
+	actionBtn: "actionBtn",
+	statusBtn: "statusBtn"
+};
+
+const bannerTypeFormat = type => {
+	return defBannerType[type];
+};
+
+const actionModeTypeFormat = type => {
+	return defActionModeType[type];
+};
+
+const showIndexTypeFormat = type => {
+	return defShowIndexType[type];
+};
+
+const StatusBtn = ({ checked, onChange, mainKey }) => {
+	let id = `switch-${mainKey}`;
+	return (
+		<div className="switch__container">
+			<input
+				id={id}
+				className="switch switch--flat"
+				type="checkbox"
+				checked={checked}
+				onChange={onChange}
+			/>
+			<label htmlFor={id}></label>
+		</div>
+	);
+};
+
+const lastUpdateUserFormat = userName => {
+	return userName ?? "-";
+};
+
+const lastUpdateTimeFormat = lastUpdTime => {
+	return lastUpdTime ? moment(lastUpdTime).format("l LTS") : "-";
+};
+
+const titleData = [
+	{ dataColumn: "bannerName", columnTitle: "BannerName" },
+	{ dataColumn: "siteName", columnTitle: "SiteName" },
+	{
+		dataColumn: "bannerType",
+		columnTitle: "BannerType",
+		body: { format: bannerTypeFormat }
+	},
+	{
+		dataColumn: "actionMode",
+		columnTitle: "ActionMode",
+		body: { format: actionModeTypeFormat }
+	},
+	{
+		dataColumn: "showIndex",
+		columnTitle: "ShowIndex",
+		body: { format: showIndexTypeFormat }
+	},
+	{
+		dataColumn: "lastUpdateUser",
+		columnTitle: "LastUpdateUser",
+		body: { format: lastUpdateUserFormat }
+	},
+	{
+		dataColumn: "lastUpdateTime",
+		columnTitle: "LastUpdateTime",
+		body: { format: lastUpdateTimeFormat }
+	},
+	{ dataColumn: "sort", columnTitle: "Sort" },
+	{
+		dataColumn: "status",
+		columnTitle: "Status",
+		body: { SpecialItem: SpecialItemType.statusBtn }
+	},
+	{
+		dataColumn: "edit",
+		columnTitle: "Edit",
+		body: { SpecialItem: SpecialItemType.actionBtn }
+	}
+];
+
+
+
+export default ({
+	GetSiteBannerList,
+	ClickCreateBanner,
+	ClickEdit,
+	UpdateBannerStatus,
+	siteList,
+	setSite,
+	bannerList,
+}) => {
+
+	let siteRows = siteList.map((_data) => {
+		return (
+			<div key={`SiteOpt-${_data.siteId}`} className="custom-control custom-radio custom-control-inline">
+				<input type="radio" id={`SiteId_${_data.siteId}`} name="SiteList" className="custom-control-input" value={_data.siteId} onChange={GetSiteBannerList.bind(null, _data.siteId)} checked={_data.siteId === setSite} />
+				<label className="custom-control-label" htmlFor={`SiteId_${_data.siteId}`}>{_data.siteName}</label>
+			</div>
+		)
+	});
+
+	let headerRows = [];
+	titleData.forEach((e, i) => {
+		headerRows.push(<th key={`title-${i}`}>{e.columnTitle}</th>);
+	});
+
+	let bodyRows = bannerList.map((_data, d_idx) => {
+		let arr = titleData.map((element, t_idx) => {
+			let body_content = null;
+			if (element.body && element.body.SpecialItem) {
+				if (element.body.SpecialItem === SpecialItemType.actionBtn) {
+					body_content = (
+						<ActionButtons clickEdit={ClickEdit.bind(null, d_idx)} />
+					);
+				} else if (element.body.SpecialItem === SpecialItemType.statusBtn) {
+					body_content = (
+						<StatusBtn
+							mainKey={`${_data.siteId}-${_data.bonusCode}`}
+							checked={_data[element.dataColumn] === 1}
+							onChange={UpdateBannerStatus.bind(this, d_idx)}
+						/>
+					);
+				}
+			} else {
+				body_content =
+					element.body && element.body.format
+						? element.body.format(_data[element.dataColumn])
+						: _data[element.dataColumn];
+			}
+			return <td key={`td-${t_idx}`}>{body_content}</td>;
+		});
+
+		return <tr key={`body-${d_idx}`}>{arr}</tr>;
+	});
+	return (
+		<div className="container-fluid">
+			<h4 className="page-name">Banner Management</h4>
+			<div className="form-group">
+				<label className="col-form-label d-block">Available Sites</label>
+				{siteRows}
+			</div>
+			{
+				setSite != "" ?
+					<>
+						<button
+							className="btn btn-add"
+							style={{ marginBottom: "20px" }}
+							onClick={ClickCreateBanner}
+						>Create Banner
+						</button>
+						<div className="table">
+							<table className="table table-striped">
+								<thead>
+									<tr>{headerRows}</tr>
+								</thead>
+								<tbody>{bodyRows}</tbody>
+							</table>
+						</div>
+					</>
+					: null
+			}
+		</div>
+	);
+};
+
+const ActionButtons = props => {
+	return (
+		<div className="button-action" onClick={props.clickEdit}>
+			<button className="btn btn-edit">
+				<i className="icon-edit"></i>
+			</button>
+		</div>
+	);
+};
