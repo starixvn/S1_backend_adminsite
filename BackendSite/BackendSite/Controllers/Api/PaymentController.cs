@@ -267,7 +267,7 @@ namespace BackendSite.Controllers.Api
         public class CustTpBetRecordListOneDayReq
         {
             public int CustId { get; set; }
-            public long selDate { get; set; }
+            public string selDate { get; set; }
         }
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordListOneDay>> GetCustTpBetRecordListOneDay(CustTpBetRecordListOneDayReq custTpBetRecordListOneDayReq)
@@ -280,7 +280,7 @@ namespace BackendSite.Controllers.Api
         public class CustTpBetRecordListbyCategoryIdReq
         {
             public int CustId { get; set; }
-            public long selDate { get; set; }
+            public string selDate { get; set; }
             public int CategoryId { get; set; }
         }
         [HttpPost]
@@ -295,7 +295,7 @@ namespace BackendSite.Controllers.Api
         public class CustTpBetRecordDetailListbyGameTypeReq
         {
             public int CustId { get; set; }
-            public long selDate { get; set; }
+            public string selDate { get; set; }
             public int gameTypeId { get; set; }
             public int PageNumber { get; set; }
             public int PageSize { get; set; }

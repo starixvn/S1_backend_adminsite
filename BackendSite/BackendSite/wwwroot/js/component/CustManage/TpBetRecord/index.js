@@ -29,7 +29,11 @@ const Panel = () => {
     }, []);
 
     const getDayData = (Date) => {
-        axios.post('/api/Payment/GetCustTpBetRecordListOneDay', { CustId: CustId, selDate: moment(Date).unix() })
+        axios.post('/api/Payment/GetCustTpBetRecordListOneDay',
+            {
+                CustId: CustId,
+                selDate: moment(Date).format("YYYY-MM-DD")
+            })
             .then((res) => {
                 let result = res.data;
                 if (result.errorCode == 0) {
@@ -44,7 +48,12 @@ const Panel = () => {
     }
 
     const getCategoryData = (Date, CategoryId) => {
-        axios.post('/api/Payment/GetCustTpBetRecordListbyCategoryId', { CustId: CustId, selDate: moment(Date).unix(), CategoryId: parseInt(CategoryId) })
+        axios.post('/api/Payment/GetCustTpBetRecordListbyCategoryId',
+            {
+                CustId: CustId,
+                selDate: moment(Date).format("YYYY-MM-DD"),
+                CategoryId: parseInt(CategoryId)
+            })
             .then((res) => {
                 let result = res.data;
                 if (result.errorCode == 0) {
@@ -62,7 +71,7 @@ const Panel = () => {
         axios.post('/api/Payment/GetCustTpBetRecordDetailListbyGameType',
             {
                 CustId: CustId,
-                selDate: moment(Date).unix(),
+                selDate: moment(Date).format("YYYY-MM-DD"),
                 gameTypeId: parseInt(GameTypeId),
                 PageSize: 15,
                 PageNumber: PageNumber

@@ -57,5 +57,10 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BannerManage" })]
+        public IActionResult BannerManage()
+        {
+            return View();
+        }
     }
 }
