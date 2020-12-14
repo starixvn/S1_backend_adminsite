@@ -76,7 +76,7 @@ const UserOnlineReport = lazy(() =>
 	import("./pages/Report/UserOnlineReport/index")
 );
 
-export const defaultPage = "MainFinancialReport";
+export const defaultPage = "StatisticalReport";
 
 export const layoutType = {
 	N88: "N88",

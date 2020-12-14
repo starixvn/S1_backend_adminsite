@@ -917,7 +917,7 @@ const Panel = (props) => {
             if(getDataItem)
             {
                 let idx = winLossFilterDatas.indexOf(getDataItem);
-                let row = turnOverValidBetColumnDefs.map((element, idx) => {
+                let row = winLossColumnDefs.map((element, idx) => {
                     let subData = {};
                     if (element.body && element.body.subData) {
                         element.body.subData.forEach(s => { subData[s] = getDataItem[s] });
@@ -976,7 +976,7 @@ const Panel = (props) => {
                 }
             });
 
-            let row = turnOverValidBetColumnDefs.map((element, idx) => {
+            let row = winLossColumnDefs.map((element, idx) => {
                 let subData = {};
                 if (element.body && element.body.subData) {
                     element.body.subData.forEach(s => { subData[s] = geCategoryItem[s] });
