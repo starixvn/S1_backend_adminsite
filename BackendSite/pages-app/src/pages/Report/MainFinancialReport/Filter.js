@@ -110,7 +110,7 @@ const CurrencyElem = ({columnTitle, options, onChange, Currencies}) => {
       };
 
     return (
-      <div className="input-item" style={{width:'200px'}}>
+      <div className="input-item" style={{width:'200px' ,zIndex:"4"}}>
           <span className="label">{columnTitle}</span>
           <div className="field">
           <MultiSelect

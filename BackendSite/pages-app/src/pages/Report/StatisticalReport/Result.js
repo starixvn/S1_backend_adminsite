@@ -437,6 +437,7 @@ const winLossDataColumnDefs = (props) => {
                     class:"text-right"
                 },
                 categoryBgcolor:"LightCyan",
+                bgcolor:"LightGray",
                 style:{}
             },
             style:{
@@ -474,6 +475,7 @@ const winLossDataColumnDefs = (props) => {
                     class:"text-right"
                 },
                 categoryBgcolor:"LightCyan",
+                bgcolor:"LightGray",
                 style:{}
             },
             style:{
@@ -511,6 +513,7 @@ const winLossDataColumnDefs = (props) => {
                     class:"text-right"
                 },
                 categoryBgcolor:"LightCyan",
+                bgcolor:"LightGray",
                 style:{}
             },
             style:{
@@ -548,6 +551,7 @@ const winLossDataColumnDefs = (props) => {
                     class:"text-right"
                 },
                 categoryBgcolor:"LightCyan",
+                bgcolor:"LightGray",
                 style:{}
             },
             style:{
@@ -585,6 +589,7 @@ const winLossDataColumnDefs = (props) => {
                     class:"text-right"
                 },
                 categoryBgcolor:"LightCyan",
+                bgcolor:"LightGray",
                 style:{}
             },
             style:{
@@ -716,6 +721,8 @@ const Panel = (props) => {
     });
 
     turnOverValidBetColumnDefs.forEach((element, idx) => {
+        console.log(element);
+        console.log(idx);
         turnOverValidBetHeaderRows.push(
             <th key={`th-${element.dataColumn}-${idx}`} 
                 scope="col"
@@ -1049,7 +1056,7 @@ const Panel = (props) => {
             <table className="table table-striped">
                 <thead>
                     <tr>
-                        <th colSpan="2" style={{ position: "sticky", top: "0",left:"0",height:"36.8px",zIndex:"3"}}>TurnOver(ValidBet)</th>
+                    <th colSpan="2" style={{ position: "sticky", top: "0",left:"0",height:"36.8px",zIndex:"3",background:"#FFFF45",color:"#F00000"}}>TurnOver(ValidBet)</th>
                         {turnOverValidBetGroupHeaderRows}
                     </tr>
                     <tr>
@@ -1062,7 +1069,7 @@ const Panel = (props) => {
                 </tbody>
                 <thead>
                     <tr>
-                        <th colSpan="2" style={{ position: "sticky", top: "0",left:"0",height:"36.8px",zIndex:"4"}}>WinLoss</th>
+                        <th colSpan="2" style={{ position: "sticky", top: "0",left:"0",height:"36.8px",zIndex:"3",background:"#FFFF45",color:"#F00000"}}>WinLoss</th>
                         {winLossGroupHeaderRows}
                     </tr>
                     <tr>
