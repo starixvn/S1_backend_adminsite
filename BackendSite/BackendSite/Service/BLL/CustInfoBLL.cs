@@ -96,11 +96,19 @@ namespace BackendSite.Service.BLL
                 {
                     foreach (var promotion in custInfoDetail.promotions)
                     {
-                        promotion.custRollOver = rolloverService.GetCustRollOver(custInfoDetail.CustId, promotion.BonusCode);
-                        if (promotion.BonusInfoStatus == 5)
+                        if (promotion.BonusInfoStatus == 1 || promotion.BonusInfoStatus == 5)
                         {
-                            promotion.BonusInfoStatus = 1;
+                            promotion.custRollOver = rolloverService.GetCustRollOver(custInfoDetail.CustId, promotion.BonusCode);
+                            if (promotion.BonusInfoStatus == 5)
+                            {
+                                promotion.BonusInfoStatus = 1;
+                            }
                         }
+                        else
+                        {
+                             promotion.custRollOver = new CustRollOver() { RollOver = 0,TurnOver = 0 };
+                        };
+                        
                     }
                 }
             }
