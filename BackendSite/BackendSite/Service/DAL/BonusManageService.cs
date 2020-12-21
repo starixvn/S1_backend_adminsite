@@ -228,5 +228,97 @@ namespace BackendSite.Service.DAL
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<TpGameType>("Admin_TpGameType_Get", commandType: CommandType.StoredProcedure);
         }
+
+        public async Task<BonusImportResult> BonusImportAsync(BonusImportPara bonusImportPara)
+        {
+            BonusImportResult Result = new BonusImportResult() {
+                SiteId = bonusImportPara.SiteId,
+                UserName = bonusImportPara.UserName,
+                BonusAmount = bonusImportPara.BonusAmount,
+                RollOver = bonusImportPara.RollOver,
+                ExpiryDay = bonusImportPara.ExpiryDay,
+                Memo = bonusImportPara.Memo,
+                Status = 0,
+                ErrorMessage = String.Empty
+            };
+            
+            try
+            {
+                using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+                conn.Open();
+
+                using var trans = conn.BeginTransaction();
+
+                DynamicParameters p = new DynamicParameters();
+                p.Add("@SiteId", bonusImportPara.SiteId);
+                p.Add("@UserName", bonusImportPara.UserName);
+                var customer = conn.Query<Customer>("Customer_GetByUserName", p, trans, commandType: CommandType.StoredProcedure).ToList();
+
+                //檢核是否有該筆UserName
+                if (customer.Count == 0)
+                {
+                    Result.Status = 1;
+                    Result.ErrorMessage = $"SiteId:{bonusImportPara.SiteId} UserName:{bonusImportPara.UserName} BonusAmount:{bonusImportPara.BonusAmount} 查詢不到該筆UserName";
+                }
+                else
+                {
+                    var bonusInfo = conn.Query<BonusInfo>("Admin_BonusInfoStatus_Get", p, trans, commandType: CommandType.StoredProcedure).ToList();
+
+                    //查詢該名User是否有未完成的Bonus活動
+                    if (bonusInfo.Count > 0)
+                    {
+                        Result.Status = 1;
+                        Result.ErrorMessage = $"SiteId:{bonusImportPara.SiteId} UserName:{bonusImportPara.UserName} BonusAmount:{bonusImportPara.BonusAmount} 該名User還有未完成的Bonus活動";
+                    }
+                    else
+                    {
+                        DynamicParameters para = new DynamicParameters();
+                        para.Add("@PromotionType", 3);
+                        para.Add("@BonusCode", "X");
+                        para.Add("@CustId", customer.FirstOrDefault().CustId);
+                        para.Add("@UserName", bonusImportPara.UserName);
+                        para.Add("@CurrencyId", 4);
+                        para.Add("@SiteId", bonusImportPara.SiteId);
+                        para.Add("@BonusInfo", JsonConvert.SerializeObject(bonusImportPara));
+                        para.Add("@LockedAmount", 0);
+                        para.Add("@BonusAmount", bonusImportPara.BonusAmount);
+                        para.Add("@ExpiryDays", bonusImportPara.ExpiryDay);
+                        para.Add("@Memo", bonusImportPara.Memo);
+                        para.Add("@Prefix", "BD");
+                        para.Add("@TransId", dbType: DbType.String, direction: ParameterDirection.Output);
+                        conn.Execute("Member_BonusInfo_Ins", para, transaction: trans, commandType: CommandType.StoredProcedure);
+
+                        string transId = para.Get<string>("TransId");
+                        int.TryParse(transId.Replace("BD", ""), out int BonusId);
+                        long expiryTime = DateTimeOffset.Now.AddDays(bonusImportPara.ExpiryDay).ToUnixTimeSeconds();
+
+                        DynamicParameters para2 = new DynamicParameters();
+                        para2.Add("@BonusId", BonusId);
+                        para2.Add("@PromoCategoryId", bonusImportPara.CategoryId);
+                        para2.Add("@TpId", bonusImportPara.TpId);
+                        para2.Add("@CustId", customer.FirstOrDefault().CustId);
+                        para2.Add("@UserName", bonusImportPara.UserName);
+                        para2.Add("@SiteId", bonusImportPara.SiteId);
+                        para2.Add("@BonusAmount", bonusImportPara.BonusAmount);
+                        para2.Add("@LockedAmount", 0);
+                        para2.Add("@Rollover", bonusImportPara.BonusAmount * bonusImportPara.RollOver);
+                        para2.Add("@ExpiryTime", expiryTime);
+                        para2.Add("@TYPE", 5);
+                        para2.Add("@Memo", null);
+                        para2.Add("@RefTransId", transId);
+                        conn.Execute("Common_Bonus_Ins", para2, transaction: trans, commandType: CommandType.StoredProcedure);
+                    }
+                }
+                
+                await Task.Run(() => trans.Commit());
+               
+            }
+            catch (Exception ex)
+            {
+                Result.Status = 1;
+                Result.ErrorMessage = $"SiteId:{bonusImportPara.SiteId} UserName:{bonusImportPara.UserName} BonusAmount:{bonusImportPara.BonusAmount} " + ex.ToString();
+            }
+            return Result;
+        }
     }
 }

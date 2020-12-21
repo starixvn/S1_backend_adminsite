@@ -272,7 +272,7 @@ const App = () => {
 
 			const siteList = await WebAPI.PostData({
 				Url: "BonusManage/GetSiteListByLoginUser",
-				Data: qs.stringify({ SiteId: state.promotionList[idx].siteId })
+				Data: qs.stringify({})
 			}).then(
 				res => {
 					return {
@@ -285,7 +285,6 @@ const App = () => {
 					return { errorCode: 991 };
 				}
 			);
-
 			if (promotionData.errorCode === 0 && siteList.errorCode === 0) {
 				dispatch({
 					type: defActionType.EDIT_PROMOTION,

@@ -7,9 +7,11 @@ using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.Operations;
 using MySql.Data.MySqlClient;
+using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 namespace BackendSite.Controllers.Api
@@ -213,6 +215,94 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = 999;
                 apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusImport" })]
+        public async Task<ApiResult<List<BonusImportResult>>> BonusImport([FromForm] int TpId,[FromForm] int CategoryId, [FromForm] IFormFile excelUpload)
+        {
+            var apiResult = new ApiResult<List<BonusImportResult>>();
+            List<BonusImportResult> BonusImportResultList = new List<BonusImportResult>();
+            //var apiResult = new List<ApiResult>();
+            const int OneRoundCount = 2; //每次N筆資料寫入DB
+            List<BonusImportPara> BonusImportListPara = new List<BonusImportPara>();
+            try
+            {
+                if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
+                {
+                    ExcelPackage excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
+                    ExcelWorksheet sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
+                    bool isLastRow = false;
+                    int RowId = 2;   // 因為有標題列，所以從第2列開始讀起
+
+                    do
+                    {
+                        string siteId = sheet.Cells[RowId, 1].Text.Trim();
+                        string bonusAmount = sheet.Cells[RowId, 3].Text.Trim();
+                        string rollover = sheet.Cells[RowId, 4].Text.Trim();
+                        string expiryDay = sheet.Cells[RowId, 5].Text.Trim();
+                        string memo = sheet.Cells[RowId, 6].Text.Trim();
+                        string userName = sheet.Cells[RowId, 2].Text.Trim();
+
+                        if (!string.IsNullOrWhiteSpace(siteId) && !string.IsNullOrWhiteSpace(bonusAmount) && !string.IsNullOrWhiteSpace(userName))
+                        {
+                            int.TryParse(siteId, out int SiteId);
+                            int.TryParse(rollover, out int Rollover);
+                            int.TryParse(expiryDay, out int ExpiryDay);
+                            decimal.TryParse(bonusAmount, out decimal BonusAmount);
+
+                            BonusImportPara para = new BonusImportPara()
+                            {
+                                SiteId = SiteId,
+                                UserName = userName,
+                                BonusAmount = BonusAmount,
+                                RollOver = Rollover,
+                                ExpiryDay = ExpiryDay,
+                                Memo = memo,
+                                TpId = TpId,
+                                CategoryId = CategoryId
+                            };
+
+                            BonusImportListPara.Add(para);
+                            RowId++;
+                            continue;
+                        }
+                        else
+                        {
+                            isLastRow = true;
+                        }
+                    }
+                    while (!isLastRow);
+                    /*Spared Task for
+                     * Batch*/
+
+                    var rounds = BonusImportListPara.Count() / OneRoundCount;
+                    var remainder = BonusImportListPara.Count() % OneRoundCount;
+                    if (remainder > 0)
+                        rounds++;
+
+                    for (int i = 1; i <= rounds; i++)
+                    {
+                        List<BonusImportPara> query = BonusImportListPara.Skip((i - 1) * OneRoundCount).Take(OneRoundCount).ToList();
+                        var insertTasks = query.Select(x => bonusManageBLL.BonusImportAsync(x));
+                        var result = await Task.WhenAll(insertTasks);
+                        foreach (var x in result)
+                        {
+                            BonusImportResultList.Add(x);
+                        }
+                    }
+                    apiResult.Data = BonusImportResultList;
+                    apiResult.ErrorCode = 0;
+                    return apiResult;
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.ToString();
             }
 
             return apiResult;

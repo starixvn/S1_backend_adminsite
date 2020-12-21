@@ -240,6 +240,11 @@
         "DisplayKey": "Pending Bonus",
         "FuncKey": "Marketing/PendingBonus",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Bonus Import",
+        "FuncKey": "Marketing/BonusImport",
+        "Enable": false
       }
     ]
   }

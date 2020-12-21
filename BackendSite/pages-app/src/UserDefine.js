@@ -72,6 +72,9 @@ const StatisticalReport = lazy(() =>
 const UserOnlineReport = lazy(() => 
 	import("./pages/Report/UserOnlineReport/index")
 );
+const BonusImport = lazy(() => 
+	import("./pages/Marketing/BonusImport/index")
+);
 
 export const defaultPage = "MainFinancialReport";
 
@@ -381,6 +384,19 @@ export const pages = {
 		comp: (
 			<Suspense fallback="loading...">
 				<UserOnlineReport />
+			</Suspense>
+		),
+		css: [
+			"./lib/bootstrap/dist/css/bootstrap.min.css",
+			"./css/css/main.css",
+			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
+		],
+		layout: layoutType.N88
+	},
+	BonusImport:{
+		comp: (
+			<Suspense fallback="loading...">
+				<BonusImport />
 			</Suspense>
 		),
 		css: [
