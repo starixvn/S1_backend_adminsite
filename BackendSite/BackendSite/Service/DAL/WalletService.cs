@@ -153,19 +153,19 @@ namespace BackendSite.Service.DAL
             var result = conn.Query<TpBetRecordListOneWeek>("Admin_TpBetRecord_byCustIDOneWeek_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
             return result;
         }
-        public IEnumerable<TpBetRecordListOneDay> GetCustTpBetRecordListOneDay(int custId, long selDate)
+        public IEnumerable<TpBetRecordListOneDay> GetCustTpBetRecordListOneDay(int custId, string selDate)
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var result = conn.Query<TpBetRecordListOneDay>("Admin_TpBetRecord_byOneDay_Get", new { CustId = custId, SelDate = selDate }, commandType: CommandType.StoredProcedure);
             return result;
         }
-        public IEnumerable<TpBetRecordbyCategoryId> GetCustTpBetRecordListbyCategoryId(int custId, long selDate,int categoryId)
+        public IEnumerable<TpBetRecordbyCategoryId> GetCustTpBetRecordListbyCategoryId(int custId, string selDate, int categoryId)
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var result = conn.Query<TpBetRecordbyCategoryId>("Admin_TpBetRecord_byCategoryId_Get", new  { CustId = custId, SelDate = selDate, CategoryId = categoryId }, commandType: CommandType.StoredProcedure);
             return result;
         }
-        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, long selDate, int gameTypeId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, string selDate, int gameTypeId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
 
             IEnumerable<TpBetRecordDetailbyGameType> result = null;

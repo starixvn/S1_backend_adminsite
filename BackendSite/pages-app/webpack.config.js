@@ -90,6 +90,13 @@ module.exports = {
 		// 	// '@babel/polyfill',
 		// 	"./src/pages/Marketing/RebateInfoReport/index.js"
 		// ],
+		// "Report/MainFinancialReport.min": [
+		// 	"./src/pages/Report/MainFinancialReport/index.js"
+		// ],
+		// "Marketing/BannerManage.min": [
+		// 	'@babel/polyfill',
+		// 	"./src/pages/Marketing/BannerManage/index.jsx"
+		// ],
 		"Report/MainFinancialReport.min": [
 			"./src/pages/Report/MainFinancialReport/index.js"
 		],
@@ -104,7 +111,6 @@ module.exports = {
 		// 	"./src/pages/Marketing/BonusImport/index.js"
 		// ],
 	},
-	
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
 		filename: "[name].js"

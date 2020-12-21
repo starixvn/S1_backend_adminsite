@@ -1,0 +1,98 @@
+﻿using BackendSite.Service.Model;
+using Dapper;
+using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Data;
+
+namespace BackendSite.Service.DAL
+{
+    public class BannerManageService
+    {
+        private readonly IConfiguration configuration;
+
+        public BannerManageService(IConfiguration configuration)
+        {
+            this.configuration = configuration;
+        }
+
+        public int SetBanner(BannerInfo bannerInfo, string user)
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var p = new DynamicParameters();
+            p.Add("BannerName", bannerInfo.BannerName);
+            p.Add("SiteId", bannerInfo.SiteId);
+            p.Add("BannerType", bannerInfo.BannerType);
+            p.Add("ActionMode", bannerInfo.ActionMode);
+            p.Add("ShowIndex", bannerInfo.ShowIndex);
+            p.Add("BonusCode", bannerInfo.BonusCode);
+            p.Add("MatchId", bannerInfo.MatchId);
+            p.Add("TpId", bannerInfo.TpId);
+            p.Add("GameId", bannerInfo.GameId);
+            p.Add("SpecificList", JsonConvert.SerializeObject(bannerInfo.Specific));
+            p.Add("Sort", bannerInfo.Sort);
+            p.Add("AdminUser", user);
+
+            return conn.Execute("Admin_Banner_InsUpd", p, commandType: CommandType.StoredProcedure);
+        }
+        public IEnumerable<BannerInfoList> GetBannerList(int SiteId)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.Query<BannerInfoList>("Admin_BannerList_Get", new { SiteId }, commandType: CommandType.StoredProcedure);
+            }
+        }
+        public BannerInfo GetBanner(int SiteId, string BannerName)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                BannerInfo result = new BannerInfo();
+                var queryresult = conn.QueryFirstOrDefault("Admin_Banner_Get", new { SiteId, BannerName }, commandType: CommandType.StoredProcedure);
+
+                if (queryresult != null)
+                {
+                    result.SiteId = Convert.ToInt32(queryresult.SiteId);
+                    result.BannerName = queryresult.BannerName;
+                    result.BannerType = Convert.ToInt32(queryresult.BannerType);
+                    result.ActionMode = Convert.ToInt32(queryresult.ActionMode);
+                    result.ShowIndex = Convert.ToInt32(queryresult.ShowIndex);
+                    result.BonusCode = queryresult.BonusCode;
+                    result.MatchId = queryresult.MatchId;
+                    result.TpId = queryresult.TpId;
+                    result.GameId = queryresult.GameId;
+                    result.Specific = JsonConvert.DeserializeObject<IEnumerable<BannerDetails>>(queryresult.Specific, new JsonSerializerSettings
+                    {
+                        Formatting = Formatting.Indented,
+                        NullValueHandling = NullValueHandling.Ignore
+                    });
+                    result.Sort = Convert.ToInt32(queryresult.Sort);
+                }
+                else
+                {
+                    result = null;
+                }
+
+                return result;
+            }
+        }
+        public int UpdateBannerStatus(int SiteId, string BannerName, int Status, string User)
+        {
+            int errorCode = 0;
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+                {
+                    conn.Execute("Admin_Banner_SetStatus", new { SiteId, BannerName, Status, AdminUser = User }, commandType: CommandType.StoredProcedure);
+                }
+            }
+            catch (Exception ex)
+            {
+                errorCode = 999;
+            }
+
+            return errorCode;
+        }
+    }
+}

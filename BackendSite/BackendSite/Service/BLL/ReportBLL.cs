@@ -173,9 +173,9 @@ namespace BackendSite.Service.BLL
 
                 mainFinancialModel = keyValuePairs[$"{dateFormat}-{data.CurrencyId}"];
 
-                mainFinancialModel.TurnOverStake = data.StakeSummary;
-                mainFinancialModel.TurnOverValidBet = data.ValidBetSummary;
-                mainFinancialModel.WinLoss = data.WinlostSummary;
+                mainFinancialModel.TurnOverStake += data.StakeSummary;
+                mainFinancialModel.TurnOverValidBet += data.ValidBetSummary;
+                mainFinancialModel.WinLoss += data.WinlostSummary;
 
                 mainFinancialModel.TurnOverStakeInMYR = Math.Round(data.StakeSummary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
                 mainFinancialModel.TurnOverValidBetInMYR = Math.Round(data.ValidBetSummary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);

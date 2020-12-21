@@ -122,7 +122,6 @@ const App = () => {
 				}
 			}
 
-			console.log(data);
 			let _datas = {
 				SiteId: data.siteId,
 				Title: JSON.stringify(title),
