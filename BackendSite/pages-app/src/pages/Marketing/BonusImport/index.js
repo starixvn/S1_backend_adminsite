@@ -188,7 +188,7 @@ const App = () => {
     return(
         <>
             <div className="container-fluid">
-                <h4 className="page-name">BonusImport</h4>
+                <h4 className="page-name">Bonus Import</h4>
                 <div className="form-group">
                     <label className="col-form-label d-block">Download Template File </label>
                     <a className="btn btn-danger" role="button" href="../../../resource/examplefile/BonusImport.xlsx" download="BonusImportTemplateFile.xlsx">Template File</a>
