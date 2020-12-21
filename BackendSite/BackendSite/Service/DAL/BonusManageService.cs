@@ -239,7 +239,7 @@ namespace BackendSite.Service.DAL
                 ExpiryDay = bonusImportPara.ExpiryDay,
                 Memo = bonusImportPara.Memo,
                 Status = 0,
-                ErrorMessage = String.Empty
+                ErrorMessage = string.Empty
             };
             
             try
