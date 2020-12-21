@@ -252,7 +252,7 @@ namespace BackendSite.Service.DAL
                 DynamicParameters p = new DynamicParameters();
                 p.Add("@SiteId", bonusImportPara.SiteId);
                 p.Add("@UserName", bonusImportPara.UserName);
-                var customer = conn.Query<Customer>("Customer_GetByUserName", p, trans, commandType: CommandType.StoredProcedure).ToList();
+                var customer = conn.Query<Customer>("Admin_CustInfoByUserName_Get", p, trans, commandType: CommandType.StoredProcedure).ToList();
 
                 //檢核是否有該筆UserName
                 if (customer.Count == 0)
@@ -262,7 +262,10 @@ namespace BackendSite.Service.DAL
                 }
                 else
                 {
-                    var bonusInfo = conn.Query<BonusInfo>("Admin_BonusInfoStatus_Get", p, trans, commandType: CommandType.StoredProcedure).ToList();
+                    DynamicParameters custBonusPara = new DynamicParameters();
+                    custBonusPara.Add("@CustId", customer.FirstOrDefault().CustId);
+                    var bonusInfo = conn.Query<CustBonus>("Admin_CustBonus_Get", custBonusPara, trans, commandType: CommandType.StoredProcedure).ToList();
+                    
 
                     //查詢該名User是否有未完成的Bonus活動
                     if (bonusInfo.Count > 0)
