@@ -288,6 +288,26 @@
         "Childs": null
       },
       {
+        "Key": "BonusImport",
+        "Title": "Bonus Import",
+        "FuncKey": "Marketing/BonusImport",
+        "Controller": "Marketing",
+        "Action": "BonusImport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "PendingBonus",
+        "Title": "Pending Bonus",
+        "FuncKey": "Marketing/PendingBonus",
+        "Controller": "Marketing",
+        "Action": "PendingBonus",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
         "Key": "RebateInfoReport",
         "Title": "Rebate Info",
         "FuncKey": "Marketing/RebateInfoReport",
@@ -308,16 +328,6 @@
         "Childs": null
       },
       {
-        "Key": "PendingBonus",
-        "Title": "Pending Bonus",
-        "FuncKey": "Marketing/PendingBonus",
-        "Controller": "Marketing",
-        "Action": "PendingBonus",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
         "Key": "NewsManage",
         "Title": "News Management",
         "FuncKey": "Marketing/NewsManage",
@@ -333,16 +343,6 @@
         "FuncKey": "Marketing/BannerManage",
         "Controller": "Marketing",
         "Action": "BannerManage",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "BonusImport",
-        "Title": "Bonus Import",
-        "FuncKey": "Marketing/BonusImport",
-        "Controller": "Marketing",
-        "Action": "BonusImport",
         "Icon": "",
         "Roles": null,
         "Childs": null

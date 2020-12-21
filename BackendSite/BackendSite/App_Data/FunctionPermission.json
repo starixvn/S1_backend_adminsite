@@ -217,16 +217,6 @@
         "Enable": false
       },
       {
-        "DisplayKey": "Rebate Info",
-        "FuncKey": "Marketing/RebateInfoReport",
-        "Enable": false
-      },
-      {
-        "DisplayKey": "Rebate Report",
-        "FuncKey": "Marketing/RebateLogReport",
-        "Enable": false
-      },
-      {
         "DisplayKey": "News Management",
         "FuncKey": "Marketing/NewsManage",
         "Enable": false
@@ -242,13 +232,23 @@
         "Enable": false
       },
       {
-        "DisplayKey": "Banner Management",
-        "FuncKey": "Marketing/BannerManage",
+        "DisplayKey": "Bonus Import",
+        "FuncKey": "Marketing/BonusImport",
         "Enable": false
       },
       {
-        "DisplayKey": "Bonus Import",
-        "FuncKey": "Marketing/BonusImport",
+        "DisplayKey": "Rebate Info",
+        "FuncKey": "Marketing/RebateInfoReport",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Rebate Report",
+        "FuncKey": "Marketing/RebateLogReport",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Banner Management",
+        "FuncKey": "Marketing/BannerManage",
         "Enable": false
       }
     ]
