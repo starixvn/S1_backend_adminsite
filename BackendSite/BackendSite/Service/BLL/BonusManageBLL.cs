@@ -77,5 +77,10 @@ namespace BackendSite.Service.BLL
         {
             return bonusManageService.GetTpGameList();
         }
+
+        public async Task<BonusImportResult> BonusImportAsync(BonusImportPara bonusImportPara)
+        {
+            return await bonusManageService.BonusImportAsync(bonusImportPara);
+        }
     }
 }

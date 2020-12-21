@@ -106,6 +106,10 @@ module.exports = {
 		// "Report/UserOnlineReport.min": [
 		// 	"./src/pages/Report/UserOnlineReport/index.js"
 		// ],
+		// "Marketing/BonusImport.min": [
+		// 	"@babel/polyfill",
+		// 	"./src/pages/Marketing/BonusImport/index.js"
+		// ],
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

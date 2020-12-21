@@ -245,6 +245,11 @@
         "DisplayKey": "Banner Management",
         "FuncKey": "Marketing/BannerManage",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Bonus Import",
+        "FuncKey": "Marketing/BonusImport",
+        "Enable": false
       }
     ]
   }

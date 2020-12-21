@@ -91,4 +91,27 @@ namespace BackendSite.Service.Model
         public bool Status { get; set; }
         public int[] SiteArray { get; set; }
     }
+    public class BonusImportPara
+    {
+        public int SiteId { get; set; }
+        public string UserName { get; set; }
+        public decimal BonusAmount { get; set; }
+        public int RollOver { get; set; }
+        public int ExpiryDay { get; set; }
+        public string Memo { get; set; }
+        public int TpId { get; set; }
+        public int CategoryId { get; set; }
+    }
+    public class BonusImportResult
+    {
+        public int SiteId { get; set; }
+        public string UserName { get; set; }
+        public decimal BonusAmount { get; set; }
+        public int RollOver { get; set; }
+        public int ExpiryDay { get; set; }
+        public string Memo { get; set; }
+        public int Status { get; set; }
+        public string ErrorMessage { get; set; }
+
+    }
 }
