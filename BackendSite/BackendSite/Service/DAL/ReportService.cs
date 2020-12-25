@@ -142,6 +142,27 @@ namespace BackendSite.Service.DAL
             }
         }
 
+        public IEnumerable<DepositReportParticalModel> GetDepositReport(string siteIds,
+                                                                        string currencyIds,
+                                                                        string startDate,
+                                                                        string endDate)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                    SiteIds = siteIds,
+                    CurrencyIds = currencyIds,
+                    StartDate = startDate,
+                    EndDate = endDate
+                });
+
+                string SpName = "Admin_Report_DepositDetailByDay_Get";
+                return conn.Query<DepositReportParticalModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
+
         public IEnumerable<ServerInfoModel> GetServerInfoList()
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))

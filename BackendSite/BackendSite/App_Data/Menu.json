@@ -37,6 +37,16 @@
       },
       {
         "Key": "",
+        "Title": "Deposit Report",
+        "FuncKey": "Report/DepositReport",
+        "Controller": "Report",
+        "Action": "DepositReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
         "Title": "Statistical Report",
         "FuncKey": "Report/StatisticalReport",
         "Controller": "Report",

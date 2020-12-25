@@ -75,8 +75,11 @@ const StatisticalReport = lazy(() =>
 const UserOnlineReport = lazy(() => 
 	import("./pages/Report/UserOnlineReport/index")
 );
+const DepositReport = lazy(() => 
+	import("./pages/Report/DepositReport/index")
+);
 
-export const defaultPage = "StatisticalReport";
+export const defaultPage = "DepositReport";
 
 export const layoutType = {
 	N88: "N88",
@@ -403,6 +406,19 @@ export const pages = {
 			"./lib/bootstrap/dist/css/bootstrap.min.css",
 			"./css/css/main.css",
 			"./css/common/fonts/main-font/style.css",
+			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
+		],
+		layout: layoutType.N88
+	},
+	DepositReport: {
+		comp: (
+			<Suspense fallback="loading...">
+				<DepositReport />
+			</Suspense>
+		),
+		css: [
+			"./lib/bootstrap/dist/css/bootstrap.min.css",
+			"./css/css/main.css",
 			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
 		],
 		layout: layoutType.N88

@@ -13,6 +13,11 @@
         "Enable": false
       },
       {
+        "DisplayKey": "Deposit Report",
+        "FuncKey": "Report/DepositReport",
+        "Enable": false
+      },
+      {
         "DisplayKey": "Statistical Report",
         "FuncKey": "Report/StatisticalReport",
         "Enable": false
