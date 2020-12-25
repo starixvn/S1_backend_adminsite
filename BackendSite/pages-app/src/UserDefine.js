@@ -79,7 +79,7 @@ const BonusImport = lazy(() =>
 	import("./pages/Marketing/BonusImport/index")
 );
 
-export const defaultPage = "StatisticalReport";
+export const defaultPage = "BannerManage";
 
 export const layoutType = {
 	N88: "N88",

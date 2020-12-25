@@ -3,7 +3,9 @@ import InputBox from "./Component/InputBox";
 import CheckBox from "./Component/Checkbox";
 import SelectBox from "./Component/SelectBox";
 import RadioBox from "./Component/RadioBox";
-import { initBannerType, initActionModeType, initShowIndexType } from "./defCols";
+import DateTimePickerElem from "./Component/DateTimePicker";
+import moment from "moment";
+import { initBannerType, initActionModeType, initShowStatusType } from "./defCols";
 
 export default ({ state, action, IsAdd, processing }) => {
 	const newActionModeType = initActionModeType
@@ -19,7 +21,7 @@ export default ({ state, action, IsAdd, processing }) => {
 			return i;
 		});
 
-	
+
 	const currencyList = Object.keys(state.specific);
 	const currencyOptions = currencyList.map(i => {
 		return {
@@ -84,12 +86,46 @@ export default ({ state, action, IsAdd, processing }) => {
 						Selected={state.actionMode}
 					/>
 					<RadioBox
-						Title="Show Index"
-						Options={initShowIndexType}
+						Title="Show Status"
+						Options={initShowStatusType}
 						OnChange={action.EditMainValue}
-						dataColumn="showIndex"
-						Selected={state.showIndex}
+						dataColumn="showStatus"
+						Selected={state.showStatus}
 					/>
+					<div className="row-flex">
+						<DateTimePickerElem
+							columnTitle="Start Time"
+							dateTimePickerProps={{
+								defaultValue: moment(state.startTime).format(
+									"l LTS"
+								),
+								onBlur: e => {
+									try {
+										action.EditMainValue(
+											moment(e).format("l LTS"),
+											"startTime"
+										);
+									} catch (ex) { }
+								}
+							}}
+						/>
+						<DateTimePickerElem
+							columnTitle="End Time"
+							dateTimePickerProps={{
+								defaultValue: moment(state.endTime).format(
+									"l LTS"
+								),
+								onBlur: e => {
+									try {
+										action.EditMainValue(
+											moment(e).format("l LTS"),
+											"endTime"
+										);
+									} catch (ex) { }
+								}
+							}}
+						/>
+					</div>
 					<div className="row-flex">
 						{
 							state.bannerType === 1 ?

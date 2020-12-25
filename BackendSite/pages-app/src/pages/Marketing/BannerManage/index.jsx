@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useReducer, useState } from "react";
 import ReactDOM from "react-dom";
 import WebAPI from "../../../module/WebAPI";
+import moment from "moment";
 import Edit from "./Edit";
 import qs from "qs";
 import {
@@ -119,7 +120,9 @@ const App = () => {
 				BannerType: Number(banner.bannerType),
 				Sort: Number(banner.sort),
 				ActionMode: Number(banner.actionMode),
-				ShowIndex: Number(banner.showIndex),
+				ShowStatus: Number(banner.showStatus),
+				UnixStartTime: moment(banner.startTime).unix(),
+				UnixEndTime: moment(banner.endTime).unix(),
 				BonusCode: banner.bonusCode,
 				TpId: banner.tpId,
 				GameId: banner.gameId,
