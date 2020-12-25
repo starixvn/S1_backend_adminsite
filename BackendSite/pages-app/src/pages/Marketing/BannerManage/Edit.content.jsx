@@ -10,10 +10,10 @@ import { initBannerType, initActionModeType, initShowStatusType } from "./defCol
 export default ({ state, action, IsAdd, processing }) => {
 	const newActionModeType = initActionModeType
 		.filter(i => {
-			if (state.bannerType === 2 && i.value !== 1) {
+			if (state.bannerType == 2 && i.value !== 1) {
 				return false;
 			}
-			if (state.bannerType === 3 && i.value === 2) {
+			if (state.bannerType == 3 && i.value === 2) {
 				return false;
 			}
 			return true
@@ -128,7 +128,7 @@ export default ({ state, action, IsAdd, processing }) => {
 					</div>
 					<div className="row-flex">
 						{
-							state.bannerType === 1 ?
+							state.bannerType == 1 ?
 								state.actionMode === 1 ?
 									<>
 										<InputBox
@@ -152,7 +152,7 @@ export default ({ state, action, IsAdd, processing }) => {
 											value={state.bonusCode}
 										/>
 										: null
-								: state.bannerType === 2 ?
+								: state.bannerType == 2 ?
 									state.actionMode === 1 ?
 										<>
 											<InputBox
@@ -175,7 +175,7 @@ export default ({ state, action, IsAdd, processing }) => {
 											/>
 										</>
 										: null
-									: state.bannerType === 3 ?
+									: state.bannerType == 3 ?
 										state.actionMode === 1 ?
 											<>
 												<InputBox
