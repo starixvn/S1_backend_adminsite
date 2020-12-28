@@ -38,6 +38,8 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<Dictionary<string, dynamic>> Content { get; set; }
 
+        public IEnumerable<Dictionary<string, dynamic>> TotalContent { get; set; }
+
         public List<string> Titles { get; set; }
 
         public List<string> TitlesNameToDisplay { get; set; }
@@ -129,13 +131,14 @@ namespace BackendSite.Service.BLL
                                                                        s.TitlesToMerge,
                                                                        currentRow);
 
-                        ComplexReportExportHeader(ws,
+                        currentRow = ComplexReportExportHeader(ws,
                                                   (s.TitlesNameToDisplay.Any() ? s.TitlesNameToDisplay : s.Titles),
-                                                   2);
+                                                   currentRow);
                         ComplexReportExportBody(ws,
                                                 s.Content,
+                                                s.TotalContent,
                                                 s.Titles,
-                                                3,
+                                               currentRow,
                                                 s.TotalTitles,
                                                 s.IsSummary,
                                                 s.IsTotalTitleMax,
@@ -161,8 +164,8 @@ namespace BackendSite.Service.BLL
                                                IEnumerable<string> titles,
                                                int currentRow)
         {
-            GeneralReportSetHeader(ws, 
-                                   titles, 
+            GeneralReportSetHeader(ws,
+                                   titles,
                                    currentRow);
         }
 
@@ -232,7 +235,7 @@ namespace BackendSite.Service.BLL
                                                       int currentRow)
         {
             return ComplexReportSetMergeHeader(ws,
-                                               mergeTitles, 
+                                               mergeTitles,
                                                currentRow);
         }
 
@@ -249,7 +252,7 @@ namespace BackendSite.Service.BLL
                     cell.Value = mergeTitles.ElementAt(i).Key;
 
                     //Cell Merging
-                    ws.Cells[1, cellCount, 1, cellCount + mergeTitles.ElementAt(i).Value - 1].Merge = true;
+                    ws.Cells[currentRow, cellCount, currentRow, cellCount + mergeTitles.ElementAt(i).Value - 1].Merge = true;
 
                     //Style  Setting
                     cell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -264,15 +267,18 @@ namespace BackendSite.Service.BLL
                         cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#E8C1B7"));
                     }
 
-                    cell.Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
-                    cell.Style.Border.Top.Style = ExcelBorderStyle.Medium;
-                    cell.Style.Border.Left.Style = ExcelBorderStyle.Medium;
-                    cell.Style.Border.Right.Style = ExcelBorderStyle.Medium;
+                    for (int j = cellCount; j < (cellCount + mergeTitles.ElementAt(i).Value); j++)
+                    {
+                        ws.Cells[currentRow, j].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
+                        ws.Cells[currentRow, j].Style.Border.Top.Style = ExcelBorderStyle.Medium;
+                        ws.Cells[currentRow, j].Style.Border.Left.Style = ExcelBorderStyle.Medium;
+                        ws.Cells[currentRow, j].Style.Border.Right.Style = ExcelBorderStyle.Medium;
+                    }
 
                     ws.Column(i + 1).AutoFit();
                     cellCount = cellCount + mergeTitles.ElementAt(i).Value;
                 }
-                currentRow ++;
+                currentRow++;
             }
 
             return currentRow;
@@ -282,16 +288,16 @@ namespace BackendSite.Service.BLL
 
         #region ComplexReportExportHeader
 
-        private void ComplexReportExportHeader(ExcelWorksheet ws,
+        private int ComplexReportExportHeader(ExcelWorksheet ws,
                                                IEnumerable<string> titles,
                                                int currentRow)
         {
-            ComplexReportSetHeader(ws,
+            return ComplexReportSetHeader(ws,
                                    titles,
                                    currentRow);
         }
 
-        private void ComplexReportSetHeader(ExcelWorksheet ws,
+        private int ComplexReportSetHeader(ExcelWorksheet ws,
                                             IEnumerable<string> titles,
                                             int currentRow)
         {
@@ -312,6 +318,8 @@ namespace BackendSite.Service.BLL
 
                 ws.Column(i + 1).AutoFit();
             }
+
+            return (currentRow + 1);
         }
 
         #endregion
@@ -320,6 +328,7 @@ namespace BackendSite.Service.BLL
 
         private void ComplexReportExportBody(ExcelWorksheet ws,
                                              IEnumerable<Dictionary<string, dynamic>> data,
+                                             IEnumerable<Dictionary<string, dynamic>> totalData,
                                              List<string> titles,
                                              int currentRow,
                                              List<string> totalTitles,
@@ -363,13 +372,20 @@ namespace BackendSite.Service.BLL
                                                             totalTitles);
             }
 
-            if (isSummary)
+            if (isSummary && notSummaryTitles.Count() > 0)
             {
                 ComplexReportSetBodySummary(ws,
                                             data,
                                             titles,
                                             currentRow,
                                             notSummaryTitles);
+            }
+            if (isSummary && totalData != null)
+            {
+                ComplexReportSetCustomizeBodySummary(ws,
+                                                     totalData,
+                                                     titles,
+                                                     currentRow);
             }
         }
 
@@ -547,6 +563,37 @@ namespace BackendSite.Service.BLL
 
             #endregion
 
+        }
+
+        private void ComplexReportSetCustomizeBodySummary(ExcelWorksheet ws,
+                                                   IEnumerable<Dictionary<string, dynamic>> data,
+                                                   List<string> titles,
+                                                   int currentRow)
+        {
+            for (var i = 0; i < data.Count(); i++)
+            {
+                var bt = data.ElementAt(i);
+
+                foreach (var item in bt)
+                {
+                    var value = item.Value;
+                    var colName = item.Key;
+                    if (titles.Any(x => string.Equals(x, colName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        var colIdx = titles.IndexOf(colName) + 1;
+                        if (value != null)
+                        {
+                            ws.Cells[currentRow, colIdx].Value = value;
+
+                            ws.Cells[currentRow, colIdx].Style.Border.Bottom.Style = ExcelBorderStyle.Double;
+                            ws.Cells[currentRow, colIdx].Style.Border.Top.Style = ExcelBorderStyle.Medium;
+
+                            ws.Cells[currentRow, colIdx].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            ws.Cells[currentRow, colIdx].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#FFFF80"));
+                        }
+                    }
+                }
+            }
         }
 
         #endregion

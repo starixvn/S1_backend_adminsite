@@ -14,11 +14,19 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/MainFinancialReport" })]
         public IActionResult MainFinancialReport()
         {
             return View();
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/DepositReport" })]
+        public IActionResult DepositReport()
+        {
+            return View();
+        }
+
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/StatisticalReport" })]
         public IActionResult StatisticalReport()
         {
