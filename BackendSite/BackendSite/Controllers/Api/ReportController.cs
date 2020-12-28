@@ -1008,9 +1008,9 @@ namespace BackendSite.Controllers.Api
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/DepositReport" })]
         public ApiResult GetDepositReport([FromForm] IEnumerable<int> SiteIds,
-                                                [FromForm] IEnumerable<int> CurrencyIds,
-                                                [FromForm] string StartDate,
-                                                [FromForm] string EndDate)
+                                          [FromForm] IEnumerable<int> CurrencyIds,
+                                          [FromForm] string StartDate,
+                                          [FromForm] string EndDate)
         {
 
             var apiResult = new ApiResult<IEnumerable<DepositReportModel>>();
