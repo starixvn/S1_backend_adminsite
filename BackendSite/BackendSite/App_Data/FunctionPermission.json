@@ -13,6 +13,11 @@
         "Enable": false
       },
       {
+        "DisplayKey": "Deposit Report",
+        "FuncKey": "Report/DepositReport",
+        "Enable": false
+      },
+      {
         "DisplayKey": "Statistical Report",
         "FuncKey": "Report/StatisticalReport",
         "Enable": false
@@ -232,11 +237,6 @@
         "Enable": false
       },
       {
-        "DisplayKey": "Bonus Import",
-        "FuncKey": "Marketing/BonusImport",
-        "Enable": false
-      },
-      {
         "DisplayKey": "Rebate Info",
         "FuncKey": "Marketing/RebateInfoReport",
         "Enable": false
@@ -244,11 +244,6 @@
       {
         "DisplayKey": "Rebate Report",
         "FuncKey": "Marketing/RebateLogReport",
-        "Enable": false
-      },
-      {
-        "DisplayKey": "Banner Management",
-        "FuncKey": "Marketing/BannerManage",
         "Enable": false
       }
     ]

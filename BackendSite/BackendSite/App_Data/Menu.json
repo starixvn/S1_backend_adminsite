@@ -37,6 +37,16 @@
       },
       {
         "Key": "",
+        "Title": "Deposit Report",
+        "FuncKey": "Report/DepositReport",
+        "Controller": "Report",
+        "Action": "DepositReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
         "Title": "Statistical Report",
         "FuncKey": "Report/StatisticalReport",
         "Controller": "Report",
@@ -288,16 +298,6 @@
         "Childs": null
       },
       {
-        "Key": "BonusImport",
-        "Title": "Bonus Import",
-        "FuncKey": "Marketing/BonusImport",
-        "Controller": "Marketing",
-        "Action": "BonusImport",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
         "Key": "PendingBonus",
         "Title": "Pending Bonus",
         "FuncKey": "Marketing/PendingBonus",
@@ -333,16 +333,6 @@
         "FuncKey": "Marketing/NewsManage",
         "Controller": "Marketing",
         "Action": "NewsManage",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "BannerManagement",
-        "Title": "Banner Management",
-        "FuncKey": "Marketing/BannerManage",
-        "Controller": "Marketing",
-        "Action": "BannerManage",
         "Icon": "",
         "Roles": null,
         "Childs": null

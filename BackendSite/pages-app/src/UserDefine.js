@@ -78,6 +78,9 @@ const UserOnlineReport = lazy(() =>
 const BonusImport = lazy(() => 
 	import("./pages/Marketing/BonusImport/index")
 );
+const DepositReport = lazy(() => 
+	import("./pages/Report/DepositReport/index")
+);
 
 export const defaultPage = "BannerManage";
 
@@ -414,6 +417,19 @@ export const pages = {
 		comp: (
 			<Suspense fallback="loading...">
 				<BonusImport />
+				</Suspense>
+		),
+		css: [
+			"./lib/bootstrap/dist/css/bootstrap.min.css",
+			"./css/css/main.css",
+			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
+		],
+		layout: layoutType.N88
+	},
+	DepositReport: {
+		comp: (
+			<Suspense fallback="loading...">
+				<DepositReport />
 			</Suspense>
 		),
 		css: [
