@@ -27,12 +27,14 @@ export const initActionModeType = [
 ];
 
 
-export const defShowIndexType = {
-	0: "No Show",
-	1: "Show"
+export const defShowStatusType = {
+	1: "No login",
+	2: "Login",
+	3: "Both"
 };
 
-export const initShowIndexType = [
-	{ value: 0, displayText: defShowIndexType[0] },
-	{ value: 1, displayText: defShowIndexType[1] }
+export const initShowStatusType = [
+	{ value: 1, displayText: defShowStatusType[1] },
+	{ value: 2, displayText: defShowStatusType[2] },
+	{ value: 3, displayText: defShowStatusType[3] },
 ];

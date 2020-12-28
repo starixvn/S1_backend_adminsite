@@ -20,9 +20,11 @@ export const initialState = (IsAdd, datas, setSite, setCurrencyList, setLangList
 			// status: 0,
 			sort: "",
 			actionMode: "",
-			showIndex: "",
+			showStatus: "",
+			startTime: new Date(),
+			endTime: new Date(),
 			bonusCode: "",
-			matchId:"",
+			matchId: "",
 			tpId: "",
 			gameId: "",
 			selectedCurrencies: [],
@@ -45,7 +47,9 @@ export const initialState = (IsAdd, datas, setSite, setCurrencyList, setLangList
 			// status: datas.status,
 			sort: datas.sort,
 			actionMode: datas.actionMode,
-			showIndex: datas.showIndex,
+			showStatus: datas.showStatus,
+			startTime: datas.startTime,
+			endTime: datas.endTime,
 			bonusCode: datas.bonusCode,
 			matchId: datas.matchId,
 			tpId: datas.tpId,
@@ -60,7 +64,7 @@ export const initialState = (IsAdd, datas, setSite, setCurrencyList, setLangList
 const initLang = {
 	bannerLink: "",
 	bannerPCUrl: "",
-	bannerMobileUrl:""
+	bannerMobileUrl: ""
 };
 
 const initSpecific = {

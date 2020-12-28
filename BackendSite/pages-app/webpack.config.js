@@ -93,16 +93,13 @@ module.exports = {
 		// "Report/MainFinancialReport.min": [
 		// 	"./src/pages/Report/MainFinancialReport/index.js"
 		// ],
-		// "Marketing/BannerManage.min": [
-		// 	'@babel/polyfill',
-		// 	"./src/pages/Marketing/BannerManage/index.jsx"
-		// ],
+		"Marketing/BannerManage.min": [
+			'@babel/polyfill',
+			"./src/pages/Marketing/BannerManage/index.jsx"
+		],
 		// "Report/MainFinancialReport.min": [
 		// 	"./src/pages/Report/MainFinancialReport/index.js"
 		// ],
-		"Report/DepositReport.min": [
-			"./src/pages/Report/DepositReport/index.js"
-		],
 		// "Report/StatisticalReport.min": [
 		// 	"./src/pages/Report/StatisticalReport/index.js"
 		// ],
