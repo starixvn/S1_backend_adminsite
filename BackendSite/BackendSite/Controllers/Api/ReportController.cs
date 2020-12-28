@@ -884,7 +884,8 @@ namespace BackendSite.Controllers.Api
                                                            SiteIds,
                                                            SelectDate);
 
-            int totalMaxCount = ExportData.GroupBy(x => new {
+            int totalMaxCount = ExportData.GroupBy(x => new
+            {
                 LocalTime = x.LocalTime
             }).Select(x => x.Sum(y => y.MaxCount)).Max();
 
@@ -1004,5 +1005,441 @@ namespace BackendSite.Controllers.Api
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         $"UserOnlineReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/DepositReport" })]
+        public ApiResult GetDepositReport([FromForm] IEnumerable<int> SiteIds,
+                                                [FromForm] IEnumerable<int> CurrencyIds,
+                                                [FromForm] string StartDate,
+                                                [FromForm] string EndDate)
+        {
+
+            var apiResult = new ApiResult<IEnumerable<DepositReportModel>>();
+
+            try
+            {
+
+                apiResult.Data = _reportBLL.GetDepositReport(CurrencyIds,
+                                                             JsonConvert.SerializeObject(SiteIds),
+                                                             JsonConvert.SerializeObject(CurrencyIds),
+                                                             StartDate,
+                                                             EndDate);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.Message;
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public IActionResult ExportDepositReport(string SiteIds,
+                                               string CurrencyIds,
+                                               string StartDate,
+                                               string EndDate)
+        {
+            #region Get Data
+
+            var currencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(CurrencyIds);
+
+            var ExportData = _reportBLL.GetDepositReport(currencyList,
+                                                         SiteIds,
+                                                         CurrencyIds,
+                                                         StartDate,
+                                                         EndDate);
+
+            var currencyData = _reportBLL.GetCurrency();
+
+            #endregion
+
+            Dictionary<string, TitleModel> summaryTitles = new Dictionary<string, TitleModel>();
+            List<Dictionary<string, dynamic>> summaryContent = new List<Dictionary<string, dynamic>>();
+            List<Dictionary<string, dynamic>> summaryTotalContent = new List<Dictionary<string, dynamic>>();
+
+            #region Customize Data(Title & Total Title & Merge Title)
+
+            List<Dictionary<string, int>> titlesToMerge = new List<Dictionary<string, int>>();
+
+            #region Summary Title
+
+            summaryTitles.Add("AccountName", new TitleModel { Name = "AccountName", SortId = 1 });
+            summaryTitles.Add("OnlineAmount-in-MYR", new TitleModel { Name = "Total in MYR", SortId = 200 });
+            summaryTitles.Add("OnlinePrecent-in-MYR", new TitleModel { Name = "Total in MYR", SortId = 400 });
+            summaryTitles.Add("MobileAmount-in-MYR", new TitleModel { Name = "Total in MYR", SortId = 600 });
+            summaryTitles.Add("MobilePrecent-in-MYR", new TitleModel { Name = "Total in MYR", SortId = 800 });
+            summaryTitles.Add("LocalAmount-in-MYR", new TitleModel { Name = "Total in MYR", SortId = 1000 });
+            summaryTitles.Add("LocalPrecent-in-MYR", new TitleModel { Name = "Total in MYR", SortId = 1200 });
+
+            summaryTitles.Add("TotalAmount", new TitleModel { Name = "Total Amount In MYR", SortId = 1400 });
+            summaryTitles.Add("TotalCount", new TitleModel { Name = "Total Count", SortId = 1600 });
+            summaryTitles.Add("AverangeAmount", new TitleModel { Name = "Averange Amount In MYR", SortId = 1800 });
+            summaryTitles.Add("SuccessRate", new TitleModel { Name = "Total Success Rate", SortId = 2000 });
+            summaryTitles.Add("FTDCount", new TitleModel { Name = "Total FTD Count", SortId = 2200 });
+            summaryTitles.Add("ApTime", new TitleModel { Name = "Total Averange Processing Time", SortId = 2400 });
+
+            foreach(var curr in currencyList)
+            {
+                string isoCode = currencyData.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+
+                var OnlineAmountPropName = $"OnlineAmount-{isoCode}";
+                var OnlinePrecentPropName = $"OnlinePrecent-{isoCode}";
+                var MobileAmountPropName = $"MobileAmount-{isoCode}";
+                var MobilePrecentPropName = $"MobilePrecent-{isoCode}";
+                var LocalAmountPropName = $"LocalAmount-{isoCode}";
+                var LocalPrecentPropName = $"LocalPrecent-{isoCode}";
+
+                var TotalAmountPropName = $"TotalAmount-{isoCode}";
+                var TotalCountPropName = $"TotalCount-{isoCode}";
+                var AverangeAmountPropName = $"AverangeAmount-{isoCode}";
+                var SuccessRatePropName = $"SuccessRate-{isoCode}";
+                var FTDCountPropName = $"FTDCount-{isoCode}";
+                var ApTimePropName = $"ApTime-{isoCode}";
+
+                var onlineAmountSortId = 100 + curr;
+                var onlinePrecentSortId = 300 + curr;
+                var mobileAmountSortId = 500 + curr;
+                var mobilePrecentSortId = 700 + curr;
+                var localAmountSortId = 900 + curr;
+                var localPrecentSortId = 1100 + curr;
+
+                var totalAmountSortId = 1300 + curr;
+                var totalCountSortId = 1500 + curr;
+                var averangeAmountSortId = 1700 + curr;
+                var successRateSortId = 1900 + curr;
+                var ftdCountSortId = 2100 + curr;
+                var apTimeSortId = 2300 + curr;
+
+                summaryTitles.Add(OnlineAmountPropName, new TitleModel { Name = isoCode, SortId = onlineAmountSortId });
+                summaryTitles.Add(OnlinePrecentPropName, new TitleModel { Name = isoCode, SortId = onlinePrecentSortId });
+                summaryTitles.Add(MobileAmountPropName, new TitleModel { Name = isoCode, SortId = mobileAmountSortId });
+                summaryTitles.Add(MobilePrecentPropName, new TitleModel { Name = isoCode, SortId = mobilePrecentSortId });
+                summaryTitles.Add(LocalAmountPropName, new TitleModel { Name = isoCode, SortId = localAmountSortId });
+                summaryTitles.Add(LocalPrecentPropName, new TitleModel { Name = isoCode, SortId = localPrecentSortId });
+
+                summaryTitles.Add(TotalAmountPropName, new TitleModel { Name = isoCode, SortId = totalAmountSortId });
+                summaryTitles.Add(TotalCountPropName, new TitleModel { Name = isoCode, SortId = totalCountSortId });
+                summaryTitles.Add(AverangeAmountPropName, new TitleModel { Name = isoCode, SortId = averangeAmountSortId });
+                summaryTitles.Add(SuccessRatePropName, new TitleModel { Name = isoCode, SortId = successRateSortId });
+                summaryTitles.Add(FTDCountPropName, new TitleModel { Name = isoCode, SortId = ftdCountSortId });
+                summaryTitles.Add(ApTimePropName, new TitleModel { Name = isoCode, SortId = apTimeSortId });
+
+            }
+
+            #endregion
+
+            #region Summary Total Title
+
+            List<string> totalTitle = new List<string>
+            {
+                "OnlineAmount-in-MYR", "OnlinePrecent-in-MYR",
+                "MobileAmount-in-MYR", "MobilePrecent-in-MYR",
+                "LocalAmount-in-MYR","LocalPrecent-in-MYR",
+                "TotalAmount","TotalCount",
+                "AverangeAmount","SuccessRate",
+                "FTDCount","ApTime"
+            };
+
+            #endregion
+
+            #region Summary Merge Title
+
+            Dictionary<string, int> depositTypeTitles = new Dictionary<string, int>();
+            depositTypeTitles.Add("", 1);
+
+            depositTypeTitles.Add("Online Banking", (currencyList.Count() + 1) * 2);
+            depositTypeTitles.Add("Mobile Pay", (currencyList.Count() + 1) * 2);
+            depositTypeTitles.Add("Local Banking", (currencyList.Count() + 1) * 2);
+            depositTypeTitles.Add("Total Data", (currencyList.Count() + 1) * 6);
+
+            titlesToMerge.Add(depositTypeTitles);
+
+            Dictionary<string, int> mergeTitles = new Dictionary<string, int>();
+            mergeTitles.Add("", 1);
+
+            mergeTitles.Add("Online Amount", currencyList.Count() + 1);
+            mergeTitles.Add("Online %", currencyList.Count() + 1);
+            mergeTitles.Add("Mobile Amount", currencyList.Count() + 1);
+            mergeTitles.Add("Mobile %", currencyList.Count() + 1);
+            mergeTitles.Add("Local Amount", currencyList.Count() + 1);
+            mergeTitles.Add("Local %", currencyList.Count() + 1);
+
+            mergeTitles.Add("Total Amount", currencyList.Count() + 1);
+            mergeTitles.Add("Total Count", currencyList.Count() + 1);
+            mergeTitles.Add("Averange Amount", currencyList.Count() + 1);
+            mergeTitles.Add("Success Rate(%)", currencyList.Count() + 1);
+            mergeTitles.Add("FTD Count", currencyList.Count() + 1);
+            mergeTitles.Add("Averange Processing Time(D.HH:MM:SS)", currencyList.Count() + 1);
+
+            titlesToMerge.Add(mergeTitles);
+
+            #endregion
+
+            #endregion
+
+            foreach (var item in ExportData)
+            {
+                //Summary Data Filling
+                foreach (var accountItem in item.SummaryAccountData)
+                {
+                    foreach (var accountCurrencyItem in accountItem.SummaryData)
+                    {
+                        var OnlineAmountPropName = $"OnlineAmount-{accountCurrencyItem.IsoCode}";
+                        var OnlinePrecentPropName = $"OnlinePrecent-{accountCurrencyItem.IsoCode}";
+                        var MobileAmountPropName = $"MobileAmount-{accountCurrencyItem.IsoCode}";
+                        var MobilePrecentPropName = $"MobilePrecent-{accountCurrencyItem.IsoCode}";
+                        var LocalAmountPropName = $"LocalAmount-{accountCurrencyItem.IsoCode}";
+                        var LocalPrecentPropName = $"LocalPrecent-{accountCurrencyItem.IsoCode}";
+
+                        var TotalAmountPropName = $"TotalAmount-{accountCurrencyItem.IsoCode}";
+                        var TotalCountPropName = $"TotalCount-{accountCurrencyItem.IsoCode}";
+                        var AverangeAmountPropName = $"AverangeAmount-{accountCurrencyItem.IsoCode}";
+                        var SuccessRatePropName = $"SuccessRate-{accountCurrencyItem.IsoCode}";
+                        var FTDCountPropName = $"FTDCount-{accountCurrencyItem.IsoCode}";
+                        var ApTimePropName = $"ApTime-{accountCurrencyItem.IsoCode}";
+
+                        //var onlineAmountSortId = 100 + accountCurrencyItem.CurrencyId;
+                        //var onlinePrecentSortId = 300 + accountCurrencyItem.CurrencyId;
+                        //var mobileAmountSortId = 500 + accountCurrencyItem.CurrencyId;
+                        //var mobilePrecentSortId = 700 + accountCurrencyItem.CurrencyId;
+                        //var localAmountSortId = 900 + accountCurrencyItem.CurrencyId;
+                        //var localPrecentSortId = 1100 + accountCurrencyItem.CurrencyId;
+
+                        //var totalAmountSortId = 1300 + accountCurrencyItem.CurrencyId;
+                        //var totalCountSortId = 1500 + accountCurrencyItem.CurrencyId;
+                        //var averangeAmountSortId = 1700 + accountCurrencyItem.CurrencyId;
+                        //var successRateSortId = 1900 + accountCurrencyItem.CurrencyId;
+                        //var ftdCountSortId = 2100 + accountCurrencyItem.CurrencyId;
+                        //var apTimeSortId = 2300 + accountCurrencyItem.CurrencyId;
+
+                        var getKey = $"{accountItem.AccountType}-{accountItem.AccountId}";
+
+                        var getItem = summaryContent.FirstOrDefault(x =>
+                            x.Any(y => y.Key == "Key" && (string)y.Value == getKey)
+                        );
+
+                        if (getItem != null)
+                        {
+                            //summaryTitles.Add(OnlineAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = onlineAmountSortId });
+                            getItem.Add(OnlineAmountPropName, accountCurrencyItem.OnlineDeposit);
+
+                            //summaryTitles.Add(OnlinePrecentPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = onlinePrecentSortId });
+                            getItem.Add(OnlinePrecentPropName, accountCurrencyItem.OnlinePrecent);
+
+                            //summaryTitles.Add(MobileAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = mobileAmountSortId });
+                            getItem.Add(MobileAmountPropName, accountCurrencyItem.MobileDeposit);
+
+                            //summaryTitles.Add(MobilePrecentPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = mobilePrecentSortId });
+                            getItem.Add(MobilePrecentPropName, accountCurrencyItem.MobilePrecent);
+
+                            //summaryTitles.Add(LocalAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = localAmountSortId });
+                            getItem.Add(LocalAmountPropName, accountCurrencyItem.LocalDeposit);
+
+                            //summaryTitles.Add(LocalPrecentPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = localPrecentSortId });
+                            getItem.Add(LocalPrecentPropName, accountCurrencyItem.LocalPrecent);
+
+
+                            //summaryTitles.Add(TotalAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = totalAmountSortId });
+                            getItem.Add(TotalAmountPropName, accountCurrencyItem.TotalAmount);
+
+                            //summaryTitles.Add(TotalCountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = totalCountSortId });
+                            getItem.Add(TotalCountPropName, accountCurrencyItem.TotalCount);
+
+                            //summaryTitles.Add(AverangeAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = averangeAmountSortId });
+                            getItem.Add(AverangeAmountPropName, accountCurrencyItem.AverangeDeposit);
+
+                            //summaryTitles.Add(SuccessRatePropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = successRateSortId });
+                            getItem.Add(SuccessRatePropName, accountCurrencyItem.SuccessRate);
+
+                            //summaryTitles.Add(FTDCountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = ftdCountSortId });
+                            getItem.Add(FTDCountPropName, accountCurrencyItem.FTDCount);
+
+                            //summaryTitles.Add(ApTimePropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = apTimeSortId });
+                            getItem.Add(ApTimePropName, accountCurrencyItem.AverangeProcessingTime);
+                        }
+                        else
+                        {
+                            Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                            {
+                                { "Key", $"{accountItem.AccountType}-{accountItem.AccountId}" },
+                                { "AccountId", accountItem.AccountId },
+                                { "AccountName", accountItem.AccountName },
+                                { "CurrencyId", accountCurrencyItem.CurrencyId },
+                                { "Currency", accountCurrencyItem.IsoCode },
+
+                                { OnlineAmountPropName, accountCurrencyItem.OnlineDeposit },
+                                { OnlinePrecentPropName, accountCurrencyItem.OnlinePrecent },
+                                { MobileAmountPropName, accountCurrencyItem.MobileDeposit },
+                                { MobilePrecentPropName, accountCurrencyItem.MobilePrecent },
+                                { LocalAmountPropName, accountCurrencyItem.LocalDeposit },
+                                { LocalPrecentPropName, accountCurrencyItem.LocalPrecent },
+
+                                { TotalAmountPropName, accountCurrencyItem.TotalAmount },
+                                { TotalCountPropName, accountCurrencyItem.TotalCount },
+                                { AverangeAmountPropName, accountCurrencyItem.AverangeDeposit },
+                                { SuccessRatePropName, accountCurrencyItem.SuccessRate },
+                                { FTDCountPropName, accountCurrencyItem.FTDCount },
+                                { ApTimePropName, accountCurrencyItem.AverangeProcessingTime },
+
+                                { "OnlineAmount-in-MYR", accountItem.SummaryTotalData.OnlineDeposit },
+                                { "OnlinePrecent-in-MYR", accountItem.SummaryTotalData.OnlinePrecent },
+                                { "MobileAmount-in-MYR", accountItem.SummaryTotalData.MobileDeposit },
+                                { "MobilePrecent-in-MYR", accountItem.SummaryTotalData.MobilePrecent },
+                                { "LocalAmount-in-MYR", accountItem.SummaryTotalData.LocalDeposit },
+                                { "LocalPrecent-in-MYR", accountItem.SummaryTotalData.LocalPrecent },
+
+                                { "TotalAmount", accountItem.SummaryTotalData.TotalAmount },
+                                { "TotalCount", accountItem.SummaryTotalData.TotalCount },
+                                { "AverangeAmount", accountItem.SummaryTotalData.AverangeDeposit },
+                                { "SuccessRate", accountItem.SummaryTotalData.SuccessRate },
+                                { "FTDCount", accountItem.SummaryTotalData.FTDCount },
+                                { "ApTime", accountItem.SummaryTotalData.AverangeProcessingTime }
+
+                            };
+
+                            summaryContent.Add(newItem);
+                            
+                            //summaryTitles.Add(OnlineAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = onlineAmountSortId });
+                            //summaryTitles.Add(OnlinePrecentPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = onlinePrecentSortId });
+                            //summaryTitles.Add(MobileAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = mobileAmountSortId });
+                            //summaryTitles.Add(MobilePrecentPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = mobilePrecentSortId });
+                            //summaryTitles.Add(LocalAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = localAmountSortId });
+                            //summaryTitles.Add(LocalPrecentPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = localPrecentSortId });
+
+                            //summaryTitles.Add(TotalAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = totalAmountSortId });
+                            //summaryTitles.Add(TotalCountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = totalCountSortId });
+                            //summaryTitles.Add(AverangeAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = averangeAmountSortId });
+                            //summaryTitles.Add(SuccessRatePropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = successRateSortId });
+                            //summaryTitles.Add(FTDCountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = ftdCountSortId });
+                            //summaryTitles.Add(ApTimePropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = apTimeSortId });
+
+                        }
+
+                    }
+                }
+
+                //Summary Total Data Filling
+                foreach (var currencyItem in item.SummaryCurrencyData)
+                {
+                    var OnlineAmountPropName = $"OnlineAmount-{currencyItem.IsoCode}";
+                    var OnlinePrecentPropName = $"OnlinePrecent-{currencyItem.IsoCode}";
+                    var MobileAmountPropName = $"MobileAmount-{currencyItem.IsoCode}";
+                    var MobilePrecentPropName = $"MobilePrecent-{currencyItem.IsoCode}";
+                    var LocalAmountPropName = $"LocalAmount-{currencyItem.IsoCode}";
+                    var LocalPrecentPropName = $"LocalPrecent-{currencyItem.IsoCode}";
+
+                    var TotalAmountPropName = $"TotalAmount-{currencyItem.IsoCode}";
+                    var TotalCountPropName = $"TotalCount-{currencyItem.IsoCode}";
+                    var AverangeAmountPropName = $"AverangeAmount-{currencyItem.IsoCode}";
+                    var SuccessRatePropName = $"SuccessRate-{currencyItem.IsoCode}";
+                    var FTDCountPropName = $"FTDCount-{currencyItem.IsoCode}";
+                    var ApTimePropName = $"ApTime-{currencyItem.IsoCode}";
+
+                    //var onlineAmountSortId = 100 + currencyItem.CurrencyId;
+                    //var onlinePrecentSortId = 300 + currencyItem.CurrencyId;
+                    //var mobileAmountSortId = 500 + currencyItem.CurrencyId;
+                    //var mobilePrecentSortId = 700 + currencyItem.CurrencyId;
+                    //var localAmountSortId = 900 + currencyItem.CurrencyId;
+                    //var localPrecentSortId = 1100 + currencyItem.CurrencyId;
+
+                    //var totalAmountSortId = 1300 + currencyItem.CurrencyId;
+                    //var totalCountSortId = 1500 + currencyItem.CurrencyId;
+                    //var averangeAmountSortId = 1700 + currencyItem.CurrencyId;
+                    //var successRateSortId = 1900 + currencyItem.CurrencyId;
+                    //var ftdCountSortId = 2100 + currencyItem.CurrencyId;
+                    //var apTimeSortId = 2300 + currencyItem.CurrencyId;
+
+                    var getKey = "TOTAL";
+
+                    var getItem = summaryContent.FirstOrDefault(x =>
+                        x.Any(y => y.Key == "Key" && (string)y.Value == getKey)
+                    );
+
+                    if (getItem != null)
+                    {
+                        getItem.Add(OnlineAmountPropName, currencyItem.OnlineDeposit);
+                        getItem.Add(OnlinePrecentPropName, currencyItem.OnlinePrecent);
+                        getItem.Add(MobileAmountPropName, currencyItem.MobileDeposit);
+                        getItem.Add(MobilePrecentPropName, currencyItem.MobilePrecent);
+                        getItem.Add(LocalAmountPropName, currencyItem.LocalDeposit);
+                        getItem.Add(LocalPrecentPropName, currencyItem.LocalPrecent);
+
+                        getItem.Add(TotalAmountPropName, currencyItem.TotalAmount);
+                        getItem.Add(TotalCountPropName, currencyItem.TotalCount);
+                        getItem.Add(AverangeAmountPropName, currencyItem.AverangeDeposit);
+                        getItem.Add(SuccessRatePropName, currencyItem.SuccessRate);
+                        getItem.Add(FTDCountPropName, currencyItem.FTDCount);
+                        getItem.Add(ApTimePropName, currencyItem.AverangeProcessingTime);
+
+                    }
+                    else
+                    {
+                        Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                        {
+                            { "Key", "TOTAL" },
+                            { "AccountId", "" },
+                            { "AccountName", "TOTAL：" },
+                            { "CurrencyId", currencyItem.CurrencyId },
+                            { "Currency", currencyItem.IsoCode },
+
+                            { OnlineAmountPropName, currencyItem.OnlineDeposit },
+                            { OnlinePrecentPropName, currencyItem.OnlinePrecent },
+                            { MobileAmountPropName, currencyItem.MobileDeposit },
+                            { MobilePrecentPropName, currencyItem.MobilePrecent },
+                            { LocalAmountPropName, currencyItem.LocalDeposit },
+                            { LocalPrecentPropName, currencyItem.LocalPrecent },
+
+                            { TotalAmountPropName, currencyItem.TotalAmount },
+                            { TotalCountPropName, currencyItem.TotalCount },
+                            { AverangeAmountPropName, currencyItem.AverangeDeposit },
+                            { SuccessRatePropName, currencyItem.SuccessRate },
+                            { FTDCountPropName, currencyItem.FTDCount },
+                            { ApTimePropName, currencyItem.AverangeProcessingTime },
+
+                            { "OnlineAmount-in-MYR",  item.SummaryTotalData.OnlineDeposit },
+                            { "OnlinePrecent-in-MYR", item.SummaryTotalData.OnlinePrecent },
+                            { "MobileAmount-in-MYR", item.SummaryTotalData.MobileDeposit },
+                            { "MobilePrecent-in-MYR", item.SummaryTotalData.MobilePrecent },
+                            { "LocalAmount-in-MYR", item.SummaryTotalData.LocalDeposit },
+                            { "LocalPrecent-in-MYR", item.SummaryTotalData.LocalPrecent },
+                            { "TotalAmount", item.SummaryTotalData.TotalAmount },
+                            { "TotalCount", item.SummaryTotalData.TotalCount },
+                            { "AverangeAmount", item.SummaryTotalData.AverangeDeposit },
+                            { "SuccessRate", item.SummaryTotalData.SuccessRate },
+                            { "FTDCount", item.SummaryTotalData.FTDCount },
+                            { "ApTime", item.SummaryTotalData.AverangeProcessingTime }
+                        };
+
+                        summaryTotalContent.Add(newItem);
+                    }
+                }
+
+            }
+
+            List<ComplexReportExportDataToExcel> exelParam = new List<ComplexReportExportDataToExcel>()
+            {
+                new ComplexReportExportDataToExcel()
+                {
+                    SheetName = "Summary",
+                    Content = summaryContent,
+                    TotalContent=summaryTotalContent,
+                    Titles = summaryTitles.OrderBy(x=> x.Value.SortId).Select(x=> x.Key).ToList(),
+                    TotalTitles = totalTitle,
+                    TitlesToMerge = titlesToMerge,
+                    TitlesNameToDisplay = summaryTitles.OrderBy(x=> x.Value.SortId).Select(x=> x.Value.Name).ToList(),
+                    IsSummary = true
+                }
+            };
+
+            var stream = _reportExcelBLL.ComplexReportExportToMultiSheet(exelParam);
+
+            return File(stream,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        $"DepositReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
+
+
     }
 }
