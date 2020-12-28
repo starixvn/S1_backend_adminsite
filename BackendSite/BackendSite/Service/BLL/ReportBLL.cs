@@ -461,10 +461,11 @@ namespace BackendSite.Service.BLL
         {
 
             Dictionary<string, DepositAccountModel> accountKeyValuePairs = new Dictionary<string, DepositAccountModel>();
+            Dictionary<string, DepositByDateReportModel> accountDateKeyValuePairs = new Dictionary<string, DepositByDateReportModel>();
 
             List<DepositSummaryReportModel> summaryCurrencyData = new List<DepositSummaryReportModel>();
             DepositSummaryReportModel summaryTotalData = new DepositSummaryReportModel();
-            
+
             #region Get Data
 
             var depositDetailList = reportService.GetDepositReport(siteIds,
@@ -483,7 +484,7 @@ namespace BackendSite.Service.BLL
             //Base Value Caculate
             foreach (var data in depositDetailList)
             {
-                
+
                 DepositAccountModel depositAccountModel = null;
                 decimal rate = 0;
                 int AccountType = 0;
@@ -589,8 +590,6 @@ namespace BackendSite.Service.BLL
 
                 depositAccountModel = accountKeyValuePairs[$"{AccountType}-{data.AccountId}"];
 
-                //accountCurrencyDataModel = depositAccountModel.SummaryData.Where(x => x.CurrencyId == data.CurrencyId).FirstOrDefault();
-
                 if (!depositAccountModel.SummaryData.Select(x => x.CurrencyId).Contains(data.CurrencyId))
                 {
                     accountCurrencyModel = new DepositSummaryReportModel();
@@ -689,7 +688,7 @@ namespace BackendSite.Service.BLL
                     summaryCurrencyModel = new DepositSummaryReportModel();
                     summaryCurrencyModel.CurrencyId = curr;
                     summaryCurrencyModel.IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
-                    
+
                     summaryCurrencyData.Add(summaryCurrencyModel);
                 }
             }
@@ -712,8 +711,254 @@ namespace BackendSite.Service.BLL
 
             #region  Combine Data：Date Data
 
+            List<string> dateList = depositDetailList.Select(x => x.Date.ToString("yyyy/MM/dd")).Distinct().ToList();
+
+            #region Account Total Data And Summary Total Data
+
+            //Base Value Caculate
+            foreach (var data in depositDetailList)
+            {
+                DepositAccountModel depositAccountModel = null;
+                DepositByDateReportModel depositByDateDictionaryModel = null;
+                decimal rate = 0;
+                int AccountType = 0;
+                string dateFormat = data.Date.ToString("yyyy/MM/dd");
+
+                switch (data.DepositType)
+                {
+                    case DepositType.LocalBank:
+                        AccountType = 3;
+                        break;
+                    default:
+                        AccountType = 99;
+                        break;
+                }
+
+                //if (!accountKeyValuePairs.ContainsKey($"{AccountType}-{data.AccountId}"))
+                //{
+                //    depositAccountModel = new DepositAccountModel();
+                //    depositAccountModel.AccountType = AccountType;
+                //    depositAccountModel.AccountId = data.AccountId;
+                //    depositAccountModel.AccountName = data.AccountName;
+
+                //    accountKeyValuePairs.Add($"{AccountType}-{data.AccountId}", depositAccountModel);
+                //}
+
+                //depositAccountModel = accountKeyValuePairs[$"{AccountType}-{data.AccountId}"];
+
+                if (!accountDateKeyValuePairs.ContainsKey($"{AccountType}-{data.AccountId}-{dateFormat}-{data.CurrencyId}"))
+                {
+                    depositByDateDictionaryModel = new DepositByDateReportModel();
+                    depositByDateDictionaryModel.Date = dateFormat;
+                    depositByDateDictionaryModel.CurrencyId = data.CurrencyId;
+                    depositByDateDictionaryModel.IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
+
+                    accountDateKeyValuePairs.Add($"{AccountType}-{data.AccountId}-{dateFormat}-{data.CurrencyId}", depositByDateDictionaryModel);
+                }
+
+                depositByDateDictionaryModel = accountDateKeyValuePairs[$"{AccountType}-{data.AccountId}-{dateFormat}-{data.CurrencyId}"];
+                rate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
+
+                depositByDateDictionaryModel.TotalAmount += RoundingNumber(data.DepositSummary, 2); ;
+                depositByDateDictionaryModel.TotalAmountInMYR += RoundingNumber(data.DepositSummary * rate, 2);
+                depositByDateDictionaryModel.TotalCount += data.TotalCount;
+                depositByDateDictionaryModel.SuccessCount += data.SuccessCount;
+                depositByDateDictionaryModel.FTDCount += data.FTDCount;
+
+            }
+
+            //Account Data Special Averange Value Caculate
+            foreach (var accountItem in accountKeyValuePairs)
+            {
+                DepositByDateReportModel depositByDateDictionaryModel = null;
+
+                foreach (var date in dateList)
+                {
+                    foreach (var curr in CurrencyIds)
+                    {
+                        if (!accountDateKeyValuePairs.ContainsKey($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-{date}-{curr}"))
+                        {
+                            depositByDateDictionaryModel = new DepositByDateReportModel();
+                            depositByDateDictionaryModel.Date = date;
+                            depositByDateDictionaryModel.CurrencyId = curr;
+                            depositByDateDictionaryModel.IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+
+                            accountDateKeyValuePairs.Add($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-{date}-{curr}", depositByDateDictionaryModel);
+                        }
+
+                        var dateItem = accountDateKeyValuePairs[$"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-{date}-{curr}"];
+
+                        dateItem.AverangeDeposit = dateItem.SuccessCount == 0 ? 0 : RoundingNumber(dateItem.TotalAmount / dateItem.SuccessCount, 2);
+                        dateItem.SuccessRate = dateItem.TotalCount == 0 ? "0%" : TransformToPercentage((decimal)dateItem.SuccessCount / dateItem.TotalCount, 2);
+
+                    }
+                }
+
+                accountItem.Value.DateData = accountDateKeyValuePairs.Where(x=>x.Key.StartsWith($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}"))
+                                                                     .Select(s => s.Value)
+                                                                     .OrderBy(value => value.Date)
+                                                                     .ThenBy(value => value.CurrencyId)
+                                                                     .ToList();
+
+            }
+
+            //Summary Data Special Averange Value Caculate
+            //summaryTotalData.TotalAmount = summaryTotalData.OnlineDeposit + summaryTotalData.MobileDeposit + summaryTotalData.LocalDeposit;
+            //summaryTotalData.AverangeDeposit = summaryTotalData.SuccessCount == 0 ? 0 : RoundingNumber((summaryTotalData.OnlineDeposit + summaryTotalData.MobileDeposit + summaryTotalData.LocalDeposit) / summaryTotalData.SuccessCount, 2);
+            //summaryTotalData.SuccessRate = summaryTotalData.TotalCount == 0 ? "0%" : TransformToPercentage((decimal)summaryTotalData.SuccessCount / summaryTotalData.TotalCount, 2);
+            //summaryTotalData.AverangeProcessingTime = summaryTotalData.SuccessCount == 0 ? TimeSpan.FromSeconds(0).ToString() : TimeSpan.FromSeconds(summaryTotalData.TotalProcessingTime / summaryTotalData.SuccessCount).ToString();
+
+            //summaryTotalData.OnlinePrecent = summaryTotalData.TotalAmount == 0 ? "0%" : TransformToPercentage(summaryTotalData.OnlineDeposit / summaryTotalData.TotalAmount, 2);
+            //summaryTotalData.MobilePrecent = summaryTotalData.TotalAmount == 0 ? "0%" : TransformToPercentage(summaryTotalData.MobileDeposit / summaryTotalData.TotalAmount, 2);
+            //summaryTotalData.LocalPrecent = summaryTotalData.TotalAmount == 0 ? "0%" : TransformToPercentage(summaryTotalData.LocalDeposit / summaryTotalData.TotalAmount, 2);
+
             #endregion
 
+            #region Account Currency Data And Summary Currency Data
+
+            ////Base Value Caculate
+            //foreach (var data in depositDetailList)
+            //{
+            //    DepositAccountModel depositAccountModel = null;
+            //    DepositSummaryReportModel accountCurrencyModel = null;
+            //    DepositSummaryReportModel summaryCurrencyModel = null;
+            //    decimal rate = 0;
+            //    int AccountType = 0;
+
+            //    switch (data.DepositType)
+            //    {
+            //        case DepositType.LocalBank:
+            //            AccountType = 3;
+            //            break;
+            //        default:
+            //            AccountType = 99;
+            //            break;
+            //    }
+
+            //    rate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
+
+            //    depositAccountModel = accountKeyValuePairs[$"{AccountType}-{data.AccountId}"];
+
+            //    //accountCurrencyDataModel = depositAccountModel.SummaryData.Where(x => x.CurrencyId == data.CurrencyId).FirstOrDefault();
+
+            //    if (!depositAccountModel.SummaryData.Select(x => x.CurrencyId).Contains(data.CurrencyId))
+            //    {
+            //        accountCurrencyModel = new DepositSummaryReportModel();
+            //        accountCurrencyModel.CurrencyId = data.CurrencyId;
+            //        accountCurrencyModel.IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
+
+            //        depositAccountModel.SummaryData.Add(accountCurrencyModel);
+            //    }
+
+            //    if (!summaryCurrencyData.Select(x => x.CurrencyId).Contains(data.CurrencyId))
+            //    {
+            //        summaryCurrencyModel = new DepositSummaryReportModel();
+            //        summaryCurrencyModel.CurrencyId = data.CurrencyId;
+            //        summaryCurrencyModel.IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
+
+            //        summaryCurrencyData.Add(summaryCurrencyModel);
+            //    }
+
+            //    accountCurrencyModel = depositAccountModel.SummaryData.Where(x => x.CurrencyId == data.CurrencyId).FirstOrDefault();
+            //    summaryCurrencyModel = summaryCurrencyData.Where(x => x.CurrencyId == data.CurrencyId).FirstOrDefault();
+
+            //    accountCurrencyModel.TotalAmount += data.DepositSummary;
+            //    accountCurrencyModel.TotalAmountInMYR += RoundingNumber(data.DepositSummary * rate, 2);
+            //    accountCurrencyModel.TotalCount += data.TotalCount;
+            //    accountCurrencyModel.SuccessCount += data.SuccessCount;
+            //    accountCurrencyModel.FTDCount += data.FTDCount;
+            //    accountCurrencyModel.TotalProcessingTime += data.TotalProcessingTime;
+
+            //    summaryCurrencyModel.TotalAmount += data.DepositSummary;
+            //    summaryCurrencyModel.TotalAmountInMYR += RoundingNumber(data.DepositSummary * rate, 2);
+            //    summaryCurrencyModel.TotalCount += data.TotalCount;
+            //    summaryCurrencyModel.SuccessCount += data.SuccessCount;
+            //    summaryCurrencyModel.FTDCount += data.FTDCount;
+            //    summaryCurrencyModel.TotalProcessingTime += data.TotalProcessingTime;
+
+            //    switch (data.DepositType)
+            //    {
+            //        case DepositType.OnlineBanking:
+            //            accountCurrencyModel.OnlineDeposit += data.DepositSummary;
+            //            accountCurrencyModel.OnlineDepositInMYR += RoundingNumber(data.DepositSummary * rate, 2);
+            //            summaryCurrencyModel.OnlineDeposit += data.DepositSummary;
+            //            summaryCurrencyModel.OnlineDepositInMYR += RoundingNumber(data.DepositSummary * rate, 2);
+            //            break;
+            //        case DepositType.MobilePayment:
+            //            accountCurrencyModel.MobileDeposit += data.DepositSummary;
+            //            accountCurrencyModel.MobileDepositInMYR += RoundingNumber(data.DepositSummary * rate, 2);
+            //            summaryCurrencyModel.MobileDeposit += data.DepositSummary;
+            //            summaryCurrencyModel.MobileDepositInMYR += RoundingNumber(data.DepositSummary * rate, 2);
+            //            break;
+            //        case DepositType.LocalBank:
+            //            accountCurrencyModel.LocalDeposit += data.DepositSummary;
+            //            accountCurrencyModel.LocalDepositInMYR += RoundingNumber(data.DepositSummary * rate, 2);
+            //            summaryCurrencyModel.LocalDeposit += data.DepositSummary;
+            //            summaryCurrencyModel.LocalDepositInMYR += RoundingNumber(data.DepositSummary * rate, 2);
+            //            break;
+            //    }
+            //}
+
+            ////Account Data Special Averange Value Caculate
+            //foreach (var accountItem in accountKeyValuePairs)
+            //{
+            //    DepositSummaryReportModel accountCurrencyModel = null;
+            //    //補0
+            //    foreach (var curr in CurrencyIds)
+            //    {
+            //        if (!accountItem.Value.SummaryData.Select(x => x.CurrencyId).Contains(curr))
+            //        {
+            //            accountCurrencyModel = new DepositSummaryReportModel();
+            //            accountCurrencyModel.CurrencyId = curr;
+            //            accountCurrencyModel.IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+
+            //            accountItem.Value.SummaryData.Add(accountCurrencyModel);
+            //        }
+            //    }
+
+            //    foreach (var accountCurrencyItem in accountItem.Value.SummaryData)
+            //    {
+            //        accountCurrencyItem.OnlinePrecent = accountItem.Value.SummaryTotalData.TotalAmount == 0 ? "0%" : TransformToPercentage(accountCurrencyItem.OnlineDepositInMYR / accountItem.Value.SummaryTotalData.TotalAmount, 2);
+            //        accountCurrencyItem.MobilePrecent = accountItem.Value.SummaryTotalData.TotalAmount == 0 ? "0%" : TransformToPercentage(accountCurrencyItem.MobileDepositInMYR / accountItem.Value.SummaryTotalData.TotalAmount, 2);
+            //        accountCurrencyItem.LocalPrecent = accountItem.Value.SummaryTotalData.TotalAmount == 0 ? "0%" : TransformToPercentage(accountCurrencyItem.LocalDepositInMYR / accountItem.Value.SummaryTotalData.TotalAmount, 2);
+
+            //        accountCurrencyItem.AverangeDeposit = accountCurrencyItem.SuccessCount == 0 ? 0 : RoundingNumber((accountCurrencyItem.OnlineDeposit + accountCurrencyItem.MobileDeposit + accountCurrencyItem.LocalDeposit) / accountCurrencyItem.SuccessCount, 2);
+            //        accountCurrencyItem.SuccessRate = accountCurrencyItem.TotalCount == 0 ? "0%" : TransformToPercentage((decimal)accountCurrencyItem.SuccessCount / accountCurrencyItem.TotalCount, 2);
+            //        accountCurrencyItem.AverangeProcessingTime = accountCurrencyItem.SuccessCount == 0 ? TimeSpan.FromSeconds(0).ToString() : TimeSpan.FromSeconds(accountCurrencyItem.TotalProcessingTime / accountCurrencyItem.SuccessCount).ToString();
+            //    }
+
+            //}
+
+            ////Summary Data Zero Fill
+            //foreach (var curr in CurrencyIds)
+            //{
+            //    DepositSummaryReportModel summaryCurrencyModel = null;
+
+            //    if (!summaryCurrencyData.Select(x => x.CurrencyId).Contains(curr))
+            //    {
+            //        summaryCurrencyModel = new DepositSummaryReportModel();
+            //        summaryCurrencyModel.CurrencyId = curr;
+            //        summaryCurrencyModel.IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+
+            //        summaryCurrencyData.Add(summaryCurrencyModel);
+            //    }
+            //}
+
+            ////Summary Data Special Averange Value Caculate
+            //foreach (var currencyItem in summaryCurrencyData)
+            //{
+            //    currencyItem.OnlinePrecent = summaryTotalData.TotalAmount == 0 ? "0%" : TransformToPercentage(currencyItem.OnlineDepositInMYR / summaryTotalData.TotalAmount, 2);
+            //    currencyItem.MobilePrecent = summaryTotalData.TotalAmount == 0 ? "0%" : TransformToPercentage(currencyItem.MobileDepositInMYR / summaryTotalData.TotalAmount, 2);
+            //    currencyItem.LocalPrecent = summaryTotalData.TotalAmount == 0 ? "0%" : TransformToPercentage(currencyItem.LocalDepositInMYR / summaryTotalData.TotalAmount, 2);
+
+            //    currencyItem.AverangeDeposit = currencyItem.SuccessCount == 0 ? 0 : RoundingNumber((currencyItem.OnlineDeposit + currencyItem.MobileDeposit + currencyItem.LocalDeposit) / currencyItem.SuccessCount, 2);
+            //    currencyItem.SuccessRate = summaryTotalData.TotalCount == 0 ? "0%" : TransformToPercentage((decimal)currencyItem.SuccessCount / summaryTotalData.TotalCount, 2);
+            //    currencyItem.AverangeProcessingTime = currencyItem.SuccessCount == 0 ? TimeSpan.FromSeconds(0).ToString() : TimeSpan.FromSeconds(currencyItem.TotalProcessingTime / currencyItem.SuccessCount).ToString();
+            //}
+
+            #endregion
+
+            #endregion
 
             var accountData = accountKeyValuePairs.Select(s => s.Value).OrderBy(value => value.AccountType)
                                                          .ThenBy(value => value.AccountId);

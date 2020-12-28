@@ -19,7 +19,9 @@ const App = () => {
         Datas: null,
         FilterInfo: null,
         CurrencyList: null,
-        TotalResult: null
+        TotalResult: null,
+        DateDatas: null,
+        DateTotalResult: null
     });
 
     const [siteList, setSiteList] = useState();
@@ -128,6 +130,8 @@ const App = () => {
                 let result = [];
                 let currencyList =[];
                 let totalResult=[];
+                let dataResult=[];
+                let dateTotalResult=[];
 
                 stateFilter.Currency.map(curr=>{
                     currencyList.push
@@ -238,6 +242,7 @@ const App = () => {
 
                 });
 
+                //Summary Currency Data
                 res.data.data[0].summaryCurrencyData.forEach(elem => {
 
                         let onlineColDef = `onlineSummary_${elem.currencyId}`;
@@ -274,6 +279,62 @@ const App = () => {
 
                 });
 
+                //Date Data
+                res.data.data[0].summaryAccountData.forEach(elem => {
+
+                    dataResult.push({
+
+                        'accountType':elem.accountType,
+                        'accountId':elem.accountId,
+                        'accountName':elem.accountName,
+                        'dateData':[],
+
+                        'totalAmountSummary': elem.summaryTotalData.totalAmount,
+                        'totalCountSummary': elem.summaryTotalData.totalCount,
+                        'averangeAmountSummary': elem.summaryTotalData.averangeDeposit,
+                        'successRateSummary': elem.summaryTotalData.successRate,
+                        'ftdCountSummary': elem.summaryTotalData.ftdCount
+                    });
+
+                    let getItem = dataResult.find(x=>x.accountType === elem.accountType 
+                                                  && x.accountId === elem.accountId);
+
+                    elem.dateData.forEach(data => {
+                        
+                        let totalAmountColDef = `totalAmount_${data.currencyId}`;
+                        let totalCountColDef = `totalCount_${data.currencyId}`;
+                        let averangeAmountColDef = `averangeAmount_${data.currencyId}`;
+                        let successRateColDef = `successRate_${data.currencyId}`;
+                        let ftdCountColDef = `ftdCount_${data.currencyId}`;
+
+                        let getDateItem=getItem.dateData.find(x=>x.date === data.date);
+
+                        if(getDateItem)
+                        {
+                            getDateItem[totalAmountColDef] = data.totalAmount;
+                            getDateItem[totalCountColDef] = data.totalCount;
+                            getDateItem[averangeAmountColDef] = data.averangeDeposit;
+                            getDateItem[successRateColDef] = data.successRate;
+                            getDateItem[ftdCountColDef] = data.ftdCount;
+                        }
+                        else
+                        {
+                            getItem.dateData.push({
+                                'date':data.date,
+
+                                [totalAmountColDef]: data.totalAmount,
+                                [totalCountColDef]: data.totalCount,
+                                [averangeAmountColDef]: data.averangeDeposit,
+                                [successRateColDef]: data.successRate,
+                                [ftdCountColDef]: data.ftdCount
+
+                            });
+                        }
+                    });
+
+                });
+
+
                 setDatas(
                     {
                         Datas:[
@@ -302,6 +363,30 @@ const App = () => {
                                            key.startsWith('mobileSummary') ||
                                            key.startsWith('localSummary') ||
                                            key.startsWith('totalAmount') || 
+                                           key.startsWith('averangeAmount')){
+                                            item[key] = number_format(number_toFixed(item[key], 2));
+                                        }
+                                    });
+        
+                                    return {...item}
+                                })
+                        ],
+                        DateDatas:[
+                            ...dataResult.map(item=>{
+                                    Object.keys(item).forEach(key => {
+                                        if(key.startsWith('totalAmount') || 
+                                           key.startsWith('averangeAmount')){
+                                            item[key] = number_format(number_toFixed(item[key], 2));
+                                        }
+                                    });
+        
+                                    return {...item}
+                                })
+                        ],
+                        DateTotalReuslt:[
+                            ...dateTotalResult.map(item=>{
+                                    Object.keys(item).forEach(key => {
+                                        if(key.startsWith('totalAmount') || 
                                            key.startsWith('averangeAmount')){
                                             item[key] = number_format(number_toFixed(item[key], 2));
                                         }

@@ -88,7 +88,7 @@ namespace BackendSite.Service.Model
         {
             get;
             set;
-        }
+        } = new List<DepositByDateReportModel>();
 
         public DepositByDateReportModel DateTotalData
         {
@@ -227,7 +227,65 @@ namespace BackendSite.Service.Model
 
     public class DepositByDateReportModel
     {
+        public string Date
+        {
+            get;
+            set;
+        }
 
+        public int CurrencyId
+        {
+            get;
+            set;
+        }
+
+        public string IsoCode
+        {
+            get;
+            set;
+        }
+
+        public decimal TotalAmount
+        {
+            get;
+            set;
+        }
+
+        public decimal TotalAmountInMYR
+        {
+            get;
+            set;
+        }
+
+        public decimal AverangeDeposit
+        {
+            get;
+            set;
+        }
+
+        public int TotalCount
+        {
+            get;
+            set;
+        }
+
+        public int SuccessCount
+        {
+            get;
+            set;
+        }
+
+        public string SuccessRate
+        {
+            get;
+            set;
+        }
+
+        public int FTDCount
+        {
+            get;
+            set;
+        }
     }
 
     #endregion
