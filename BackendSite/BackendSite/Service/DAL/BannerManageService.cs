@@ -26,7 +26,9 @@ namespace BackendSite.Service.DAL
             p.Add("SiteId", bannerInfo.SiteId);
             p.Add("BannerType", bannerInfo.BannerType);
             p.Add("ActionMode", bannerInfo.ActionMode);
-            p.Add("ShowIndex", bannerInfo.ShowIndex);
+            p.Add("ShowStatus", bannerInfo.ShowStatus);
+            p.Add("UnixStartTime", bannerInfo.UnixStartTime);
+            p.Add("UnixEndTime", bannerInfo.UnixEndTime);
             p.Add("BonusCode", bannerInfo.BonusCode);
             p.Add("MatchId", bannerInfo.MatchId);
             p.Add("TpId", bannerInfo.TpId);
@@ -57,7 +59,9 @@ namespace BackendSite.Service.DAL
                     result.BannerName = queryresult.BannerName;
                     result.BannerType = Convert.ToInt32(queryresult.BannerType);
                     result.ActionMode = Convert.ToInt32(queryresult.ActionMode);
-                    result.ShowIndex = Convert.ToInt32(queryresult.ShowIndex);
+                    result.ShowStatus = Convert.ToInt32(queryresult.ShowStatus);
+                    result.StartTime = queryresult.StartTime;
+                    result.EndTime = queryresult.EndTime;
                     result.BonusCode = queryresult.BonusCode;
                     result.MatchId = queryresult.MatchId;
                     result.TpId = queryresult.TpId;

@@ -82,7 +82,7 @@ const DepositReport = lazy(() =>
 	import("./pages/Report/DepositReport/index")
 );
 
-export const defaultPage = "DepositReport";
+export const defaultPage = "BannerManage";
 
 export const layoutType = {
 	N88: "N88",

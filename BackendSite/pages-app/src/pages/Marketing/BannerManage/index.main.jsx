@@ -1,6 +1,6 @@
 import React from "react";
 import moment from "moment";
-import { defBannerType, defActionModeType, defShowIndexType } from "./defCols";
+import { defBannerType, defActionModeType, defShowStatusType } from "./defCols";
 const SpecialItemType = {
 	actionBtn: "actionBtn",
 	statusBtn: "statusBtn"
@@ -14,8 +14,8 @@ const actionModeTypeFormat = type => {
 	return defActionModeType[type];
 };
 
-const showIndexTypeFormat = type => {
-	return defShowIndexType[type];
+const showStatusTypeFormat = type => {
+	return defShowStatusType[type];
 };
 
 const StatusBtn = ({ checked, onChange, mainKey }) => {
@@ -32,6 +32,10 @@ const StatusBtn = ({ checked, onChange, mainKey }) => {
 			<label htmlFor={id}></label>
 		</div>
 	);
+};
+
+const dateFormat = createTime => {
+	return moment(createTime).format("l LTS");
 };
 
 const lastUpdateUserFormat = userName => {
@@ -56,9 +60,19 @@ const titleData = [
 		body: { format: actionModeTypeFormat }
 	},
 	{
-		dataColumn: "showIndex",
-		columnTitle: "ShowIndex",
-		body: { format: showIndexTypeFormat }
+		dataColumn: "showStatus",
+		columnTitle: "ShowStatus",
+		body: { format: showStatusTypeFormat }
+	},
+	{
+		dataColumn: "startTime",
+		columnTitle: "Start Time",
+		body: { format: dateFormat }
+	},
+	{
+		dataColumn: "endTime",
+		columnTitle: "End Time",
+		body: { format: dateFormat }
 	},
 	{
 		dataColumn: "lastUpdateUser",
