@@ -157,10 +157,16 @@ namespace BackendSite.Service.DAL
                     StartDate = startDate,
                     EndDate = endDate
                 });
-
                 string SpName = "Admin_Report_DepositDetailByDay_Get";
-                return conn.Query<DepositReportParticalModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+                return conn.Query<DepositReportParticalModel>(SpName, parameters, commandType: CommandType.StoredProcedure,commandTimeout:180);
             }
+            
+            //Test Data
+            //using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            //{
+            //    string SpName = "Temp_EttaReportTest_Get";
+            //    return conn.Query<DepositReportParticalModel>(SpName, commandType: CommandType.StoredProcedure);
+            //}
         }
 
         public IEnumerable<ServerInfoModel> GetServerInfoList()

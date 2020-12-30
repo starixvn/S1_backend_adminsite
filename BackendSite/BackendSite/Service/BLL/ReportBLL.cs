@@ -21,7 +21,7 @@ namespace BackendSite.Service.BLL
         }
 
 
-        #region Liberay Formula
+        #region Library Formula
 
         /// <summary>
         /// 亞洲四捨五入
@@ -461,10 +461,12 @@ namespace BackendSite.Service.BLL
         {
 
             Dictionary<string, DepositAccountModel> accountKeyValuePairs = new Dictionary<string, DepositAccountModel>();
+            Dictionary<string, DepositByDateReportModel> accountDateKeyValuePairs = new Dictionary<string, DepositByDateReportModel>();
+            Dictionary<string, DepositByDateReportModel> accountDateTotalKeyValuePairs = new Dictionary<string, DepositByDateReportModel>();
 
             List<DepositSummaryReportModel> summaryCurrencyData = new List<DepositSummaryReportModel>();
             DepositSummaryReportModel summaryTotalData = new DepositSummaryReportModel();
-            
+
             #region Get Data
 
             var depositDetailList = reportService.GetDepositReport(siteIds,
@@ -483,7 +485,7 @@ namespace BackendSite.Service.BLL
             //Base Value Caculate
             foreach (var data in depositDetailList)
             {
-                
+
                 DepositAccountModel depositAccountModel = null;
                 decimal rate = 0;
                 int AccountType = 0;
@@ -589,8 +591,6 @@ namespace BackendSite.Service.BLL
 
                 depositAccountModel = accountKeyValuePairs[$"{AccountType}-{data.AccountId}"];
 
-                //accountCurrencyDataModel = depositAccountModel.SummaryData.Where(x => x.CurrencyId == data.CurrencyId).FirstOrDefault();
-
                 if (!depositAccountModel.SummaryData.Select(x => x.CurrencyId).Contains(data.CurrencyId))
                 {
                     accountCurrencyModel = new DepositSummaryReportModel();
@@ -689,7 +689,7 @@ namespace BackendSite.Service.BLL
                     summaryCurrencyModel = new DepositSummaryReportModel();
                     summaryCurrencyModel.CurrencyId = curr;
                     summaryCurrencyModel.IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
-                    
+
                     summaryCurrencyData.Add(summaryCurrencyModel);
                 }
             }
@@ -712,8 +712,126 @@ namespace BackendSite.Service.BLL
 
             #region  Combine Data：Date Data
 
+            List<string> dateList = depositDetailList.Select(x => x.Date.ToString("yyyy/MM/dd")).Distinct().ToList();
+
+            #region Account Total Data And Summary Total Data
+
+            //Base Value Caculate
+            foreach (var data in depositDetailList)
+            {
+                DepositByDateReportModel depositByDateReportModel = null;
+                DepositByDateReportModel depositByDateReportTotalModel = null;
+                decimal rate = 0;
+                int AccountType = 0;
+                string dateFormat = data.Date.ToString("yyyy/MM/dd");
+
+                switch (data.DepositType)
+                {
+                    case DepositType.LocalBank:
+                        AccountType = 3;
+                        break;
+                    default:
+                        AccountType = 99;
+                        break;
+                }
+
+                if (!accountDateKeyValuePairs.ContainsKey($"{AccountType}-{data.AccountId}-{dateFormat}-{data.CurrencyId}"))
+                {
+                    depositByDateReportModel = new DepositByDateReportModel();
+                    depositByDateReportModel.Date = dateFormat;
+                    depositByDateReportModel.CurrencyId = data.CurrencyId;
+                    depositByDateReportModel.IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
+
+                    accountDateKeyValuePairs.Add($"{AccountType}-{data.AccountId}-{dateFormat}-{data.CurrencyId}", depositByDateReportModel);
+                }
+
+                depositByDateReportModel = accountDateKeyValuePairs[$"{AccountType}-{data.AccountId}-{dateFormat}-{data.CurrencyId}"];
+                rate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
+
+                depositByDateReportModel.TotalAmount += RoundingNumber(data.DepositSummary, 2); ;
+                depositByDateReportModel.TotalAmountInMYR += RoundingNumber(data.DepositSummary * rate, 2);
+                depositByDateReportModel.TotalCount += data.TotalCount;
+                depositByDateReportModel.SuccessCount += data.SuccessCount;
+                depositByDateReportModel.FTDCount += data.FTDCount;
+
+                if (!accountDateTotalKeyValuePairs.ContainsKey($"{AccountType}-{data.AccountId}-{dateFormat}"))
+                {
+                    depositByDateReportTotalModel = new DepositByDateReportModel();
+                    depositByDateReportTotalModel.Date = dateFormat;
+
+                    accountDateTotalKeyValuePairs.Add($"{AccountType}-{data.AccountId}-{dateFormat}", depositByDateReportTotalModel);
+                }
+
+                depositByDateReportTotalModel = accountDateTotalKeyValuePairs[$"{AccountType}-{data.AccountId}-{dateFormat}"];
+                rate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
+
+                depositByDateReportTotalModel.TotalAmount += RoundingNumber(data.DepositSummary * rate, 2);
+                depositByDateReportTotalModel.TotalCount += data.TotalCount;
+                depositByDateReportTotalModel.SuccessCount += data.SuccessCount;
+                depositByDateReportTotalModel.FTDCount += data.FTDCount;
+
+            }
+
+            //Account Data Special Averange Value Caculate
+            foreach (var accountItem in accountKeyValuePairs)
+            {
+                DepositByDateReportModel depositByDateReportModel = null;
+                DepositByDateReportModel depositByDateReportTotalModel = null;
+
+                foreach (var date in dateList)
+                {
+                    
+                    foreach (var curr in CurrencyIds)
+                    {
+                        if (!accountDateKeyValuePairs.ContainsKey($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-{date}-{curr}"))
+                        {
+                            depositByDateReportModel = new DepositByDateReportModel();
+                            depositByDateReportModel.Date = date;
+                            depositByDateReportModel.CurrencyId = curr;
+                            depositByDateReportModel.IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+
+                            accountDateKeyValuePairs.Add($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-{date}-{curr}", depositByDateReportModel);
+                        }
+
+                        var dateItem = accountDateKeyValuePairs[$"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-{date}-{curr}"];
+
+                        dateItem.AverangeDeposit = dateItem.SuccessCount == 0 ? 0 : RoundingNumber(dateItem.TotalAmount / dateItem.SuccessCount, 2);
+                        dateItem.SuccessRate = dateItem.TotalCount == 0 ? "0%" : TransformToPercentage((decimal)dateItem.SuccessCount / dateItem.TotalCount, 2);
+
+                    }
+
+                    if (!accountDateTotalKeyValuePairs.ContainsKey($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-{date}"))
+                    {
+                        depositByDateReportTotalModel = new DepositByDateReportModel();
+                        depositByDateReportTotalModel.Date = date;
+
+                        accountDateTotalKeyValuePairs.Add($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-{date}", depositByDateReportTotalModel);
+                    }
+
+                    var dateTotalItem = accountDateTotalKeyValuePairs[$"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-{date}"];
+
+                    dateTotalItem.AverangeDeposit = dateTotalItem.SuccessCount == 0 ? 0 : RoundingNumber(dateTotalItem.TotalAmount / dateTotalItem.SuccessCount, 2);
+                    dateTotalItem.SuccessRate = dateTotalItem.TotalCount == 0 ? "0%" : TransformToPercentage((decimal)dateTotalItem.SuccessCount / dateTotalItem.TotalCount, 2);
+
+                }
+
+                accountItem.Value.DateData = accountDateKeyValuePairs.Where(x=>x.Key.StartsWith($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-"))
+                                                                     .Select(s => s.Value)
+                                                                     .OrderBy(value => value.Date)
+                                                                     .ThenBy(value => value.CurrencyId)
+                                                                     .ToList();
+
+                accountItem.Value.DateTotalData = accountDateTotalKeyValuePairs.Where(x => x.Key.StartsWith($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-"))
+                                                                     .Select(s => s.Value)
+                                                                     .OrderBy(value => value.Date)
+                                                                     .ToList();
+
+
+            }
+
             #endregion
 
+            #endregion
 
             var accountData = accountKeyValuePairs.Select(s => s.Value).OrderBy(value => value.AccountType)
                                                          .ThenBy(value => value.AccountId);

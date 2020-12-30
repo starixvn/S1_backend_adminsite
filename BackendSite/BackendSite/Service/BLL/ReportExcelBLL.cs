@@ -46,7 +46,7 @@ namespace BackendSite.Service.BLL
 
         public List<string> TotalTitles { get; set; }
 
-        public List<Dictionary<string, int>> TitlesToMerge { get; set; }
+        public List<Dictionary<string, MergeTitleModel>> TitlesToMerge { get; set; }
 
         public List<string> NotSummaryTitles { get; set; } = new List<string>();
 
@@ -55,6 +55,20 @@ namespace BackendSite.Service.BLL
         public bool IsTotalTitleMax { get; set; } = false;
 
     }
+
+    #region
+
+    /// <summary>
+    /// 合併標題模型
+    /// </summary>
+    public class MergeTitleModel
+    {
+        public string Name { get; set; }
+
+        public int MergeRange { get; set; }
+    }
+
+    #endregion
 
     #endregion
 
@@ -117,12 +131,12 @@ namespace BackendSite.Service.BLL
             using var ms = new MemoryStream();
             using var p = new ExcelPackage(ms);
 
-            int currentRow = 1;
-
             if (t.Any())
             {
                 foreach (var s in t)
                 {
+                    int currentRow = 1;
+
                     var ws = p.Workbook.Worksheets.Add(s.SheetName);
 
                     if (s.Content.Any())
@@ -231,7 +245,7 @@ namespace BackendSite.Service.BLL
         #region ComplexReportExportMergeRowHeader
 
         private int ComplexReportExportMergeRowHeader(ExcelWorksheet ws,
-                                                      List<Dictionary<string, int>> mergeTitles,
+                                                      List<Dictionary<string, MergeTitleModel>> mergeTitles,
                                                       int currentRow)
         {
             return ComplexReportSetMergeHeader(ws,
@@ -240,7 +254,7 @@ namespace BackendSite.Service.BLL
         }
 
         private int ComplexReportSetMergeHeader(ExcelWorksheet ws,
-                                                List<Dictionary<string, int>> mergeTitlesList,
+                                                List<Dictionary<string, MergeTitleModel>> mergeTitlesList,
                                                 int currentRow)
         {
             foreach (var mergeTitles in mergeTitlesList)
@@ -249,25 +263,39 @@ namespace BackendSite.Service.BLL
                 for (var i = 0; i < mergeTitles.Count(); i++)
                 {
                     var cell = ws.Cells[currentRow, cellCount];
-                    cell.Value = mergeTitles.ElementAt(i).Key;
+                    cell.Value = mergeTitles.ElementAt(i).Value.Name;
 
                     //Cell Merging
-                    ws.Cells[currentRow, cellCount, currentRow, cellCount + mergeTitles.ElementAt(i).Value - 1].Merge = true;
+                    ws.Cells[currentRow, cellCount, currentRow, cellCount + mergeTitles.ElementAt(i).Value.MergeRange - 1].Merge = true;
 
                     //Style  Setting
                     cell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
 
-                    if (i % 2 == 1)
+                    if(currentRow % 2 ==1)
                     {
-                        cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                        if (i % 2 == 1)
+                        {
+                            cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#FFCF78"));
+                        }
+                        else
+                        {
+                            cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#FF7878"));
+                        }
                     }
                     else
                     {
-                        cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#E8C1B7"));
+                        if (i % 2 == 1)
+                        {
+                            cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                        }
+                        else
+                        {
+                            cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#E8C1B7"));
+                        }
                     }
 
-                    for (int j = cellCount; j < (cellCount + mergeTitles.ElementAt(i).Value); j++)
+                    for (int j = cellCount; j < (cellCount + mergeTitles.ElementAt(i).Value.MergeRange); j++)
                     {
                         ws.Cells[currentRow, j].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
                         ws.Cells[currentRow, j].Style.Border.Top.Style = ExcelBorderStyle.Medium;
@@ -276,7 +304,7 @@ namespace BackendSite.Service.BLL
                     }
 
                     ws.Column(i + 1).AutoFit();
-                    cellCount = cellCount + mergeTitles.ElementAt(i).Value;
+                    cellCount = cellCount + mergeTitles.ElementAt(i).Value.MergeRange;
                 }
                 currentRow++;
             }

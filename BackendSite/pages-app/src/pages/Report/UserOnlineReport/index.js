@@ -157,7 +157,6 @@ const App = () => {
     }
 
     const ExportToExcel = () => {
-        console.log(stateDatas);
         if (stateDatas.FilterInfo.SiteIds.length === 0) {
             alert("Please Choose at least one Site.")
             return false;
