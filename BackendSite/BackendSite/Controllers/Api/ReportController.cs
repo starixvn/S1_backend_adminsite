@@ -77,7 +77,7 @@ namespace BackendSite.Controllers.Api
 
             List<Dictionary<string, dynamic>> byDate = new List<Dictionary<string, dynamic>>();
             Dictionary<string, TitleModel> byDateTitles = new Dictionary<string, TitleModel>();
-            List<Dictionary<string, int>> titlesToMerge = new List<Dictionary<string, int>>();
+            List<Dictionary<string, MergeTitleModel>> titlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
             List<string> notSummaryTitles = new List<string> { "Key", "Date", "CurrencyId", "Currency" };
             List<string> totalTitle = new List<string>
             {
@@ -367,18 +367,18 @@ namespace BackendSite.Controllers.Api
 
             #region Titles To Merge
 
-            Dictionary<string, int> mergeTitles = new Dictionary<string, int>();
-            mergeTitles.Add("", 1);
+            Dictionary<string, MergeTitleModel> mergeTitles = new Dictionary<string, MergeTitleModel>();
+            mergeTitles.Add("FirstMergeTitle",new MergeTitleModel { Name="",MergeRange=1});
 
-            mergeTitles.Add("Deposit", currencyList.Count() + 1);
-            mergeTitles.Add("Withdrawal", currencyList.Count() + 1);
-            mergeTitles.Add("Nett", currencyList.Count() + 1);
-            mergeTitles.Add("Bonus", currencyList.Count() + 1);
-            mergeTitles.Add("Rebate", currencyList.Count() + 1);
-            mergeTitles.Add("Adjustment", currencyList.Count() + 1);
-            mergeTitles.Add("TurnOver(Stake)", currencyList.Count() + 1);
-            mergeTitles.Add("TurnOver(ValidBet)", currencyList.Count() + 1);
-            mergeTitles.Add("WinLoss", currencyList.Count() + 1);
+            mergeTitles.Add("Deposit", new MergeTitleModel { Name = "Deposit", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("Withdrawal", new MergeTitleModel { Name = "Withdrawal", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("Nett", new MergeTitleModel { Name = "Nett", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("Bonus", new MergeTitleModel { Name = "Bonus", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("Rebate", new MergeTitleModel { Name = "Rebate", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("Adjustment", new MergeTitleModel { Name = "Adjustment", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("TurnOverStake", new MergeTitleModel { Name = "TurnOver(Stake)", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("TurnOverValidBet", new MergeTitleModel { Name = "TurnOver(ValidBet)", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("WinLoss", new MergeTitleModel { Name = "WinLoss", MergeRange = currencyList.Count() + 1 });
 
             titlesToMerge.Add(mergeTitles);
 
@@ -457,7 +457,7 @@ namespace BackendSite.Controllers.Api
             Dictionary<string, TitleModel> turnOverTitles = new Dictionary<string, TitleModel>();
             List<Dictionary<string, dynamic>> winLossContent = new List<Dictionary<string, dynamic>>();
             Dictionary<string, TitleModel> winLossTitles = new Dictionary<string, TitleModel>();
-            List<Dictionary<string, int>> titlesToMerge = new List<Dictionary<string, int>>();
+            List<Dictionary<string, MergeTitleModel>> titlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
             List<string> notSummaryTitles = new List<string> { "Key", "CurrencyId", "Currency", "CategoryId", "CategoryName", "GameId", "GameName" };
             List<string> totalTitle = new List<string>
             {
@@ -805,14 +805,14 @@ namespace BackendSite.Controllers.Api
             }
 
             #region Titles To Merge
-            Dictionary<string, int> mergeTitles = new Dictionary<string, int>();
-            mergeTitles.Add("", 2);
+            Dictionary<string, MergeTitleModel> mergeTitles = new Dictionary<string, MergeTitleModel>();
+            mergeTitles.Add("FirstMergeTitle", new MergeTitleModel { Name="",MergeRange=1});
 
-            mergeTitles.Add("Today", CurrencyList.Count() + 1);
-            mergeTitles.Add("Yesterday", CurrencyList.Count() + 1);
-            mergeTitles.Add("Last 2 Days", CurrencyList.Count() + 1);
-            mergeTitles.Add("This Month", CurrencyList.Count() + 1);
-            mergeTitles.Add("Last Month", CurrencyList.Count() + 1);
+            mergeTitles.Add("Today", new MergeTitleModel { Name = "Today", MergeRange = CurrencyList.Count() + 1 });
+            mergeTitles.Add("Yesterday", new MergeTitleModel { Name = "Yesterday", MergeRange = CurrencyList.Count() + 1 });
+            mergeTitles.Add("LastTwoDays", new MergeTitleModel { Name = "Last 2 Days", MergeRange = CurrencyList.Count() + 1 });
+            mergeTitles.Add("ThisMonth", new MergeTitleModel { Name = "This Month", MergeRange = CurrencyList.Count() + 1 });
+            mergeTitles.Add("LastMonth", new MergeTitleModel { Name = "Last Month", MergeRange = CurrencyList.Count() + 1 });
 
             titlesToMerge.Add(mergeTitles);
 
@@ -892,7 +892,7 @@ namespace BackendSite.Controllers.Api
             List<string> CurrencyList = new List<string>();
             List<Dictionary<string, dynamic>> Content = new List<Dictionary<string, dynamic>>();
             Dictionary<string, TitleModel> Titles = new Dictionary<string, TitleModel>();
-            List<Dictionary<string, int>> titlesToMerge = new List<Dictionary<string, int>>();
+            List<Dictionary<string, MergeTitleModel>> titlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
             List<string> notSummaryTitles = new List<string> { "Key", "LocalTime", "TotalOnline" };
             List<string> totalTitle = new List<string>
             {
@@ -974,10 +974,10 @@ namespace BackendSite.Controllers.Api
 
             #region Titles To Merge
 
-            Dictionary<string, int> MergeTitles = new Dictionary<string, int>();
+            Dictionary<string, MergeTitleModel> MergeTitles = new Dictionary<string, MergeTitleModel>();
 
-            MergeTitles.Add(SelectDate, 1);
-            MergeTitles.Add("Online Count", siteList.Count() + 1);
+            MergeTitles.Add("Date", new MergeTitleModel { Name= SelectDate, MergeRange=1});
+            MergeTitles.Add("OnlineCount", new MergeTitleModel { Name = "Online Count", MergeRange = siteList.Count() + 1 }); 
 
             titlesToMerge.Add(MergeTitles);
 
@@ -1006,7 +1006,7 @@ namespace BackendSite.Controllers.Api
                         $"UserOnlineReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/DepositReport" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/DepositReport" })]
         public ApiResult GetDepositReport([FromForm] IEnumerable<int> SiteIds,
                                                 [FromForm] IEnumerable<int> CurrencyIds,
                                                 [FromForm] string StartDate,
@@ -1055,13 +1055,52 @@ namespace BackendSite.Controllers.Api
 
             #endregion
 
+            List<Dictionary<string, MergeTitleModel>> summaryTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
             Dictionary<string, TitleModel> summaryTitles = new Dictionary<string, TitleModel>();
+            List<string> summaryTotalTitle = new List<string>();
             List<Dictionary<string, dynamic>> summaryContent = new List<Dictionary<string, dynamic>>();
             List<Dictionary<string, dynamic>> summaryTotalContent = new List<Dictionary<string, dynamic>>();
 
+            List<Dictionary<string, MergeTitleModel>> dateTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
+            Dictionary<string, TitleModel> dateTitles = new Dictionary<string, TitleModel>();
+            List<string> dateTotalTitle = new List<string>();
+            List<Dictionary<string, dynamic>> dateContent = new List<Dictionary<string, dynamic>>();
+            List<Dictionary<string, dynamic>> dateTotalContent = new List<Dictionary<string, dynamic>>();
+
             #region Customize Data(Title & Total Title & Merge Title)
 
-            List<Dictionary<string, int>> titlesToMerge = new List<Dictionary<string, int>>();
+            #region Summary Merge Title
+
+            Dictionary<string, MergeTitleModel> depositTypeTitles = new Dictionary<string, MergeTitleModel>();
+            depositTypeTitles.Add("FirstMergeTitle", new MergeTitleModel { Name = "", MergeRange = 1 });
+
+            depositTypeTitles.Add("OnlineBanking", new MergeTitleModel {Name = "Online Banking", MergeRange = (currencyList.Count() + 1) * 2 });
+            depositTypeTitles.Add("MobilePay", new MergeTitleModel { Name = "Mobile Pay", MergeRange = (currencyList.Count() + 1) * 2 });
+            depositTypeTitles.Add("LocalBanking", new MergeTitleModel { Name = "Local Banking", MergeRange = (currencyList.Count() + 1) * 2 });
+            depositTypeTitles.Add("TotalData", new MergeTitleModel { Name = "", MergeRange = (currencyList.Count() + 1) * 6 });
+
+            summaryTitlesToMerge.Add(depositTypeTitles);
+
+            Dictionary<string, MergeTitleModel> mergeTitles = new Dictionary<string, MergeTitleModel>();
+            mergeTitles.Add("SecondMergeTitle", new MergeTitleModel { Name = "", MergeRange = 1 });
+
+            mergeTitles.Add("OnlineAmount", new MergeTitleModel { Name = "Amount", MergeRange = currencyList.Count() + 1});
+            mergeTitles.Add("OnlinePrecent", new MergeTitleModel { Name = "%", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("MobileAmount", new MergeTitleModel { Name = "Amount", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("MobilePrecent", new MergeTitleModel { Name = "%", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("LocalAmount", new MergeTitleModel { Name = "Amount", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("LocalPrecent", new MergeTitleModel { Name = "%", MergeRange = currencyList.Count() + 1 });
+
+            mergeTitles.Add("TotalAmount", new MergeTitleModel { Name = "Total Amount", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("TotalCount", new MergeTitleModel { Name = "Total Count", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("AverangeAmount", new MergeTitleModel { Name = "Averange Amount", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("SuccessRate", new MergeTitleModel { Name = "Success Rate(%)", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("FTDCount", new MergeTitleModel { Name = "FTD Count", MergeRange = currencyList.Count() + 1 });
+            mergeTitles.Add("AverangeProcessingTime", new MergeTitleModel { Name = "Averange Processing Time(D.HH:MM:SS)", MergeRange = currencyList.Count() + 1 });
+
+            summaryTitlesToMerge.Add(mergeTitles);
+
+            #endregion
 
             #region Summary Title
 
@@ -1132,11 +1171,12 @@ namespace BackendSite.Controllers.Api
 
             #region Summary Total Title
 
-            List<string> totalTitle = new List<string>
+            summaryTotalTitle = new List<string>
             {
                 "OnlineAmount-in-MYR", "OnlinePrecent-in-MYR",
                 "MobileAmount-in-MYR", "MobilePrecent-in-MYR",
                 "LocalAmount-in-MYR","LocalPrecent-in-MYR",
+
                 "TotalAmount","TotalCount",
                 "AverangeAmount","SuccessRate",
                 "FTDCount","ApTime"
@@ -1144,36 +1184,80 @@ namespace BackendSite.Controllers.Api
 
             #endregion
 
-            #region Summary Merge Title
+            #region Date Merge Title
 
-            Dictionary<string, int> depositTypeTitles = new Dictionary<string, int>();
-            depositTypeTitles.Add("", 1);
+            Dictionary<string, MergeTitleModel> accountNameTitles = new Dictionary<string, MergeTitleModel>();
+            Dictionary<string, MergeTitleModel> dateMergeTitles = new Dictionary<string, MergeTitleModel>();
 
-            depositTypeTitles.Add("Online Banking", (currencyList.Count() + 1) * 2);
-            depositTypeTitles.Add("Mobile Pay", (currencyList.Count() + 1) * 2);
-            depositTypeTitles.Add("Local Banking", (currencyList.Count() + 1) * 2);
-            depositTypeTitles.Add("Total Data", (currencyList.Count() + 1) * 6);
+            accountNameTitles.Add("Account",new MergeTitleModel { Name="Account",MergeRange=1});
+            dateMergeTitles.Add("SecondMergeTitle", new MergeTitleModel { Name = "", MergeRange = 1 });
 
-            titlesToMerge.Add(depositTypeTitles);
+            foreach (var data in ExportData)
+            {
+                foreach(var account in data.SummaryAccountData)
+                {
+                    accountNameTitles.Add($"{account.AccountType}-{account.AccountId}-AccountName", new MergeTitleModel { Name = account.AccountName, MergeRange = (currencyList.Count() + 1)*5 });
 
-            Dictionary<string, int> mergeTitles = new Dictionary<string, int>();
-            mergeTitles.Add("", 1);
+                    dateMergeTitles.Add($"{account.AccountType}-{account.AccountId}-TotalAmount", new MergeTitleModel { Name = "Total Amount", MergeRange = currencyList.Count() + 1 });
+                    dateMergeTitles.Add($"{account.AccountType}-{account.AccountId}-TotalCount", new MergeTitleModel { Name = "Total Count", MergeRange = currencyList.Count() + 1 });
+                    dateMergeTitles.Add($"{account.AccountType}-{account.AccountId}-AverangeAmount", new MergeTitleModel { Name = "Averange Amount", MergeRange = currencyList.Count() + 1});
+                    dateMergeTitles.Add($"{account.AccountType}-{account.AccountId}-SuccessRate", new MergeTitleModel { Name = "Success Rate(%)", MergeRange = currencyList.Count() + 1});
+                    dateMergeTitles.Add($"{account.AccountType}-{account.AccountId}-FTDCount", new MergeTitleModel { Name = "FTD Count", MergeRange = currencyList.Count() + 1 });
+                }
+            }
 
-            mergeTitles.Add("Online Amount", currencyList.Count() + 1);
-            mergeTitles.Add("Online %", currencyList.Count() + 1);
-            mergeTitles.Add("Mobile Amount", currencyList.Count() + 1);
-            mergeTitles.Add("Mobile %", currencyList.Count() + 1);
-            mergeTitles.Add("Local Amount", currencyList.Count() + 1);
-            mergeTitles.Add("Local %", currencyList.Count() + 1);
+            dateTitlesToMerge.Add(accountNameTitles);
+            dateTitlesToMerge.Add(dateMergeTitles);
 
-            mergeTitles.Add("Total Amount", currencyList.Count() + 1);
-            mergeTitles.Add("Total Count", currencyList.Count() + 1);
-            mergeTitles.Add("Averange Amount", currencyList.Count() + 1);
-            mergeTitles.Add("Success Rate(%)", currencyList.Count() + 1);
-            mergeTitles.Add("FTD Count", currencyList.Count() + 1);
-            mergeTitles.Add("Averange Processing Time(D.HH:MM:SS)", currencyList.Count() + 1);
+            #endregion
 
-            titlesToMerge.Add(mergeTitles);
+            #region Date Title & Date Total Title
+
+            foreach (var data in ExportData)
+            {
+                int i = 0;
+                dateTitles.Add($"Date", new TitleModel { Name = "AccountName", SortId = 1 });
+
+                foreach (var account in data.SummaryAccountData)
+                {
+                    dateTitles.Add($"{account.AccountType}-{account.AccountId}-TotalAmount", new TitleModel { Name = "Total Amount in MYR", SortId = i + 200 });
+                    dateTitles.Add($"{account.AccountType}-{account.AccountId}-TotalCount", new TitleModel { Name = "Total Count", SortId = i + 400 });
+                    dateTitles.Add($"{account.AccountType}-{account.AccountId}-AverangeAmount", new TitleModel { Name = "Averange Amount in MYR", SortId = i + 600 });
+                    dateTitles.Add($"{account.AccountType}-{account.AccountId}-SuccessRate", new TitleModel { Name = "Total Success Rate", SortId = i + 800 });
+                    dateTitles.Add($"{account.AccountType}-{account.AccountId}-FTDCount", new TitleModel { Name = "Total FTD Count", SortId = i + 1000 });
+
+                    dateTotalTitle.Add($"{account.AccountType}-{account.AccountId}-TotalAmount");
+                    dateTotalTitle.Add($"{account.AccountType}-{account.AccountId}-TotalCount");
+                    dateTotalTitle.Add($"{account.AccountType}-{account.AccountId}-AverangeAmount");
+                    dateTotalTitle.Add($"{account.AccountType}-{account.AccountId}-SuccessRate");
+                    dateTotalTitle.Add($"{account.AccountType}-{account.AccountId}-FTDCount");
+
+                    foreach (var curr in currencyList)
+                    {
+                        string isoCode = currencyData.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+
+                        var TotalAmountPropName = $"{account.AccountType}-{account.AccountId}-TotalAmount-{isoCode}";
+                        var TotalCountPropName = $"{account.AccountType}-{account.AccountId}-TotalCount-{isoCode}";
+                        var AverangeAmountPropName = $"{account.AccountType}-{account.AccountId}-AverangeAmount-{isoCode}";
+                        var SuccessRatePropName = $"{account.AccountType}-{account.AccountId}-SuccessRate-{isoCode}";
+                        var FTDCountPropName = $"{account.AccountType}-{account.AccountId}-FTDCount-{isoCode}";
+
+                        var totalAmountSortId = i + 100 + curr;
+                        var totalCountSortId = i + 300 + curr;
+                        var averangeAmountSortId = i + 500 + curr;
+                        var successRateSortId = i + 700 + curr;
+                        var ftdCountSortId = i + 900 + curr;
+
+                        dateTitles.Add(TotalAmountPropName, new TitleModel { Name = isoCode, SortId = totalAmountSortId });
+                        dateTitles.Add(TotalCountPropName, new TitleModel { Name = isoCode, SortId = totalCountSortId });
+                        dateTitles.Add(AverangeAmountPropName, new TitleModel { Name = isoCode, SortId = averangeAmountSortId });
+                        dateTitles.Add(SuccessRatePropName, new TitleModel { Name = isoCode, SortId = successRateSortId });
+                        dateTitles.Add(FTDCountPropName, new TitleModel { Name = isoCode, SortId = ftdCountSortId });
+                    }
+
+                    i = i + 1000;
+                }
+            }   
 
             #endregion
 
@@ -1200,20 +1284,6 @@ namespace BackendSite.Controllers.Api
                         var FTDCountPropName = $"FTDCount-{accountCurrencyItem.IsoCode}";
                         var ApTimePropName = $"ApTime-{accountCurrencyItem.IsoCode}";
 
-                        //var onlineAmountSortId = 100 + accountCurrencyItem.CurrencyId;
-                        //var onlinePrecentSortId = 300 + accountCurrencyItem.CurrencyId;
-                        //var mobileAmountSortId = 500 + accountCurrencyItem.CurrencyId;
-                        //var mobilePrecentSortId = 700 + accountCurrencyItem.CurrencyId;
-                        //var localAmountSortId = 900 + accountCurrencyItem.CurrencyId;
-                        //var localPrecentSortId = 1100 + accountCurrencyItem.CurrencyId;
-
-                        //var totalAmountSortId = 1300 + accountCurrencyItem.CurrencyId;
-                        //var totalCountSortId = 1500 + accountCurrencyItem.CurrencyId;
-                        //var averangeAmountSortId = 1700 + accountCurrencyItem.CurrencyId;
-                        //var successRateSortId = 1900 + accountCurrencyItem.CurrencyId;
-                        //var ftdCountSortId = 2100 + accountCurrencyItem.CurrencyId;
-                        //var apTimeSortId = 2300 + accountCurrencyItem.CurrencyId;
-
                         var getKey = $"{accountItem.AccountType}-{accountItem.AccountId}";
 
                         var getItem = summaryContent.FirstOrDefault(x =>
@@ -1222,41 +1292,18 @@ namespace BackendSite.Controllers.Api
 
                         if (getItem != null)
                         {
-                            //summaryTitles.Add(OnlineAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = onlineAmountSortId });
                             getItem.Add(OnlineAmountPropName, accountCurrencyItem.OnlineDeposit);
-
-                            //summaryTitles.Add(OnlinePrecentPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = onlinePrecentSortId });
                             getItem.Add(OnlinePrecentPropName, accountCurrencyItem.OnlinePrecent);
-
-                            //summaryTitles.Add(MobileAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = mobileAmountSortId });
                             getItem.Add(MobileAmountPropName, accountCurrencyItem.MobileDeposit);
-
-                            //summaryTitles.Add(MobilePrecentPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = mobilePrecentSortId });
                             getItem.Add(MobilePrecentPropName, accountCurrencyItem.MobilePrecent);
-
-                            //summaryTitles.Add(LocalAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = localAmountSortId });
                             getItem.Add(LocalAmountPropName, accountCurrencyItem.LocalDeposit);
-
-                            //summaryTitles.Add(LocalPrecentPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = localPrecentSortId });
                             getItem.Add(LocalPrecentPropName, accountCurrencyItem.LocalPrecent);
-
-
-                            //summaryTitles.Add(TotalAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = totalAmountSortId });
+                            
                             getItem.Add(TotalAmountPropName, accountCurrencyItem.TotalAmount);
-
-                            //summaryTitles.Add(TotalCountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = totalCountSortId });
                             getItem.Add(TotalCountPropName, accountCurrencyItem.TotalCount);
-
-                            //summaryTitles.Add(AverangeAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = averangeAmountSortId });
                             getItem.Add(AverangeAmountPropName, accountCurrencyItem.AverangeDeposit);
-
-                            //summaryTitles.Add(SuccessRatePropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = successRateSortId });
                             getItem.Add(SuccessRatePropName, accountCurrencyItem.SuccessRate);
-
-                            //summaryTitles.Add(FTDCountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = ftdCountSortId });
                             getItem.Add(FTDCountPropName, accountCurrencyItem.FTDCount);
-
-                            //summaryTitles.Add(ApTimePropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = apTimeSortId });
                             getItem.Add(ApTimePropName, accountCurrencyItem.AverangeProcessingTime);
                         }
                         else
@@ -1266,8 +1313,8 @@ namespace BackendSite.Controllers.Api
                                 { "Key", $"{accountItem.AccountType}-{accountItem.AccountId}" },
                                 { "AccountId", accountItem.AccountId },
                                 { "AccountName", accountItem.AccountName },
-                                { "CurrencyId", accountCurrencyItem.CurrencyId },
-                                { "Currency", accountCurrencyItem.IsoCode },
+                                //{ "CurrencyId", accountCurrencyItem.CurrencyId },
+                                //{ "Currency", accountCurrencyItem.IsoCode },
 
                                 { OnlineAmountPropName, accountCurrencyItem.OnlineDeposit },
                                 { OnlinePrecentPropName, accountCurrencyItem.OnlinePrecent },
@@ -1301,20 +1348,6 @@ namespace BackendSite.Controllers.Api
 
                             summaryContent.Add(newItem);
                             
-                            //summaryTitles.Add(OnlineAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = onlineAmountSortId });
-                            //summaryTitles.Add(OnlinePrecentPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = onlinePrecentSortId });
-                            //summaryTitles.Add(MobileAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = mobileAmountSortId });
-                            //summaryTitles.Add(MobilePrecentPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = mobilePrecentSortId });
-                            //summaryTitles.Add(LocalAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = localAmountSortId });
-                            //summaryTitles.Add(LocalPrecentPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = localPrecentSortId });
-
-                            //summaryTitles.Add(TotalAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = totalAmountSortId });
-                            //summaryTitles.Add(TotalCountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = totalCountSortId });
-                            //summaryTitles.Add(AverangeAmountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = averangeAmountSortId });
-                            //summaryTitles.Add(SuccessRatePropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = successRateSortId });
-                            //summaryTitles.Add(FTDCountPropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = ftdCountSortId });
-                            //summaryTitles.Add(ApTimePropName, new TitleModel { Name = accountCurrencyItem.IsoCode, SortId = apTimeSortId });
-
                         }
 
                     }
@@ -1336,20 +1369,6 @@ namespace BackendSite.Controllers.Api
                     var SuccessRatePropName = $"SuccessRate-{currencyItem.IsoCode}";
                     var FTDCountPropName = $"FTDCount-{currencyItem.IsoCode}";
                     var ApTimePropName = $"ApTime-{currencyItem.IsoCode}";
-
-                    //var onlineAmountSortId = 100 + currencyItem.CurrencyId;
-                    //var onlinePrecentSortId = 300 + currencyItem.CurrencyId;
-                    //var mobileAmountSortId = 500 + currencyItem.CurrencyId;
-                    //var mobilePrecentSortId = 700 + currencyItem.CurrencyId;
-                    //var localAmountSortId = 900 + currencyItem.CurrencyId;
-                    //var localPrecentSortId = 1100 + currencyItem.CurrencyId;
-
-                    //var totalAmountSortId = 1300 + currencyItem.CurrencyId;
-                    //var totalCountSortId = 1500 + currencyItem.CurrencyId;
-                    //var averangeAmountSortId = 1700 + currencyItem.CurrencyId;
-                    //var successRateSortId = 1900 + currencyItem.CurrencyId;
-                    //var ftdCountSortId = 2100 + currencyItem.CurrencyId;
-                    //var apTimeSortId = 2300 + currencyItem.CurrencyId;
 
                     var getKey = "TOTAL";
 
@@ -1416,6 +1435,154 @@ namespace BackendSite.Controllers.Api
                     }
                 }
 
+                //Date Data
+                foreach(var accountItem in item.SummaryAccountData)
+                {
+                    //Date Data Filling
+                    foreach (var accountDateItem in accountItem.DateData)
+                    {
+                        var TotalAmountPropName = $"{accountItem.AccountType}-{accountItem.AccountId}-TotalAmount-{accountDateItem.IsoCode}";
+                        var TotalCountPropName = $"{accountItem.AccountType}-{accountItem.AccountId}-TotalCount-{accountDateItem.IsoCode}";
+                        var AverangeAmountPropName = $"{accountItem.AccountType}-{accountItem.AccountId}-AverangeAmount-{accountDateItem.IsoCode}";
+                        var SuccessRatePropName = $"{accountItem.AccountType}-{accountItem.AccountId}-SuccessRate-{accountDateItem.IsoCode}";
+                        var FTDCountPropName = $"{accountItem.AccountType}-{accountItem.AccountId}-FTDCount-{accountDateItem.IsoCode}";
+
+                        var getKey = $"{accountDateItem.Date}";
+
+                        var getItem = dateContent.FirstOrDefault(x =>
+                            x.Any(y => y.Key == "Key" && (string)y.Value == getKey)
+                        );
+
+                        if (getItem != null)
+                        {
+                            getItem.Add(TotalAmountPropName, accountDateItem.TotalAmount);
+                            getItem.Add(TotalCountPropName, accountDateItem.TotalCount);
+                            getItem.Add(AverangeAmountPropName, accountDateItem.AverangeDeposit);
+                            getItem.Add(SuccessRatePropName, accountDateItem.SuccessRate);
+                            getItem.Add(FTDCountPropName, accountDateItem.FTDCount);
+                        }
+                        else
+                        {
+                            Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                            {
+                                { "Key", $"{accountDateItem.Date}" },
+                                { "Date", accountDateItem.Date },
+                                { "AccountId", accountItem.AccountId },
+                                { "AccountName", accountItem.AccountName },
+
+                                { TotalAmountPropName, accountDateItem.TotalAmount },
+                                { TotalCountPropName, accountDateItem.TotalCount },
+                                { AverangeAmountPropName, accountDateItem.AverangeDeposit },
+                                { SuccessRatePropName, accountDateItem.SuccessRate },
+                                { FTDCountPropName, accountDateItem.FTDCount },
+                            };
+
+                            dateContent.Add(newItem);
+
+                        }
+
+                    }
+
+                    foreach (var accountDateItem in accountItem.DateTotalData)
+                    {
+                        var TotalAmountPropName = $"{accountItem.AccountType}-{accountItem.AccountId}-TotalAmount";
+                        var TotalCountPropName = $"{accountItem.AccountType}-{accountItem.AccountId}-TotalCount";
+                        var AverangeAmountPropName = $"{accountItem.AccountType}-{accountItem.AccountId}-AverangeAmount";
+                        var SuccessRatePropName = $"{accountItem.AccountType}-{accountItem.AccountId}-SuccessRate";
+                        var FTDCountPropName = $"{accountItem.AccountType}-{accountItem.AccountId}-FTDCount";
+
+                        var getKey = $"{accountDateItem.Date}";
+
+                        var getItem = dateContent.FirstOrDefault(x =>
+                            x.Any(y => y.Key == "Key" && (string)y.Value == getKey)
+                        );
+
+                        //if (getItem != null)
+                        //{
+                            getItem.Add(TotalAmountPropName, accountDateItem.TotalAmount);
+                            getItem.Add(TotalCountPropName, accountDateItem.TotalCount);
+                            getItem.Add(AverangeAmountPropName, accountDateItem.AverangeDeposit);
+                            getItem.Add(SuccessRatePropName, accountDateItem.SuccessRate);
+                            getItem.Add(FTDCountPropName, accountDateItem.FTDCount);
+                        //}
+                        //else
+                        //{
+                        //    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                        //    {
+                        //        { "Date", $"{accountDateItem.Date}" },
+                        //        { "AccountId", accountItem.AccountId },
+                        //        { "AccountName", accountItem.AccountName },
+
+                        //        { TotalAmountPropName, accountDateItem.TotalAmount },
+                        //        { TotalCountPropName, accountDateItem.TotalCount },
+                        //        { AverangeAmountPropName, accountDateItem.AverangeDeposit },
+                        //        { SuccessRatePropName, accountDateItem.SuccessRate },
+                        //        { FTDCountPropName, accountDateItem.FTDCount },
+                        //    };
+
+                        //    dateContent.Add(newItem);
+
+                        //}
+
+                    }
+
+                    //Date Total Data Filling
+                    foreach (var accountCurrencyItem in accountItem.SummaryData)
+                    {
+
+                        var TotalAmountPropName = $"{accountItem.AccountType}-{accountItem.AccountId}-TotalAmount-{accountCurrencyItem.IsoCode}";
+                        var TotalCountPropName = $"{accountItem.AccountType}-{accountItem.AccountId}-TotalCount-{accountCurrencyItem.IsoCode}";
+                        var AverangeAmountPropName = $"{accountItem.AccountType}-{accountItem.AccountId}-AverangeAmount-{accountCurrencyItem.IsoCode}";
+                        var SuccessRatePropName = $"{accountItem.AccountType}-{accountItem.AccountId}-SuccessRate-{accountCurrencyItem.IsoCode}";
+                        var FTDCountPropName = $"{accountItem.AccountType}-{accountItem.AccountId}-FTDCount-{accountCurrencyItem.IsoCode}";
+
+                        var getKey = $"TOTAL";
+
+                        var getItem = dateTotalContent.FirstOrDefault(x =>
+                            x.Any(y => y.Key == "Key" && (string)y.Value == getKey)
+                        );
+
+                        if (getItem != null)
+                        {
+                            getItem.Add(TotalAmountPropName, accountCurrencyItem.TotalAmount);
+                            getItem.Add(TotalCountPropName, accountCurrencyItem.TotalCount);
+                            getItem.Add(AverangeAmountPropName, accountCurrencyItem.AverangeDeposit);
+                            getItem.Add(SuccessRatePropName, accountCurrencyItem.SuccessRate);
+                            getItem.Add(FTDCountPropName, accountCurrencyItem.FTDCount);
+                        }
+                        else
+                        {
+                            Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                            {
+                                { "Key", "TOTAL" },
+                                { "Date", "TOTAL：" },
+
+                                { TotalAmountPropName, accountCurrencyItem.TotalAmount },
+                                { TotalCountPropName, accountCurrencyItem.TotalCount },
+                                { AverangeAmountPropName, accountCurrencyItem.AverangeDeposit },
+                                { SuccessRatePropName, accountCurrencyItem.SuccessRate },
+                                { FTDCountPropName, accountCurrencyItem.FTDCount },
+
+                            };
+
+                            dateTotalContent.Add(newItem);
+
+                        }
+
+                    }
+
+                    var getTotalKey = $"TOTAL";
+
+                    var getTotalItem = dateTotalContent.FirstOrDefault(x =>
+                        x.Any(y => y.Key == "Key" && (string)y.Value == getTotalKey)
+                    );
+
+                    getTotalItem.Add($"{accountItem.AccountType}-{accountItem.AccountId}-TotalAmount", accountItem.SummaryTotalData.TotalAmount);
+                    getTotalItem.Add($"{accountItem.AccountType}-{accountItem.AccountId}-TotalCount", accountItem.SummaryTotalData.TotalCount);
+                    getTotalItem.Add($"{accountItem.AccountType}-{accountItem.AccountId}-AverangeAmount", accountItem.SummaryTotalData.AverangeDeposit);
+                    getTotalItem.Add($"{accountItem.AccountType}-{accountItem.AccountId}-SuccessRate", accountItem.SummaryTotalData.SuccessRate);
+                    getTotalItem.Add($"{accountItem.AccountType}-{accountItem.AccountId}-FTDCount", accountItem.SummaryTotalData.FTDCount);
+                }
             }
 
             List<ComplexReportExportDataToExcel> exelParam = new List<ComplexReportExportDataToExcel>()
@@ -1426,9 +1593,20 @@ namespace BackendSite.Controllers.Api
                     Content = summaryContent,
                     TotalContent=summaryTotalContent,
                     Titles = summaryTitles.OrderBy(x=> x.Value.SortId).Select(x=> x.Key).ToList(),
-                    TotalTitles = totalTitle,
-                    TitlesToMerge = titlesToMerge,
+                    TotalTitles = summaryTotalTitle,
+                    TitlesToMerge = summaryTitlesToMerge,
                     TitlesNameToDisplay = summaryTitles.OrderBy(x=> x.Value.SortId).Select(x=> x.Value.Name).ToList(),
+                    IsSummary = true
+                },
+                new ComplexReportExportDataToExcel()
+                {
+                    SheetName = "ByDate",
+                    Content = dateContent,
+                    TotalContent=dateTotalContent,
+                    Titles = dateTitles.OrderBy(x=> x.Value.SortId).Select(x=> x.Key).ToList(),
+                    TotalTitles = dateTotalTitle,
+                    TitlesToMerge = dateTitlesToMerge,
+                    TitlesNameToDisplay = dateTitles.OrderBy(x=> x.Value.SortId).Select(x=> x.Value.Name).ToList(),
                     IsSummary = true
                 }
             };

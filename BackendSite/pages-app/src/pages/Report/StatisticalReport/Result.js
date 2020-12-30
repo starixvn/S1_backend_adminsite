@@ -721,8 +721,6 @@ const Panel = (props) => {
     });
 
     turnOverValidBetColumnDefs.forEach((element, idx) => {
-        console.log(element);
-        console.log(idx);
         turnOverValidBetHeaderRows.push(
             <th key={`th-${element.dataColumn}-${idx}`} 
                 scope="col"

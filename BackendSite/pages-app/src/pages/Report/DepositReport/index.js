@@ -19,14 +19,19 @@ const App = () => {
         Datas: null,
         FilterInfo: null,
         CurrencyList: null,
+        DateList:null,
         TotalResult: null,
         DateDatas: null,
         DateTotalResult: null
     });
 
     const [siteList, setSiteList] = useState();
+
     const [SubmitStatus, setSubmitStatus] = useState(false);
     const [ExportStatus, setExportStatus] = useState(false);
+
+    const [SummaryStatus, setSummaryStatus] = useState(true);
+    const [DateStatus, setDateStatus] = useState(false);
 
     useEffect(() => {
         let param = {
@@ -82,6 +87,20 @@ const App = () => {
         });
     }
 
+    const Result_SetShowDataBtnOnClick = (summaryBtn,dateBtn) => {
+
+        if(summaryBtn)
+        {
+            setSummaryStatus(false);
+            setDateStatus(true);
+        }
+        else
+        {
+            setSummaryStatus(true);
+            setDateStatus(false);
+        }
+    }
+
     const Filter_Submit = () => {
         if (stateFilter.SiteIds.length === 0) {
             alert("Please Choose at least one Site")
@@ -132,6 +151,7 @@ const App = () => {
                 let totalResult=[];
                 let dataResult=[];
                 let dateTotalResult=[];
+                let dateList=[];
 
                 stateFilter.Currency.map(curr=>{
                     currencyList.push
@@ -158,8 +178,13 @@ const App = () => {
                     'ftdCountSummary':res.data.data[0].summaryTotalData.ftdCount,
                     'apTimeSummary':res.data.data[0].summaryTotalData.averangeProcessingTime    
                 });
+
+                dateTotalResult.push({
+                    'date':"TOTAL："
+                });
     
                 let totalItem=totalResult[0];
+                let dateTotalItem=dateTotalResult[0];
     
                 currencyList.map(curr=>{
     
@@ -301,11 +326,11 @@ const App = () => {
 
                     elem.dateData.forEach(data => {
                         
-                        let totalAmountColDef = `totalAmount_${data.currencyId}`;
-                        let totalCountColDef = `totalCount_${data.currencyId}`;
-                        let averangeAmountColDef = `averangeAmount_${data.currencyId}`;
-                        let successRateColDef = `successRate_${data.currencyId}`;
-                        let ftdCountColDef = `ftdCount_${data.currencyId}`;
+                        let totalAmountColDef = `totalAmount_${elem.accountType}_${elem.accountId}_${data.currencyId}`;
+                        let totalCountColDef = `totalCount_${elem.accountType}_${elem.accountId}_${data.currencyId}`;
+                        let averangeAmountColDef = `averangeAmount_${elem.accountType}_${elem.accountId}_${data.currencyId}`;
+                        let successRateColDef = `successRate_${elem.accountType}_${elem.accountId}_${data.currencyId}`;
+                        let ftdCountColDef = `ftdCount_${elem.accountType}_${elem.accountId}_${data.currencyId}`;
 
                         let getDateItem=getItem.dateData.find(x=>x.date === data.date);
 
@@ -326,15 +351,87 @@ const App = () => {
                                 [totalCountColDef]: data.totalCount,
                                 [averangeAmountColDef]: data.averangeDeposit,
                                 [successRateColDef]: data.successRate,
-                                [ftdCountColDef]: data.ftdCount
+                                [ftdCountColDef]: data.ftdCount,
 
                             });
                         }
+
+                        if(!dateList.find(x=>x.date===data.date))
+                        {
+                            dateList.push
+                            ({
+                                'date':data.date,
+
+                                [totalAmountColDef]: data.totalAmount,
+                                [totalCountColDef]: data.totalCount,
+                                [averangeAmountColDef]: data.averangeDeposit,
+                                [successRateColDef]: data.successRate,
+                                [ftdCountColDef]: data.ftdCount
+                            });
+                        }
+                        else
+                        {
+                            let dateItem=dateList.find(x=>x.date===data.date);
+
+                            dateItem[totalAmountColDef]= data.totalAmount;
+                            dateItem[totalCountColDef]= data.totalCount;
+                            dateItem[averangeAmountColDef]= data.averangeDeposit;
+                            dateItem[successRateColDef]= data.successRate;
+                            dateItem[ftdCountColDef]= data.ftdCount;
+                        }
+
+                    });
+
+                    elem.dateTotalData.forEach(data=>{
+
+                        let totalAmountColDef = `totalAmountSummary_${elem.accountType}_${elem.accountId}`;
+                        let totalCountColDef = `totalCountSummary_${elem.accountType}_${elem.accountId}`;
+                        let averangeAmountColDef = `averangeAmountSummary_${elem.accountType}_${elem.accountId}`;
+                        let successRateColDef = `successRateSummary_${elem.accountType}_${elem.accountId}`;
+                        let ftdCountColDef = `ftdCountSummary_${elem.accountType}_${elem.accountId}`;
+
+                        let dateItem=dateList.find(x=>x.date===data.date);
+
+                            dateItem[totalAmountColDef]= data.totalAmount;
+                            dateItem[totalCountColDef]= data.totalCount;
+                            dateItem[averangeAmountColDef]= data.averangeDeposit;
+                            dateItem[successRateColDef]= data.successRate;
+                            dateItem[ftdCountColDef]= data.ftdCount;
                     });
 
                 });
 
+                //Date Total Data
+                res.data.data[0].summaryAccountData.forEach(elem => {
 
+                    dateTotalItem[`totalAmountSummary_${elem.accountType}_${elem.accountId}`]=elem.summaryTotalData.totalAmount;
+                    dateTotalItem[`totalCountSummary_${elem.accountType}_${elem.accountId}`]= elem.summaryTotalData.totalCount;
+                    dateTotalItem[`averangeAmountSummary_${elem.accountType}_${elem.accountId}`]= elem.summaryTotalData.averangeDeposit;
+                    dateTotalItem[`successRateSummary_${elem.accountType}_${elem.accountId}`]= elem.summaryTotalData.successRate;
+                    dateTotalItem[`ftdCountSummary_${elem.accountType}_${elem.accountId}`]= elem.summaryTotalData.ftdCount;
+
+                    elem.summaryData.forEach(data => {
+    
+                        let totalAmountColDef = `totalAmount_${elem.accountType}_${elem.accountId}_${data.currencyId}`;
+                        let totalCountColDef = `totalCount_${elem.accountType}_${elem.accountId}_${data.currencyId}`;
+                        let averangeAmountColDef = `averangeAmount_${elem.accountType}_${elem.accountId}_${data.currencyId}`;
+                        let successRateColDef = `successRate_${elem.accountType}_${elem.accountId}_${data.currencyId}`;
+                        let ftdCountColDef = `ftdCount_${elem.accountType}_${elem.accountId}_${data.currencyId}`;
+
+                        //#region Detail Data
+
+                        dateTotalItem[totalAmountColDef] = data.totalAmount;
+                        dateTotalItem[totalCountColDef] = data.totalCount;
+                        dateTotalItem[averangeAmountColDef] = data.averangeDeposit;
+                        dateTotalItem[successRateColDef] = data.successRate;
+                        dateTotalItem[ftdCountColDef] = data.ftdCount;
+
+                        //#endregion
+
+                    });
+
+                });
+                
                 setDatas(
                     {
                         Datas:[
@@ -356,6 +453,18 @@ const App = () => {
                             ...stateFilter
                         },
                         CurrencyList: currencyList,
+                        DateList:[
+                            ...dateList.map(item=>{
+                                Object.keys(item).forEach(key => {
+                                    if(key.startsWith('totalAmount') || 
+                                       key.startsWith('averangeAmount')){
+                                        item[key] = number_format(number_toFixed(item[key], 2));
+                                    }
+                                });
+    
+                                return {...item}
+                            })
+                        ],
                         TotalResult:[
                             ...totalResult.map(item=>{
                                     Object.keys(item).forEach(key => {
@@ -463,7 +572,10 @@ const App = () => {
             ? null 
             : <Result {...stateDatas}
                       ExportToExcel={ExportToExcel} 
-                      ExportBtnDisabled={ExportStatus}/>}
+                      ExportBtnDisabled={ExportStatus}
+                      SummaryBtnDisabled={SummaryStatus}
+                      DateBtnDisabled={DateStatus}
+                      SetShowDataBtn={Result_SetShowDataBtnOnClick}/>}
         </div>
     );
 }

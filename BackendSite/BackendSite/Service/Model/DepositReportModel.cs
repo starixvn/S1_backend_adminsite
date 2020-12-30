@@ -38,14 +38,6 @@ namespace BackendSite.Service.Model
             set;
         } = new DepositSummaryReportModel();
 
-        /// <summary>
-        /// 明細加總資料
-        /// </summary>
-        public DepositSummaryReportModel DateTotalData
-        {
-            get;
-            set;
-        }
     }
 
     /// <summary>
@@ -90,11 +82,11 @@ namespace BackendSite.Service.Model
             set;
         } = new List<DepositByDateReportModel>();
 
-        public DepositByDateReportModel DateTotalData
+        public List<DepositByDateReportModel> DateTotalData
         {
             get;
             set;
-        } = new DepositByDateReportModel();
+        } = new List<DepositByDateReportModel>();
 
     }
 
