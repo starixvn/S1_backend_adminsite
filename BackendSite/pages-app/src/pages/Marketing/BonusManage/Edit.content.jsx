@@ -115,6 +115,20 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 			<div id="searchForm">
 				<div className="filter">
 					<div className="row-flex">
+						{CheckboxSingal("",specialBonusOptions,state.specialBonusCheck,SpecialBonusCheckBox,"specialBonus",null,!IsAdd)}
+						{state.specialBonusCheck.length > 0 ?
+							<InputBox
+							Title="SpecialCode"
+							OnChange={action.EditMainValue}
+							dataColumn="specialCode"
+							value={state.specialCode}
+							Disabled={!IsAdd}
+						/>	
+						:null}
+					</div>	
+				</div>		
+				<div className="filter">
+					<div className="row-flex">
 						<InputBox
 							Title="BonusCode"
 							OnChange={action.EditMainValue}
@@ -122,8 +136,6 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 							value={state.bonusCode}
 							Disabled={!IsAdd}
 						/>						
-						{CheckboxSingal("",specialBonusOptions,state.specialBonusCheck,SpecialBonusCheckBox,"specialBonus",null,!IsAdd)}
-						<pre>            </pre>
 						<SelectBox
 							Title="PromotionType"
 							Options={state.isSpecial ? initSpecialBonusPromotionType:initPromotionType}
@@ -261,18 +273,7 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 									/>
 								) : null}
 						</div>)}
-					{state.specialBonusCheck.length > 0 ? 	
-					<div className="filter">
-						<div className="row-flex">
-							<InputBox
-								Title="SpecialCode"
-								OnChange={action.EditMainValue}
-								dataColumn="specialCode"
-								value={state.specialCode}
-								Disabled={!IsAdd}
-							/>	
-						</div>
-					</div>:null}	
+	
 
 				<div className="filter noBGcolor">
 					<CheckBox

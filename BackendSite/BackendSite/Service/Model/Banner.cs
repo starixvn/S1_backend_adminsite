@@ -9,7 +9,11 @@ namespace BackendSite.Service.Model
         public string BannerName { get; set; }
         public int BannerType { get; set; }
         public int ActionMode { get; set; }
-        public int ShowIndex { get; set; }
+        public int ShowStatus { get; set; }
+        public DateTime? StartTime { get; set; }
+        public DateTime? EndTime { get; set; }
+        public long? UnixStartTime { get; set; }
+        public long? UnixEndTime { get; set; }
         public string BonusCode { get; set; }
         public string MatchId { get; set; }
         public string TpId { get; set; }
