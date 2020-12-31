@@ -49,7 +49,6 @@ const Panel = (props) => {
                 <DateTimePickerElem
                     columnTitle="From Date"
                     dateTimePickerProps={{
-                        // moment.unix(props.filterInfo.StartDate).format('l') : moment().add(-10, 'days').format('l')
                         defaultValue: moment(props.filterInfo.StartDate).format(
                             "l"
                         ),

@@ -56,7 +56,6 @@ const Panel = (props) => {
     let headerRows = [];
 
     groupColumnDefs.forEach((element, idx) => {
-        console.log(element);
         groupHeaderRows.push(
             <th key={`th-${element.dataColumn}-${idx}`}
                 scope="col"
