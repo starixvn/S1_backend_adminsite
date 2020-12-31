@@ -227,6 +227,7 @@ const App = () => {
             value={item.isoCode}
             Disabled={true}
             Index={index}
+            type="text"
           />
         </td>
         <td>
@@ -237,6 +238,7 @@ const App = () => {
             value={item.periodDays}
             Disabled={false}
             Index={index}
+            type="number"
           />
         </td>
         <td>
@@ -247,6 +249,7 @@ const App = () => {
             value={item.bonusAmount}
             Disabled={false}
             Index={index}
+            type="number"
           />
         </td>
         <td>
@@ -257,6 +260,7 @@ const App = () => {
             value={item.vaildBet}
             Disabled={false}
             Index={index}
+            type="number"
           />
         </td>
         <td>
@@ -267,6 +271,7 @@ const App = () => {
             value={item.deposit}
             Disabled={false}
             Index={index}
+            type="number"
           />
         </td>
       </tr>
