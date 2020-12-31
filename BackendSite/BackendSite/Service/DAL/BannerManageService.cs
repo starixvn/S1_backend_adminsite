@@ -33,6 +33,7 @@ namespace BackendSite.Service.DAL
             p.Add("MatchId", bannerInfo.MatchId);
             p.Add("TpId", bannerInfo.TpId);
             p.Add("GameId", bannerInfo.GameId);
+            p.Add("UrlRouter", bannerInfo.UrlRouter);
             p.Add("SpecificList", JsonConvert.SerializeObject(bannerInfo.Specific));
             p.Add("Sort", bannerInfo.Sort);
             p.Add("AdminUser", user);
@@ -66,6 +67,7 @@ namespace BackendSite.Service.DAL
                     result.MatchId = queryresult.MatchId;
                     result.TpId = queryresult.TpId;
                     result.GameId = queryresult.GameId;
+                    result.UrlRouter = queryresult.UrlRouter;
                     result.Specific = JsonConvert.DeserializeObject<IEnumerable<BannerDetails>>(queryresult.Specific, new JsonSerializerSettings
                     {
                         Formatting = Formatting.Indented,
