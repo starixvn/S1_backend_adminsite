@@ -26,6 +26,9 @@ const App = ()=>{
     const [SubmitStatus, setSubmitStatus] = useState(false);
     const [ExportStatus, setExportStatus] = useState(false);
 
+    const [TurnOverStatus, setTurnOverStatus] = useState(true);
+    const [WinLossStatus, setWinLossStatus] = useState(false);
+
     const [HiddenTitles, setHiddenTitles] = useState({
         turnOverValidBetHiddenCategoryList:[],
         winLossHiddenCategoryList:[],
@@ -142,6 +145,20 @@ const App = ()=>{
             winLossHiddenCategoryList: winLossHiddenlist
         });
 
+    }
+
+    const Result_SetShowDataBtnOnClick = (turnOverBtn,winLossBtn) => {
+
+        if(turnOverBtn)
+        {
+            setTurnOverStatus(false);
+            setWinLossStatus(true);
+        }
+        else
+        {
+            setTurnOverStatus(true);
+            setWinLossStatus(false);
+        }
     }
 
     const Filter_Submit = ()=>{
@@ -516,7 +533,10 @@ const App = ()=>{
                 ExportBtnDisabled={ExportStatus}
                 HidenTitles={HiddenTitles}
                 TurnOverValidBetHideShowBtn={Result_ValidBetHideShowBtnOnClick}
-                WinLossHideShowBtn={Result_WinLossHideShowBtnOnClick} />}
+                WinLossHideShowBtn={Result_WinLossHideShowBtnOnClick}
+                TurnOverBtnDisabled={TurnOverStatus}
+                WinLossBtnDisabled={WinLossStatus}
+                SetShowDataBtn={Result_SetShowDataBtnOnClick} />}
         </div>
     );
 }

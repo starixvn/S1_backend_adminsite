@@ -48,6 +48,11 @@ namespace BackendSite.Service.BLL
 
         #region Liberay Data
 
+        public IEnumerable<ServerInfoModel> GetServer()
+        {
+            return reportService.GetServerInfoList();
+        }
+
         public IEnumerable<CurrencyModel> GetCurrency()
         {
             return reportService.GetCurrencyList();
