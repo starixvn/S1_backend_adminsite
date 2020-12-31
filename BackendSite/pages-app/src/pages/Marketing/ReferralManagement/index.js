@@ -152,12 +152,7 @@ const App = () => {
   };
 
   const Search = () => {
-    let check = true;
-    if (
-      check &&
-      window.confirm("Are you want to change Referral Manegement?")
-    ) {
-      let formData = new FormData();
+    let formData = new FormData();
       formData.append("SiteId", parseInt(site));
       api
         .post("/api/BonusManage/GetReferral", formData)
@@ -168,9 +163,13 @@ const App = () => {
         .catch(function (error) {
           alert(error);
         });
-    }
   };
   const Submit = () => {
+    let check = true;
+    if (
+      check &&
+      window.confirm("Are you want to change Referral Manegement?")
+    ){
     let formData = new FormData();
     formData.append("referral", JSON.stringify(referral));
     api
@@ -185,6 +184,7 @@ const App = () => {
       .catch(function (error) {
         alert(error);
       });
+    }
   };
   const Edit = (outindex, value, name) => {
     let result = referral;
