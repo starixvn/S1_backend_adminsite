@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.Operations;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
@@ -24,11 +25,15 @@ namespace BackendSite.Controllers.Api
     {
         private readonly BonusManageBLL bonusManageBLL;
         private readonly ServerInfoBLL serverInfoBLL;
+        private readonly ReferralManagementBLL referralManagementBLL;
+        private readonly ReportBLL reportBLL;
 
-        public BonusManageController(BonusManageBLL bonusManageBLL, ServerInfoBLL serverInfoBLL)
+        public BonusManageController(BonusManageBLL bonusManageBLL, ServerInfoBLL serverInfoBLL, ReferralManagementBLL referralManagementBLL, ReportBLL reportBLL)
         {
             this.bonusManageBLL = bonusManageBLL;
             this.serverInfoBLL = serverInfoBLL;
+            this.referralManagementBLL = referralManagementBLL;
+            this.reportBLL = reportBLL;
         }
 
         [HttpPost]
@@ -306,6 +311,53 @@ namespace BackendSite.Controllers.Api
             }
 
             return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<List<ReferralManagement>> GetReferral([FromForm] int SiteId)
+        {
+            var apiResult = new ApiResult<List<ReferralManagement>>();
+            var siteList = serverInfoBLL.GetSiteListByLoginUser();
+            var referralList = referralManagementBLL.GetReferralBySiteId(SiteId);
+            var currencyList = reportBLL.GetCurrency().ToList();
+            List<ReferralManagement> referralManagementList = new List<ReferralManagement>();
+
+            foreach (string currency in siteList.ToList().Find(x => x.SiteId == SiteId).CurrencyList.Replace("[","").Replace("]", "").Split(","))
+            {
+                int currencyId;
+                Int32.TryParse(currency, out currencyId);
+                var referral = referralList?.Where(x=>x.CurrencyId == currencyId).ToList().FirstOrDefault();
+                referralManagementList.Add(new ReferralManagement { 
+                    SiteId = SiteId,
+                    CurrencyId = currencyId,
+                    PeriodDays = referral == null?string.Empty: referral.PeriodDays.ToString(),
+                    BonusAmount = referral == null ? string.Empty : referral.BonusAmount.ToString(),
+                    VaildBet = referral == null ? string.Empty : referral.VaildBet.ToString(),
+                    Deposit = referral == null ? string.Empty : referral.Deposit.ToString(),
+                    IsoCode = currencyList.Find(x=>x.CurrencyId == currencyId).IsoCode
+                });
+            }
+
+            apiResult.Data = referralManagementList;
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<dynamic> SetReferral([FromForm] string referral)
+        {
+            var apiResult = new ApiResult<dynamic>();
+            try
+            {
+                var referralList = JsonConvert.DeserializeObject<List<ReferralManagement>>(referral);
+                referralManagementBLL.SetReferral(referralList);
+            }
+            catch(Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }                      
+            return apiResult;
+            
         }
     }
 }
