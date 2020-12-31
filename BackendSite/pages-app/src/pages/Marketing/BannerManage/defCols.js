@@ -11,11 +11,12 @@ export const initBannerType = [
 ];
 
 export const defActionModeType = {
-	1: "Go to Game",
-	2: "Go to Bonus",
-	3: "Open Window",
-	4: "Redirect Page",
-	5: "No Action"
+	1: "No Action",
+	2: "Go to Game",
+	3: "Go to Bonus",
+	4: "Open Window",
+	5: "Redirect Page",
+	6: "Redirect pages of this site",
 }
 
 export const initActionModeType = [
@@ -23,7 +24,8 @@ export const initActionModeType = [
 	{ value: 2, displayText: defActionModeType[2] },
 	{ value: 3, displayText: defActionModeType[3] },
 	{ value: 4, displayText: defActionModeType[4] },
-	{ value: 5, displayText: defActionModeType[5] }
+	{ value: 5, displayText: defActionModeType[5] },
+	{ value: 6, displayText: defActionModeType[6] }
 ];
 
 

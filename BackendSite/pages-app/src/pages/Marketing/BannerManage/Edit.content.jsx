@@ -10,10 +10,10 @@ import { initBannerType, initActionModeType, initShowStatusType } from "./defCol
 export default ({ state, action, IsAdd, processing }) => {
 	const newActionModeType = initActionModeType
 		.filter(i => {
-			if (state.bannerType == 2 && i.value !== 1) {
+			if (state.bannerType == 2 && i.value !== 2) {
 				return false;
 			}
-			if (state.bannerType == 3 && i.value === 2) {
+			if (state.bannerType == 3 && i.value === 3) {
 				return false;
 			}
 			return true
@@ -129,7 +129,7 @@ export default ({ state, action, IsAdd, processing }) => {
 					<div className="row-flex">
 						{
 							state.bannerType == 1 ?
-								state.actionMode === 1 ?
+								state.actionMode === 2 ?
 									<>
 										<InputBox
 											Title="Tp Id"
@@ -144,16 +144,23 @@ export default ({ state, action, IsAdd, processing }) => {
 											value={state.gameId}
 										/>
 									</>
-									: state.actionMode === 2 ?
+									: state.actionMode === 3 ?
 										<InputBox
 											Title="Bonus Code"
 											OnChange={action.EditMainValue}
 											dataColumn="bonusCode"
 											value={state.bonusCode}
 										/>
+										:state.actionMode === 6 ?
+										<InputBox
+											Title="Url Router"
+											OnChange={action.EditMainValue}
+											dataColumn="urlRouter"
+											value={state.urlRouter}
+										/>
 										: null
 								: state.bannerType == 2 ?
-									state.actionMode === 1 ?
+									state.actionMode === 2 ?
 										<>
 											<InputBox
 												Title="Match Id"
@@ -176,7 +183,7 @@ export default ({ state, action, IsAdd, processing }) => {
 										</>
 										: null
 									: state.bannerType == 3 ?
-										state.actionMode === 1 ?
+										state.actionMode === 2 ?
 											<>
 												<InputBox
 													Title="Tp Id"
@@ -331,7 +338,7 @@ const LangPanel = props => {
 			</a>
 			<div className="panel-body">
 				{
-					props.state.actionMode === 3 || props.state.actionMode === 4 ?
+					props.state.actionMode === 4 || props.state.actionMode === 5 ?
 						<InputBox
 							Title="Banner Link"
 							ClassName="form-group"
