@@ -815,6 +815,44 @@ import TpBetRecord from './TpBetRecord/index';
             }
         }
 
+        onPhoneVerifiedChange(e) {
+            if (confirm('Are you sure change PhoneVerified ?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/api/CustManage/SetCustStatusSwitch', { CustId: data.custId, OP: 3 })
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.props.onGetCustInfoDetail();
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
+        onEmailVerifiedChange(e) {
+            if (confirm('Are you sure change EmailVerified ?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/api/CustManage/SetCustStatusSwitch', { CustId: data.custId, OP: 4 })
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.props.onGetCustInfoDetail();
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
         onAskReupload() {
             if (confirm('Are you sure delete Photo ?')) {
                 let data = this.props.CustInfoData;
@@ -1251,13 +1289,23 @@ import TpBetRecord from './TpBetRecord/index';
                                     <tr>
                                         <th scope="row">PhoneVerified</th>
                                         <td>
-                                            <span>{data.phoneVerified ? "Yes" : "No"}</span>
+                                            {/* <span>{data.phoneVerified ? "Yes" : "No"}</span> */}
+                                            {data.phoneVerified ? "Yes" : "No"}
+                                            <div className="switch__container">
+                                                <input id="switch-phoneVerified" className="switch switch--flat" checked={data.phoneVerified} type="checkbox" onChange={this.onPhoneVerifiedChange.bind(this)} />
+                                                <label htmlFor="switch-phoneVerified"></label>
+                                            </div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <th scope="row">EmailVerified</th>
                                         <td>
-                                            <span>{data.emailVerified ? "Yes" : "No"}</span>
+                                            {/* <span>{data.emailVerified ? "Yes" : "No"}</span> */}
+                                            {data.emailVerified ? "Yes" : "No"}
+                                            <div className="switch__container">
+                                                <input id="switch-emailVerified" className="switch switch--flat" checked={data.emailVerified} type="checkbox" onChange={this.onEmailVerifiedChange.bind(this)} />
+                                                <label htmlFor="switch-emailVerified"></label>
+                                            </div>
                                         </td>
                                     </tr>
                                     <tr>

@@ -68,5 +68,11 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
+        public IActionResult ReferralManagement()
+        {
+            return View();
+        }
     }
 }

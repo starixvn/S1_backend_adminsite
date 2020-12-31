@@ -298,6 +298,16 @@
         "Childs": null
       },
       {
+        "Key": "ReferralManagement",
+        "Title": "Referral Management",
+        "FuncKey": "Marketing/ReferralManagement",
+        "Controller": "Marketing",
+        "Action": "ReferralManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
         "Key": "PendingBonus",
         "Title": "Pending Bonus",
         "FuncKey": "Marketing/PendingBonus",
