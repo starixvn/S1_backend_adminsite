@@ -308,6 +308,16 @@
         "Childs": null
       },
       {
+        "Key": "BonusImport",
+        "Title": "Bonus Import",
+        "FuncKey": "Marketing/BonusImport",
+        "Controller": "Marketing",
+        "Action": "BonusImport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
         "Key": "PendingBonus",
         "Title": "Pending Bonus",
         "FuncKey": "Marketing/PendingBonus",
