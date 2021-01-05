@@ -181,6 +181,7 @@ const App = () => {
           if (response.data.errorCode === 999) {
             alert(response.data.message);
           } else {
+            setmode(0);
             alert("存檔成功");
           }
         })
