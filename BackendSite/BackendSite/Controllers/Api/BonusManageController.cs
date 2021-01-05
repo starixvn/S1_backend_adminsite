@@ -334,7 +334,8 @@ namespace BackendSite.Controllers.Api
                     BonusAmount = referral == null ? string.Empty : referral.BonusAmount.ToString(),
                     VaildBet = referral == null ? string.Empty : referral.VaildBet.ToString(),
                     Deposit = referral == null ? string.Empty : referral.Deposit.ToString(),
-                    IsoCode = currencyList.Find(x=>x.CurrencyId == currencyId).IsoCode
+                    IsoCode = currencyList.Find(x=>x.CurrencyId == currencyId).IsoCode,
+                    Status = referral == null ? false : referral.Status
                 });
             }
 
@@ -358,6 +359,31 @@ namespace BackendSite.Controllers.Api
             }                      
             return apiResult;
             
+        }
+
+        [HttpPost]
+        public ApiResult<dynamic> SetReferralStatus([FromForm] int SiteId, [FromForm] int CurrencyId)
+        {
+            var apiResult = new ApiResult<dynamic>();
+            try
+            {
+                var referralList = referralManagementBLL.GetReferralBySiteId(SiteId);
+                var referral = referralList?.Where(x => x.CurrencyId == CurrencyId).ToList().FirstOrDefault();
+                if(referral == null)
+                {
+                    apiResult.ErrorCode = 7;
+                    apiResult.Message = "";
+                    return apiResult;
+                }
+                referralManagementBLL.SetReferralStatus(SiteId, CurrencyId);
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
+
         }
     }
 }
