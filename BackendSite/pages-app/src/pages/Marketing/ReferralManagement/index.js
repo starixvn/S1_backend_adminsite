@@ -182,7 +182,7 @@ const App = () => {
             alert(response.data.message);
           } else {
             setmode(0);
-            alert("存檔成功");
+            alert("Success.");
           }
         })
         .catch(function (error) {
