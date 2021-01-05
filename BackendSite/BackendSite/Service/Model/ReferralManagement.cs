@@ -14,6 +14,7 @@ namespace BackendSite.Service.Model
         public string VaildBet { get; set; }
         public string Deposit { get; set; }
         public string IsoCode { get; set; }
+        public bool Status { get; set; }
     }
     public class ReferralList
     {
@@ -23,5 +24,6 @@ namespace BackendSite.Service.Model
         public decimal BonusAmount { get; set; }
         public decimal VaildBet { get; set; }
         public decimal Deposit { get; set; }
+        public bool Status { get; set; }
     }
 }

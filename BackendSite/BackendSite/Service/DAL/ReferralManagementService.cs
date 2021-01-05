@@ -31,7 +31,7 @@ namespace BackendSite.Service.DAL
             List<ReferralList> para = new List<ReferralList>();
             referralList.ForEach(x =>
             {
-                if(!string.IsNullOrWhiteSpace(x.PeriodDays) && !string.IsNullOrWhiteSpace(x.BonusAmount) && !string.IsNullOrWhiteSpace(x.VaildBet) && !string.IsNullOrWhiteSpace(x.Deposit))
+                if (!string.IsNullOrWhiteSpace(x.PeriodDays) && !string.IsNullOrWhiteSpace(x.BonusAmount) && !string.IsNullOrWhiteSpace(x.VaildBet) && !string.IsNullOrWhiteSpace(x.Deposit))
                 {
                     para.Add(new ReferralList
                     {
@@ -42,9 +42,14 @@ namespace BackendSite.Service.DAL
                         VaildBet = decimal.Parse(x.VaildBet),
                         Deposit = decimal.Parse(x.Deposit)
                     });
-                }              
+                }
             });
             conn.Execute("Admin_Referral_Set", para, commandType: CommandType.StoredProcedure);
+        }
+        public void SetReferralStatus(int SiteId, int CurrencyId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Execute("Admin_Referral_Status_Set", new { SiteId , CurrencyId }, commandType: CommandType.StoredProcedure);
         }
     }
 }

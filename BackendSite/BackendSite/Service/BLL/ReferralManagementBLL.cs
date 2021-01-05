@@ -26,5 +26,9 @@ namespace BackendSite.Service.BLL
         {
             referralManagementService.SetReferral(referralList);
         }
+        public void SetReferralStatus(int SiteId,int CurrencyId)
+        {
+            referralManagementService.SetReferralStatus(SiteId, CurrencyId);
+        }
     }
 }

@@ -9,14 +9,14 @@ const App = () => {
   const [site, setsite] = useState(1);
   const [referral, setreferral] = useState([]);
   const [focusid, setfocusid] = useState("");
+  const [mode, setmode] = useState(0);
   let headerRows = [];
   useEffect(() => {
     let param = {
       Url: "BonusManage/GetSiteListByLoginUser",
     };
 
-    api
-        .post("/api/BonusManage/GetSiteListByLoginUser").then((res) => {
+    api.post("/api/BonusManage/GetSiteListByLoginUser").then((res) => {
       if (res.data.errorCode === 0) {
         let result = [];
         res.data.data.map((e, index) => {
@@ -30,10 +30,11 @@ const App = () => {
   }, []);
   const titleData = [
     { dataColumn: "Currency", columnTitle: "Currency" },
-    { dataColumn: "PeriodDays", columnTitle: "PeriodDays" },
-    { dataColumn: "BonusAmount", columnTitle: "BonusAmount" },
+    { dataColumn: "Validity", columnTitle: "Validity" },
     { dataColumn: "VaildBet", columnTitle: "VaildBet" },
     { dataColumn: "Deposit", columnTitle: "Deposit" },
+    { dataColumn: "BonusAmount", columnTitle: "BonusAmount" },
+    { dataColumn: "Status", columnTitle: "Status" },
   ];
   titleData.forEach((e, i) => {
     headerRows.push(<th key={`title-${i}`}>{e.columnTitle}</th>);
@@ -97,6 +98,7 @@ const App = () => {
           {props.SubTitle ? (
             <span className="bule-bold">{props.SubTitle}</span>
           ) : null}
+
           <input
             id={`${props.dataColumn}${props.Index}`}
             type={props.type ? props.type : "text"}
@@ -153,37 +155,38 @@ const App = () => {
 
   const Search = () => {
     let formData = new FormData();
-      formData.append("SiteId", parseInt(site));
-      api
-        .post("/api/BonusManage/GetReferral", formData)
-        .then(function (response) {
-          setreferral(response.data.data);
-          // bodyRows();
-        })
-        .catch(function (error) {
-          alert(error);
-        });
+    formData.append("SiteId", parseInt(site));
+    api
+      .post("/api/BonusManage/GetReferral", formData)
+      .then(function (response) {
+        console.log(response.data.data);
+        setreferral(response.data.data);
+        // bodyRows();
+      })
+      .catch(function (error) {
+        alert(error);
+      });
   };
   const Submit = () => {
     let check = true;
     if (
       check &&
       window.confirm("Are you want to change Referral Manegement?")
-    ){
-    let formData = new FormData();
-    formData.append("referral", JSON.stringify(referral));
-    api
-      .post("/api/BonusManage/SetReferral", formData)
-      .then(function (response) {
-        if (response.data.errorCode === 999) {
-          alert(response.data.message);
-        } else {
-          alert("存檔成功");
-        }
-      })
-      .catch(function (error) {
-        alert(error);
-      });
+    ) {
+      let formData = new FormData();
+      formData.append("referral", JSON.stringify(referral));
+      api
+        .post("/api/BonusManage/SetReferral", formData)
+        .then(function (response) {
+          if (response.data.errorCode === 999) {
+            alert(response.data.message);
+          } else {
+            alert("存檔成功");
+          }
+        })
+        .catch(function (error) {
+          alert(error);
+        });
     }
   };
   const Edit = (outindex, value, name) => {
@@ -199,6 +202,37 @@ const App = () => {
       ele.focus();
     }
   }, [referral]);
+
+  const handleToggle = (outindex, value, name, site, currencyId) => {
+    if (window.confirm("Are you sure change Status ?")) {
+      let formData = new FormData();
+      formData.append("SiteId", parseInt(site));
+      formData.append("CurrencyId", parseInt(currencyId));
+      api
+        .post("/api/BonusManage/SetReferralStatus", formData)
+        .then(function (response) {
+          // bodyRows();
+          if (response.data.errorCode === 7) {
+            alert("請先新增該筆的資料，才允許調整狀態");
+          } else {
+            let result = referral;
+            result[outindex][name] = !value;
+            setreferral([...result]);
+          }
+        })
+        .catch(function (error) {
+          alert(error);
+        });
+    }
+  };
+
+  const Modify = () => {
+    setmode(1);
+  };
+
+  const View = () => {
+    setmode(0);
+  };
 
   const data = referral.map((item, index) => {
     return (
@@ -236,18 +270,7 @@ const App = () => {
             OnChange={Edit.bind(this, index)}
             dataColumn="periodDays"
             value={item.periodDays}
-            Disabled={false}
-            Index={index}
-            type="number"
-          />
-        </td>
-        <td>
-          <InputBox
-            Title="BonusAmount"
-            OnChange={Edit.bind(this, index)}
-            dataColumn="bonusAmount"
-            value={item.bonusAmount}
-            Disabled={false}
+            Disabled={mode !== 1}
             Index={index}
             type="number"
           />
@@ -257,8 +280,8 @@ const App = () => {
             Title="VaildBet"
             OnChange={Edit.bind(this, index)}
             dataColumn="vaildBet"
-            value={item.vaildBet}
-            Disabled={false}
+            value={item.vaildBet === "" ? "" : parseFloat(item.vaildBet)}
+            Disabled={mode !== 1}
             Index={index}
             type="number"
           />
@@ -268,20 +291,52 @@ const App = () => {
             Title="Deposit"
             OnChange={Edit.bind(this, index)}
             dataColumn="deposit"
-            value={item.deposit}
-            Disabled={false}
+            value={item.deposit === "" ? "" : parseFloat(item.deposit)}
+            Disabled={mode !== 1}
             Index={index}
             type="number"
           />
         </td>
+        <td>
+          <InputBox
+            Title="BonusAmount"
+            OnChange={Edit.bind(this, index)}
+            dataColumn="bonusAmount"
+            value={item.bonusAmount === "" ? "" : parseFloat(item.bonusAmount)}
+            Disabled={mode !== 1}
+            Index={index}
+            type="number"
+          />
+        </td>
+        <td>
+          {item.status ? "Yes" : "No"}
+          <div className="switch__container">
+            <input
+              id={`switch-${index}`}
+              className="switch switch--flat"
+              checked={item.status}
+              type="checkbox"
+              onChange={() =>
+                handleToggle(
+                  index,
+                  item.status,
+                  "status",
+                  item.siteId,
+                  item.currencyId
+                )
+              }
+              disabled={mode !== 0}
+            />
+            <label htmlFor={`switch-${index}`}></label>
+          </div>
+        </td>
       </tr>
     );
   });
-  console.log(referral)
   return (
     <>
       <div className="container-fluid">
-        <h4 className="page-name">Referral Manegement</h4>
+        <h4 className="page-name">Referral Management</h4>
       </div>
       <div>
         <div className="filter">
@@ -304,27 +359,29 @@ const App = () => {
               Search
             </button>
           </div>
+          <div>
+            {referral.length !== 0 ? (
+              mode !== 1 ? (
+                <button
+                  className="btn btn-add"
+                  style={{ marginTop: "5px", marginBottom: "5px" }}
+                  onClick={Modify}
+                >
+                  Modify(Mode)
+                </button>
+              ) : (
+                <button
+                  className="btn btn-add"
+                  style={{ marginTop: "5px", marginBottom: "5px" }}
+                  onClick={View}
+                >
+                  View(Mode)
+                </button>
+              )
+            ) : null}
+          </div>
         </div>
       </div>
-      {/* {data} */}
-      {/* <div className="table">
-        <table className="table table-bordered">
-          <thead>
-            <tr>{headerRows}</tr>
-          </thead>
-          <tbody>{data}</tbody>
-        </table>
-      </div>
-      <div>
-        <button
-          className="btn btn-add"
-          style={{ marginTop: "20px", marginBottom: "40px" }}
-          onClick={Submit}
-        >
-          Submit
-        </button>
-      </div> */}
-
       <div className="table">
         {referral.length !== 0 ? (
           <table className="table table-bordered">
@@ -347,12 +404,29 @@ const App = () => {
           </button>
         ) : null}
       </div>
+      {/* <div>
+      {referral.length !== 0 ?
+          mode !== 1 ? ( <button
+            className="btn btn-add"
+            style={{ marginTop: "20px", marginBottom: "40px"}}
+            onClick={Modify}
+          >
+            Modify(Mode)
+          </button>):(<button
+            className="btn btn-add"
+            style={{ marginTop: "20px", marginBottom: "40px"}}
+            onClick={View}
+          >
+            View(Mode)
+          </button>):null
+      }
+      </div> */}
     </>
   );
 };
 
 export default App;
 
-if (process.env.NODE_ENV === 'production') {
-    ReactDOM.render(<App />, document.getElementById('content'))
+if (process.env.NODE_ENV === "production") {
+  ReactDOM.render(<App />, document.getElementById("content"));
 }
