@@ -356,6 +356,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "BannerManagement",
+        "Title": "Banner Management",
+        "FuncKey": "Marketing/BannerManage",
+        "Controller": "Marketing",
+        "Action": "BannerManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   }

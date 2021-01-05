@@ -181,7 +181,8 @@ const App = () => {
           if (response.data.errorCode === 999) {
             alert(response.data.message);
           } else {
-            alert("存檔成功");
+            setmode(0);
+            alert("Success.");
           }
         })
         .catch(function (error) {
@@ -254,81 +255,99 @@ const App = () => {
             Disabled={true}
             Index={index}
           />
-          <InputBox
-            Title="Currency"
-            OnChange={Edit.bind(this, index)}
-            dataColumn="isoCode"
-            value={item.isoCode}
-            Disabled={true}
-            Index={index}
-            type="text"
-          />
+          <span className="label">{item.isoCode}</span>
         </td>
         <td>
-          <InputBox
-            Title="PeriodDays"
-            OnChange={Edit.bind(this, index)}
-            dataColumn="periodDays"
-            value={item.periodDays}
-            Disabled={mode !== 1}
-            Index={index}
-            type="number"
-          />
+          {mode === 1 ? (
+            <InputBox
+              Title="PeriodDays"
+              OnChange={Edit.bind(this, index)}
+              dataColumn="periodDays"
+              value={item.periodDays}
+              Disabled={mode !== 1}
+              Index={index}
+              type="number"
+            />
+          ) : (
+            <span className="label">{item.periodDays}</span>
+          )}
         </td>
         <td>
-          <InputBox
-            Title="VaildBet"
-            OnChange={Edit.bind(this, index)}
-            dataColumn="vaildBet"
-            value={item.vaildBet === "" ? "" : parseFloat(item.vaildBet)}
-            Disabled={mode !== 1}
-            Index={index}
-            type="number"
-          />
+          {mode === 1 ? (
+            <InputBox
+              Title="VaildBet"
+              OnChange={Edit.bind(this, index)}
+              dataColumn="vaildBet"
+              value={item.vaildBet === "" ? "" : parseFloat(item.vaildBet)}
+              Disabled={mode !== 1}
+              Index={index}
+              type="number"
+            />
+          ) : (
+            <span className="label">
+              {item.vaildBet === "" ? "" : parseFloat(item.vaildBet)}
+            </span>
+          )}
         </td>
         <td>
-          <InputBox
-            Title="Deposit"
-            OnChange={Edit.bind(this, index)}
-            dataColumn="deposit"
-            value={item.deposit === "" ? "" : parseFloat(item.deposit)}
-            Disabled={mode !== 1}
-            Index={index}
-            type="number"
-          />
+          {mode === 1 ? (
+            <InputBox
+              Title="Deposit"
+              OnChange={Edit.bind(this, index)}
+              dataColumn="deposit"
+              value={item.deposit === "" ? "" : parseFloat(item.deposit)}
+              Disabled={mode !== 1}
+              Index={index}
+              type="number"
+            />
+          ) : (
+            <span className="label">
+              {item.deposit === "" ? "" : parseFloat(item.deposit)}
+            </span>
+          )}
         </td>
         <td>
-          <InputBox
-            Title="BonusAmount"
-            OnChange={Edit.bind(this, index)}
-            dataColumn="bonusAmount"
-            value={item.bonusAmount === "" ? "" : parseFloat(item.bonusAmount)}
-            Disabled={mode !== 1}
-            Index={index}
-            type="number"
-          />
+          {mode === 1 ? (
+            <InputBox
+              Title="BonusAmount"
+              OnChange={Edit.bind(this, index)}
+              dataColumn="bonusAmount"
+              value={
+                item.bonusAmount === "" ? "" : parseFloat(item.bonusAmount)
+              }
+              Disabled={mode !== 1}
+              Index={index}
+              type="number"
+            />
+          ) : (
+            <span className="label">
+              {item.bonusAmount === "" ? "" : parseFloat(item.bonusAmount)}
+            </span>
+          )}
         </td>
         <td>
           {item.status ? "Yes" : "No"}
-          <div className="switch__container">
-            <input
-              id={`switch-${index}`}
-              className="switch switch--flat"
-              checked={item.status}
-              type="checkbox"
-              onChange={() =>
-                handleToggle(
-                  index,
-                  item.status,
-                  "status",
-                  item.siteId,
-                  item.currencyId
-                )
-              }
-              disabled={mode !== 0}
-            />
-            <label htmlFor={`switch-${index}`}></label>
-          </div>
+          {mode !== 1 ? (
+            <div className="switch__container">
+              <input
+                id={`switch-${index}`}
+                className="switch switch--flat"
+                checked={item.status}
+                type="checkbox"
+                onChange={() =>
+                  handleToggle(
+                    index,
+                    item.status,
+                    "status",
+                    item.siteId,
+                    item.currencyId
+                  )
+                }
+                disabled={mode !== 0}
+              />
+              <label htmlFor={`switch-${index}`}></label>
+            </div>
+          ) : null}
         </td>
       </tr>
     );
@@ -353,32 +372,14 @@ const App = () => {
           <div>
             <button
               className="btn btn-add"
-              style={{ marginTop: "20px", marginBottom: "40px" }}
+              style={{
+                marginTop: "10px",
+                marginBottom: "10px"
+              }}
               onClick={Search}
             >
               Search
             </button>
-          </div>
-          <div>
-            {referral.length !== 0 ? (
-              mode !== 1 ? (
-                <button
-                  className="btn btn-add"
-                  style={{ marginTop: "5px", marginBottom: "5px" }}
-                  onClick={Modify}
-                >
-                  Modify(Mode)
-                </button>
-              ) : (
-                <button
-                  className="btn btn-add"
-                  style={{ marginTop: "5px", marginBottom: "5px" }}
-                  onClick={View}
-                >
-                  View(Mode)
-                </button>
-              )
-            ) : null}
           </div>
         </div>
       </div>
@@ -392,35 +393,50 @@ const App = () => {
           </table>
         ) : null}
       </div>
-
       <div>
         {referral.length !== 0 ? (
-          <button
-            className="btn btn-add"
-            style={{ marginTop: "20px", marginBottom: "40px" }}
-            onClick={Submit}
-          >
-            Submit
-          </button>
+          mode !== 1 ? null : (
+            <button
+              className="btn btn-add"
+              style={{
+                marginTop: "20px",
+                marginBottom: "40px",
+                marginRight: "10px",
+              }}
+              onClick={Submit}
+            >
+              Save
+            </button>
+          )
+        ) : null}
+        {referral.length !== 0 ? (
+          mode !== 1 ? (
+            <button
+              className="btn btn-add"
+              style={{
+                marginTop: "20px",
+                marginBottom: "40px",
+                marginRight: "10px",
+              }}
+              onClick={Modify}
+            >
+              Edit
+            </button>
+          ) : (
+            <button
+              className="btn btn-add"
+              style={{
+                marginTop: "20px",
+                marginBottom: "40px",
+                marginRight: "10px",
+              }}
+              onClick={View}
+            >
+              Cancel
+            </button>
+          )
         ) : null}
       </div>
-      {/* <div>
-      {referral.length !== 0 ?
-          mode !== 1 ? ( <button
-            className="btn btn-add"
-            style={{ marginTop: "20px", marginBottom: "40px"}}
-            onClick={Modify}
-          >
-            Modify(Mode)
-          </button>):(<button
-            className="btn btn-add"
-            style={{ marginTop: "20px", marginBottom: "40px"}}
-            onClick={View}
-          >
-            View(Mode)
-          </button>):null
-      }
-      </div> */}
     </>
   );
 };
