@@ -235,7 +235,7 @@ const App = () => {
 	};
 
 	const skipField = {
-		"default": ["bonusCode", "matchId", "tpId", "gameId"]
+		"default": ["bonusCode", "matchId", "tpId", "gameId", "urlRouter"]
 	}
 	return state.panelType === defPanelType.Main ? (
 		<Main
