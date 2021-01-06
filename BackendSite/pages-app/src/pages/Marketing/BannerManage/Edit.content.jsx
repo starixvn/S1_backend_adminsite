@@ -151,14 +151,22 @@ export default ({ state, action, IsAdd, processing }) => {
 											dataColumn="bonusCode"
 											value={state.bonusCode}
 										/>
-										:state.actionMode === 6 ?
-										<InputBox
-											Title="Url Router"
-											OnChange={action.EditMainValue}
-											dataColumn="urlRouter"
-											value={state.urlRouter}
-										/>
-										: null
+										: state.actionMode === 6 ?
+											<>
+												<InputBox
+													Title="Url Router"
+													OnChange={action.EditMainValue}
+													dataColumn="urlRouter"
+													value={state.urlRouter}
+												/>
+												<InputBox
+													Title="Tp Id"
+													OnChange={action.EditMainValue}
+													dataColumn="tpId"
+													value={state.tpId}
+												/>
+											</>
+											: null
 								: state.bannerType == 2 ?
 									state.actionMode === 2 ?
 										<>
@@ -198,7 +206,22 @@ export default ({ state, action, IsAdd, processing }) => {
 													value={state.gameId}
 												/>
 											</>
-											: null
+											: state.actionMode === 6 ?
+												<>
+													<InputBox
+														Title="Url Router"
+														OnChange={action.EditMainValue}
+														dataColumn="urlRouter"
+														value={state.urlRouter}
+													/>
+													<InputBox
+														Title="Tp Id"
+														OnChange={action.EditMainValue}
+														dataColumn="tpId"
+														value={state.tpId}
+													/>
+												</>
+												: null
 										: null
 						}
 					</div>
