@@ -35,6 +35,7 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
+        public string Currency { get; set; }
         public string GameName { get; set; }
         public string RebateTypeName { get; set; }
         public decimal RedeemAmount { get; set; }
