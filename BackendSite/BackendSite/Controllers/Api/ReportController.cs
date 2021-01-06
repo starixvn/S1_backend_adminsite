@@ -961,51 +961,14 @@ namespace BackendSite.Controllers.Api
         {
 
             var apiResult = new ApiResult<IEnumerable<DepositReportModel>>();
-            CancellationTokenSource CancelSourceToken = new CancellationTokenSource();
             try
             {
-
-                Task<ApiResult<IEnumerable<DepositReportModel>>> timerTask = new Task<ApiResult<IEnumerable<DepositReportModel>>>(() =>
-                {
-                    var Result = new ApiResult<IEnumerable<DepositReportModel>>();
-                    Thread.Sleep(180 * 1000); //Timer Seconds
-
-                    if (!CancelSourceToken.IsCancellationRequested)
-                    {
-                        CancelSourceToken.Cancel();
-                    }
-
-                    Result.ErrorCode = 999;
-                    Result.Message = "Get data Timeout(Over 180 sec).";
-
-                    return Result;
-
-                }, CancelSourceToken.Token);
-
-                Task<ApiResult<IEnumerable<DepositReportModel>>> dataTask = new Task<ApiResult<IEnumerable<DepositReportModel>>>(() =>
-                {
-                    var Result = new ApiResult<IEnumerable<DepositReportModel>>();
-                    Result.Data = _reportBLL.GetDepositReport(CurrencyIds,
-                                                             JsonConvert.SerializeObject(SiteIds),
-                                                             JsonConvert.SerializeObject(CurrencyIds),
-                                                             StartDate,
-                                                             EndDate);
-                    Result.ErrorCode = 0;
-
-                    if (!CancelSourceToken.IsCancellationRequested)
-                    {
-                        CancelSourceToken.Cancel();
-                    }
-
-                    return Result;
-
-                }, CancelSourceToken.Token);
-
-                dataTask.Start();
-                timerTask.Start();
-
-                apiResult = Task.WhenAny(timerTask, dataTask).Result.GetAwaiter().GetResult();
-
+                apiResult.Data = _reportBLL.GetDepositReport(CurrencyIds,
+                                                         JsonConvert.SerializeObject(SiteIds),
+                                                         JsonConvert.SerializeObject(CurrencyIds),
+                                                         StartDate,
+                                                         EndDate);
+                apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
             {

@@ -1048,6 +1048,7 @@ const Panel = (props) => {
 
     return (
         <div className="table">
+            
             <div style={{background: "#E9E9E9",borderBottom: "0",padding:"8px",display:"flex",border:"1px solid #d5d5d5"}}>
                 <button type="button" className="btn btn-light" 
                         style={props.TurnOverBtnDisabled ? {background:"black",color:"white"} : null}

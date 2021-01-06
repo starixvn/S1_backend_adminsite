@@ -10,8 +10,14 @@ namespace BackendSite.Service.BLL
 {
     public class ReportBLL
     {
+        #region Fields
+
         private readonly ReportService reportService;
         private readonly SelLangBLL selLangBLL;
+
+        #endregion
+
+        #region Constructors
 
         public ReportBLL(ReportService reportService,
                          SelLangBLL selLangBLL)
@@ -20,6 +26,8 @@ namespace BackendSite.Service.BLL
             this.selLangBLL = selLangBLL;
         }
 
+
+        #endregion
 
         #region Library Formula
 
@@ -46,7 +54,7 @@ namespace BackendSite.Service.BLL
 
         #endregion
 
-        #region Liberay Data
+        #region Library Data
 
         public IEnumerable<ServerInfoModel> GetServer()
         {
