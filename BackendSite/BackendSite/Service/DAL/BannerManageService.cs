@@ -20,7 +20,7 @@ namespace BackendSite.Service.DAL
 
         public int SetBanner(BannerInfo bannerInfo, string user)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var p = new DynamicParameters();
             p.Add("BannerName", bannerInfo.BannerName);
             p.Add("SiteId", bannerInfo.SiteId);
@@ -38,18 +38,18 @@ namespace BackendSite.Service.DAL
             p.Add("Sort", bannerInfo.Sort);
             p.Add("AdminUser", user);
 
-            return conn.Execute("Admin_Banner_InsUpd", p, commandType: CommandType.StoredProcedure);
+            return conn.Execute("Admin_Banner_Set", p, commandType: CommandType.StoredProcedure);
         }
         public IEnumerable<BannerInfoList> GetBannerList(int SiteId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
                 return conn.Query<BannerInfoList>("Admin_BannerList_Get", new { SiteId }, commandType: CommandType.StoredProcedure);
             }
         }
         public BannerInfo GetBanner(int SiteId, string BannerName)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
                 BannerInfo result = new BannerInfo();
                 var queryresult = conn.QueryFirstOrDefault("Admin_Banner_Get", new { SiteId, BannerName }, commandType: CommandType.StoredProcedure);
@@ -64,8 +64,8 @@ namespace BackendSite.Service.DAL
                     result.StartTime = queryresult.StartTime;
                     result.EndTime = queryresult.EndTime;
                     result.BonusCode = queryresult.BonusCode;
-                    result.MatchId = queryresult.MatchId;
-                    result.TpId = queryresult.TpId;
+                    result.MatchId = Convert.ToInt32(queryresult.MatchId);
+                    result.TpId = Convert.ToInt32(queryresult.TpId);
                     result.GameId = queryresult.GameId;
                     result.UrlRouter = queryresult.UrlRouter;
                     result.Specific = JsonConvert.DeserializeObject<IEnumerable<BannerDetails>>(queryresult.Specific, new JsonSerializerSettings
@@ -90,10 +90,10 @@ namespace BackendSite.Service.DAL
             {
                 using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
                 {
-                    conn.Execute("Admin_Banner_SetStatus", new { SiteId, BannerName, Status, AdminUser = User }, commandType: CommandType.StoredProcedure);
+                    conn.Execute("Admin_BannerStatus_Set", new { SiteId, BannerName, Status, AdminUser = User }, commandType: CommandType.StoredProcedure);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 errorCode = 999;
             }

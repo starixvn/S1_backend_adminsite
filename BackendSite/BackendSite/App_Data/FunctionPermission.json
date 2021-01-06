@@ -255,6 +255,11 @@
         "DisplayKey": "Rebate Report",
         "FuncKey": "Marketing/RebateLogReport",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Banner Management",
+        "FuncKey": "Marketing/BannerManage",
+        "Enable": false
       }
     ]
   }
