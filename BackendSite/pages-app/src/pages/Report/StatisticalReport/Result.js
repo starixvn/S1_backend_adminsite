@@ -1048,10 +1048,23 @@ const Panel = (props) => {
 
     return (
         <div className="table">
-            <div className="table-options">
-                {/* <button type="button" className="btn btn-approved" onClick={props.ExportBtnDisabled ? null : props.ExportToExcel} disabled={props.ExportBtnDisabled}>Export Excel</button> */}
+            
+            <div style={{background: "#E9E9E9",borderBottom: "0",padding:"8px",display:"flex",border:"1px solid #d5d5d5"}}>
+                <button type="button" className="btn btn-light" 
+                        style={props.TurnOverBtnDisabled ? {background:"black",color:"white"} : null}
+                        onClick={() => props.SetShowDataBtn(props.TurnOverBtnDisabled,props.WinLossBtnDisabled)} 
+                        disabled={props.TurnOverBtnDisabled}>TurnOver(ValidBet)</button>
+                <button type="button" className="btn btn-light" 
+                        style={props.WinLossBtnDisabled ? {background:"black",color:"white"} : null}
+                        onClick={() => props.SetShowDataBtn(props.TurnOverBtnDisabled,props.WinLossBtnDisabled)} 
+                        disabled={props.WinLossBtnDisabled}>WinLoss</button>
+                {/* <button type="button" className="btn btn-approved" 
+                        style={{position:"absolute",right:"23px"}}
+                        onClick={props.ExportBtnDisabled ? null : props.ExportToExcel} 
+                        disabled={props.ExportBtnDisabled}>Export Excel</button> */}
             </div>
-            <table className="table table-striped">
+
+            <table className="table table-striped" hidden={!props.TurnOverBtnDisabled}>
                 <thead>
                     <tr>
                     <th colSpan="2" style={{ position: "sticky", top: "0",left:"0",height:"36.8px",zIndex:"3",background:"#FFFF45",color:"#F00000"}}>TurnOver(ValidBet)</th>
@@ -1065,6 +1078,9 @@ const Panel = (props) => {
                     {turnOverValidBetBodyRows}
                     {turnOverValidBetTotalRows}
                 </tbody>
+            </table>
+
+            <table className="table table-striped" hidden={!props.WinLossBtnDisabled}>
                 <thead>
                     <tr>
                         <th colSpan="2" style={{ position: "sticky", top: "0",left:"0",height:"36.8px",zIndex:"3",background:"#FFFF45",color:"#F00000"}}>WinLoss</th>
@@ -1079,7 +1095,7 @@ const Panel = (props) => {
                     {winLossTotalRows}
                 </tbody>
             </table>
-           
+
         </div>  
         
     )

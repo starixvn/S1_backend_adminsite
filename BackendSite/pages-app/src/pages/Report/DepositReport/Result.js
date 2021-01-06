@@ -1087,20 +1087,19 @@ const Panel = (props) => {
 
             <div style={{background: "#E9E9E9",borderBottom: "0",padding:"8px",display:"flex",border:"1px solid #d5d5d5"}}>
          
-                <button type="button" className="btn btn-light pull-left" 
+                <button type="button" className="btn btn-light" 
                         style={props.SummaryBtnDisabled ? {background:"black",color:"white"} : null}
                         onClick={() => props.SetShowDataBtn(props.SummaryBtnDisabled,props.DateBtnDisabled)} 
                         disabled={props.SummaryBtnDisabled}>Summary</button>
-                <button type="button" className="btn btn-light pull-left" 
+                <button type="button" className="btn btn-light" 
                         style={props.DateBtnDisabled ? {background:"black",color:"white"} : null}
                         onClick={() => props.SetShowDataBtn(props.SummaryBtnDisabled,props.DateBtnDisabled)} 
                         disabled={props.DateBtnDisabled}>ByDate</button>
-               
-                        <button type="button" className="btn btn-approved pull-right"
-                        style={{right:"10px"}}
+                <button type="button" className="btn btn-approved"
+                        style={{position:"absolute",right:"23px"}}
                         onClick={props.ExportBtnDisabled ? null : props.ExportToExcel} 
                         disabled={props.ExportBtnDisabled}>Export Excel</button>
-                        </div>
+            </div>
 
             <table className="table table-striped" style={{width:"auto"}} hidden={!props.SummaryBtnDisabled}>
                 <thead>

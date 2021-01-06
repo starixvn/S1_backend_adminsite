@@ -18,7 +18,7 @@ namespace BackendSite.Service.BLL
     {
         public string SheetName { get; set; }
         public IEnumerable<Dictionary<string, dynamic>> Content { get; set; }
-        public List<string> Titles { get; set; }
+        public Dictionary<string, string> Titles { get; set; }
 
     }
 
@@ -36,13 +36,14 @@ namespace BackendSite.Service.BLL
             set;
         }
 
+        /// <summary>
+        /// 內容
+        /// </summary>
         public IEnumerable<Dictionary<string, dynamic>> Content { get; set; }
 
         public IEnumerable<Dictionary<string, dynamic>> TotalContent { get; set; }
 
-        public List<string> Titles { get; set; }
-
-        public List<string> TitlesNameToDisplay { get; set; }
+        public Dictionary<string,string> Titles { get; set; }
 
         public List<string> TotalTitles { get; set; }
 
@@ -105,12 +106,12 @@ namespace BackendSite.Service.BLL
                     {
 
                         GeneralReportExportHeader(ws,
-                                                  s.Titles,
+                                                  s.Titles.Select(x => x.Value),
                                                   1);
 
                         GeneralReportExportBody(ws,
                                                 s.Content,
-                                                s.Titles,
+                                                s.Titles.Select(x => x.Value).ToList(),
                                                 2);
                     }
                 }
@@ -146,12 +147,12 @@ namespace BackendSite.Service.BLL
                                                                        currentRow);
 
                         currentRow = ComplexReportExportHeader(ws,
-                                                  (s.TitlesNameToDisplay.Any() ? s.TitlesNameToDisplay : s.Titles),
+                                                  s.Titles.Select(x => x.Value),
                                                    currentRow);
                         ComplexReportExportBody(ws,
                                                 s.Content,
                                                 s.TotalContent,
-                                                s.Titles,
+                                                s.Titles.Select(x => x.Key).ToList(),
                                                currentRow,
                                                 s.TotalTitles,
                                                 s.IsSummary,
