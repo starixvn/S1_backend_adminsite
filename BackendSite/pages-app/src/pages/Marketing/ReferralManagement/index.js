@@ -231,7 +231,17 @@ const App = () => {
     setmode(1);
   };
 
-  const View = () => {
+  const View = () => { 
+    let formData = new FormData();
+    formData.append("SiteId", parseInt(site));
+    api
+      .post("/api/BonusManage/GetReferral", formData)
+      .then(function (response) {
+        setreferral(response.data.data);
+      })
+      .catch(function (error) {
+        alert(error);
+      });
     setmode(0);
   };
 
