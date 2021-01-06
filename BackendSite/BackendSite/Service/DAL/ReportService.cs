@@ -13,12 +13,23 @@ namespace BackendSite.Service.DAL
 {
     public class ReportService
     {
+
+        #region Fields
+
         private readonly IConfiguration configuration;
+
+        #endregion
+
+        #region Constructors
 
         public ReportService(IConfiguration configuration)
         {
             this.configuration = configuration;
         }
+
+        #endregion
+
+        #region Library Methods
 
         public IEnumerable<CurrencyModel> GetCurrencyList()
         {
@@ -28,6 +39,17 @@ namespace BackendSite.Service.DAL
                 return conn.Query<CurrencyModel>(SpName, commandType: CommandType.StoredProcedure);
             }
         }
+
+        public IEnumerable<ServerInfoModel> GetServerInfoList()
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                string SpName = "Admin_ServerInfoList_Get";
+                return conn.Query<ServerInfoModel>(SpName, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        #endregion
 
         public Dictionary<string, IEnumerable<PartcialSummeryModel>> GetMainFinancialReport(string siteIds,
                                                                                             string currencyIds,
@@ -158,7 +180,7 @@ namespace BackendSite.Service.DAL
                     EndDate = endDate
                 });
                 string SpName = "Admin_Report_DepositDetailByDay_Get";
-                return conn.Query<DepositReportParticalModel>(SpName, parameters, commandType: CommandType.StoredProcedure,commandTimeout:180);
+                return conn.Query<DepositReportParticalModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
             
             //Test Data
@@ -169,13 +191,5 @@ namespace BackendSite.Service.DAL
             //}
         }
 
-        public IEnumerable<ServerInfoModel> GetServerInfoList()
-        {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
-            {
-                string SpName = "Admin_ServerInfoList_Get";
-                return conn.Query<ServerInfoModel>(SpName, commandType: CommandType.StoredProcedure);
-            }
-        }
     }
 }
