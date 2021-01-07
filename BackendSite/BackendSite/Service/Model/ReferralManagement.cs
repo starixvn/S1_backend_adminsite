@@ -54,6 +54,7 @@ namespace BackendSite.Service.Model
         public decimal TotalBet { get; set; }
         public decimal VaildBetC { get; set; }
         public decimal BonusAmount { get; set; }
+        public DateTime? RewardTime { get; set; }
         public int Status { get; set; }
         public string StatusName { get; set; }
 
