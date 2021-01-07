@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import WebAPI from "../../../module/WebAPI";
 import Filter from './Filter';
 import qs from "qs";
+import Result from './Result';
 
 const App = () =>{
     const [state,setstate] = useState(0);
@@ -13,9 +14,19 @@ const App = () =>{
         'User': '',
     });
 
+    // const [stateDatas, setDatas] = useState({
+    //     PageInfo: null,
+    //     Datas: null,
+    //     FilterInfo: null
+    // });
+    const [stateDatas, setDatas] = useState({
+        PageInfo: null,
+        Datas: null,
+        FilterInfo: null
+    });
+
 
     useEffect(() => {
-        console.log(123)
         let param = {
             Url: 'Common/AdminUserSiteList'
         };
@@ -77,42 +88,88 @@ const App = () =>{
         }
         let param = {
             Url: 'BonusManage/GetReferralCustList',
-            Data: qs.stringify({
+            Data: {
                 SelectSite: stateFilter.SelectSite,
-                CurrencyType: stateFilter.Type,
+                CurrencyId: parseInt(stateFilter.Type,10),
                 UserName: stateFilter.User,
                 PageNumber: 1
-            })
+            }
         };
+        WebAPI.PostData(param).then((res) => {
+            if (res.data.errorCode === 0) {
+                setDatas(
+                    {
+                        PageInfo: {
+                            totalPages: res.data.totalPages,
+                            pageNumber: 1,
+                            rowCount: res.data.rowCount
+                        },
+                        Datas: [...res.data.data],
+                        FilterInfo: {
+                            ...stateFilter
+                        }
+                    }
+                )               
+            } else {
+                alert(res.data.message ?? 'failed to get data.');
+            }
 
-        // WebAPI.PostData(param).then((res) => {
-        //     if (res.data.errorCode === 0) {
-        //         setDatas(
-        //             {
-        //                 PageInfo: {
-        //                     totalPages: res.data.totalPages,
-        //                     pageNumber: 1,
-        //                     rowCount: res.data.rowCount
-        //                 },
-        //                 Datas: [...res.data.data],
-        //                 FilterInfo: {
-        //                     ...stateFilter
-        //                 }
-        //             }
-        //         )
-        //     } else {
-        //         alert(res.data.message ?? 'failed to get data.');
-        //     }
-        // })
+        })
     }
 
-    return (
-        <div className="container-fluid">
-            <h4 className="page-name">Referral Report</h4>
-            <Filter filterInfo={stateFilter} onChange={Filter_OnChange} onChangeCheckBox={Filter_CheckBox_OnChange} onChangeAllCheckBox={Filter_CheckBox_CheckAll} ClickSubmit={Filter_Submit} SiteList={siteList} />
-            {/* {stateDatas.Datas === null ? null : <Result {...stateDatas} ChangePage={Result_ChangePage} ExportToExcel={Result_ExportToExcel} />} */}
-        </div>
-    );
+    const Result_ChangePage = (PageNumber) => {
+        if (stateDatas.FilterInfo.SelectSite.length === 0) {
+            alert("Please Choose at least one Site")
+            return false;
+        }
+        let param = {
+            Url: 'BonusManage/GetReferralCustList',
+            Data: {
+                SelectSite: stateFilter.SelectSite,
+                CurrencyId: parseInt(stateFilter.Type,10),
+                UserName: stateFilter.User,
+                PageNumber: PageNumber
+            }
+        };
+
+        WebAPI.PostData(param).then((res) => {
+            if (res.data.errorCode === 0) {
+                setDatas({
+                    ...stateDatas,
+                    PageInfo: {
+                        ...stateDatas.PageInfo,
+                        pageNumber: PageNumber
+                    },
+                    Datas: [...res.data.data],
+                });
+            } else {
+                alert(res.data.message ?? 'failed to get data.');
+            }
+        })
+    }
+
+    const Click_Detail = (prop) =>{
+        console.log(prop.userName)
+        setstate(1);
+    }
+
+    if(state === 0){
+        return (
+            <div className="container-fluid">
+                <h4 className="page-name">Referral Report</h4>
+                <Filter filterInfo={stateFilter} onChange={Filter_OnChange} onChangeCheckBox={Filter_CheckBox_OnChange} onChangeAllCheckBox={Filter_CheckBox_CheckAll} ClickSubmit={Filter_Submit} SiteList={siteList} />
+                {stateDatas.Datas === null ? null : <Result {...stateDatas} ChangePage={Result_ChangePage} Detail={Click_Detail}/>}
+            </div>
+        );
+    }
+    else{
+        return(
+            <div>
+                <h4 className="detail">Detail</h4>
+            </div>
+        )
+    }
+    
 }
 
 export default App;
