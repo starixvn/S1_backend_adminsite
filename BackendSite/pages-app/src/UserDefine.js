@@ -88,7 +88,7 @@ const ReferralReport = lazy(() =>
 	import("./pages/Marketing/ReferralReport/index")
 );
 
-export const defaultPage = "BannerManage";
+export const defaultPage = "DepositReport";
 
 export const layoutType = {
 	N88: "N88",

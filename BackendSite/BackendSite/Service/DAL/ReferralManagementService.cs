@@ -2,6 +2,7 @@
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -50,6 +51,28 @@ namespace BackendSite.Service.DAL
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Execute("Admin_Referral_Status_Set", new { SiteId , CurrencyId }, commandType: CommandType.StoredProcedure);
+        }
+        public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId,int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        {
+            string SelectSite = null;
+            if (selectSite != null && selectSite.Any())
+            {
+                SelectSite = JsonConvert.SerializeObject(selectSite);
+            }
+            totalPages = 0;
+
+            var p = new DynamicParameters(new { SelectSite, UserName = userName, CurrencyId = currencyId, PageSize = pageSize});
+            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var result = conn.Query<ReferralCustList>("Admin_ReferralCustlist_Get", p, commandType: CommandType.StoredProcedure);
+            pageNumber = p.Get<int?>("PageNumber") ?? 0;
+            totalPages = p.Get<int?>("TotalPages") ?? 0;
+            rowCount = p.Get<int?>("RowCount") ?? 0;
+            return result;
         }
     }
 }

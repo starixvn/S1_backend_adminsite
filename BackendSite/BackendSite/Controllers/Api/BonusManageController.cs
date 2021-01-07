@@ -385,5 +385,32 @@ namespace BackendSite.Controllers.Api
             return apiResult;
 
         }
+        public class ReferralCustListReq
+        {
+            public IEnumerable<int> SelectSite { get; set; }
+            public string UserName { get; set; }
+            public int CurrencyId { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+        }
+
+        [HttpPost]
+        public ApiListResult<ReferralCustList> GetReferralCustList(ReferralCustListReq referralCustListReq)
+        {
+            var apiResult = new ApiListResult<ReferralCustList>();
+            int totalPages = 0, rowCount = 0;
+
+            int pageNumber = referralCustListReq.PageNumber;
+            int pageSize = 10;
+            if (referralCustListReq.PageSize > 0)
+                pageSize = referralCustListReq.PageSize;
+            apiResult.Data = referralManagementBLL.GetReferralCustList(referralCustListReq.SelectSite, referralCustListReq.UserName, referralCustListReq.CurrencyId, pageSize, ref pageNumber, out totalPages, out rowCount);
+            apiResult.TotalPages = totalPages;
+            apiResult.PageNumber = pageNumber;
+            apiResult.RowCount = rowCount;
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
+        }
     }
 }
