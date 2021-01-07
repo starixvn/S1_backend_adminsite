@@ -412,5 +412,46 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+        public class RefFriendListReq
+        {
+            public int CustId { get; set; }
+            public long? StartDate { get; set; }
+            public long? EndDate { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+        }
+
+        [HttpPost]
+        public ApiListResult<ReferralFriend> GetRefFriendList(RefFriendListReq refFriendListReq)
+        {
+            Dictionary<int, string> referralStatus = new Dictionary<int, string>()
+            {
+                {0,"Approved" },
+                {1,"Running" },
+                {2,"Expired" }
+            };
+
+            int PageSize = 10;
+            if (refFriendListReq.PageSize > 0)
+                PageSize = refFriendListReq.PageSize;
+            int pageNumber = refFriendListReq.PageNumber;
+            int totalPages = 0;
+            int rowCount = 0;
+            var apiResult = new ApiListResult<ReferralFriend>();
+            var data = referralManagementBLL.GetRefFriendList(refFriendListReq.CustId, refFriendListReq.StartDate, refFriendListReq.EndDate, PageSize, ref pageNumber, ref totalPages, ref rowCount);
+            foreach (var x in data)
+            {
+                referralStatus.TryGetValue(x.Status, out string name);
+                x.StatusName = name;
+            }
+            apiResult.Data = data;
+            apiResult.PageNumber = pageNumber;
+            apiResult.TotalPages = totalPages;
+            apiResult.RowCount = rowCount;
+            apiResult.ErrorCode = 0;
+            apiResult.Message = "";
+
+            return apiResult;
+        }
     }
 }

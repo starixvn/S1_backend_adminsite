@@ -42,4 +42,20 @@ namespace BackendSite.Service.Model
         public int ExpiredCount { get; set; }
 
     }
+    public class ReferralFriend
+    {
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int CurrencyId { get; set; }
+        public string Currency { get; set; }
+        public DateTime RegisterDate { get; set; }
+        public decimal TotalDeposit { get; set; }
+        public decimal DepositC { get; set; }
+        public decimal TotalBet { get; set; }
+        public decimal VaildBetC { get; set; }
+        public decimal BonusAmount { get; set; }
+        public int Status { get; set; }
+        public string StatusName { get; set; }
+
+    }
 }
