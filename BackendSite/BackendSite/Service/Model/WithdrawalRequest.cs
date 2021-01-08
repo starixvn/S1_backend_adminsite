@@ -83,6 +83,7 @@ namespace BackendSite.Service.Model
         public int CustId { set; get; }
         public string UserName { set; get; }
         public int CurrencyId { set; get; }
+        public bool IsTest { set; get; }
         public decimal Amount { set; get; }
         public string BankName { set; get; }
         public string BankCode { set; get; }
