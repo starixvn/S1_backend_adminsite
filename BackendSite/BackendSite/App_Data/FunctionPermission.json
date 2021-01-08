@@ -232,11 +232,6 @@
         "Enable": false
       },
       {
-        "DisplayKey": "Referral Management",
-        "FuncKey": "Marketing/ReferralManagement",
-        "Enable": false
-      },
-      {
         "DisplayKey": "Pending Bonus",
         "FuncKey": "Marketing/PendingBonus",
         "Enable": false
@@ -259,6 +254,16 @@
       {
         "DisplayKey": "Banner Management",
         "FuncKey": "Marketing/BannerManage",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Referral Management",
+        "FuncKey": "Marketing/ReferralManagement",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Referral Report",
+        "FuncKey": "Marketing/ReferralReport",
         "Enable": false
       }
     ]
