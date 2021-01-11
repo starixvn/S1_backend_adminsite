@@ -217,18 +217,13 @@
         "Enable": false
       },
       {
-        "DisplayKey": "Bonus Report",
-        "FuncKey": "Marketing/BonusInfoReport",
-        "Enable": false
-      },
-      {
-        "DisplayKey": "News Management",
-        "FuncKey": "Marketing/NewsManage",
-        "Enable": false
-      },
-      {
         "DisplayKey": "Bonus Management",
         "FuncKey": "Marketing/BonusManage",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Bonus Report",
+        "FuncKey": "Marketing/BonusInfoReport",
         "Enable": false
       },
       {
@@ -252,11 +247,6 @@
         "Enable": false
       },
       {
-        "DisplayKey": "Banner Management",
-        "FuncKey": "Marketing/BannerManage",
-        "Enable": false
-      },
-      {
         "DisplayKey": "Referral Management",
         "FuncKey": "Marketing/ReferralManagement",
         "Enable": false
@@ -264,6 +254,16 @@
       {
         "DisplayKey": "Referral Report",
         "FuncKey": "Marketing/ReferralReport",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "News Management",
+        "FuncKey": "Marketing/NewsManage",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Banner Management",
+        "FuncKey": "Marketing/BannerManage",
         "Enable": false
       }
     ]

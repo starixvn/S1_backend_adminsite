@@ -278,21 +278,21 @@
         "Childs": null
       },
       {
-        "Key": "BonusInfoReport",
-        "Title": "Bonus Report",
-        "FuncKey": "Marketing/BonusInfoReport",
-        "Controller": "Marketing",
-        "Action": "BonusInfoReport",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
         "Key": "BonusManage",
         "Title": "Bonus Management",
         "FuncKey": "Marketing/BonusManage",
         "Controller": "Marketing",
         "Action": "BonusManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "BonusInfoReport",
+        "Title": "Bonus Report",
+        "FuncKey": "Marketing/BonusInfoReport",
+        "Controller": "Marketing",
+        "Action": "BonusInfoReport",
         "Icon": "",
         "Roles": null,
         "Childs": null
@@ -338,26 +338,6 @@
         "Childs": null
       },
       {
-        "Key": "NewsManage",
-        "Title": "News Management",
-        "FuncKey": "Marketing/NewsManage",
-        "Controller": "Marketing",
-        "Action": "NewsManage",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "BannerManagement",
-        "Title": "Banner Management",
-        "FuncKey": "Marketing/BannerManage",
-        "Controller": "Marketing",
-        "Action": "BannerManage",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
         "Key": "ReferralManagement",
         "Title": "Referral Management",
         "FuncKey": "Marketing/ReferralManagement",
@@ -373,6 +353,26 @@
         "FuncKey": "Marketing/ReferralReport",
         "Controller": "Marketing",
         "Action": "ReferralReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "NewsManage",
+        "Title": "News Management",
+        "FuncKey": "Marketing/NewsManage",
+        "Controller": "Marketing",
+        "Action": "NewsManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "BannerManagement",
+        "Title": "Banner Management",
+        "FuncKey": "Marketing/BannerManage",
+        "Controller": "Marketing",
+        "Action": "BannerManage",
         "Icon": "",
         "Roles": null,
         "Childs": null
