@@ -34,7 +34,7 @@ const Panel = (props) => {
           />
         ) : null}
         <DropDownBox
-          columnTitle="Currency Type"
+          columnTitle="Currency"
           options={Object.keys(defCurrencyType).map((key) => {
             return { value: key, displayText: defCurrencyType[key] };
           })}
