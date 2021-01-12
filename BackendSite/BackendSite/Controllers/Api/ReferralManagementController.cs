@@ -109,7 +109,7 @@ namespace BackendSite.Controllers.Api
             public int PageSize { get; set; }
         }
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralReport" })]
         public ApiListResult<ReferralCustList> GetReferralCustList(ReferralCustListReq referralCustListReq)
         {
             var apiResult = new ApiListResult<ReferralCustList>();
