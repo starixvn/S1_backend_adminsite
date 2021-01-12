@@ -16,7 +16,7 @@ const App = () => {
       Url: "BonusManage/GetSiteListByLoginUser",
     };
 
-    api.post("/api/BonusManage/GetSiteListByLoginUser").then((res) => {
+    api.post("/api/Common/AdminUserSiteList").then((res) => {
       if (res.data.errorCode === 0) {
         let result = [];
         res.data.data.map((e, index) => {
@@ -157,7 +157,7 @@ const App = () => {
     let formData = new FormData();
     formData.append("SiteId", parseInt(site));
     api
-      .post("/api/BonusManage/GetReferral", formData)
+      .post("/api/ReferralManagement/GetReferral", formData)
       .then(function (response) {
         console.log(response.data.data);
         setreferral(response.data.data);
@@ -176,7 +176,7 @@ const App = () => {
       let formData = new FormData();
       formData.append("referral", JSON.stringify(referral));
       api
-        .post("/api/BonusManage/SetReferral", formData)
+        .post("/api/ReferralManagement/SetReferral", formData)
         .then(function (response) {
           if (response.data.errorCode === 999) {
             alert(response.data.message);
@@ -210,7 +210,7 @@ const App = () => {
       formData.append("SiteId", parseInt(site));
       formData.append("CurrencyId", parseInt(currencyId));
       api
-        .post("/api/BonusManage/SetReferralStatus", formData)
+        .post("/api/ReferralManagement/SetReferralStatus", formData)
         .then(function (response) {
           // bodyRows();
           if (response.data.errorCode === 7) {
@@ -235,7 +235,7 @@ const App = () => {
     let formData = new FormData();
     formData.append("SiteId", parseInt(site));
     api
-      .post("/api/BonusManage/GetReferral", formData)
+      .post("/api/ReferralManagement/GetReferral", formData)
       .then(function (response) {
         setreferral(response.data.data);
       })
