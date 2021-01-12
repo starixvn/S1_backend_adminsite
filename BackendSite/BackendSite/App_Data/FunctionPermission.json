@@ -81,6 +81,22 @@
           {
             "DisplayKey": "Export Excel",
             "FuncKey": "ca_exportExcel"
+          },
+          {
+            "DisplayKey": "Is Kyc",
+            "FuncKey": "ca_isKyc"
+          },
+          {
+            "DisplayKey": "Is Risk",
+            "FuncKey": "ca_isRisk"
+          },
+          {
+            "DisplayKey": "Phone Verified",
+            "FuncKey": "ca_phoneVerified"
+          },
+          {
+            "DisplayKey": "Email Verified",
+            "FuncKey": "ca_emailVerified"
           }
         ]
       },

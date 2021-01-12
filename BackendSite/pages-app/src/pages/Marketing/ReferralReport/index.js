@@ -90,7 +90,7 @@ const App = () => {
       PageNumber: 1,
     };
     api
-      .post("/api/BonusManage/GetReferralCustList", Data)
+      .post("/api/ReferralManagement/GetReferralCustList", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           setDatas({
@@ -125,7 +125,7 @@ const App = () => {
         PageNumber: PageNumber,
       };
       api
-        .post("/api/BonusManage/GetReferralCustList", Data)
+        .post("/api/ReferralManagement/GetReferralCustList", Data)
         .then(function (res) {
           if (res.data.errorCode === 0) {
             setDatas({
