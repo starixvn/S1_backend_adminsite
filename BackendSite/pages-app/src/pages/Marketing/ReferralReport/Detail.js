@@ -29,7 +29,7 @@ const Panel = (props) => {
       PageNumber: 1,
     };
     api
-      .post("/api/BonusManage/GetRefFriendList", Data)
+      .post("/api/ReferralManagement/GetRefFriendList", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           setDetailBody(res.data.data);
@@ -55,7 +55,7 @@ const Panel = (props) => {
         PageNumber: PageNumber,
       };
       api
-        .post("/api/BonusManage/GetRefFriendList", Data)
+        .post("/api/ReferralManagement/GetRefFriendList", Data)
         .then(function (res) {
           if (res.data.errorCode === 0) {
             setDetailBody(res.data.data);
