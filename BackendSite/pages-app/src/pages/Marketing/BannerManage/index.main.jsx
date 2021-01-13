@@ -122,7 +122,6 @@ export default ({
 	titleData.forEach((e, i) => {
 		headerRows.push(<th key={`title-${i}`}>{e.columnTitle}</th>);
 	});
-
 	let bodyRows = bannerList.map((_data, d_idx) => {
 		let arr = titleData.map((element, t_idx) => {
 			let body_content = null;
@@ -134,9 +133,9 @@ export default ({
 				} else if (element.body.SpecialItem === SpecialItemType.statusBtn) {
 					body_content = (
 						<StatusBtn
-							mainKey={`${_data.siteId}-${_data.bonusCode}`}
+							mainKey={`${_data.siteId}-${_data.bannerName}`}
 							checked={_data[element.dataColumn] === 1}
-							onChange={UpdateBannerStatus.bind(this, d_idx)}
+							onChange={UpdateBannerStatus.bind(null, d_idx)}
 						/>
 					);
 				}

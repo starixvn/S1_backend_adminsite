@@ -81,6 +81,22 @@
           {
             "DisplayKey": "Export Excel",
             "FuncKey": "ca_exportExcel"
+          },
+          {
+            "DisplayKey": "Is Kyc",
+            "FuncKey": "ca_isKyc"
+          },
+          {
+            "DisplayKey": "Is Risk",
+            "FuncKey": "ca_isRisk"
+          },
+          {
+            "DisplayKey": "Phone Verified",
+            "FuncKey": "ca_phoneVerified"
+          },
+          {
+            "DisplayKey": "Email Verified",
+            "FuncKey": "ca_emailVerified"
           }
         ]
       },
@@ -217,23 +233,13 @@
         "Enable": false
       },
       {
-        "DisplayKey": "Bonus Report",
-        "FuncKey": "Marketing/BonusInfoReport",
-        "Enable": false
-      },
-      {
-        "DisplayKey": "News Management",
-        "FuncKey": "Marketing/NewsManage",
-        "Enable": false
-      },
-      {
         "DisplayKey": "Bonus Management",
         "FuncKey": "Marketing/BonusManage",
         "Enable": false
       },
       {
-        "DisplayKey": "Referral Management",
-        "FuncKey": "Marketing/ReferralManagement",
+        "DisplayKey": "Bonus Report",
+        "FuncKey": "Marketing/BonusInfoReport",
         "Enable": false
       },
       {
@@ -254,6 +260,26 @@
       {
         "DisplayKey": "Rebate Report",
         "FuncKey": "Marketing/RebateLogReport",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Referral Management",
+        "FuncKey": "Marketing/ReferralManagement",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Referral Report",
+        "FuncKey": "Marketing/ReferralReport",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "News Management",
+        "FuncKey": "Marketing/NewsManage",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Banner Management",
+        "FuncKey": "Marketing/BannerManage",
         "Enable": false
       }
     ]

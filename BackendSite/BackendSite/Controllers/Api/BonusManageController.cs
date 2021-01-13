@@ -334,7 +334,8 @@ namespace BackendSite.Controllers.Api
                     BonusAmount = referral == null ? string.Empty : referral.BonusAmount.ToString(),
                     VaildBet = referral == null ? string.Empty : referral.VaildBet.ToString(),
                     Deposit = referral == null ? string.Empty : referral.Deposit.ToString(),
-                    IsoCode = currencyList.Find(x=>x.CurrencyId == currencyId).IsoCode
+                    IsoCode = currencyList.Find(x=>x.CurrencyId == currencyId).IsoCode,
+                    Status = referral == null ? false : referral.Status
                 });
             }
 
@@ -358,6 +359,99 @@ namespace BackendSite.Controllers.Api
             }                      
             return apiResult;
             
+        }
+
+        [HttpPost]
+        public ApiResult<dynamic> SetReferralStatus([FromForm] int SiteId, [FromForm] int CurrencyId)
+        {
+            var apiResult = new ApiResult<dynamic>();
+            try
+            {
+                var referralList = referralManagementBLL.GetReferralBySiteId(SiteId);
+                var referral = referralList?.Where(x => x.CurrencyId == CurrencyId).ToList().FirstOrDefault();
+                if(referral == null)
+                {
+                    apiResult.ErrorCode = 7;
+                    apiResult.Message = "";
+                    return apiResult;
+                }
+                referralManagementBLL.SetReferralStatus(SiteId, CurrencyId);
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
+
+        }
+        public class ReferralCustListReq
+        {
+            public IEnumerable<int> SelectSite { get; set; }
+            public string UserName { get; set; }
+            public int CurrencyId { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+        }
+
+        [HttpPost]
+        public ApiListResult<ReferralCustList> GetReferralCustList(ReferralCustListReq referralCustListReq)
+        {
+            var apiResult = new ApiListResult<ReferralCustList>();
+            int totalPages = 0, rowCount = 0;
+
+            int pageNumber = referralCustListReq.PageNumber;
+            int pageSize = 10;
+            if (referralCustListReq.PageSize > 0)
+                pageSize = referralCustListReq.PageSize;
+            apiResult.Data = referralManagementBLL.GetReferralCustList(referralCustListReq.SelectSite, referralCustListReq.UserName, referralCustListReq.CurrencyId, pageSize, ref pageNumber, out totalPages, out rowCount);
+            apiResult.TotalPages = totalPages;
+            apiResult.PageNumber = pageNumber;
+            apiResult.RowCount = rowCount;
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
+        }
+        public class RefFriendListReq
+        {
+            public int CustId { get; set; }
+            public long? StartDate { get; set; }
+            public long? EndDate { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+        }
+
+        [HttpPost]
+        public ApiListResult<ReferralFriend> GetRefFriendList(RefFriendListReq refFriendListReq)
+        {
+            Dictionary<int, string> referralStatus = new Dictionary<int, string>()
+            {
+                {0,"Approved" },
+                {1,"Running" },
+                {2,"Expired" }
+            };
+
+            int PageSize = 10;
+            if (refFriendListReq.PageSize > 0)
+                PageSize = refFriendListReq.PageSize;
+            int pageNumber = refFriendListReq.PageNumber;
+            int totalPages = 0;
+            int rowCount = 0;
+            var apiResult = new ApiListResult<ReferralFriend>();
+            var data = referralManagementBLL.GetRefFriendList(refFriendListReq.CustId, refFriendListReq.StartDate, refFriendListReq.EndDate, PageSize, ref pageNumber, ref totalPages, ref rowCount);
+            foreach (var x in data)
+            {
+                referralStatus.TryGetValue(x.Status, out string name);
+                x.StatusName = name;
+            }
+            apiResult.Data = data;
+            apiResult.PageNumber = pageNumber;
+            apiResult.TotalPages = totalPages;
+            apiResult.RowCount = rowCount;
+            apiResult.ErrorCode = 0;
+            apiResult.Message = "";
+
+            return apiResult;
         }
     }
 }

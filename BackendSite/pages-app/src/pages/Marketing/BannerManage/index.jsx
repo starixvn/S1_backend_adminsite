@@ -124,8 +124,10 @@ const App = () => {
 				UnixStartTime: moment(banner.startTime).unix(),
 				UnixEndTime: moment(banner.endTime).unix(),
 				BonusCode: banner.bonusCode,
-				TpId: banner.tpId,
+				MatchId: Number(banner.matchId),
+				TpId: Number(banner.tpId),
 				GameId: banner.gameId,
+				UrlRouter: banner.urlRouter,
 				Specific: _specific
 			};
 			let param = {
@@ -233,7 +235,7 @@ const App = () => {
 	};
 
 	const skipField = {
-		"default": ["bonusCode", "matchId", "tpId", "gameId"]
+		"default": ["bonusCode", "matchId", "tpId", "gameId", "urlRouter"]
 	}
 	return state.panelType === defPanelType.Main ? (
 		<Main

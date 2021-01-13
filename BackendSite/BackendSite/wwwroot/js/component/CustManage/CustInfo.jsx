@@ -432,6 +432,56 @@ import TpBetRecord from './TpBetRecord/index';
         }
     }
 
+    class ReferralHistoryList extends React.Component {
+        constructor(props) {
+            super(props);
+
+        }
+
+        ChangePage(pageNumber) {
+            this.props.ChangePage(pageNumber);
+        }
+
+        render() {
+            let rows = this.props.searchData.data.map((row, idx) =>
+                <tr key={idx}>
+                    <th>{row.userName}</th>
+                    <th>{row.currency}</th>
+                    <th>{row.registerDate}</th>
+                    <th>{row.totalDeposit}/{row.depositC}</th>
+                    <th>{row.totalBet}/{row.vaildBetC}</th>
+                    <th>{row.bonusAmount}</th>
+                    <th>{row.rewardTime}</th>
+                    <th>{row.statusName}</th>
+                </tr>
+            );
+
+            return (
+                <div className="table">
+                    <table className="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">UserName</th>
+                                <th scope="col">Currency</th>
+                                <th scope="col">Reg Time</th>
+                                <th scope="col">TotalDeposit</th>
+                                <th scope="col">TotalBet</th>
+                                <th scope="col">Reward Amount</th>
+                                <th scope="col">Reward Time</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rows}
+                        </tbody>
+                    </table>
+                    <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                </div>
+            )
+
+        }
+    }
+
     class RebateLog extends React.Component {
         constructor(props) {
             super(props);
@@ -504,6 +554,30 @@ import TpBetRecord from './TpBetRecord/index';
                 </div>
             )
         }
+    }
+
+    class ReferralHistory extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = {};
+            this.props.GetReferralHistory(1);
+        }
+
+        onChange(event) {
+            let obj = this.state;
+            obj[event.target.name] = event.target.value;
+            this.setState(obj);
+        }
+
+        render() {
+            let searchData = this.props.searchData;
+            return (
+                <div>
+                    {searchData != null ? <ReferralHistoryList searchData={searchData} ChangePage={this.props.GetReferralHistory} /> : null}
+                </div>
+            )
+        }
+
     }
 
     class FinancialLogList extends React.Component {
@@ -1271,41 +1345,56 @@ import TpBetRecord from './TpBetRecord/index';
                                         <th scope="row">IsKyc</th>
                                         <td>
                                             {data.isKyc ? "Yes" : "No"}
-                                            <div className="switch__container">
-                                                <input id="switch-isKyc" className="switch switch--flat" checked={data.isKyc} type="checkbox" onChange={this.onKycChange.bind(this)} />
-                                                <label htmlFor="switch-isKyc"></label>
-                                            </div>
+                                            {
+                                                subFuncKeys.includes('ca_isKyc') ? (
+                                                    <div className="switch__container">
+                                                        <input id="switch-isKyc" className="switch switch--flat" checked={data.isKyc} type="checkbox" onChange={this.onKycChange.bind(this)} />
+                                                        <label htmlFor="switch-isKyc"></label>
+                                                    </div>
+                                                ) : null
+                                            }
                                         </td>
                                     </tr>
                                     <tr>
                                         <th scope="row">IsRisk</th>
-                                        <td>{data.isRisk ? "Yes" : "No"}
-                                            <div className="switch__container">
-                                                <input id="switch-isRisk" className="switch switch--flat" checked={data.isRisk} type="checkbox" onChange={this.onRiskChange.bind(this)} />
-                                                <label htmlFor="switch-isRisk"></label>
-                                            </div>
+                                        <td>
+                                            {data.isRisk ? "Yes" : "No"}
+                                            {
+                                                subFuncKeys.includes('ca_isRisk') ? (
+                                                    <div className="switch__container">
+                                                        <input id="switch-isRisk" className="switch switch--flat" checked={data.isRisk} type="checkbox" onChange={this.onRiskChange.bind(this)} />
+                                                        <label htmlFor="switch-isRisk"></label>
+                                                    </div>
+                                                ) : null
+                                            }
                                         </td>
                                     </tr>
                                     <tr>
                                         <th scope="row">PhoneVerified</th>
                                         <td>
-                                            {/* <span>{data.phoneVerified ? "Yes" : "No"}</span> */}
                                             {data.phoneVerified ? "Yes" : "No"}
-                                            <div className="switch__container">
-                                                <input id="switch-phoneVerified" className="switch switch--flat" checked={data.phoneVerified} type="checkbox" onChange={this.onPhoneVerifiedChange.bind(this)} />
-                                                <label htmlFor="switch-phoneVerified"></label>
-                                            </div>
+                                            {
+                                                subFuncKeys.includes('ca_phoneVerified') ? (
+                                                    <div className="switch__container">
+                                                        <input id="switch-phoneVerified" className="switch switch--flat" checked={data.phoneVerified} type="checkbox" onChange={this.onPhoneVerifiedChange.bind(this)} />
+                                                        <label htmlFor="switch-phoneVerified"></label>
+                                                    </div>
+                                                ) : null
+                                            }
                                         </td>
                                     </tr>
                                     <tr>
                                         <th scope="row">EmailVerified</th>
                                         <td>
-                                            {/* <span>{data.emailVerified ? "Yes" : "No"}</span> */}
                                             {data.emailVerified ? "Yes" : "No"}
-                                            <div className="switch__container">
-                                                <input id="switch-emailVerified" className="switch switch--flat" checked={data.emailVerified} type="checkbox" onChange={this.onEmailVerifiedChange.bind(this)} />
-                                                <label htmlFor="switch-emailVerified"></label>
-                                            </div>
+                                            {
+                                                subFuncKeys.includes('ca_emailVerified') ? (
+                                                    <div className="switch__container">
+                                                        <input id="switch-emailVerified" className="switch switch--flat" checked={data.emailVerified} type="checkbox" onChange={this.onEmailVerifiedChange.bind(this)} />
+                                                        <label htmlFor="switch-emailVerified"></label>
+                                                    </div>
+                                                ) : null
+                                            }
                                         </td>
                                     </tr>
                                     <tr>
@@ -1437,7 +1526,7 @@ import TpBetRecord from './TpBetRecord/index';
                                             :
                                             <tr>
                                                 <td>
-                                                    <input id="uploadfile" className="form-control" type="file" accept=".png, .jpg, .jpeg" onChange={(e) => { this.EditFiled(e.target.value, 'file') }} disabled={data.isKyc}/>
+                                                    <input id="uploadfile" className="form-control" type="file" accept=".png, .jpg, .jpeg" onChange={(e) => { this.EditFiled(e.target.value, 'file') }} disabled={data.isKyc} />
                                                 </td>
                                                 <td>
                                                     <button className="btn btn-add" disabled={data.isKyc} onClick={!data.isKyc ? this.onNewUpload.bind(this) : null}>Upload</button>
@@ -1458,12 +1547,12 @@ import TpBetRecord from './TpBetRecord/index';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
         constructor(props) {
             super(props);
-            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData) };
+            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {} };
         }
 
         onTab(idx, tabName) {
@@ -1525,6 +1614,28 @@ import TpBetRecord from './TpBetRecord/index';
                         let result = response.data;
                         if (result.errorCode == 0) {
                             this.setState({ RebateLogData: result });
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
+        GetReferralHistory(PageNumber) {
+            Loading.OnLoading();
+            let pageNumber = PageNumber || this.state.ReferralHistoryData.pageNumber;
+            let CustId = getUrlParameter("custId");
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                axios.post('/api/ReferralManagement/GetRefFriendList', { CustId: iCustId, PageNumber: pageNumber })
+                    .then(function (response) {
+                        Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({ ReferralHistoryData: result });
                         } else {
                             alert(result.message);
                         }
@@ -1977,6 +2088,8 @@ import TpBetRecord from './TpBetRecord/index';
                 dataContainer = <AdminUserLog GetAdminUserLogByCust={this.GetAdminUserLogByCust.bind(this)} searchData={this.state.AdminUserLogData} AdminUserLog={this.state.AdminUserLog} onChangeValue={this.onChangeValue.bind(this)} />
             } else if (TabName == this._Tabs[15]) {
                 dataContainer = <BankLog GetBankLog={this.GetBankLog.bind(this)} searchData={this.state.BankLogData} />
+            } else if (TabName == this._Tabs[16]) {
+                dataContainer = <ReferralHistory GetReferralHistory={this.GetReferralHistory.bind(this)} searchData={this.state.ReferralHistoryData} ReferralHistory={this.state.ReferralHistory} onChangeValue={this.onChangeValue.bind(this)} />
             }
 
             let authSubKeys = {

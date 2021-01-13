@@ -278,16 +278,6 @@
         "Childs": null
       },
       {
-        "Key": "BonusInfoReport",
-        "Title": "Bonus Report",
-        "FuncKey": "Marketing/BonusInfoReport",
-        "Controller": "Marketing",
-        "Action": "BonusInfoReport",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
         "Key": "BonusManage",
         "Title": "Bonus Management",
         "FuncKey": "Marketing/BonusManage",
@@ -298,11 +288,11 @@
         "Childs": null
       },
       {
-        "Key": "ReferralManagement",
-        "Title": "Referral Management",
-        "FuncKey": "Marketing/ReferralManagement",
+        "Key": "BonusInfoReport",
+        "Title": "Bonus Report",
+        "FuncKey": "Marketing/BonusInfoReport",
         "Controller": "Marketing",
-        "Action": "ReferralManagement",
+        "Action": "BonusInfoReport",
         "Icon": "",
         "Roles": null,
         "Childs": null
@@ -348,11 +338,41 @@
         "Childs": null
       },
       {
+        "Key": "ReferralManagement",
+        "Title": "Referral Management",
+        "FuncKey": "Marketing/ReferralManagement",
+        "Controller": "Marketing",
+        "Action": "ReferralManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "ReferralReport",
+        "Title": "Referral Report",
+        "FuncKey": "Marketing/ReferralReport",
+        "Controller": "Marketing",
+        "Action": "ReferralReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
         "Key": "NewsManage",
         "Title": "News Management",
         "FuncKey": "Marketing/NewsManage",
         "Controller": "Marketing",
         "Action": "NewsManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "BannerManagement",
+        "Title": "Banner Management",
+        "FuncKey": "Marketing/BannerManage",
+        "Controller": "Marketing",
+        "Action": "BannerManage",
         "Icon": "",
         "Roles": null,
         "Childs": null

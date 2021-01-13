@@ -70,6 +70,7 @@ namespace BackendSite.Service.Model
         public string UserName { set; get; }
         public string Agent { set; get; }
         public string SiteName { set; get; }
+        public bool IsTest { set; get; }
         public decimal Amount { set; get; }
         public string Comment { set; get; }
         public DateTime CreateTime { set; get; }
@@ -83,14 +84,14 @@ namespace BackendSite.Service.Model
         public string BankCode { set; get; }
         public string PayName { set; get; }
         public string ChannelName { set; get; }
-        /*public string CalCode =>
+        public string CalCode =>
             DepositType switch
             {
-                (int)enums.DepositType.OnlineBanking => $"{SiteName}-{BankCode}",
-                (int)enums.DepositType.MobilePayment => $"{SiteName}-{BankCode}",
+                (int)enums.DepositType.OnlineBanking => $"{SiteName}-{PayName}-{BankCode}",
+                (int)enums.DepositType.MobilePayment => $"{SiteName}-{PayName}-{ChannelName}",
                 (int)enums.DepositType.LocalBank => $"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
                 _ => null
-            };*/
+            };
 
         //public virtual IEnumerable<Comments> Comments { get; set; }
 

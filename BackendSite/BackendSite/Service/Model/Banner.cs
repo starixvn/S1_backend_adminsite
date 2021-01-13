@@ -15,9 +15,10 @@ namespace BackendSite.Service.Model
         public long? UnixStartTime { get; set; }
         public long? UnixEndTime { get; set; }
         public string BonusCode { get; set; }
-        public string MatchId { get; set; }
-        public string TpId { get; set; }
+        public int MatchId { get; set; }
+        public int TpId { get; set; }
         public string GameId { get; set; }
+        public string UrlRouter { get; set; }
         public IEnumerable<BannerDetails> Specific { get; set; }
         public int Sort { get; set; }
         public string SiteName { get; set; }
