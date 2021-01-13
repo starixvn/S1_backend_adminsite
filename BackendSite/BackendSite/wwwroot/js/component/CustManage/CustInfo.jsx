@@ -461,14 +461,14 @@ import TpBetRecord from './TpBetRecord/index';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                            <th scope="col">UserName</th>
-                            <th scope="col">Currency</th>
-                            <th scope="col">Reg Time</th>
-                            <th scope="col">TotalDeposit</th>
-                            <th scope="col">TotalBet</th>
-                            <th scope="col">Reward Amount</th>
-                            <th scope="col">Reward Time</th>
-                            <th scope="col">Status</th>
+                                <th scope="col">UserName</th>
+                                <th scope="col">Currency</th>
+                                <th scope="col">Reg Time</th>
+                                <th scope="col">TotalDeposit</th>
+                                <th scope="col">TotalBet</th>
+                                <th scope="col">Reward Amount</th>
+                                <th scope="col">Reward Time</th>
+                                <th scope="col">Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -571,13 +571,13 @@ import TpBetRecord from './TpBetRecord/index';
 
         render() {
             let searchData = this.props.searchData;
-            return(
+            return (
                 <div>
-                    {searchData != null ?<ReferralHistoryList searchData={searchData} ChangePage={this.props.GetReferralHistory}/> : null}
+                    {searchData != null ? <ReferralHistoryList searchData={searchData} ChangePage={this.props.GetReferralHistory} /> : null}
                 </div>
             )
         }
-        
+
     }
 
     class FinancialLogList extends React.Component {
@@ -1345,41 +1345,56 @@ import TpBetRecord from './TpBetRecord/index';
                                         <th scope="row">IsKyc</th>
                                         <td>
                                             {data.isKyc ? "Yes" : "No"}
-                                            <div className="switch__container">
-                                                <input id="switch-isKyc" className="switch switch--flat" checked={data.isKyc} type="checkbox" onChange={this.onKycChange.bind(this)} />
-                                                <label htmlFor="switch-isKyc"></label>
-                                            </div>
+                                            {
+                                                subFuncKeys.includes('ca_isKyc') ? (
+                                                    <div className="switch__container">
+                                                        <input id="switch-isKyc" className="switch switch--flat" checked={data.isKyc} type="checkbox" onChange={this.onKycChange.bind(this)} />
+                                                        <label htmlFor="switch-isKyc"></label>
+                                                    </div>
+                                                ) : null
+                                            }
                                         </td>
                                     </tr>
                                     <tr>
                                         <th scope="row">IsRisk</th>
-                                        <td>{data.isRisk ? "Yes" : "No"}
-                                            <div className="switch__container">
-                                                <input id="switch-isRisk" className="switch switch--flat" checked={data.isRisk} type="checkbox" onChange={this.onRiskChange.bind(this)} />
-                                                <label htmlFor="switch-isRisk"></label>
-                                            </div>
+                                        <td>
+                                            {data.isRisk ? "Yes" : "No"}
+                                            {
+                                                subFuncKeys.includes('ca_isRisk') ? (
+                                                    <div className="switch__container">
+                                                        <input id="switch-isRisk" className="switch switch--flat" checked={data.isRisk} type="checkbox" onChange={this.onRiskChange.bind(this)} />
+                                                        <label htmlFor="switch-isRisk"></label>
+                                                    </div>
+                                                ) : null
+                                            }
                                         </td>
                                     </tr>
                                     <tr>
                                         <th scope="row">PhoneVerified</th>
                                         <td>
-                                            {/* <span>{data.phoneVerified ? "Yes" : "No"}</span> */}
                                             {data.phoneVerified ? "Yes" : "No"}
-                                            <div className="switch__container">
-                                                <input id="switch-phoneVerified" className="switch switch--flat" checked={data.phoneVerified} type="checkbox" onChange={this.onPhoneVerifiedChange.bind(this)} />
-                                                <label htmlFor="switch-phoneVerified"></label>
-                                            </div>
+                                            {
+                                                subFuncKeys.includes('ca_phoneVerified') ? (
+                                                    <div className="switch__container">
+                                                        <input id="switch-phoneVerified" className="switch switch--flat" checked={data.phoneVerified} type="checkbox" onChange={this.onPhoneVerifiedChange.bind(this)} />
+                                                        <label htmlFor="switch-phoneVerified"></label>
+                                                    </div>
+                                                ) : null
+                                            }
                                         </td>
                                     </tr>
                                     <tr>
                                         <th scope="row">EmailVerified</th>
                                         <td>
-                                            {/* <span>{data.emailVerified ? "Yes" : "No"}</span> */}
                                             {data.emailVerified ? "Yes" : "No"}
-                                            <div className="switch__container">
-                                                <input id="switch-emailVerified" className="switch switch--flat" checked={data.emailVerified} type="checkbox" onChange={this.onEmailVerifiedChange.bind(this)} />
-                                                <label htmlFor="switch-emailVerified"></label>
-                                            </div>
+                                            {
+                                                subFuncKeys.includes('ca_emailVerified') ? (
+                                                    <div className="switch__container">
+                                                        <input id="switch-emailVerified" className="switch switch--flat" checked={data.emailVerified} type="checkbox" onChange={this.onEmailVerifiedChange.bind(this)} />
+                                                        <label htmlFor="switch-emailVerified"></label>
+                                                    </div>
+                                                ) : null
+                                            }
                                         </td>
                                     </tr>
                                     <tr>
@@ -1511,7 +1526,7 @@ import TpBetRecord from './TpBetRecord/index';
                                             :
                                             <tr>
                                                 <td>
-                                                    <input id="uploadfile" className="form-control" type="file" accept=".png, .jpg, .jpeg" onChange={(e) => { this.EditFiled(e.target.value, 'file') }} disabled={data.isKyc}/>
+                                                    <input id="uploadfile" className="form-control" type="file" accept=".png, .jpg, .jpeg" onChange={(e) => { this.EditFiled(e.target.value, 'file') }} disabled={data.isKyc} />
                                                 </td>
                                                 <td>
                                                     <button className="btn btn-add" disabled={data.isKyc} onClick={!data.isKyc ? this.onNewUpload.bind(this) : null}>Upload</button>
@@ -1537,7 +1552,7 @@ import TpBetRecord from './TpBetRecord/index';
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
         constructor(props) {
             super(props);
-            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {}};
+            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {} };
         }
 
         onTab(idx, tabName) {
@@ -1615,7 +1630,7 @@ import TpBetRecord from './TpBetRecord/index';
             let CustId = getUrlParameter("custId");
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
-                axios.post('/api/BonusManage/GetRefFriendList', { CustId: iCustId, PageNumber: pageNumber })
+                axios.post('/api/ReferralManagement/GetRefFriendList', { CustId: iCustId, PageNumber: pageNumber })
                     .then(function (response) {
                         Loading.UnLoading();
                         let result = response.data;
