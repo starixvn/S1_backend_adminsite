@@ -183,10 +183,10 @@ namespace BackendSite.Controllers.Api
                 "WinLossInMYR"
             };
 
-            List<string> notSummaryTitles = new List<string> 
-            {   
-                "Key", "Date", 
-                "CurrencyId", "Currency" 
+            List<string> notSummaryTitles = new List<string>
+            {
+                "Key", "Date",
+                "CurrencyId", "Currency"
             };
 
             #endregion
@@ -445,7 +445,7 @@ namespace BackendSite.Controllers.Api
                                                             StartDate,
                                                             EndDate);
 
-            var currencyList = ExportData.Select(x=>x.CurrencyId).Distinct();
+            var currencyList = ExportData.Select(x => x.CurrencyId).Distinct();
 
             var currencyData = _reportBLL.GetCurrency();
 
@@ -488,7 +488,7 @@ namespace BackendSite.Controllers.Api
             Titles.Add("ThisMonthInMYR", new TitleModel { Name = "Total in MYR", SortId = 800 });
             Titles.Add("LastMonthInMYR", new TitleModel { Name = "Total in MYR", SortId = 1000 });
 
-            foreach(var curr in currencyList)
+            foreach (var curr in currencyList)
             {
                 string isoCode = currencyData.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
 
@@ -524,13 +524,22 @@ namespace BackendSite.Controllers.Api
 
             #endregion
 
+            #region Group Title
+
+            List<string> groupTitle = new List<string>
+            {
+                "GameName"
+            };
+
+            #endregion
+
             #region Not Summary Title
 
-            List<string> notSummaryTitles = new List<string> 
-            {   "Key", "CurrencyId", 
-                "Currency", "CategoryId", 
-                "CategoryName", "GameId", 
-                "GameName" 
+            List<string> notSummaryTitles = new List<string>
+            {   "Key", "CurrencyId",
+                "Currency", "CategoryId",
+                "CategoryName", "GameId",
+                "GameName"
             };
 
             #endregion
@@ -547,12 +556,23 @@ namespace BackendSite.Controllers.Api
                 var LastMonthPropName = $"LastMonth-{item.IsoCode}";
 
                 var getKey = $"{item.CategoryId}-{item.GameId}";
+
                 var getTurnOverItem = turnOverContent.FirstOrDefault(x =>
                     x.Any(y => y.Key == "Key" && (string)y.Value == getKey)
                 );
 
                 var getWinLossItem = winLossContent.FirstOrDefault(x =>
                     x.Any(y => y.Key == "Key" && (string)y.Value == getKey)
+                );
+
+                var getCategoryKey = $"{item.CategoryId}-Total";
+
+                var getTurnOverCategoryItem = turnOverContent.FirstOrDefault(x =>
+                    x.Any(y => y.Key == "Key" && (string)y.Value == getCategoryKey)
+                );
+
+                var getWinLossCategoryItem = winLossContent.FirstOrDefault(x =>
+                    x.Any(y => y.Key == "Key" && (string)y.Value == getCategoryKey)
                 );
 
                 if (getTurnOverItem != null)
@@ -639,6 +659,107 @@ namespace BackendSite.Controllers.Api
                         { "CategoryName", item.CategoryName },
                         { "GameId", item.GameId },
                         { "GameName", item.GameName },
+
+                        { TodayPropName,  item.TurnOverValidBetTodaySummary },
+                        { YesterdayPropName, item.TurnOverValidBetYesterdaySummary },
+                        { LastTwoDaysPropName, item.TurnOverValidBetLastTwoDaysSummary },
+                        { ThisMonthPropName, item.TurnOverValidBetThisMonthSummary },
+                        { LastMonthPropName, item.TurnOverValidBetLastMonthSummary },
+
+                        { "TodayInMYR", item.TurnOverValidBetTodaySummaryInMYR },
+                        { "YesterdayInMYR", item.TurnOverValidBetYesterdaySummaryInMYR },
+                        { "LastTwoDaysInMYR", item.TurnOverValidBetLastTwoDaysSummaryInMYR },
+                        { "ThisMonthInMYR", item.TurnOverValidBetThisMonthSummaryInMYR},
+                        { "LastMonthInMYR", item.TurnOverValidBetLastMonthSummaryInMYR }
+                    };
+
+                    turnOverContent.Add(newItem);
+                }
+
+                if (getTurnOverCategoryItem != null)
+                {
+                    getTurnOverCategoryItem.TryGetValue("TodayInMYR", out dynamic today);
+                    getTurnOverCategoryItem["TodayInMYR"] = (decimal)today + item.TurnOverValidBetTodaySummaryInMYR;
+
+                    getTurnOverCategoryItem.TryGetValue("YesterdayInMYR", out dynamic withdrawal);
+                    getTurnOverCategoryItem["YesterdayInMYR"] = (decimal)withdrawal + item.TurnOverValidBetYesterdaySummaryInMYR;
+
+                    getTurnOverCategoryItem.TryGetValue("LastTwoDaysInMYR", out dynamic nett);
+                    getTurnOverCategoryItem["LastTwoDaysInMYR"] = (decimal)nett + item.TurnOverValidBetLastTwoDaysSummaryInMYR;
+
+                    getTurnOverCategoryItem.TryGetValue("ThisMonthInMYR", out dynamic bonus);
+                    getTurnOverCategoryItem["ThisMonthInMYR"] = (decimal)bonus + item.TurnOverValidBetThisMonthSummaryInMYR;
+
+                    getTurnOverCategoryItem.TryGetValue("LastMonthInMYR", out dynamic rebate);
+                    getTurnOverCategoryItem["LastMonthInMYR"] = (decimal)rebate + item.TurnOverValidBetLastMonthSummaryInMYR;
+
+
+                    //Today
+                    if (getTurnOverCategoryItem.ContainsKey(TodayPropName))
+                    {
+                        getTurnOverCategoryItem.TryGetValue(TodayPropName, out dynamic todaydata);
+                        getTurnOverCategoryItem[TodayPropName] = (decimal)todaydata + item.TurnOverValidBetTodaySummary;
+                    }
+                    else
+                    {
+                        getTurnOverCategoryItem.Add(TodayPropName, item.TurnOverValidBetTodaySummary);
+                    }
+
+                    //Yesterday
+                    if (getTurnOverCategoryItem.ContainsKey(YesterdayPropName))
+                    {
+                        getTurnOverCategoryItem.TryGetValue(YesterdayPropName, out dynamic yesterdaydata);
+                        getTurnOverCategoryItem[YesterdayPropName] = (decimal)yesterdaydata + item.TurnOverValidBetYesterdaySummary;
+                    }
+                    else
+                    {
+                        getTurnOverCategoryItem.Add(YesterdayPropName, item.TurnOverValidBetYesterdaySummary);
+                    }
+
+                    //LastTwoDays
+                    if (getTurnOverCategoryItem.ContainsKey(LastTwoDaysPropName))
+                    {
+                        getTurnOverCategoryItem.TryGetValue(LastTwoDaysPropName, out dynamic lasttwodaysdata);
+                        getTurnOverCategoryItem[LastTwoDaysPropName] = (decimal)lasttwodaysdata + item.TurnOverValidBetLastTwoDaysSummary;
+                    }
+                    else
+                    {
+                        getTurnOverCategoryItem.Add(LastTwoDaysPropName, item.TurnOverValidBetLastTwoDaysSummary);
+                    }
+
+                    //ThisMonth
+                    if (getTurnOverCategoryItem.ContainsKey(ThisMonthPropName))
+                    {
+                        getTurnOverCategoryItem.TryGetValue(ThisMonthPropName, out dynamic thismonthdata);
+                        getTurnOverCategoryItem[ThisMonthPropName] = (decimal)thismonthdata + item.TurnOverValidBetThisMonthSummary;
+                    }
+                    else
+                    {
+                        getTurnOverCategoryItem.Add(ThisMonthPropName, item.TurnOverValidBetThisMonthSummary);
+                    }
+
+                    //LastMonth
+                    if (getTurnOverCategoryItem.ContainsKey(LastMonthPropName))
+                    {
+                        getTurnOverCategoryItem.TryGetValue(LastMonthPropName, out dynamic lastmonthdata);
+                        getTurnOverCategoryItem[LastMonthPropName] = (decimal)lastmonthdata + item.TurnOverValidBetLastMonthSummary;
+                    }
+                    else
+                    {
+                        getTurnOverCategoryItem.Add(LastMonthPropName, item.TurnOverValidBetLastMonthSummary);
+                    }
+                }
+                else
+                {
+                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    {
+                        { "Key", getCategoryKey },
+                        { "CurrencyId", item.CurrencyId },
+                        { "Currency", item.IsoCode },
+                        { "CategoryId", item.CategoryId },
+                        { "CategoryName", item.CategoryName },
+                        { "GameId", "TOTAL" },
+                        { "GameName", "TOTAL：" },
 
                         { TodayPropName,  item.TurnOverValidBetTodaySummary },
                         { YesterdayPropName, item.TurnOverValidBetYesterdaySummary },
@@ -757,18 +878,134 @@ namespace BackendSite.Controllers.Api
 
                     winLossContent.Add(newItem);
                 }
+
+                if (getWinLossCategoryItem != null)
+                {
+                    getWinLossCategoryItem.TryGetValue("TodayInMYR", out dynamic today);
+                    getWinLossCategoryItem["TodayInMYR"] = (decimal)today + item.WinLossTodaySummaryInMYR;
+
+                    getWinLossCategoryItem.TryGetValue("YesterdayInMYR", out dynamic yesterday);
+                    getWinLossCategoryItem["YesterdayInMYR"] = (decimal)yesterday + item.TurnOverValidBetYesterdaySummaryInMYR;
+
+                    getWinLossCategoryItem.TryGetValue("LastTwoDaysInMYR", out dynamic lasttwodays);
+                    getWinLossCategoryItem["LastTwoDaysInMYR"] = (decimal)lasttwodays + item.WinLossLastTwoDaysSummaryInMYR;
+
+                    getWinLossCategoryItem.TryGetValue("ThisMonthInMYR", out dynamic thismonth);
+                    getWinLossCategoryItem["ThisMonthInMYR"] = (decimal)thismonth + item.WinLossThisMonthSummaryInMYR;
+
+                    getWinLossCategoryItem.TryGetValue("LastMonthInMYR", out dynamic lastmonth);
+                    getWinLossCategoryItem["LastMonthInMYR"] = (decimal)lastmonth + item.WinLossLastMonthSummaryInMYR;
+
+
+                    //Today
+                    if (getWinLossCategoryItem.ContainsKey(TodayPropName))
+                    {
+                        getWinLossCategoryItem.TryGetValue(TodayPropName, out dynamic todaydata);
+                        getWinLossCategoryItem[TodayPropName] = (decimal)todaydata + item.WinLossTodaySummary;
+                    }
+                    else
+                    {
+                        getWinLossCategoryItem.Add(TodayPropName, item.WinLossTodaySummary);
+                    }
+
+                    //Yesterday
+                    if (getWinLossCategoryItem.ContainsKey(YesterdayPropName))
+                    {
+                        getWinLossCategoryItem.TryGetValue(YesterdayPropName, out dynamic yesterdaydata);
+                        getWinLossCategoryItem[YesterdayPropName] = (decimal)yesterdaydata + item.WinLossYesterdaySummary;
+                    }
+                    else
+                    {
+                        getWinLossCategoryItem.Add(YesterdayPropName, item.WinLossYesterdaySummary);
+                    }
+
+                    //LastTwoDays
+                    if (getWinLossCategoryItem.ContainsKey(LastTwoDaysPropName))
+                    {
+                        getWinLossCategoryItem.TryGetValue(LastTwoDaysPropName, out dynamic lasttwodaysdata);
+                        getWinLossCategoryItem[LastTwoDaysPropName] = (decimal)lasttwodaysdata + item.WinLossLastTwoDaysSummary;
+                    }
+                    else
+                    {
+                        getWinLossCategoryItem.Add(LastTwoDaysPropName, item.WinLossLastTwoDaysSummary);
+                    }
+
+                    //ThisMonth
+                    if (getWinLossCategoryItem.ContainsKey(ThisMonthPropName))
+                    {
+                        getWinLossCategoryItem.TryGetValue(ThisMonthPropName, out dynamic thismonthdata);
+                        getWinLossCategoryItem[ThisMonthPropName] = (decimal)thismonthdata + item.WinLossThisMonthSummary;
+                    }
+                    else
+                    {
+                        getWinLossCategoryItem.Add(ThisMonthPropName, item.WinLossThisMonthSummary);
+                    }
+
+                    //LastMonth
+                    if (getWinLossCategoryItem.ContainsKey(LastMonthPropName))
+                    {
+                        getWinLossCategoryItem.TryGetValue(LastMonthPropName, out dynamic lastmonthdata);
+                        getWinLossCategoryItem[LastMonthPropName] = (decimal)lastmonthdata + item.WinLossLastMonthSummary;
+                    }
+                    else
+                    {
+                        getWinLossCategoryItem.Add(LastMonthPropName, item.WinLossLastMonthSummary);
+                    }
+
+                }
+                else
+                {
+                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    {
+                        { "Key", getCategoryKey },
+                        { "CurrencyId", item.CurrencyId },
+                        { "Currency", item.IsoCode },
+                        { "CategoryId", item.CategoryId },
+                        { "CategoryName", item.CategoryName },
+                        { "GameId", "TOTAL" },
+                        { "GameName", "TOTAL：" },
+
+                        { TodayPropName,  item.WinLossTodaySummary },
+                        { YesterdayPropName, item.WinLossYesterdaySummary },
+                        { LastTwoDaysPropName, item.WinLossLastTwoDaysSummary },
+                        { ThisMonthPropName, item.WinLossThisMonthSummary },
+                        { LastMonthPropName, item.WinLossLastMonthSummary },
+
+                        { "TodayInMYR", item.WinLossTodaySummaryInMYR },
+                        { "YesterdayInMYR", item.WinLossYesterdaySummaryInMYR },
+                        { "LastTwoDaysInMYR", item.WinLossLastTwoDaysSummaryInMYR },
+                        { "ThisMonthInMYR", item.WinLossThisMonthSummaryInMYR},
+                        { "LastMonthInMYR", item.WinLossLastMonthSummaryInMYR }
+                    };
+
+                    winLossContent.Add(newItem);
+                }
             }
+
+            #region Merge Content Rule
+
+            var categoryIdList = ExportData.Select(x => x.CategoryId).Distinct().OrderBy(x => x);
+            List<int> mergeContentRule = new List<int>();
+
+            foreach (var categoryId in categoryIdList)
+            {
+                mergeContentRule.Add(turnOverContent.Where(x => x["CategoryId"] == categoryId).Count());
+            }
+
+            #endregion
 
             List<ComplexReportExportDataToExcel> d = new List<ComplexReportExportDataToExcel>()
             {
                 new ComplexReportExportDataToExcel()
                 {
                     SheetName = "TurnOver(ValidBet)",
-                    Content = turnOverContent,
+                    Content = turnOverContent.OrderBy(x => x["Key"]),
                     Titles = Titles.OrderBy(x=> x.Value.SortId).ToDictionary(x=>x.Key,x=>x.Value.Name),
                     TotalTitles = totalTitle,
                     TitlesToMerge = titlesToMerge,
-                    NotSummaryTitles = notSummaryTitles
+                    NotSummaryTitles = notSummaryTitles,
+                    MergeContentRules = mergeContentRule,
+                    GroupTitles = groupTitle
                 },
                 new ComplexReportExportDataToExcel()
                 {
@@ -777,7 +1014,9 @@ namespace BackendSite.Controllers.Api
                     Titles = Titles.OrderBy(x=> x.Value.SortId).ToDictionary(x=>x.Key,x=>x.Value.Name),
                     TotalTitles = totalTitle,
                     TitlesToMerge = titlesToMerge,
-                    NotSummaryTitles = notSummaryTitles
+                    NotSummaryTitles = notSummaryTitles,
+                    MergeContentRules = mergeContentRule,
+                    GroupTitles = groupTitle
                 }
             };
 
@@ -860,7 +1099,7 @@ namespace BackendSite.Controllers.Api
             Titles.Add("LocalTime", new TitleModel { Name = "Local Time(GMT +8)", SortId = 1 });
             Titles.Add("TotalOnline", new TitleModel { Name = "Total Online", SortId = 200 });
 
-            foreach(var site in siteList)
+            foreach (var site in siteList)
             {
                 string siteName = serverData.Where(x => x.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
 
@@ -878,14 +1117,14 @@ namespace BackendSite.Controllers.Api
                 "TotalOnline",
             };
 
-            List<string> notSummaryTitles = new List<string> 
-            { 
+            List<string> notSummaryTitles = new List<string>
+            {
                 "Key", "LocalTime",
-                "TotalOnline" 
+                "TotalOnline"
             };
-            
+
             #endregion
-           
+
             foreach (var item in ExportData)
             {
                 var OnlinePropName = $"Online-{item.SiteName}";
@@ -1023,7 +1262,7 @@ namespace BackendSite.Controllers.Api
             Dictionary<string, MergeTitleModel> depositTypeTitles = new Dictionary<string, MergeTitleModel>();
             depositTypeTitles.Add("FirstMergeTitle", new MergeTitleModel { Name = "", MergeRange = 1 });
 
-            depositTypeTitles.Add("OnlineBanking", new MergeTitleModel {Name = "Online Banking", MergeRange = (currencyList.Count() + 1) * 2 });
+            depositTypeTitles.Add("OnlineBanking", new MergeTitleModel { Name = "Online Banking", MergeRange = (currencyList.Count() + 1) * 2 });
             depositTypeTitles.Add("MobilePay", new MergeTitleModel { Name = "Mobile Pay", MergeRange = (currencyList.Count() + 1) * 2 });
             depositTypeTitles.Add("LocalBanking", new MergeTitleModel { Name = "Local Banking", MergeRange = (currencyList.Count() + 1) * 2 });
             depositTypeTitles.Add("TotalData", new MergeTitleModel { Name = "", MergeRange = (currencyList.Count() + 1) * 6 });
@@ -1033,7 +1272,7 @@ namespace BackendSite.Controllers.Api
             Dictionary<string, MergeTitleModel> mergeTitles = new Dictionary<string, MergeTitleModel>();
             mergeTitles.Add("SecondMergeTitle", new MergeTitleModel { Name = "", MergeRange = 1 });
 
-            mergeTitles.Add("OnlineAmount", new MergeTitleModel { Name = "Amount", MergeRange = currencyList.Count() + 1});
+            mergeTitles.Add("OnlineAmount", new MergeTitleModel { Name = "Amount", MergeRange = currencyList.Count() + 1 });
             mergeTitles.Add("OnlinePrecent", new MergeTitleModel { Name = "%", MergeRange = currencyList.Count() + 1 });
             mergeTitles.Add("MobileAmount", new MergeTitleModel { Name = "Amount", MergeRange = currencyList.Count() + 1 });
             mergeTitles.Add("MobilePrecent", new MergeTitleModel { Name = "%", MergeRange = currencyList.Count() + 1 });
@@ -1068,7 +1307,7 @@ namespace BackendSite.Controllers.Api
             summaryTitles.Add("FTDCount", new TitleModel { Name = "Total FTD Count", SortId = 2200 });
             summaryTitles.Add("ApTime", new TitleModel { Name = "Total Averange Processing Time", SortId = 2400 });
 
-            foreach(var curr in currencyList)
+            foreach (var curr in currencyList)
             {
                 string isoCode = currencyData.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
 
@@ -1138,19 +1377,19 @@ namespace BackendSite.Controllers.Api
             Dictionary<string, MergeTitleModel> accountNameTitles = new Dictionary<string, MergeTitleModel>();
             Dictionary<string, MergeTitleModel> dateMergeTitles = new Dictionary<string, MergeTitleModel>();
 
-            accountNameTitles.Add("Account",new MergeTitleModel { Name="Account",MergeRange=1});
+            accountNameTitles.Add("Account", new MergeTitleModel { Name = "Account", MergeRange = 1 });
             dateMergeTitles.Add("SecondMergeTitle", new MergeTitleModel { Name = "", MergeRange = 1 });
 
             foreach (var data in ExportData)
             {
-                foreach(var account in data.SummaryAccountData)
+                foreach (var account in data.SummaryAccountData)
                 {
-                    accountNameTitles.Add($"{account.AccountType}-{account.AccountId}-AccountName", new MergeTitleModel { Name = account.AccountName, MergeRange = (currencyList.Count() + 1)*5 });
+                    accountNameTitles.Add($"{account.AccountType}-{account.AccountId}-AccountName", new MergeTitleModel { Name = account.AccountName, MergeRange = (currencyList.Count() + 1) * 5 });
 
                     dateMergeTitles.Add($"{account.AccountType}-{account.AccountId}-TotalAmount", new MergeTitleModel { Name = "Total Amount", MergeRange = currencyList.Count() + 1 });
                     dateMergeTitles.Add($"{account.AccountType}-{account.AccountId}-TotalCount", new MergeTitleModel { Name = "Total Count", MergeRange = currencyList.Count() + 1 });
-                    dateMergeTitles.Add($"{account.AccountType}-{account.AccountId}-AverangeAmount", new MergeTitleModel { Name = "Averange Amount", MergeRange = currencyList.Count() + 1});
-                    dateMergeTitles.Add($"{account.AccountType}-{account.AccountId}-SuccessRate", new MergeTitleModel { Name = "Success Rate(%)", MergeRange = currencyList.Count() + 1});
+                    dateMergeTitles.Add($"{account.AccountType}-{account.AccountId}-AverangeAmount", new MergeTitleModel { Name = "Averange Amount", MergeRange = currencyList.Count() + 1 });
+                    dateMergeTitles.Add($"{account.AccountType}-{account.AccountId}-SuccessRate", new MergeTitleModel { Name = "Success Rate(%)", MergeRange = currencyList.Count() + 1 });
                     dateMergeTitles.Add($"{account.AccountType}-{account.AccountId}-FTDCount", new MergeTitleModel { Name = "FTD Count", MergeRange = currencyList.Count() + 1 });
                 }
             }
@@ -1249,7 +1488,7 @@ namespace BackendSite.Controllers.Api
                             getItem.Add(MobilePrecentPropName, accountCurrencyItem.MobilePrecent);
                             getItem.Add(LocalAmountPropName, accountCurrencyItem.LocalDeposit);
                             getItem.Add(LocalPrecentPropName, accountCurrencyItem.LocalPrecent);
-                            
+
                             getItem.Add(TotalAmountPropName, accountCurrencyItem.TotalAmount);
                             getItem.Add(TotalCountPropName, accountCurrencyItem.TotalCount);
                             getItem.Add(AverangeAmountPropName, accountCurrencyItem.AverangeDeposit);
@@ -1296,7 +1535,7 @@ namespace BackendSite.Controllers.Api
                             };
 
                             summaryContent.Add(newItem);
-                            
+
                         }
 
                     }
@@ -1385,7 +1624,7 @@ namespace BackendSite.Controllers.Api
                 }
 
                 //Date Data
-                foreach(var accountItem in item.SummaryAccountData)
+                foreach (var accountItem in item.SummaryAccountData)
                 {
                     //Date Data Filling
                     foreach (var accountDateItem in accountItem.DateData)
@@ -1448,11 +1687,11 @@ namespace BackendSite.Controllers.Api
 
                         //if (getItem != null)
                         //{
-                            getItem.Add(TotalAmountPropName, accountDateItem.TotalAmount);
-                            getItem.Add(TotalCountPropName, accountDateItem.TotalCount);
-                            getItem.Add(AverangeAmountPropName, accountDateItem.AverangeDeposit);
-                            getItem.Add(SuccessRatePropName, accountDateItem.SuccessRate);
-                            getItem.Add(FTDCountPropName, accountDateItem.FTDCount);
+                        getItem.Add(TotalAmountPropName, accountDateItem.TotalAmount);
+                        getItem.Add(TotalCountPropName, accountDateItem.TotalCount);
+                        getItem.Add(AverangeAmountPropName, accountDateItem.AverangeDeposit);
+                        getItem.Add(SuccessRatePropName, accountDateItem.SuccessRate);
+                        getItem.Add(FTDCountPropName, accountDateItem.FTDCount);
                         //}
                         //else
                         //{
