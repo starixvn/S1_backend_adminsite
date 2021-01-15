@@ -376,6 +376,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "PrizeSearch",
+        "Title": "Prize Search",
+        "FuncKey": "Marketing/PrizeSearch",
+        "Controller": "Marketing",
+        "Action": "PrizeSearch",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   }

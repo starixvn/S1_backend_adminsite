@@ -27,13 +27,15 @@ namespace BackendSite.Controllers.Api
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly ReferralManagementBLL referralManagementBLL;
         private readonly ReportBLL reportBLL;
+        private readonly PrizeBLL prizeBLL;
 
-        public BonusManageController(BonusManageBLL bonusManageBLL, ServerInfoBLL serverInfoBLL, ReferralManagementBLL referralManagementBLL, ReportBLL reportBLL)
+        public BonusManageController(BonusManageBLL bonusManageBLL, ServerInfoBLL serverInfoBLL, ReferralManagementBLL referralManagementBLL, ReportBLL reportBLL, PrizeBLL prizeBLL)
         {
             this.bonusManageBLL = bonusManageBLL;
             this.serverInfoBLL = serverInfoBLL;
             this.referralManagementBLL = referralManagementBLL;
             this.reportBLL = reportBLL;
+            this.prizeBLL = prizeBLL;
         }
 
         [HttpPost]
@@ -451,6 +453,50 @@ namespace BackendSite.Controllers.Api
             apiResult.ErrorCode = 0;
             apiResult.Message = "";
 
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiListResult<PrizeData> PrizeSearch(PrizeSelect prizeSelect)
+        {
+            var apiResult = new ApiListResult<PrizeData>();
+            try
+            {
+                var prizeSearchResult = prizeBLL.PrizeSearch(prizeSelect);
+                apiResult.Data = prizeSearchResult.PrizeData;
+                apiResult.PageNumber = prizeSearchResult.PageNumber;
+                apiResult.TotalPages = prizeSearchResult.TotalPages;
+                apiResult.RowCount = prizeSearchResult.RowCount;
+                apiResult.ErrorCode = 0;
+            }
+            catch(Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+            
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiListResult<PrizeLogData> GetPrizeLog(PrizeLogPara prizeLogPara)
+        {
+            var apiResult = new ApiListResult<PrizeLogData>();
+            try
+            {
+                var logResult = prizeBLL.GetPrizeLog(prizeLogPara);
+                apiResult.Data = logResult.PrizeLogData;
+                apiResult.PageNumber = logResult.PageNumber;
+                apiResult.TotalPages = logResult.TotalPages;
+                apiResult.RowCount = logResult.RowCount;
+                apiResult.ErrorCode = 0;
+            }
+            catch(Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+            
             return apiResult;
         }
     }

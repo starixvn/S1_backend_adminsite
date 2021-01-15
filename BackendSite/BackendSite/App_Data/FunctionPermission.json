@@ -281,6 +281,11 @@
         "DisplayKey": "Banner Management",
         "FuncKey": "Marketing/BannerManage",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Prize Search",
+        "FuncKey": "Marketing/PrizeSearch",
+        "Enable": false
       }
     ]
   }

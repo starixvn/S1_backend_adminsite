@@ -87,6 +87,9 @@ const ReferralManagement = lazy(() =>
 const ReferralReport = lazy(() => 
 	import("./pages/Marketing/ReferralReport/index")
 );
+const PrizeSearch = lazy(() => 
+	import("./pages/Marketing/PrizeSearch/index")
+);
 
 export const defaultPage = "DepositReport";
 
@@ -462,6 +465,19 @@ export const pages = {
 		comp: (
 			<Suspense fallback="loading...">
 				<ReferralReport />
+			</Suspense>
+		),
+		css: [
+			"./lib/bootstrap/dist/css/bootstrap.min.css",
+			"./css/css/main.css",
+			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
+		],
+		layout: layoutType.N88
+	},
+	PrizeSearch: {
+		comp: (
+			<Suspense fallback="loading...">
+				<PrizeSearch />
 			</Suspense>
 		),
 		css: [
