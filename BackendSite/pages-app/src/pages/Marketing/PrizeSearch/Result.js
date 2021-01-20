@@ -6,9 +6,8 @@ const dataColumnDefs = () => {
     { dataColumn: "eventDate", columnTitle: "EventDate" },
     { dataColumn: "siteName", columnTitle: "SiteName" },
     { dataColumn: "currency", columnTitle: "Currency" },
-    { dataColumn: "giftName", columnTitle: "GiftName" },
+    { dataColumn: "prizeName", columnTitle: "PrizeName" },
     { dataColumn: "amount", columnTitle: "Amount" },
-    { dataColumn: "quantity", columnTitle: "Quantity" },
     { dataColumn: "usedQuantity", columnTitle: "UsedQuantity" },
     { dataColumn: "listOfWinner", columnTitle: "List Of Winner" },
   ];

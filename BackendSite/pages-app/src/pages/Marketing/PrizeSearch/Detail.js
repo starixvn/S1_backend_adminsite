@@ -22,8 +22,8 @@ const Panel = (props) => {
     let Data = {
       PrizeId: props.PrizeId,
       EventId: props.EventId,
-      StartDate: moment(props.StartDate).unix(),
-      EndDate: moment(props.EndDate).unix(),
+      StartDate: moment(props.EventTime).unix(),
+      EndDate: moment(props.EventTime).add(1, "days").unix() - 1,
       PageNumber: 1,
     };
     api
@@ -51,8 +51,8 @@ const Panel = (props) => {
     let Data = {
       PrizeId: props.PrizeId,
       EventId: props.EventId,
-      StartDate: moment(props.StartDate).unix(),
-      EndDate: moment(props.EndDate).unix(),
+      StartDate: moment(props.EventTime).unix(),
+      EndDate: moment(props.EventTime).add(1, "days").unix() - 1,
       PageNumber: PageNumber,
     };
     api

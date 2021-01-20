@@ -35,9 +35,10 @@ namespace BackendSite.Service.DAL
             props.Add("SelectSite", prizeSelect.SelectSite != null ? prizeSelect.SelectSite.Any()? JsonConvert.SerializeObject(prizeSelect.SelectSite) :null: null);
             props.Add("CurrencyId", prizeSelect.CurrencyId);
 
-            var result = conn.Query<PrizeData>("Admin_Prize_Get", props, commandType: CommandType.StoredProcedure);
-            SearchResult.PrizeData = result.ToList();
-            SearchResult.TotalPages = props.Get<int?>("PageNumber") ?? 0;
+            var result = conn.Query<DrawPrize>("Admin_DrawPrize_Get", props, commandType: CommandType.StoredProcedure);
+            
+            SearchResult.DrawPrize = result.ToList();
+            SearchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
             SearchResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
             SearchResult.RowCount = props.Get<int?>("RowCount") ?? 0;
 
@@ -59,9 +60,9 @@ namespace BackendSite.Service.DAL
             props.Add("EventId", prizeLogPara.EventId);
             props.Add("PrizeId", prizeLogPara.PrizeId);
 
-            var result = conn.Query<PrizeLogData>("Admin_Prize_ListOfWinner_Get", props, commandType: CommandType.StoredProcedure);
+            var result = conn.Query<PrizeLogData>("Admin_DrawPrize_ListOfWinner_Get", props, commandType: CommandType.StoredProcedure);
             LogResult.PrizeLogData = result.ToList();
-            LogResult.TotalPages = props.Get<int?>("PageNumber") ?? 0;
+            LogResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
             LogResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
             LogResult.RowCount = props.Get<int?>("RowCount") ?? 0;
 

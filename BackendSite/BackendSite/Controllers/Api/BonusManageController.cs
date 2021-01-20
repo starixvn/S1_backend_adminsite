@@ -457,13 +457,13 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiListResult<PrizeData> PrizeSearch(PrizeSelect prizeSelect)
+        public ApiListResult<DrawPrize> PrizeSearch(PrizeSelect prizeSelect)
         {
-            var apiResult = new ApiListResult<PrizeData>();
+            var apiResult = new ApiListResult<DrawPrize>();
             try
             {
                 var prizeSearchResult = prizeBLL.PrizeSearch(prizeSelect);
-                apiResult.Data = prizeSearchResult.PrizeData;
+                apiResult.Data = prizeSearchResult.DrawPrize;
                 apiResult.PageNumber = prizeSearchResult.PageNumber;
                 apiResult.TotalPages = prizeSearchResult.TotalPages;
                 apiResult.RowCount = prizeSearchResult.RowCount;

@@ -30,6 +30,7 @@ const App = () => {
     EventId: 0,
     StartDate: "",
     EndDate: "",
+    EventTime: ""
   });
 
   useEffect(() => {
@@ -50,7 +51,6 @@ const App = () => {
     setFilter({
       ...stateFilter,
     });
-    console.log(stateFilter);
   };
 
   const Filter_CheckBox_OnChange = (v, dataColumn) => {
@@ -161,8 +161,9 @@ const App = () => {
       ...detailDatas,
       PrizeId: prop.prizeId,
       EventId: prop.eventId,
-      StartDate: prop.startDate,
-      EndDate: prop.endDate,
+      StartDate: prop.startTime,
+      EndDate: prop.endTime,
+      EventTime: prop.eventTime
     });
     setstate(1);
   };
@@ -200,7 +201,8 @@ const App = () => {
         PrizeId={detailDatas.PrizeId}
         EventId={detailDatas.EventId}
         StartDate={detailDatas.StartDate}
-        EndDate={detailDatas.EndDate}/>
+        EndDate={detailDatas.EndDate}
+        EventTime={detailDatas.EventTime}/>
         <div className="button-group">
           <button
             className="btn btn-search"

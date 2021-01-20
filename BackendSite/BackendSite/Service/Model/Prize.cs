@@ -39,23 +39,22 @@ namespace BackendSite.Service.Model
                 PageSize = 10;
         }
     }
-    public class PrizeData
+    public class DrawPrize
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
         public int EventId { get; set; }
         public int PrizeId { get; set; }
-        public int Quantity { get; set; }
         public int UsedQuantity { get; set; }
-        public int GiftId { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public int GiftType { get; set; }
-        public string GiftName { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public int PrizeType { get; set; }
+        public string PrizeName { get; set; }
         public decimal Amount { get; set; }
         public string Currency { get; set; }
         public string SiteName { get; set; }
         public string EventDate { get; set; }
+        public DateTime EventTime { get; set; }
     }
     public class PrizeLogData
     {
@@ -64,7 +63,7 @@ namespace BackendSite.Service.Model
     }
     public class PrizeSearchResult
     {
-        public List<PrizeData> PrizeData { get; set; }
+        public List<DrawPrize> DrawPrize { get; set; }
         public int PageNumber { get; set; }
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
