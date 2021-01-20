@@ -128,6 +128,10 @@ const App = () => {
 				TpId: Number(banner.tpId),
 				GameId: banner.gameId,
 				UrlRouter: banner.urlRouter,
+				UnixSportBattleDateTime: moment(banner.sportBattleDateTime).unix(),
+				SportCategoryId: Number(banner.sportCategoryId),
+				SportLeaguesId: Number(banner.sportLeaguesId),
+				SportTeamsId: (Object.keys(banner.sportTeamsId).length > 0) ? [{ "Home": Number(banner.sportTeamsId.home), "Away": Number(banner.sportTeamsId.away) }] : null,
 				Specific: _specific
 			};
 			let param = {
@@ -140,7 +144,7 @@ const App = () => {
 			WebAPI.PostData(param).then(
 				res => {
 					if (isMountedRef.current) {
-						if (res.data.errorCode === 0) {
+						if (res.data.errorCode <= 2 ) {
 							dispatch({ type: defActionType.SET_BANNER });
 							GetSiteBannerList(_banner.SiteId);
 						} else if (res.data.errorCode === 1062) {
@@ -166,39 +170,46 @@ const App = () => {
 			if (isMountedRef.current) {
 				setProcessing(true);
 			}
-			const bannerData = await WebAPI.PostData({
-				Url: "BannerManage/GetBanner",
-				Data: qs.stringify({
-					SiteId: state.bannerList[idx].siteId,
-					BannerName: state.bannerList[idx].bannerName
+			let bannerData = {};
+			try {
+				const res = await WebAPI.PostData({
+					Url: "BannerManage/GetBanner",
+					Data: qs.stringify({
+						SiteId: state.bannerList[idx].siteId,
+						BannerName: state.bannerList[idx].bannerName
+					})
 				})
-			}).then(
-				res => {
-					return {
-						errorCode: res.data.errorCode,
-						data: res.data.data,
-						msg: res.data.message
-					};
-				},
-				err => {
-					return { errorCode: 991 };
+
+				bannerData = {
+					errorCode: res.data.errorCode,
+					data: res.data.data,
+					msg: res.data.message
 				}
-			);
 
-			if (bannerData.errorCode === 0) {
-				dispatch({
-					type: defActionType.EDIT_BANNER,
-					bannerData: bannerData.data,
-				});
-			} else {
-				let msg =
-					bannerData.errorCode === 991 ? "API Server Error." : bannerData.msg;
-				alert(msg);
+				if (bannerData.errorCode === 0) {
+					if (isMountedRef.current) {
+						setProcessing(false);
+						dispatch({
+							type: defActionType.EDIT_BANNER,
+							bannerData: bannerData.data,
+						});
+					}
+
+				} else {
+					if (isMountedRef.current) {
+						setProcessing(false);
+					}
+					let msg =
+						bannerData.errorCode === 991 ? "API Server Error." : bannerData.msg;
+					alert(msg);
+				}
+			} catch (error) {
+				if (isMountedRef.current) {
+					setProcessing(false);
+				}
+				bannerData = { errorCode: 991 }
 			}
 
-			if (isMountedRef.current) {
-				setProcessing(false);
-			}
 		}
 	};
 
@@ -235,8 +246,10 @@ const App = () => {
 	};
 
 	const skipField = {
-		"default": ["bonusCode", "matchId", "tpId", "gameId", "urlRouter"]
+		"default": ["bonusCode", "matchId", "tpId", "gameId", "urlRouter", "sportBattleDateTime", "sportCategoryId", "sportLeaguesId", "sportTeamsId"],
+		"2": ["bonusCode", "gameId", "urlRouter", "currentTab", "selectedCurrencies", "specific", "currentLang"],
 	}
+
 	return state.panelType === defPanelType.Main ? (
 		<Main
 			GetSiteBannerList={GetSiteBannerList}
@@ -253,7 +266,7 @@ const App = () => {
 				SetSite={state.setSite}
 				SetCurrencyList={state.setCurrencyList}
 				SetLangList={state.setLangList}
-				action={{ SetBanner, ClickBack }}
+				action={{ SetBanner, ClickBack, setProcessing }}
 				IsAdd={state.panelType === defPanelType.Add}
 				processing={processing}
 				skipField={skipField}
