@@ -24,6 +24,7 @@ const Panel = (props) => {
       EventId: props.EventId,
       StartDate: moment(props.EventTime).unix(),
       EndDate: moment(props.EventTime).add(1, "days").unix() - 1,
+      EventTime: moment(props.EventTime).unix(),
       PageNumber: 1,
     };
     api
@@ -53,6 +54,7 @@ const Panel = (props) => {
       EventId: props.EventId,
       StartDate: moment(props.EventTime).unix(),
       EndDate: moment(props.EventTime).add(1, "days").unix() - 1,
+      EventTime: moment(props.EventTime).unix(),
       PageNumber: PageNumber,
     };
     api
@@ -83,7 +85,7 @@ const Panel = (props) => {
           <span className="label">{item.userName}</span>
         </td>
         <td>
-          <span className="label">{item.drawTime}</span>
+          <span className="label">{moment(item.drawTime).format("l LTS")}</span>
         </td>
       </tr>
     );

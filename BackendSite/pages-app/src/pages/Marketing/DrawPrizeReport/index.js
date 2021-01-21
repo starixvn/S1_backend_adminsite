@@ -30,7 +30,9 @@ const App = () => {
     EventId: 0,
     StartDate: "",
     EndDate: "",
-    EventTime: ""
+    EventTime: "",
+    PrizeName: "",
+    EventDate: ""
   });
 
   useEffect(() => {
@@ -163,7 +165,9 @@ const App = () => {
       EventId: prop.eventId,
       StartDate: prop.startTime,
       EndDate: prop.endTime,
-      EventTime: prop.eventTime
+      EventTime: prop.eventTime,
+      PrizeName: prop.prizeName,
+      EventDate: prop.eventDate
     });
     setstate(1);
   };
@@ -175,7 +179,7 @@ const App = () => {
   if (state === 0) {
     return (
       <div className="container-fluid">
-        <h4 className="page-name">Prize Search</h4>
+        <h4 className="page-name">Draw Prize Report</h4>
         <Filter
           filterInfo={stateFilter}
           onChange={Filter_OnChange}
@@ -196,7 +200,8 @@ const App = () => {
   } else {
     return (
       <div>
-        <h4 className="detail">List Of Winner</h4>
+        <h5 className="detail">EventDate:{detailDatas.EventDate}</h5>
+        <h5 className="detail">PrizeName:{detailDatas.PrizeName}</h5>
         <Detail 
         PrizeId={detailDatas.PrizeId}
         EventId={detailDatas.EventId}

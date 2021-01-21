@@ -378,11 +378,11 @@
         "Childs": null
       },
       {
-        "Key": "PrizeSearch",
-        "Title": "Prize Search",
-        "FuncKey": "Marketing/PrizeSearch",
+        "Key": "DrawPrizeReport",
+        "Title": "Draw Prize Report",
+        "FuncKey": "Marketing/DrawPrizeReport",
         "Controller": "Marketing",
-        "Action": "PrizeSearch",
+        "Action": "DrawPrizeReport",
         "Icon": "",
         "Roles": null,
         "Childs": null

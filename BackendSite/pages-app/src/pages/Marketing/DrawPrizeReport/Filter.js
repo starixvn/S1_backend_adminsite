@@ -34,7 +34,7 @@ const Panel = (props) => {
             dataColumn="SelectSite"
           />
         ) : null}
-        <DropDownBox
+        {/* <DropDownBox
           columnTitle="Currency"
           options={Object.keys(defCurrencyType).map((key) => {
             return { value: key, displayText: defCurrencyType[key] };
@@ -43,7 +43,7 @@ const Panel = (props) => {
           selectedValue={0}
           dataColumn="Type"
           onChange={props.onChange}
-        />
+        /> */}
         <DateTimePickerElem
           columnTitle="From Date"
           dateTimePickerProps={{

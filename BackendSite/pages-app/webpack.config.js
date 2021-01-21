@@ -113,9 +113,13 @@ module.exports = {
 		// 	"@babel/polyfill",
 		// 	"./src/pages/Marketing/BonusImport/index.js"
 		// ],
-		"Marketing/PrizeSearch.min": [
+		// "Marketing/DrawPrizeReport.min": [
+		// 	"@babel/polyfill",
+		// 	"./src/pages/Marketing/DrawPrizeReport/index.js"
+		// ],
+		"Marketing/ReferralReport.min": [
 			"@babel/polyfill",
-			"./src/pages/Marketing/PrizeSearch/index.js"
+			"./src/pages/Marketing/ReferralReport/index.js"
 		],
 	},
 	output: {

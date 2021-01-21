@@ -55,10 +55,9 @@ namespace BackendSite.Service.DAL
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("PageSize", prizeLogPara.PageSize);
-            props.Add("StartDate", prizeLogPara.StartDate);
-            props.Add("EndDate", prizeLogPara.EndDate);
             props.Add("EventId", prizeLogPara.EventId);
             props.Add("PrizeId", prizeLogPara.PrizeId);
+            props.Add("EventTime", prizeLogPara.EventTime);
 
             var result = conn.Query<PrizeLogData>("Admin_DrawPrize_ListOfWinner_Get", props, commandType: CommandType.StoredProcedure);
             LogResult.PrizeLogData = result.ToList();

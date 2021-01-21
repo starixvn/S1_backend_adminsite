@@ -283,8 +283,8 @@
         "Enable": false
       },
       {
-        "DisplayKey": "Prize Search",
-        "FuncKey": "Marketing/PrizeSearch",
+        "DisplayKey": "Draw Prize Report",
+        "FuncKey": "Marketing/DrawPrizeReport",
         "Enable": false
       }
     ]
