@@ -61,7 +61,7 @@ namespace BackendSite.Service.BLL
                     if (titles.Any(x => string.Equals(x, colName, StringComparison.OrdinalIgnoreCase)))
                     {
                         var colIdx = titles.IndexOf(colName) + 1;
-                        if (value != null && colName == "DateTime" && ((DateTime)value).Year > 1)
+                        if (value != null && value.GetType() == typeof(DateTime) && ((DateTime)value).Year > 1)
                         {
                             var time = new DateTimeOffset((DateTime)value);
                             ws.Cells[currentRow, colIdx].Value = time.ToOffset(TimeSpan.FromHours(8)).DateTime;
@@ -69,9 +69,7 @@ namespace BackendSite.Service.BLL
                         }
                         else
                         {
-
                             ws.Cells[currentRow, colIdx].Value = value;
-
                         }
                     }
                 }
