@@ -94,19 +94,7 @@ namespace BackendSite.Service.Model
         public string Agent { get; set; }
         public DateTime RegTime { get; set; }
         public int Status { get; set; }
-        private string _SabaID;
-        public string SabaID
-        {
-            get
-            {
-                return _SabaID == null ? $"{SiteName}_{}" : _SabaID;
-            }
-
-            set
-            {
-                _SabaID = value;
-            }
-        }
+        public string SabaID { get; set; }
         public string SignupUrl { get; set; }
         public string AffiliateId { get; set; }
     }
