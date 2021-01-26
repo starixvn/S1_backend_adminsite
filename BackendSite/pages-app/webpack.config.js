@@ -93,10 +93,10 @@ module.exports = {
 		// "Report/MainFinancialReport.min": [
 		// 	"./src/pages/Report/MainFinancialReport/index.js"
 		// ],
-		// "Marketing/BannerManage.min": [
-		// 	'@babel/polyfill',
-		// 	"./src/pages/Marketing/BannerManage/index.jsx"
-		// ],
+		"Marketing/BannerManage.min": [
+			'@babel/polyfill',
+			"./src/pages/Marketing/BannerManage/index.jsx"
+		],
 		// "Report/MainFinancialReport.min": [
 		// 	"./src/pages/Report/MainFinancialReport/index.js"
 		// ],
@@ -113,6 +113,14 @@ module.exports = {
 		// 	"@babel/polyfill",
 		// 	"./src/pages/Marketing/BonusImport/index.js"
 		// ],
+		// "Marketing/ReferralReport.min": [
+		// 	"@babel/polyfill",
+		// 	"./src/pages/Marketing/ReferralReport/index.js"
+		// ],
+		// "Marketing/ReferralManagement.min": [
+		// 	"@babel/polyfill",
+		// 	"./src/pages/Marketing/ReferralManagement/index.js"
+		// ]
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
