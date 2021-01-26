@@ -54,6 +54,9 @@ const dataColumnDefs = () => {
         {
             dataColumn: 'memo', columnTitle: 'Memo'
         },
+        {
+            dataColumn: 'operator', columnTitle: 'Operator'
+        },
     ]
 }
 
