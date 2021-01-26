@@ -33,6 +33,9 @@ const App = () => {
     const [SummaryStatus, setSummaryStatus] = useState(true);
     const [DateStatus, setDateStatus] = useState(false);
 
+    const [AccountDataShowLists, setAccountDataShowLists] = useState({});
+    const [AccoutDataShowStatus, setAccountDataShowStatus] = useState(false);
+
     useEffect(() => {
         let param = {
             Url: 'Common/AdminUserSiteList'
@@ -99,6 +102,24 @@ const App = () => {
             setSummaryStatus(true);
             setDateStatus(false);
         }
+    }
+
+    const Result_AccountShowBtnOnClick = (accountType,accountId,accountName) => {
+
+        setAccountDataShowLists({
+                'AccountType':accountType,
+                'AccountId': accountId,
+                'AccountName':accountName
+        });
+
+        setAccountDataShowStatus(true);
+    }
+
+    const Result_CloseBtnClick = (Status) => {
+
+        setAccountDataShowLists({});
+        setAccountDataShowStatus(false);
+
     }
 
     const Filter_Submit = () => {
@@ -575,6 +596,10 @@ const App = () => {
                       ExportBtnDisabled={ExportStatus}
                       SummaryBtnDisabled={SummaryStatus}
                       DateBtnDisabled={DateStatus}
+                      AccountDataShowLists={AccountDataShowLists}
+                      AccoutDataShowStatus={AccoutDataShowStatus}
+                      CloseBtn={Result_CloseBtnClick}
+                      SetAccountShowBtn={Result_AccountShowBtnOnClick}
                       SetShowDataBtn={Result_SetShowDataBtnOnClick}/>}
         </div>
     );
