@@ -1058,10 +1058,10 @@ const Panel = (props) => {
                         style={props.WinLossBtnDisabled ? {background:"black",color:"white"} : null}
                         onClick={() => props.SetShowDataBtn(props.TurnOverBtnDisabled,props.WinLossBtnDisabled)} 
                         disabled={props.WinLossBtnDisabled}>WinLoss</button>
-                {/* <button type="button" className="btn btn-approved" 
+                <button type="button" className="btn btn-approved" 
                         style={{position:"absolute",right:"23px"}}
                         onClick={props.ExportBtnDisabled ? null : props.ExportToExcel} 
-                        disabled={props.ExportBtnDisabled}>Export Excel</button> */}
+                        disabled={props.ExportBtnDisabled}>Export Excel</button>
             </div>
 
             <table className="table table-striped" hidden={!props.TurnOverBtnDisabled}>

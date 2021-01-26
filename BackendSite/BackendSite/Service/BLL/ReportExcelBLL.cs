@@ -43,13 +43,17 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<Dictionary<string, dynamic>> TotalContent { get; set; }
 
-        public Dictionary<string,string> Titles { get; set; }
+        public Dictionary<string, string> Titles { get; set; }
 
         public List<string> TotalTitles { get; set; }
 
         public List<Dictionary<string, MergeTitleModel>> TitlesToMerge { get; set; }
 
         public List<string> NotSummaryTitles { get; set; } = new List<string>();
+
+        public List<int> MergeContentRules { get; set; } = new List<int>();
+
+        public List<string> GroupTitles { get; set; } = new List<string>();
 
         public bool IsSummary { get; set; } = true;
 
@@ -157,7 +161,9 @@ namespace BackendSite.Service.BLL
                                                 s.TotalTitles,
                                                 s.IsSummary,
                                                 s.IsTotalTitleMax,
-                                                s.NotSummaryTitles);
+                                                s.NotSummaryTitles,
+                                                s.MergeContentRules,
+                                                s.GroupTitles);
 
                     }
                 }
@@ -273,7 +279,7 @@ namespace BackendSite.Service.BLL
                     cell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
 
-                    if(currentRow % 2 ==1)
+                    if (currentRow % 2 == 1)
                     {
                         if (i % 2 == 1)
                         {
@@ -363,8 +369,11 @@ namespace BackendSite.Service.BLL
                                              List<string> totalTitles,
                                              bool isSummary,
                                              bool IsTotalTitleMax,
-                                             List<string> notSummaryTitles)
+                                             List<string> notSummaryTitles,
+                                             List<int> mergeContentRules,
+                                             List<string> groupTitles)
         {
+            int bodyStartRow = currentRow;
             if (IsTotalTitleMax)
             {
                 for (var i = 0; i < data.Count(); i++)
@@ -399,6 +408,22 @@ namespace BackendSite.Service.BLL
                                                             titles,
                                                             currentRow,
                                                             totalTitles);
+            }
+
+            if (mergeContentRules.Count() > 0)
+            {
+                ComplexReportSetCustomizeBodyCellMerge(ws,
+                                                       mergeContentRules,
+                                                       bodyStartRow);
+            }
+
+            if (groupTitles.Count() > 0)
+            {
+                ComplexReportSetBodyGroupContentStyle(ws,
+                                                      titles,
+                                                      groupTitles,
+                                                      bodyStartRow,
+                                                      currentRow);
             }
 
             if (isSummary && notSummaryTitles.Count() > 0)
@@ -518,6 +543,67 @@ namespace BackendSite.Service.BLL
                 }
             }
 
+        }
+
+        private void ComplexReportSetBodyGroupContentStyle(ExcelWorksheet ws,
+                                                           List<string> titles,
+                                                           List<string> groupTitles,
+                                                           int bodyStartRow,
+                                                           int bodyEndRow)
+        {
+            foreach (var title in titles)
+            {
+                if (groupTitles.Contains(title))
+                {
+                    var colIdx = titles.IndexOf(title) + 1;
+
+                    for (int i = bodyStartRow; i < bodyEndRow; i++)
+                    {
+                        string value = (string)ws.Cells[i, colIdx].Value;
+
+                        if (value.Contains("TOTAL"))
+                        {
+                            for (int j = colIdx; j <= titles.Count(); j++)
+                            {
+                                ws.Cells[i, j].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                ws.Cells[i, j].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#BFFFFF"));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ComplexReportSetCustomizeBodyCellMerge(ExcelWorksheet ws,
+                                                    List<int> mergeContentRules,
+                                                    int currentRow)
+        {
+            foreach (int row in mergeContentRules)
+            {
+                var cell = ws.Cells[currentRow, 1];
+
+                //Cell Merging
+                ws.Cells[currentRow, 1, currentRow + row - 1, 1].Merge = true;
+
+                //Style  Setting
+                cell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                cell.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                for (int i = currentRow; i <= currentRow + row - 1; i++)
+                {
+                    ws.Cells[i, 1, i + 1, 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                    ws.Cells[i, 1, i + 1, 1].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                    ws.Cells[i, 1, i + 1, 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                    ws.Cells[i, 1, i + 1, 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                }
+
+                cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+
+
+                cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#FFE8BF"));
+
+                currentRow = currentRow + row;
+            }
         }
 
         private void ComplexReportSetBodySummary(ExcelWorksheet ws,

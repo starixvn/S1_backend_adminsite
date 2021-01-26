@@ -4,6 +4,9 @@ export const defActionType = {
 	CURRENCY_SET_VALUE: "CURRENCY_SET_VALUE",
 	CURRENCY_LANG_SET_VALUE: "CURRENCY_LANG_SET_VALUE",
 	CURRENCY_SET_LANG_CHECKBOX: "CURRENCY_SET_LANG_CHECKBOX",
+	SPORTS_LEAGUES_SET_LIST: "SPORTS_LEAGUES_SET_LIST",
+	SPORTS_TEAMS_SET_LIST: "SPORTS_TEAMS_SET_LIST",
+	MAIN_SET_SPORTS_TEAMS_VALUE: "MAIN_SET_SPORTS_TEAMS_VALUE",
 };
 
 export const initialState = (IsAdd, datas, setSite, setCurrencyList, setLangList) => {
@@ -28,6 +31,12 @@ export const initialState = (IsAdd, datas, setSite, setCurrencyList, setLangList
 			tpId: "",
 			gameId: "",
 			urlRouter: "",
+			sportBattleDateTime: new Date(),
+			sportCategoryId: 1,
+			sportLeaguesId: 1,
+			sportTeamsId: { "home": 1, "away": 1 },
+			sportsLeaguesList: [],
+			sportsTeamsList: [],
 			selectedCurrencies: [],
 			currentTab: null,
 			specific: _specific,
@@ -56,6 +65,12 @@ export const initialState = (IsAdd, datas, setSite, setCurrencyList, setLangList
 			tpId: datas.tpId,
 			gameId: datas.gameId,
 			urlRouter: datas.urlRouter,
+			sportBattleDateTime: datas.sportBattleDateTime,
+			sportCategoryId: 1,
+			sportLeaguesId: datas.sportLeaguesId,
+			sportTeamsId: (datas.sportTeamsId[0]) ? datas.sportTeamsId[0] : {},
+			sportsLeaguesList: [],
+			sportsTeamsList: [],
 			currentTab: _selectedCurrencies[0],
 			selectedCurrencies: _selectedCurrencies,
 			specific: _specific,
@@ -210,6 +225,45 @@ export function reducer(state, action) {
 						selectedLang: newLangs,
 						currentLang: currLang
 					}
+				}
+			};
+
+		case defActionType.SPORTS_LEAGUES_SET_LIST:
+			let sportsLeaguesList = action.sportsLeaguesList.map(s => {
+				return {
+					value: s.id,
+					displayText: s.name,
+				};
+			});
+			return {
+				...state,
+				sportsLeaguesList: sportsLeaguesList
+			};
+
+		case defActionType.SPORTS_TEAMS_SET_LIST:
+			let sportsTeamsList = action.sportsTeamsList.map(s => {
+				return {
+					value: s.id,
+					displayText: s.name,
+				};
+			});
+			return {
+				...state,
+				[action.dataColumn]: action.value,
+				sportsTeamsList: sportsTeamsList,
+				sportTeamsId: {
+					...state.sportTeamsId,
+					"home": action.action == "default" ? state.sportTeamsId.home : sportsTeamsList[0].value,
+					"away": action.action == "default" ? state.sportTeamsId.away : sportsTeamsList[0].value
+				}
+			};
+
+		case defActionType.MAIN_SET_SPORTS_TEAMS_VALUE:
+			return {
+				...state,
+				sportTeamsId: {
+					...state.sportTeamsId,
+					[action.dataColumn]: action.value
 				}
 			};
 
