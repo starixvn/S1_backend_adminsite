@@ -22,6 +22,7 @@ export default props => {
 					SportCategoryId: 1
 				}
 			};
+			console.log(props.Datas.sportLeaguesId);
 			WebAPI.PostData(SportLeaguesListParam).then(
 				res => {
 					if (isMountedRef.current) {
@@ -30,7 +31,7 @@ export default props => {
 								type: defActionType.SPORTS_LEAGUES_SET_LIST,
 								sportsLeaguesList: res.data.data
 							});
-							GetSportTeamsList("default", props.Datas.sportLeaguesId, "sportLeaguesId");
+							GetSportTeamsList("default", props.Datas.sportLeaguesId ? props.Datas.sportLeaguesId : 1, "sportLeaguesId");
 						} else {
 							alert(res.data.message ?? "failed to get data.");
 						}
