@@ -15,16 +15,25 @@ namespace BackendSite.Service.Model
         public long? UnixStartTime { get; set; }
         public long? UnixEndTime { get; set; }
         public string BonusCode { get; set; }
-        public int MatchId { get; set; }
-        public int TpId { get; set; }
+        public int? MatchId { get; set; }
+        public int? TpId { get; set; }
         public string GameId { get; set; }
         public string UrlRouter { get; set; }
+        public DateTime? SportBattleDateTime { get; set; }
+        public long? UnixSportBattleDateTime { get; set; }
+        public int? SportCategoryId { get; set; }
+        public int? SportLeaguesId { get; set; }
+        public IEnumerable<BannerSportTeamsDetails> SportTeamsId { get; set; }
         public IEnumerable<BannerDetails> Specific { get; set; }
         public int Sort { get; set; }
         public string SiteName { get; set; }
 
     }
-
+    public class BannerSportTeamsDetails
+    {
+        public int Home { get; set; }
+        public int Away { get; set; }
+    }
     public class BannerDetails
     {
         public int CurrencyId { get; set; }

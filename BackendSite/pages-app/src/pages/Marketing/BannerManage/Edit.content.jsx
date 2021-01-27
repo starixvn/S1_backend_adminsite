@@ -39,7 +39,6 @@ export default ({ state, action, IsAdd, processing }) => {
 			</button>
 		);
 	});
-	// console.log(state.bannerType);
 	return (
 		<div className="container-fluid" id="Panel">
 			<div className="filter noBGcolor"></div>
@@ -225,33 +224,93 @@ export default ({ state, action, IsAdd, processing }) => {
 										: null
 						}
 					</div>
+					{
+						state.bannerType == 2 && state.actionMode === 2 ?
+							<>
+								<div className="row-flex">
+									<DateTimePickerElem
+										columnTitle="Sport Battle Date"
+										dateTimePickerProps={{
+											defaultValue: moment(state.sportBattleDateTime).format(
+												"l LTS"
+											),
+											onBlur: e => {
+												try {
+													action.EditMainValue(
+														moment(e).format("l LTS"),
+														"sportBattleDateTime"
+													);
+												} catch (ex) { }
+											}
+										}}
+									/>
+								</div>
+								<div className="row-flex">
+									<SelectBox
+										Title="Sport Leagues"
+										Options={state.sportsLeaguesList}
+										HandleChange={action.GetSportTeamsList.bind(null,"change")}
+										dataColumn="sportLeaguesId"
+										SelectedValue={state.sportLeaguesId}
+									/>
+								</div>
+								{
+									state.sportsTeamsList.length != 0 ?
+										<div className="row-flex">
+											<SelectBox
+												Title="Home Sport Teams"
+												Options={state.sportsTeamsList}
+												HandleChange={action.EditSportsTeamsValue}
+												dataColumn="home"
+												SelectedValue={state.sportTeamsId.home}
+											/>
+											<div style={{ "marginRight": "10px", "marginBottom": "5px" }}>VS</div>
+											<SelectBox
+												Title="Away Sport Teams"
+												Options={state.sportsTeamsList}
+												HandleChange={action.EditSportsTeamsValue}
+												dataColumn="away"
+												SelectedValue={state.sportTeamsId.away}
+											/>
+										</div>
+										: null
+								}
+							</>
+							: null
+					}
 				</div>
-				<div className="filter noBGcolor">
-					<CheckBox
-						Options={currencyOptions}
-						Title="Available Currency"
-						OnChange={action.EditCurrencyCheckBox}
-						dataColumn="selectedCurrencies"
-						Selected={state.selectedCurrencies}
-						mainKey={state.siteId}
-					/>
-				</div>
-				<div className="filter noBGcolor tag">{tabArr}</div>
-				{state.selectedCurrencies.length > 0 &&
-					state.currentTab !== null ? (
-						<div className="filter">
-							<div className="panel level-1 mt-20">
-								<SubPanel
-									state={state}
-									displayText={window.i18n[`lbl_Currency${state.currentTab}`]}
-									EditMainValue={action.EditCurrencyPanel.bind(this, state.currentTab)}
-									EditCurrencyLangPanelValue={action.EditCurrencyLangPanelValue}
-									currencyId={state.currentTab}
-									action={action}
+				{
+					state.bannerType != 2 ?
+						<>
+							<div className="filter noBGcolor">
+								<CheckBox
+									Options={currencyOptions}
+									Title="Available Currency"
+									OnChange={action.EditCurrencyCheckBox}
+									dataColumn="selectedCurrencies"
+									Selected={state.selectedCurrencies}
+									mainKey={state.siteId}
 								/>
 							</div>
-						</div>
-					) : null}
+							<div className="filter noBGcolor tag">{tabArr}</div>
+							{state.selectedCurrencies.length > 0 &&
+								state.currentTab !== null ? (
+									<div className="filter">
+										<div className="panel level-1 mt-20">
+											<SubPanel
+												state={state}
+												displayText={window.i18n[`lbl_Currency${state.currentTab}`]}
+												EditMainValue={action.EditCurrencyPanel.bind(this, state.currentTab)}
+												EditCurrencyLangPanelValue={action.EditCurrencyLangPanelValue}
+												currencyId={state.currentTab}
+												action={action}
+											/>
+										</div>
+									</div>
+								) : null}
+						</>
+						: null
+				}
 			</div>
 			<div className="filter float-btn-group">
 				<button

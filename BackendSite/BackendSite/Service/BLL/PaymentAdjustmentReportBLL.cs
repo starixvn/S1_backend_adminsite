@@ -54,7 +54,8 @@ namespace BackendSite.Service.BLL
                         CreateTime = row.CreateTime,
                         StatusName = selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
                         Memo = row.Memo,
-                        SabaID = row.SabaID
+                        SabaID = row.SabaID,
+                        Operator = row.Operator
                     });
                 }
             }
@@ -87,10 +88,12 @@ namespace BackendSite.Service.BLL
                         AdjustTypeName = selLangBLL.GetResourceValue($"lbl_AdjustmentType{row.AdjustType}"),
                         SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
                         UserName = row.UserName,
+                        SabaID = row.SabaID,
                         Amount = row.Amount,
                         CreateTime = row.CreateTime,
                         StatusName = selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
-                        Memo = row.Memo
+                        Memo = row.Memo,
+                        Operator = row.Operator
                     });
                 }
             }

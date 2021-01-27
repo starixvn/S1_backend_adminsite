@@ -93,10 +93,10 @@ module.exports = {
 		// "Report/MainFinancialReport.min": [
 		// 	"./src/pages/Report/MainFinancialReport/index.js"
 		// ],
-		// "Marketing/BannerManage.min": [
-		// 	'@babel/polyfill',
-		// 	"./src/pages/Marketing/BannerManage/index.jsx"
-		// ],
+		"Marketing/BannerManage.min": [
+			'@babel/polyfill',
+			"./src/pages/Marketing/BannerManage/index.jsx"
+		],
 		// "Report/MainFinancialReport.min": [
 		// 	"./src/pages/Report/MainFinancialReport/index.js"
 		// ],
@@ -106,21 +106,25 @@ module.exports = {
 		// "Report/UserOnlineReport.min": [
 		// 	"./src/pages/Report/UserOnlineReport/index.js"
 		// ],
-		// "Report/DepositReport.min": [
-		// 	"./src/pages/Report/DepositReport/index.js"
-		// ],
+		"Report/DepositReport.min": [
+			"./src/pages/Report/DepositReport/index.js"
+		],
 		// "Marketing/BonusImport.min": [
 		// 	"@babel/polyfill",
 		// 	"./src/pages/Marketing/BonusImport/index.js"
 		// ],
+		// "Marketing/ReferralReport.min": [
+		// 	"@babel/polyfill",
+		// 	"./src/pages/Marketing/ReferralReport/index.js"
+		// ],
+		// "Marketing/ReferralManagement.min": [
+		// 	"@babel/polyfill",
+		// 	"./src/pages/Marketing/ReferralManagement/index.js"
+		// ],
 		// "Marketing/DrawPrizeReport.min": [
 		// 	"@babel/polyfill",
 		// 	"./src/pages/Marketing/DrawPrizeReport/index.js"
-		// ],
-		"Marketing/ReferralReport.min": [
-			"@babel/polyfill",
-			"./src/pages/Marketing/ReferralReport/index.js"
-		],
+		// ]
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
