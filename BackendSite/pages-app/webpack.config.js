@@ -120,6 +120,10 @@ module.exports = {
 		// "Marketing/ReferralManagement.min": [
 		// 	"@babel/polyfill",
 		// 	"./src/pages/Marketing/ReferralManagement/index.js"
+		// ],
+		// "Marketing/DrawPrizeReport.min": [
+		// 	"@babel/polyfill",
+		// 	"./src/pages/Marketing/DrawPrizeReport/index.js"
 		// ]
 	},
 	output: {

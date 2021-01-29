@@ -8,6 +8,15 @@ import * as Loading from '../commJS/Loading.jsx';
         3: <span className="status status-closed">Closed</span>,
     }
 
+    const defCurrencyType = {
+        2: "MYR",
+        4: "THB",
+        13: "RMB",
+        15: "IDR",
+        51: "VND",
+        96: "USDT",
+      };
+
     class CustInfoRow extends React.Component {
         render() {
             let data = this.props.dataRow;
@@ -82,7 +91,7 @@ import * as Loading from '../commJS/Loading.jsx';
         _Search = false;
         constructor(props) {
             super(props);
-            this.state = { SiteList: [], selectSite: [], searchData: null, UserName: "", TransId: "", Loading: false };
+            this.state = { SiteList: [], selectSite: [], searchData: null, UserName: "", TransId: "", Loading: false , CurrencyList: [], selectCurrency: []};
             this.f_trigger_Start = React.createRef();
             this.selectdate_start = React.createRef();
             this.f_trigger_End = React.createRef();
@@ -133,7 +142,8 @@ import * as Loading from '../commJS/Loading.jsx';
                 PhoneNo: !this.state.sPhoneNo ? null : this.state.sPhoneNo,
                 PageNumber: pageNumber,
                 PageSize: this._PageSize,
-                AffId: !this.state.sAffId ? null : parseInt(this.state.sAffId)
+                AffId: !this.state.sAffId ? null : parseInt(this.state.sAffId),
+                SelectCurrency: !this.state.selectCurrency ? null : this.state.selectCurrency
             };
             axios.post('/api/CustManage/GetCustInfoList', data)
                 .then(function (response) {
@@ -241,6 +251,40 @@ import * as Loading from '../commJS/Loading.jsx';
             $('#selectSite').multiselect('updateButtonText');
         }
 
+        getCurrencyList() {
+            let state = this.state;
+            this.buildSelectCurrency();
+
+        }
+
+        buildSelectCurrency = () => {
+            let state = this.state;
+            $("#selectCurrency").multiselect({
+                includeSelectAllOption: true,
+                selectAllText: 'Check all!',
+                onSelectAll: function () {
+                    console.log(state.selectCurrency);
+                    state.selectCurrency.length = 0;
+                    console.log(state.selectCurrency);
+                    // state.SiteList.forEach(function (obj) {
+                    //     state.selectSite.push(obj.siteId);
+                    // });
+                    Object.keys(defCurrencyType).forEach((key) => {
+                        state.selectCurrency.push(parseInt(key));
+                    })
+                },
+                onDeselectAll: function () {
+                    state.selectCurrency.length = 0;
+                },
+                onChange: function (option, checked, select) {
+                    let val = parseInt($(option).val()), index = state.selectCurrency.indexOf(val);
+                    (checked) ? state.selectCurrency.push(val) : (index > -1) ? state.selectCurrency.splice(index, 1) : state.selectCurrency;
+                    state.selectCurrency.sort();
+                }
+            });
+            $('#selectCurrency').multiselect('updateButtonText');
+        }
+
         componentDidMount() {
             let f_trigger_Start = this.f_trigger_Start.current;
             let f_trigger_End = this.f_trigger_End.current;
@@ -262,6 +306,7 @@ import * as Loading from '../commJS/Loading.jsx';
                 singleClick: true              // double-click mode
             });
             this.getSiteList();
+            this.getCurrencyList();
         }
 
         render() {
@@ -288,7 +333,11 @@ import * as Loading from '../commJS/Loading.jsx';
             let siteList = this.state.SiteList.map(function (obj) {
                 return <option key={obj.siteId} value={obj.siteId}>{obj.siteName}</option>;
             }.bind(this));
+            let currencyList = Object.keys(defCurrencyType).map((key) => {
+                return <option key={key} value={key}>{defCurrencyType[key]}</option>;
+            });
             siteList = <select id="selectSite" name="selectSite[]" multiple="multiple">{siteList}</select>;
+            currencyList = <select id="selectCurrency" name="selectCurrency[]" multiple="multiple">{currencyList}</select>;
             return (
                 <div>
                     <h4 className="page-name">Customer Search</h4>
@@ -305,6 +354,12 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <label className="label">User Name</label>
                                     <div className="field">
                                         <input type="text" placeholder="User Name" autoComplete="off" value={this.state.UserName} onChange={this.onUserNameChange.bind(this)} />
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Currency</span>
+                                    <div className="field">
+                                        {currencyList}
                                     </div>
                                 </div>
                                 <div className="input-item">

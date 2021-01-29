@@ -376,6 +376,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "DrawPrizeReport",
+        "Title": "Draw Prize Report",
+        "FuncKey": "Marketing/DrawPrizeReport",
+        "Controller": "Marketing",
+        "Action": "DrawPrizeReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   }
