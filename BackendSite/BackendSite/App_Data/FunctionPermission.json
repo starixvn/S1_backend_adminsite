@@ -281,6 +281,11 @@
         "DisplayKey": "Banner Management",
         "FuncKey": "Marketing/BannerManage",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Draw Prize Report",
+        "FuncKey": "Marketing/DrawPrizeReport",
+        "Enable": false
       }
     ]
   }
