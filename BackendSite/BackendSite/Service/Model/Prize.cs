@@ -11,8 +11,8 @@ namespace BackendSite.Service.Model
     public class PrizeSelect
     {
         public IEnumerable<int> SelectSite { get; set; }
-        public long StartDate { get; set; }
-        public long EndDate { get; set; }
+        public string StartDate { get; set; }
+        public string EndDate { get; set; }
         public int CurrencyId { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
@@ -30,7 +30,7 @@ namespace BackendSite.Service.Model
         public int PageSize { get; set; }
         public int EventId { get; set; }
         public int PrizeId { get; set; }
-        public long EventTime { get; set; }
+        public string EventTime { get; set; }
         public PrizeLogPara()
         {
             //PageSize預設10

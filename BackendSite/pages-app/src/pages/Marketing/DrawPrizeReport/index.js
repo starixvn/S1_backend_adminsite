@@ -99,8 +99,8 @@ const App = () => {
       SelectSite: stateFilter.SelectSite,
       CurrencyId: parseInt(stateFilter.Type, 10),
       PageNumber: 1,
-      StartDate: moment(stateFilter.StartDate).unix(),
-      EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
+      StartDate: moment(stateFilter.StartDate).format("YYYY-MM-DD"),
+      EndDate: moment(stateFilter.EndDate).format("YYYY-MM-DD"),
     };
     api
       .post("/api/BonusManage/PrizeSearch", Data)
@@ -134,8 +134,8 @@ const App = () => {
     let Data = {
       SelectSite: stateFilter.SelectSite,
       CurrencyId: parseInt(stateFilter.Type, 10),
-      StartDate: moment(stateFilter.StartDate).unix(),
-      EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
+      StartDate: moment(stateFilter.StartDate).format("YYYY-MM-DD"),
+      EndDate: moment(stateFilter.EndDate).format("YYYY-MM-DD"),
       PageNumber: PageNumber,
     };
     api

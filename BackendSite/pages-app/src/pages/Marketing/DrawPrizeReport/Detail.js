@@ -24,7 +24,7 @@ const Panel = (props) => {
       EventId: props.EventId,
       StartDate: moment(props.EventTime).unix(),
       EndDate: moment(props.EventTime).add(1, "days").unix() - 1,
-      EventTime: moment(props.EventTime).unix(),
+      EventTime: moment(props.EventTime).format("YYYY-MM-DD"),
       PageNumber: 1,
     };
     api
@@ -54,7 +54,7 @@ const Panel = (props) => {
       EventId: props.EventId,
       StartDate: moment(props.EventTime).unix(),
       EndDate: moment(props.EventTime).add(1, "days").unix() - 1,
-      EventTime: moment(props.EventTime).unix(),
+      EventTime: moment(props.EventTime).format("YYYY-MM-DD"),
       PageNumber: PageNumber,
     };
     api
