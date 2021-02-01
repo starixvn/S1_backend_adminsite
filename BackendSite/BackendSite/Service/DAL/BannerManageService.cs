@@ -72,7 +72,7 @@ namespace BackendSite.Service.DAL
                     result.TpId = Convert.ToInt32(queryresult.TpId);
                     result.GameId = queryresult.GameId;
                     result.UrlRouter = queryresult.UrlRouter;
-                    result.SportBattleDateTime = queryresult.SportBattleDateTime;
+                    result.SportBattleDateTime = Convert.ToDateTime(queryresult.SportBattleDateTime);
                     result.SportCategoryId = Convert.ToInt32(queryresult.SportCategoryId);
                     result.SportLeaguesId = Convert.ToInt32(queryresult.SportLeaguesId);
                     if (queryresult.SportTeamsId != null)
