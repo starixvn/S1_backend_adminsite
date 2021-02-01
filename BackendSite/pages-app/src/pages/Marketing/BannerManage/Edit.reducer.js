@@ -68,7 +68,7 @@ export const initialState = (IsAdd, datas, setSite, setCurrencyList, setLangList
 			sportBattleDateTime: datas.sportBattleDateTime,
 			sportCategoryId: 1,
 			sportLeaguesId: datas.sportLeaguesId,
-			sportTeamsId: (datas.sportTeamsId[0]) ? datas.sportTeamsId[0] : {},
+			sportTeamsId: (datas.sportTeamsId[0]) ? datas.sportTeamsId[0] : { "home": null, "away": null },
 			sportsLeaguesList: [],
 			sportsTeamsList: [],
 			currentTab: _selectedCurrencies[0],
