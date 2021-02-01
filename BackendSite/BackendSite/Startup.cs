@@ -78,6 +78,7 @@ namespace BackendSite
             services.AddSingleton<BannerManageService>();
             services.AddSingleton<ReferralManagementService>();
             services.AddSingleton<SportsService>();
+            services.AddSingleton<PrizeService>();
             //var dal = AppDomain.CurrentDomain.GetAssemblies()
             //           .SelectMany(t => t.GetTypes())
             //           .Where(t => t.IsClass && t.Namespace == "BackendSite.Service.DAL");
@@ -120,6 +121,7 @@ namespace BackendSite
             services.AddSingleton<ReportExcelBLL>();
             services.AddSingleton<ReferralManagementBLL>();
             services.AddSingleton<SportsBLL>();
+            services.AddSingleton<PrizeBLL>();
             // var bll = AppDomain.CurrentDomain.GetAssemblies()
             //.SelectMany(t => t.GetTypes())
             //.Where(t => t.IsClass && t.Namespace == "BackendSite.Service.BLL");
@@ -144,7 +146,7 @@ namespace BackendSite
                 //option.AccessDeniedPath
                 option.LoginPath = "/Home/Signin";
                 option.Cookie.Name = ".backend";
-                option.ExpireTimeSpan = TimeSpan.FromDays(1);//沒給預設14天
+                option.ExpireTimeSpan = TimeSpan.FromDays(1);//?S???w?]14??
                 option.Cookie.SameSite = SameSiteMode.Unspecified;
             });
             services.AddDataProtection().DisableAutomaticKeyGeneration();

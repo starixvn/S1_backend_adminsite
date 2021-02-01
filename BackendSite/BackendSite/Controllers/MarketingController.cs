@@ -80,5 +80,11 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/DrawPrizeReport" })]
+        public IActionResult DrawPrizeReport()
+        {
+            return View();
+        }
     }
 }
