@@ -42,7 +42,7 @@ export const specialBonusOptions = [
 ];
 
 export const onlyRegisteredBonusOptions = [
-	{ value: 1, displayText: "Only Registered"}
+	{ value: 1, displayText: "New Member"}
 ];
 
 export const periodType = {
