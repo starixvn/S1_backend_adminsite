@@ -65,8 +65,8 @@ namespace BackendSite.Service.DAL
                     result.BannerType = Convert.ToInt32(queryresult.BannerType);
                     result.ActionMode = Convert.ToInt32(queryresult.ActionMode);
                     result.ShowStatus = Convert.ToInt32(queryresult.ShowStatus);
-                    result.StartTime = queryresult.StartTime;
-                    result.EndTime = queryresult.EndTime;
+                    result.StartTime = Convert.ToDateTime(queryresult.StartTime);
+                    result.EndTime = Convert.ToDateTime(queryresult.EndTime);
                     result.BonusCode = queryresult.BonusCode;
                     result.MatchId = Convert.ToInt32(queryresult.MatchId);
                     result.TpId = Convert.ToInt32(queryresult.TpId);

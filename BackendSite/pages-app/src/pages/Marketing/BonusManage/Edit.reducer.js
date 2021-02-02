@@ -11,7 +11,8 @@ export const defActionType = {
 	CURRENCY_SET_AMOUNT_VALUE: "CURRENCY_SET_AMOUNT_VALUE",
 	GET_TPGAME_CATEGORIES: "GET_TPGAME_CATEGORIES",
 	CURRENCY_SET_TpGame_VALUE: "CURRENCY_SET_TpGame_VALUE",
-	SPECIALBONUS_VALUE: "SPECIALBONUS_VALUE"
+	SPECIALBONUS_VALUE: "SPECIALBONUS_VALUE",
+	ONLY_REGISTERED_SET_VALUE: "ONLY_REGISTERED_SET_VALUE"
 };
 
 export const initialState = (IsAdd, datas, siteList) => {
@@ -43,9 +44,10 @@ export const initialState = (IsAdd, datas, siteList) => {
 			periodMonth: 1,
 			redeemHours: "",
 			tpGameCategory: [],
-			specialCode:"",
+			specialCode: "",
 			isSpecial: false,
-			specialBonusCheck: []
+			specialBonusCheck: [],
+			onlyRegistered: []
 		};
 	} else {
 		let _specific = SetSpecific(
@@ -78,9 +80,10 @@ export const initialState = (IsAdd, datas, siteList) => {
 			periodMonth: datas.periodMonth ? datas.periodMonth : 1,
 			redeemHours: datas.redeemHours,
 			tpGameCategory: [],
-			specialCode:datas.specialCode,
+			specialCode: datas.specialCode,
 			isSpecial: datas.isSpecial,
-			specialBonusCheck: datas.isSpecial ? [1] : []
+			specialBonusCheck: datas.isSpecial ? [1] : [],
+			onlyRegistered: datas.onlyRegistered ? [1] : [],
 		};
 	}
 };
@@ -125,7 +128,7 @@ const SetSpecific = (currencyList, langList, data) => {
 		});
 		_specific[currency].lang = lang;
 	});
-	
+
 	if (data !== null) {
 		data.forEach(d => {
 			let _newData = {};
@@ -147,7 +150,7 @@ const SetSpecific = (currencyList, langList, data) => {
 			Object.keys(initSpecific).forEach(k => {
 				if (k === "bonusAmountType") {
 					_newData[k] = d.bonusType;
-				}else if (k === "affid") {
+				} else if (k === "affid") {
 					_newData[k] = d.vN_AffCodes;
 				} else {
 					_newData[k] = d[k] ?? "";
@@ -355,12 +358,20 @@ export function reducer(state, action) {
 					}
 				}
 			};
-		
+
 		case defActionType.SPECIALBONUS_VALUE:
-			return{
+			return {
 				...state,
-				specialBonusCheck:action.specialBonusCheck,
-				isSpecial:action.isSpecial
+				specialBonusCheck: action.specialBonusCheck,
+				isSpecial: action.isSpecial
+			};
+
+		case defActionType.ONLY_REGISTERED_SET_VALUE:
+			let newValue = state.onlyRegistered.includes(action.value) ? [] : [action.value];
+			console.log(newValue);
+			return {
+				...state,
+				onlyRegistered: newValue
 			};
 
 		default:
