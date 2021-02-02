@@ -33,8 +33,16 @@ export const initSpecialBonusPromotionType = [
 	{ value: 3, displayText: defPromotionType[3] },
 ];
 
+export const initOnlyRegisteredPromotionType = [
+	{ value: 3, displayText: defPromotionType[3] },
+];
+
 export const specialBonusOptions = [
 	{ value: 1, displayText: "SpecialBonus"}
+];
+
+export const onlyRegisteredBonusOptions = [
+	{ value: 1, displayText: "New Member"}
 ];
 
 export const periodType = {

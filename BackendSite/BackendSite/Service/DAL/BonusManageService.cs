@@ -115,6 +115,7 @@ namespace BackendSite.Service.DAL
             p.Add("PeriodDay", promotion.PeriodDay);
             p.Add("SpecialCode", promotion.SpecialCode);
             p.Add("IsSpecial", promotion.IsSpecial);
+            p.Add("OnlyRegistered", promotion.OnlyRegistered);
             p.Add("ErrorCode", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             conn.Execute("Admin_Promotion_Set", p, transaction: trans, commandType: CommandType.StoredProcedure);

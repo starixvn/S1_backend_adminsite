@@ -30,6 +30,7 @@ namespace BackendSite.Service.Model
         public int? PeriodDay { get; set; }
         public string SpecialCode { get; set; }
         public bool IsSpecial { get; set; }
+        public bool OnlyRegistered { get; set; }
     }
 
     public class PromotionSpecific

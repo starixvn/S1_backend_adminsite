@@ -1,5 +1,5 @@
 export const defBannerType = {
-	1: "Promotions",
+	1: "Main Banner",
 	2: "HotEvent",
 	3: "Slots"
 };

@@ -11,7 +11,7 @@ const InputBox = (props) => {
     return (
         <div className={props.ClassName ? props.ClassName : "input-item"}>
             {
-                props.HideTitle === true ? null : <label className="label">{props.Title}</label>
+                props.HideTitle === true ? null : <label className="label">{props.Title} {props.TitleDetail ? <a href={props.TitleDetail} target="_blank"> (Detail) </a> : null}</label>
             }
             <div className={`field${props.iptSubClass ? (' ' + props.iptSubClass) : ''}`}>
                 {
