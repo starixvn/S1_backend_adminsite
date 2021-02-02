@@ -2,6 +2,7 @@ import Pagination from "./Pagination";
 import React, { useEffect, useRef, useReducer, useState } from "react";
 import WebAPI from "../../../module/WebAPI";
 import { api } from "../../../module/WebAPI";
+import moment from "moment";
 
 const Panel = (props) => {
   const [detailBody, setDetailBody] = useState([]);
@@ -85,7 +86,7 @@ const Panel = (props) => {
           <span className="label">{item.currency}</span>
         </td>
         <td>
-          <span className="label">{item.registerDate}</span>
+          <span className="label">{moment(item.registerDate).format("l LTS")}</span>
         </td>
         <td>
           <span className="label">
@@ -101,7 +102,7 @@ const Panel = (props) => {
           <span className="label">{item.bonusAmount}</span>
         </td>
         <td>
-          <span className="label">{item.rewardTime}</span>
+          <span className="label">{moment(item.rewardTime).format("l LTS")}</span>
         </td>
         <td>
           <span className="label">{item.statusName}</span>

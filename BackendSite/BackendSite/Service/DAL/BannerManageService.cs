@@ -34,6 +34,10 @@ namespace BackendSite.Service.DAL
             p.Add("TpId", bannerInfo.TpId);
             p.Add("GameId", bannerInfo.GameId);
             p.Add("UrlRouter", bannerInfo.UrlRouter);
+            p.Add("UnixSportBattleDateTime", bannerInfo.UnixSportBattleDateTime);
+            p.Add("SportCategoryId", bannerInfo.SportCategoryId);
+            p.Add("SportLeaguesId", bannerInfo.SportLeaguesId);
+            p.Add("SportTeamsId", JsonConvert.SerializeObject(bannerInfo.SportTeamsId));
             p.Add("SpecificList", JsonConvert.SerializeObject(bannerInfo.Specific));
             p.Add("Sort", bannerInfo.Sort);
             p.Add("AdminUser", user);
@@ -68,6 +72,21 @@ namespace BackendSite.Service.DAL
                     result.TpId = Convert.ToInt32(queryresult.TpId);
                     result.GameId = queryresult.GameId;
                     result.UrlRouter = queryresult.UrlRouter;
+                    result.SportBattleDateTime = queryresult.SportBattleDateTime;
+                    result.SportCategoryId = Convert.ToInt32(queryresult.SportCategoryId);
+                    result.SportLeaguesId = Convert.ToInt32(queryresult.SportLeaguesId);
+                    if (queryresult.SportTeamsId != null)
+                    {
+                        result.SportTeamsId = JsonConvert.DeserializeObject<IEnumerable<BannerSportTeamsDetails>>(queryresult.SportTeamsId, new JsonSerializerSettings
+                        {
+                            Formatting = Formatting.Indented,
+                            NullValueHandling = NullValueHandling.Ignore
+                        });
+                    }
+                    else
+                    {
+                        result.SportTeamsId = null;
+                    }
                     result.Specific = JsonConvert.DeserializeObject<IEnumerable<BannerDetails>>(queryresult.Specific, new JsonSerializerSettings
                     {
                         Formatting = Formatting.Indented,
