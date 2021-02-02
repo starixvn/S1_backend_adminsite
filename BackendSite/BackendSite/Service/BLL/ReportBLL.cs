@@ -225,9 +225,9 @@ namespace BackendSite.Service.BLL
                 mainFinancialModel.TurnOverValidBet += data.ValidBetSummary;
                 mainFinancialModel.WinLoss += data.WinlostSummary;
 
-                mainFinancialModel.TurnOverStakeInMYR = Math.Round(data.StakeSummary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
-                mainFinancialModel.TurnOverValidBetInMYR = Math.Round(data.ValidBetSummary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
-                mainFinancialModel.WinLossInMYR = Math.Round(data.WinlostSummary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+                mainFinancialModel.TurnOverStakeInMYR += Math.Round(data.StakeSummary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+                mainFinancialModel.TurnOverValidBetInMYR += Math.Round(data.ValidBetSummary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+                mainFinancialModel.WinLossInMYR += Math.Round(data.WinlostSummary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
             }
 
             #endregion

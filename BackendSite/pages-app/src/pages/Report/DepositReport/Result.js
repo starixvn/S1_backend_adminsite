@@ -167,9 +167,10 @@ const dataGroupColumnDefs = (props) => {
 const dataColumnDefs = (props) => {
     return [
         { 
-            columnTitle: 'Detail',
-            dataColumn: '',
+            columnTitle: 'AccountName',
+            dataColumn: 'accountName',
             body:{
+                format: accountFormat,
                 attr:{
                     bgcolor:"Bisque",
                     class:"text-center",
@@ -186,29 +187,6 @@ const dataColumnDefs = (props) => {
                 position: "sticky",
                 top: "73.6px",
                 left:"0",
-                zIndex:"3"
-            }
-        },
-        { 
-            columnTitle: 'AccountName',
-            dataColumn: 'accountName',
-            body:{
-                attr:{
-                    bgcolor:"Bisque",
-                    class:"text-center",
-                },
-                style:{
-                    position: "sticky",
-                    top: "42.36px",
-                    left:"51.2px",
-                    height:"36.8px",
-                    zIndex:"1"
-                }
-            },
-            style:{
-                position: "sticky",
-                top: "73.6px",
-                left:"51.2px",
                 zIndex:"3"
             }
         },
@@ -996,36 +974,63 @@ const Panel = (props) => {
         );
     });
 
+    // let bodyRows = props.Datas.map((data, idx) => {
+    //     let row = columnDefs.map((element, idx) => {
+    //         let subData = {};
+    //         if (element.body && element.body.subData) {
+    //             element.body.subData.forEach(s => { subData[s] = data[s] });
+    //         }
+    //         if(element.columnTitle == "Detail")
+    //         {
+    //             return (
+    //                 <td key={`td-${element.dataColumn}-${idx}`} 
+    //                     className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+    //                     style={element.body && element.body.style ? element.body.style : ''}
+    //                     bgcolor={element.body && element.body.attr && element.body.attr.bgcolor ? element.body.attr.bgcolor : ''}
+    //                     >
+    //                     {<button type="button" className="btn btn-info" style={{width:"40px",padding:"1px"}} onClick={() => props.SetAccountShowBtn(data.accountType,data.accountId,data.accountName)}>show</button>}
+    //                 </td>
+    //             );
+    //         }
+    //         else
+    //         {
+    //             return (
+    //                 <td key={`td-${element.dataColumn}-${idx}`} 
+    //                     className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+    //                     style={element.body && element.body.style ? element.body.style : ''}
+    //                     bgcolor={element.body && element.body.attr && element.body.attr.bgcolor ? element.body.attr.bgcolor : ''}
+    //                     >
+    //                     {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
+    //                 </td>
+    //             );
+    //         }
+    //     });
+
+    //     return (
+    //         <tr key={`result-body-${idx}`}>
+    //             {row}
+    //         </tr>
+    //     )
+    // });
+
     let bodyRows = props.Datas.map((data, idx) => {
         let row = columnDefs.map((element, idx) => {
             let subData = {};
             if (element.body && element.body.subData) {
                 element.body.subData.forEach(s => { subData[s] = data[s] });
             }
-            if(element.columnTitle == "Detail")
-            {
-                return (
-                    <td key={`td-${element.dataColumn}-${idx}`} 
-                        className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
-                        style={element.body && element.body.style ? element.body.style : ''}
-                        bgcolor={element.body && element.body.attr && element.body.attr.bgcolor ? element.body.attr.bgcolor : ''}
-                        >
-                        {<button type="button" className="btn btn-info" style={{width:"40px",padding:"1px"}} onClick={() => props.SetAccountShowBtn(data.accountType,data.accountId,data.accountName)}>show</button>}
-                    </td>
-                );
-            }
-            else
-            {
-                return (
-                    <td key={`td-${element.dataColumn}-${idx}`} 
-                        className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
-                        style={element.body && element.body.style ? element.body.style : ''}
-                        bgcolor={element.body && element.body.attr && element.body.attr.bgcolor ? element.body.attr.bgcolor : ''}
-                        >
-                        {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
-                    </td>
-                );
-            }
+            return (
+                <td key={`td-${element.dataColumn}-${idx}`}
+                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                    style={element.body && element.body.style ? element.body.style : ''}
+                    bgcolor={element.body && element.body.attr && element.body.attr.bgcolor ? element.body.attr.bgcolor : ''}
+                >
+                    {element.body && element.body.format 
+                    ? <button className="btn btn-link" onClick={() => props.SetAccountShowBtn(data.accountType,data.accountId,data.accountName)}>{data[element.dataColumn]}</button> 
+                    : data[element.dataColumn]}
+                    
+                </td>
+            );
         });
 
         return (
@@ -1113,7 +1118,7 @@ console.log('AccountDataShowLists',props.AccountDataShowLists);
                         style={element.body && element.body.style ? element.body.style : ''}
                         bgcolor={element.body && element.body.attr && element.body.attr.bgcolor ? element.body.attr.bgcolor : ''}
                         >
-                        {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
+                        {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData,props) : data[element.dataColumn]}
                     </td>
                 );
             });
@@ -1175,14 +1180,14 @@ console.log('AccountDataShowLists',props.AccountDataShowLists);
             <table className="table table-striped" style={{width:"auto"}} hidden={!props.SummaryBtnDisabled}>
                 <thead>
                     <tr>
-                        <th colSpan="2" style={{ position: "sticky", top: "0",left:"0",height:"36.8px",zIndex:"3",background:"#FFFF45",color:"#F00000"}} >Summary</th>
+                        <th style={{ position: "sticky", top: "0",left:"0",height:"36.8px",zIndex:"3",background:"#FFFF45",color:"#F00000"}} >Summary</th>
                         <th colSpan={(props.CurrencyList.length+1)*2} className="text-center" style={{position:"sticky", top:"0px" }}>Online Banking</th>
                         <th colSpan={(props.CurrencyList.length+1)*2} className="text-center" style={{position:"sticky", top:"0px" }}>Mobile Pay</th>
                         <th colSpan={(props.CurrencyList.length+1)*2} className="text-center" style={{position:"sticky", top:"0px" }}>Local Banking</th>
                         <th colSpan={(props.CurrencyList.length+1)*6} style={{position:"sticky", top:"0px" }}></th>
                     </tr>
                     <tr>
-                        <th colSpan="2" style={{ position: "sticky", top: "36.8px",left:"0",height:"36.8px",zIndex:"3"}}></th>
+                        <th style={{ position: "sticky", top: "36.8px",left:"0",height:"36.8px",zIndex:"3"}}></th>
                         {groupHeaderRows}
                     </tr>
                     <tr>
@@ -1226,6 +1231,10 @@ console.log('AccountDataShowLists',props.AccountDataShowLists);
             
         </div>
     )
+}
+
+const accountFormat = (accountName) => {
+    return accountName;
 }
 
 export default Panel;
