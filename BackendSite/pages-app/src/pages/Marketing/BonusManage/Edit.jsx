@@ -187,6 +187,10 @@ export default props => {
 		});
 	};
 
+	const EditOnlyRegisteredValue = (value, dataColumn) => {
+		dispatch({ type: defActionType.ONLY_REGISTERED_SET_VALUE, value, dataColumn });
+	};
+
 	const GetPromoCategories = (isInit, walletType, value) => {
 		if (walletType !== value) {
 			let param = {
@@ -245,7 +249,8 @@ export default props => {
 					GetPromoCategories,
 					SelectTpId,
 					EditCurrencyAmountValue,
-					EditTpGameCategoryValue
+					EditTpGameCategoryValue,
+					EditOnlyRegisteredValue
 				}}
 				siteList={props.SiteList}
 				IsAdd={props.IsAdd}

@@ -6,7 +6,7 @@ import DateTimePickerElem from "./Component/DateTimePicker";
 import moment from "moment";
 import RadioBox from "./Component/RadioBox";
 import RichText from "./Component/RichText.jsx";
-import { initWalletType, initPromotionType, initWeekOptions, initPeriodType, weekOptions, initSpecialBonusPromotionType, specialBonusOptions} from "./defCols";
+import { initWalletType, initPromotionType, initWeekOptions, initPeriodType, weekOptions, initSpecialBonusPromotionType, specialBonusOptions, onlyRegisteredBonusOptions, initOnlyRegisteredPromotionType } from "./defCols";
 import { defActionType } from "./Edit.reducer";
 
 const initBonusAmountType = promoType => {
@@ -39,28 +39,28 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 	});
 
 	const SpecialBonusCheckBox = (value, dataColumn) => {
-		if(state.specialBonusCheck.length > 0){
+		if (state.specialBonusCheck.length > 0) {
 			dispatch({
 				type: defActionType.SPECIALBONUS_VALUE,
-				specialBonusCheck:[],
+				specialBonusCheck: [],
 				isSpecial: false
 			});
 		}
-		else{
+		else {
 			dispatch({
 				type: defActionType.SPECIALBONUS_VALUE,
-				specialBonusCheck:[value],
+				specialBonusCheck: [value],
 				isSpecial: true
 			});
 
 		}
 	};
 
-	const CheckboxSingal = (Title,Options,Selected,OnChange,dataColumn,mainKey,Disabled=false) =>{
-		let opt = Options.map(o=>{
-			return <CheckboxSingalCheckBox key={`${Title}-${o.value}${mainKey === null ? '': `-${mainKey}`}`} onChange={OnChange} Title={o.displayText} checked={Selected.includes(o.value)} Value={o.value} dataColumn={dataColumn} Disabled={Disabled}/>
+	const CheckboxSingal = (Title, Options, Selected, OnChange, dataColumn, mainKey, Disabled = false) => {
+		let opt = Options.map(o => {
+			return <CheckboxSingalCheckBox key={`${Title}-${o.value}${mainKey === null ? '' : `-${mainKey}`}`} onChange={OnChange} Title={o.displayText} checked={Selected.includes(o.value)} Value={o.value} dataColumn={dataColumn} Disabled={Disabled} />
 		});
-		return(
+		return (
 			<>
 				{Title !== "" ? <div className="row-flex">
 					<div className="input-item">
@@ -74,13 +74,13 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 		)
 	}
 
-	const CheckboxSingalCheckBox = (props)=>{    
-		const SpecialBonusCheckBoxOnChange = (e)=>{
+	const CheckboxSingalCheckBox = (props) => {
+		const SpecialBonusCheckBoxOnChange = (e) => {
 			props.onChange(props.Value, props.dataColumn);
 		}
 		return (
 			<label className="checkbox checkbox-checked" >
-				<input type="checkbox" value={props.Value} checked={props.checked} onChange={SpecialBonusCheckBoxOnChange} disabled={props.Disabled}/>
+				<input type="checkbox" value={props.Value} checked={props.checked} onChange={SpecialBonusCheckBoxOnChange} disabled={props.Disabled} />
 				<i className="icon icon-checkbox"></i>
 				<span className="text">{props.Title}</span>
 			</label>
@@ -115,18 +115,29 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 			<div id="searchForm">
 				<div className="filter">
 					<div className="row-flex">
-						{CheckboxSingal("",specialBonusOptions,state.specialBonusCheck,SpecialBonusCheckBox,"specialBonus",null,!IsAdd)}
+						{CheckboxSingal("", specialBonusOptions, state.specialBonusCheck, SpecialBonusCheckBox, "specialBonus", null, !IsAdd)}
 						{state.specialBonusCheck.length > 0 ?
 							<InputBox
-							Title="SpecialCode"
-							OnChange={action.EditMainValue}
-							dataColumn="specialCode"
-							value={state.specialCode}
+								Title="SpecialCode"
+								OnChange={action.EditMainValue}
+								dataColumn="specialCode"
+								value={state.specialCode}
+								Disabled={!IsAdd}
+							/>
+							: null}
+					</div>
+					{state.specialBonusCheck.length > 0 ?
+						<CheckBox
+							Options={onlyRegisteredBonusOptions}
+							Title=""
+							OnChange={action.EditOnlyRegisteredValue}
+							dataColumn="onlyRegistered"
+							Selected={state.onlyRegistered}
+							mainKey={state.siteId}
 							Disabled={!IsAdd}
-						/>	
-						:null}
-					</div>	
-				</div>		
+						/>
+						: null}
+				</div>
 				<div className="filter">
 					<div className="row-flex">
 						<InputBox
@@ -135,10 +146,10 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 							dataColumn="bonusCode"
 							value={state.bonusCode}
 							Disabled={!IsAdd}
-						/>						
+						/>
 						<SelectBox
 							Title="PromotionType"
-							Options={state.isSpecial ? initSpecialBonusPromotionType:initPromotionType}
+							Options={state.isSpecial ? state.onlyRegistered ? initOnlyRegisteredPromotionType : initSpecialBonusPromotionType : initPromotionType}
 							HandleChange={action.EditMainValue}
 							dataColumn="promotionType"
 							SelectedValue={state.promotionType}
@@ -273,7 +284,7 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 									/>
 								) : null}
 						</div>)}
-	
+
 
 				<div className="filter noBGcolor">
 					<CheckBox
@@ -462,14 +473,14 @@ const SubPanel = props => {
 					(props.state.promotionType == 8) ?
 						null : (
 							<>
-									<InputBox
-										Title="Affiliate Id"
-										ClassName="form-group"
-										inputClass="form-control"
-										OnChange={props.EditMainValue}
-										dataColumn="affid"
-										value={props.state.specific[props.currencyId].affid}
-									/>
+								<InputBox
+									Title="Affiliate Id"
+									ClassName="form-group"
+									inputClass="form-control"
+									OnChange={props.EditMainValue}
+									dataColumn="affid"
+									value={props.state.specific[props.currencyId].affid}
+								/>
 								<div className="row-flex">
 									<InputBox
 										Type="Number"
