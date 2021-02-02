@@ -91,7 +91,7 @@ const DrawPrizeReport = lazy(() =>
 	import("./pages/Marketing/DrawPrizeReport/index")
 );
 
-export const defaultPage = "StatisticalReport";
+export const defaultPage = "DepositReport";
 
 export const layoutType = {
 	N88: "N88",
