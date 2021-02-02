@@ -8,6 +8,7 @@ import moment from "moment";
 import { initBannerType, initActionModeType, initShowStatusType } from "./defCols";
 
 export default ({ state, action, IsAdd, processing }) => {
+	let TitleDetail = "https://docs.google.com/spreadsheets/d/1f2ONaTvR5Bj3nBuWK4W7fkuZO24pYVh41IThrrieqB8/edit#gid=0";
 	const newActionModeType = initActionModeType
 		.filter(i => {
 			if (state.bannerType == 2 && i.value !== 2) {
@@ -132,6 +133,7 @@ export default ({ state, action, IsAdd, processing }) => {
 									<>
 										<InputBox
 											Title="Tp Id"
+											TitleDetail={TitleDetail}
 											OnChange={action.EditMainValue}
 											dataColumn="tpId"
 											value={state.tpId}
@@ -160,6 +162,7 @@ export default ({ state, action, IsAdd, processing }) => {
 												/>
 												<InputBox
 													Title="Tp Id"
+													TitleDetail={TitleDetail}
 													OnChange={action.EditMainValue}
 													dataColumn="tpId"
 													value={state.tpId}
@@ -177,6 +180,7 @@ export default ({ state, action, IsAdd, processing }) => {
 											/>
 											<InputBox
 												Title="Tp Id"
+												TitleDetail={TitleDetail}
 												OnChange={action.EditMainValue}
 												dataColumn="tpId"
 												value={state.tpId}
@@ -194,6 +198,7 @@ export default ({ state, action, IsAdd, processing }) => {
 											<>
 												<InputBox
 													Title="Tp Id"
+													TitleDetail={TitleDetail}
 													OnChange={action.EditMainValue}
 													dataColumn="tpId"
 													value={state.tpId}
@@ -215,6 +220,7 @@ export default ({ state, action, IsAdd, processing }) => {
 													/>
 													<InputBox
 														Title="Tp Id"
+														TitleDetail={TitleDetail}
 														OnChange={action.EditMainValue}
 														dataColumn="tpId"
 														value={state.tpId}
@@ -249,7 +255,7 @@ export default ({ state, action, IsAdd, processing }) => {
 									<SelectBox
 										Title="Sport Leagues"
 										Options={state.sportsLeaguesList}
-										HandleChange={action.GetSportTeamsList.bind(null,"change")}
+										HandleChange={action.GetSportTeamsList.bind(null, "change")}
 										dataColumn="sportLeaguesId"
 										SelectedValue={state.sportLeaguesId}
 									/>
