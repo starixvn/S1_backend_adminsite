@@ -6,7 +6,7 @@ import DateTimePickerElem from "./Component/DateTimePicker";
 import moment from "moment";
 import RadioBox from "./Component/RadioBox";
 import RichText from "./Component/RichText.jsx";
-import { initWalletType, initPromotionType, initWeekOptions, initPeriodType, weekOptions, initSpecialBonusPromotionType, specialBonusOptions, onlyRegisteredBonusOptions, initOnlyRegisteredPromotionType } from "./defCols";
+import { initWalletType, initPromotionType, initWeekOptions, initPeriodType, weekOptions, initSpecialBonusPromotionType, specialBonusOptions, onlyRegisteredBonusOptions } from "./defCols";
 import { defActionType } from "./Edit.reducer";
 
 const initBonusAmountType = promoType => {
@@ -149,7 +149,7 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 						/>
 						<SelectBox
 							Title="PromotionType"
-							Options={state.isSpecial ? state.onlyRegistered ? initOnlyRegisteredPromotionType : initSpecialBonusPromotionType : initPromotionType}
+							Options={state.isSpecial ? initSpecialBonusPromotionType : initPromotionType}
 							HandleChange={action.EditMainValue}
 							dataColumn="promotionType"
 							SelectedValue={state.promotionType}
