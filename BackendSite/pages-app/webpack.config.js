@@ -69,10 +69,10 @@ module.exports = {
 		// "CSD/ChangeVipLevelBatch.min": [
 		// 	"./src/pages/CSD/ChangeVipLevelBatch/index.js"
 		// ],
-		// "Marketing/BonusManage.min": [
-		// 	"@babel/polyfill",
-		// 	"./src/pages/Marketing/BonusManage/index.jsx"
-		// ],
+		"Marketing/BonusManage.min": [
+			"@babel/polyfill",
+			"./src/pages/Marketing/BonusManage/index.jsx"
+		],
 		// "Marketing/PendingBonus.min": [
 		// 	"./src/pages/Marketing/PendingBonus/index.jsx"
 		// ],
@@ -121,10 +121,10 @@ module.exports = {
 		// 	"@babel/polyfill",
 		// 	"./src/pages/Marketing/ReferralManagement/index.js"
 		// ],
-		"Marketing/DrawPrizeReport.min": [
-			"@babel/polyfill",
-			"./src/pages/Marketing/DrawPrizeReport/index.js"
-		]
+		// "Marketing/DrawPrizeReport.min": [
+		// 	"@babel/polyfill",
+		// 	"./src/pages/Marketing/DrawPrizeReport/index.js"
+		// ]
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
