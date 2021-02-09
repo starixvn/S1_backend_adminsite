@@ -90,6 +90,9 @@ const ReferralReport = lazy(() =>
 const DrawPrizeReport = lazy(() => 
 	import("./pages/Marketing/DrawPrizeReport/index")
 );
+const GameCasinoManagement = lazy(() => 
+	import("./pages/Marketing/GameCasinoManagement/index")
+);
 
 export const defaultPage = "DepositReport";
 
@@ -487,4 +490,17 @@ export const pages = {
 		],
 		layout: layoutType.N88
 	},
+	GameCasinoManage: {
+		comp: (
+			<Suspense fallback="loading...">
+				<GameCasinoManagement />
+			</Suspense>
+		),
+		css: [
+			"./lib/bootstrap/dist/css/bootstrap.min.css",
+			"./css/css/main.css",
+			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
+		],
+		layout: layoutType.N88
+	}
 };

@@ -121,9 +121,13 @@ module.exports = {
 		// 	"@babel/polyfill",
 		// 	"./src/pages/Marketing/ReferralManagement/index.js"
 		// ],
-		"Marketing/DrawPrizeReport.min": [
+		// "Marketing/DrawPrizeReport.min": [
+		// 	"@babel/polyfill",
+		// 	"./src/pages/Marketing/DrawPrizeReport/index.js"
+		// ]
+		"Marketing/GameCasinoManagement.min": [
 			"@babel/polyfill",
-			"./src/pages/Marketing/DrawPrizeReport/index.js"
+			"./src/pages/Marketing/GameCasinoManagement/index.js"
 		]
 	},
 	output: {

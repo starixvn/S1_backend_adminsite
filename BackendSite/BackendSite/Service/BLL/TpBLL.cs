@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static BackendSite.Controllers.Api.TpController;
 
 namespace BackendSite.Service.BLL
 {
@@ -159,6 +160,11 @@ namespace BackendSite.Service.BLL
         public IEnumerable<AdminTpTransferInfo> GetAdjustmentTpLog(int SiteId, int TpId, int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
             return thirdPartyService.GetAdjustmentTpLog(SiteId, TpId, CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+        }
+
+        public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(TpDetailPara TpDetailPara)
+        {
+            return thirdPartyService.GetTpBySiteAndCurrency(TpDetailPara);
         }
     }
 }
