@@ -44,15 +44,30 @@ const App = () => {
     if ((dataColumn === "Currency") & (stateFilter.Site !== null)) {
       GetTpBySiteAndCurrency(stateFilter.Site, v);
     }
-    setFilter({
-      ...stateFilter,
-      [dataColumn]: v,
-    });
+    if (dataColumn !== "TPid") {
+      setFilter({
+        ...stateFilter,
+        [dataColumn]: v,
+        TPid: "0",
+      });
+    } else {
+      setFilter({
+        ...stateFilter,
+        [dataColumn]: v,
+      });
+    }
+
     if (stateFilter.Site !== null) {
     }
   };
 
   const GetTpBySiteAndCurrency = (site, currency) => {
+    // setFilter({
+    //   ...stateFilter,
+    //   TPid: "0",
+    // });
+
+    // setTPList(null);
     let Data = {
       Site: site,
       Currency: currency,
@@ -62,6 +77,10 @@ const App = () => {
       .then(function (res) {
         if (res.data.errorCode === 0) {
           setTPList(res.data.data);
+          // setFilter({
+          //   ...stateFilter,
+          //   TPid: "0",
+          // });
         } else {
           alert(res.data.message ?? "failed to get data.");
         }
@@ -112,7 +131,6 @@ const App = () => {
       .post("/api/GameCasinoManagement/GameCasinoByTPId", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
-          console.log(888);
           setpageInfo({
             totalPages: res.data.totalPages,
             pageNumber: res.data.pageNumber,
@@ -149,11 +167,6 @@ const App = () => {
       .post("/api/GameCasinoManagement/GetGameCasinoDetail", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
-          console.log(123);
-          console.log(res.data);
-          if (res.data.data !== null) {
-            console.log(456);
-          }
           setdetailDatas({
             ...detailDatas,
             SiteId: res.data.data.siteId,
@@ -229,31 +242,33 @@ const App = () => {
       });
   };
   const Delete = () => {
-    let Data = {
-      SiteId: detailInfo.site,
-      CurrencyId: detailInfo.currency,
-      GameCasinoId: detailInfo.gameCasinoId,
-    };
-    api
-      .post("/api/GameCasinoManagement/DeleteGameCasinoDetail", Data)
-      .then(function (res) {
-        if (res.data.errorCode === 0) {
-          setdetailDatas({
-            SiteId: 0,
-            CurrencyId: 0,
-            GameCasinoId: 0,
-            Hot: false,
-            Featured: false,
-            Status: false,
-            UpdateAt: "",
-          });
-        } else {
-          alert(res.data.message ?? "failed to get data.");
-        }
-      })
-      .catch(function (error) {
-        alert(error);
-      });
+    if (window.confirm("Are you sure delete?")) {
+      let Data = {
+        SiteId: detailInfo.site,
+        CurrencyId: detailInfo.currency,
+        GameCasinoId: detailInfo.gameCasinoId,
+      };
+      api
+        .post("/api/GameCasinoManagement/DeleteGameCasinoDetail", Data)
+        .then(function (res) {
+          if (res.data.errorCode === 0) {
+            setdetailDatas({
+              SiteId: 0,
+              CurrencyId: 0,
+              GameCasinoId: 0,
+              Hot: false,
+              Featured: false,
+              Status: false,
+              UpdateAt: "",
+            });
+          } else {
+            alert(res.data.message ?? "failed to get data.");
+          }
+        })
+        .catch(function (error) {
+          alert(error);
+        });
+    }
   };
   if (mainPage === 0) {
     return (

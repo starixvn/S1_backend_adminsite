@@ -74,19 +74,22 @@ const Panel = (props) => {
         {props.StateTPList === null ? null : (
           <DropDownBox
             columnTitle="TP"
-            options={props.StateTPList.map((x,index) => {
-              if(index === 0){
-                return { value: 0, displayText: "Option" };
-              }
-              else
-              {
-                return { value: x.tpId, displayText: x.tpName };
-              }
-            })}
+            // options={props.StateTPList.map((x,index) => {
+            //   if(index === 0){
+            //     return { value: 0, displayText: "Option" };
+            //   }
+            //   else
+            //   {
+            //     return { value: x.tpId, displayText: x.tpName };
+            //   }
+            // })}
+            options = {GetTPOptions(props.StateTPList)}
             hasAll={false}
+            // selectedValue={props.StateFilter.TPid}
             selectedValue={0}
             dataColumn="TPid"
             onChange={props.FiterOnChange}
+            value={props.StateFilter.TPid}
           />
         )}
       </div>
@@ -104,6 +107,14 @@ const Panel = (props) => {
     </div>
   );
 };
+const GetTPOptions=(StateTPList)=>{
+  let TPOptions = [];
+  TPOptions.push({ value: 0, displayText: "Option" });
+  StateTPList.forEach(x=>{
+    TPOptions.push({ value: x.tpId, displayText: x.tpName });
+  });
+  return TPOptions;
+}
 
 const GetPromoCategories = () => {};
 const RadioBox = ({
@@ -186,7 +197,7 @@ const DropDownBox = (props) => {
     <div className="input-item">
       <span className="label">{props.columnTitle}</span>
       <div className="field">
-        <select defaultValue={props.selectedValue} onChange={onChange}>
+        <select onChange={onChange} value={props.value}>
           {props.hasAll ? <option value="0">All</option> : null}
           {optionRows}
         </select>
