@@ -1170,6 +1170,12 @@ import TpBetRecord from './TpBetRecord/index';
                                         <td>{data.userName}</td>
                                     </tr>
                                     <tr>
+                                        <th scope="row">
+                                            Vip Level&nbsp;<span class="status status-pending">New</span>
+                                        </th>
+                                        <td>{data.levelName}</td>
+                                    </tr>                                    
+                                    <tr>
                                         <th scope="row">User Level</th>
                                         {
                                             this.props.isEdit.Level ? (
@@ -1202,10 +1208,6 @@ import TpBetRecord from './TpBetRecord/index';
                                     </tr>
                                     <tr>
                                         <th scope="row">Point Level</th>
-                                        <td>{data.pointLevel}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Vip Level</th>
                                         <td>{data.vipLevel}</td>
                                     </tr>
                                     <tr>
