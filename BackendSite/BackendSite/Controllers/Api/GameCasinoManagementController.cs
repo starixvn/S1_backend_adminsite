@@ -23,7 +23,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoByTPId" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
         public ApiListResult<GameCasinoData> GameCasinoByTPId(GameCasinoPara gameCasinoPara)
         {
             var apiResult = new ApiListResult<GameCasinoData>();
@@ -46,7 +46,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GetGameCasinoDetail" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
         public ApiResult<GameCasinoDetail> GetGameCasinoDetail(GameCasinoDetailPara para)
         {
             var apiResult = new ApiResult<GameCasinoDetail>();
@@ -82,7 +82,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/SetGameCasinoDetail" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
         public ApiResult SetGameCasinoDetail(SetGameCasionPara para) 
         {
             var apiResult = new ApiResult();
@@ -100,7 +100,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/InsertGameCasinoDetail" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
         public ApiResult InsertGameCasinoDetail(InsertGameCasionPara para)
         {
             var apiResult = new ApiResult();
@@ -119,7 +119,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/DeleteGameCasinoDetail" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
         public ApiResult DeleteGameCasinoDetail(DeleteGameCasionPara para)
         {
             var apiResult = new ApiResult();
