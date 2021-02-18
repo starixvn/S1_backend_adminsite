@@ -74,7 +74,7 @@ const Panel = (props) => {
         {props.StateTPList === null ? null : (
           <DropDownBox
             columnTitle="TP"
-            options = {GetTPOptions(props.StateTPList)}
+            options={GetTPOptions(props.StateTPList)}
             hasAll={false}
             selectedValue={0}
             dataColumn="TPid"
@@ -97,14 +97,17 @@ const Panel = (props) => {
     </div>
   );
 };
-const GetTPOptions=(StateTPList)=>{
+const GetTPOptions = (StateTPList) => {
   let TPOptions = [];
   TPOptions.push({ value: 0, displayText: "Option" });
-  StateTPList.forEach(x=>{
-    TPOptions.push({ value: x.tpId, displayText: x.tpName });
-  });
+  if (StateTPList != null) {
+    StateTPList.forEach((x) => {
+      TPOptions.push({ value: x.tpId, displayText: x.tpName });
+    });
+  }
+  console.log(TPOptions);
   return TPOptions;
-}
+};
 
 const GetPromoCategories = () => {};
 const RadioBox = ({

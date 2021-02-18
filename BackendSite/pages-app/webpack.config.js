@@ -121,14 +121,14 @@ module.exports = {
 		// 	"@babel/polyfill",
 		// 	"./src/pages/Marketing/ReferralManagement/index.js"
 		// ],
-		"Marketing/DrawPrizeReport.min": [
-			"@babel/polyfill",
-			"./src/pages/Marketing/DrawPrizeReport/index.js"
-		]
-		// "Marketing/GameCasinoManagement.min": [
+		// "Marketing/DrawPrizeReport.min": [
 		// 	"@babel/polyfill",
-		// 	"./src/pages/Marketing/GameCasinoManagement/index.js"
+		// 	"./src/pages/Marketing/DrawPrizeReport/index.js"
 		// ]
+		"Marketing/GameCasinoManagement.min": [
+			"@babel/polyfill",
+			"./src/pages/Marketing/GameCasinoManagement/index.js"
+		]
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

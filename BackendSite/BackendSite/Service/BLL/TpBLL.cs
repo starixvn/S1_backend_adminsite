@@ -13,17 +13,19 @@ namespace BackendSite.Service.BLL
 {
     public class TpBLL
     {
+        private readonly ServerInfoService serverInfoService;
         private readonly CourierAdapter courierAdapter;
         private readonly string apiUrl;
         private readonly ThirdPartyService thirdPartyService;
         private readonly IMemoryCache cache;
 
-        public TpBLL(IMemoryCache cache, IConfiguration configuration, CourierAdapter courierAdapter, ThirdPartyService thirdPartyService)
+        public TpBLL(IMemoryCache cache, IConfiguration configuration, CourierAdapter courierAdapter, ThirdPartyService thirdPartyService, ServerInfoService serverInfoService)
         {
             this.courierAdapter = courierAdapter;
             this.apiUrl = configuration.GetValue<string>("TpService");
             this.thirdPartyService = thirdPartyService;
             this.cache = cache;
+            this.serverInfoService = serverInfoService;
         }
         public IEnumerable<TpTransferInfo> GetTpTransferInfoByCust(int CustId, string TransId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
@@ -164,7 +166,13 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(TpDetailPara TpDetailPara)
         {
-            return thirdPartyService.GetTpBySiteAndCurrency(TpDetailPara);
+            var UserSiteList = serverInfoService.GetSiteList();
+            IEnumerable<SiteTpListIfo> result = null;
+            if (UserSiteList.Where(x => x.SiteId == TpDetailPara.Site).Select(x => x).ToList().FirstOrDefault().ICurrencyList.Contains(TpDetailPara.Currency))
+            {
+                result =  thirdPartyService.GetTpBySiteAndCurrency(TpDetailPara);
+            }
+            return result;
         }
     }
 }
