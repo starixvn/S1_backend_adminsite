@@ -27,6 +27,7 @@ namespace BackendSite.Service.Model
         public int Site { get; set; }
         public int Currency { get; set; }
         public string HasDetail { get; set;  }
+        public string TpName { get; set; }
     }
 
     public class GameCasinoPara

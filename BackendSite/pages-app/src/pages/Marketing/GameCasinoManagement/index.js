@@ -21,6 +21,7 @@ const App = () => {
   const [detailInfo, setdetailInfo] = useState({
     Ename: "",
     Cname: "",
+    tpName: "",
     site: null,
     currency: null,
     tpId: null,
@@ -37,7 +38,6 @@ const App = () => {
   });
 
   const FilterOnChange = (v, dataColumn) => {
-    console.log(v, dataColumn);
     if ((dataColumn === "Site") & (stateFilter.Currency !== null)) {
       GetTpBySiteAndCurrency(v, stateFilter.Currency);
     }
@@ -62,12 +62,6 @@ const App = () => {
   };
 
   const GetTpBySiteAndCurrency = (site, currency) => {
-    // setFilter({
-    //   ...stateFilter,
-    //   TPid: "0",
-    // });
-
-    // setTPList(null);
     let Data = {
       Site: site,
       Currency: currency,
@@ -77,10 +71,6 @@ const App = () => {
       .then(function (res) {
         if (res.data.errorCode === 0) {
           setTPList(res.data.data);
-          // setFilter({
-          //   ...stateFilter,
-          //   TPid: "0",
-          // });
         } else {
           alert(res.data.message ?? "failed to get data.");
         }
@@ -161,6 +151,7 @@ const App = () => {
       currency: GameData.currency,
       tpId: GameData.tpId,
       gameCasinoId: GameData.gameCasinoId,
+      tpName: GameData.tpName,
     });
 
     api
@@ -270,6 +261,36 @@ const App = () => {
         });
     }
   };
+  const GetCurrencyName = (prop) => {
+    switch (prop) {
+      case 2:
+        return "MYR";
+      case 4:
+        return "THB";
+      case 13:
+        return "RMB";
+      case 15:
+        return "IDR";
+      case 51:
+        return "VND";
+      case 96:
+        return "USDT";
+      default:
+        return "沒有符合的條件";
+    }
+  };
+  const GetSiteName = (prop) => {
+    switch (prop) {
+      case 1:
+        return "Nova88";
+      case 2:
+        return "Goal123";
+      case 3:
+        return "Bwing";
+      default:
+        return "沒有符合的條件";
+    }
+  };
   if (mainPage === 0) {
     return (
       <div className="container-fluid">
@@ -294,9 +315,9 @@ const App = () => {
   } else {
     return (
       <div>
-        <h5 className="detail">SiteId:{detailInfo.site}</h5>
-        <h5 className="detail">CurrencyId:{detailInfo.currency}</h5>
-        <h5 className="detail">TpId:{detailInfo.tpId}</h5>
+        <h5 className="detail">Site:{GetSiteName(detailInfo.site)}</h5>
+        <h5 className="detail">Currency:{GetCurrencyName(detailInfo.currency)}</h5>
+        <h5 className="detail">Tp:{detailInfo.tpName}</h5>
         <h5 className="detail">GameCasinoId:{detailInfo.gameCasinoId}</h5>
         <h5 className="detail">Ename:{detailInfo.Ename}</h5>
         <h5 className="detail">Cname:{detailInfo.Cname}</h5>

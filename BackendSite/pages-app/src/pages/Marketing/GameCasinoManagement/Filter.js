@@ -74,18 +74,8 @@ const Panel = (props) => {
         {props.StateTPList === null ? null : (
           <DropDownBox
             columnTitle="TP"
-            // options={props.StateTPList.map((x,index) => {
-            //   if(index === 0){
-            //     return { value: 0, displayText: "Option" };
-            //   }
-            //   else
-            //   {
-            //     return { value: x.tpId, displayText: x.tpName };
-            //   }
-            // })}
             options = {GetTPOptions(props.StateTPList)}
             hasAll={false}
-            // selectedValue={props.StateFilter.TPid}
             selectedValue={0}
             dataColumn="TPid"
             onChange={props.FiterOnChange}

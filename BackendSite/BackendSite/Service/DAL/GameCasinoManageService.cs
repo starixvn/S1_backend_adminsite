@@ -33,7 +33,7 @@ namespace BackendSite.Service.DAL
             props.Add("SiteId", gameCasinoPara.Site);
             props.Add("CurrencyId", gameCasinoPara.Currency);
 
-            var result = conn.Query<GameCasinoData>("Admin_GameCanio_Get", props, commandType: CommandType.StoredProcedure);
+            var result = conn.Query<GameCasinoData>("Admin_GameCasino_Get", props, commandType: CommandType.StoredProcedure);
             LogResult.GameCasinoData = result.ToList();
             LogResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
             LogResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
@@ -49,7 +49,7 @@ namespace BackendSite.Service.DAL
             props.Add("SiteId", para.SiteId);
             props.Add("CurrencyId", para.CurrencyId);
             props.Add("GameCasinoId", para.GameCasinoId);
-            return conn.Query<GameCasinoDetail>("Admin_GameGasinoDetail_Get", props, commandType: CommandType.StoredProcedure).FirstOrDefault();
+            return conn.Query<GameCasinoDetail>("Admin_GameCasinoDetail_Get", props, commandType: CommandType.StoredProcedure).FirstOrDefault();
         }
         public int SetGameCasinoDetail(SetGameCasionPara para)
         {
@@ -61,7 +61,7 @@ namespace BackendSite.Service.DAL
             props.Add("Hot", para.Hot ? 1 : 2);
             props.Add("Featured", para.Featured ? 1 : 2);
             props.Add("Status", para.Status ? 1 : 2);
-            return conn.Execute("Admin_GameGasinoDetail_Set", props, commandType: CommandType.StoredProcedure);
+            return conn.Execute("Admin_GameCasinoDetail_Set", props, commandType: CommandType.StoredProcedure);
         }
         public int InsertGameCasinoDetail (InsertGameCasionPara para) 
         {
@@ -70,7 +70,7 @@ namespace BackendSite.Service.DAL
             props.Add("SiteId", para.SiteId);
             props.Add("CurrencyId", para.CurrencyId);
             props.Add("GameCasinoId", para.GameCasinoId);
-            return conn.Execute("Admin_GameGasinoDetail_Ins", props, commandType: CommandType.StoredProcedure);
+            return conn.Execute("Admin_GameCasinoDetail_Ins", props, commandType: CommandType.StoredProcedure);
         }
         public int DeleteGameCasinoDetail(DeleteGameCasionPara para)
         {
@@ -79,7 +79,7 @@ namespace BackendSite.Service.DAL
             props.Add("SiteId", para.SiteId);
             props.Add("CurrencyId", para.CurrencyId);
             props.Add("GameCasinoId", para.GameCasinoId);
-            return conn.Execute("Admin_GameGasinoDetail_Del", props, commandType: CommandType.StoredProcedure);
+            return conn.Execute("Admin_GameCasinoDetail_Del", props, commandType: CommandType.StoredProcedure);
         }
     }
 }

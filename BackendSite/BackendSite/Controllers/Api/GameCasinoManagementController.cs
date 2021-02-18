@@ -30,7 +30,6 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var gameCasinoData = gameCasinoManageBLL.GameCasinoByTPId(gameCasinoPara);
-                //var logResult = prizeBLL.GetPrizeLog(prizeLogPara);
                 apiResult.Data = gameCasinoData.GameCasinoData;
                 apiResult.PageNumber = gameCasinoData.PageNumber;
                 apiResult.TotalPages = gameCasinoData.TotalPages;
