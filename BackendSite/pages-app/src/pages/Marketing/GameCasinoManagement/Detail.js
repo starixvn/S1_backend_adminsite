@@ -14,7 +14,7 @@ const Panel = (props) => {
     headerRows.push(<th key={`title-${i}`}>{e.columnTitle}</th>);
   });
   const handleToggle = (type, value) => {
-    if (window.confirm("Are you sure change Status ?")) {
+    if (window.confirm(`Are you sure change ${type} ?`)) {
       let Data = {
         SiteId: props.Datas.SiteId,
         CurrencyId: props.Datas.CurrencyId,
