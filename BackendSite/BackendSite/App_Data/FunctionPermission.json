@@ -97,6 +97,10 @@
           {
             "DisplayKey": "Email Verified",
             "FuncKey": "ca_emailVerified"
+          },
+          {
+            "DisplayKey": "VIP Level Edit",
+            "FuncKey": "ca_vipLevelEdit"
           }
         ]
       },
