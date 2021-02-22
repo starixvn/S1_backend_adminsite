@@ -136,5 +136,15 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
+        public ApiResult<IEnumerable<CurrencyData>> GetCurrency(GetCurrency para)
+        {
+            var apiResult = new ApiResult<IEnumerable<CurrencyData>>();
+            apiResult.Data = gameCasinoManageBLL.GetCurrency(para.SiteId);
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
+        }
     }
 }

@@ -44,7 +44,6 @@ const Panel = (props) => {
         });
         Data.Status = !Data.Status;
       }
-      console.log(props);
       api
         .post("/api/GameCasinoManagement/SetGameCasinoDetail", Data)
         .then(function (response) {})

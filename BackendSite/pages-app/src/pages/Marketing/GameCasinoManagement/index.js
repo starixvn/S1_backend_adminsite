@@ -14,6 +14,15 @@ const App = () => {
     Currency: null,
     TPid: null,
   });
+  const [backupFilter, setbackupFilter] = useState({
+    Site: null,
+    Currency: null,
+    TPid: null,
+  });
+  const [backsiteList, setbacksiteList] = useState(null);
+  const [backcurrencyList, setbackcurrencyList] = useState(null);
+  const [siteList, setsiteList] = useState(null);
+  const [currencyList, setcurrencyList] = useState(null);
   const [stateTPList, setTPList] = useState(null);
   const [datas, setdatas] = useState(null);
   const [pageInfo, setpageInfo] = useState(null);
@@ -36,10 +45,35 @@ const App = () => {
     Status: false,
     UpdateAt: "",
   });
+  const [siteChange, setsiteChange] = useState(0);
+
+  useEffect(() => {
+    api
+      .post("/api/Common/AdminUserSiteList")
+      .then(function (response) {
+        if (response.data.errorCode === 0) {
+          let SiteList = response.data.data.map((s) => {
+            return {
+              value: s.siteId,
+              displayText: s.siteName,
+            };
+          });
+          setsiteList(SiteList);
+        } else {
+          alert(response.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  }, []);
 
   const FilterOnChange = (v, dataColumn) => {
-    if ((dataColumn === "Site") & (stateFilter.Currency !== null)) {
-      GetTpBySiteAndCurrency(v, stateFilter.Currency);
+    if (dataColumn === "Site") {
+      GetCurrency(v);
+      if (stateFilter.Currency !== null) {
+        GetTpBySiteAndCurrency(v, stateFilter.Currency);
+      }
     }
     if ((dataColumn === "Currency") & (stateFilter.Site !== null)) {
       GetTpBySiteAndCurrency(stateFilter.Site, v);
@@ -59,6 +93,29 @@ const App = () => {
 
     if (stateFilter.Site !== null) {
     }
+  };
+  const GetCurrency = (site) => {
+    let Data = {
+      SiteId: site,
+    };
+    api
+      .post("/api/GameCasinoManagement/GetCurrency", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          let CurrencyLiST = res.data.data.map((s) => {
+            return {
+              value: s.currencyId,
+              displayText: s.currencyName,
+            };
+          });
+          setcurrencyList(CurrencyLiST);
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
   };
 
   const GetTpBySiteAndCurrency = (site, currency) => {
@@ -101,6 +158,13 @@ const App = () => {
             rowCount: res.data.rowCount,
           });
           setdatas(res.data.data);
+          setbackupFilter({
+            TPid: parseInt(stateFilter.TPid),
+            Currency: stateFilter.Currency,
+            Site: stateFilter.Site,
+          });
+          setbacksiteList(siteList);
+          setbackcurrencyList(currencyList);
         } else {
           alert(res.data.message ?? "failed to get data.");
         }
@@ -112,9 +176,9 @@ const App = () => {
 
   const Result_ChangePage = (PageNumber) => {
     let Data = {
-      Site: stateFilter.Site,
-      Currency: stateFilter.Currency,
-      TPid: parseInt(stateFilter.TPid),
+      Site: backupFilter.Site,
+      Currency: backupFilter.Currency,
+      TPid: parseInt(backupFilter.TPid),
       PageNumber: PageNumber,
     };
     api
@@ -168,6 +232,7 @@ const App = () => {
             Status: res.data.data.status === 1,
             UpdateAt: "",
           });
+          setmainPage(1);
         } else {
           alert(res.data.message ?? "failed to get data.");
         }
@@ -175,14 +240,13 @@ const App = () => {
       .catch(function (error) {
         alert(error);
       });
-    setmainPage(1);
   };
 
   const Goback = () => {
     let Data = {
-      Site: stateFilter.Site,
-      Currency: stateFilter.Currency,
-      TPid: parseInt(stateFilter.TPid),
+      Site: backupFilter.Site,
+      Currency: backupFilter.Currency,
+      TPid: parseInt(backupFilter.TPid),
       PageNumber: pageInfo.pageNumber,
     };
     api
@@ -262,34 +326,22 @@ const App = () => {
     }
   };
   const GetCurrencyName = (prop) => {
-    switch (prop) {
-      case 2:
-        return "MYR";
-      case 4:
-        return "THB";
-      case 13:
-        return "RMB";
-      case 15:
-        return "IDR";
-      case 51:
-        return "VND";
-      case 96:
-        return "USDT";
-      default:
-        return "沒有符合的條件";
-    }
+    let result = "";
+    backcurrencyList.forEach((x) => {
+      if (x.value === prop) {
+        result = x.displayText;
+      }
+    });
+    return result;
   };
   const GetSiteName = (prop) => {
-    switch (prop) {
-      case 1:
-        return "Nova88";
-      case 2:
-        return "Goal123";
-      case 3:
-        return "Bwing";
-      default:
-        return "沒有符合的條件";
-    }
+    let result = "";
+    backsiteList.forEach((x) => {
+      if (x.value === prop) {
+        result = x.displayText;
+      }
+    });
+    return result;
   };
   if (mainPage === 0) {
     return (
@@ -300,6 +352,9 @@ const App = () => {
           FiterOnChange={FilterOnChange}
           StateTPList={stateTPList}
           Submit={Submit}
+          SiteList={siteList}
+          CurrencyList={currencyList}
+          SiteChange={siteChange}
         />
         {datas === null ? null : (
           <Result
@@ -316,7 +371,9 @@ const App = () => {
     return (
       <div>
         <h5 className="detail">Site:{GetSiteName(detailInfo.site)}</h5>
-        <h5 className="detail">Currency:{GetCurrencyName(detailInfo.currency)}</h5>
+        <h5 className="detail">
+          Currency:{GetCurrencyName(detailInfo.currency)}
+        </h5>
         <h5 className="detail">Tp:{detailInfo.tpName}</h5>
         <h5 className="detail">GameCasinoId:{detailInfo.gameCasinoId}</h5>
         <h5 className="detail">Ename:{detailInfo.Ename}</h5>

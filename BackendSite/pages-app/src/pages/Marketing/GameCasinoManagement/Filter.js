@@ -2,72 +2,33 @@ import React from "react";
 import moment from "moment";
 import DateTimePicker from "react-datetime";
 
-const defSite = {
-  0: {
-    value: 1,
-    displayText: "Nova88",
-  },
-  1: {
-    value: 2,
-    displayText: "Goal123",
-  },
-  2: {
-    value: 3,
-    displayText: "Bwing",
-  },
-};
-const defCurrency = {
-  0: {
-    value: 2,
-    displayText: "MYR",
-  },
-  1: {
-    value: 4,
-    displayText: "THB",
-  },
-  2: {
-    value: 13,
-    displayText: "RMB",
-  },
-  3: {
-    value: 15,
-    displayText: "IDR",
-  },
-  4: {
-    value: 51,
-    displayText: "VND",
-  },
-  5: {
-    value: 96,
-    displayText: "USDT",
-  },
-};
-const initSite = () => Object.values(defSite);
-const initCurrency = () => Object.values(defCurrency);
-
 const Panel = (props) => {
   return (
     <div className="filter">
       <div className="row-flex">
         <div>
-          <RadioBox
-            Title="Site"
-            Options={initSite()}
-            OnChange={props.FiterOnChange}
-            dataColumn="Site"
-            Selected={props.StateFilter.Site}
-          />
+          {props.SiteList === null ? null : (
+            <RadioBox
+              Title="Site"
+              Options={Object.values(props.SiteList)}
+              OnChange={props.FiterOnChange}
+              dataColumn="Site"
+              Selected={props.StateFilter.Site}
+            />
+          )}
         </div>
       </div>
       <div>
         <div>
-          <RadioBox
-            Title="Currency"
-            Options={initCurrency()}
-            OnChange={props.FiterOnChange}
-            dataColumn="Currency"
-            Selected={props.StateFilter.Currency}
-          />
+          {props.StateFilter.Site === null || props.CurrencyList === null ? null : (
+            <RadioBox
+              Title="Currency"
+              Options={Object.values(props.CurrencyList)}
+              OnChange={props.FiterOnChange}
+              dataColumn="Currency"
+              Selected={props.StateFilter.Currency}
+            />
+          )}
         </div>
       </div>
       <div>
@@ -105,11 +66,9 @@ const GetTPOptions = (StateTPList) => {
       TPOptions.push({ value: x.tpId, displayText: x.tpName });
     });
   }
-  console.log(TPOptions);
   return TPOptions;
 };
 
-const GetPromoCategories = () => {};
 const RadioBox = ({
   Title,
   Options,

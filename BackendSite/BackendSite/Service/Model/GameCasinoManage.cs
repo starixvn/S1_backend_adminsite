@@ -87,4 +87,13 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public int GameCasinoId { get; set; }
     }
+    public class GetCurrency
+    {
+        public int SiteId { get; set; }
+    }
+    public class CurrencyData
+    {
+        public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
+    }
 }

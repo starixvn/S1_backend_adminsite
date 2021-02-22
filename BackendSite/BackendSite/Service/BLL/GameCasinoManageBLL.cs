@@ -11,10 +11,14 @@ namespace BackendSite.Service.BLL
     public class GameCasinoManageBLL
     {
         private readonly GameCasinoManageService gameCasinoManageService;
+        private readonly ReportService reportService;
+        private readonly ServerInfoService serverInfoService;
 
-        public GameCasinoManageBLL(GameCasinoManageService gameCasinoManageService)
+        public GameCasinoManageBLL(GameCasinoManageService gameCasinoManageService, ReportService reportService, ServerInfoService serverInfoService)
         {
             this.gameCasinoManageService = gameCasinoManageService;
+            this.reportService = reportService;
+            this.serverInfoService = serverInfoService;
         }
 
         public class GameCasinoName
@@ -53,6 +57,25 @@ namespace BackendSite.Service.BLL
         public int DeleteGameCasinoDetail(DeleteGameCasionPara para)
         {
             return gameCasinoManageService.DeleteGameCasinoDetail(para);
+        }
+        public IEnumerable<CurrencyData> GetCurrency(int siteId)
+        {
+            IEnumerable<ServerInfo> SiteList = null;
+            IEnumerable<CurrencyModel> CurrencyList = null;
+            List<CurrencyData> CurrencyData = new List<CurrencyData>();
+            SiteList = serverInfoService.GetSiteList();
+            CurrencyList = reportService.GetCurrencyList();
+            if(SiteList != null && CurrencyList != null)
+            {
+                SiteList.Where(x => x.SiteId == siteId).FirstOrDefault().ICurrencyList.ToList().ForEach(y => {
+                    CurrencyData.Add(new CurrencyData
+                    {
+                        CurrencyId = y,
+                        CurrencyName = CurrencyList.Where(z => z.CurrencyId == y).FirstOrDefault().IsoCode
+                    });
+                });
+            }          
+            return CurrencyData;
         }
     }
 }
