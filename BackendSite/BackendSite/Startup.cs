@@ -79,6 +79,7 @@ namespace BackendSite
             services.AddSingleton<ReferralManagementService>();
             services.AddSingleton<SportsService>();
             services.AddSingleton<PrizeService>();
+            services.AddSingleton<VipLevelService>();
             services.AddSingleton<GameCasinoManageService>();
             //var dal = AppDomain.CurrentDomain.GetAssemblies()
             //           .SelectMany(t => t.GetTypes())
@@ -123,6 +124,7 @@ namespace BackendSite
             services.AddSingleton<ReferralManagementBLL>();
             services.AddSingleton<SportsBLL>();
             services.AddSingleton<PrizeBLL>();
+            services.AddSingleton<VipLevelBLL>();
             services.AddSingleton<GameCasinoManageBLL>();
             // var bll = AppDomain.CurrentDomain.GetAssemblies()
             //.SelectMany(t => t.GetTypes())
