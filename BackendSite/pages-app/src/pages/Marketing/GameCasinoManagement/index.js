@@ -13,11 +13,13 @@ const App = () => {
     Site: null,
     Currency: null,
     TPid: null,
+    Name: null,
   });
   const [backupFilter, setbackupFilter] = useState({
     Site: null,
     Currency: null,
     TPid: null,
+    Name: null,
   });
   const [backsiteList, setbacksiteList] = useState(null);
   const [backcurrencyList, setbackcurrencyList] = useState(null);
@@ -69,6 +71,7 @@ const App = () => {
   }, []);
 
   const FilterOnChange = (v, dataColumn) => {
+    console.log(stateFilter)
     if (dataColumn === "Site") {
       GetCurrency(v);
       if (stateFilter.Currency !== null) {
@@ -79,11 +82,18 @@ const App = () => {
       GetTpBySiteAndCurrency(stateFilter.Site, v);
     }
     if (dataColumn !== "TPid") {
-      setFilter({
-        ...stateFilter,
-        [dataColumn]: v,
-        TPid: "0",
-      });
+      if (dataColumn !== "Name") {
+        setFilter({
+          ...stateFilter,
+          [dataColumn]: v,
+          TPid: "0",
+        });
+      } else {
+        setFilter({
+          ...stateFilter,
+          [dataColumn]: v,
+        });
+      }
     } else {
       setFilter({
         ...stateFilter,
@@ -146,6 +156,7 @@ const App = () => {
       Site: stateFilter.Site,
       Currency: stateFilter.Currency,
       TPid: parseInt(stateFilter.TPid),
+      Name: stateFilter.Name,
       PageNumber: 1,
     };
     api
@@ -162,6 +173,7 @@ const App = () => {
             TPid: parseInt(stateFilter.TPid),
             Currency: stateFilter.Currency,
             Site: stateFilter.Site,
+            Name: stateFilter.Name
           });
           setbacksiteList(siteList);
           setbackcurrencyList(currencyList);
@@ -179,6 +191,7 @@ const App = () => {
       Site: backupFilter.Site,
       Currency: backupFilter.Currency,
       TPid: parseInt(backupFilter.TPid),
+      Name: backupFilter.Name,
       PageNumber: PageNumber,
     };
     api
@@ -247,6 +260,7 @@ const App = () => {
       Site: backupFilter.Site,
       Currency: backupFilter.Currency,
       TPid: parseInt(backupFilter.TPid),
+      Name: backupFilter.Name,
       PageNumber: pageInfo.pageNumber,
     };
     api

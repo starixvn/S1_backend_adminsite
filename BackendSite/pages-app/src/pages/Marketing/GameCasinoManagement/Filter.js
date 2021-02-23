@@ -20,7 +20,8 @@ const Panel = (props) => {
       </div>
       <div>
         <div>
-          {props.StateFilter.Site === null || props.CurrencyList === null ? null : (
+          {props.StateFilter.Site === null ||
+          props.CurrencyList === null ? null : (
             <RadioBox
               Title="Currency"
               Options={Object.values(props.CurrencyList)}
@@ -41,6 +42,17 @@ const Panel = (props) => {
             dataColumn="TPid"
             onChange={props.FiterOnChange}
             value={props.StateFilter.TPid}
+          />
+        )}
+      </div>
+      <div>
+        {props.StateTPList === null ? null : (
+          <InputField
+            columnTitle="Name"
+            Value={props.StateFilter.Name}
+            dataColumn="Name"
+            onChange={props.FiterOnChange}
+            defaultValue=""
           />
         )}
       </div>
@@ -154,6 +166,28 @@ const DropDownBox = (props) => {
           {optionRows}
         </select>
       </div>
+    </div>
+  );
+};
+
+const InputField = (props) => {
+  const EditField = (e) => {
+    if (props.onChange) {
+      props.onChange(e.target.value, props.dataColumn);
+    } else if (props.onBlur) {
+      props.onBlur(e.target.value, props.dataColumn);
+    }
+  };
+  return (
+    <div className="input-item">
+      <span className="label">{props.columnTitle}</span>
+      <input
+        className="form-control"
+        defaultValue={props.defaultValue}
+        value={props.Value}
+        onChange={EditField}
+        onBlur={EditField}
+      />
     </div>
   );
 };

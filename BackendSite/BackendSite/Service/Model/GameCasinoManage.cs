@@ -37,6 +37,7 @@ namespace BackendSite.Service.Model
         public int Site { get; set; }
         public int Currency { get; set; }
         public int TPid { get; set; }
+        public string Name { get; set; }
         public GameCasinoPara()
         {
             //PageSize預設10

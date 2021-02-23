@@ -32,6 +32,7 @@ namespace BackendSite.Service.DAL
             props.Add("TPId", gameCasinoPara.TPid);
             props.Add("SiteId", gameCasinoPara.Site);
             props.Add("CurrencyId", gameCasinoPara.Currency);
+            props.Add("Names", string.IsNullOrEmpty(gameCasinoPara.Name == null ? null: gameCasinoPara.Name.Replace(" ", "")) ? null: $"%{gameCasinoPara.Name.Trim()}%");
 
             var result = conn.Query<GameCasinoData>("Admin_GameCasino_Get", props, commandType: CommandType.StoredProcedure);
             LogResult.GameCasinoData = result.ToList();
