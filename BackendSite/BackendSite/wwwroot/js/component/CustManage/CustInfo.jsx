@@ -13,6 +13,7 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
 import { BankLog } from './CustInfo_BankLog.jsx';
 import DateTimePicker from 'react-datetime';
 import TpBetRecord from './TpBetRecord/index';
+import VipLevel from './VipLevel/index';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -1174,7 +1175,7 @@ import TpBetRecord from './TpBetRecord/index';
                                             Vip Level&nbsp;<span class="status status-pending">New</span>
                                         </th>
                                         <td>{data.levelName}</td>
-                                    </tr>                                    
+                                    </tr>
                                     <tr>
                                         <th scope="row">User Level</th>
                                         {
@@ -1549,7 +1550,7 @@ import TpBetRecord from './TpBetRecord/index';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History", "VIP Level"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
         constructor(props) {
@@ -2092,6 +2093,8 @@ import TpBetRecord from './TpBetRecord/index';
                 dataContainer = <BankLog GetBankLog={this.GetBankLog.bind(this)} searchData={this.state.BankLogData} />
             } else if (TabName == this._Tabs[16]) {
                 dataContainer = <ReferralHistory GetReferralHistory={this.GetReferralHistory.bind(this)} searchData={this.state.ReferralHistoryData} ReferralHistory={this.state.ReferralHistory} onChangeValue={this.onChangeValue.bind(this)} />
+            } else if (TabName == this._Tabs[17]) {
+                dataContainer = <VipLevel />
             }
 
             let authSubKeys = {

@@ -81,6 +81,7 @@ import DateTimePicker from 'react-datetime';
                         <td>{row.accountName}</td>
                         <td>{moment(row.createTime).format('l LTS')}</td>
                         <td>{row.updateTime ? moment(row.updateTime).format('l LTS') : null}</td>
+                        <td>{row.vipLevelName}</td>
                         <td className="text-right">{row.depositCnt}</td>
                         <td>{DepositStatusOp[row.status]}</td>
                     </tr>
@@ -122,6 +123,7 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">To Acc. Name</th>
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Update Time (" + moment().format('Z') + ")"}</th>
+                                <th scope="col">VIP Level</th>
                                 <th scope="col" className="text-right">Total Deposit Count</th>
                                 <th scope="col">{i18n.lbl_Status}</th>
                             </tr>
