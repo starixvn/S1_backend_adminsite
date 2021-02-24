@@ -1170,45 +1170,56 @@ import VipLevel from './VipLevel/index';
                                         <th scope="row">User Name</th>
                                         <td>{data.userName}</td>
                                     </tr>
-                                    <tr>
-                                        <th scope="row">User Level</th>
-                                        {
-                                            this.props.isEdit.Level ? (
-                                                <td>
-                                                    <input type="number" min="1" defaultValue={data.userLevel} onChange={(e) => this.props.editOnChange(e.target.value, "Level")} />
-                                                    <div className="button-action float-right">
-                                                        <button className="btn btn-save" onClick={this.props.editUpdate}>
-                                                            <i className="icon-save"></i>
-                                                        </button>
-                                                        <button className="btn btn-icon-cancel" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Level, "Level")}>
-                                                            <i className="icon-cancel"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            ) : (
-                                                    <td>
-                                                        {data.userLevel}
-                                                        {
-                                                            subFuncKeys.includes('ca_userEdit') ? (
-                                                                <div className="button-action float-right">
-                                                                    <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Level, "Level")}>
-                                                                        <i className="icon-edit"></i>
-                                                                    </button>
-                                                                </div >
-                                                            ) : null
-                                                        }
-                                                    </td>
-                                                )
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Point Level</th>
-                                        <td>{data.pointLevel}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Vip Level</th>
-                                        <td>{data.vipLevel}</td>
-                                    </tr>
+                                    {(data.siteName == "Nova88") ?
+                                        <tr>
+                                            <th scope="row">
+                                                Vip Level&nbsp;<span class="status status-pending">New</span>
+                                            </th>
+                                            <td>{data.levelName}</td>
+                                        </tr>
+                                        :
+                                        <>
+                                            <tr>
+                                                <th scope="row">User Level</th>
+                                                {
+                                                    this.props.isEdit.Level ? (
+                                                        <td>
+                                                            <input type="number" min="1" defaultValue={data.userLevel} onChange={(e) => this.props.editOnChange(e.target.value, "Level")} />
+                                                            <div className="button-action float-right">
+                                                                <button className="btn btn-save" onClick={this.props.editUpdate}>
+                                                                    <i className="icon-save"></i>
+                                                                </button>
+                                                                <button className="btn btn-icon-cancel" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Level, "Level")}>
+                                                                    <i className="icon-cancel"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    ) : (
+                                                            <td>
+                                                                {data.userLevel}
+                                                                {
+                                                                    subFuncKeys.includes('ca_userEdit') ? (
+                                                                        <div className="button-action float-right">
+                                                                            <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Level, "Level")}>
+                                                                                <i className="icon-edit"></i>
+                                                                            </button>
+                                                                        </div >
+                                                                    ) : null
+                                                                }
+                                                            </td>
+                                                        )
+                                                }
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Point Level</th>
+                                                <td>{data.pointLevel}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Vip Level</th>
+                                                <td>{data.vipLevel}</td>
+                                            </tr>
+                                        </>
+                                    }
                                     <tr>
                                         <th scope="row">Currency</th>
                                         <td>{i18n["lbl_Currency" + data.currencyId]}</td></tr>
