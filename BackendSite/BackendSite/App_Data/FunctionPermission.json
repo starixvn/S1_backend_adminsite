@@ -23,6 +23,11 @@
         "Enable": false
       },
       {
+        "DisplayKey": "Customer Statistical Report",
+        "FuncKey": "Report/CustomerStatisticalReport",
+        "Enable": false
+      },
+      {
         "DisplayKey": "User Online Report",
         "FuncKey": "Report/UserOnlineReport",
         "Enable": false
