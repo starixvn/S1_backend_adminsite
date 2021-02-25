@@ -6,47 +6,19 @@ const Panel = (props) => {
   return (
     <div className="filter">
       <div className="row-flex">
-        <div>
-          {props.SiteList === null ? null : (
-            <RadioBox
-              Title="Site"
-              Options={Object.values(props.SiteList)}
-              OnChange={props.FiterOnChange}
-              dataColumn="Site"
-              Selected={props.StateFilter.Site}
-            />
-          )}
-        </div>
       </div>
       <div>
-        <div>
-          {props.StateFilter.Site === null ||
-          props.CurrencyList === null ? null : (
-            <RadioBox
-              Title="Currency"
-              Options={Object.values(props.CurrencyList)}
-              OnChange={props.FiterOnChange}
-              dataColumn="Currency"
-              Selected={props.StateFilter.Currency}
-            />
-          )}
-        </div>
+        <DropDownBox
+          columnTitle="TP"
+          options={GetTPOptions(props.StateTPList)}
+          hasAll={false}
+          selectedValue={0}
+          dataColumn="TPid"
+          onChange={props.FiterOnChange}
+          value={props.StateFilter.TPid}
+        />
       </div>
       <div>
-        {props.StateTPList === null ? null : (
-          <DropDownBox
-            columnTitle="TP"
-            options={GetTPOptions(props.StateTPList)}
-            hasAll={false}
-            selectedValue={0}
-            dataColumn="TPid"
-            onChange={props.FiterOnChange}
-            value={props.StateFilter.TPid}
-          />
-        )}
-      </div>
-      <div>
-        {props.StateTPList === null ? null : (
           <InputField
             columnTitle="Name"
             Value={props.StateFilter.Name}
@@ -54,7 +26,6 @@ const Panel = (props) => {
             onChange={props.FiterOnChange}
             defaultValue=""
           />
-        )}
       </div>
       <div>
         {props.StateTPList === null ? null : (
@@ -72,7 +43,7 @@ const Panel = (props) => {
 };
 const GetTPOptions = (StateTPList) => {
   let TPOptions = [];
-  TPOptions.push({ value: 0, displayText: "Option" });
+  TPOptions.push({ value: 0, displayText: "----------------------------------------" });
   if (StateTPList != null) {
     StateTPList.forEach((x) => {
       TPOptions.push({ value: x.tpId, displayText: x.tpName });
@@ -80,70 +51,6 @@ const GetTPOptions = (StateTPList) => {
   }
   return TPOptions;
 };
-
-const RadioBox = ({
-  Title,
-  Options,
-  Selected,
-  OnChange,
-  dataColumn,
-  mainKey = null,
-}) => {
-  let opt = Options.map((o, oIdx) => {
-    let key = `${Title}-${o.value}${mainKey === null ? "" : `-${mainKey}`}`;
-    return (
-      <RadioBtn
-        key={key}
-        Id={key}
-        DisplayText={o.displayText}
-        Value={`${o.value}${mainKey === null ? "" : `-${mainKey}`}`}
-        dataColumn={dataColumn}
-        Name={`${Title}${mainKey === null ? "" : `-${mainKey}`}`}
-        OnChange={OnChange.bind(this, o.value, dataColumn, mainKey, oIdx)}
-        Checked={Selected === o.value}
-      />
-    );
-  });
-  return (
-    <>
-      <div className="row-flex">
-        <div className="input-item">
-          <label className="label">{Title}</label>
-        </div>
-      </div>
-      <div className="row-flex">{opt}</div>
-    </>
-  );
-};
-
-const RadioBtn = ({
-  Id,
-  DisplayText,
-  Value,
-  Name,
-  OnChange,
-  Checked,
-  Disabled,
-}) => {
-  return (
-    <div className="custom-control custom-radio custom-control-inline">
-      <input
-        type="radio"
-        id={Id}
-        name={Name}
-        className="custom-control-input revert-style"
-        value={Value}
-        onChange={OnChange}
-        checked={Checked}
-        disabled={Disabled}
-      />
-      <label className="custom-control-label" htmlFor={Id}>
-        {DisplayText}
-      </label>
-    </div>
-  );
-};
-
 const DropDownBox = (props) => {
   const onChange = (e) => {
     if (props.onChange) {
@@ -183,7 +90,6 @@ const InputField = (props) => {
       <span className="label">{props.columnTitle}</span>
       <input
         className="form-control"
-        defaultValue={props.defaultValue}
         value={props.Value}
         onChange={EditField}
         onBlur={EditField}

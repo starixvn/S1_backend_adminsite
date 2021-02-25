@@ -77,5 +77,44 @@ namespace BackendSite.Service.BLL
             }          
             return CurrencyData;
         }
+
+        public IEnumerable<SiteTpListIfo>  GetTpList()
+        {
+            return gameCasinoManageService.GetTpList();
+        }
+
+        public GameCasinoResult GameCasinoByTPIdV2(GameCasinoPara gameCasinoPara)
+        {
+            var result = gameCasinoManageService.GameCasinoByTPIdV2(gameCasinoPara);
+
+            result.GameCasinoData.ForEach(x =>
+            {
+                x.Ename = JsonConvert.DeserializeObject<GameCasinoName>(x.Name).en;
+                x.Cname = JsonConvert.DeserializeObject<GameCasinoName>(x.Name).cs;
+                x.Site = gameCasinoPara.Site;
+                x.Currency = gameCasinoPara.Currency;
+            });
+            return result;
+        }
+
+        public int SetGameCasino(SetGameCasionV2Para para)
+        {
+            return gameCasinoManageService.SetGameCasino(para);
+        }
+
+        public int GetGameCasinoDetail(GetGameCasinoDetailPara para)
+        {
+            IEnumerable<CurrencyDataV2> CurrencyData = null;
+            IEnumerable<ServerInfo> SiteList = null;
+            List<GameCasinoDetail> GameCasinoDetailList = new List<GameCasinoDetail>();
+            List<int> siteData = new List<int>();
+            CurrencyData = gameCasinoManageService.GetCurrency(para);
+            SiteList = serverInfoService.GetSiteList();
+            GameCasinoDetailList = gameCasinoManageService.GetGameCasinoDetailBySiteAndCasinoId(para);
+            var site  = SiteList.Where(x => x.SiteId == para.SiteId)?.FirstOrDefault().ICurrencyList.ToList();
+            CurrencyData.ToList().ForEach(x=> { if (site.Contains(x.CurrencyId)) { siteData.Add(x.CurrencyId); } });
+            //return gameCasinoManageService.GetCurrency(para);
+            return 0;
+        }
     }
 }

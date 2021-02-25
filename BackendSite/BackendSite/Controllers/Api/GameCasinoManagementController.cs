@@ -146,5 +146,77 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
+        //new 
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
+        public ApiResult<IEnumerable<SiteTpListIfo>> GetTpList()
+        {
+            var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>();
+            apiResult.Data = gameCasinoManageBLL.GetTpList();
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
+        public ApiListResult<GameCasinoData> GameCasinoByTPIdV2(GameCasinoPara gameCasinoPara)
+        {
+            var apiResult = new ApiListResult<GameCasinoData>();
+            try
+            {
+                var gameCasinoData = gameCasinoManageBLL.GameCasinoByTPIdV2(gameCasinoPara);
+                apiResult.Data = gameCasinoData.GameCasinoData;
+                apiResult.PageNumber = gameCasinoData.PageNumber;
+                apiResult.TotalPages = gameCasinoData.TotalPages;
+                apiResult.RowCount = gameCasinoData.RowCount;
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
+        public ApiResult SetGameCasino(SetGameCasionV2Para para)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                gameCasinoManageBLL.SetGameCasino(para);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
+        public ApiResult GetGameCasinoDetail(GetGameCasinoDetailPara para)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                gameCasinoManageBLL.GetGameCasinoDetail(para);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
     }
 }

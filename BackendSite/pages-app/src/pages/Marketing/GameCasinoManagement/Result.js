@@ -1,12 +1,16 @@
 import React from "react";
 import Pagination from "./Pagination";
+import WebAPI from "../../../module/WebAPI";
+import { api } from "../../../module/WebAPI";
 
 const dataColumnDefs = () => {
   return [
     { dataColumn: "gameId", columnTitle: "GameId" },
     { dataColumn: "ename", columnTitle: "Ename" },
     { dataColumn: "cname", columnTitle: "Cname" },
-    { dataColumn: "hasDetail", columnTitle: "HasDetail" },
+    { dataColumn: "hot", columnTitle: "Hot" },
+    { dataColumn: "featured", columnTitle: "Featured" },
+    { dataColumn: "status", columnTitle: "Status" },
     { dataColumn: "detail", columnTitle: "Detail" },
   ];
 };
@@ -30,8 +34,7 @@ const Panel = (props) => {
       </th>
     );
   });
-
-  let bodyRows = props.Datas.map((data, idx) => {
+  let bodyRows = props.Datas.map((data, dataidx) => {
     let row = columnDefs.map((element, idx) => {
       let subData = {};
       if (element.body && element.body.subData) {
@@ -39,7 +42,36 @@ const Panel = (props) => {
           subData[s] = data[s];
         });
       }
-      return element.dataColumn !== "detail" ? (
+      return element.dataColumn === "detail" ? (
+        <td key={`td-${element.dataColumn}-${idx}`}>
+          <div>
+            <button
+              className="btn btn-search"
+              type="submit"
+              onClick={props.Detail.bind(this, data)}
+            >
+              Detail
+            </button>
+          </div>
+        </td>
+      ) : element.dataColumn === "hot" ||
+        element.dataColumn === "featured" ||
+        element.dataColumn === "status" ? (
+        <td key={`td-${element.dataColumn}-${idx}`}>
+          {data[element.dataColumn] ? "Yes" : "No"}
+          <div className="switch__container">
+            <input
+              id={`switch-${element.dataColumn + dataidx}`}
+              className="switch switch--flat"
+              checked={data[element.dataColumn]}
+              type="checkbox"
+              onChange={() => handleToggle(element.dataColumn, data,props.UpdateResultStatus)}
+              disabled={false}
+            />
+            <label htmlFor={`switch-${element.dataColumn + dataidx}`}></label>
+          </div>
+        </td>
+      ) : (
         <td
           key={`td-${element.dataColumn}-${idx}`}
           className={
@@ -52,24 +84,11 @@ const Panel = (props) => {
             ? element.body.format(data[element.dataColumn], subData)
             : data[element.dataColumn]}
         </td>
-      ) : (
-        <td key={`td-${element.dataColumn}-${idx}`}>
-          <div>
-            <button
-              className="btn btn-search"
-              type="submit"
-              onClick={props.Detail.bind(this, data)}
-            >
-              Detail
-            </button>
-          </div>
-        </td>
       );
     });
 
-    return <tr key={`result-body-${idx}`}>{row}</tr>;
+    return <tr key={`result-body-${dataidx}`}>{row}</tr>;
   });
-
   return (
     <div className="table">
       <table className="table table-striped">
@@ -88,6 +107,28 @@ const Panel = (props) => {
       />
     </div>
   );
+};
+
+const handleToggle = (type, value,UpdateResultStatus) => {
+  console.log(type, value);
+  if (window.confirm(`Are you sure change ${value.ename}-${type} ?`)) {
+    let Data = {
+      GameCasinoId: value.gameCasinoId,
+      Type: type
+    };
+    api
+      .post("/api/GameCasinoManagement/SetGameCasino", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          UpdateResultStatus()
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  }
 };
 
 export default Panel;

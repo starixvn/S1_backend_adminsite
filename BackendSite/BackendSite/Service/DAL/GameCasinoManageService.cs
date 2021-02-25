@@ -82,5 +82,59 @@ namespace BackendSite.Service.DAL
             props.Add("GameCasinoId", para.GameCasinoId);
             return conn.Execute("Admin_GameCasinoDetail_Del", props, commandType: CommandType.StoredProcedure);
         }
+        public IEnumerable<SiteTpListIfo> GetTpList()
+        {
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.Query<SiteTpListIfo>("Admin_TpList_Get", new {}, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public GameCasinoResult GameCasinoByTPIdV2(GameCasinoPara gameCasinoPara)
+        {
+            GameCasinoResult LogResult = new GameCasinoResult();
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            DynamicParameters props = new DynamicParameters();
+            props.Add("PageNumber", gameCasinoPara.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("PageSize", gameCasinoPara.PageSize);
+            props.Add("TPId", gameCasinoPara.TPid);
+            props.Add("Names", string.IsNullOrEmpty(gameCasinoPara.Name == null ? null : gameCasinoPara.Name.Replace(" ", "")) ? null : $"%{gameCasinoPara.Name.Trim()}%");
+
+            var result = conn.Query<GameCasinoData>("Admin_GameCasinoV2_Get", props, commandType: CommandType.StoredProcedure);
+            LogResult.GameCasinoData = result.ToList();
+            LogResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            LogResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            LogResult.RowCount = props.Get<int?>("RowCount") ?? 0;
+
+            return LogResult;
+        }
+
+        public int SetGameCasino(SetGameCasionV2Para para)
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            DynamicParameters props = new DynamicParameters();
+            props.Add("GameCasinoId", para.GameCasinoId);
+            props.Add("Type", para.Type == "hot"? 0: para.Type == "featured"? 1:2);
+            return conn.Execute("Admin_GameCasino_Set", props, commandType: CommandType.StoredProcedure);
+        }
+
+        public IEnumerable<CurrencyDataV2> GetCurrency(GetGameCasinoDetailPara para)
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            DynamicParameters props = new DynamicParameters();
+            props.Add("GameCasinoId", para.GameCasinoId);
+            return conn.Query<CurrencyDataV2>("Admin_Currency_GetByCasinoId", props, commandType: CommandType.StoredProcedure);
+        }
+
+        public List<GameCasinoDetail> GetGameCasinoDetailBySiteAndCasinoId(GetGameCasinoDetailPara para)
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            DynamicParameters props = new DynamicParameters();
+            props.Add("GameCasinoId", para.GameCasinoId);
+            return conn.Query<GameCasinoDetail>("Admin__GameCasinoDetail_GetBySiteAndCasinoId", props, commandType: CommandType.StoredProcedure).ToList();
+        }
     }
 }
