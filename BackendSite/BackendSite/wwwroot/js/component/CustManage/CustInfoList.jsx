@@ -15,7 +15,7 @@ import * as Loading from '../commJS/Loading.jsx';
         15: "IDR",
         51: "VND",
         96: "USDT",
-      };
+    };
 
     class CustInfoRow extends React.Component {
         render() {
@@ -24,7 +24,12 @@ import * as Loading from '../commJS/Loading.jsx';
                 <tr key={data.custId}>
                     <td>{data.siteName}</td>
                     <td><a href={"/CustManage/CustInfo?UserName=" + data.userName + "&custId=" + data.custId + "&TransId=" + (this.props.transId || "")} target="_blank">{data.userName}</a></td>
-                    <td>{data.userLevel}</td>
+                    {
+                        (data.siteName == "Nova88") ?
+                            <td>{data.levelName}</td>
+                            :
+                            <td>{data.userLevel}</td>
+                    }
                     <td>{i18n["lbl_Currency" + data.currencyId]}</td>
                     <td>{data.agent}</td>
                     <td>{data.isTest.toString()}</td>
@@ -91,7 +96,7 @@ import * as Loading from '../commJS/Loading.jsx';
         _Search = false;
         constructor(props) {
             super(props);
-            this.state = { SiteList: [], selectSite: [], searchData: null, UserName: "", TransId: "", Loading: false , CurrencyList: [], selectCurrency: []};
+            this.state = { SiteList: [], selectSite: [], searchData: null, UserName: "", TransId: "", Loading: false, CurrencyList: [], selectCurrency: [] };
             this.f_trigger_Start = React.createRef();
             this.selectdate_start = React.createRef();
             this.f_trigger_End = React.createRef();
