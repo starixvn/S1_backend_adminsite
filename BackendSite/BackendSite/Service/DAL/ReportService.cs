@@ -191,5 +191,28 @@ namespace BackendSite.Service.DAL
             //}
         }
 
+        public IEnumerable<CustomerStatisticalPartcialSummeryModel> GetCustomerStatisticalReport(string siteIds,
+                                                                                        string currencyIds,
+                                                                                        string startDate,
+                                                                                        string endDate,
+                                                                                        string userName)
+        {
+
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                    SiteIds = siteIds,
+                    CurrencyIds = currencyIds,
+                    StartDate = startDate,
+                    EndDate = endDate,
+                    CustomerName = userName
+                });
+
+                string SpName = "Admin_ReportTurnOverAndWinlost_CustomerStatistical_Get";
+                return conn.Query<CustomerStatisticalPartcialSummeryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
     }
 }

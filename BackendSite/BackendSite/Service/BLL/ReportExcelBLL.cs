@@ -620,25 +620,30 @@ namespace BackendSite.Service.BLL
             {
                 var bt = data.ElementAt(i);
 
-                foreach (var item in bt)
+                var getValue = bt["Key"];
+
+                if (!getValue.Contains("Total"))
                 {
-                    var value = item.Value;
-                    var colName = item.Key;
-
-                    var getItem = totaldata.TryGetValue(colName, out dynamic total);
-
-                    if (getItem)
+                    foreach (var item in bt)
                     {
-                        if (!notSummaryTitles.Contains(colName))
+                        var value = item.Value;
+                        var colName = item.Key;
+
+                        var getItem = totaldata.TryGetValue(colName, out dynamic total);
+
+                        if (getItem)
                         {
-                            totaldata[colName] = (decimal)total + value;
+                            if (!notSummaryTitles.Contains(colName))
+                            {
+                                totaldata[colName] = (decimal)total + value;
+                            }
                         }
-                    }
-                    else
-                    {
-                        totaldata.Add(colName, value);
-                    }
+                        else
+                        {
+                            totaldata.Add(colName, value);
+                        }
 
+                    }
                 }
             }
 

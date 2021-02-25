@@ -57,6 +57,16 @@
       },
       {
         "Key": "",
+        "Title": "Customer Statistical Report",
+        "FuncKey": "Report/CustomerStatisticalReport",
+        "Controller": "Report",
+        "Action": "CustomerStatisticalReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
         "Title": "User Online Report",
         "FuncKey": "Report/UserOnlineReport",
         "Controller": "Report",
