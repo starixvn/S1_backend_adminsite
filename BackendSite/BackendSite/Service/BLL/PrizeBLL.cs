@@ -24,5 +24,9 @@ namespace BackendSite.Service.BLL
         {
              return prizeService.GetPrizeLog(prizeLogPara);
         }
+        public IEnumerable<EventDraw> GetEventName()
+        {
+            return prizeService.GetEventName();
+        }
     }
 }
