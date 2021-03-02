@@ -50,17 +50,17 @@ namespace BackendSite.Service.Model
                 PageSize = 10;
         }
     }
-    public class GameCasinoDetailPara
-    {
-        public int SiteId { get; set; }
-        public int CurrencyId { get; set; }
-        public int GameCasinoId { get; set; }
-        public int TpId { get; set; }
-    }
-    public class GameCasinoDetailResult
-    {
-        public GameCasinoDetail GameCasinoDetail { get; set; }
-    }
+    //public class GameCasinoDetailPara
+    //{
+    //    public int SiteId { get; set; }
+    //    public int CurrencyId { get; set; }
+    //    public int GameCasinoId { get; set; }
+    //    public int TpId { get; set; }
+    //}
+    //public class GameCasinoDetailResult
+    //{
+    //    public GameCasinoDetail GameCasinoDetail { get; set; }
+    //}
     public class GameCasinoDetail 
     { 
 
@@ -80,6 +80,7 @@ namespace BackendSite.Service.Model
         public bool Hot { get; set; }
         public bool Featured { get; set; }
         public bool Status { get; set; }
+        public string Type { get; set; }
     }
     public class InsertGameCasionPara
     {
@@ -93,15 +94,15 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public int GameCasinoId { get; set; }
     }
-    public class GetCurrency
-    {
-        public int SiteId { get; set; }
-    }
-    public class CurrencyData
-    {
-        public int CurrencyId { get; set; }
-        public string CurrencyName { get; set; }
-    }
+    //public class GetCurrency
+    //{
+    //    public int SiteId { get; set; }
+    //}
+    //public class CurrencyData
+    //{
+    //    public int CurrencyId { get; set; }
+    //    public string CurrencyName { get; set; }
+    //}
 
     public class SetGameCasionV2Para
     {
@@ -117,5 +118,17 @@ namespace BackendSite.Service.Model
     {
         public int CurrencyId { get; set; }
         public int Tpid { get; set; }
+        public string IsoCode { get; set; }
+    }
+    public class GameCasinoDetailData 
+    {
+        public bool HasDetail { get; set; }
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
+        public int GameCasinoId { get; set; }
+        public int Hot { get; set; }
+        public int Featured { get; set; }
+        public int Status { get; set; }
     }
 }

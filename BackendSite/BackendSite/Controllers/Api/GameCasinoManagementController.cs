@@ -24,65 +24,6 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
-        public ApiListResult<GameCasinoData> GameCasinoByTPId(GameCasinoPara gameCasinoPara)
-        {
-            var apiResult = new ApiListResult<GameCasinoData>();
-            try
-            {
-                var gameCasinoData = gameCasinoManageBLL.GameCasinoByTPId(gameCasinoPara);
-                apiResult.Data = gameCasinoData.GameCasinoData;
-                apiResult.PageNumber = gameCasinoData.PageNumber;
-                apiResult.TotalPages = gameCasinoData.TotalPages;
-                apiResult.RowCount = gameCasinoData.RowCount;
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = ex.Message;
-            }
-
-            return apiResult;
-        }
-
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
-        public ApiResult<GameCasinoDetail> GetGameCasinoDetail(GameCasinoDetailPara para)
-        {
-            var apiResult = new ApiResult<GameCasinoDetail>();
-            try
-            {
-                var result = gameCasinoManageBLL.GetGameCasinoDetail(para);
-                if(result != null)
-                {
-                    apiResult.Data = result;
-                }
-                else
-                {
-                    apiResult.Data = new GameCasinoDetail
-                    {
-                        SiteId = 0,
-                        CurrencyId =0,
-                        GameCasinoId =0,
-                        Hot =0,
-                        Featured =0,
-                        Status =0
-                    };
-                }
-                
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = ex.Message;
-            }
-
-            return apiResult;
-        }
-
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
         public ApiResult SetGameCasinoDetail(SetGameCasionPara para) 
         {
             var apiResult = new ApiResult();
@@ -99,6 +40,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
         public ApiResult InsertGameCasinoDetail(InsertGameCasionPara para)
@@ -136,18 +78,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
-        public ApiResult<IEnumerable<CurrencyData>> GetCurrency(GetCurrency para)
-        {
-            var apiResult = new ApiResult<IEnumerable<CurrencyData>>();
-            apiResult.Data = gameCasinoManageBLL.GetCurrency(para.SiteId);
-            apiResult.ErrorCode = 0;
 
-            return apiResult;
-        }
-
-        //new 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
         public ApiResult<IEnumerable<SiteTpListIfo>> GetTpList()
@@ -200,17 +131,19 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
-        public ApiResult GetGameCasinoDetail(GetGameCasinoDetailPara para)
+        public ApiResult<IEnumerable<GameCasinoDetailData>> GetGameCasinoDetailV2(GetGameCasinoDetailPara para)
         {
-            var apiResult = new ApiResult();
+
+            var apiResult = new ApiResult<IEnumerable<GameCasinoDetailData>>();
             try
             {
-                gameCasinoManageBLL.GetGameCasinoDetail(para);
+                apiResult.Data = gameCasinoManageBLL.GetGameCasinoDetail(para);
                 apiResult.ErrorCode = 0;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;

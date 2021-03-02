@@ -66,7 +66,7 @@ const Panel = (props) => {
               checked={data[element.dataColumn]}
               type="checkbox"
               onChange={() => handleToggle(element.dataColumn, data,props.UpdateResultStatus)}
-              disabled={false}
+              disabled={!props.CanChangeGameCasino}
             />
             <label htmlFor={`switch-${element.dataColumn + dataidx}`}></label>
           </div>
@@ -110,7 +110,6 @@ const Panel = (props) => {
 };
 
 const handleToggle = (type, value,UpdateResultStatus) => {
-  console.log(type, value);
   if (window.confirm(`Are you sure change ${value.ename}-${type} ?`)) {
     let Data = {
       GameCasinoId: value.gameCasinoId,

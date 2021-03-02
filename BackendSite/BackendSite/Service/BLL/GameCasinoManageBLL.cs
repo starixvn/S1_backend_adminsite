@@ -27,25 +27,6 @@ namespace BackendSite.Service.BLL
             public string ch { get; set; }
             public string cs { get; set; }
         }
-        public GameCasinoResult GameCasinoByTPId(GameCasinoPara gameCasinoPara)
-        {
-            var result = gameCasinoManageService.GameCasinoByTPId(gameCasinoPara);
-
-            result.GameCasinoData.ForEach(x =>
-            {
-                x.Ename = JsonConvert.DeserializeObject<GameCasinoName>(x.Name).en;
-                x.Cname = JsonConvert.DeserializeObject<GameCasinoName>(x.Name).cs;
-                x.Site = gameCasinoPara.Site;
-                x.Currency = gameCasinoPara.Currency;
-            });
-            return result;
-        }
-
-        public GameCasinoDetail GetGameCasinoDetail(GameCasinoDetailPara para)
-        {
-            return gameCasinoManageService.GetGameCasinoDetail(para);
-
-        }
         public int SetGameCasinoDetail(SetGameCasionPara para)
         {
             return gameCasinoManageService.SetGameCasinoDetail(para);
@@ -57,25 +38,6 @@ namespace BackendSite.Service.BLL
         public int DeleteGameCasinoDetail(DeleteGameCasionPara para)
         {
             return gameCasinoManageService.DeleteGameCasinoDetail(para);
-        }
-        public IEnumerable<CurrencyData> GetCurrency(int siteId)
-        {
-            IEnumerable<ServerInfo> SiteList = null;
-            IEnumerable<CurrencyModel> CurrencyList = null;
-            List<CurrencyData> CurrencyData = new List<CurrencyData>();
-            SiteList = serverInfoService.GetSiteList();
-            CurrencyList = reportService.GetCurrencyList();
-            if(SiteList != null && CurrencyList != null)
-            {
-                SiteList.Where(x => x.SiteId == siteId).FirstOrDefault().ICurrencyList.ToList().ForEach(y => {
-                    CurrencyData.Add(new CurrencyData
-                    {
-                        CurrencyId = y,
-                        CurrencyName = CurrencyList.Where(z => z.CurrencyId == y).FirstOrDefault().IsoCode
-                    });
-                });
-            }          
-            return CurrencyData;
         }
 
         public IEnumerable<SiteTpListIfo>  GetTpList()
@@ -102,19 +64,53 @@ namespace BackendSite.Service.BLL
             return gameCasinoManageService.SetGameCasino(para);
         }
 
-        public int GetGameCasinoDetail(GetGameCasinoDetailPara para)
+        public List<GameCasinoDetailData> GetGameCasinoDetail(GetGameCasinoDetailPara para)
         {
             IEnumerable<CurrencyDataV2> CurrencyData = null;
             IEnumerable<ServerInfo> SiteList = null;
             List<GameCasinoDetail> GameCasinoDetailList = new List<GameCasinoDetail>();
             List<int> siteData = new List<int>();
+            List<GameCasinoDetailData> gameCasinoDetailData = new List<GameCasinoDetailData>();
+            //這個GameCasinoId是屬於哪個TP,哪個Currency有這個TP
             CurrencyData = gameCasinoManageService.GetCurrency(para);
+            //取出SITE相關資料
             SiteList = serverInfoService.GetSiteList();
+            //取出GameCasinoDetail資料,只看SiteAndCasinoId,不分Currency
             GameCasinoDetailList = gameCasinoManageService.GetGameCasinoDetailBySiteAndCasinoId(para);
+            //取出指定的site有哪些Currency
             var site  = SiteList.Where(x => x.SiteId == para.SiteId)?.FirstOrDefault().ICurrencyList.ToList();
             CurrencyData.ToList().ForEach(x=> { if (site.Contains(x.CurrencyId)) { siteData.Add(x.CurrencyId); } });
-            //return gameCasinoManageService.GetCurrency(para);
-            return 0;
+
+            siteData.ForEach(x =>
+            {
+                if(GameCasinoDetailList.Exists(y=> y.CurrencyId == x))
+                {
+                    var taget = GameCasinoDetailList.Find(y => y.CurrencyId == x);
+                    gameCasinoDetailData.Add(new GameCasinoDetailData { 
+                        HasDetail = true,
+                        SiteId = para.SiteId,
+                        CurrencyId = x,
+                        Hot = taget.Hot,
+                        Featured = taget.Featured,
+                        Status = taget.Status,
+                        CurrencyName = CurrencyData.ToList().Find(y=> y.CurrencyId == x).IsoCode,
+                        GameCasinoId = para.GameCasinoId
+                    });
+                }
+                else
+                {
+                    gameCasinoDetailData.Add(new GameCasinoDetailData
+                    {
+                        HasDetail = false,
+                        SiteId = para.SiteId,
+                        CurrencyId = x,
+                        CurrencyName = CurrencyData.ToList().Find(y => y.CurrencyId == x).IsoCode,
+                        GameCasinoId = para.GameCasinoId
+                    });
+                }
+            });
+
+            return gameCasinoDetailData;
         }
     }
 }

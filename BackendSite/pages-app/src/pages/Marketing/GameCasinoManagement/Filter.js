@@ -43,7 +43,7 @@ const Panel = (props) => {
 };
 const GetTPOptions = (StateTPList) => {
   let TPOptions = [];
-  TPOptions.push({ value: 0, displayText: "----------------------------------------" });
+  // TPOptions.push({ value: 0, displayText: "----------------------------------------" });
   if (StateTPList != null) {
     StateTPList.forEach((x) => {
       TPOptions.push({ value: x.tpId, displayText: x.tpName });
