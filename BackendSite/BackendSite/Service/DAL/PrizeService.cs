@@ -34,8 +34,9 @@ namespace BackendSite.Service.DAL
             props.Add("EndDate", prizeSelect.EndDate);
             props.Add("SelectSite", prizeSelect.SelectSite != null ? prizeSelect.SelectSite.Any()? JsonConvert.SerializeObject(prizeSelect.SelectSite) :null: null);
             props.Add("CurrencyId", prizeSelect.CurrencyId);
+            props.Add("EventName", string.IsNullOrWhiteSpace(prizeSelect.EventName.Trim()) ? null : prizeSelect.EventName);
 
-            var result = conn.Query<DrawPrize>("Admin_DrawPrize_Get", props, commandType: CommandType.StoredProcedure);
+            var result = conn.Query<DrawPrize>("Admin_DrawPrize_GetV2", props, commandType: CommandType.StoredProcedure);
             
             SearchResult.DrawPrize = result.ToList();
             SearchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
@@ -66,6 +67,12 @@ namespace BackendSite.Service.DAL
             LogResult.RowCount = props.Get<int?>("RowCount") ?? 0;
 
             return LogResult;
+        }
+
+        public IEnumerable<EventDraw> GetEventName()
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<EventDraw>("Admin_EventDraw_Get", commandType: CommandType.StoredProcedure);
         }
     }
 }

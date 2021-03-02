@@ -66,5 +66,18 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/DrawPrizeReport" })]
+        public ApiResult<IEnumerable<EventDraw>> GetEventName()
+        {
+
+            var apiResult = new ApiResult<IEnumerable<EventDraw>>();
+            apiResult.Data = prizeBLL.GetEventName();
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
+
+        }
     }
 }
