@@ -295,6 +295,22 @@
         "DisplayKey": "Draw Prize Report",
         "FuncKey": "Marketing/DrawPrizeReport",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Game Casino Management",
+        "FuncKey": "Marketing/GameCasinoManagement",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit Main",
+            "FuncKey": "gcm_edit_main"
+          },
+          {
+            "DisplayKey": "Edit Detail",
+            "FuncKey": "gcm_edit_detail"
+          }
+        ]
       }
     ]
   }

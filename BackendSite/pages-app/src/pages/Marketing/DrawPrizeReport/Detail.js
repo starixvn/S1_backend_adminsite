@@ -28,7 +28,7 @@ const Panel = (props) => {
       PageNumber: 1,
     };
     api
-      .post("/api/BonusManage/GetPrizeLog", Data)
+      .post("/api/DrawPrizeReport/GetPrizeLog", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           setDetailBody(res.data.data);
@@ -58,7 +58,7 @@ const Panel = (props) => {
       PageNumber: PageNumber,
     };
     api
-      .post("/api/BonusManage/GetPrizeLog", Data)
+      .post("/api/DrawPrizeReport/GetPrizeLog", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           setDetailBody(res.data.data);

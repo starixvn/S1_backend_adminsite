@@ -80,6 +80,7 @@ namespace BackendSite
             services.AddSingleton<SportsService>();
             services.AddSingleton<PrizeService>();
             services.AddSingleton<VipLevelService>();
+            services.AddSingleton<GameCasinoManageService>();
             //var dal = AppDomain.CurrentDomain.GetAssemblies()
             //           .SelectMany(t => t.GetTypes())
             //           .Where(t => t.IsClass && t.Namespace == "BackendSite.Service.DAL");
@@ -124,6 +125,7 @@ namespace BackendSite
             services.AddSingleton<SportsBLL>();
             services.AddSingleton<PrizeBLL>();
             services.AddSingleton<VipLevelBLL>();
+            services.AddSingleton<GameCasinoManageBLL>();
             // var bll = AppDomain.CurrentDomain.GetAssemblies()
             //.SelectMany(t => t.GetTypes())
             //.Where(t => t.IsClass && t.Namespace == "BackendSite.Service.BLL");

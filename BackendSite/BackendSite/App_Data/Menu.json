@@ -396,6 +396,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "GameCasinoManagement",
+        "Title": "Game Casino Management",
+        "FuncKey": "Marketing/GameCasinoManagement",
+        "Controller": "Marketing",
+        "Action": "GameCasinoManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   }

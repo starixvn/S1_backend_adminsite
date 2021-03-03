@@ -168,5 +168,20 @@ namespace BackendSite.Controllers.Api
 
             return result;
         }
+        public class TpDetailPara
+        {
+            public int Site { get; set; }
+            public int Currency { get; set; }
+        }
+        [HttpPost]
+        public ApiResult<IEnumerable<SiteTpListIfo>> GetTpBySiteAndCurrency(TpDetailPara TpDetailPara)
+        {
+            var apiListResult = new ApiResult<IEnumerable<SiteTpListIfo>>();
+
+            var TPList = tpBLL.GetTpBySiteAndCurrency(TpDetailPara);
+            apiListResult.Data = TPList;
+            apiListResult.ErrorCode = 0;
+            return apiListResult;
+        }
     }
 }

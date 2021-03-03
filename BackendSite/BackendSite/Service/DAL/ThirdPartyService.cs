@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using static BackendSite.Controllers.Api.TpController;
 
 namespace BackendSite.Service.DAL
 {
@@ -68,6 +69,14 @@ namespace BackendSite.Service.DAL
             }
 
             return result;
+        }
+
+        public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(TpDetailPara TpDetailPara)
+        {
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                return conn.Query<SiteTpListIfo>("Admin_TpList_GetByCurrency", new { CurrencyId = TpDetailPara.Currency, SiteId = TpDetailPara.Site }, commandType: CommandType.StoredProcedure);
+            }
         }
     }
 }

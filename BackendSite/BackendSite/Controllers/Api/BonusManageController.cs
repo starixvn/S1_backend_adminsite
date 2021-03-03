@@ -455,49 +455,5 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-
-        [HttpPost]
-        public ApiListResult<DrawPrize> PrizeSearch(PrizeSelect prizeSelect)
-        {
-            var apiResult = new ApiListResult<DrawPrize>();
-            try
-            {
-                var prizeSearchResult = prizeBLL.PrizeSearch(prizeSelect);
-                apiResult.Data = prizeSearchResult.DrawPrize;
-                apiResult.PageNumber = prizeSearchResult.PageNumber;
-                apiResult.TotalPages = prizeSearchResult.TotalPages;
-                apiResult.RowCount = prizeSearchResult.RowCount;
-                apiResult.ErrorCode = 0;
-            }
-            catch(Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = ex.Message;
-            }
-            
-            return apiResult;
-        }
-
-        [HttpPost]
-        public ApiListResult<PrizeLogData> GetPrizeLog(PrizeLogPara prizeLogPara)
-        {
-            var apiResult = new ApiListResult<PrizeLogData>();
-            try
-            {
-                var logResult = prizeBLL.GetPrizeLog(prizeLogPara);
-                apiResult.Data = logResult.PrizeLogData;
-                apiResult.PageNumber = logResult.PageNumber;
-                apiResult.TotalPages = logResult.TotalPages;
-                apiResult.RowCount = logResult.RowCount;
-                apiResult.ErrorCode = 0;
-            }
-            catch(Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = ex.Message;
-            }
-            
-            return apiResult;
-        }
     }
 }

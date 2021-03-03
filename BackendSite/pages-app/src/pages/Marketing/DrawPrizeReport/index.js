@@ -103,7 +103,7 @@ const App = () => {
       EndDate: moment(stateFilter.EndDate).format("YYYY-MM-DD"),
     };
     api
-      .post("/api/BonusManage/PrizeSearch", Data)
+      .post("/api/DrawPrizeReport/PrizeSearch", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           setDatas({
@@ -139,7 +139,7 @@ const App = () => {
       PageNumber: PageNumber,
     };
     api
-      .post("/api/BonusManage/PrizeSearch", Data)
+      .post("/api/DrawPrizeReport/PrizeSearch", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           setDatas({
