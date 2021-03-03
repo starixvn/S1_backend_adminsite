@@ -192,26 +192,26 @@ const App = () => {
       CurrencyId: props.currencyId,
       GameCasinoId: props.gameCasinoId,
     };
-    api
-      .post("/api/GameCasinoManagement/InsertGameCasinoDetail", Data)
-      .then(function (res) {
-        if (res.data.errorCode === 0) {
-        } else {
-          alert(res.data.message ?? "failed to get data.");
-        }
-      })
-      .catch(function (error) {
-        alert(error);
-      });
     let Data2 = {
       GameCasinoId: parseInt(detailData.gameCasinoId),
       SiteId: parseInt(DetailFilter),
     };
     api
-      .post("/api/GameCasinoManagement/GetGameCasinoDetailV2", Data2)
+      .post("/api/GameCasinoManagement/InsertGameCasinoDetail", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
-          setdetailSearchData(res.data.data);
+          api
+            .post("/api/GameCasinoManagement/GetGameCasinoDetailV2", Data2)
+            .then(function (res) {
+              if (res.data.errorCode === 0) {
+                setdetailSearchData(res.data.data);
+              } else {
+                alert(res.data.message ?? "failed to get data.");
+              }
+            })
+            .catch(function (error) {
+              alert(error);
+            });
         } else {
           alert(res.data.message ?? "failed to get data.");
         }
@@ -227,29 +227,29 @@ const App = () => {
       GameCasinoId: props.gameCasinoId,
       Hot: props.hot,
       Featured: props.featured,
-      Status: props.status
+      Status: props.status,
+    };
+    let Data2 = {
+      GameCasinoId: parseInt(detailData.gameCasinoId),
+      SiteId: parseInt(DetailFilter),
     };
     if (window.confirm(`Are you sure to delete ${props.currencyName} ?`)) {
       api
         .post("/api/GameCasinoManagement/DeleteGameCasinoDetail", Data)
         .then(function (res) {
           if (res.data.errorCode === 0) {
-          } else {
-            alert(res.data.message ?? "failed to get data.");
-          }
-        })
-        .catch(function (error) {
-          alert(error);
-        });
-      let Data2 = {
-        GameCasinoId: parseInt(detailData.gameCasinoId),
-        SiteId: parseInt(DetailFilter),
-      };
-      api
-        .post("/api/GameCasinoManagement/GetGameCasinoDetailV2", Data2)
-        .then(function (res) {
-          if (res.data.errorCode === 0) {
-            setdetailSearchData(res.data.data);
+            api
+              .post("/api/GameCasinoManagement/GetGameCasinoDetailV2", Data2)
+              .then(function (res) {
+                if (res.data.errorCode === 0) {
+                  setdetailSearchData(res.data.data);
+                } else {
+                  alert(res.data.message ?? "failed to get data.");
+                }
+              })
+              .catch(function (error) {
+                alert(error);
+              });
           } else {
             alert(res.data.message ?? "failed to get data.");
           }
@@ -267,7 +267,11 @@ const App = () => {
       Type: type,
       Hot: props.hot,
       Featured: props.featured,
-      Status: props.status
+      Status: props.status,
+    };
+    let Data2 = {
+      GameCasinoId: parseInt(detailData.gameCasinoId),
+      SiteId: parseInt(DetailFilter),
     };
     if (
       window.confirm(`Are you sure to change ${props.currencyName} ${type} ?`)
@@ -276,23 +280,18 @@ const App = () => {
         .post("/api/GameCasinoManagement/SetGameCasinoDetail", Data)
         .then(function (res) {
           if (res.data.errorCode === 0) {
-          } else {
-            alert(res.data.message ?? "failed to get data.");
-          }
-        })
-        .catch(function (error) {
-          alert(error);
-        });
-
-      let Data2 = {
-        GameCasinoId: parseInt(detailData.gameCasinoId),
-        SiteId: parseInt(DetailFilter),
-      };
-      api
-        .post("/api/GameCasinoManagement/GetGameCasinoDetailV2", Data2)
-        .then(function (res) {
-          if (res.data.errorCode === 0) {
-            setdetailSearchData(res.data.data);
+            api
+              .post("/api/GameCasinoManagement/GetGameCasinoDetailV2", Data2)
+              .then(function (res) {
+                if (res.data.errorCode === 0) {
+                  setdetailSearchData(res.data.data);
+                } else {
+                  alert(res.data.message ?? "failed to get data.");
+                }
+              })
+              .catch(function (error) {
+                alert(error);
+              });
           } else {
             alert(res.data.message ?? "failed to get data.");
           }
