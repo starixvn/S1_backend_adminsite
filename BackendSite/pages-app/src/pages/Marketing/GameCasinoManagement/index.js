@@ -200,18 +200,7 @@ const App = () => {
       .post("/api/GameCasinoManagement/InsertGameCasinoDetail", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
-          api
-            .post("/api/GameCasinoManagement/GetGameCasinoDetailV2", Data2)
-            .then(function (res) {
-              if (res.data.errorCode === 0) {
-                setdetailSearchData(res.data.data);
-              } else {
-                alert(res.data.message ?? "failed to get data.");
-              }
-            })
-            .catch(function (error) {
-              alert(error);
-            });
+          DetailSubmit();
         } else {
           alert(res.data.message ?? "failed to get data.");
         }
@@ -238,18 +227,7 @@ const App = () => {
         .post("/api/GameCasinoManagement/DeleteGameCasinoDetail", Data)
         .then(function (res) {
           if (res.data.errorCode === 0) {
-            api
-              .post("/api/GameCasinoManagement/GetGameCasinoDetailV2", Data2)
-              .then(function (res) {
-                if (res.data.errorCode === 0) {
-                  setdetailSearchData(res.data.data);
-                } else {
-                  alert(res.data.message ?? "failed to get data.");
-                }
-              })
-              .catch(function (error) {
-                alert(error);
-              });
+            DetailSubmit();
           } else {
             alert(res.data.message ?? "failed to get data.");
           }
@@ -280,18 +258,7 @@ const App = () => {
         .post("/api/GameCasinoManagement/SetGameCasinoDetail", Data)
         .then(function (res) {
           if (res.data.errorCode === 0) {
-            api
-              .post("/api/GameCasinoManagement/GetGameCasinoDetailV2", Data2)
-              .then(function (res) {
-                if (res.data.errorCode === 0) {
-                  setdetailSearchData(res.data.data);
-                } else {
-                  alert(res.data.message ?? "failed to get data.");
-                }
-              })
-              .catch(function (error) {
-                alert(error);
-              });
+            DetailSubmit();
           } else {
             alert(res.data.message ?? "failed to get data.");
           }
