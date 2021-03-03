@@ -59,17 +59,25 @@ const Panel = (props) => {
         element.dataColumn === "status" ? (
         <td key={`td-${element.dataColumn}-${idx}`}>
           {data[element.dataColumn] ? "Yes" : "No"}
-          <div className="switch__container">
-            <input
-              id={`switch-${element.dataColumn + dataidx}`}
-              className="switch switch--flat"
-              checked={data[element.dataColumn]}
-              type="checkbox"
-              onChange={() => handleToggle(element.dataColumn, data,props.UpdateResultStatus)}
-              disabled={!props.CanChangeGameCasino}
-            />
-            <label htmlFor={`switch-${element.dataColumn + dataidx}`}></label>
-          </div>
+          {window.subFuncKeys.includes("gcm_edit_main") ? (
+            <div className="switch__container">
+              <input
+                id={`switch-${element.dataColumn + dataidx}`}
+                className="switch switch--flat"
+                checked={data[element.dataColumn]}
+                type="checkbox"
+                onChange={() =>
+                  handleToggle(
+                    element.dataColumn,
+                    data,
+                    props.UpdateResultStatus
+                  )
+                }
+                disabled={false}
+              />
+              <label htmlFor={`switch-${element.dataColumn + dataidx}`}></label>
+            </div>
+          ) : null}
         </td>
       ) : (
         <td
@@ -109,17 +117,20 @@ const Panel = (props) => {
   );
 };
 
-const handleToggle = (type, value,UpdateResultStatus) => {
+const handleToggle = (type, value, UpdateResultStatus) => {
   if (window.confirm(`Are you sure change ${value.ename}-${type} ?`)) {
     let Data = {
       GameCasinoId: value.gameCasinoId,
-      Type: type
+      Type: type,
+      Hot: value.hot,
+      Featured: value.featured,
+      Status: value.status,
     };
     api
       .post("/api/GameCasinoManagement/SetGameCasino", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
-          UpdateResultStatus()
+          UpdateResultStatus();
         } else {
           alert(res.data.message ?? "failed to get data.");
         }

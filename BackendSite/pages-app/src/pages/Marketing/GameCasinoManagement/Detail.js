@@ -53,73 +53,79 @@ const Panel = (props) => {
                     <tr>
                       <td>
                         {data.hot === 1 ? "Yes" : "No"}
-                        <div>
-                          <input
-                            id={`switch-hot${idx}`}
-                            className="switch switch--flat"
-                            checked={data.hot === 1}
-                            type="checkbox"
-                            onChange={() => handleToggle("hot", data)}
-                            disabled={false}
-                          />
-                          <label htmlFor={`switch-hot${idx}`}></label>
-                        </div>
+                        {window.subFuncKeys.includes("gcm_edit_detail") ? (
+                          <div>
+                            <input
+                              id={`switch-hot${idx}`}
+                              className="switch switch--flat"
+                              checked={data.hot === 1}
+                              type="checkbox"
+                              onChange={() => handleToggle("hot", data)}
+                              disabled={false}
+                            />
+                            <label htmlFor={`switch-hot${idx}`}></label>
+                          </div>
+                        ) : null}
                       </td>
                       <td>
                         {data.featured === 1 ? "Yes" : "No"}
-                        <div>
-                          <input
-                            id={`switch-featured${idx}`}
-                            className="switch switch--flat"
-                            checked={data.featured === 1}
-                            type="checkbox"
-                            onChange={() =>
-                                handleToggle("featured", data)
-                            }
-                            disabled={false}
-                          />
-                          <label htmlFor={`switch-featured${idx}`}></label>
-                        </div>
+                        {window.subFuncKeys.includes("gcm_edit_detail") ? (
+                          <div>
+                            <input
+                              id={`switch-featured${idx}`}
+                              className="switch switch--flat"
+                              checked={data.featured === 1}
+                              type="checkbox"
+                              onChange={() => handleToggle("featured", data)}
+                              disabled={false}
+                            />
+                            <label htmlFor={`switch-featured${idx}`}></label>
+                          </div>
+                        ) : null}
                       </td>
                       <td>
                         {data.status === 1 ? "Yes" : "No"}
-                        <div>
-                          <input
-                            id={`switch-status${idx}`}
-                            className="switch switch--flat"
-                            checked={data.status === 1}
-                            type="checkbox"
-                            onChange={() =>
-                                handleToggle("status", data)
-                            }
-                            disabled={false}
-                          />
-                          <label htmlFor={`switch-status${idx}`}></label>
-                        </div>
+                        {window.subFuncKeys.includes("gcm_edit_detail") ? (
+                          <div>
+                            <input
+                              id={`switch-status${idx}`}
+                              className="switch switch--flat"
+                              checked={data.status === 1}
+                              type="checkbox"
+                              onChange={() => handleToggle("status", data)}
+                              disabled={false}
+                            />
+                            <label htmlFor={`switch-status${idx}`}></label>
+                          </div>
+                        ) : null}
                       </td>
                     </tr>
                   </tbody>
                 </table>
-                <div style={{ margin: "5px" }}>
-                  <button
-                    className="btn btn-search"
-                    type="submit"
-                    onClick={props.Delete.bind(null, data)}
-                  >
-                    Delete
-                  </button>
-                </div>
+                {window.subFuncKeys.includes("gcm_edit_detail") ? (
+                  <div style={{ margin: "5px" }}>
+                    <button
+                      className="btn btn-search"
+                      type="submit"
+                      onClick={props.Delete.bind(null, data)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ) : null}
               </div>
             </div>
           ) : (
             <div>
-              <button
-                className="btn btn-search"
-                type="submit"
-                onClick={props.Create.bind(null, data)}
-              >
-                Create
-              </button>
+              {window.subFuncKeys.includes("gcm_edit_detail") ? (
+                <button
+                  className="btn btn-search"
+                  type="submit"
+                  onClick={props.Create.bind(null, data)}
+                >
+                  Create
+                </button>
+              ) : null}
             </div>
           )}
         </div>

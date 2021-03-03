@@ -26,7 +26,6 @@ const App = () => {
   const [siteList, setsiteList] = useState(null);
   const [DetailFilter, setDetailFilter] = useState(0);
   const [detailSearchData, setdetailSearchData] = useState(null);
-  const [canChangeGameCasino, setcanChangeGameCasino] = useState(false);
   useEffect(() => {
     api
       .post("/api/GameCasinoManagement/GetTpList")
@@ -60,9 +59,6 @@ const App = () => {
             };
           });
           setsiteList(SiteList);
-          if(response.data.data.length === 3){
-            setcanChangeGameCasino(true);
-          }
         } else {
           alert(response.data.message ?? "failed to get data.");
         }
@@ -229,6 +225,9 @@ const App = () => {
       SiteId: props.siteId,
       CurrencyId: props.currencyId,
       GameCasinoId: props.gameCasinoId,
+      Hot: props.hot,
+      Featured: props.featured,
+      Status: props.status
     };
     if (window.confirm(`Are you sure to delete ${props.currencyName} ?`)) {
       api
@@ -266,8 +265,13 @@ const App = () => {
       CurrencyId: props.currencyId,
       GameCasinoId: props.gameCasinoId,
       Type: type,
+      Hot: props.hot,
+      Featured: props.featured,
+      Status: props.status
     };
-    if (window.confirm(`Are you sure to change ${props.currencyName} ${type} ?`)) {
+    if (
+      window.confirm(`Are you sure to change ${props.currencyName} ${type} ?`)
+    ) {
       api
         .post("/api/GameCasinoManagement/SetGameCasinoDetail", Data)
         .then(function (res) {
@@ -302,12 +306,11 @@ const App = () => {
     setFilter({
       ...stateFilter,
       TPid: backupFilter.TPid,
-      Name:backupFilter.Name
+      Name: backupFilter.Name,
     });
     setmainPage(0);
     setdetailSearchData(null);
     setDetailFilter(0);
-
   };
   if (mainPage === 0) {
     return (
@@ -330,7 +333,6 @@ const App = () => {
             Detail={Click_Detail}
             Setdatas={setdatas}
             UpdateResultStatus={UpdateResultStatus}
-            CanChangeGameCasino={canChangeGameCasino}
           />
         )}
       </div>
@@ -338,16 +340,13 @@ const App = () => {
   } else {
     return (
       <div className="container-fluid">
-        <h5>Ename:{detailData.ename}</h5>
-        <h5>Cname:{detailData.cname}</h5>
-        <h5>Hot:{detailData.hot ? "Yes" : "No"}</h5>
-        <h5>Featured:{detailData.featured ? "Yes" : "No"}</h5>
-        <h5>Status:{detailData.status ? "Yes" : "No"}</h5>
         <DetailFilterPage
           SiteList={siteList}
           DetailFilterChange={DetailFilterChange}
           DetailFilter={DetailFilter}
           Submit={DetailSubmit}
+          DetailData={detailData}
+          Goback={Goback}
         />
         {detailSearchData === null ? null : (
           <Detail
@@ -357,20 +356,6 @@ const App = () => {
             Update={Update_Detail_Status}
           />
         )}
-        <div className="button-group">
-          <button
-            className="btn btn-search"
-            type="back"
-            onClick={Goback}
-            style={{
-              marginTop: "20px",
-              marginBottom: "40px",
-              marginRight: "10px",
-            }}
-          >
-            Back
-          </button>
-        </div>
       </div>
     );
   }

@@ -1,8 +1,10 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +32,15 @@ namespace BackendSite.Controllers.Api
             try
             {
                 gameCasinoManageBLL.SetGameCasinoDetail(para);
+                var beforeStatus = para.Type == "hot" ? para.Hot : para.Type == "featured" ? para.Featured : para.Status;
+                var afterStatus = beforeStatus == 1 ? 2 : 1;
+                var log = new GameCasinoDetailLog() {GameCasinoId = para.GameCasinoId,
+                                                    SiteId = para.SiteId,
+                                                    CurrencyId = para.CurrencyId,
+                                                    ChangeData = para.Type,
+                                                    Before = beforeStatus,
+                                                    After = afterStatus};
+                gameCasinoManageBLL.AddLog("Marketing/GameCasinoManagement/Detail", ActionType.Update, JsonConvert.SerializeObject(log), User.Identity.Name);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -49,6 +60,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 gameCasinoManageBLL.InsertGameCasinoDetail(para);
+                gameCasinoManageBLL.AddLog("Marketing/GameCasinoManagement/Detail", ActionType.Create, JsonConvert.SerializeObject(para), User.Identity.Name);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -68,6 +80,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 gameCasinoManageBLL.DeleteGameCasinoDetail(para);
+                gameCasinoManageBLL.AddLog("Marketing/GameCasinoManagement/Detail", ActionType.Delete, JsonConvert.SerializeObject(para), User.Identity.Name);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -121,6 +134,16 @@ namespace BackendSite.Controllers.Api
             try
             {
                 gameCasinoManageBLL.SetGameCasino(para);
+                var beforeStatus = para.Type == "hot" ? para.Hot : para.Type == "featured" ? para.Featured : para.Status;
+                var afterStatus = !beforeStatus;
+                var log = new GameCasinoLog()
+                {
+                    GameCasinoId = para.GameCasinoId,
+                    ChangeData = para.Type,
+                    Before = beforeStatus ? 1:2,
+                    After = afterStatus? 1:2
+                };
+                gameCasinoManageBLL.AddLog("Marketing/GameCasinoManagement", ActionType.Update, JsonConvert.SerializeObject(log), User.Identity.Name);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)

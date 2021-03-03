@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace BackendSite.Service.BLL
         }
         public int SetGameCasinoDetail(SetGameCasionPara para)
         {
-            return gameCasinoManageService.SetGameCasinoDetail(para);
+            return gameCasinoManageService.SetGameCasinoDetail(para);          
         }
         public int InsertGameCasinoDetail(InsertGameCasionPara para)
         {
@@ -111,6 +112,17 @@ namespace BackendSite.Service.BLL
             });
 
             return gameCasinoDetailData;
+        }
+        public void AddLog(string menu, ActionType actionType, string detailInfo,string user)
+        {
+            var addAdminOperateLog = new AddAdminOperateLog
+            {
+                Menu = menu,
+                ActionType = actionType,
+                DetailInfo = detailInfo,
+                Operator = user
+            };
+            serverInfoService.AddAdminOperateLog(addAdminOperateLog);
         }
     }
 }

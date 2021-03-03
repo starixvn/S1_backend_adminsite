@@ -22,12 +22,65 @@ const Panel = (props) => {
         {props.StateTPList === null ? null : (
           <button
             className="btn btn-add"
-            style={{ marginTop: "20px", marginBottom: "40px" }}
+            // style={{ marginTop: "20px", marginBottom: "40px" }}
             onClick={props.Submit}
+            style={{
+              marginTop: "20px",
+              marginBottom: "40px",
+              marginRight: "10px",
+            }}
           >
             Submit
           </button>
         )}
+        <button
+          className="btn btn-search"
+          type="back"
+          onClick={props.Goback}
+          style={{
+            marginTop: "20px",
+            marginBottom: "40px",
+            marginRight: "10px",
+          }}
+        >
+          Back
+        </button>
+      </div>
+      {/* <div className="button-group">
+        <button
+          className="btn btn-search"
+          type="back"
+          onClick={props.Goback}
+          style={{
+            marginTop: "20px",
+            marginBottom: "40px",
+            marginRight: "10px",
+          }}
+        >
+          Back
+        </button>
+      </div> */}
+      <div className="table">
+        <table className="table table-striped">
+          <thead>
+            <tr>
+              <th>Ename</th>
+              <th>Cname</th>
+              <th>Hot</th>
+              <th>Featured</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{props.DetailData.ename}</td>
+              <td>{props.DetailData.cname}</td>
+              <td>{props.DetailData.hot ? "Yes" : "No"}</td>
+              <td>{props.DetailData.featured ? "Yes" : "No"}</td>
+              <td>{props.DetailData.status ? "Yes" : "No"}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );
