@@ -74,5 +74,20 @@ namespace BackendSite.Service.DAL
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<EventDraw>("Admin_EventDraw_Get", commandType: CommandType.StoredProcedure);
         }
+
+        public IEnumerable<DrawPrizeExcelData> GetExportData(IEnumerable<int> SelectSite, string StartDate, string EndDate, int CurrencyId, string EventName)
+        {
+            PrizeSearchResult SearchResult = new PrizeSearchResult();
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            DynamicParameters props = new DynamicParameters();
+            props.Add("StartDate", StartDate);
+            props.Add("EndDate", EndDate);
+            props.Add("SelectSite", SelectSite != null ? SelectSite.Any() ? JsonConvert.SerializeObject(SelectSite) : null : null);
+            props.Add("CurrencyId", CurrencyId);
+            props.Add("EventName", string.IsNullOrWhiteSpace(EventName) ? null : EventName);
+
+            return conn.Query<DrawPrizeExcelData>("Admin_DrawPrizeExport_Get", props, commandType: CommandType.StoredProcedure);
+
+        }
     }
 }

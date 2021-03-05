@@ -1,6 +1,7 @@
 import React from "react";
 import moment from "moment";
 import DateTimePicker from "react-datetime";
+import { ColumnGroup } from "ag-grid-community";
 
 const defCurrencyType = {
   2: "MYR",
@@ -12,7 +13,7 @@ const defCurrencyType = {
 };
 
 const Panel = (props) => {
-  let siteListOptions = "";
+  let siteListOptions = [];
   if (props.SiteList) {
     siteListOptions = props.SiteList.map((i) => {
       return {
@@ -21,10 +22,11 @@ const Panel = (props) => {
       };
     });
   }
+
   return (
     <div className="filter">
       <div className="row-flex">
-        {siteListOptions ? (
+        {siteListOptions.length > 0 ? (
           <CheckBoxElem
             Title="Site"
             Options={siteListOptions}
@@ -68,6 +70,18 @@ const Panel = (props) => {
             },
           }}
         />
+        {props.EventName !== null ? (
+          <DropDownBox
+            columnTitle="EventName"
+            options={props.EventName.map((x, index) => {
+              return { value: x.eventName, displayText: x.eventName };
+            })}
+            hasAll={true}
+            selectedValue={0}
+            dataColumn="EventName"
+            onChange={props.onChange}
+          />
+        ) : null}
       </div>
       <div className="row-flex">
         <div className="button-group">

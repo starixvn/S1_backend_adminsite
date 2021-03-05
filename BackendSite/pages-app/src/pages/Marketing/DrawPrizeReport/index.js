@@ -10,7 +10,7 @@ import Detail from "./Detail";
 
 const App = () => {
   const [state, setstate] = useState(0);
-  const [siteList, setSiteList] = useState();
+  const [siteList, setSiteList] = useState([]);
   const [stateFilter, setFilter] = useState({
     SelectSite: [],
     Type: 0,
@@ -18,6 +18,7 @@ const App = () => {
     Event: "",
     StartDate: moment().add(-10, "days").format("l"),
     EndDate: moment().format("l"),
+    EventName: "0",
   });
   const [stateDatas, setDatas] = useState({
     PageInfo: null,
@@ -32,14 +33,16 @@ const App = () => {
     EndDate: "",
     EventTime: "",
     PrizeName: "",
-    EventDate: ""
+    EventDate: "",
   });
+
+  const [eventName, seteventName] = useState(null);
 
   useEffect(() => {
     let param = {
       Url: "Common/AdminUserSiteList",
     };
-    api.post("/api/Common/AdminUserSiteList").then((res) => {
+    WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {
         setSiteList(res.data.data);
       } else {
@@ -48,10 +51,20 @@ const App = () => {
     });
   }, []);
 
+  useEffect(() => {
+    api.post("/api/DrawPrizeReport/GetEventName").then((res) => {
+      if (res.data.errorCode === 0) {
+        seteventName(res.data.data);
+      } else {
+        alert(res.data.message ?? "failed to get data.");
+      }
+    });
+  }, []);
+
   const Filter_OnChange = (v, dataColumn) => {
-    stateFilter[dataColumn] = v;
     setFilter({
       ...stateFilter,
+      [dataColumn]: v,
     });
   };
 
@@ -101,6 +114,7 @@ const App = () => {
       PageNumber: 1,
       StartDate: moment(stateFilter.StartDate).format("YYYY-MM-DD"),
       EndDate: moment(stateFilter.EndDate).format("YYYY-MM-DD"),
+      EventName: stateFilter.EventName === "0" ? "" : stateFilter.EventName,
     };
     api
       .post("/api/DrawPrizeReport/PrizeSearch", Data)
@@ -132,11 +146,15 @@ const App = () => {
       return false;
     }
     let Data = {
-      SelectSite: stateFilter.SelectSite,
-      CurrencyId: parseInt(stateFilter.Type, 10),
-      StartDate: moment(stateFilter.StartDate).format("YYYY-MM-DD"),
-      EndDate: moment(stateFilter.EndDate).format("YYYY-MM-DD"),
+      SelectSite: stateDatas.FilterInfo.SelectSite,
+      CurrencyId: parseInt(stateDatas.FilterInfo.Type, 10),
+      StartDate: moment(stateDatas.FilterInfo.StartDate).format("YYYY-MM-DD"),
+      EndDate: moment(stateDatas.FilterInfo.EndDate).format("YYYY-MM-DD"),
       PageNumber: PageNumber,
+      EventName:
+        stateDatas.FilterInfo.EventName === "0"
+          ? ""
+          : stateDatas.FilterInfo.EventName,
     };
     api
       .post("/api/DrawPrizeReport/PrizeSearch", Data)
@@ -167,13 +185,31 @@ const App = () => {
       EndDate: prop.endTime,
       EventTime: prop.eventTime,
       PrizeName: prop.prizeName,
-      EventDate: prop.eventDate
+      EventDate: prop.eventDate,
     });
     setstate(1);
   };
 
   const Click_Back = () => {
     setstate(0);
+  };
+
+  const Result_ExportToExcel = () => {
+    let param = {
+      Url: "DrawPrizeReport/ExportPrizeData",
+      Data: {
+        SelectSite: JSON.stringify(stateDatas.FilterInfo.SelectSite),
+        StartDate: moment(stateDatas.FilterInfo.StartDate).format("YYYY-MM-DD"),
+        EndDate: moment(stateDatas.FilterInfo.EndDate).format("YYYY-MM-DD"),
+        CurrencyId: parseInt(stateDatas.FilterInfo.Type, 10),
+        EventName:
+          stateDatas.FilterInfo.EventName === "0"
+            ? ""
+            : stateDatas.FilterInfo.EventName,
+      },
+    };
+
+    WebAPI.DownloadData(param);
   };
 
   if (state === 0) {
@@ -187,12 +223,14 @@ const App = () => {
           onChangeAllCheckBox={Filter_CheckBox_CheckAll}
           ClickSubmit={Filter_Submit}
           SiteList={siteList}
+          EventName={eventName}
         />
         {stateDatas.Datas === null ? null : (
           <Result
             {...stateDatas}
             ChangePage={Result_ChangePage}
             Detail={Click_Detail}
+            ExportToExcel={Result_ExportToExcel}
           />
         )}
       </div>
@@ -202,12 +240,13 @@ const App = () => {
       <div>
         <h5 className="detail">EventDate:{detailDatas.EventDate}</h5>
         <h5 className="detail">PrizeName:{detailDatas.PrizeName}</h5>
-        <Detail 
-        PrizeId={detailDatas.PrizeId}
-        EventId={detailDatas.EventId}
-        StartDate={detailDatas.StartDate}
-        EndDate={detailDatas.EndDate}
-        EventTime={detailDatas.EventTime}/>
+        <Detail
+          PrizeId={detailDatas.PrizeId}
+          EventId={detailDatas.EventId}
+          StartDate={detailDatas.StartDate}
+          EndDate={detailDatas.EndDate}
+          EventTime={detailDatas.EventTime}
+        />
         <div className="button-group">
           <button
             className="btn btn-search"
