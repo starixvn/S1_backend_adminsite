@@ -4,6 +4,7 @@ import Pagination from "./Pagination";
 const dataColumnDefs = () => {
   return [
     { dataColumn: "eventDate", columnTitle: "EventDate" },
+    { dataColumn: "eventName", columnTitle: "EventName" },
     { dataColumn: "siteName", columnTitle: "SiteName" },
     { dataColumn: "currency", columnTitle: "Currency" },
     { dataColumn: "prizeName", columnTitle: "PrizeName" },
@@ -41,33 +42,31 @@ const Panel = (props) => {
           subData[s] = data[s];
         });
       }
-      return (
-          element.dataColumn !== "listOfWinner" ? (
-            <td
-              key={`td-${element.dataColumn}-${idx}`}
-              className={
-                element.body && element.body.attr && element.body.attr.class
-                  ? element.body.attr.class
-                  : ""
-              }
-            >
-              {element.body && element.body.format
-                ? element.body.format(data[element.dataColumn], subData)
-                : data[element.dataColumn]}
-            </td>
-          ) : (
-              <td key={`td-${element.dataColumn}-${idx}`}>
-              <div>
+      return element.dataColumn !== "listOfWinner" ? (
+        <td
+          key={`td-${element.dataColumn}-${idx}`}
+          className={
+            element.body && element.body.attr && element.body.attr.class
+              ? element.body.attr.class
+              : ""
+          }
+        >
+          {element.body && element.body.format
+            ? element.body.format(data[element.dataColumn], subData)
+            : data[element.dataColumn]}
+        </td>
+      ) : (
+        <td key={`td-${element.dataColumn}-${idx}`}>
+          <div>
             <button
               className="btn btn-search"
               type="submit"
-              onClick={props.Detail.bind(this,data)}
+              onClick={props.Detail.bind(this, data)}
             >
               Detail
             </button>
-            </div>
-            </td>
-          )
+          </div>
+        </td>
       );
     });
 
@@ -76,6 +75,15 @@ const Panel = (props) => {
 
   return (
     <div className="table">
+      <div className="table-options">
+        <button
+          type="button"
+          className="btn btn-approved"
+          onClick={props.ExportToExcel}
+        >
+          Export Excel
+        </button>
+      </div>
       <table className="table table-striped">
         <thead>
           <tr>{headerRows}</tr>

@@ -16,9 +16,11 @@ namespace BackendSite.Controllers.Api
     public class DrawPrizeReportController : Controller
     {
         private readonly PrizeBLL prizeBLL;
-        public DrawPrizeReportController(PrizeBLL prizeBLL)
+        private readonly ExcelBLL excelBLL;
+        public DrawPrizeReportController(PrizeBLL prizeBLL, ExcelBLL excelBLL)
         {
             this.prizeBLL = prizeBLL;
+            this.excelBLL = excelBLL;
         }
 
         [HttpPost]
@@ -78,6 +80,15 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
 
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/DrawPrizeReport" })]
+        public IActionResult ExportPrizeData(string SelectSite, string StartDate, string EndDate, int CurrencyId, string EventName)
+        {
+            var ExportData = prizeBLL.GetExportData(SelectSite, StartDate, EndDate, CurrencyId, EventName);
+            var stream = excelBLL.Export(ExportData);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DrawPrize_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
     }
 }
