@@ -1,9 +1,7 @@
 import React, { useEffect, useRef, useReducer, useState } from "react";
 import ReactDOM from "react-dom";
-import WebAPI from "../../../module/WebAPI";
-import { api } from "../../../module/WebAPI";
+import WebAPI, { api } from "../../../module/WebAPI";
 import Filter from "./Filter";
-import qs from "qs";
 import Result from "./Result";
 import moment from "moment";
 import Detail from "./Detail";
