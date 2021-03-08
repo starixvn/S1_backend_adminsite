@@ -106,5 +106,24 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        public class SetRebateCategoryReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int CategoryId { get; set; }
+            public int level { get; set; }
+            public decimal percentage { get; set; }
+            public string lastUpdateUser { get; set; }
+
+        }
+        public ApiResult  SetRebateCategory(SetRebateCategoryReq setRebateCategoryReq)
+        {
+            var apiResult = new ApiResult ();
+            apiResult.ErrorCode = 0;
+            rebateMangeBLL.SetRebateCategory(setRebateCategoryReq.SiteId, setRebateCategoryReq.CurrencyId, setRebateCategoryReq.CategoryId, setRebateCategoryReq.level, setRebateCategoryReq.percentage, setRebateCategoryReq.lastUpdateUser);
+
+            return apiResult;
+        }
+
     }
 }

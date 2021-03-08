@@ -69,5 +69,13 @@ namespace BackendSite.Service.BLL
             reault.GameTypeList = rList;
             return reault;
         }
+        public int SetRebateCategory(int siteId, int currencyId, int categoryId, int level, decimal percentage, string lastUpdateUser)
+        {
+            return rebateMangeService.SetRebateCategory( siteId, currencyId, categoryId, level, percentage, lastUpdateUser);
+        }
+        public int SetRebateCategoryBatch(int siteId, int categoryId, string levelPercentage, string lastUpdateUser)
+        {
+            return rebateMangeService.SetRebateCategoryBatch( siteId, categoryId, levelPercentage, lastUpdateUser);
+        }
     }
 }
