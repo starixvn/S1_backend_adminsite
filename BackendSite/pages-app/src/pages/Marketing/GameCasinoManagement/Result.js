@@ -11,6 +11,7 @@ const dataColumnDefs = () => {
     { dataColumn: "hot", columnTitle: "Hot" },
     { dataColumn: "featured", columnTitle: "Featured" },
     { dataColumn: "status", columnTitle: "Status" },
+    { dataColumn: "promotion", columnTitle: "Promotion" },
     { dataColumn: "detail", columnTitle: "Detail" },
   ];
 };
@@ -56,10 +57,11 @@ const Panel = (props) => {
         </td>
       ) : element.dataColumn === "hot" ||
         element.dataColumn === "featured" ||
-        element.dataColumn === "status" ? (
+        element.dataColumn === "status" ||
+        element.dataColumn === "promotion"? (
         <td key={`td-${element.dataColumn}-${idx}`}>
           {data[element.dataColumn] ? "Yes" : "No"}
-          {window.subFuncKeys.includes("gcm_edit_main") ? (
+          {window.subFuncKeys && window.subFuncKeys.includes("gcm_edit_main") ? (
             <div className="switch__container">
               <input
                 id={`switch-${element.dataColumn + dataidx}`}

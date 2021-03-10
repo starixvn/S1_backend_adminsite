@@ -152,4 +152,53 @@ namespace BackendSite.Service.Model
         public string BonusCode { set; get; }
         public decimal Bonus { get; set; }
     }
+    public class CustTele
+    {
+        public string UserName { get; set; }
+        public int ActStatus { get; set; }
+        public string RegTime { get; set; }
+        public int CallOutStatus { get; set; }
+        public string AccountName { get; set; }
+        public string PhoneNo { get; set; }
+        public int CustId { get; set; }
+        public int SiteId { get; set; }
+        public bool CanUpdate { get; set; }
+        public string UpdateAt { get; set; }
+        public string Operator { get; set; }
+        public List<String> UpdateRemark { get; set; }
+        public CustTele() {
+            CanUpdate = true;
+        }
+
+    }
+    public class TeleCSDData
+    {
+        public List<CustTele> CustTeleList { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
+
+    public class CustTeleExport
+    {
+        public string UserName { get; set; }
+        public string FullName { get; set; }
+        public string DepositStatus { get; set; }
+        public string RegDate { get; set; }    
+        public string PhoneNumber { get; set; }
+        public string FirstTimeCall { get; set; }
+        public string SecondTimeCall { get; set; }
+        public string ThirdTimeCall { get; set; }
+    }
+    public class CustTeleExportTemp
+    {
+        public string UserName { get; set; }
+        public string FullName { get; set; }
+        public string DepositStatus { get; set; }
+        public string RegDate { get; set; }
+        public string PhoneNumber { get; set; }
+        public int Remark { get; set; }
+        public string UpdateAt { get; set; }
+        public string Operator { get; set; }
+    }
 }

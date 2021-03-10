@@ -128,6 +128,18 @@
         "DisplayKey": "Withdrawal KYC Control",
         "FuncKey": "Message/WithdrawalKYCControl",
         "Enable": false
+      },
+      {
+        "DisplayKey": "TeleCSD",
+        "FuncKey": "CustManage/TeleCSD",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Export Excel",
+            "FuncKey": "tele_export_excel"
+          }
+        ]
       }
     ]
   },

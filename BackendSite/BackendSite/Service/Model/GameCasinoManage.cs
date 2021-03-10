@@ -33,6 +33,7 @@ namespace BackendSite.Service.Model
         public bool Hot { get; set; }
         public bool Status { get; set; }
         public bool Featured { get; set; }
+        public bool Promotion { get; set; }
     }
 
     public class GameCasinoPara
@@ -60,6 +61,7 @@ namespace BackendSite.Service.Model
         public int Hot { get; set; }
         public int Featured { get; set; }
         public int Status { get; set; }
+        public int Promotion { get; set; }
         public DateTime UpdateAt { get; set; }
     }
     public class SetGameCasionPara
@@ -70,6 +72,7 @@ namespace BackendSite.Service.Model
         public int Hot { get; set; }
         public int Featured { get; set; }
         public int Status { get; set; }
+        public int Promotion { get; set; }
         public string Type { get; set; }
     }
     public class InsertGameCasionPara
@@ -95,6 +98,7 @@ namespace BackendSite.Service.Model
         public bool Hot { get; set; }
         public bool Featured { get; set; }
         public bool Status { get; set; }
+        public bool Promotion { get; set; }
     }
     public class GetGameCasinoDetailPara
     {
@@ -117,6 +121,7 @@ namespace BackendSite.Service.Model
         public int Hot { get; set; }
         public int Featured { get; set; }
         public int Status { get; set; }
+        public int Promotion { get; set; }
     }
     public class GameCasinoDetailLog
     {

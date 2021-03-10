@@ -94,6 +94,7 @@ namespace BackendSite.Service.BLL
                         Hot = taget.Hot,
                         Featured = taget.Featured,
                         Status = taget.Status,
+                        Promotion = taget.Promotion,
                         CurrencyName = CurrencyData.ToList().Find(y=> y.CurrencyId == x).IsoCode,
                         GameCasinoId = para.GameCasinoId
                     });

@@ -32,7 +32,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 gameCasinoManageBLL.SetGameCasinoDetail(para);
-                var beforeStatus = para.Type == "hot" ? para.Hot : para.Type == "featured" ? para.Featured : para.Status;
+                var beforeStatus = para.Type == "hot" ? para.Hot : para.Type == "featured" ? para.Featured : para.Type == "status" ? para.Status:para.Promotion;
                 var afterStatus = beforeStatus == 1 ? 2 : 1;
                 var log = new GameCasinoDetailLog() {GameCasinoId = para.GameCasinoId,
                                                     SiteId = para.SiteId,
@@ -134,7 +134,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 gameCasinoManageBLL.SetGameCasino(para);
-                var beforeStatus = para.Type == "hot" ? para.Hot : para.Type == "featured" ? para.Featured : para.Status;
+                var beforeStatus = para.Type == "hot" ? para.Hot : para.Type == "featured" ? para.Featured : para.Type == "status" ? para.Status:para.Promotion;
                 var afterStatus = !beforeStatus;
                 var log = new GameCasinoLog()
                 {

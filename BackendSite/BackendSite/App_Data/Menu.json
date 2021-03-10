@@ -132,6 +132,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "TeleCSD",
+        "FuncKey": "CustManage/TeleCSD",
+        "Controller": "CustManage",
+        "Action": "TeleCSD",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
