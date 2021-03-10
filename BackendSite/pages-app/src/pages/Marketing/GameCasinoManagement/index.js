@@ -246,6 +246,7 @@ const App = () => {
       Hot: props.hot,
       Featured: props.featured,
       Status: props.status,
+      Promotion: props.promotion
     };
     let Data2 = {
       GameCasinoId: parseInt(detailData.gameCasinoId),

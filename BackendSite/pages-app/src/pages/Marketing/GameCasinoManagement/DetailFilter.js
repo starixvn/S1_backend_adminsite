@@ -22,7 +22,6 @@ const Panel = (props) => {
         {props.StateTPList === null ? null : (
           <button
             className="btn btn-add"
-            // style={{ marginTop: "20px", marginBottom: "40px" }}
             onClick={props.Submit}
             style={{
               marginTop: "20px",
@@ -46,20 +45,6 @@ const Panel = (props) => {
           Back
         </button>
       </div>
-      {/* <div className="button-group">
-        <button
-          className="btn btn-search"
-          type="back"
-          onClick={props.Goback}
-          style={{
-            marginTop: "20px",
-            marginBottom: "40px",
-            marginRight: "10px",
-          }}
-        >
-          Back
-        </button>
-      </div> */}
       <div className="table">
         <table className="table table-striped">
           <thead>
@@ -69,6 +54,7 @@ const Panel = (props) => {
               <th>Hot</th>
               <th>Featured</th>
               <th>Status</th>
+              <th>Promotion</th>
             </tr>
           </thead>
           <tbody>
@@ -78,6 +64,7 @@ const Panel = (props) => {
               <td>{props.DetailData.hot ? "Yes" : "No"}</td>
               <td>{props.DetailData.featured ? "Yes" : "No"}</td>
               <td>{props.DetailData.status ? "Yes" : "No"}</td>
+              <td>{props.DetailData.promotion ? "Yes" : "No"}</td>
             </tr>
           </tbody>
         </table>

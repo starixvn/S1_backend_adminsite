@@ -96,6 +96,9 @@ const CustomerStatisticalReport = lazy(() =>
 const GameCasinoManagement = lazy(() => 
 	import("./pages/Marketing/GameCasinoManagement/index")
 );
+const TeleCSD = lazy(() => 
+  import("./pages/CSD/TeleCSD/index")
+);
 
 export const defaultPage = "CustomerStatisticalReport";
 
@@ -518,5 +521,18 @@ export const pages = {
 			"./css/css/vendor/DateTimePicker/DateTimePicker.css"
 		],
 		layout: layoutType.N88
-	}
+	},
+	TeleCSD: {
+	  comp: (
+		<Suspense fallback="loading...">
+		  <TeleCSD />
+		</Suspense>
+	  ),
+	  css: [
+		"./lib/bootstrap/dist/css/bootstrap.min.css",
+		"./css/css/main.css",
+		"./css/css/vendor/DateTimePicker/DateTimePicker.css",
+	  ],
+	  layout: layoutType.N88,
+	},
 };

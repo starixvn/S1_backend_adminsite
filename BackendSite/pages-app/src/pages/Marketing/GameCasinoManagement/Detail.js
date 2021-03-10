@@ -8,6 +8,7 @@ const dataColumnDefs = () => {
     { dataColumn: "hot", columnTitle: "Hot" },
     { dataColumn: "featured", columnTitle: "Featured" },
     { dataColumn: "status", columnTitle: "Status" },
+    { dataColumn: "promotion", columnTitle: "Promotion" },
   ];
 };
 const Panel = (props) => {
@@ -96,6 +97,22 @@ const Panel = (props) => {
                               disabled={false}
                             />
                             <label htmlFor={`switch-status${idx}`}></label>
+                          </div>
+                        ) : null}
+                      </td>
+                      <td>
+                        {data.promotion === 1 ? "Yes" : "No"}
+                        {window.subFuncKeys.includes("gcm_edit_detail") ? (
+                          <div>
+                            <input
+                              id={`switch-promotion${idx}`}
+                              className="switch switch--flat"
+                              checked={data.promotion === 1}
+                              type="checkbox"
+                              onChange={() => handleToggle("promotion", data)}
+                              disabled={false}
+                            />
+                            <label htmlFor={`switch-promotion${idx}`}></label>
                           </div>
                         ) : null}
                       </td>

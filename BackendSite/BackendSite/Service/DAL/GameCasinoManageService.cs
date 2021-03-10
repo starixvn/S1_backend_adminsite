@@ -26,7 +26,7 @@ namespace BackendSite.Service.DAL
             props.Add("SiteId", para.SiteId);
             props.Add("CurrencyId", para.CurrencyId);
             props.Add("GameCasinoId", para.GameCasinoId);
-            props.Add("Type", para.Type == "hot" ? 0 : para.Type == "featured" ? 1 : 2);
+            props.Add("Type", para.Type == "hot" ? 0 : para.Type == "featured" ? 1 : para.Type == "status" ? 2:3);
             return conn.Execute("Admin_GameCasinoDetail_Set", props, commandType: CommandType.StoredProcedure);
         }
 
@@ -85,7 +85,7 @@ namespace BackendSite.Service.DAL
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             DynamicParameters props = new DynamicParameters();
             props.Add("GameCasinoId", para.GameCasinoId);
-            props.Add("Type", para.Type == "hot"? 0: para.Type == "featured"? 1:2);
+            props.Add("Type", para.Type == "hot"? 0: para.Type == "featured"? 1: para.Type == "status"? 2: 3);
             return conn.Execute("Admin_GameCasino_Set", props, commandType: CommandType.StoredProcedure);
         }
 
