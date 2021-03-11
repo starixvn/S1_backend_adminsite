@@ -22,6 +22,7 @@ const Panel = (props) => {
     let Data = {
       PrizeId: props.PrizeId,
       EventId: props.EventId,
+      PrizeName: props.PrizeName,
       StartDate: moment(props.EventTime).unix(),
       EndDate: moment(props.EventTime).add(1, "days").unix() - 1,
       EventTime: moment(props.EventTime).format("YYYY-MM-DD"),
@@ -52,6 +53,7 @@ const Panel = (props) => {
     let Data = {
       PrizeId: props.PrizeId,
       EventId: props.EventId,
+      PrizeName: props.PrizeName,
       StartDate: moment(props.EventTime).unix(),
       EndDate: moment(props.EventTime).add(1, "days").unix() - 1,
       EventTime: moment(props.EventTime).format("YYYY-MM-DD"),

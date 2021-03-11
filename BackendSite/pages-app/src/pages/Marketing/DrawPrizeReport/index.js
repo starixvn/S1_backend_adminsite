@@ -244,6 +244,7 @@ const App = () => {
           StartDate={detailDatas.StartDate}
           EndDate={detailDatas.EndDate}
           EventTime={detailDatas.EventTime}
+          PrizeName={detailDatas.PrizeName}
         />
         <div className="button-group">
           <button
