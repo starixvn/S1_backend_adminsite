@@ -98,6 +98,7 @@ import VipLevel from './VipLevel/index';
                     <td>{DepositStatusOp[row.status]}</td>
                     <td>{row.refId}</td>
                     <td>{moment(row.depositTime).format('l LTS')}</td>
+                    <td>{moment(row.updateTime).format('l LTS')}</td>
                 </tr>
             );
 
@@ -120,6 +121,7 @@ import VipLevel from './VipLevel/index';
                                 <th scope="col">Status</th>
                                 <th scope="col">RefId</th>
                                 <th scope="col">DepositTime {moment().format('(Z)')}</th>
+                                <th scope="col">UpdateTime {moment().format('(Z)')}</th>
                             </tr>
                         </thead>
                         <tbody>
