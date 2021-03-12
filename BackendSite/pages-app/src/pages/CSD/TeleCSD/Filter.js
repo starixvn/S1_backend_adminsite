@@ -24,9 +24,9 @@ const defCallOutStatusType = {
 };
 
 const defDormantUserType = {
-  1: "1 month inactive",
-  2: "2 month inactive",
-  3: "3 month inactive",
+  3: "3 day inactive",
+  7: "1 week inactive",
+  14: "2 week inactive",
 };
 
 const Panel = (props) => {
@@ -175,16 +175,7 @@ const Panel = (props) => {
       </div>
       <div className="row-flex">
         <div className="input-item" style={{ width: "200px", zIndex: "998" }}>
-          {/* <span className="label">Deposit Status</span> */}
           <div className="field">
-            {/* <MultiSelect
-              disableSearch={"true"}
-              options={depositStatusList}
-              value={props.StateFilter.Deposit}
-              onChange={DepositChange}
-              labelledBy={"Select"}
-              ItemRenderer={itemRenderer}             
-            /> */}
             <DropDownBox
               columnTitle="Deposit Status"
               options={depositStatusList2}
@@ -196,16 +187,7 @@ const Panel = (props) => {
           </div>
         </div>
         <div className="input-item" style={{ width: "200px", zIndex: "998" }}>
-          {/* <span className="label">CallOut Status</span> */}
           <div className="field">
-            {/* <MultiSelect
-              disableSearch={"true"}
-              options={callOutStatusList}
-              value={props.StateFilter.CallOut}
-              onChange={CallOutChange}
-              labelledBy={"Select"}
-              ItemRenderer={itemRenderer}
-            /> */}
             <DropDownBox
               columnTitle="CallOut Status"
               options={callOutStatusList2}
@@ -217,16 +199,7 @@ const Panel = (props) => {
           </div>
         </div>
         <div className="input-item" style={{ width: "200px", zIndex: "998" }}>
-          {/* <span className="label">Dormant User</span> */}
           <div className="field">
-            {/* <MultiSelect
-              disableSearch={"true"}
-              options={dormantUserList}
-              value={props.StateFilter.DormantUser}
-              onChange={DormantUserChange}
-              labelledBy={"Select"}
-              ItemRenderer={itemRenderer}
-            /> */}
             <DropDownBox
               columnTitle="Dormant User"
               options={dormantUserList2}

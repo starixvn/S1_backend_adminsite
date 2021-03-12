@@ -13,10 +13,9 @@ const App = () => {
     Currency: [],
     StartDate: moment().add(-10, "days").format("l"),
     EndDate: moment().format("l"),
-    // Deposit: [{ label: "Deposited", value: 1 }, { label: "Non deposit", value: 2 }],
     Deposit: "0",
     CallOut: "0",
-    DormantUser: "1",
+    DormantUser: "3",
   });
   const [stateDatas, setDatas] = useState({
     PageInfo: null,
@@ -84,7 +83,6 @@ const App = () => {
     });
   };
   const Complete_once = (prop) => {
-    //UpdateCustomerTele
     let Data = {
       CustId: prop.custId,
       SiteId: prop.siteId

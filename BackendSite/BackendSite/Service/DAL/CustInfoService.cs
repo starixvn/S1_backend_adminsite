@@ -218,7 +218,7 @@ namespace BackendSite.Service.DAL
             string SiteIdFilter = JsonConvert.SerializeObject(SiteIdFilterArray);
             string CurrencyFilter = JsonConvert.SerializeObject(CurrencyFilterArray);
             int ActStatus = int.Parse(Deposit);
-            int MonthInactive = int.Parse(DormantUser);
+            int DayInactive = int.Parse(DormantUser);
             int CallOutStatus = int.Parse(CallOut);
 
             props.Add("PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
@@ -232,7 +232,7 @@ namespace BackendSite.Service.DAL
             props.Add("StartDate", StartDate);
             props.Add("EndDate", EndDate);
             props.Add("ActStatus", ActStatus);
-            props.Add("MonthInactive", MonthInactive);
+            props.Add("DayInactive", DayInactive);
             props.Add("CallOutStatus", CallOutStatus);
             var result = conn.Query<CustTele>("Admin_CustTeleSearch_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
@@ -302,7 +302,7 @@ namespace BackendSite.Service.DAL
             string SiteIdFilter = JsonConvert.SerializeObject(SiteIdFilterArray);
             string CurrencyFilter = JsonConvert.SerializeObject(CurrencyFilterArray);
             int ActStatus = int.Parse(Deposit);
-            int MonthInactive = int.Parse(DormantUser);
+            int DayInactive = int.Parse(DormantUser);
             int CallOutStatus = int.Parse(CallOut);
 
             props.Add("SelectSite", SiteIdFilter);
@@ -310,7 +310,7 @@ namespace BackendSite.Service.DAL
             props.Add("StartDate", StartDate);
             props.Add("EndDate", EndDate);
             props.Add("ActStatus", ActStatus);
-            props.Add("MonthInactive", MonthInactive);
+            props.Add("DayInactive", DayInactive);
             props.Add("CallOutStatus", CallOutStatus);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
