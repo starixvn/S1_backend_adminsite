@@ -32,6 +32,7 @@ namespace BackendSite.Service.Model
         public int EventId { get; set; }
         public int PrizeId { get; set; }
         public string EventTime { get; set; }
+        public string PrizeName { get; set; }
         public PrizeLogPara()
         {
             //PageSize預設10

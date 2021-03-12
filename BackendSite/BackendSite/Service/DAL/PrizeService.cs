@@ -59,8 +59,9 @@ namespace BackendSite.Service.DAL
             props.Add("EventId", prizeLogPara.EventId);
             props.Add("PrizeId", prizeLogPara.PrizeId);
             props.Add("EventTime", prizeLogPara.EventTime);
+            props.Add("PrizeName", prizeLogPara.PrizeName);
 
-            var result = conn.Query<PrizeLogData>("Admin_DrawPrize_ListOfWinner_Get", props, commandType: CommandType.StoredProcedure);
+            var result = conn.Query<PrizeLogData>("Admin_DrawPrize_ListOfWinner_GetV2", props, commandType: CommandType.StoredProcedure);
             LogResult.PrizeLogData = result.ToList();
             LogResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
             LogResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
