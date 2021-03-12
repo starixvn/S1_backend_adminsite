@@ -24,9 +24,9 @@ const defCallOutStatusType = {
 };
 
 const defDormantUserType = {
-  1: "1 week inactive",
-  2: "2 week inactive",
-  3: "3 week inactive",
+  3: "3 day inactive",
+  7: "1 week inactive",
+  14: "2 week inactive",
 };
 
 const Panel = (props) => {

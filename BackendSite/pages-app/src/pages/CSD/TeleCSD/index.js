@@ -15,7 +15,7 @@ const App = () => {
     EndDate: moment().format("l"),
     Deposit: "0",
     CallOut: "0",
-    DormantUser: "1",
+    DormantUser: "3",
   });
   const [stateDatas, setDatas] = useState({
     PageInfo: null,
