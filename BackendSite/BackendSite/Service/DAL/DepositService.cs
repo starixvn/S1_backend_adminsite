@@ -28,19 +28,20 @@ namespace BackendSite.Service.DAL
             this.withdrawalLimitService = withdrawalLimitService;
         }
 
-        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, long startDate, long endDate, int siteId, string DepositId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, long startDate, long endDate, int siteId, string DepositId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             var SelectSite = JsonConvert.SerializeObject(selectSite);
             var DepositType = JsonConvert.SerializeObject(depositType);
             var CurrencyId = JsonConvert.SerializeObject(currencyId);
             var Status = JsonConvert.SerializeObject(status);
+            var VipStatus = JsonConvert.SerializeObject(levelstatus);
             int depositId = 0;
             if (!string.IsNullOrWhiteSpace(DepositId))
             {
                 Match m = Regex.Match(DepositId, @"\d+");
                 int.TryParse(m.Value, out depositId);
             }
-            var p = new DynamicParameters(new { SelectSite, DepositType, StartDate = startDate, EndDate = endDate, SiteId = siteId, DepositId = depositId, TransId = DepositId, UserName, CurrencyId, Status, PageSize = pageSize });
+            var p = new DynamicParameters(new { SelectSite, DepositType, StartDate = startDate, EndDate = endDate, SiteId = siteId, DepositId = depositId, TransId = DepositId, UserName, CurrencyId, Status, VipStatus= VipStatus, PageSize = pageSize });
             p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
