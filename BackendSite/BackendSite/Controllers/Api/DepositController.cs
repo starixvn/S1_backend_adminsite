@@ -45,6 +45,7 @@ namespace BackendSite.Controllers.Api
             public long startDate { get; set; }
             public long endDate { get; set; }
             public IEnumerable<int> status { get; set; }
+            public IEnumerable<int> LevelStatus { get; set; }
         }
 
         [HttpPost]
@@ -54,7 +55,7 @@ namespace BackendSite.Controllers.Api
             int pageNumber = depositListReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
-            var depositRequestList = depositBLL.GetDepositRequestList(depositListReq.SelectSite, depositListReq.DepositType, depositListReq.startDate, depositListReq.endDate, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, 10, ref pageNumber, out totalPages, out rowCount);
+            var depositRequestList = depositBLL.GetDepositRequestList(depositListReq.SelectSite, depositListReq.DepositType, depositListReq.startDate, depositListReq.endDate, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, depositListReq.LevelStatus,10, ref pageNumber, out totalPages, out rowCount);
             apiListResult.Data = depositRequestList;
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;

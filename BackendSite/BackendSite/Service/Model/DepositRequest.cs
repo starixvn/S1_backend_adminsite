@@ -60,6 +60,7 @@ namespace BackendSite.Service.Model
         public int Flag { set; get; }
         public DateTime? UpdateTime { set; get; }
         public string ChannelName { set; get; }
+        public int VipLevel { set; get; }
     }
 
     public class DepositInfoForExport

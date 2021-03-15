@@ -78,8 +78,8 @@ import DateTimePicker from 'react-datetime';
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
                         <td className="text-right">{number_format(row.amount)}</td>
                         <td>{row.bankName}</td>
-                        <td>{row.accountNo}</td>
-                        <td>{row.accountName}</td>
+                        {/* <td>{row.accountNo}</td>
+                        <td>{row.accountName}</td> */}
                         <td>{moment(row.createTime).format('l LTS')}</td>
                         <td>{row.updateTime ? moment(row.updateTime).format('l LTS') : null}</td>
                         <td className="text-right">{row.withdrawlCnt}</td>
@@ -117,8 +117,8 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">CCY</th>
                                 <th scope="col" className="text-right">{i18n.lbl_Amount}</th>
                                 <th scope="col">Bank Name</th>
-                                <th scope="col">To Acc. NO.</th>
-                                <th scope="col">To Acc. Name</th>
+                                {/* <th scope="col">To Acc. NO.</th>
+                                <th scope="col">To Acc. Name</th> */}
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Update Time (" + moment().format('Z') + ")"}</th>
                                 <th scope="col" className="text-right">Total Withdrawl Count</th>
