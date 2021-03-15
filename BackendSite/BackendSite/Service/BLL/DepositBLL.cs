@@ -98,9 +98,9 @@ namespace BackendSite.Service.BLL
             var depositRequest = GetDepositRequest(transId);
             return depositService.GetDepositReceipt(depositId, depositRequest.SiteId);
         }
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string depositType, long startDate, long endDate, string DepositId, string UserName, string currencyId, string status)
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string depositType, long startDate, long endDate, string DepositId, string UserName, string currencyId, string status,string LevelStatus)
         {
-            return depositService.GetDepositExportList(selectSite, depositType, startDate, endDate, DepositId, UserName, currencyId, status);
+            return depositService.GetDepositExportList(selectSite, depositType, startDate, endDate, DepositId, UserName, currencyId, status, LevelStatus);
         }
         public IEnumerable<DepositLimitCurrencyInfo> GetDepositLimitCurrencyList(int siteId, int depositType) => depositService.GetDepositLimitCurrencyList(siteId, depositType);
 

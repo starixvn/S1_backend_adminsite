@@ -48,7 +48,7 @@ namespace BackendSite.Service.DAL
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var depositList = conn.Query<DepositRequest>("Admin_DepositListV4_Get", p, commandType: CommandType.StoredProcedure);
+            var depositList = conn.Query<DepositRequest>("Admin_DepositListV5_Get", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -178,7 +178,7 @@ namespace BackendSite.Service.DAL
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.QueryFirstOrDefault<DepositReceipt>("DepositReceipt_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string depositType, long startDate, long endDate, string DepositId, string UserName, string currencyId, string status)
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string depositType, long startDate, long endDate, string DepositId, string UserName, string currencyId, string status,string LevelStatus)
         {
             //var SelectSite = JsonConvert.SerializeObject(selectSite);
 
@@ -186,6 +186,7 @@ namespace BackendSite.Service.DAL
             var DepositType = $"[{depositType}]";
             var CurrencyId = $"[{currencyId}]";
             var Status = $"[{status}]";
+            var VipStatus = $"[{LevelStatus}]";
 
             int depositId = 0;
             if (!string.IsNullOrWhiteSpace(DepositId))
@@ -193,10 +194,9 @@ namespace BackendSite.Service.DAL
                 Match m = Regex.Match(DepositId, @"\d+");
                 int.TryParse(m.Value, out depositId);
             }
-            var p = new DynamicParameters(new { SelectSite, DepositType, StartDate = startDate, EndDate = endDate, DepositId = depositId, TransId = DepositId, UserName, CurrencyId, Status });
-
+            var p = new DynamicParameters(new { SelectSite, DepositType, StartDate = startDate, EndDate = endDate, DepositId = depositId, TransId = DepositId, UserName, CurrencyId, Status, VipStatus = VipStatus });
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var depositList = conn.Query<DepositInfoForExport>("Admin_DepositListForExportV2_Get", p, commandType: CommandType.StoredProcedure);
+            var depositList = conn.Query<DepositInfoForExport>("Admin_DepositListForExportV3_Get", p, commandType: CommandType.StoredProcedure);
             return depositList;
         }
         public IEnumerable<DepositLimitCurrencyInfo> GetDepositLimitCurrencyList(int siteId, int depositType)

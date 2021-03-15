@@ -89,12 +89,13 @@ namespace BackendSite.Controllers
             public long startDate { get; set; }
             public long endDate { get; set; }
             public string status { get; set; }
+            public string LevelStatus { get; set; }
         }
 
         [HttpPost]
         public IActionResult ExportDepositList(DepositListReq depositListReq)
         {
-            var ExportDeposit = depositBLL.GetDepositExportList(depositListReq.SelectSite, depositListReq.DepositType, depositListReq.startDate, depositListReq.endDate, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status);
+            var ExportDeposit = depositBLL.GetDepositExportList(depositListReq.SelectSite, depositListReq.DepositType, depositListReq.startDate, depositListReq.endDate, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, depositListReq.LevelStatus);
 
             var stream = excelBLL.Export(ExportDeposit);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportDeposit)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
@@ -109,12 +110,13 @@ namespace BackendSite.Controllers
             public long startDate { get; set; }
             public long endDate { get; set; }
             public string status { get; set; }
+            public string LevelStatus { get; set; }
         }
 
         [HttpPost]
         public IActionResult ExportWithdrawalList(WithdrawalListReq withdrawalListReq)
         {
-            var ExportWithdrawal = withdrawalBLL.GetWithdrawalExportList(withdrawalListReq.SelectSite, withdrawalListReq.withdrawalType, withdrawalListReq.startDate, withdrawalListReq.endDate, withdrawalListReq.WithdrawalId, withdrawalListReq.UserName, withdrawalListReq.CurrencyId, withdrawalListReq.status);
+            var ExportWithdrawal = withdrawalBLL.GetWithdrawalExportList(withdrawalListReq.SelectSite, withdrawalListReq.withdrawalType, withdrawalListReq.startDate, withdrawalListReq.endDate, withdrawalListReq.WithdrawalId, withdrawalListReq.UserName, withdrawalListReq.CurrencyId, withdrawalListReq.status, withdrawalListReq.LevelStatus);
 
             var stream = excelBLL.Export(ExportWithdrawal);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportWithdrawal)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
