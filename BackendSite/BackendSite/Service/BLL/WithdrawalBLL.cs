@@ -22,10 +22,10 @@ namespace BackendSite.Service.BLL
             this.withdrawalLimitService = withdrawalLimitService;
         }
 
-        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite, IEnumerable<int> withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite, IEnumerable<int> withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             var serverInfo = serverInfoService.GetModel();
-            return withdrawalService.GetWithdrawalRequestList(selectSite, withdrawalType, startDate, endDate, serverInfo.SiteId/*Not require*/, WithdrawalId, UserName, currencyId, status, pageSize, ref pageNumber, out totalPages, out rowCount);
+            return withdrawalService.GetWithdrawalRequestList(selectSite, withdrawalType, startDate, endDate, serverInfo.SiteId/*Not require*/, WithdrawalId, UserName, currencyId, status, levelstatus,pageSize, ref pageNumber, out totalPages, out rowCount);
         }
 
         public WithdrawalRequest GetWithdrawalRequest(string transId)
@@ -148,9 +148,9 @@ namespace BackendSite.Service.BLL
             return withdrawalService.GetWithdrawalListByCust(CustId, TransId, Status, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
 
-        public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(string selectSite, string withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, string currencyId, string status)
+        public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(string selectSite, string withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, string currencyId, string status,string LevelStatus)
         {
-            return withdrawalService.GetWithdrawalExportList(selectSite, withdrawalType, startDate, endDate, WithdrawalId, UserName, currencyId, status);
+            return withdrawalService.GetWithdrawalExportList(selectSite, withdrawalType, startDate, endDate, WithdrawalId, UserName, currencyId, status, LevelStatus);
         }
         public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(int siteId, int currencyId) => withdrawalLimitService.GetWithdrawalLimitInfos(siteId, currencyId);
 
