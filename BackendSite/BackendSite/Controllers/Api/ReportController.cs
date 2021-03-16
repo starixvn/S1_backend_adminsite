@@ -52,6 +52,15 @@ namespace BackendSite.Controllers.Api
             public string UserName { get; set; }
         }
 
+        public class GetCustomerDetailReq
+        {
+            public int CustId { get; set; }
+
+            public int GameId { get; set; }
+
+            public string Date { get; set; }
+        }
+
         #endregion
 
         public class TitleModel
@@ -2378,6 +2387,29 @@ namespace BackendSite.Controllers.Api
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         $"StatisticalReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
+
+        public ApiResult GetCustomerDetail(GetCustomerDetailReq request)
+        {
+
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordDetailModel>>();
+
+            try
+            {
+                apiResult.Data = _reportBLL.GetCustomerDetail(request.CustId,
+                                                              request.GameId,
+                                                              request.Date);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.Message;
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+            }
+
+            return apiResult;
+        }
+
 
         #endregion
 

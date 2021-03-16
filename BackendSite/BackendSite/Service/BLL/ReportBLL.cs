@@ -967,5 +967,19 @@ namespace BackendSite.Service.BLL
 
             return Data;
         }
+
+        public IEnumerable<TpBetRecordDetailModel> GetCustomerDetail(int custId,
+                                                               int gameId,
+                                                               string date)
+        {
+            Dictionary<string, TpBetRecordDetailModel> keyValuePairs = new Dictionary<string, TpBetRecordDetailModel>();
+            string dateFormat = string.Empty;
+            var detailList = reportService.GetCustomerDetail(custId,
+                                                             gameId,
+                                                             date);
+
+
+            return detailList;
+        }
     }
 }

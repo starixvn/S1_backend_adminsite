@@ -10,7 +10,7 @@ const App = ()=>{
     const [stateFilter, setFilter] = useState({
         'SiteIds': [],
         'Currency': [],
-        'StartDate': moment().add(-14, 'days').format('l'),
+        'StartDate': moment().add(-7, 'days').format('l'),
         'EndDate': moment().format('l'),
         'UserName':null
     });
@@ -23,7 +23,9 @@ const App = ()=>{
         UserTotalResult: null,
         TotalResult: null,
         CurrencyList: null,
-        UserList: null
+        UserList: null,
+        //for date detail
+        DateDetailDatas:null
     });
 
     const [siteList, setSiteList] = useState(); 
@@ -32,7 +34,12 @@ const App = ()=>{
 
     const [UserDataShowLists, setUserDataShowLists] = useState({});
     const [UserDataShowStatus, setUserDataShowStatus] = useState(false);
-
+    const [UserCategoryDataShowLists, setUserCategoryDataShowLists] = useState({});
+    const [UserCategoryDataShowStatus, setUserCategoryDataShowStatus] = useState(false);
+    const [UserGameDataShowLists, setUserGameDataShowLists] = useState({});
+    const [UserGameDataShowStatus, setUserGameDataShowStatus] = useState(false);
+    const [UserDateDataShowLists, setUserDateDataShowLists] = useState({});
+    const [UserDateDataShowStatus, setUserDateDataShowStatus] = useState(false);
 
     useEffect(() => {
         let param = {
@@ -46,6 +53,8 @@ const App = ()=>{
             }
         })
     }, []);
+
+    //#region Filter Component 
 
     const Filter_OnChange = (v, dataColumn)=>{
         setFilter({
@@ -88,24 +97,160 @@ const App = ()=>{
         });
     }
 
-    const Result_UserShowBtnOnClick = (user) => {
+    //#endregion
+
+    //#region  Result Component
+
+    const Result_UserShowBtnOnClick = (custid) => {
+
+        let getUserItem=stateData.UserList.find(x=>x.custId===custid);
 
         setUserDataShowLists({
-                'CustId': user.custId,
-                'UserName':user.userName,
-                'CategoryList':user.categoryList,
-                'CurrencyList':user.currencyList
+                'custId': getUserItem.custId,
+                'userName':getUserItem.userName,
+                'categoryList':getUserItem.categoryList,
+                'currencyList':getUserItem.currencyList
         });
 
         setUserDataShowStatus(true);
+
+        setUserCategoryDataShowStatus(false);
+        setUserCategoryDataShowLists({});
+        setUserGameDataShowStatus(false);
+        setUserGameDataShowLists({});
+        setUserDateDataShowStatus(false);
+        setUserDateDataShowLists({});
     }
 
-    const Result_CloseBtnClick = (Status) => {
+    const Result_UserCategoryShowBtnOnClick = (custid,categoryid) => {
 
-        setUserDataShowLists({});
+        let getUserItem=stateData.UserList.find(x=>x.custId===custid);
+        let getCategoryItem = getUserItem.categoryList.find(x=>x.categoryId===categoryid);
+        
+        setUserCategoryDataShowLists({
+                'custId': getUserItem.custId,
+                'userName':getUserItem.userName,
+                'categoryId':getCategoryItem.categoryId,
+                'categoryName':getCategoryItem.categoryName,
+                'gameList':getCategoryItem.gameList,
+                'currencyList':getUserItem.currencyList
+        });
+
+        setUserCategoryDataShowStatus(true);
+
         setUserDataShowStatus(false);
+        setUserDataShowLists({});
+        setUserGameDataShowStatus(false);
+        setUserGameDataShowLists({});
+        setUserDateDataShowStatus(false);
+        setUserDateDataShowLists({});
+    }
+
+    const Result_UserGameShowBtnOnClick = (custid,categoryid,gameid) => {
+
+        let getUserItem=stateData.UserList.find(x=>x.custId===custid);
+        let getCategoryItem = getUserItem.categoryList.find(x=>x.categoryId===categoryid);
+        let getGameItem = getCategoryItem.gameList.find(x=>x.gameId===gameid);
+
+        setUserGameDataShowLists({
+                'custId': getUserItem.custId,
+                'userName':getUserItem.userName,
+                'categoryId':getCategoryItem.categoryId,
+                'categoryName':getCategoryItem.categoryName,
+                'gameId':getGameItem.gameId,
+                'gameName':getGameItem.gameName,
+                'currencyList':getUserItem.currencyList
+        });
+
+        setUserGameDataShowStatus(true);
+
+        setUserDataShowStatus(false);
+        setUserDataShowLists({});
+        setUserCategoryDataShowStatus(false);
+        setUserCategoryDataShowLists({});
+        setUserDateDataShowStatus(false);
+        setUserDateDataShowLists({});
+    }
+
+    const Result_UserDateShowBtnOnClick = (custid,categoryid,gameid,date) => {
+
+        let param = {
+            Url: 'Report/GetCustomerDetail',
+            Data: {
+                CustId: custid,
+                GameId: gameid,
+                Date: moment(date).format('YYYY-MM-DD')
+            }
+        };
+
+        WebAPI.PostData(param).then((res) => {
+
+            if (res.data.errorCode === 0) {
+
+                setData({
+                    FilterInfo: stateData.FilterInfo,
+                    Datas: stateData.Datas,
+                    DatasByDate: stateData.DatasByDate,
+                    UserCategoryTotalResult: stateData.UserCategoryTotalResult,
+                    UserTotalResult: stateData.UserTotalResult,
+                    TotalResult: stateData.TotalResult,
+                    CurrencyList: stateData.CurrencyList,
+                    UserList: stateData.UserList,
+                    DateDetailDatas: [...res.data.data]
+                });
+
+                //setUserGameDataShowLists({});
+                //setUserGameDataShowStatus(false);
+
+                let getUserItem=stateData.UserList.find(x=>x.custId===custid);
+                let getCategoryItem = getUserItem.categoryList.find(x=>x.categoryId===categoryid);
+                let getGameItem = getCategoryItem.gameList.find(x=>x.gameId===gameid);
+
+                setUserDateDataShowLists({
+                    'custId': getUserItem.custId,
+                    'userName':getUserItem.userName,
+                    'categoryId':getCategoryItem.categoryId,
+                    'categoryName':getCategoryItem.categoryName,
+                    'gameId':getGameItem.gameId,
+                    'gameName':getGameItem.gameName,
+                    'currencyList':getUserItem.currencyList,
+                    'date':date
+                });
+
+                setUserDateDataShowStatus(true);
+
+                setUserDataShowStatus(false);
+                setUserDataShowLists({});
+                setUserCategoryDataShowStatus(false);
+                setUserCategoryDataShowLists({});
+                setUserGameDataShowStatus(false);
+                setUserGameDataShowLists({});
+
+            }else{
+                alert(res.data.message ?? 'failed to get data.');
+            }
+        });
 
     }
+
+    //All Poppout Close
+    const Result_CloseBtnClick = () => {
+
+            //All Poppout Close
+            setUserDataShowStatus(false);
+            setUserDataShowLists({});
+            setUserCategoryDataShowStatus(false);
+            setUserCategoryDataShowLists({});
+            setUserGameDataShowStatus(false);
+            setUserGameDataShowLists({});
+            setUserDateDataShowStatus(false);
+            setUserDateDataShowLists({});
+
+    }
+    
+    //#endregion
+
+    //#region Main Methods
 
     const Filter_Submit = ()=>{
 
@@ -118,6 +263,7 @@ const App = ()=>{
             alert("Please Choose at least one currency")
             return false;
         }
+
         if (!moment(stateFilter.StartDate).unix()) {
             alert("Please Choose Start Date")
             return false;
@@ -565,6 +711,8 @@ const App = ()=>{
         }, 5000);
     }
 
+    //#endregion
+
     return (
         <div style={{ width: "100%", height: "100%", padding: "15px" }}>
              <h4 className="page-name">Customer Statistical Report</h4>
@@ -582,8 +730,17 @@ const App = ()=>{
                 ExportBtnDisabled={ExportStatus}
                 UserDataShowLists={UserDataShowLists}
                 UserDataShowStatus={UserDataShowStatus}
+                UserCategoryDataShowLists={UserCategoryDataShowLists}
+                UserCategoryDataShowStatus={UserCategoryDataShowStatus}
+                UserGameDataShowLists={UserGameDataShowLists}
+                UserGameDataShowStatus={UserGameDataShowStatus}
+                UserDateDataShowLists={UserDateDataShowLists}
+                UserDateDataShowStatus={UserDateDataShowStatus}
                 CloseBtn={Result_CloseBtnClick}
-                SetUserShowBtn={Result_UserShowBtnOnClick}/>}
+                SetUserShowBtn={Result_UserShowBtnOnClick}
+                SetUserCategoryShowBtn={Result_UserCategoryShowBtnOnClick}
+                SetUserGameShowBtn={Result_UserGameShowBtnOnClick}
+                SetUserDateShowBtn={Result_UserDateShowBtnOnClick}/>}
         </div>
     );
 }
