@@ -196,7 +196,7 @@ namespace BackendSite.Service.DAL
             }
             var p = new DynamicParameters(new { SelectSite, DepositType, StartDate = startDate, EndDate = endDate, DepositId = depositId, TransId = DepositId, UserName, CurrencyId, Status, VipStatus = VipStatus });
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var depositList = conn.Query<DepositInfoForExport>("Admin_DepositListForExportV3_Get", p, commandType: CommandType.StoredProcedure);
+            var depositList = conn.Query<DepositInfoForExport>("Admin_DepositListForExportV4_Get", p, commandType: CommandType.StoredProcedure);
             return depositList;
         }
         public IEnumerable<DepositLimitCurrencyInfo> GetDepositLimitCurrencyList(int siteId, int depositType)
