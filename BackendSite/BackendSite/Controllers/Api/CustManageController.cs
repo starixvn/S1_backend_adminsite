@@ -746,5 +746,18 @@ namespace BackendSite.Controllers.Api
             var stream = excelBLL.Export(ExportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"TeleCSD_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
+
+        public class VipUpgradeReviewPara
+        {
+            public int Year { get; set; }
+            public int Month { get; set; }
+            public int SiteId { get; set; }
+        }
+        [HttpPost]
+        public ApiListResult<CustTele> GetVipUpgradeReview(VipUpgradeReviewPara para)
+        {
+            custInfoBLL.GetVipUpgradeReview(para.Year,para.Month,para.SiteId);
+            return null;
+        }
     }
 }

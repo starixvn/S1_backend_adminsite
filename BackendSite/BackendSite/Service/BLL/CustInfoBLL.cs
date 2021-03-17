@@ -234,6 +234,11 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);
         }
+        public VipUpgradeReviewData GetVipUpgradeReview(int year,int month,int siteid)
+        {
+            custInfoService.GetVipUpgradeReview(year, month, siteid);
+            return null;
+        }
     }
 }
  

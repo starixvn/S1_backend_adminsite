@@ -201,4 +201,27 @@ namespace BackendSite.Service.Model
         public string UpdateAt { get; set; }
         public string Operator { get; set; }
     }
+    public class VipUpgradeList
+    {
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int CurrentVipLevel { get; set; }
+        public int UpgradeVipLevel { get; set; }
+        public string CurrentVipName { get; set; }
+        public string UpgradeVipName { get; set; }
+        public string CCY { get; set; }
+        public decimal FullAmount { get; set; }
+        public decimal UpgradeAmount { get; set; }
+        public string CalculateTime { get; set; }
+        public bool Status { get; set; }
+    }
+    public class VipUpgradeReviewData
+    {
+        public List<VipUpgradeList> VipUpgradeList { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
 }

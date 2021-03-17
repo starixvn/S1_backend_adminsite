@@ -356,5 +356,31 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+
+        public VipUpgradeReviewData GetVipUpgradeReview(int year,int month,int siteid)
+        {
+            VipUpgradeReviewData SearchData = new VipUpgradeReviewData();
+            DynamicParameters props = new DynamicParameters();
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            string CalculateMonth = string.Empty;
+            CalculateMonth = month > 9 ? $"{year}{month}" : $"{year}0{month}";
+            props.Add("CalculateMonth", CalculateMonth);
+            props.Add("SiteId", siteid);
+            props.Add("UserName", "");
+            props.Add("Status", 0);
+            props.Add("UpgradeTime", null);
+            props.Add("PageNumber", 1, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("PageSize", 20);
+            var result = conn.Query<VipUpgradeList>("Admin_VipUpgradeReview_GetV2", props, commandType: CommandType.StoredProcedure).ToList();
+
+            SearchData.VipUpgradeList = result;
+            SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            SearchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
+            return SearchData;
+        }
     }
 }
