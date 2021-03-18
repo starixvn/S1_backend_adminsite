@@ -75,5 +75,11 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/VipUpgrade" })]
+        public IActionResult VipUpgrade()
+        {
+            return View();
+        }
     }
 }

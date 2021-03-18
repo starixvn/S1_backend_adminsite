@@ -4,6 +4,7 @@ import WebAPI from "../../../module/WebAPI";
 import moment from "moment";
 import { api } from "../../../module/WebAPI";
 import Filter from "./Filter";
+import Result from "./Result";
 
 const App = () => {
   const [siteList, setSiteList] = useState([]);
@@ -21,21 +22,45 @@ const App = () => {
   }, []);
   const [stateFilter, setFilter] = useState({
     optSite: 0,
-    month: 1,
-    year: 2021
+    YearMonth: moment(),
+    Status:0,
+    UserName:""
   });
-  const Submit = ()=>{
-    console.log(stateFilter)
+  const [stateDatas, setDatas] = useState({
+    PageInfo: null,
+    Datas: null,
+    FilterInfo: null,
+    CanUpgrade: false
+  });
+  const Submit = () => {
+    if (stateFilter.optSite === 0) {
+      alert("Please Choose at one Site");
+      return false;
+    }
     let Data = {
-      Year: stateFilter.year,
-      Month: stateFilter.month,
       SiteId: stateFilter.optSite,
+      YearMonth: moment(stateFilter.YearMonth).format("YYYYMM"),
+      PageNumber: 1,
+      Status: parseInt(stateFilter.Status, 10),
+      UserName: stateFilter.UserName
     };
     api
       .post("/api/CustManage/GetVipUpgradeReview", Data)
       .then(function (res) {
-        if (res.data.errorCode === 0) {
-          
+        if (res.data.errorCode === 0 || res.data.errorCode === 1) {
+          setDatas({
+            ...stateDatas,
+            Datas: res.data.data,
+            PageInfo: {
+              totalPages: res.data.totalPages,
+              pageNumber: 1,
+              rowCount: res.data.rowCount,
+            },
+            FilterInfo: {
+              ...stateFilter,
+            },
+            CanUpgrade: res.data.errorCode === 0
+          });
         } else {
           alert(res.data.message ?? "failed to get data.");
         }
@@ -43,6 +68,148 @@ const App = () => {
       .catch(function (error) {
         alert(error);
       });
+  };
+  const Result_ChangePage = (PageNumber) => {
+    if (stateDatas.FilterInfo.optSite === 0) {
+      alert("Please Choose at one Site");
+      return false;
+    }
+    let Data = {
+      SiteId: stateDatas.FilterInfo.optSite,
+      YearMonth: moment(stateDatas.FilterInfo.YearMonth).format("YYYYMM"),
+      PageNumber: PageNumber,
+      Status: parseInt(stateDatas.FilterInfo.Status, 10),
+      UserName: stateFilter.UserName
+    };
+    api
+      .post("/api/CustManage/GetVipUpgradeReview", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0 || res.data.errorCode === 1) {
+          setDatas({
+            ...stateDatas,
+            Datas: res.data.data,
+            PageInfo: {
+              totalPages: res.data.totalPages,
+              pageNumber: PageNumber,
+              rowCount: res.data.rowCount,
+            },
+            FilterInfo: {
+              ...stateFilter,
+            },
+            CanUpgrade: res.data.errorCode === 0
+          });
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  };
+  const UpdateReset = () => {
+    let Data = {
+      SiteId: stateDatas.FilterInfo.optSite,
+      YearMonth: moment(stateDatas.FilterInfo.YearMonth).format("YYYYMM"),
+      PageNumber: stateDatas.PageInfo.pageNumber,
+      Status: parseInt(stateDatas.FilterInfo.Status, 10),
+      UserName: stateFilter.UserName
+    };
+    api
+      .post("/api/CustManage/GetVipUpgradeReview", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0 || res.data.errorCode === 1) {
+          setDatas({
+            ...stateDatas,
+            Datas: res.data.data,
+            PageInfo: {
+              totalPages: res.data.totalPages,
+              pageNumber: stateDatas.PageInfo.pageNumber,
+              rowCount: res.data.rowCount,
+            },
+            FilterInfo: {
+              ...stateFilter,
+            },
+            CanUpgrade: res.data.errorCode === 0
+          });
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  };
+  const Upgrade = (props) => {
+    let CustIds = [];
+    CustIds.push(props.custId);
+    let Data = {
+      CustIds: JSON.stringify(CustIds),
+      YearMonth: moment(stateDatas.FilterInfo.YearMonth).format("YYYYMM"),
+    };
+    api
+      .post("/api/CustManage/UpdateVipUpgradeReview", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0 || res.data.errorCode === 1) {
+          UpdateReset();
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  };
+  const AllUpgrade = () => {
+    let CustIds = [];
+    stateDatas.Datas.forEach((x) => {
+      if (x["status"] === 1) {
+        CustIds.push(x["custId"]);
+      }
+    });
+    if(CustIds.length === 0){
+      return false;
+    }
+    let Data = {
+      CustIds: JSON.stringify(CustIds),
+      YearMonth: moment(stateDatas.FilterInfo.YearMonth).format("YYYYMM"),
+    };
+    api
+      .post("/api/CustManage/UpdateVipUpgradeReview", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0 || res.data.errorCode === 1) {
+          UpdateReset();
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  };
+  const Result_ExportToExcel =()=>{
+    let param = {
+      Url: "CustManage/ExportVipUpgradedata",
+      Data: {
+        SiteId: stateDatas.FilterInfo.optSite,
+        YearMonth: moment(stateDatas.FilterInfo.YearMonth).format("YYYYMM"),
+        Status: parseInt(stateDatas.FilterInfo.Status, 10),
+        UserName: stateFilter.UserName
+      },
+    };
+
+    WebAPI.DownloadData(param);
+  }
+  const StatusChange=(props)=>{
+    setFilter({
+      ...stateFilter,
+      Status:props
+    })
+  }
+  const UserNameChange=(props)=>{
+    setFilter({
+      ...stateFilter,
+      UserName:props
+    })
   }
   return (
     <div className="container-fluid">
@@ -52,7 +219,18 @@ const App = () => {
         StateFilter={stateFilter}
         SetFilter={setFilter}
         Submit={Submit}
+        StatusChange={StatusChange}
+        UserNameChange={UserNameChange}
       />
+      {stateDatas.Datas === null ? null : (
+        <Result
+          {...stateDatas}
+          AllUpgrade={AllUpgrade}
+          Upgrade={Upgrade}
+          ChangePage={Result_ChangePage}
+          ExportToExcel={Result_ExportToExcel}
+        />
+      )}
     </div>
   );
 };

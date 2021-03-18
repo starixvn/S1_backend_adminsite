@@ -142,6 +142,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "VipUpgrade",
+        "FuncKey": "CustManage/VipUpgrade",
+        "Controller": "CustManage",
+        "Action": "VipUpgrade",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

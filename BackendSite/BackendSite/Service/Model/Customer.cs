@@ -213,9 +213,12 @@ namespace BackendSite.Service.Model
         public string UpgradeVipName { get; set; }
         public string CCY { get; set; }
         public decimal FullAmount { get; set; }
+        public decimal ThresholdAmount { get; set; }
         public decimal UpgradeAmount { get; set; }
         public string CalculateTime { get; set; }
-        public bool Status { get; set; }
+        public int Status { get; set; }
+        public string StatusName { get; set; }
+        public int CurrencyId { get; set; }
     }
     public class VipUpgradeReviewData
     {
@@ -223,5 +226,24 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
+    }
+    public class VipSystemData
+    {
+        public decimal UpDeposit { get; set; }
+        public int CurrencyId { get; set; }
+        public int Level { get; set; }
+    }
+    public class VipUpgradeExport
+    {
+        public string SiteName { get; set; }
+        public string UserName { get; set; }
+        public string CurrentVipLevel { get; set; }
+        public string  UpgradeVipLevel { get; set; }
+        public string Currency { get; set; }
+        public decimal DepositAmount { get; set; }
+        public decimal ThresholdAmount { get; set; }
+        public decimal UpgradeBonus { get; set; }
+        public string CalculateTime { get; set; }
+        public string Status { get; set; }
     }
 }

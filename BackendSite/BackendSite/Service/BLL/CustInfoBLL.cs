@@ -233,12 +233,43 @@ namespace BackendSite.Service.BLL
         public IEnumerable<CustTeleExport> GetTeleCSDExportData(string SiteIds, string Currency, string StartDate, string EndDate, string Deposit, string DormantUser, string CallOut)
         {
             return custInfoService.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);
+            
         }
-        public VipUpgradeReviewData GetVipUpgradeReview(int year,int month,int siteid)
+        public VipUpgradeReviewData GetVipUpgradeReview(string YearMonth, int siteid, int PageNumber, int PageSize, int Status,string UserName)
         {
-            custInfoService.GetVipUpgradeReview(year, month, siteid);
-            return null;
+            var VipUpgradeReviewData = custInfoService.GetVipUpgradeReview(YearMonth, siteid, PageNumber, PageSize, Status, UserName);
+            var VipSystemData = custInfoService.GetVipSystemData(siteid);
+            VipUpgradeReviewData.VipUpgradeList.ForEach(x => x.ThresholdAmount = VipSystemData.Find(y => y.Level == x.UpgradeVipLevel && y.CurrencyId == x.CurrencyId).UpDeposit);
+            return VipUpgradeReviewData;
         }
+        public int UpdateVipUpgradeReview(string CustIds, string YearMonth)
+        {
+            return custInfoService.UpdateVipUpgradeReview(CustIds, YearMonth);
+        }
+
+        public IEnumerable<VipUpgradeExport> GetVipUpgradedata(int SiteId, string YearMonth, int Status, string UserName)
+        {
+            List<VipUpgradeExport> VipUpgradeExport = new List<VipUpgradeExport>();
+            var result = custInfoService.GetVipUpgradedata(SiteId, YearMonth, Status, UserName);
+            var VipSystemData = custInfoService.GetVipSystemData(SiteId);
+            result.ForEach(x => x.StatusName = x.Status == 1 ? "Pending" : x.Status == 2 ? "Approved" : "Rejected");
+            result.ForEach(x => {
+                VipUpgradeExport.Add(new VipUpgradeExport { 
+                    SiteName = x.SiteName, 
+                    UserName = x.UserName, 
+                    CurrentVipLevel = x.CurrentVipName, 
+                    UpgradeVipLevel  = x.UpgradeVipName, 
+                    Currency = x.CCY,
+                    DepositAmount = x.FullAmount,
+                    ThresholdAmount = VipSystemData.Find(y=> y.Level == x.UpgradeVipLevel && y.CurrencyId == x.CurrencyId).UpDeposit,
+                    UpgradeBonus = x.UpgradeAmount,
+                    CalculateTime = x.CalculateTime,
+                    Status = x.Status == 1 ? "Pending" : x.Status == 2 ? "Approved" : "Rejected"
+                });
+            });
+            return VipUpgradeExport;
+        }
+
     }
 }
  
