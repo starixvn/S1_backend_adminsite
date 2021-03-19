@@ -140,22 +140,6 @@
             "FuncKey": "tele_export_excel"
           }
         ]
-      },
-      {
-        "DisplayKey": "VipUpgrade",
-        "FuncKey": "CustManage/VipUpgrade",
-        "Enable": false,
-        "InputBoxType": "checkbox",
-        "SubFuncKeys": [
-          {
-            "DisplayKey": "Export Excel",
-            "FuncKey": "vipupgrade_export_excel"
-          },
-          {
-            "DisplayKey": "Upgrade",
-            "FuncKey": "vipupgrade_Upgrade"
-          }
-        ]
       }
     ]
   },
@@ -337,6 +321,22 @@
           {
             "DisplayKey": "Edit Detail",
             "FuncKey": "gcm_edit_detail"
+          }
+        ]
+      },
+      {
+        "DisplayKey": "VipUpgrade",
+        "FuncKey": "Marketing/VipUpgrade",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Export Excel",
+            "FuncKey": "vipupgrade_export_excel"
+          },
+          {
+            "DisplayKey": "Upgrade",
+            "FuncKey": "vipupgrade_Upgrade"
           }
         ]
       }

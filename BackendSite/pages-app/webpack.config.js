@@ -136,9 +136,9 @@ module.exports = {
 		// 	"@babel/polyfill",
 		// 	"./src/pages/CSD/TeleCSD/index.js"
 		// ],
-		"CSD/VipUpgrade.min": [
+		"Marketing/VipUpgrade.min": [
 			"@babel/polyfill",
-			"./src/pages/CSD/VipUpgrade/index.js"
+			"./src/pages/Marketing/VipUpgrade/index.js"
 		],
 	},
 	output: {

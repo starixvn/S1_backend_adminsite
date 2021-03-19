@@ -18,7 +18,7 @@
     var authData = authorizeBLL.GetAuthData();
     var loginUser = adminUserService.GetUser(authData.UserId);
 
-    IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("CustManage/VipUpgrade");
+    IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("Marketing/VipUpgrade");
     subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
 
     var i18n = new Dictionary<string, string>();
@@ -39,7 +39,7 @@
 <div id="content">
 </div>
 @section Scripts {
-    <script src="~/js/component/CSD/VipUpgrade.min.js" asp-append-version="true"></script>
+    <script src="~/js/component/Marketing/VipUpgrade.min.js" asp-append-version="true"></script>
     <script type="text/javascript">
         //$('.collapse').collapse();
         window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));

@@ -45,7 +45,7 @@ const App = () => {
       UserName: stateFilter.UserName
     };
     api
-      .post("/api/CustManage/GetVipUpgradeReview", Data)
+      .post("/api/VipLevel/GetVipUpgradeReview", Data)
       .then(function (res) {
         if (res.data.errorCode === 0 || res.data.errorCode === 1) {
           setDatas({
@@ -82,7 +82,7 @@ const App = () => {
       UserName: stateFilter.UserName
     };
     api
-      .post("/api/CustManage/GetVipUpgradeReview", Data)
+      .post("/api/VipLevel/GetVipUpgradeReview", Data)
       .then(function (res) {
         if (res.data.errorCode === 0 || res.data.errorCode === 1) {
           setDatas({
@@ -115,7 +115,7 @@ const App = () => {
       UserName: stateFilter.UserName
     };
     api
-      .post("/api/CustManage/GetVipUpgradeReview", Data)
+      .post("/api/VipLevel/GetVipUpgradeReview", Data)
       .then(function (res) {
         if (res.data.errorCode === 0 || res.data.errorCode === 1) {
           setDatas({
@@ -147,7 +147,7 @@ const App = () => {
       YearMonth: moment(stateDatas.FilterInfo.YearMonth).format("YYYYMM"),
     };
     api
-      .post("/api/CustManage/UpdateVipUpgradeReview", Data)
+      .post("/api/VipLevel/UpdateVipUpgradeReview", Data)
       .then(function (res) {
         if (res.data.errorCode === 0 || res.data.errorCode === 1) {
           UpdateReset();
@@ -174,7 +174,7 @@ const App = () => {
       YearMonth: moment(stateDatas.FilterInfo.YearMonth).format("YYYYMM"),
     };
     api
-      .post("/api/CustManage/UpdateVipUpgradeReview", Data)
+      .post("/api/VipLevel/UpdateVipUpgradeReview", Data)
       .then(function (res) {
         if (res.data.errorCode === 0 || res.data.errorCode === 1) {
           UpdateReset();
@@ -188,7 +188,7 @@ const App = () => {
   };
   const Result_ExportToExcel =()=>{
     let param = {
-      Url: "CustManage/ExportVipUpgradedata",
+      Url: "VipLevel/ExportVipUpgradedata",
       Data: {
         SiteId: stateDatas.FilterInfo.optSite,
         YearMonth: moment(stateDatas.FilterInfo.YearMonth).format("YYYYMM"),

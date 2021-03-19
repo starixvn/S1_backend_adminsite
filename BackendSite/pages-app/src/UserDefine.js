@@ -81,7 +81,7 @@ const GameCasinoManagement = lazy(() =>
   import("./pages/Marketing/GameCasinoManagement/index")
 );
 const TeleCSD = lazy(() => import("./pages/CSD/TeleCSD/index"));
-const VipUpgrade = lazy(() => import("./pages/CSD/VipUpgrade/index"));
+const VipUpgrade = lazy(() => import("./pages/Marketing/VipUpgrade/index"));
 
 export const defaultPage = "CustomerStatisticalReport";
 

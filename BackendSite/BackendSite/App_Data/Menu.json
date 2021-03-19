@@ -142,16 +142,6 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      },
-      {
-        "Key": "",
-        "Title": "VipUpgrade",
-        "FuncKey": "CustManage/VipUpgrade",
-        "Controller": "CustManage",
-        "Action": "VipUpgrade",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
       }
     ]
   },
@@ -423,6 +413,16 @@
         "FuncKey": "Marketing/GameCasinoManagement",
         "Controller": "Marketing",
         "Action": "GameCasinoManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "VipUpgrade",
+        "FuncKey": "Marketing/VipUpgrade",
+        "Controller": "Marketing",
+        "Action": "VipUpgrade",
         "Icon": "",
         "Roles": null,
         "Childs": null
