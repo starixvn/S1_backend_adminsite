@@ -5,6 +5,7 @@ using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.DAL
 {
@@ -60,7 +61,6 @@ namespace BackendSite.Service.DAL
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("PageSize", PageSize);
-            //var result = conn.Query<VipUpgradeList>("Admin_VipUpgradeReview_GetV2", props, commandType: CommandType.StoredProcedure).ToList();
             var result = conn.Query<VipUpgradeList>("Service_VipUpgradeReview_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             SearchData.VipUpgradeList = result;
@@ -76,7 +76,7 @@ namespace BackendSite.Service.DAL
 
             props.Add("CustIds", CustIds);
             props.Add("CalculateMonth", YearMonth);
-            props.Add("Status", 2);
+            props.Add("Status", (int)VipStatus.Approved);
 
             return conn.Execute("Admin_VipUpgradeReview_Set", props, commandType: CommandType.StoredProcedure);
         }
@@ -96,14 +96,6 @@ namespace BackendSite.Service.DAL
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<VipUpgradeList>("Service_VipUpgradeReview_Get", props, commandType: CommandType.StoredProcedure).ToList();
-        }
-
-        public List<VipSystemData> GetVipSystemData(int SiteId)
-        {
-            DynamicParameters props = new DynamicParameters();
-            props.Add("SiteId", SiteId);
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<VipSystemData>("Service_VipSystem_GetV2", props, commandType: CommandType.StoredProcedure).ToList();
         }
     }
 }

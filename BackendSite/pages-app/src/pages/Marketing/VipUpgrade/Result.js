@@ -9,14 +9,11 @@ const dataColumnDefs = () => {
     { dataColumn: "upgradeVipName", columnTitle: "UpgradeVipLevel" },
     { dataColumn: "ccy", columnTitle: "Currency" },
     { dataColumn: "fullAmount", columnTitle: "Deposit Amount" },
-    { dataColumn: "thresholdAmount", columnTitle: "Threshold Amount" },
+    { dataColumn: "upDeposit", columnTitle: "Threshold Amount" },
     { dataColumn: "upgradeAmount", columnTitle: "Upgrade Bonus" },
     { dataColumn: "calculateTime", columnTitle: "Calculate Time" },
     { dataColumn: "status", columnTitle: "Status" },
     { dataColumn: "upgrade", columnTitle: "Upgrade" },
-    
-    // { dataColumn: "currentVipName", columnTitle: "CurrentVipName" },
-    // { dataColumn: "upgradeVipName", columnTitle: "UpgradeVipName" },   
   ];
 };
 const Panel = (props) => {

@@ -3,6 +3,7 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Controllers.Api
 {
@@ -112,11 +113,6 @@ namespace BackendSite.Controllers.Api
                 if (PageSize == 0)
                     PageSize = 20;
             }
-        }
-        public enum GetVipUpgradeReviewErrorCode
-        {
-            CanUpgrade = 0,
-            JustCanSearch = 1
         }
 
         [HttpPost]

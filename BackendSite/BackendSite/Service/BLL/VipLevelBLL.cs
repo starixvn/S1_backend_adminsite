@@ -2,6 +2,7 @@
 using BackendSite.Service.Model;
 using System;
 using System.Collections.Generic;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL
 {
@@ -37,8 +38,6 @@ namespace BackendSite.Service.BLL
         public VipUpgradeReviewData GetVipUpgradeReview(string YearMonth, int siteid, int PageNumber, int PageSize, int Status, string UserName)
         {
             var VipUpgradeReviewData = vipLevelService.GetVipUpgradeReview(YearMonth, siteid, PageNumber, PageSize, Status, UserName);
-            var VipSystemData = vipLevelService.GetVipSystemData(siteid);
-            VipUpgradeReviewData.VipUpgradeList.ForEach(x => x.ThresholdAmount = VipSystemData.Find(y => y.Level == x.UpgradeVipLevel && y.CurrencyId == x.CurrencyId).UpDeposit);
             VipUpgradeReviewData.VipUpgradeList.ForEach(x => x.CalculateTime = Convert.ToDateTime(x.CalculateTime).ToString("yyyy/MM/dd HH:mm:ss"));
             return VipUpgradeReviewData;
         }
@@ -47,18 +46,10 @@ namespace BackendSite.Service.BLL
             return vipLevelService.UpdateVipUpgradeReview(CustIds, YearMonth);
         }
 
-        public enum VipStatus
-        {
-            Pending = 1,
-            Approved = 2,
-            Rejected = 3
-        }
-
         public IEnumerable<VipUpgradeExport> GetVipUpgradedata(int SiteId, string YearMonth, int Status, string UserName)
         {
             List<VipUpgradeExport> VipUpgradeExport = new List<VipUpgradeExport>();
             var result = vipLevelService.GetVipUpgradedata(SiteId, YearMonth, Status, UserName);
-            var VipSystemData = vipLevelService.GetVipSystemData(SiteId);
             result.ForEach(x => {
                 VipUpgradeExport.Add(new VipUpgradeExport
                 {
@@ -68,7 +59,7 @@ namespace BackendSite.Service.BLL
                     UpgradeVipLevel = x.UpgradeVipName,
                     Currency = x.CCY,
                     DepositAmount = x.FullAmount,
-                    ThresholdAmount = VipSystemData.Find(y => y.Level == x.UpgradeVipLevel && y.CurrencyId == x.CurrencyId).UpDeposit,
+                    ThresholdAmount = x.UpDeposit,
                     UpgradeBonus = x.UpgradeAmount,
                     CalculateTime = x.CalculateTime,
                     Status = Enum.GetName(typeof(VipStatus), x.Status)
