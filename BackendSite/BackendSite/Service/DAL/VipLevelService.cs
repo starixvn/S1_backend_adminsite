@@ -81,7 +81,7 @@ namespace BackendSite.Service.DAL
             return conn.Execute("Admin_VipUpgradeReview_Set", props, commandType: CommandType.StoredProcedure);
         }
 
-        public List<VipUpgradeList> GetVipUpgradedata(int SiteId, string YearMonth, int Status, string UserName)
+        public IEnumerable<VipUpgradeExport> GetVipUpgradedata(int SiteId, string YearMonth, int Status, string UserName)
         {
             DynamicParameters props = new DynamicParameters();
             props.Add("CalculateMonth", YearMonth);
@@ -95,7 +95,7 @@ namespace BackendSite.Service.DAL
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<VipUpgradeList>("Service_VipUpgradeReview_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            return conn.Query<VipUpgradeExport>("Service_VipUpgradeReview_Get", props, commandType: CommandType.StoredProcedure);
         }
     }
 }

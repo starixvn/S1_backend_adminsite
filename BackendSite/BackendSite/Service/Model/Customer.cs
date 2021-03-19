@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -211,14 +212,14 @@ namespace BackendSite.Service.Model
         public int UpgradeVipLevel { get; set; }
         public string CurrentVipName { get; set; }
         public string UpgradeVipName { get; set; }
-        public string CCY { get; set; }
-        public decimal FullAmount { get; set; }
-        public decimal UpgradeAmount { get; set; }
+        public string Currency { get; set; }
+        public decimal DepositAmount { get; set; }
+        public decimal UpgradeBonus { get; set; }
         public string CalculateTime { get; set; }
         public int Status { get; set; }
         public string StatusName { get; set; }
         public int CurrencyId { get; set; }
-        public decimal UpDeposit { get; set; }
+        public decimal ThresholdAmount { get; set; }
     }
     public class VipUpgradeReviewData
     {
@@ -232,12 +233,13 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public string UserName { get; set; }
         public string CurrentVipLevel { get; set; }
-        public string  UpgradeVipLevel { get; set; }
+        public string UpgradeVipLevel { get; set; }
         public string Currency { get; set; }
         public decimal DepositAmount { get; set; }
         public decimal ThresholdAmount { get; set; }
         public decimal UpgradeBonus { get; set; }
         public string CalculateTime { get; set; }
-        public string Status { get; set; }
+        public int Status { get; set; }
+        public string StatusName => Enum.GetName(typeof(VipStatus), Status) ;
     }
 }

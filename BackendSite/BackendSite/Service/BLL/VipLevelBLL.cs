@@ -30,7 +30,7 @@ namespace BackendSite.Service.BLL
         public int SetVipLevel(int SiteId, int CustId, string UserName, int VipLevel, string Operator)
         {
             return vipLevelService.SetVipLevel(SiteId, CustId, UserName, VipLevel, $"{Operator} Update VipLevel", Operator);
-        }
+        } 
         public int SetVipLevelManually(int SiteId, int CustId, string UserName, int Manually, string Operator)
         {
             return vipLevelService.SetVipLevelManually(SiteId, CustId, UserName, Manually, $"{Operator} Update Manually", Operator);
@@ -48,24 +48,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<VipUpgradeExport> GetVipUpgradedata(int SiteId, string YearMonth, int Status, string UserName)
         {
-            List<VipUpgradeExport> VipUpgradeExport = new List<VipUpgradeExport>();
-            var result = vipLevelService.GetVipUpgradedata(SiteId, YearMonth, Status, UserName);
-            result.ForEach(x => {
-                VipUpgradeExport.Add(new VipUpgradeExport
-                {
-                    SiteName = x.SiteName,
-                    UserName = x.UserName,
-                    CurrentVipLevel = x.CurrentVipName,
-                    UpgradeVipLevel = x.UpgradeVipName,
-                    Currency = x.CCY,
-                    DepositAmount = x.FullAmount,
-                    ThresholdAmount = x.UpDeposit,
-                    UpgradeBonus = x.UpgradeAmount,
-                    CalculateTime = x.CalculateTime,
-                    Status = Enum.GetName(typeof(VipStatus), x.Status)
-                });
-            });
-            return VipUpgradeExport;
+            return vipLevelService.GetVipUpgradedata(SiteId, YearMonth, Status, UserName);
         }
         public bool CanUpgradeVip(string month)
         {
