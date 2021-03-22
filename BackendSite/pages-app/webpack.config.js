@@ -128,14 +128,18 @@ module.exports = {
 		// "Report/CustomerStatisticalReport.min": [
 		// 	"./src/pages/Report/CustomerStatisticalReport/index.js"
 		// ],
-		"Marketing/GameCasinoManagement.min": [
-			"@babel/polyfill",
-			"./src/pages/Marketing/GameCasinoManagement/index.js"
-		]
+		// "Marketing/GameCasinoManagement.min": [
+		// 	"@babel/polyfill",
+		// 	"./src/pages/Marketing/GameCasinoManagement/index.js"
+		// ]
 		// "CSD/TeleCSD.min": [
 		// 	"@babel/polyfill",
 		// 	"./src/pages/CSD/TeleCSD/index.js"
 		// ],
+		"Marketing/VipUpgrade.min": [
+			"@babel/polyfill",
+			"./src/pages/Marketing/VipUpgrade/index.js"
+		],
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

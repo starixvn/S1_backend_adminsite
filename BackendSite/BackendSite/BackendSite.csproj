@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <Content Remove="Views\Message\Index.cshtml" />
+    <Content Remove="wwwroot\js\component\CSD\VipUpgrade.min.js" />
   </ItemGroup>
 
   <ItemGroup>
