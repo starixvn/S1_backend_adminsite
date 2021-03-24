@@ -418,7 +418,7 @@
         "Childs": null
       },
       {
-        "Key": "",
+        "Key": "VipUpgrade",
         "Title": "VipUpgrade",
         "FuncKey": "Marketing/VipUpgrade",
         "Controller": "Marketing",
