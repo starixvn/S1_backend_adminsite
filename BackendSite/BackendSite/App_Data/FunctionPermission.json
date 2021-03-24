@@ -339,6 +339,11 @@
             "FuncKey": "vipupgrade_Upgrade"
           }
         ]
+      },
+      {
+        "DisplayKey": "Latest Highlight Video Management",
+        "FuncKey": "Marketing/LatestHighlightVideoManagement",
+        "Enable": false
       }
     ]
   }

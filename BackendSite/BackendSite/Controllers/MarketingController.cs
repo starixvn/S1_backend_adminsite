@@ -98,5 +98,11 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/LatestHighlightVideoManagement" })]
+        public IActionResult LatestHighlightVideoManagement()
+        {
+            return View();
+        }
     }
 }
