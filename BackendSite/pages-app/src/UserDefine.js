@@ -99,8 +99,8 @@ const GameCasinoManagement = lazy(() =>
 const TeleCSD = lazy(() => 
   import("./pages/CSD/TeleCSD/index")
 );
-const HighlightVideoManagement = lazy(() => 
-  import("./pages/Marketing/HighlightVideoManagement/index")
+const LatestHighlightVideoManagement = lazy(() => 
+  import("./pages/Marketing/LatestHighlightVideoManagement/index")
 );
 
 export const defaultPage = "CustomerStatisticalReport";
@@ -538,10 +538,10 @@ export const pages = {
 	  ],
 	  layout: layoutType.N88,
 	},
-	HighlightVideoManagement: {
+	LatestHighlightVideoManagement: {
 		comp: (
 		  <Suspense fallback="loading...">
-			<HighlightVideoManagement />
+			<LatestHighlightVideoManagement/>
 		  </Suspense>
 		),
 		css: [

@@ -416,6 +416,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "LatestHighlightVideoManagement",
+        "Title": "Latest Highlight Video Management",
+        "FuncKey": "Marketing/LatestHighlightVideoManagement",
+        "Controller": "Marketing",
+        "Action": "LatestHighlightVideoManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   }

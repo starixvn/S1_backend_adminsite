@@ -120,4 +120,12 @@ namespace BackendSite.Service.Model.enums
         Update = 3,
         Delete = 4
     }
+    public enum LangType
+    {
+        en = 1,
+        cs = 2,
+        th = 3,
+        id = 4,
+        vn = 5
+    }
 }

@@ -323,6 +323,11 @@
             "FuncKey": "gcm_edit_detail"
           }
         ]
+      },
+      {
+        "DisplayKey": "Latest Highlight Video Management",
+        "FuncKey": "Marketing/LatestHighlightVideoManagement",
+        "Enable": false
       }
     ]
   }
