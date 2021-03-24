@@ -69,7 +69,7 @@ const Panel = (props) => {
               type="submit"
               onClick={props.Alter.bind(this, data)}
             >
-              Alter
+              Edit
             </button>
           </div>
         </td>
