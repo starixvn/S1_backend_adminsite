@@ -325,6 +325,22 @@
         ]
       },
       {
+        "DisplayKey": "VipUpgrade",
+        "FuncKey": "Marketing/VipUpgrade",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Export Excel",
+            "FuncKey": "vipupgrade_export_excel"
+          },
+          {
+            "DisplayKey": "Upgrade",
+            "FuncKey": "vipupgrade_Upgrade"
+          }
+        ]
+      },
+      {
         "DisplayKey": "Latest Highlight Video Management",
         "FuncKey": "Marketing/LatestHighlightVideoManagement",
         "Enable": false
