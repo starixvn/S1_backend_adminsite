@@ -220,5 +220,21 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.GetCustBonus(custId);
         }
+        public TeleCSDData GetTeleCSD(string SiteIds, string Currency, string StartDate, string EndDate, string Deposit, string DormantUser, string CallOut, int PageNumber, int PageSize)
+        {
+            return custInfoService.GetTeleCSD(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut, PageNumber, PageSize);
+        }
+
+        public int UpdateCustomerTele(int siteId,int custId,string Operator)
+        {
+            return custInfoService.UpdateCustomerTele(siteId, custId, Operator);
+        }
+
+        public IEnumerable<CustTeleExport> GetTeleCSDExportData(string SiteIds, string Currency, string StartDate, string EndDate, string Deposit, string DormantUser, string CallOut)
+        {
+            return custInfoService.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);
+            
+        }
     }
 }
+ 

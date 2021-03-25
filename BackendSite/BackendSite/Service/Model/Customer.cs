@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -71,7 +72,7 @@ namespace BackendSite.Service.Model
         public string AffiliateId { get; set; }
         public DateTime? ReloadTime { get; set; }
         public string IP { get; set; }
-
+        public string LevelName { get; set; }
     }
 
     public class CustInfoDetailForExport
@@ -90,7 +91,8 @@ namespace BackendSite.Service.Model
         public string AreaCode { get; set; }
         public string PhoneNo { get; set; }
         public int CurrencyId { get; set; }
-        public int VipLevel { get; set; }
+        //public int VipLevel { get; set; }
+        public string LevelName { get; set; }
         public string Agent { get; set; }
         public DateTime RegTime { get; set; }
         public int Status { get; set; }
@@ -150,5 +152,94 @@ namespace BackendSite.Service.Model
         public string PromotionCategory { set; get; }
         public string BonusCode { set; get; }
         public decimal Bonus { get; set; }
+    }
+    public class CustTele
+    {
+        public string UserName { get; set; }
+        public int ActStatus { get; set; }
+        public string RegTime { get; set; }
+        public int CallOutStatus { get; set; }
+        public string AccountName { get; set; }
+        public string PhoneNo { get; set; }
+        public int CustId { get; set; }
+        public int SiteId { get; set; }
+        public bool CanUpdate { get; set; }
+        public string UpdateAt { get; set; }
+        public string Operator { get; set; }
+        public List<String> UpdateRemark { get; set; }
+        public CustTele() {
+            CanUpdate = true;
+        }
+
+    }
+    public class TeleCSDData
+    {
+        public List<CustTele> CustTeleList { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
+
+    public class CustTeleExport
+    {
+        public string UserName { get; set; }
+        public string FullName { get; set; }
+        public string DepositStatus { get; set; }
+        public string RegDate { get; set; }    
+        public string PhoneNumber { get; set; }
+        public string FirstTimeCall { get; set; }
+        public string SecondTimeCall { get; set; }
+        public string ThirdTimeCall { get; set; }
+    }
+    public class CustTeleExportTemp
+    {
+        public string UserName { get; set; }
+        public string FullName { get; set; }
+        public string DepositStatus { get; set; }
+        public string RegDate { get; set; }
+        public string PhoneNumber { get; set; }
+        public int Remark { get; set; }
+        public string UpdateAt { get; set; }
+        public string Operator { get; set; }
+    }
+    public class VipUpgradeList
+    {
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int CurrentVipLevel { get; set; }
+        public int UpgradeVipLevel { get; set; }
+        public string CurrentVipName { get; set; }
+        public string UpgradeVipName { get; set; }
+        public string Currency { get; set; }
+        public decimal DepositAmount { get; set; }
+        public decimal UpgradeBonus { get; set; }
+        public string CalculateTime { get; set; }
+        public int Status { get; set; }
+        public string StatusName { get; set; }
+        public int CurrencyId { get; set; }
+        public decimal ThresholdAmount { get; set; }
+    }
+    public class VipUpgradeReviewData
+    {
+        public List<VipUpgradeList> VipUpgradeList { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
+    public class VipUpgradeExport
+    {
+        public string SiteName { get; set; }
+        public string UserName { get; set; }
+        public string CurrentVipLevel { get; set; }
+        public string UpgradeVipLevel { get; set; }
+        public string Currency { get; set; }
+        public decimal DepositAmount { get; set; }
+        public decimal ThresholdAmount { get; set; }
+        public decimal UpgradeBonus { get; set; }
+        public string CalculateTime { get; set; }
+        public int Status { get; set; }
+        public string StatusName => Enum.GetName(typeof(VipStatus), Status) ;
     }
 }

@@ -13,6 +13,7 @@ import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
 import { BankLog } from './CustInfo_BankLog.jsx';
 import DateTimePicker from 'react-datetime';
 import TpBetRecord from './TpBetRecord/index';
+import VipLevel from './VipLevel/index';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -97,6 +98,7 @@ import TpBetRecord from './TpBetRecord/index';
                     <td>{DepositStatusOp[row.status]}</td>
                     <td>{row.refId}</td>
                     <td>{moment(row.depositTime).format('l LTS')}</td>
+                    <td>{moment(row.updateTime).format('l LTS')}</td>
                 </tr>
             );
 
@@ -119,6 +121,7 @@ import TpBetRecord from './TpBetRecord/index';
                                 <th scope="col">Status</th>
                                 <th scope="col">RefId</th>
                                 <th scope="col">DepositTime {moment().format('(Z)')}</th>
+                                <th scope="col">UpdateTime {moment().format('(Z)')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1170,6 +1173,12 @@ import TpBetRecord from './TpBetRecord/index';
                                         <td>{data.userName}</td>
                                     </tr>
                                     <tr>
+                                        <th scope="row">
+                                            Vip Level&nbsp;<span class="status status-pending">New</span>
+                                        </th>
+                                        <td>{data.levelName}</td>
+                                    </tr>
+                                    <tr>
                                         <th scope="row">User Level</th>
                                         {
                                             this.props.isEdit.Level ? (
@@ -1202,12 +1211,58 @@ import TpBetRecord from './TpBetRecord/index';
                                     </tr>
                                     <tr>
                                         <th scope="row">Point Level</th>
-                                        <td>{data.pointLevel}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Vip Level</th>
                                         <td>{data.vipLevel}</td>
                                     </tr>
+                                    {(data.siteName == "Nova88") ?
+                                        <tr>
+                                            <th scope="row">
+                                                Vip Level&nbsp;<span class="status status-pending">New</span>
+                                            </th>
+                                            <td>{data.levelName}</td>
+                                        </tr>
+                                        :
+                                        <>
+                                            <tr>
+                                                <th scope="row">User Level</th>
+                                                {
+                                                    this.props.isEdit.Level ? (
+                                                        <td>
+                                                            <input type="number" min="1" defaultValue={data.userLevel} onChange={(e) => this.props.editOnChange(e.target.value, "Level")} />
+                                                            <div className="button-action float-right">
+                                                                <button className="btn btn-save" onClick={this.props.editUpdate}>
+                                                                    <i className="icon-save"></i>
+                                                                </button>
+                                                                <button className="btn btn-icon-cancel" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Level, "Level")}>
+                                                                    <i className="icon-cancel"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    ) : (
+                                                            <td>
+                                                                {data.userLevel}
+                                                                {
+                                                                    subFuncKeys.includes('ca_userEdit') ? (
+                                                                        <div className="button-action float-right">
+                                                                            <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Level, "Level")}>
+                                                                                <i className="icon-edit"></i>
+                                                                            </button>
+                                                                        </div >
+                                                                    ) : null
+                                                                }
+                                                            </td>
+                                                        )
+                                                }
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Point Level</th>
+                                                <td>{data.pointLevel}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Vip Level</th>
+                                                <td>{data.vipLevel}</td>
+                                            </tr>
+                                        </>
+                                    }
                                     <tr>
                                         <th scope="row">Currency</th>
                                         <td>{i18n["lbl_Currency" + data.currencyId]}</td></tr>
@@ -1547,7 +1602,7 @@ import TpBetRecord from './TpBetRecord/index';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History", "VIP Level"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
         constructor(props) {
@@ -2090,6 +2145,8 @@ import TpBetRecord from './TpBetRecord/index';
                 dataContainer = <BankLog GetBankLog={this.GetBankLog.bind(this)} searchData={this.state.BankLogData} />
             } else if (TabName == this._Tabs[16]) {
                 dataContainer = <ReferralHistory GetReferralHistory={this.GetReferralHistory.bind(this)} searchData={this.state.ReferralHistoryData} ReferralHistory={this.state.ReferralHistory} onChangeValue={this.onChangeValue.bind(this)} />
+            } else if (TabName == this._Tabs[17]) {
+                dataContainer = <VipLevel />
             }
 
             let authSubKeys = {

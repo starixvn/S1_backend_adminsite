@@ -31,8 +31,9 @@ namespace BackendSite.Controllers.Api
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly Common common;
         private readonly PaymentBLL paymentBLL;
+        private readonly ExcelBLL excelBLL;
 
-        public CustManageController(CustInfoBLL custInfoBLL, TpBLL tpBLL, WinLostReportService winLostReportService, PermissionBLL permissionBLL, ServerInfoBLL serverInfoBLL, Common common, PaymentBLL paymentBLL)
+        public CustManageController(CustInfoBLL custInfoBLL, TpBLL tpBLL, WinLostReportService winLostReportService, PermissionBLL permissionBLL, ServerInfoBLL serverInfoBLL, Common common, PaymentBLL paymentBLL, ExcelBLL excelBLL)
         {
             this.custInfoBLL = custInfoBLL;
             this.tpBLL = tpBLL;
@@ -41,6 +42,7 @@ namespace BackendSite.Controllers.Api
             this.serverInfoBLL = serverInfoBLL;
             this.common = common;
             this.paymentBLL = paymentBLL;
+            this.excelBLL = excelBLL;
         }
         public class CustInfoListReq
         {
@@ -673,5 +675,76 @@ namespace BackendSite.Controllers.Api
             apiListResult.ErrorCode = 0;
             return apiListResult;
         }
+
+        public class TeleCSDpara
+        {
+            public string SiteIds { get; set; }
+            public string Currency { get; set; }
+            public string Deposit { get; set; }
+            public string CallOut { get; set; }
+            public string DormantUser { get; set; }
+            public string StartDate { get; set; }
+            public string EndDate { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+            public TeleCSDpara()
+            {
+                //PageSize預設10
+                if (PageSize == 0)
+                    PageSize = 10;
+            }
+        }
+
+        [HttpPost]
+        public ApiListResult<CustTele> GetTeleCSD(TeleCSDpara para)
+        {
+            var apiResult = new ApiListResult<CustTele>();
+            try
+            {
+                var SearchResult = custInfoBLL.GetTeleCSD(para.SiteIds, para.Currency, para.StartDate, para.EndDate, para.Deposit, para.DormantUser, para.CallOut, para.PageNumber, para.PageSize);
+                apiResult.Data = SearchResult.CustTeleList;
+                apiResult.PageNumber = SearchResult.PageNumber;
+                apiResult.TotalPages = SearchResult.TotalPages;
+                apiResult.RowCount = SearchResult.RowCount;
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
+        }
+
+        public class TeleCSDUpdatepara
+        {
+            public int CustId { get; set; }
+            public int SiteId { get; set; }
+        }
+        [HttpPost]
+        public ApiResult UpdateCustomerTele(TeleCSDUpdatepara para )
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                custInfoBLL.UpdateCustomerTele(para.SiteId, para.CustId, User.Identity.Name);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public IActionResult ExportTeleCSDData(string SiteIds, string Currency, string Deposit, string CallOut, string DormantUser, string StartDate, string EndDate)
+        {
+            var ExportData = custInfoBLL.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);
+            var stream = excelBLL.Export(ExportData);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"TeleCSD_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }   
     }
 }

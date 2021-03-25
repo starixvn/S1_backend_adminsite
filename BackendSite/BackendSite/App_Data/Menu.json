@@ -57,6 +57,16 @@
       },
       {
         "Key": "",
+        "Title": "Customer Statistical Report",
+        "FuncKey": "Report/CustomerStatisticalReport",
+        "Controller": "Report",
+        "Action": "CustomerStatisticalReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
         "Title": "User Online Report",
         "FuncKey": "Report/UserOnlineReport",
         "Controller": "Report",
@@ -119,6 +129,16 @@
         "FuncKey": "Message/WithdrawalKYCControl",
         "Controller": "Message",
         "Action": "WithdrawalKYCControl",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "TeleCSD",
+        "FuncKey": "CustManage/TeleCSD",
+        "Controller": "CustManage",
+        "Action": "TeleCSD",
         "Icon": "",
         "Roles": null,
         "Childs": null
@@ -383,6 +403,36 @@
         "FuncKey": "Marketing/DrawPrizeReport",
         "Controller": "Marketing",
         "Action": "DrawPrizeReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "GameCasinoManagement",
+        "Title": "Game Casino Management",
+        "FuncKey": "Marketing/GameCasinoManagement",
+        "Controller": "Marketing",
+        "Action": "GameCasinoManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "VipUpgrade",
+        "Title": "VipUpgrade",
+        "FuncKey": "Marketing/VipUpgrade",
+        "Controller": "Marketing",
+        "Action": "VipUpgrade",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "LatestHighlightVideoManagement",
+        "Title": "Latest Highlight Video Management",
+        "FuncKey": "Marketing/LatestHighlightVideoManagement",
+        "Controller": "Marketing",
+        "Action": "LatestHighlightVideoManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null

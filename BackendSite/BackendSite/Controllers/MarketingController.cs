@@ -86,5 +86,23 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
+        public IActionResult GameCasinoManagement()
+        {
+            return View();
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipUpgrade" })]
+        public IActionResult VipUpgrade()
+        {
+            return View();
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/LatestHighlightVideoManagement" })]
+        public IActionResult LatestHighlightVideoManagement()
+        {
+            return View();
+        }
     }
 }

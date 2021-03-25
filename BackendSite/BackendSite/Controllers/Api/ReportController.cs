@@ -37,6 +37,23 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        #region API Model
+
+        public class GetCustomerStatisticalReportReq
+        {
+            public IEnumerable<int> SiteIds { get; set; }
+
+            public IEnumerable<int> CurrencyIds { get; set; }
+
+            public string StartDate { get; set; }
+
+            public string EndDate { get; set; }
+
+            public string UserName { get; set; }
+        }
+
+        #endregion
+
         public class TitleModel
         {
             public string Name { get; set; }
@@ -44,7 +61,7 @@ namespace BackendSite.Controllers.Api
             public int SortId { get; set; }
         }
 
-
+        #region MainFinancial Report
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/MainFinancialReport" })]
         public ApiResult GetMainFinancialReport([FromForm] IEnumerable<int> SiteIds,
@@ -395,6 +412,10 @@ namespace BackendSite.Controllers.Api
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         $"MainFinancialReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
+
+        #endregion
+
+        #region StatisticalReport By Products
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/StatisticalReport" })]
         public ApiResult GetStatisticalReport([FromForm] IEnumerable<int> SiteIds,
@@ -1010,7 +1031,7 @@ namespace BackendSite.Controllers.Api
                 new ComplexReportExportDataToExcel()
                 {
                     SheetName = "WinLoss",
-                    Content = winLossContent,
+                    Content = winLossContent.OrderBy(x => x["Key"]),
                     Titles = Titles.OrderBy(x=> x.Value.SortId).ToDictionary(x=>x.Key,x=>x.Value.Name),
                     TotalTitles = totalTitle,
                     TitlesToMerge = titlesToMerge,
@@ -1026,6 +1047,10 @@ namespace BackendSite.Controllers.Api
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         $"StatisticalReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
+
+        #endregion
+
+        #region UserOnlineReport
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/UserOnlineReport" })]
         public ApiResult GetUserOnlineReport([FromForm] IEnumerable<int> SiteIds,
@@ -1191,6 +1216,10 @@ namespace BackendSite.Controllers.Api
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         $"UserOnlineReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
+
+        #endregion
+
+        #region Deposit Report
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/DepositReport" })]
         public ApiResult GetDepositReport([FromForm] IEnumerable<int> SiteIds,
@@ -1806,6 +1835,551 @@ namespace BackendSite.Controllers.Api
                         $"DepositReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
+        #endregion
+
+        #region StatisticalReport By Customers
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/CustomerStatisticalReport" })]
+        public ApiResult GetCustomerStatisticalReport(GetCustomerStatisticalReportReq request)
+        {
+
+            var apiResult = new ApiResult<IEnumerable<CustomerStatisticalReportModel>>();
+
+            try
+            {
+                apiResult.Data = _reportBLL.GetCustomerStatisticalReport(request.CurrencyIds,
+                                                                         JsonConvert.SerializeObject(request.SiteIds),
+                                                                         JsonConvert.SerializeObject(request.CurrencyIds),
+                                                                         request.StartDate,
+                                                                         request.EndDate,
+                                                                         request.UserName);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.Message;
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public IActionResult ExportCustomerStatisticalReport(string SiteIds,
+                                               string CurrencyIds,
+                                               string StartDate,
+                                               string EndDate,
+                                               string UserName)
+        {
+
+            #region Get Data
+
+            var currencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(CurrencyIds);
+
+            var ExportData = _reportBLL.GetCustomerStatisticalReport(currencyList,
+                                                                     SiteIds,
+                                                                     CurrencyIds,
+                                                                     StartDate,
+                                                                     EndDate,
+                                                                     UserName);
+
+            var currencyData = _reportBLL.GetCurrency();
+
+            #endregion
+
+            #region Initial Param
+
+            currencyList = ExportData.Select(x => x.CurrencyId).Distinct();
+
+            List<Dictionary<string, MergeTitleModel>> summaryTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
+            List<Dictionary<string, MergeTitleModel>> byDateTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
+            Dictionary<string, TitleModel> SummaryTitles = new Dictionary<string, TitleModel>();
+            Dictionary<string, TitleModel> ByDateTitles = new Dictionary<string, TitleModel>();
+
+            List<Dictionary<string, dynamic>> summaryContent = new List<Dictionary<string, dynamic>>();
+            List<Dictionary<string, dynamic>> byDateContent = new List<Dictionary<string, dynamic>>();
+
+            #endregion
+
+            #region Set Title(Title & Total Title & Merge Title & Not Summary Title)
+
+            #region Titles To Merge
+
+            Dictionary<string, MergeTitleModel> summaryMergeTitles = new Dictionary<string, MergeTitleModel>();
+            Dictionary<string, MergeTitleModel> byDateMergeTitles = new Dictionary<string, MergeTitleModel>();
+
+            summaryMergeTitles.Add("FirstMergeTitle", new MergeTitleModel { Name = "", MergeRange = 3 });
+
+            summaryMergeTitles.Add("TurnOverValidBet", new MergeTitleModel { Name = "TurnOver(ValidBet)", MergeRange = currencyList.Count() + 1 });
+            summaryMergeTitles.Add("WinLoss", new MergeTitleModel { Name = "WinLoss", MergeRange = currencyList.Count() + 1 });
+
+            summaryTitlesToMerge.Add(summaryMergeTitles);
+
+            byDateMergeTitles.Add("FirstMergeTitle", new MergeTitleModel { Name = "", MergeRange = 4 });
+
+            byDateMergeTitles.Add("TurnOverValidBet", new MergeTitleModel { Name = "TurnOver(ValidBet)", MergeRange = currencyList.Count() + 1 });
+            byDateMergeTitles.Add("WinLoss", new MergeTitleModel { Name = "WinLoss", MergeRange = currencyList.Count() + 1 });
+
+            byDateTitlesToMerge.Add(byDateMergeTitles);
+
+            #endregion
+
+            #region Title
+
+            SummaryTitles.Add("UserName", new TitleModel { Name = "User Name", SortId = 1 });
+            SummaryTitles.Add("CategoryName", new TitleModel { Name = "Category Name", SortId = 2 });
+            SummaryTitles.Add("GameName", new TitleModel { Name = "Game Name", SortId = 3 });
+            SummaryTitles.Add("TurnOverValidBetInMYR", new TitleModel { Name = "Total in MYR", SortId = 200 });
+            SummaryTitles.Add("WinLossInMYR", new TitleModel { Name = "Total in MYR", SortId = 400 });
+
+            ByDateTitles.Add("UserName", new TitleModel { Name = "User Name", SortId = 1 });
+            ByDateTitles.Add("Date", new TitleModel { Name = "Date", SortId = 2 });
+            ByDateTitles.Add("CategoryName", new TitleModel { Name = "Category Name", SortId = 3 });
+            ByDateTitles.Add("GameName", new TitleModel { Name = "Game Name", SortId = 4 });
+            ByDateTitles.Add("TurnOverValidBetInMYR", new TitleModel { Name = "Total in MYR", SortId = 200 });
+            ByDateTitles.Add("WinLossInMYR", new TitleModel { Name = "Total in MYR", SortId = 400 });
+
+            foreach (var curr in currencyList)
+            {
+                string isoCode = currencyData.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+
+                var TurnOverValidBetPropName = $"TurnOverValidBet-{isoCode}";
+                var WinLossPropName = $"WinLoss-{isoCode}";
+
+                var turnOverValidBetSortId = 100 + curr;
+                var winLossSortId = 300 + curr;
+
+                SummaryTitles.Add(TurnOverValidBetPropName, new TitleModel { Name = isoCode, SortId = turnOverValidBetSortId });
+                SummaryTitles.Add(WinLossPropName, new TitleModel { Name = isoCode, SortId = winLossSortId });
+
+                ByDateTitles.Add(TurnOverValidBetPropName, new TitleModel { Name = isoCode, SortId = turnOverValidBetSortId });
+                ByDateTitles.Add(WinLossPropName, new TitleModel { Name = isoCode, SortId = winLossSortId });
+            }
+
+            #endregion
+
+            #region Total Title
+
+            List<string> totalTitle = new List<string>
+            {
+                "TurnOverValidBetInMYR", "WinLossInMYR",
+            };
+
+            #endregion
+
+            #region Group Title
+
+            List<string> groupTitle = new List<string>
+            {
+                "GameName","CategoryName"
+            };
+
+            #endregion
+
+            #region Not Summary Title
+
+            List<string> notSummaryTitles = new List<string>
+            {   "Key", "Date",
+                "CustId", "UserName",
+                "CurrencyId", "Currency",
+                "CategoryId", "CategoryName",
+                "GameId", "GameName"
+            };
+
+            #endregion
+
+            #endregion
+
+            foreach (var item in ExportData)
+            {
+                //CurrencyPropName
+                var TurnOverValidBetPropName = $"TurnOverValidBet-{item.IsoCode}";
+                var WinLossPropName = $"WinLoss-{item.IsoCode}";
+
+                #region Summary Find Define
+
+                var getSummaryKey = $"{item.CustId}-{item.CategoryId}-{item.GameId}";
+
+                var getSummaryItem = summaryContent.FirstOrDefault(x =>
+                    x.Any(y => y.Key == "Key" && (string)y.Value == getSummaryKey)
+                );
+
+                var getCategoryKey = $"{item.CustId}-{item.CategoryId}-Total";
+
+                var getSummaryCategoryItem = summaryContent.FirstOrDefault(x =>
+                    x.Any(y => y.Key == "Key" && (string)y.Value == getCategoryKey)
+                );
+
+                var getUserNameKey = $"{item.CustId}-Total-Total";
+
+                var getSummaryUserNameItem = summaryContent.FirstOrDefault(x =>
+                    x.Any(y => y.Key == "Key" && (string)y.Value == getUserNameKey)
+                );
+
+                #endregion
+
+                #region ByDate Find Define
+
+                var getByDateKey = $"{item.Date}-{item.CustId}-{item.CategoryId}-{item.GameId}";
+
+                var getUserItem = byDateContent.FirstOrDefault(x =>
+                    x.Any(y => y.Key == "Key" && (string)y.Value == getByDateKey)
+                );
+
+                var getByDateUserNameKey = $"{item.CustId}-Total-Total";
+
+                var getByDateUserItem = byDateContent.FirstOrDefault(x =>
+                    x.Any(y => y.Key == "Key" && (string)y.Value == getByDateUserNameKey)
+                );
+
+                #endregion
+
+                #region Summary Content Add
+
+                if (getSummaryItem != null)
+                {
+                    getSummaryItem.TryGetValue("TurnOverValidBetInMYR", out dynamic turnOverValidBet);
+                    getSummaryItem["TurnOverValidBetInMYR"] = (decimal)turnOverValidBet + item.TurnOverValidBetSummaryInMYR;
+
+                    getSummaryItem.TryGetValue("WinLossInMYR", out dynamic winLoss);
+                    getSummaryItem["WinLossInMYR"] = (decimal)winLoss + item.WinLossSummaryInMYR;
+
+                    //TurnOverValidBet
+                    if (getSummaryItem.ContainsKey(TurnOverValidBetPropName))
+                    {
+                        getSummaryItem.TryGetValue(TurnOverValidBetPropName, out dynamic turnoverdata);
+                        getSummaryItem[TurnOverValidBetPropName] = (decimal)turnoverdata + item.TurnOverValidBetSummary;
+                    }
+                    else
+                    {
+                        getSummaryItem.Add(TurnOverValidBetPropName, item.TurnOverValidBetSummary);
+                    }
+
+                    //WinLoss
+                    if (getSummaryItem.ContainsKey(WinLossPropName))
+                    {
+                        getSummaryItem.TryGetValue(WinLossPropName, out dynamic winlossdata);
+                        getSummaryItem[WinLossPropName] = (decimal)winlossdata + item.WinLossSummary;
+                    }
+                    else
+                    {
+                        getSummaryItem.Add(WinLossPropName, item.WinLossSummary);
+                    }
+                }
+                else
+                {
+                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    {
+                        { "Key", getSummaryKey },
+                        { "CustId", item.CustId },
+                        { "UserName", item.UserName },
+                        { "CategoryId", item.CategoryId },
+                        { "CategoryName", item.CategoryName },
+                        { "GameId", item.GameId },
+                        { "GameName", item.GameName },
+                        { "CurrencyId", item.CurrencyId },
+                        { "Currency", item.IsoCode },
+
+                        { TurnOverValidBetPropName,  item.TurnOverValidBetSummary },
+                        { WinLossPropName, item.WinLossSummary },
+
+                        { "TurnOverValidBetInMYR", item.TurnOverValidBetSummaryInMYR },
+                        { "WinLossInMYR", item.WinLossSummaryInMYR }
+                    };
+
+                    summaryContent.Add(newItem);
+                }
+
+                if (getSummaryCategoryItem != null)
+                {
+                    getSummaryCategoryItem.TryGetValue("TurnOverValidBetInMYR", out dynamic today);
+                    getSummaryCategoryItem["TurnOverValidBetInMYR"] = (decimal)today + item.TurnOverValidBetSummaryInMYR;
+
+                    getSummaryCategoryItem.TryGetValue("WinLossInMYR", out dynamic withdrawal);
+                    getSummaryCategoryItem["WinLossInMYR"] = (decimal)withdrawal + item.WinLossSummaryInMYR;
+
+                    //TurnOverValidBet
+                    if (getSummaryCategoryItem.ContainsKey(TurnOverValidBetPropName))
+                    {
+                        getSummaryCategoryItem.TryGetValue(TurnOverValidBetPropName, out dynamic turnOverValidBet);
+                        getSummaryCategoryItem[TurnOverValidBetPropName] = (decimal)turnOverValidBet + item.TurnOverValidBetSummary;
+                    }
+                    else
+                    {
+                        getSummaryCategoryItem.Add(TurnOverValidBetPropName, item.TurnOverValidBetSummary);
+                    }
+
+                    //WinLoss
+                    if (getSummaryCategoryItem.ContainsKey(WinLossPropName))
+                    {
+                        getSummaryCategoryItem.TryGetValue(WinLossPropName, out dynamic winLoss);
+                        getSummaryCategoryItem[WinLossPropName] = (decimal)winLoss + item.WinLossSummary;
+                    }
+                    else
+                    {
+                        getSummaryCategoryItem.Add(WinLossPropName, item.WinLossSummary);
+                    }
+
+                }
+                else
+                {
+                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    {
+                        { "Key", getCategoryKey },
+                        { "CustId", item.CustId },
+                        { "UserName", item.UserName },
+                        { "CurrencyId", item.CurrencyId },
+                        { "Currency", item.IsoCode },
+                        { "CategoryId", item.CategoryId },
+                        { "CategoryName", item.CategoryName },
+                        { "GameId", 999999999 },
+                        { "GameName", "TOTAL：" },
+
+                        { TurnOverValidBetPropName,  item.TurnOverValidBetSummary },
+                        { WinLossPropName, item.WinLossSummary },
+
+                        { "TurnOverValidBetInMYR", item.TurnOverValidBetSummaryInMYR },
+                        { "WinLossInMYR", item.WinLossSummaryInMYR }
+                    };
+
+                    summaryContent.Add(newItem);
+                }
+
+                if (getSummaryUserNameItem != null)
+                {
+                    getSummaryUserNameItem.TryGetValue("TurnOverValidBetInMYR", out dynamic turnOverValidBetInMYR);
+                    getSummaryUserNameItem["TurnOverValidBetInMYR"] = (decimal)turnOverValidBetInMYR + item.TurnOverValidBetSummaryInMYR;
+
+                    getSummaryUserNameItem.TryGetValue("WinLossInMYR", out dynamic winLossInMYR);
+                    getSummaryUserNameItem["WinLossInMYR"] = (decimal)winLossInMYR + item.WinLossSummaryInMYR;
+
+                    //TurnOverValidBet
+                    if (getSummaryUserNameItem.ContainsKey(TurnOverValidBetPropName))
+                    {
+                        getSummaryUserNameItem.TryGetValue(TurnOverValidBetPropName, out dynamic turnOverValidBet);
+                        getSummaryUserNameItem[TurnOverValidBetPropName] = (decimal)turnOverValidBet + item.TurnOverValidBetSummary;
+                    }
+                    else
+                    {
+                        getSummaryUserNameItem.Add(TurnOverValidBetPropName, item.TurnOverValidBetSummary);
+                    }
+
+                    //WinLoss
+                    if (getSummaryUserNameItem.ContainsKey(WinLossPropName))
+                    {
+                        getSummaryUserNameItem.TryGetValue(WinLossPropName, out dynamic winLoss);
+                        getSummaryUserNameItem[WinLossPropName] = (decimal)winLoss + item.WinLossSummary;
+                    }
+                    else
+                    {
+                        getSummaryUserNameItem.Add(WinLossPropName, item.WinLossSummary);
+                    }
+
+                }
+                else
+                {
+                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    {
+                        { "Key", getUserNameKey },
+                        { "CustId", item.CustId },
+                        { "UserName", item.UserName },
+                        { "CurrencyId", item.CurrencyId },
+                        { "Currency", item.IsoCode },
+                        { "CategoryId", 999999999 },
+                        { "CategoryName", "USER" },
+                        { "GameId", 999999999 },
+                        { "GameName", "TOTAL：" },
+
+                        { TurnOverValidBetPropName,  item.TurnOverValidBetSummary },
+                        { WinLossPropName, item.WinLossSummary },
+
+                        { "TurnOverValidBetInMYR", item.TurnOverValidBetSummaryInMYR },
+                        { "WinLossInMYR", item.WinLossSummaryInMYR }
+                    };
+
+                    summaryContent.Add(newItem);
+                }
+
+                #endregion
+
+                #region ByDate Content Add
+
+                if (getUserItem != null)
+                {
+                    getUserItem.TryGetValue("TurnOverValidBetInMYR", out dynamic turnOverValidBet);
+                    getUserItem["TurnOverValidBetInMYR"] = (decimal)turnOverValidBet + item.TurnOverValidBetSummaryInMYR;
+
+                    getUserItem.TryGetValue("WinLossInMYR", out dynamic winLoss);
+                    getUserItem["WinLossInMYR"] = (decimal)winLoss + item.WinLossSummaryInMYR;
+
+                    //TurnOver
+                    if (getUserItem.ContainsKey(TurnOverValidBetPropName))
+                    {
+                        getUserItem.TryGetValue(TurnOverValidBetPropName, out dynamic turnoverdata);
+                        getUserItem[TurnOverValidBetPropName] = (decimal)turnoverdata + item.TurnOverValidBetSummaryInMYR;
+                    }
+                    else
+                    {
+                        getUserItem.Add(TurnOverValidBetPropName, item.TurnOverValidBetSummaryInMYR);
+                    }
+
+                    //WinLoss
+                    if (getUserItem.ContainsKey(WinLossPropName))
+                    {
+                        getUserItem.TryGetValue(WinLossPropName, out dynamic winlossdata);
+                        getUserItem[WinLossPropName] = (decimal)winlossdata + item.WinLossSummaryInMYR;
+                    }
+                    else
+                    {
+                        getUserItem.Add(WinLossPropName, item.WinLossSummaryInMYR);
+                    }
+                }
+                else
+                {
+                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    {
+                        { "Key", getByDateKey },
+                        { "Date", item.Date },
+                        { "CustId", item.CustId },
+                        { "UserName", item.UserName },
+                        { "CategoryId", item.CategoryId },
+                        { "CategoryName", item.CategoryName },
+                        { "GameId", item.GameId },
+                        { "GameName", item.GameName },
+                        { "CurrencyId", item.CurrencyId },
+                        { "Currency", item.IsoCode },
+
+                        { TurnOverValidBetPropName,  item.TurnOverValidBetSummary },
+                        { WinLossPropName, item.WinLossSummary },
+
+                        { "TurnOverValidBetInMYR", item.TurnOverValidBetSummaryInMYR },
+                        { "WinLossInMYR", item.WinLossSummaryInMYR }
+                    };
+
+                    byDateContent.Add(newItem);
+                }
+
+                if (getByDateUserItem != null)
+                {
+                    getByDateUserItem.TryGetValue("TurnOverValidBetInMYR", out dynamic turnOverValidBetInMYR);
+                    getByDateUserItem["TurnOverValidBetInMYR"] = (decimal)turnOverValidBetInMYR + item.TurnOverValidBetSummaryInMYR;
+
+                    getByDateUserItem.TryGetValue("WinLossInMYR", out dynamic winLossInMYR);
+                    getByDateUserItem["WinLossInMYR"] = (decimal)winLossInMYR + item.WinLossSummaryInMYR;
+
+                    //TurnOverValidBet
+                    if (getByDateUserItem.ContainsKey(TurnOverValidBetPropName))
+                    {
+                        getByDateUserItem.TryGetValue(TurnOverValidBetPropName, out dynamic turnOverValidBet);
+                        getByDateUserItem[TurnOverValidBetPropName] = (decimal)turnOverValidBet + item.TurnOverValidBetSummary;
+                    }
+                    else
+                    {
+                        getByDateUserItem.Add(TurnOverValidBetPropName, item.TurnOverValidBetSummary);
+                    }
+
+                    //WinLoss
+                    if (getByDateUserItem.ContainsKey(WinLossPropName))
+                    {
+                        getByDateUserItem.TryGetValue(WinLossPropName, out dynamic winLoss);
+                        getByDateUserItem[WinLossPropName] = (decimal)winLoss + item.WinLossSummary;
+                    }
+                    else
+                    {
+                        getByDateUserItem.Add(WinLossPropName, item.WinLossSummary);
+                    }
+
+                }
+                else
+                {
+                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    {
+                        { "Key", getByDateUserNameKey },
+                        { "Date", "USER" },
+                        { "CustId", item.CustId },
+                        { "UserName", item.UserName },
+                        { "CurrencyId", item.CurrencyId },
+                        { "Currency", item.IsoCode },
+                        { "CategoryId", 999999999 },
+                        { "CategoryName", "DATE" },
+                        { "GameId", 999999999 },
+                        { "GameName", "TOTAL：" },
+
+                        { TurnOverValidBetPropName,  item.TurnOverValidBetSummary },
+                        { WinLossPropName, item.WinLossSummary },
+
+                        { "TurnOverValidBetInMYR", item.TurnOverValidBetSummaryInMYR },
+                        { "WinLossInMYR", item.WinLossSummaryInMYR }
+                    };
+
+                    byDateContent.Add(newItem);
+                }
+
+                #endregion
+            }
+
+            #region Merge Content Rule
+
+            #region Summary
+
+            var custIdList = ExportData.Select(x => x.CustId).Distinct().OrderBy(x => x);
+            List<int> summaryMergeContentRule = new List<int>();
+
+            foreach (var custId in custIdList)
+            {
+                summaryMergeContentRule.Add(summaryContent.Where(x => x["CustId"] == custId).Count());
+            }
+
+            #endregion
+
+            #region ByDate
+
+            List<int> byDateMergeContentRule = new List<int>();
+
+            foreach (var custId in custIdList)
+            {
+                byDateMergeContentRule.Add(byDateContent.Where(x => x["CustId"] == custId).Count());
+            }
+
+            #endregion
+
+            #endregion
+
+            List<ComplexReportExportDataToExcel> d = new List<ComplexReportExportDataToExcel>()
+            {
+                new ComplexReportExportDataToExcel()
+                {
+                    SheetName = "UserSummary",
+                    Content = summaryContent.OrderBy(x => x["CustId"]).ThenBy(x=>x["CategoryId"]).ThenBy(x=>x["GameId"]).ThenBy(x=>x["Key"]),
+                    Titles = SummaryTitles.OrderBy(x=> x.Value.SortId).ToDictionary(x=>x.Key,x=>x.Value.Name),
+                    TotalTitles = totalTitle,
+                    TitlesToMerge = summaryTitlesToMerge,
+                    NotSummaryTitles = notSummaryTitles,
+                    MergeContentRules = summaryMergeContentRule,
+                    GroupTitles = groupTitle
+                },
+                new ComplexReportExportDataToExcel()
+                {
+                    SheetName = "UserByDate",
+                    Content = byDateContent.OrderBy(x => x["CustId"]).ThenBy(x=>x["Date"]),
+                    Titles = ByDateTitles.OrderBy(x=> x.Value.SortId).ToDictionary(x=>x.Key,x=>x.Value.Name),
+                    TotalTitles = totalTitle,
+                    TitlesToMerge = byDateTitlesToMerge,
+                    NotSummaryTitles = notSummaryTitles,
+                    MergeContentRules = byDateMergeContentRule,
+                    GroupTitles = groupTitle
+                }
+            };
+
+            var stream = _reportExcelBLL.ComplexReportExportToMultiSheet(d);
+
+            return File(stream,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        $"StatisticalReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
+
+        #endregion
 
     }
 }

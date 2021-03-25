@@ -121,9 +121,28 @@ module.exports = {
 		// 	"@babel/polyfill",
 		// 	"./src/pages/Marketing/ReferralManagement/index.js"
 		// ],
-		"Marketing/DrawPrizeReport.min": [
+		// "Marketing/DrawPrizeReport.min": [
+		// 	"@babel/polyfill",
+		// 	"./src/pages/Marketing/DrawPrizeReport/index.js"
+		// ],
+		// "Report/CustomerStatisticalReport.min": [
+		// 	"./src/pages/Report/CustomerStatisticalReport/index.js"
+		// ],
+		// "Marketing/GameCasinoManagement.min": [
+		// 	"@babel/polyfill",
+		// 	"./src/pages/Marketing/GameCasinoManagement/index.js"
+		// ]
+		// "CSD/TeleCSD.min": [
+		// 	"@babel/polyfill",
+		// 	"./src/pages/CSD/TeleCSD/index.js"
+		// ],
+		"Marketing/VipUpgrade.min": [
 			"@babel/polyfill",
-			"./src/pages/Marketing/DrawPrizeReport/index.js"
+			"./src/pages/Marketing/VipUpgrade/index.js"
+		],
+		"Marketing/LatestHighlightVideoManagement.min": [
+			"@babel/polyfill",
+			"./src/pages/Marketing/LatestHighlightVideoManagement/index.js"
 		]
 	},
 	output: {

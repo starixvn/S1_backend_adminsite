@@ -28,26 +28,27 @@ namespace BackendSite.Service.DAL
             this.withdrawalLimitService = withdrawalLimitService;
         }
 
-        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, long startDate, long endDate, int siteId, string DepositId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, long startDate, long endDate, int siteId, string DepositId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             var SelectSite = JsonConvert.SerializeObject(selectSite);
             var DepositType = JsonConvert.SerializeObject(depositType);
             var CurrencyId = JsonConvert.SerializeObject(currencyId);
             var Status = JsonConvert.SerializeObject(status);
+            var VipStatus = JsonConvert.SerializeObject(levelstatus);
             int depositId = 0;
             if (!string.IsNullOrWhiteSpace(DepositId))
             {
                 Match m = Regex.Match(DepositId, @"\d+");
                 int.TryParse(m.Value, out depositId);
             }
-            var p = new DynamicParameters(new { SelectSite, DepositType, StartDate = startDate, EndDate = endDate, SiteId = siteId, DepositId = depositId, TransId = DepositId, UserName, CurrencyId, Status, PageSize = pageSize });
+            var p = new DynamicParameters(new { SelectSite, DepositType, StartDate = startDate, EndDate = endDate, SiteId = siteId, DepositId = depositId, TransId = DepositId, UserName, CurrencyId, Status, VipStatus= VipStatus, PageSize = pageSize });
             p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var depositList = conn.Query<DepositRequest>("Admin_DepositListV2_Get", p, commandType: CommandType.StoredProcedure);
+            var depositList = conn.Query<DepositRequest>("Admin_DepositListV5_Get", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -177,7 +178,7 @@ namespace BackendSite.Service.DAL
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.QueryFirstOrDefault<DepositReceipt>("DepositReceipt_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string depositType, long startDate, long endDate, string DepositId, string UserName, string currencyId, string status)
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string depositType, long startDate, long endDate, string DepositId, string UserName, string currencyId, string status,string LevelStatus)
         {
             //var SelectSite = JsonConvert.SerializeObject(selectSite);
 
@@ -185,6 +186,7 @@ namespace BackendSite.Service.DAL
             var DepositType = $"[{depositType}]";
             var CurrencyId = $"[{currencyId}]";
             var Status = $"[{status}]";
+            var VipStatus = $"[{LevelStatus}]";
 
             int depositId = 0;
             if (!string.IsNullOrWhiteSpace(DepositId))
@@ -192,10 +194,9 @@ namespace BackendSite.Service.DAL
                 Match m = Regex.Match(DepositId, @"\d+");
                 int.TryParse(m.Value, out depositId);
             }
-            var p = new DynamicParameters(new { SelectSite, DepositType, StartDate = startDate, EndDate = endDate, DepositId = depositId, TransId = DepositId, UserName, CurrencyId, Status });
-
+            var p = new DynamicParameters(new { SelectSite, DepositType, StartDate = startDate, EndDate = endDate, DepositId = depositId, TransId = DepositId, UserName, CurrencyId, Status, VipStatus = VipStatus });
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var depositList = conn.Query<DepositInfoForExport>("Admin_DepositListForExportV2_Get", p, commandType: CommandType.StoredProcedure);
+            var depositList = conn.Query<DepositInfoForExport>("Admin_DepositListForExportV5_Get", p, commandType: CommandType.StoredProcedure);
             return depositList;
         }
         public IEnumerable<DepositLimitCurrencyInfo> GetDepositLimitCurrencyList(int siteId, int depositType)

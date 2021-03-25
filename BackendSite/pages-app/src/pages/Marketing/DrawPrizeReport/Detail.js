@@ -22,13 +22,14 @@ const Panel = (props) => {
     let Data = {
       PrizeId: props.PrizeId,
       EventId: props.EventId,
+      PrizeName: props.PrizeName,
       StartDate: moment(props.EventTime).unix(),
       EndDate: moment(props.EventTime).add(1, "days").unix() - 1,
       EventTime: moment(props.EventTime).format("YYYY-MM-DD"),
       PageNumber: 1,
     };
     api
-      .post("/api/BonusManage/GetPrizeLog", Data)
+      .post("/api/DrawPrizeReport/GetPrizeLog", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           setDetailBody(res.data.data);
@@ -52,13 +53,14 @@ const Panel = (props) => {
     let Data = {
       PrizeId: props.PrizeId,
       EventId: props.EventId,
+      PrizeName: props.PrizeName,
       StartDate: moment(props.EventTime).unix(),
       EndDate: moment(props.EventTime).add(1, "days").unix() - 1,
       EventTime: moment(props.EventTime).format("YYYY-MM-DD"),
       PageNumber: PageNumber,
     };
     api
-      .post("/api/BonusManage/GetPrizeLog", Data)
+      .post("/api/DrawPrizeReport/GetPrizeLog", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           setDetailBody(res.data.data);

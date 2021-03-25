@@ -16,6 +16,7 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
+        public string EventName { get; set; }
 
         public PrizeSelect()
         {
@@ -31,6 +32,7 @@ namespace BackendSite.Service.Model
         public int EventId { get; set; }
         public int PrizeId { get; set; }
         public string EventTime { get; set; }
+        public string PrizeName { get; set; }
         public PrizeLogPara()
         {
             //PageSize預設10
@@ -54,6 +56,7 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public string EventDate { get; set; }
         public DateTime EventTime { get; set; }
+        public string EventName { get; set; }
     }
     public class PrizeLogData
     {
@@ -74,5 +77,18 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
     }
+    public class EventDraw
+    {
+        public string EventName { get; set; }
+    }
 
+    public class DrawPrizeExcelData
+    {
+        public string EventDate { get; set; }
+        public string EventName { get; set; }
+        public string SiteName { get; set; }
+        public string Currency { get; set; }
+        public string PrizeName { get; set; }
+        public string UserName { get; set; }
+    }
 }

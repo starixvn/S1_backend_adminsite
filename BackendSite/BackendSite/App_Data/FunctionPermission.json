@@ -23,6 +23,11 @@
         "Enable": false
       },
       {
+        "DisplayKey": "Customer Statistical Report",
+        "FuncKey": "Report/CustomerStatisticalReport",
+        "Enable": false
+      },
+      {
         "DisplayKey": "User Online Report",
         "FuncKey": "Report/UserOnlineReport",
         "Enable": false
@@ -97,6 +102,10 @@
           {
             "DisplayKey": "Email Verified",
             "FuncKey": "ca_emailVerified"
+          },
+          {
+            "DisplayKey": "VIP Level Edit",
+            "FuncKey": "ca_vipLevelEdit"
           }
         ]
       },
@@ -119,6 +128,18 @@
         "DisplayKey": "Withdrawal KYC Control",
         "FuncKey": "Message/WithdrawalKYCControl",
         "Enable": false
+      },
+      {
+        "DisplayKey": "TeleCSD",
+        "FuncKey": "CustManage/TeleCSD",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Export Excel",
+            "FuncKey": "tele_export_excel"
+          }
+        ]
       }
     ]
   },
@@ -285,6 +306,43 @@
       {
         "DisplayKey": "Draw Prize Report",
         "FuncKey": "Marketing/DrawPrizeReport",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Game Casino Management",
+        "FuncKey": "Marketing/GameCasinoManagement",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit Main",
+            "FuncKey": "gcm_edit_main"
+          },
+          {
+            "DisplayKey": "Edit Detail",
+            "FuncKey": "gcm_edit_detail"
+          }
+        ]
+      },
+      {
+        "DisplayKey": "VipUpgrade",
+        "FuncKey": "Marketing/VipUpgrade",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Export Excel",
+            "FuncKey": "vipupgrade_export_excel"
+          },
+          {
+            "DisplayKey": "Upgrade",
+            "FuncKey": "vipupgrade_Upgrade"
+          }
+        ]
+      },
+      {
+        "DisplayKey": "Latest Highlight Video Management",
+        "FuncKey": "Marketing/LatestHighlightVideoManagement",
         "Enable": false
       }
     ]

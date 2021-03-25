@@ -43,6 +43,16 @@ import DateTimePicker from 'react-datetime';
         7: "Rejected",
     }
 
+    const LevelStatus = {
+        0: 0,
+        1: 1,
+        2: 2,
+        3: 3,
+        4: 4,
+        5: 5,
+        6: 6
+    }
+
     class WithdrawalList extends React.Component {
         constructor(props) {
             super(props);
@@ -65,6 +75,8 @@ import DateTimePicker from 'react-datetime';
 
             let rows = this.props.searchData.data.map(row => {
                 let styleblod = (row.flag === 0) ? { fontWeight: 'bold' } : {};
+                //銅=>銀=>金=>白金=>水鑽藍=>紅寶石
+                let vipbg = (row.vipLevel === 1 ) ? "c6842c": (row.vipLevel === 2 ) ? "c0c0c0" : (row.vipLevel === 3 ) ? "ffd700" : (row.vipLevel === 4 ) ? "66CDAA" :　(row.vipLevel === 5) ? "4169E1" : (row.vipLevel === 6) ? "B22222" : null;
                 return (
                     <tr key={row.transId} style={styleblod}>
                         <th scope="row">
@@ -78,10 +90,11 @@ import DateTimePicker from 'react-datetime';
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
                         <td className="text-right">{number_format(row.amount)}</td>
                         <td>{row.bankName}</td>
-                        <td>{row.accountNo}</td>
-                        <td>{row.accountName}</td>
+                        {/* <td>{row.accountNo}</td>
+                        <td>{row.accountName}</td> */}
                         <td>{moment(row.createTime).format('l LTS')}</td>
                         <td>{row.updateTime ? moment(row.updateTime).format('l LTS') : null}</td>
+                        {row.vipLevel === 0 ? <td>{row.vipLevelName}</td> : <td bgcolor={vipbg}>{row.vipLevelName}</td>}
                         <td className="text-right">{row.withdrawlCnt}</td>
                         <td>{WithdrawalStatusOp[row.status]}{row.status == 8 && row.hasPhotoId ? <span>(Uploaded PhothId)</span> : null} </td>
                     </tr>
@@ -111,17 +124,18 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">Trxn.ID</th>
                                 {/* <th scope="col">Calvin Code</th> */}
                                 <th scope="col">{i18n.lbl_WithdrawalType}</th>
-                                <th scope="col">Is Kyc</th>
-                                <th scope="col">Is Risk</th>
+                                <th scope="col">Kyc</th>
+                                <th scope="col">Risk</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
-                                <th scope="col">CCY</th>
+                                <th scope="col">Currency</th>
                                 <th scope="col" className="text-right">{i18n.lbl_Amount}</th>
                                 <th scope="col">Bank Name</th>
-                                <th scope="col">To Acc. NO.</th>
-                                <th scope="col">To Acc. Name</th>
+                                {/* <th scope="col">To Acc. NO.</th>
+                                <th scope="col">To Acc. Name</th> */}
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Update Time (" + moment().format('Z') + ")"}</th>
-                                <th scope="col" className="text-right">Total Withdrawl Count</th>
+                                <th scope="col">VIP Level</th>
+                                <th scope="col" className="text-right">Withdrawl Count</th>
                                 <th scope="col">{i18n.lbl_Status}</th>
                             </tr>
                         </thead>
@@ -454,11 +468,11 @@ import DateTimePicker from 'react-datetime';
                                 <td>{i18n["lbl_WithdrawalStatus" + data.status]}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Is Kyc</th>
+                                <th scope="row">Kyc</th>
                                 <td>{data.isKyc === 1 ? "YES" : "NO"}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Is Risk</th>
+                                <th scope="row">Risk</th>
                                 <td>{data.isRisk === 1 ? "YES" : "NO"}</td>
                             </tr>
                             <tr>
@@ -507,7 +521,7 @@ import DateTimePicker from 'react-datetime';
                                 <td>{data.refId}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Total Withdrawl Count</th>
+                                <th scope="row">Withdrawl Count</th>
                                 <td>{data.withdrawlCnt}</td>
                             </tr>
                             <tr>
@@ -540,7 +554,7 @@ import DateTimePicker from 'react-datetime';
             this.selectdate_start = React.createRef();
             this.selectdate_end = React.createRef();
             this.ExportForm = React.createRef();
-            this.state = { SiteList: [], selectSite: [], selectType: [], selectCurrency: [], selectStatus: [], SelectUser: "", SelectWithdrawalID: "", ShowDetial: false, timeInterval: this._timeInterval, IsRefresh: false, MutiSelRefresh: false };
+            this.state = { SiteList: [], selectSite: [], selectType: [], selectCurrency: [], selectStatus: [], SelectUser: "", SelectWithdrawalID: "", ShowDetial: false, timeInterval: this._timeInterval, IsRefresh: false, MutiSelRefresh: false ,levelStatus: []};
             this.searchFilter = {};
         }
 
@@ -583,6 +597,10 @@ import DateTimePicker from 'react-datetime';
                 data.CurrencyID = this.searchFilter.selectCurrency;
             }
 
+            if (this.searchFilter.levelStatus.length != 0) {
+                data.LevelStatus = this.searchFilter.levelStatus;
+            }
+            
             axios.post('/api/Withdrawal/GetWithdrawalRequestList', data)
                 .then(function (response) {
                     //Loading.UnLoading();
@@ -623,6 +641,10 @@ import DateTimePicker from 'react-datetime';
 
             if (this.searchFilter.selectCurrency.length != 0) {
                 data.CurrencyID = this.searchFilter.selectCurrency;
+            }
+
+            if (this.searchFilter.levelStatus.length != 0) {
+                data.LevelStatus = this.searchFilter.levelStatus;
             }
 
             let ExportParam = [];
@@ -845,12 +867,48 @@ import DateTimePicker from 'react-datetime';
             (state.MutiSelRefresh) ? $('#selectStatus').multiselect('select', searchFilter.selectStatus) : $('#selectStatus').multiselect('select', 1);
             $('#selectStatus').multiselect('updateButtonText');
         }
+
+        //levelStatus
+        buildLevel = () => {
+            let state = this.state, searchFilter = this.searchFilter;
+            $("#levelStatus").multiselect({
+                includeSelectAllOption: true,
+                selectAllText: 'Check all!',
+                onSelectAll: function () {
+                    state.levelStatus.length = 0;
+                    Object.keys(LevelStatus).forEach(function (obj) {
+                        state.levelStatus.push(parseInt(obj));
+                    });
+                },
+                onDeselectAll: function () {
+                    state.levelStatus.length = 0;
+                },
+                onChange: function (option, checked, select) {
+                    let val = parseInt($(option).val()), index = state.levelStatus.indexOf(val);
+                    (checked) ? state.levelStatus.push(val) : (index > -1) ? state.levelStatus.splice(index, 1) : state.levelStatus;
+                    state.levelStatus.sort();
+                },
+                onInitialized: function () {
+                    state.levelStatus.length = 0;
+                    (searchFilter.levelStatus) ?
+                        searchFilter.levelStatus.forEach(function (obj) {
+                            state.levelStatus.push(parseInt(obj));
+                        })
+                        : Object.keys(LevelStatus).forEach(function (obj) {
+                            state.levelStatus.push(parseInt(obj));
+                        });
+                }
+            });
+            (state.MutiSelRefresh) ? $('#levelStatus').multiselect('select', searchFilter.levelStatus) : $('#levelStatus').multiselect('selectAll', false);
+            $('#levelStatus').multiselect('updateButtonText');
+        }
         componentDidUpdate() {
             if (this.state.MutiSelRefresh) {
                 this.buildSelectSite();
                 this.buildTypeSite();
                 this.buildCurrencySite();
                 this.buildStatusSite();
+                this.buildLevel();
                 this.setState({ MutiSelRefresh: false });
             }
         }
@@ -860,6 +918,7 @@ import DateTimePicker from 'react-datetime';
             this.buildTypeSite();
             this.buildCurrencySite();
             this.buildStatusSite();
+            this.buildLevel();
             //setTimeout(thisAutoRefresh, 2000);
         }
 
@@ -893,6 +952,11 @@ import DateTimePicker from 'react-datetime';
                 return <option key={`status-list-${obj}`} value={obj}>{StatusSelectOp[obj]}</option>;
             }.bind(this));
             statusList = <select id="selectStatus" name="selectStatus[]" multiple="multiple">{statusList}</select>;
+
+            let levelList = Object.keys(LevelStatus).map(function (obj) {
+                return <option key={`status-list-${obj}`} value={obj}>{LevelStatus[obj]}</option>;
+            }.bind(this));
+            levelList = <select id="levelStatus" name="levelStatus[]" multiple="multiple">{levelList}</select>;
 
             let searchData = this.state.searchData;
             let StartDate = this.state.StartDate;
@@ -937,6 +1001,12 @@ import DateTimePicker from 'react-datetime';
                                     <span className="label">Status</span>
                                     <div className="field">
                                         {statusList}
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">VIP Level</span>
+                                    <div className="field">
+                                        {levelList}
                                     </div>
                                 </div>
                             </div>

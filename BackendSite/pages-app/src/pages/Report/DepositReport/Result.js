@@ -1066,7 +1066,6 @@ const Panel = (props) => {
     //#endregion
 
     //#region Detail Data
-console.log('AccountDataShowLists',props.AccountDataShowLists);
     if(getDateItem)
     {
 

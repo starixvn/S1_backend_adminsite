@@ -36,6 +36,15 @@ import DateTimePicker from 'react-datetime';
         4: "Rejected",
         5: "Cancelled"
     }
+    const LevelStatus = {
+        0: 0,
+        1: 1,
+        2: 2,
+        3: 3,
+        4: 4,
+        5: 5,
+        6: 6
+    }
 
     class DepositList extends React.Component {
         constructor(props) {
@@ -63,6 +72,8 @@ import DateTimePicker from 'react-datetime';
                 // console.log(this.props.rejectChecks.list[idx]);
                 let styleblod = (row.flag === 0) ? { fontWeight: 'bold' } : {};
                 let showbankname = (row.depositType === 1) ? row.bankName + " ( " + row.payName + " ) " : (row.depositType === 2) ? row.channelName + " ( " + row.payName + " ) " : (row.depositType === 3) ? row.bankName : null;
+                //銅=>銀=>金=>白金=>水鑽藍=>紅寶石
+                let vipbg = (row.vipLevel === 1 ) ? "c6842c": (row.vipLevel === 2 ) ? "c0c0c0" : (row.vipLevel === 3 ) ? "ffd700" : (row.vipLevel === 4 ) ? "66CDAA" :　(row.vipLevel === 5) ? "4169E1" : (row.vipLevel === 6) ? "B22222" : null;
                 return (
                     <tr key={row.transId} style={styleblod}>
                         {(subFuncKeys.indexOf("f_dp_execute") > -1) ? (row.status === 1) ? <td><input type="checkbox" value={row.transId} checked={this.props.rejectChecks.list[idx].isChecked} onChange={this.props.handleChange.bind(this, row.transId)} /></td> : <td></td> : null}
@@ -81,6 +92,7 @@ import DateTimePicker from 'react-datetime';
                         <td>{row.accountName}</td>
                         <td>{moment(row.createTime).format('l LTS')}</td>
                         <td>{row.updateTime ? moment(row.updateTime).format('l LTS') : null}</td>
+                        {row.vipLevel === 0 ? <td>{row.vipLevelName}</td> : <td bgcolor={vipbg}>{row.vipLevelName}</td>}
                         <td className="text-right">{row.depositCnt}</td>
                         <td>{DepositStatusOp[row.status]}</td>
                     </tr>
@@ -108,21 +120,22 @@ import DateTimePicker from 'react-datetime';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                {(subFuncKeys.indexOf("f_dp_execute") > -1) ? <th scope="col"><input type="checkbox" checked={this.props.rejectChecks.allChecked} onChange={this.props.handleChange.bind(this, "checkAll")} />Check all</th> : null}
+                                {(subFuncKeys.indexOf("f_dp_execute") > -1) ? <th scope="col"><input type="checkbox" checked={this.props.rejectChecks.allChecked} onChange={this.props.handleChange.bind(this, "checkAll")} /></th> : null}
                                 <th scope="col">Trxn.ID</th>
                                 {/* <th scope="col">Calvin Code</th> */}
                                 <th scope="col">{i18n.lbl_DepositType}</th>
-                                <th scope="col">Is Kyc</th>
-                                <th scope="col">Is Risk</th>
+                                <th scope="col">Kyc</th>
+                                <th scope="col">Risk</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
-                                <th scope="col">CCY</th>
+                                <th scope="col">Currency</th>
                                 <th scope="col" className="text-right">{i18n.lbl_Amount}</th>
                                 <th scope="col">Bank Name</th>
                                 <th scope="col">To Acc. NO.</th>
                                 <th scope="col">To Acc. Name</th>
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Update Time (" + moment().format('Z') + ")"}</th>
-                                <th scope="col" className="text-right">Total Deposit Count</th>
+                                <th scope="col">VIP Level</th>
+                                <th scope="col" className="text-right">Deposit Count</th>
                                 <th scope="col">{i18n.lbl_Status}</th>
                             </tr>
                         </thead>
@@ -360,11 +373,11 @@ import DateTimePicker from 'react-datetime';
                                 <td>{i18n["lbl_DepositStatus" + data.status]}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Is Kyc</th>
+                                <th scope="row">Kyc</th>
                                 <td>{data.isKyc === 1 ? "YES" : "NO"}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Is Risk</th>
+                                <th scope="row">Risk</th>
                                 <td>{data.isRisk === 1 ? "YES" : "NO"}</td>
                             </tr>
                             <tr>
@@ -409,7 +422,7 @@ import DateTimePicker from 'react-datetime';
                                 <td>{data.refId}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Total Deposit Count</th>
+                                <th scope="row">Deposit Count</th>
                                 <td>{data.depositCnt}</td>
                             </tr>
                             <tr>
@@ -453,7 +466,8 @@ import DateTimePicker from 'react-datetime';
                 timeInterval: this._timeInterval,
                 IsRefresh: false,
                 MutiSelRefresh: false,
-                rejectChecks: {}
+                rejectChecks: {},
+                levelStatus: []
             };
             this.searchFilter = {};
         }
@@ -475,7 +489,7 @@ import DateTimePicker from 'react-datetime';
                 clearTimeout(this._myTimer);
             }
             //Loading.OnLoading();
-            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, PageNumber: pageNumber, SelectSite: this.searchFilter.selectSite };
+            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, PageNumber: pageNumber, SelectSite: this.searchFilter.selectSite};
 
             if (this.searchFilter.SelectDepositID != "") {
                 data.DepositId = this.searchFilter.SelectDepositID;
@@ -495,6 +509,10 @@ import DateTimePicker from 'react-datetime';
 
             if (this.searchFilter.selectCurrency.length != 0) {
                 data.CurrencyID = this.searchFilter.selectCurrency;
+            }
+
+            if (this.searchFilter.levelStatus.length != 0) {
+                data.LevelStatus = this.searchFilter.levelStatus;
             }
             axios.post('/api/Deposit/GetDepositRequestList', data)
                 .then(function (response) {
@@ -550,6 +568,11 @@ import DateTimePicker from 'react-datetime';
             if (this.searchFilter.selectCurrency.length != 0) {
                 data.CurrencyID = this.searchFilter.selectCurrency;
             }
+
+            if (this.searchFilter.levelStatus.length != 0) {
+                data.LevelStatus = this.searchFilter.levelStatus;
+            }
+        
             let ExportParam = [];
             for (var prop in data) {
                 ExportParam.push(<input key={prop} type="hidden" name={prop} value={data[prop]} />);
@@ -787,6 +810,40 @@ import DateTimePicker from 'react-datetime';
             (state.MutiSelRefresh) ? $('#selectCurrency').multiselect('select', searchFilter.selectCurrency) : $('#selectCurrency').multiselect('selectAll', false);
             $('#selectCurrency').multiselect('updateButtonText');
         }
+        //levelStatus
+        buildLevel = () => {
+            let state = this.state, searchFilter = this.searchFilter;
+            $("#levelStatus").multiselect({
+                includeSelectAllOption: true,
+                selectAllText: 'Check all!',
+                onSelectAll: function () {
+                    state.levelStatus.length = 0;
+                    Object.keys(LevelStatus).forEach(function (obj) {
+                        state.levelStatus.push(parseInt(obj));
+                    });
+                },
+                onDeselectAll: function () {
+                    state.levelStatus.length = 0;
+                },
+                onChange: function (option, checked, select) {
+                    let val = parseInt($(option).val()), index = state.levelStatus.indexOf(val);
+                    (checked) ? state.levelStatus.push(val) : (index > -1) ? state.levelStatus.splice(index, 1) : state.levelStatus;
+                    state.levelStatus.sort();
+                },
+                onInitialized: function () {
+                    state.levelStatus.length = 0;
+                    (searchFilter.levelStatus) ?
+                        searchFilter.levelStatus.forEach(function (obj) {
+                            state.levelStatus.push(parseInt(obj));
+                        })
+                        : Object.keys(LevelStatus).forEach(function (obj) {
+                            state.levelStatus.push(parseInt(obj));
+                        });
+                }
+            });
+            (state.MutiSelRefresh) ? $('#levelStatus').multiselect('select', searchFilter.levelStatus) : $('#levelStatus').multiselect('selectAll', false);
+            $('#levelStatus').multiselect('updateButtonText');
+        }
 
         buildStatusSite = () => {
             let state = this.state, searchFilter = this.searchFilter;
@@ -827,6 +884,7 @@ import DateTimePicker from 'react-datetime';
                 this.buildTypeSite();
                 this.buildCurrencySite();
                 this.buildStatusSite();
+                this.buildLevel();
                 this.setState({ MutiSelRefresh: false });
             }
         }
@@ -836,6 +894,7 @@ import DateTimePicker from 'react-datetime';
             this.buildTypeSite();
             this.buildCurrencySite();
             this.buildStatusSite();
+            this.buildLevel();
         }
 
         onCheckDetail(id) {
@@ -867,6 +926,12 @@ import DateTimePicker from 'react-datetime';
                 return <option key={`status-list-${obj}`} value={obj}>{StatusSelectOp[obj]}</option>;
             }.bind(this));
             statusList = <select id="selectStatus" name="selectStatus[]" multiple="multiple">{statusList}</select>;
+
+            let levelList = Object.keys(LevelStatus).map(function (obj) {
+                return <option key={`status-list-${obj}`} value={obj}>{LevelStatus[obj]}</option>;
+            }.bind(this));
+            levelList = <select id="levelStatus" name="levelStatus[]" multiple="multiple">{levelList}</select>;
+            
 
             let searchData = this.state.searchData;
 
@@ -913,6 +978,12 @@ import DateTimePicker from 'react-datetime';
                                     <span className="label">Status</span>
                                     <div className="field">
                                         {statusList}
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">VIP Level</span>
+                                    <div className="field">
+                                        {levelList}
                                     </div>
                                 </div>
                             </div>

@@ -38,5 +38,11 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/CustomerStatisticalReport" })]
+        public IActionResult CustomerStatisticalReport()
+        {
+            return View();
+        }
     }
 }

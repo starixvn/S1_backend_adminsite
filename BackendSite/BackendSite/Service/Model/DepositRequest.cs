@@ -55,10 +55,12 @@ namespace BackendSite.Service.Model
         //public virtual string StatusString { get; set; }
         public int IsKyc { set; get; }
         public int IsRisk { set; get; }
+        public string VipLevelName { set; get; }
         public int DepositCnt { set; get; }
         public int Flag { set; get; }
         public DateTime? UpdateTime { set; get; }
         public string ChannelName { set; get; }
+        public int VipLevel { set; get; }
     }
 
     public class DepositInfoForExport

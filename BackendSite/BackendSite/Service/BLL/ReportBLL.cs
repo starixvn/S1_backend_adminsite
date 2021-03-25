@@ -793,7 +793,7 @@ namespace BackendSite.Service.BLL
 
                 foreach (var date in dateList)
                 {
-                    
+
                     foreach (var curr in CurrencyIds)
                     {
                         if (!accountDateKeyValuePairs.ContainsKey($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-{date}-{curr}"))
@@ -828,7 +828,7 @@ namespace BackendSite.Service.BLL
 
                 }
 
-                accountItem.Value.DateData = accountDateKeyValuePairs.Where(x=>x.Key.StartsWith($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-"))
+                accountItem.Value.DateData = accountDateKeyValuePairs.Where(x => x.Key.StartsWith($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-"))
                                                                      .Select(s => s.Value)
                                                                      .OrderBy(value => value.Date)
                                                                      .ThenBy(value => value.CurrencyId)
@@ -855,6 +855,117 @@ namespace BackendSite.Service.BLL
                 SummaryCurrencyData = summaryCurrencyData,
                 SummaryTotalData = summaryTotalData
             };
+        }
+
+        public IEnumerable<CustomerStatisticalReportModel> GetCustomerStatisticalReport(IEnumerable<int> CurrencyIds,
+                                                                                        string siteIds,
+                                                                                        string currencyIds,
+                                                                                        string startDate,
+                                                                                        string endDate,
+                                                                                        string userName)
+        {
+            Dictionary<string, CustomerStatisticalReportModel> keyValuePairs = new Dictionary<string, CustomerStatisticalReportModel>();
+            string dateFormat = string.Empty;
+            var statisticalList = reportService.GetCustomerStatisticalReport(siteIds,
+                                                                             currencyIds,
+                                                                             startDate,
+                                                                             endDate,
+                                                                             userName);
+
+            var currencyList = reportService.GetCurrencyList();
+
+            #region Data Statistical
+
+            foreach (var data in statisticalList)
+            {
+                CustomerStatisticalReportModel customerStatisticalReportModel = null;
+
+                dateFormat = data.Date.ToString("yyyy/MM/dd");
+
+                if (!keyValuePairs.ContainsKey($"{dateFormat}-{data.CategoryId}-{data.GameId}-{data.CurrencyId}-{data.CustId}"))
+                {
+                    customerStatisticalReportModel = new CustomerStatisticalReportModel();
+                    keyValuePairs.Add($"{dateFormat}-{data.CategoryId}-{data.GameId}-{data.CurrencyId}-{data.CustId}", customerStatisticalReportModel);
+                    customerStatisticalReportModel.Date = dateFormat;
+                    customerStatisticalReportModel.CurrencyId = data.CurrencyId;
+                    customerStatisticalReportModel.IsoCode = data.Code;
+                    customerStatisticalReportModel.CategoryId = data.CategoryId;
+                    customerStatisticalReportModel.CategoryName = data.CategoryName;
+                    customerStatisticalReportModel.GameId = data.GameId;
+                    customerStatisticalReportModel.GameName = data.GameName;
+                    customerStatisticalReportModel.CustId = data.CustId;
+                    customerStatisticalReportModel.UserName = data.UserName;
+                    customerStatisticalReportModel.ActualRate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
+                }
+
+                customerStatisticalReportModel = keyValuePairs[$"{dateFormat}-{data.CategoryId}-{data.GameId}-{data.CurrencyId}-{data.CustId}"];
+
+                customerStatisticalReportModel.TurnOverValidBetSummary = Math.Round(data.ValidBetSummary, 2, MidpointRounding.AwayFromZero);
+                customerStatisticalReportModel.WinLossSummary = Math.Round(data.WinLostSummary, 2, MidpointRounding.AwayFromZero);
+
+                customerStatisticalReportModel.TurnOverValidBetSummaryInMYR = Math.Round(customerStatisticalReportModel.TurnOverValidBetSummary * customerStatisticalReportModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+                customerStatisticalReportModel.WinLossSummaryInMYR = Math.Round(customerStatisticalReportModel.WinLossSummary * customerStatisticalReportModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+
+            }
+
+            #endregion
+
+            #region 補0
+
+            //List<GameModel> gameList = keyValuePairs.Select(s => s.Value).GroupBy(c => new { c.GameId, c.GameName })
+            //                        .Select(x => new GameModel
+            //                        {
+            //                            GameId = x.Key.GameId,
+            //                            GameName = x.Key.GameName
+            //                        }).ToList();
+
+            //List<CategoryModel> categoryList = keyValuePairs.Select(s => s.Value).GroupBy(c => new { c.CategoryId, c.CategoryName })
+            //                        .Select(x => new CategoryModel
+            //                        {
+            //                            CategoryId = x.Key.CategoryId,
+            //                            CategoryName = x.Key.CategoryName
+            //                        }).ToList();
+
+            //List<CategoryGameModel> categoryGameList = keyValuePairs.Select(s => s.Value).GroupBy(c => new { c.CategoryId, c.GameId })
+            //                        .Select(x => new CategoryGameModel
+            //                        {
+            //                            IdentifyString = $"{x.Key.CategoryId}-{x.Key.GameId}",
+            //                            CategoryId = x.Key.CategoryId,
+            //                            GameId = x.Key.GameId
+            //                        }).ToList();
+
+            //List<int> currencyIds = keyValuePairs.Select(s => s.Value).Select(x => x.CurrencyId).Distinct().ToList();
+
+            //foreach (var curr in currencyIds)
+            //{
+            //    foreach (var item in categoryGameList)
+            //    {
+            //        StatisticalReportModel statisticalReportModel = null;
+
+            //        if (!keyValuePairs.ContainsKey($"{item.IdentifyString}-{curr}"))
+            //        {
+            //            statisticalReportModel = new StatisticalReportModel();
+            //            keyValuePairs.Add($"{item.IdentifyString}-{curr}", statisticalReportModel);
+            //            statisticalReportModel.CurrencyId = curr;
+            //            statisticalReportModel.IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+            //            statisticalReportModel.CategoryId = item.CategoryId;
+            //            statisticalReportModel.CategoryName = categoryList.Where(x => x.CategoryId == item.CategoryId).Select(x => x.CategoryName).FirstOrDefault();
+            //            statisticalReportModel.GameId = item.GameId;
+            //            statisticalReportModel.GameName = gameList.Where(x => x.GameId == item.GameId).Select(x => x.GameName).FirstOrDefault();
+            //            statisticalReportModel.ActualRate = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.ActualRate).FirstOrDefault();
+            //        }
+            //    }
+            //}
+
+            #endregion
+
+            var Data = keyValuePairs.Select(s => s.Value).OrderBy(value => value.CustId)
+                                                         .ThenBy(value => value.Date)
+                                                         .ThenBy(value => value.CategoryId)
+                                                         .ThenBy(value => value.GameId)
+                                                         .ThenBy(Value => Value.CurrencyId);
+
+            return Data;
         }
     }
 }
