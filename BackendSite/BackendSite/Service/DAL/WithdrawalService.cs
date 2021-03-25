@@ -172,7 +172,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new { SelectSite, WithdrawalType, StartDate = startDate, EndDate = endDate, WithdrawalId = withdrawalId, TransId = WithdrawalId, UserName, CurrencyId, Status, VipStatus= VipStatus });
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var depositList = conn.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExportV3_Get", p, commandType: CommandType.StoredProcedure);
+            var depositList = conn.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExportV4_Get", p, commandType: CommandType.StoredProcedure);
             return depositList;
         }
 
