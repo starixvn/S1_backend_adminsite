@@ -34,9 +34,9 @@ namespace BackendSite.Service.Model
    
     public class RebatePeriod
     {
-        public int? RedeemHours { get; set; }
         public int? PeriodType { get; set; }
         public int? PeriodDay { get; set; }
+        public int? RedeemHours { get; set; }
     }
     public class RebateLevelData
     {

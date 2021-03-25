@@ -13,9 +13,12 @@ namespace BackendSite.Controllers.Api
     public class RebateMangeController : ControllerBase
     {
         private RebateMangeBLL rebateMangeBLL;
-        public RebateMangeController(RebateMangeBLL rebateMangeBLL)
+        private readonly AuthorizeBLL authorizeBLL;
+
+        public RebateMangeController(RebateMangeBLL rebateMangeBLL, AuthorizeBLL authorizeBLL)
         {
             this.rebateMangeBLL = rebateMangeBLL;
+            this.authorizeBLL = authorizeBLL;
 
         }
         public class VipLevelReq
@@ -67,6 +70,52 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        public class SetRebatePeriodReq
+        {
+            public int SiteId { get; set; }
+            public int PeriodType { get; set; }
+            public int ?PeriodDay { get; set; }
+            public int RedeemHours { get; set; }
+            
+
+        }
+        public ApiResult SetRebatePeriod(SetRebatePeriodReq setRebatePeriodReq)
+        {
+            var apiResult = new ApiResult();
+            string UserName = authorizeBLL.GetAuthData().UserName;
+            apiResult.ErrorCode = 99;
+            bool result = rebateMangeBLL.SetRebatePeriod(setRebatePeriodReq.SiteId, setRebatePeriodReq.PeriodType, setRebatePeriodReq.PeriodDay, setRebatePeriodReq.RedeemHours, UserName); ;
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+            }
+            return apiResult;
+        }
+
+        public class DelRebatePeriodReq
+        {
+            public int SiteId { get; set; }
+        }
+        public ApiResult DelRebatePeriod(DelRebatePeriodReq delRebatePeriodReq)
+        {
+            var apiResult = new ApiResult();
+            apiResult.ErrorCode = 99;
+            bool result = rebateMangeBLL.DelRebatePeriod(delRebatePeriodReq.SiteId); 
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+            }
+            return apiResult;
+        }
+
         public class RebateInfoReq
         {
             public int SiteId { get; set; }
@@ -113,17 +162,217 @@ namespace BackendSite.Controllers.Api
             public int CategoryId { get; set; }
             public int level { get; set; }
             public decimal percentage { get; set; }
-            public string lastUpdateUser { get; set; }
 
         }
-        public ApiResult  SetRebateCategory(SetRebateCategoryReq setRebateCategoryReq)
+        public ApiResult SetRebateCategory(SetRebateCategoryReq setRebateCategoryReq)
         {
             var apiResult = new ApiResult ();
             apiResult.ErrorCode = 0;
-            rebateMangeBLL.SetRebateCategory(setRebateCategoryReq.SiteId, setRebateCategoryReq.CurrencyId, setRebateCategoryReq.CategoryId, setRebateCategoryReq.level, setRebateCategoryReq.percentage, setRebateCategoryReq.lastUpdateUser);
-
+            string UserName = authorizeBLL.GetAuthData().UserName;
+            apiResult.ErrorCode = 99;
+            bool result = rebateMangeBLL.SetRebateCategory(setRebateCategoryReq.SiteId, setRebateCategoryReq.CurrencyId, setRebateCategoryReq.CategoryId, setRebateCategoryReq.level, setRebateCategoryReq.percentage, UserName);
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+            }
             return apiResult;
         }
 
+        public class SetRebateCategoryBatchReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int CategoryId { get; set; }
+            public string levelPercentage { get; set; }
+
+        }
+        public ApiResult SetRebateCategoryBatch(SetRebateCategoryBatchReq setRebateCategoryBatchReq)
+        {
+            var apiResult = new ApiResult();
+            apiResult.ErrorCode = 0;
+            string UserName = authorizeBLL.GetAuthData().UserName;
+            apiResult.ErrorCode = 99;
+            bool result = rebateMangeBLL.SetRebateCategoryBatch(setRebateCategoryBatchReq.SiteId, setRebateCategoryBatchReq.CurrencyId, setRebateCategoryBatchReq.CategoryId, setRebateCategoryBatchReq.levelPercentage, UserName);
+
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+            }
+
+            return apiResult;
+        }
+        public class DelRebateCategoryReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int CategoryId { get; set; }
+            public int level { get; set; }
+
+        }
+        public ApiResult DelRebateCategory(DelRebateCategoryReq delRebateCategoryReq)
+        {
+            var apiResult = new ApiResult();
+            apiResult.ErrorCode = 99;
+            bool result = rebateMangeBLL.DelRebateCategory(delRebateCategoryReq.SiteId, delRebateCategoryReq.CurrencyId, delRebateCategoryReq.CategoryId, delRebateCategoryReq.level);
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }else
+            {
+                apiResult.ErrorCode = -1;
+            }
+            return apiResult;
+        }
+        public class SetRebateGameTypeReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int GameType { get; set; }
+            public int level { get; set; }
+            public decimal percentage { get; set; }
+
+        }
+        public ApiResult SetRebateGameType(SetRebateGameTypeReq setRebateCategoryGameTypeReq)
+        {
+            var apiResult = new ApiResult();
+            string UserName = authorizeBLL.GetAuthData().UserName;
+            apiResult.ErrorCode = 99;
+            bool result = rebateMangeBLL.SetRebateGameType(setRebateCategoryGameTypeReq.SiteId, setRebateCategoryGameTypeReq.CurrencyId, setRebateCategoryGameTypeReq.GameType, setRebateCategoryGameTypeReq.level, setRebateCategoryGameTypeReq.percentage, UserName);
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+            }
+            return apiResult;
+        }
+
+        public class SetRebateGameTypeBatchReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int GameType { get; set; }
+            public string levelPercentage { get; set; }
+
+        }
+        public ApiResult SetRebateGameTypeBatch(SetRebateGameTypeBatchReq setRebateGameTypeBatchReq)
+        {
+            var apiResult = new ApiResult();
+            string UserName = authorizeBLL.GetAuthData().UserName;
+            apiResult.ErrorCode = 99;
+            bool result = rebateMangeBLL.SetRebateGameTypeBatch(setRebateGameTypeBatchReq.SiteId, setRebateGameTypeBatchReq.CurrencyId, setRebateGameTypeBatchReq.GameType, setRebateGameTypeBatchReq.levelPercentage, UserName);
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+            }
+            return apiResult;
+        }
+        public class DelRebateGameTypeReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int GameType { get; set; }
+            public int level { get; set; }
+
+        }
+        public ApiResult DelRebateGameType(DelRebateGameTypeReq delRebateGameTypeReq)
+        {
+            var apiResult = new ApiResult();
+            apiResult.ErrorCode = 99;
+            bool result = rebateMangeBLL.DelRebateGameType(delRebateGameTypeReq.SiteId, delRebateGameTypeReq.CurrencyId, delRebateGameTypeReq.GameType, delRebateGameTypeReq.level);
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+            }
+            return apiResult;
+        }
+        public class SetRebatePayoutLimitReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int CategoryId { get; set; }
+            public decimal MaxPayout { get; set; }
+            public decimal MinPayout { get; set; }
+
+        }
+        public ApiResult SetRebatePayoutLimit(SetRebatePayoutLimitReq setRebatePayoutLimitReq)
+        {
+            var apiResult = new ApiResult();
+            string UserName = authorizeBLL.GetAuthData().UserName;
+            apiResult.ErrorCode = 99;
+            bool result = rebateMangeBLL.SetRebatePayoutLimit(setRebatePayoutLimitReq.SiteId, setRebatePayoutLimitReq.CurrencyId, setRebatePayoutLimitReq.CategoryId, setRebatePayoutLimitReq.MaxPayout, setRebatePayoutLimitReq.MinPayout, UserName);
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+            }
+            return apiResult;
+        }
+        public class SetRebatePayoutLimitBatchReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public string LevelPayout { get; set; }
+
+        }
+        public ApiResult SetRebatePayoutLimitBatch(SetRebatePayoutLimitBatchReq setRebatePayoutLimitBatchReq)
+        {
+            var apiResult = new ApiResult();
+            string UserName = authorizeBLL.GetAuthData().UserName;
+            apiResult.ErrorCode = 99;
+            bool result = rebateMangeBLL.SetRebatePayoutLimitBatch(setRebatePayoutLimitBatchReq.SiteId, setRebatePayoutLimitBatchReq.CurrencyId, setRebatePayoutLimitBatchReq.LevelPayout, UserName);
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+            }
+            return apiResult;
+        }
+        public class DelRebatePayoutLimitReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int CategoryId { get; set; }
+
+        }
+        public ApiResult DelRebatePayoutLimit(DelRebatePayoutLimitReq delRebatePayoutLimitReq)
+        {
+            var apiResult = new ApiResult();
+            apiResult.ErrorCode = 99;
+            bool result = rebateMangeBLL.DelRebatePayoutLimit(delRebatePayoutLimitReq.SiteId, delRebatePayoutLimitReq.CurrencyId, delRebatePayoutLimitReq.CategoryId);
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+            }
+            return apiResult;
+        }
     }
 }
