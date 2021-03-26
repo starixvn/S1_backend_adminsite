@@ -27,10 +27,14 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite, IEnumerable<int> withdrawalType, long startDate, long endDate, int siteId, string WithdrawalId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
+            //舊的規則 status 1是pending,新的規則 status 1跟2 都是onHold,所以查詢條件要查onhold必須 也查status 1
+            var statusList = status.ToList();
+            status.ToList().ForEach(x => { if (x == 2) { statusList.Add(1); } });
+
             var SelectSite = JsonConvert.SerializeObject(selectSite);
             var WithdrawalType = JsonConvert.SerializeObject(withdrawalType);
             var CurrencyId = JsonConvert.SerializeObject(currencyId);
-            var Status = JsonConvert.SerializeObject(status);
+            var Status = JsonConvert.SerializeObject(statusList);
             var VipStatus = JsonConvert.SerializeObject(levelstatus);
             int withdrawalId = 0;
             if (!string.IsNullOrWhiteSpace(WithdrawalId))
