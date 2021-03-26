@@ -73,6 +73,7 @@ namespace BackendSite.Service.Model
         public DateTime? ReloadTime { get; set; }
         public string IP { get; set; }
         public string LevelName { get; set; }
+        public string AffiliateCode { get; set; }
     }
 
     public class CustInfoDetailForExport
