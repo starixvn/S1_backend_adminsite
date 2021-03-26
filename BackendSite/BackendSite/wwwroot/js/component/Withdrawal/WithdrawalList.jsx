@@ -33,7 +33,6 @@ import DateTimePicker from 'react-datetime';
     };
 
     const StatusSelectOp = {
-        1: "Pending",
         8: "To KYC",
         2: "On Hold",
         3: "Verify",
@@ -861,10 +860,10 @@ import DateTimePicker from 'react-datetime';
                         searchFilter.selectStatus.forEach(function (obj) {
                             state.selectStatus.push(parseInt(obj));
                         })
-                        : state.selectStatus.push(1);
+                        : state.selectStatus.push(2);
                 }
             });
-            (state.MutiSelRefresh) ? $('#selectStatus').multiselect('select', searchFilter.selectStatus) : $('#selectStatus').multiselect('select', 1);
+            (state.MutiSelRefresh) ? $('#selectStatus').multiselect('select', searchFilter.selectStatus) : $('#selectStatus').multiselect('select', 2);
             $('#selectStatus').multiselect('updateButtonText');
         }
 
