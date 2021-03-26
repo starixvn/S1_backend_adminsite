@@ -1275,6 +1275,10 @@ import VipLevel from './VipLevel/index';
                                         <td>{(typeof data.affiliateId === 'undefined' || data.affiliateId === 0) ? "N/A" : data.affiliateId}</td>
                                     </tr>
                                     <tr>
+                                        <th scope="row">Affiliates Code</th>
+                                        <td>{(typeof data.affiliateCode === null) ? "" : data.affiliateCode}</td>
+                                    </tr>
+                                    <tr>
                                         <th scope="row">Prefer Languages</th>
                                         <td>{data.userLang}</td>
                                     </tr>
