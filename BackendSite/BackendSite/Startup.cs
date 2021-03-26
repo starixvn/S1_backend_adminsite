@@ -74,6 +74,7 @@ namespace BackendSite
             services.AddSingleton<HomeService>();
             services.AddSingleton<BonusManageService>();
             services.AddSingleton<NewsServices>();
+            services.AddSingleton<RebateManageService>();
             services.AddSingleton<ReportService>();
             services.AddSingleton<BannerManageService>();
             services.AddSingleton<ReferralManagementService>();
@@ -121,6 +122,8 @@ namespace BackendSite
             services.AddSingleton<HomeBLL>();
             services.AddSingleton<BonusManageBLL>();
             services.AddSingleton<NewsBLL>();
+            services.AddSingleton<RebateManageBLL>();
+            
             services.AddSingleton<ReportBLL>();
             services.AddSingleton<BannerManageBLL>();
             services.AddSingleton<ReportExcelBLL>();
