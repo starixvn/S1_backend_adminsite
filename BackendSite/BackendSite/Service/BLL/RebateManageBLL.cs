@@ -15,87 +15,103 @@ namespace BackendSite.Service.BLL
         {
             this.rebateManageService = rebateManageService;
         }
-        public IEnumerable<RebateActionTime> GetRebateActionTime(int siteId)
+        public IEnumerable<VipLevel> GetVipLevel(int siteId)
         {
-            return rebateManageService.GetRebateActionTime(siteId);
+            return rebateManageService.GetVipLevel(siteId);
         }
-        public void SetRebateActionTime(int siteId, int periodType, int? periodDay, int redeemHours, string lastUpdateUser)
+        public IEnumerable<TPCategory> GetTPCategoryList()
         {
-             rebateManageService.SetRebateActionTime(siteId, periodType, periodDay, redeemHours, lastUpdateUser);
+            return rebateManageService.GetTPCategoryList();
         }
-        public void DelRebateActionTime(int siteId)
+        public IEnumerable<TpGameType> GetTpGameTypeListbyCategory(int categoryId)
         {
-             rebateManageService.DelRebateActionTime(siteId);
+            return rebateManageService.GetTpGameTypeListbyCategory(categoryId);
         }
-        public void SetRebatePayoutLimit(int siteId, int currencyId, int groupID, int rollOver, decimal maxPayout, decimal minPayout, string lastUpdateUser)
+        public IEnumerable<RebatePayoutLimitData> GetRebatePayoutLimit(int siteId, int currencyId, int? categoryId)
         {
-            rebateManageService.SetRebatePayoutLimit(siteId, currencyId, groupID, rollOver, maxPayout, minPayout, lastUpdateUser);
+            return rebateManageService.GetRebatePayoutLimit( siteId, currencyId,  categoryId);
         }
-        public void SetRebatePayoutLimitbatch(int siteId, int currencyId, string groupPayout, string lastUpdateUser)
+        public bool SetRebatePayoutLimit(int siteId, int currencyId, int categoryId, decimal maxPayout, decimal minPayout, string lastUpdateUser)
         {
-            rebateManageService.SetRebatePayoutLimitbatch( siteId, currencyId, groupPayout, lastUpdateUser);
+            return rebateManageService.SetRebatePayoutLimit(siteId, currencyId, categoryId, maxPayout, minPayout, lastUpdateUser);
         }
-        public void DelRebatePayoutLimit(int siteId, int groupID, int currencyId)
+        public bool SetRebatePayoutLimitBatch(int siteId, int currencyId, string levelPayout, string lastUpdateUser)
         {
-            rebateManageService.DelRebatePayoutLimit(siteId, groupID, currencyId);
+            return rebateManageService.SetRebatePayoutLimitBatch(siteId, currencyId, levelPayout, lastUpdateUser);
         }
-        public IEnumerable<RebatePayoutLimit> GetRebatePayoutLimit(int siteId, int currencyId)
+        public bool DelRebatePayoutLimit(int siteId, int currencyId, int categoryId)
         {
-            return rebateManageService.GetRebatePayoutLimit(siteId, currencyId);
+            return rebateManageService.DelRebatePayoutLimit( siteId, currencyId, categoryId);
         }
-        public void InsLevelGroup(int siteId, string groupName, int levelBase)
+        public int GetRebatePeriod(int siteId, out int periodType, out int periodDay, out int redeemHours)
         {
-            rebateManageService.InsLevelGroup( siteId, groupName, levelBase);
+            return rebateManageService.GetRebatePeriod(siteId, out periodType, out periodDay, out redeemHours);
         }
-        public void InsLevelGroupbatch(int siteId, string groupBaseList)
+        public bool SetRebatePeriod(int siteId, int periodType, int? periodDay, int redeemHours, string lastUpdateUser)
         {
-            rebateManageService.InsLevelGroupbatch(siteId, groupBaseList);
+            return rebateManageService.SetRebatePeriod(siteId, periodType, periodDay, redeemHours, lastUpdateUser);
         }
-        public void UpdateLevelGroup(int groupID, int siteId, string groupName, int levelBase)
+        public bool DelRebatePeriod(int siteId)
         {
-            rebateManageService.UpdateLevelGroup( groupID, siteId, groupName, levelBase);
+            return rebateManageService.DelRebatePeriod(siteId);
         }
-        public void DelLevelGroup(int groupID)
+        public IEnumerable<RebateLevelData> GetRebateDataByCategory(int siteId, int categoryId, int currencyId)
         {
-            rebateManageService.DelLevelGroup(groupID);
+            return rebateManageService.GetRebateDataByCategory(siteId, categoryId, currencyId);
         }
-        public IEnumerable<LevelGroup> GetLevelGroup(int siteId)
+        public RebateCurrencyData GeRebateInfo(int siteId, int currencyId)
         {
-            return rebateManageService.GetLevelGroup(siteId);
+            var reault = new RebateCurrencyData();
+            reault.CurrencyId = currencyId;
+            reault.PayoutLimitList = GetRebatePayoutLimit(siteId, currencyId, null);
+            var rList= new List<RebateCategoryList>();
+            foreach (var x in GetTPCategoryList())
+            {
+                rList.Add( new RebateCategoryList() { CategoryId = x.CategoryId, CategoryName = x.CategoryName, CategoryLevelList = GetRebateDataByCategory(siteId, x.CategoryId, currencyId)});
+            }
+            reault.CategoryDataList = rList;
+            return reault;
         }
-        public void SetRebateCategory(int siteId, int categoryId, int groupID, decimal percentage, string lastUpdateUser)
+        public IEnumerable<RebateLevelData> GetRebateDataByGameType(int siteId, int gameType, int currencyId)
         {
-            rebateManageService.SetRebateCategory( siteId, categoryId, groupID,percentage, lastUpdateUser);
+            return rebateManageService.GetRebateDataByGameType(siteId, gameType, currencyId);
         }
-        public void SetRebateCategoryBatch(int siteId, int categoryId, string groupPercentage, string lastUpdateUser)
+        public RebateCategoryDetail GeRebateCategoryDetail(int siteId, int currencyId, int categoryId)
         {
-            rebateManageService.SetRebateCategoryBatch(siteId, categoryId, groupPercentage, lastUpdateUser);
-           
-        }
-        public void DelRebateCategory(int siteId, int categoryId, int groupID)
-        {
-            rebateManageService.DelRebateCategory(siteId, categoryId, groupID);
-        }
-        public IEnumerable<RebateGroup> GetRebateCategory(int siteId, int categoryId)
-        {
-            return rebateManageService.GetRebateCategory(siteId, categoryId);
-        }
+            var reault = new RebateCategoryDetail();
+            reault.CategoryId = categoryId;
 
-        public void SetRebateGameType(int siteId, int gameType, int groupID, decimal percentage, string lastUpdateUser)
-        {
-            rebateManageService.SetRebateGameType( siteId, gameType, groupID, percentage, lastUpdateUser);
+            var rList = new List<RebateGameTypeList>();
+            foreach (var x in GetTpGameTypeListbyCategory(categoryId))
+            {
+                rList.Add(new RebateGameTypeList() { Type = x.Type, TypeName = x.TypeName, GameTypeLevelList = GetRebateDataByGameType(siteId, x.Type, currencyId) });
+            }
+            reault.GameTypeList = rList;
+            return reault;
         }
-        public void SetRebateGameTypeBatch(int siteId, int gameType, string groupPercentage, string lastUpdateUser)
+        public bool SetRebateCategory(int siteId, int currencyId, int categoryId, int level, decimal percentage, string lastUpdateUser)
         {
-            rebateManageService.SetRebateGameTypeBatch( siteId, gameType, groupPercentage, lastUpdateUser);
+            return rebateManageService.SetRebateCategory( siteId, currencyId, categoryId, level, percentage, lastUpdateUser);
         }
-        public void DelRebateGameType(int siteId, int gameType, int groupID)
+        public bool SetRebateCategoryBatch(int siteId, int CurrencyId, int categoryId, string levelPercentage, string lastUpdateUser)
         {
-            rebateManageService.DelRebateGameType( siteId, gameType, groupID);
+            return rebateManageService.SetRebateCategoryBatch( siteId, CurrencyId, categoryId, levelPercentage, lastUpdateUser);
         }
-        public IEnumerable<RebateGroup> GetRebateGameType(int siteId, int gameType)
+        public bool DelRebateCategory(int siteId, int currencyId, int categoryId, int level)
         {
-            return rebateManageService.GetRebateGameType( siteId, gameType);
+            return rebateManageService.DelRebateCategory( siteId, currencyId, categoryId, level);
+        }
+        public bool SetRebateGameType(int siteId, int currencyId, int gameType, int level, decimal percentage, string lastUpdateUser)
+        {
+            return rebateManageService.SetRebateGameType(siteId, currencyId, gameType, level, percentage, lastUpdateUser);
+        }
+        public bool SetRebateGameTypeBatch(int siteId, int currencyId, int gameType, string levelPercentage, string lastUpdateUser)
+        {
+            return rebateManageService.SetRebateGameTypeBatch(siteId, currencyId, gameType, levelPercentage, lastUpdateUser);
+        }
+        public bool DelRebateGameType(int siteId, int currencyId, int gameType, int level)
+        {
+            return rebateManageService.DelRebateGameType(siteId, currencyId, gameType, level);
         }
     }
 }

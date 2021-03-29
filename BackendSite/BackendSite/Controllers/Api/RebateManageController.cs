@@ -1,8 +1,6 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,84 +8,299 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class RebateManageController : ControllerBase
     {
-        private readonly IConfiguration configuration;
-        private readonly RebateManageBLL rebateManageBLL;
+        private RebateManageBLL rebateManageBLL;
         private readonly AuthorizeBLL authorizeBLL;
 
-        public RebateManageController(IConfiguration configuration, RebateManageBLL rebateManageBLL, AuthorizeBLL authorizeBLL)
+        public RebateManageController(RebateManageBLL rebateManageBLL, AuthorizeBLL authorizeBLL)
         {
-            this.configuration = configuration;
             this.rebateManageBLL = rebateManageBLL;
             this.authorizeBLL = authorizeBLL;
-        }
 
-        public class GetRebateActionTimeReq
-        {
-            public int siteId { get; set; }
         }
-        [HttpPost]
-        public ApiResult<IEnumerable<RebateActionTime>> GetRebateActionTime(GetRebateActionTimeReq getRebateActionTimeReq)
+        public class VipLevelReq
         {
-            var apiResult = new ApiResult<IEnumerable<RebateActionTime>>();
-            try
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Data = rebateManageBLL.GetRebateActionTime(getRebateActionTimeReq.siteId);
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
-            }
+            public int SiteId { get; set; }
+        }
+        public ApiResult<IEnumerable<VipLevel>> GetVipLevel(VipLevelReq vipLevelReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<VipLevel>>();
+            apiResult.ErrorCode = 0;
+            apiResult.Data = rebateManageBLL.GetVipLevel(vipLevelReq.SiteId);
             return apiResult;
         }
-        public class SetRebateActionTimeReq
+        public ApiResult<IEnumerable<TPCategory>> GetTPCategoryList()
+        {
+            var apiResult = new ApiResult<IEnumerable<TPCategory>>();
+            apiResult.ErrorCode = 0;
+            apiResult.Data = rebateManageBLL.GetTPCategoryList();
+            return apiResult;
+        }
+        public class GameTypeListReq
+        {
+            public int CategoryId { get; set; }
+        }
+        public ApiResult<IEnumerable<TpGameType>> GetTpGameTypeListbyCategory(GameTypeListReq gameTypeListReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<TpGameType>>();
+            apiResult.ErrorCode = 0;
+            apiResult.Data = rebateManageBLL.GetTpGameTypeListbyCategory(gameTypeListReq.CategoryId);
+            return apiResult;
+        }
+
+        public class RebatePeriodReq
+        {
+            public int SiteId { get; set; }
+        }
+        public ApiResult<RebatePeriod> GetRebatePeriod(RebatePeriodReq rebatePeriodReq)
+        {
+            var apiResult = new ApiResult<RebatePeriod>();
+            apiResult.Data = new RebatePeriod();
+            int periodType = 0;
+            int periodDay = 0;
+            int redeemHours = 0;
+            apiResult.ErrorCode = 0;
+            rebateManageBLL.GetRebatePeriod(rebatePeriodReq.SiteId, out periodType, out periodDay, out redeemHours);
+            apiResult.Data.PeriodType = periodType;
+            apiResult.Data.PeriodDay = periodDay;
+            apiResult.Data.RedeemHours = redeemHours;
+            return apiResult;
+        }
+
+        public class SetRebatePeriodReq
         {
             public int SiteId { get; set; }
             public int PeriodType { get; set; }
-            public int? PeriodDay { get; set; }
+            public int ?PeriodDay { get; set; }
             public int RedeemHours { get; set; }
+            
+
         }
-        public ApiResult SetRebateActionTime(SetRebateActionTimeReq setRebateActionTimeReq)
+        public ApiResult SetRebatePeriod(SetRebatePeriodReq setRebatePeriodReq)
         {
             var apiResult = new ApiResult();
-            try
+            string UserName = authorizeBLL.GetAuthData().UserName;
+            apiResult.ErrorCode = 99;
+            bool result = rebateManageBLL.SetRebatePeriod(setRebatePeriodReq.SiteId, setRebatePeriodReq.PeriodType, setRebatePeriodReq.PeriodDay, setRebatePeriodReq.RedeemHours, UserName); ;
+            if (result)
             {
-                var authData = authorizeBLL.GetAuthData();
-                rebateManageBLL.SetRebateActionTime(setRebateActionTimeReq.SiteId, setRebateActionTimeReq.PeriodType, setRebateActionTimeReq.PeriodDay, setRebateActionTimeReq.RedeemHours, authData.UserName);
                 apiResult.ErrorCode = 0;
             }
-            catch (Exception ex)
+            else
             {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
+                apiResult.ErrorCode = -1;
             }
             return apiResult;
         }
-        public class DelRebateActionTimeReq
+
+        public class DelRebatePeriodReq
         {
-            public int siteId { get; set; }
+            public int SiteId { get; set; }
         }
-        public ApiResult DelRebateActionTime(DelRebateActionTimeReq delRebateActionTimeReq)
+        public ApiResult DelRebatePeriod(DelRebatePeriodReq delRebatePeriodReq)
         {
             var apiResult = new ApiResult();
-            try
+            apiResult.ErrorCode = 99;
+            bool result = rebateManageBLL.DelRebatePeriod(delRebatePeriodReq.SiteId); 
+            if (result)
             {
-                rebateManageBLL.DelRebateActionTime(delRebateActionTimeReq.siteId);
                 apiResult.ErrorCode = 0;
             }
-            catch (Exception ex)
+            else
             {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
+                apiResult.ErrorCode = -1;
+            }
+            return apiResult;
+        }
+
+        public class RebateInfoReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+        }
+        public ApiResult<RebateCurrencyData> GetRebateInfo(RebateInfoReq rebateInfoReq)
+        {
+            var apiResult = new ApiResult<RebateCurrencyData>();
+            apiResult.ErrorCode = 0;
+            apiResult.Data = rebateManageBLL.GeRebateInfo(rebateInfoReq.SiteId, rebateInfoReq.CurrencyId);
+            return apiResult;
+        }
+        public class RebateInfoByGameTypeReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int GameType { get; set; }
+        }
+        public ApiResult<IEnumerable<RebateLevelData>> GetRebateInfoByGameType(RebateInfoByGameTypeReq rebateInfoByGameTypeReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<RebateLevelData>>();
+            apiResult.ErrorCode = 0;
+            apiResult.Data = rebateManageBLL.GetRebateDataByGameType(rebateInfoByGameTypeReq.SiteId, rebateInfoByGameTypeReq.GameType, rebateInfoByGameTypeReq.CurrencyId);
+            return apiResult;
+        }
+        public class RebateCategoryDetailReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int CategoryId { get; set; }
+        }
+        public ApiResult<RebateCategoryDetail> GeRebateCategoryDetail(RebateCategoryDetailReq rebateCategoryDetailReq)
+        {
+            var apiResult = new ApiResult<RebateCategoryDetail>();
+            apiResult.ErrorCode = 0;
+            apiResult.Data = rebateManageBLL.GeRebateCategoryDetail(rebateCategoryDetailReq.SiteId, rebateCategoryDetailReq.CurrencyId, rebateCategoryDetailReq.CategoryId);
+            return apiResult;
+        }
+
+        public class SetRebateCategoryReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int CategoryId { get; set; }
+            public int level { get; set; }
+            public decimal percentage { get; set; }
+
+        }
+        public ApiResult SetRebateCategory(SetRebateCategoryReq setRebateCategoryReq)
+        {
+            var apiResult = new ApiResult ();
+            apiResult.ErrorCode = 0;
+            string UserName = authorizeBLL.GetAuthData().UserName;
+            apiResult.ErrorCode = 99;
+            bool result = rebateManageBLL.SetRebateCategory(setRebateCategoryReq.SiteId, setRebateCategoryReq.CurrencyId, setRebateCategoryReq.CategoryId, setRebateCategoryReq.level, setRebateCategoryReq.percentage, UserName);
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+            }
+            return apiResult;
+        }
+
+        public class SetRebateCategoryBatchReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int CategoryId { get; set; }
+            public string levelPercentage { get; set; }
+
+        }
+        public ApiResult SetRebateCategoryBatch(SetRebateCategoryBatchReq setRebateCategoryBatchReq)
+        {
+            var apiResult = new ApiResult();
+            apiResult.ErrorCode = 0;
+            string UserName = authorizeBLL.GetAuthData().UserName;
+            apiResult.ErrorCode = 99;
+            bool result = rebateManageBLL.SetRebateCategoryBatch(setRebateCategoryBatchReq.SiteId, setRebateCategoryBatchReq.CurrencyId, setRebateCategoryBatchReq.CategoryId, setRebateCategoryBatchReq.levelPercentage, UserName);
+
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+            }
+
+            return apiResult;
+        }
+        public class DelRebateCategoryReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int CategoryId { get; set; }
+            public int level { get; set; }
+
+        }
+        public ApiResult DelRebateCategory(DelRebateCategoryReq delRebateCategoryReq)
+        {
+            var apiResult = new ApiResult();
+            apiResult.ErrorCode = 99;
+            bool result = rebateManageBLL.DelRebateCategory(delRebateCategoryReq.SiteId, delRebateCategoryReq.CurrencyId, delRebateCategoryReq.CategoryId, delRebateCategoryReq.level);
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }else
+            {
+                apiResult.ErrorCode = -1;
+            }
+            return apiResult;
+        }
+        public class SetRebateGameTypeReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int GameType { get; set; }
+            public int level { get; set; }
+            public decimal percentage { get; set; }
+
+        }
+        public ApiResult SetRebateGameType(SetRebateGameTypeReq setRebateCategoryGameTypeReq)
+        {
+            var apiResult = new ApiResult();
+            string UserName = authorizeBLL.GetAuthData().UserName;
+            apiResult.ErrorCode = 99;
+            bool result = rebateManageBLL.SetRebateGameType(setRebateCategoryGameTypeReq.SiteId, setRebateCategoryGameTypeReq.CurrencyId, setRebateCategoryGameTypeReq.GameType, setRebateCategoryGameTypeReq.level, setRebateCategoryGameTypeReq.percentage, UserName);
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+            }
+            return apiResult;
+        }
+
+        public class SetRebateGameTypeBatchReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int GameType { get; set; }
+            public string levelPercentage { get; set; }
+
+        }
+        public ApiResult SetRebateGameTypeBatch(SetRebateGameTypeBatchReq setRebateGameTypeBatchReq)
+        {
+            var apiResult = new ApiResult();
+            string UserName = authorizeBLL.GetAuthData().UserName;
+            apiResult.ErrorCode = 99;
+            bool result = rebateManageBLL.SetRebateGameTypeBatch(setRebateGameTypeBatchReq.SiteId, setRebateGameTypeBatchReq.CurrencyId, setRebateGameTypeBatchReq.GameType, setRebateGameTypeBatchReq.levelPercentage, UserName);
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+            }
+            return apiResult;
+        }
+        public class DelRebateGameTypeReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int GameType { get; set; }
+            public int level { get; set; }
+
+        }
+        public ApiResult DelRebateGameType(DelRebateGameTypeReq delRebateGameTypeReq)
+        {
+            var apiResult = new ApiResult();
+            apiResult.ErrorCode = 99;
+            bool result = rebateManageBLL.DelRebateGameType(delRebateGameTypeReq.SiteId, delRebateGameTypeReq.CurrencyId, delRebateGameTypeReq.GameType, delRebateGameTypeReq.level);
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
             }
             return apiResult;
         }
@@ -95,25 +308,24 @@ namespace BackendSite.Controllers.Api
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
-            public int GroupID { get; set; }
-            public int RollOver { get; set; }
+            public int CategoryId { get; set; }
             public decimal MaxPayout { get; set; }
             public decimal MinPayout { get; set; }
+
         }
         public ApiResult SetRebatePayoutLimit(SetRebatePayoutLimitReq setRebatePayoutLimitReq)
         {
             var apiResult = new ApiResult();
-            try
+            string UserName = authorizeBLL.GetAuthData().UserName;
+            apiResult.ErrorCode = 99;
+            bool result = rebateManageBLL.SetRebatePayoutLimit(setRebatePayoutLimitReq.SiteId, setRebatePayoutLimitReq.CurrencyId, setRebatePayoutLimitReq.CategoryId, setRebatePayoutLimitReq.MaxPayout, setRebatePayoutLimitReq.MinPayout, UserName);
+            if (result)
             {
-                var authData = authorizeBLL.GetAuthData();
-                rebateManageBLL.SetRebatePayoutLimit(setRebatePayoutLimitReq.SiteId, setRebatePayoutLimitReq.CurrencyId, setRebatePayoutLimitReq.GroupID, setRebatePayoutLimitReq.RollOver, setRebatePayoutLimitReq.MaxPayout, setRebatePayoutLimitReq.MinPayout, authData.UserName);
                 apiResult.ErrorCode = 0;
             }
-            catch (Exception ex)
+            else
             {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
+                apiResult.ErrorCode = -1;
             }
             return apiResult;
         }
@@ -121,353 +333,44 @@ namespace BackendSite.Controllers.Api
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
-            public string GroupPayout { get; set; }
+            public string LevelPayout { get; set; }
+
         }
         public ApiResult SetRebatePayoutLimitBatch(SetRebatePayoutLimitBatchReq setRebatePayoutLimitBatchReq)
         {
             var apiResult = new ApiResult();
-            try
+            string UserName = authorizeBLL.GetAuthData().UserName;
+            apiResult.ErrorCode = 99;
+            bool result = rebateManageBLL.SetRebatePayoutLimitBatch(setRebatePayoutLimitBatchReq.SiteId, setRebatePayoutLimitBatchReq.CurrencyId, setRebatePayoutLimitBatchReq.LevelPayout, UserName);
+            if (result)
             {
-                var authData = authorizeBLL.GetAuthData();
-                rebateManageBLL.SetRebatePayoutLimitbatch(setRebatePayoutLimitBatchReq.SiteId, setRebatePayoutLimitBatchReq.CurrencyId, setRebatePayoutLimitBatchReq.GroupPayout, authData.UserName);
                 apiResult.ErrorCode = 0;
             }
-            catch (Exception ex)
+            else
             {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
+                apiResult.ErrorCode = -1;
             }
             return apiResult;
         }
         public class DelRebatePayoutLimitReq
         {
-            public int siteId { get; set; }
-            public int groupID { get; set; }
-            public int currencyId { get; set; }
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int CategoryId { get; set; }
+
         }
         public ApiResult DelRebatePayoutLimit(DelRebatePayoutLimitReq delRebatePayoutLimitReq)
         {
             var apiResult = new ApiResult();
-            try
-            {
-                rebateManageBLL.DelRebatePayoutLimit(delRebatePayoutLimitReq.siteId, delRebatePayoutLimitReq.groupID, delRebatePayoutLimitReq.currencyId);
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
-            }
-            return apiResult;
-        }
-        public class GetRebatePayoutLimitReq
-        {
-            public int siteId { get; set; }
-            public int currencyId { get; set; }
-        }
-        public ApiResult<IEnumerable<RebatePayoutLimit>> GetRebatePayoutLimit(GetRebatePayoutLimitReq getRebatePayoutLimitReq)
-        {
-            var apiResult = new ApiResult<IEnumerable<RebatePayoutLimit>>();
-            try
+            apiResult.ErrorCode = 99;
+            bool result = rebateManageBLL.DelRebatePayoutLimit(delRebatePayoutLimitReq.SiteId, delRebatePayoutLimitReq.CurrencyId, delRebatePayoutLimitReq.CategoryId);
+            if (result)
             {
                 apiResult.ErrorCode = 0;
-                apiResult.Data = rebateManageBLL.GetRebatePayoutLimit(getRebatePayoutLimitReq.siteId, getRebatePayoutLimitReq.currencyId);
             }
-            catch (Exception ex)
+            else
             {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
-            }
-            return apiResult;
-        }
-        public class InsLevelGroupReq
-        {
-            public int SiteId { get; set; }
-            public string GroupName { get; set; }
-            public int LevelBase { get; set; }
-        }
-        public ApiResult InsLevelGroup(InsLevelGroupReq insLevelGroupReq)
-        {
-            var apiResult = new ApiResult();
-            try
-            {
-                rebateManageBLL.InsLevelGroup(insLevelGroupReq.SiteId, insLevelGroupReq.GroupName, insLevelGroupReq.LevelBase);
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
-            }
-            return apiResult;
-        }
-        public class InsLevelGroupbatchReq
-        {
-            public int SiteId { get; set; }
-            public string GroupBaseList { get; set; }
-        }
-        public ApiResult InsLevelGroupbatch(InsLevelGroupbatchReq insLevelGroupbatchReq)
-        {
-            var apiResult = new ApiResult();
-            try
-            {
-                rebateManageBLL.InsLevelGroupbatch(insLevelGroupbatchReq.SiteId, insLevelGroupbatchReq.GroupBaseList);
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
-            }
-            return apiResult;
-        }
-        public class UpdateLevelGroupReq
-        {
-            public int GroupID { get; set; }
-            public int SiteId { get; set; }
-            public string GroupName { get; set; }
-            public int LevelBase { get; set; }
-        }
-        public ApiResult UpdateLevelGroup(UpdateLevelGroupReq updateLevelGroupReq)
-        {
-            var apiResult = new ApiResult();
-            try
-            {
-                rebateManageBLL.UpdateLevelGroup(updateLevelGroupReq.GroupID, updateLevelGroupReq.SiteId, updateLevelGroupReq.GroupName, updateLevelGroupReq.LevelBase);
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
-            }
-            return apiResult;
-        }
-        public class DelLevelGroupReq
-        {
-            public int GroupID { get; set; }
-        }
-        public ApiResult DelLevelGroup(DelLevelGroupReq delLevelGroupReq)
-        {
-            var apiResult = new ApiResult();
-            try
-            {
-                rebateManageBLL.DelLevelGroup(delLevelGroupReq.GroupID);
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
-            }
-            return apiResult;
-        }
-        public class GetLevelGroupReq
-        {
-            public int SiteId { get; set; }
-        }
-        public ApiResult<IEnumerable<LevelGroup>> GetLevelGroup(GetLevelGroupReq getLevelGroupReq)
-        {
-            var apiResult = new ApiResult<IEnumerable<LevelGroup>>();
-            try
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Data = rebateManageBLL.GetLevelGroup(getLevelGroupReq.SiteId);
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
-            }
-            return apiResult;
-        }
-        public class SetRebateCategoryReq
-        {
-            public int SiteId { get; set; }
-            public int CategoryId { get; set; }
-            public int GroupID { get; set; }
-            public decimal Percentage { get; set; }
-        }
-        public ApiResult SetRebateCategory(SetRebateCategoryReq setRebateCategoryReq)
-        {
-            var apiResult = new ApiResult();
-            try
-            {
-                var authData = authorizeBLL.GetAuthData();
-                rebateManageBLL.SetRebateCategory(setRebateCategoryReq.SiteId, setRebateCategoryReq.CategoryId, setRebateCategoryReq.GroupID, setRebateCategoryReq.Percentage, authData.UserName);
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
-            }
-            return apiResult;
-        }
-        public class SetRebateCategoryBatchReq
-        {
-            public int SiteId { get; set; }
-            public int CategoryId { get; set; }
-            public string groupPercentage { get; set; }
-        }
-        public ApiResult SetRebateCategoryBatch(SetRebateCategoryBatchReq setRebateCategoryBatchReq)
-        {
-            var apiResult = new ApiResult();
-            try
-            {
-                var authData = authorizeBLL.GetAuthData();
-                rebateManageBLL.SetRebateCategoryBatch(setRebateCategoryBatchReq.SiteId, setRebateCategoryBatchReq.CategoryId, setRebateCategoryBatchReq.groupPercentage, authData.UserName);
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
-            }
-            return apiResult;
-        }
-        public class DelRebateCategoryReq
-        {
-            public int SiteId { get; set; }
-            public int CategoryId { get; set; }
-            public int GroupID { get; set; }
-        }
-        public ApiResult DelRebateCategory(DelRebateCategoryReq delRebateCategoryReq)
-        {
-            var apiResult = new ApiResult();
-            try
-            {
-                rebateManageBLL.DelRebateCategory(delRebateCategoryReq.SiteId, delRebateCategoryReq.CategoryId, delRebateCategoryReq.GroupID);
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
-            }
-            return apiResult;
-        }
-        public class GetRebateCategoryReq
-        {
-            public int SiteId { get; set; }
-            public int CategoryId { get; set; }
-        }
-        [HttpPost]
-        public ApiResult<IEnumerable<RebateGroup>> GetRebateCategory(GetRebateCategoryReq getRebateCategoryReq)
-        {
-            var apiResult = new ApiResult<IEnumerable<RebateGroup>>();
-            try
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Data = rebateManageBLL.GetRebateCategory(getRebateCategoryReq.SiteId, getRebateCategoryReq.CategoryId);
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
-            }
-            return apiResult;
-        }
-        public class SetRebateGameTypeReq
-        {
-            public int SiteId { get; set; }
-            public int GameType { get; set; }
-            public int GroupID { get; set; }
-            public decimal Percentage { get; set; }
-        }
-        public ApiResult SetRebateGameType(SetRebateGameTypeReq setRebateGameTypeReq)
-        {
-            var apiResult = new ApiResult();
-            try
-            {
-                var authData = authorizeBLL.GetAuthData();
-                rebateManageBLL.SetRebateGameType(setRebateGameTypeReq.SiteId, setRebateGameTypeReq.GameType, setRebateGameTypeReq.GroupID, setRebateGameTypeReq.Percentage, authData.UserName);
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
-            }
-            return apiResult;
-        }
-        public class SetRebateGameTypeBatchReq
-        {
-            public int SiteId { get; set; }
-            public int GameType { get; set; }
-            public string groupPercentage { get; set; }
-        }
-        public ApiResult SetRebateGameTypeBatch(SetRebateGameTypeBatchReq setRebateGameTypeBatchReq)
-        {
-            var apiResult = new ApiResult();
-            try
-            {
-                var authData = authorizeBLL.GetAuthData();
-                rebateManageBLL.SetRebateGameTypeBatch(setRebateGameTypeBatchReq.SiteId, setRebateGameTypeBatchReq.GameType, setRebateGameTypeBatchReq.groupPercentage, authData.UserName);
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
-            }
-            return apiResult;
-        }
-        public class DelRebateGameTypeReq
-        {
-            public int SiteId { get; set; }
-            public int GameType { get; set; }
-            public int GroupID { get; set; }
-        }
-        public ApiResult DelRebateGameType(DelRebateGameTypeReq delRebateGameTypeReq)
-        {
-            var apiResult = new ApiResult();
-            try
-            {
-                rebateManageBLL.DelRebateGameType(delRebateGameTypeReq.SiteId, delRebateGameTypeReq.GameType, delRebateGameTypeReq.GroupID);
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
-            }
-            return apiResult;
-        }
-        public class GetRebateGameTypeReq
-        {
-            public int SiteId { get; set; }
-            public int GameType { get; set; }
-        }
-        [HttpPost]
-        public ApiResult<IEnumerable<RebateGroup>> GetRebateGameType(GetRebateGameTypeReq getRebateGameTypeReq)
-        {
-            var apiResult = new ApiResult<IEnumerable<RebateGroup>>();
-            try
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Data = rebateManageBLL.GetRebateGameType(getRebateGameTypeReq.SiteId, getRebateGameTypeReq.GameType);
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
+                apiResult.ErrorCode = -1;
             }
             return apiResult;
         }

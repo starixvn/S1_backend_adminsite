@@ -80,7 +80,7 @@ namespace BackendSite
             services.AddSingleton<ReferralManagementService>();
             services.AddSingleton<SportsService>();
             services.AddSingleton<PrizeService>();
-            services.AddSingleton<RebateMangeService>();
+            services.AddSingleton<RebateManageService>();
   
             services.AddSingleton<VipLevelService>();
             services.AddSingleton<GameCasinoManageService>();
@@ -130,7 +130,7 @@ namespace BackendSite
             services.AddSingleton<ReferralManagementBLL>();
             services.AddSingleton<SportsBLL>();
             services.AddSingleton<PrizeBLL>();
-            services.AddSingleton<RebateMangeBLL>();
+            services.AddSingleton<RebateManageBLL>();
             services.AddSingleton<VipLevelBLL>();
             services.AddSingleton<GameCasinoManageBLL>();
             services.AddSingleton<LatestHighlightVideoManagementBLL>();
