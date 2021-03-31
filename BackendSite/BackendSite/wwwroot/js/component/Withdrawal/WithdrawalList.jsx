@@ -33,6 +33,7 @@ import DateTimePicker from 'react-datetime';
     };
 
     const StatusSelectOp = {
+        1: "Pending",
         8: "To KYC",
         2: "On Hold",
         3: "Verify",
@@ -268,6 +269,9 @@ import DateTimePicker from 'react-datetime';
                 case 0:
                     confirmstring += " Draft ?";
                     break;
+                case 1:
+                    confirmstring += " Pending ?";
+                    break;
                 case 2:
                     confirmstring += " On Hold(Risk Check) ?";
                     break;
@@ -282,6 +286,9 @@ import DateTimePicker from 'react-datetime';
                     break;
                 case 7:
                     confirmstring += " Rejected ?";
+                    break;
+                case 8:
+                    confirmstring += " To KYC ?";
                     break;
                 default:
                     confirmstring += " ?";
@@ -376,20 +383,25 @@ import DateTimePicker from 'react-datetime';
             let selectPay = null;
             let PayFrom = [];
             if (data != null) {
-                // if (data.status == 1 || data.status == 2 || data.status == 3 || data.status == 4)
-                //     btnGroup.push(<button key={0} type="button" className="btn btn-draft" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
-                //只有8:"To KYC"跟3:"Verify"顯示On Hold
-                if ((data.status == 3  && subFuncKeys.indexOf("f_wd_payment") > -1) || (data.status == 8 && subFuncKeys.indexOf("f_wd_csd") > -1))
+                if ((data.status == 1 && subFuncKeys.indexOf("f_wd_risk") > -1) || (data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1) 
+                    || (data.status == 4 && data.sameOperator))
+                    btnGroup.push(<button key={0} type="button" className="btn btn-draft" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
+                if ((data.status == 1  && subFuncKeys.indexOf("f_wd_risk") > -1))
                     btnGroup.push(<button key={2} type="button" className="btn btn-hold" onClick={this.onConfirm.bind(this, 2)}>On Hold(Risk Check)</button>);
-                //只有1.2:"On Hold"跟4:"Process"顯示Verify
-                if ((data.status == 1 && subFuncKeys.indexOf("f_wd_risk") > -1) || (data.status == 2 && subFuncKeys.indexOf("f_wd_risk") > -1) || (data.status == 4 && subFuncKeys.indexOf("f_wd_payment") > -1))
+                if ((data.status == 1 && subFuncKeys.indexOf("f_wd_risk") > -1) || (data.status == 4 && data.sameOperator))
                     btnGroup.push(<button key={3} type="button" className="btn btn-verify" onClick={this.onConfirm.bind(this, 3)}>Verify</button>);
                 if (data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1)
                     btnGroup.push(<button key={4} type="button" className="btn btn-process" onClick={this.onConfirm.bind(this, 4)}>Process</button>);
-                if (data.status == 4 && data.withdrawalType != 1 && subFuncKeys.indexOf("f_wd_payment") > -1)
+                if (data.status == 4 && data.withdrawalType != 1 && data.sameOperator)
                     btnGroup.push(<button key={6} type="button" className="btn btn-aprroved" onClick={this.onConfirm.bind(this, 6)}>Approved</button>);
-                if (data.status == 3 || data.status == 2 || data.status == 8 || data.status == 1)
+                if ((data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1) || (data.status == 8 && (subFuncKeys.indexOf("f_wd_risk") > -1 || subFuncKeys.indexOf("f_wd_payment") > -1)) 
+                    || (data.status == 1 && subFuncKeys.indexOf("f_wd_risk") > -1))
                     btnGroup.push(<button key={7} type="button" className="btn btn-rejected" onClick={this.onConfirm.bind(this, 7)}>Rejected</button>);
+                if ((data.status == 8 && (subFuncKeys.indexOf("f_wd_risk") > -1 || subFuncKeys.indexOf("f_wd_payment") > -1)) || (data.status == 2 && subFuncKeys.indexOf("f_wd_risk") > -1) 
+                    || (data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1))
+                    btnGroup.push(<button key={1} type="button" className="btn btn-pending" onClick={this.onConfirm.bind(this, 1)}>Pending</button>);
+                if ((data.status == 1  && subFuncKeys.indexOf("f_wd_risk") > -1))
+                    btnGroup.push(<button key={8} type="button" className="btn btn-tokyc" onClick={this.onConfirm.bind(this, 8)}>ToKyc</button>);
 
                 selectType = i18n["lbl_WithdrawalType" + data.withdrawalType];
 
@@ -862,10 +874,10 @@ import DateTimePicker from 'react-datetime';
                         searchFilter.selectStatus.forEach(function (obj) {
                             state.selectStatus.push(parseInt(obj));
                         })
-                        : state.selectStatus.push(2);
+                        : state.selectStatus.push(1);
                 }
             });
-            (state.MutiSelRefresh) ? $('#selectStatus').multiselect('select', searchFilter.selectStatus) : $('#selectStatus').multiselect('select', 2);
+            (state.MutiSelRefresh) ? $('#selectStatus').multiselect('select', searchFilter.selectStatus) : $('#selectStatus').multiselect('select', 1);
             $('#selectStatus').multiselect('updateButtonText');
         }
 
