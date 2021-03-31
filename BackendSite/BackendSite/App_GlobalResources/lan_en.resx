@@ -460,7 +460,7 @@
     <value>Draft</value>
   </data>
   <data name="lbl_WithdrawalStatus1" xml:space="preserve">
-    <value>OnHold</value>
+    <value>Pending</value>
   </data>
   <data name="lbl_WithdrawalStatus2" xml:space="preserve">
     <value>OnHold</value>
