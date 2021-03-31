@@ -41,7 +41,8 @@ namespace BackendSite.Service.Model
         public bool HasPhotoId { set; get; }
         public string VipLevelName { set; get; }
         public int VipLevel { set; get; }
-
+        public string Operator { set; get; }
+        public bool SameOperator { get; set; }
         public string CalCode =>
     WithdrawalType switch
     {

@@ -181,10 +181,6 @@
             "FuncKey": "f_wd_execute"
           },
           {
-            "DisplayKey": "CSD",
-            "FuncKey": "f_wd_csd"
-          },
-          {
             "DisplayKey": "Payment",
             "FuncKey": "f_wd_payment"
           },
