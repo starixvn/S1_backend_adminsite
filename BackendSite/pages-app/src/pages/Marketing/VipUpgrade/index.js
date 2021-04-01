@@ -23,14 +23,14 @@ const App = () => {
   const [stateFilter, setFilter] = useState({
     optSite: 0,
     YearMonth: moment(),
-    Status:0,
-    UserName:""
+    Status: 0,
+    UserName: "",
   });
   const [stateDatas, setDatas] = useState({
     PageInfo: null,
     Datas: null,
     FilterInfo: null,
-    CanUpgrade: false
+    CanUpgrade: false,
   });
   const Submit = () => {
     if (stateFilter.optSite === 0) {
@@ -42,7 +42,7 @@ const App = () => {
       YearMonth: moment(stateFilter.YearMonth).format("YYYYMM"),
       PageNumber: 1,
       Status: parseInt(stateFilter.Status, 10),
-      UserName: stateFilter.UserName
+      UserName: stateFilter.UserName,
     };
     api
       .post("/api/VipLevel/GetVipUpgradeReview", Data)
@@ -59,7 +59,7 @@ const App = () => {
             FilterInfo: {
               ...stateFilter,
             },
-            CanUpgrade: res.data.errorCode === 0
+            CanUpgrade: res.data.errorCode === 0,
           });
         } else {
           alert(res.data.message ?? "failed to get data.");
@@ -79,7 +79,7 @@ const App = () => {
       YearMonth: moment(stateDatas.FilterInfo.YearMonth).format("YYYYMM"),
       PageNumber: PageNumber,
       Status: parseInt(stateDatas.FilterInfo.Status, 10),
-      UserName: stateFilter.UserName
+      UserName: stateFilter.UserName,
     };
     api
       .post("/api/VipLevel/GetVipUpgradeReview", Data)
@@ -96,7 +96,7 @@ const App = () => {
             FilterInfo: {
               ...stateFilter,
             },
-            CanUpgrade: res.data.errorCode === 0
+            CanUpgrade: res.data.errorCode === 0,
           });
         } else {
           alert(res.data.message ?? "failed to get data.");
@@ -112,7 +112,7 @@ const App = () => {
       YearMonth: moment(stateDatas.FilterInfo.YearMonth).format("YYYYMM"),
       PageNumber: stateDatas.PageInfo.pageNumber,
       Status: parseInt(stateDatas.FilterInfo.Status, 10),
-      UserName: stateFilter.UserName
+      UserName: stateFilter.UserName,
     };
     api
       .post("/api/VipLevel/GetVipUpgradeReview", Data)
@@ -129,8 +129,29 @@ const App = () => {
             FilterInfo: {
               ...stateFilter,
             },
-            CanUpgrade: res.data.errorCode === 0
+            CanUpgrade: res.data.errorCode === 0,
           });
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  };
+  const Rdject = (props) => {
+    let CustIds = [];
+    CustIds.push(props.custId);
+    let Data = {
+      CustIds: JSON.stringify(CustIds),
+      YearMonth: moment(stateDatas.FilterInfo.YearMonth).format("YYYYMM"),
+      ChangeStatus: parseInt(3)
+    };
+    api
+      .post("/api/VipLevel/UpdateVipUpgradeReview", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0 || res.data.errorCode === 1) {
+          UpdateReset();
         } else {
           alert(res.data.message ?? "failed to get data.");
         }
@@ -145,6 +166,7 @@ const App = () => {
     let Data = {
       CustIds: JSON.stringify(CustIds),
       YearMonth: moment(stateDatas.FilterInfo.YearMonth).format("YYYYMM"),
+      ChangeStatus: parseInt(2)
     };
     api
       .post("/api/VipLevel/UpdateVipUpgradeReview", Data)
@@ -162,16 +184,17 @@ const App = () => {
   const AllUpgrade = () => {
     let CustIds = [];
     stateDatas.Datas.forEach((x) => {
-      if (x["status"] === 1) {
+      if (x["status"] === 1 || x["status"] === 3) {
         CustIds.push(x["custId"]);
       }
     });
-    if(CustIds.length === 0){
+    if (CustIds.length === 0) {
       return false;
     }
     let Data = {
       CustIds: JSON.stringify(CustIds),
       YearMonth: moment(stateDatas.FilterInfo.YearMonth).format("YYYYMM"),
+      ChangeStatus: parseInt(2)
     };
     api
       .post("/api/VipLevel/UpdateVipUpgradeReview", Data)
@@ -186,31 +209,31 @@ const App = () => {
         alert(error);
       });
   };
-  const Result_ExportToExcel =()=>{
+  const Result_ExportToExcel = () => {
     let param = {
       Url: "VipLevel/ExportVipUpgradedata",
       Data: {
         SiteId: stateDatas.FilterInfo.optSite,
         YearMonth: moment(stateDatas.FilterInfo.YearMonth).format("YYYYMM"),
         Status: parseInt(stateDatas.FilterInfo.Status, 10),
-        UserName: stateFilter.UserName
+        UserName: stateFilter.UserName,
       },
     };
 
     WebAPI.DownloadData(param);
-  }
-  const StatusChange=(props)=>{
+  };
+  const StatusChange = (props) => {
     setFilter({
       ...stateFilter,
-      Status:props
-    })
-  }
-  const UserNameChange=(props)=>{
+      Status: props,
+    });
+  };
+  const UserNameChange = (props) => {
     setFilter({
       ...stateFilter,
-      UserName:props
-    })
-  }
+      UserName: props,
+    });
+  };
   return (
     <div className="container-fluid">
       <h4 className="page-name">VipUpgrade</h4>
@@ -229,6 +252,7 @@ const App = () => {
           Upgrade={Upgrade}
           ChangePage={Result_ChangePage}
           ExportToExcel={Result_ExportToExcel}
+          Rdject={Rdject}
         />
       )}
     </div>
