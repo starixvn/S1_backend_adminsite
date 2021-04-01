@@ -387,16 +387,16 @@ import DateTimePicker from 'react-datetime';
                     btnGroup.push(<button key={0} type="button" className="btn btn-draft" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
                 if ((data.status == 1  && subFuncKeys.indexOf("f_wd_risk") > -1))
                     btnGroup.push(<button key={2} type="button" className="btn btn-hold" onClick={this.onConfirm.bind(this, 2)}>On Hold(Risk Check)</button>);
-                if ((data.status == 1 && subFuncKeys.indexOf("f_wd_risk") > -1) || (data.status == 4 && data.sameOperator))
+                if ((data.status == 1 && subFuncKeys.indexOf("f_wd_risk") > -1) || (data.status == 4 && data.sameOperator) || (data.status == 2 && subFuncKeys.indexOf("f_wd_risk") > -1))
                     btnGroup.push(<button key={3} type="button" className="btn btn-verify" onClick={this.onConfirm.bind(this, 3)}>Verify</button>);
                 if (data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1)
                     btnGroup.push(<button key={4} type="button" className="btn btn-process" onClick={this.onConfirm.bind(this, 4)}>Process</button>);
                 if (data.status == 4 && data.withdrawalType != 1 && data.sameOperator)
                     btnGroup.push(<button key={6} type="button" className="btn btn-aprroved" onClick={this.onConfirm.bind(this, 6)}>Approved</button>);
                 if ((data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1) || (data.status == 8 && (subFuncKeys.indexOf("f_wd_risk") > -1 || subFuncKeys.indexOf("f_wd_payment") > -1)) 
-                    || (data.status == 1 && subFuncKeys.indexOf("f_wd_risk") > -1))
+                    || (data.status == 1 && subFuncKeys.indexOf("f_wd_risk") > -1) || (data.status == 2 && subFuncKeys.indexOf("f_wd_risk") > -1))
                     btnGroup.push(<button key={7} type="button" className="btn btn-rejected" onClick={this.onConfirm.bind(this, 7)}>Rejected</button>);
-                if ((data.status == 8 && (subFuncKeys.indexOf("f_wd_risk") > -1 || subFuncKeys.indexOf("f_wd_payment") > -1)) || (data.status == 2 && subFuncKeys.indexOf("f_wd_risk") > -1) 
+                if ((data.status == 8 && (subFuncKeys.indexOf("f_wd_risk") > -1 || subFuncKeys.indexOf("f_wd_payment") > -1)) 
                     || (data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1))
                     btnGroup.push(<button key={1} type="button" className="btn btn-pending" onClick={this.onConfirm.bind(this, 1)}>Pending</button>);
                 if ((data.status == 1  && subFuncKeys.indexOf("f_wd_risk") > -1))
