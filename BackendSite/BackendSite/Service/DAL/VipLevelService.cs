@@ -69,14 +69,15 @@ namespace BackendSite.Service.DAL
             SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
             return SearchData;
         }
-        public int UpdateVipUpgradeReview(string CustIds, string YearMonth)
+        public int UpdateVipUpgradeReview(string CustIds, string YearMonth,string username,int ChangeStatus)
         {
             DynamicParameters props = new DynamicParameters();
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
 
             props.Add("CustIds", CustIds);
             props.Add("CalculateMonth", YearMonth);
-            props.Add("Status", (int)VipStatus.Approved);
+            props.Add("Status", ChangeStatus);
+            props.Add("LastUpdateUser", username);
 
             return conn.Execute("Admin_VipUpgradeReview_Set", props, commandType: CommandType.StoredProcedure);
         }

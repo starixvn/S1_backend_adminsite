@@ -41,9 +41,9 @@ namespace BackendSite.Service.BLL
             VipUpgradeReviewData.VipUpgradeList.ForEach(x => x.CalculateTime = Convert.ToDateTime(x.CalculateTime).ToString("yyyy/MM/dd HH:mm:ss"));
             return VipUpgradeReviewData;
         }
-        public int UpdateVipUpgradeReview(string CustIds, string YearMonth)
+        public int UpdateVipUpgradeReview(string CustIds, string YearMonth,string username,int ChangeStatus)
         {
-            return vipLevelService.UpdateVipUpgradeReview(CustIds, YearMonth);
+            return vipLevelService.UpdateVipUpgradeReview(CustIds, YearMonth, username, ChangeStatus);
         }
 
         public IEnumerable<VipUpgradeExport> GetVipUpgradedata(int SiteId, string YearMonth, int Status, string UserName)
