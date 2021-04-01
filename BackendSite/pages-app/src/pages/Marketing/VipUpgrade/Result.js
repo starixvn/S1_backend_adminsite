@@ -12,6 +12,7 @@ const dataColumnDefs = () => {
     { dataColumn: "thresholdAmount", columnTitle: "Threshold Amount" },
     { dataColumn: "upgradeBonus", columnTitle: "Upgrade Bonus" },
     { dataColumn: "calculateTime", columnTitle: "Calculate Time" },
+    { dataColumn: "lastUpdateUser", columnTitle: "LastUpdateUser" },
     { dataColumn: "status", columnTitle: "Status" },
     { dataColumn: "upgrade", columnTitle: "Upgrade" },
   ];
@@ -144,7 +145,7 @@ const Panel = (props) => {
               : data[element.dataColumn]}
           </td>
         )
-      ) : data["status"] === 1 &&
+      ) : (data["status"] === 1 || data["status"] === 3) &&
         props.CanUpgrade &&
         window.subFuncKeys &&
         window.subFuncKeys.includes("vipupgrade_Upgrade") ? (
@@ -163,7 +164,15 @@ const Panel = (props) => {
         window.subFuncKeys &&
         window.subFuncKeys.includes("vipupgrade_Upgrade") ? (
         <td key={`td-${element.dataColumn}-${idx}`}>
-          <div></div>
+          <div>
+            <button
+              className="btn btn-search"
+              type="submit"
+              onClick={props.Rdject.bind(this, data)}
+            >
+              Rdject
+            </button>
+          </div>
         </td>
       ) : null;
     });
