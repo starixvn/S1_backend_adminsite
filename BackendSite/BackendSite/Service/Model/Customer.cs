@@ -221,6 +221,7 @@ namespace BackendSite.Service.Model
         public string StatusName { get; set; }
         public int CurrencyId { get; set; }
         public decimal ThresholdAmount { get; set; }
+        public string LastUpdateUser { get; set; }
     }
     public class VipUpgradeReviewData
     {
