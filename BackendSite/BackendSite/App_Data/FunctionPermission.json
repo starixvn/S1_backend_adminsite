@@ -227,6 +227,11 @@
         "DisplayKey": "3RD Funds Adjustment",
         "FuncKey": "Finance/ThirdPartyAdjustment",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Deposit Submission",
+        "FuncKey": "Finance/DepositSubmission",
+        "Enable": false
       }
     ]
   },

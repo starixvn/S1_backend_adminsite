@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.Api
 {
@@ -247,6 +248,27 @@ namespace BackendSite.Controllers.Api
             var depositLimitInfos = depositBLL.GetDepositLimitInfos(depositLimit.SiteId, depositLimit.DepositType, depositLimit.CurrencyId);
             apiResult.Data = depositLimitInfos;
             apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Finance/DepositSubmission"})]
+        public ApiResult DepositSubmission([FromForm] DepositDetailSubmission deposit)
+        {
+            var depositDetails = JsonConvert.DeserializeObject<DepositDetailInfo>(deposit.DepositDetails);
+
+            var result = depositBLL.CreateDeposit(depositDetails, deposit.Receipt);
+            var apiResult = new ApiResult();
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_InsertSuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_InsertFailed");
+            }
             return apiResult;
         }
 

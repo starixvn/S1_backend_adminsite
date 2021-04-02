@@ -250,6 +250,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "lbl_DepositSubmission",
+        "Title": "Deposit Submission",
+        "FuncKey": "Finance/DepositSubmission",
+        "Controller": "Finance",
+        "Action": "DepositSubmission",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

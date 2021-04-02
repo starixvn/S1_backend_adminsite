@@ -83,6 +83,43 @@ namespace BackendSite.Service.DAL
             return conn.Query<Comments>("DepositRequestComment_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
 
+        public string InsertDepositRequest(DepositDetailInfo deposit)
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using MySqlTransaction trans = conn.BeginTransaction();
+
+            var p = new DynamicParameters(new
+            {
+                deposit.CustId,
+                deposit.UserName,
+                deposit.CurrencyId,
+                deposit.SiteId,
+                deposit.DepositInfo,
+                deposit.Amount,
+                deposit.Comment,
+                deposit.RefId,
+                deposit.DepositTime,
+                deposit.Operator,
+                Prefix = $"D{common.GetEnv()}"
+            });
+
+            p.Add("vTransId", dbType: DbType.String, direction: ParameterDirection.Output);
+
+            var result = conn.Execute("Admin_DepositInfo_Ins", p, transaction: trans, commandType: CommandType.StoredProcedure);
+            trans.Commit();
+
+            var transId = p.Get<string>("vTransId");
+
+            return transId;
+        }
+
+        public int SetDepositReceiptPic(int custId, int depositId, string picFileName, byte[] depositPic)
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_DepositReceiptPic_Set", new { CustId = custId, DepositId = depositId, PicFileName = picFileName, DepositPic = depositPic }, commandType: CommandType.StoredProcedure);
+        }
+
         public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatus status, DepositRequest depositRequest)
         {
             int depositId = 0;

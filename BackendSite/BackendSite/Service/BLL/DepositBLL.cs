@@ -1,8 +1,12 @@
-﻿using BackendSite.Service.DAL;
+﻿using System;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text.RegularExpressions;
+using LazZiya.ImageResize;
+using Microsoft.AspNetCore.Http;
 
 namespace BackendSite.Service.BLL
 {
@@ -11,12 +15,14 @@ namespace BackendSite.Service.BLL
         private readonly DepositService depositService;
         private readonly ServerInfoService serverInfoService;
         private readonly AdjustmentService adjustmentService;
+        private readonly CustInfoBLL custInfoBLL;
 
-        public DepositBLL(DepositService depositService, ServerInfoService serverInfoService, AdjustmentService adjustmentService)
+        public DepositBLL(DepositService depositService, ServerInfoService serverInfoService, AdjustmentService adjustmentService, CustInfoBLL custInfoBLL)
         {
             this.depositService = depositService;
             this.serverInfoService = serverInfoService;
             this.adjustmentService = adjustmentService;
+            this.custInfoBLL = custInfoBLL;
         }
         public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, long startDate, long endDate, string DepositId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
@@ -28,6 +34,100 @@ namespace BackendSite.Service.BLL
         {
             return depositService.GetDepositListByCust(CustId, TransId, Status, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
+
+        public bool CreateDeposit(DepositDetailInfo deposit, IFormFile receipt)
+        {
+            var depositInfo = new DepositInfo3_1
+            {
+                AccountName = deposit.AccountHolderName,
+                CurrencyId = deposit.CurrencyId,
+                AccountNo = deposit.AccountNumber,
+                SysId = deposit.SysId,
+                Ver = 1
+            };
+            deposit.DepositInfo = Newtonsoft.Json.JsonConvert.SerializeObject(depositInfo);
+
+            var customer = custInfoBLL.GetCustInfoDetails(null, deposit.UserName, deposit.SiteId);
+            deposit.CurrencyId = customer.CurrencyId;
+            deposit.CustId = customer.CustId;
+
+            var transId = depositService.InsertDepositRequest(deposit);
+
+            if (!string.IsNullOrEmpty(transId) && receipt!=null)
+            {
+                InsertDepositReceipt(receipt, deposit.CustId, transId);
+            }
+
+            return !string.IsNullOrEmpty(transId);
+        }
+
+        private int InsertDepositReceipt(IFormFile depositReceipt, int custId, string transId)
+        {
+            var processedReceipt = ProcessImage(depositReceipt);
+
+            var depositId = ValidateDepositReceiptPic(transId);
+
+            return depositService.SetDepositReceiptPic(custId, depositId, processedReceipt.FileName, processedReceipt.FileBytes); ;
+        }
+
+        private ProcessedDepositReceipt ProcessImage(IFormFile depositReceipt)
+        {
+            var processedDepositReceipt = new ProcessedDepositReceipt();
+            if (_contentTypesCheck.ContainsKey(depositReceipt.ContentType))
+            {
+                decimal xSize = 500m;
+                var apiResult = new ApiResult();
+                decimal xCell = 1;
+
+                using var fileStream = depositReceipt.OpenReadStream();
+                using var uploadedImage = Image.FromStream(fileStream);
+                using var ms = new System.IO.MemoryStream();
+
+                if (uploadedImage.Width > xSize || uploadedImage.Height > xSize)
+                {
+                    if (uploadedImage.Width > uploadedImage.Height)
+                    {
+                        xCell = xSize / uploadedImage.Width;
+                    }
+                    else
+                    {
+                        xCell = xSize / uploadedImage.Height;
+                    }
+                }
+
+                var graphicOptions = new GraphicOptions();
+                graphicOptions.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
+                graphicOptions.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+                var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
+                img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                string fileName = depositReceipt.FileName;
+                fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
+                fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
+
+                byte[] fileBytes = ms.ToArray();
+
+                processedDepositReceipt.FileName = fileName;
+                processedDepositReceipt.FileBytes = fileBytes;
+            }
+
+            return processedDepositReceipt;
+        }
+
+        private int ValidateDepositReceiptPic(string transId)
+        {
+            int depositId = 0;
+            Match m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out depositId);
+            return depositId;
+        }
+
+        public class ProcessedDepositReceipt
+        {
+            public string FileName { get; set; }
+            public byte[] FileBytes { get; set; }
+        }
+
         public DepositRequest GetDepositRequest(string transId)
         {
             var serverInfo = serverInfoService.GetModel();
@@ -158,5 +258,12 @@ namespace BackendSite.Service.BLL
 
             return depositService.DeleteDepositLimitInfo(depositLimitInfo);
         }
+
+        private readonly Dictionary<string, System.Drawing.Imaging.ImageFormat> _contentTypesCheck = new Dictionary<string, System.Drawing.Imaging.ImageFormat>(comparer: StringComparer.OrdinalIgnoreCase)
+        {
+            {"image/png",System.Drawing.Imaging.ImageFormat.Png},
+            {"image/jpeg",System.Drawing.Imaging.ImageFormat.Jpeg},
+            { "image/gif",System.Drawing.Imaging.ImageFormat.Gif}
+        };
     }
 }
