@@ -140,6 +140,10 @@ module.exports = {
 			"@babel/polyfill",
 			"./src/pages/Marketing/VipUpgrade/index.js"
 		],
+		"Marketing/LatestHighlightVideoManagement.min": [
+			"@babel/polyfill",
+			"./src/pages/Marketing/LatestHighlightVideoManagement/index.js"
+		]
 	},
 	output: {
 		path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

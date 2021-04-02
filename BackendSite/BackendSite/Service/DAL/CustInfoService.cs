@@ -24,23 +24,28 @@ namespace BackendSite.Service.DAL
             return conn.QueryFirstOrDefault<Customer>("Customer_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? AffId, ref int pageNumber, out int totalPages, out int rowCount, string siteList)
+        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? AffId, IEnumerable<int> selectCurrency, ref int pageNumber, out int totalPages, out int rowCount, string siteList, string currncyList)
         {
             string SelectSite = null;
+            string SelectCurrency = null;
             if (selectSite != null && selectSite.Any())
             {
                 SelectSite = JsonConvert.SerializeObject(selectSite);
             }
+            if (selectCurrency != null && selectCurrency.Any())
+            {
+                SelectCurrency = JsonConvert.SerializeObject(selectCurrency);
+            }
             totalPages = 0;
 
-            var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TransId = transId, TpUserName = TpUserName, Email = Email, PhoneNo = PhoneNo, StartDate = startDate, EndDate = endDate, PageSize = pageSize, SiteList = siteList, AffId });
+            var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TransId = transId, TpUserName = TpUserName, Email = Email, PhoneNo = PhoneNo, StartDate = startDate, EndDate = endDate, PageSize = pageSize, SelectCurrency=SelectCurrency,SiteList = siteList, AffId, CurrncyList = currncyList});
             p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.Query<CustInfoDetail>("Admin_CustInfoSearch_Get", p, commandType: CommandType.StoredProcedure);
+            var result = conn.Query<CustInfoDetail>("Admin_CustInfoSearchV2_Get", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -70,7 +75,7 @@ namespace BackendSite.Service.DAL
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfoDetailSearch_Get", new { CustId = custId, UserName = userName, SiteList = siteList }, commandType: CommandType.StoredProcedure);
+            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfoDetailSearchV2_Get", new { CustId = custId, UserName = userName, SiteList = siteList }, commandType: CommandType.StoredProcedure);
             return result;
         }
 

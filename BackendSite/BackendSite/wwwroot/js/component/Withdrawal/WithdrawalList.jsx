@@ -124,10 +124,10 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">Trxn.ID</th>
                                 {/* <th scope="col">Calvin Code</th> */}
                                 <th scope="col">{i18n.lbl_WithdrawalType}</th>
-                                <th scope="col">Is Kyc</th>
-                                <th scope="col">Is Risk</th>
+                                <th scope="col">Kyc</th>
+                                <th scope="col">Risk</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
-                                <th scope="col">CCY</th>
+                                <th scope="col">Currency</th>
                                 <th scope="col" className="text-right">{i18n.lbl_Amount}</th>
                                 <th scope="col">Bank Name</th>
                                 {/* <th scope="col">To Acc. NO.</th>
@@ -135,7 +135,7 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Update Time (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">VIP Level</th>
-                                <th scope="col" className="text-right">Total Withdrawl Count</th>
+                                <th scope="col" className="text-right">Withdrawl Count</th>
                                 <th scope="col">{i18n.lbl_Status}</th>
                             </tr>
                         </thead>
@@ -269,6 +269,9 @@ import DateTimePicker from 'react-datetime';
                 case 0:
                     confirmstring += " Draft ?";
                     break;
+                case 1:
+                    confirmstring += " Pending ?";
+                    break;
                 case 2:
                     confirmstring += " On Hold(Risk Check) ?";
                     break;
@@ -283,6 +286,9 @@ import DateTimePicker from 'react-datetime';
                     break;
                 case 7:
                     confirmstring += " Rejected ?";
+                    break;
+                case 8:
+                    confirmstring += " To KYC ?";
                     break;
                 default:
                     confirmstring += " ?";
@@ -377,18 +383,24 @@ import DateTimePicker from 'react-datetime';
             let selectPay = null;
             let PayFrom = [];
             if (data != null) {
-                if (data.status == 1 || data.status == 2 || data.status == 3 || data.status == 4)
+                if (data.status == 1 || data.status == 2 || data.status == 3 || data.status == 4 || data.status == 8)
                     btnGroup.push(<button key={0} type="button" className="btn btn-draft" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
-                if (data.status == 1 || data.status == 3 || data.status == 8)
+                if ((data.status == 1  && subFuncKeys.indexOf("f_wd_risk") > -1))
                     btnGroup.push(<button key={2} type="button" className="btn btn-hold" onClick={this.onConfirm.bind(this, 2)}>On Hold(Risk Check)</button>);
-                if (data.status == 1 || data.status == 2 || data.status == 4 || data.status == 8)
+                if ((data.status == 1 && subFuncKeys.indexOf("f_wd_risk") > -1) || (data.status == 4 && data.sameOperator) || (data.status == 2 && subFuncKeys.indexOf("f_wd_risk") > -1))
                     btnGroup.push(<button key={3} type="button" className="btn btn-verify" onClick={this.onConfirm.bind(this, 3)}>Verify</button>);
-                if (data.status == 3)
+                if (data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1)
                     btnGroup.push(<button key={4} type="button" className="btn btn-process" onClick={this.onConfirm.bind(this, 4)}>Process</button>);
-                if (data.status == 4 && data.withdrawalType != 1)
+                if (data.status == 4 && data.withdrawalType != 1 && data.sameOperator)
                     btnGroup.push(<button key={6} type="button" className="btn btn-aprroved" onClick={this.onConfirm.bind(this, 6)}>Approved</button>);
-                if (data.status == 3 || data.status == 2 || data.status == 8)
+                if ((data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1) || (data.status == 8 && (subFuncKeys.indexOf("f_wd_risk") > -1 || subFuncKeys.indexOf("f_wd_payment") > -1)) 
+                    || (data.status == 1 && subFuncKeys.indexOf("f_wd_risk") > -1) || (data.status == 2 && subFuncKeys.indexOf("f_wd_risk") > -1))
                     btnGroup.push(<button key={7} type="button" className="btn btn-rejected" onClick={this.onConfirm.bind(this, 7)}>Rejected</button>);
+                if ((data.status == 8 && (subFuncKeys.indexOf("f_wd_risk") > -1 || subFuncKeys.indexOf("f_wd_payment") > -1)) 
+                    || (data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1))
+                    btnGroup.push(<button key={1} type="button" className="btn btn-pending" onClick={this.onConfirm.bind(this, 1)}>Pending</button>);
+                if ((data.status == 1  && subFuncKeys.indexOf("f_wd_risk") > -1))
+                    btnGroup.push(<button key={8} type="button" className="btn btn-tokyc" onClick={this.onConfirm.bind(this, 8)}>ToKyc</button>);
 
                 selectType = i18n["lbl_WithdrawalType" + data.withdrawalType];
 
@@ -468,11 +480,11 @@ import DateTimePicker from 'react-datetime';
                                 <td>{i18n["lbl_WithdrawalStatus" + data.status]}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Is Kyc</th>
+                                <th scope="row">Kyc</th>
                                 <td>{data.isKyc === 1 ? "YES" : "NO"}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Is Risk</th>
+                                <th scope="row">Risk</th>
                                 <td>{data.isRisk === 1 ? "YES" : "NO"}</td>
                             </tr>
                             <tr>
@@ -521,7 +533,7 @@ import DateTimePicker from 'react-datetime';
                                 <td>{data.refId}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Total Withdrawl Count</th>
+                                <th scope="row">Withdrawl Count</th>
                                 <td>{data.withdrawlCnt}</td>
                             </tr>
                             <tr>
