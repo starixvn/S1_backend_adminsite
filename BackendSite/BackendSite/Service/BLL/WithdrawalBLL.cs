@@ -69,6 +69,7 @@ namespace BackendSite.Service.BLL
             forStatus.Add((int)WithdrawalStatus.OnHold);
             forStatus.Add((int)WithdrawalStatus.Verify);
             forStatus.Add((int)WithdrawalStatus.ToKyc);
+            forStatus.Add((int)WithdrawalStatus.Pending);
             int custId = 0;
             decimal amount = 0m;
             int withdrawalId = 0;
@@ -86,7 +87,7 @@ namespace BackendSite.Service.BLL
             forStatus.Add((int)WithdrawalStatus.Pending);
             forStatus.Add((int)WithdrawalStatus.OnHold);
             forStatus.Add((int)WithdrawalStatus.Process);
-            forStatus.Add((int)WithdrawalStatus.ToKyc);
+            //forStatus.Add((int)WithdrawalStatus.ToKyc);
             int custId = 0;
             decimal amount = 0m;
             int withdrawalId = 0;
@@ -113,9 +114,9 @@ namespace BackendSite.Service.BLL
         {
             var serverInfo = serverInfoService.GetModel();
             List<int> forStatus = new List<int>();
-            forStatus.Add((int)WithdrawalStatus.Verify);
+            //forStatus.Add((int)WithdrawalStatus.Verify);
             forStatus.Add((int)WithdrawalStatus.Pending);
-            forStatus.Add((int)WithdrawalStatus.ToKyc);
+            //forStatus.Add((int)WithdrawalStatus.ToKyc);
             int custId = 0;
             decimal amount = 0m;
             int withdrawalId = 0;
@@ -143,6 +144,37 @@ namespace BackendSite.Service.BLL
             var withdrawalRequest = withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
             return withdrawalService.SetWithdrawalInfo(transId, withdrawalRequest.SiteId, comment, Operator, forStatus, WithdrawalStatus.Draft, null, (int?)null, out custId, out amount);
         }
+        public int WithdrawalPending(string transId, string comment, string Operator)
+        {
+            var serverInfo = serverInfoService.GetModel();
+            List<int> forStatus = new List<int>();
+            //forStatus.Add((int)WithdrawalStatus.OnHold);
+            forStatus.Add((int)WithdrawalStatus.Verify);
+            forStatus.Add((int)WithdrawalStatus.ToKyc);
+            int custId = 0;
+            decimal amount = 0m;
+            int withdrawalId = 0;
+
+            Match m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out withdrawalId);
+            var withdrawalRequest = withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            return withdrawalService.SetWithdrawalInfo(transId, withdrawalRequest.SiteId, comment, Operator, forStatus, WithdrawalStatus.Pending, null, (int?)null, out custId, out amount);
+        }
+        public int WithdrawalToKyc(string transId, string comment, string Operator)
+        {
+            var serverInfo = serverInfoService.GetModel();
+            List<int> forStatus = new List<int>();
+            forStatus.Add((int)WithdrawalStatus.Pending);
+            int custId = 0;
+            decimal amount = 0m;
+            int withdrawalId = 0;
+
+            Match m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out withdrawalId);
+            var withdrawalRequest = withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            return withdrawalService.SetWithdrawalInfo(transId, withdrawalRequest.SiteId, comment, Operator, forStatus, WithdrawalStatus.ToKyc, null, (int?)null, out custId, out amount);
+        }
+        
         public IEnumerable<WithdrawalRequest> GetWithdrawalListByCust(int CustId, string TransId, int? Status, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             return withdrawalService.GetWithdrawalListByCust(CustId, TransId, Status, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);

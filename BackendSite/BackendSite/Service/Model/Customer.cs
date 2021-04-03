@@ -73,6 +73,7 @@ namespace BackendSite.Service.Model
         public DateTime? ReloadTime { get; set; }
         public string IP { get; set; }
         public string LevelName { get; set; }
+        public string AffiliateCode { get; set; }
     }
 
     public class CustInfoDetailForExport
@@ -220,6 +221,7 @@ namespace BackendSite.Service.Model
         public string StatusName { get; set; }
         public int CurrencyId { get; set; }
         public decimal ThresholdAmount { get; set; }
+        public string LastUpdateUser { get; set; }
     }
     public class VipUpgradeReviewData
     {
