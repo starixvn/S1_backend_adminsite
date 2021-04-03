@@ -11,16 +11,17 @@ import { Dropdown } from 'semantic-ui-react';
             this.state = {
                 SiteList: [],
                 SiteId: 0,
-                UserName: null,
-                Amount: 0.00,
+                UserName: "",
+                Amount: 0,
                 BankName: null,
                 AccountName: "",
                 AccountNo: "",
                 ReferenceNumber: null,
-                Remark: null,
+                Remark: "",
                 File: null,
                 selectOptions: [],
                 BankCode: "",
+                CurrencyId: 0,
                 SysId: 0
             };
 
@@ -32,7 +33,7 @@ import { Dropdown } from 'semantic-ui-react';
             this.getAccountList();
         }
 
-        onChange(event) {
+        onChange(e) {
             let obj = this.state;
             obj[event.target.name] = event.target.value;
             this.setState(obj);
@@ -91,32 +92,41 @@ import { Dropdown } from 'semantic-ui-react';
                     BankName: e.currentTarget.getAttribute("bankname"),
                     AccountName: e.currentTarget.getAttribute("accountname"),
                     AccountNo: e.currentTarget.getAttribute("accountno"),
-                    SysId: parseInt(e.currentTarget.getAttribute("sysid"))
-                });
-            }
-            if (e.keyCode == '38' || e.keyCode == '40') {
-                this.setState({
-                    BankName: e.target.getAttribute("bankname"),
-                    AccountName: e.target.getAttribute("accountname"),
-                    AccountNo: e.target.getAttribute("accountno"),
-                    SysId: parseInt(e.target.getAttribute("sysid"))
+                    SysId: parseInt(e.currentTarget.getAttribute("sysid")),
+                    CurrencyId: parseInt(e.currentTarget.getAttribute("currencyid"))
                 });
             }
         }
 
         onSubmitDeposit(event) {
+            event.preventDefault();
+            if (this.state.UserName.length == 0) {
+                alert("Please enter username");
+                return;
+            }
+
+            if (this.state.Amount == '0') {
+                alert("Please enter deposited amount");
+                return;
+            }
+
+            if (this.state.SysId.length == 0 || this.state.SysId == 0 || this.state.SysId == null) {
+                alert("Please select deposited bank");
+                return;
+            }
+
             let deposit = {
                 SiteId: this.state.SiteId,
                 UserName: this.state.UserName,
-                Amount: parseFloat(this.state.Amount),
-                Comment: this.state.Comment,
+                Amount: parseFloat(this.state.Amount) || 0,
+                Comment: this.state.Remark,
                 RefId: this.state.ReferenceNumber,
                 DepositTime: moment(this.DepositTime.current.state.inputValue).unix(),
-                Operator: "admin chipmunk",
                 BankName: this.state.BankName,
                 AccountHolderName: this.state.AccountName,
                 AccountNumber: this.state.AccountNo,
-                SysId: this.state.SysId
+                SysId: this.state.SysId,
+                CurrencyId: this.state.CurrencyId
             };
 
             var bodyFormData = new FormData();
@@ -129,10 +139,24 @@ import { Dropdown } from 'semantic-ui-react';
                     data: bodyFormData,
                     headers: { 'Content-Type': "multipart/form-data" }
                 })
-                .then(function(response) {
-                    console.log(response.data.errorCode);
-                    console.log(response.data.message);
-                    alert('test');
+                .then((response) => {
+                    if (response.data.errorCode === 1) {
+                        this.setState({
+                            UserName: "",
+                            Amount: 0.00,
+                            BankName: null,
+                            AccountName: "",
+                            AccountNo: "",
+                            ReferenceNumber: null,
+                            Remark: "",
+                            SysId: 0, 
+                            File: null
+                        });
+                        document.getElementById('uploadReceipt').value = '';
+                    }
+                    alert(response.data.message);
+                }).catch(function (error) {
+                    alert(error);
                 });
         }
 
@@ -155,11 +179,11 @@ import { Dropdown } from 'semantic-ui-react';
                         </div>
                         <div className="form-group">
                             <label className="col-form-label">Username</label>
-                            <input className="form-control" type="text" name="UserName" onChange={this.onChange.bind(this)}/>
+                            <input className="form-control" type="text" name="UserName" onChange={this.onChange.bind(this)} value={this.state.UserName || ""}/>
                         </div>
                         <div className="form-group">
                             <label className="col-form-label">Amount</label>
-                            <input className="form-control text-right" type="text" name="Amount" onChange={this.onChange.bind(this)}/>
+                            <input className="form-control text-right" type="text" name="Amount" onChange={this.onChange.bind(this)} value={this.state.Amount || ""}/>
                         </div>
                         <div>--------------------------------------------------------------------------</div>
                         <div className="form-group">
@@ -172,6 +196,7 @@ import { Dropdown } from 'semantic-ui-react';
                                 options={this.state.selectOptions}
                                 placeholder='Deposited Account Number'
                                 onChange={this.onSelectedAccount.bind(this)}
+                                value={this.state.AccountNo || ''}
                                 /*onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}*/
                                 />
                         </div>
@@ -186,7 +211,7 @@ import { Dropdown } from 'semantic-ui-react';
                             <div>--------------------------------------------------------------------------</div>
                         <div className="form-group">
                             <label className="col-form-label">Reference No</label>
-                            <input className="form-control" type="text" name="ReferenceNumber" onChange={this.onChange.bind(this)}/>
+                            <input className="form-control" type="text" name="ReferenceNumber" onChange={this.onChange.bind(this)} value={this.state.ReferenceNumber || ""}/>
                         </div>
                         <div className="form-group">
                             <label className="col-form-label">Submitted DateTime</label>
@@ -202,8 +227,8 @@ import { Dropdown } from 'semantic-ui-react';
                             </div>
                         </div>
                         <div className="form-group">
-                            <label className="col-form-label">Comment</label>
-                            <input className="form-control" type="text" name="Comment" onChange={this.onChange.bind(this)}/>
+                            <label className="col-form-label">Remark</label>
+                            <input className="form-control" type="text" name="Remark" onChange={this.onChange.bind(this)} value={this.state.Remark || ""}/>
                         </div>
                         <div>
                             <label className="col-form-label">Receipt</label>

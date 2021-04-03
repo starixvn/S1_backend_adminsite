@@ -259,14 +259,19 @@ namespace BackendSite.Controllers.Api
 
             var result = depositBLL.CreateDeposit(depositDetails, deposit.Receipt);
             var apiResult = new ApiResult();
-            if (result)
+            if (result == 1)
             {
-                apiResult.ErrorCode = 0;
+                apiResult.ErrorCode = 1;
                 apiResult.Message = selLangBLL.GetMsg("msg_InsertSuccessful");
+            }
+            else if (result == -1)
+            {
+                apiResult.ErrorCode = -1;
+                apiResult.Message = selLangBLL.GetMsg("msg_UserNotFound");
             }
             else
             {
-                apiResult.ErrorCode = 9;
+                apiResult.ErrorCode = 0;
                 apiResult.Message = selLangBLL.GetMsg("msg_InsertFailed");
             }
             return apiResult;

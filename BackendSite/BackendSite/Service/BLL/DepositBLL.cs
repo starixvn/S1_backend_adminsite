@@ -16,13 +16,15 @@ namespace BackendSite.Service.BLL
         private readonly ServerInfoService serverInfoService;
         private readonly AdjustmentService adjustmentService;
         private readonly CustInfoBLL custInfoBLL;
+        private readonly AuthorizeBLL authorizeBLL;
 
-        public DepositBLL(DepositService depositService, ServerInfoService serverInfoService, AdjustmentService adjustmentService, CustInfoBLL custInfoBLL)
+        public DepositBLL(DepositService depositService, ServerInfoService serverInfoService, AdjustmentService adjustmentService, CustInfoBLL custInfoBLL, AuthorizeBLL authorizeBLL)
         {
             this.depositService = depositService;
             this.serverInfoService = serverInfoService;
             this.adjustmentService = adjustmentService;
             this.custInfoBLL = custInfoBLL;
+            this.authorizeBLL = authorizeBLL;
         }
         public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, long startDate, long endDate, string DepositId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
@@ -35,7 +37,7 @@ namespace BackendSite.Service.BLL
             return depositService.GetDepositListByCust(CustId, TransId, Status, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
 
-        public bool CreateDeposit(DepositDetailInfo deposit, IFormFile receipt)
+        public int CreateDeposit(DepositDetailInfo deposit, IFormFile receipt)
         {
             var depositInfo = new DepositInfo3_1
             {
@@ -48,8 +50,15 @@ namespace BackendSite.Service.BLL
             deposit.DepositInfo = Newtonsoft.Json.JsonConvert.SerializeObject(depositInfo);
 
             var customer = custInfoBLL.GetCustInfoDetails(null, deposit.UserName, deposit.SiteId);
+            if (customer == null)
+            {
+                return -1;
+            }
             deposit.CurrencyId = customer.CurrencyId;
             deposit.CustId = customer.CustId;
+
+            var creator = authorizeBLL.GetAuthData();
+            deposit.Operator = creator.UserName;
 
             var transId = depositService.InsertDepositRequest(deposit);
 
@@ -58,7 +67,11 @@ namespace BackendSite.Service.BLL
                 InsertDepositReceipt(receipt, deposit.CustId, transId);
             }
 
-            return !string.IsNullOrEmpty(transId);
+            if (!string.IsNullOrEmpty(transId))
+            {
+                return 1;
+            }
+            return 0;
         }
 
         private int InsertDepositReceipt(IFormFile depositReceipt, int custId, string transId)
