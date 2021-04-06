@@ -4,7 +4,13 @@ import Pagination from "./Pagination";
 const dataColumnDefs = () => {
   return [
     { dataColumn: "siteName", columnTitle: "SiteName" },
-    { dataColumn: "userName", columnTitle: "UserName" },
+    {
+      dataColumn: 'userName', columnTitle: 'UserName',
+      body: {
+          format: userNameFormat,
+          subData: ['custId', 'transId']
+      }
+    },
     { dataColumn: "currentVipName", columnTitle: "CurrentVipLevel" },
     { dataColumn: "upgradeVipName", columnTitle: "UpgradeVipLevel" },
     { dataColumn: "currency", columnTitle: "Currency" },
@@ -211,5 +217,9 @@ const Panel = (props) => {
     </div>
   );
 };
+
+const userNameFormat = (userName, subData) => {
+  return <a href={"/CustManage/CustInfo?UserName=" + userName + "&custId=" + subData.custId + "&TransId=" + subData.transId} target="_blank">{userName}</a>
+}
 
 export default Panel;
