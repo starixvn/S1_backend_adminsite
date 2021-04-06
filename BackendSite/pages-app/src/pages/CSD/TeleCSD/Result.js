@@ -3,7 +3,13 @@ import Pagination from "./Pagination";
 
 const dataColumnDefs = () => {
   return [
-    { dataColumn: "userName", columnTitle: "Username" },
+    {
+      dataColumn: 'userName', columnTitle: 'UserName',
+      body: {
+          format: userNameFormat,
+          subData: ['custId', 'transId']
+      }
+    },
     { dataColumn: "accountName", columnTitle: "Full name" },
     { dataColumn: "actStatus", columnTitle: "Deposit Status" },
     { dataColumn: "regTime", columnTitle: "Reg Data" },
@@ -129,5 +135,7 @@ const Panel = (props) => {
     </div>
   );
 };
-
+const userNameFormat = (userName, subData) => {
+  return <a href={"/CustManage/CustInfo?UserName=" + userName + "&custId=" + subData.custId + "&TransId=" + subData.transId} target="_blank">{userName}</a>
+}
 export default Panel;
