@@ -120,14 +120,14 @@ import DateTimePicker from 'react-datetime';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                {(subFuncKeys.indexOf("f_dp_execute") > -1) ? <th scope="col"><input type="checkbox" checked={this.props.rejectChecks.allChecked} onChange={this.props.handleChange.bind(this, "checkAll")} />Check all</th> : null}
+                                {(subFuncKeys.indexOf("f_dp_execute") > -1) ? <th scope="col"><input type="checkbox" checked={this.props.rejectChecks.allChecked} onChange={this.props.handleChange.bind(this, "checkAll")} /></th> : null}
                                 <th scope="col">Trxn.ID</th>
                                 {/* <th scope="col">Calvin Code</th> */}
                                 <th scope="col">{i18n.lbl_DepositType}</th>
-                                <th scope="col">Is Kyc</th>
-                                <th scope="col">Is Risk</th>
+                                <th scope="col">Kyc</th>
+                                <th scope="col">Risk</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
-                                <th scope="col">CCY</th>
+                                <th scope="col">Currency</th>
                                 <th scope="col" className="text-right">{i18n.lbl_Amount}</th>
                                 <th scope="col">Bank Name</th>
                                 <th scope="col">To Acc. NO.</th>
@@ -135,7 +135,7 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Update Time (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">VIP Level</th>
-                                <th scope="col" className="text-right">Total Deposit Count</th>
+                                <th scope="col" className="text-right">Deposit Count</th>
                                 <th scope="col">{i18n.lbl_Status}</th>
                             </tr>
                         </thead>
@@ -373,11 +373,11 @@ import DateTimePicker from 'react-datetime';
                                 <td>{i18n["lbl_DepositStatus" + data.status]}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Is Kyc</th>
+                                <th scope="row">Kyc</th>
                                 <td>{data.isKyc === 1 ? "YES" : "NO"}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Is Risk</th>
+                                <th scope="row">Risk</th>
                                 <td>{data.isRisk === 1 ? "YES" : "NO"}</td>
                             </tr>
                             <tr>
@@ -422,7 +422,7 @@ import DateTimePicker from 'react-datetime';
                                 <td>{data.refId}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Total Deposit Count</th>
+                                <th scope="row">Deposit Count</th>
                                 <td>{data.depositCnt}</td>
                             </tr>
                             <tr>

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -72,6 +73,7 @@ namespace BackendSite.Service.Model
         public DateTime? ReloadTime { get; set; }
         public string IP { get; set; }
         public string LevelName { get; set; }
+        public string AffiliateCode { get; set; }
     }
 
     public class CustInfoDetailForExport
@@ -200,5 +202,46 @@ namespace BackendSite.Service.Model
         public int Remark { get; set; }
         public string UpdateAt { get; set; }
         public string Operator { get; set; }
+    }
+    public class VipUpgradeList
+    {
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int CurrentVipLevel { get; set; }
+        public int UpgradeVipLevel { get; set; }
+        public string CurrentVipName { get; set; }
+        public string UpgradeVipName { get; set; }
+        public string Currency { get; set; }
+        public decimal DepositAmount { get; set; }
+        public decimal UpgradeBonus { get; set; }
+        public string CalculateTime { get; set; }
+        public int Status { get; set; }
+        public string StatusName { get; set; }
+        public int CurrencyId { get; set; }
+        public decimal ThresholdAmount { get; set; }
+        public string LastUpdateUser { get; set; }
+    }
+    public class VipUpgradeReviewData
+    {
+        public List<VipUpgradeList> VipUpgradeList { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
+    public class VipUpgradeExport
+    {
+        public string SiteName { get; set; }
+        public string UserName { get; set; }
+        public string CurrentVipLevel { get; set; }
+        public string UpgradeVipLevel { get; set; }
+        public string Currency { get; set; }
+        public decimal DepositAmount { get; set; }
+        public decimal ThresholdAmount { get; set; }
+        public decimal UpgradeBonus { get; set; }
+        public string CalculateTime { get; set; }
+        public int Status { get; set; }
+        public string StatusName => Enum.GetName(typeof(VipStatus), Status) ;
     }
 }

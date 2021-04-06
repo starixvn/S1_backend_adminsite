@@ -179,6 +179,14 @@
           {
             "DisplayKey": "Execute",
             "FuncKey": "f_wd_execute"
+          },
+          {
+            "DisplayKey": "Payment",
+            "FuncKey": "f_wd_payment"
+          },
+          {
+            "DisplayKey": "Risk",
+            "FuncKey": "f_wd_risk"
           }
         ]
       },
@@ -323,6 +331,27 @@
             "FuncKey": "gcm_edit_detail"
           }
         ]
+      },
+      {
+        "DisplayKey": "VipUpgrade",
+        "FuncKey": "Marketing/VipUpgrade",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Export Excel",
+            "FuncKey": "vipupgrade_export_excel"
+          },
+          {
+            "DisplayKey": "Upgrade",
+            "FuncKey": "vipupgrade_Upgrade"
+          }
+        ]
+      },
+      {
+        "DisplayKey": "Latest Highlight Video Management",
+        "FuncKey": "Marketing/LatestHighlightVideoManagement",
+        "Enable": false
       }
     ]
   },

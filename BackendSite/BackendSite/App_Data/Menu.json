@@ -416,6 +416,26 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "VipUpgrade",
+        "Title": "VipUpgrade",
+        "FuncKey": "Marketing/VipUpgrade",
+        "Controller": "Marketing",
+        "Action": "VipUpgrade",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "LatestHighlightVideoManagement",
+        "Title": "Latest Highlight Video Management",
+        "FuncKey": "Marketing/LatestHighlightVideoManagement",
+        "Controller": "Marketing",
+        "Action": "LatestHighlightVideoManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

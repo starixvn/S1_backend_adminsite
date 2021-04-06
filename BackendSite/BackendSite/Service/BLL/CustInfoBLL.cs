@@ -67,14 +67,19 @@ namespace BackendSite.Service.BLL
             {
                 cache.Set(key, vipLevelCache, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30)));
             }
-
+            
             return vipLevelCache;
         }
-        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? affId, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency, ref int pageNumber, out int totalPages, out int rowCount)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
+            List<int> currncyList = new List<int>();
+            serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x =>
+            {
+                currncyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
+            });
 
-            return custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList));
+            return custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, selectCurrency,ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList()));
         }
 
         public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int? AffId)
@@ -233,6 +238,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<CustTeleExport> GetTeleCSDExportData(string SiteIds, string Currency, string StartDate, string EndDate, string Deposit, string DormantUser, string CallOut)
         {
             return custInfoService.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);
+            
         }
     }
 }

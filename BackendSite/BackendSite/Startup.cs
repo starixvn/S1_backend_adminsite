@@ -74,14 +74,18 @@ namespace BackendSite
             services.AddSingleton<HomeService>();
             services.AddSingleton<BonusManageService>();
             services.AddSingleton<NewsServices>();
+            services.AddSingleton<RebateManageService>();
             services.AddSingleton<ReportService>();
             services.AddSingleton<BannerManageService>();
             services.AddSingleton<ReferralManagementService>();
             services.AddSingleton<SportsService>();
             services.AddSingleton<PrizeService>();
+            services.AddSingleton<RebateManageService>();
+  
             services.AddSingleton<VipLevelService>();
             services.AddSingleton<GameCasinoManageService>();
             services.AddSingleton<BankFinancialService>();
+            services.AddSingleton<LatestHighlightVideoManagementService>();
             //var dal = AppDomain.CurrentDomain.GetAssemblies()
             //           .SelectMany(t => t.GetTypes())
             //           .Where(t => t.IsClass && t.Namespace == "BackendSite.Service.DAL");
@@ -119,15 +123,20 @@ namespace BackendSite
             services.AddSingleton<HomeBLL>();
             services.AddSingleton<BonusManageBLL>();
             services.AddSingleton<NewsBLL>();
+            services.AddSingleton<RebateManageBLL>();
+            
             services.AddSingleton<ReportBLL>();
             services.AddSingleton<BannerManageBLL>();
             services.AddSingleton<ReportExcelBLL>();
             services.AddSingleton<ReferralManagementBLL>();
             services.AddSingleton<SportsBLL>();
             services.AddSingleton<PrizeBLL>();
+            services.AddSingleton<RebateManageBLL>();
             services.AddSingleton<VipLevelBLL>();
             services.AddSingleton<GameCasinoManageBLL>();
             services.AddSingleton<BankFinancialBLL>();
+            services.AddSingleton<LatestHighlightVideoManagementBLL>();
+
             // var bll = AppDomain.CurrentDomain.GetAssemblies()
             //.SelectMany(t => t.GetTypes())
             //.Where(t => t.IsClass && t.Namespace == "BackendSite.Service.BLL");
