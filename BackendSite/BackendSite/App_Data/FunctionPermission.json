@@ -354,5 +354,15 @@
         "Enable": false
       }
     ]
+  },
+  {
+    "DisplayKey": "Bank Transfer",
+    "Settings": [
+      {
+        "DisplayKey": "Bank Transfer Account",
+        "FuncKey": "BankFinancial/TransferAccountManage",
+        "Enable": false
+      }
+    ]
   }
 ]
