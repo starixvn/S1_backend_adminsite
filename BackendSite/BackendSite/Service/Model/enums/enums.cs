@@ -120,4 +120,55 @@ namespace BackendSite.Service.Model.enums
         Update = 3,
         Delete = 4
     }
+
+    #region Bank Financial Account
+
+    /// <summary>
+    /// 轉帳方式 列舉
+    /// </summary>
+    public enum TransferChannelEnum
+    {
+        /// <summary>
+        /// 當地銀行
+        /// </summary>
+        LocalBank = 1,
+
+        /// <summary>
+        /// 高層帳戶
+        /// </summary>
+        HeadOffice = 2,
+
+        /// <summary>
+        /// 第三方支付
+        /// </summary>
+        PSP = 3
+    }
+
+    /// <summary>
+    /// 轉帳帳戶資料狀態 列舉
+    /// </summary>
+    public enum TransferAccountStatusEnum
+    {
+        /// <summary>
+        /// 初始設定(Front-End Hidden)
+        /// </summary>
+        Initial = 1,
+
+        /// <summary>
+        /// 開放使用(Front-End Show)
+        /// </summary>
+        Open = 2,
+
+        /// <summary>
+        /// 帳戶暫停
+        /// </summary>
+        Suspend = 3,
+
+        /// <summary>
+        /// 帳戶關閉(Never Open)
+        /// </summary>
+        Close = 4
+    }
+
+    #endregion
 }
