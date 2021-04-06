@@ -121,6 +121,18 @@ namespace BackendSite.Service.Model.enums
         Delete = 4
     }
 
+    public enum VipStatus
+    {
+        Pending = 1,
+        Approved = 2,
+        Rejected = 3
+    }
+    public enum GetVipUpgradeReviewErrorCode
+    {
+        CanUpgrade = 0,
+        JustCanSearch = 1
+    }
+
     #region Bank Financial Account
 
     /// <summary>
