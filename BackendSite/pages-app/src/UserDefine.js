@@ -81,12 +81,15 @@ const GameCasinoManagement = lazy(() =>
   import("./pages/Marketing/GameCasinoManagement/index")
 );
 const TeleCSD = lazy(() => import("./pages/CSD/TeleCSD/index"));
+const TransferAccountManage = lazy(() =>
+  import("./pages/BankFinancial/TransferAccountManage/index")
+);
 const VipUpgrade = lazy(() => import("./pages/Marketing/VipUpgrade/index"));
 const LatestHighlightVideoManagement = lazy(() =>
-	import("./pages/Marketing/LatestHighlightVideoManagement/index")
+  import("./pages/Marketing/LatestHighlightVideoManagement/index")
 );
 
-export const defaultPage = "CustomerStatisticalReport";
+export const defaultPage = "TransferAccountManage";
 
 export const layoutType = {
   N88: "N88",
@@ -512,6 +515,19 @@ export const pages = {
     ],
     layout: layoutType.N88,
   },
+  TransferAccountManage: {
+    comp: (
+      <Suspense fallback="loading...">
+        <TransferAccountManage />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
   VipUpgrade: {
     comp: (
       <Suspense fallback="loading...">
@@ -524,18 +540,18 @@ export const pages = {
       "./css/css/vendor/DateTimePicker/DateTimePicker.css",
     ],
     layout: layoutType.N88,
-   },
-   LatestHighlightVideoManagement: {
-        comp: (
-            <Suspense fallback="loading...">
-                <LatestHighlightVideoManagement />
-            </Suspense>
-        ),
-        css: [
-            "./lib/bootstrap/dist/css/bootstrap.min.css",
-            "./css/css/main.css",
-            "./css/css/vendor/DateTimePicker/DateTimePicker.css",
-        ],
-        layout: layoutType.N88,
-    },
+  },
+  LatestHighlightVideoManagement: {
+    comp: (
+      <Suspense fallback="loading...">
+        <LatestHighlightVideoManagement />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
 };
