@@ -120,4 +120,23 @@ namespace BackendSite.Service.Model.enums
         Update = 3,
         Delete = 4
     }
+    public enum VipStatus
+    {
+        Pending = 1,
+        Approved = 2,
+        Rejected = 3
+    }
+    public enum GetVipUpgradeReviewErrorCode
+    {
+        CanUpgrade = 0,
+        JustCanSearch = 1
+    }
+    public enum LangType
+    {
+        en = 1,
+        cs = 2,
+        th = 3,
+        id = 4,
+        vn = 5
+    }
 }

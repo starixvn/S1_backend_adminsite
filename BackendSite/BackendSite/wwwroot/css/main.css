@@ -324,6 +324,24 @@
         background-color: #c82333;
     }
 
+.btn-pending {
+        background-color: #c530a5;
+        color: #fff;
+    }
+    
+    .btn-pending:hover {
+            background-color: #921988;
+    }
+
+.btn-tokyc {
+        background-color: #30bbc5;
+        color: #fff;
+    }
+    
+    .btn-tokyc:hover {
+            background-color: #199282;
+    }
+
 .btn-cancel {
     background-color: #9FB0BC;
     color: #fff;

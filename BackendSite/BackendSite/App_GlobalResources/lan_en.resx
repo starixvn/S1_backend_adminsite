@@ -162,6 +162,9 @@
   <data name="Currency_9" xml:space="preserve">
     <value>AUD</value>
   </data>
+  <data name="Currency_96" xml:space="preserve">
+    <value>USDT</value>
+  </data>
   <data name="lbl_AccountList" xml:space="preserve">
     <value>Account List</value>
   </data>
@@ -605,8 +608,5 @@
   </data>
   <data name="lbl_PromotionType8" xml:space="preserve">
     <value>Advertising</value>
-  </data>
-  <data name="Currency_96" xml:space="preserve">
-    <value>USDT</value>
   </data>
 </root>
