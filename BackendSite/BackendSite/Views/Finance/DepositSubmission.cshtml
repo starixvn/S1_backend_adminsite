@@ -1,0 +1,61 @@
+﻿@using Microsoft.AspNetCore.Hosting
+@using Newtonsoft.Json
+@using BackendSite.Service.BLL
+@inject IWebHostEnvironment environment
+@inject SelLangBLL selLangBLL
+@inject ServerInfoBLL serverInfoBLL
+@inject AuthorizeBLL authorizeBLL
+@inject PermissionBLL permissionBLL
+
+@section Style {
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/lib/bootstrap-multiselect/bootstrap-multiselect-modify.css" rel="stylesheet" />
+    <link href="~/lib/Oneworks/jscalendar/calendar-blue.css" rel="stylesheet" />
+    <link href="~/css/vendor/DateTimePicker/DateTimePicker.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.css" rel="stylesheet" />
+}
+
+@{
+    Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
+    ViewData["Title"] = selLangBLL.GetResourceValue("lbl_DepositSubmission");
+}
+@{
+    var currencyList = new[] { 2, 4, 13, 15, 51 };
+    var i18n = new Dictionary<string, string>();
+
+    for (var currency = 1; currency <= 51; currency++)
+    {
+        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
+        {
+            i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+        }
+    }
+
+    string[] lbl_Txts = { "lbl_Action", "lbl_Comment", "lbl_ActualDeposit", "lbl_No", "lbl_TransId", "lbl_DepositType", "lbl_UserName", "lbl_Amount", "lbl_Postscript", "lbl_Memo", "lbl_CreateTime", "lbl_Status" };
+    foreach (var lbl_Txt in lbl_Txts)
+    {
+        if (!i18n.ContainsKey(lbl_Txt))
+        {
+            i18n.Add(lbl_Txt, selLangBLL.GetResourceValue(lbl_Txt));
+        }
+    }
+
+    var subFuncKeys = permissionBLL.GetSubFunckeys("Finance/DepositSubmission");
+    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
+}
+<h4 class="page-name">@selLangBLL.GetResourceValue("lbl_DepositSubmission")</h4>
+
+<div id="DepositSubmissionForm"></div>
+
+@section Scripts {
+    <script src="~/lib/Oneworks/jscalendar/calendar.js"></script>
+    <script src="~/lib/Oneworks/jscalendar/lang/calendar-en.js"></script>
+    <script src="~/lib/Oneworks/jscalendar/calendar-setup.js"></script>
+    <script type="text/javascript">
+        window.i18n = @Html.Raw(JsonConvert.SerializeObject(i18n));
+        window.RootUrl = '@Url.Content("~/api")';
+        window.LangCode = 'en';
+    </script>
+    <script src="~/js/component/Finance/DepositSubmission.min.js" asp-append-version="true"></script>
+}
