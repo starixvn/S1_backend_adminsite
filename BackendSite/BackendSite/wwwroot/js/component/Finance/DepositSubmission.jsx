@@ -105,13 +105,21 @@ import { Dropdown } from 'semantic-ui-react';
                 return;
             }
 
-            if (this.state.Amount == '0') {
+            if (this.state.Amount == 0 || isNaN(parseFloat(this.state.Amount))) {
                 alert("Please enter deposited amount");
+                this.setState({
+                    Amount: 0
+                })
                 return;
             }
 
             if (this.state.SysId.length == 0 || this.state.SysId == 0 || this.state.SysId == null) {
                 alert("Please select deposited bank");
+                return;
+            }
+
+            if (this.DepositTime.current.state.inputValue == "") {
+                alert("Please select proper time");
                 return;
             }
 
@@ -202,11 +210,11 @@ import { Dropdown } from 'semantic-ui-react';
                         </div>
                         <div className="form-group">
                             <label className="col-form-label">Bank Name</label>
-                            <input className="form-control" type="text" name="BankName" value={this.state.BankName || ""} onChange={this.onChange.bind(this)}/>
+                            <input className="form-control" type="text" name="BankName" value={this.state.BankName || ""} onChange={this.onChange.bind(this)} disabled="disabled"/>
                         </div>
                         <div className="form-group">
                             <label className="col-form-label">Account Holder Name</label>
-                            <input className="form-control" type="text" name="AccountName" value={this.state.AccountName || ""} onChange={this.onChange.bind(this)}/>
+                            <input className="form-control" type="text" name="AccountName" value={this.state.AccountName || ""} onChange={this.onChange.bind(this)} disabled="disabled"/>
                         </div>
                             <div>--------------------------------------------------------------------------</div>
                         <div className="form-group">
