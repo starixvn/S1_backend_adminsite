@@ -1,5 +1,8 @@
 import React from "react";
 import Modal from "./components/Popout";
+import CategoryModal from "./components/CategoryPopout";
+import GameModal from "./components/GamePopout";
+import DateDetailModal from "./components/DateDetailPopout";
 
 const GroupColumnDefs = (props) => {
     return [
@@ -234,7 +237,7 @@ const Panel = (props) => {
                                         bgcolor={element.body && element.body.categoryBgcolor ? element.body.categoryBgcolor : ''}
                                     >
                                         {element.body && element.body.format 
-                                        ? <button className="btn btn-link" onClick={() => props.SetUserShowBtn(user)}>{getDataItem[element.dataColumn]}</button>  
+                                        ? <button className="btn btn-link" onClick={() => props.SetUserShowBtn(user.custId)}>{getDataItem[element.dataColumn]}</button>  
                                         : getDataItem[element.dataColumn]}
                                     </td>
                                 );
@@ -255,11 +258,25 @@ const Panel = (props) => {
                                                 //style={{position:"sticky",left:"0",zIndex:"1"}}
                                                 bgcolor={element.body && element.body.categoryBgcolor ? element.body.categoryBgcolor : ''}
                                             >
-                                                {element.body && element.body.format ? element.body.format(getDataItem[element.dataColumn], subData) : getDataItem[element.dataColumn]}
+                                                {/* {element.body && element.body.format ? element.body.format(getDataItem[element.dataColumn], subData) : getDataItem[element.dataColumn]} */}
+                                                <button className="btn btn-link" onClick={() => props.SetUserCategoryShowBtn(user.custId,category.categoryId)}>{getDataItem[element.dataColumn]}</button>
                                                 {/* <button type="button" className="btn btn-info pull-right" onClick={() => props.TurnOverValidBetHideShowBtn(getDataItem['categoryId'])}>hide</button> */}
                                             </td>
                                         );
                                     }
+                                }
+                                else if (element.dataColumn==="gameName")
+                                {
+                                    return (
+                                        <td key={`td-${element.dataColumn}-${idx}`}
+                                            className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                                            style={element.body && element.body.style ? element.body.style : ''}
+                                            bgcolor={element.body && element.body.bgcolor ? element.body.bgcolor : ''}
+                                        >
+                                            {/* {element.body && element.body.format ? element.body.format(getDataItem[element.dataColumn], subData) : getDataItem[element.dataColumn]} */}
+                                            <button className="btn btn-link" onClick={() => props.SetUserGameShowBtn(user.custId,category.categoryId,game.gameId,props.SetUserUserShowBtn)}>{getDataItem[element.dataColumn]}</button>
+                                        </td>
+                                    );
                                 }
                                 else
                                 {
@@ -399,12 +416,42 @@ const Panel = (props) => {
                 </tbody>
             </table>
 
-            <Modal handleClose={e => props.CloseBtn(props.UserDataShowStatus)}
+            <Modal handleClose={e => props.CloseBtn()}
                    show={props.UserDataShowStatus}
                    userdata={props.UserDataShowLists}
                    dateDatas={props.DatasByDate}
-                   userTotalDatas={props.UserTotalResult}/>
+                   userTotalDatas={props.UserTotalResult}
+                   userCategoryDataShow={props.SetUserCategoryShowBtn}
+                   userGameDataShow={props.SetUserGameShowBtn}
+                   userDateDataShow={props.SetUserDateShowBtn}/>
 
+            <CategoryModal handleClose={e => props.CloseBtn()}
+                           handleBack={props.SetUserShowBtn}
+                           show={props.UserCategoryDataShowStatus}
+                           useroriginaldata={props.UserList}
+                           userdata={props.UserCategoryDataShowLists}
+                           dateDatas={props.DatasByDate}
+                           userCategoryTotalDatas={props.UserCategoryTotalResult}
+                           userGameDataShow={props.SetUserGameShowBtn}
+                           userDateDataShow={props.SetUserDateShowBtn}/>
+
+            <GameModal handleClose={e => props.CloseBtn()}
+                       handleBack={props.SetUserCategoryShowBtn}
+                           show={props.UserGameDataShowStatus}
+                           useroriginaldata={props.UserList}
+                           userdata={props.UserGameDataShowLists}
+                           dateDatas={props.DatasByDate}
+                           userGameTotalDatas={props.Datas}
+                           userDateShowBtn={props.SetUserDateShowBtn}
+                           userCategoryDataShow={props.SetUserCategoryShowBtn}/>
+
+            <DateDetailModal handleClose={e => props.CloseBtn()}
+                             handleBack={props.SetUserGameShowBtn}
+                           show={props.UserDateDataShowStatus}
+                           useroriginaldata={props.UserList}
+                           userdata={props.UserDateDataShowLists}
+                           dateDetailDatas={props.DateDetailDatas}
+                           dateDetailTotalDatas={props.DateDetailTotalDatas}/>
         </div>  
         
     )

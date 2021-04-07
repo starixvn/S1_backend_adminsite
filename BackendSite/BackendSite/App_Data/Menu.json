@@ -448,5 +448,23 @@
         "Childs": null
       }
     ]
+  },
+  {
+    "Key": "",
+    "Title": "Bank Transfer",
+    "Icon": "icon-finance",
+    "Roles": null,
+    "Childs": [
+      {
+        "Key": "",
+        "Title": "Bank Transfer Account",
+        "FuncKey": "BankFinancial/TransferAccountManage",
+        "Controller": "BankFinancial",
+        "Action": "TransferAccountManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      }
+    ]
   }
 ]
