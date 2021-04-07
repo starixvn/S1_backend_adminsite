@@ -225,7 +225,7 @@ import qs from 'qs';
                                         <input className="custom-control-input" id="checkwd" type="checkbox" name="Checkwd" checked={this.state.Checkwd} onChange={this.onCheck.bind(this, this.state.Checkwd)} />
                                         <label className="custom-control-label" htmlFor="checkwd">Withdraw Condition(Balance Amount X Times):</label>
                                     </div>
-                                    <input className="form-control width-200" type="number" name="Withdrawal" pattern="[0-9]*" value={this.state.Withdrawal} disabled />
+                                    <input className="form-control width-200" type="number" name="Withdrawal" pattern="[0-9]*" value={this.state.Withdrawal} onChange={this.onChange.bind(this)}/>
                                 </div>
                                 <div className="form-group width-200">
                                     <label className="col-form-label">Amount</label>
