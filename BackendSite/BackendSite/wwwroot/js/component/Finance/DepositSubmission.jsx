@@ -113,7 +113,7 @@ import { Dropdown } from 'semantic-ui-react';
                 return;
             }
 
-            if (this.state.SysId.length == 0 || this.state.SysId == 0 || this.state.SysId == null) {
+            if (this.state.SysId.length == 0 || this.state.SysId == 0 || this.state.SysId == null || isNaN(parseInt(this.state.SysId))) {
                 alert("Please select deposited bank");
                 return;
             }
