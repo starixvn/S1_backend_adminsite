@@ -191,7 +191,7 @@ import { Dropdown } from 'semantic-ui-react';
                         </div>
                         <div className="form-group">
                             <label className="col-form-label">Amount</label>
-                            <input className="form-control text-right" type="text" name="Amount" onChange={this.onChange.bind(this)} value={this.state.Amount || ""}/>
+                            <input className="form-control text-right" type="number" name="Amount" onChange={this.onChange.bind(this)} value={this.state.Amount || ""}/>
                         </div>
                         <div>--------------------------------------------------------------------------</div>
                         <div className="form-group">
