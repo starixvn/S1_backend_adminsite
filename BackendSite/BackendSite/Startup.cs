@@ -84,6 +84,7 @@ namespace BackendSite
   
             services.AddSingleton<VipLevelService>();
             services.AddSingleton<GameCasinoManageService>();
+            services.AddSingleton<BankFinancialService>();
             services.AddSingleton<LatestHighlightVideoManagementService>();
             //var dal = AppDomain.CurrentDomain.GetAssemblies()
             //           .SelectMany(t => t.GetTypes())
@@ -133,7 +134,9 @@ namespace BackendSite
             services.AddSingleton<RebateManageBLL>();
             services.AddSingleton<VipLevelBLL>();
             services.AddSingleton<GameCasinoManageBLL>();
+            services.AddSingleton<BankFinancialBLL>();
             services.AddSingleton<LatestHighlightVideoManagementBLL>();
+
             // var bll = AppDomain.CurrentDomain.GetAssemblies()
             //.SelectMany(t => t.GetTypes())
             //.Where(t => t.IsClass && t.Namespace == "BackendSite.Service.BLL");
