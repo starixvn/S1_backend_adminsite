@@ -107,7 +107,10 @@ namespace BackendSite.Service.DAL
             p.Add("vTransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
             var result = conn.Execute("Admin_DepositInfo_Ins", p, transaction: trans, commandType: CommandType.StoredProcedure);
-            trans.Commit();
+            if (result > 0)
+            {
+                trans.Commit();
+            }
 
             var transId = p.Get<string>("vTransId");
 

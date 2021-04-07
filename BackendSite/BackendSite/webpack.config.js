@@ -4,9 +4,6 @@ var webpack = require('webpack');
 
 module.exports = {
     entry: {
-        // "js/component/Withdrawal/WithdrawalList.min": [
-        //     '../BackendSite/wwwroot/js/component/Withdrawal/WithdrawalList.jsx'
-        // ],
         //"js/component/Deposit/DepositList.min": [
         //    '../BackendSite/wwwroot/js/component/Deposit/DepositList.jsx'
         //],

@@ -21,7 +21,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<BankInfoOff> GetAllBankAccountOff()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<BankInfoOff>("Admin_BankAccountOff_Get", commandType: CommandType.StoredProcedure);
         }
 
