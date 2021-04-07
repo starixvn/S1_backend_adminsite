@@ -105,8 +105,11 @@ import { Dropdown } from 'semantic-ui-react';
                 return;
             }
 
-            if (this.state.Amount == '0') {
+            if (this.state.Amount == 0 || isNaN(parseFloat(this.state.Amount))) {
                 alert("Please enter deposited amount");
+                this.setState({
+                    Amount: 0
+                })
                 return;
             }
 
