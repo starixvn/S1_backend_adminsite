@@ -115,6 +115,11 @@ import { Dropdown } from 'semantic-ui-react';
                 return;
             }
 
+            if (this.DepositTime.current.state.inputValue == "") {
+                alert("Please select proper time");
+                return;
+            }
+
             let deposit = {
                 SiteId: this.state.SiteId,
                 UserName: this.state.UserName,
@@ -202,11 +207,11 @@ import { Dropdown } from 'semantic-ui-react';
                         </div>
                         <div className="form-group">
                             <label className="col-form-label">Bank Name</label>
-                            <input className="form-control" type="text" name="BankName" value={this.state.BankName || ""} onChange={this.onChange.bind(this)}/>
+                            <input className="form-control" type="text" name="BankName" value={this.state.BankName || ""} onChange={this.onChange.bind(this)} disabled="disabled"/>
                         </div>
                         <div className="form-group">
                             <label className="col-form-label">Account Holder Name</label>
-                            <input className="form-control" type="text" name="AccountName" value={this.state.AccountName || ""} onChange={this.onChange.bind(this)}/>
+                            <input className="form-control" type="text" name="AccountName" value={this.state.AccountName || ""} onChange={this.onChange.bind(this)} disabled="disabled"/>
                         </div>
                             <div>--------------------------------------------------------------------------</div>
                         <div className="form-group">
