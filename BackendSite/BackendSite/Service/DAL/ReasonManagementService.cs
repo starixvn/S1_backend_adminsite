@@ -46,5 +46,18 @@ namespace BackendSite.Service.DAL
 
             return SearchResult;
         }
+
+        public int SetReasonManagement(SetReasonManagementPara para)
+        {
+            DynamicParameters props = new DynamicParameters();
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+
+            //props.Add("CustIds", CustIds);
+            //props.Add("CalculateMonth", YearMonth);
+            //props.Add("Status", ChangeStatus);
+            //props.Add("LastUpdateUser", username);
+
+            return conn.Execute("Admin_VipUpgradeReview_Set", props, commandType: CommandType.StoredProcedure);
+        }
     }
 }

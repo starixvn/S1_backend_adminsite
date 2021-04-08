@@ -24,5 +24,10 @@ namespace BackendSite.Service.BLL
         {
             return reasonManagementService.GetReasonManagementData(para);
         }
+
+        public int SetReasonManagement(SetReasonManagementPara para)
+        {
+            return reasonManagementService.SetReasonManagement(para);
+        }
     }
 }

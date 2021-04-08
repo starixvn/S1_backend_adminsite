@@ -129,6 +129,18 @@ const App = () => {
     });
     setstate(1);
   };
+  const Edit_Change=(v, dataColumn)=>{
+    seteditData({
+      ...editData,
+      [dataColumn]:v
+    })
+  }
+  const Edit_Submit=()=>{
+    let Data={
+      Id:editData.Id,
+      Description:editData.Description
+    }
+  }
   if (state === 0) {
     return (
       <div className="container-fluid">
@@ -144,8 +156,7 @@ const App = () => {
             {...stateDatas}
             Edit={Edit}
             ChangePage={ChangePage}
-            // Detail={Click_Detail}
-            // ExportToExcel={Result_ExportToExcel}
+            Submit={Edit_Submit}
           />
         )}
       </div>
@@ -155,6 +166,7 @@ const App = () => {
       <div>
         <Detail 
           EditData={editData}
+          Change={Edit_Change}
         />
       </div>
     );

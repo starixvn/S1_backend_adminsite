@@ -24,9 +24,9 @@ namespace BackendSite.Service.Model
         public string FuncKey { get; set; }
         public int ReasonId { get; set; }
         public string Description { get; set; }
-        public string CreateTime { get; set; }
+        public DateTime CreateTime { get; set; }
         public string Creator { get; set; }
-        public string UpdateTime { get; set; }
+        public DateTime UpdateTime { get; set; }
         public string Updator { get; set; }
     }
 
@@ -36,5 +36,9 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
+    }
+    public class SetReasonManagementPara
+    {
+
     }
 }
