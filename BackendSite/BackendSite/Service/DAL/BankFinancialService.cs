@@ -51,7 +51,7 @@ namespace BackendSite.Service.DAL
                     _FuncKey = funcKey
                 });
 
-                string SpName = "Admin_BankFinancialReason_Get";
+                string SpName = "Admin_BankFinancialReason_GetByFuncKey";
                 return conn.Query<BankFinancialReasonModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
@@ -84,6 +84,7 @@ namespace BackendSite.Service.DAL
                 new
                 {
                     _SiteId = bankFinancialTransferAccount.SiteId,
+                    _SiteName = bankFinancialTransferAccount.SiteName,
                     _CurrencyId = bankFinancialTransferAccount.CurrencyId,
                     _SysId = bankFinancialTransferAccount.SysId,
                     _Purpose = bankFinancialTransferAccount.Purpose,
@@ -119,6 +120,7 @@ namespace BackendSite.Service.DAL
                 {
                     _Id = bankFinancialTransferAccount.Id,
                     _SiteId = bankFinancialTransferAccount.SiteId,
+                    _SiteName = bankFinancialTransferAccount.SiteName,
                     _CurrencyId = bankFinancialTransferAccount.CurrencyId,
                     _SysId = bankFinancialTransferAccount.SysId,
                     _Purpose = bankFinancialTransferAccount.Purpose,
@@ -153,6 +155,7 @@ namespace BackendSite.Service.DAL
                 new
                 {
                     _SiteId = bankFinancialTransferAccount.SiteId,
+                    _SiteName = bankFinancialTransferAccount.SiteName,
                     _CurrencyId = bankFinancialTransferAccount.CurrencyId,
                     _SysId = bankFinancialTransferAccount.SysId,
                     _Purpose = bankFinancialTransferAccount.Purpose,

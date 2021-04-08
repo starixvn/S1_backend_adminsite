@@ -7,7 +7,7 @@ import TextBox from "./Component/TextBox";
 import moment from "moment";
 import { initChannelType,initSiteId, initStatusType,initPurposeType } from "./defCols";
 
-export default ({ state, action, processing }) => {	
+export default ({ state, action, processing,isAdd }) => {	
 	const currencyList = state.currencyList;
 	const currencyOptions =[];
 	currencyOptions.push({value:0,displayText:" - Select Currency -"});
@@ -33,10 +33,18 @@ export default ({ state, action, processing }) => {
 						<SelectBox
 							Title="Site"
 							Options={initSiteId}
-							HandleChange={action.EditMainValue}
+							HandleChange={action.EditSiteIdSelectBox}
 							dataColumn="siteId"
 							SelectedValue={state.siteId}
+							//Disabled={!isAdd}
 							Disabled={true}
+						/>
+						<InputBox
+							Title="SiteName"
+							OnChange={action.EditMainValue}
+							dataColumn="siteName"
+							value={state.siteName}
+							Disabled={!isAdd || !state.siteId==0}
 						/>
 					</div>
 					<div className="row-flex">

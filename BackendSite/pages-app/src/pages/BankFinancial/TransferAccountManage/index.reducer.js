@@ -17,7 +17,7 @@ export const initState = {
   transferAccountData: [],
   transferAccountList: [],
   siteList: [],
-  setSite: "",
+  setSite: null,
   setCurrencyList: [],
   panelType: defPanelType.Main,
 };

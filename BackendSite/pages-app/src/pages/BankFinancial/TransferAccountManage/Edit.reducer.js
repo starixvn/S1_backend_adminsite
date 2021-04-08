@@ -7,6 +7,7 @@ export const defActionType = {
   REASON_SET_LIST: "REASON_SET_LIST",
   PAY_SET_LIST: "PAY_SET_LIST",
   BANK_CODE_SET_LIST: "BANK_CODE_SET_LIST",
+  MAIN_SET_SITEID_VALUE: "MAIN_SET_SITEID_VALUE",
   MAIN_SET_CURRENCY_VALUE: "MAIN_SET_CURRENCY_VALUE",
   MAIN_SET_CHANNEL_VALUE: "MAIN_SET_CHANNEL_VALUE",
   MAIN_SET_PURPOSE_CHECKBOX: "MAIN_SET_PURPOSE_CHECKBOX",
@@ -17,9 +18,23 @@ export const initialState = (datas, setCurrencyList, isAdd) => {
   if (!isAdd) {
     _selectedPurpposes = datas.purpose.split(",").map((str) => Number(str));
   }
+  if (isAdd) {
+    switch (datas.siteId) {
+      case 1:
+        datas.siteName = "Nova88";
+        break;
+      case 2:
+        datas.siteName = "Goal123";
+        break;
+      case 3:
+        datas.siteName = "Bwing";
+        break;
+    }
+  }
   return {
     id: datas.id,
     siteId: datas.siteId,
+    siteName: datas.siteName,
     currencyId: datas.currencyId,
     sysId: datas.sysId,
     purpose: _selectedPurpposes,
@@ -55,6 +70,33 @@ export function reducer(state, action) {
         ...state,
         [action.dataColumn]: action.value,
       };
+
+    case defActionType.MAIN_SET_SITEID_VALUE:
+      if (action.value == 1) {
+        return {
+          ...state,
+          [action.dataColumn]: action.value,
+          siteName: "Nova88",
+        };
+      } else if (action.value == 2) {
+        return {
+          ...state,
+          [action.dataColumn]: action.value,
+          siteName: "Goal123",
+        };
+      } else if (action.value == 3) {
+        return {
+          ...state,
+          [action.dataColumn]: action.value,
+          siteName: "Bwing",
+        };
+      } else {
+        return {
+          ...state,
+          [action.dataColumn]: action.value,
+          siteName: "",
+        };
+      }
 
     case defActionType.MAIN_SET_CURRENCY_VALUE:
       let currencyBankList = [];
