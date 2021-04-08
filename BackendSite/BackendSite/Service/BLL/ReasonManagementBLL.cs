@@ -19,5 +19,10 @@ namespace BackendSite.Service.BLL
         {
             return reasonManagementService.GetFuncKey();
         }
+
+        public GetReasonManagementDataResult GetReasonManagementData(GetReasonManagementDataPara para)
+        {
+            return reasonManagementService.GetReasonManagementData(para);
+        }
     }
 }

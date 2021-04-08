@@ -21,7 +21,7 @@ namespace BackendSite.Controllers.Api
             this.reasonManagementBLL = reasonManagementBLL;
         }
 
-        public ApiResult<IEnumerable<ReasonManagementFuncKey>> GetEventName()
+        public ApiResult<IEnumerable<ReasonManagementFuncKey>> GetFuncKey()
         {
 
             var apiResult = new ApiResult<IEnumerable<ReasonManagementFuncKey>>();
@@ -30,6 +30,27 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
 
+        }
+        [HttpPost]
+        public ApiListResult<ReasonManagementData> GetReasonManagementData(GetReasonManagementDataPara para)
+        {
+            var apiResult = new ApiListResult<ReasonManagementData>();
+            try
+            {
+                var SearchResult = reasonManagementBLL.GetReasonManagementData(para);
+                apiResult.Data = SearchResult.ReasonManagementData;
+                apiResult.PageNumber = SearchResult.PageNumber;
+                apiResult.TotalPages = SearchResult.TotalPages;
+                apiResult.RowCount = SearchResult.RowCount;
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
         }
     }
 }

@@ -24,5 +24,27 @@ namespace BackendSite.Service.DAL
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<ReasonManagementFuncKey>("Admin_BankFinancialReason_FuncKey_Get", commandType: CommandType.StoredProcedure);
         }
+
+        public GetReasonManagementDataResult GetReasonManagementData(GetReasonManagementDataPara para)
+        {
+            GetReasonManagementDataResult SearchResult = new GetReasonManagementDataResult();
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            DynamicParameters props = new DynamicParameters();
+            props.Add("PageNumber", para.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("PageSize", para.PageSize);
+            props.Add("FuncKey", para.FuncKey == "0" ? null: para.FuncKey);
+
+            var result = conn.Query<ReasonManagementData>("Admin_BankFinancialReason_Get", props, commandType: CommandType.StoredProcedure);
+
+            SearchResult.ReasonManagementData = result.ToList();
+            SearchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            SearchResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            SearchResult.RowCount = props.Get<int?>("RowCount") ?? 0;
+
+            return SearchResult;
+        }
     }
 }
