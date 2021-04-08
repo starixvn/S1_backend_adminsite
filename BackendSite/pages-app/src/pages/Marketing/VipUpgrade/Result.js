@@ -1,17 +1,73 @@
 import React from "react";
 import Pagination from "./Pagination";
+import moment from 'moment';
+import {number_format, number_toFixed} from '../../../module/Formatting/NumberFormat';
 
 const dataColumnDefs = () => {
   return [
     { dataColumn: "siteName", columnTitle: "SiteName" },
-    { dataColumn: "userName", columnTitle: "UserName" },
+    {
+      dataColumn: 'userName', columnTitle: 'UserName',
+      body: {
+          format: userNameFormat,
+          subData: ['custId', 'transId']
+      }
+    },
     { dataColumn: "currentVipName", columnTitle: "CurrentVipLevel" },
     { dataColumn: "upgradeVipName", columnTitle: "UpgradeVipLevel" },
     { dataColumn: "currency", columnTitle: "Currency" },
-    { dataColumn: "depositAmount", columnTitle: "Deposit Amount" },
-    { dataColumn: "thresholdAmount", columnTitle: "Threshold Amount" },
-    { dataColumn: "upgradeBonus", columnTitle: "Upgrade Bonus" },
-    { dataColumn: "calculateTime", columnTitle: "Calculate Time" },
+    {
+      dataColumn:'depositAmount',
+      columnTitle:'Deposit Amount',
+      header:{
+          attr:{
+              class:"text-right"
+          }
+      },
+      body:{
+          attr:{
+              class:"text-right"
+          },
+          format:numberFormat
+      }
+    },
+    {
+      dataColumn:'thresholdAmount',
+      columnTitle:'Threshold Amount',
+      header:{
+          attr:{
+              class:"text-right"
+          }
+      },
+      body:{
+          attr:{
+              class:"text-right"
+          },
+          format:numberFormat
+      }
+    },
+    {
+      dataColumn:'upgradeBonus',
+      columnTitle:'Upgrade Bonus',
+      header:{
+          attr:{
+              class:"text-right"
+          }
+      },
+      body:{
+          attr:{
+              class:"text-right"
+          },
+          format:numberFormat
+      }
+    },
+    {
+      dataColumn: "calculateTime",
+      columnTitle: "Calculate Time" + " (" + moment().format('Z') + ")",
+      body:{
+          format:dateFormat
+      }
+    },
     { dataColumn: "lastUpdateUser", columnTitle: "LastUpdateUser" },
     { dataColumn: "status", columnTitle: "Status" },
     { dataColumn: "upgrade", columnTitle: "Upgrade" },
@@ -211,5 +267,15 @@ const Panel = (props) => {
     </div>
   );
 };
+
+const userNameFormat = (userName, subData) => {
+  return <a href={"/CustManage/CustInfo?UserName=" + userName + "&custId=" + subData.custId + "&TransId=" + subData.transId} target="_blank">{userName}</a>
+}
+const numberFormat = (number)=>{
+  return number_format(number_toFixed(number, 0));
+}
+const dateFormat = (createTime)=>{
+  return moment(createTime).format('l LTS');
+}
 
 export default Panel;

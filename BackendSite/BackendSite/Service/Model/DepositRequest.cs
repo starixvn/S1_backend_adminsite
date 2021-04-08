@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using Microsoft.AspNetCore.Http;
 
 namespace BackendSite.Service.Model
 {
@@ -106,6 +107,31 @@ namespace BackendSite.Service.Model
         public DateTime? UpdateTime { set; get; }
 
     }
+
+    public class DepositDetailSubmission
+    {
+        public string DepositDetails { get; set; }
+        public IFormFile Receipt { get; set; }
+    }
+
+    public class DepositDetailInfo
+    {
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int CurrencyId { get; set; }
+        public int SiteId { get; set; }
+        public int SysId { get; set; }
+        public string DepositInfo { get; set; }
+        public decimal Amount { get; set; }
+        public string Comment { get; set; }
+        public string RefId { get; set; }
+        public long DepositTime { get; set; }
+        public string Operator { get; set; }
+        public string BankName { get; set; }
+        public string AccountHolderName { get; set; }
+        public string AccountNumber { get; set; }
+    }
+
     public interface IDepositInfo
     {
         int Ver { get; set; }
