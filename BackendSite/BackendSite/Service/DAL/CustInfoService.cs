@@ -271,7 +271,7 @@ namespace BackendSite.Service.DAL
         public int UpdateCustomerTele(int siteId, int custId,string Operator)
         {
             DynamicParameters props = new DynamicParameters();
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
 
             props.Add("SiteId", siteId);
             props.Add("CustId", custId);
