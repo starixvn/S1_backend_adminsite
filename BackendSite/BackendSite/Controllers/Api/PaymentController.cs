@@ -413,7 +413,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BalanceAdjustmentBatch" })]
-        public async Task<List<ApiResult>> BalanceAdjustmentBatch([FromForm] int option, [FromForm] int optSite, [FromForm] int withdrawalLimitOption, [FromForm] IFormFile excelUpload)
+        public async Task<List<ApiResult>> BalanceAdjustmentBatch([FromForm] int option, [FromForm] int optSite, [FromForm] int withdrawalLimitOption, [FromForm] IFormFile excelUpload, [FromForm] decimal withdrawal)
         {
             var apiResult = new List<ApiResult>();
             var authData = authorizeBLL.GetAuthData();
@@ -450,7 +450,7 @@ namespace BackendSite.Controllers.Api
                             {
                                 try
                                 {
-                                    decimal withdrawalLimitAmount = (withdrawalLimitOption == 1) ? amount : 0;
+                                    decimal withdrawalLimitAmount = (withdrawalLimitOption == 1) ? amount * withdrawal : 0;
                                     AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit
                                     {
                                         CustId = custInfoDetail.CustId,
