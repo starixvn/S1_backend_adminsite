@@ -25,9 +25,10 @@ namespace BackendSite.Service.BLL
             return reasonManagementService.GetReasonManagementData(para);
         }
 
-        public int SetReasonManagement(SetReasonManagementPara para)
+        public int SetReasonManagement(SetReasonManagementPara para,string User)
         {
-            return reasonManagementService.SetReasonManagement(para);
+            DateTime now = DateTime.UtcNow;
+            return reasonManagementService.SetReasonManagement(para,User, now);
         }
     }
 }

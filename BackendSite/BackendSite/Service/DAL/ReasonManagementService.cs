@@ -47,17 +47,17 @@ namespace BackendSite.Service.DAL
             return SearchResult;
         }
 
-        public int SetReasonManagement(SetReasonManagementPara para)
+        public int SetReasonManagement(SetReasonManagementPara para,string user,DateTime now)
         {
             DynamicParameters props = new DynamicParameters();
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
 
-            //props.Add("CustIds", CustIds);
-            //props.Add("CalculateMonth", YearMonth);
-            //props.Add("Status", ChangeStatus);
-            //props.Add("LastUpdateUser", username);
+            props.Add("Id", para.Id);
+            props.Add("Description", para.Description);
+            props.Add("UpdateTime", now);
+            props.Add("Updator", user);
 
-            return conn.Execute("Admin_VipUpgradeReview_Set", props, commandType: CommandType.StoredProcedure);
+            return conn.Execute("Admin_BankFinancialReason_Upd", props, commandType: CommandType.StoredProcedure);
         }
     }
 }

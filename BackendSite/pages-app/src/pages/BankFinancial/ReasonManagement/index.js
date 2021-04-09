@@ -115,7 +115,7 @@ const App = () => {
       });
   };
   const Edit = (props) => {
-    console.log(props)
+    console.log(props);
     seteditData({
       ...editData,
       Id: props.id,
@@ -129,18 +129,61 @@ const App = () => {
     });
     setstate(1);
   };
-  const Edit_Change=(v, dataColumn)=>{
+  const Edit_Change = (v, dataColumn) => {
     seteditData({
       ...editData,
-      [dataColumn]:v
-    })
+      [dataColumn]: v,
+    });
+  };
+  const Edit_Submit = () => {
+    let Data = {
+      Id: editData.Id,
+      Description: editData.Description,
+    };
+    api
+      .post("/api/ReasonManagement/SetReasonManagement", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          Resubmit();
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  };
+  const Resubmit = () => {
+    let Data = {
+      FuncKey: stateDatas.FilterInfo.Funckey,
+      PageSize: parseInt(10),
+      PageNumber: parseInt(stateDatas.PageInfo.pageNumber),
+    };
+    api
+      .post("/api/ReasonManagement/GetReasonManagementData", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          setDatas({
+            ...stateDatas,
+            PageInfo: {
+              ...stateDatas.PageInfo,
+              pageNumber: stateDatas.pageNumber,
+            },
+            Datas: [...res.data.data],
+          });
+          setstate(0);
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  };
+  const Back =()=>{
+    setstate(0);
   }
-  const Edit_Submit=()=>{
-    let Data={
-      Id:editData.Id,
-      Description:editData.Description
-    }
-  }
+
   if (state === 0) {
     return (
       <div className="container-fluid">
@@ -150,6 +193,7 @@ const App = () => {
           ClickSubmit={Filter_Submit}
           SiteList={siteList}
           Funckey={funckey}
+          stateFilter={stateFilter}
         />
         {stateDatas.Datas === null ? null : (
           <Result
@@ -164,10 +208,7 @@ const App = () => {
   } else if (state === 1) {
     return (
       <div>
-        <Detail 
-          EditData={editData}
-          Change={Edit_Change}
-        />
+        <Detail EditData={editData} Change={Edit_Change} Submit={Edit_Submit} Back={Back}/>
       </div>
     );
   }

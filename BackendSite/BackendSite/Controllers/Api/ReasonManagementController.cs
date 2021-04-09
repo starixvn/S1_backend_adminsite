@@ -58,7 +58,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult();
             try
             {
-                reasonManagementBLL.SetReasonManagement(para);
+                reasonManagementBLL.SetReasonManagement(para, User.Identity.Name);
+                apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
             {

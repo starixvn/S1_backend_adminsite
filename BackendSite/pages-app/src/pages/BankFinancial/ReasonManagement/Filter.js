@@ -22,7 +22,7 @@ const Panel = (props) => {
               return { value: x.funcKey, displayText: x.funcKey };
             })}
             hasAll={true}
-            selectedValue={0}
+            selectedValue={props.stateFilter.Funckey}
             dataColumn="Funckey"
             onChange={props.onChange}
           />

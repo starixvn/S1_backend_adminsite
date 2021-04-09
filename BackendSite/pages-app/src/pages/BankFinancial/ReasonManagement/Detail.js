@@ -57,8 +57,8 @@ const Panel = (props) => {
       </div>
       <div className="row-flex">
         <InputField2
-          columnTitle={"CreateTime(" + moment().format('Z') + ")"}
-          Value={moment(props.EditData.CreateTime).format('l LTS')}
+          columnTitle={"CreateTime(" + moment().format("Z") + ")"}
+          Value={moment(props.EditData.CreateTime).format("l LTS")}
           dataColumn="CreateTime"
           defaultValue=""
           Disabled={true}
@@ -76,14 +76,42 @@ const Panel = (props) => {
       </div>
       <div className="row-flex">
         <InputField2
-          columnTitle={"UpdateTime(" + moment().format('Z') + ")"}
-          Value={moment(props.EditData.UpdateTime).format('l LTS')}
+          columnTitle={"UpdateTime(" + moment().format("Z") + ")"}
+          Value={moment(props.EditData.UpdateTime).format("l LTS")}
           dataColumn="UpdateTime"
           defaultValue=""
           Disabled={true}
           Size={300}
         />
       </div>
+      <td>
+        <div>
+          <button
+            className="btn btn-search"
+            type="submit"
+            onClick={props.Submit}
+            style={{
+              marginTop: "20px",
+              marginBottom: "40px",
+              marginRight: "10px",
+            }}
+          >
+            Submit
+          </button>
+          <button
+            className="btn btn-search"
+            type="submit"
+            onClick={props.Back}
+            style={{
+              marginTop: "20px",
+              marginBottom: "40px",
+              marginRight: "10px",
+            }}
+          >
+            Back
+          </button>
+        </div>
+      </td>
     </div>
   );
 };
