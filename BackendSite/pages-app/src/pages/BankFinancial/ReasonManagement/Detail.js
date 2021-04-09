@@ -1,11 +1,7 @@
-import Pagination from "./Pagination";
 import React, { useEffect, useRef, useReducer, useState } from "react";
-import WebAPI from "../../../module/WebAPI";
-import { api } from "../../../module/WebAPI";
 import moment from "moment";
 
 const Panel = (props) => {
-  console.log(props.EditData);
   return (
     <div className="filter">
       <div className="row-flex">
@@ -84,34 +80,32 @@ const Panel = (props) => {
           Size={300}
         />
       </div>
-      <td>
-        <div>
-          <button
-            className="btn btn-search"
-            type="submit"
-            onClick={props.Submit}
-            style={{
-              marginTop: "20px",
-              marginBottom: "40px",
-              marginRight: "10px",
-            }}
-          >
-            Submit
-          </button>
-          <button
-            className="btn btn-search"
-            type="submit"
-            onClick={props.Back}
-            style={{
-              marginTop: "20px",
-              marginBottom: "40px",
-              marginRight: "10px",
-            }}
-          >
-            Back
-          </button>
-        </div>
-      </td>
+      <div>
+        <button
+          className="btn btn-search"
+          type="submit"
+          onClick={props.Submit}
+          style={{
+            marginTop: "20px",
+            marginBottom: "40px",
+            marginRight: "10px",
+          }}
+        >
+          Submit
+        </button>
+        <button
+          className="btn btn-search"
+          type="submit"
+          onClick={props.Back}
+          style={{
+            marginTop: "20px",
+            marginBottom: "40px",
+            marginRight: "10px",
+          }}
+        >
+          Back
+        </button>
+      </div>
     </div>
   );
 };

@@ -59,5 +59,19 @@ namespace BackendSite.Service.DAL
 
             return conn.Execute("Admin_BankFinancialReason_Upd", props, commandType: CommandType.StoredProcedure);
         }
+        public int InsertReasonManagement(InsertReasonManagementPara para, string user, DateTime now)
+        {
+            DynamicParameters props = new DynamicParameters();
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+
+            props.Add("FuncKey", para.FuncKey);
+            props.Add("Description", para.Description);
+            props.Add("UpdateTime", now);
+            props.Add("Updator", user);
+            props.Add("CreateTime", now);
+            props.Add("Creator", user);
+
+            return conn.Execute("Admin_BankFinancialReason_Ins", props, commandType: CommandType.StoredProcedure);
+        }
     }
 }

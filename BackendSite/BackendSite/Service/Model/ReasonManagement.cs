@@ -24,9 +24,9 @@ namespace BackendSite.Service.Model
         public string FuncKey { get; set; }
         public int ReasonId { get; set; }
         public string Description { get; set; }
-        public DateTime CreateTime { get; set; }
+        public string CreateTime { get; set; }
         public string Creator { get; set; }
-        public DateTime UpdateTime { get; set; }
+        public string UpdateTime { get; set; }
         public string Updator { get; set; }
     }
 
@@ -41,5 +41,10 @@ namespace BackendSite.Service.Model
     {
         public string Description { get; set; }
         public int Id { get; set; }
+    }
+    public class InsertReasonManagementPara
+    {
+        public string FuncKey { get; set; }
+        public string Description { get; set; }
     }
 }

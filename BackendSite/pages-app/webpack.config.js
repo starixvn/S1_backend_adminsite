@@ -144,9 +144,13 @@ module.exports = {
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/LatestHighlightVideoManagement/index.js"
     // ],
-    "BankFinancial/TransferAccountManage.min": [
+    // "BankFinancial/TransferAccountManage.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/BankFinancial/TransferAccountManage/index.jsx",
+    // ],
+    "BankFinancial/ReasonManagement.min": [
       "@babel/polyfill",
-      "./src/pages/BankFinancial/TransferAccountManage/index.jsx",
+      "./src/pages/BankFinancial/ReasonManagement/index.js",
     ],
   },
   output: {

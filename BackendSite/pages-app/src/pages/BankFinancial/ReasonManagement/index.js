@@ -6,6 +6,7 @@ import { api } from "../../../module/WebAPI";
 import Filter from "./Filter";
 import Result from "./Result";
 import Detail from "./Detail";
+import Create from "./Create";
 
 const App = () => {
   const [state, setstate] = useState(0);
@@ -29,6 +30,12 @@ const App = () => {
     Updator: null,
     UpdateTime: null,
   });
+  const [insertData, setinsertData] = useState({
+    OldFuncKey: "0",
+    NewFuncKey: "",
+    Description: "",
+    FuncKeyType: 0,
+  });
   useEffect(() => {
     let param = {
       Url: "Common/AdminUserSiteList",
@@ -50,10 +57,17 @@ const App = () => {
         alert(res.data.message ?? "failed to get data.");
       }
     });
-  }, []);
+  }, [state]);
   const Filter_OnChange = (v, dataColumn) => {
     setFilter({
       ...stateFilter,
+      [dataColumn]: v,
+    });
+  };
+  const Create_OnChange = (v, dataColumn) => {
+    console.log(v, dataColumn);
+    setinsertData({
+      ...insertData,
       [dataColumn]: v,
     });
   };
@@ -85,10 +99,6 @@ const App = () => {
       });
   };
   const ChangePage = (PageNumber) => {
-    if (stateDatas.FilterInfo.SelectSite.length === 0) {
-      alert("Please Choose at least one Site");
-      return false;
-    }
     let Data = {
       FuncKey: stateDatas.FilterInfo.Funckey,
       PageSize: parseInt(10),
@@ -103,6 +113,8 @@ const App = () => {
             PageInfo: {
               ...stateDatas.PageInfo,
               pageNumber: PageNumber,
+              totalPages: res.data.totalPages,
+              rowCount: res.data.rowCount,
             },
             Datas: [...res.data.data],
           });
@@ -159,6 +171,7 @@ const App = () => {
       PageSize: parseInt(10),
       PageNumber: parseInt(stateDatas.PageInfo.pageNumber),
     };
+    console.log(Data);
     api
       .post("/api/ReasonManagement/GetReasonManagementData", Data)
       .then(function (res) {
@@ -167,7 +180,8 @@ const App = () => {
             ...stateDatas,
             PageInfo: {
               ...stateDatas.PageInfo,
-              pageNumber: stateDatas.pageNumber,
+              totalPages: res.data.totalPages,
+              rowCount: res.data.rowCount,
             },
             Datas: [...res.data.data],
           });
@@ -180,14 +194,63 @@ const App = () => {
         alert(error);
       });
   };
-  const Back =()=>{
+  const Back = () => {
+    setstate(0);
+  };
+  const CreateOne = () => {
+    setstate(2);
+  };
+  const Create_Submit = () => {
+    console.log(111);
+    if (insertData.FuncKeyType === 0 && insertData.OldFuncKey === "0") {
+      alert("Please Choose at least one FuncKey");
+      return false;
+    }
+    if (
+      insertData.FuncKeyType === 1 &&
+      insertData.NewFuncKey.replace(/(^\s*)|(\s*$)/g, "") === ""
+    ) {
+      alert("Please Fill in FuncKey");
+      return false;
+    }
+    let Data = {
+      FuncKey:
+        insertData.FuncKeyType === 0
+          ? insertData.OldFuncKey
+          : insertData.NewFuncKey,
+      Description: insertData.Description,
+    };
+    api
+      .post("/api/ReasonManagement/InsertReasonManagement", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          ResetinsertData();
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  };
+  const ResetinsertData = ()=>{
+    setinsertData({
+      ...insertData,
+      OldFuncKey: "0",
+      NewFuncKey: "",
+      Description: "",
+      FuncKeyType: 0,
+    })
+    console.log(stateDatas);
+    if(stateDatas.Datas !== null){
+      Resubmit();
+    }   
     setstate(0);
   }
-
   if (state === 0) {
     return (
       <div className="container-fluid">
-        <h4 className="page-name">Draw Prize Report</h4>
+        <h4 className="page-name">Reason Management</h4>
         <Filter
           onChange={Filter_OnChange}
           ClickSubmit={Filter_Submit}
@@ -203,12 +266,45 @@ const App = () => {
             Submit={Edit_Submit}
           />
         )}
+        <div className="row-flex">
+          <div className="button-group">
+            <button
+              className="btn btn-search"
+              type="submit"
+              onClick={CreateOne}
+              style={{
+                marginTop: "20px",
+                marginBottom: "40px",
+                marginRight: "10px",
+              }}
+            >
+              Create
+            </button>
+          </div>
+        </div>
       </div>
     );
   } else if (state === 1) {
     return (
       <div>
-        <Detail EditData={editData} Change={Edit_Change} Submit={Edit_Submit} Back={Back}/>
+        <Detail
+          EditData={editData}
+          Change={Edit_Change}
+          Submit={Edit_Submit}
+          Back={Back}
+        />
+      </div>
+    );
+  } else {
+    return (
+      <div>
+        <Create
+          insertData={insertData}
+          onChange={Create_OnChange}
+          Funckey={funckey}
+          Back={Back}
+          Submit={Create_Submit}
+        />
       </div>
     );
   }

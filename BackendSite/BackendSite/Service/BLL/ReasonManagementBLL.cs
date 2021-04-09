@@ -30,5 +30,10 @@ namespace BackendSite.Service.BLL
             DateTime now = DateTime.UtcNow;
             return reasonManagementService.SetReasonManagement(para,User, now);
         }
+        public int InsertReasonManagement(InsertReasonManagementPara para, string User)
+        {
+            DateTime now = DateTime.UtcNow;
+            return reasonManagementService.InsertReasonManagement(para, User, now);
+        }
     }
 }

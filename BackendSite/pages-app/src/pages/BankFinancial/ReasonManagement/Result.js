@@ -1,12 +1,19 @@
 import React from "react";
 import Pagination from "./Pagination";
+import moment from 'moment';
 
 const dataColumnDefs = () => {
   return [
     { dataColumn: "funcKey", columnTitle: "FuncKey" },
     { dataColumn: "reasonId", columnTitle: "ReasonId" },
     { dataColumn: "description", columnTitle: "Description" },
-    { dataColumn: "updateTime", columnTitle: "UpdateTime" },
+    {
+      dataColumn: "updateTime",
+      columnTitle: "UpdateTime",
+      body: {
+        format: dateFormat,
+      },
+    },
     { dataColumn: "updator", columnTitle: "Updator" },
     { dataColumn: "action", columnTitle: "Action" },
   ];
@@ -89,5 +96,7 @@ const Panel = (props) => {
     </div>
   );
 };
-
+const dateFormat = (createTime)=>{
+  return moment(createTime).format('l LTS');
+}
 export default Panel;
