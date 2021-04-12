@@ -7,13 +7,7 @@ const dataColumnDefs = () => {
     { dataColumn: "funcKey", columnTitle: "FuncKey" },
     { dataColumn: "reasonId", columnTitle: "ReasonId" },
     { dataColumn: "description", columnTitle: "Description" },
-    {
-      dataColumn: "updateTime",
-      columnTitle: "UpdateTime",
-      body: {
-        format: dateFormat,
-      },
-    },
+    { dataColumn: "updateTime", columnTitle: "UpdateTime" },
     { dataColumn: "updator", columnTitle: "Updator" },
     { dataColumn: "action", columnTitle: "Action" },
   ];

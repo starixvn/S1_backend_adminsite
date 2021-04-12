@@ -15,10 +15,12 @@ namespace BackendSite.Controllers.Api
     public class ReasonManagementController : Controller
     {
         private readonly ReasonManagementBLL reasonManagementBLL;
+        private readonly AuthorizeBLL authorizeBLL;
 
-        public ReasonManagementController(ReasonManagementBLL reasonManagementBLL)
+        public ReasonManagementController(ReasonManagementBLL reasonManagementBLL, AuthorizeBLL authorizeBLL)
         {
             this.reasonManagementBLL = reasonManagementBLL;
+            this.authorizeBLL = authorizeBLL;
         }
 
         public ApiResult<IEnumerable<ReasonManagementFuncKey>> GetFuncKey()
@@ -58,7 +60,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult();
             try
             {
-                reasonManagementBLL.SetReasonManagement(para, User.Identity.Name);
+                var authData = authorizeBLL.GetAuthData();
+                reasonManagementBLL.SetReasonManagement(para, authData.UserId);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -74,7 +77,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult();
             try
             {
-                reasonManagementBLL.InsertReasonManagement(para, User.Identity.Name);
+                var authData = authorizeBLL.GetAuthData();
+                reasonManagementBLL.InsertReasonManagement(para, authData.UserId);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)

@@ -47,7 +47,7 @@ namespace BackendSite.Service.DAL
             return SearchResult;
         }
 
-        public int SetReasonManagement(SetReasonManagementPara para,string user,DateTime now)
+        public int SetReasonManagement(SetReasonManagementPara para,int UserId, DateTime now)
         {
             DynamicParameters props = new DynamicParameters();
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
@@ -55,11 +55,11 @@ namespace BackendSite.Service.DAL
             props.Add("Id", para.Id);
             props.Add("Description", para.Description);
             props.Add("UpdateTime", now);
-            props.Add("Updator", user);
+            props.Add("Updator", UserId);
 
             return conn.Execute("Admin_BankFinancialReason_Upd", props, commandType: CommandType.StoredProcedure);
         }
-        public int InsertReasonManagement(InsertReasonManagementPara para, string user, DateTime now)
+        public int InsertReasonManagement(InsertReasonManagementPara para, int UserId, DateTime now)
         {
             DynamicParameters props = new DynamicParameters();
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
@@ -67,9 +67,9 @@ namespace BackendSite.Service.DAL
             props.Add("FuncKey", para.FuncKey);
             props.Add("Description", para.Description);
             props.Add("UpdateTime", now);
-            props.Add("Updator", user);
+            props.Add("Updator", UserId);
             props.Add("CreateTime", now);
-            props.Add("Creator", user);
+            props.Add("Creator", UserId);
 
             return conn.Execute("Admin_BankFinancialReason_Ins", props, commandType: CommandType.StoredProcedure);
         }
