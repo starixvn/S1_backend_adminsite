@@ -194,7 +194,7 @@ namespace BackendSite.Service.DAL
             public int value { get; set; }
         }
 
-        public TeleCSDData GetTeleCSD(string SiteIds, string Currency, string StartDate, string EndDate, string Deposit, string DormantUser, string CallOut, int PageNumber, int PageSize)
+        public TeleCSDData GetTeleCSD(string SiteIds, string Currency, long StartDate, long EndDate, string Deposit, string DormantUser, string CallOut, int PageNumber, int PageSize)
         {
             TeleCSDData SearchData = new TeleCSDData();
             DynamicParameters props = new DynamicParameters();
@@ -239,7 +239,7 @@ namespace BackendSite.Service.DAL
             props.Add("ActStatus", ActStatus);
             props.Add("DayInactive", DayInactive);
             props.Add("CallOutStatus", CallOutStatus);
-            var result = conn.Query<CustTele>("Admin_CustTeleSearch_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var result = conn.Query<CustTele>("Admin_CustTeleSearchV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             result.ForEach(x =>
             {
@@ -280,7 +280,7 @@ namespace BackendSite.Service.DAL
             return conn.Execute("Admin_CustTele_Ins", props, commandType: CommandType.StoredProcedure);
         }
 
-        public List<CustTeleExport> GetTeleCSDExportData(string SiteIds, string Currency, string StartDate, string EndDate, string Deposit, string DormantUser, string CallOut)
+        public List<CustTeleExport> GetTeleCSDExportData(string SiteIds, string Currency, long StartDate, long EndDate, string Deposit, string DormantUser, string CallOut)
         {
             List<CustTeleExport> result = new List<CustTeleExport>();
             DynamicParameters props = new DynamicParameters();
@@ -319,7 +319,7 @@ namespace BackendSite.Service.DAL
             props.Add("CallOutStatus", CallOutStatus);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var tempresult = conn.Query<CustTeleExportTemp>("Admin_CustTeleExport_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var tempresult = conn.Query<CustTeleExportTemp>("Admin_CustTeleExportV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             tempresult.ForEach(x =>
             {

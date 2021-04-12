@@ -684,8 +684,8 @@ namespace BackendSite.Controllers.Api
             public string Deposit { get; set; }
             public string CallOut { get; set; }
             public string DormantUser { get; set; }
-            public string StartDate { get; set; }
-            public string EndDate { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
             public TeleCSDpara()
@@ -741,7 +741,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public IActionResult ExportTeleCSDData(string SiteIds, string Currency, string Deposit, string CallOut, string DormantUser, string StartDate, string EndDate)
+        public IActionResult ExportTeleCSDData(string SiteIds, string Currency, string Deposit, string CallOut, string DormantUser, long StartDate, long EndDate)
         {
             var ExportData = custInfoBLL.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);
             var stream = excelBLL.Export(ExportData);
