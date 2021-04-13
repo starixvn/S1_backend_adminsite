@@ -110,6 +110,7 @@ export default ({ state, action, processing,isAdd }) => {
 							OnChange={action.EditMainValue}
 							dataColumn="accountNo"
 							value={state.accountNo}
+							Disabled={!isAdd}
 						/>
 						<InputBox
 							Title="Account Name"
