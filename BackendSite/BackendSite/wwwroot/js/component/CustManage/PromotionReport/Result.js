@@ -23,7 +23,7 @@ const Result = (props) => {
               <td>{number_format(d.custRollOver.turnOver)}</td>
               <td>{moment(d.claimDate).format('l LTS')}</td>
               <td>{BonusInfoStatus[d.bonusInfoStatus]}</td>
-              <td>{d.bonusInfoStatus == 2 ? <button className="btn btn-primary" onClick={props.CancelBonus.bind(this, d.bonusId)}>Cancel Bonus</button> : null}</td>
+              <td>{d.bonusInfoStatus == 1 ? <button className="btn btn-primary" onClick={props.CancelBonus.bind(this, d.bonusId)}>Cancel Bonus</button> : null}</td>
             </tr>
           );
         });

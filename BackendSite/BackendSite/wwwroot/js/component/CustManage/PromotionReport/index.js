@@ -41,11 +41,12 @@ const Panel = () => {
   };
   const cancelBonus = (bonusId) => {
     console.log(bonusId);
+    console.log(iCustId);
     if (confirm("Are you sure Cancel Bonus ?")) {
       //let data = this.props.CustInfoData;
       axios
         .post("/api/CustManage/CancelBonusByBonusId", {
-          CustId: CustId,
+          CustId: iCustId,
           BonusId: bonusId,
         })
         .then(

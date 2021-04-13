@@ -736,33 +736,34 @@ import PromotionReport from './PromotionReport/index';
     class Promotion extends React.Component {
 
         render() {
-            let Promotions = this.props.Promotions;
-            let promotionRows = null;
+            // let Promotions = this.props.Promotions;
+            // let promotionRows = null;
 
-            if (Promotions != null) {
-                promotionRows = <tbody>{Promotions.map(x => <PromotionRow key={x.bonusCode} Promotion={x} CancelBonus={this.props.CancelBonus} />)}</tbody>;
-            }
+            // if (Promotions != null) {
+            //     promotionRows = <tbody>{Promotions.map(x => <PromotionRow key={x.bonusCode} Promotion={x} CancelBonus={this.props.CancelBonus} />)}</tbody>;
+            // }
 
-            return (
-                <div className="table-responsive-md table">
-                    <span class="label">Promotion</span>
-                    <table className="table table-striped">
-                        <thead>
-                            <tr>
-                                <th scope="col">BonusCode</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Bonus Amount</th>
-                                <th scope="col">Locked Amount</th>
-                                <th scope="col">Rollover</th>
-                                <th scope="col">Turnover</th>
-                                <th scope="col">Status</th>
-                                <th scope="col"></th>
-                            </tr>
-                        </thead>
-                        {promotionRows}
-                    </table>
-                </div>
-            )
+            // return (
+            //     <div className="table-responsive-md table">
+            //         <span class="label">Promotion</span>
+            //         <table className="table table-striped">
+            //             <thead>
+            //                 <tr>
+            //                     <th scope="col">BonusCode</th>
+            //                     <th scope="col">Description</th>
+            //                     <th scope="col">Bonus Amount</th>
+            //                     <th scope="col">Locked Amount</th>
+            //                     <th scope="col">Rollover</th>
+            //                     <th scope="col">Turnover</th>
+            //                     <th scope="col">Status</th>
+            //                     <th scope="col"></th>
+            //                 </tr>
+            //             </thead>
+            //             {promotionRows}
+            //         </table>
+            //     </div>
+            // )
+            return(<></>)
         }
     }
 
