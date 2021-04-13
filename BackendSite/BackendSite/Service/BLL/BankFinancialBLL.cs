@@ -147,7 +147,7 @@ namespace BackendSite.Service.BLL
                         return (status, count, "Update Transfer Account Fail.");
                     };
 
-                    if (_bankFinancialService.InsertTransferAccountLog(ActionType.Create, transferAccountModel) != 1)
+                    if (_bankFinancialService.InsertTransferAccountLog(ActionType.Update, transferAccountModel) != 1)
                     {
                         scope.Dispose();
 
@@ -163,7 +163,6 @@ namespace BackendSite.Service.BLL
             return (status, count, message);
         }
 
-
         private string SortPurpose(string purpose)
         {
 
@@ -173,6 +172,120 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+
+
+        public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoList(bool isSetting, 
+                                                                                     int siteId,
+                                                                                     TransferTypeEnum? transferType,
+                                                                                     string transFromDate,
+                                                                                     string transToDate,
+                                                                                     string fromAccountNo,
+                                                                                     string fromAccountDisplayName,
+                                                                                     string toAccountNo,
+                                                                                     string toAccountDisplayName,
+                                                                                     int? reason,
+                                                                                     int id)
+        {
+            return _bankFinancialService.GetTransferInfoList(isSetting, 
+                                                             siteId,
+                                                             transferType,
+                                                             transFromDate,
+                                                             transToDate,
+                                                             fromAccountNo,
+                                                             fromAccountDisplayName,
+                                                             toAccountNo,
+                                                             toAccountDisplayName,
+                                                             reason,
+                                                             id);
+        }
+
+        public (bool Status, int Count, string Message) SetTransferInfo(BankFinancialTransferInfoModel bankFinancialTransferInfo)
+        {
+            bool status = false;
+            int count = 0;
+            string message = string.Empty;
+
+            BankFinancialTransferInfoModel transferInfoModel = new BankFinancialTransferInfoModel
+            {
+                Id = bankFinancialTransferInfo.Id,
+                TransferId = bankFinancialTransferInfo.TransferId,
+                TransactionType = bankFinancialTransferInfo.TransactionType,
+                TransferType = bankFinancialTransferInfo.TransferType,
+                PlusOrMinus = bankFinancialTransferInfo.PlusOrMinus,
+                TransDate = bankFinancialTransferInfo.TransDate,
+                Channel = bankFinancialTransferInfo.Channel,
+                Agent = bankFinancialTransferInfo.Agent == "" ? null : bankFinancialTransferInfo.Agent,
+                PayId = bankFinancialTransferInfo.PayId == 0 ? null : bankFinancialTransferInfo.PayId,
+                SiteId = bankFinancialTransferInfo.SiteId,
+                SiteName = bankFinancialTransferInfo.SiteName == "" ? null : bankFinancialTransferInfo.SiteName,
+                CustId = bankFinancialTransferInfo.CustId,
+                CurrencyId = bankFinancialTransferInfo.CurrencyId,
+                SysId = bankFinancialTransferInfo.SysId,
+                AccountNo = bankFinancialTransferInfo.AccountNo,
+                AccountDisplayName = bankFinancialTransferInfo.AccountDisplayName,
+                Amount = bankFinancialTransferInfo.Amount,
+                Fee = bankFinancialTransferInfo.Fee,
+                Reason = bankFinancialTransferInfo.Reason,
+                Remark = bankFinancialTransferInfo.Remark,
+                CreateTime = bankFinancialTransferInfo.CreateTime,
+                Creator = bankFinancialTransferInfo.Creator,
+                UpdateTime = bankFinancialTransferInfo.UpdateTime,
+                Updator = bankFinancialTransferInfo.Updator
+            };
+
+            if (transferInfoModel.Id == 0)
+            {
+                using (TransactionScope scope = new TransactionScope())
+                {
+
+                    if (_bankFinancialService.InsertTransferInfo(transferInfoModel) != 1)
+                    {
+                        scope.Dispose();
+
+                        return (status, count, "Insert Transfer Info Fail.");
+                    };
+
+                    if (_bankFinancialService.InsertTransferInfoLog(ActionType.Create, transferInfoModel) != 1)
+                    {
+                        scope.Dispose();
+
+                        return (status, count, "Insert Transfer Info Log Fail.");
+                    }
+
+                    scope.Complete();
+                }
+                status = true;
+                count = 1;
+                message = "Insert Transfer Account And Insert Log Success.";
+            }
+            else
+            {
+                using (TransactionScope scope = new TransactionScope())
+                {
+
+                    if (_bankFinancialService.UpdateTransferInfo(transferInfoModel) != 1)
+                    {
+                        scope.Dispose();
+
+                        return (status, count, "Update Transfer Info Fail.");
+                    };
+
+                    if (_bankFinancialService.InsertTransferInfoLog(ActionType.Update, transferInfoModel) != 1)
+                    {
+                        scope.Dispose();
+
+                        return (status, count, "Insert Transfer Info Log Fail.");
+                    }
+
+                    scope.Complete();
+                }
+                status = true;
+                count = 1;
+                message = "Update Transfer Info And Insert Log Success.";
+            }
+            return (status, count, message);
+        }
+
 
     }
 }

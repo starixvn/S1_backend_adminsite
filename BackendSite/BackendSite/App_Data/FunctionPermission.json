@@ -367,6 +367,11 @@
         "DisplayKey": "Bank Transfer Account",
         "FuncKey": "BankFinancial/TransferAccountManage",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Transfer Management",
+        "FuncKey": "BankFinancial/TransferManage",
+        "Enable": false
       }
     ]
   }

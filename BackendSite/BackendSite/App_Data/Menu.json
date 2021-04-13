@@ -464,6 +464,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Transfer Management",
+        "FuncKey": "BankFinancial/TransferManage",
+        "Controller": "BankFinancial",
+        "Action": "TransferManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   }
