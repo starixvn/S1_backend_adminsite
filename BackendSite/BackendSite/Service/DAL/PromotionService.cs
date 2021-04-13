@@ -34,5 +34,27 @@ namespace BackendSite.Service.DAL
             trans.Commit();
             return result;
         }
+        public PromotionListData GetPromotionListByCustIdAndDate(int CustId, long StartDate, long EndDate, int PageNumber, int PageSize)
+        {
+            PromotionListData PromotionListData = new PromotionListData();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            DynamicParameters props = new DynamicParameters();
+            props.Add("PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("PageSize", PageSize);
+            props.Add("CustId", CustId);
+            props.Add("StartDate", StartDate);
+            props.Add("EndDate", EndDate);
+            var result =  conn.Query<Promotion>("Admin_PromotionListByCustIdAndDate_Get", props, commandType: CommandType.StoredProcedure).ToList();
+
+            PromotionListData.PromotionList = result;
+            PromotionListData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            PromotionListData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            PromotionListData.RowCount = props.Get<int?>("RowCount") ?? 0;
+
+            return PromotionListData;
+        }
     }
 }

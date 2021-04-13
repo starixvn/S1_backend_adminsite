@@ -14,6 +14,7 @@ import { BankLog } from './CustInfo_BankLog.jsx';
 import DateTimePicker from 'react-datetime';
 import TpBetRecord from './TpBetRecord/index';
 import VipLevel from './VipLevel/index';
+import PromotionReport from './PromotionReport/index';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -1606,7 +1607,7 @@ import VipLevel from './VipLevel/index';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History", "VIP Level"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History", "VIP Level", "Promotion Report"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
         constructor(props) {
@@ -2151,6 +2152,8 @@ import VipLevel from './VipLevel/index';
                 dataContainer = <ReferralHistory GetReferralHistory={this.GetReferralHistory.bind(this)} searchData={this.state.ReferralHistoryData} ReferralHistory={this.state.ReferralHistory} onChangeValue={this.onChangeValue.bind(this)} />
             } else if (TabName == this._Tabs[17]) {
                 dataContainer = <VipLevel />
+            } else if (TabName == this._Tabs[18]) {
+                dataContainer = <PromotionReport />
             }
 
             let authSubKeys = {

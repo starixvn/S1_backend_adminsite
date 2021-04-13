@@ -746,6 +746,34 @@ namespace BackendSite.Controllers.Api
             var ExportData = custInfoBLL.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);
             var stream = excelBLL.Export(ExportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"TeleCSD_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
-        }   
+        }
+        public class CustPromotionpara
+        {
+            public int CustId { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+        }
+        [HttpPost]
+        public ApiListResult<Promotion> GetPromotionListByCustIdAndDate([FromForm] int CustId, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int PageSize)
+        {
+            var apiResult = new ApiListResult<Promotion>();
+            try
+            {
+                var SearchResult = custInfoBLL.GetPromotionListByCustIdAndDate(CustId,StartDate,EndDate,PageNumber,PageSize);
+                apiResult.Data = SearchResult.PromotionList;
+                apiResult.PageNumber = SearchResult.PageNumber;
+                apiResult.TotalPages = SearchResult.TotalPages;
+                apiResult.RowCount = SearchResult.RowCount;
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
+        }
     }
 }
