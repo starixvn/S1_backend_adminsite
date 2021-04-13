@@ -88,6 +88,9 @@ const VipUpgrade = lazy(() => import("./pages/Marketing/VipUpgrade/index"));
 const LatestHighlightVideoManagement = lazy(() =>
   import("./pages/Marketing/LatestHighlightVideoManagement/index")
 );
+const VipRebateInfoReport = lazy(() =>
+  import("./pages/Marketing/VipRebateInfoReport/index")
+);
 
 export const defaultPage = "TransferAccountManage";
 
@@ -545,6 +548,19 @@ export const pages = {
     comp: (
       <Suspense fallback="loading...">
         <LatestHighlightVideoManagement />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  VipRebateInfoReport: {
+    comp: (
+      <Suspense fallback="loading...">
+        <VipRebateInfoReport />
       </Suspense>
     ),
     css: [

@@ -446,6 +446,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "VipRebateInfoReport",
+        "Title": "Vip Rebate Info",
+        "FuncKey": "Marketing/VipRebateInfoReport",
+        "Controller": "Marketing",
+        "Action": "VipRebateInfoReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
