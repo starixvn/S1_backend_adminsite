@@ -96,4 +96,25 @@ namespace BackendSite.Service.Model
         public DateTime TransTime { get; set; }
         public DateTime SettledTime { get; set; }
     }
+    public class VipRebateInfo
+    {
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int CurrencyId { get; set; }
+        public string Currency { get; set; }
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
+        public decimal RCRedeemAmount { get; set; }
+        public DateTime CreateTime { get; set; }
+        public long RelId { get; set; }
+    }
+    public class VipRebateInfoData
+    {
+        public List<VipRebateInfo> VipRebateInfoList { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
 }
