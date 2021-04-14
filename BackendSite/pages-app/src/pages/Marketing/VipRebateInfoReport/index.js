@@ -156,7 +156,7 @@ const App = () => {
 
   return (
     <div className="container-fluid">
-      <h4 className="page-name">Vip Rebate Info Report</h4>
+      <h4 className="page-name">Vip Rebate Report</h4>
       <Filter
         filterInfo={stateFilter}
         onChange={Filter_OnChange}
