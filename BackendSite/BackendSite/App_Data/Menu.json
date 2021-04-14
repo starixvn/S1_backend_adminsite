@@ -358,21 +358,21 @@
         "Childs": null
       },
       {
-        "Key": "VipRebateInfoReport",
-        "Title": "Vip Rebate Info",
-        "FuncKey": "Marketing/VipRebateInfoReport",
-        "Controller": "Marketing",
-        "Action": "VipRebateInfoReport",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
         "Key": "RebateLogReport",
         "Title": "Rebate Report",
         "FuncKey": "Marketing/RebateLogReport",
         "Controller": "Marketing",
         "Action": "RebateLogReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "VipRebateInfoReport",
+        "Title": "Vip Rebate Report",
+        "FuncKey": "Marketing/VipRebateInfoReport",
+        "Controller": "Marketing",
+        "Action": "VipRebateInfoReport",
         "Icon": "",
         "Roles": null,
         "Childs": null
