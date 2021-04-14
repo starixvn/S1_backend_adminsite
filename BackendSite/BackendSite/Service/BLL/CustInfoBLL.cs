@@ -237,8 +237,32 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<CustTeleExport> GetTeleCSDExportData(string SiteIds, string Currency, long StartDate, long EndDate, string Deposit, string DormantUser, string CallOut)
         {
-            return custInfoService.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);
-            
+            return custInfoService.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);           
+        }
+
+        public PromotionListData GetPromotionListByCustIdAndDate(int custId, long StartDate, long EndDate,int PageNumber, int PageSize)
+        {
+            var result =  promotionService.GetPromotionListByCustIdAndDate(custId, StartDate, EndDate, PageNumber, PageSize);
+            if (result.PromotionList != null)
+            {
+                foreach (var promotion in result.PromotionList)
+                {
+                    if (promotion.BonusInfoStatus == 1 || promotion.BonusInfoStatus == 5)
+                    {
+                        promotion.custRollOver = rolloverService.GetCustRollOver(custId, promotion.BonusCode);
+                        if (promotion.BonusInfoStatus == 5)
+                        {
+                            promotion.BonusInfoStatus = 1;
+                        }
+                    }
+                    else
+                    {
+                        promotion.custRollOver = new CustRollOver() { RollOver = 0, TurnOver = 0 };
+                    };
+
+                }
+            }
+            return result;
         }
     }
 }
