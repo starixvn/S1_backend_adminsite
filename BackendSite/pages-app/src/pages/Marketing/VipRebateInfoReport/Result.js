@@ -13,7 +13,6 @@ const dataColumnDefs = () => {
                 subData: ['custId']
             }
         },
-        { dataColumn: 'userName', columnTitle: 'UserName' },
         { dataColumn: 'currency', columnTitle: 'Currency' },
         { dataColumn: 'categoryName', columnTitle: 'Category' },
         {
