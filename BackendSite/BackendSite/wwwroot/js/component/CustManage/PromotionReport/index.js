@@ -15,6 +15,8 @@ const Panel = () => {
     });
   };
 
+
+  
   let CustId = getUrlParameter("custId");
   let iCustId = parseInt(CustId);
   const onSubmit = () => {
