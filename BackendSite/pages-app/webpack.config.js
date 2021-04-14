@@ -144,9 +144,13 @@ module.exports = {
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/LatestHighlightVideoManagement/index.js"
     // ],
-    "BankFinancial/TransferAccountManage.min": [
-      "@babel/polyfill",
-      "./src/pages/BankFinancial/TransferAccountManage/index.jsx",
+    // "BankFinancial/TransferAccountManage.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/BankFinancial/TransferAccountManage/index.jsx",
+    // ],
+    "Marketing/VipRebateInfoReport.min": [
+    	 '@babel/polyfill',
+    	"./src/pages/Marketing/VipRebateInfoReport/index.js"
     ],
   },
   output: {
