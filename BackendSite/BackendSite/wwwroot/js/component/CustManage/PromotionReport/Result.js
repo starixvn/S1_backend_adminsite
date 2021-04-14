@@ -1,12 +1,13 @@
 import { number_format } from "../../commJS/common";
-import moment from 'moment';
+import moment from "moment";
+import Pagination from "./Pagination";
 
 const BonusInfoStatus = {
-    1: <span className="status status-active">Running</span>,
-    2: <span className="status status-suspend">Canceled</span>,
-    3: <span className="status status-closed">Expired</span>,
-    4: <span className="status status-initial">Reached</span>,
-}
+  1: <span className="status status-active">Running</span>,
+  2: <span className="status status-suspend">Canceled</span>,
+  3: <span className="status status-closed">Expired</span>,
+  4: <span className="status status-initial">Reached</span>,
+};
 
 const Result = (props) => {
   let rows =
@@ -21,9 +22,18 @@ const Result = (props) => {
               <td>{number_format(d.lockedAmount)}</td>
               <td>{number_format(d.custRollOver.rollOver)}</td>
               <td>{number_format(d.custRollOver.turnOver)}</td>
-              <td>{moment(d.claimDate).format('l LTS')}</td>
+              <td>{moment(d.claimDate).format("l LTS")}</td>
               <td>{BonusInfoStatus[d.bonusInfoStatus]}</td>
-              <td>{d.bonusInfoStatus == 1 ? <button className="btn btn-primary" onClick={props.CancelBonus.bind(this, d.bonusId)}>Cancel Bonus</button> : null}</td>
+              <td>
+                {d.bonusInfoStatus == 1 ? (
+                  <button
+                    className="btn btn-primary"
+                    onClick={props.CancelBonus.bind(this, d.bonusId)}
+                  >
+                    Cancel Bonus
+                  </button>
+                ) : null}
+              </td>
             </tr>
           );
         });
@@ -47,6 +57,14 @@ const Result = (props) => {
           </thead>
           {rows}
         </table>
+        <Pagination
+          Data={{
+            totalPages: props.PageInfo.totalPages,
+            pageNumber: props.PageInfo.pageNumber,
+            rowCount: props.PageInfo.rowCount,
+          }}
+          ChangePage={props.ChangePage}
+        />
       </div>
     </>
   );
