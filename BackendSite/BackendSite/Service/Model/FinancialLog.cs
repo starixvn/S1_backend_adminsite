@@ -117,4 +117,9 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
     }
+    public class VipTPCategory
+    {
+        public int CategoryId { get; set; }
+        public String CategoryName { get; set; }
+    }
 }

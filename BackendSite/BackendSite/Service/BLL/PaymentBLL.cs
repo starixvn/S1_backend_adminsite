@@ -81,5 +81,9 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetVipRebateInfoList(selectSite, currency, startDate, endDate, User, pageSize, pageNumber, CategoryId);
         }
+        public IEnumerable<VipTPCategory> GetTPCategoryList()
+        {
+            return walletService.GetTPCategoryList();
+        }
     }
 }
