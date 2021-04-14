@@ -14,6 +14,7 @@ const App = () => {
     EndDate: moment().format("l"),
     Currency: "0",
     User: "",
+    Category:"0"
   });
 
   const [stateDatas, setDatas] = useState({
@@ -23,6 +24,7 @@ const App = () => {
   });
 
   const [siteList, setSiteList] = useState();
+  const [CategoryList, setCategoryList] = useState(null);
 
   useEffect(() => {
     let param = {
@@ -31,6 +33,16 @@ const App = () => {
     WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {
         setSiteList(res.data.data);
+      } else {
+        alert(res.data.message ?? "failed to get data.");
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    api.post("/api/Payment/GetTPCategoryListByVipRebate").then((res) => {
+      if (res.data.errorCode === 0) {
+        setCategoryList(res.data.data);
       } else {
         alert(res.data.message ?? "failed to get data.");
       }
@@ -86,6 +98,7 @@ const App = () => {
     let Data = {
       SelectSite: stateFilter.SelectSite,
       Currency: parseInt(stateFilter.Currency),
+      CategoryId:parseInt(stateFilter.Category),
       StartDate: moment(stateFilter.StartDate).unix(),
       EndDate: moment(stateFilter.EndDate).unix(),
       User: stateFilter.User,
@@ -125,6 +138,7 @@ const App = () => {
     let Data = {
       SelectSite: stateDatas.FilterInfo.SelectSite,
       Currency: parseInt(stateDatas.FilterInfo.Currency),
+      CategoryId:parseInt(stateDatas.FilterInfo.Category),
       StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
       EndDate: moment(stateDatas.FilterInfo.EndDate).unix(),
       User: stateDatas.FilterInfo.User,
@@ -164,6 +178,7 @@ const App = () => {
         onChangeAllCheckBox={Filter_CheckBox_CheckAll}
         ClickSubmit={Filter_Submit}
         SiteList={siteList}
+        CategoryList={CategoryList}
       />
       {stateDatas.Datas === null ? null : (
         <Result
