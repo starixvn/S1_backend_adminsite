@@ -27,9 +27,8 @@ namespace BackendSite.Controllers.Api
         private readonly int mainWalletType;
         private readonly Common common;
         private readonly ExcelBLL excelBLL;
-        private readonly RebateManageBLL rebateManageBLL;
 
-        public PaymentController(IConfiguration configuration, PaymentBLL paymentBLL, CustInfoBLL custInfoBLL, TpBLL tpBLL, AuthorizeBLL authorizeBLL, Common common, ExcelBLL excelBLL, RebateManageBLL rebateManageBLL)
+        public PaymentController(IConfiguration configuration, PaymentBLL paymentBLL, CustInfoBLL custInfoBLL, TpBLL tpBLL, AuthorizeBLL authorizeBLL, Common common, ExcelBLL excelBLL)
         {
             this.paymentBLL = paymentBLL;
             this.custInfoBLL = custInfoBLL;
@@ -38,7 +37,6 @@ namespace BackendSite.Controllers.Api
             mainWalletType = configuration.GetValue<int>("MainWalletType");
             this.common = common;
             this.excelBLL = excelBLL;
-            this.rebateManageBLL = rebateManageBLL;
         }
         public class PaymentAdjustmentReq
         {
@@ -581,11 +579,11 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        public ApiResult<IEnumerable<TPCategory>> GetTPCategoryListByVipRebate()
+        public ApiResult<IEnumerable<VipTPCategory>> GetTPCategoryListByVipRebate()
         {
-            var apiResult = new ApiResult<IEnumerable<TPCategory>>();
+            var apiResult = new ApiResult<IEnumerable<VipTPCategory>>();
             apiResult.ErrorCode = 0;
-            apiResult.Data = rebateManageBLL.GetTPCategoryList();
+            apiResult.Data = paymentBLL.GetTPCategoryList();
             return apiResult;
         }
     }
