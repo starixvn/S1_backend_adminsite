@@ -30,7 +30,7 @@ const dataColumnDefs = () => {
                 format:numberFormat
             }
         },
-        { dataColumn: 'relId', columnTitle: 'RelId' },
+        { dataColumn: 'refId', columnTitle: 'RefId' },
         {
             dataColumn: 'createTime',
             columnTitle: 'CreateTime',

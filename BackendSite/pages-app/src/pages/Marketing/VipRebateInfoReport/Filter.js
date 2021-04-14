@@ -44,6 +44,18 @@ const Panel = (props) => {
           dataColumn="Currency"
           onChange={props.onChange}
         />
+        {props.CategoryList !== null ? (
+          <DropDownBox
+            columnTitle="Category"
+            options={props.CategoryList.map((x, index) => {
+              return { value: x.categoryId, displayText: x.categoryName };
+            })}
+            hasAll={true}
+            selectedValue={0}
+            dataColumn="Category"
+            onChange={props.onChange}
+          />
+        ) : null}
         <DateTimePickerElem
           columnTitle="From Date"
           dateTimePickerProps={{

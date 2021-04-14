@@ -108,7 +108,7 @@ namespace BackendSite.Service.Model
         public string CategoryName { get; set; }
         public decimal RCRedeemAmount { get; set; }
         public DateTime CreateTime { get; set; }
-        public long RelId { get; set; }
+        public long RefId { get; set; }
     }
     public class VipRebateInfoData
     {

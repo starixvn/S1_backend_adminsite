@@ -27,8 +27,9 @@ namespace BackendSite.Controllers.Api
         private readonly int mainWalletType;
         private readonly Common common;
         private readonly ExcelBLL excelBLL;
+        private readonly RebateManageBLL rebateManageBLL;
 
-        public PaymentController(IConfiguration configuration, PaymentBLL paymentBLL, CustInfoBLL custInfoBLL, TpBLL tpBLL, AuthorizeBLL authorizeBLL, Common common, ExcelBLL excelBLL)
+        public PaymentController(IConfiguration configuration, PaymentBLL paymentBLL, CustInfoBLL custInfoBLL, TpBLL tpBLL, AuthorizeBLL authorizeBLL, Common common, ExcelBLL excelBLL, RebateManageBLL rebateManageBLL)
         {
             this.paymentBLL = paymentBLL;
             this.custInfoBLL = custInfoBLL;
@@ -37,6 +38,7 @@ namespace BackendSite.Controllers.Api
             mainWalletType = configuration.GetValue<int>("MainWalletType");
             this.common = common;
             this.excelBLL = excelBLL;
+            this.rebateManageBLL = rebateManageBLL;
         }
         public class PaymentAdjustmentReq
         {
@@ -556,6 +558,7 @@ namespace BackendSite.Controllers.Api
             public string User { get; set; }
             public int PageSize { get; set; }
             public int PageNumber { get; set; }
+            public int CategoryId { get; set; }
         }
         [HttpPost]
         public ApiListResult<VipRebateInfo> GetVipRebateInfoList(VipRebateInfoPara para)
@@ -563,7 +566,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<VipRebateInfo>();
             try
             {
-                var SearchResult = paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, para.StartDate, para.EndDate, para.User, para.PageSize, para.PageNumber);
+                var SearchResult = paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, para.StartDate, para.EndDate, para.User, para.PageSize, para.PageNumber,para.CategoryId);
                 apiResult.Data = SearchResult.VipRebateInfoList;
                 apiResult.PageNumber = SearchResult.PageNumber;
                 apiResult.TotalPages = SearchResult.TotalPages;
@@ -576,6 +579,13 @@ namespace BackendSite.Controllers.Api
                 apiResult.Message = ex.Message;
             }
 
+            return apiResult;
+        }
+        public ApiResult<IEnumerable<TPCategory>> GetTPCategoryListByVipRebate()
+        {
+            var apiResult = new ApiResult<IEnumerable<TPCategory>>();
+            apiResult.ErrorCode = 0;
+            apiResult.Data = rebateManageBLL.GetTPCategoryList();
             return apiResult;
         }
     }
