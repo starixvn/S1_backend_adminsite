@@ -14,7 +14,7 @@ const App = () => {
     EndDate: moment().format("l"),
     Currency: "0",
     User: "",
-    Category:"0"
+    Category: "0",
   });
 
   const [stateDatas, setDatas] = useState({
@@ -98,7 +98,7 @@ const App = () => {
     let Data = {
       SelectSite: stateFilter.SelectSite,
       Currency: parseInt(stateFilter.Currency),
-      CategoryId:parseInt(stateFilter.Category),
+      CategoryId: parseInt(stateFilter.Category),
       StartDate: moment(stateFilter.StartDate).unix(),
       EndDate: moment(stateFilter.EndDate).unix(),
       User: stateFilter.User,
@@ -109,7 +109,7 @@ const App = () => {
       .post("/api/Payment/GetVipRebateInfoList", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
-          console.log(res.data.data)
+          console.log(res.data.data);
           setDatas({
             PageInfo: {
               totalPages: res.data.totalPages,
@@ -138,7 +138,7 @@ const App = () => {
     let Data = {
       SelectSite: stateDatas.FilterInfo.SelectSite,
       Currency: parseInt(stateDatas.FilterInfo.Currency),
-      CategoryId:parseInt(stateDatas.FilterInfo.Category),
+      CategoryId: parseInt(stateDatas.FilterInfo.Category),
       StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
       EndDate: moment(stateDatas.FilterInfo.EndDate).unix(),
       User: stateDatas.FilterInfo.User,
@@ -168,6 +168,23 @@ const App = () => {
       });
   };
 
+  const Result_ExportToExcel = () => {
+    let param = {
+      Url: "Payment/GetVipRebateInfoListExport",
+      Data: {
+        SelectSite: JSON.stringify(stateDatas.FilterInfo.SelectSite),
+        Currency: parseInt(stateDatas.FilterInfo.Currency),
+        CategoryId: parseInt(stateDatas.FilterInfo.Category),
+        StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
+        EndDate: moment(stateDatas.FilterInfo.EndDate).unix(),
+        User: stateDatas.FilterInfo.User,
+      },
+    };
+    console.log(param);
+
+    WebAPI.DownloadData(param);
+  };
+
   return (
     <div className="container-fluid">
       <h4 className="page-name">Vip Rebate Report</h4>
@@ -181,10 +198,7 @@ const App = () => {
         CategoryList={CategoryList}
       />
       {stateDatas.Datas === null ? null : (
-        <Result
-          {...stateDatas}
-          ChangePage={Result_ChangePage}
-        />
+        <Result {...stateDatas} ChangePage={Result_ChangePage} ExportToExcel={Result_ExportToExcel}/>
       )}
     </div>
   );
