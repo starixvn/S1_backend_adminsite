@@ -95,6 +95,9 @@ namespace BackendSite.Service.BLL
             var custInfoDetail = custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
             if (custInfoDetail != null)
             {
+                var DepositAndWithdrawalTime = custInfoService.GetCustDepositAndWithdrawalTime(custId);
+                custInfoDetail.LastDepositTime = DepositAndWithdrawalTime.LastDepositTime;
+                custInfoDetail.LastWithdrawlTime = DepositAndWithdrawalTime.LastWithdrawlTime;
                 custInfoDetail.tpWallet = await tpBLL.GetTpWalletAsync(custInfoDetail.CustId);
                 custInfoDetail.promotions = promotionService.GetPromotionListByCustId(custInfoDetail.CustId);
                 if (custInfoDetail.promotions != null)
