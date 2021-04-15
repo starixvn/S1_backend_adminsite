@@ -86,6 +86,13 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
+        public LastDepositAndWithdrawalTime GetCustDepositAndWithdrawalTime(int custId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var result = conn.QueryFirstOrDefault<LastDepositAndWithdrawalTime>("Admin_CustInfoLastDepositAndWithdrawalTime", new { CustId = custId}, commandType: CommandType.StoredProcedure);
+            return result;
+        }
+
         public int SetCustStatusSwitch(int custId, int Op)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
