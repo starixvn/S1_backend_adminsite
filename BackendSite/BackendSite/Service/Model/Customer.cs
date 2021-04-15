@@ -74,8 +74,8 @@ namespace BackendSite.Service.Model
         public string IP { get; set; }
         public string LevelName { get; set; }
         public string AffiliateCode { get; set; }
-        public DateTime LastDepositTime { get; set; }
-        public DateTime LastWithdrawlTime { get; set; }
+        public string LastDepositTime { get; set; }
+        public string LastWithdrawlTime { get; set; }
     }
 
     public class CustInfoDetailForExport
@@ -248,7 +248,7 @@ namespace BackendSite.Service.Model
     }
     public class LastDepositAndWithdrawalTime
     {
-        public DateTime LastDepositTime { get; set; }
-        public DateTime LastWithdrawlTime { get; set; }
+        public DateTime? LastDepositTime { get; set; }
+        public DateTime? LastWithdrawlTime { get; set; }
     }
 }
