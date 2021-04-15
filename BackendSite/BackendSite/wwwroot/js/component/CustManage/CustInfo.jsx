@@ -1527,7 +1527,7 @@ import PromotionReport from './PromotionReport/index';
                                     </tr>
                                     <tr>
                                         <th scope="row">Last Deposit Time</th>
-                                        <td>{data.lastDepositTime != null? moment(data.lastDepositTime).format('l LTS'): ""}</td>
+                                        <td>{data.lastDepositTime}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Deposit Summary</th>
@@ -1535,7 +1535,7 @@ import PromotionReport from './PromotionReport/index';
                                     </tr>
                                     <tr>
                                         <th scope="row">Last Withdrawl Time</th>
-                                        <td>{data.lastWithdrawlTime != null? moment(data.lastWithdrawlTime).format('l LTS'): ""}</td>
+                                        <td>{data.lastWithdrawlTime}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Withdrawl Summary</th>
