@@ -81,7 +81,7 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetVipRebateInfoList(selectSite, currency, startDate, endDate, User, pageSize, pageNumber, CategoryId);
         }
-        public VipRebateInfoData GetVipRebateInfoListExport(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int CategoryId)
+        public VipRebateInfoData GetVipRebateInfoListExport(string selectSite, int currency, long startDate, long endDate, string User, int CategoryId)
         {
             return walletService.GetVipRebateInfoListExport(selectSite, currency, startDate, endDate, User, CategoryId);
         }

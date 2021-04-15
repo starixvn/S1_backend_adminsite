@@ -212,11 +212,11 @@ namespace BackendSite.Service.DAL
             SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
             return SearchData;
         }
-        public VipRebateInfoData GetVipRebateInfoListExport(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int CategoryId)
+        public VipRebateInfoData GetVipRebateInfoListExport(string selectSite, int currency, long startDate, long endDate, string User, int CategoryId)
         {
             VipRebateInfoData SearchData = new VipRebateInfoData();
             DynamicParameters props = new DynamicParameters();
-            props.Add("SelectSite", JsonConvert.SerializeObject(selectSite));
+            props.Add("SelectSite", selectSite);
             props.Add("Currency", currency);
             props.Add("UserName", string.IsNullOrWhiteSpace(User) ? null : User);
             props.Add("StartDate", startDate);
