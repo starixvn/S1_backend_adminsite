@@ -212,6 +212,25 @@ namespace BackendSite.Service.DAL
             SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
             return SearchData;
         }
+        public VipRebateInfoData GetVipRebateInfoListExport(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int CategoryId)
+        {
+            VipRebateInfoData SearchData = new VipRebateInfoData();
+            DynamicParameters props = new DynamicParameters();
+            props.Add("SelectSite", JsonConvert.SerializeObject(selectSite));
+            props.Add("Currency", currency);
+            props.Add("UserName", string.IsNullOrWhiteSpace(User) ? null : User);
+            props.Add("StartDate", startDate);
+            props.Add("EndDate", endDate);
+            props.Add("CategoryId", CategoryId);
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var result = conn.Query<VipRebateInfo>("Admin_VipRebateReportListV2Export_Get", props, commandType: CommandType.StoredProcedure).ToList();
+
+            SearchData.VipRebateInfoList = result;
+            SearchData.PageNumber = 0;
+            SearchData.TotalPages = 0;
+            SearchData.RowCount = 0;
+            return SearchData;
+        }
         public IEnumerable<VipTPCategory> GetTPCategoryList()
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
