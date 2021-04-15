@@ -579,6 +579,22 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+        public class VipRebateInfoParaExport
+        {
+            public IEnumerable<int> SelectSite { get; set; }
+            public int Currency { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
+            public string User { get; set; }
+            public int CategoryId { get; set; }
+        }
+        [HttpPost]
+        public IActionResult GetVipRebateInfoListExport(VipRebateInfoParaExport para)
+        {
+            var SearchResult = paymentBLL.GetVipRebateInfoListExport(para.SelectSite, para.Currency, para.StartDate, para.EndDate, para.User, para.CategoryId);
+            var stream = excelBLL.Export(SearchResult.VipRebateInfoList);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"VipRebateReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
         public ApiResult<IEnumerable<VipTPCategory>> GetTPCategoryListByVipRebate()
         {
             var apiResult = new ApiResult<IEnumerable<VipTPCategory>>();
