@@ -92,6 +92,30 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
+        public ApiResult CheckSignIn()
+        {
+            var result = new ApiResult();
+            try
+            {
+                if (User.Identity.IsAuthenticated)
+                {
+                    result.ErrorCode = 0;
+                }
+                else
+                {
+                    result.ErrorCode = -1;
+                }
+            }
+            catch (Exception ex)
+            {
+                result.ErrorCode = 999;
+                result.RawMessage = ex.ToString();
+            }
+
+            return result;
+        }
+
+        [HttpPost]
         public async Task<ApiResult> Signout()
         {
             var apiResult = new ApiResult(selLangBLL);
