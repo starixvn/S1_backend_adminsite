@@ -13,10 +13,10 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]/[Action]")]
     [ApiController]
-    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferManage" })]
+    //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferManage" })]
     public class TransferManageController : Controller
     {
         #region Fields
@@ -56,8 +56,6 @@ namespace BackendSite.Controllers.Api
 
         public class GetTransferInfoReq
         {
-            public int SiteId { get; set; }
-
             public TransferTypeEnum? TransferType { get; set; }
 
             public string TransFromDate { get; set; }
@@ -74,14 +72,12 @@ namespace BackendSite.Controllers.Api
 
             public int? Reason { get; set; }
 
-            public int Id { get; set; }
+            public string TransferId { get; set; }
         }
 
         public class CreateTransferInfoReq
         {
             public int SiteId { get; set; }
-
-            public int CurrencyId { get; set; }
         }
 
         #endregion
@@ -96,8 +92,7 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                apiResult.Data = _bankFinancialBLL.GetTransferInfoList(false, 
-                                                                       req.SiteId,
+                apiResult.Data = _bankFinancialBLL.GetTransferInfoList(false,
                                                                        req.TransferType,
                                                                        req.TransFromDate,
                                                                        req.TransToDate,
@@ -106,7 +101,7 @@ namespace BackendSite.Controllers.Api
                                                                        req.ToAccountNo,
                                                                        req.ToAccountDisplayName,
                                                                        req.Reason,
-                                                                       req.Id);
+                                                                       req.TransferId);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -121,7 +116,7 @@ namespace BackendSite.Controllers.Api
 
         //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferAccountManages" })]
         [HttpPost]
-        public ApiResult CreateTransferInfo(CreateTransferInfoReq req)
+        public ApiResult CreateTransferInfo()
         {
 
             var apiResult = new ApiResult<BankFinancialTransferInfoDetailModel>();
@@ -129,14 +124,13 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var authData = _authorizeBLL.GetAuthData();
-                string dateTime = GetTimeZoneDateTime(req.SiteId);
+                string dateTime = GetTimeZoneDateTime(1);
                 apiResult.Data = new BankFinancialTransferInfoDetailModel()
                 {
-                    SiteId = req.SiteId,
-                    CurrencyId = req.CurrencyId,
-
-                    Amount = 0,
-                    Fee = 0,
+                    FromAmount = 0,
+                    FromFee = 0,
+                    ToAmount = 0,
+                    ToFee = 0,
                     CreateTime = dateTime,
                     Creator = authData.UserId,
                     CreatorName = authData.UserName,
@@ -166,8 +160,7 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                var result = _bankFinancialBLL.GetTransferInfoList(true, 
-                                                                   req.SiteId,
+                var result = _bankFinancialBLL.GetTransferInfoList(true,
                                                                    req.TransferType,
                                                                    req.TransFromDate,
                                                                    req.TransToDate,
@@ -176,17 +169,17 @@ namespace BackendSite.Controllers.Api
                                                                    req.ToAccountNo,
                                                                    req.ToAccountDisplayName,
                                                                    req.Reason,
-                                                                   req.Id);
+                                                                   req.TransferId);
 
                 if (result.Count() == 1)
                 {
                     var data = result.FirstOrDefault();
 
                     var authData = _authorizeBLL.GetAuthData();
-                    string dateTime = GetTimeZoneDateTime(req.SiteId);
+                    string dateTime = GetTimeZoneDateTime(1);
 
-                    data.Updator = authData.UserId;
-                    data.UpdatorName = authData.UserName;
+                    //data.Updator = authData.UserId;
+                    //data.UpdatorName = authData.UserName;
                     data.UpdateTime = dateTime;
 
                     apiResult.Data = data;
@@ -210,14 +203,14 @@ namespace BackendSite.Controllers.Api
 
         //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferAccountManages" })]
         [HttpPost]
-        public ApiResult SetTransferInfo(BankFinancialTransferInfoModel bankFinancialTransferInfo)
+        public ApiResult SetTransferInfo(BankFinancialTransferInfoDetailModel bankFinancialTransferInfoDetail)
         {
 
             var apiResult = new ApiResult<int>();
 
             try
             {
-                var result = _bankFinancialBLL.SetTransferInfo(bankFinancialTransferInfo);
+                var result = _bankFinancialBLL.SetTransferInfo(bankFinancialTransferInfoDetail);
 
                 if (result.Status)
                 {
@@ -244,15 +237,23 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public IActionResult ExportTransferInfoList(int SiteId)
+        public IActionResult ExportTransferInfoList(GetTransferInfoReq req)
         {
-            var ExportData = _bankFinancialBLL.GetTransferAccountInfoList(false, SiteId, 0);
+            var ExportData = _bankFinancialBLL.GetTransferInfoList(false,
+                                                                       req.TransferType,
+                                                                       req.TransFromDate,
+                                                                       req.TransToDate,
+                                                                       req.FromAccountNo,
+                                                                       req.FromAccountDisplayName,
+                                                                       req.ToAccountNo,
+                                                                       req.ToAccountDisplayName,
+                                                                       req.Reason,
+                                                                       req.TransferId);
             var stream = _excelBLL.Export(ExportData);
             return File(stream,
                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                        $"TransferAccountInfoList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
-
 
         #region Data For Set
 

@@ -51,7 +51,7 @@ namespace BackendSite.Service.DAL
                     _FuncKey = funcKey
                 });
 
-                string SpName = "Admin_BankFinancialReason_Get";
+                string SpName = "Admin_BankFinancialReason_GetByFuncKey";
                 return conn.Query<BankFinancialReasonModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
@@ -84,6 +84,7 @@ namespace BackendSite.Service.DAL
                 new
                 {
                     _SiteId = bankFinancialTransferAccount.SiteId,
+                    _SiteName = bankFinancialTransferAccount.SiteName,
                     _CurrencyId = bankFinancialTransferAccount.CurrencyId,
                     _SysId = bankFinancialTransferAccount.SysId,
                     _Purpose = bankFinancialTransferAccount.Purpose,
@@ -119,6 +120,7 @@ namespace BackendSite.Service.DAL
                 {
                     _Id = bankFinancialTransferAccount.Id,
                     _SiteId = bankFinancialTransferAccount.SiteId,
+                    _SiteName = bankFinancialTransferAccount.SiteName,
                     _CurrencyId = bankFinancialTransferAccount.CurrencyId,
                     _SysId = bankFinancialTransferAccount.SysId,
                     _Purpose = bankFinancialTransferAccount.Purpose,
@@ -151,6 +153,7 @@ namespace BackendSite.Service.DAL
                 new
                 {
                     _SiteId = bankFinancialTransferAccount.SiteId,
+                    _SiteName = bankFinancialTransferAccount.SiteName,
                     _CurrencyId = bankFinancialTransferAccount.CurrencyId,
                     _SysId = bankFinancialTransferAccount.SysId,
                     _Purpose = bankFinancialTransferAccount.Purpose,
@@ -176,8 +179,7 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoList(bool isSetting, 
-                                                                                     int siteId, 
+        public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoList(bool isSetting,
                                                                                      TransferTypeEnum? transferType,
                                                                                      string fromDate,
                                                                                      string toDate,
@@ -186,7 +188,7 @@ namespace BackendSite.Service.DAL
                                                                                      string toAccountNo,
                                                                                      string toAccountDisplayName,
                                                                                      int? reason,
-                                                                                     int id)
+                                                                                     string transferId)
         {
 
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
@@ -195,16 +197,15 @@ namespace BackendSite.Service.DAL
                 new
                 {
                     _IsSetting = isSetting,
-                    _SiteId = siteId,
                     _TransferType = transferType,
                     _TransFromDate = fromDate,
                     _TransToDate = toDate,
-                    _FromAccount = fromAccountNo,
+                    _FromAccountNo = fromAccountNo,
                     _FromAccountDisplayName = fromAccountDisplayName,
                     _ToAccountNo = toAccountNo,
                     _ToAccountDisplayName = toAccountDisplayName,
                     _Reason = reason,
-                    _Id = id
+                    _TransferId = transferId
                 });
 
                 string SpName = "Admin_BankFinancialTransferInfo_Get";
@@ -257,7 +258,6 @@ namespace BackendSite.Service.DAL
                 var parameters = new DynamicParameters(
                 new
                 {
-                    _Id = bankFinancialTransferInfo.Id,
                     _TransferId = bankFinancialTransferInfo.TransferId,
                     _TransactionType = bankFinancialTransferInfo.TransactionType,
                     _TransferType = bankFinancialTransferInfo.TransferType,

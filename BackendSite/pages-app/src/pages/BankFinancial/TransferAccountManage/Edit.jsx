@@ -117,7 +117,19 @@ export default props => {
 	};
 
 	const EditMainValue = (value, dataColumn) => {
-		dispatch({ type: defActionType.MAIN_SET_VALUE, value, dataColumn });
+		dispatch({ 
+			type: defActionType.MAIN_SET_VALUE, 
+			value, 
+			dataColumn });
+	};
+
+	const EditSiteIdSelectBox = (value, dataColumn) => {
+		console.log("aaa",value);
+		dispatch({
+			type: defActionType.MAIN_SET_SITEID_VALUE,
+			value,
+			dataColumn
+		});
 	};
 
 	const EditCurrencySelectBox = (value, dataColumn) => {
@@ -151,12 +163,13 @@ export default props => {
 			action={{
 				ClickSubmit,
 				EditMainValue,
+				EditSiteIdSelectBox,
 				EditPurposeCheckBox,
 				EditCurrencySelectBox,
 				EditChannelSelectBox,
 				ClickBack: props.action.ClickBack,
 			}}
-			IsAdd={props.IsAdd}
+			isAdd={props.IsAdd}
 			processing={props.processing}
 		/>
 	);

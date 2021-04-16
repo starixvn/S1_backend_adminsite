@@ -20,7 +20,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 交易ID
         /// </summary>
-        public int TransferId
+        public string TransferId
         {
             get;
             set;

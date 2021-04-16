@@ -8,19 +8,11 @@ namespace BackendSite.Service.Model
 {
     public class BankFinancialTransferInfoDetailModel
     {
-        /// <summary>
-        /// 讀寫 識別值ID
-        /// </summary>
-        public int Id
-        {
-            get;
-            set;
-        }
 
         /// <summary>
         /// 讀寫 交易ID
         /// </summary>
-        public int TransferId
+        public string TransferId
         {
             get;
             set;
@@ -62,10 +54,12 @@ namespace BackendSite.Service.Model
             set;
         }
 
+        #region From Data
+
         /// <summary>
         /// 讀寫 付款方式
         /// </summary>
-        public TransferChannelEnum Channel
+        public TransferChannelEnum FromChannel
         {
             get;
             set;
@@ -74,7 +68,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 代理人
         /// </summary>
-        public string Agent
+        public string FromAgent
         {
             get;
             set;
@@ -83,7 +77,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 第三方支付ID
         /// </summary>
-        public int? PayId
+        public int? FromPayId
         {
             get;
             set;
@@ -92,7 +86,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 第三方支付名稱
         /// </summary>
-        public string PayName
+        public string FromPayName
         {
             get;
             set;
@@ -101,7 +95,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 網站ID
         /// </summary>
-        public int SiteId
+        public int FromSiteId
         {
             get;
             set;
@@ -110,7 +104,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 網站名稱
         /// </summary>
-        public string SiteName
+        public string FromSiteName
         {
             get;
             set;
@@ -119,7 +113,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 客戶ID
         /// </summary>
-        public int CustId
+        public int FromCustId
         {
             get;
             set;
@@ -128,7 +122,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 客戶名稱
         /// </summary>
-        public string UserName
+        public string FromUserName
         {
             get;
             set;
@@ -137,7 +131,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 幣別
         /// </summary>
-        public int CurrencyId
+        public int FromCurrencyId
         {
             get;
             set;
@@ -146,7 +140,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 幣別代號
         /// </summary>
-        public string IsoCode
+        public string FromIsoCode
         {
             get;
             set;
@@ -155,7 +149,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 銀行ID
         /// </summary>
-        public int SysId
+        public int FromSysId
         {
             get;
             set;
@@ -164,7 +158,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 銀行代號
         /// </summary>
-        public string BankCode
+        public string FromBankCode
         {
             get;
             set;
@@ -173,7 +167,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 帳戶帳號
         /// </summary>
-        public string AccountNo
+        public string FromAccountNo
         {
             get;
             set;
@@ -182,7 +176,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 帳戶顯示名稱
         /// </summary>
-        public string AccountDisplayName
+        public string FromAccountDisplayName
         {
             get;
             set;
@@ -191,7 +185,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 交易金額
         /// </summary>
-        public decimal Amount
+        public decimal FromAmount
         {
             get;
             set;
@@ -200,11 +194,161 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 手續費(皆為減項)
         /// </summary>
-        public decimal Fee
+        public decimal FromFee
         {
             get;
             set;
         }
+
+        #endregion
+
+        #region To Data
+
+        /// <summary>
+        /// 讀寫 付款方式
+        /// </summary>
+        public TransferChannelEnum ToChannel
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 讀寫 代理人
+        /// </summary>
+        public string ToAgent
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 讀寫 第三方支付ID
+        /// </summary>
+        public int? ToPayId
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 讀寫 第三方支付名稱
+        /// </summary>
+        public string ToPayName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 讀寫 網站ID
+        /// </summary>
+        public int ToSiteId
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 讀寫 網站名稱
+        /// </summary>
+        public string ToSiteName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 讀寫 客戶ID
+        /// </summary>
+        public int ToCustId
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 讀寫 客戶名稱
+        /// </summary>
+        public string ToUserName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 讀寫 幣別
+        /// </summary>
+        public int ToCurrencyId
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 讀寫 幣別代號
+        /// </summary>
+        public string ToIsoCode
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 讀寫 銀行ID
+        /// </summary>
+        public int ToSysId
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 讀寫 銀行代號
+        /// </summary>
+        public string ToBankCode
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 讀寫 帳戶帳號
+        /// </summary>
+        public string ToAccountNo
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 讀寫 帳戶顯示名稱
+        /// </summary>
+        public string ToAccountDisplayName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 讀寫 交易金額
+        /// </summary>
+        public decimal ToAmount
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 讀寫 手續費(皆為減項)
+        /// </summary>
+        public decimal ToFee
+        {
+            get;
+            set;
+        }
+
+        #endregion
 
         /// <summary>
         /// 讀寫 原因
