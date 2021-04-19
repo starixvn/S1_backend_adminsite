@@ -191,6 +191,7 @@ const App = () => {
 				BonusCode: promotion.bonusCode,
 				Description: promotion.description,
 				PromotionType: promotion.promotionType,
+				PromotionDeviceType:promotion.promotionDeviceType,
 				UnixPeriodFrom: moment(promotion.periodFrom).unix(),
 				UnixPeriodTo: moment(promotion.periodTo).unix(),
 				Status: promotion.status,

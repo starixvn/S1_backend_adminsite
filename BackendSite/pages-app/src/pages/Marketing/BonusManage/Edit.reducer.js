@@ -25,6 +25,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 		return {
 			bonusCode: "",
 			promotionType: 1,
+			promotionDeviceType: 1,
 			periodFrom: moment(),
 			periodTo: moment(),
 			expiryDays: "",
@@ -61,6 +62,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 		return {
 			bonusCode: datas.bonusCode,
 			promotionType: datas.promotionType,
+			promotionDeviceType: datas.promotionDeviceType,
 			periodFrom: datas.periodFrom,
 			periodTo: datas.periodTo,
 			expiryDays: datas.expiryDays,

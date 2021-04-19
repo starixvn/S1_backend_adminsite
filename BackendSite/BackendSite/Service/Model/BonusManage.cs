@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.Model
 {
@@ -31,6 +29,7 @@ namespace BackendSite.Service.Model
         public string SpecialCode { get; set; }
         public bool IsSpecial { get; set; }
         public bool OnlyRegistered { get; set; }
+        public int PromotionDeviceType { get; set; }
     }
 
     public class PromotionSpecific

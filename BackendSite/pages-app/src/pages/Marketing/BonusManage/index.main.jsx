@@ -1,16 +1,21 @@
 import React from "react";
 import moment from "moment";
-import { defWalletType, defPromotionType } from "./defCols";
+import { defWalletType, defPromotionType, defPromotionDeviceType } from "./defCols";
 import PopBoxContent from "./Component/PopBoxContent";
-import {initPromotionType} from "./defCols";
+import { initPromotionType } from "./defCols";
 import CheckBox from "./Component/Checkbox";
 import MultiSelect from "react-multi-select-component";
 const SpecialItemType = {
 	actionBtn: "actionBtn",
 	statusBtn: "statusBtn"
 };
+
 const promotionTypeFormat = type => {
 	return defPromotionType[type];
+};
+
+const promotionDeviceTypeFormat = type => {
+	return defPromotionDeviceType[type];
 };
 
 const StatusBtn = ({ checked, onChange, mainKey }) => {
@@ -52,6 +57,11 @@ const titleData = [
 		dataColumn: "promotionType",
 		columnTitle: "PromotionType",
 		body: { format: promotionTypeFormat }
+	},
+	{
+		dataColumn: "promotionDeviceType",
+		columnTitle: "DeviceType",
+		body: { format: promotionDeviceTypeFormat }
 	},
 	{ dataColumn: "description", columnTitle: "Description" },
 	{
@@ -153,17 +163,17 @@ export default ({
 
 	let siteListOptions = "";
 
-    if (StateFilter.SelectSite) {
-        siteListOptions = StateFilter.SelectSite.map(i => {
-            return {
-                value: 1,
-                displayText: "Show ALL"
-            };
-        });
+	if (StateFilter.SelectSite) {
+		siteListOptions = StateFilter.SelectSite.map(i => {
+			return {
+				value: 1,
+				displayText: "Show ALL"
+			};
+		});
 	};
 
 	return (
-		<div className="container-fluid">			
+		<div className="container-fluid">
 			<h4 className="page-name">Bonus Management</h4>
 			<div className="filter">
 				<div className="row-flex">
@@ -179,7 +189,7 @@ export default ({
 						onChange={SetSitnemaFilter}
 						labelledBy={"Select"}
 					/>
-					<pre>              </pre>					
+					<pre>              </pre>
 					<MultiSelect
 						options={GetSelectedPromotionType(initPromotionType)}
 						value={PromotionTypeFilter}
@@ -195,14 +205,14 @@ export default ({
 						Selected={StatusCheck}
 						mainKey={null}
 					/>
-					<button				
+					<button
 						className="btn btn-search"
 						style={{ marginBottom: "10px" }}
 						onClick={SelectClick}>
 						Search
 					</button>
-				</div>				
-			</div>			
+				</div>
+			</div>
 			<button
 				className="btn btn-add"
 				style={{ marginBottom: "20px" }}
@@ -248,23 +258,23 @@ const ActionButtons = props => {
 		</>
 	);
 };
-const GetSelectedSiteName = (props) =>{
+const GetSelectedSiteName = (props) => {
 	let headerRows = [];
-	props.map(x=>{		 
+	props.map(x => {
 		headerRows.push({
 			label: x.siteName,
 			value: x.siteId,
 		})
-	 })
-	 return headerRows;
+	})
+	return headerRows;
 };
-const GetSelectedPromotionType = (props) =>{
+const GetSelectedPromotionType = (props) => {
 	let headerRows = [];
-	props.map(x=>{		 
+	props.map(x => {
 		headerRows.push({
 			label: x.displayText,
 			value: x.value,
 		})
-	 })
-	 return headerRows;
+	})
+	return headerRows;
 };

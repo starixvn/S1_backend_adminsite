@@ -1,11 +1,7 @@
-﻿using BackendSite.Service.DAL;
-using BackendSite.Service.Model;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using BackendSite.Service.DAL;
+using BackendSite.Service.Model;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -30,8 +26,8 @@ namespace BackendSite.Service.BLL
             {
                 filterPara = new FilterPara()
                 {
-                    SiteidFilter = Select.SiteidFilter != null? JsonConvert.DeserializeObject<Filter[]>(Select.SiteidFilter) :null,
-                    PromotionTypeFilter = Select.PromotionTypeFilter != null? JsonConvert.DeserializeObject<Filter[]>(Select.PromotionTypeFilter):null,
+                    SiteidFilter = Select.SiteidFilter != null ? JsonConvert.DeserializeObject<Filter[]>(Select.SiteidFilter) : null,
+                    PromotionTypeFilter = Select.PromotionTypeFilter != null ? JsonConvert.DeserializeObject<Filter[]>(Select.PromotionTypeFilter) : null,
                     Status = Select != null ? Select.Status : false,
                     SiteArray = siteArray
                 };
@@ -56,7 +52,7 @@ namespace BackendSite.Service.BLL
                 //promotion.Sort = 1;
                 promotion.Status = 2;
             }
-            
+
             return bonusManageService.SetPromotion(IsAdd, promotion);
         }
 
