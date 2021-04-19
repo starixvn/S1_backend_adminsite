@@ -63,6 +63,7 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
             public IEnumerable<int> SelectCurrency { get; set; }
+            public string BankAccountNumber { get; set; }
         }
 
         [HttpPost]
@@ -72,7 +73,7 @@ namespace BackendSite.Controllers.Api
             int totalPages = 0, rowCount = 0;
             int pageNumber = custInfoListReq.PageNumber;
 
-            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite, custInfoListReq.BirDate, custInfoListReq.BirMonth, custInfoListReq.BirYear, custInfoListReq.UserName, custInfoListReq.AccountName, custInfoListReq.LoginIp, custInfoListReq.TransId, custInfoListReq.TpUserName, custInfoListReq.Email, custInfoListReq.PhoneNo, custInfoListReq.StartDate, custInfoListReq.EndDate, custInfoListReq.PageSize, custInfoListReq.AffId, custInfoListReq.SelectCurrency,ref pageNumber, out totalPages, out rowCount);
+            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite, custInfoListReq.BirDate, custInfoListReq.BirMonth, custInfoListReq.BirYear, custInfoListReq.UserName, custInfoListReq.AccountName, custInfoListReq.LoginIp, custInfoListReq.TransId, custInfoListReq.TpUserName, custInfoListReq.Email, custInfoListReq.PhoneNo, custInfoListReq.StartDate, custInfoListReq.EndDate, custInfoListReq.PageSize, custInfoListReq.AffId, custInfoListReq.SelectCurrency, custInfoListReq.BankAccountNumber, ref pageNumber, out totalPages, out rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;
