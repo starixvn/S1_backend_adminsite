@@ -250,6 +250,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "lbl_DepositSubmission",
+        "Title": "Deposit Submission",
+        "FuncKey": "Finance/DepositSubmission",
+        "Controller": "Finance",
+        "Action": "DepositSubmission",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
@@ -358,6 +368,16 @@
         "Childs": null
       },
       {
+        "Key": "VipRebateInfoReport",
+        "Title": "Vip Rebate Report",
+        "FuncKey": "Marketing/VipRebateInfoReport",
+        "Controller": "Marketing",
+        "Action": "VipRebateInfoReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
         "Key": "ReferralManagement",
         "Title": "Referral Management",
         "FuncKey": "Marketing/ReferralManagement",
@@ -433,6 +453,24 @@
         "FuncKey": "Marketing/LatestHighlightVideoManagement",
         "Controller": "Marketing",
         "Action": "LatestHighlightVideoManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      }
+    ]
+  },
+  {
+    "Key": "",
+    "Title": "Bank Transfer",
+    "Icon": "icon-finance",
+    "Roles": null,
+    "Childs": [
+      {
+        "Key": "",
+        "Title": "Bank Transfer Account",
+        "FuncKey": "BankFinancial/TransferAccountManage",
+        "Controller": "BankFinancial",
+        "Action": "TransferAccountManage",
         "Icon": "",
         "Roles": null,
         "Childs": null

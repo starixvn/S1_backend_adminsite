@@ -181,10 +181,6 @@
             "FuncKey": "f_wd_execute"
           },
           {
-            "DisplayKey": "CSD",
-            "FuncKey": "f_wd_csd"
-          },
-          {
             "DisplayKey": "Payment",
             "FuncKey": "f_wd_payment"
           },
@@ -238,6 +234,11 @@
       {
         "DisplayKey": "3RD Funds Adjustment",
         "FuncKey": "Finance/ThirdPartyAdjustment",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Deposit Submission",
+        "FuncKey": "Finance/DepositSubmission",
         "Enable": false
       }
     ]
@@ -355,6 +356,21 @@
       {
         "DisplayKey": "Latest Highlight Video Management",
         "FuncKey": "Marketing/LatestHighlightVideoManagement",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Vip Rebate Info",
+        "FuncKey": "Marketing/VipRebateInfoReport",
+        "Enable": false
+      }
+    ]
+  },
+  {
+    "DisplayKey": "Bank Transfer",
+    "Settings": [
+      {
+        "DisplayKey": "Bank Transfer Account",
+        "FuncKey": "BankFinancial/TransferAccountManage",
         "Enable": false
       }
     ]

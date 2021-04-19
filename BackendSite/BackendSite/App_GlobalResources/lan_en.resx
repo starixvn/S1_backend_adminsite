@@ -162,6 +162,9 @@
   <data name="Currency_9" xml:space="preserve">
     <value>AUD</value>
   </data>
+  <data name="Currency_96" xml:space="preserve">
+    <value>USDT</value>
+  </data>
   <data name="lbl_AccountList" xml:space="preserve">
     <value>Account List</value>
   </data>
@@ -460,7 +463,7 @@
     <value>Draft</value>
   </data>
   <data name="lbl_WithdrawalStatus1" xml:space="preserve">
-    <value>OnHold</value>
+    <value>Pending</value>
   </data>
   <data name="lbl_WithdrawalStatus2" xml:space="preserve">
     <value>OnHold</value>
@@ -608,5 +611,8 @@
   </data>
   <data name="Currency_96" xml:space="preserve">
     <value>USDT</value>
+  </data>
+  <data name="lbl_DepositSubmission" xml:space="preserve">
+    <value>Deposit Submission</value>
   </data>
 </root>

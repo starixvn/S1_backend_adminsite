@@ -87,6 +87,11 @@ namespace BackendSite.Controllers.Api
 
             }
 
+            if(withdrawalRequest.Operator == User.Identity.Name)
+            {
+                withdrawalRequest.SameOperator = true;
+            }
+
             apiResult.Data = withdrawalRequest;
             apiResult.ErrorCode = 0;
             return apiResult;
@@ -227,6 +232,14 @@ namespace BackendSite.Controllers.Api
             else if (withdrawalReq.Action == (int)WithdrawalStatus.Draft)
             {
                 withdrawConfirmReuslt = withdrawalBLL.WithdrawalDraft(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
+            }
+            else if (withdrawalReq.Action == (int)WithdrawalStatus.Pending)
+            {
+                withdrawConfirmReuslt = withdrawalBLL.WithdrawalPending(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
+            }
+            else if (withdrawalReq.Action == (int)WithdrawalStatus.ToKyc)
+            {
+                withdrawConfirmReuslt = withdrawalBLL.WithdrawalToKyc(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
             }
 
             if (withdrawConfirmReuslt <= 0)

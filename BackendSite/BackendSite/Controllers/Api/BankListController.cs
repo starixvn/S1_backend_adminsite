@@ -49,6 +49,16 @@ namespace BackendSite.Controllers.Api
             return apiListResult;
         }
 
+        [HttpGet]
+        public ApiResult<IEnumerable<BankInfoOff>> GetAllBankInfoOffList()
+        {
+            var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
+            var bankInfoOff = bankDetailBLL.GetAllBankInfoOff();
+            apiResult.Data = bankInfoOff;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
         [HttpPost]
         public ApiResult<IEnumerable<BankInfoSys>> GetSysBankList()
         {

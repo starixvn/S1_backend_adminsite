@@ -19,11 +19,18 @@ namespace BackendSite.Service.DAL
             this.configuration = configuration;
         }
 
+        public IEnumerable<BankInfoOff> GetAllBankAccountOff()
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<BankInfoOff>("Admin_BankAccountOff_Get", commandType: CommandType.StoredProcedure);
+        }
+
         public IEnumerable<BankInfoOff> GetBankAccountOff(int siteId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.Query<BankInfoOff>("BankAccountOff_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
+
         public IEnumerable<BankInfoPay> GetBankInfoPayList()
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));

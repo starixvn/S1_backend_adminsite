@@ -74,6 +74,8 @@ namespace BackendSite.Service.Model
         public string IP { get; set; }
         public string LevelName { get; set; }
         public string AffiliateCode { get; set; }
+        public string LastDepositTime { get; set; }
+        public string LastWithdrawlTime { get; set; }
     }
 
     public class CustInfoDetailForExport
@@ -221,6 +223,7 @@ namespace BackendSite.Service.Model
         public string StatusName { get; set; }
         public int CurrencyId { get; set; }
         public decimal ThresholdAmount { get; set; }
+        public string LastUpdateUser { get; set; }
     }
     public class VipUpgradeReviewData
     {
@@ -242,5 +245,10 @@ namespace BackendSite.Service.Model
         public string CalculateTime { get; set; }
         public int Status { get; set; }
         public string StatusName => Enum.GetName(typeof(VipStatus), Status) ;
+    }
+    public class LastDepositAndWithdrawalTime
+    {
+        public DateTime? LastDepositTime { get; set; }
+        public DateTime? LastWithdrawlTime { get; set; }
     }
 }

@@ -48,7 +48,7 @@ namespace BackendSite.Service.DAL
         }
         public int SetLatestHighlightVideo(SetLatestHighlightVideoPara para,string User)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             DynamicParameters props = new DynamicParameters();
             props.Add("Date", para.Date);
             props.Add("VideoId", para.VideoId);
@@ -60,7 +60,7 @@ namespace BackendSite.Service.DAL
         public void InsertLatestHighlightVideo(int SiteId,string Date, List<GetSiteLangData> SiteLangDatas, string User)
         {
             LatestHighlightVideoDataResult result = new LatestHighlightVideoDataResult();
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 conn.Open();
                 using (var tran = conn.BeginTransaction())

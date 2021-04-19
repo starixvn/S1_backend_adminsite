@@ -214,5 +214,25 @@ namespace BackendSite.Service.DAL
                 return conn.Query<CustomerStatisticalPartcialSummeryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
+
+        public IEnumerable<TpBetRecordDetailModel> GetCustomerDetail(int custId,
+                                                               int gameId,
+                                                               string date)
+        {
+
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                    _CustId = custId,
+                    _GameId = gameId,
+                    _SelDate = date
+                });
+
+                string SpName = "Admin_TpBetRecord_ByCustIdAndGameIdAndDate_Get";
+                return conn.Query<TpBetRecordDetailModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
     }
 }

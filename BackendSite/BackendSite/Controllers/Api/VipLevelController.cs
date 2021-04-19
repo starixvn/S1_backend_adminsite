@@ -147,6 +147,7 @@ namespace BackendSite.Controllers.Api
         {
             public string CustIds { get; set; }
             public string YearMonth { get; set; }
+            public int ChangeStatus { get; set; }
         }
         [HttpPost]
         public ApiResult UpdateVipUpgradeReview(UpdateVipUpgradeReviewPara para)
@@ -156,7 +157,7 @@ namespace BackendSite.Controllers.Api
             {
                 if (vipLevelBLL.CanUpgradeVip(para.YearMonth))
                 {
-                    vipLevelBLL.UpdateVipUpgradeReview(para.CustIds, para.YearMonth);
+                    vipLevelBLL.UpdateVipUpgradeReview(para.CustIds, para.YearMonth, User.Identity.Name, para.ChangeStatus);
                 }
                 apiResult.ErrorCode = 0;
             }

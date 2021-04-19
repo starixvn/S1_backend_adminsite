@@ -123,7 +123,8 @@ import * as Loading from '../commJS/Loading.jsx';
                 sLoginIp: this.state.LoginIp,
                 sEmail: this.state.Email,
                 sPhoneNo: this.state.PhoneNo,
-                Loading: true
+                Loading: true,
+                sBankAccountNumber: this.state.BankAccountNumber
             }, function () {
                 this.onSearch(1);
             }.bind(this));
@@ -148,7 +149,8 @@ import * as Loading from '../commJS/Loading.jsx';
                 PageNumber: pageNumber,
                 PageSize: this._PageSize,
                 AffId: !this.state.sAffId ? null : parseInt(this.state.sAffId),
-                SelectCurrency: !this.state.selectCurrency ? null : this.state.selectCurrency
+                SelectCurrency: !this.state.selectCurrency ? null : this.state.selectCurrency,
+                BankAccountNumber: !this.state.sBankAccountNumber ? null : this.state.sBankAccountNumber,
             };
             axios.post('/api/CustManage/GetCustInfoList', data)
                 .then(function (response) {
@@ -182,7 +184,9 @@ import * as Loading from '../commJS/Loading.jsx';
                 LoginIp: !this.state.sLoginIp ? null : this.state.sLoginIp,
                 Email: !this.state.sEmail ? null : this.state.sEmail,
                 PhoneNo: !this.state.sPhoneNo ? null : this.state.sPhoneNo,
-                AffId: !this.state.sAffId ? null : parseInt(this.state.sAffId)
+                AffId: !this.state.sAffId ? null : parseInt(this.state.sAffId),
+                SelectCurrency: !this.state.selectCurrency ? null : this.state.selectCurrency,
+                BankAccountNumber: !this.state.sBankAccountNumber ? null : this.state.sBankAccountNumber,
             };
 
             let ExportParam = [];
@@ -407,6 +411,12 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <label className="label">Phone No</label>
                                     <div className="field">
                                         <input type="text" placeholder="Phone No" autoComplete="off" name="PhoneNo" value={this.state.PhoneNo} onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <label className="label">Bank Account Number</label>
+                                    <div className="field">
+                                        <input type="text" placeholder="Bank Account Number" autoComplete="off" name="BankAccountNumber" value={this.state.BankAccountNumber} onChange={this.onChange.bind(this)} />
                                     </div>
                                 </div>
                                 <div className="input-item">
