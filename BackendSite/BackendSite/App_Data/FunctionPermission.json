@@ -357,6 +357,11 @@
         "DisplayKey": "Latest Highlight Video Management",
         "FuncKey": "Marketing/LatestHighlightVideoManagement",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Vip Rebate Info",
+        "FuncKey": "Marketing/VipRebateInfoReport",
+        "Enable": false
       }
     ]
   },

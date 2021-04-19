@@ -17,13 +17,14 @@ const App = () => {
     const [stateSend, updateSend] = useState(false);
     const [stateData, updateData] = useState({ ...initData });
     const [sendData, updateSendData] = useState([]);
-    const EditFiled = (v, datacolumn) => { updateData({ ...stateData, [datacolumn]: v }); };
+    const EditFiled = (v, datacolumn) => { console.log(v, datacolumn);updateData({ ...stateData, [datacolumn]: v }); };
     const SetMsg = () => {
         let msg = "";
         let check = true;
         if (!stateData.file) { check = false; msg = "Please choose excel file."; }
         if (!stateData.option) { check = false; msg = "Please check Option."; }
         if (!stateData.optSite) { check = false; msg = "Please check Site."; }
+        if(stateData.checkwd && (isNaN(parseInt(stateData.withdrawal))? 0:parseInt(stateData.withdrawal)) === 0) { check = false; msg = "Please Enter Withdrawal Limit."; }
         if (check && window.confirm("Are you sure to import data to " + _site[stateData.optSite] + "?")) {
             let settings = { headers: { 'content-type': 'multipart/form-data' } }
             let file = document.getElementById("uploadfile").files[0];
@@ -32,6 +33,8 @@ const App = () => {
             formData.append('option', parseInt(stateData.option));
             formData.append('optSite', parseInt(stateData.optSite));
             formData.append('withdrawalLimitOption', (stateData.checkwd) ? 1 : 0);
+            formData.append('withdrawal',parseFloat(stateData.withdrawal))
+            console.log(stateData.withdrawal);
             if (!stateSend) {
                 updateSend(true);
                 api.post('/api/Payment/BalanceAdjustmentBatch', formData, settings)
@@ -118,7 +121,7 @@ const App = () => {
                         <input className="custom-control-input" id="checkwd" type="checkbox" onChange={(e) => { EditFiled(e.target.checked, 'checkwd') }} disabled={stateSend} checked={stateData.checkwd === true} />
                         <label className="custom-control-label" htmlFor="checkwd">Withdraw Condition(Balance Amount X Times):</label>
                     </div>
-                    <input className="form-control width-200" type="number" defaultValue={stateData.withdrawal} disabled />
+                    <input className="form-control width-200" type="number" defaultValue={stateData.withdrawal} onChange={(e) => { EditFiled(e.target.value, 'withdrawal') }} />
                 </div>
                 <div className="form-group width-200">
                     <label className="col-form-label">Upload File</label>
