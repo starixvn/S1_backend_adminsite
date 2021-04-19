@@ -144,14 +144,14 @@ module.exports = {
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/LatestHighlightVideoManagement/index.js"
     // ],
-    // "BankFinancial/TransferAccountManage.min": [
-    //   "@babel/polyfill",
-    //   "./src/pages/BankFinancial/TransferAccountManage/index.jsx",
-    // ],
-    "Marketing/VipRebateInfoReport.min": [
-    	 '@babel/polyfill',
-    	"./src/pages/Marketing/VipRebateInfoReport/index.js"
+    "BankFinancial/TransferAccountManage.min": [
+      "@babel/polyfill",
+      "./src/pages/BankFinancial/TransferAccountManage/index.jsx",
     ],
+    // "Marketing/VipRebateInfoReport.min": [
+    // 	 '@babel/polyfill',
+    // 	"./src/pages/Marketing/VipRebateInfoReport/index.js"
+    // ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

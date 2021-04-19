@@ -44,7 +44,7 @@ export default ({ state, action, processing,isAdd }) => {
 							OnChange={action.EditMainValue}
 							dataColumn="siteName"
 							value={state.siteName}
-							Disabled={!isAdd || !state.siteId==0}
+							Disabled={true}
 						/>
 					</div>
 					<div className="row-flex">
