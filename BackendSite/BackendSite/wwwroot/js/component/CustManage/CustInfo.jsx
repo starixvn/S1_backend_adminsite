@@ -1534,11 +1534,11 @@ import PromotionReport from './PromotionReport/index';
                                         <td>{number_format(data.depositSum)}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Last Withdrawl Time</th>
+                                        <th scope="row">Last Withdrawal Time</th>
                                         <td>{data.lastWithdrawlTime}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Withdrawl Summary</th>
+                                        <th scope="row">Withdrawal Summary</th>
                                         <td>{number_format(data.withdrawlSum)}</td>
                                     </tr>
                                     <tr>
@@ -1562,7 +1562,7 @@ import PromotionReport from './PromotionReport/index';
                                         <td>{number_format(data.turnOver)}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Elgible Withdrawal</th>
+                                        <th scope="row">Eligible Withdrawal</th>
                                         <td>{number_format(elgibleWithdrawal)}</td>
                                     </tr>
                                 </tbody>
