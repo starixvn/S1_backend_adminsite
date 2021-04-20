@@ -327,6 +327,12 @@
   <data name="lbl_DepositType3" xml:space="preserve">
     <value>Local Bank</value>
   </data>
+  <data name="lbl_DepositType4" xml:space="preserve">
+    <value>Crypto</value>
+  </data>
+  <data name="lbl_DepositType5" xml:space="preserve">
+    <value>Load Card</value>
+  </data>
   <data name="lbl_Direction1" xml:space="preserve">
     <value>Credit</value>
   </data>
