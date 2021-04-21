@@ -20,7 +20,7 @@ namespace BackendSite.Service.BLL
             this.selLangBLL = selLangBLL;
         }
 
-        public IEnumerable<WinLostReport> GetWinLostReport(DateTime StartDate, DateTime EndDate, int Currency)
+        public IEnumerable<WinLostReport> GetWinLostReport(DateTime StartDate, DateTime EndDate, int Currency,bool isExport)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
             var report = winLostReportService.GetWinLostReport(StartDate, EndDate, siteList?.Select(x=>x.SiteId), Currency);
@@ -29,6 +29,10 @@ namespace BackendSite.Service.BLL
                 var gameTypeList = winLostReportService.GetAllGameType().ToDictionary(row => (int)row.Type, row => (string)row.TypeName);
                 foreach (var row in report)
                 {
+                    if (isExport)
+                    {
+                        row.SettledDate = row.SettledDate.AddHours(8);
+                    }
                     row.CurrencyName = selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}");
                     row.SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName;
 

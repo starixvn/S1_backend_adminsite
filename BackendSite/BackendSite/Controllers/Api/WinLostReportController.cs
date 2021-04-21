@@ -28,7 +28,7 @@ namespace BackendSite.Controllers.Api
             var result = new ApiResult<IEnumerable<WinLostReport>>();
             try
             {
-                result.Data = winLostReportBLL.GetWinLostReport(StartDate, EndDate, Currency);
+                result.Data = winLostReportBLL.GetWinLostReport(StartDate, EndDate, Currency,false);
                 result.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -44,7 +44,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public IActionResult ExportReport(DateTime StartDate, DateTime EndDate, int Currency)
         {
-            var Datas = winLostReportBLL.GetWinLostReport(StartDate, EndDate, Currency);
+            var Datas = winLostReportBLL.GetWinLostReport(StartDate, EndDate, Currency,true);
 
             List<Dictionary<string, dynamic>> byDate = new List<Dictionary<string, dynamic>>();
             List<Dictionary<string, dynamic>> Total = new List<Dictionary<string, dynamic>>();
