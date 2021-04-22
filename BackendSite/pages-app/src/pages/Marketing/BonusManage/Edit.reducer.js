@@ -25,6 +25,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 		return {
 			bonusCode: "",
 			promotionType: 1,
+			promotionAction: null,
 			promotionDeviceType: 1,
 			periodFrom: moment(),
 			periodTo: moment(),
@@ -62,6 +63,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 		return {
 			bonusCode: datas.bonusCode,
 			promotionType: datas.promotionType,
+			promotionAction: datas.promotionAction,
 			promotionDeviceType: datas.promotionDeviceType,
 			periodFrom: datas.periodFrom,
 			periodTo: datas.periodTo,
@@ -211,6 +213,7 @@ export function reducer(state, action) {
 			};
 
 		case defActionType.MAIN_SET_VALUE:
+			console.log(action);
 			return {
 				...state,
 				[action.dataColumn]: action.value

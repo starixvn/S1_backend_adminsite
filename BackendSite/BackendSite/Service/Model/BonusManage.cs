@@ -30,6 +30,7 @@ namespace BackendSite.Service.Model
         public bool IsSpecial { get; set; }
         public bool OnlyRegistered { get; set; }
         public int PromotionDeviceType { get; set; }
+        public int? PromotionAction { get; set; }
     }
 
     public class PromotionSpecific

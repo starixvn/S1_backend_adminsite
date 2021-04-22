@@ -6,7 +6,7 @@ import DateTimePickerElem from "./Component/DateTimePicker";
 import moment from "moment";
 import RadioBox from "./Component/RadioBox";
 import RichText from "./Component/RichText.jsx";
-import { initWalletType, initPromotionType, initWeekOptions, initPeriodType, weekOptions, initSpecialBonusPromotionType, specialBonusOptions, onlyRegisteredBonusOptions, initPromotionDeviceType } from "./defCols";
+import { initWalletType, initPromotionType, initWeekOptions, initPeriodType, weekOptions, initSpecialBonusPromotionType, specialBonusOptions, onlyRegisteredBonusOptions, initPromotionDeviceType, initPromotionAction } from "./defCols";
 import { defActionType } from "./Edit.reducer";
 
 const initBonusAmountType = promoType => {
@@ -216,6 +216,15 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 						dataColumn="description"
 						value={state.description}
 					/>
+					{(state.promotionType == 8) ?
+						<RadioBox
+							Title="Promotion Action"
+							Options={initPromotionAction()}
+							OnChange={action.EditMainValue}
+							dataColumn="promotionAction"
+							Selected={state.promotionAction}
+						/>
+						: null}
 				</div>
 				{(state.promotionType == 6 || state.promotionType == 7) ?
 					(<div className="filter">
@@ -278,8 +287,7 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 								dataColumn="walletType"
 								Selected={state.walletType}
 							/>
-							{state.walletType !== null &&
-								state.productCategory !== undefined ? (
+							{state.walletType !== null && state.productCategory !== undefined ? (
 								<RadioBox
 									Title="Product Category"
 									Options={state.productCategory}
@@ -294,9 +302,8 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 									}
 								/>
 							) : null}
-						</div>)}
-
-
+						</div>
+						)}
 				<div className="filter noBGcolor">
 					<CheckBox
 						Options={currencyOptions}
@@ -612,8 +619,7 @@ const LangPanel = props => {
 				<span style={{ color: "white" }}>{props.langId}</span>
 			</a>
 			<div className="panel-body">
-				{(props.state.promotionType == 8) ?
-
+				{(props.state.promotionType == 8 && props.state.promotionAction == 0) ?
 					<InputBox
 						Title="Promotion Link"
 						ClassName="form-group"
@@ -664,8 +670,7 @@ const LangPanel = props => {
 						].description
 					}
 				/>
-				{(props.state.promotionType == 8) ?
-					null :
+				{(props.state.promotionType == 8 && props.state.promotionAction == 1) ?
 					<RichText
 						EditDetail={EditDetail}
 						Value={
@@ -676,6 +681,7 @@ const LangPanel = props => {
 						CurrencyId={props.currencyId}
 						LangId={props.langId}
 					/>
+					: null
 				}
 			</div>
 		</>

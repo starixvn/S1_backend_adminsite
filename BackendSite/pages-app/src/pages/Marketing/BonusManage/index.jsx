@@ -191,7 +191,8 @@ const App = () => {
 				BonusCode: promotion.bonusCode,
 				Description: promotion.description,
 				PromotionType: promotion.promotionType,
-				PromotionDeviceType:promotion.promotionDeviceType,
+				PromotionAction: promotion.promotionAction,
+				PromotionDeviceType: promotion.promotionDeviceType,
 				UnixPeriodFrom: moment(promotion.periodFrom).unix(),
 				UnixPeriodTo: moment(promotion.periodTo).unix(),
 				Status: promotion.status,
@@ -444,9 +445,9 @@ const App = () => {
 	};
 
 	const skipField = {
-		"default": ["currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours", "minPayout", "specialCode"],
-		"6": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "affid", "specialCode"],
-		"7": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "affid", "specialCode"],
+		"default": ["currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours", "minPayout", "specialCode", "promotionAction"],
+		"6": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "affid", "specialCode", "promotionAction"],
+		"7": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "affid", "specialCode", "promotionAction"],
 		"8": ["expiryDays", "walletType", "categoryId", "tpId", "rollOver", "minPayout", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours", "affid", "specialCode"],
 	}
 
@@ -471,15 +472,15 @@ const App = () => {
 			StateCheckBox={StateCheckBox}
 		/>
 	) : (
-			<Edit
-				Datas={state.promotionData}
-				SiteList={state.siteList}
-				action={{ SetPromotion, ClickBack }}
-				IsAdd={state.panelType === defPanelType.Add}
-				processing={processing}
-				skipField={skipField}
-			/>
-		);
+		<Edit
+			Datas={state.promotionData}
+			SiteList={state.siteList}
+			action={{ SetPromotion, ClickBack }}
+			IsAdd={state.panelType === defPanelType.Add}
+			processing={processing}
+			skipField={skipField}
+		/>
+	);
 };
 
 export default App;

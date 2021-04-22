@@ -9,6 +9,8 @@ export const defWalletType = {
 	}
 };
 
+export const initWalletType = () => Object.values(defWalletType);
+
 export const defPromotionType = {
 	1: "First Deposit",
 	2: "Re-Deposit",
@@ -87,4 +89,15 @@ export const initPromotionDeviceType = [
 	{ value: 3, displayText: defPromotionDeviceType[3] }
 ];
 
-export const initWalletType = () => Object.values(defWalletType);
+export const defPromotionAction = {
+	0: {
+		value: 0,
+		displayText: "Link"
+	},
+	1: {
+		value: 1,
+		displayText: "Detail"
+	}
+};
+
+export const initPromotionAction = () => Object.values(defPromotionAction);
