@@ -30,7 +30,7 @@ import DateTimePicker from 'react-datetime';
         0: "Undefine",
         1: "Online Payment",
         2: "Local Bank",
-        3: "Crypto Pay",
+        4: "Crypto Pay",
     };
 
     const StatusSelectOp = {
@@ -221,7 +221,7 @@ import DateTimePicker from 'react-datetime';
                         if (result.data.status == 3) {
                             await this.onGetPayList(result.data.currencyId, result.data.sysId);
                             await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId, result.data.siteId);
-                            await this.GetCryptoPayList(result.data.currencyId, result.data.sysId);
+                            await this.onGetCryptoPayList(result.data.currencyId, result.data.sysId);
                         }
 
                         let SelId = null;
@@ -435,7 +435,7 @@ import DateTimePicker from 'react-datetime';
                     if (this.state.BankInfoOffList.length > 0)
                         selectOp.push(<option key={2} value="2">Local Bank</option>);
                     if (this.state.CryptoPayList.length > 0)
-                        selectOp.push(<option key={2} value="2">Crypto Pay</option>);
+                        selectOp.push(<option key={4} value="4">Crypto Pay</option>);
                     selectType = <select className="form-control" onChange={this.onSelectType.bind(this)} value={this.state.selectType}>
                         {selectOp}
                     </select>;
@@ -452,7 +452,7 @@ import DateTimePicker from 'react-datetime';
                             this.state.SelId=this.state.BankInfoOffList[0];
                         }*/
                     } else if (this.state.selectType == 4) {
-                        selectPay = this.state.GetCryptoPayList.map(row => <option key={row.payId} value={row.payId}>{row.payName}</option>);
+                        selectPay = this.state.CryptoPayList.map(row => <option key={row.payId} value={row.payId}>{row.payName}</option>);
                         /*if(this.state.BankInfoOffList.length>0) {
                             this.state.SelId=this.state.BankInfoOffList[0];
                         }*/
