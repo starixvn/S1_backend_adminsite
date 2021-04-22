@@ -10,15 +10,15 @@ module.exports = {
         // "js/component/Finance/DepositSubmission.min": [
         //     '../BackendSite/wwwroot/js/component/Finance/DepositSubmission.jsx'
         // ], 
-        // "js/component/Payment/BankInfoList.min": [
-        //     '../BackendSite/wwwroot/js/component/Payment/BankInfoList.jsx'
-        // ],
+        "js/component/Payment/BankInfoList.min": [
+            '../BackendSite/wwwroot/js/component/Payment/BankInfoList.jsx'
+        ],
         // "js/component/Finance/PaymentAdjustment.min": [
         //     '../BackendSite/wwwroot/js/component/Finance/PaymentAdjustment.jsx'
         // ],
-        "js/component/CustManage/CustInfo.min": [
-           '../BackendSite/wwwroot/js/component/CustManage/CustInfo.jsx'
-        ],
+        // "js/component/CustManage/CustInfo.min": [
+        //    '../BackendSite/wwwroot/js/component/CustManage/CustInfo.jsx'
+        // ],
         // "js/component/CustManage/CustInfoList.min": [
         //     '../BackendSite/wwwroot/js/component/CustManage/CustInfoList.jsx'
         // ],

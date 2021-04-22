@@ -449,5 +449,73 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
+
+        public class WithdrawalLimitPara
+        {
+            public int SiteId { set; get; }
+        }
+        [HttpPost]
+        public ApiResult<IEnumerable<WithdrawalData>> GetWithdrawalLimitData(WithdrawalLimitPara para)
+        {
+            var apiResult = new ApiResult<IEnumerable<WithdrawalData>>();
+            try
+            {
+                apiResult.Data = withdrawalBLL.GetWithdrawalLimitData(para.SiteId);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        public class InsertWithdrawalLimitPara 
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+        }
+
+        [HttpPost]
+        public ApiResult InsertWithdrawalLimit(InsertWithdrawalLimitPara para)
+        {
+            var result = withdrawalBLL.InsertWithdrawalLimit(para.SiteId, para.CurrencyId, User.Identity.Name);
+            var apiResult = new ApiResult();
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+        public class UpdateWithdrawalLimitPara
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int WithdrawalMin { get; set; }
+        }
+        [HttpPost]
+        public ApiResult UpdateWithdrawalLimit(UpdateWithdrawalLimitPara para)
+        {
+            var result = withdrawalBLL.UpdateWithdrawalLimit(para.SiteId, para.CurrencyId, para.WithdrawalMin,User.Identity.Name);
+            var apiResult = new ApiResult();
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
     }
 }
