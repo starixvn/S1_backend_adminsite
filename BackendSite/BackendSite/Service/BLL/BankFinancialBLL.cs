@@ -58,13 +58,13 @@ namespace BackendSite.Service.BLL
             return ConvertForExport(_bankFinancialService.GetTransferAccountInfoList(isSetting, siteId, id));
         }
 
-        public (bool Status,int Count,string Message) SetTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
+        public (bool Status, int Count, string Message) SetTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
         {
             bool status = false;
             int count = 0;
             string message = string.Empty;
 
-            if(!CheckParameterForSetTransferAccount(bankFinancialTransferAccount,out message))
+            if (!CheckParameterForSetTransferAccount(bankFinancialTransferAccount, out message))
             {
                 return (status, count, message);
             }
@@ -144,6 +144,7 @@ namespace BackendSite.Service.BLL
                 count = 1;
                 message = "Update Transfer Account And Insert Log Success.";
             }
+
             return (status, count, message);
         }
 
@@ -156,7 +157,7 @@ namespace BackendSite.Service.BLL
 
             if (bankFinancialTransferAccount == null)
             {
-                message= "Data Invalid.";
+                message = "Data Invalid.";
 
                 return false;
             }
@@ -177,7 +178,7 @@ namespace BackendSite.Service.BLL
                 return false;
 
             }
-            
+
             if (bankFinancialTransferAccount.SiteId != 0 &&
                 bankFinancialTransferAccount.SiteId != 1 &&
                 bankFinancialTransferAccount.SiteId != 2 &&
@@ -222,9 +223,9 @@ namespace BackendSite.Service.BLL
 
                 return false;
             }
-            
-            if (bankFinancialTransferAccount.Channel== TransferChannelEnum.PSP &&
-                (bankFinancialTransferAccount.PayId == null || bankFinancialTransferAccount.PayId ==0))
+
+            if (bankFinancialTransferAccount.Channel == TransferChannelEnum.PSP &&
+                (bankFinancialTransferAccount.PayId == null || bankFinancialTransferAccount.PayId == 0))
             {
                 message = "Data-[Channel] is PSP.But [Pay] is invalid.";
 
@@ -260,7 +261,7 @@ namespace BackendSite.Service.BLL
                 return false;
             }
 
-            if (bankFinancialTransferAccount.InitialAmount == null || bankFinancialTransferAccount.InitialAmount <0)
+            if (bankFinancialTransferAccount.InitialAmount == null || bankFinancialTransferAccount.InitialAmount < 0)
             {
                 message = "Data-[InitialAmount] invalid.";
 
@@ -327,7 +328,7 @@ namespace BackendSite.Service.BLL
 
         #endregion
 
-        public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoList(bool isSetting, 
+        public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoList(bool isSetting,
                                                                                      TransferTypeEnum? transferType,
                                                                                      string transFromDate,
                                                                                      string transToDate,
@@ -414,6 +415,10 @@ namespace BackendSite.Service.BLL
             {
                 using (TransactionScope scope = new TransactionScope())
                 {
+
+                    string TransferId = GetTransferId(bankFinancialTransferInfoDetail.TransferType);
+                    transferInfoFromModel.TransferId = TransferId;
+                    transferInfoToModel.TransferId = TransferId;
 
                     if (_bankFinancialService.InsertTransferInfo(transferInfoFromModel) != 1)
                     {
@@ -549,6 +554,34 @@ namespace BackendSite.Service.BLL
             }
 
             return result.Substring(1);
+        }
+
+        private string GetTransferId(TransferTypeEnum transferType)
+        {
+            string prefix = string.Empty;
+            string nowDate = string.Empty;
+            string nowMaxNo = string.Empty;
+
+            switch (transferType)
+            {
+                case TransferTypeEnum.Deposit:
+                    prefix = "D";
+                    break;
+                case TransferTypeEnum.Withdrawal:
+                    prefix = "W";
+                    break;
+                case TransferTypeEnum.Transfer:
+                    prefix = "T";
+                    break;
+                case TransferTypeEnum.Other:
+                    prefix = "R";
+                    break;
+            }
+
+            (nowDate, nowMaxNo) = _bankFinancialService.NoAssign(prefix);
+
+            return prefix + nowDate + nowMaxNo.PadLeft(4, '0');
+
         }
 
         #endregion

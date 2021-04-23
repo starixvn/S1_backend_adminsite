@@ -235,7 +235,7 @@ namespace BackendSite.Service.Model.enums
         /// <summary>
         /// 其他(手續費、利息...)
         /// </summary>
-        Other = 3
+        Other = 4
     }
 
     /// <summary>

@@ -324,5 +324,22 @@ namespace BackendSite.Service.DAL
             }
         }
 
+        public (string,string) NoAssign(string prefix)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("_Prefix", prefix);
+                parameters.Add("_NowDate", direction: ParameterDirection.Output);
+                parameters.Add("_NowMaxNo", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+
+                string SpName = "Admin_BankFinancialNoAssignForGetNo_Upd";
+                var tempresult = conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+
+                return ((parameters.Get<string>("_NowDate") ?? string.Empty), (parameters.Get<int?>("_NowMaxNo") ?? 0).ToString());
+            }
+        }
+
     }
 }
