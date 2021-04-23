@@ -198,7 +198,7 @@ namespace BackendSite.Controllers.Api
                     decimal amount = 0m;
                     withdrawConfirmReuslt = withdrawalBLL.WithdrawalProcess(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name, Newtonsoft.Json.JsonConvert.SerializeObject(withdrawalInfo), withdrawalReq.WithdrawalType, out custId, out amount);
 
-                    if (withdrawConfirmReuslt > 0 && ((withdrawalReq.WithdrawalType == (int)WithdrawalType.OnlinePayment) || (withdrawalReq.WithdrawalType == (int)WithdrawalType.CryptoPay))
+                    if (withdrawConfirmReuslt > 0 && ((withdrawalReq.WithdrawalType == (int)WithdrawalType.OnlinePayment) || (withdrawalReq.WithdrawalType == (int)WithdrawalType.CryptoPay)))
                     {
                         var reqWithdrawalOnline = new ReqWithdrawalOnline
                         {
