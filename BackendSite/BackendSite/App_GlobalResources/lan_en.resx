@@ -504,6 +504,9 @@
   <data name="lbl_WithdrawalType2" xml:space="preserve">
     <value>Local Bank</value>
   </data>
+  <data name="lbl_WithdrawalType4" xml:space="preserve">
+    <value>Crypto Payment</value>
+  </data>
   <data name="lbl_SelectSite" xml:space="preserve">
     <value>Select site</value>
   </data>
