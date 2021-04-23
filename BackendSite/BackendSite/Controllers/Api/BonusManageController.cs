@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
@@ -9,11 +8,9 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.Operations;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using OfficeOpenXml;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 namespace BackendSite.Controllers.Api
 {
@@ -39,7 +36,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> GetPromotionList([FromForm]PromotionSelect Select)
+        public ApiResult<IEnumerable<PromotionInfo>> GetPromotionList([FromForm] PromotionSelect Select)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
 
@@ -48,7 +45,7 @@ namespace BackendSite.Controllers.Api
                 var siteList = serverInfoBLL.GetSiteListByLoginUser();
                 int[] siteArray = siteList.Select(x => x.SiteId).ToArray();
 
-                apiResult.Data = bonusManageBLL.GetPromotionList(siteArray,Select).Where(b=> siteList.Any(s=> s.SiteId == b.SiteId));
+                apiResult.Data = bonusManageBLL.GetPromotionList(siteArray, Select).Where(b => siteList.Any(s => s.SiteId == b.SiteId));
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -62,7 +59,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<PromotionInfo> GetPromotion([FromForm]string BonusCode, [FromForm]int SiteId)
+        public ApiResult<PromotionInfo> GetPromotion([FromForm] string BonusCode, [FromForm] int SiteId)
         {
             var apiResult = new ApiResult<PromotionInfo>();
             try
@@ -81,13 +78,13 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<dynamic>> GetSiteListByLoginUser([FromForm]int? SiteId)
+        public ApiResult<IEnumerable<dynamic>> GetSiteListByLoginUser([FromForm] int? SiteId)
         {
             var apiResult = new ApiResult<IEnumerable<dynamic>>();
             try
             {
                 apiResult.Data = serverInfoBLL.GetSiteListByLoginUser()?.Select(x => new { x.SiteName, x.SiteId, CurrencyList = x.ICurrencyList, LangList = x.ILangList });
-                if(SiteId != null && apiResult.Data != null && apiResult.Data.Any())
+                if (SiteId != null && apiResult.Data != null && apiResult.Data.Any())
                 {
                     apiResult.Data = apiResult.Data.Where(s => s.SiteId == SiteId);
                 }
@@ -104,7 +101,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> SetPromotion([FromForm]bool IsAdd, [FromForm]PromotionInfo Promotion, [FromForm] PromotionSelect Select)
+        public ApiResult<IEnumerable<PromotionInfo>> SetPromotion([FromForm] bool IsAdd, [FromForm] PromotionInfo Promotion, [FromForm] PromotionSelect Select)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
             try
@@ -114,7 +111,7 @@ namespace BackendSite.Controllers.Api
                 int[] siteArray = siteList.Select(x => x.SiteId).ToArray();
                 apiResult.Data = bonusManageBLL.GetPromotionList(siteArray, Select);
                 apiResult.ErrorCode = errorCode;
-                apiResult.Message = errorCode ==1 ? "The bonus setting already exists which with same promotion-type & product-category." : "";
+                apiResult.Message = errorCode == 1 ? "The bonus setting already exists which with same promotion-type & product-category." : "";
             }
             catch (MySqlException sqlException)
             {
@@ -127,7 +124,7 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
                 apiResult.RawMessage = ex.ToString();
-            }            
+            }
 
             return apiResult;
         }
@@ -170,7 +167,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<dynamic> UpdatePromotionStatus([FromForm]string BonusCode, [FromForm]int SiteId, [FromForm]int Status)
+        public ApiResult<dynamic> UpdatePromotionStatus([FromForm] string BonusCode, [FromForm] int SiteId, [FromForm] int Status)
         {
             var apiResult = new ApiResult<dynamic>();
             try
@@ -190,7 +187,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<PromoCategory>> GetPromoCategories([FromForm]int WalletType)
+        public ApiResult<IEnumerable<PromoCategory>> GetPromoCategories([FromForm] int WalletType)
         {
             var apiResult = new ApiResult<IEnumerable<PromoCategory>>();
 
@@ -229,7 +226,7 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusImport" })]
-        public async Task<ApiResult<List<BonusImportResult>>> BonusImport([FromForm] int TpId,[FromForm] int CategoryId, [FromForm] IFormFile excelUpload)
+        public async Task<ApiResult<List<BonusImportResult>>> BonusImport([FromForm] int TpId, [FromForm] int CategoryId, [FromForm] IFormFile excelUpload)
         {
             var apiResult = new ApiResult<List<BonusImportResult>>();
             List<BonusImportResult> BonusImportResultList = new List<BonusImportResult>();
@@ -324,19 +321,20 @@ namespace BackendSite.Controllers.Api
             var currencyList = reportBLL.GetCurrency().ToList();
             List<ReferralManagement> referralManagementList = new List<ReferralManagement>();
 
-            foreach (string currency in siteList.ToList().Find(x => x.SiteId == SiteId).CurrencyList.Replace("[","").Replace("]", "").Split(","))
+            foreach (string currency in siteList.ToList().Find(x => x.SiteId == SiteId).CurrencyList.Replace("[", "").Replace("]", "").Split(","))
             {
                 int currencyId;
                 Int32.TryParse(currency, out currencyId);
-                var referral = referralList?.Where(x=>x.CurrencyId == currencyId).ToList().FirstOrDefault();
-                referralManagementList.Add(new ReferralManagement { 
+                var referral = referralList?.Where(x => x.CurrencyId == currencyId).ToList().FirstOrDefault();
+                referralManagementList.Add(new ReferralManagement
+                {
                     SiteId = SiteId,
                     CurrencyId = currencyId,
-                    PeriodDays = referral == null?string.Empty: referral.PeriodDays.ToString(),
+                    PeriodDays = referral == null ? string.Empty : referral.PeriodDays.ToString(),
                     BonusAmount = referral == null ? string.Empty : referral.BonusAmount.ToString(),
                     VaildBet = referral == null ? string.Empty : referral.VaildBet.ToString(),
                     Deposit = referral == null ? string.Empty : referral.Deposit.ToString(),
-                    IsoCode = currencyList.Find(x=>x.CurrencyId == currencyId).IsoCode,
+                    IsoCode = currencyList.Find(x => x.CurrencyId == currencyId).IsoCode,
                     Status = referral == null ? false : referral.Status
                 });
             }
@@ -354,13 +352,13 @@ namespace BackendSite.Controllers.Api
                 var referralList = JsonConvert.DeserializeObject<List<ReferralManagement>>(referral);
                 referralManagementBLL.SetReferral(referralList);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
-            }                      
+            }
             return apiResult;
-            
+
         }
 
         [HttpPost]
@@ -371,7 +369,7 @@ namespace BackendSite.Controllers.Api
             {
                 var referralList = referralManagementBLL.GetReferralBySiteId(SiteId);
                 var referral = referralList?.Where(x => x.CurrencyId == CurrencyId).ToList().FirstOrDefault();
-                if(referral == null)
+                if (referral == null)
                 {
                     apiResult.ErrorCode = 7;
                     apiResult.Message = "";
