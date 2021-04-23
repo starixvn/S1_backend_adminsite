@@ -311,6 +311,23 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        [HttpPost]
+        public ApiResult<IEnumerable<Pay>> GetCryptoPayList(WithdrawalReq3 withdrawalReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<Pay>>();
+            var cryptoPay = bankDetailBLL.GetCryptoPay();
+            var _payInfo = (from x in cryptoPay
+                            select new Pay
+                            {
+                                PayId = x.PayId,
+                                PayName = x.PayName
+
+                            }).Distinct(bankInfoPayComparer);
+            apiResult.Data = _payInfo;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
         private class BankInfoPayComparer : IEqualityComparer<Pay>
         {
             public bool Equals(Pay t1, Pay t2)
