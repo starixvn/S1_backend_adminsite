@@ -189,5 +189,26 @@ namespace BackendSite.Service.DAL
             return conn.Execute("Admin_WithdrawalKyc_Set", new { withdrawalKYC.SiteId, withdrawalKYC.CurrencyId, withdrawalKYC.Amount }, commandType: CommandType.StoredProcedure) > 0;
         }
 
+        public IEnumerable<WithdrawalMinInfo> GetWithdrawalLimitData(int SiteId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var WithdrawalMinInfo = conn.Query<WithdrawalMinInfo>("Admin_WithdrawalMinInfo_Get", new { SiteId }, commandType: CommandType.StoredProcedure);
+            return WithdrawalMinInfo;
+        }
+        public bool InsertWithdrawalLimit(int SiteId, int CurrencyId, int WithdrawalMin, string Operator)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_WithdrawalMinInfo_Ins", new { SiteId, CurrencyId, Operator, WithdrawalMin }, commandType: CommandType.StoredProcedure) > 0;
+        }
+        public bool UpdateWithdrawalLimit(int SiteId, int CurrencyId,int WithdrawalMin,string Operator)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_WithdrawalMinInfo_Upd", new { SiteId, CurrencyId, Operator, WithdrawalMin,  }, commandType: CommandType.StoredProcedure) > 0;
+        }
+        public bool DeleteWithdrawalLimit(int SiteId, int CurrencyId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_WithdrawalMinInfo_Del", new { SiteId, CurrencyId }, commandType: CommandType.StoredProcedure) > 0;
+        }
     }
 }

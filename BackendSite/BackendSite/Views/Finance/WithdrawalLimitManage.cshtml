@@ -1,0 +1,26 @@
+﻿@using BackendSite.Service.BLL
+@inject SelLangBLL selLangBLL
+@{
+    Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
+    ViewData["Title"] = "Withdrawal Limit Manage";
+}
+<link href="~/css/main.css" rel="stylesheet" />
+<link href="~/css/page/Marketing.css" rel="stylesheet" asp-append-version="true" />
+@{
+    var i18n = new Dictionary<string, string>();
+
+    for (var currency = 1; currency <= 51; currency++)
+    {
+        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
+            i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+    }
+}
+<div id="content">
+</div>
+@section Scripts {
+    <script src="~/js/component/Finance/WithdrawalLimitManage.min.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        //$('.collapse').collapse();
+        window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
+    </script>
+}

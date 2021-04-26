@@ -143,4 +143,18 @@ namespace BackendSite.Service.Model
         public double Amount { get; set; }
 
     }
+    public class WithdrawalData
+    {
+        public bool HasDetail { get; set; }
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
+        public int WithdrawalMin { get; set; }
+    }
+    public class WithdrawalMinInfo
+    {
+        public int CurrencyId { get; set; }
+        public int WithdrawalMin { get; set; }
+    }
+
 }

@@ -240,6 +240,11 @@
         "DisplayKey": "Deposit Submission",
         "FuncKey": "Finance/DepositSubmission",
         "Enable": false
+      },
+      {
+        "DisplayKey": "WithdrawalLimit Manage",
+        "FuncKey": "Finance/WithdrawalLimitManage",
+        "Enable": false
       }
     ]
   },
