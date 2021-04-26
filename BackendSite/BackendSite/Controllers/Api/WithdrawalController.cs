@@ -87,7 +87,7 @@ namespace BackendSite.Controllers.Api
 
             }
 
-            if(withdrawalRequest.Operator == User.Identity.Name)
+            if (withdrawalRequest.Operator == User.Identity.Name)
             {
                 withdrawalRequest.SameOperator = true;
             }
@@ -181,6 +181,10 @@ namespace BackendSite.Controllers.Api
                         withdrawalInfo.BankId = bankInfoOff.BankId;
                     }
                 }
+                else if (withdrawalReq.WithdrawalType == (int)WithdrawalType.CryptoPay)
+                {
+                    withdrawalInfo.PayId = withdrawalReq.SelId;
+                }
 
                 if (withdrawalReq.WithdrawalType == null || withdrawalReq.WithdrawalType == (int)WithdrawalType.Undefine)
                 {
@@ -194,7 +198,7 @@ namespace BackendSite.Controllers.Api
                     decimal amount = 0m;
                     withdrawConfirmReuslt = withdrawalBLL.WithdrawalProcess(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name, Newtonsoft.Json.JsonConvert.SerializeObject(withdrawalInfo), withdrawalReq.WithdrawalType, out custId, out amount);
 
-                    if (withdrawConfirmReuslt > 0 && withdrawalReq.WithdrawalType == (int)WithdrawalType.OnlinePayment)
+                    if (withdrawConfirmReuslt > 0 && ((withdrawalReq.WithdrawalType == (int)WithdrawalType.OnlinePayment) || (withdrawalReq.WithdrawalType == (int)WithdrawalType.CryptoPay)))
                     {
                         var reqWithdrawalOnline = new ReqWithdrawalOnline
                         {
@@ -208,7 +212,13 @@ namespace BackendSite.Controllers.Api
                             //ReturnUrl = Url.RouteUrl("desktop", new { action = "Deposit", controller = "Cashier", authData.LangId }, protocol: Request.Scheme, host: Request.Host.Port == 80 ? Request.Host.Host : $"{Request.Host.Host}:{Request.Host.Port}")
                         };
 
-                        var myUrl = $"{payApiUrl}Withdrawal";
+
+                        var myUrl = "";
+                        if (withdrawalReq.WithdrawalType == (int)WithdrawalType.CryptoPay) 
+                            myUrl = $"{payApiUrl}CryptoWithdrawal";
+                        else 
+                            myUrl = $"{payApiUrl}Withdrawal";
+
                         var apiOnlineResult = await courierAdapter.MyPostAsync<bool, ReqWithdrawalOnline>(myUrl, reqWithdrawalOnline);
                         if (apiOnlineResult == null)
                         {
@@ -300,6 +310,23 @@ namespace BackendSite.Controllers.Api
             var bankInfoPay = bankDetailBLL.GetBankInfoPay();
             var _payInfo = (from x in bankInfoPay
                             where x.CurrencyId == withdrawalReq.CurrencyId && x.SysId == withdrawalReq.SysId
+                            select new Pay
+                            {
+                                PayId = x.PayId,
+                                PayName = x.PayName
+
+                            }).Distinct(bankInfoPayComparer);
+            apiResult.Data = _payInfo;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<Pay>> GetCryptoPayList(WithdrawalReq3 withdrawalReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<Pay>>();
+            var cryptoPay = bankDetailBLL.GetCryptoPay();
+            var _payInfo = (from x in cryptoPay
                             select new Pay
                             {
                                 PayId = x.PayId,

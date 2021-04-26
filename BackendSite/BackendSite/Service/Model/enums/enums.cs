@@ -33,6 +33,7 @@ namespace BackendSite.Service.Model.enums
         Undefine = 0,
         OnlinePayment = 1,
         LocalBank = 2,
+        CryptoPay = 4
     }
     /// <summary>
     /// 

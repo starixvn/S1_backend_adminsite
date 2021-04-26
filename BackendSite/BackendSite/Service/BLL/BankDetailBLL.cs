@@ -119,5 +119,21 @@ namespace BackendSite.Service.BLL
             //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
             return BankInfoPayList;
         }
+        public IEnumerable<BankInfoPay> GetCryptoPay()
+        {
+            string sCryptoPayListKey = "CryptoPayForPayout";
+            var CryptoPayList = cache.Get<IEnumerable<BankInfoPay>>(sCryptoPayListKey);
+            if (CryptoPayList == null)
+            {
+                CryptoPayList = localBankService.GetCryptoPayList();
+                if (CryptoPayList != null)
+                {
+                    cache.Set(sCryptoPayListKey, CryptoPayList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
+                }
+            }
+
+            //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
+            return CryptoPayList;
+        }
     }
 }

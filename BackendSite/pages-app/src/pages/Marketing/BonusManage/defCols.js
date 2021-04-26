@@ -9,6 +9,8 @@ export const defWalletType = {
 	}
 };
 
+export const initWalletType = () => Object.values(defWalletType);
+
 export const defPromotionType = {
 	1: "First Deposit",
 	2: "Re-Deposit",
@@ -75,4 +77,27 @@ export const initWeekOptions = [
 	{ value: 7, displayText: weekOptions[7] }
 ];
 
-export const initWalletType = () => Object.values(defWalletType);
+export const defPromotionDeviceType = {
+	1: "All",
+	2: "Web",
+	3: "App"
+};
+
+export const initPromotionDeviceType = [
+	{ value: 1, displayText: defPromotionDeviceType[1] },
+	{ value: 2, displayText: defPromotionDeviceType[2] },
+	{ value: 3, displayText: defPromotionDeviceType[3] }
+];
+
+export const defPromotionAction = {
+	0: {
+		value: 0,
+		displayText: "Link"
+	},
+	1: {
+		value: 1,
+		displayText: "Detail"
+	}
+};
+
+export const initPromotionAction = () => Object.values(defPromotionAction);

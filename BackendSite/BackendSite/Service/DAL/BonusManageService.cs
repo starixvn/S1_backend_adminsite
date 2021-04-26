@@ -1,15 +1,13 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.Extensions.Configuration;
-using MySql.Data.MySqlClient;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Service.Model;
+using Dapper;
+using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -36,7 +34,7 @@ namespace BackendSite.Service.DAL
                     SiteIdFilterArray[i] = filterPara.SiteidFilter[i].value;
                 }
             }
-            if(promotionTypelength > 0)
+            if (promotionTypelength > 0)
             {
                 for (var i = 0; i < filterPara.PromotionTypeFilter.Length; i++)
                 {
@@ -68,7 +66,7 @@ namespace BackendSite.Service.DAL
                 if (promotion.Specific != null)
                 {
                     var rebateList = conn.Query<PromotionRebate1>("Admin_PromotionRebate_Get", new { BonusCode, SiteId }, transaction: trans, commandType: CommandType.StoredProcedure);
-                    foreach(var s in promotion.Specific)
+                    foreach (var s in promotion.Specific)
                     {
                         if (!string.IsNullOrEmpty(s.VN_AffIds))
                         {
@@ -116,6 +114,8 @@ namespace BackendSite.Service.DAL
             p.Add("SpecialCode", promotion.SpecialCode);
             p.Add("IsSpecial", promotion.IsSpecial);
             p.Add("OnlyRegistered", promotion.OnlyRegistered);
+            p.Add("PromotionDeviceType", promotion.PromotionDeviceType);
+            p.Add("PromotionAction", promotion.PromotionAction);
             p.Add("ErrorCode", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             conn.Execute("Admin_Promotion_Set", p, transaction: trans, commandType: CommandType.StoredProcedure);
@@ -232,7 +232,8 @@ namespace BackendSite.Service.DAL
 
         public async Task<BonusImportResult> BonusImportAsync(BonusImportPara bonusImportPara)
         {
-            BonusImportResult Result = new BonusImportResult() {
+            BonusImportResult Result = new BonusImportResult()
+            {
                 SiteId = bonusImportPara.SiteId,
                 UserName = bonusImportPara.UserName,
                 BonusAmount = bonusImportPara.BonusAmount,
@@ -242,7 +243,7 @@ namespace BackendSite.Service.DAL
                 Status = 0,
                 ErrorMessage = string.Empty
             };
-            
+
             try
             {
                 using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
@@ -266,7 +267,7 @@ namespace BackendSite.Service.DAL
                     DynamicParameters custBonusPara = new DynamicParameters();
                     custBonusPara.Add("@CustId", customer.FirstOrDefault().CustId);
                     var bonusInfo = conn.Query<CustBonus>("Admin_CustBonus_Get", custBonusPara, trans, commandType: CommandType.StoredProcedure).ToList();
-                    
+
 
                     //查詢該名User是否有未完成的Bonus活動
                     if (bonusInfo.Count > 0)
@@ -313,9 +314,9 @@ namespace BackendSite.Service.DAL
                         conn.Execute("Common_Bonus_Ins", para2, transaction: trans, commandType: CommandType.StoredProcedure);
                     }
                 }
-                
+
                 await Task.Run(() => trans.Commit());
-               
+
             }
             catch (Exception ex)
             {
