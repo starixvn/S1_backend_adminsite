@@ -195,15 +195,20 @@ namespace BackendSite.Service.DAL
             var WithdrawalMinInfo = conn.Query<WithdrawalMinInfo>("Admin_WithdrawalMinInfo_Get", new { SiteId }, commandType: CommandType.StoredProcedure);
             return WithdrawalMinInfo;
         }
-        public bool InsertWithdrawalLimit(int SiteId, int CurrencyId,string Operator)
+        public bool InsertWithdrawalLimit(int SiteId, int CurrencyId, int WithdrawalMin, string Operator)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_WithdrawalMinInfo_Ins", new { SiteId, CurrencyId, Operator }, commandType: CommandType.StoredProcedure) > 0;
+            return conn.Execute("Admin_WithdrawalMinInfo_Ins", new { SiteId, CurrencyId, Operator, WithdrawalMin }, commandType: CommandType.StoredProcedure) > 0;
         }
         public bool UpdateWithdrawalLimit(int SiteId, int CurrencyId,int WithdrawalMin,string Operator)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_WithdrawalMinInfo_Upd", new { SiteId, CurrencyId, Operator, WithdrawalMin,  }, commandType: CommandType.StoredProcedure) > 0;
+        }
+        public bool DeleteWithdrawalLimit(int SiteId, int CurrencyId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_WithdrawalMinInfo_Del", new { SiteId, CurrencyId }, commandType: CommandType.StoredProcedure) > 0;
         }
     }
 }

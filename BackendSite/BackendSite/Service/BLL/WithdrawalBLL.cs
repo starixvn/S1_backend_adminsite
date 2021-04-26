@@ -272,18 +272,22 @@ namespace BackendSite.Service.BLL
             });
             return result;
         }
-        public bool InsertWithdrawalLimit(int SiteId,int CurrencyId,string Operator)
+        public bool InsertWithdrawalLimit(int SiteId,int CurrencyId, int WithdrawalMin,string Operator)
         {
             var WithdrawalMinInfo = withdrawalService.GetWithdrawalLimitData(SiteId).ToList();
             if(WithdrawalMinInfo.Exists(x=> x.CurrencyId == CurrencyId))
             {
                 return true;
             }
-            return withdrawalService.InsertWithdrawalLimit(SiteId, CurrencyId, Operator);
+            return withdrawalService.InsertWithdrawalLimit(SiteId, CurrencyId, WithdrawalMin, Operator);
         }
         public bool UpdateWithdrawalLimit(int SiteId, int CurrencyId, int WithdrawalMin,string Operator)
         {
             return withdrawalService.UpdateWithdrawalLimit(SiteId, CurrencyId, WithdrawalMin, Operator);         
+        }
+        public bool DeleteWithdrawalLimit(int SiteId, int CurrencyId)
+        {
+            return withdrawalService.DeleteWithdrawalLimit(SiteId, CurrencyId);
         }
     }
 }

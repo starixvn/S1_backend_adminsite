@@ -9,18 +9,7 @@ const dataColumnDefs = () => {
   return [
     {
       dataColumn: "withdrawalMin",
-      columnTitle: "WithdrawalMin",
-      //   header: {
-      //     attr: {
-      //       class: "text-right",
-      //     },
-      //   },
-      //   body: {
-      //     attr: {
-      //       class: "text-right",
-      //     },
-      //     format: numberFormat,
-      //   },
+      columnTitle: "WithdrawalMin"
     },
     { dataColumn: "action", columnTitle: "Action" },
   ];
@@ -70,7 +59,7 @@ const Panel = (props) => {
                       <td>
                         <div
                           className="field"
-                          style={{ marginBottom: "20px", marginLeft: "20px" }}
+                          //style={{ marginBottom: "20px", marginLeft: "20px" }}
                         >
                           {data.withdrawalMin}
                         </div>
@@ -89,7 +78,7 @@ const Panel = (props) => {
                         <button
                           className="btn btn-search"
                           type="submit"
-                          onClick={props.Create.bind(null, data)}
+                          onClick={props.Deleta.bind(null, data)}
                           style={{
                             marginRight: "10px",
                           }}

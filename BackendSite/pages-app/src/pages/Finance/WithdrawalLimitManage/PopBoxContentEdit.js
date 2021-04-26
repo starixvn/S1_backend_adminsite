@@ -7,7 +7,8 @@ export const PopBoxContentEdit = (props) => {
       <div className="popup-wrap is-show">
         <div className="popup is-open">
           <div className="popup__head">
-            <span className="text">{props.EditData.currencyName}-Edit</span>
+            {/* <span className="text">{props.EditData.currencyName}-Edit</span> */}
+            <span className="text">{props.EditData.currencyName}{props.isCreate? '-Create':'-Edit'}</span>
             <div className="newbtn">
               <i className="icon icon-close"></i>
             </div>
@@ -44,12 +45,14 @@ export const PopBoxContentEdit = (props) => {
                             <div
                               className="newbtn newbtn-primary newbtn-w-min"
                               onClick={props.Save}
+                              style={{ marginTop: "20px" }}
                             >
                               <span className="text">Save</span>
                             </div>
                             <div
                               className="newbtn newbtn-secondary newbtn-w-min"
                               onClick={props.Cancel}
+                              style={{ marginTop: "20px" }}
                             >
                               <span className="text">Cancel</span>
                             </div>

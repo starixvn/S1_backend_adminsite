@@ -475,12 +475,13 @@ namespace BackendSite.Controllers.Api
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
+            public int WithdrawalMin { get; set; }
         }
 
         [HttpPost]
         public ApiResult InsertWithdrawalLimit(InsertWithdrawalLimitPara para)
         {
-            var result = withdrawalBLL.InsertWithdrawalLimit(para.SiteId, para.CurrencyId, User.Identity.Name);
+            var result = withdrawalBLL.InsertWithdrawalLimit(para.SiteId, para.CurrencyId,para.WithdrawalMin, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result)
             {
@@ -504,6 +505,28 @@ namespace BackendSite.Controllers.Api
         public ApiResult UpdateWithdrawalLimit(UpdateWithdrawalLimitPara para)
         {
             var result = withdrawalBLL.UpdateWithdrawalLimit(para.SiteId, para.CurrencyId, para.WithdrawalMin,User.Identity.Name);
+            var apiResult = new ApiResult();
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+        public class DeleteWithdrawalLimitPara
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+        }
+        [HttpPost]
+        public ApiResult DeleteWithdrawalLimit(DeleteWithdrawalLimitPara para)
+        {
+            var result = withdrawalBLL.DeleteWithdrawalLimit(para.SiteId, para.CurrencyId);
             var apiResult = new ApiResult();
             if (result)
             {

@@ -149,12 +149,12 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
         public string CurrencyName { get; set; }
-        public decimal WithdrawalMin { get; set; }
+        public int WithdrawalMin { get; set; }
     }
     public class WithdrawalMinInfo
     {
         public int CurrencyId { get; set; }
-        public decimal WithdrawalMin { get; set; }
+        public int WithdrawalMin { get; set; }
     }
 
 }
