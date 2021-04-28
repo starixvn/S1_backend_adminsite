@@ -670,7 +670,8 @@ const LangPanel = props => {
 						].description
 					}
 				/>
-				{(props.state.promotionType == 8 && props.state.promotionAction == 1) ?
+				{(props.state.promotionType == 8 && props.state.promotionAction == 0) ?
+					null :
 					<RichText
 						EditDetail={EditDetail}
 						Value={
@@ -681,7 +682,6 @@ const LangPanel = props => {
 						CurrencyId={props.currencyId}
 						LangId={props.langId}
 					/>
-					: null
 				}
 			</div>
 		</>
