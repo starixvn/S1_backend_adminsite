@@ -368,6 +368,16 @@
         "Childs": null
       },
       {
+        "Key": "VipRebateInfoReport",
+        "Title": "Vip Rebate Report",
+        "FuncKey": "Marketing/VipRebateInfoReport",
+        "Controller": "Marketing",
+        "Action": "VipRebateInfoReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
         "Key": "ReferralManagement",
         "Title": "Referral Management",
         "FuncKey": "Marketing/ReferralManagement",

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -70,7 +71,7 @@ namespace BackendSite.Service.BLL
             
             return vipLevelCache;
         }
-        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency,string bankAccountNumber, ref int pageNumber, out int totalPages, out int rowCount)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
             List<int> currncyList = new List<int>();
@@ -79,14 +80,20 @@ namespace BackendSite.Service.BLL
                 currncyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
 
-            return custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, selectCurrency,ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList()));
+            return custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList()));
         }
 
-        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int? AffId)
+        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int? AffId, IEnumerable<int> selectCurrency, string BankAccountNumber)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
 
-            return custInfoService.GetCustInfoExportList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, JsonConvert.SerializeObject(siteList), AffId);
+            List<int> currncyList = new List<int>();
+            serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x =>
+            {
+                currncyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
+            });
+
+            return custInfoService.GetCustInfoExportList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, JsonConvert.SerializeObject(siteList), AffId, selectCurrency, BankAccountNumber, JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList()));
         }
 
         public async Task<CustInfoDetail> GetCustInfoDetailAsync(int custId, string userName)
@@ -95,6 +102,9 @@ namespace BackendSite.Service.BLL
             var custInfoDetail = custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
             if (custInfoDetail != null)
             {
+                var DepositAndWithdrawalTime = custInfoService.GetCustDepositAndWithdrawalTime(custId);
+                custInfoDetail.LastDepositTime = DepositAndWithdrawalTime.LastDepositTime == null ? "": DepositAndWithdrawalTime.LastDepositTime?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.LastWithdrawlTime = DepositAndWithdrawalTime.LastWithdrawlTime == null ? "" : DepositAndWithdrawalTime.LastWithdrawlTime?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
                 custInfoDetail.tpWallet = await tpBLL.GetTpWalletAsync(custInfoDetail.CustId);
                 custInfoDetail.promotions = promotionService.GetPromotionListByCustId(custInfoDetail.CustId);
                 if (custInfoDetail.promotions != null)
@@ -225,7 +235,7 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.GetCustBonus(custId);
         }
-        public TeleCSDData GetTeleCSD(string SiteIds, string Currency, string StartDate, string EndDate, string Deposit, string DormantUser, string CallOut, int PageNumber, int PageSize)
+        public TeleCSDData GetTeleCSD(string SiteIds, string Currency, long StartDate, long EndDate, string Deposit, string DormantUser, string CallOut, int PageNumber, int PageSize)
         {
             return custInfoService.GetTeleCSD(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut, PageNumber, PageSize);
         }
@@ -235,10 +245,34 @@ namespace BackendSite.Service.BLL
             return custInfoService.UpdateCustomerTele(siteId, custId, Operator);
         }
 
-        public IEnumerable<CustTeleExport> GetTeleCSDExportData(string SiteIds, string Currency, string StartDate, string EndDate, string Deposit, string DormantUser, string CallOut)
+        public IEnumerable<CustTeleExport> GetTeleCSDExportData(string SiteIds, string Currency, long StartDate, long EndDate, string Deposit, string DormantUser, string CallOut)
         {
-            return custInfoService.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);
-            
+            return custInfoService.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);           
+        }
+
+        public PromotionListData GetPromotionListByCustIdAndDate(int custId, long StartDate, long EndDate,int PageNumber, int PageSize)
+        {
+            var result =  promotionService.GetPromotionListByCustIdAndDate(custId, StartDate, EndDate, PageNumber, PageSize);
+            if (result.PromotionList != null)
+            {
+                foreach (var promotion in result.PromotionList)
+                {
+                    if (promotion.BonusInfoStatus == 1 || promotion.BonusInfoStatus == 5)
+                    {
+                        promotion.custRollOver = rolloverService.GetCustRollOver(custId, promotion.BonusCode);
+                        if (promotion.BonusInfoStatus == 5)
+                        {
+                            promotion.BonusInfoStatus = 1;
+                        }
+                    }
+                    else
+                    {
+                        promotion.custRollOver = new CustRollOver() { RollOver = 0, TurnOver = 0 };
+                    };
+
+                }
+            }
+            return result;
         }
     }
 }

@@ -38,7 +38,7 @@ export const initPurposeType = [
 ];
 
 export const initSiteId = [
-  { value: 0, displayText: "Other" },
+  { value: 0, displayText: "Soon88" },
   { value: 1, displayText: "Nova88" },
   { value: 2, displayText: "Goal123" },
   { value: 3, displayText: "Bwing" },

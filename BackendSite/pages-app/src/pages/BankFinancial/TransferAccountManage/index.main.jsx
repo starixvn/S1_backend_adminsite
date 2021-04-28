@@ -129,7 +129,7 @@ export default ({
 	{
 		siteList.push({
 			siteId:0,
-			siteName:"Other",
+			siteName:"Soon88",
 			iCurrencyList:[2,4,13,15,51,96]
 		});
 	}

@@ -152,6 +152,10 @@ module.exports = {
       "@babel/polyfill",
       "./src/pages/BankFinancial/TransferManage/index.jsx",
     ],
+    // "Marketing/VipRebateInfoReport.min": [
+    // 	 '@babel/polyfill',
+    // 	"./src/pages/Marketing/VipRebateInfoReport/index.js"
+    // ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
