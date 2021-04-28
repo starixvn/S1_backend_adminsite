@@ -102,9 +102,12 @@ namespace BackendSite.Service.BLL
             var custInfoDetail = custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
             if (custInfoDetail != null)
             {
-                var DepositAndWithdrawalTime = custInfoService.GetCustDepositAndWithdrawalTime(custId);
-                custInfoDetail.LastDepositTime = DepositAndWithdrawalTime.LastDepositTime == null ? "": DepositAndWithdrawalTime.LastDepositTime?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.LastWithdrawlTime = DepositAndWithdrawalTime.LastWithdrawlTime == null ? "" : DepositAndWithdrawalTime.LastWithdrawlTime?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                var custOtherData = custInfoService.GetCustDepositAndWithdrawalTime(custId);
+                custInfoDetail.LastDepositTime = custOtherData.LastDepositTime == null ? "": custOtherData.LastDepositTime?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.LastWithdrawlTime = custOtherData.LastWithdrawlTime == null ? "" : custOtherData.LastWithdrawlTime?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.LastBettingTime = custOtherData.LastBettingTime == null ? "" : custOtherData.LastBettingTime?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.TotalAdjustment = custOtherData.TotalAdjustment;
+                custInfoDetail.TotalBonusClaimed = custOtherData.TotalBonusClaimed;
                 custInfoDetail.tpWallet = await tpBLL.GetTpWalletAsync(custInfoDetail.CustId);
                 custInfoDetail.promotions = promotionService.GetPromotionListByCustId(custInfoDetail.CustId);
                 if (custInfoDetail.promotions != null)

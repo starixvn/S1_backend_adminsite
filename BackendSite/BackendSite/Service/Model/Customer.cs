@@ -76,6 +76,9 @@ namespace BackendSite.Service.Model
         public string AffiliateCode { get; set; }
         public string LastDepositTime { get; set; }
         public string LastWithdrawlTime { get; set; }
+        public string LastBettingTime { get; set; }
+        public decimal TotalAdjustment { get; set; }
+        public decimal TotalBonusClaimed { get; set; }
     }
 
     public class CustInfoDetailForExport
@@ -250,5 +253,8 @@ namespace BackendSite.Service.Model
     {
         public DateTime? LastDepositTime { get; set; }
         public DateTime? LastWithdrawlTime { get; set; }
+        public decimal TotalAdjustment { get; set; }
+        public DateTime? LastBettingTime { get; set; }
+        public decimal TotalBonusClaimed { get; set; }
     }
 }

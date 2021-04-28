@@ -94,7 +94,7 @@ namespace BackendSite.Service.DAL
         public LastDepositAndWithdrawalTime GetCustDepositAndWithdrawalTime(int custId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.QueryFirstOrDefault<LastDepositAndWithdrawalTime>("Admin_CustInfoLastDepositAndWithdrawalTime", new { CustId = custId}, commandType: CommandType.StoredProcedure);
+            var result = conn.QueryFirstOrDefault<LastDepositAndWithdrawalTime>("Admin_CustInfoOther", new { CustId = custId}, commandType: CommandType.StoredProcedure);
             return result;
         }
 
