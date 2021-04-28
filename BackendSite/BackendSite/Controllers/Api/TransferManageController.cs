@@ -13,10 +13,10 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]/[Action]")]
     [ApiController]
-    //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferManage" })]
+    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferManage" })]
     public class TransferManageController : Controller
     {
         #region Fields
@@ -84,7 +84,6 @@ namespace BackendSite.Controllers.Api
 
         #region Action
 
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferAccountManages" })]
         public ApiResult GetTransferInfoList(GetTransferInfoReq req)
         {
 
@@ -114,19 +113,19 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferAccountManages" })]
         [HttpPost]
         public ApiResult CreateTransferInfo()
         {
 
             var apiResult = new ApiResult<BankFinancialTransferInfoDetailModel>();
-
             try
             {
                 var authData = _authorizeBLL.GetAuthData();
                 string dateTime = GetTimeZoneDateTime(1);
                 apiResult.Data = new BankFinancialTransferInfoDetailModel()
                 {
+                    TransDate = DateTime.Now.ToString("yyyy-MM-dd"),
+
                     FromAmount = 0,
                     FromFee = 0,
                     ToAmount = 0,
@@ -151,7 +150,6 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferAccountManages" })]
         [HttpPost]
         public ApiResult<BankFinancialTransferInfoDetailModel> GetTransferInfoData(GetTransferInfoReq req)
         {
@@ -178,8 +176,8 @@ namespace BackendSite.Controllers.Api
                     var authData = _authorizeBLL.GetAuthData();
                     string dateTime = GetTimeZoneDateTime(1);
 
-                    //data.Updator = authData.UserId;
-                    //data.UpdatorName = authData.UserName;
+                    data.Updator = authData.UserId;
+                    data.UpdatorName = authData.UserName;
                     data.UpdateTime = dateTime;
 
                     apiResult.Data = data;
@@ -201,7 +199,6 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferAccountManages" })]
         [HttpPost]
         public ApiResult SetTransferInfo(BankFinancialTransferInfoDetailModel bankFinancialTransferInfoDetail)
         {
@@ -225,6 +222,39 @@ namespace BackendSite.Controllers.Api
                     apiResult.ErrorCode = 500;
                 }
 
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.Message;
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult DeleteTransferInfoData(GetTransferInfoReq req)
+        {
+
+            var apiResult = new ApiResult<int>();
+
+            try
+            {
+                var result = _bankFinancialBLL.DeleteTransferInfo(req.TransferId);
+
+                if (result.Status)
+                {
+                    apiResult.Data = result.Count;
+                    apiResult.RawMessage = result.Message;
+                    apiResult.ErrorCode = 0;
+                }
+                else
+                {
+                    apiResult.Data = result.Count;
+                    apiResult.RawMessage = result.Message;
+                    apiResult.ErrorCode = 500;
+                }
             }
             catch (Exception ex)
             {

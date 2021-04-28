@@ -11,12 +11,57 @@ export default props => {
 	});
 
 	useEffect(() => {
+		let param = {
+			Url: "Common/AdminUserSiteList"
+		};
+		WebAPI.PostData(param).then(
+			res => {
+				if (isMountedRef.current) {
+					if (res.data.errorCode === 0) {
+						dispatch({
+							type: defActionType.SITE_SET_LIST,
+							siteList: res.data.data
+						});
+						dispatch({
+							type: defActionType.FROM_CURRENCY_SET_LIST,
+							siteList: res.data.data,
+							fromSiteId:props.Datas.fromSiteId
+						});
+						dispatch({
+							type: defActionType.TO_CURRENCY_SET_LIST,
+							siteList: res.data.data,
+							toSiteId:props.Datas.toSiteId
+						});
+						dispatch({
+							type: defActionType.FROM_BANK_SET_LIST,
+							fromCurrencyId:props.Datas.fromCurrencyId
+						});
+						dispatch({
+							type: defActionType.TO_BANK_SET_LIST,
+							toCurrencyId:props.Datas.toCurrencyId
+						});
+					} else {
+						alert(res.data.message ?? "failed to get data.");
+					}
+					props.action.setProcessing(false);
+				}
+			},
+			err => {
+				if (isMountedRef.current) {
+					alert("API Server Error.");
+					props.action.setProcessing(false);
+				}
+			}
+		);
+	}, []);
+
+	useEffect(() => {
 		if (!props.processing) {
 			if (isMountedRef.current) {
 				props.action.setProcessing(true);
 			}
 			let ReasonListParam = {
-				Url: "TransferAccountManage/GetTransferAccountReason"
+				Url: "TransferManage/GetTransferAccountReason"
 			};
 			WebAPI.PostData(ReasonListParam).then(
 				res => {
@@ -49,7 +94,7 @@ export default props => {
 				props.action.setProcessing(true);
 			}
 			let GetBankCodeListParam = {
-				Url: "TransferAccountManage/GetSysBankList"
+				Url: "TransferManage/GetSysBankList"
 			};
 			WebAPI.PostData(GetBankCodeListParam).then(
 				res => {
@@ -81,7 +126,7 @@ export default props => {
 				props.action.setProcessing(true);
 			}
 			let GetPayListParam = {
-				Url: "TransferAccountManage/GetPayList"
+				Url: "TransferManage/GetPayList"
 			};
 			WebAPI.PostData(GetPayListParam).then(
 				res => {
@@ -106,42 +151,77 @@ export default props => {
 			);
 		}
 	}, []);
-
+	
 	const [state, dispatch] = useReducer(
 		reducer,
-		initialState(props.Datas ,props.SetCurrencyList ,props.IsAdd)
+		initialState(props.Datas ,props.IsAdd)
 	);
 
 	const ClickSubmit = () => {
-		props.action.SetTransferAccount(state);
+		props.action.SetTransferInfo(state);
 	};
 
 	const EditMainValue = (value, dataColumn) => {
-		dispatch({ type: defActionType.MAIN_SET_VALUE, value, dataColumn });
+		dispatch({ 
+			type: defActionType.MAIN_SET_VALUE, 
+			value, 
+			dataColumn });
+	};
+
+	const EditSiteSelectBox = (value, dataColumn) => {
+		if(dataColumn == "fromSiteId")
+		{
+			dispatch({
+				type: defActionType.MAIN_SET_FROM_SITEID_VALUE,
+				value,
+				dataColumn
+			});
+		}
+		else
+		{
+			dispatch({
+				type: defActionType.MAIN_SET_TO_SITEID_VALUE,
+				value,
+				dataColumn
+			});
+		}
 	};
 
 	const EditCurrencySelectBox = (value, dataColumn) => {
-		dispatch({
-			type: defActionType.MAIN_SET_CURRENCY_VALUE,
-			value,
-			dataColumn
-		});
+		if(dataColumn=="fromCurrencyId")
+		{
+			dispatch({
+				type: defActionType.MAIN_SET_FROM_CURRENCY_VALUE,
+				value,
+				dataColumn
+			});
+		}else{
+			dispatch({
+				type: defActionType.MAIN_SET_TO_CURRENCY_VALUE,
+				value,
+				dataColumn
+			});
+		}
 	};
 
+	//OK
 	const EditChannelSelectBox = (value, dataColumn) => {
-		dispatch({
-			type: defActionType.MAIN_SET_CHANNEL_VALUE,
-			value,
-			dataColumn
-		});
-	};
-
-	const EditPurposeCheckBox = (value, dataColumn) => {
-		dispatch({
-			type: defActionType.MAIN_SET_PURPOSE_CHECKBOX,
-			value,
-			dataColumn
-		});
+		if(dataColumn=="fromChannel")
+		{
+			dispatch({
+				type: defActionType.MAIN_SET_FROM_CHANNEL_VALUE,
+				value,
+				dataColumn
+			});
+		}
+		else
+		{
+			dispatch({
+				type: defActionType.MAIN_SET_TO_CHANNEL_VALUE,
+				value,
+				dataColumn
+			});
+		}
 	};
 
 	return (
@@ -151,12 +231,12 @@ export default props => {
 			action={{
 				ClickSubmit,
 				EditMainValue,
-				EditPurposeCheckBox,
+				EditSiteSelectBox,
 				EditCurrencySelectBox,
 				EditChannelSelectBox,
 				ClickBack: props.action.ClickBack,
 			}}
-			IsAdd={props.IsAdd}
+			isAdd={props.IsAdd}
 			processing={props.processing}
 		/>
 	);

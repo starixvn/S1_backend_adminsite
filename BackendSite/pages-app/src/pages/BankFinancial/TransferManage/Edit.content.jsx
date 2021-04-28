@@ -1,0 +1,357 @@
+import React from "react";
+import InputBox from "./Component/InputBox";
+import DateTimePickerElem from "./Component/DateTimePicker";
+import SelectBox from "./Component/SelectBox";
+import RadioBox from "./Component/RadioBox";
+import TextBox from "./Component/TextBox";
+import moment from "moment";
+import { initChannelType,initSiteId, initTransferType } from "./defCols";
+
+export default ({ state, action, processing,isAdd }) => {	
+	// const currencyList = state.currencyList;
+	// const currencyOptions =[];
+	// currencyOptions.push({value:0,displayText:" - Select Currency -"});
+	// currencyList.map(i => {
+	// 	currencyOptions.push({
+	// 		value: Number(i),
+	// 		displayText: window.i18n[`lbl_Currency${i}`]
+	// 	});
+	// });
+	return (
+		<div className="container-fluid" id="Panel">
+			<div className="filter noBGcolor"></div>
+			<div className="panel level-1 mt-20">
+				<div
+					className="panel-title no-arrow"
+					style={{ justifyContent: "space-between" }}>
+					<span style={{ color: "white" }}>Transfer Info</span>
+				</div>
+			</div>
+			<div id="searchForm">
+				<div className="filter">
+				    <div className="row-flex">
+						<RadioBox
+							Title="Transfer Type"
+							Options={initTransferType}
+							OnChange={action.EditMainValue}
+							dataColumn="transferType"
+							Selected={state.transferType}
+							Disabled={!isAdd}
+						/>
+					</div>
+					<div className="row-flex">
+						<DateTimePickerElem
+							columnTitle="Trans Date"
+							dateTimePickerProps={{
+								defaultValue: moment(state.transDate).format('YYYY-MM-DD'),
+								timeFormat: false,
+								onBlur: e => {
+									try {
+										action.EditMainValue(
+											moment(e).format('YYYY-MM-DD'),
+											"transDate"
+										);
+									} catch (ex) { }
+								}
+							}}
+						/>
+					</div>
+					<div className="panel level-1 mt-20">
+						<div className="panel-title no-arrow" style={{ justifyContent: "space-between" }}>
+							<span style={{ color: "white" }}>From Data</span>
+						</div>
+					</div>
+					<div className="row-flex">
+						<SelectBox
+							Title="From Channel"
+							Options={initChannelType}
+							HandleChange={action.EditChannelSelectBox}
+							dataColumn="fromChannel"
+							SelectedValue={state.fromChannel}
+						/>
+						{state.fromChannel == 3 ?
+						<>
+						<SelectBox
+							Title="From Pay"
+							Options={state.payList}
+							HandleChange={action.EditMainValue}
+							dataColumn="fromPayId"
+							SelectedValue={state.fromPayId}
+						/>
+						</>
+						:
+						<>
+						<InputBox
+							Title="From Agent"
+							OnChange={action.EditMainValue}
+							dataColumn="fromAgent"
+							value={state.fromAgent}
+						/>
+						</>
+						}
+					</div>
+					<div className="row-flex">
+						<SelectBox
+							Title="From Site"
+							Options={initSiteId}
+							HandleChange={action.EditSiteSelectBox}
+							dataColumn="fromSiteId"
+							SelectedValue={state.fromSiteId}
+						/>
+						{state.fromSiteId == 0 ?
+						<>
+						</>
+						:
+						<>
+						<InputBox
+							Title="From CustId"
+							OnChange={action.EditMainValue}
+							dataColumn="fromCustId"
+							value={state.fromCustId}
+						/>
+						<InputBox
+							Title="From UserName"
+							OnChange={action.EditMainValue}
+							dataColumn="fromUserName"
+							value={state.fromUserName}
+						/>
+						</>
+						}
+					</div>
+					<div className="row-flex">
+				
+						<SelectBox
+							Title="From Currency"
+							Options={state.setFromCurrencyList}
+							HandleChange={action.EditCurrencySelectBox}
+							dataColumn="fromCurrencyId"
+							SelectedValue={state.fromCurrencyId}
+							mainKey={state.fromSiteId}
+						/>
+						<SelectBox
+							Title="From Bank Code"
+							Options={state.setFromBankCodeList}
+							HandleChange={action.EditMainValue}
+							dataColumn="fromSysId"
+							SelectedValue={state.fromSysId}
+						/> 
+					</div>
+					<div className="row-flex">
+						<InputBox
+							Title="From Account No."
+							OnChange={action.EditMainValue}
+							dataColumn="fromAccountNo"
+							value={state.fromAccountNo}
+						/>
+						<InputBox
+							Title="From Account Display Name"
+							OnChange={action.EditMainValue}
+							dataColumn="fromAccountDisplayName"
+							value={state.fromAccountDisplayName}
+						/>
+					</div>
+					<div className="row-flex">
+						<InputBox
+							Title="From Amount"
+							OnChange={action.EditMainValue}
+							dataColumn="fromAmount"
+							value={state.fromAmount}
+							type="number"
+						/>
+						<InputBox
+							Title="From Fee"
+							OnChange={action.EditMainValue}
+							dataColumn="fromFee"
+							value={state.fromFee}
+							type="number"
+						/>
+					</div>
+					<div className="panel level-1 mt-20">
+						<div className="panel-title no-arrow" style={{ justifyContent: "space-between" }}>
+							<span style={{ color: "white" }}>To Data</span>
+						</div>
+					</div>
+					<div className="row-flex">
+						<SelectBox
+							Title="To Channel"
+							Options={initChannelType}
+							HandleChange={action.EditChannelSelectBox}
+							dataColumn="toChannel"
+							SelectedValue={state.toChannel}
+						/>
+						{state.toChannel == 3 ?
+						<>
+						<SelectBox
+							Title="To Pay"
+							Options={state.payList}
+							HandleChange={action.EditMainValue}
+							dataColumn="toPayId"
+							SelectedValue={state.toPayId}
+						/>
+						</>
+						:
+						<>
+						<InputBox
+							Title="To Agent"
+							OnChange={action.EditMainValue}
+							dataColumn="toAgent"
+							value={state.toAgent}
+						/>
+						</>
+						}
+					</div>
+					<div className="row-flex">
+						<SelectBox
+							Title="To Site"
+							Options={initSiteId}
+							HandleChange={action.EditSiteSelectBox}
+							dataColumn="toSiteId"
+							SelectedValue={state.toSiteId}
+						/>
+						{state.toSiteId == 0 ?
+						<>
+						</>
+						:
+						<>
+						<InputBox
+							Title="To CustId"
+							OnChange={action.EditMainValue}
+							dataColumn="toCustId"
+							value={state.toCustId}
+						/>
+						<InputBox
+							Title="To UserName"
+							OnChange={action.EditMainValue}
+							dataColumn="toUserName"
+							value={state.toUserName}
+						/>
+						</>
+						}
+					</div>
+					<div className="row-flex">
+				
+						<SelectBox
+							Title="To Currency"
+							Options={state.setToCurrencyList}
+							HandleChange={action.EditCurrencySelectBox}
+							dataColumn="toCurrencyId"
+							SelectedValue={state.toCurrencyId}
+							mainKey={state.toSiteId}
+						/>
+						<SelectBox
+							Title="To Bank Code"
+							Options={state.setToBankCodeList}
+							HandleChange={action.EditMainValue}
+							dataColumn="toSysId"
+							SelectedValue={state.toSysId}
+						/> 
+					</div>
+					<div className="row-flex">
+						<InputBox
+							Title="To Account No."
+							OnChange={action.EditMainValue}
+							dataColumn="toAccountNo"
+							value={state.toAccountNo}
+						/>
+						<InputBox
+							Title="To Account Display Name"
+							OnChange={action.EditMainValue}
+							dataColumn="toAccountDisplayName"
+							value={state.toAccountDisplayName}
+						/>
+					</div>
+					<div className="row-flex">
+						<InputBox
+							Title="To Amount"
+							OnChange={action.EditMainValue}
+							dataColumn="toAmount"
+							value={state.toAmount}
+							type="number"
+						/>
+						<InputBox
+							Title="To Fee"
+							OnChange={action.EditMainValue}
+							dataColumn="toFee"
+							value={state.toFee}
+							type="number"
+						/>
+					</div>
+					<hr></hr>
+					<div className="row-flex">
+						<SelectBox
+							Title="Reason"
+							Options={state.reasonList}
+							HandleChange={action.EditMainValue}
+							dataColumn="reason"
+							SelectedValue={state.reason}
+						/>
+					</div>
+					<div className="row-flex">
+						<TextBox
+							Title="Remark"
+							OnChange={action.EditMainValue}
+							dataColumn="remark"
+							value={state.remark}
+						/>
+					</div>
+					<hr></hr>
+					<div className="row-flex">
+						<InputBox
+							Title="Create Time"
+							OnChange={action.EditMainValue}
+							dataColumn="createTime"
+							value={state.createTime}
+							Disabled={true}
+						/>
+						<InputBox
+							Title="Creator"
+							OnChange={action.EditMainValue}
+							dataColumn="creatorName"
+							value={state.creatorName}
+							Disabled={true}
+						/>
+					</div>
+					<div className="row-flex">
+						<InputBox
+							Title="Update Time"
+							OnChange={action.EditMainValue}
+							dataColumn="updateTime"
+							value={state.updateTime}
+							Disabled={true}
+						/>
+						<InputBox
+							Title="Updator"
+							OnChange={action.EditMainValue}
+							dataColumn="updatorName"
+							value={state.updatorName}
+							Disabled={true}
+						/>
+					</div>
+					<div className="row-flex">
+						<InputBox
+							Title="TransferId"
+							OnChange={action.EditMainValue}
+							dataColumn="transferId"
+							value={state.transferId}
+							Disabled={true}
+						/>
+					</div>
+				</div>
+			</div>
+			<div className="filter float-btn-group">
+				<button
+					className="btn btn-back"
+					onClick={action.ClickBack}
+					disabled={processing}>
+					Back
+				</button>
+				<button
+					className="btn btn-add"
+					onClick={action.ClickSubmit}
+					disabled={processing}>
+					Submit
+				</button>
+			</div>
+		</div>
+	);
+};

@@ -1,9 +1,10 @@
 export const defActionType = {
   SET_SITE_LIST: "SET_SITE_LIST",
-  SET_TRANSFER_ACCOUNT_LIST: "SET_TRANSFER_ACCOUNT_LIST",
-  GOTO_ADD_TRANSFER_ACCOUNT: "GOTO_ADD_TRANSFER_ACCOUNT",
-  SET_TRANSFER_ACCOUNT: "SET_TRANSFER_ACCOUNT",
-  EDIT_TRANSFER_ACCOUNT: "EDIT_TRANSFER_ACCOUNT",
+  SET_REASON_LIST: "SET_REASON_LIST",
+  SET_TRANSFER_INFO_LIST: "SET_TRANSFER_INFO_LIST",
+  GOTO_ADD_TRANSFER_INFO: "GOTO_ADD_TRANSFER_INFO",
+  SET_TRANSFER_INFO: "SET_TRANSFER_INFO",
+  EDIT_TRANSFER_INFO: "EDIT_TRANSFER_INFO",
   CLICK_BACK: "CLICK_BACK",
 };
 
@@ -14,46 +15,45 @@ export const defPanelType = {
 };
 
 export const initState = {
-  transferAccountData: [],
-  transferAccountList: [],
+  transferInfoData: [],
+  transferInfoList: [],
+  reasonList: [],
   siteList: [],
-  setSite: "",
-  setCurrencyList: [],
   panelType: defPanelType.Main,
 };
 
 export function reducer(state, action) {
   switch (action.type) {
-    case defActionType.SET_SITE_LIST:
+    case defActionType.SET_REASON_LIST:
       return {
         ...state,
-        siteList: action.siteList,
+        reasonList: action.reasonList,
       };
-    case defActionType.SET_TRANSFER_ACCOUNT_LIST:
+    case defActionType.SET_TRANSFER_INFO_LIST:
       return {
         ...state,
-        transferAccountList: action.transferAccountList,
+        transferInfoList: action.transferInfoList,
         setSite: action.setSite,
         setCurrencyList: action.setCurrencyList,
       };
 
-    case defActionType.SET_TRANSFER_ACCOUNT:
+    case defActionType.SET_TRANSFER_INFO:
       return {
         ...state,
         panelType: defPanelType.Main,
       };
 
-    case defActionType.GOTO_ADD_TRANSFER_ACCOUNT:
+    case defActionType.GOTO_ADD_TRANSFER_INFO:
       return {
         ...state,
-        transferAccountData: action.transferAccountData,
+        transferInfoData: action.transferInfoData,
         panelType: defPanelType.Add,
       };
 
-    case defActionType.EDIT_TRANSFER_ACCOUNT:
+    case defActionType.EDIT_TRANSFER_INFO:
       return {
         ...state,
-        transferAccountData: action.transferAccountData,
+        transferInfoData: action.transferInfoData,
         panelType: defPanelType.Edit,
       };
 
@@ -61,6 +61,7 @@ export function reducer(state, action) {
       return {
         ...state,
         panelType: defPanelType.Main,
+        transferInfoList: [],
       };
 
     default:

@@ -37,15 +37,6 @@ namespace BackendSite.Service.Model
         }
 
         /// <summary>
-        /// 讀寫 加項或減項
-        /// </summary>
-        public PlusOrMinusEnum PlusOrMinus
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// 讀寫 交易日期
         /// </summary>
         public string TransDate
@@ -113,7 +104,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 客戶ID
         /// </summary>
-        public int FromCustId
+        public int? FromCustId
         {
             get;
             set;
@@ -261,7 +252,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 客戶ID
         /// </summary>
-        public int ToCustId
+        public int? ToCustId
         {
             get;
             set;

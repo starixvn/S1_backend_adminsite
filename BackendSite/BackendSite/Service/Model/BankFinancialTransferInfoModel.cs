@@ -110,7 +110,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 客戶ID
         /// </summary>
-        public int CustId
+        public int? CustId
         {
             get;
             set;

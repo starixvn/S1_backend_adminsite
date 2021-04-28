@@ -88,8 +88,11 @@ const VipUpgrade = lazy(() => import("./pages/Marketing/VipUpgrade/index"));
 const LatestHighlightVideoManagement = lazy(() =>
   import("./pages/Marketing/LatestHighlightVideoManagement/index")
 );
+const TransferManage = lazy(() =>
+  import("./pages/BankFinancial/TransferManage/index")
+);
 
-export const defaultPage = "TransferAccountManage";
+export const defaultPage = "TransferManage";
 
 export const layoutType = {
   N88: "N88",
@@ -545,6 +548,19 @@ export const pages = {
     comp: (
       <Suspense fallback="loading...">
         <LatestHighlightVideoManagement />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  TransferManage: {
+    comp: (
+      <Suspense fallback="loading...">
+        <TransferManage />
       </Suspense>
     ),
     css: [

@@ -369,7 +369,7 @@ namespace BackendSite.Service.BLL
                 PayId = bankFinancialTransferInfoDetail.FromPayId == 0 ? null : bankFinancialTransferInfoDetail.FromPayId,
                 SiteId = bankFinancialTransferInfoDetail.FromSiteId,
                 SiteName = bankFinancialTransferInfoDetail.FromSiteName == "" ? null : bankFinancialTransferInfoDetail.FromSiteName,
-                CustId = bankFinancialTransferInfoDetail.FromCustId,
+                CustId = bankFinancialTransferInfoDetail.FromCustId == 0 ? null : bankFinancialTransferInfoDetail.FromCustId,
                 CurrencyId = bankFinancialTransferInfoDetail.FromCurrencyId,
                 SysId = bankFinancialTransferInfoDetail.FromSysId,
                 AccountNo = bankFinancialTransferInfoDetail.FromAccountNo,
@@ -396,7 +396,7 @@ namespace BackendSite.Service.BLL
                 PayId = bankFinancialTransferInfoDetail.ToPayId == 0 ? null : bankFinancialTransferInfoDetail.ToPayId,
                 SiteId = bankFinancialTransferInfoDetail.ToSiteId,
                 SiteName = bankFinancialTransferInfoDetail.ToSiteName == "" ? null : bankFinancialTransferInfoDetail.ToSiteName,
-                CustId = bankFinancialTransferInfoDetail.ToCustId,
+                CustId = bankFinancialTransferInfoDetail.ToCustId == 0 ? null : bankFinancialTransferInfoDetail.ToCustId,
                 CurrencyId = bankFinancialTransferInfoDetail.ToCurrencyId,
                 SysId = bankFinancialTransferInfoDetail.ToSysId,
                 AccountNo = bankFinancialTransferInfoDetail.ToAccountNo,
@@ -497,6 +497,131 @@ namespace BackendSite.Service.BLL
             return (status, count, message);
         }
 
+        public (bool Status, int Count, string Message) DeleteTransferInfo(string transferId)
+        {
+
+            bool status = false;
+            int count = 0;
+            string message = string.Empty;
+
+            if (transferId != null)
+            {
+                //Step1:Get Data
+                IEnumerable<BankFinancialTransferInfoDetailModel> getdata = _bankFinancialService.GetTransferInfoList(true,
+                                                             null,
+                                                             null,
+                                                             null,
+                                                             null,
+                                                             null,
+                                                             null,
+                                                             null,
+                                                             null,
+                                                             transferId);
+
+                BankFinancialTransferInfoDetailModel data = new BankFinancialTransferInfoDetailModel();
+
+                if (getdata.Count()==1)
+                {
+                    data = getdata.FirstOrDefault();
+                }
+
+                BankFinancialTransferInfoModel dataFromModel = new BankFinancialTransferInfoModel
+                {
+                    TransferId = data.TransferId,
+                    TransactionType = data.TransactionType,
+                    TransferType = data.TransferType,
+                    PlusOrMinus = PlusOrMinusEnum.Minus,
+                    TransDate = data.TransDate,
+                    Channel = data.FromChannel,
+                    Agent = data.FromAgent == "" ? null : data.FromAgent,
+                    PayId = data.FromPayId == 0 ? null : data.FromPayId,
+                    SiteId = data.FromSiteId,
+                    SiteName = data.FromSiteName == "" ? null : data.FromSiteName,
+                    CustId = data.FromCustId == 0 ? null : data.FromCustId,
+                    CurrencyId = data.FromCurrencyId,
+                    SysId = data.FromSysId,
+                    AccountNo = data.FromAccountNo,
+                    AccountDisplayName = data.FromAccountDisplayName,
+                    Amount = data.FromAmount,
+                    Fee = data.FromFee,
+                    Reason = data.Reason,
+                    Remark = data.Remark,
+                    CreateTime = data.CreateTime,
+                    Creator = data.Creator,
+                    UpdateTime = data.UpdateTime,
+                    Updator = data.Updator
+                };
+
+                BankFinancialTransferInfoModel dataToModel = new BankFinancialTransferInfoModel
+                {
+                    TransferId = data.TransferId,
+                    TransactionType = data.TransactionType,
+                    TransferType = data.TransferType,
+                    PlusOrMinus = PlusOrMinusEnum.Plus,
+                    TransDate = data.TransDate,
+                    Channel = data.ToChannel,
+                    Agent = data.ToAgent == "" ? null : data.ToAgent,
+                    PayId = data.ToPayId == 0 ? null : data.ToPayId,
+                    SiteId = data.ToSiteId,
+                    SiteName = data.ToSiteName == "" ? null : data.ToSiteName,
+                    CustId = data.ToCustId == 0 ? null : data.ToCustId,
+                    CurrencyId = data.ToCurrencyId,
+                    SysId = data.ToSysId,
+                    AccountNo = data.ToAccountNo,
+                    AccountDisplayName = data.ToAccountDisplayName,
+                    Amount = data.ToAmount,
+                    Fee = data.ToFee,
+                    Reason = data.Reason,
+                    Remark = data.Remark,
+                    CreateTime = data.CreateTime,
+                    Creator = data.Creator,
+                    UpdateTime = data.UpdateTime,
+                    Updator = data.Updator
+                };
+
+                //Step2:Insert Log
+
+
+                //Step3:Delete Data
+
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    if (_bankFinancialService.InsertTransferInfoLog(ActionType.Delete, dataFromModel) != 1)
+                    {
+                        scope.Dispose();
+
+                        return (status, count, "Insert Transfer Info Log Minus Data Fail.");
+                    }
+
+                    if (_bankFinancialService.InsertTransferInfoLog(ActionType.Delete, dataToModel) != 1)
+                    {
+                        scope.Dispose();
+
+                        return (status, count, "Insert Transfer Info Log Plus Data Fail.");
+                    }
+
+                    if (_bankFinancialService.DeleteTransferInfo(transferId) != 1)
+                    {
+                        scope.Dispose();
+
+                        return (status, count, "Delete Transfer Info Data Fail.");
+                    }
+
+                    scope.Complete();
+
+                    count = 1;
+                }
+                status = true;
+                message = "Delete Transfer Info Success.";
+            }
+            else
+            {
+                return (status, count, "Delete Transfer Info Data Fail.TransferId is null.");
+            }
+
+            return (status, count, message);
+
+        }
 
         #region Private Methods For GetTransferAccountInfoList
 
@@ -585,7 +710,6 @@ namespace BackendSite.Service.BLL
         }
 
         #endregion
-
 
     }
 }

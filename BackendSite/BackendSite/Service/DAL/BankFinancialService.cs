@@ -341,5 +341,21 @@ namespace BackendSite.Service.DAL
             }
         }
 
+        public int DeleteTransferInfo(string transferId)
+        {
+
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                    _TransferId = transferId
+                });
+
+                string SpName = "Admin_BankFinancialTransferInfo_Del";
+                return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
+
     }
 }
