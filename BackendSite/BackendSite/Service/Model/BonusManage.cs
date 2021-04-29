@@ -31,6 +31,7 @@ namespace BackendSite.Service.Model
         public bool OnlyRegistered { get; set; }
         public int PromotionDeviceType { get; set; }
         public int? PromotionAction { get; set; }
+        public int AutoExtend { get; set; }
     }
 
     public class PromotionSpecific
