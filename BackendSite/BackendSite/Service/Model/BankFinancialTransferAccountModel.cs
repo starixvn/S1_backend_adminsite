@@ -27,6 +27,15 @@ namespace BackendSite.Service.Model
         }
 
         /// <summary>
+        /// 讀寫 網站名稱
+        /// </summary>
+        public string SiteName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// 讀寫 幣別Id
         /// </summary>
         public int CurrencyId
