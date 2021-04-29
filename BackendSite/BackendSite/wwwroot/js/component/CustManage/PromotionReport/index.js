@@ -103,7 +103,6 @@ const Panel = () => {
             //Loading.UnLoading();
             let result = response.data;
             if (result.errorCode == 0) {
-              console.log(123)
               onSubmit();
             } else {
               alert(result.message);
