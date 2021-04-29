@@ -6,7 +6,7 @@ import DateTimePickerElem from "./Component/DateTimePicker";
 import moment from "moment";
 import RadioBox from "./Component/RadioBox";
 import RichText from "./Component/RichText.jsx";
-import { initWalletType, initPromotionType, initWeekOptions, initPeriodType, weekOptions, initSpecialBonusPromotionType, specialBonusOptions, onlyRegisteredBonusOptions, initPromotionDeviceType, initPromotionAction } from "./defCols";
+import { initWalletType, initPromotionType, initWeekOptions, initPeriodType, weekOptions, initSpecialBonusPromotionType, specialBonusOptions, onlyRegisteredBonusOptions, initPromotionDeviceType, initPromotionAction, AutoExtendOptions } from "./defCols";
 import { defActionType } from "./Edit.reducer";
 
 const initBonusAmountType = promoType => {
@@ -206,6 +206,14 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 							OnChange={action.EditMainValue}
 							dataColumn="sort"
 							value={state.sort}
+						/>
+						<CheckBox
+							Options={AutoExtendOptions}
+							Title=""
+							OnChange={action.EditAutoExtendValue}
+							dataColumn="AutoExtend"
+							Selected={state.autoExtend}
+							mainKey={state.siteId}
 						/>
 					</div>
 					<InputBox

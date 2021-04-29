@@ -97,7 +97,9 @@ const VipRebateInfoReport = lazy(() =>
 const WithdrawalLimitManage = lazy(() =>
   import("./pages/Finance/WithdrawalLimitManage/index")
 );
-export const defaultPage = "TransferManage";
+
+export const defaultPage = "BonusManage";
+
 
 export const layoutType = {
   N88: "N88",
