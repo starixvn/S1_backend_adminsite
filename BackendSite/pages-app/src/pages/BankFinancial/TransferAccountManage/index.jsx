@@ -95,6 +95,10 @@ const App = () => {
 			if (isMountedRef.current) {
 				setProcessing(true);
 			}
+			if(siteId===null || siteId==="")
+			{
+				siteId=0;
+			}
 			let transferAccountData = {};
 			try {
 				const res = await WebAPI.PostData({
@@ -169,6 +173,7 @@ const App = () => {
 			let _account = {
 				Id:account.id,
 				SiteId: Number(account.siteId),
+				SiteName:account.siteName,
 				CurrencyId: Number(account.currencyId),
 				SysId: Number(account.sysId),
 				Purpose: a,

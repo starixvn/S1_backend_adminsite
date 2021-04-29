@@ -25,8 +25,8 @@ module.exports = {
     // 	"./src/pages/Administration/GroupAuthoritySetting/index.js"
     // ],
     "Report/LicenseeWinLost.min": [
-    	// '@babel/polyfill',
-    	"./src/pages/Report/LicenseeWinLost/index.js"
+      // '@babel/polyfill',
+      "./src/pages/Report/LicenseeWinLost/index.js",
     ],
     // "Finance/PaymentAdjustmentReport.min": [
     // 	// '@babel/polyfill',
@@ -153,9 +153,17 @@ module.exports = {
     // 	"./src/pages/Marketing/VipRebateInfoReport/index.js"
     // ],
     "Finance/WithdrawalLimitManage.min": [
-    	// '@babel/polyfill',
-    	"./src/pages/Finance/WithdrawalLimitManage/index.js"
+      // '@babel/polyfill',
+      "./src/pages/Finance/WithdrawalLimitManage/index.js",
     ],
+    "BankFinancial/TransferManage.min": [
+      "@babel/polyfill",
+      "./src/pages/BankFinancial/TransferManage/index.jsx",
+    ],
+    // "Marketing/VipRebateInfoReport.min": [
+    // 	 '@babel/polyfill',
+    // 	"./src/pages/Marketing/VipRebateInfoReport/index.js"
+    // ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
