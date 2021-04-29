@@ -24,8 +24,9 @@ namespace BackendSite.Controllers.Api
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly AdminBLL adminBLL;
         private readonly HomeBLL homeBLL;
+        private readonly DashBoardBLL dashBoardBLL;
 
-        public HomeController(SelLangBLL selLangBLL, AuthorizeBLL authorizeBLL, Tools tools, ServerInfoBLL serverInfoBLL, AdminBLL adminBLL, HomeBLL homeBLL)
+        public HomeController(SelLangBLL selLangBLL, AuthorizeBLL authorizeBLL, Tools tools, ServerInfoBLL serverInfoBLL, AdminBLL adminBLL, HomeBLL homeBLL, DashBoardBLL dashBoardBLL)
         {
             this.selLangBLL = selLangBLL;
             this.authorizeBLL = authorizeBLL;
@@ -33,6 +34,7 @@ namespace BackendSite.Controllers.Api
             this.serverInfoBLL = serverInfoBLL;
             this.adminBLL = adminBLL;
             this.homeBLL = homeBLL;
+            this.dashBoardBLL = dashBoardBLL;
         }
         public class LoginModel
         {
@@ -196,6 +198,20 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = 999;
             }
+
+            return apiResult;
+        }
+        public class DashBoardPara
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int BaseCurrencyId { get; set; }
+        }
+        [HttpPost]
+        public ApiResult<DashBoardData> GetDashBoardData(DashBoardPara para)
+        {
+            var apiResult = new ApiResult<DashBoardData>();
+            dashBoardBLL.GetDashBoardData(para.SiteId,para.CurrencyId,para.BaseCurrencyId);
 
             return apiResult;
         }
