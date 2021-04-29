@@ -63,6 +63,8 @@ const App = () => {
 	}, []);
 
 	const Filter_OnChange = (v, dataColumn) => {
+		console.log("v",v);
+		console.log("dataColumn",dataColumn);
 		setFilter({
 		  ...stateFilter,
 		  [dataColumn]: v,
@@ -74,13 +76,14 @@ const App = () => {
 			if (isMountedRef.current) {
 				setProcessing(true);
 			}
+			console.log(stateFilter);
 			let param = {
 				Url: "TransferManage/GetTransferInfoList",
 				Data: {
-					TransferType: stateFilter.TransferType,
+					TransferType: Number(stateFilter.TransferType),
                     TransFromDate: moment(stateFilter.FromDate).format('YYYY-MM-DD'),
                     TransToDate: moment(stateFilter.ToDate).format('YYYY-MM-DD'),
-				    Reason: stateFilter.Reason,
+				    Reason:  Number(stateFilter.Reason),
                     FromAccountNo: stateFilter.FromAccountNo,
 				    FromAccountDisplayName: stateFilter.FromAccountDisplayName,
 				    ToAccountNo: stateFilter.ToAccountNo,
@@ -187,9 +190,11 @@ const App = () => {
 			if (isMountedRef.current) {
 				setProcessing(true);
 			}
+			console.log(info);
 			let _info = {
 				TransferId:info.transferId,
 				TransferType:Number(info.transferType),
+				TransactionType:Number(info.transactionType),
 				TransDate:info.transDate,
 
 				FromChannel: Number(info.fromChannel),
@@ -319,7 +324,6 @@ const App = () => {
 			});
 		}
 	};
-
 
 	const ClickBack = () => {
 		dispatch({ type: defActionType.CLICK_BACK });

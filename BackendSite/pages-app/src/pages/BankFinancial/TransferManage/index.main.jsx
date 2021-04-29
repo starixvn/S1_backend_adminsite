@@ -337,12 +337,12 @@ export default ({
 							onClick={ClickCreateTransferInfo.bind(null, setSite)}
 						>Create
 						</button>
-						<button
+						{/* <button
 							className="btn btn-approved"
 							style={{ marginBottom: "20px" }}
 							onClick={ClickExportTransferInfo.bind(null, setSite)}
 						>Export Excel
-						</button>
+						</button> */}
 						<div className="table">
 							<table className="table table-striped">
 								<thead>
@@ -364,16 +364,6 @@ const ActionButtons = props => {
 				<i className="icon-edit"></i>
 			</button>
 			<button className="btn btn-delete" onClick={props.clickDelete}>
-				<i className="icon-delete"></i>
-			</button>
-		</div>
-	);
-};
-
-const DeleteActionButtons = props => {
-	return (
-		<div className="button-action" onClick={props.clickDelete}>
-			<button className="btn btn-delete">
 				<i className="icon-delete"></i>
 			</button>
 		</div>

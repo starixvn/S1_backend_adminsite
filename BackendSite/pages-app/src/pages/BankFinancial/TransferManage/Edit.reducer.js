@@ -1,6 +1,9 @@
 export const defActionType = {
   MAIN_SET_VALUE: "MAIN_SET_VALUE",
 
+  MAIN_SET_TRANSFERTYPE_VALUE: "MAIN_SET_TRANSFERTYPE_VALUE",
+  //MAIN_SET_TRANSACTIONTYPE_VALUE: "MAIN_SET_TRANSACTIONTYPE_VALUE",
+
   MAIN_SET_FROM_CHANNEL_VALUE: "MAIN_SET_FROM_CHANNEL_VALUE",
   MAIN_SET_FROM_SITEID_VALUE: "MAIN_SET_FROM_SITEID_VALUE",
   MAIN_SET_FROM_CURRENCY_VALUE: "MAIN_SET_FROM_CURRENCY_VALUE",
@@ -21,24 +24,14 @@ export const defActionType = {
   REASON_SET_LIST: "REASON_SET_LIST",
 };
 
-export const initialState = (
-  datas,
-  setFromSiteList,
-  setFromCurrencyList,
-  setFromBankList,
-  setToSiteList,
-  setToCurrencyList,
-  setToBankList,
-  isAdd
-) => {
+export const initialState = (datas, isAdd) => {
   if (isAdd) {
   }
-
-  console.log("datas", datas);
 
   return {
     transferId: datas.transferId,
     transferType: datas.transferType,
+    transactionType: datas.transactionType,
     transDate: datas.transDate,
 
     //From Data
@@ -99,6 +92,28 @@ export function reducer(state, action) {
         ...state,
         [action.dataColumn]: action.value,
       };
+
+    case defActionType.MAIN_SET_TRANSFERTYPE_VALUE:
+      let defaultTransactionType = 0;
+      if (action.value != 4) {
+        defaultTransactionType = 3;
+      }
+      return {
+        ...state,
+        [action.dataColumn]: action.value,
+        transactionType: defaultTransactionType,
+      };
+
+    // case defActionType.MAIN_SET_TRANSACTIONTYPE_VALUE:
+    //   let defaultTransactionType = 0;
+    //   if (action.value == 1) {
+    //     defaultTransactionType = 3;
+    //   }
+    //   return {
+    //     ...state,
+    //     [action.dataColumn]: action.value,
+    //     transactionType: defaultTransactionType,
+    //   };
 
     case defActionType.MAIN_SET_FROM_SITEID_VALUE:
       let getFromSiteId = null;
@@ -421,7 +436,6 @@ export function reducer(state, action) {
         ...state,
         [action.dataColumn]: action.value,
         bankCodeList: bankList,
-        setBankCodeList: defaultBankList,
       };
 
     case defActionType.PAY_SET_LIST:

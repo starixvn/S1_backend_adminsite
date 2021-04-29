@@ -212,13 +212,13 @@ namespace BackendSite.Controllers.Api
                 if (result.Status)
                 {
                     apiResult.Data = result.Count;
-                    apiResult.RawMessage = result.Message;
+                    apiResult.Message = result.Message;
                     apiResult.ErrorCode = 0;
                 }
                 else
                 {
                     apiResult.Data = result.Count;
-                    apiResult.RawMessage = result.Message;
+                    apiResult.Message = result.Message;
                     apiResult.ErrorCode = 500;
                 }
 

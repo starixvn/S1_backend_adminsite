@@ -31,3 +31,13 @@ export const initSiteId = [
   { value: 2, displayText: "Goal123" },
   { value: 3, displayText: "Bwing" },
 ];
+
+export const defTransactionType = {
+  1: "Only Plus",
+  2: "Only Minus",
+};
+
+export const initTransactionType = [
+  { value: 1, displayText: defTransactionType[1] },
+  { value: 2, displayText: defTransactionType[2] },
+];

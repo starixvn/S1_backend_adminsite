@@ -48,6 +48,8 @@ namespace BackendSite.Service.BLL
 
         #endregion
 
+        #region Transfer Account Management
+
         public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoListForDisplay(bool isSetting, int siteId, int id)
         {
             return ConvertForDisplay(_bankFinancialService.GetTransferAccountInfoList(isSetting, siteId, id));
@@ -147,6 +149,94 @@ namespace BackendSite.Service.BLL
 
             return (status, count, message);
         }
+
+        #region Private Methods For GetTransferAccountInfoList
+
+        private IEnumerable<BankFinancialTransferAccountDetailModel> ConvertForDisplay(IEnumerable<BankFinancialTransferAccountDetailModel> datas)
+        {
+
+            foreach (var data in datas.ToArray())
+            {
+
+                data.CreateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.CreateTime);
+                data.UpdateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.UpdateTime);
+            }
+
+            return datas;
+
+        }
+
+        private IEnumerable<BankFinancialTransferAccountDetailModel> ConvertForExport(IEnumerable<BankFinancialTransferAccountDetailModel> datas)
+        {
+
+            foreach (var data in datas.ToArray())
+            {
+
+                data.Purpose = GetPurpose(data.Purpose);
+
+                data.CreateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.CreateTime);
+                data.UpdateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.UpdateTime);
+            }
+
+            return datas;
+
+        }
+
+        private string GetTimeZoneDateTimeByDateString(int siteId, string datetime)
+        {
+            int timeZone = (siteId == 2 || siteId == 3) ? 7 : 8;
+            return Convert.ToDateTime(datetime).AddHours(timeZone).ToString("yyyy-MM-dd HH:mm:ss");
+        }
+
+        private string GetPurpose(string purpose)
+        {
+            string result = string.Empty;
+
+            IEnumerable<int> purposeList = purpose.Split(',').Select(int.Parse).ToList();
+
+            foreach (int i in purposeList)
+            {
+                switch (i)
+                {
+                    case 1: result = result + ",Deposit"; break;
+                    case 2: result = result + ",Withdrawal"; break;
+                    case 3: result = result + ",Transfer"; break;
+                }
+
+            }
+
+            return result.Substring(1);
+        }
+
+        private string GetTransferId(TransferTypeEnum transferType)
+        {
+            string prefix = string.Empty;
+            string nowDate = string.Empty;
+            string nowMaxNo = string.Empty;
+
+            switch (transferType)
+            {
+                case TransferTypeEnum.Deposit:
+                    prefix = "D";
+                    break;
+                case TransferTypeEnum.Withdrawal:
+                    prefix = "W";
+                    break;
+                case TransferTypeEnum.Transfer:
+                    prefix = "T";
+                    break;
+                case TransferTypeEnum.Other:
+                    prefix = "R";
+                    break;
+            }
+
+            (nowDate, nowMaxNo) = _bankFinancialService.NoAssign(prefix);
+
+            return prefix + nowDate + nowMaxNo.PadLeft(4, '0');
+
+        }
+
+        #endregion
 
         #region Private Methods Set TransferAccount
 
@@ -328,6 +418,10 @@ namespace BackendSite.Service.BLL
 
         #endregion
 
+        #endregion
+
+        #region Transfer Info Management
+
         public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoList(bool isSetting,
                                                                                      TransferTypeEnum? transferType,
                                                                                      string transFromDate,
@@ -357,99 +451,83 @@ namespace BackendSite.Service.BLL
             int count = 0;
             string message = string.Empty;
 
-            BankFinancialTransferInfoModel transferInfoFromModel = new BankFinancialTransferInfoModel
-            {
-                TransferId = bankFinancialTransferInfoDetail.TransferId,
-                TransactionType = bankFinancialTransferInfoDetail.TransactionType,
-                TransferType = bankFinancialTransferInfoDetail.TransferType,
-                PlusOrMinus = PlusOrMinusEnum.Minus,
-                TransDate = bankFinancialTransferInfoDetail.TransDate,
-                Channel = bankFinancialTransferInfoDetail.FromChannel,
-                Agent = bankFinancialTransferInfoDetail.FromAgent == "" ? null : bankFinancialTransferInfoDetail.FromAgent,
-                PayId = bankFinancialTransferInfoDetail.FromPayId == 0 ? null : bankFinancialTransferInfoDetail.FromPayId,
-                SiteId = bankFinancialTransferInfoDetail.FromSiteId,
-                SiteName = bankFinancialTransferInfoDetail.FromSiteName == "" ? null : bankFinancialTransferInfoDetail.FromSiteName,
-                CustId = bankFinancialTransferInfoDetail.FromCustId == 0 ? null : bankFinancialTransferInfoDetail.FromCustId,
-                CurrencyId = bankFinancialTransferInfoDetail.FromCurrencyId,
-                SysId = bankFinancialTransferInfoDetail.FromSysId,
-                AccountNo = bankFinancialTransferInfoDetail.FromAccountNo,
-                AccountDisplayName = bankFinancialTransferInfoDetail.FromAccountDisplayName,
-                Amount = bankFinancialTransferInfoDetail.FromAmount,
-                Fee = bankFinancialTransferInfoDetail.FromFee,
-                Reason = bankFinancialTransferInfoDetail.Reason,
-                Remark = bankFinancialTransferInfoDetail.Remark,
-                CreateTime = bankFinancialTransferInfoDetail.CreateTime,
-                Creator = bankFinancialTransferInfoDetail.Creator,
-                UpdateTime = bankFinancialTransferInfoDetail.UpdateTime,
-                Updator = bankFinancialTransferInfoDetail.Updator
-            };
+            #region Checnk Parameter
 
-            BankFinancialTransferInfoModel transferInfoToModel = new BankFinancialTransferInfoModel
+            if (!CheckSharedParameterForSetTransferInfo(bankFinancialTransferInfoDetail, out message))
             {
-                TransferId = bankFinancialTransferInfoDetail.TransferId,
-                TransactionType = bankFinancialTransferInfoDetail.TransactionType,
-                TransferType = bankFinancialTransferInfoDetail.TransferType,
-                PlusOrMinus = PlusOrMinusEnum.Plus,
-                TransDate = bankFinancialTransferInfoDetail.TransDate,
-                Channel = bankFinancialTransferInfoDetail.ToChannel,
-                Agent = bankFinancialTransferInfoDetail.ToAgent == "" ? null : bankFinancialTransferInfoDetail.ToAgent,
-                PayId = bankFinancialTransferInfoDetail.ToPayId == 0 ? null : bankFinancialTransferInfoDetail.ToPayId,
-                SiteId = bankFinancialTransferInfoDetail.ToSiteId,
-                SiteName = bankFinancialTransferInfoDetail.ToSiteName == "" ? null : bankFinancialTransferInfoDetail.ToSiteName,
-                CustId = bankFinancialTransferInfoDetail.ToCustId == 0 ? null : bankFinancialTransferInfoDetail.ToCustId,
-                CurrencyId = bankFinancialTransferInfoDetail.ToCurrencyId,
-                SysId = bankFinancialTransferInfoDetail.ToSysId,
-                AccountNo = bankFinancialTransferInfoDetail.ToAccountNo,
-                AccountDisplayName = bankFinancialTransferInfoDetail.ToAccountDisplayName,
-                Amount = bankFinancialTransferInfoDetail.ToAmount,
-                Fee = bankFinancialTransferInfoDetail.ToFee,
-                Reason = bankFinancialTransferInfoDetail.Reason,
-                Remark = bankFinancialTransferInfoDetail.Remark,
-                CreateTime = bankFinancialTransferInfoDetail.CreateTime,
-                Creator = bankFinancialTransferInfoDetail.Creator,
-                UpdateTime = bankFinancialTransferInfoDetail.UpdateTime,
-                Updator = bankFinancialTransferInfoDetail.Updator
-            };
+                return (status, count, message);
+            }
 
-            if (transferInfoFromModel.TransferId == null)
+            if (bankFinancialTransferInfoDetail.TransferType != TransferTypeEnum.Other)
+            {
+                if (!CheckParameterForSetTransferInfo(bankFinancialTransferInfoDetail, out message))
+                {
+                    return (status, count, message);
+                }
+            }
+            else
+            {
+                if (!CheckParameterWithTypeOtherForSetTransferInfo(bankFinancialTransferInfoDetail, out message))
+                {
+                    return (status, count, message);
+                }
+            }
+
+            #endregion
+
+            #region SetParameterModel
+
+            var result = SetParameterModelForSetTransferInfo(bankFinancialTransferInfoDetail);
+
+            #endregion
+
+            if (bankFinancialTransferInfoDetail.TransferId == null)
             {
                 using (TransactionScope scope = new TransactionScope())
                 {
-
                     string TransferId = GetTransferId(bankFinancialTransferInfoDetail.TransferType);
-                    transferInfoFromModel.TransferId = TransferId;
-                    transferInfoToModel.TransferId = TransferId;
+                    result.TransferInfoFromModel.TransferId = TransferId;
+                    result.TransferInfoToModel.TransferId = TransferId;
 
-                    if (_bankFinancialService.InsertTransferInfo(transferInfoFromModel) != 1)
+                    if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.PlusAndMinus ||
+                       bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.OnlyMinus)
                     {
-                        scope.Dispose();
+                        if (_bankFinancialService.InsertTransferInfo(result.TransferInfoFromModel) != 1)
+                        {
+                            scope.Dispose();
 
-                        return (status, count, "Insert Transfer Info Minus Data Fail.");
-                    };
+                            return (status, count, "Insert Transfer Info Minus Data Fail.");
+                        };
 
-                    if (_bankFinancialService.InsertTransferInfo(transferInfoToModel) != 1)
-                    {
-                        scope.Dispose();
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Create, result.TransferInfoFromModel) != 1)
+                        {
+                            scope.Dispose();
 
-                        return (status, count, "Insert Transfer Info Plus Data Fail.");
-                    };
-
-                    if (_bankFinancialService.InsertTransferInfoLog(ActionType.Create, transferInfoFromModel) != 1)
-                    {
-                        scope.Dispose();
-
-                        return (status, count, "Insert Transfer Info Log Minus Data Fail.");
+                            return (status, count, "Insert Transfer Info Log Minus Data Fail.");
+                        }
                     }
 
-                    if (_bankFinancialService.InsertTransferInfoLog(ActionType.Create, transferInfoToModel) != 1)
+                    if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.PlusAndMinus ||
+                       bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.OnlyPlus)
                     {
-                        scope.Dispose();
+                        if (_bankFinancialService.InsertTransferInfo(result.TransferInfoToModel) != 1)
+                        {
+                            scope.Dispose();
 
-                        return (status, count, "Insert Transfer Info Log Plus Data Fail.");
+                            return (status, count, "Insert Transfer Info Plus Data Fail.");
+                        };
+
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Create, result.TransferInfoToModel) != 1)
+                        {
+                            scope.Dispose();
+
+                            return (status, count, "Insert Transfer Info Log Plus Data Fail.");
+                        }
                     }
 
                     scope.Complete();
                 }
+
                 status = true;
                 count = 1;
                 message = "Insert Transfer Info And Insert Log Success.";
@@ -458,37 +536,47 @@ namespace BackendSite.Service.BLL
             {
                 using (TransactionScope scope = new TransactionScope())
                 {
-
-                    if (_bankFinancialService.UpdateTransferInfo(transferInfoFromModel) != 1)
+                    if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.PlusAndMinus ||
+                       bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.OnlyMinus)
                     {
-                        scope.Dispose();
 
-                        return (status, count, "Update Transfer Info Minus Data Fail.");
-                    };
+                        if (_bankFinancialService.UpdateTransferInfo(result.TransferInfoFromModel) != 1)
+                        {
+                            scope.Dispose();
 
-                    if (_bankFinancialService.UpdateTransferInfo(transferInfoToModel) != 1)
-                    {
-                        scope.Dispose();
+                            return (status, count, "Update Transfer Info Minus Data Fail.");
+                        };
 
-                        return (status, count, "Update Transfer Info Plus Data Fail.");
-                    };
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Update, result.TransferInfoFromModel) != 1)
+                        {
+                            scope.Dispose();
 
-                    if (_bankFinancialService.InsertTransferInfoLog(ActionType.Update, transferInfoFromModel) != 1)
-                    {
-                        scope.Dispose();
-
-                        return (status, count, "Insert Transfer Info Log Minus Data Fail.");
+                            return (status, count, "Insert Transfer Info Log Minus Data Fail.");
+                        }
                     }
 
-                    if (_bankFinancialService.InsertTransferInfoLog(ActionType.Update, transferInfoToModel) != 1)
+                    if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.PlusAndMinus ||
+                       bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.OnlyPlus)
                     {
-                        scope.Dispose();
+                        if (_bankFinancialService.UpdateTransferInfo(result.TransferInfoToModel) != 1)
+                        {
+                            scope.Dispose();
 
-                        return (status, count, "Insert Transfer Info Log Plus Data Fail.");
+                            return (status, count, "Update Transfer Info Plus Data Fail.");
+                        };
+
+
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Update, result.TransferInfoToModel) != 1)
+                        {
+                            scope.Dispose();
+
+                            return (status, count, "Insert Transfer Info Log Plus Data Fail.");
+                        }
                     }
 
                     scope.Complete();
                 }
+
                 status = true;
                 count = 1;
                 message = "Update Transfer Info And Insert Log Success.";
@@ -499,7 +587,6 @@ namespace BackendSite.Service.BLL
 
         public (bool Status, int Count, string Message) DeleteTransferInfo(string transferId)
         {
-
             bool status = false;
             int count = 0;
             string message = string.Empty;
@@ -520,9 +607,13 @@ namespace BackendSite.Service.BLL
 
                 BankFinancialTransferInfoDetailModel data = new BankFinancialTransferInfoDetailModel();
 
-                if (getdata.Count()==1)
+                if (getdata.Count() == 1)
                 {
                     data = getdata.FirstOrDefault();
+                }
+                else
+                {
+                    return (status, count, "Delete Transfer Info Data Fail.Data is not exist.");
                 }
 
                 BankFinancialTransferInfoModel dataFromModel = new BankFinancialTransferInfoModel
@@ -586,18 +677,25 @@ namespace BackendSite.Service.BLL
 
                 using (TransactionScope scope = new TransactionScope())
                 {
-                    if (_bankFinancialService.InsertTransferInfoLog(ActionType.Delete, dataFromModel) != 1)
+                    if (data.TransactionType == TransactionTypeEnum.PlusAndMinus
+                       || data.TransactionType == TransactionTypeEnum.OnlyMinus)
                     {
-                        scope.Dispose();
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Delete, dataFromModel) != 1)
+                        {
+                            scope.Dispose();
 
-                        return (status, count, "Insert Transfer Info Log Minus Data Fail.");
+                            return (status, count, "Insert Transfer Info Log Minus Data Fail.");
+                        }
                     }
-
-                    if (_bankFinancialService.InsertTransferInfoLog(ActionType.Delete, dataToModel) != 1)
+                    if (data.TransactionType == TransactionTypeEnum.PlusAndMinus
+                       || data.TransactionType == TransactionTypeEnum.OnlyPlus)
                     {
-                        scope.Dispose();
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Delete, dataToModel) != 1)
+                        {
+                            scope.Dispose();
 
-                        return (status, count, "Insert Transfer Info Log Plus Data Fail.");
+                            return (status, count, "Insert Transfer Info Log Plus Data Fail.");
+                        }
                     }
 
                     if (_bankFinancialService.DeleteTransferInfo(transferId) != 1)
@@ -623,91 +721,560 @@ namespace BackendSite.Service.BLL
 
         }
 
-        #region Private Methods For GetTransferAccountInfoList
+        #region Private Methods For Set Transfer Info
 
-        private IEnumerable<BankFinancialTransferAccountDetailModel> ConvertForDisplay(IEnumerable<BankFinancialTransferAccountDetailModel> datas)
+        /// <summary>
+        /// 檢核 共有 資料
+        /// </summary>
+        /// <param name="bankFinancialTransferInfoDetail"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private bool CheckSharedParameterForSetTransferInfo(BankFinancialTransferInfoDetailModel bankFinancialTransferInfoDetail,
+                                                            out string message)
         {
+            message = String.Empty;
 
-            foreach (var data in datas.ToArray())
+            if (bankFinancialTransferInfoDetail == null)
             {
+                message = "Data Invalid.";
 
-                data.CreateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.CreateTime);
-                data.UpdateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.UpdateTime);
+                return false;
             }
 
-            return datas;
+            #region Parameter Values Check
 
-        }
-
-        private IEnumerable<BankFinancialTransferAccountDetailModel> ConvertForExport(IEnumerable<BankFinancialTransferAccountDetailModel> datas)
-        {
-
-            foreach (var data in datas.ToArray())
+            if (bankFinancialTransferInfoDetail.TransferType == null
+                || bankFinancialTransferInfoDetail.TransferType == 0)
             {
+                message = "Data-[Transfer Type] invalid.";
 
-                data.Purpose = GetPurpose(data.Purpose);
-
-                data.CreateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.CreateTime);
-                data.UpdateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.UpdateTime);
+                return false;
             }
 
-            return datas;
-
-        }
-
-        private string GetTimeZoneDateTimeByDateString(int siteId, string datetime)
-        {
-            int timeZone = (siteId == 2 || siteId == 3) ? 7 : 8;
-            return Convert.ToDateTime(datetime).AddHours(timeZone).ToString("yyyy-MM-dd HH:mm:ss");
-        }
-
-        private string GetPurpose(string purpose)
-        {
-            string result = string.Empty;
-
-            IEnumerable<int> purposeList = purpose.Split(',').Select(int.Parse).ToList();
-
-            foreach (int i in purposeList)
+            if (bankFinancialTransferInfoDetail.TransactionType == null
+                || bankFinancialTransferInfoDetail.TransactionType == 0)
             {
-                switch (i)
+                message = "Data-[Transaction Type] invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.TransDate == null)
+            {
+                message = "Data-[Trans Date] invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.CreateTime == null)
+            {
+                message = "Data-[CreateTime] invalid.Notify admin please.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.Creator == null)
+            {
+                message = "Data-[Creator] invalid.Notify admin please.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.UpdateTime == null)
+            {
+                message = "Data-[UpdateTime] invalid.Notify admin please.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.Updator == null)
+            {
+                message = "Data-[Updator] invalid.Notify admin please.";
+
+                return false;
+            }
+
+            #endregion
+
+            return true;
+        }
+
+        /// <summary>
+        /// 檢核 加項 和 減項 的資料
+        /// </summary>
+        /// <param name="bankFinancialTransferInfoDetail"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private bool CheckParameterForSetTransferInfo(BankFinancialTransferInfoDetailModel bankFinancialTransferInfoDetail,
+                                                      out string message)
+        {
+            message = String.Empty;
+
+            #region From Data
+
+            if (bankFinancialTransferInfoDetail.FromChannel == null || bankFinancialTransferInfoDetail.FromChannel == 0)
+            {
+                message = "Data-[From Channel] invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.FromChannel == TransferChannelEnum.PSP &&
+                (bankFinancialTransferInfoDetail.FromPayId == null || bankFinancialTransferInfoDetail.FromPayId == 0))
+            {
+                message = "Data-[From Channel] is PSP.But [From Pay] is invalid.";
+
+                return false;
+            }
+
+            if ((bankFinancialTransferInfoDetail.FromChannel == TransferChannelEnum.LocalBank || bankFinancialTransferInfoDetail.FromChannel == TransferChannelEnum.HeadOffice) &&
+               bankFinancialTransferInfoDetail.FromAgent == null)
+            {
+                message = "Data-[From Channel] is Local Bank or Head Office.But [From Agent] is invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.FromSiteId == null)
+            {
+                message = "Data-[From Site] invalid.";
+
+                return false;
+
+            }
+
+            if (bankFinancialTransferInfoDetail.FromSiteId != 0 &&
+                bankFinancialTransferInfoDetail.FromSiteId != 1 &&
+                bankFinancialTransferInfoDetail.FromSiteId != 2 &&
+                bankFinancialTransferInfoDetail.FromSiteId != 3)
+            {
+                message = "Data-[From Site] not match.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.FromSiteName == null)
+            {
+                message = "Data-[From SiteName] Invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.FromCurrencyId == null || bankFinancialTransferInfoDetail.FromCurrencyId == 0)
+            {
+                message = "Data-[From Currency] invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.FromSysId == null || bankFinancialTransferInfoDetail.FromSysId == 0)
+            {
+                message = "Data-[From Bank Code] invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.FromAccountNo == null)
+            {
+                message = "Data-[From Account No.] invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.FromAccountDisplayName == null)
+            {
+                message = "Data-[From Account Display Name] invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.FromAmount == null || bankFinancialTransferInfoDetail.FromAmount < 0)
+            {
+                message = "Data-[From Amount] invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.FromFee == null || bankFinancialTransferInfoDetail.FromFee < 0)
+            {
+                message = "Data-[From Fee] invalid.";
+
+                return false;
+            }
+
+            #endregion
+
+            #region To Data
+
+            if (bankFinancialTransferInfoDetail.ToChannel == null || bankFinancialTransferInfoDetail.ToChannel == 0)
+            {
+                message = "Data-[To Channel] invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.ToChannel == TransferChannelEnum.PSP &&
+                (bankFinancialTransferInfoDetail.ToPayId == null || bankFinancialTransferInfoDetail.ToPayId == 0))
+            {
+                message = "Data-[To Channel] is PSP.But [To Pay] is invalid.";
+
+                return false;
+            }
+
+            if ((bankFinancialTransferInfoDetail.ToChannel == TransferChannelEnum.LocalBank || bankFinancialTransferInfoDetail.ToChannel == TransferChannelEnum.HeadOffice) &&
+               bankFinancialTransferInfoDetail.ToAgent == null)
+            {
+                message = "Data-[To Channel] is Local Bank or Head Office.But [To Agent] is invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.ToSiteId == null)
+            {
+                message = "Data-[To Site] invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.ToSiteId != 0 &&
+                bankFinancialTransferInfoDetail.ToSiteId != 1 &&
+                bankFinancialTransferInfoDetail.ToSiteId != 2 &&
+                bankFinancialTransferInfoDetail.ToSiteId != 3)
+            {
+                message = "Data-[To Site] not match.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.ToSiteName == null)
+            {
+                message = "Data-[To SiteName] Invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.ToCurrencyId == null || bankFinancialTransferInfoDetail.ToCurrencyId == 0)
+            {
+                message = "Data-[To Currency] invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.ToSysId == null || bankFinancialTransferInfoDetail.ToSysId == 0)
+            {
+                message = "Data-[To Bank Code] invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.ToAccountNo == null)
+            {
+                message = "Data-[To Account No.] invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.ToAccountDisplayName == null)
+            {
+                message = "Data-[To Account Display Name] invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.ToAmount == null || bankFinancialTransferInfoDetail.ToAmount < 0)
+            {
+                message = "Data-[To Amount] invalid.";
+
+                return false;
+            }
+
+            if (bankFinancialTransferInfoDetail.ToFee == null || bankFinancialTransferInfoDetail.ToFee < 0)
+            {
+                message = "Data-[To Fee] invalid.";
+
+                return false;
+            }
+
+            #endregion
+
+            return true;
+        }
+
+        /// <summary>
+        /// 檢核 和 判斷 單加項 或 單減項 的資料
+        /// </summary>
+        /// <param name="bankFinancialTransferInfoDetail"></param>
+        /// <param name="transactionType"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private bool CheckParameterWithTypeOtherForSetTransferInfo(BankFinancialTransferInfoDetailModel bankFinancialTransferInfoDetail,
+                                                                   out string message)
+        {
+            message = String.Empty;
+
+            if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.OnlyMinus)
+            {
+                //Minus
+
+                if (bankFinancialTransferInfoDetail.FromChannel == null || bankFinancialTransferInfoDetail.FromChannel == 0)
                 {
-                    case 1: result = result + ",Deposit"; break;
-                    case 2: result = result + ",Withdrawal"; break;
-                    case 3: result = result + ",Transfer"; break;
+                    message = "Data-[From Channel] invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.FromChannel == TransferChannelEnum.PSP &&
+               (bankFinancialTransferInfoDetail.FromPayId == null || bankFinancialTransferInfoDetail.FromPayId == 0))
+                {
+                    message = "Data-[From Channel] is PSP.But [From Pay] is invalid.";
+
+                    return false;
+                }
+
+                if ((bankFinancialTransferInfoDetail.FromChannel == TransferChannelEnum.LocalBank || bankFinancialTransferInfoDetail.FromChannel == TransferChannelEnum.HeadOffice) &&
+                   bankFinancialTransferInfoDetail.FromAgent == null)
+                {
+                    message = "Data-[From Channel] is Local Bank or Head Office.But [From Agent] is invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.FromSiteId == null)
+                {
+                    message = "Data-[From Site] invalid.";
+
+                    return false;
+
+                }
+
+                if (bankFinancialTransferInfoDetail.FromSiteId != 0 &&
+                    bankFinancialTransferInfoDetail.FromSiteId != 1 &&
+                    bankFinancialTransferInfoDetail.FromSiteId != 2 &&
+                    bankFinancialTransferInfoDetail.FromSiteId != 3)
+                {
+                    message = "Data-[From Site] not match.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.FromSiteName == null)
+                {
+                    message = "Data-[From SiteName] Invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.FromCurrencyId == null || bankFinancialTransferInfoDetail.FromCurrencyId == 0)
+                {
+                    message = "Data-[From Currency] invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.FromSysId == null || bankFinancialTransferInfoDetail.FromSysId == 0)
+                {
+                    message = "Data-[From Bank Code] invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.FromAccountNo == null)
+                {
+                    message = "Data-[From Account No.] invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.FromAccountDisplayName == null)
+                {
+                    message = "Data-[From Account Display Name] invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.FromAmount == null || bankFinancialTransferInfoDetail.FromAmount < 0)
+                {
+                    message = "Data-[From Amount] invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.FromFee == null || bankFinancialTransferInfoDetail.FromFee < 0)
+                {
+                    message = "Data-[From Fee] invalid.";
+
+                    return false;
+                }
+            }
+            else
+            {
+                //Plus
+
+                if (bankFinancialTransferInfoDetail.ToChannel == null || bankFinancialTransferInfoDetail.ToChannel == 0)
+                {
+                    message = "Data-[To Channel] invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.ToChannel == TransferChannelEnum.PSP &&
+                    (bankFinancialTransferInfoDetail.ToPayId == null || bankFinancialTransferInfoDetail.ToPayId == 0))
+                {
+                    message = "Data-[To Channel] is PSP.But [To Pay] is invalid.";
+
+                    return false;
+                }
+
+                if ((bankFinancialTransferInfoDetail.ToChannel == TransferChannelEnum.LocalBank || bankFinancialTransferInfoDetail.ToChannel == TransferChannelEnum.HeadOffice) &&
+                   bankFinancialTransferInfoDetail.ToAgent == null)
+                {
+                    message = "Data-[To Channel] is Local Bank or Head Office.But [To Agent] is invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.ToSiteId == null)
+                {
+                    message = "Data-[To Site] invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.ToSiteId != 0 &&
+                    bankFinancialTransferInfoDetail.ToSiteId != 1 &&
+                    bankFinancialTransferInfoDetail.ToSiteId != 2 &&
+                    bankFinancialTransferInfoDetail.ToSiteId != 3)
+                {
+                    message = "Data-[To Site] not match.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.ToSiteName == null)
+                {
+                    message = "Data-[To SiteName] Invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.ToCurrencyId == null || bankFinancialTransferInfoDetail.ToCurrencyId == 0)
+                {
+                    message = "Data-[To Currency] invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.ToSysId == null || bankFinancialTransferInfoDetail.ToSysId == 0)
+                {
+                    message = "Data-[To Bank Code] invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.ToAccountNo == null)
+                {
+                    message = "Data-[To Account No.] invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.ToAccountDisplayName == null)
+                {
+                    message = "Data-[To Account Display Name] invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.ToAmount == null || bankFinancialTransferInfoDetail.ToAmount < 0)
+                {
+                    message = "Data-[To Amount] invalid.";
+
+                    return false;
+                }
+
+                if (bankFinancialTransferInfoDetail.ToFee == null || bankFinancialTransferInfoDetail.ToFee < 0)
+                {
+                    message = "Data-[To Fee] invalid.";
+
+                    return false;
                 }
 
             }
 
-            return result.Substring(1);
+            return true;
         }
 
-        private string GetTransferId(TransferTypeEnum transferType)
+        private (BankFinancialTransferInfoModel TransferInfoFromModel, BankFinancialTransferInfoModel TransferInfoToModel) SetParameterModelForSetTransferInfo(BankFinancialTransferInfoDetailModel bankFinancialTransferInfoDetail)
         {
-            string prefix = string.Empty;
-            string nowDate = string.Empty;
-            string nowMaxNo = string.Empty;
+            var transferInfoFromModel = new BankFinancialTransferInfoModel();
+            var transferInfoToModel = new BankFinancialTransferInfoModel();
 
-            switch (transferType)
+            if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.PlusAndMinus
+                || bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.OnlyMinus)
             {
-                case TransferTypeEnum.Deposit:
-                    prefix = "D";
-                    break;
-                case TransferTypeEnum.Withdrawal:
-                    prefix = "W";
-                    break;
-                case TransferTypeEnum.Transfer:
-                    prefix = "T";
-                    break;
-                case TransferTypeEnum.Other:
-                    prefix = "R";
-                    break;
+                transferInfoFromModel = new BankFinancialTransferInfoModel
+                {
+                    TransferId = bankFinancialTransferInfoDetail.TransferId,
+                    TransactionType = bankFinancialTransferInfoDetail.TransactionType,
+                    TransferType = bankFinancialTransferInfoDetail.TransferType,
+                    PlusOrMinus = PlusOrMinusEnum.Minus,
+                    TransDate = bankFinancialTransferInfoDetail.TransDate,
+                    Channel = bankFinancialTransferInfoDetail.FromChannel,
+                    Agent = bankFinancialTransferInfoDetail.FromAgent == "" ? null : bankFinancialTransferInfoDetail.FromAgent,
+                    PayId = bankFinancialTransferInfoDetail.FromPayId == 0 ? null : bankFinancialTransferInfoDetail.FromPayId,
+                    SiteId = bankFinancialTransferInfoDetail.FromSiteId,
+                    SiteName = bankFinancialTransferInfoDetail.FromSiteName == "" ? null : bankFinancialTransferInfoDetail.FromSiteName,
+                    CustId = bankFinancialTransferInfoDetail.FromCustId == 0 ? null : bankFinancialTransferInfoDetail.FromCustId,
+                    CurrencyId = bankFinancialTransferInfoDetail.FromCurrencyId,
+                    SysId = bankFinancialTransferInfoDetail.FromSysId,
+                    AccountNo = bankFinancialTransferInfoDetail.FromAccountNo,
+                    AccountDisplayName = bankFinancialTransferInfoDetail.FromAccountDisplayName,
+                    Amount = bankFinancialTransferInfoDetail.FromAmount,
+                    Fee = bankFinancialTransferInfoDetail.FromFee,
+                    Reason = bankFinancialTransferInfoDetail.Reason,
+                    Remark = bankFinancialTransferInfoDetail.Remark,
+                    CreateTime = bankFinancialTransferInfoDetail.CreateTime,
+                    Creator = bankFinancialTransferInfoDetail.Creator,
+                    UpdateTime = bankFinancialTransferInfoDetail.UpdateTime,
+                    Updator = bankFinancialTransferInfoDetail.Updator
+                };
+            }
+            if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.PlusAndMinus
+               || bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.OnlyPlus)
+            {
+                transferInfoToModel = new BankFinancialTransferInfoModel
+                {
+                    TransferId = bankFinancialTransferInfoDetail.TransferId,
+                    TransactionType = bankFinancialTransferInfoDetail.TransactionType,
+                    TransferType = bankFinancialTransferInfoDetail.TransferType,
+                    PlusOrMinus = PlusOrMinusEnum.Plus,
+                    TransDate = bankFinancialTransferInfoDetail.TransDate,
+                    Channel = bankFinancialTransferInfoDetail.ToChannel,
+                    Agent = bankFinancialTransferInfoDetail.ToAgent == "" ? null : bankFinancialTransferInfoDetail.ToAgent,
+                    PayId = bankFinancialTransferInfoDetail.ToPayId == 0 ? null : bankFinancialTransferInfoDetail.ToPayId,
+                    SiteId = bankFinancialTransferInfoDetail.ToSiteId,
+                    SiteName = bankFinancialTransferInfoDetail.ToSiteName == "" ? null : bankFinancialTransferInfoDetail.ToSiteName,
+                    CustId = bankFinancialTransferInfoDetail.ToCustId == 0 ? null : bankFinancialTransferInfoDetail.ToCustId,
+                    CurrencyId = bankFinancialTransferInfoDetail.ToCurrencyId,
+                    SysId = bankFinancialTransferInfoDetail.ToSysId,
+                    AccountNo = bankFinancialTransferInfoDetail.ToAccountNo,
+                    AccountDisplayName = bankFinancialTransferInfoDetail.ToAccountDisplayName,
+                    Amount = bankFinancialTransferInfoDetail.ToAmount,
+                    Fee = bankFinancialTransferInfoDetail.ToFee,
+                    Reason = bankFinancialTransferInfoDetail.Reason,
+                    Remark = bankFinancialTransferInfoDetail.Remark,
+                    CreateTime = bankFinancialTransferInfoDetail.CreateTime,
+                    Creator = bankFinancialTransferInfoDetail.Creator,
+                    UpdateTime = bankFinancialTransferInfoDetail.UpdateTime,
+                    Updator = bankFinancialTransferInfoDetail.Updator
+                };
             }
 
-            (nowDate, nowMaxNo) = _bankFinancialService.NoAssign(prefix);
-
-            return prefix + nowDate + nowMaxNo.PadLeft(4, '0');
+            return (transferInfoFromModel, transferInfoToModel);
 
         }
+
+        #endregion
 
         #endregion
 

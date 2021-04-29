@@ -32,14 +32,6 @@ export default props => {
 							siteList: res.data.data,
 							toSiteId:props.Datas.toSiteId
 						});
-						dispatch({
-							type: defActionType.FROM_BANK_SET_LIST,
-							fromCurrencyId:props.Datas.fromCurrencyId
-						});
-						dispatch({
-							type: defActionType.TO_BANK_SET_LIST,
-							toCurrencyId:props.Datas.toCurrencyId
-						});
 					} else {
 						alert(res.data.message ?? "failed to get data.");
 					}
@@ -103,6 +95,14 @@ export default props => {
 							dispatch({
 								type: defActionType.BANK_CODE_SET_LIST,
 								bankCodeList: res.data.data
+							});
+							dispatch({
+								type: defActionType.FROM_BANK_SET_LIST,
+								fromCurrencyId:props.Datas.fromCurrencyId
+							});
+							dispatch({
+								type: defActionType.TO_BANK_SET_LIST,
+								toCurrencyId:props.Datas.toCurrencyId
 							});
 						} else {
 							alert(res.data.message ?? "failed to get data.");
@@ -168,6 +168,20 @@ export default props => {
 			dataColumn });
 	};
 
+	const EditTransferTypeValue = (value, dataColumn) => {
+		dispatch({ 
+			type: defActionType.MAIN_SET_TRANSFERTYPE_VALUE, 
+			value, 
+			dataColumn });
+	};
+
+	const EditTransactionTypeValue = (value, dataColumn) => {
+		dispatch({ 
+			type: defActionType.MAIN_SET_TRANSACTIONTYPE_VALUE, 
+			value, 
+			dataColumn });
+	};
+
 	const EditSiteSelectBox = (value, dataColumn) => {
 		if(dataColumn == "fromSiteId")
 		{
@@ -204,7 +218,6 @@ export default props => {
 		}
 	};
 
-	//OK
 	const EditChannelSelectBox = (value, dataColumn) => {
 		if(dataColumn=="fromChannel")
 		{
@@ -231,6 +244,8 @@ export default props => {
 			action={{
 				ClickSubmit,
 				EditMainValue,
+				EditTransferTypeValue,
+				EditTransactionTypeValue,
 				EditSiteSelectBox,
 				EditCurrencySelectBox,
 				EditChannelSelectBox,
