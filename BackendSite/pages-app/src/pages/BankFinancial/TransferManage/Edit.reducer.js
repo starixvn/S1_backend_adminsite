@@ -2,7 +2,6 @@ export const defActionType = {
   MAIN_SET_VALUE: "MAIN_SET_VALUE",
 
   MAIN_SET_TRANSFERTYPE_VALUE: "MAIN_SET_TRANSFERTYPE_VALUE",
-  //MAIN_SET_TRANSACTIONTYPE_VALUE: "MAIN_SET_TRANSACTIONTYPE_VALUE",
 
   MAIN_SET_FROM_CHANNEL_VALUE: "MAIN_SET_FROM_CHANNEL_VALUE",
   MAIN_SET_FROM_SITEID_VALUE: "MAIN_SET_FROM_SITEID_VALUE",
@@ -22,6 +21,9 @@ export const defActionType = {
   PAY_SET_LIST: "PAY_SET_LIST",
   BANK_CODE_SET_LIST: "BANK_CODE_SET_LIST",
   REASON_SET_LIST: "REASON_SET_LIST",
+
+  //Upload Receipt
+  SET_UPLOAD_RECEIPT: "SET_UPLOAD_RECEIPT",
 };
 
 export const initialState = (datas, isAdd) => {
@@ -71,6 +73,9 @@ export const initialState = (datas, isAdd) => {
     updator: datas.updator,
     updatorName: datas.updatorName,
 
+    uploadReceipt: datas.uploadReceipt,
+    uploadReceiptName: datas.uploadReceiptName,
+    transferPic: datas.transferPic,
     setFromSiteList: [],
     setFromCurrencyList: [],
     setFromBankCodeList: [],
@@ -103,17 +108,6 @@ export function reducer(state, action) {
         [action.dataColumn]: action.value,
         transactionType: defaultTransactionType,
       };
-
-    // case defActionType.MAIN_SET_TRANSACTIONTYPE_VALUE:
-    //   let defaultTransactionType = 0;
-    //   if (action.value == 1) {
-    //     defaultTransactionType = 3;
-    //   }
-    //   return {
-    //     ...state,
-    //     [action.dataColumn]: action.value,
-    //     transactionType: defaultTransactionType,
-    //   };
 
     case defActionType.MAIN_SET_FROM_SITEID_VALUE:
       let getFromSiteId = null;
@@ -285,7 +279,6 @@ export function reducer(state, action) {
       };
 
     case defActionType.FROM_CURRENCY_SET_LIST:
-      console.log(action);
       let getFromSiteItem = null;
       let iniFromSiteName = null;
       if (action.fromSiteId == 0) {
@@ -295,7 +288,6 @@ export function reducer(state, action) {
         getFromSiteItem = action.siteList.find(
           (x) => x.siteId == action.fromSiteId
         );
-        console.log(getFromSiteItem);
         iniFromSiteName = getFromSiteItem.siteName;
       }
 
@@ -451,6 +443,13 @@ export function reducer(state, action) {
         ...state,
         [action.dataColumn]: action.value,
         payList: setPayList,
+      };
+
+    case defActionType.SET_UPLOAD_RECEIPT:
+      return {
+        ...state,
+        transferPic: action.uploadReceiptPic.data.fileBytes,
+        uploadReceiptName: "",
       };
 
     default:

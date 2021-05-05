@@ -2,6 +2,7 @@ import React, { useReducer, useEffect, useRef } from "react";
 import { reducer, defActionType, initialState } from "./Edit.reducer";
 import Panel from "./Edit.content";
 import WebAPI from "../../../module/WebAPI";
+import {api} from "../../../module/WebAPI";
 
 export default props => {
 	const isMountedRef = useRef(null);
@@ -237,6 +238,37 @@ export default props => {
 		}
 	};
 
+	const UploadReceipt = (value, dataColumn) => {
+	
+		let settings = { headers: { "content-type": "multipart/form-data" } };
+		let file = document.getElementById("UploadReceipt").files[0];
+		var formData = new FormData();
+		formData.append("UploadReceipt", file, file.name);
+	
+		api.post("/api/TransferManage/ReviewTransferReceiptPic", formData, settings)
+		.then(function (response) {
+		if (response.data) {
+			let uploadReceiptPic =response.data;
+			    dispatch({ 
+					type: defActionType.SET_UPLOAD_RECEIPT, 
+					uploadReceiptPic,
+					dataColumn 
+				});
+				} else {
+				  alert("sent error");
+				}
+			  })
+			  .catch(function (error) {
+				alert(error);
+			  });
+
+			dispatch({ 
+				type: defActionType.MAIN_SET_VALUE, 
+				value, 
+				dataColumn
+			});
+	};
+
 	return (
 		<Panel
 			dispatch={dispatch}
@@ -249,6 +281,7 @@ export default props => {
 				EditSiteSelectBox,
 				EditCurrencySelectBox,
 				EditChannelSelectBox,
+				UploadReceipt,
 				ClickBack: props.action.ClickBack,
 			}}
 			isAdd={props.IsAdd}

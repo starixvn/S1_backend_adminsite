@@ -23,7 +23,7 @@ const InputBox = (props) => {
                     value={props.value === null || props.value === undefined ? '' : props.value}
                     onChange={OnChange}
                     disabled={props.Disabled === true}
-                    className={props.inputClass ? props.inputClass : ''} />
+                    className={props.inputClass ? props.inputClass : ''}/>
             </div>
         </div>
     )

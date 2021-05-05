@@ -98,8 +98,7 @@ const WithdrawalLimitManage = lazy(() =>
   import("./pages/Finance/WithdrawalLimitManage/index")
 );
 
-export const defaultPage = "BonusManage";
-
+export const defaultPage = "TransferManage";
 
 export const layoutType = {
   N88: "N88",
