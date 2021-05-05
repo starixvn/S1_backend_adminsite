@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -211,7 +212,12 @@ namespace BackendSite.Controllers.Api
         public ApiResult<DashBoardData> GetDashBoardData(DashBoardPara para)
         {
             var apiResult = new ApiResult<DashBoardData>();
-            dashBoardBLL.GetDashBoardData(para.SiteId,para.CurrencyId,para.BaseCurrencyId);
+            List<int> CanSearchSite = new List<int>();
+            serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x=> CanSearchSite.Add(x.SiteId));
+            var result = dashBoardBLL.GetDashBoardData(para.SiteId,para.CurrencyId,para.BaseCurrencyId, CanSearchSite);
+
+            apiResult.Data = result;
+            apiResult.ErrorCode = 0;
 
             return apiResult;
         }
