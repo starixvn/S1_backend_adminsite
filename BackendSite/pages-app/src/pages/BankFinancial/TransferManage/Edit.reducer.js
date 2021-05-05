@@ -112,35 +112,32 @@ export function reducer(state, action) {
     case defActionType.MAIN_SET_FROM_SITEID_VALUE:
       let getFromSiteId = null;
       let fromSiteName = null;
-      if (action.value == 0) {
-        getFromSiteId = state.setFromSiteList.find((x) => x.siteId == 1);
-        fromSiteName = "Soon88";
-      } else {
-        getFromSiteId = state.setFromSiteList.find(
-          (x) => x.siteId == action.value
-        );
-        fromSiteName = getFromSiteId.siteName;
-      }
-
       let fromCurrencyList = [];
+      let initialFromBankList = [];
 
       fromCurrencyList.push({
         value: 0,
         displayText: "- Select Currency -",
       });
 
-      getFromSiteId.iCurrencyList.map((i) => {
-        fromCurrencyList.push({
-          value: Number(i),
-          displayText: window.i18n[`lbl_Currency${i}`],
-        });
-      });
-
-      let initialFromBankList = [];
       initialFromBankList.push({
         value: 0,
         displayText: "- Select Bank Code -",
       });
+
+      getFromSiteId = state.setFromSiteList.find(
+        (x) => x.siteId == action.value
+      );
+      if (getFromSiteId) {
+        fromSiteName = getFromSiteId.siteName;
+
+        getFromSiteId.iCurrencyList.map((i) => {
+          fromCurrencyList.push({
+            value: Number(i),
+            displayText: window.i18n[`lbl_Currency${i}`],
+          });
+        });
+      }
 
       return {
         ...state,
@@ -194,33 +191,31 @@ export function reducer(state, action) {
     case defActionType.MAIN_SET_TO_SITEID_VALUE:
       let getToSiteId = null;
       let toSiteName = null;
-      if (action.value == 0) {
-        getToSiteId = state.setToSiteList.find((x) => x.siteId == 1);
-        toSiteName = "Soon88";
-      } else {
-        getToSiteId = state.setToSiteList.find((x) => x.siteId == action.value);
-        toSiteName = getToSiteId.siteName;
-      }
-
       let toCurrencyList = [];
+      let initialToBankList = [];
 
       toCurrencyList.push({
         value: 0,
         displayText: "- Select Currency -",
       });
 
-      getToSiteId.iCurrencyList.map((i) => {
-        toCurrencyList.push({
-          value: Number(i),
-          displayText: window.i18n[`lbl_Currency${i}`],
-        });
-      });
-
-      let initialToBankList = [];
       initialToBankList.push({
         value: 0,
         displayText: "- Select Bank Code -",
       });
+
+      getToSiteId = state.setToSiteList.find((x) => x.siteId == action.value);
+
+      if (getToSiteId) {
+        toSiteName = getToSiteId.siteName;
+
+        getToSiteId.iCurrencyList.map((i) => {
+          toCurrencyList.push({
+            value: Number(i),
+            displayText: window.i18n[`lbl_Currency${i}`],
+          });
+        });
+      }
 
       return {
         ...state,
@@ -281,16 +276,6 @@ export function reducer(state, action) {
     case defActionType.FROM_CURRENCY_SET_LIST:
       let getFromSiteItem = null;
       let iniFromSiteName = null;
-      if (action.fromSiteId == 0) {
-        getFromSiteItem = action.siteList.find((x) => x.siteId == 1);
-        iniFromSiteName = "Soon88";
-      } else {
-        getFromSiteItem = action.siteList.find(
-          (x) => x.siteId == action.fromSiteId
-        );
-        iniFromSiteName = getFromSiteItem.siteName;
-      }
-
       let iniFromCurrencyList = [];
 
       iniFromCurrencyList.push({
@@ -298,12 +283,20 @@ export function reducer(state, action) {
         displayText: "- Select Currency -",
       });
 
-      getFromSiteItem.iCurrencyList.map((i) => {
-        iniFromCurrencyList.push({
-          value: Number(i),
-          displayText: window.i18n[`lbl_Currency${i}`],
+      getFromSiteItem = action.siteList.find(
+        (x) => x.siteId == action.fromSiteId
+      );
+
+      if (getFromSiteItem) {
+        iniFromSiteName = getFromSiteItem.siteName;
+
+        getFromSiteItem.iCurrencyList.map((i) => {
+          iniFromCurrencyList.push({
+            value: Number(i),
+            displayText: window.i18n[`lbl_Currency${i}`],
+          });
         });
-      });
+      }
 
       return {
         ...state,
@@ -314,16 +307,6 @@ export function reducer(state, action) {
     case defActionType.TO_CURRENCY_SET_LIST:
       let getToSiteItem = null;
       let iniToSiteName = null;
-      if (action.toSiteId == 0) {
-        getToSiteItem = action.siteList.find((x) => x.siteId == 1);
-        iniToSiteName = "Soon88";
-      } else {
-        getToSiteItem = action.siteList.find(
-          (x) => x.siteId == action.toSiteId
-        );
-        iniToSiteName = getToSiteItem.siteName;
-      }
-
       let iniToCurrencyList = [];
 
       iniToCurrencyList.push({
@@ -331,12 +314,18 @@ export function reducer(state, action) {
         displayText: "- Select Currency -",
       });
 
-      getToSiteItem.iCurrencyList.map((i) => {
-        iniToCurrencyList.push({
-          value: Number(i),
-          displayText: window.i18n[`lbl_Currency${i}`],
+      getToSiteItem = action.siteList.find((x) => x.siteId == action.toSiteId);
+
+      if (getToSiteItem) {
+        iniToSiteName = getToSiteItem.siteName;
+
+        getToSiteItem.iCurrencyList.map((i) => {
+          iniToCurrencyList.push({
+            value: Number(i),
+            displayText: window.i18n[`lbl_Currency${i}`],
+          });
         });
-      });
+      }
 
       return {
         ...state,

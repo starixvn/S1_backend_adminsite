@@ -273,7 +273,7 @@ namespace BackendSite.Service.BLL
 
             }
 
-            if (bankFinancialTransferAccount.SiteId != 0 &&
+            if (bankFinancialTransferAccount.SiteId != 4 &&
                 bankFinancialTransferAccount.SiteId != 1 &&
                 bankFinancialTransferAccount.SiteId != 2 &&
                 bankFinancialTransferAccount.SiteId != 3)
@@ -829,7 +829,7 @@ namespace BackendSite.Service.BLL
 
             }
 
-            if (bankFinancialTransferInfoDetail.FromSiteId != 0 &&
+            if (bankFinancialTransferInfoDetail.FromSiteId != 4 &&
                 bankFinancialTransferInfoDetail.FromSiteId != 1 &&
                 bankFinancialTransferInfoDetail.FromSiteId != 2 &&
                 bankFinancialTransferInfoDetail.FromSiteId != 3)
@@ -922,7 +922,7 @@ namespace BackendSite.Service.BLL
                 return false;
             }
 
-            if (bankFinancialTransferInfoDetail.ToSiteId != 0 &&
+            if (bankFinancialTransferInfoDetail.ToSiteId != 4 &&
                 bankFinancialTransferInfoDetail.ToSiteId != 1 &&
                 bankFinancialTransferInfoDetail.ToSiteId != 2 &&
                 bankFinancialTransferInfoDetail.ToSiteId != 3)
@@ -1033,7 +1033,7 @@ namespace BackendSite.Service.BLL
 
                 }
 
-                if (bankFinancialTransferInfoDetail.FromSiteId != 0 &&
+                if (bankFinancialTransferInfoDetail.FromSiteId != 4 &&
                     bankFinancialTransferInfoDetail.FromSiteId != 1 &&
                     bankFinancialTransferInfoDetail.FromSiteId != 2 &&
                     bankFinancialTransferInfoDetail.FromSiteId != 3)
@@ -1126,7 +1126,7 @@ namespace BackendSite.Service.BLL
                     return false;
                 }
 
-                if (bankFinancialTransferInfoDetail.ToSiteId != 0 &&
+                if (bankFinancialTransferInfoDetail.ToSiteId != 4 &&
                     bankFinancialTransferInfoDetail.ToSiteId != 1 &&
                     bankFinancialTransferInfoDetail.ToSiteId != 2 &&
                     bankFinancialTransferInfoDetail.ToSiteId != 3)

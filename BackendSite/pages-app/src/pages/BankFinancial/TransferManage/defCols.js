@@ -26,10 +26,11 @@ export const initTransferType = [
 ];
 
 export const initSiteId = [
-  { value: 0, displayText: "Soon88" },
+  { value: 0, displayText: "- Select Site -" },
   { value: 1, displayText: "Nova88" },
   { value: 2, displayText: "Goal123" },
   { value: 3, displayText: "Bwing" },
+  { value: 4, displayText: "Soon88" },
 ];
 
 export const defTransactionType = {
