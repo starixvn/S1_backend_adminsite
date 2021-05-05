@@ -87,7 +87,7 @@ namespace BackendSite.Controllers.Api
 
             }
 
-            if(withdrawalRequest.Operator == User.Identity.Name)
+            if (withdrawalRequest.Operator == User.Identity.Name)
             {
                 withdrawalRequest.SameOperator = true;
             }
@@ -181,6 +181,10 @@ namespace BackendSite.Controllers.Api
                         withdrawalInfo.BankId = bankInfoOff.BankId;
                     }
                 }
+                else if (withdrawalReq.WithdrawalType == (int)WithdrawalType.CryptoPay)
+                {
+                    withdrawalInfo.PayId = withdrawalReq.SelId;
+                }
 
                 if (withdrawalReq.WithdrawalType == null || withdrawalReq.WithdrawalType == (int)WithdrawalType.Undefine)
                 {
@@ -194,7 +198,7 @@ namespace BackendSite.Controllers.Api
                     decimal amount = 0m;
                     withdrawConfirmReuslt = withdrawalBLL.WithdrawalProcess(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name, Newtonsoft.Json.JsonConvert.SerializeObject(withdrawalInfo), withdrawalReq.WithdrawalType, out custId, out amount);
 
-                    if (withdrawConfirmReuslt > 0 && withdrawalReq.WithdrawalType == (int)WithdrawalType.OnlinePayment)
+                    if (withdrawConfirmReuslt > 0 && ((withdrawalReq.WithdrawalType == (int)WithdrawalType.OnlinePayment) || (withdrawalReq.WithdrawalType == (int)WithdrawalType.CryptoPay)))
                     {
                         var reqWithdrawalOnline = new ReqWithdrawalOnline
                         {
@@ -208,7 +212,13 @@ namespace BackendSite.Controllers.Api
                             //ReturnUrl = Url.RouteUrl("desktop", new { action = "Deposit", controller = "Cashier", authData.LangId }, protocol: Request.Scheme, host: Request.Host.Port == 80 ? Request.Host.Host : $"{Request.Host.Host}:{Request.Host.Port}")
                         };
 
-                        var myUrl = $"{payApiUrl}Withdrawal";
+
+                        var myUrl = "";
+                        if (withdrawalReq.WithdrawalType == (int)WithdrawalType.CryptoPay) 
+                            myUrl = $"{payApiUrl}CryptoWithdrawal";
+                        else 
+                            myUrl = $"{payApiUrl}Withdrawal";
+
                         var apiOnlineResult = await courierAdapter.MyPostAsync<bool, ReqWithdrawalOnline>(myUrl, reqWithdrawalOnline);
                         if (apiOnlineResult == null)
                         {
@@ -300,6 +310,23 @@ namespace BackendSite.Controllers.Api
             var bankInfoPay = bankDetailBLL.GetBankInfoPay();
             var _payInfo = (from x in bankInfoPay
                             where x.CurrencyId == withdrawalReq.CurrencyId && x.SysId == withdrawalReq.SysId
+                            select new Pay
+                            {
+                                PayId = x.PayId,
+                                PayName = x.PayName
+
+                            }).Distinct(bankInfoPayComparer);
+            apiResult.Data = _payInfo;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<Pay>> GetCryptoPayList(WithdrawalReq3 withdrawalReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<Pay>>();
+            var cryptoPay = bankDetailBLL.GetCryptoPay();
+            var _payInfo = (from x in cryptoPay
                             select new Pay
                             {
                                 PayId = x.PayId,
@@ -436,6 +463,97 @@ namespace BackendSite.Controllers.Api
         public ApiResult EditWithdrawalKYCList(WithdrawalKYC withdrawalKYC)
         {
             var result = withdrawalBLL.EditWithdrawalKYCList(withdrawalKYC);
+            var apiResult = new ApiResult();
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+
+        public class WithdrawalLimitPara
+        {
+            public int SiteId { set; get; }
+        }
+        [HttpPost]
+        public ApiResult<IEnumerable<WithdrawalData>> GetWithdrawalLimitData(WithdrawalLimitPara para)
+        {
+            var apiResult = new ApiResult<IEnumerable<WithdrawalData>>();
+            try
+            {
+                apiResult.Data = withdrawalBLL.GetWithdrawalLimitData(para.SiteId);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        public class InsertWithdrawalLimitPara 
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int WithdrawalMin { get; set; }
+        }
+
+        [HttpPost]
+        public ApiResult InsertWithdrawalLimit(InsertWithdrawalLimitPara para)
+        {
+            var result = withdrawalBLL.InsertWithdrawalLimit(para.SiteId, para.CurrencyId,para.WithdrawalMin, User.Identity.Name);
+            var apiResult = new ApiResult();
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+        public class UpdateWithdrawalLimitPara
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int WithdrawalMin { get; set; }
+        }
+        [HttpPost]
+        public ApiResult UpdateWithdrawalLimit(UpdateWithdrawalLimitPara para)
+        {
+            var result = withdrawalBLL.UpdateWithdrawalLimit(para.SiteId, para.CurrencyId, para.WithdrawalMin,User.Identity.Name);
+            var apiResult = new ApiResult();
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+        public class DeleteWithdrawalLimitPara
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+        }
+        [HttpPost]
+        public ApiResult DeleteWithdrawalLimit(DeleteWithdrawalLimitPara para)
+        {
+            var result = withdrawalBLL.DeleteWithdrawalLimit(para.SiteId, para.CurrencyId);
             var apiResult = new ApiResult();
             if (result)
             {

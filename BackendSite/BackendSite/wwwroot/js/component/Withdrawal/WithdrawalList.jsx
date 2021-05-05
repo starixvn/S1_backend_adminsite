@@ -29,7 +29,8 @@ import DateTimePicker from 'react-datetime';
     const TypeSelectOp = {
         0: "Undefine",
         1: "Online Payment",
-        2: "Local Bank"
+        2: "Local Bank",
+        4: "Crypto Pay",
     };
 
     const StatusSelectOp = {
@@ -220,6 +221,7 @@ import DateTimePicker from 'react-datetime';
                         if (result.data.status == 3) {
                             await this.onGetPayList(result.data.currencyId, result.data.sysId);
                             await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId, result.data.siteId);
+                            await this.onGetCryptoPayList(result.data.currencyId, result.data.sysId);
                         }
 
                         let SelId = null;
@@ -227,6 +229,8 @@ import DateTimePicker from 'react-datetime';
                             SelId = result.data.payId;
                         } else if (result.data.withdrawalType == 2) {
                             SelId = result.data.bankId;
+                        } else if (result.data.withdrawalType == 4) {
+                            SelId = result.data.payId;
                         }
 
                         this.setState({ Data: result.data, selectType: result.data.withdrawalType, GetData: true, SelId: SelId, Comment: result.data.comment });
@@ -333,6 +337,8 @@ import DateTimePicker from 'react-datetime';
                 SelId = this.state.PayList[0].payId;
             } else if (parseInt(event.target.value) == 2 && this.state.BankInfoOffList.length > 0) {
                 SelId = this.state.BankInfoOffList[0].bankId;
+            } else if (parseInt(event.target.value) == 4 && this.state.CryptoPayList.length > 0) {
+                SelId = this.state.CryptoPayList[0].payId;
             }
 
             this.setState({ selectType: parseInt(event.target.value), SelId: SelId });
@@ -363,6 +369,23 @@ import DateTimePicker from 'react-datetime';
                     let result = response.data;
                     if (result.errorCode == 0) {
                         this.setState({ PayList: result.data });
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+        }
+
+        async onGetCryptoPayList(currencyId, sysId) {
+            let data = this.state.Data;
+            await axios.post('/api/Withdrawal/GetCryptoPayList', { CurrencyId: currencyId, SysId: sysId })
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        this.setState({ CryptoPayList: result.data });
                     } else {
                         alert(result.message);
                     }
@@ -411,6 +434,8 @@ import DateTimePicker from 'react-datetime';
                         selectOp.push(<option key={1} value="1">Online Payment</option>);
                     if (this.state.BankInfoOffList.length > 0)
                         selectOp.push(<option key={2} value="2">Local Bank</option>);
+                    if (this.state.CryptoPayList.length > 0)
+                        selectOp.push(<option key={4} value="4">Crypto Pay</option>);
                     selectType = <select className="form-control" onChange={this.onSelectType.bind(this)} value={this.state.selectType}>
                         {selectOp}
                     </select>;
@@ -423,6 +448,11 @@ import DateTimePicker from 'react-datetime';
                         }*/
                     } else if (this.state.selectType == 2) {
                         selectPay = this.state.BankInfoOffList.map(row => <option key={row.bankId} value={row.bankId}>{row.bankCode + "-" + row.accountName + "-" + row.accountNo}</option>);
+                        /*if(this.state.BankInfoOffList.length>0) {
+                            this.state.SelId=this.state.BankInfoOffList[0];
+                        }*/
+                    } else if (this.state.selectType == 4) {
+                        selectPay = this.state.CryptoPayList.map(row => <option key={row.payId} value={row.payId}>{row.payName}</option>);
                         /*if(this.state.BankInfoOffList.length>0) {
                             this.state.SelId=this.state.BankInfoOffList[0];
                         }*/

@@ -3,11 +3,12 @@ import ReactDOM from 'react-dom';
 import Filter from './Filter';
 import Result from './Result';
 import WebAPI from '../../../module/WebAPI';
-import moment from 'moment';
+import moment from "moment-timezone";
 import qs from 'qs';
 import {number_format, number_toFixed} from '../../../module/Formatting/NumberFormat';
 
 const App = ()=>{
+    moment.tz.setDefault("Asia/Taipei");
     const [stateData, setData] = useState({
         SearchInfo:{
             Currency:0,

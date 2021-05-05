@@ -12,7 +12,8 @@ export const defActionType = {
 	GET_TPGAME_CATEGORIES: "GET_TPGAME_CATEGORIES",
 	CURRENCY_SET_TpGame_VALUE: "CURRENCY_SET_TpGame_VALUE",
 	SPECIALBONUS_VALUE: "SPECIALBONUS_VALUE",
-	ONLY_REGISTERED_SET_VALUE: "ONLY_REGISTERED_SET_VALUE"
+	ONLY_REGISTERED_SET_VALUE: "ONLY_REGISTERED_SET_VALUE",
+	AUTOEXTEND_SET_VALUE: "AUTOEXTEND_SET_VALUE"
 };
 
 export const initialState = (IsAdd, datas, siteList) => {
@@ -25,6 +26,8 @@ export const initialState = (IsAdd, datas, siteList) => {
 		return {
 			bonusCode: "",
 			promotionType: 1,
+			promotionAction: null,
+			promotionDeviceType: 1,
 			periodFrom: moment(),
 			periodTo: moment(),
 			expiryDays: "",
@@ -47,7 +50,8 @@ export const initialState = (IsAdd, datas, siteList) => {
 			specialCode: "",
 			isSpecial: false,
 			specialBonusCheck: [],
-			onlyRegistered: []
+			onlyRegistered: [],
+			autoExtend: []
 		};
 	} else {
 		let _specific = SetSpecific(
@@ -61,6 +65,8 @@ export const initialState = (IsAdd, datas, siteList) => {
 		return {
 			bonusCode: datas.bonusCode,
 			promotionType: datas.promotionType,
+			promotionAction: datas.promotionAction,
+			promotionDeviceType: datas.promotionDeviceType,
 			periodFrom: datas.periodFrom,
 			periodTo: datas.periodTo,
 			expiryDays: datas.expiryDays,
@@ -84,6 +90,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 			isSpecial: datas.isSpecial,
 			specialBonusCheck: datas.isSpecial ? [1] : [],
 			onlyRegistered: datas.onlyRegistered ? [1] : [],
+			autoExtend: datas.autoExtend ? [1] : [],
 		};
 	}
 };
@@ -209,6 +216,7 @@ export function reducer(state, action) {
 			};
 
 		case defActionType.MAIN_SET_VALUE:
+			console.log(action);
 			return {
 				...state,
 				[action.dataColumn]: action.value
@@ -372,6 +380,13 @@ export function reducer(state, action) {
 			return {
 				...state,
 				onlyRegistered: newValue
+			};
+
+		case defActionType.AUTOEXTEND_SET_VALUE:
+			let newAutoValue = state.autoExtend.includes(action.value) ? [] : [action.value];
+			return {
+				...state,
+				autoExtend: newAutoValue
 			};
 
 		default:

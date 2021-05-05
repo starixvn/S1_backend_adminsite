@@ -27,7 +27,9 @@ import DateTimePicker from 'react-datetime';
     const TypeSelectOp = {
         1: "Online Banking",
         2: "Mobile Deposit",
-        3: "Local Bank"
+        3: "Local Bank",
+        4: "Crypto",
+        5: "Load Card"
     };
     const StatusSelectOp = {
         1: "Pending",

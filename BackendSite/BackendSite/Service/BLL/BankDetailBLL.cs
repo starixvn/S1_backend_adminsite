@@ -70,6 +70,23 @@ namespace BackendSite.Service.BLL
             return sysBankList;
         }
 
+        public IEnumerable<BankInfoOff> GetAllBankInfoOff()
+        {
+            string sBankInfoOffListKey = $"BankInfoOffList_All";
+            var bankInfoOffList = cache.Get<IEnumerable<BankInfoOff>>(sBankInfoOffListKey);
+
+            if (bankInfoOffList == null)
+            {
+                bankInfoOffList = localBankService.GetAllBankAccountOff();
+                if (bankInfoOffList != null)
+                {
+                    cache.Set(sBankInfoOffListKey, bankInfoOffList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30)));
+                }
+            }
+
+            return bankInfoOffList;
+        }
+
         public IEnumerable<BankInfoOff> GetBankInfoOff(int siteId)
         {
             string sBankInfoOffListKey = $"BankInfoOffList_{siteId}";
@@ -101,6 +118,22 @@ namespace BackendSite.Service.BLL
 
             //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
             return BankInfoPayList;
+        }
+        public IEnumerable<BankInfoPay> GetCryptoPay()
+        {
+            string sCryptoPayListKey = "CryptoPayForPayout";
+            var CryptoPayList = cache.Get<IEnumerable<BankInfoPay>>(sCryptoPayListKey);
+            if (CryptoPayList == null)
+            {
+                CryptoPayList = localBankService.GetCryptoPayList();
+                if (CryptoPayList != null)
+                {
+                    cache.Set(sCryptoPayListKey, CryptoPayList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
+                }
+            }
+
+            //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
+            return CryptoPayList;
         }
     }
 }

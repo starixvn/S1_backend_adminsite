@@ -1,5 +1,5 @@
 import React, {forwardRef} from "react";
-import moment from 'moment';
+import moment from "moment-timezone";
 import CalendarIcon from 'mdi-react/CalendarIcon';
 
 if(process.env.NODE_ENV!=='production'){

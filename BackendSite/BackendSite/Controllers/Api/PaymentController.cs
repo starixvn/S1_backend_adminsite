@@ -413,7 +413,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BalanceAdjustmentBatch" })]
-        public async Task<List<ApiResult>> BalanceAdjustmentBatch([FromForm] int option, [FromForm] int optSite, [FromForm] int withdrawalLimitOption, [FromForm] IFormFile excelUpload)
+        public async Task<List<ApiResult>> BalanceAdjustmentBatch([FromForm] int option, [FromForm] int optSite, [FromForm] int withdrawalLimitOption, [FromForm] IFormFile excelUpload, [FromForm] decimal withdrawal)
         {
             var apiResult = new List<ApiResult>();
             var authData = authorizeBLL.GetAuthData();
@@ -450,7 +450,7 @@ namespace BackendSite.Controllers.Api
                             {
                                 try
                                 {
-                                    decimal withdrawalLimitAmount = (withdrawalLimitOption == 1) ? amount : 0;
+                                    decimal withdrawalLimitAmount = (withdrawalLimitOption == 1) ? amount * withdrawal : 0;
                                     AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit
                                     {
                                         CustId = custInfoDetail.CustId,
@@ -545,6 +545,62 @@ namespace BackendSite.Controllers.Api
                 apiResult.Add(new ApiResult() { ErrorCode = -1, Message = ex.ToString() });
                 return apiResult;
             }
+        }
+
+        public class VipRebateInfoPara
+        {
+            public IEnumerable<int> SelectSite { get; set; }
+            public int Currency { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
+            public string User { get; set; }
+            public int PageSize { get; set; }
+            public int PageNumber { get; set; }
+            public int CategoryId { get; set; }
+        }
+        [HttpPost]
+        public ApiListResult<VipRebateInfo> GetVipRebateInfoList(VipRebateInfoPara para)
+        {
+            var apiResult = new ApiListResult<VipRebateInfo>();
+            try
+            {
+                var SearchResult = paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, para.StartDate, para.EndDate, para.User, para.PageSize, para.PageNumber,para.CategoryId);
+                apiResult.Data = SearchResult.VipRebateInfoList;
+                apiResult.PageNumber = SearchResult.PageNumber;
+                apiResult.TotalPages = SearchResult.TotalPages;
+                apiResult.RowCount = SearchResult.RowCount;
+                apiResult.ErrorCode = 0;
+            }
+            catch(Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        public class VipRebateInfoParaExport
+        {
+            public string SelectSite { get; set; }
+            public int Currency { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
+            public string User { get; set; }
+            public int CategoryId { get; set; }
+        }
+        [HttpPost]
+        public IActionResult GetVipRebateInfoListExport(string SelectSite, int Currency, long StartDate, long EndDate, string User, int CategoryId)
+        {
+            var SearchResult = paymentBLL.GetVipRebateInfoListExport(SelectSite, Currency, StartDate, EndDate, User, CategoryId);
+            var stream = excelBLL.Export(SearchResult.VipRebateInfoList);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"VipRebateReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
+        public ApiResult<IEnumerable<VipTPCategory>> GetTPCategoryListByVipRebate()
+        {
+            var apiResult = new ApiResult<IEnumerable<VipTPCategory>>();
+            apiResult.ErrorCode = 0;
+            apiResult.Data = paymentBLL.GetTPCategoryList();
+            return apiResult;
         }
     }
 }

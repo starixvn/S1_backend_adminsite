@@ -88,11 +88,18 @@ const VipUpgrade = lazy(() => import("./pages/Marketing/VipUpgrade/index"));
 const LatestHighlightVideoManagement = lazy(() =>
   import("./pages/Marketing/LatestHighlightVideoManagement/index")
 );
-const ReasonManagement = lazy(() =>
-  import("./pages/BankFinancial/ReasonManagement/index")
+const TransferManage = lazy(() =>
+  import("./pages/BankFinancial/TransferManage/index")
+);
+const VipRebateInfoReport = lazy(() =>
+  import("./pages/Marketing/VipRebateInfoReport/index")
+);
+const WithdrawalLimitManage = lazy(() =>
+  import("./pages/Finance/WithdrawalLimitManage/index")
 );
 
-export const defaultPage = "TransferAccountManage";
+export const defaultPage = "BonusManage";
+
 
 export const layoutType = {
   N88: "N88",
@@ -557,10 +564,36 @@ export const pages = {
     ],
     layout: layoutType.N88,
   },
-  ReasonManagement: {
+  TransferManage: {
     comp: (
       <Suspense fallback="loading...">
-        <ReasonManagement />
+        <TransferManage />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  VipRebateInfoReport: {
+    comp: (
+      <Suspense fallback="loading...">
+        <VipRebateInfoReport />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  WithdrawalLimitManage: {
+    comp: (
+      <Suspense fallback="loading...">
+        <WithdrawalLimitManage />
       </Suspense>
     ),
     css: [

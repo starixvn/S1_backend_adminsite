@@ -63,6 +63,7 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
             public IEnumerable<int> SelectCurrency { get; set; }
+            public string BankAccountNumber { get; set; }
         }
 
         [HttpPost]
@@ -72,7 +73,7 @@ namespace BackendSite.Controllers.Api
             int totalPages = 0, rowCount = 0;
             int pageNumber = custInfoListReq.PageNumber;
 
-            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite, custInfoListReq.BirDate, custInfoListReq.BirMonth, custInfoListReq.BirYear, custInfoListReq.UserName, custInfoListReq.AccountName, custInfoListReq.LoginIp, custInfoListReq.TransId, custInfoListReq.TpUserName, custInfoListReq.Email, custInfoListReq.PhoneNo, custInfoListReq.StartDate, custInfoListReq.EndDate, custInfoListReq.PageSize, custInfoListReq.AffId, custInfoListReq.SelectCurrency,ref pageNumber, out totalPages, out rowCount);
+            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite, custInfoListReq.BirDate, custInfoListReq.BirMonth, custInfoListReq.BirYear, custInfoListReq.UserName, custInfoListReq.AccountName, custInfoListReq.LoginIp, custInfoListReq.TransId, custInfoListReq.TpUserName, custInfoListReq.Email, custInfoListReq.PhoneNo, custInfoListReq.StartDate, custInfoListReq.EndDate, custInfoListReq.PageSize, custInfoListReq.AffId, custInfoListReq.SelectCurrency, custInfoListReq.BankAccountNumber, ref pageNumber, out totalPages, out rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;
@@ -684,8 +685,8 @@ namespace BackendSite.Controllers.Api
             public string Deposit { get; set; }
             public string CallOut { get; set; }
             public string DormantUser { get; set; }
-            public string StartDate { get; set; }
-            public string EndDate { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
             public TeleCSDpara()
@@ -741,11 +742,39 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public IActionResult ExportTeleCSDData(string SiteIds, string Currency, string Deposit, string CallOut, string DormantUser, string StartDate, string EndDate)
+        public IActionResult ExportTeleCSDData(string SiteIds, string Currency, string Deposit, string CallOut, string DormantUser, long StartDate, long EndDate)
         {
             var ExportData = custInfoBLL.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);
             var stream = excelBLL.Export(ExportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"TeleCSD_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
-        }   
+        }
+        public class CustPromotionpara
+        {
+            public int CustId { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+        }
+        [HttpPost]
+        public ApiListResult<Promotion> GetPromotionListByCustIdAndDate([FromForm] int CustId, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int PageSize)
+        {
+            var apiResult = new ApiListResult<Promotion>();
+            try
+            {
+                var SearchResult = custInfoBLL.GetPromotionListByCustIdAndDate(CustId,StartDate,EndDate,PageNumber,PageSize);
+                apiResult.Data = SearchResult.PromotionList;
+                apiResult.PageNumber = SearchResult.PageNumber;
+                apiResult.TotalPages = SearchResult.TotalPages;
+                apiResult.RowCount = SearchResult.RowCount;
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
+        }
     }
 }

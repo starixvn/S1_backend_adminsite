@@ -27,5 +27,13 @@ namespace BackendSite.Service.Model
         public int BonusInfoStatus { get; set; }
         public int Sort { get; set; }
         public CustRollOver custRollOver { get; set; }
+        public DateTime ClaimDate { get;set; }
+    }
+    public class PromotionListData
+    {
+        public List<Promotion> PromotionList { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
     }
 }

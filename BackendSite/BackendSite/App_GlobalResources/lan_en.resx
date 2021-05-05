@@ -327,6 +327,12 @@
   <data name="lbl_DepositType3" xml:space="preserve">
     <value>Local Bank</value>
   </data>
+  <data name="lbl_DepositType4" xml:space="preserve">
+    <value>Crypto</value>
+  </data>
+  <data name="lbl_DepositType5" xml:space="preserve">
+    <value>Load Card</value>
+  </data>
   <data name="lbl_Direction1" xml:space="preserve">
     <value>Credit</value>
   </data>
@@ -498,6 +504,9 @@
   <data name="lbl_WithdrawalType2" xml:space="preserve">
     <value>Local Bank</value>
   </data>
+  <data name="lbl_WithdrawalType4" xml:space="preserve">
+    <value>Crypto Payment</value>
+  </data>
   <data name="lbl_SelectSite" xml:space="preserve">
     <value>Select site</value>
   </data>
@@ -608,5 +617,8 @@
   </data>
   <data name="lbl_PromotionType8" xml:space="preserve">
     <value>Advertising</value>
+  </data>
+  <data name="lbl_DepositSubmission" xml:space="preserve">
+    <value>Deposit Submission</value>
   </data>
 </root>

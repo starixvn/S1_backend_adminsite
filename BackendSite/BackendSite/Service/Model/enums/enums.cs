@@ -33,6 +33,7 @@ namespace BackendSite.Service.Model.enums
         Undefine = 0,
         OnlinePayment = 1,
         LocalBank = 2,
+        CryptoPay = 4
     }
     /// <summary>
     /// 
@@ -189,6 +190,69 @@ namespace BackendSite.Service.Model.enums
         /// 帳戶關閉(Never Open)
         /// </summary>
         Close = 4
+    }
+
+    /// <summary>
+    /// 交易型態 列舉
+    /// </summary>
+    public enum TransactionTypeEnum
+    {
+        /// <summary>
+        /// 只有加項
+        /// </summary>
+        OnlyPlus = 1,
+
+        /// <summary>
+        /// 只有減項
+        /// </summary>
+        OnlyMinus = 2,
+
+        /// <summary>
+        /// 一加一減
+        /// </summary>
+        PlusAndMinus = 3
+    }
+
+    /// <summary>
+    /// 交易類型 列舉
+    /// </summary>
+    public enum TransferTypeEnum
+    {
+        /// <summary>
+        /// 存款(客戶戶頭=>公司戶頭)
+        /// </summary>
+        Deposit = 1,
+
+        /// <summary>
+        /// 提款(公司戶頭=>客戶戶頭)
+        /// </summary>
+        Withdrawal = 2,
+
+        /// <summary>
+        /// 轉帳(公司戶頭=>公司戶頭)
+        /// </summary>
+        Transfer = 3,
+
+        /// <summary>
+        /// 其他(手續費、利息...)
+        /// </summary>
+        Other = 4
+    }
+
+    /// <summary>
+    /// 加項或減項 列舉
+    /// </summary>
+    public enum PlusOrMinusEnum
+    {
+        /// <summary>
+        /// 加項
+        /// </summary>
+        Plus = 1,
+
+        /// <summary>
+        /// 減項
+        /// </summary>
+        Minus = 2
     }
 
     #endregion

@@ -14,6 +14,7 @@ import { BankLog } from './CustInfo_BankLog.jsx';
 import DateTimePicker from 'react-datetime';
 import TpBetRecord from './TpBetRecord/index';
 import VipLevel from './VipLevel/index';
+import PromotionReport from './PromotionReport/index';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -735,33 +736,34 @@ import VipLevel from './VipLevel/index';
     class Promotion extends React.Component {
 
         render() {
-            let Promotions = this.props.Promotions;
-            let promotionRows = null;
+            // let Promotions = this.props.Promotions;
+            // let promotionRows = null;
 
-            if (Promotions != null) {
-                promotionRows = <tbody>{Promotions.map(x => <PromotionRow key={x.bonusCode} Promotion={x} CancelBonus={this.props.CancelBonus} />)}</tbody>;
-            }
+            // if (Promotions != null) {
+            //     promotionRows = <tbody>{Promotions.map(x => <PromotionRow key={x.bonusCode} Promotion={x} CancelBonus={this.props.CancelBonus} />)}</tbody>;
+            // }
 
-            return (
-                <div className="table-responsive-md table">
-                    <span class="label">Promotion</span>
-                    <table className="table table-striped">
-                        <thead>
-                            <tr>
-                                <th scope="col">BonusCode</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Bonus Amount</th>
-                                <th scope="col">Locked Amount</th>
-                                <th scope="col">Rollover</th>
-                                <th scope="col">Turnover</th>
-                                <th scope="col">Status</th>
-                                <th scope="col"></th>
-                            </tr>
-                        </thead>
-                        {promotionRows}
-                    </table>
-                </div>
-            )
+            // return (
+            //     <div className="table-responsive-md table">
+            //         <span class="label">Promotion</span>
+            //         <table className="table table-striped">
+            //             <thead>
+            //                 <tr>
+            //                     <th scope="col">BonusCode</th>
+            //                     <th scope="col">Description</th>
+            //                     <th scope="col">Bonus Amount</th>
+            //                     <th scope="col">Locked Amount</th>
+            //                     <th scope="col">Rollover</th>
+            //                     <th scope="col">Turnover</th>
+            //                     <th scope="col">Status</th>
+            //                     <th scope="col"></th>
+            //                 </tr>
+            //             </thead>
+            //             {promotionRows}
+            //         </table>
+            //     </div>
+            // )
+            return(<></>)
         }
     }
 
@@ -1524,11 +1526,19 @@ import VipLevel from './VipLevel/index';
                                         <td>{number_format(data.balance)}</td>
                                     </tr>
                                     <tr>
+                                        <th scope="row">Last Deposit Time</th>
+                                        <td>{data.lastDepositTime}</td>
+                                    </tr>
+                                    <tr>
                                         <th scope="row">Deposit Summary</th>
                                         <td>{number_format(data.depositSum)}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Withdrawl Summary</th>
+                                        <th scope="row">Last Withdrawal Time</th>
+                                        <td>{data.lastWithdrawlTime}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Withdrawal Summary</th>
                                         <td>{number_format(data.withdrawlSum)}</td>
                                     </tr>
                                     <tr>
@@ -1552,8 +1562,20 @@ import VipLevel from './VipLevel/index';
                                         <td>{number_format(data.turnOver)}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Elgible Withdrawal</th>
+                                        <th scope="row">Eligible Withdrawal</th>
                                         <td>{number_format(elgibleWithdrawal)}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Last Betting Time</th>
+                                        <td>{data.lastBettingTime}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Total Adjustment</th>
+                                        <td>{number_format(data.totalAdjustment)}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Total Bonus Claimed</th>
+                                        <td>{number_format(data.totalBonusClaimed)}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1606,7 +1628,7 @@ import VipLevel from './VipLevel/index';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History", "VIP Level"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History", "VIP Level", "Promotion Report"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
         constructor(props) {
@@ -2151,6 +2173,8 @@ import VipLevel from './VipLevel/index';
                 dataContainer = <ReferralHistory GetReferralHistory={this.GetReferralHistory.bind(this)} searchData={this.state.ReferralHistoryData} ReferralHistory={this.state.ReferralHistory} onChangeValue={this.onChangeValue.bind(this)} />
             } else if (TabName == this._Tabs[17]) {
                 dataContainer = <VipLevel />
+            } else if (TabName == this._Tabs[18]) {
+                dataContainer = <PromotionReport />
             }
 
             let authSubKeys = {

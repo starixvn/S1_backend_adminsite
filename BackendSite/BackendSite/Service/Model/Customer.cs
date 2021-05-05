@@ -74,7 +74,15 @@ namespace BackendSite.Service.Model
         public string IP { get; set; }
         public string LevelName { get; set; }
         public string AffiliateCode { get; set; }
-    }
+        public string LastDepositTime { get; set; }
+        public string LastWithdrawlTime { get; set; }
+        public string LastBettingTime { get; set; }
+        public decimal TotalAdjustment { get; set; }
+        public decimal TotalBonusClaimed { get; set; }
+        public DateTime? LastWithdrawalTimeRecord { get; set; }
+        public DateTime? LastDepositTimeRecord { get; set; }
+        public DateTime? LastTpBetRecordTimeRecord { get; set; }
+}
 
     public class CustInfoDetailForExport
     {
@@ -243,5 +251,13 @@ namespace BackendSite.Service.Model
         public string CalculateTime { get; set; }
         public int Status { get; set; }
         public string StatusName => Enum.GetName(typeof(VipStatus), Status) ;
+    }
+    public class LastDepositAndWithdrawalTime
+    {
+        public DateTime? LastDepositTime { get; set; }
+        public DateTime? LastWithdrawlTime { get; set; }
+        public decimal TotalAdjustment { get; set; }
+        public DateTime? LastBettingTime { get; set; }
+        public decimal TotalBonusClaimed { get; set; }
     }
 }

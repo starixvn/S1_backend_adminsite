@@ -235,6 +235,16 @@
         "DisplayKey": "3RD Funds Adjustment",
         "FuncKey": "Finance/ThirdPartyAdjustment",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Deposit Submission",
+        "FuncKey": "Finance/DepositSubmission",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "WithdrawalLimit Manage",
+        "FuncKey": "Finance/WithdrawalLimitManage",
+        "Enable": false
       }
     ]
   },
@@ -352,6 +362,11 @@
         "DisplayKey": "Latest Highlight Video Management",
         "FuncKey": "Marketing/LatestHighlightVideoManagement",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Vip Rebate Info",
+        "FuncKey": "Marketing/VipRebateInfoReport",
+        "Enable": false
       }
     ]
   },
@@ -361,6 +376,11 @@
       {
         "DisplayKey": "Bank Transfer Account",
         "FuncKey": "BankFinancial/TransferAccountManage",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Transfer Management",
+        "FuncKey": "BankFinancial/TransferManage",
         "Enable": false
       },
       {

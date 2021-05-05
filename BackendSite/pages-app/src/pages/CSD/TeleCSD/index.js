@@ -47,8 +47,8 @@ const App = () => {
       Deposit: stateFilter.Deposit,
       CallOut: stateFilter.CallOut,
       DormantUser: stateFilter.DormantUser,
-      StartDate: moment(stateFilter.StartDate).format("YYYY-MM-DD"),
-      EndDate: moment(stateFilter.EndDate).format("YYYY-MM-DD"),
+      StartDate: moment(stateFilter.StartDate).unix(),
+      EndDate: moment(stateFilter.EndDate).unix(),
       PageNumber: 1,
     };
 
@@ -107,8 +107,8 @@ const App = () => {
       Deposit: stateDatas.FilterInfo.Deposit,
       CallOut: stateDatas.FilterInfo.CallOut,
       DormantUser: stateDatas.FilterInfo.DormantUser,
-      StartDate: moment(stateDatas.FilterInfo.StartDate).format("YYYY-MM-DD"),
-      EndDate: moment(stateDatas.FilterInfo.EndDate).format("YYYY-MM-DD"),
+      StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
+      EndDate: moment(stateDatas.FilterInfo.EndDate).unix(),
       PageNumber: stateDatas.PageInfo.pageNumber,
     };
     api
@@ -149,8 +149,8 @@ const App = () => {
       Deposit: stateDatas.FilterInfo.Deposit,
       CallOut: stateDatas.FilterInfo.CallOut,
       DormantUser: stateDatas.FilterInfo.DormantUser,
-      StartDate: moment(stateDatas.FilterInfo.StartDate).format("YYYY-MM-DD"),
-      EndDate: moment(stateDatas.FilterInfo.EndDate).format("YYYY-MM-DD"),
+      StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
+      EndDate: moment(stateDatas.FilterInfo.EndDate).unix(),
       PageNumber: PageNumber,
     };
     api
@@ -187,8 +187,8 @@ const App = () => {
         Deposit: stateDatas.FilterInfo.Deposit,
         CallOut: stateDatas.FilterInfo.CallOut,
         DormantUser: stateDatas.FilterInfo.DormantUser,
-        StartDate: moment(stateDatas.FilterInfo.StartDate).format("YYYY-MM-DD"),
-        EndDate: moment(stateDatas.FilterInfo.EndDate).format("YYYY-MM-DD"),
+        StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
+        EndDate: moment(stateDatas.FilterInfo.EndDate).unix(),
       },
     };
 
