@@ -112,7 +112,7 @@ export default ({ state, action, processing,isAdd }) => {
 							dataColumn="toSiteId"
 							SelectedValue={state.toSiteId}
 						/>
-						{state.toSiteId == 0 ?
+						{state.toSiteId == 0 || state.toSiteId == 4 ?
 						<>
 						</>
 						:
@@ -123,12 +123,12 @@ export default ({ state, action, processing,isAdd }) => {
 							dataColumn="toCustId"
 							value={state.toCustId}
 						/>
-						<InputBox
+						{/* <InputBox
 							Title="To UserName"
 							OnChange={action.EditMainValue}
 							dataColumn="toUserName"
 							value={state.toUserName}
-						/>
+						/> */}
 						</>
 						}
 					</div>
@@ -234,7 +234,7 @@ export default ({ state, action, processing,isAdd }) => {
 							dataColumn="fromSiteId"
 							SelectedValue={state.fromSiteId}
 						/>
-						{state.fromSiteId == 0 ?
+						{state.fromSiteId == 0 || state.fromSiteId == 4 ?
 						<>
 						</>
 						:
@@ -245,12 +245,12 @@ export default ({ state, action, processing,isAdd }) => {
 							dataColumn="fromCustId"
 							value={state.fromCustId}
 						/>
-						<InputBox
+						{/* <InputBox
 							Title="From UserName"
 							OnChange={action.EditMainValue}
 							dataColumn="fromUserName"
 							value={state.fromUserName}
-						/>
+						/> */}
 						</>
 						}
 					</div>
@@ -360,7 +360,7 @@ export default ({ state, action, processing,isAdd }) => {
 							dataColumn="fromSiteId"
 							SelectedValue={state.fromSiteId}
 						/>
-						{state.fromSiteId == 0  || state.transferType == 2 || state.transferType == 3?
+						{state.fromSiteId == 0 || state.fromSiteId == 4 || state.transferType == 2 || state.transferType == 3?
 						<>
 						</>
 						:
@@ -371,12 +371,12 @@ export default ({ state, action, processing,isAdd }) => {
 							dataColumn="fromCustId"
 							value={state.fromCustId}
 						/>
-						<InputBox
+						{/* <InputBox
 							Title="From UserName"
 							OnChange={action.EditMainValue}
 							dataColumn="fromUserName"
 							value={state.fromUserName}
-						/>
+						/> */}
 						</>
 						}
 					</div>
@@ -490,7 +490,7 @@ export default ({ state, action, processing,isAdd }) => {
 							dataColumn="toSiteId"
 							SelectedValue={state.toSiteId}
 						/>
-						{state.toSiteId == 0 || state.transferType == 1 || state.transferType == 3 ?
+						{state.toSiteId == 0 || state.toSiteId == 4 || state.transferType == 1 || state.transferType == 3 ?
 						<>
 						</>
 						:
@@ -501,12 +501,12 @@ export default ({ state, action, processing,isAdd }) => {
 							dataColumn="toCustId"
 							value={state.toCustId}
 						/>
-						<InputBox
+						{/* <InputBox
 							Title="To UserName"
 							OnChange={action.EditMainValue}
 							dataColumn="toUserName"
 							value={state.toUserName}
-						/>
+						/> */}
 						</>
 						}
 					</div>
