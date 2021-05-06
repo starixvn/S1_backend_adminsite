@@ -81,7 +81,7 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                apiResult.Data = _bankFinancialBLL.GetTransferAccountInfoList(false, req.SiteId, req.Id);
+                apiResult.Data = _bankFinancialBLL.GetTransferAccountInfoListForDisplay(false, req.SiteId, req.Id);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -104,7 +104,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var authData = _authorizeBLL.GetAuthData();
-                string dateTime = GetTimeZoneDateTime(req.SiteId);
+                string dateTime = GetTimeZoneDateTimeBySiteId(req.SiteId);
                 apiResult.Data = new BankFinancialTransferAccountDetailModel()
                 {
                     SiteId = req.SiteId,
@@ -142,15 +142,15 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                var result = _bankFinancialBLL.GetTransferAccountInfoList(true, req.SiteId, req.Id);
-                
-                if ( result.Count() == 1)
+                var result = _bankFinancialBLL.GetTransferAccountInfoListForDisplay(true, req.SiteId, req.Id);
+
+                if (result.Count() == 1)
                 {
                     var data = result.FirstOrDefault();
 
                     var authData = _authorizeBLL.GetAuthData();
-                    string dateTime = GetTimeZoneDateTime(req.SiteId);
-                    
+                    string dateTime = GetTimeZoneDateTimeBySiteId(req.SiteId);
+
                     data.Updator = authData.UserId;
                     data.UpdatorName = authData.UserName;
                     data.UpdateTime = dateTime;
@@ -183,18 +183,20 @@ namespace BackendSite.Controllers.Api
 
             try
             {
+                bankFinancialTransferAccount.CreateTime = GetTimeZoneZeroDateTimeByDateString(bankFinancialTransferAccount.CreateTime);
+                bankFinancialTransferAccount.UpdateTime = GetTimeZoneZeroDateTimeByDateString(bankFinancialTransferAccount.UpdateTime);
                 var result = _bankFinancialBLL.SetTransferAccount(bankFinancialTransferAccount);
 
                 if (result.Status)
                 {
                     apiResult.Data = result.Count;
-                    apiResult.RawMessage = result.Message;
+                    apiResult.Message = result.Message;
                     apiResult.ErrorCode = 0;
                 }
                 else
                 {
                     apiResult.Data = result.Count;
-                    apiResult.RawMessage = result.Message;
+                    apiResult.Message = result.Message;
                     apiResult.ErrorCode = 500;
                 }
 
@@ -212,9 +214,9 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public IActionResult ExportTransferAccountInfoList(int SiteId)
         {
-            var ExportData = _bankFinancialBLL.GetTransferAccountInfoList(false, SiteId, 0);
+            var ExportData = _bankFinancialBLL.GetTransferAccountInfoListForExport(false, SiteId, 0);
             var stream = _excelBLL.Export(ExportData);
-            return File(stream, 
+            return File(stream,
                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                        $"TransferAccountInfoList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
@@ -286,10 +288,15 @@ namespace BackendSite.Controllers.Api
 
         #region Private Methods
 
-        private string GetTimeZoneDateTime(int siteId)
+        private string GetTimeZoneDateTimeBySiteId(int siteId)
         {
-            int timeZone = siteId == 1 ? 8 : 7;
+            int timeZone = (siteId == 2 || siteId == 3) ? 7 : 8;
             return new DateTimeOffset(DateTime.Now).ToOffset(new TimeSpan(timeZone, 0, 0)).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+
+        private string GetTimeZoneZeroDateTimeByDateString(string datetime)
+        {
+            return new DateTimeOffset(Convert.ToDateTime(datetime)).ToOffset(new TimeSpan(0, 0, 0)).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
         #endregion

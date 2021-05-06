@@ -80,7 +80,7 @@ namespace BackendSite.Service.DAL
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfoDetailSearchV2_Get", new { CustId = custId, UserName = userName, SiteList = siteList }, commandType: CommandType.StoredProcedure);
+            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfoDetailSearchV3_Get", new { CustId = custId, UserName = userName, SiteList = siteList }, commandType: CommandType.StoredProcedure);
             return result;
         }
 
@@ -94,7 +94,7 @@ namespace BackendSite.Service.DAL
         public LastDepositAndWithdrawalTime GetCustDepositAndWithdrawalTime(int custId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.QueryFirstOrDefault<LastDepositAndWithdrawalTime>("Admin_CustInfoLastDepositAndWithdrawalTime", new { CustId = custId}, commandType: CommandType.StoredProcedure);
+            var result = conn.QueryFirstOrDefault<LastDepositAndWithdrawalTime>("Admin_CustInfoOther", new { CustId = custId}, commandType: CommandType.StoredProcedure);
             return result;
         }
 

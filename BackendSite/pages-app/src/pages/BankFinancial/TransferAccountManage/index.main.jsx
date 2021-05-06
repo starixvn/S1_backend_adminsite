@@ -124,6 +124,15 @@ export default ({
 	setSite,
 	transferAccountList,
 }) => {
+	let getItem=siteList.find(x=>x.siteId==0);
+	if(!getItem)
+	{
+		siteList.push({
+			siteId:0,
+			siteName:"Soon88",
+			iCurrencyList:[2,4,13,15,51,96]
+		});
+	}
 
 	let siteRows = siteList.map((_data) => {
 		return (
@@ -167,7 +176,7 @@ export default ({
 				{siteRows}
 			</div>
 			{
-				setSite != "" ?
+				setSite !=null && setSite >=0 ?
 					<>
 						<button
 							className="btn btn-add"

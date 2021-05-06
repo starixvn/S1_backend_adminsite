@@ -1565,6 +1565,18 @@ import PromotionReport from './PromotionReport/index';
                                         <th scope="row">Eligible Withdrawal</th>
                                         <td>{number_format(elgibleWithdrawal)}</td>
                                     </tr>
+                                    <tr>
+                                        <th scope="row">Last Betting Time</th>
+                                        <td>{data.lastBettingTime}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Total Adjustment</th>
+                                        <td>{number_format(data.totalAdjustment)}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Total Bonus Claimed</th>
+                                        <td>{number_format(data.totalBonusClaimed)}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                             {data.RebateInfo != null ? <RebateInfo RebateInfo={data.RebateInfo} /> : null}

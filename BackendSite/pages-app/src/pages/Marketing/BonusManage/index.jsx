@@ -186,7 +186,7 @@ const App = () => {
 						VN_AffCodes: info.affid
 					};
 				});
-
+console.log("promotion",promotion);
 			let _promo = {
 				BonusCode: promotion.bonusCode,
 				Description: promotion.description,
@@ -209,7 +209,8 @@ const App = () => {
 				RedeemHours: Number(promotion.redeemHours) ? Number(promotion.redeemHours) : 0,
 				SpecialCode: promotion.specialCode,
 				IsSpecial: promotion.isSpecial,
-				OnlyRegistered: promotion.onlyRegistered.length > 0 ? true : false
+				OnlyRegistered: promotion.onlyRegistered.length > 0 ? true : false,
+				AutoExtend: promotion.autoExtend.length > 0 ? 1 : 0
 			};
 			let _select = {
 				SiteidFilter: JSON.stringify(sitnemaFilter),

@@ -255,6 +255,11 @@ import * as Loading from '../commJS/Loading.jsx';
                     let val = parseInt($(option).val()), index = state.selectSite.indexOf(val);
                     (checked) ? state.selectSite.push(val) : (index > -1) ? state.selectSite.splice(index, 1) : state.selectSite;
                     state.selectSite.sort();
+                },
+                onInitialized: function () {
+                    state.SiteList.forEach(function (obj) {
+                        state.selectSite.push(obj.siteId);
+                    });
                 }
             });
             $('#selectSite').multiselect('updateButtonText');
@@ -289,6 +294,14 @@ import * as Loading from '../commJS/Loading.jsx';
                     let val = parseInt($(option).val()), index = state.selectCurrency.indexOf(val);
                     (checked) ? state.selectCurrency.push(val) : (index > -1) ? state.selectCurrency.splice(index, 1) : state.selectCurrency;
                     state.selectCurrency.sort();
+                },
+                onInitialized: function () {
+                    state.selectCurrency.push(2);
+                    state.selectCurrency.push(4);
+                    state.selectCurrency.push(13);
+                    state.selectCurrency.push(15);
+                    state.selectCurrency.push(51);
+                    state.selectCurrency.push(96);
                 }
             });
             $('#selectCurrency').multiselect('updateButtonText');
@@ -340,10 +353,12 @@ import * as Loading from '../commJS/Loading.jsx';
             let StartDate = this.state.StartDate;
             let EndDate = this.state.EndDate;
             let siteList = this.state.SiteList.map(function (obj) {
-                return <option key={obj.siteId} value={obj.siteId}>{obj.siteName}</option>;
+                return <option key={obj.siteId} value={obj.siteId} selected="selected">{obj.siteName}</option>;
+                //return <option key={obj.siteId} value={obj.siteId}>{obj.siteName}</option>;
             }.bind(this));
             let currencyList = Object.keys(defCurrencyType).map((key) => {
-                return <option key={key} value={key}>{defCurrencyType[key]}</option>;
+                return <option key={key} value={key} selected="selected">{defCurrencyType[key]}</option>;
+                //return <option key={key} value={key}>{defCurrencyType[key]}</option>;
             });
             siteList = <select id="selectSite" name="selectSite[]" multiple="multiple">{siteList}</select>;
             currencyList = <select id="selectCurrency" name="selectCurrency[]" multiple="multiple">{currencyList}</select>;

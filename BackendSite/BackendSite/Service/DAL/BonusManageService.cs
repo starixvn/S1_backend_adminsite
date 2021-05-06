@@ -116,9 +116,10 @@ namespace BackendSite.Service.DAL
             p.Add("OnlyRegistered", promotion.OnlyRegistered);
             p.Add("PromotionDeviceType", promotion.PromotionDeviceType);
             p.Add("PromotionAction", promotion.PromotionAction);
+            p.Add("AutoExtend", promotion.AutoExtend);
             p.Add("ErrorCode", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            conn.Execute("Admin_Promotion_Set", p, transaction: trans, commandType: CommandType.StoredProcedure);
+            conn.Execute("Admin_PromotionV3_Set", p, transaction: trans, commandType: CommandType.StoredProcedure);
             errorCode = p.Get<int>("ErrorCode");
             if (errorCode == 0)
             {
