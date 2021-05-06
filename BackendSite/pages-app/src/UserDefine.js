@@ -102,8 +102,7 @@ import("./pages/Home/DashBoardNew/index")
 );
 export const defaultPage = "TransferAccountManage";
 
-export const defaultPage = "BonusManage";
-
+export const defaultPage = "TransferManage";
 
 export const layoutType = {
   N88: "N88",

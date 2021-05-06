@@ -2,6 +2,7 @@ import React from "react";
 import moment from "moment";
 import { defChannelType, defTransferType } from "./defCols";
 import DateTimePicker from "react-datetime";
+import {number_format, number_toFixed} from '../../../module/Formatting/NumberFormat';
 const SpecialItemType = {
 	actionBtn: "actionBtn"
 };
@@ -20,6 +21,10 @@ const lastUpdateUserFormat = userName => {
 
 const lastUpdateTimeFormat = lastUpdTime => {
 	return lastUpdTime ?? "-";
+};
+
+const numberFormat = number => {
+	return number_format(number);
 };
 
 const titleGroupData =[
@@ -98,11 +103,13 @@ const titleData = [
 	},
 	{
 		dataColumn: "fromAmount",
-		columnTitle: "Amount"
+		columnTitle: "Amount",
+		body:{format:numberFormat}
 	},
 	{
 		dataColumn: "fromFee",
-		columnTitle: "Fee"
+		columnTitle: "Fee",
+		body:{format:numberFormat}
 	},
 	{ 
 		dataColumn: "toChannel", 
@@ -147,11 +154,13 @@ const titleData = [
 	},
 	{
 		dataColumn: "toAmount",
-		columnTitle: "Amount"
+		columnTitle: "Amount",
+		body:{format:numberFormat}
 	},
 	{
 		dataColumn: "toFee",
-		columnTitle: "Fee"
+		columnTitle: "Fee",
+		body:{format:numberFormat}
 	},
 	{
 		dataColumn: "createTime",
@@ -337,12 +346,12 @@ export default ({
 							onClick={ClickCreateTransferInfo.bind(null, setSite)}
 						>Create
 						</button>
-						{/* <button
+						<button
 							className="btn btn-approved"
 							style={{ marginBottom: "20px" }}
 							onClick={ClickExportTransferInfo.bind(null, setSite)}
 						>Export Excel
-						</button> */}
+						</button>
 						<div className="table">
 							<table className="table table-striped">
 								<thead>

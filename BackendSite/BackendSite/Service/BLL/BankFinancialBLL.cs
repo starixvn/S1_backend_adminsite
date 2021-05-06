@@ -1,11 +1,15 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using LazZiya.ImageResize;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -269,7 +273,7 @@ namespace BackendSite.Service.BLL
 
             }
 
-            if (bankFinancialTransferAccount.SiteId != 0 &&
+            if (bankFinancialTransferAccount.SiteId != 4 &&
                 bankFinancialTransferAccount.SiteId != 1 &&
                 bankFinancialTransferAccount.SiteId != 2 &&
                 bankFinancialTransferAccount.SiteId != 3)
@@ -433,7 +437,7 @@ namespace BackendSite.Service.BLL
                                                                                      int? reason,
                                                                                      string transferId)
         {
-            return _bankFinancialService.GetTransferInfoList(isSetting,
+            return ConvertForDisplay(_bankFinancialService.GetTransferInfoList(isSetting,
                                                              transferType,
                                                              transFromDate,
                                                              transToDate,
@@ -442,10 +446,10 @@ namespace BackendSite.Service.BLL
                                                              toAccountNo,
                                                              toAccountDisplayName,
                                                              reason,
-                                                             transferId);
+                                                             transferId));
         }
 
-        public (bool Status, int Count, string Message) SetTransferInfo(BankFinancialTransferInfoDetailModel bankFinancialTransferInfoDetail)
+        public (bool Status, int Count, string Message) SetTransferInfo(BankFinancialTransferInfoDetailModel bankFinancialTransferInfoDetail, IFormFile transferReceipt)
         {
             bool status = false;
             int count = 0;
@@ -525,6 +529,16 @@ namespace BackendSite.Service.BLL
                         }
                     }
 
+                    if (transferReceipt != null)
+                    {
+                        if (InsertTransferReceipt(transferReceipt, TransferId) != 1)
+                        {
+                            scope.Dispose();
+
+                            return (status, count, "Insert Transfer Receipt Fail.");
+                        }
+                    }
+
                     scope.Complete();
                 }
 
@@ -574,6 +588,16 @@ namespace BackendSite.Service.BLL
                         }
                     }
 
+                    if (transferReceipt != null)
+                    {
+                        if (InsertTransferReceipt(transferReceipt, bankFinancialTransferInfoDetail.TransferId) > 2)
+                        {
+                            scope.Dispose();
+
+                            return (status, count, "Update Transfer Receipt Fail.");
+                        }
+                    }
+
                     scope.Complete();
                 }
 
@@ -605,6 +629,8 @@ namespace BackendSite.Service.BLL
                                                              null,
                                                              transferId);
 
+                var transferInfoReceiptModel= _bankFinancialService.GetTransferInfoReceipt(transferId);
+
                 BankFinancialTransferInfoDetailModel data = new BankFinancialTransferInfoDetailModel();
 
                 if (getdata.Count() == 1)
@@ -616,93 +642,53 @@ namespace BackendSite.Service.BLL
                     return (status, count, "Delete Transfer Info Data Fail.Data is not exist.");
                 }
 
-                BankFinancialTransferInfoModel dataFromModel = new BankFinancialTransferInfoModel
-                {
-                    TransferId = data.TransferId,
-                    TransactionType = data.TransactionType,
-                    TransferType = data.TransferType,
-                    PlusOrMinus = PlusOrMinusEnum.Minus,
-                    TransDate = data.TransDate,
-                    Channel = data.FromChannel,
-                    Agent = data.FromAgent == "" ? null : data.FromAgent,
-                    PayId = data.FromPayId == 0 ? null : data.FromPayId,
-                    SiteId = data.FromSiteId,
-                    SiteName = data.FromSiteName == "" ? null : data.FromSiteName,
-                    CustId = data.FromCustId == 0 ? null : data.FromCustId,
-                    CurrencyId = data.FromCurrencyId,
-                    SysId = data.FromSysId,
-                    AccountNo = data.FromAccountNo,
-                    AccountDisplayName = data.FromAccountDisplayName,
-                    Amount = data.FromAmount,
-                    Fee = data.FromFee,
-                    Reason = data.Reason,
-                    Remark = data.Remark,
-                    CreateTime = data.CreateTime,
-                    Creator = data.Creator,
-                    UpdateTime = data.UpdateTime,
-                    Updator = data.Updator
-                };
-
-                BankFinancialTransferInfoModel dataToModel = new BankFinancialTransferInfoModel
-                {
-                    TransferId = data.TransferId,
-                    TransactionType = data.TransactionType,
-                    TransferType = data.TransferType,
-                    PlusOrMinus = PlusOrMinusEnum.Plus,
-                    TransDate = data.TransDate,
-                    Channel = data.ToChannel,
-                    Agent = data.ToAgent == "" ? null : data.ToAgent,
-                    PayId = data.ToPayId == 0 ? null : data.ToPayId,
-                    SiteId = data.ToSiteId,
-                    SiteName = data.ToSiteName == "" ? null : data.ToSiteName,
-                    CustId = data.ToCustId == 0 ? null : data.ToCustId,
-                    CurrencyId = data.ToCurrencyId,
-                    SysId = data.ToSysId,
-                    AccountNo = data.ToAccountNo,
-                    AccountDisplayName = data.ToAccountDisplayName,
-                    Amount = data.ToAmount,
-                    Fee = data.ToFee,
-                    Reason = data.Reason,
-                    Remark = data.Remark,
-                    CreateTime = data.CreateTime,
-                    Creator = data.Creator,
-                    UpdateTime = data.UpdateTime,
-                    Updator = data.Updator
-                };
-
-                //Step2:Insert Log
-
-
-                //Step3:Delete Data
+                //Step2: Set Data for Insert Log
+                var result = SetParameterModelForSetTransferInfo(data);
 
                 using (TransactionScope scope = new TransactionScope())
                 {
+                    int affectCount = 0;
+
+                    //Step3:Insert Log
                     if (data.TransactionType == TransactionTypeEnum.PlusAndMinus
                        || data.TransactionType == TransactionTypeEnum.OnlyMinus)
                     {
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Delete, dataFromModel) != 1)
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Delete, result.TransferInfoFromModel) != 1)
                         {
                             scope.Dispose();
 
                             return (status, count, "Insert Transfer Info Log Minus Data Fail.");
                         }
+                        affectCount++;
                     }
                     if (data.TransactionType == TransactionTypeEnum.PlusAndMinus
                        || data.TransactionType == TransactionTypeEnum.OnlyPlus)
                     {
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Delete, dataToModel) != 1)
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Delete, result.TransferInfoToModel) != 1)
                         {
                             scope.Dispose();
 
                             return (status, count, "Insert Transfer Info Log Plus Data Fail.");
                         }
+                        affectCount++;
                     }
 
-                    if (_bankFinancialService.DeleteTransferInfo(transferId) != 1)
+                    //Step4:Delete Data
+                    if (_bankFinancialService.DeleteTransferInfo(transferId) != affectCount)
                     {
                         scope.Dispose();
 
                         return (status, count, "Delete Transfer Info Data Fail.");
+                    }
+
+                    if(transferInfoReceiptModel!=null)
+                    {
+                        if (_bankFinancialService.DeleteTransferInfoReceipt(transferId) != 1)
+                        {
+                            scope.Dispose();
+
+                            return (status, count, "Delete Transfer Info Receipt Fail.");
+                        }
                     }
 
                     scope.Complete();
@@ -843,7 +829,7 @@ namespace BackendSite.Service.BLL
 
             }
 
-            if (bankFinancialTransferInfoDetail.FromSiteId != 0 &&
+            if (bankFinancialTransferInfoDetail.FromSiteId != 4 &&
                 bankFinancialTransferInfoDetail.FromSiteId != 1 &&
                 bankFinancialTransferInfoDetail.FromSiteId != 2 &&
                 bankFinancialTransferInfoDetail.FromSiteId != 3)
@@ -936,7 +922,7 @@ namespace BackendSite.Service.BLL
                 return false;
             }
 
-            if (bankFinancialTransferInfoDetail.ToSiteId != 0 &&
+            if (bankFinancialTransferInfoDetail.ToSiteId != 4 &&
                 bankFinancialTransferInfoDetail.ToSiteId != 1 &&
                 bankFinancialTransferInfoDetail.ToSiteId != 2 &&
                 bankFinancialTransferInfoDetail.ToSiteId != 3)
@@ -1047,7 +1033,7 @@ namespace BackendSite.Service.BLL
 
                 }
 
-                if (bankFinancialTransferInfoDetail.FromSiteId != 0 &&
+                if (bankFinancialTransferInfoDetail.FromSiteId != 4 &&
                     bankFinancialTransferInfoDetail.FromSiteId != 1 &&
                     bankFinancialTransferInfoDetail.FromSiteId != 2 &&
                     bankFinancialTransferInfoDetail.FromSiteId != 3)
@@ -1140,7 +1126,7 @@ namespace BackendSite.Service.BLL
                     return false;
                 }
 
-                if (bankFinancialTransferInfoDetail.ToSiteId != 0 &&
+                if (bankFinancialTransferInfoDetail.ToSiteId != 4 &&
                     bankFinancialTransferInfoDetail.ToSiteId != 1 &&
                     bankFinancialTransferInfoDetail.ToSiteId != 2 &&
                     bankFinancialTransferInfoDetail.ToSiteId != 3)
@@ -1204,6 +1190,11 @@ namespace BackendSite.Service.BLL
             return true;
         }
 
+        /// <summary>
+        /// 裝載 加項設定資料 和 減項設定資料
+        /// </summary>
+        /// <param name="bankFinancialTransferInfoDetail"></param>
+        /// <returns></returns>
         private (BankFinancialTransferInfoModel TransferInfoFromModel, BankFinancialTransferInfoModel TransferInfoToModel) SetParameterModelForSetTransferInfo(BankFinancialTransferInfoDetailModel bankFinancialTransferInfoDetail)
         {
             var transferInfoFromModel = new BankFinancialTransferInfoModel();
@@ -1275,6 +1266,98 @@ namespace BackendSite.Service.BLL
         }
 
         #endregion
+
+        #region Receipt Logic
+
+        public BankFinancialTransferInfoReceiptModel GetTransferIngoReceipt(string transferId)
+        {
+            return _bankFinancialService.GetTransferInfoReceipt(transferId);
+        }
+
+        private int InsertTransferReceipt(IFormFile transferReceipt, string transferId)
+        {
+            var processedReceipt = ProcessImage(transferReceipt);
+
+            return _bankFinancialService.SetTransferInfoReceipt(transferId, processedReceipt.FileName, processedReceipt.FileBytes);
+        }
+
+        public ProcessedImage ProcessImage(IFormFile image)
+        {
+            var processedImage = new ProcessedImage();
+            
+            if (_contentTypesCheck.ContainsKey(image.ContentType))
+            {
+                decimal xSize = 500m;
+                var apiResult = new ApiResult();
+                decimal xCell = 1;
+
+                using var fileStream = image.OpenReadStream();
+                using var uploadedImage = Image.FromStream(fileStream);
+                using var ms = new System.IO.MemoryStream();
+
+                if (uploadedImage.Width > xSize || uploadedImage.Height > xSize)
+                {
+                    if (uploadedImage.Width > uploadedImage.Height)
+                    {
+                        xCell = xSize / uploadedImage.Width;
+                    }
+                    else
+                    {
+                        xCell = xSize / uploadedImage.Height;
+                    }
+                }
+
+                var graphicOptions = new GraphicOptions();
+                graphicOptions.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
+                graphicOptions.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+                var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
+                img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                string fileName = image.FileName;
+                fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
+                fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
+
+                byte[] fileBytes = ms.ToArray();
+
+                processedImage.FileName = fileName;
+                processedImage.FileBytes = fileBytes;
+            }
+
+            return processedImage;
+        }
+
+        public class ProcessedImage
+        {
+            public string FileName { get; set; }
+            public byte[] FileBytes { get; set; }
+        }
+
+        private readonly Dictionary<string, System.Drawing.Imaging.ImageFormat> _contentTypesCheck = new Dictionary<string, System.Drawing.Imaging.ImageFormat>(comparer: StringComparer.OrdinalIgnoreCase)
+        {
+            {"image/png",System.Drawing.Imaging.ImageFormat.Png},
+            {"image/jpeg",System.Drawing.Imaging.ImageFormat.Jpeg},
+            { "image/gif",System.Drawing.Imaging.ImageFormat.Gif}
+        };
+
+        #endregion
+
+        /// <summary>
+        /// 時區轉換
+        /// </summary>
+        /// <param name="datas"></param>
+        /// <returns></returns>
+        private IEnumerable<BankFinancialTransferInfoDetailModel> ConvertForDisplay(IEnumerable<BankFinancialTransferInfoDetailModel> datas)
+        {
+
+            foreach (var data in datas.ToArray())
+            {
+                data.CreateTime = GetTimeZoneDateTimeByDateString(1, data.CreateTime);
+                data.UpdateTime = GetTimeZoneDateTimeByDateString(1, data.UpdateTime);
+            }
+
+            return datas;
+
+        }
 
         #endregion
 
