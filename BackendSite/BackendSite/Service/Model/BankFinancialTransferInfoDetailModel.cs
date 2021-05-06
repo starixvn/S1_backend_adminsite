@@ -3,9 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace BackendSite.Service.Model
 {
+    public class BankFinancialTransferInfoDetailModelForSet
+    {
+        public string TransferInfoDetails { get; set; }
+        public IFormFile UploadReceipt { get; set; }
+    }
+
     public class BankFinancialTransferInfoDetailModel
     {
 
@@ -408,6 +415,33 @@ namespace BackendSite.Service.Model
         /// 讀寫 資料更新者名稱
         /// </summary>
         public string UpdatorName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 圖檔名稱
+        /// </summary>
+        public string UploadReceiptName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 圖檔Binary
+        /// </summary>
+        public byte[] TransferPic 
+        { 
+            get;
+            set; 
+        }
+
+        /// <summary>
+        /// 讀寫 上傳收據
+        /// </summary>
+        public IFormFile UploadReceipt
         {
             get;
             set;

@@ -1,11 +1,13 @@
 import React from "react";
 import InputBox from "./Component/InputBox";
+import UploadBox from "./Component/UploadBox";
 import DateTimePickerElem from "./Component/DateTimePicker";
 import SelectBox from "./Component/SelectBox";
 import RadioBox from "./Component/RadioBox";
 import TextBox from "./Component/TextBox";
 import moment from "moment";
 import { initChannelType,initSiteId, initTransferType,initTransactionType } from "./defCols";
+import {number_format, number_toFixed} from '../../../module/Formatting/NumberFormat';
 
 export default ({ state, action, processing,isAdd }) => {	
 	return (
@@ -110,7 +112,7 @@ export default ({ state, action, processing,isAdd }) => {
 							dataColumn="toSiteId"
 							SelectedValue={state.toSiteId}
 						/>
-						{state.toSiteId == 0 ?
+						{state.toSiteId == 0 || state.toSiteId == 4 ?
 						<>
 						</>
 						:
@@ -121,12 +123,12 @@ export default ({ state, action, processing,isAdd }) => {
 							dataColumn="toCustId"
 							value={state.toCustId}
 						/>
-						<InputBox
+						{/* <InputBox
 							Title="To UserName"
 							OnChange={action.EditMainValue}
 							dataColumn="toUserName"
 							value={state.toUserName}
-						/>
+						/> */}
 						</>
 						}
 					</div>
@@ -163,20 +165,24 @@ export default ({ state, action, processing,isAdd }) => {
 						/>
 					</div>
 					<div className="row-flex">
-						<InputBox
+					<InputBox
 							Title="To Amount"
 							OnChange={action.EditMainValue}
 							dataColumn="toAmount"
 							value={state.toAmount}
 							type="number"
 						/>
-						<InputBox
+						<label>{number_format(state.toAmount)}</label>
+					</div>
+					<div className="row-flex">
+					<InputBox
 							Title="To Fee"
 							OnChange={action.EditMainValue}
 							dataColumn="toFee"
 							value={state.toFee}
 							type="number"
 						/>
+						<label>{number_format(state.toFee)}</label>
 					</div>
 						</>
 						:
@@ -228,7 +234,7 @@ export default ({ state, action, processing,isAdd }) => {
 							dataColumn="fromSiteId"
 							SelectedValue={state.fromSiteId}
 						/>
-						{state.fromSiteId == 0 ?
+						{state.fromSiteId == 0 || state.fromSiteId == 4 ?
 						<>
 						</>
 						:
@@ -239,12 +245,12 @@ export default ({ state, action, processing,isAdd }) => {
 							dataColumn="fromCustId"
 							value={state.fromCustId}
 						/>
-						<InputBox
+						{/* <InputBox
 							Title="From UserName"
 							OnChange={action.EditMainValue}
 							dataColumn="fromUserName"
 							value={state.fromUserName}
-						/>
+						/> */}
 						</>
 						}
 					</div>
@@ -281,20 +287,24 @@ export default ({ state, action, processing,isAdd }) => {
 						/>
 					</div>
 					<div className="row-flex">
-						<InputBox
+					    <InputBox
 							Title="From Amount"
 							OnChange={action.EditMainValue}
 							dataColumn="fromAmount"
 							value={state.fromAmount}
 							type="number"
 						/>
-						<InputBox
+						<label>{number_format(state.fromAmount)}</label>
+					</div>
+					<div className="row-flex">
+					<InputBox
 							Title="From Fee"
 							OnChange={action.EditMainValue}
 							dataColumn="fromFee"
 							value={state.fromFee}
 							type="number"
 						/>
+						<label>{number_format(state.fromFee)}</label>
 					</div>
 						</>
 						:
@@ -350,7 +360,7 @@ export default ({ state, action, processing,isAdd }) => {
 							dataColumn="fromSiteId"
 							SelectedValue={state.fromSiteId}
 						/>
-						{state.fromSiteId == 0 ?
+						{state.fromSiteId == 0 || state.fromSiteId == 4 || state.transferType == 2 || state.transferType == 3?
 						<>
 						</>
 						:
@@ -361,12 +371,12 @@ export default ({ state, action, processing,isAdd }) => {
 							dataColumn="fromCustId"
 							value={state.fromCustId}
 						/>
-						<InputBox
+						{/* <InputBox
 							Title="From UserName"
 							OnChange={action.EditMainValue}
 							dataColumn="fromUserName"
 							value={state.fromUserName}
-						/>
+						/> */}
 						</>
 						}
 					</div>
@@ -418,6 +428,26 @@ export default ({ state, action, processing,isAdd }) => {
 							type="number"
 						/>
 					</div>
+					<div className="row-flex">
+					    <InputBox
+							Title="From Amount"
+							OnChange={action.EditMainValue}
+							dataColumn="fromAmount"
+							value={state.fromAmount}
+							type="number"
+						/>
+						<label>{number_format(state.fromAmount)}</label>
+					</div>
+					<div className="row-flex">
+					<InputBox
+							Title="From Fee"
+							OnChange={action.EditMainValue}
+							dataColumn="fromFee"
+							value={state.fromFee}
+							type="number"
+						/>
+						<label>{number_format(state.fromFee)}</label>
+					</div>
 					<div className="panel level-1 mt-20">
 						<div className="panel-title no-arrow" style={{ justifyContent: "space-between" }}>
 							<span style={{ color: "white" }}>To Data</span>
@@ -460,7 +490,7 @@ export default ({ state, action, processing,isAdd }) => {
 							dataColumn="toSiteId"
 							SelectedValue={state.toSiteId}
 						/>
-						{state.toSiteId == 0 ?
+						{state.toSiteId == 0 || state.toSiteId == 4 || state.transferType == 1 || state.transferType == 3 ?
 						<>
 						</>
 						:
@@ -471,12 +501,12 @@ export default ({ state, action, processing,isAdd }) => {
 							dataColumn="toCustId"
 							value={state.toCustId}
 						/>
-						<InputBox
+						{/* <InputBox
 							Title="To UserName"
 							OnChange={action.EditMainValue}
 							dataColumn="toUserName"
 							value={state.toUserName}
-						/>
+						/> */}
 						</>
 						}
 					</div>
@@ -520,6 +550,9 @@ export default ({ state, action, processing,isAdd }) => {
 							value={state.toAmount}
 							type="number"
 						/>
+						<label>{number_format(state.toAmount)}</label>
+					</div>
+					<div className="row-flex">
 						<InputBox
 							Title="To Fee"
 							OnChange={action.EditMainValue}
@@ -527,6 +560,7 @@ export default ({ state, action, processing,isAdd }) => {
 							value={state.toFee}
 							type="number"
 						/>
+						<label>{number_format(state.toFee)}</label>
 					</div>
 						</>
 						:
@@ -551,6 +585,25 @@ export default ({ state, action, processing,isAdd }) => {
 							value={state.remark}
 						/>
 					</div>
+				   <div className="row-flex"> 
+				   <UploadBox
+				            Id="UploadReceipt"
+							Title="Upload Receipt"
+							type="file"
+							Accept=".png, .jpg, .jpeg"
+							OnChange={action.UploadReceipt}
+							dataColumn="uploadReceipt"
+							value={state.uploadReceipt}
+						/>
+						<label>{state.uploadReceiptName}</label>
+                   </div>
+				   { state.transferPic==null || state.transferPic==undefined ?
+				   <></>
+				   :
+				   <>
+                 <img className="img-receipt" src={`data:image/jpeg;base64,${state.transferPic}`} /> 
+				 </>
+				   }
 					<hr></hr>
 					<div className="row-flex">
 						<InputBox
