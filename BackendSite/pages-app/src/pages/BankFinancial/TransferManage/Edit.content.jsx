@@ -413,22 +413,6 @@ export default ({ state, action, processing,isAdd }) => {
 						/>
 					</div>
 					<div className="row-flex">
-						<InputBox
-							Title="From Amount"
-							OnChange={action.EditMainValue}
-							dataColumn="fromAmount"
-							value={state.fromAmount}
-							type="number"
-						/>
-						<InputBox
-							Title="From Fee"
-							OnChange={action.EditMainValue}
-							dataColumn="fromFee"
-							value={state.fromFee}
-							type="number"
-						/>
-					</div>
-					<div className="row-flex">
 					    <InputBox
 							Title="From Amount"
 							OnChange={action.EditMainValue}
