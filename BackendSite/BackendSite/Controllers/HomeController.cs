@@ -41,5 +41,9 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        public IActionResult DashboardNew()
+        {
+            return View();
+        }
     }
 }

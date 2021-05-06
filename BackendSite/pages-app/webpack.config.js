@@ -168,6 +168,11 @@ module.exports = {
     // 	"./src/pages/Marketing/VipRebateInfoReport/index.js"
 
     // ],
+    // "Finance/WithdrawalLimitManage.min": [
+    // 	// '@babel/polyfill',
+    // 	"./src/pages/Finance/WithdrawalLimitManage/index.js"
+    // ],
+    "Home/DashBoardNew.min": ["./src/pages/Home/DashBoardNew/index.js"],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

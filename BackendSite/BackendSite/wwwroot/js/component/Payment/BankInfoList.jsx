@@ -64,11 +64,11 @@ import { number_format } from '../commJS/common';
                         </select>
                     </td>
                     <td>
-                        {row.status < 3 ? <select className="custom-select" name="status" onChange={this.onChange.bind(this)} value={row.status}>
+                        <select className="custom-select" name="status" onChange={this.onChange.bind(this)} value={row.status}>
                             <option value={1}>Active</option>
                             <option value={2}>Suspend</option>
                             <option value={3}>Closed</option>
-                        </select> : BankCardStatus[row.status]}
+                        </select>
                     </td>
                     <td>{number_format(row.dummy)}</td>
                     <td className="text-right"><input className="input-small" type="number" name="bSort" value={row.bSort} onChange={this.onChange.bind(this)} /></td>
