@@ -213,11 +213,20 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<DashBoardData>();
             List<int> CanSearchSite = new List<int>();
-            serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x=> CanSearchSite.Add(x.SiteId));
-            var result = dashBoardBLL.GetDashBoardData(para.SiteId,para.CurrencyId,para.BaseCurrencyId, CanSearchSite);
+            try
+            {
+                serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x => CanSearchSite.Add(x.SiteId));
+                var result = dashBoardBLL.GetDashBoardData(para.SiteId, para.CurrencyId, para.BaseCurrencyId, CanSearchSite);
 
-            apiResult.Data = result;
-            apiResult.ErrorCode = 0;
+                apiResult.Data = result;
+                apiResult.ErrorCode = 0;
+            }
+            catch(Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.RawMessage = ex.ToString();
+            }
+            
 
             return apiResult;
         }
