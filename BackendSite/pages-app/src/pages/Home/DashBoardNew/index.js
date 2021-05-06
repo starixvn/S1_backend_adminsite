@@ -36,7 +36,6 @@ const App = () => {
     };
     api.post("/api/Home/GetDashBoardData",param).then((res) => {
       if (res.data.errorCode === 0) {
-        console.log(res.data.data);
         setDatas(res.data.data)
       } else {
         alert(res.data.message ?? "failed to get data.");
@@ -49,7 +48,6 @@ const App = () => {
       ...stateFilter,
       [dataColumn]: v,
     });
-    console.log(stateFilter);
   };
 
   return (

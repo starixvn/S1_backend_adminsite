@@ -25,7 +25,6 @@ namespace BackendSite.Service.DAL
             SiteList.Add(SiteId);
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             DynamicParameters props = new DynamicParameters();
-            //props.Add("SiteId", SiteId);
             props.Add("CurrencyId", CurrencyId);
             props.Add("BaseCurrencyId", BaseCurrencyId);
             props.Add("SelectSite", SiteId != 0 ? JsonConvert.SerializeObject(SiteList) : JsonConvert.SerializeObject(CanSearchSite));

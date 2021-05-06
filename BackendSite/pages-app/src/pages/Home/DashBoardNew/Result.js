@@ -19,7 +19,7 @@ const dataColumnDefs = () => {
         attr: {
           class: "text-right",
         },
-        format: numberFormat,
+        format: numberFormatInteger,
       },
     },
     {
@@ -34,7 +34,7 @@ const dataColumnDefs = () => {
         attr: {
           class: "text-right",
         },
-        format: numberFormat,
+        format: numberFormatInteger,
       },
     },
     {
@@ -276,7 +276,7 @@ const Panel = (props) => {
                   border: "2px #ccc solid",
                   borderRadius: "5px",
                   width: "200px",
-                  backgroundColor: "#0000DB",
+                  backgroundColor: "#A3A3FF",
                 }}
               >
                 <div style={{ textAlign: "center" }}>
@@ -313,5 +313,8 @@ const Panel = (props) => {
 const numberFormat = (number) => {
   return number_format(number_toFixed(number, 2));
 };
+const numberFormatInteger = (number) => {
+    return number_format(number_toFixed(number, 0));
+  };
 
 export default Panel;
