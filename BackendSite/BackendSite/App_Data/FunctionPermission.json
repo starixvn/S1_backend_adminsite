@@ -389,5 +389,15 @@
         "Enable": false
       }
     ]
+  },
+  {
+    "DisplayKey": "Home",
+    "Settings": [
+      {
+        "DisplayKey": "Dashboard",
+        "FuncKey": "Home/DashboardNew",
+        "Enable": false
+      }
+    ]
   }
 ]

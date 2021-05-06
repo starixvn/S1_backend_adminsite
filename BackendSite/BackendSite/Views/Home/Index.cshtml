@@ -5,6 +5,7 @@
 @inject SelLangBLL selLangBLL
 @inject ServerInfoBLL serverInfoBLL
 @inject MenuBLL menuBLL
+@inject PermissionBLL permissionBLL
 @{
     ViewData["Title"] = "Home Page";
     Layout = null;
@@ -108,8 +109,16 @@
             </div>
 
             <div class="main-content-inner">
-                <iframe allowtransparency="true" src="/Home/DashboardNew" frameborder="0" scrolling="auto" id="iframe" class="iframe" name="main">
-                </iframe>
+                @if (permissionBLL.DashBoardAuthorize())
+                {
+                    <iframe allowtransparency="true" src="/Home/DashboardNew" frameborder="0" scrolling="auto" id="iframe" class="iframe" name="main">
+                    </iframe>
+                }
+                else
+                {
+                    <iframe allowtransparency="true" src="" frameborder="0" scrolling="auto" id="iframe" class="iframe" name="main">
+                    </iframe>
+                }
             </div>
         </div>
     </div>
