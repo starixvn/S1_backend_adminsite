@@ -81,6 +81,10 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetVipRebateInfoList(selectSite, currency, startDate, endDate, User, pageSize, pageNumber, CategoryId);
         }
+        public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, long? startDate, long? endDate, int pageSize, int pageNumber)
+        {
+            return walletService.GetVipRebateInfoListByCustId(custId, startDate, endDate, pageSize, pageNumber);
+        }
         public VipRebateInfoData GetVipRebateInfoListExport(string selectSite, int currency, long startDate, long endDate, string User, int CategoryId)
         {
             return walletService.GetVipRebateInfoListExport(selectSite, currency, startDate, endDate, User, CategoryId);
