@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useReducer, useState } from "react";
 import ReactDOM from "react-dom";
 import WebAPI from "../../../module/WebAPI";
+import {api} from "../../../module/WebAPI";
 import moment from "moment";
 import Edit from "./Edit";
 
@@ -63,8 +64,6 @@ const App = () => {
 	}, []);
 
 	const Filter_OnChange = (v, dataColumn) => {
-		console.log("v",v);
-		console.log("dataColumn",dataColumn);
 		setFilter({
 		  ...stateFilter,
 		  [dataColumn]: v,
@@ -76,18 +75,17 @@ const App = () => {
 			if (isMountedRef.current) {
 				setProcessing(true);
 			}
-			console.log(stateFilter);
 			let param = {
 				Url: "TransferManage/GetTransferInfoList",
 				Data: {
-					TransferType: Number(stateFilter.TransferType),
+					TransferType: stateFilter.TransferType == 0 ? null : Number(stateFilter.TransferType),
                     TransFromDate: moment(stateFilter.FromDate).format('YYYY-MM-DD'),
                     TransToDate: moment(stateFilter.ToDate).format('YYYY-MM-DD'),
-				    Reason:  Number(stateFilter.Reason),
+				    Reason:  stateFilter.Reason == 0 ? null : Number(stateFilter.Reason),
                     FromAccountNo: stateFilter.FromAccountNo,
 				    FromAccountDisplayName: stateFilter.FromAccountDisplayName,
 				    ToAccountNo: stateFilter.ToAccountNo,
-				    ToAccountDIsplayName: stateFilter.ToAccountDIsplayName,
+				    ToAccountDisplayName: stateFilter.ToAccountDisplayName,
 				}
 			};
 			WebAPI.PostData(param).then(
@@ -170,9 +168,16 @@ const App = () => {
 				setProcessing(true);
 			}
 			let param = {
-				Url: 'TransferAccountManage/ExportTransferAccountInfoList',
+				Url: 'TransferManage/ExportTransferInfoList',
 				Data: {
-					SiteId: siteId
+					TransferType: stateFilter.TransferType == 0 ? null : Number(stateFilter.TransferType),
+                    TransFromDate: moment(stateFilter.FromDate).format('YYYY-MM-DD'),
+                    TransToDate: moment(stateFilter.ToDate).format('YYYY-MM-DD'),
+				    Reason:  stateFilter.Reason == 0 ? null : Number(stateFilter.Reason),
+                    FromAccountNo: stateFilter.FromAccountNo,
+				    FromAccountDisplayName: stateFilter.FromAccountDisplayName,
+				    ToAccountNo: stateFilter.ToAccountNo,
+				    ToAccountDisplayName: stateFilter.ToAccountDisplayName,
 				}
 			};
 	
@@ -190,7 +195,6 @@ const App = () => {
 			if (isMountedRef.current) {
 				setProcessing(true);
 			}
-			console.log(info);
 			let _info = {
 				TransferId:info.transferId,
 				TransferType:Number(info.transferType),
@@ -228,32 +232,38 @@ const App = () => {
 				CreateTime:info.createTime,
 				Creator: Number(info.creator),
 				UpdateTime:info.updateTime,
-				Updator: Number(info.updator)
+				Updator: Number(info.updator),
 			};
 
-			let param = {
-				Url: "TransferManage/SetTransferInfo",
-				Data:_info
-			};
-			WebAPI.PostData(param).then(
-				res => {
-					if (isMountedRef.current) {
-						if (res.data.errorCode <= 2 ) {
-							dispatch({ type: defActionType.SET_TRANSFER_INFO });
-						} 
-						else {
-							alert(res.data.message ?? "failed to set data.");
-						}
-						setProcessing(false);
-					}
-				},
-				err => {
-					if (isMountedRef.current) {
-						alert("API Server Error.");
-						setProcessing(false);
-					}
-				}
-			);
+			let settings = { headers: { "content-type": "multipart/form-data" } };
+			let file = document.getElementById("UploadReceipt").files[0];
+
+			var formData = new FormData();
+            formData.append("TransferInfoDetails", JSON.stringify(_info));
+
+			if(file != undefined){
+				let fileName=file.name;
+				formData.append("UploadReceipt", file, file.name);
+			}
+
+            api
+          .post("/api/TransferManage/SetTransferInfo", formData, settings)
+          .then(function (response) {
+            if (response.data.errorCode <= 2) {
+				dispatch({ type: defActionType.SET_TRANSFER_INFO });
+				Filter_Submit();
+			} 
+			else {
+				alert(response.data.message ?? "failed to set data.");
+			}
+			setProcessing(false);
+          })
+          .catch(function (error) {
+			if (isMountedRef.current) {
+				alert("API Server Error.");
+				setProcessing(false);
+			}
+          });
 		}
 	};
 
@@ -284,6 +294,7 @@ const App = () => {
 							type: defActionType.EDIT_TRANSFER_INFO,
 							transferInfoData: transferInfoData.data,
 						});
+						//Filter_Submit();
 					}
 
 				} else {
@@ -345,8 +356,6 @@ const App = () => {
 	) : (
 			<Edit
 				Datas={state.transferInfoData}
-				SetFromCurrencyList={state.setFromCurrencyList}
-				SetToCurrencyList={state.setToCurrencyList}
 				action={{ SetTransferInfo, ClickBack, setProcessing }}
 				IsAdd={state.panelType === defPanelType.Add}
 				processing={processing}

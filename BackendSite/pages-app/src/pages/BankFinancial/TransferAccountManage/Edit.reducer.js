@@ -20,9 +20,6 @@ export const initialState = (datas, setCurrencyList, isAdd) => {
   }
   if (isAdd) {
     switch (datas.siteId) {
-      case 0:
-        datas.siteName = "Soon88";
-        break;
       case 1:
         datas.siteName = "Nova88";
         break;
@@ -31,6 +28,9 @@ export const initialState = (datas, setCurrencyList, isAdd) => {
         break;
       case 3:
         datas.siteName = "Bwing";
+        break;
+      case 4:
+        datas.siteName = "Soon88";
         break;
     }
   }
@@ -75,7 +75,7 @@ export function reducer(state, action) {
       };
 
     case defActionType.MAIN_SET_SITEID_VALUE:
-      if (action.value == 0) {
+      if (action.value == 4) {
         return {
           ...state,
           [action.dataColumn]: action.value,

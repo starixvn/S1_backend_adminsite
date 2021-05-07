@@ -269,5 +269,28 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+
+        public bool DashBoardAuthorize()
+        {
+            bool result = false;
+
+            var authData = authorizeBLL.GetAuthData();
+            var loginUser = adminUserService.GetUser(authData.UserId);
+
+            if (loginUser.IsSuper)
+            {
+                result = true;
+            }
+            else if (loginUser.GroupSEQ != null)
+            {
+                var permissions = GetUserPermission((int)loginUser.GroupSEQ, "Home/DashboardNew");
+                if (permissions != null)
+                {
+                    result = true;
+                }
+            }
+
+            return result;
+        }
     }
 }
