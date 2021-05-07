@@ -11,6 +11,24 @@ const defRebateType = {
     1: "Rebate",
     2: "Cash Back"
 };
+const defCurrencyType = {
+    2: "MYR",
+    4: "THB",
+    13: "RMB",
+    15: "IDR",
+    51: "VND",
+    96: "USDT",
+};
+const defCategoryType = {
+    1: "Sports",
+    2: "Slots",
+    3: "Live Casino",
+    4: "Fishing",
+    5: "Cockfighting",
+    6: "Lottery",
+    7: "Virtual Sports",
+    8: "Poker"
+};
 
 const Panel = (props) => {
     let siteListOptions = "";
@@ -80,12 +98,42 @@ const Panel = (props) => {
                         }
                     }}
                 />
+                <DropDownBox
+                    columnTitle="Currency"
+                    options={Object.keys(defCurrencyType).map(key => { return { value: key, displayText: defCurrencyType[key] } })}
+                    hasAll={true}
+                    selectedValue={0}
+                    dataColumn="Currency"
+                    onChange={props.onChange}
+                />
+                <DropDownBox
+                    columnTitle="Base Currency Show"
+                    options={Object.keys(defCurrencyType).map(key => { return { value: key, displayText: defCurrencyType[key] } })}
+                    hasAll={false}
+                    selectedValue={2}
+                    dataColumn="BaseCurrency"
+                    onChange={props.onChange}
+                />
             </div>
             <div className="row-flex">
                 <InputField
                     columnTitle="User"
                     defaultValue=""
                     dataColumn="User"
+                    onChange={props.onChange}
+                />
+                <DropDownBox
+                    columnTitle="Rebate Categories"
+                    options={Object.keys(defCategoryType).map(key => { return { value: key, displayText: defCategoryType[key] } })}
+                    hasAll={true}
+                    selectedValue={0}
+                    dataColumn="RebateCategories"
+                    onChange={props.onChange}
+                />
+                <InputField
+                    columnTitle="Total Amount Show"
+                    defaultValue=""
+                    dataColumn="TotalAmountShow"
                     onChange={props.onChange}
                 />
                 <div className="button-group">

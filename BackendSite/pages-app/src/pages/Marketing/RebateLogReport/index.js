@@ -13,6 +13,10 @@ const App = () => {
         'EndDate': moment().format('l'),
         'Type': 0,
         'User': '',
+        'Currency':0,
+        'BaseCurrency':2,
+        'TotalAmountShow':0.0,
+        'RebateCategories':0
     });
 
     const [stateDatas, setDatas] = useState({
@@ -90,7 +94,11 @@ const App = () => {
                 StartDate: moment(stateFilter.StartDate).unix(),
                 EndDate: moment(stateFilter.EndDate).add(1, 'days').unix() - 1,
                 UserName: stateFilter.User,
-                PageNumber: 1
+                PageNumber: 1,
+                CurrencyId:parseInt(stateFilter.Currency,10),
+                BaseCurrencyId:parseInt(stateFilter.BaseCurrency,10),
+                TotalAmountShow:parseFloat(stateFilter.TotalAmountShow),
+                RebateCategoriesId:parseInt(stateFilter.RebateCategories,10),
             })
         };
 

@@ -199,13 +199,13 @@ namespace BackendSite.Controllers.Api
 
             return apiListResult;
         }
-        public ApiListResult<RebateLog> GetRebateLog([FromForm] IEnumerable<int> SelectSite, [FromForm] string UserName, [FromForm] int RebateType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)
+        public ApiListResult<RebateLog> GetRebateLog([FromForm] IEnumerable<int> SelectSite, [FromForm] string UserName, [FromForm] int RebateType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int CurrencyId, [FromForm] int BaseCurrencyId, [FromForm] decimal TotalAmountShow, [FromForm] int RebateCategoriesId)
         {
             var apiListResult = new ApiListResult<RebateLog>();
             int PageSize = 10;
             int TotalPages = 0;
             int RowCount = 0;
-            apiListResult.Data = paymentBLL.GetRebateLog(SelectSite, UserName, RebateType, StartDate, EndDate, PageSize, ref PageNumber, out TotalPages, out RowCount);
+            apiListResult.Data = paymentBLL.GetRebateLog(SelectSite, UserName, RebateType, StartDate, EndDate, PageSize, CurrencyId, BaseCurrencyId, TotalAmountShow, RebateCategoriesId, ref PageNumber, out TotalPages, out RowCount);
             apiListResult.PageNumber = PageNumber;
             apiListResult.RowCount = RowCount;
             apiListResult.TotalPages = TotalPages;
