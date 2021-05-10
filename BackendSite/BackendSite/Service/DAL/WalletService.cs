@@ -213,6 +213,27 @@ namespace BackendSite.Service.DAL
             SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
             return SearchData;
         }
+        public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, long? startDate, long? endDate, int pageSize, int pageNumber)
+        {
+            VipRebateInfoData SearchData = new VipRebateInfoData();
+            DynamicParameters props = new DynamicParameters();
+            props.Add("CustId", custId);
+            props.Add("StartDate", startDate);
+            props.Add("EndDate", endDate);
+            props.Add("PageSize", pageSize);
+            props.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var result = conn.Query<VipRebateInfo>("Admin_VipRebateReportListbyCust_Get", props, commandType: CommandType.StoredProcedure).ToList();
+
+            SearchData.VipRebateInfoList = result;
+            SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            SearchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
+            return SearchData;
+        }
         public VipRebateInfoData GetVipRebateInfoListExport(string selectSite, int currency, long startDate, long endDate, string User, int CategoryId)
         {
             VipRebateInfoData SearchData = new VipRebateInfoData();

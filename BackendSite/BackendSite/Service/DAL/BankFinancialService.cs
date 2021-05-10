@@ -198,6 +198,17 @@ namespace BackendSite.Service.DAL
             }
         }
 
+        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountList()
+        {
+
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                string SpName = "Admin_BankFinancialTransferAccount_GetForList";
+                return conn.Query<BankFinancialTransferAccountDetailModel>(SpName,commandType: CommandType.StoredProcedure);
+            }
+        }
+
+
         #endregion
 
         #region Transfer Info

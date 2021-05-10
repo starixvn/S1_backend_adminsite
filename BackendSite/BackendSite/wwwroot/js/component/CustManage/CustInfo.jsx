@@ -398,14 +398,52 @@ import PromotionReport from './PromotionReport/index';
             this.props.ChangePage(pageNumber);
         }
 
+        // render() {
+        //     let rows = this.props.searchData.data.map(row =>
+        //         <tr key={row.id}>
+        //             <td>{moment(row.createTime).format('l LTS')}</td>
+        //             <td>{row.gameName ? row.gameName : "N/A"}</td>
+        //             <td>{row.rebateTypeName ? row.rebateTypeName : "N/A"}</td>
+        //             <td className="text-right">{number_format(row.redeemAmount)}</td>
+        //             <td>{row.bonusCode ? row.bonusCode : "N/A"}</td>
+        //         </tr>
+        //     );
+
+        //     return (
+        //         <div className="table">
+        //             <div className="table-options">
+        //                 <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>
+        //                     Refresh
+        //                 </button>
+        //             </div>
+        //             <table className="table table-striped">
+        //                 <thead>
+        //                     <tr>
+        //                         <th scope="col">Timexxxx {moment().format('(Z)')}</th>
+        //                         <th scope="col">Game Name</th>
+        //                         <th scope="col">Rebate Type Name</th>
+        //                         <th scope="col" className="text-right">Redeem Amount</th>
+        //                         <th scope="col">Bonus Code</th>
+        //                     </tr>
+        //                 </thead>
+        //                 <tbody>
+        //                     {rows}
+        //                 </tbody>
+        //             </table>
+        //             <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+        //         </div>
+        //     )
+        // }
+
+   
         render() {
+            console.log(this.props.searchData.data);
             let rows = this.props.searchData.data.map(row =>
                 <tr key={row.id}>
                     <td>{moment(row.createTime).format('l LTS')}</td>
-                    <td>{row.gameName ? row.gameName : "N/A"}</td>
-                    <td>{row.rebateTypeName ? row.rebateTypeName : "N/A"}</td>
-                    <td className="text-right">{number_format(row.redeemAmount)}</td>
-                    <td>{row.bonusCode ? row.bonusCode : "N/A"}</td>
+                    <td>{row.categoryName }</td>
+                    <td className="text-right">{number_format(row.rcRedeemAmount)}</td>
+                    <td>{row.refId}</td>
                 </tr>
             );
 
@@ -419,11 +457,10 @@ import PromotionReport from './PromotionReport/index';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">Time {moment().format('(Z)')}</th>
-                                <th scope="col">Game Name</th>
-                                <th scope="col">Rebate Type Name</th>
-                                <th scope="col" className="text-right">Redeem Amount</th>
-                                <th scope="col">Bonus Code</th>
+                            <th scope="col">Time {"+08:00"}</th>  
+                            <th scope="col">Category</th>
+                            <th scope="col" className="text-right">Redeem Amount</th>
+                            <th scope="col">RefId</th>                            
                             </tr>
                         </thead>
                         <tbody>
@@ -1628,7 +1665,7 @@ import PromotionReport from './PromotionReport/index';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History", "VIP Level", "Promotion Report"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History", "VIP Level", "Promotion Report"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
         constructor(props) {
@@ -1683,13 +1720,34 @@ import PromotionReport from './PromotionReport/index';
             }
         }
 
+        // GetRebateLog(PageNumber) {
+        //     Loading.OnLoading();
+        //     let pageNumber = PageNumber || this.state.RebateLogData.pageNumber;
+        //     let CustId = getUrlParameter("custId");
+        //     if (!isNaN(CustId)) {
+        //         let iCustId = parseInt(CustId);
+        //         axios.post('/api/Payment/GetRebateLogByCust', { ...this.state.RebateLog, CustId: iCustId, PageNumber: pageNumber })
+        //             .then(function (response) {
+        //                 Loading.UnLoading();
+        //                 let result = response.data;
+        //                 if (result.errorCode == 0) {
+        //                     this.setState({ RebateLogData: result });
+        //                 } else {
+        //                     alert(result.message);
+        //                 }
+        //             }.bind(this)).catch(function (error) {
+        //                 Loading.UnLoading();
+        //                 alert(error);
+        //             }.bind(this));
+        //     }
+        // }
         GetRebateLog(PageNumber) {
             Loading.OnLoading();
             let pageNumber = PageNumber || this.state.RebateLogData.pageNumber;
             let CustId = getUrlParameter("custId");
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
-                axios.post('/api/Payment/GetRebateLogByCust', { ...this.state.RebateLog, CustId: iCustId, PageNumber: pageNumber })
+                axios.post('/api/Payment/GetVipRebateInfoListByCustId', { ...this.state.RebateLog, CustId: iCustId, PageNumber: pageNumber })
                     .then(function (response) {
                         Loading.UnLoading();
                         let result = response.data;

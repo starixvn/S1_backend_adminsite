@@ -30,6 +30,7 @@ const App = () => {
 	});
 
 	const GetInitSelectedSiteName = (props) => {
+		console.log(props);
 		let headerRows = [];
 		props.map(x => {
 			headerRows.push({
@@ -52,10 +53,10 @@ const App = () => {
 
 	useEffect(() => {
 		let param1 = {
-			Url: "Marketing/GetAllSites"
+			Url: "Common/AdminUserSiteList"
 		};
 		let aaa = [];
-		WebAPI.fetchData(param1).then(x => {
+		WebAPI.PostData(param1).then(x => {
 			if (isMountedRef.current) {
 				if (x.data.errorCode === 0) {
 					let initSitnemaFilter = GetInitSelectedSiteName(x.data.data);
@@ -93,9 +94,9 @@ const App = () => {
 
 	useEffect(() => {
 		let param = {
-			Url: "Marketing/GetAllSites"
+			Url: "Common/AdminUserSiteList"
 		};
-		WebAPI.fetchData(param).then(res => {
+		WebAPI.PostData(param).then(res => {
 			if (isMountedRef.current) {
 				if (res.data.errorCode === 0) {
 					dispatch({

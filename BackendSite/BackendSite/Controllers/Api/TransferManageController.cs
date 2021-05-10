@@ -384,6 +384,25 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        public ApiResult GetTransferAccountList()
+        {
+            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccountDetailModel>>();
+
+            try
+            {
+                apiResult.Data = _bankFinancialBLL.GetTransferAccountList();
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.Message;
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+            }
+
+            return apiResult;
+        }
+
         #endregion
 
         #endregion

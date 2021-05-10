@@ -579,6 +579,34 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+        public class VipRebateInfoByCustIdPara
+        {
+            public int CustId { get; set; }
+            public long? StartDate { get; set; }
+            public long? EndDate { get; set; }
+            public int PageNumber { get; set; }
+        }
+        [HttpPost]
+        public ApiListResult<VipRebateInfo> GetVipRebateInfoListByCustId(VipRebateInfoByCustIdPara para)
+        {
+            var apiResult = new ApiListResult<VipRebateInfo>();
+            try
+            {
+                var SearchResult = paymentBLL.GetVipRebateInfoListByCustId(para.CustId, para.StartDate, para.EndDate, 10, para.PageNumber);
+                apiResult.Data = SearchResult.VipRebateInfoList;
+                apiResult.PageNumber = SearchResult.PageNumber;
+                apiResult.TotalPages = SearchResult.TotalPages;
+                apiResult.RowCount = SearchResult.RowCount;
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
         public class VipRebateInfoParaExport
         {
             public string SelectSite { get; set; }
