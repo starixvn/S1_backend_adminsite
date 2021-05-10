@@ -97,11 +97,7 @@ const VipRebateInfoReport = lazy(() =>
 const WithdrawalLimitManage = lazy(() =>
   import("./pages/Finance/WithdrawalLimitManage/index")
 );
-const DashBoardNew= lazy(() =>
-import("./pages/Home/DashBoardNew/index")
-);
-export const defaultPage = "TransferAccountManage";
-
+const DashBoardNew = lazy(() => import("./pages/Home/DashBoardNew/index"));
 export const defaultPage = "TransferManage";
 
 export const layoutType = {

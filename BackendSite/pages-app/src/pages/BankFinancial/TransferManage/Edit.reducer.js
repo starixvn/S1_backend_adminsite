@@ -1,3 +1,5 @@
+import { data } from "jquery";
+
 export const defActionType = {
   MAIN_SET_VALUE: "MAIN_SET_VALUE",
 
@@ -6,10 +8,14 @@ export const defActionType = {
   MAIN_SET_FROM_CHANNEL_VALUE: "MAIN_SET_FROM_CHANNEL_VALUE",
   MAIN_SET_FROM_SITEID_VALUE: "MAIN_SET_FROM_SITEID_VALUE",
   MAIN_SET_FROM_CURRENCY_VALUE: "MAIN_SET_FROM_CURRENCY_VALUE",
+  MAIN_SET_FROM_BANK_VALUE: "MAIN_SET_FROM_BANK_VALUE",
+  MAIN_SET_FROM_ACCOUNT_VALUE: "MAIN_SET_FROM_ACCOUNT_VALUE",
 
   MAIN_SET_TO_CHANNEL_VALUE: "MAIN_SET_TO_CHANNEL_VALUE",
   MAIN_SET_TO_SITEID_VALUE: "MAIN_SET_TO_SITEID_VALUE",
   MAIN_SET_TO_CURRENCY_VALUE: "MAIN_SET_TO_CURRENCY_VALUE",
+  MAIN_SET_TO_BANK_VALUE: "MAIN_SET_TO_BANK_VALUE",
+  MAIN_SET_TO_ACCOUNT_VALUE: "MAIN_SET_TO_ACCOUNT_VALUE",
 
   //Initial List
   SITE_SET_LIST: "SITE_SET_LIST",
@@ -17,10 +23,13 @@ export const defActionType = {
   TO_CURRENCY_SET_LIST: "TO_CURRENCY_SET_LIST",
   FROM_BANK_SET_LIST: "FROM_BANK_SET_LIST",
   TO_BANK_SET_LIST: "TO_BANK_SET_LIST",
+  FROM_ACCOUNT_SET_LIST: "FROM_ACCOUNT_SET_LIST",
+  TO_ACCOUNT_SET_LIST: "TO_ACCOUNT_SET_LIST",
   CHANNEL_SET_VALUE: "CHANNEL_SET_VALUE",
   PAY_SET_LIST: "PAY_SET_LIST",
   BANK_CODE_SET_LIST: "BANK_CODE_SET_LIST",
   REASON_SET_LIST: "REASON_SET_LIST",
+  TRANSFER_ACCOUNT_SET_LIST: "TRANSFER_ACCOUNT_SET_LIST",
 
   //Upload Receipt
   SET_UPLOAD_RECEIPT: "SET_UPLOAD_RECEIPT",
@@ -45,6 +54,7 @@ export const initialState = (datas, isAdd) => {
     fromCustId: datas.fromCustId,
     fromCurrencyId: datas.fromCurrencyId,
     fromSysId: datas.fromSysId,
+    fromAccount: datas.fromAccountNo,
     fromAccountNo: datas.fromAccountNo,
     fromAccountDisplayName: datas.fromAccountDisplayName,
     fromAmount: datas.fromAmount,
@@ -59,6 +69,7 @@ export const initialState = (datas, isAdd) => {
     toCustId: datas.toCustId,
     toCurrencyId: datas.toCurrencyId,
     toSysId: datas.toSysId,
+    toAccount: datas.toAccountNo,
     toAccountNo: datas.toAccountNo,
     toAccountDisplayName: datas.toAccountDisplayName,
     toAmount: datas.toAmount,
@@ -79,14 +90,17 @@ export const initialState = (datas, isAdd) => {
     setFromSiteList: [],
     setFromCurrencyList: [],
     setFromBankCodeList: [],
+    setFromAccountList: [],
 
     setToSiteList: [],
     setToCurrencyList: [],
     setToBankCodeList: [],
+    setToAccountList: [],
 
     reasonList: [],
     payList: [],
     bankCodeList: [],
+    transferAccountList: [],
   };
 };
 
@@ -126,17 +140,20 @@ export function reducer(state, action) {
       });
 
       getFromSiteId = state.setFromSiteList.find(
-        (x) => x.siteId == action.value
+        (x) => x.value == action.value
       );
-      if (getFromSiteId) {
-        fromSiteName = getFromSiteId.siteName;
 
-        getFromSiteId.iCurrencyList.map((i) => {
-          fromCurrencyList.push({
-            value: Number(i),
-            displayText: window.i18n[`lbl_Currency${i}`],
+      if (getFromSiteId) {
+        fromSiteName = getFromSiteId.displayText;
+
+        if (getFromSiteId.iCurrencyList) {
+          getFromSiteId.iCurrencyList.map((i) => {
+            fromCurrencyList.push({
+              value: Number(i),
+              displayText: window.i18n[`lbl_Currency${i}`],
+            });
           });
-        });
+        }
       }
 
       return {
@@ -145,6 +162,8 @@ export function reducer(state, action) {
         fromSiteName: fromSiteName,
         fromCurrencyId: 0,
         fromSysId: 0,
+        fromAgnet: "",
+        fromPayId: "",
         fromAccountNo: "",
         fromAccountDisplayName: "",
         setFromCurrencyList: fromCurrencyList,
@@ -169,24 +188,97 @@ export function reducer(state, action) {
       return {
         ...state,
         [action.dataColumn]: action.value,
-        sysId: 0,
+        fromSysId: 0,
+        fromAgent: "",
+        fromPayId: 0,
         setFromBankCodeList: fromBankList,
       };
 
     case defActionType.MAIN_SET_FROM_CHANNEL_VALUE:
+      let refreshFromAccountList = [];
+      refreshFromAccountList.push({
+        value: 0,
+        displayText: "- Select Account -",
+      });
+      state.transferAccountList.map((s) => {
+        if (
+          s.channel == Number(action.value) &&
+          s.siteId == Number(state.fromSiteId) &&
+          s.currencyId == Number(state.fromCurrencyId) &&
+          s.sysId == Number(state.fromSysId)
+        ) {
+          refreshFromAccountList.push({
+            value: s.value,
+            displayText: s.displayText,
+          });
+        }
+      });
       if (action.value == 3) {
         return {
           ...state,
           [action.dataColumn]: action.value,
           fromAgent: "",
+          fromPayId: 0,
+          setFromAccountList: refreshFromAccountList,
+          fromAccount: 0,
+          fromAccountNo: "",
+          fromAccountDisplayName: "",
         };
       } else {
         return {
           ...state,
           [action.dataColumn]: action.value,
           fromPayId: 0,
+          fromAgent: "",
+          fromAccount: 0,
+          setFromAccountList: refreshFromAccountList,
+          fromAccountNo: "",
+          fromAccountDisplayName: "",
         };
       }
+
+    case defActionType.MAIN_SET_FROM_BANK_VALUE:
+      let fromAccountList = [];
+      fromAccountList.push({
+        value: 0,
+        displayText: "- Select Account -",
+      });
+      state.transferAccountList.map((s) => {
+        if (
+          s.channel == Number(state.fromChannel) &&
+          s.siteId == Number(state.fromSiteId) &&
+          s.currencyId == Number(state.fromCurrencyId) &&
+          s.sysId == Number(action.value)
+        ) {
+          fromAccountList.push({
+            value: s.value,
+            displayText: s.displayText,
+          });
+        }
+      });
+      return {
+        ...state,
+        [action.dataColumn]: action.value,
+        setFromAccountList: fromAccountList,
+        fromAccount: 0,
+        fromAgent: "",
+        fromPayId: 0,
+        fromAccountNo: "",
+        fromAccountDisplayName: "",
+      };
+
+    case defActionType.MAIN_SET_FROM_ACCOUNT_VALUE:
+      let getFromAccountItem = state.transferAccountList.find(
+        (x) => x.value == action.value
+      );
+      return {
+        ...state,
+        fromAccount: getFromAccountItem.value,
+        fromAccountNo: getFromAccountItem.value,
+        fromAgent: getFromAccountItem.agent,
+        fromPayId: getFromAccountItem.payId,
+        fromAccountDisplayName: getFromAccountItem.displayText,
+      };
 
     case defActionType.MAIN_SET_TO_SITEID_VALUE:
       let getToSiteId = null;
@@ -204,17 +296,19 @@ export function reducer(state, action) {
         displayText: "- Select Bank Code -",
       });
 
-      getToSiteId = state.setToSiteList.find((x) => x.siteId == action.value);
+      getToSiteId = state.setToSiteList.find((x) => x.value == action.value);
 
       if (getToSiteId) {
-        toSiteName = getToSiteId.siteName;
+        toSiteName = getToSiteId.displayText;
 
-        getToSiteId.iCurrencyList.map((i) => {
-          toCurrencyList.push({
-            value: Number(i),
-            displayText: window.i18n[`lbl_Currency${i}`],
+        if (getToSiteId.iCurrencyList) {
+          getToSiteId.iCurrencyList.map((i) => {
+            toCurrencyList.push({
+              value: Number(i),
+              displayText: window.i18n[`lbl_Currency${i}`],
+            });
           });
-        });
+        }
       }
 
       return {
@@ -247,30 +341,117 @@ export function reducer(state, action) {
       return {
         ...state,
         [action.dataColumn]: action.value,
-        sysId: 0,
+        toSysId: 0,
+        toAgent: "",
+        toPayId: 0,
         setToBankCodeList: toBankList,
       };
 
     case defActionType.MAIN_SET_TO_CHANNEL_VALUE:
+      let refreshToAccountList = [];
+      refreshToAccountList.push({
+        value: 0,
+        displayText: "- Select Account -",
+      });
+      state.transferAccountList.map((s) => {
+        if (
+          s.channel == Number(action.value) &&
+          s.siteId == Number(state.toSiteId) &&
+          s.currencyId == Number(state.toCurrencyId) &&
+          s.sysId == Number(state.toSysId)
+        ) {
+          refreshToAccountList.push({
+            value: s.value,
+            displayText: s.displayText,
+          });
+        }
+      });
+
       if (action.value == 3) {
         return {
           ...state,
           [action.dataColumn]: action.value,
           toAgent: "",
+          toPayId: 0,
+          setToAccountList: refreshToAccountList,
+          toAccount: 0,
+          toAccountNo: "",
+          toAccountDisplayName: "",
         };
       } else {
         return {
           ...state,
           [action.dataColumn]: action.value,
+          toAgent: "",
           toPayId: 0,
+          setToAccountList: refreshToAccountList,
+          toAccount: 0,
+          toAccountNo: "",
+          toAccountDisplayName: "",
         };
       }
 
-    case defActionType.SITE_SET_LIST:
+    case defActionType.MAIN_SET_TO_BANK_VALUE:
+      let toAccountList = [];
+      toAccountList.push({
+        value: 0,
+        displayText: "- Select Account -",
+      });
+      state.transferAccountList.map((s) => {
+        if (
+          s.channel == Number(state.toChannel) &&
+          s.siteId == Number(state.toSiteId) &&
+          s.currencyId == Number(state.toCurrencyId) &&
+          s.sysId == Number(action.value)
+        ) {
+          toAccountList.push({
+            value: s.value,
+            displayText: s.displayText,
+          });
+        }
+      });
       return {
         ...state,
-        setFromSiteList: action.siteList,
-        setToSiteList: action.siteList,
+        [action.dataColumn]: action.value,
+        setToAccountList: toAccountList,
+        toAccount: 0,
+        toAccountNo: "",
+        toAccountDisplayName: "",
+      };
+
+    case defActionType.MAIN_SET_TO_ACCOUNT_VALUE:
+      let getToAccountItem = state.transferAccountList.find(
+        (x) => x.value == action.value
+      );
+      return {
+        ...state,
+        toAccount: getToAccountItem.value,
+        toAccountNo: getToAccountItem.value,
+        toAgent: getToAccountItem.agent,
+        toPayId: getToAccountItem.payId,
+        toAccountDisplayName: getToAccountItem.displayText,
+      };
+
+    case defActionType.SITE_SET_LIST:
+      var iniSiteList = [];
+
+      iniSiteList.push({
+        value: 0,
+        displayText: "- Select Site -",
+      });
+
+      action.siteList.map((s) => {
+        iniSiteList.push({
+          value: s.siteId,
+          displayText: s.siteName,
+          iCurrencyList: s.iCurrencyList,
+        });
+      });
+
+      return {
+        ...state,
+        setFromSiteList: iniSiteList,
+        setToSiteList: iniSiteList,
       };
 
     case defActionType.FROM_CURRENCY_SET_LIST:
@@ -373,6 +554,56 @@ export function reducer(state, action) {
         setToBankCodeList: iniToBankList,
       };
 
+    case defActionType.FROM_ACCOUNT_SET_LIST:
+      let iniFromAccountList = [];
+      iniFromAccountList.push({
+        value: 0,
+        displayText: "- Select Account -",
+      });
+      state.transferAccountList.map((s) => {
+        if (
+          s.channel == Number(action.fromChannel) &&
+          s.siteId == Number(action.fromSiteId) &&
+          s.currencyId == Number(action.fromCurrencyId) &&
+          s.sysId == Number(action.fromSysId)
+        ) {
+          iniFromAccountList.push({
+            value: s.value,
+            displayText: s.displayText,
+          });
+        }
+      });
+      return {
+        ...state,
+        setFromAccountList: iniFromAccountList,
+      };
+
+    case defActionType.TO_ACCOUNT_SET_LIST:
+      console.log(action);
+      console.log(state.transferAccountList);
+      let iniToAccountList = [];
+      iniToAccountList.push({
+        value: 0,
+        displayText: "- Select Account -",
+      });
+      state.transferAccountList.map((s) => {
+        if (
+          s.channel == Number(action.toChannel) &&
+          s.siteId == Number(action.toSiteId) &&
+          s.currencyId == Number(action.toCurrencyId) &&
+          s.sysId == Number(action.toSysId)
+        ) {
+          iniToAccountList.push({
+            value: s.value,
+            displayText: s.displayText,
+          });
+        }
+      });
+      return {
+        ...state,
+        setToAccountList: iniToAccountList,
+      };
+
     case defActionType.REASON_SET_LIST:
       let resultList = [];
       resultList.push({ value: 0, displayText: "- Select Reason -" });
@@ -430,8 +661,31 @@ export function reducer(state, action) {
       });
       return {
         ...state,
-        [action.dataColumn]: action.value,
         payList: setPayList,
+      };
+
+    case defActionType.TRANSFER_ACCOUNT_SET_LIST:
+      let setTransferAccountList = [];
+      setTransferAccountList.push({
+        value: 0,
+        displayText: "- Select Account -",
+      });
+      action.transferAccountList.map((s) => {
+        setTransferAccountList.push({
+          value: s.accountNo,
+          displayText: s.displayName,
+          siteId: s.siteId,
+          currencyId: s.currencyId,
+          sysId: s.sysId,
+          payId: s.payId,
+          agent: s.agent,
+          channel: s.channel,
+          purpose: s.purpose,
+        });
+      });
+      return {
+        ...state,
+        transferAccountList: setTransferAccountList,
       };
 
     case defActionType.SET_UPLOAD_RECEIPT:

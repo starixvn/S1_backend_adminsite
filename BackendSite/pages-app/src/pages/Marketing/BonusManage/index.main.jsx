@@ -184,6 +184,7 @@ export default ({
 				</div>
 				<div className="row-flex">
 					<MultiSelect
+					    disableSearch={"true"}
 						options={GetSelectedSiteName(SiteList)}
 						value={SitnemaFilter}
 						onChange={SetSitnemaFilter}
@@ -191,6 +192,7 @@ export default ({
 					/>
 					<pre>              </pre>
 					<MultiSelect
+					    disableSearch={"true"}
 						options={GetSelectedPromotionType(initPromotionType)}
 						value={PromotionTypeFilter}
 						onChange={SetPromotionTypeFilter}
