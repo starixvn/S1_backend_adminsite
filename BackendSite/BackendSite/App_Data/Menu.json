@@ -11,6 +11,24 @@
   },*/
   {
     "Key": "",
+    "Title": "Home",
+    "Icon": "icon-calendar",
+    "Roles": null,
+    "Childs": [
+      {
+        "Key": "",
+        "Title": "Dash Board",
+        "FuncKey": "Home/DashboardNew",
+        "Controller": "Home",
+        "Action": "DashboardNew",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      }
+    ]
+  },
+  {
+    "Key": "",
     "Title": "Reports",
     "Icon": "icon-reports",
     "Roles": null,
