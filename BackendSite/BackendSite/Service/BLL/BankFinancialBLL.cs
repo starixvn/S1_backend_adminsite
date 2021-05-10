@@ -50,6 +50,12 @@ namespace BackendSite.Service.BLL
             return _paymentManageService.GetPayList();
         }
 
+        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountList()
+        {
+            return _bankFinancialService.GetTransferAccountList();
+        }
+
+
         #endregion
 
         #region Transfer Account Management
