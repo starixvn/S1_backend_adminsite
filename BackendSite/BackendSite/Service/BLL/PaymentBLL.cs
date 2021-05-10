@@ -37,9 +37,9 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetRebateLog(selectSite, userName, rebateType, startDate, endDate, pageSize, currencyId, baseCurrencyId, totalAmountShow, rebateCategoriesId, ref pageNumber, out totalPages, out rowCount);
         }
-        public IEnumerable<RebateLog> GetRebateLogExport(string selectSite, string userName, int rebateType, long startDate, long endDate)
+        public IEnumerable<RebateLog> GetRebateLogExport(string selectSite, string userName, int rebateType, long startDate, long endDate, int currencyId, int baseCurrencyId, decimal totalAmountShow, int rebateCategoriesId)
         {
-            return walletService.GetRebateLogExport(selectSite, userName, rebateType, startDate, endDate);
+            return walletService.GetRebateLogExport(selectSite, userName, rebateType, startDate, endDate, currencyId, baseCurrencyId, totalAmountShow, rebateCategoriesId);
         }
         public IEnumerable<RebateInfo> GetRebateInfoByCust(int CustId)
         {

@@ -21,7 +21,7 @@ namespace BackendSite.Service.BLL
             this.selLangBLL = selLangBLL;
         }
 
-        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, decimal TotalAmountShow,ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
             var datas = bonusInfoService.GetBonusInfoReport(
@@ -35,6 +35,8 @@ namespace BackendSite.Service.BLL
                     StartDate,
                     EndDate,
                     PageSize,
+                    BaseCurrencyId,
+                    TotalAmountShow,
                     ref PageNumber,
                     ref TotalPages,
                     ref RowCount
@@ -69,7 +71,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate)
+        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate, int BaseCurrencyId, decimal TotalAmountShow)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
             var datas = bonusInfoService.GetBonusInfoExportReport(
@@ -81,7 +83,9 @@ namespace BackendSite.Service.BLL
                     PromotionType,
                     siteList?.Select(x => x.SiteId),
                     StartDate,
-                    EndDate
+                    EndDate,
+                    BaseCurrencyId,
+                    TotalAmountShow
                 );
 
             List<BonusInfoFrontEnd> result = new List<BonusInfoFrontEnd>();

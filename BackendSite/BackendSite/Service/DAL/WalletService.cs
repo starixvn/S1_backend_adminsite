@@ -98,17 +98,17 @@ namespace BackendSite.Service.DAL
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var rebateLogList = conn.Query<RebateLog>("Admin_RebateLogListV3_Get", p, commandType: CommandType.StoredProcedure);
+            var rebateLogList = conn.Query<RebateLog>("Admin_RebateLogListV2_Get", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return rebateLogList;
         }
-        public IEnumerable<RebateLog> GetRebateLogExport(string SelectSite, string userName, int rebateType, long startDate, long endDate)
+        public IEnumerable<RebateLog> GetRebateLogExport(string SelectSite, string userName, int rebateType, long startDate, long endDate, int currencyId, int baseCurrencyId, decimal totalAmountShow, int rebateCategoriesId)
         {
-            var p = new DynamicParameters(new { SelectSite, UserName = userName, RebateType = rebateType, StartDate = startDate, EndDate = endDate });
+            var p = new DynamicParameters(new { SelectSite, UserName = userName, RebateType = rebateType, StartDate = startDate, EndDate = endDate, CategoryType = rebateCategoriesId, CurrencyId = currencyId, BaseCurrencyId = baseCurrencyId, TotalAmountShow = totalAmountShow });
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var rebateLogList = conn.Query<RebateLog>("Admin_RebateLogListExport_Get", p, commandType: CommandType.StoredProcedure);
+            var rebateLogList = conn.Query<RebateLog>("Admin_RebateLogListExportV2_Get", p, commandType: CommandType.StoredProcedure);
             return rebateLogList;
         }
         public IEnumerable<RebateInfo> GetRebateInfoByCust(int CustId)

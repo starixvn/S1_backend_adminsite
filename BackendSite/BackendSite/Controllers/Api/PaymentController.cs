@@ -214,9 +214,9 @@ namespace BackendSite.Controllers.Api
             return apiListResult;
         }
         [HttpPost]
-        public IActionResult ExportRebateLog(string SelectSite, string UserName, int RebateType, long StartDate, long EndDate)
+        public IActionResult ExportRebateLog(string SelectSite, string UserName, int RebateType, long StartDate, long EndDate, int CurrencyId, int BaseCurrencyId, decimal TotalAmountShow, int RebateCategoriesId)
         {
-            var ExportData = paymentBLL.GetRebateLogExport(SelectSite, UserName, RebateType, StartDate, EndDate);
+            var ExportData = paymentBLL.GetRebateLogExport(SelectSite, UserName, RebateType, StartDate, EndDate, CurrencyId, BaseCurrencyId, TotalAmountShow, RebateCategoriesId);
             var stream = excelBLL.Export(ExportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
