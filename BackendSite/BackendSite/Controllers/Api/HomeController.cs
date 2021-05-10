@@ -19,6 +19,8 @@ namespace BackendSite.Controllers.Api
     [ApiController]
     public class HomeController : ControllerBase
     {
+        #region Fields
+
         private readonly SelLangBLL selLangBLL;
         private readonly AuthorizeBLL authorizeBLL;
         private readonly Tools tools;
@@ -26,8 +28,20 @@ namespace BackendSite.Controllers.Api
         private readonly AdminBLL adminBLL;
         private readonly HomeBLL homeBLL;
         private readonly DashBoardBLL dashBoardBLL;
+        private readonly MenuBLL _menuBLL;
 
-        public HomeController(SelLangBLL selLangBLL, AuthorizeBLL authorizeBLL, Tools tools, ServerInfoBLL serverInfoBLL, AdminBLL adminBLL, HomeBLL homeBLL, DashBoardBLL dashBoardBLL)
+        #endregion
+
+        #region Constructors
+
+        public HomeController(SelLangBLL selLangBLL, 
+                              AuthorizeBLL authorizeBLL, 
+                              Tools tools, 
+                              ServerInfoBLL serverInfoBLL, 
+                              AdminBLL adminBLL, 
+                              HomeBLL homeBLL, 
+                              DashBoardBLL dashBoardBLL,
+                              MenuBLL menuBLL)
         {
             this.selLangBLL = selLangBLL;
             this.authorizeBLL = authorizeBLL;
@@ -36,12 +50,29 @@ namespace BackendSite.Controllers.Api
             this.adminBLL = adminBLL;
             this.homeBLL = homeBLL;
             this.dashBoardBLL = dashBoardBLL;
+            _menuBLL = menuBLL;
         }
+
+        #endregion
+
+        #region API Model
+
         public class LoginModel
         {
             public string txtID { set; get; }
             public string txtPW { set; get; }
         }
+
+        public class DashBoardPara
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int BaseCurrencyId { get; set; }
+        }
+
+        #endregion
+
+        #region Actions
 
         [HttpPost]
         [AllowAnonymous]
@@ -202,12 +233,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        public class DashBoardPara
-        {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public int BaseCurrencyId { get; set; }
-        }
+
         [HttpPost]
         public ApiResult<DashBoardData> GetDashBoardData(DashBoardPara para)
         {
@@ -230,5 +256,31 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
+        /// <summary>
+        /// 取得主選單
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult GetMenu()
+        {
+            var apiResult = new ApiResult<List<MenuItem>>();
+            try
+            {
+                apiResult.Data = _menuBLL.GetMenuData();
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.Message;
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+            }
+
+            return apiResult;
+        }
+
+        #endregion
+
     }
 }
