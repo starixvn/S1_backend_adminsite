@@ -17,6 +17,23 @@ const defPromotionType = {
     7: "CashBack",
     8: "Advertising"
 };
+const defDateType = {
+    '0':'',
+    '1': "Today",
+    '2': "Yesterday",
+    '3': "This Week",
+    '4': "Last Week",
+    '5': "This Month",
+    '6': "Last Month"
+};
+const defCurrencyType = {
+    2: "MYR",
+    4: "THB",
+    13: "RMB",
+    15: "IDR",
+    51: "VND",
+    96: "USDT",
+};
 
 const Panel = (props) => {
     let siteListOptions = "";
@@ -59,18 +76,24 @@ const Panel = (props) => {
                     dataColumn="Currency"
                     onChange={props.onChange}
                 />
+                <DropDownBox
+                    columnTitle="Base Currency Show"
+                    options={Object.keys(defCurrencyType).map(key => { return { value: key, displayText: defCurrencyType[key] } })}
+                    hasAll={false}
+                    selectedValue={2}
+                    dataColumn="BaseCurrency"
+                    onChange={props.onChange}
+                />
                 <DateTimePickerElem
                     columnTitle="From Date"
                     dateTimePickerProps={{
-                        // moment.unix(props.filterInfo.StartDate).format('l') : moment().add(-10, 'days').format('l')
-                        defaultValue: moment(props.filterInfo.StartDate).format(
-                            "l"
-                        ),
+                        value: props.filterInfo.StartDate,
+                        defaultValue: props.filterInfo.StartDate,
                         timeFormat: false,
-                        onBlur: e => {
+                        onChange: e => {
                             try {
                                 props.onChange(
-                                    moment(e).format('l'),
+                                    e,
                                     "StartDate"
                                 );
                             } catch (ex) { }
@@ -80,14 +103,13 @@ const Panel = (props) => {
                 <DateTimePickerElem
                     columnTitle="To Date"
                     dateTimePickerProps={{
-                        defaultValue: moment(props.filterInfo.EndDate).format(
-                            "l"
-                        ),
+                        value: props.filterInfo.EndDate,
+                        defaultValue: props.filterInfo.EndDate,
                         timeFormat: false,
-                        onBlur: e => {
+                        onChange: e => {
                             try {
                                 props.onChange(
-                                    moment(e).format('l'),
+                                    e,
                                     "EndDate"
                                 );
                             } catch (ex) { }
@@ -102,6 +124,14 @@ const Panel = (props) => {
                     dataColumn="User"
                     onChange={props.onChange}
                 />
+                <DropDownBox2
+                    columnTitle="Date Quick Picker"
+                    options={Object.keys(defDateType).map(key => { return { value: key, displayText: defDateType[key] } })}
+                    hasAll={false}
+                    value={props.filterInfo.DateQuickPicker}
+                    dataColumn="DateQuickPicker"
+                    onChange={props.datePickeronChange}
+                />
                 <InputField
                     columnTitle="TransID"
                     defaultValue=""
@@ -112,6 +142,12 @@ const Panel = (props) => {
                     columnTitle="BonusCode"
                     defaultValue=""
                     dataColumn="BonusCode"
+                    onChange={props.onChange}
+                />
+                <InputField
+                    columnTitle="Total Amount Show"
+                    defaultValue=""
+                    dataColumn="TotalAmountShow"
                     onChange={props.onChange}
                 />
                 <div className="button-group">
@@ -161,6 +197,32 @@ const DropDownBox = (props) => {
         </div>
     )
 }
+
+const DropDownBox2 = (props) => {
+    const onChange = (e) => {
+      if (props.onChange) {
+        props.onChange(e.target.value, props.dataColumn);
+      }
+    };
+    let optionRows = props.options.map((item) => {
+      return (
+        <option key={`${props.ColumnTitle}-${item.value}`} value={item.value}>
+          {item.displayText}
+        </option>
+      );
+    });
+    return (
+      <div className="input-item">
+        <span className="label">{props.columnTitle}</span>
+        <div className="field">
+          <select value={props.value} onChange={onChange}>
+            {props.hasAll ? <option value="0">All</option> : null}
+            {optionRows}
+          </select>
+        </div>
+      </div>
+    );
+  };
 
 const DateTimePickerElem = (props) => {
     return (
