@@ -244,7 +244,7 @@ namespace BackendSite.Controllers.Api
                 serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x => CanSearchSite.Add(x.SiteId));
                 var result = dashBoardBLL.GetDashBoardData(para.SiteId, para.CurrencyId, para.BaseCurrencyId, CanSearchSite);
 
-                apiResult.Data = result;
+                apiResult.Data =  result;
                 apiResult.ErrorCode = 0;
             }
             catch(Exception ex)

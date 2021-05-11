@@ -16,15 +16,20 @@ namespace BackendSite.Service.BLL
         }
         public DashBoardData GetDashBoardData(int SiteId,int CurrencyId,int BaseCurrencyId,List<int> CanSearchSite)
         {
+            List<int> type = new List<int>() { 0, 1, 2, 3, 4 };
             var retsult =  dashBoardService.GetDashBoardData(SiteId, CurrencyId, BaseCurrencyId, CanSearchSite);
 
             retsult.TodayData = new List<DashBoardDetailData>();
             retsult.TodayData.Add(dashBoardService.GetDashBoardTodayData(SiteId, CurrencyId, BaseCurrencyId, CanSearchSite));
 
-            for(int i = 0; i < 5; i++)
+            Parallel.ForEach(type, item =>
             {
-                retsult.TodayData.Add(dashBoardService.GetDashBoardTodayExtraData(SiteId, CurrencyId, BaseCurrencyId, CanSearchSite, i));
-            }
+                DashBoardDetailData data = dashBoardService.GetDashBoardTodayExtraData(SiteId, CurrencyId, BaseCurrencyId, CanSearchSite, item);
+                if (data != null)
+                {
+                    retsult.TodayData.Add(data);
+                }
+            });
 
             return retsult;
         }
