@@ -77,17 +77,17 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetCustTpBetRecordDetailListbyGameType(custId, selDate, gameTypeId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
         }
-        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int pageSize, int pageNumber,int CategoryId)
+        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int pageSize, int pageNumber,int CategoryId,int BaseCurrencyId,int RebateCategoriesId,decimal TotalAmountShow)
         {
-            return walletService.GetVipRebateInfoList(selectSite, currency, startDate, endDate, User, pageSize, pageNumber, CategoryId);
+            return walletService.GetVipRebateInfoList(selectSite, currency, startDate, endDate, User, pageSize, pageNumber, CategoryId, BaseCurrencyId, RebateCategoriesId, TotalAmountShow);
         }
         public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, long? startDate, long? endDate, int pageSize, int pageNumber)
         {
             return walletService.GetVipRebateInfoListByCustId(custId, startDate, endDate, pageSize, pageNumber);
         }
-        public VipRebateInfoData GetVipRebateInfoListExport(string selectSite, int currency, long startDate, long endDate, string User, int CategoryId)
+        public VipRebateInfoData GetVipRebateInfoListExport(string selectSite, int currency, long startDate, long endDate, string User, int CategoryId, int BaseCurrencyId, int RebateCategoriesId, decimal TotalAmountShow)
         {
-            return walletService.GetVipRebateInfoListExport(selectSite, currency, startDate, endDate, User, CategoryId);
+            return walletService.GetVipRebateInfoListExport(selectSite, currency, startDate, endDate, User, CategoryId, BaseCurrencyId, RebateCategoriesId, TotalAmountShow);
         }
         public IEnumerable<VipTPCategory> GetTPCategoryList()
         {

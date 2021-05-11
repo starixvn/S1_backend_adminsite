@@ -124,11 +124,11 @@ const Panel = (props) => {
                     dataColumn="User"
                     onChange={props.onChange}
                 />
-                <DropDownBox
+                <DropDownBox2
                     columnTitle="Date Quick Picker"
                     options={Object.keys(defDateType).map(key => { return { value: key, displayText: defDateType[key] } })}
                     hasAll={false}
-                    selectedValue={0}
+                    value={props.filterInfo.DateQuickPicker}
                     dataColumn="DateQuickPicker"
                     onChange={props.datePickeronChange}
                 />
@@ -197,6 +197,32 @@ const DropDownBox = (props) => {
         </div>
     )
 }
+
+const DropDownBox2 = (props) => {
+    const onChange = (e) => {
+      if (props.onChange) {
+        props.onChange(e.target.value, props.dataColumn);
+      }
+    };
+    let optionRows = props.options.map((item) => {
+      return (
+        <option key={`${props.ColumnTitle}-${item.value}`} value={item.value}>
+          {item.displayText}
+        </option>
+      );
+    });
+    return (
+      <div className="input-item">
+        <span className="label">{props.columnTitle}</span>
+        <div className="field">
+          <select value={props.value} onChange={onChange}>
+            {props.hasAll ? <option value="0">All</option> : null}
+            {optionRows}
+          </select>
+        </div>
+      </div>
+    );
+  };
 
 const DateTimePickerElem = (props) => {
     return (

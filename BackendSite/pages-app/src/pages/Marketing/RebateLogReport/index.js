@@ -16,7 +16,8 @@ const App = () => {
     Currency: 0,
     BaseCurrency: 2,
     TotalAmountShow: 0.0,
-    RebateCategories: 0
+    RebateCategories: 0,
+    DateQuickPicker:"0"
   });
 
   const [stateDatas, setDatas] = useState({
@@ -41,10 +42,18 @@ const App = () => {
   }, []);
 
   const Filter_OnChange = (v, dataColumn) => {
-    setFilter({
+    if (dataColumn === "StartDate" || dataColumn === "EndDate") {
+      setFilter({
+        ...stateFilter,
+        [dataColumn]: v,
+        ["DateQuickPicker"]:"0"
+      });
+    } else {
+      setFilter({
         ...stateFilter,
         [dataColumn]: v,
       });
+    }
   };
   const DatePicker_OnChange = (props) => {
     let _startDate = "";
@@ -89,6 +98,12 @@ const App = () => {
         ...stateFilter,
         ["StartDate"]: _startDate,
         ["EndDate"]: _endDate,
+        ["DateQuickPicker"]:props
+      });
+    }else{
+      setFilter({
+        ...stateFilter,
+        ["DateQuickPicker"]:props
       });
     }
   };
@@ -188,8 +203,7 @@ const App = () => {
         TotalAmountShow: parseFloat(stateDatas.FilterInfo.TotalAmountShow),
         RebateCategoriesId: parseInt(
           stateDatas.FilterInfo.RebateCategories,
-          10
-        ),
+          10)
       }),
     };
 

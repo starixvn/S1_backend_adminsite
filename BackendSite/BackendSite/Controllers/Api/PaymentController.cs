@@ -557,6 +557,9 @@ namespace BackendSite.Controllers.Api
             public int PageSize { get; set; }
             public int PageNumber { get; set; }
             public int CategoryId { get; set; }
+            public int BaseCurrencyId { get; set; }
+            public int RebateCategoriesId { get; set; }
+            public decimal TotalAmountShow { get; set; }
         }
         [HttpPost]
         public ApiListResult<VipRebateInfo> GetVipRebateInfoList(VipRebateInfoPara para)
@@ -564,7 +567,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<VipRebateInfo>();
             try
             {
-                var SearchResult = paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, para.StartDate, para.EndDate, para.User, para.PageSize, para.PageNumber,para.CategoryId);
+                var SearchResult = paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, para.StartDate, para.EndDate, para.User, para.PageSize, para.PageNumber,
+                    para.CategoryId,para.BaseCurrencyId,para.RebateCategoriesId,para.TotalAmountShow);
                 apiResult.Data = SearchResult.VipRebateInfoList;
                 apiResult.PageNumber = SearchResult.PageNumber;
                 apiResult.TotalPages = SearchResult.TotalPages;
@@ -617,9 +621,9 @@ namespace BackendSite.Controllers.Api
             public int CategoryId { get; set; }
         }
         [HttpPost]
-        public IActionResult GetVipRebateInfoListExport(string SelectSite, int Currency, long StartDate, long EndDate, string User, int CategoryId)
+        public IActionResult GetVipRebateInfoListExport(string SelectSite, int Currency, long StartDate, long EndDate, string User, int CategoryId,int BaseCurrencyId,int RebateCategoriesId,decimal TotalAmountShow)
         {
-            var SearchResult = paymentBLL.GetVipRebateInfoListExport(SelectSite, Currency, StartDate, EndDate, User, CategoryId);
+            var SearchResult = paymentBLL.GetVipRebateInfoListExport(SelectSite, Currency, StartDate, EndDate, User, CategoryId, BaseCurrencyId, RebateCategoriesId, TotalAmountShow);
             var stream = excelBLL.Export(SearchResult.VipRebateInfoList);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"VipRebateReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

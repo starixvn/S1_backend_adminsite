@@ -17,7 +17,8 @@ const App = () => {
     Type: 0,
     BonusCode: "",
     BaseCurrency: 2,
-    TotalAmountShow:0.0
+    TotalAmountShow:0.0,
+    DateQuickPicker:"0"
   });
 
   const [stateDatas, setDatas] = useState({
@@ -42,10 +43,18 @@ const App = () => {
   }, []);
 
   const Filter_OnChange = (v, dataColumn) => {
-    setFilter({
-      ...stateFilter,
-      [dataColumn]: v,
-    });
+    if (dataColumn === "StartDate" || dataColumn === "EndDate") {
+      setFilter({
+        ...stateFilter,
+        [dataColumn]: v,
+        ["DateQuickPicker"]:"0"
+      });
+    } else {
+      setFilter({
+        ...stateFilter,
+        [dataColumn]: v,
+      });
+    }
   };
 
   const Filter_CheckBox_OnChange = (v, dataColumn) => {
@@ -126,6 +135,12 @@ const App = () => {
         ...stateFilter,
         ["StartDate"]: _startDate,
         ["EndDate"]: _endDate,
+        ["DateQuickPicker"]:props
+      });
+    }else{
+      setFilter({
+        ...stateFilter,
+        ["DateQuickPicker"]:props
       });
     }
   };
