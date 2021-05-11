@@ -13,8 +13,18 @@ const App = () => {
     BaseCurrency: "2",
   });
   const [stateDatas, setDatas] = useState(null);
+  const [count, setCount] = useState(30);
+  const [isloading,setisloading] = useState(true);
   useEffect(() => {
+    let id = setInterval(() => {
+      if (count > 0) {
+        setCount(count - 1);
+      }
+    }, 1000);
+    return () => clearInterval(id);
+  });
 
+  useEffect(() => {
     api.post("/api/Common/AdminUserSiteList").then((res) => {
       if (res.data.errorCode === 0) {
         let result = [];
@@ -29,19 +39,46 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    setisloading(true);
     let param = {
-        SiteId: parseInt(stateFilter.Site),
-        CurrencyId:parseInt(stateFilter.Currency),
-        BaseCurrencyId:parseInt(stateFilter.BaseCurrency)
+      SiteId: parseInt(stateFilter.Site),
+      CurrencyId: parseInt(stateFilter.Currency),
+      BaseCurrencyId: parseInt(stateFilter.BaseCurrency),
     };
-    api.post("/api/Home/GetDashBoardData",param).then((res) => {
+    api.post("/api/Home/GetDashBoardData", param).then((res) => {
       if (res.data.errorCode === 0) {
-        setDatas(res.data.data)
+        setDatas(res.data.data);
+        setCount(30);
+        setisloading(false);
       } else {
         alert(res.data.message ?? "failed to get data.");
+        setCount(30);
+        setisloading(false);
       }
     });
   }, [stateFilter]);
+
+  useEffect(() => {
+    if (count === 0) {
+      setisloading(true);
+      let param = {
+        SiteId: parseInt(stateFilter.Site),
+        CurrencyId: parseInt(stateFilter.Currency),
+        BaseCurrencyId: parseInt(stateFilter.BaseCurrency),
+      };
+      api.post("/api/Home/GetDashBoardData", param).then((res) => {
+        if (res.data.errorCode === 0) {
+          setDatas(res.data.data);
+          setCount(30);
+          setisloading(false);
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+          setCount(30);
+          setisloading(false);
+        }
+      });
+    }
+  }, [count]);
 
   const Filter_OnChange = (v, dataColumn) => {
     setFilter({
@@ -50,13 +87,23 @@ const App = () => {
     });
   };
 
+  const Refresh = ()=>{
+    setCount(0);
+  }
   return (
     <div className="container-fluid">
       <h4 className="page-name">Dash Board</h4>
-      <Filter filterInfo={stateFilter} SiteList={siteList} onChange={Filter_OnChange}/>
+      <Filter
+        filterInfo={stateFilter}
+        SiteList={siteList}
+        onChange={Filter_OnChange}
+        Count={count}
+        Isloading={isloading}
+        Refresh={Refresh}
+      />
       {stateDatas === null ? null : (
-          <Result DashBoardData = {stateDatas}/>
-        )}
+        <Result DashBoardData={stateDatas} Count={count} />
+      )}
     </div>
   );
 };
