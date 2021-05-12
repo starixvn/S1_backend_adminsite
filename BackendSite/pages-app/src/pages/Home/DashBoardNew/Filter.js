@@ -43,6 +43,28 @@ const Panel = (props) => {
           dataColumn="BaseCurrency"
           onChange={(e) => props.onChange(e, "BaseCurrency")}
         />
+        {props.Isloading === true ? (
+          <div>
+            <button
+              type="button"
+              className="btn btn-refresh"
+              disabled={true}
+              onClick={null}
+            >
+              Loading
+            </button>
+          </div>
+        ) : (
+          <div>
+            <button
+              type="button"
+              className="btn btn-refresh"
+              onClick={props.Refresh}
+            >
+              Refresh <span>{props.Count}</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
