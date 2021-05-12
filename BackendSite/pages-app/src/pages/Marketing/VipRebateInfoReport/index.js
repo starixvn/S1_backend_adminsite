@@ -15,6 +15,10 @@ const App = () => {
     Currency: "0",
     User: "",
     Category: "0",
+    BaseCurrency: 2,
+    TotalAmountShow: 0.0,
+    RebateCategories: 0,
+    DateQuickPicker:"0"
   });
 
   const [stateDatas, setDatas] = useState({
@@ -49,11 +53,72 @@ const App = () => {
     });
   }, []);
 
+  const DatePicker_OnChange = (props) => {
+    let _startDate = "";
+    let _endDate = "";
+
+    switch (props) {
+      case "1":
+        _startDate = moment().startOf("day");
+        _endDate = moment().endOf("day");
+
+        break;
+      case "2":
+        _startDate = moment().subtract(1, "days");
+        _endDate = moment().subtract(1, "days");
+
+        break;
+      case "3":
+        _startDate = moment().startOf("week");
+        _endDate = moment().endOf("week");
+
+        break;
+      case "4":
+        _startDate = moment().subtract(1, "week").startOf("week");
+        _endDate = moment().subtract(1, "week").endOf("week");
+
+        break;
+      case "5":
+        _startDate = moment().startOf("month");
+        _endDate = moment().endOf("month");
+
+        break;
+      case "6":
+        _startDate = moment().subtract(1, "month").startOf("month");
+        _endDate = moment().subtract(1, "month").endOf("month");
+
+        break;
+      default:
+        break;
+    }
+    if (props !== "0") {
+      setFilter({
+        ...stateFilter,
+        ["StartDate"]: _startDate,
+        ["EndDate"]: _endDate,
+        ["DateQuickPicker"]:props
+      });
+    }else{
+      setFilter({
+        ...stateFilter,
+        ["DateQuickPicker"]:props
+      });
+    }
+  };
+
   const Filter_OnChange = (v, dataColumn) => {
-    setFilter({
-      ...stateFilter,
-      [dataColumn]: v,
-    });
+    if (dataColumn === "StartDate" || dataColumn === "EndDate") {
+      setFilter({
+        ...stateFilter,
+        [dataColumn]: v,
+        ["DateQuickPicker"]:"0"
+      });
+    } else {
+      setFilter({
+        ...stateFilter,
+        [dataColumn]: v,
+      });
+    }
   };
 
   const Filter_CheckBox_OnChange = (v, dataColumn) => {
@@ -104,12 +169,14 @@ const App = () => {
       User: stateFilter.User,
       PageNumber: 1,
       PageSize: 10,
+      BaseCurrencyId: parseInt(stateFilter.BaseCurrency, 10),
+      TotalAmountShow: parseFloat(stateFilter.TotalAmountShow),
+      RebateCategoriesId: parseInt(stateFilter.RebateCategories, 10),
     };
     api
       .post("/api/Payment/GetVipRebateInfoList", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
-          console.log(res.data.data);
           setDatas({
             PageInfo: {
               totalPages: res.data.totalPages,
@@ -144,6 +211,9 @@ const App = () => {
       User: stateDatas.FilterInfo.User,
       PageNumber: PageNumber,
       PageSize: 10,
+      BaseCurrencyId: parseInt(stateDatas.FilterInfo.BaseCurrency, 10),
+      TotalAmountShow: parseFloat(stateDatas.FilterInfo.TotalAmountShow),
+      RebateCategoriesId: parseInt(stateDatas.FilterInfo.RebateCategories, 10),
     };
 
     api
@@ -178,9 +248,14 @@ const App = () => {
         StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
         EndDate: moment(stateDatas.FilterInfo.EndDate).unix(),
         User: stateDatas.FilterInfo.User,
+        BaseCurrencyId: parseInt(stateDatas.FilterInfo.BaseCurrency, 10),
+        TotalAmountShow: parseFloat(stateDatas.FilterInfo.TotalAmountShow),
+        RebateCategoriesId: parseInt(
+          stateDatas.FilterInfo.RebateCategories,
+          10
+        ),
       },
     };
-    console.log(param);
 
     WebAPI.DownloadData(param);
   };
@@ -196,9 +271,14 @@ const App = () => {
         ClickSubmit={Filter_Submit}
         SiteList={siteList}
         CategoryList={CategoryList}
+        datePickeronChange={DatePicker_OnChange}
       />
       {stateDatas.Datas === null ? null : (
-        <Result {...stateDatas} ChangePage={Result_ChangePage} ExportToExcel={Result_ExportToExcel}/>
+        <Result
+          {...stateDatas}
+          ChangePage={Result_ChangePage}
+          ExportToExcel={Result_ExportToExcel}
+        />
       )}
     </div>
   );

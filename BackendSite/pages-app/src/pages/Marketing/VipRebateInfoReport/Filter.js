@@ -10,6 +10,25 @@ const defCurrencyType = {
   51: "VND",
   96: "USDT",
 };
+const defCategoryType = {
+  1: "Sports",
+  2: "Slots",
+  3: "Live Casino",
+  4: "Fishing",
+  5: "Cockfighting",
+  6: "Lottery",
+  7: "Virtual Sports",
+  8: "Poker",
+};
+const defDateType = {
+  0: "",
+  1: "Today",
+  2: "Yesterday",
+  3: "This Week",
+  4: "Last Week",
+  5: "This Month",
+  6: "Last Month",
+};
 
 const Panel = (props) => {
   let siteListOptions = "";
@@ -44,6 +63,16 @@ const Panel = (props) => {
           dataColumn="Currency"
           onChange={props.onChange}
         />
+        <DropDownBox
+          columnTitle="Base Currency Show"
+          options={Object.keys(defCurrencyType).map((key) => {
+            return { value: key, displayText: defCurrencyType[key] };
+          })}
+          hasAll={false}
+          selectedValue={2}
+          dataColumn="BaseCurrency"
+          onChange={props.onChange}
+        />
         {props.CategoryList !== null ? (
           <DropDownBox
             columnTitle="Category"
@@ -59,11 +88,12 @@ const Panel = (props) => {
         <DateTimePickerElem
           columnTitle="From Date"
           dateTimePickerProps={{
-            defaultValue: moment(props.filterInfo.StartDate).format("l"),
+            value: props.filterInfo.StartDate,
+            defaultValue: props.filterInfo.StartDate,
             timeFormat: false,
-            onBlur: (e) => {
+            onChange: (e) => {
               try {
-                props.onChange(moment(e).format("l"), "StartDate");
+                props.onChange(e, "StartDate");
               } catch (ex) {}
             },
           }}
@@ -71,11 +101,12 @@ const Panel = (props) => {
         <DateTimePickerElem
           columnTitle="To Date"
           dateTimePickerProps={{
-            defaultValue: moment(props.filterInfo.EndDate).format("l"),
+            value: props.filterInfo.EndDate,
+            defaultValue: props.filterInfo.EndDate,
             timeFormat: false,
-            onBlur: (e) => {
+            onChange: (e) => {
               try {
-                props.onChange(moment(e).format("l"), "EndDate");
+                props.onChange(e, "EndDate");
               } catch (ex) {}
             },
           }}
@@ -86,6 +117,33 @@ const Panel = (props) => {
           columnTitle="User"
           defaultValue=""
           dataColumn="User"
+          onChange={props.onChange}
+        />
+        <DropDownBox2
+          columnTitle="Date Quick Picker"
+          options={Object.keys(defDateType).map((key) => {
+            return { value: key, displayText: defDateType[key] };
+          })}
+          hasAll={false}
+          selectedValue={0}
+          value={props.filterInfo.DateQuickPicker}
+          dataColumn="DateQuickPicker"
+          onChange={props.datePickeronChange}
+        />
+        <DropDownBox
+          columnTitle="Rebate Categories"
+          options={Object.keys(defCategoryType).map((key) => {
+            return { value: key, displayText: defCategoryType[key] };
+          })}
+          hasAll={true}
+          selectedValue={0}
+          dataColumn="RebateCategories"
+          onChange={props.onChange}
+        />
+        <InputField
+          columnTitle="Total Amount Show"
+          defaultValue=""
+          dataColumn="TotalAmountShow"
           onChange={props.onChange}
         />
         <div className="button-group">
@@ -140,6 +198,31 @@ const DropDownBox = (props) => {
       <span className="label">{props.columnTitle}</span>
       <div className="field">
         <select defaultValue={props.selectedValue} onChange={onChange}>
+          {props.hasAll ? <option value="0">All</option> : null}
+          {optionRows}
+        </select>
+      </div>
+    </div>
+  );
+};
+const DropDownBox2 = (props) => {
+  const onChange = (e) => {
+    if (props.onChange) {
+      props.onChange(e.target.value, props.dataColumn);
+    }
+  };
+  let optionRows = props.options.map((item) => {
+    return (
+      <option key={`${props.ColumnTitle}-${item.value}`} value={item.value}>
+        {item.displayText}
+      </option>
+    );
+  });
+  return (
+    <div className="input-item">
+      <span className="label">{props.columnTitle}</span>
+      <div className="field">
+        <select value={props.value} onChange={onChange}>
           {props.hasAll ? <option value="0">All</option> : null}
           {optionRows}
         </select>
