@@ -54,7 +54,7 @@ const Panel = (props) => {
               <th>Hot</th>
               <th>Featured</th>
               <th>Status</th>
-              <th>Promotion</th>
+              <th>Jackpot</th>
             </tr>
           </thead>
           <tbody>
