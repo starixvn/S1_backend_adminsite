@@ -399,5 +399,25 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+
+        /// <summary>
+        /// 刪除線上使用者資料
+        /// </summary>
+        /// <param name="custId">客戶ID</param>
+        /// <returns></returns>
+        public int DeleteOnUserData(int custId)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                    _CustId = custId
+                });
+
+                string SpName = "Admin_OnUser_Del";
+                return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
     }
 }

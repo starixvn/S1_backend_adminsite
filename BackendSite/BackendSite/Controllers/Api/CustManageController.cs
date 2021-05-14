@@ -340,6 +340,8 @@ namespace BackendSite.Controllers.Api
         {
             public int CustId { get; set; }
             public string UserName { get; set; }
+
+            public string Reason { get; set; }
         }
 
         public class DepositRep3
@@ -526,60 +528,111 @@ namespace BackendSite.Controllers.Api
 
         //    return apiResult;
         //}
+
+
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_unlock" })]
         [HttpPost]
         public ApiResult SetUnlock(CustInfoReq setCustStatusReq)
         {
             ApiResult apiResult = new ApiResult();
-            if (custInfoBLL.SetCustStatus(setCustStatusReq.CustId, 1))
-            {
-                string Menu = "CustManage/CustInfoList";
-                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
-                Info.Add("MenuName", "Customer Info");
-                Info.Add("Action", "Set Unlock");
-                serverInfoBLL.AdminOperateLog(null, setCustStatusReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
+            if (custInfoBLL.SetCustStatus("CustManage/CustInfoList",
+                                          setCustStatusReq.CustId,
+                                          1,
+                                          setCustStatusReq.Reason,
+                                          "Set Unlock",
+                                          User.Identity.Name))
+            {
                 apiResult.ErrorCode = 0;
+                apiResult.Message = "Set Unlock Success.";
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+                apiResult.Message = "Set Unlock Fail.Please Contact admin.";
             }
 
             return apiResult;
         }
+
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_lock" })]
         [HttpPost]
         public ApiResult SetLock(CustInfoReq setCustStatusReq)
         {
             ApiResult apiResult = new ApiResult();
-            if (custInfoBLL.SetCustStatus(setCustStatusReq.CustId, 2))
-            {
-                string Menu = "CustManage/CustInfoList";
-                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
-                Info.Add("MenuName", "Customer Info");
-                Info.Add("Action", "Set Lock");
-                serverInfoBLL.AdminOperateLog(null, setCustStatusReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
+            if (custInfoBLL.SetCustStatus("CustManage/CustInfoList",
+                                          setCustStatusReq.CustId,
+                                          2,
+                                          setCustStatusReq.Reason,
+                                          "Set Lock",
+                                          User.Identity.Name))
+            {
                 apiResult.ErrorCode = 0;
+                apiResult.Message = "Set Lock Success.";
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+                apiResult.Message = "Set Lock Fail.Please Contact admin.";
             }
 
             return apiResult;
         }
+        
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_close" })]
         [HttpPost]
         public ApiResult SetClose(CustInfoReq setCustStatusReq)
         {
             ApiResult apiResult = new ApiResult();
-            if (custInfoBLL.SetCustStatus(setCustStatusReq.CustId, 3))
-            {
-                string Menu = "CustManage/CustInfoList";
-                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
-                Info.Add("MenuName", "Customer Info");
-                Info.Add("Action", "Set Close");
-                serverInfoBLL.AdminOperateLog(null, setCustStatusReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
+            if (custInfoBLL.SetCustStatus("CustManage/CustInfoList",
+                                          setCustStatusReq.CustId,
+                                          3,
+                                          setCustStatusReq.Reason,
+                                          "Set Close",
+                                          User.Identity.Name))
+            {
                 apiResult.ErrorCode = 0;
+                apiResult.Message = "Set Close Success.";
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+                apiResult.Message = "Set Close Fail.Please Contact admin.";
             }
 
             return apiResult;
         }
+        
+        /// <summary>
+        /// 強制讓客戶登出
+        /// </summary>
+        /// <param name="setCustStatusReq"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_kickout" })]
+        [HttpPost]
+        public ApiResult KickOut(CustInfoReq setCustStatusReq)
+        {
+            ApiResult apiResult = new ApiResult();
+
+            if (custInfoBLL.DeleteOnUserData("CustManage/CustInfoList",
+                                                    setCustStatusReq.CustId,
+                                                    setCustStatusReq.Reason,
+                                                    User.Identity.Name) > 0)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = "Kick out success.";
+            }
+            else
+            {
+                apiResult.ErrorCode = -1;
+                apiResult.Message = "Kick out fail.Customer is not online now.";
+            }
+
+            return apiResult;
+        }
+
         public class BonusReq
         {
             public int CustId { get; set; }
