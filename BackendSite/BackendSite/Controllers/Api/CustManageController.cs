@@ -610,7 +610,7 @@ namespace BackendSite.Controllers.Api
         /// </summary>
         /// <param name="setCustStatusReq"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_kickout" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_kickout" })]
         [HttpPost]
         public ApiResult KickOut(CustInfoReq setCustStatusReq)
         {
