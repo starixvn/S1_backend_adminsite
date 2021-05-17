@@ -72,8 +72,10 @@ module.exports = {
     // 	"./src/pages/CSD/ChangeVipLevelBatch/index.js"
     // ],
     // "Marketing/BonusManage.min": [
+
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/BonusManage/index.jsx",
+
     // ],
     // "Marketing/PendingBonus.min": [
     // 	"./src/pages/Marketing/PendingBonus/index.jsx"
@@ -166,7 +168,10 @@ module.exports = {
     // "Marketing/VipRebateInfoReport.min": [
     // 	 '@babel/polyfill',
     // 	"./src/pages/Marketing/VipRebateInfoReport/index.js"
+    // ],
 
+    // "Marketing/DomainManage.min": [
+    // 	"./src/pages/Marketing/DomainManage/index.js"
     // ],
     // "Finance/WithdrawalLimitManage.min": [
     // 	// '@babel/polyfill',

@@ -109,5 +109,11 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/DomainManage" })]
+        public IActionResult DomainManage()
+        {
+            return View();
+        }
     }
 }
