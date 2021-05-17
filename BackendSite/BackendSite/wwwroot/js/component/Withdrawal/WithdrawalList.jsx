@@ -2,6 +2,7 @@
 import { Pagination } from '../commJS/Pagination.jsx';
 import * as Loading from '../commJS/Loading.jsx';
 import DateTimePicker from 'react-datetime';
+import { guid } from "@progress/kendo-react-common";
 
 (function ($, React, ReactDOM, i18n, axios, moment, Calendar) {
     const WithdrawalStatus = {
@@ -194,7 +195,7 @@ import DateTimePicker from 'react-datetime';
         _clipboard = null;
         constructor(props) {
             super(props);
-            this.state = { Data: null };
+            this.state = { Data: null ,files:[]};
         }
 
         componentDidMount() {
@@ -399,6 +400,31 @@ import DateTimePicker from 'react-datetime';
             this.setState({ SelId: event.target.value });
         }
 
+        handlePaste = (e) => {
+            if (e.clipboardData.files.length) {
+                console.log(e.target.value);
+              const fileObject = e.clipboardData.files[0];
+
+              const file = {
+                getRawFile: () => fileObject,
+                name: fileObject.name,
+                size: fileObject.size,
+                uid: guid(),
+                status: 2,
+                progress: 0,
+              };
+        
+              const filesState = this.state.files.map((f) => ({ ...f }));
+              filesState.push(file);
+              console.log(filesState);
+              this.setState({ ...this.state,files: filesState });
+            } else {
+              alert(
+                "No image data was found in your clipboard. Copy an image first or take a screenshot."
+              );
+            }
+          };
+
         render() {
             let data = this.state.Data;
             let btnGroup = [];
@@ -572,6 +598,21 @@ import DateTimePicker from 'react-datetime';
                             </tr>
                         </tbody>
                     </table>
+                    <div
+                        onPaste={this.handlePaste.bind(this)}>
+                            <div
+                                style={{
+                                    marginTop: 5,
+                                    padding: 10,
+                                    fontStyle: "italic",
+                                    color: "red",
+                                    border: "1px solid red",
+                                    height: 500,
+                                }}
+                            >
+                                Paste Area
+                            </div>
+                    </div>
                     <WithdrawalRequestComment Data={this.state.Comments} />
                     <div className="input-field mt-20">
                         <label htmlFor="command" className="label">{i18n.lbl_Comment}</label>
