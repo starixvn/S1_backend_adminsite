@@ -466,6 +466,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "DomainManagement",
+        "Title": "Domain Management",
+        "FuncKey": "Marketing/DomainManage",
+        "Controller": "Marketing",
+        "Action": "DomainManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

@@ -19,13 +19,21 @@ namespace BackendSite.Service.BLL
         {
             return domainTableService.GetDomainList(selectSite, currency);
         }
-        public int SetDomain(int siteId, int currency, string domain, int status, int sort, string lastUpdateUser)
+        public IEnumerable<DomainTable> GetDomainListbySite(int siteId, int currency)
         {
-            return domainTableService.SetDomain( siteId, currency, domain, status, sort, lastUpdateUser);
+            return domainTableService.GetDomainListbySite(siteId, currency);
         }
-        public int DelDomain(int siteId, int currency, string domain)
+        public int SetDomain(int siteId, int currencyId, string domain, int status, int sort, string lastUpdateUser)
         {
-            return domainTableService.DelDomain( siteId, currency, domain);
+            return domainTableService.SetDomain( siteId, currencyId, domain, status, sort, lastUpdateUser);
+        }
+        public int DelDomain(int dId)
+        {
+            return domainTableService.DelDomain( dId);
+        }
+        public int UpdateDomain(int dId, string domain, int status, int sort, string lastUpdateUser)
+        {
+            return domainTableService.UpdateDomain(dId, domain, status, sort, lastUpdateUser);
         }
     }
 }
