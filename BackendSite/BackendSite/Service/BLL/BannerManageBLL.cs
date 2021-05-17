@@ -18,9 +18,9 @@ namespace BackendSite.Service.BLL
         {
             return bannerManageService.SetBanner(bannerInfo, user);
         }
-        public IEnumerable<BannerInfoList> GetBannerList(int SiteId)
+        public IEnumerable<BannerInfoList> GetBannerList(int SiteId,int BannerTypeId)
         {
-            return bannerManageService.GetBannerList(SiteId);
+            return bannerManageService.GetBannerList(SiteId, BannerTypeId);
 
         }
         public BannerInfo GetBanner(int SiteId, string BannerName)

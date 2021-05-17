@@ -38,7 +38,24 @@ const Result = (props) => {
 
 
     const handleAddDomainList = (_newList) => {
-        setDomainList([...domainList, _newList]);
+        //setDomainList([...domainList, _newList]);
+        let mounted = true;
+        api.post('/api/DomainTable/GetDomainListbySite', { siteId: props.siteId, currencyId: props.currId })
+            .then(function (response) {
+                if (response.data.errorCode === 0) {
+                    
+                    // if(response.data !== null)
+                    //    { console.log(response.data);}
+                    
+                    if (mounted) {
+                        setDomainList(response.data === null ? [] : response.data.data);
+                    }
+                } else {
+                    // alert(response.message);
+                }
+            }).catch(function (error) {
+                alert(error);
+            })  
         setOpen(false);
     }
 
@@ -68,8 +85,8 @@ const Result = (props) => {
     
 
     const handleDelete = (idx) => {
-        if (window.confirm('Are you sure to delete'+domainList[idx].domain +'?') === true) {
-            api.post('/api/DomainTable/DelDomain', { dId : domainList[idx].did })
+        if (window.confirm('Are you sure to delete  '+domainList[idx].domain +' ?') === true) {
+            api.post('/api/DomainTable/DelDomain', { dId : domainList[idx].dId })
                 .then(function (response) {
                     if (response.data.errorCode === 0) {
                         handleSetDomainList(idx, "Delete");

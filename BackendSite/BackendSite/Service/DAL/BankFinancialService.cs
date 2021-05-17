@@ -56,7 +56,26 @@ namespace BackendSite.Service.DAL
             }
         }
 
+        public (string, string) NoAssign(string prefix)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("_Prefix", prefix);
+                parameters.Add("_NowDate", direction: ParameterDirection.Output);
+                parameters.Add("_NowMaxNo", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+
+                string SpName = "Admin_BankFinancialNoAssignForGetNo_Upd";
+                var tempresult = conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+
+                return ((parameters.Get<string>("_NowDate") ?? string.Empty), (parameters.Get<int?>("_NowMaxNo") ?? 0).ToString());
+            }
+        }
+
         #endregion
+
+        #region Transfer Account
 
         public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoList(bool isSetting, int siteId, int id)
         {
@@ -178,6 +197,21 @@ namespace BackendSite.Service.DAL
                 return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
+
+        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountList()
+        {
+
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                string SpName = "Admin_BankFinancialTransferAccount_GetForList";
+                return conn.Query<BankFinancialTransferAccountDetailModel>(SpName,commandType: CommandType.StoredProcedure);
+            }
+        }
+
+
+        #endregion
+
+        #region Transfer Info
 
         public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoList(bool isSetting,
                                                                                      TransferTypeEnum? transferType,
@@ -324,23 +358,6 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public (string,string) NoAssign(string prefix)
-        {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                var parameters = new DynamicParameters();
-                parameters.Add("_Prefix", prefix);
-                parameters.Add("_NowDate", direction: ParameterDirection.Output);
-                parameters.Add("_NowMaxNo", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-
-                string SpName = "Admin_BankFinancialNoAssignForGetNo_Upd";
-                var tempresult = conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
-
-                return ((parameters.Get<string>("_NowDate") ?? string.Empty), (parameters.Get<int?>("_NowMaxNo") ?? 0).ToString());
-            }
-        }
-
         public int DeleteTransferInfo(string transferId)
         {
 
@@ -356,6 +373,57 @@ namespace BackendSite.Service.DAL
                 return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
+
+        #endregion
+
+        #region Transfer Info Receipt
+
+        public BankFinancialTransferInfoReceiptModel GetTransferInfoReceipt(string transferId)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                   _TransferId = transferId
+                });
+                string SpName = "Admin_BankFinancialTransferInfoReceipt_Get";
+                return conn.QueryFirstOrDefault<BankFinancialTransferInfoReceiptModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public int SetTransferInfoReceipt(string transferId, string picFileName, byte[] transferPic)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                    _TransferId = transferId,
+                    _PicFileName = picFileName,
+                    _TransferPic = transferPic
+                });
+
+                string SpName = "Admin_BankFinancialTransferInfoReceipt_Set";
+                return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public int DeleteTransferInfoReceipt(string transferId)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                    _TransferId = transferId
+                });
+                string SpName = "Admin_BankFinancialTransferInfoReceipt_Del";
+                return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        #endregion
 
     }
 }

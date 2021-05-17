@@ -56,6 +56,10 @@
             "FuncKey": "ca_acc_close"
           },
           {
+            "DisplayKey": "KickOut",
+            "FuncKey": "ca_kickout"
+          },
+          {
             "DisplayKey": "Reset Password",
             "FuncKey": "ca_resetpwd"
           },
@@ -386,6 +390,21 @@
       {
         "DisplayKey": "Transfer Management",
         "FuncKey": "BankFinancial/TransferManage",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Reason Management",
+        "FuncKey": "BankFinancial/ReasonManagement",
+        "Enable": false
+      }
+    ]
+  },
+  {
+    "DisplayKey": "Home",
+    "Settings": [
+      {
+        "DisplayKey": "Dashboard",
+        "FuncKey": "Home/DashboardNew",
         "Enable": false
       }
     ]

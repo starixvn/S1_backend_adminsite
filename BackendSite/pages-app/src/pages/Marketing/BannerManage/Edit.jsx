@@ -4,7 +4,6 @@ import Panel from "./Edit.content";
 import WebAPI from "../../../module/WebAPI";
 
 export default props => {
-
 	const isMountedRef = useRef(null);
 	useEffect(() => {
 		isMountedRef.current = true;

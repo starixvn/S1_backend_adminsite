@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,11 +74,6 @@ namespace BackendSite.Controllers.Api
             public int? Reason { get; set; }
 
             public string TransferId { get; set; }
-        }
-
-        public class CreateTransferInfoReq
-        {
-            public int SiteId { get; set; }
         }
 
         #endregion
@@ -173,8 +169,16 @@ namespace BackendSite.Controllers.Api
                 {
                     var data = result.FirstOrDefault();
 
+                    var receipt = _bankFinancialBLL.GetTransferIngoReceipt(data.TransferId);
+
                     var authData = _authorizeBLL.GetAuthData();
                     string dateTime = GetTimeZoneDateTime(1);
+
+                    if(receipt!=null)
+                    {
+                        data.UploadReceiptName = receipt.PicFileName;
+                        data.TransferPic = receipt.TransferPic;
+                    }
 
                     data.Updator = authData.UserId;
                     data.UpdatorName = authData.UserName;
@@ -200,14 +204,19 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult SetTransferInfo(BankFinancialTransferInfoDetailModel bankFinancialTransferInfoDetail)
+        public ApiResult SetTransferInfo([FromForm] BankFinancialTransferInfoDetailModelForSet bankFinancialTransferInfoDetailModelForSet)
         {
 
             var apiResult = new ApiResult<int>();
 
             try
             {
-                var result = _bankFinancialBLL.SetTransferInfo(bankFinancialTransferInfoDetail);
+                var transferInfoDetails = JsonConvert.DeserializeObject<BankFinancialTransferInfoDetailModel>(bankFinancialTransferInfoDetailModelForSet.TransferInfoDetails);
+
+                transferInfoDetails.CreateTime = GetTimeZoneZeroDateTimeByDateString(transferInfoDetails.CreateTime);
+                transferInfoDetails.UpdateTime = GetTimeZoneZeroDateTimeByDateString(transferInfoDetails.UpdateTime);
+
+                var result = _bankFinancialBLL.SetTransferInfo(transferInfoDetails, bankFinancialTransferInfoDetailModelForSet.UploadReceipt);
 
                 if (result.Status)
                 {
@@ -267,22 +276,52 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public IActionResult ExportTransferInfoList(GetTransferInfoReq req)
+        public IActionResult ExportTransferInfoList(TransferTypeEnum? TransferType,
+                                                    string TransFromDate,
+                                                    string TransToDate,
+                                                    string FromAccountNo,
+                                                    string FromAccountDisplayName,
+                                                    string ToAccountNo,
+                                                    string ToAccountDisplayName,
+                                                    int? Reason)
         {
             var ExportData = _bankFinancialBLL.GetTransferInfoList(false,
-                                                                       req.TransferType,
-                                                                       req.TransFromDate,
-                                                                       req.TransToDate,
-                                                                       req.FromAccountNo,
-                                                                       req.FromAccountDisplayName,
-                                                                       req.ToAccountNo,
-                                                                       req.ToAccountDisplayName,
-                                                                       req.Reason,
-                                                                       req.TransferId);
+                                                                       TransferType,
+                                                                       TransFromDate,
+                                                                       TransToDate,
+                                                                       FromAccountNo,
+                                                                       FromAccountDisplayName,
+                                                                       ToAccountNo,
+                                                                       ToAccountDisplayName,
+                                                                       Reason,
+                                                                       null);
             var stream = _excelBLL.Export(ExportData);
             return File(stream,
                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                       $"TransferAccountInfoList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+                       $"TransferInfoList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
+
+        [HttpPost]
+        public ApiResult<ProcessedImage> ReviewTransferReceiptPic([FromForm] IFormFile UploadReceipt)
+        {
+            ProcessedImage processedImage = new ProcessedImage();
+            var apiResult = new ApiResult<ProcessedImage>();
+
+            var transferReceipt = _bankFinancialBLL.ProcessImage(UploadReceipt);
+
+            processedImage.FileName = transferReceipt.FileName;
+
+            processedImage.FileBytes = transferReceipt.FileBytes;
+
+            apiResult.Data = processedImage;
+
+            return apiResult;
+        }
+
+        public class ProcessedImage
+        {
+            public string FileName { get; set; }
+            public byte[] FileBytes { get; set; }
         }
 
         #region Data For Set
@@ -345,6 +384,25 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        public ApiResult GetTransferAccountList()
+        {
+            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccountDetailModel>>();
+
+            try
+            {
+                apiResult.Data = _bankFinancialBLL.GetTransferAccountList();
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.Message;
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+            }
+
+            return apiResult;
+        }
+
         #endregion
 
         #endregion
@@ -355,6 +413,11 @@ namespace BackendSite.Controllers.Api
         {
             int timeZone = siteId == 1 ? 8 : 7;
             return new DateTimeOffset(DateTime.Now).ToOffset(new TimeSpan(timeZone, 0, 0)).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+
+        private string GetTimeZoneZeroDateTimeByDateString(string datetime)
+        {
+            return new DateTimeOffset(Convert.ToDateTime(datetime)).ToOffset(new TimeSpan(0, 0, 0)).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
         #endregion

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useReducer, useState } from "react";
 import ReactDOM from "react-dom";
 import WebAPI from "../../../module/WebAPI";
-import moment from "moment";
+import moment from "moment-timezone";
 import Edit from "./Edit";
 import qs from "qs";
 import {
@@ -15,7 +15,8 @@ import Main from "./index.main";
 const App = () => {
 	const [state, dispatch] = useReducer(reducer, initState);
 	const [processing, setProcessing] = useState(false);
-
+	const [BannerType, setBannerType] = useState(0);
+	const [Sitid, setSitid] = useState(0);
 	const isMountedRef = useRef(null);
 	useEffect(() => {
 		isMountedRef.current = true;
@@ -49,6 +50,51 @@ const App = () => {
 		);
 	}, []);
 
+	const FilterOnchange=(v)=>{
+		console.log(v);
+		setBannerType(v);
+		if (!processing && Sitid !== 0) {
+			if (isMountedRef.current) {
+				setProcessing(true);
+			}
+			let param = {
+				Url: "BannerManage/GetBannerList",
+				Data: qs.stringify({
+					SiteId: Sitid,
+					BannerTypeId:parseInt(v)
+				})
+			};
+			console.log(param);
+			let site = state.siteList.find(s => s.siteId === Sitid);
+			WebAPI.PostData(param).then(
+				res => {
+					if (isMountedRef.current) {
+						if (res.data.errorCode === 0) {
+							dispatch({
+								type: defActionType.SET_BANNER_LIST,
+								bannerList: res.data.data,
+								setSite: Sitid,
+								setCurrencyList: site.iCurrencyList,
+								setLangList: site.iLangList
+							});
+						} else {
+							alert(res.data.message ?? "failed to get data.");
+						}
+						setProcessing(false);
+						setSitid(Sitid);
+					}
+				},
+				err => {
+					if (isMountedRef.current) {
+						alert("API Server Error.");
+						setProcessing(false);
+						setSitid(Sitid);
+					}
+				}
+			);
+		}
+	}
+
 	const GetSiteBannerList = siteId => {
 		if (!processing) {
 			if (isMountedRef.current) {
@@ -57,7 +103,8 @@ const App = () => {
 			let param = {
 				Url: "BannerManage/GetBannerList",
 				Data: qs.stringify({
-					SiteId: siteId
+					SiteId: siteId,
+					BannerTypeId:BannerType
 				})
 			};
 			let site = state.siteList.find(s => s.siteId === siteId);
@@ -76,12 +123,14 @@ const App = () => {
 							alert(res.data.message ?? "failed to get data.");
 						}
 						setProcessing(false);
+						setSitid(siteId);
 					}
 				},
 				err => {
 					if (isMountedRef.current) {
 						alert("API Server Error.");
 						setProcessing(false);
+						setSitid(siteId);
 					}
 				}
 			);
@@ -259,6 +308,8 @@ const App = () => {
 			siteList={state.siteList}
 			setSite={state.setSite}
 			bannerList={state.bannerList}
+			FilterOnchange={FilterOnchange}
+			BannerType={BannerType}
 		/>
 	) : (
 			<Edit
