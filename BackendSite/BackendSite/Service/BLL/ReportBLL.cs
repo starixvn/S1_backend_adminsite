@@ -270,12 +270,14 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<StatisticalReportModel> GetStatisticalReport(string siteIds,
+                                                                        string timeZone,
                                                                         string startDate,
                                                                         string endDate)
         {
             Dictionary<string, StatisticalReportModel> keyValuePairs = new Dictionary<string, StatisticalReportModel>();
             string dateFormat = string.Empty;
             var statisticalList = reportService.GetStatisticalReport(siteIds,
+                                                                     timeZone,
                                                                      startDate,
                                                                      endDate);
 
