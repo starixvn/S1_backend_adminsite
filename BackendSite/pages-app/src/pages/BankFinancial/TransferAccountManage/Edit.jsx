@@ -124,7 +124,6 @@ export default props => {
 	};
 
 	const EditSiteIdSelectBox = (value, dataColumn) => {
-		console.log("aaa",value);
 		dispatch({
 			type: defActionType.MAIN_SET_SITEID_VALUE,
 			value,

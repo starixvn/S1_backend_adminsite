@@ -204,7 +204,67 @@ namespace BackendSite.Service.DAL
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
                 string SpName = "Admin_BankFinancialTransferAccount_GetForList";
-                return conn.Query<BankFinancialTransferAccountDetailModel>(SpName,commandType: CommandType.StoredProcedure);
+                return conn.Query<BankFinancialTransferAccountDetailModel>(SpName, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public int GetTransferDataCount(string accountNo)
+        {
+            int count = 0;
+
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+
+                var parameters = new DynamicParameters(
+                new
+                {
+                    _AccountNo = accountNo,
+                });
+                parameters.Add("_Count", count, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+
+                string SpName = "Admin_BankFinancialTransferInfo_ByAccountNo_Get";
+                conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure, commandTimeout: 60);
+
+                count = parameters.Get<int?>("_Count") ?? 0;
+
+                return count;
+            }
+        }
+
+        public int UpdateTransferInfo(BankFinancialTransferAccountModel bankFinancialTransferAccount, BankFinancialTransferAccountDetailModel oldData)
+        {
+            int affectCount = 0;
+
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                    _OldChannel = oldData.Channel,
+                    _OldAgent = oldData.Agent,
+                    _OldPayId = oldData.PayId,
+                    _OldCurrencyId = oldData.CurrencyId,
+                    _OldSysId = oldData.SysId,
+                    _OldAccountNo = oldData.AccountNo,
+                    _OldAccountDisplayName = oldData.DisplayName,
+
+                    _NewChannel = bankFinancialTransferAccount.Channel,
+                    _NewAgent = bankFinancialTransferAccount.Agent,
+                    _NewPayId = bankFinancialTransferAccount.PayId,
+                    _NewCurrencyId = bankFinancialTransferAccount.CurrencyId,
+                    _NewSysId = bankFinancialTransferAccount.SysId,
+                    _NewAccountNo = bankFinancialTransferAccount.AccountNo,
+                    _NewAccountDisplayName = bankFinancialTransferAccount.DisplayName,
+                });
+
+                parameters.Add("_AffectCount", affectCount, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+
+                string SpName = "Admin_BankFinancialTransferInfo_ByAccountNo_Set";
+                conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure, commandTimeout: 60);
+
+                affectCount = parameters.Get<int?>("_AffectCount") ?? 0;
+
+                return affectCount;
             }
         }
 
@@ -385,7 +445,7 @@ namespace BackendSite.Service.DAL
                 var parameters = new DynamicParameters(
                 new
                 {
-                   _TransferId = transferId
+                    _TransferId = transferId
                 });
                 string SpName = "Admin_BankFinancialTransferInfoReceipt_Get";
                 return conn.QueryFirstOrDefault<BankFinancialTransferInfoReceiptModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
