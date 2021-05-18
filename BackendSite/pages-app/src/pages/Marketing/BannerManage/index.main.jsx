@@ -110,7 +110,6 @@ export default ({
 	FilterOnchange,
 	BannerType
 }) => {
-	moment.tz.setDefault("Asia/Taipei");
 	let siteRows = siteList.map((_data) => {
 		return (
 			<div key={`SiteOpt-${_data.siteId}`} className="custom-control custom-radio custom-control-inline">

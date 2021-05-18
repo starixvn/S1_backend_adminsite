@@ -97,8 +97,15 @@ const VipRebateInfoReport = lazy(() =>
 const WithdrawalLimitManage = lazy(() =>
   import("./pages/Finance/WithdrawalLimitManage/index")
 );
+
+const DomainManage = lazy(() =>
+  import("./pages/Marketing/DomainManage/index")
+);
+
 const DashBoardNew = lazy(() => import("./pages/Home/DashBoardNew/index"));
+
 export const defaultPage = "TransferManage";
+
 
 export const layoutType = {
   N88: "N88",
@@ -384,6 +391,19 @@ export const pages = {
     comp: (
       <Suspense fallback="loading...">
         <BannerManage />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  DomainManage: {
+    comp: (
+      <Suspense fallback="loading...">
+        <DomainManage />
       </Suspense>
     ),
     css: [

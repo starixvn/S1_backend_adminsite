@@ -371,6 +371,11 @@
         "DisplayKey": "Vip Rebate Info",
         "FuncKey": "Marketing/VipRebateInfoReport",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Domain Management",
+        "FuncKey": "Marketing/DomainManage",
+        "Enable": false
       }
     ]
   },
@@ -404,4 +409,5 @@
       }
     ]
   }
+  
 ]

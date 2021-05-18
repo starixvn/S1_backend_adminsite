@@ -13,7 +13,6 @@ import {
 import Main from "./index.main";
 
 const App = () => {
-	moment.tz.setDefault("Asia/Taipei");
 	const [state, dispatch] = useReducer(reducer, initState);
 	const [processing, setProcessing] = useState(false);
 	const [BannerType, setBannerType] = useState(0);
