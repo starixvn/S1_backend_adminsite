@@ -194,7 +194,7 @@ import DateTimePicker from 'react-datetime';
         _clipboard = null;
         constructor(props) {
             super(props);
-            this.state = { Data: null };
+            this.state = { Data: null};
         }
 
         componentDidMount() {
@@ -208,6 +208,10 @@ import DateTimePicker from 'react-datetime';
             this._clipboard.on('error', function (e) {
                 //console.log(e);
             });
+        }
+
+        onRefresh() {
+            this.onGetData();
         }
 
         onGetData() {
@@ -399,7 +403,36 @@ import DateTimePicker from 'react-datetime';
             this.setState({ SelId: event.target.value });
         }
 
-        render() {
+        handlePaste = (event) => {
+            let transId = this.props.transId;
+            let imgindex = 0;
+            if (event.clipboardData.files.length) {
+                for(var i=0;i<event.clipboardData.items.length;i++){
+                    if(event.clipboardData.items[i].type == "image/png"){
+                        imgindex = i;                     
+                    }
+                }
+            }
+            var blob = event.clipboardData.items[imgindex].getAsFile();
+            var reader = new FileReader();
+            reader.onload = function(event){
+                axios.post('/api/Withdrawal/UploadWithdrawalPic', { Pic: event.target.result,TransId: transId })
+                .then(async function (response) {
+                    if(response.data.errorCode == 0){
+                    }
+                    else{
+                    }
+                    
+                }.bind(this)).catch(function (error) {
+                    
+                }.bind(this));
+            }; // data url!
+            reader.readAsDataURL(blob)
+
+            this.onRefresh();
+        }
+
+         render() {
             let data = this.state.Data;
             let btnGroup = [];
             let selectType = null
@@ -492,6 +525,31 @@ import DateTimePicker from 'react-datetime';
                     }
                 }
             }
+            let picrows = null;
+            if (data != null) {
+                if(data.hasPic){
+                    picrows = <img className="img-slip" src={"/api/Withdrawal/GetWithdrawalPic?transId=" + data.transId} />;
+                }
+                else{
+                    if(data.status == 4){
+                        picrows = <div
+                                    onPaste={this.handlePaste.bind(this)}>
+                                        <div
+                                            style={{
+                                                marginTop: 5,
+                                                padding: 10,
+                                                fontStyle: "italic",
+                                                color: "red",
+                                                border: "1px solid red",
+                                                height: 500,
+                                            }}
+                                        >
+                                            Paste Area
+                                        </div>
+                                </div>
+                    }
+                }
+            }
 
             return (
                 data != null ? <div>
@@ -572,6 +630,7 @@ import DateTimePicker from 'react-datetime';
                             </tr>
                         </tbody>
                     </table>
+                    {picrows}
                     <WithdrawalRequestComment Data={this.state.Comments} />
                     <div className="input-field mt-20">
                         <label htmlFor="command" className="label">{i18n.lbl_Comment}</label>

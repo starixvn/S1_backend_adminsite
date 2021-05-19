@@ -56,6 +56,7 @@ namespace BackendSite.Service.Model
         public int Flag { set; get; }
         public DateTime? UpdateTime { set; get; }
         //public virtual IEnumerable<Comments> Comments { get; set; }
+        public bool HasPic { get; set; }
     }
     public class WithdrawalInfo
     {

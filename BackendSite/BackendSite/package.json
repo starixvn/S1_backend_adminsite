@@ -23,6 +23,7 @@
     "webpack-notifier": "^1.8.0"
   },
   "dependencies": {
+    "@progress/kendo-react-common": "^4.6.0",
     "axios": "^0.19.1",
     "calendar": "^0.1.1",
     "install": "^0.13.0",
