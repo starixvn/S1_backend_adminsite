@@ -2,7 +2,6 @@
 import { Pagination } from '../commJS/Pagination.jsx';
 import * as Loading from '../commJS/Loading.jsx';
 import DateTimePicker from 'react-datetime';
-import { guid } from "@progress/kendo-react-common";
 
 (function ($, React, ReactDOM, i18n, axios, moment, Calendar) {
     const WithdrawalStatus = {
@@ -195,7 +194,7 @@ import { guid } from "@progress/kendo-react-common";
         _clipboard = null;
         constructor(props) {
             super(props);
-            this.state = { Data: null ,files:[]};
+            this.state = { Data: null};
         }
 
         componentDidMount() {
@@ -209,6 +208,10 @@ import { guid } from "@progress/kendo-react-common";
             this._clipboard.on('error', function (e) {
                 //console.log(e);
             });
+        }
+
+        onRefresh() {
+            this.onGetData();
         }
 
         onGetData() {
@@ -400,32 +403,36 @@ import { guid } from "@progress/kendo-react-common";
             this.setState({ SelId: event.target.value });
         }
 
-        handlePaste = (e) => {
-            if (e.clipboardData.files.length) {
-                console.log(e.target.value);
-              const fileObject = e.clipboardData.files[0];
-
-              const file = {
-                getRawFile: () => fileObject,
-                name: fileObject.name,
-                size: fileObject.size,
-                uid: guid(),
-                status: 2,
-                progress: 0,
-              };
-        
-              const filesState = this.state.files.map((f) => ({ ...f }));
-              filesState.push(file);
-              console.log(filesState);
-              this.setState({ ...this.state,files: filesState });
-            } else {
-              alert(
-                "No image data was found in your clipboard. Copy an image first or take a screenshot."
-              );
+        handlePaste = (event) => {
+            let transId = this.props.transId;
+            let imgindex = 0;
+            if (event.clipboardData.files.length) {
+                for(var i=0;i<event.clipboardData.items.length;i++){
+                    if(event.clipboardData.items[i].type == "image/png"){
+                        imgindex = i;                     
+                    }
+                }
             }
-          };
+            var blob = event.clipboardData.items[imgindex].getAsFile();
+            var reader = new FileReader();
+            reader.onload = function(event){
+                axios.post('/api/Withdrawal/UploadWithdrawalPic', { Pic: event.target.result,TransId: transId })
+                .then(async function (response) {
+                    if(response.data.errorCode == 0){
+                    }
+                    else{
+                    }
+                    
+                }.bind(this)).catch(function (error) {
+                    
+                }.bind(this));
+            }; // data url!
+            reader.readAsDataURL(blob)
 
-        render() {
+            this.onRefresh();
+        }
+
+         render() {
             let data = this.state.Data;
             let btnGroup = [];
             let selectType = null
@@ -518,6 +525,31 @@ import { guid } from "@progress/kendo-react-common";
                     }
                 }
             }
+            let picrows = null;
+            if (data != null) {
+                if(data.hasPic){
+                    picrows = <img className="img-slip" src={"/api/Withdrawal/GetWithdrawalPic?transId=" + data.transId} />;
+                }
+                else{
+                    if(data.status == 6){
+                        picrows = <div
+                                    onPaste={this.handlePaste.bind(this)}>
+                                        <div
+                                            style={{
+                                                marginTop: 5,
+                                                padding: 10,
+                                                fontStyle: "italic",
+                                                color: "red",
+                                                border: "1px solid red",
+                                                height: 500,
+                                            }}
+                                        >
+                                            Paste Area
+                                        </div>
+                                </div>
+                    }
+                }
+            }
 
             return (
                 data != null ? <div>
@@ -598,21 +630,7 @@ import { guid } from "@progress/kendo-react-common";
                             </tr>
                         </tbody>
                     </table>
-                    <div
-                        onPaste={this.handlePaste.bind(this)}>
-                            <div
-                                style={{
-                                    marginTop: 5,
-                                    padding: 10,
-                                    fontStyle: "italic",
-                                    color: "red",
-                                    border: "1px solid red",
-                                    height: 500,
-                                }}
-                            >
-                                Paste Area
-                            </div>
-                    </div>
+                    {picrows}
                     <WithdrawalRequestComment Data={this.state.Comments} />
                     <div className="input-field mt-20">
                         <label htmlFor="command" className="label">{i18n.lbl_Comment}</label>
