@@ -127,6 +127,7 @@ namespace BackendSite.Service.DAL
         }
 
         public IEnumerable<StatisticalPartcialSummeryModel> GetStatisticalReport(string siteIds,
+                                                                                 string timeZone,
                                                                                  string startDate,
                                                                                  string endDate)
         {
@@ -136,9 +137,10 @@ namespace BackendSite.Service.DAL
                 var parameters = new DynamicParameters(
                 new
                 {
-                    SiteIds = siteIds,
-                    StartDate = startDate,
-                    EndDate = endDate
+                    _SiteIds = siteIds,
+                    _TimeZone= timeZone,
+                    _StartDate = startDate,
+                    _EndDate = endDate
                 });
 
                 string SpName = "Admin_ReportTurnOverValidBet_Statistical_Get";

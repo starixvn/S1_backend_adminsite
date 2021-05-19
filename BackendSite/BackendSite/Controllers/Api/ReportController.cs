@@ -428,6 +428,7 @@ namespace BackendSite.Controllers.Api
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/StatisticalReport" })]
         public ApiResult GetStatisticalReport([FromForm] IEnumerable<int> SiteIds,
+                                              [FromForm] string TimeZone,
                                               [FromForm] string EndDate)
         {
 
@@ -443,8 +444,9 @@ namespace BackendSite.Controllers.Api
                 #endregion
 
                 apiResult.Data = _reportBLL.GetStatisticalReport(JsonConvert.SerializeObject(SiteIds),
-                                                                StartDate,
-                                                                EndDate);
+                                                                 TimeZone,
+                                                                 StartDate,
+                                                                 EndDate);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -459,6 +461,7 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         public IActionResult ExportStatisticalReport(string SiteIds,
+                                                     string TimeZone,
                                                      string EndDate)
         {
 
@@ -472,8 +475,9 @@ namespace BackendSite.Controllers.Api
             #region Get Data
 
             var ExportData = _reportBLL.GetStatisticalReport(SiteIds,
-                                                            StartDate,
-                                                            EndDate);
+                                                             TimeZone,
+                                                             StartDate,
+                                                             EndDate);
 
             var currencyList = ExportData.Select(x => x.CurrencyId).Distinct();
 

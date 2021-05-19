@@ -362,7 +362,6 @@ namespace BackendSite.Service.BLL
             Dictionary<string, dynamic> noteInfo = new Dictionary<string, dynamic>();
             mainInfo.Add("MenuName", "Customer Info");
             mainInfo.Add("Action", "Kick Out");
-            mainInfo.Add("Affect Table", "OnUser");
             noteInfo.Add("MenuName", "Customer Info");
             noteInfo.Add("Action", "Add Note");
 
