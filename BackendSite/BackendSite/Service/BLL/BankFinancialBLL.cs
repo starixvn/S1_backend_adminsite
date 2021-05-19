@@ -75,10 +75,26 @@ namespace BackendSite.Service.BLL
             bool status = false;
             int count = 0;
             string message = string.Empty;
+            bool updateTransferDataFlag = false;
+            int affectTransferData = 0;
+            BankFinancialTransferAccountDetailModel oldData = new BankFinancialTransferAccountDetailModel();
 
             if (!CheckParameterForSetTransferAccount(bankFinancialTransferAccount, out message))
             {
                 return (status, count, message);
+            }
+
+            if (bankFinancialTransferAccount.Id != 0)
+            {
+                oldData = GetTransferAccountInfoListForDisplay(true, bankFinancialTransferAccount.SiteId, bankFinancialTransferAccount.Id).FirstOrDefault();
+
+                affectTransferData = _bankFinancialService.GetTransferDataCount(oldData.AccountNo);
+
+                if (affectTransferData > 0)
+                {
+
+                    updateTransferDataFlag = CheckKeyValueForSetTransferAccount(bankFinancialTransferAccount, oldData);
+                }
             }
 
             BankFinancialTransferAccountModel transferAccountModel = new BankFinancialTransferAccountModel
@@ -148,6 +164,16 @@ namespace BackendSite.Service.BLL
                         scope.Dispose();
 
                         return (status, count, "Insert Transfer Account Log Fail.");
+                    }
+
+                    if (updateTransferDataFlag)
+                    {
+                        if (_bankFinancialService.UpdateTransferInfo(bankFinancialTransferAccount, oldData) != affectTransferData)
+                        {
+                            scope.Dispose();
+
+                            return (status, count, "Update Transfer Data Fail.");
+                        }
                     }
 
                     scope.Complete();
@@ -416,6 +442,57 @@ namespace BackendSite.Service.BLL
             return true;
         }
 
+        private bool CheckKeyValueForSetTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount, BankFinancialTransferAccountDetailModel oldData)
+        {
+
+            #region Key Values Check
+
+
+            if (bankFinancialTransferAccount.CurrencyId != oldData.CurrencyId)
+            {
+                return true;
+            }
+
+            if (bankFinancialTransferAccount.SysId != oldData.SysId)
+            {
+                return true;
+            }
+
+            if (bankFinancialTransferAccount.Channel != oldData.Channel)
+            {
+                return true;
+            }
+
+            if (bankFinancialTransferAccount.PayId != oldData.PayId)
+            {
+                return true;
+            }
+
+            if (bankFinancialTransferAccount.Agent != oldData.Agent)
+            {
+                return true;
+            }
+
+            if (bankFinancialTransferAccount.AccountNo != oldData.AccountNo)
+            {
+                return true;
+            }
+
+            if (bankFinancialTransferAccount.AccountName != oldData.AccountName)
+            {
+                return true;
+            }
+
+            if (bankFinancialTransferAccount.DisplayName != oldData.DisplayName)
+            {
+                return true;
+            }
+
+            #endregion
+
+            return false;
+        }
+
         private string SortPurpose(string purpose)
         {
 
@@ -635,7 +712,7 @@ namespace BackendSite.Service.BLL
                                                              null,
                                                              transferId);
 
-                var transferInfoReceiptModel= _bankFinancialService.GetTransferInfoReceipt(transferId);
+                var transferInfoReceiptModel = _bankFinancialService.GetTransferInfoReceipt(transferId);
 
                 BankFinancialTransferInfoDetailModel data = new BankFinancialTransferInfoDetailModel();
 
@@ -687,7 +764,7 @@ namespace BackendSite.Service.BLL
                         return (status, count, "Delete Transfer Info Data Fail.");
                     }
 
-                    if(transferInfoReceiptModel!=null)
+                    if (transferInfoReceiptModel != null)
                     {
                         if (_bankFinancialService.DeleteTransferInfoReceipt(transferId) != 1)
                         {
@@ -1290,7 +1367,7 @@ namespace BackendSite.Service.BLL
         public ProcessedImage ProcessImage(IFormFile image)
         {
             var processedImage = new ProcessedImage();
-            
+
             if (_contentTypesCheck.ContainsKey(image.ContentType))
             {
                 decimal xSize = 500m;
