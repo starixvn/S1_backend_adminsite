@@ -531,7 +531,7 @@ import DateTimePicker from 'react-datetime';
                     picrows = <img className="img-slip" src={"/api/Withdrawal/GetWithdrawalPic?transId=" + data.transId} />;
                 }
                 else{
-                    if(data.status == 6){
+                    if(data.status == 4){
                         picrows = <div
                                     onPaste={this.handlePaste.bind(this)}>
                                         <div
