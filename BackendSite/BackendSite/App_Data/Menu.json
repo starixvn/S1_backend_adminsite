@@ -288,6 +288,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "WithdrawalLimit Management",
+        "FuncKey": "Finance/WithdrawalLimitManagement",
+        "Controller": "Finance",
+        "Action": "WithdrawalLimitManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
