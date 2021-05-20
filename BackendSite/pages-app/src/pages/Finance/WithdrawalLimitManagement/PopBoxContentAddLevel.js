@@ -34,8 +34,8 @@ export const PopBoxContentAddLevel = (props) => {
     }
 
     return (
-        <div className="popup">
-            <div className="popup_inner">
+        <div>
+            <div>
                 <h1>Add new Vip level</h1>
                 <form className="ui form">
                     <div className="field">
