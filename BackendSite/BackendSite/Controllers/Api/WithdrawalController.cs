@@ -35,6 +35,7 @@ namespace BackendSite.Controllers.Api
         private readonly string awsSecretKey;
         private readonly string awsWithdrawalFolder;
         private readonly string awsWithdrawalUrl;
+        private readonly string awsWithdrawalBucketName;
         public WithdrawalController(IConfiguration configuration, CourierAdapter courierAdapter, WithdrawalBLL withdrawalBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL)
         {
             this.withdrawalBLL = withdrawalBLL;
@@ -48,6 +49,7 @@ namespace BackendSite.Controllers.Api
             awsSecretKey = configuration.GetValue<string>("AwsSecretKey");
             awsWithdrawalFolder = configuration.GetValue<string>("AwsWithdrawalFolder");
             awsWithdrawalUrl = configuration.GetValue<string>("AwsWithdrawalUrl");
+            awsWithdrawalBucketName = configuration.GetValue<string>("AwsWithdrawalBucketName");    
         }
 
         public class WithdrawalListReq
@@ -106,14 +108,21 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                RegionEndpoint bucketRegion = RegionEndpoint.APSoutheast1;
-                IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, bucketRegion);
-                var getRequest = new GetObjectRequest();
-                string key = string.Format("{0}/{1}.png", awsWithdrawalFolder, withdrawalReq.TransId);
-                getRequest.BucketName = "ailab-payment";
-                getRequest.Key = key;
-                GetObjectResponse getResponse = await client.GetObjectAsync(getRequest);
-                withdrawalRequest.HasPic = true;
+                if(withdrawalRequest.Status == 4 || withdrawalRequest.Status == 6)
+                {
+                    RegionEndpoint bucketRegion = RegionEndpoint.APSoutheast1;
+                    IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, bucketRegion);
+                    var getRequest = new GetObjectRequest();
+                    string key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, withdrawalReq.TransId, withdrawalRequest.BankSlipPicCount);
+                    getRequest.BucketName = awsWithdrawalBucketName;
+                    getRequest.Key = key;
+                    GetObjectResponse getResponse = await client.GetObjectAsync(getRequest);
+                    withdrawalRequest.HasPic = true;
+                }
+                else
+                {
+                    withdrawalRequest.HasPic = false;
+                }
             }
             catch(Exception ex)
             {
@@ -607,20 +616,30 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult();
             try
             {
-                string x = para.Pic.Replace("data:image/png;base64,", "");
-                byte[] bytes = Convert.FromBase64String(x);
-                MemoryStream stream = new MemoryStream(bytes);
-                RegionEndpoint bucketRegion = RegionEndpoint.APSoutheast1;
-                IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, bucketRegion);
-                var putRequest = new PutObjectRequest();
-                string key = string.Format("{0}/{1}.png", awsWithdrawalFolder, para.TransId);
-                putRequest.BucketName = "ailab-payment";        // Your bucket name
-                putRequest.ContentType = "image/png";
-                putRequest.InputStream = stream;
-                putRequest.Key = key;
+                var result = withdrawalBLL.UpdateWithdrawalPicCount(para.TransId);
+                if (result)
+                {
+                    var WithdrawalPic = withdrawalBLL.GetWithdrawalPicCount(para.TransId);
+                    string x = para.Pic.Replace("data:image/png;base64,", "");
+                    byte[] bytes = Convert.FromBase64String(x);
+                    MemoryStream stream = new MemoryStream(bytes);
+                    RegionEndpoint bucketRegion = RegionEndpoint.APSoutheast1;
+                    IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, bucketRegion);
+                    var putRequest = new PutObjectRequest();
+                    string key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, para.TransId, WithdrawalPic.BankSlipPicCount);
+                    putRequest.BucketName = awsWithdrawalBucketName;        // Your bucket name
+                    putRequest.ContentType = "image/png";
+                    putRequest.InputStream = stream;
+                    putRequest.Key = key;
 
-                PutObjectResponse putResponse = await client.PutObjectAsync(putRequest);
-                apiResult.ErrorCode = 0;
+
+                    PutObjectResponse putResponse = await client.PutObjectAsync(putRequest);
+                    apiResult.ErrorCode = 0;
+                }
+                else
+                {
+                    apiResult.ErrorCode = 999;
+                }
 
             }
             catch(Exception ex)
@@ -637,9 +656,37 @@ namespace BackendSite.Controllers.Api
             public string Url { get; set; }
         }
         [HttpGet]
-        public ActionResult GetWithdrawalPic(string transId)
+        public ActionResult GetWithdrawalPic(string transId, int BankSlipPicCount)
         {
-            return Redirect(string.Format("{0}{1}/{2}.png", awsWithdrawalUrl, awsWithdrawalFolder, transId));
+            var WithdrawalPic = withdrawalBLL.GetWithdrawalPicCount(transId);
+            return Redirect(string.Format("{0}{1}/{2}_{3}.png", awsWithdrawalUrl, awsWithdrawalFolder, transId, WithdrawalPic.BankSlipPicCount));
+        }
+        public class DeleteWithdrawalPicPara
+        {
+            public string TransId { get; set; }
+        }
+        [HttpPost]
+        public async Task<ApiResult> DeleteWithdrawalPic(DeleteWithdrawalPicPara para)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                var WithdrawalPic = withdrawalBLL.GetWithdrawalPicCount(para.TransId);
+                RegionEndpoint bucketRegion = RegionEndpoint.APSoutheast1;
+                IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, bucketRegion);
+                var request = new DeleteObjectRequest();
+                string key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, para.TransId, WithdrawalPic.BankSlipPicCount);
+                request.BucketName = awsWithdrawalBucketName;
+                request.Key = key;
+                DeleteObjectResponse Response = await client.DeleteObjectAsync(request);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
         }
     }
 }

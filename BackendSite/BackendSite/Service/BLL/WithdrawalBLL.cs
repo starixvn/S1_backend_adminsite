@@ -289,5 +289,13 @@ namespace BackendSite.Service.BLL
         {
             return withdrawalService.DeleteWithdrawalLimit(SiteId, CurrencyId);
         }
+        public bool UpdateWithdrawalPicCount(string transId)
+        {
+            return withdrawalService.UpdateWithdrawalPicCount(transId);
+        }
+        public BankSlipPic GetWithdrawalPicCount(string transId)
+        {
+            return withdrawalService.GetWithdrawalPicCount(transId);
+        }
     }
 }
