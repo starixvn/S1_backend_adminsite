@@ -18,8 +18,8 @@ export const PopBoxContentAddLevel = (props) => {
         e.preventDefault();
 
         if (lastList.vipLevel >= Level) { return (alert("err1")) };
-        if (lastList.withdrawalMin >= WithdrawalMin) { return (alert("Withdrawal Min too small")) };
-        if (lastList.withdrawalMax >= WithdrawalMax) { return (alert("Withdrawal Max too small")) };
+        //if (lastList.withdrawalMin >= WithdrawalMin) { return (alert("Withdrawal Min too small")) };
+        //if (lastList.withdrawalMax >= WithdrawalMax) { return (alert("Withdrawal Max too small")) };
         api.post('/api/Withdrawal/AddWithdrawalLimitInfo', { siteId: siteId, currencyId: currencyId, vipLevel: Level, withdrawalMin: WithdrawalMin, withdrawalMax: WithdrawalMax })
             .then(function (response) {
                 if (response.data.errorCode === 0) {
@@ -34,8 +34,8 @@ export const PopBoxContentAddLevel = (props) => {
     }
 
     return (
-        <div className="popup">
-            <div className="popup_inner">
+        <div>
+            <div>
                 <h1>Add new Vip level</h1>
                 <form className="ui form">
                     <div className="field">
@@ -49,6 +49,7 @@ export const PopBoxContentAddLevel = (props) => {
                     <div className="field">
                         <label>Withdrawal Max</label>
                         <input type="number" defaultValue={withdrawalMax} onChange={(e) => { setWithdrawalMax(parseInt(e.target.value)) }} />
+                        <label>(0 = Unlimited)</label>
                     </div>
                     <button className="ui right floated primary button" onClick={handleSave} >Save</button>
                     <button className="ui right floated button" onClick={props.ClickCancel}>Cancel</button>
