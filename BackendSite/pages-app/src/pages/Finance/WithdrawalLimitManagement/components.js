@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import {number_format} from '../../../module/Formatting/NumberFormat';
 
 export const InputBox = (props) => {
     return props.isEdit ? (
@@ -9,7 +10,7 @@ export const InputBox = (props) => {
             }
         }} />
     ) : (
-            props.defaultValue
+        number_format(props.defaultValue)
         )
 }
 
