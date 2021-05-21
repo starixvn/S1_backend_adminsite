@@ -15,6 +15,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using System.IO;
 using Amazon;
+using System.Net;
 
 namespace BackendSite.Controllers.Api
 {
@@ -36,6 +37,8 @@ namespace BackendSite.Controllers.Api
         private readonly string awsWithdrawalFolder;
         private readonly string awsWithdrawalUrl;
         private readonly string awsWithdrawalBucketName;
+        private readonly string ProxyHost;
+        private readonly int ProxyPort;
         public WithdrawalController(IConfiguration configuration, CourierAdapter courierAdapter, WithdrawalBLL withdrawalBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL)
         {
             this.withdrawalBLL = withdrawalBLL;
@@ -49,7 +52,9 @@ namespace BackendSite.Controllers.Api
             awsSecretKey = configuration.GetValue<string>("AwsSecretKey");
             awsWithdrawalFolder = configuration.GetValue<string>("AwsWithdrawalFolder");
             awsWithdrawalUrl = configuration.GetValue<string>("AwsWithdrawalUrl");
-            awsWithdrawalBucketName = configuration.GetValue<string>("AwsWithdrawalBucketName");    
+            awsWithdrawalBucketName = configuration.GetValue<string>("AwsWithdrawalBucketName");
+            ProxyHost = configuration.GetValue<string>("ProxyHost");
+            ProxyPort = configuration.GetValue<int>("ProxyPort");
         }
 
         public class WithdrawalListReq
@@ -108,10 +113,22 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                if(withdrawalRequest.Status == 4 || withdrawalRequest.Status == 6)
+                
+                if (withdrawalRequest.Status == 4 || withdrawalRequest.Status == 6)
                 {
-                    RegionEndpoint bucketRegion = RegionEndpoint.APSoutheast1;
-                    IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, bucketRegion);
+                    var config = new AmazonS3Config
+                    {
+                        RegionEndpoint = RegionEndpoint.APSoutheast1
+                    };
+
+                    if (!string.IsNullOrEmpty(ProxyHost))
+                    {
+                        config.ProxyHost = ProxyHost;
+                        config.ProxyPort = ProxyPort;
+                    }
+
+                    IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
+
                     var getRequest = new GetObjectRequest();
                     string key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, withdrawalReq.TransId, withdrawalRequest.BankSlipPicCount);
                     getRequest.BucketName = awsWithdrawalBucketName;
@@ -623,8 +640,17 @@ namespace BackendSite.Controllers.Api
                     string x = para.Pic.Replace("data:image/png;base64,", "");
                     byte[] bytes = Convert.FromBase64String(x);
                     MemoryStream stream = new MemoryStream(bytes);
-                    RegionEndpoint bucketRegion = RegionEndpoint.APSoutheast1;
-                    IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, bucketRegion);
+                    var config = new AmazonS3Config
+                    {
+                        RegionEndpoint = RegionEndpoint.APSoutheast1
+                    };
+
+                    if (!string.IsNullOrEmpty(ProxyHost))
+                    {
+                        config.ProxyHost = ProxyHost;
+                        config.ProxyPort = ProxyPort;
+                    }
+                    IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
                     var putRequest = new PutObjectRequest();
                     string key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, para.TransId, WithdrawalPic.BankSlipPicCount);
                     putRequest.BucketName = awsWithdrawalBucketName;        // Your bucket name
@@ -672,8 +698,17 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var WithdrawalPic = withdrawalBLL.GetWithdrawalPicCount(para.TransId);
-                RegionEndpoint bucketRegion = RegionEndpoint.APSoutheast1;
-                IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, bucketRegion);
+                var config = new AmazonS3Config
+                {
+                    RegionEndpoint = RegionEndpoint.APSoutheast1
+                };
+
+                if (!string.IsNullOrEmpty(ProxyHost))
+                {
+                    config.ProxyHost = ProxyHost;
+                    config.ProxyPort = ProxyPort;
+                }
+                IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
                 var request = new DeleteObjectRequest();
                 string key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, para.TransId, WithdrawalPic.BankSlipPicCount);
                 request.BucketName = awsWithdrawalBucketName;
