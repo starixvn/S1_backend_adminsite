@@ -165,6 +165,9 @@
   <data name="Currency_96" xml:space="preserve">
     <value>USDT</value>
   </data>
+  <data name="Currency_61" xml:space="preserve">
+    <value>INR</value>
+  </data>
   <data name="lbl_AccountList" xml:space="preserve">
     <value>Account List</value>
   </data>

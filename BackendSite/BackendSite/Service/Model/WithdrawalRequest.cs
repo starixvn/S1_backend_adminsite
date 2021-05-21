@@ -134,6 +134,8 @@ namespace BackendSite.Service.Model
         public double WithdrawalMin { get; set; }
 
         public double WithdrawalMax { get; set; }
+        public DateTime UpdateTime { get; set; }
+        public string UpdateOperator { get; set; }
     }
 
     public class WithdrawalKYC
