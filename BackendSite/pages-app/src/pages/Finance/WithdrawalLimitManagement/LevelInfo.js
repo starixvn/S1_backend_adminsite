@@ -20,7 +20,6 @@ export const LevelInfo = (props) => {
                 withdrawalMin: value.withdrawalMin,
                 withdrawalMax: value.withdrawalMax
             };
-
         return (
             <tr key={`levellist-${value.currencyId}-${idx}`}>
                 <td>{value.vipLevel}</td>
@@ -40,7 +39,7 @@ export const LevelInfo = (props) => {
                 <tr>
                     <th scope="col">Vip Level</th>
                     <th scope="col">Withdrawal Min</th>
-                    <th scope="col">Withdrawal Max</th>
+                    <th scope="col">Withdrawal Max (0 = Unlimited)</th>
                     <th scope="col">Action</th>
                 </tr>
             </thead>
