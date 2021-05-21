@@ -23,8 +23,8 @@ export const LevelInfo = (props) => {
         return (
             <tr key={`levellist-${value.currencyId}-${idx}`}>
                 <td>{value.vipLevel}</td>
-                <td><InputBox isEdit={isEdit} defaultValue={number_format(_editValue.withdrawalMin)} onChange={props.ChangeData.bind(null, idx, "withdrawalMin")} /></td>
-                <td><InputBox isEdit={isEdit} defaultValue={number_format(_editValue.withdrawalMax)} onChange={props.ChangeData.bind(null, idx, "withdrawalMax")} /></td>
+                <td><InputBox isEdit={isEdit} defaultValue={_editValue.withdrawalMin} onChange={props.ChangeData.bind(null, idx, "withdrawalMin")} /></td>
+                <td><InputBox isEdit={isEdit} defaultValue={_editValue.withdrawalMax} onChange={props.ChangeData.bind(null, idx, "withdrawalMax")} /></td>
                 <td>
                     <div className="button-action">
                         <ActionButtons isEdit={isEdit} isDelete={isDelete} ClickEdit={props.handleEdit.bind(null, idx)} HandleDelete={props.handleDelete.bind(null, idx)} HandleUpdate={props.handleUpdate.bind(null, idx)} />
