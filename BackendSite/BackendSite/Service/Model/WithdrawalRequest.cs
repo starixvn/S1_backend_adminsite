@@ -56,6 +56,8 @@ namespace BackendSite.Service.Model
         public int Flag { set; get; }
         public DateTime? UpdateTime { set; get; }
         //public virtual IEnumerable<Comments> Comments { get; set; }
+        public bool HasPic { get; set; }
+        public int BankSlipPicCount { get; set; }
     }
     public class WithdrawalInfo
     {
@@ -158,5 +160,8 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public int WithdrawalMin { get; set; }
     }
-
+    public class BankSlipPic
+    {
+        public int BankSlipPicCount { get; set; }
+    }
 }

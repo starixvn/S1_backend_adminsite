@@ -154,6 +154,14 @@ export function reducer(state, action) {
             });
           });
         }
+        if (action.value == 1) {
+          if (!getFromSiteId.iCurrencyList.find((x) => x == 13)) {
+            fromCurrencyList.push({
+              value: Number(13),
+              displayText: window.i18n[`lbl_Currency${13}`],
+            });
+          }
+        }
       }
 
       return {
@@ -308,6 +316,14 @@ export function reducer(state, action) {
               displayText: window.i18n[`lbl_Currency${i}`],
             });
           });
+        }
+        if (action.value == 1) {
+          if (!getToSiteId.iCurrencyList.find((x) => x == 13)) {
+            toCurrencyList.push({
+              value: Number(13),
+              displayText: window.i18n[`lbl_Currency${13}`],
+            });
+          }
         }
       }
 
@@ -477,6 +493,15 @@ export function reducer(state, action) {
             displayText: window.i18n[`lbl_Currency${i}`],
           });
         });
+
+        if (action.fromSiteId == 1) {
+          if (!getFromSiteItem.iCurrencyList.find((x) => x == 13)) {
+            iniFromCurrencyList.push({
+              value: Number(13),
+              displayText: window.i18n[`lbl_Currency${13}`],
+            });
+          }
+        }
       }
 
       return {
@@ -506,6 +531,15 @@ export function reducer(state, action) {
             displayText: window.i18n[`lbl_Currency${i}`],
           });
         });
+
+        if (action.toSiteId == 1) {
+          if (!getToSiteItem.iCurrencyList.find((x) => x == 13)) {
+            iniToCurrencyList.push({
+              value: Number(13),
+              displayText: window.i18n[`lbl_Currency${13}`],
+            });
+          }
+        }
       }
 
       return {
