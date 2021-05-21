@@ -416,7 +416,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManage" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         public ApiResult<IEnumerable<WithdrawalLimitInfoManage>> GetWithdrawalLimitInfos(WithdrawalLimit withdrawalLimit)
         {
             var apiResult = new ApiResult<IEnumerable<WithdrawalLimitInfoManage>>();
@@ -427,7 +427,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManage" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         public ApiResult AddWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
         {
             var result = withdrawalBLL.AddWithdrawalLimit(withdrawalLimitInfoManage, User.Identity.Name);
@@ -446,7 +446,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManage" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         public ApiResult EditWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
         {
             var result = withdrawalBLL.EditWithdrawalLimit(withdrawalLimitInfoManage, User.Identity.Name);
@@ -464,7 +464,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManage" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
         public ApiResult DeleteWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
         {
