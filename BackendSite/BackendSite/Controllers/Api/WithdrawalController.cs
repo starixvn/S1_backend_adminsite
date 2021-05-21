@@ -430,7 +430,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManage" })]
         public ApiResult AddWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
         {
-            var result = withdrawalBLL.AddWithdrawalLimit(withdrawalLimitInfoManage);
+            var result = withdrawalBLL.AddWithdrawalLimit(withdrawalLimitInfoManage, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result)
             {
@@ -449,7 +449,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManage" })]
         public ApiResult EditWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
         {
-            var result = withdrawalBLL.EditWithdrawalLimit(withdrawalLimitInfoManage);
+            var result = withdrawalBLL.EditWithdrawalLimit(withdrawalLimitInfoManage, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result)
             {

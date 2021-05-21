@@ -188,7 +188,7 @@ namespace BackendSite.Service.BLL
         }
         public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(int siteId, int currencyId) => withdrawalLimitService.GetWithdrawalLimitInfos(siteId, currencyId);
 
-        public bool AddWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        public bool AddWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string UpdateOperator)
         {
             if (withdrawalLimitInfoManage.VipLevel > 1)
             {
@@ -203,10 +203,10 @@ namespace BackendSite.Service.BLL
                     return false;
             }
 
-            return withdrawalLimitService.AddWithdrawalLimitInfo(withdrawalLimitInfoManage);
+            return withdrawalLimitService.AddWithdrawalLimitInfo(withdrawalLimitInfoManage, UpdateOperator);
         }
 
-        public bool EditWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        public bool EditWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage,string UpdateOperator)
         {
             var currentBelowLevel = withdrawalLimitService.GetWithdrawalLimitInfo(withdrawalLimitInfoManage.SiteId, withdrawalLimitInfoManage.CurrencyId, withdrawalLimitInfoManage.VipLevel - 1);
             var currentUpperLevel = withdrawalLimitService.GetWithdrawalLimitInfo(withdrawalLimitInfoManage.SiteId, withdrawalLimitInfoManage.CurrencyId, withdrawalLimitInfoManage.VipLevel + 1);
@@ -228,7 +228,7 @@ namespace BackendSite.Service.BLL
                     return false;
             }
 
-            return withdrawalLimitService.EditWithdrawalLimitInfo(withdrawalLimitInfoManage);
+            return withdrawalLimitService.EditWithdrawalLimitInfo(withdrawalLimitInfoManage, UpdateOperator);
         }
 
         public int DeleteWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
