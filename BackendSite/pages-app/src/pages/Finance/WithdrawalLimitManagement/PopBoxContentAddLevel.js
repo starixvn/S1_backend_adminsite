@@ -19,7 +19,7 @@ export const PopBoxContentAddLevel = (props) => {
 
         if (lastList.vipLevel >= Level) { return (alert("err1")) };
         //if (lastList.withdrawalMin >= WithdrawalMin) { return (alert("Withdrawal Min too small")) };
-        if (lastList.withdrawalMax >= WithdrawalMax) { return (alert("Withdrawal Max too small")) };
+        //if (lastList.withdrawalMax >= WithdrawalMax) { return (alert("Withdrawal Max too small")) };
         api.post('/api/Withdrawal/AddWithdrawalLimitInfo', { siteId: siteId, currencyId: currencyId, vipLevel: Level, withdrawalMin: WithdrawalMin, withdrawalMax: WithdrawalMax })
             .then(function (response) {
                 if (response.data.errorCode === 0) {
