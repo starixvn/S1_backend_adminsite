@@ -216,7 +216,6 @@ export function reducer(state, action) {
 			};
 
 		case defActionType.MAIN_SET_VALUE:
-			console.log(action);
 			return {
 				...state,
 				[action.dataColumn]: action.value
@@ -376,7 +375,6 @@ export function reducer(state, action) {
 
 		case defActionType.ONLY_REGISTERED_SET_VALUE:
 			let newValue = state.onlyRegistered.includes(action.value) ? [] : [action.value];
-			console.log(newValue);
 			return {
 				...state,
 				onlyRegistered: newValue
