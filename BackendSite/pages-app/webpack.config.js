@@ -58,9 +58,9 @@ module.exports = {
     // "Finance/DepositLimitManagement.min": [
     // 	"./src/pages/Finance/DepositLimitManagement/index.js"
     // ],
-    "Finance/WithdrawalLimitManagement.min": [
-    	"./src/pages/Finance/WithdrawalLimitManagement/index.js"
-    ],
+    // "Finance/WithdrawalLimitManagement.min": [
+    // 	"./src/pages/Finance/WithdrawalLimitManagement/index.js"
+    // ],
     // "CSD/WithdrawalKYCControl.min": [
     // 	"./src/pages/CSD/WithdrawalKYCControl/index.js"
     // ],
@@ -71,12 +71,12 @@ module.exports = {
     // "CSD/ChangeVipLevelBatch.min": [
     // 	"./src/pages/CSD/ChangeVipLevelBatch/index.js"
     // ],
-    // "Marketing/BonusManage.min": [
+    "Marketing/BonusManage.min": [
 
-    //   "@babel/polyfill",
-    //   "./src/pages/Marketing/BonusManage/index.jsx",
+      "@babel/polyfill",
+      "./src/pages/Marketing/BonusManage/index.jsx",
 
-    // ],
+    ],
     // "Marketing/PendingBonus.min": [
     // 	"./src/pages/Marketing/PendingBonus/index.jsx"
     // ],

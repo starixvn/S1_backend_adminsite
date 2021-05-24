@@ -61,7 +61,7 @@ namespace BackendSite.Service.DAL
             var promotion = conn.Query<PromotionInfo>("Admin_Promotion_Get", new { BonusCode, SiteId, PermissionSiteIds }, transaction: trans, commandType: CommandType.StoredProcedure).FirstOrDefault();
             if (promotion != null)
             {
-                promotion.Specific = conn.Query<PromotionSpecific>("Admin_PromotionSpecific_Get", new { BonusCode, SiteId }, transaction: trans, commandType: CommandType.StoredProcedure);
+                promotion.Specific = conn.Query<PromotionSpecific>("Admin_PromotionSpecificV2_Get", new { BonusCode, SiteId }, transaction: trans, commandType: CommandType.StoredProcedure);
 
                 if (promotion.Specific != null)
                 {
@@ -141,11 +141,12 @@ namespace BackendSite.Service.DAL
                         LockedType = specific.LockedType,
                         MinPayout = specific.MinPayout,
                         VN_AffIds = !string.IsNullOrEmpty(specific.VN_AffIds) ? JsonConvert.SerializeObject(specific.VN_AffIds.Split(",")) : null,
-                        VN_AffCodes = !string.IsNullOrEmpty(specific.VN_AffCodes) ? JsonConvert.SerializeObject(specific.VN_AffCodes.Split(",")) : null
+                        VN_AffCodes = !string.IsNullOrEmpty(specific.VN_AffCodes) ? JsonConvert.SerializeObject(specific.VN_AffCodes.Split(",")) : null,
+                        TotalUsageLimit = specific.TotalUsageLimit
                     });
                 }
 
-                conn.Execute("Admin_PromotionSpecific_Set", new
+                conn.Execute("Admin_PromotionSpecificV3_Set", new
                 {
                     promotion.BonusCode,
                     promotion.SiteId,

@@ -527,6 +527,12 @@ const SubPanel = props => {
 										dataColumn="rollOver"
 										value={props.state.specific[props.currencyId].rollOver}
 									/>
+									<InputBox
+										Title="Total Usage Limit"
+										OnChange={props.EditMainValue}
+										dataColumn="totalUsageLimit"
+										value={props.state.specific[props.currencyId].totalUsageLimit}
+									/>
 								</div>
 								<RadioBox
 									Title="Bonus Amount Type"

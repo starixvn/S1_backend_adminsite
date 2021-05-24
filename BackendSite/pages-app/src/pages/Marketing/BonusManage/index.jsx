@@ -184,7 +184,8 @@ const App = () => {
 						BeenUsed: info.beenUsed,
 						RebateList: tpGame,
 						MinPayout: Number(info.minPayout),
-						VN_AffCodes: info.affid
+						VN_AffCodes: info.affid,
+						TotalUsageLimit: info.totalUsageLimit
 					};
 				});
 console.log("promotion",promotion);
