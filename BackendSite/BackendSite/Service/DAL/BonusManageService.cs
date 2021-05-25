@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BackendSite.Service.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
@@ -14,10 +15,12 @@ namespace BackendSite.Service.DAL
     public class BonusManageService
     {
         private readonly IConfiguration configuration;
+        private readonly ILogger<BonusManageService> logger;
 
-        public BonusManageService(IConfiguration configuration)
+        public BonusManageService(IConfiguration configuration, ILogger<BonusManageService> logger)
         {
             this.configuration = configuration;
+            this.logger = logger;
         }
 
         public IEnumerable<PromotionInfo> GetPromotionList(string BonusCode, FilterPara filterPara)
@@ -326,6 +329,43 @@ namespace BackendSite.Service.DAL
                 Result.ErrorMessage = $"SiteId:{bonusImportPara.SiteId} UserName:{bonusImportPara.UserName} BonusAmount:{bonusImportPara.BonusAmount} " + ex.ToString();
             }
             return Result;
+        }
+        public int SetScratchCardCode(string specialCode, string scratchCardCode,string lastUpdateUser)
+        {
+            int errorCode = 0;
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+                {
+                    string SpName = "Admin_ScratchCardCode_set";
+                    conn.Execute(SpName, new { specialCode, scratchCardCode, lastUpdateUser }, commandType: CommandType.StoredProcedure);
+                   // logger.LogInformation($"success - SpecialCode:{SpecialCode} ScratchCardCode:{ScratchCardCode}");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+               // logger.LogInformation($"Fail - SpecialCode:{SpecialCode} ScratchCardCode:{ScratchCardCode} error:{e.Message}");
+            }
+
+            return errorCode;
+        }
+
+        public IEnumerable<ScratchCard> GetScratchCardList(string specialCode)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                string SpName = "Admin_ScratchCardCodeList_Get";
+                return conn.Query<ScratchCard>(SpName, new { SpecialCode = specialCode, CustId = -1 }, commandType: CommandType.StoredProcedure);
+            }
+        }
+        public IEnumerable<ScratchCardExport> GetScratchCardListExport(string specialCode)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                string SpName = "Admin_ScratchCardCodeListExport_Get";
+                return conn.Query<ScratchCardExport>(SpName, new { SpecialCode = specialCode}, commandType: CommandType.StoredProcedure);
+            }
         }
     }
 }
