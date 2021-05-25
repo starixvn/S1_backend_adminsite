@@ -448,10 +448,10 @@ console.log("promotion",promotion);
 	};
 
 	const skipField = {
-		"default": ["currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours", "minPayout", "specialCode", "promotionAction"],
+		"default": ["currentLang", "productCategory", "lockedType", "periodWeek", "periodMonth", "redeemHours", "minPayout", "specialCode", "promotionAction",""],
 		"6": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "affid", "specialCode", "promotionAction"],
 		"7": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "affid", "specialCode", "promotionAction"],
-		"8": ["expiryDays", "walletType", "categoryId", "tpId", "rollOver", "minPayout", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours", "affid", "specialCode"],
+		"8": ["expiryDays", "walletType", "categoryId", "tpId", "rollOver", "minPayout", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "periodWeek", "periodMonth", "redeemHours", "affid", "specialCode"],
 	}
 
 	return state.panelType === defPanelType.Main || state.panelType === defPanelType.Copy ? (
