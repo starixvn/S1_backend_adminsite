@@ -415,10 +415,12 @@ import DateTimePicker from 'react-datetime';
             }
             var blob = event.clipboardData.items[imgindex].getAsFile();
             var reader = new FileReader();
+            const scope = this;
             reader.onload = function(event){
                 axios.post('/api/Withdrawal/UploadWithdrawalPic', { Pic: event.target.result,TransId: transId })
                 .then(async function (response) {
                     if(response.data.errorCode == 0){
+                        scope.onRefresh();                    
                     }
                     else{
                     }
@@ -427,9 +429,23 @@ import DateTimePicker from 'react-datetime';
                     
                 }.bind(this));
             }; // data url!
-            reader.readAsDataURL(blob)
 
-            this.onRefresh();
+            reader.readAsDataURL(blob)         
+        }
+
+        onDelete = ()=>{
+            let transId = this.props.transId;
+            axios.post('/api/Withdrawal/DeleteWithdrawalPic', { TransId: transId })
+                .then(async function (response) {
+                    if(response.data.errorCode == 0){
+                        this.onRefresh();
+                    }
+                    else{
+                    }
+                    
+                }.bind(this)).catch(function (error) {
+                    
+                }.bind(this));               
         }
 
          render() {
@@ -528,7 +544,11 @@ import DateTimePicker from 'react-datetime';
             let picrows = null;
             if (data != null) {
                 if(data.hasPic){
-                    picrows = <img className="img-slip" src={"/api/Withdrawal/GetWithdrawalPic?transId=" + data.transId} />;
+                    picrows = 
+                    <div>
+                        <img className="img-slip" src={"/api/Withdrawal/GetWithdrawalPic?transId=" + data.transId + "&BankSlipPicCount=" + data.bankSlipPicCount} />
+                        <div><button type="button" className="btn btn-back pull-left" onClick={this.onDelete.bind(this)}>Delete</button></div>                     
+                    </div>;
                 }
                 else{
                     if(data.status == 4){

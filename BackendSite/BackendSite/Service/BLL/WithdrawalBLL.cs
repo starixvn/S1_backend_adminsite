@@ -188,47 +188,22 @@ namespace BackendSite.Service.BLL
         }
         public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(int siteId, int currencyId) => withdrawalLimitService.GetWithdrawalLimitInfos(siteId, currencyId);
 
-        public bool AddWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        public bool AddWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string UpdateOperator)
         {
-            if (withdrawalLimitInfoManage.VipLevel > 1)
+            if (withdrawalLimitInfoManage.WithdrawalMax < 0 || withdrawalLimitInfoManage.WithdrawalMin < 0)
             {
-                var currentMaxLevel = withdrawalLimitService.GetWithdrawalLimitInfo(withdrawalLimitInfoManage.SiteId, withdrawalLimitInfoManage.CurrencyId, withdrawalLimitInfoManage.VipLevel - 1);
-
-                if (withdrawalLimitInfoManage.WithdrawalMin <= currentMaxLevel.WithdrawalMin || withdrawalLimitInfoManage.WithdrawalMax <= currentMaxLevel.WithdrawalMax)
-                    return false;
+                return false;
             }
-            else
-            {
-                if (withdrawalLimitInfoManage.WithdrawalMin <= 0 || withdrawalLimitInfoManage.WithdrawalMax <= 0)
-                    return false;
-            }
-
-            return withdrawalLimitService.AddWithdrawalLimitInfo(withdrawalLimitInfoManage);
+            return withdrawalLimitService.AddWithdrawalLimitInfo(withdrawalLimitInfoManage, UpdateOperator);
         }
 
-        public bool EditWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        public bool EditWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage,string UpdateOperator)
         {
-            var currentBelowLevel = withdrawalLimitService.GetWithdrawalLimitInfo(withdrawalLimitInfoManage.SiteId, withdrawalLimitInfoManage.CurrencyId, withdrawalLimitInfoManage.VipLevel - 1);
-            var currentUpperLevel = withdrawalLimitService.GetWithdrawalLimitInfo(withdrawalLimitInfoManage.SiteId, withdrawalLimitInfoManage.CurrencyId, withdrawalLimitInfoManage.VipLevel + 1);
-
-            if (currentBelowLevel != null)
+            if(withdrawalLimitInfoManage.WithdrawalMax <0 || withdrawalLimitInfoManage.WithdrawalMin < 0)
             {
-                if (withdrawalLimitInfoManage.WithdrawalMin <= currentBelowLevel.WithdrawalMin || withdrawalLimitInfoManage.WithdrawalMax <= currentBelowLevel.WithdrawalMax)
-                    return false;
+                return false;
             }
-            else
-            {
-                if (withdrawalLimitInfoManage.WithdrawalMin <= 0 || withdrawalLimitInfoManage.WithdrawalMax <= 0)
-                    return false;
-            }
-
-            if (currentUpperLevel != null)
-            {
-                if (withdrawalLimitInfoManage.WithdrawalMin >= currentUpperLevel.WithdrawalMin || withdrawalLimitInfoManage.WithdrawalMax >= currentUpperLevel.WithdrawalMax)
-                    return false;
-            }
-
-            return withdrawalLimitService.EditWithdrawalLimitInfo(withdrawalLimitInfoManage);
+            return withdrawalLimitService.EditWithdrawalLimitInfo(withdrawalLimitInfoManage, UpdateOperator);
         }
 
         public int DeleteWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
@@ -288,6 +263,14 @@ namespace BackendSite.Service.BLL
         public bool DeleteWithdrawalLimit(int SiteId, int CurrencyId)
         {
             return withdrawalService.DeleteWithdrawalLimit(SiteId, CurrencyId);
+        }
+        public bool UpdateWithdrawalPicCount(string transId)
+        {
+            return withdrawalService.UpdateWithdrawalPicCount(transId);
+        }
+        public BankSlipPic GetWithdrawalPicCount(string transId)
+        {
+            return withdrawalService.GetWithdrawalPicCount(transId);
         }
     }
 }

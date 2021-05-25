@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
@@ -77,6 +79,55 @@ namespace BackendSite.Service.BLL
         public async Task<BonusImportResult> BonusImportAsync(BonusImportPara bonusImportPara)
         {
             return await bonusManageService.BonusImportAsync(bonusImportPara);
+        }
+        private static Random random = new Random();
+        public static string RandomString(int length,int type)
+        {
+            const string chars1 = "0123456789";
+            const string chars2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string chars3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; 
+            string chars = chars3;
+            if (type == 1)
+            {
+                chars = chars1;
+            } else if(type == 2)
+            {
+                chars = chars2;
+            }
+
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+       
+        public int GenScratchCardCode(string specialCode,int num, string lastUpdateUser)
+        {
+            int count = num;
+            int errorcount = 0;
+            while (count > 0 && errorcount < 30)
+            {
+                string ScratchCardCode = $"{RandomString(5, 2)}-{RandomString(10, 3)}";
+                if (bonusManageService.SetScratchCardCode(specialCode, ScratchCardCode, lastUpdateUser) == 0)
+                {
+                    count--;
+                }
+                else
+                {
+                    errorcount++; //Prevent infinite loops
+                }
+            }
+            if(errorcount>=30)
+            {
+                return 90;
+            }
+            return 0;
+        }
+        public IEnumerable<ScratchCard> GetScratchCardList(string specialCode)
+        {
+            return bonusManageService.GetScratchCardList(specialCode);
+        }
+        public IEnumerable<ScratchCardExport> GetScratchCardListExport(string specialCode)
+        {
+            return bonusManageService.GetScratchCardListExport(specialCode);
         }
     }
 }

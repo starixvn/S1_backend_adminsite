@@ -25,14 +25,18 @@ namespace BackendSite.Controllers.Api
         private readonly ReferralManagementBLL referralManagementBLL;
         private readonly ReportBLL reportBLL;
         private readonly PrizeBLL prizeBLL;
+        private readonly AuthorizeBLL authorizeBLL;
+        private readonly ExcelBLL excelBLL;
 
-        public BonusManageController(BonusManageBLL bonusManageBLL, ServerInfoBLL serverInfoBLL, ReferralManagementBLL referralManagementBLL, ReportBLL reportBLL, PrizeBLL prizeBLL)
+        public BonusManageController(BonusManageBLL bonusManageBLL, ServerInfoBLL serverInfoBLL, ReferralManagementBLL referralManagementBLL, ReportBLL reportBLL, PrizeBLL prizeBLL, AuthorizeBLL authorizeBLL,ExcelBLL excelBLL)
         {
             this.bonusManageBLL = bonusManageBLL;
             this.serverInfoBLL = serverInfoBLL;
             this.referralManagementBLL = referralManagementBLL;
             this.reportBLL = reportBLL;
             this.prizeBLL = prizeBLL;
+            this.authorizeBLL = authorizeBLL;
+            this.excelBLL = excelBLL;
         }
 
         [HttpPost]
@@ -453,5 +457,61 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
+
+        public class GenScratchCardCodeReq
+        {
+            public string SpecialCode { get; set; }
+            public int Num { get; set; }
+        }
+        [HttpPost]
+        public ApiResult<dynamic> GenScratchCardCode(GenScratchCardCodeReq genScratchCardCodeReq)
+        {
+            var apiResult = new ApiResult<dynamic>();
+            try
+            {
+                apiResult.ErrorCode = bonusManageBLL.GenScratchCardCode(genScratchCardCodeReq.SpecialCode, genScratchCardCodeReq.Num, authorizeBLL.GetAuthData().UserName);
+              //  apiResult.Data = new { promotion.LastUpdateUser, promotion.LastUpdateTime };
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+        public class GetScratchCardListReq
+        {
+            public string SpecialCode { get; set; }
+        }
+        [HttpPost]
+        public ApiResult<IEnumerable<ScratchCard>> GetScratchCardList(GetScratchCardListReq getScratchCardListReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<ScratchCard>>();
+            try
+            {
+                apiResult.Data = bonusManageBLL.GetScratchCardList(getScratchCardListReq.SpecialCode);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.RawMessage = ex.ToString();
+            }
+            return apiResult;
+        }
+  
+        [HttpPost]
+        public IActionResult GetScratchCardListExport(string SpecialCode)
+        {
+
+            var ExportData = bonusManageBLL.GetScratchCardListExport(SpecialCode);
+           
+            var stream = excelBLL.Export(ExportData);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"ScratchCardList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
+        
     }
 }

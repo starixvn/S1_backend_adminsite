@@ -55,7 +55,7 @@ namespace BackendSite.Service.DAL
         public WithdrawalRequest GetWithdrawalRequest(int withdrawalId, int siteId)
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.QueryFirstOrDefault<WithdrawalRequest>("Admin_WithdrawalRequestTransIDV2_Get", new { WithdrawalId = withdrawalId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            return conn.QueryFirstOrDefault<WithdrawalRequest>("Admin_WithdrawalRequestTransIDV3_Get", new { WithdrawalId = withdrawalId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<Comments> GetWithdrawalRequestComment(int withdrawalId, int siteId)
@@ -209,6 +209,18 @@ namespace BackendSite.Service.DAL
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_WithdrawalMinInfo_Del", new { SiteId, CurrencyId }, commandType: CommandType.StoredProcedure) > 0;
+        }
+
+        public bool UpdateWithdrawalPicCount(string transId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_BankSlipPic_Ins", new { TransId=transId }, commandType: CommandType.StoredProcedure) > 0;
+        }
+        public BankSlipPic GetWithdrawalPicCount(string transId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var WithdrawalMinInfo = conn.Query<BankSlipPic>("Admin_BankSlipPic_Get", new { TransId = transId }, commandType: CommandType.StoredProcedure).FirstOrDefault();
+            return WithdrawalMinInfo;
         }
     }
 }

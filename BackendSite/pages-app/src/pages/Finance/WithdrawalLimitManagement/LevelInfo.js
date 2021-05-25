@@ -20,12 +20,11 @@ export const LevelInfo = (props) => {
                 withdrawalMin: value.withdrawalMin,
                 withdrawalMax: value.withdrawalMax
             };
-
         return (
             <tr key={`levellist-${value.currencyId}-${idx}`}>
                 <td>{value.vipLevel}</td>
-                <td><InputBox isEdit={isEdit} defaultValue={number_format(_editValue.withdrawalMin)} onChange={props.ChangeData.bind(null, idx, "withdrawalMin")} /></td>
-                <td><InputBox isEdit={isEdit} defaultValue={number_format(_editValue.withdrawalMax)} onChange={props.ChangeData.bind(null, idx, "withdrawalMax")} /></td>
+                <td><InputBox isEdit={isEdit} defaultValue={_editValue.withdrawalMin} onChange={props.ChangeData.bind(null, idx, "withdrawalMin")} /></td>
+                <td><InputBox isEdit={isEdit} defaultValue={_editValue.withdrawalMax} onChange={props.ChangeData.bind(null, idx, "withdrawalMax")} /></td>
                 <td>
                     <div className="button-action">
                         <ActionButtons isEdit={isEdit} isDelete={isDelete} ClickEdit={props.handleEdit.bind(null, idx)} HandleDelete={props.handleDelete.bind(null, idx)} HandleUpdate={props.handleUpdate.bind(null, idx)} />
@@ -40,7 +39,7 @@ export const LevelInfo = (props) => {
                 <tr>
                     <th scope="col">Vip Level</th>
                     <th scope="col">Withdrawal Min</th>
-                    <th scope="col">Withdrawal Max</th>
+                    <th scope="col">Withdrawal Max (0 = Unlimited)</th>
                     <th scope="col">Action</th>
                 </tr>
             </thead>

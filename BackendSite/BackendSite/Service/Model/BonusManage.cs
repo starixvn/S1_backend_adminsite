@@ -116,4 +116,23 @@ namespace BackendSite.Service.Model
         public string ErrorMessage { get; set; }
 
     }
+    public class ScratchCard
+    {
+        public string SpecialCode { get; set; }
+        public string ScratchCardCode { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public DateTime CreateTime { get; set; }
+        public DateTime UpdateTime { get; set; }
+        public string LastUpdateUser { get; set; }
+    }
+    public class ScratchCardExport
+    {
+        public string SpecialCode { get; set; }
+        public string ScratchCardCode { get; set; }
+        public string Joiner { get; set; }
+        public DateTime CreateTime { get; set; }
+        public DateTime UpdateTime { get; set; }
+        public string Creator { get; set; }
+    }
 }

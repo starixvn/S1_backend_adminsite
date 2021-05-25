@@ -34,7 +34,7 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public bool AddWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        public bool AddWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string UpdateOperator)
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
@@ -44,13 +44,14 @@ namespace BackendSite.Service.DAL
                     withdrawalLimitInfoManage.CurrencyId,
                     withdrawalLimitInfoManage.VipLevel,
                     withdrawalLimitInfoManage.WithdrawalMin,
-                    withdrawalLimitInfoManage.WithdrawalMax
+                    withdrawalLimitInfoManage.WithdrawalMax,
+                    UpdateOperator
                 };
                 return conn.Execute("Admin_WithdrawalLimitInfo_Ins", param, commandType: CommandType.StoredProcedure) > 0;
             }
         }
 
-        public bool EditWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        public bool EditWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage,string UpdateOperator)
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
@@ -60,7 +61,8 @@ namespace BackendSite.Service.DAL
                     withdrawalLimitInfoManage.CurrencyId,
                     withdrawalLimitInfoManage.VipLevel,
                     withdrawalLimitInfoManage.WithdrawalMin,
-                    withdrawalLimitInfoManage.WithdrawalMax
+                    withdrawalLimitInfoManage.WithdrawalMax,
+                    UpdateOperator
                 };
                 return conn.Execute("Admin_WithdrawalLimitInfo_Set", param, commandType: CommandType.StoredProcedure) > 0;
             }

@@ -2,12 +2,14 @@ import React from "react";
 import moment from "moment";
 import { defWalletType, defPromotionType, defPromotionDeviceType } from "./defCols";
 import PopBoxContent from "./Component/PopBoxContent";
+import PopBoxContentforGen from "./Component/PopBoxContentforGen";
 import { initPromotionType } from "./defCols";
 import CheckBox from "./Component/Checkbox";
 import MultiSelect from "react-multi-select-component";
 const SpecialItemType = {
 	actionBtn: "actionBtn",
-	statusBtn: "statusBtn"
+	statusBtn: "statusBtn",
+	actionBtn2: "actionBtn2",
 };
 
 const promotionTypeFormat = type => {
@@ -100,11 +102,18 @@ const titleData = [
 		columnTitle: "Edit",
 		body: { SpecialItem: SpecialItemType.actionBtn }
 	}
+	,
+	{
+		dataColumn: "ScratchCard",
+		columnTitle: "ScratchCard",
+		body: { SpecialItem: SpecialItemType.actionBtn2 }
+	}
 ];
 
 export default ({
 	ClickCreateBonus,
 	ClickEdit,
+	ClickEdit2,
 	promotionList,
 	UpdatePromotionStatus,
 	SelectClick,
@@ -147,6 +156,15 @@ export default ({
 							onChange={UpdatePromotionStatus.bind(this, d_idx)}
 						/>
 					);
+				}else if (element.body.SpecialItem === SpecialItemType.actionBtn2) {
+					if(_data.isSpecial)
+					{
+						body_content = (
+							<ActionButtons2 
+								clickEdit2={ClickEdit2.bind(null, d_idx)}
+							/>
+						);
+					}
 				}
 			} else {
 				body_content =
@@ -255,6 +273,17 @@ const ActionButtons = props => {
 			<div className="button-action" onClick={props.clickClone}>
 				<button className="btn btn-edit">
 					<i className="fa fa-clone"></i>
+				</button>
+			</div>
+		</>
+	);
+};
+const ActionButtons2 = props => {
+	return (
+		<>
+			<div className="button-action" onClick={props.clickEdit2}>
+				<button className="btn btn-edit">
+					<i className="icon-edit"></i>
 				</button>
 			</div>
 		</>
