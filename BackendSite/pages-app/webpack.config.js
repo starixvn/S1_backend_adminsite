@@ -102,17 +102,15 @@ module.exports = {
     // 	"./src/pages/Marketing/BannerManage/index.jsx"
     // ],
     // "Report/MainFinancialReport.min": [
-    // 	"./src/pages/Report/MainFinancialReport/index.js"
+    //   "./src/pages/Report/MainFinancialReport/index.js",
     // ],
     // "Report/StatisticalReport.min": [
-    // 	"./src/pages/Report/StatisticalReport/index.js"
+    //   "./src/pages/Report/StatisticalReport/index.js",
     // ],
     // "Report/UserOnlineReport.min": [
-    // 	"./src/pages/Report/UserOnlineReport/index.js"
+    //   "./src/pages/Report/UserOnlineReport/index.js",
     // ],
-    // "Report/DepositReport.min": [
-    // 	"./src/pages/Report/DepositReport/index.js"
-    // ],
+    "Report/DepositReport.min": ["./src/pages/Report/DepositReport/index.js"],
     // "Marketing/BonusImport.min": [
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/BonusImport/index.js"
@@ -161,10 +159,10 @@ module.exports = {
     //   // '@babel/polyfill',
     //   "./src/pages/Finance/WithdrawalLimitManage/index.js",
     // ],
-    "BankFinancial/TransferManage.min": [
-      "@babel/polyfill",
-      "./src/pages/BankFinancial/TransferManage/index.jsx",
-    ],
+    // "BankFinancial/TransferManage.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/BankFinancial/TransferManage/index.jsx",
+    // ],
     // "Marketing/VipRebateInfoReport.min": [
     // 	 '@babel/polyfill',
     // 	"./src/pages/Marketing/VipRebateInfoReport/index.js"

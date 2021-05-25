@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -49,7 +50,7 @@ namespace BackendSite.Service.BLL
             var serverInfo = serverInfoService.GetModel();
             return adminService.EditAccount(serverInfo.SiteId, adminUser);
         }
-        
+
         public bool ChangePwdAccount(AdminUser adminUser)
         {
             var serverInfo = serverInfoService.GetModel();
@@ -60,7 +61,7 @@ namespace BackendSite.Service.BLL
             return adminService.ChangePwdAccount(serverInfo.SiteId, adminUser);
         }
 
-        public bool ChangePwd(ChangePwd changePwd, out int response)
+        public ErrorMessageCodeEnum ChangePwd(ChangePwd changePwd)
         {
             string Md5Userpwd = null;
             var serverInfo = serverInfoService.GetModel();
@@ -71,16 +72,14 @@ namespace BackendSite.Service.BLL
 
             if (adminService.ChangePwd(serverInfo.SiteId, userId, changePwd, out Md5Userpwd))
             {
-                response = 0;
-                return true;
+                return ErrorMessageCodeEnum.Success;
             }
             else
             {
                 if (Md5Userpwd != changePwd.Oldpwd)
-                    response = 8;
+                    return ErrorMessageCodeEnum.OldpwdNotMatch;
                 else
-                    response = 9;
-                return false;
+                    return ErrorMessageCodeEnum.Fail;
             }
         }
     }
