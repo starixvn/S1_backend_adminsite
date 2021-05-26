@@ -78,10 +78,8 @@ namespace BackendSite.Extensions.Middlewares
                     : content;
 
                 var authData = _authorizeBLL.GetAuthData();
-                var serverInfo = _serverInfoBLL.GetServerInfo();
                 LogContext.PushProperty("UserId", authData?.UserId);
                 LogContext.PushProperty("UserName", authData?.UserName);
-                LogContext.PushProperty("SiteId", serverInfo?.SiteId);
                 {
                     _logger.LogInformation(
                         $"REQUEST METHOD: {context.Request.Method}, CodePage: {codePage}, REQUEST BODY: {content}, REQUEST URL: {url}");
