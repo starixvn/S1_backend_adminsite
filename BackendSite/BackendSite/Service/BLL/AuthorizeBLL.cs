@@ -30,25 +30,39 @@ namespace BackendSite.Service.BLL
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public int UserLogin(string userName, string pwd, string ip, string fromUrl, string userAgent, ref AdminUser adminUser)
+        public ErrorMessageCodeEnum UserLogin(string userName, 
+                                              string pwd, 
+                                              string ip, 
+                                              string fromUrl, 
+                                              string userAgent, 
+                                              ref AdminUser adminUser)
         {
+            if(string.IsNullOrEmpty(userName))
+            {
+                return ErrorMessageCodeEnum.AccountInvalid;
+            }
+            if(string.IsNullOrEmpty(pwd))
+            {
+                return ErrorMessageCodeEnum.PasswordInvalid;
+            }
+
             adminUser = adminUserService.GetAdminUserByUserName(userName);
 
             if (adminUser == null)
             {
-                return -1;
+                return ErrorMessageCodeEnum.AccountError;
             }
             else if (adminUser.Userpwd != tools.MD5Encrypt(pwd))
             {
-                return -2;
+                return ErrorMessageCodeEnum.PasswordError;
             }
             else if (adminUser.Status != (int)AdminUserStatus.Running)
             {
-                return -3;
+                return ErrorMessageCodeEnum.AccountLocked;
             }
             else
             {
-                return 0;
+                return ErrorMessageCodeEnum.Success;
             }
         }
 
