@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using Microsoft.AspNetCore.Http;
 
 namespace BackendSite
@@ -223,6 +224,8 @@ namespace BackendSite
             app.UseCors(AllowSpecificOrigins);
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseRequestLogMiddleware();
+            app.UseResponseLogMiddleware();
 
             app.UseEndpoints(endpoints =>
             {
