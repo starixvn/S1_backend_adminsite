@@ -41,14 +41,11 @@ const defCurrencyType = {
   96: "USDT",
 };
 const defCategoryType = {
-  1: "Sports",
-  2: "Slots",
-  3: "Live Casino",
-  4: "Fishing",
-  5: "Cockfighting",
-  6: "Lottery",
-  7: "Virtual Sports",
-  8: "Poker",
+  1: "Slots Game",
+  2: "Live Casino",
+  4: "Saba Sports",
+  5: "Lottery",
+  6: "Sports",
 };
 
 const Panel = (props) => {
