@@ -197,11 +197,11 @@ const App = () => {
 
     let param = {
       Url: "Report/GetStatisticalReport",
-      Data: qs.stringify({
+      Data: {
         SiteIds: stateFilter.SiteIds,
         TimeZone: String(getTimeZoneItem),
         EndDate: moment().format("YYYY-MM-DD"),
-      }),
+      },
     };
 
     setData({

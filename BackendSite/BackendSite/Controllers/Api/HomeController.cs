@@ -12,6 +12,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
+
 namespace BackendSite.Controllers.Api
 {
     [Authorize]
@@ -21,36 +22,39 @@ namespace BackendSite.Controllers.Api
     {
         #region Fields
 
-        private readonly SelLangBLL selLangBLL;
-        private readonly AuthorizeBLL authorizeBLL;
-        private readonly Tools tools;
-        private readonly ServerInfoBLL serverInfoBLL;
-        private readonly AdminBLL adminBLL;
-        private readonly HomeBLL homeBLL;
-        private readonly DashBoardBLL dashBoardBLL;
+        private readonly SelLangBLL _selLangBLL;
+        private readonly AuthorizeBLL _authorizeBLL;
+        private readonly Tools _tools;
+        private readonly ServerInfoBLL _serverInfoBLL;
+        private readonly AdminBLL _adminBLL;
+        private readonly HomeBLL _homeBLL;
+        private readonly DashBoardBLL _dashBoardBLL;
         private readonly MenuBLL _menuBLL;
+        private readonly ResponseSettingBLL _responseSettingBLL;
 
         #endregion
 
         #region Constructors
 
-        public HomeController(SelLangBLL selLangBLL, 
-                              AuthorizeBLL authorizeBLL, 
-                              Tools tools, 
-                              ServerInfoBLL serverInfoBLL, 
-                              AdminBLL adminBLL, 
-                              HomeBLL homeBLL, 
+        public HomeController(SelLangBLL selLangBLL,
+                              AuthorizeBLL authorizeBLL,
+                              Tools tools,
+                              ServerInfoBLL serverInfoBLL,
+                              AdminBLL adminBLL,
+                              HomeBLL homeBLL,
                               DashBoardBLL dashBoardBLL,
-                              MenuBLL menuBLL)
+                              MenuBLL menuBLL,
+                              ResponseSettingBLL responseSettingBLL)
         {
-            this.selLangBLL = selLangBLL;
-            this.authorizeBLL = authorizeBLL;
-            this.tools = tools;
-            this.serverInfoBLL = serverInfoBLL;
-            this.adminBLL = adminBLL;
-            this.homeBLL = homeBLL;
-            this.dashBoardBLL = dashBoardBLL;
+            _selLangBLL = selLangBLL;
+            _authorizeBLL = authorizeBLL;
+            _tools = tools;
+            _serverInfoBLL = serverInfoBLL;
+            _adminBLL = adminBLL;
+            _homeBLL = homeBLL;
+            _dashBoardBLL = dashBoardBLL;
             _menuBLL = menuBLL;
+            _responseSettingBLL = responseSettingBLL;
         }
 
         #endregion
@@ -74,132 +78,168 @@ namespace BackendSite.Controllers.Api
 
         #region Actions
 
+        /// <summary>
+        /// 登入
+        /// </summary>
+        /// <param name="loginModel"></param>
+        /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ApiResult> Signin([FromBody] LoginModel loginModel)
+        public async Task<IActionResult> Signin([FromBody] LoginModel loginModel)
         {
-            var apiResult = new ApiResult(selLangBLL);
-            string userName = loginModel.txtID;
-            string userpwd = loginModel.txtPW;
-            AdminUser adminUser = null;
+            //var apiResult = new ApiResult(_selLangBLL);
+            try
+            {
+                AdminUser adminUser = null;
 
-            var userLoginResult = authorizeBLL.UserLogin(userName, userpwd, tools.GetClientIP(HttpContext), tools.GetFromUrl(HttpContext), Request.Headers["User-Agent"], ref adminUser);
+                var userLoginResult = _authorizeBLL.UserLogin(loginModel.txtID,
+                                                              loginModel.txtPW,
+                                                              _tools.GetClientIP(HttpContext),
+                                                              _tools.GetFromUrl(HttpContext),
+                                                              Request.Headers["User-Agent"],
+                                                              ref adminUser);
 
-            if (userLoginResult == -1)
-            {
-                apiResult.ErrorCode = 1101;
-                apiResult.Message = selLangBLL.GetMsg("msg_LoginFailed");
-            }
-            else if (userLoginResult == -2)
-            {
-                apiResult.ErrorCode = 1001;
-                apiResult.Message = selLangBLL.GetMsg("msg_LoginFailed");
-            }
-            else if (userLoginResult == -3)
-            {
-                apiResult.ErrorCode = 1102;
-                apiResult.Message = selLangBLL.GetMsg("msg_ACLocked");
-            }
-            else if (userLoginResult != 0)
-            {
-                apiResult.ErrorCode = 9000;
-            }
+                if (userLoginResult != Service.Model.enums.ErrorMessageCodeEnum.Success)
+                {
+                    return StatusCode(200,
+                                      _responseSettingBLL.SetResponse(userLoginResult));
+                }
 
-            if (userLoginResult != 0)
-            {
+                //if (userLoginResult != 0)
+                //{
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                return apiResult;
-            }
+                //   return apiResult;
+                //}
 
-            var claims = new List<Claim>
+                var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name,adminUser.UserName ),
                     new Claim(ClaimTypes.NameIdentifier,adminUser.UserId.ToString())
                     //new Claim("LangId",? ),
-            };
+                };
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-            apiResult.Message = Url.Action("Index", "Home");
-            apiResult.ErrorCode = 0;
-            return apiResult;
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                                     new ClaimsPrincipal(claimsIdentity));
+
+                return StatusCode(200, _responseSettingBLL.SetResponse(userLoginResult,
+                                                                                 custMessage: Url.Action("Index", "Home")));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, _responseSettingBLL.SetResponse(ex));
+            }
+
         }
 
+        /// <summary>
+        /// 登入檢查
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
-        public ApiResult CheckSignIn()
+        public IActionResult CheckSignIn()
         {
             var result = new ApiResult();
             try
             {
                 if (User.Identity.IsAuthenticated)
                 {
-                    result.ErrorCode = 0;
+                    return StatusCode(200,
+                                      _responseSettingBLL.SetResponse(Service.Model.enums.ErrorMessageCodeEnum.Success, custMessage: "Logining."));
                 }
                 else
                 {
-                    result.ErrorCode = -1;
+                    return StatusCode(200,
+                                      _responseSettingBLL.SetResponse(Service.Model.enums.ErrorMessageCodeEnum.Fail, custMessage: "Not logining."));
                 }
             }
             catch (Exception ex)
             {
-                result.ErrorCode = 999;
-                result.RawMessage = ex.ToString();
+                return StatusCode(500,
+                                  _responseSettingBLL.SetResponse(ex));
             }
-
-            return result;
         }
 
+        /// <summary>
+        /// 登出
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult> Signout()
+        public async Task<IActionResult> Signout()
         {
-            var apiResult = new ApiResult(selLangBLL);
+
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            apiResult.Message = Url.RouteUrl("default", new { action = "Signin", controller = "Home" });
-            apiResult.ErrorCode = 0;
-            return apiResult;
+
+            return StatusCode(200,
+                              _responseSettingBLL.SetResponse(Service.Model.enums.ErrorMessageCodeEnum.Success, custMessage: Url.RouteUrl("default", new { action = "Signin", controller = "Home" })));
         }
 
+        /// <summary>
+        /// 取得網站清單
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<ServerInfo>> GetSiteList()
+        public IActionResult GetSiteList()
         {
-            var apiResult = new ApiResult<IEnumerable<ServerInfo>>(selLangBLL);
-            apiResult.Data = serverInfoBLL.GetSiteList();
-            apiResult.ErrorCode = 0;
-
-            return apiResult;
-        }
-
-        [HttpPost]
-        public ApiResult ChangePwd([FromBody] ChangePwd changePwd)
-        {
-            int response = 0;
-            bool result = adminBLL.ChangePwd(changePwd, out response);
-            var apiResult = new ApiResult();
-            if (result)
+            try
             {
-                apiResult.ErrorCode = 0;
-                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
-            }
-            else
-            {
-                if (response == 8)
+                var data = _serverInfoBLL.GetSiteList();
+
+                if (data.Count() == 0)
                 {
-                    apiResult.ErrorCode = 8;
-                    apiResult.Message = selLangBLL.GetMsg("msg_OldpwdNotMatch");
+                    return StatusCode(200,
+                                      _responseSettingBLL.SetResponse<IEnumerable<ServerInfo>>(Service.Model.enums.ErrorMessageCodeEnum.NoData,
+                                                                                               data));
                 }
                 else
                 {
-                    apiResult.ErrorCode = 9;
-                    apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+                    return StatusCode(200,
+                                      _responseSettingBLL.SetResponse<IEnumerable<ServerInfo>>(Service.Model.enums.ErrorMessageCodeEnum.Success,
+                                                                                               data));
                 }
             }
-            return apiResult;
+            catch (Exception ex)
+            {
+                return StatusCode(500,
+                                  _responseSettingBLL.SetResponse(ex));
+            }
         }
+
+        [HttpPost]
+        public IActionResult ChangePwd([FromBody] ChangePwd changePwd)
+        {
+            try
+            {
+                var result = _adminBLL.ChangePwd(changePwd);
+                string custMsg = string.Empty;
+
+                if (result == Service.Model.enums.ErrorMessageCodeEnum.Success)
+                {
+                    custMsg = "Update Successful.";
+                }
+                else if (result == Service.Model.enums.ErrorMessageCodeEnum.Fail)
+                {
+                    custMsg = "Update Fail.";
+                }
+
+                return StatusCode(200,
+                                  _responseSettingBLL.SetResponse(result, custMessage: custMsg));
+
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500,
+                                 _responseSettingBLL.SetResponse(ex));
+            }
+        }
+
+        #region Temp,沒再使用
 
         [HttpPost]
         public ApiResult<int> RegisteredCustomers([FromForm] int SiteId, [FromForm] long StartDate, [FromForm] long EndDate)
         {
-            var result = homeBLL.GetRegisteredCustomers(SiteId, StartDate, EndDate);
+            var result = _homeBLL.GetRegisteredCustomers(SiteId, StartDate, EndDate);
             var apiResult = new ApiResult<int>();
 
             if (result >= 0)
@@ -218,7 +258,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<int> DepositCustomers([FromForm] int SiteId, [FromForm] long StartDate, [FromForm] long EndDate)
         {
-            var result = homeBLL.GetepositCustomers(SiteId, StartDate, EndDate);
+            var result = _homeBLL.GetepositCustomers(SiteId, StartDate, EndDate);
             var apiResult = new ApiResult<int>();
 
             if (result >= 0)
@@ -234,6 +274,8 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        #endregion
+
         [HttpPost]
         public ApiResult<DashBoardData> GetDashBoardData(DashBoardPara para)
         {
@@ -241,18 +283,18 @@ namespace BackendSite.Controllers.Api
             List<int> CanSearchSite = new List<int>();
             try
             {
-                serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x => CanSearchSite.Add(x.SiteId));
-                var result = dashBoardBLL.GetDashBoardData(para.SiteId, para.CurrencyId, para.BaseCurrencyId, CanSearchSite);
+                _serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x => CanSearchSite.Add(x.SiteId));
+                var result = _dashBoardBLL.GetDashBoardData(para.SiteId, para.CurrencyId, para.BaseCurrencyId, CanSearchSite);
 
-                apiResult.Data =  result;
+                apiResult.Data = result;
                 apiResult.ErrorCode = 0;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.RawMessage = ex.ToString();
             }
-            
+
 
             return apiResult;
         }
@@ -262,22 +304,31 @@ namespace BackendSite.Controllers.Api
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult GetMenu()
+        public IActionResult GetMenu()
         {
-            var apiResult = new ApiResult<List<MenuItem>>();
             try
             {
-                apiResult.Data = _menuBLL.GetMenuData();
-                apiResult.ErrorCode = 0;
+                var data = _menuBLL.GetMenuData();
+
+                if (data.Count() == 0)
+                {
+                    return StatusCode(200,
+                  _responseSettingBLL.SetResponse<IEnumerable<MenuItem>>(Service.Model.enums.ErrorMessageCodeEnum.NoData,
+                                                                         data,
+                                                                         custMessage: "No data."));
+                }
+                else
+                {
+                    return StatusCode(200,
+                  _responseSettingBLL.SetResponse<IEnumerable<MenuItem>>(Service.Model.enums.ErrorMessageCodeEnum.Success,
+                                                                         data));
+                }
             }
             catch (Exception ex)
             {
-                apiResult.RawMessage = ex.Message;
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
+                return StatusCode(500,
+                                  _responseSettingBLL.SetResponse(ex));
             }
-
-            return apiResult;
         }
 
         #endregion
