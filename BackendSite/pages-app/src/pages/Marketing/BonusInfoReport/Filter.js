@@ -43,6 +43,7 @@ const defCurrencyType = {
 const defCategoryType = {
   1: "Slots Game",
   2: "Live Casino",
+  3: "Fish",
   4: "Saba Sports",
   5: "Lottery",
   6: "Sports",
