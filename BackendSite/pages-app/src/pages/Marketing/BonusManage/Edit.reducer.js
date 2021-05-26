@@ -106,6 +106,7 @@ const initSpecific = {
 	affid: "",
 	usage: "0",
 	rollOver: "",
+	totalUsageLimit:"0",
 	bonusAmountType: null,
 	bonus: "",
 	maxBonus: "",

@@ -53,6 +53,7 @@ namespace BackendSite.Service.Model
         public decimal MinPayout { get; set; }
         public string VN_AffIds { get; set; }
         public string VN_AffCodes { get; set; }
+        public int TotalUsageLimit { get; set; }
     }
     public class TpGameType
     {

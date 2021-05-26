@@ -184,7 +184,8 @@ const App = () => {
 						BeenUsed: info.beenUsed,
 						RebateList: tpGame,
 						MinPayout: Number(info.minPayout),
-						VN_AffCodes: info.affid
+						VN_AffCodes: info.affid,
+						TotalUsageLimit: info.totalUsageLimit
 					};
 				});
 
@@ -573,6 +574,7 @@ const App = () => {
 
 	const skipField = {
 		"default": ["currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours", "minPayout", "specialCode", "promotionAction"],
+		"2": ["currentLang", "productCategory", "lockedType", "periodWeek", "periodMonth", "redeemHours", "minPayout", "specialCode", "promotionAction"],
 		"6": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "affid", "specialCode", "promotionAction"],
 		"7": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "affid", "specialCode", "promotionAction"],
 		"8": ["expiryDays", "walletType", "categoryId", "tpId", "rollOver", "minPayout", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours", "affid", "specialCode"],

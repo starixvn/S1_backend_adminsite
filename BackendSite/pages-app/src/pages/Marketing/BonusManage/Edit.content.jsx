@@ -234,6 +234,91 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 						/>
 						: null}
 				</div>
+
+				{/* <div className="filter">
+						<RadioBox
+							Title="Period Type"
+							Options={initPeriodType}
+							OnChange={action.EditMainValue}
+							dataColumn="periodType"
+							Selected={state.periodType}
+						/>
+						{(state.promotionType == 6 || state.promotionType == 7) ?
+						(<>
+							<div className="row-flex">
+								<label className="label">
+									Pay Time {" (" + moment().format('Z') + ") "}
+									<span className="bule-bold">{state.periodType === 2 ? weekOptions[state.periodWeek] : state.periodType === 3 ? `${state.periodMonth}th of every month` : ''}  {state.redeemHours === null || state.redeemHours === undefined || state.redeemHours === "" ? '' : `${state.redeemHours}:00`}</span>
+								</label>
+							</div>
+							<div className="row-flex">
+								{state.periodType === 2 ? (
+									<SelectBox
+										Title="Week Option"
+										Options={initWeekOptions}
+										HandleChange={action.EditMainValue}
+										dataColumn="periodWeek"
+										SelectedValue={state.periodWeek}
+									/>
+								) : state.periodType === 3 ?
+									<InputBox
+										Title="Date"
+										OnChange={action.EditMainValue}
+										dataColumn="periodMonth"
+										value={state.periodMonth}
+									/>
+									: null}
+								<InputBox
+									Title="Redeem Hours"
+									OnChange={action.EditMainValue}
+									dataColumn="redeemHours"
+									value={state.redeemHours}
+								/>
+							</div>
+						</>
+						):null}
+				</div>
+				{(state.promotionType == 8 || state.promotionType == 6 || state.promotionType == 7) ?
+						null : (<div className="filter">
+							<div className="row-flex">
+								<InputBox
+									Title="ExpiryDays"
+									OnChange={action.EditMainValue}
+									dataColumn="expiryDays"
+									value={state.expiryDays}
+								/>
+							</div>
+							<RadioBox
+								Title="Wallet Type"
+								Options={initWalletType()}
+								OnChange={action.GetPromoCategories.bind(
+									this,
+									false,
+									state.walletType
+								)}
+								dataColumn="walletType"
+								Selected={state.walletType}
+							/>
+							{state.walletType !== null && state.productCategory !== undefined ? (
+								<RadioBox
+									Title="Product Category"
+									Options={state.productCategory}
+									OnChange={action.SelectTpId}
+									dataColumn={"categoryId"
+										// state.walletType === 0 ? "tpId" : "categoryId"
+									}
+									Selected={state.categoryId
+										// state.walletType === 0
+										// 	? state.tpId
+										// 	: state.categoryId
+									}
+								/>
+							) : null}
+						</div>
+						)} */}
+
+
+
 				{(state.promotionType == 6 || state.promotionType == 7) ?
 					(<div className="filter">
 						<RadioBox
@@ -311,7 +396,18 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 								/>
 							) : null}
 						</div>
-						)}
+				)}
+				{(state.promotionType == 2) ? 
+					<div className="filter">
+								<RadioBox
+								Title="Period Type"
+								Options={initPeriodType}
+								OnChange={action.EditMainValue}
+								dataColumn="periodType"
+								Selected={state.periodType}
+								/>
+					</div>:null}
+
 				<div className="filter noBGcolor">
 					<CheckBox
 						Options={currencyOptions}
@@ -526,6 +622,12 @@ const SubPanel = props => {
 										OnChange={props.EditMainValue}
 										dataColumn="rollOver"
 										value={props.state.specific[props.currencyId].rollOver}
+									/>
+									<InputBox
+										Title="Total Usage Limit"
+										OnChange={props.EditMainValue}
+										dataColumn="totalUsageLimit"
+										value={props.state.specific[props.currencyId].totalUsageLimit}
 									/>
 								</div>
 								<RadioBox
