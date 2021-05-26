@@ -49,55 +49,51 @@ namespace BackendSite.Extensions.Middlewares
         {
             var url = context.Request.GetDisplayUrl();
             var path = context.Request.Path.Value;
-            if (path == "/" && (context.Request.Method.Equals("OPTIONS", StringComparison.OrdinalIgnoreCase) ||
-                                context.Request.Method.Equals("GET", StringComparison.OrdinalIgnoreCase)))
+            //if (path == "/" && (context.Request.Method.Equals("OPTIONS", StringComparison.OrdinalIgnoreCase) ||
+            //                    context.Request.Method.Equals("GET", StringComparison.OrdinalIgnoreCase)))
+            //{
+            //    await _next(context);
+            //}
+            //else
+            //{
+            var requestBodyStream = new MemoryStream();
+            var originalRequestBody = context.Request.Body;
+            var content = string.Empty;
+            if (context.Request.ContentType?.StartsWith("application/x-www-form-urlencoded") ?? false)
             {
-                await _next(context);
+                var formData = await context.Request.ReadFormAsync();
+                content = JsonConvert.SerializeObject(formData);
             }
-            else
+
+            await context.Request.Body.CopyToAsync(requestBodyStream);
+            requestBodyStream.Seek(0, SeekOrigin.Begin);
+
+            using (var requestBody = new StreamReader(requestBodyStream, Encoding.UTF8, true, 1024, true))
             {
-                var requestBodyStream = new MemoryStream();
-                var originalRequestBody = context.Request.Body;
-                var content = string.Empty;
-                if (context.Request.ContentType?.StartsWith("application/x-www-form-urlencoded") ?? false)
+                var codePage = requestBody.CurrentEncoding.CodePage;
+
+                content = !context.Request.Method.Equals("GET", StringComparison.OrdinalIgnoreCase)
+                          && string.IsNullOrEmpty(content)
+                    ? await requestBody.ReadToEndAsync()
+                    : content;
+
+                var authData = _authorizeBLL.GetAuthData();
+                var serverInfo = _serverInfoBLL.GetServerInfo();
+                LogContext.PushProperty("UserId", authData?.UserId);
+                LogContext.PushProperty("UserName", authData?.UserName);
+                LogContext.PushProperty("SiteId", serverInfo?.SiteId);
                 {
-                    var formData = await context.Request.ReadFormAsync();
-                    content = JsonConvert.SerializeObject(formData);
+                    _logger.LogInformation(
+                        $"REQUEST METHOD: {context.Request.Method}, CodePage: {codePage}, REQUEST BODY: {content}, REQUEST URL: {url}");
                 }
-
-                await context.Request.Body.CopyToAsync(requestBodyStream);
-                requestBodyStream.Seek(0, SeekOrigin.Begin);
-
-                using (var requestBody = new StreamReader(requestBodyStream, Encoding.UTF8, true, 1024, true))
-                {
-                    var codePage = requestBody.CurrentEncoding.CodePage;
-
-                    content = !context.Request.Method.Equals("GET", StringComparison.OrdinalIgnoreCase)
-                              && string.IsNullOrEmpty(content)
-                        ? await requestBody.ReadToEndAsync()
-                        : content;
-
-                    var authData = _authorizeBLL.GetAuthData();
-                    var serverInfo = _serverInfoBLL.GetServerInfo();
-                    LogContext.PushProperty("CustId", authData?.UserId);
-                    LogContext.PushProperty("UserName", authData?.UserName);
-                    LogContext.PushProperty("SiteId", serverInfo?.SiteId);
-                    //LogContext.PushProperty("ClientIp", _tools.GetClientIP());
-                    using (LogContext.PushProperty("Domain", context.Request.Host.ToString()))
-                    using (LogContext.PushProperty("ClientAgent", context.Request.Headers["User-Agent"].ToString()))
-                    using (LogContext.PushProperty("Referer", context.Request.Headers["Referer"].ToString()))
-                    {
-                        _logger.LogInformation(
-                            $"REQUEST METHOD: {context.Request.Method}, CodePage: {codePage}, REQUEST BODY: {content}, REQUEST URL: {url}, ES: {context.Request.Cookies[".ES"]}");
-                    }
-                }
-
-                requestBodyStream.Seek(0, SeekOrigin.Begin);
-                context.Request.Body = requestBodyStream;
-
-                await _next(context);
-                context.Request.Body = originalRequestBody;
             }
+
+            requestBodyStream.Seek(0, SeekOrigin.Begin);
+            context.Request.Body = requestBodyStream;
+
+            await _next(context);
+            context.Request.Body = originalRequestBody;
+            //}
         }
 
         #endregion

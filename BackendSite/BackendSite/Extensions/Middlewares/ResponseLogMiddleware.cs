@@ -36,13 +36,13 @@ namespace BackendSite.Extensions.Middlewares
         {
             var sw = Stopwatch.StartNew();
             var path = context.Request.Path.Value;
-            if (path == "/" && (context.Request.Method.Equals("OPTIONS", StringComparison.OrdinalIgnoreCase) ||
-                                context.Request.Method.Equals("GET", StringComparison.OrdinalIgnoreCase)))
-            {
-                await _next(context);
-            }
-            else
-            {
+            //if (path == "/" && (context.Request.Method.Equals("OPTIONS", StringComparison.OrdinalIgnoreCase) ||
+            //                    context.Request.Method.Equals("GET", StringComparison.OrdinalIgnoreCase)))
+            //{
+            //    await _next(context);
+            //}
+            //else
+            //{
                 var bodyStream = context.Response.Body;
 
                 var responseBodyStream = new MemoryStream();
@@ -60,7 +60,7 @@ namespace BackendSite.Extensions.Middlewares
 
                 responseBodyStream.Seek(0, SeekOrigin.Begin);
                 await responseBodyStream.CopyToAsync(bodyStream);
-            }
+            //}
         }
 
         #endregion
