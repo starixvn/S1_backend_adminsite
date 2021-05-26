@@ -235,7 +235,7 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 						: null}
 				</div>
 
-				<div className="filter">
+				{/* <div className="filter">
 						<RadioBox
 							Title="Period Type"
 							Options={initPeriodType}
@@ -315,11 +315,11 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 								/>
 							) : null}
 						</div>
-						)}
+						)} */}
 
 
 
-				{/* {(state.promotionType == 6 || state.promotionType == 7) ?
+				{(state.promotionType == 6 || state.promotionType == 7) ?
 					(<div className="filter">
 						<RadioBox
 							Title="Period Type"
@@ -396,7 +396,18 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 								/>
 							) : null}
 						</div>
-						)} */}
+				)}
+				{(state.promotionType == 2) ? 
+					<div className="filter">
+								<RadioBox
+								Title="Period Type"
+								Options={initPeriodType}
+								OnChange={action.EditMainValue}
+								dataColumn="periodType"
+								Selected={state.periodType}
+								/>
+					</div>:null}
+
 				<div className="filter noBGcolor">
 					<CheckBox
 						Options={currencyOptions}
