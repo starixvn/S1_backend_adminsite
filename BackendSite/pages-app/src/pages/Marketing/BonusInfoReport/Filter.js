@@ -3,13 +3,14 @@ import moment from "moment";
 import DateTimePicker from "react-datetime";
 
 if (process.env.NODE_ENV !== "production") {
-  window.gCurrencyList = [2, 4, 13, 15, 51];
+  window.gCurrencyList = [2, 4, 13, 15, 51, 61];
   window.i18n = {
     lbl_Currency2: "MYR",
     lbl_Currency4: "THB",
     lbl_Currency13: "RMB",
     lbl_Currency15: "IDR",
     lbl_Currency51: "VND",
+    lbl_Currency61: "INR",
   };
 }
 
@@ -38,7 +39,7 @@ const defCurrencyType = {
   13: "RMB",
   15: "IDR",
   51: "VND",
-  96: "USDT",
+  61: "INR",
 };
 const defCategoryType = {
   1: "Slots Game",

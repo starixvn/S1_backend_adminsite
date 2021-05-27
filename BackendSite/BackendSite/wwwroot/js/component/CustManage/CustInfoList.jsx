@@ -14,7 +14,7 @@ import * as Loading from '../commJS/Loading.jsx';
         13: "RMB",
         15: "IDR",
         51: "VND",
-        96: "USDT",
+        61: "INR",
     };
     const defStatusType = {
         1: "Running",
@@ -307,7 +307,7 @@ import * as Loading from '../commJS/Loading.jsx';
                     state.selectCurrency.push(13);
                     state.selectCurrency.push(15);
                     state.selectCurrency.push(51);
-                    state.selectCurrency.push(96);
+                    state.selectCurrency.push(61);
                 }
             });
             $('#selectCurrency').multiselect('updateButtonText');
