@@ -77,18 +77,20 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiListResult<DepositRequest> GetDepositListByCust(DepositListReq1 depositListReq)
+        public ApiListResultTotalAmount<DepositRequest> GetDepositListByCust(DepositListReq1 depositListReq)
         {
-            var apiListResult = new ApiListResult<DepositRequest>();
+            var apiListResult = new ApiListResultTotalAmount<DepositRequest>();
             int pageNumber = depositListReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
-            var depositRequestList = depositBLL.GetDepositListByCust(depositListReq.CustId, depositListReq.TransId, depositListReq.Status, depositListReq.startDate, depositListReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
+            decimal totalAmount = 0;
+            var depositRequestList = depositBLL.GetDepositListByCust(depositListReq.CustId, depositListReq.TransId, depositListReq.Status, depositListReq.startDate, depositListReq.endDate, 10, ref pageNumber, out totalPages, out rowCount,out totalAmount);
             apiListResult.Data = depositRequestList;
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;
             apiListResult.TotalPages = totalPages;
             apiListResult.RowCount = rowCount;
+            apiListResult.TotalAmount = totalAmount;
 
             return apiListResult;
         }

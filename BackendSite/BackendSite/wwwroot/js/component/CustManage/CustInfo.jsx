@@ -16,6 +16,7 @@ import TpBetRecord from './TpBetRecord/index';
 import VipLevel from './VipLevel/index';
 import PromotionReport from './PromotionReport/index';
 import SetCustStatusNote from './SetCustStatusNote/PopboxContentSetNote.js';
+import { DepositInfoPagination } from './CustInfo_DepositInfoPagination.jsx';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -130,7 +131,7 @@ import SetCustStatusNote from './SetCustStatusNote/PopboxContentSetNote.js';
                             {rows}
                         </tbody>
                     </table>
-                    <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                    <DepositInfoPagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
                 </div>
             )
         }
