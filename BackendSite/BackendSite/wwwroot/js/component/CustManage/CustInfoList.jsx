@@ -14,7 +14,7 @@ import * as Loading from '../commJS/Loading.jsx';
         13: "RMB",
         15: "IDR",
         51: "VND",
-        96: "USDT",
+        61: "INR",
     };
     const defStatusType = {
         1: "Running",

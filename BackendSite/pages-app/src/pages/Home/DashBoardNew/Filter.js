@@ -6,7 +6,7 @@ const defCurrencyType = {
   13: "RMB",
   15: "IDR",
   51: "VND",
-  96: "USDT",
+  61: "INR",
 };
 
 const Panel = (props) => {
