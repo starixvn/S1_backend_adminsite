@@ -73,4 +73,16 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int RowCount { get; set; }
     }
+    public class ApiListResultTotalAmount<TData> : ApiResult
+    {
+        public ApiListResultTotalAmount() : this(9000, "") { }
+        public ApiListResultTotalAmount(ISelLang selLang) : this(9000, "") { SelLang = selLang; }
+        public ApiListResultTotalAmount(int ErrorCode, string Message) : base(ErrorCode, Message) { }
+        public IEnumerable<TData> Data { get; set; }
+
+        public int TotalPages { get; set; }
+        public int PageNumber { get; set; }
+        public int RowCount { get; set; }
+        public decimal TotalAmount { get; set; }
+    }
 }

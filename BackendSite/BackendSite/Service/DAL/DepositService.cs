@@ -55,19 +55,21 @@ namespace BackendSite.Service.DAL
             return depositList;
         }
 
-        public IEnumerable<DepositRequest> GetDepositListByCust(int CustId, string TransId, int? Status, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<DepositRequest> GetDepositListByCust(int CustId, string TransId, int? Status, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount, out decimal totalAmount)
         {
             var p = new DynamicParameters(new { CustId, TransId, Status, StartDate = startDate, EndDate = endDate, PageSize = pageSize });
             p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("TotalAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var depositList = conn.Query<DepositRequest>("Admin_DepositInfoListByCust_Get", p, commandType: CommandType.StoredProcedure);
+            var depositList = conn.Query<DepositRequest>("Admin_DepositInfoListByCustV2_Get", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
+            totalAmount = p.Get<decimal?>("TotalAmount") ?? 0;
             return depositList;
         }
 

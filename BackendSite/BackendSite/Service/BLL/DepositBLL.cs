@@ -32,9 +32,9 @@ namespace BackendSite.Service.BLL
             return depositService.GetDepositRequestList(selectSite, depositType, startDate, endDate, serverInfo.SiteId/*Not require*/, DepositId, UserName, currencyId, status, levelstatus,pageSize, ref pageNumber, out totalPages, out rowCount);
         }
 
-        public IEnumerable<DepositRequest> GetDepositListByCust(int CustId, string TransId, int? Status, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<DepositRequest> GetDepositListByCust(int CustId, string TransId, int? Status, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount,out decimal totalAmount)
         {
-            return depositService.GetDepositListByCust(CustId, TransId, Status, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+            return depositService.GetDepositListByCust(CustId, TransId, Status, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount,out totalAmount);
         }
 
         public int CreateDeposit(DepositDetailInfo deposit, IFormFile receipt)
