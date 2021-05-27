@@ -54,7 +54,7 @@ namespace BackendSite.Service.Model
         public decimal WithdrawlSum { get; set; }
         public decimal EffectiveBetSum { get; set; }
         public bool HasPhotoId { get; set; }
-        public DateTime FirstDepositTime { get; set; }
+        public string FirstDepositTime { get; set; }
         public string AccountName { get; set; }
         public string CountryCode { get; set; }
         public string AreaCode { get; set; }
@@ -82,7 +82,8 @@ namespace BackendSite.Service.Model
         public DateTime? LastWithdrawalTimeRecord { get; set; }
         public DateTime? LastDepositTimeRecord { get; set; }
         public DateTime? LastTpBetRecordTimeRecord { get; set; }
-}
+        public DateTime? FirstDepositTimeRecord { get; set; }
+    }
 
     public class CustInfoDetailForExport
     {

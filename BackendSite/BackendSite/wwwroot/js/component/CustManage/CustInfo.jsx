@@ -1595,7 +1595,7 @@ import { DepositInfoPagination } from './CustInfo_DepositInfoPagination.jsx';
                                     </tr>
                                     <tr>
                                         <th scope="row">First Deposit Time</th>
-                                        <td>{moment(data.firstDepositTime).format('l LTS (Z)')}</td>
+                                        <td>{data.firstDepositTime}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Last Activity Time</th>
