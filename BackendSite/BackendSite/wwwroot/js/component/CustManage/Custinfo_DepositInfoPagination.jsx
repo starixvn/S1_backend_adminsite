@@ -22,13 +22,11 @@ export class DepositInfoPagination extends React.Component {
 
         return (
             <nav className="paging" aria-label="Page navigation example">
-                <span>Total records: {data.rowCount}</span>
-                {/* <span style={{float:'right'}}>Total amount: {data.totalAmount}</span> */}
-                {/* <ul className="pagination">
-                    <span style={{float:'right'}}>Total amount: {data.totalAmount}</span>
-                </ul> */}
+                <span>
+                    <tr>Total approved amount: {number_format(data.totalAmount)}</tr>  
+                    <tr>Total records: {data.rowCount}</tr>                             
+                </span>
                 <ul className="pagination">
-                    <li style={{border:'0' ,marginBottom: "10px",marginTop: "5px"}}>Total amount: {number_format(data.totalAmount)}</li>
                     <li className={"page-item"+ (data.pageNumber==1?" disabled":"")}>
                         <a className="page-link" tabIndex="-1" aria-disabled={data.pageNumber == 1} onClick={data.pageNumber == 1 ? null : this.ChangePage.bind(this, data.pageNumber - 1)}>
                             <span aria-hidden="true">&laquo;</span>
