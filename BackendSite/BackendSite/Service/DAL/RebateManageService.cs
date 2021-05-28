@@ -18,11 +18,11 @@ namespace BackendSite.Service.DAL
         {
             this.configuration = configuration;
         }
-        public IEnumerable<VipLevel> GetVipLevel(int siteId)
-        {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<VipLevel>("Admin_VipLevel_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
-        }
+        //public IEnumerable<VipLevel> GetVipLevel(int siteId)
+        //{
+        //    using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+        //    return conn.Query<VipLevel>("Admin_VipLevel_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+        //}
         public IEnumerable<TPCategory> GetTPCategoryList()
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
