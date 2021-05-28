@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BackendSite.Service.Model
+namespace BackendSite.Service.Model.BankFinancial
 {
-    public class BankFinancialTransferInfoModel
+    public class BankFinancialTransferAccountModel
     {
         /// <summary>
         /// 讀寫 識別值ID
@@ -18,45 +18,46 @@ namespace BackendSite.Service.Model
         }
 
         /// <summary>
-        /// 讀寫 交易ID
+        /// 讀寫 網站ID
         /// </summary>
-        public string TransferId
+        public int SiteId
         {
             get;
             set;
         }
 
         /// <summary>
-        /// 讀寫 交易型態
+        /// 讀寫 網站名稱
         /// </summary>
-        public TransactionTypeEnum TransactionType
+        public string SiteName
         {
             get;
             set;
         }
 
         /// <summary>
-        /// 讀寫 交易類型
+        /// 讀寫 幣別Id
         /// </summary>
-        public TransferTypeEnum TransferType
+        public int CurrencyId
         {
             get;
             set;
         }
 
         /// <summary>
-        /// 讀寫 加項或減項
+        /// 讀寫 銀行ID
         /// </summary>
-        public PlusOrMinusEnum PlusOrMinus
+        public int SysId
         {
             get;
             set;
         }
 
         /// <summary>
-        /// 讀寫 交易日期
+        /// 讀寫 目的
+        /// 1=Deposit,2=Withdrawal,3=Transfer
         /// </summary>
-        public string TransDate
+        public string Purpose
         {
             get;
             set;
@@ -90,51 +91,6 @@ namespace BackendSite.Service.Model
         }
 
         /// <summary>
-        /// 讀寫 網站ID
-        /// </summary>
-        public int SiteId
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 網站名稱
-        /// </summary>
-        public string SiteName
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 客戶ID
-        /// </summary>
-        public int? CustId
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 幣別
-        /// </summary>
-        public int CurrencyId
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 銀行ID
-        /// </summary>
-        public int SysId
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// 讀寫 帳戶帳號
         /// </summary>
         public string AccountNo
@@ -144,27 +100,36 @@ namespace BackendSite.Service.Model
         }
 
         /// <summary>
+        /// 讀寫 帳戶名稱
+        /// </summary>
+        public string AccountName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// 讀寫 帳戶顯示名稱
         /// </summary>
-        public string AccountDisplayName
+        public string DisplayName
         {
             get;
             set;
         }
 
         /// <summary>
-        /// 讀寫 交易金額
+        /// 讀寫 初始金額
         /// </summary>
-        public decimal Amount
+        public decimal InitialAmount
         {
             get;
             set;
         }
 
         /// <summary>
-        /// 讀寫 手續費(皆為減項)
+        /// 讀寫 超過餘額警示
         /// </summary>
-        public decimal Fee
+        public decimal MaxBalanceAlertAmount
         {
             get;
             set;
@@ -183,6 +148,15 @@ namespace BackendSite.Service.Model
         /// 讀寫 備註
         /// </summary>
         public string Remark
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 讀寫 資料狀態
+        /// </summary>
+        public TransferAccountStatusEnum Status
         {
             get;
             set;
@@ -223,5 +197,6 @@ namespace BackendSite.Service.Model
             get;
             set;
         }
+
     }
 }
