@@ -105,7 +105,7 @@ namespace BackendSite.Service.BLL
             int errorcount = 0;
             while (count > 0 && errorcount < 30)
             {
-                string ScratchCardCode = $"{RandomString(5, 2)}-{RandomString(10, 3)}";
+                string ScratchCardCode = $"{RandomString(5, 2)}-{RandomString(6, 3)}";
                 if (bonusManageService.SetScratchCardCode(specialCode, ScratchCardCode, lastUpdateUser) == 0)
                 {
                     count--;
