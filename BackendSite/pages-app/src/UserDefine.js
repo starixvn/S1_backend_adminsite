@@ -98,14 +98,15 @@ const WithdrawalLimitManage = lazy(() =>
   import("./pages/Finance/WithdrawalLimitManage/index")
 );
 
-const DomainManage = lazy(() =>
-  import("./pages/Marketing/DomainManage/index")
-);
+const DomainManage = lazy(() => import("./pages/Marketing/DomainManage/index"));
 
 const DashBoardNew = lazy(() => import("./pages/Home/DashBoardNew/index"));
 
-export const defaultPage = "TransferManage";
+const TransferInfoReport = lazy(() =>
+  import("./pages/BankFinancial/TransferInfoReport/index")
+);
 
+export const defaultPage = "TransferInfoReport";
 
 export const layoutType = {
   N88: "N88",
@@ -626,6 +627,19 @@ export const pages = {
     comp: (
       <Suspense fallback="loading...">
         <DashBoardNew />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  TransferInfoReport: {
+    comp: (
+      <Suspense fallback="loading...">
+        <TransferInfoReport />
       </Suspense>
     ),
     css: [

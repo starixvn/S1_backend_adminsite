@@ -273,7 +273,7 @@ namespace BackendSite.Service.DAL
 
         #region Transfer Info
 
-        public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoList(bool isSetting,
+        public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetTransferInfoList(bool isSetting,
                                                                                      TransferTypeEnum? transferType,
                                                                                      string fromDate,
                                                                                      string toDate,
@@ -303,7 +303,7 @@ namespace BackendSite.Service.DAL
                 });
 
                 string SpName = "Admin_BankFinancialTransferInfo_Get";
-                return conn.Query<BankFinancialTransferInfoDetailModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+                return conn.Query<BankFinancialTransferInfoTransDetailModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
 
@@ -431,6 +431,28 @@ namespace BackendSite.Service.DAL
 
                 string SpName = "Admin_BankFinancialTransferInfo_Del";
                 return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoReport(int siteId,
+                                                                                            string accountNo,
+                                                                                            string startDate,
+                                                                                            string endDate)
+        {
+
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                    _SiteId = siteId,
+                    _AccountNo = accountNo,
+                    _StartDate = startDate,
+                    _EndDate = endDate
+                });
+
+                string SpName = "Admin_BankFinancialTransferInfoDetail_Get";
+                return conn.Query<BankFinancialTransferInfoDetailModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
 

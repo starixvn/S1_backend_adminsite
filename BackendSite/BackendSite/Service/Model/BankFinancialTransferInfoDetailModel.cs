@@ -3,18 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace BackendSite.Service.Model
 {
-    public class BankFinancialTransferInfoDetailModelForSet
-    {
-        public string TransferInfoDetails { get; set; }
-        public IFormFile UploadReceipt { get; set; }
-    }
-
     public class BankFinancialTransferInfoDetailModel
     {
+        /// <summary>
+        /// 讀寫 識別值ID
+        /// </summary>
+        public int Id
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// 讀寫 交易ID
@@ -44,6 +45,15 @@ namespace BackendSite.Service.Model
         }
 
         /// <summary>
+        /// 讀寫 加項或減項
+        /// </summary>
+        public PlusOrMinusEnum PlusOrMinus
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// 讀寫 交易日期
         /// </summary>
         public string TransDate
@@ -52,12 +62,10 @@ namespace BackendSite.Service.Model
             set;
         }
 
-        #region From Data
-
         /// <summary>
         /// 讀寫 付款方式
         /// </summary>
-        public TransferChannelEnum FromChannel
+        public TransferChannelEnum Channel
         {
             get;
             set;
@@ -66,7 +74,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 代理人
         /// </summary>
-        public string FromAgent
+        public string Agent
         {
             get;
             set;
@@ -75,7 +83,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 第三方支付ID
         /// </summary>
-        public int? FromPayId
+        public int? PayId
         {
             get;
             set;
@@ -84,7 +92,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 第三方支付名稱
         /// </summary>
-        public string FromPayName
+        public string PayName
         {
             get;
             set;
@@ -93,7 +101,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 網站ID
         /// </summary>
-        public int FromSiteId
+        public int SiteId
         {
             get;
             set;
@@ -102,7 +110,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 網站名稱
         /// </summary>
-        public string FromSiteName
+        public string SiteName
         {
             get;
             set;
@@ -111,34 +119,25 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 客戶ID
         /// </summary>
-        public int? FromCustId
+        public int? CustId
         {
             get;
             set;
         }
 
         /// <summary>
-        /// 讀寫 客戶名稱
+        /// 讀寫 幣別ID
         /// </summary>
-        public string FromUserName
+        public int CurrencyId
         {
             get;
             set;
         }
 
         /// <summary>
-        /// 讀寫 幣別
+        /// 讀寫 幣別名稱
         /// </summary>
-        public int FromCurrencyId
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 幣別代號
-        /// </summary>
-        public string FromIsoCode
+        public string IsoCode
         {
             get;
             set;
@@ -147,7 +146,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 銀行ID
         /// </summary>
-        public int FromSysId
+        public int SysId
         {
             get;
             set;
@@ -156,7 +155,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 銀行代號
         /// </summary>
-        public string FromBankCode
+        public string BankCode
         {
             get;
             set;
@@ -165,7 +164,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 帳戶帳號
         /// </summary>
-        public string FromAccountNo
+        public string AccountNo
         {
             get;
             set;
@@ -174,7 +173,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 帳戶顯示名稱
         /// </summary>
-        public string FromAccountDisplayName
+        public string AccountDisplayName
         {
             get;
             set;
@@ -183,7 +182,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 交易金額
         /// </summary>
-        public decimal FromAmount
+        public decimal Amount
         {
             get;
             set;
@@ -192,164 +191,14 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// 讀寫 手續費(皆為減項)
         /// </summary>
-        public decimal FromFee
-        {
-            get;
-            set;
-        }
-
-        #endregion
-
-        #region To Data
-
-        /// <summary>
-        /// 讀寫 付款方式
-        /// </summary>
-        public TransferChannelEnum ToChannel
+        public decimal Fee
         {
             get;
             set;
         }
 
         /// <summary>
-        /// 讀寫 代理人
-        /// </summary>
-        public string ToAgent
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 第三方支付ID
-        /// </summary>
-        public int? ToPayId
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 第三方支付名稱
-        /// </summary>
-        public string ToPayName
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 網站ID
-        /// </summary>
-        public int ToSiteId
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 網站名稱
-        /// </summary>
-        public string ToSiteName
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 客戶ID
-        /// </summary>
-        public int? ToCustId
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 客戶名稱
-        /// </summary>
-        public string ToUserName
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 幣別
-        /// </summary>
-        public int ToCurrencyId
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 幣別代號
-        /// </summary>
-        public string ToIsoCode
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 銀行ID
-        /// </summary>
-        public int ToSysId
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 銀行代號
-        /// </summary>
-        public string ToBankCode
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 帳戶帳號
-        /// </summary>
-        public string ToAccountNo
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 帳戶顯示名稱
-        /// </summary>
-        public string ToAccountDisplayName
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 交易金額
-        /// </summary>
-        public decimal ToAmount
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 讀寫 手續費(皆為減項)
-        /// </summary>
-        public decimal ToFee
-        {
-            get;
-            set;
-        }
-
-        #endregion
-
-        /// <summary>
-        /// 讀寫 原因
+        /// 讀寫 原因ID
         /// </summary>
         public int? Reason
         {
@@ -358,9 +207,9 @@ namespace BackendSite.Service.Model
         }
 
         /// <summary>
-        /// 讀寫 備註
+        /// 讀寫 原因說明
         /// </summary>
-        public string Remark
+        public string Description
         {
             get;
             set;
@@ -376,7 +225,7 @@ namespace BackendSite.Service.Model
         }
 
         /// <summary>
-        /// 讀寫 資料建立者
+        /// 讀寫 資料建立者ID
         /// </summary>
         public int Creator
         {
@@ -403,7 +252,7 @@ namespace BackendSite.Service.Model
         }
 
         /// <summary>
-        /// 讀寫 資料更新者
+        /// 讀寫 資料更新者ID
         /// </summary>
         public int Updator
         {
@@ -415,33 +264,6 @@ namespace BackendSite.Service.Model
         /// 讀寫 資料更新者名稱
         /// </summary>
         public string UpdatorName
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 圖檔名稱
-        /// </summary>
-        public string UploadReceiptName
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 圖檔Binary
-        /// </summary>
-        public byte[] TransferPic 
-        { 
-            get;
-            set; 
-        }
-
-        /// <summary>
-        /// 讀寫 上傳收據
-        /// </summary>
-        public IFormFile UploadReceipt
         {
             get;
             set;

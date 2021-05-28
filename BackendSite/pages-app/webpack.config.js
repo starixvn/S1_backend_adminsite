@@ -71,12 +71,10 @@ module.exports = {
     // "CSD/ChangeVipLevelBatch.min": [
     // 	"./src/pages/CSD/ChangeVipLevelBatch/index.js"
     // ],
-    "Marketing/BonusManage.min": [
-
-      "@babel/polyfill",
-      "./src/pages/Marketing/BonusManage/index.jsx",
-
-    ],
+    // "Marketing/BonusManage.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/BonusManage/index.jsx",
+    // ],
     // "Marketing/PendingBonus.min": [
     // 	"./src/pages/Marketing/PendingBonus/index.jsx"
     // ],
@@ -95,7 +93,7 @@ module.exports = {
     // 	"./src/pages/Marketing/RebateInfoReport/index.js"
     // ],
     // "Report/MainFinancialReport.min": [
-    // 	"./src/pages/Report/MainFinancialReport/index.js"
+    //   "./src/pages/Report/MainFinancialReport/index.js",
     // ],
     // "Marketing/BannerManage.min": [
     // 	'@babel/polyfill',
@@ -110,7 +108,9 @@ module.exports = {
     // "Report/UserOnlineReport.min": [
     //   "./src/pages/Report/UserOnlineReport/index.js",
     // ],
-    "Report/DepositReport.min": ["./src/pages/Report/DepositReport/index.js"],
+    // "Report/DepositReport.min": [
+    //     "./src/pages/Report/DepositReport/index.js"
+    // ],
     // "Marketing/BonusImport.min": [
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/BonusImport/index.js"
@@ -163,10 +163,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/TransferManage/index.jsx",
     // ],
-    // "Marketing/VipRebateInfoReport.min": [
-    // 	 '@babel/polyfill',
-    // 	"./src/pages/Marketing/VipRebateInfoReport/index.js"
-    // ],
+    "Marketing/VipRebateInfoReport.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/VipRebateInfoReport/index.js",
+    ],
 
     // "Marketing/DomainManage.min": [
     // 	"./src/pages/Marketing/DomainManage/index.js"
@@ -176,6 +176,10 @@ module.exports = {
     // 	"./src/pages/Finance/WithdrawalLimitManage/index.js"
     // ],
     // "Home/DashBoardNew.min": ["./src/pages/Home/DashBoardNew/index.js"],
+    // "BankFinancial/TransferInfoReport.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/BankFinancial/TransferInfoReport/index.js",
+    // ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

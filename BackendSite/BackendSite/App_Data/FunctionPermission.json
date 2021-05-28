@@ -393,6 +393,11 @@
         "Enable": false
       },
       {
+        "DisplayKey": "TransferInfo Report",
+        "FuncKey": "BankFinancialReport/TransferInfoReport",
+        "Enable": false
+      },
+      {
         "DisplayKey": "Reason Management",
         "FuncKey": "BankFinancial/ReasonManagement",
         "Enable": false

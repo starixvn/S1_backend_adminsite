@@ -83,7 +83,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult GetTransferInfoList(GetTransferInfoReq req)
         {
 
-            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferInfoDetailModel>>();
+            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferInfoTransDetailModel>>();
 
             try
             {
@@ -113,12 +113,12 @@ namespace BackendSite.Controllers.Api
         public ApiResult CreateTransferInfo()
         {
 
-            var apiResult = new ApiResult<BankFinancialTransferInfoDetailModel>();
+            var apiResult = new ApiResult<BankFinancialTransferInfoTransDetailModel>();
             try
             {
                 var authData = _authorizeBLL.GetAuthData();
                 string dateTime = GetTimeZoneDateTime(1);
-                apiResult.Data = new BankFinancialTransferInfoDetailModel()
+                apiResult.Data = new BankFinancialTransferInfoTransDetailModel()
                 {
                     TransDate = DateTime.Now.ToString("yyyy-MM-dd"),
 
@@ -147,10 +147,10 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<BankFinancialTransferInfoDetailModel> GetTransferInfoData(GetTransferInfoReq req)
+        public ApiResult<BankFinancialTransferInfoTransDetailModel> GetTransferInfoData(GetTransferInfoReq req)
         {
 
-            var apiResult = new ApiResult<BankFinancialTransferInfoDetailModel>();
+            var apiResult = new ApiResult<BankFinancialTransferInfoTransDetailModel>();
 
             try
             {
@@ -204,14 +204,14 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult SetTransferInfo([FromForm] BankFinancialTransferInfoDetailModelForSet bankFinancialTransferInfoDetailModelForSet)
+        public ApiResult SetTransferInfo([FromForm] BankFinancialTransferInfoTransDetailModelForSet bankFinancialTransferInfoDetailModelForSet)
         {
 
             var apiResult = new ApiResult<int>();
 
             try
             {
-                var transferInfoDetails = JsonConvert.DeserializeObject<BankFinancialTransferInfoDetailModel>(bankFinancialTransferInfoDetailModelForSet.TransferInfoDetails);
+                var transferInfoDetails = JsonConvert.DeserializeObject<BankFinancialTransferInfoTransDetailModel>(bankFinancialTransferInfoDetailModelForSet.TransferInfoDetails);
 
                 transferInfoDetails.CreateTime = GetTimeZoneZeroDateTimeByDateString(transferInfoDetails.CreateTime);
                 transferInfoDetails.UpdateTime = GetTimeZoneZeroDateTimeByDateString(transferInfoDetails.UpdateTime);

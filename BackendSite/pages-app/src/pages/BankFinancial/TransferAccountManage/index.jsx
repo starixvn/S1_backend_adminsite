@@ -166,7 +166,7 @@ const App = () => {
 
 	const SetTransferAccount = account => {
 		if (!processing) {
-			if(!confirm("Update Account will Update Tranfer Data too. Aure you sure ?"))
+			if(!window.confirm("Update Account will Update Tranfer Data too. Aure you sure ?"))
 			{
 				setProcessing(false);
 			}
