@@ -15,10 +15,10 @@ namespace BackendSite.Service.BLL
         {
             this.rebateManageService = rebateManageService;
         }
-        public IEnumerable<VipLevel> GetVipLevel(int siteId)
-        {
-            return rebateManageService.GetVipLevel(siteId);
-        }
+        //public IEnumerable<VipLevel> GetVipLevel(int siteId)
+        //{
+        //    return rebateManageService.GetVipLevel(siteId);
+        //}
         public IEnumerable<TPCategory> GetTPCategoryList()
         {
             return rebateManageService.GetTPCategoryList();

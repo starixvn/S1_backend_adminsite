@@ -94,6 +94,10 @@ const TransferManage = lazy(() =>
 const VipRebateInfoReport = lazy(() =>
   import("./pages/Marketing/VipRebateInfoReport/index")
 );
+const VipRebateMangetment = lazy(() =>
+  import("./pages/Marketing/VipRebateMangetment/index")
+);
+
 const WithdrawalLimitManage = lazy(() =>
   import("./pages/Finance/WithdrawalLimitManage/index")
 );
@@ -106,7 +110,7 @@ const TransferInfoReport = lazy(() =>
   import("./pages/BankFinancial/TransferInfoReport/index")
 );
 
-export const defaultPage = "TransferInfoReport";
+export const defaultPage = "VipRebateMangetment";
 
 export const layoutType = {
   N88: "N88",
@@ -610,6 +614,19 @@ export const pages = {
     ],
     layout: layoutType.N88,
   },
+  VipRebateMangetment: {
+    comp: (
+      <Suspense fallback="loading...">
+        <VipRebateMangetment />
+        </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
   WithdrawalLimitManage: {
     comp: (
       <Suspense fallback="loading...">
@@ -619,7 +636,7 @@ export const pages = {
     css: [
       "./lib/bootstrap/dist/css/bootstrap.min.css",
       "./css/css/main.css",
-      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css"
     ],
     layout: layoutType.N88,
   },
