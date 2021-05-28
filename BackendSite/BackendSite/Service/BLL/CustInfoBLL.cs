@@ -107,6 +107,7 @@ namespace BackendSite.Service.BLL
                 custInfoDetail.LastDepositTime = custInfoDetail.LastDepositTimeRecord == null ? "" : custInfoDetail.LastDepositTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
                 custInfoDetail.LastWithdrawlTime = custInfoDetail.LastWithdrawalTimeRecord == null ? "" : custInfoDetail.LastWithdrawalTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
                 custInfoDetail.LastBettingTime = custInfoDetail.LastTpBetRecordTimeRecord == null ? "" : custInfoDetail.LastTpBetRecordTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.FirstDepositTime = custInfoDetail.FirstDepositTimeRecord == null ? "" : string.Format("{0} (+08:00)", custInfoDetail.FirstDepositTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture));
 
                 custInfoDetail.tpWallet = await tpBLL.GetTpWalletAsync(custInfoDetail.CustId);
                 custInfoDetail.promotions = promotionService.GetPromotionListByCustId(custInfoDetail.CustId);
