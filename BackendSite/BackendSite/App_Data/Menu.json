@@ -456,6 +456,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "VipRebateMangetment",
+        "Title": "Vip Rebate Mangetment",
+        "FuncKey": "Marketing/VipRebateMangetment",
+        "Controller": "Marketing",
+        "Action": "VipRebateMangetment",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

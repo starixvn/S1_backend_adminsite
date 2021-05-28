@@ -91,8 +91,11 @@ const LatestHighlightVideoManagement = lazy(() =>
 const VipRebateInfoReport = lazy(() =>
   import("./pages/Marketing/VipRebateInfoReport/index")
 );
+const VipRebateMangetment = lazy(() =>
+  import("./pages/Marketing/VipRebateMangetment/index")
+);
 
-export const defaultPage = "TransferAccountManage";
+export const defaultPage = "VipRebateMangetment";
 
 export const layoutType = {
   N88: "N88",
@@ -570,4 +573,17 @@ export const pages = {
     ],
     layout: layoutType.N88,
   },
+  VipRebateMangetment: {
+    comp: (
+      <Suspense fallback="loading...">
+        <VipRebateMangetment />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css"
+    ],
+    layout: layoutType.N88,
+  }
 };

@@ -24,10 +24,10 @@ module.exports = {
     // 	// '@babel/polyfill',
     // 	"./src/pages/Administration/GroupAuthoritySetting/index.js"
     // ],
-    "Report/LicenseeWinLost.min": [
-    	// '@babel/polyfill',
-    	"./src/pages/Report/LicenseeWinLost/index.js"
-    ],
+    // "Report/LicenseeWinLost.min": [
+    // 	// '@babel/polyfill',
+    // 	"./src/pages/Report/LicenseeWinLost/index.js"
+    // ],
     // "Finance/PaymentAdjustmentReport.min": [
     // 	// '@babel/polyfill',
     // 	"./src/pages/Finance/PaymentAdjustmentReport/index.js"
@@ -93,10 +93,10 @@ module.exports = {
     // "Report/MainFinancialReport.min": [
     // 	"./src/pages/Report/MainFinancialReport/index.js"
     // ],
-    // "Marketing/BannerManage.min": [
-    // 	'@babel/polyfill',
-    // 	"./src/pages/Marketing/BannerManage/index.jsx"
-    // ],
+    "Marketing/BannerManage.min": [
+      '@babel/polyfill',
+      "./src/pages/Marketing/BannerManage/index.jsx"
+    ],
     // "Report/MainFinancialReport.min": [
     // 	"./src/pages/Report/MainFinancialReport/index.js"
     // ],
@@ -152,6 +152,10 @@ module.exports = {
     // 	 '@babel/polyfill',
     // 	"./src/pages/Marketing/VipRebateInfoReport/index.js"
     // ],
+    "Marketing/VipRebateMangetment.min": [
+      '@babel/polyfill',
+      "./src/pages/Marketing/VipRebateMangetment/index.jsx"
+    ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

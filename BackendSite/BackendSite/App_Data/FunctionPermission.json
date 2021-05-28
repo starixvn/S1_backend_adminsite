@@ -359,6 +359,18 @@
         "Enable": false
       },
       {
+        "DisplayKey": "Vip Rebate Mangetment",
+        "FuncKey": "Marketing/VipRebateMangetment",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit",
+            "FuncKey": "f_vrm_edit"
+          }
+        ]
+      },
+      {
         "DisplayKey": "Vip Rebate Info",
         "FuncKey": "Marketing/VipRebateInfoReport",
         "Enable": false

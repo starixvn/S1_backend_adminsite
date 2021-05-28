@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.Tsp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,22 +15,24 @@ namespace BackendSite.Controllers.Api
     {
         private RebateManageBLL rebateManageBLL;
         private readonly AuthorizeBLL authorizeBLL;
+        private VipLevelBLL vipLevelBLL;
 
-        public RebateManageController(RebateManageBLL rebateManageBLL, AuthorizeBLL authorizeBLL)
+        public RebateManageController(RebateManageBLL rebateManageBLL, AuthorizeBLL authorizeBLL, VipLevelBLL vipLevelBLL)
         {
             this.rebateManageBLL = rebateManageBLL;
             this.authorizeBLL = authorizeBLL;
-
+            this.vipLevelBLL = vipLevelBLL;
         }
         public class VipLevelReq
         {
             public int SiteId { get; set; }
         }
-        public ApiResult<IEnumerable<VipLevel>> GetVipLevel(VipLevelReq vipLevelReq)
+        public ApiResult<IEnumerable<VipLevelSetting>> GetVipLevel(VipLevelReq vipLevelReq)
         {
-            var apiResult = new ApiResult<IEnumerable<VipLevel>>();
+            var apiResult = new ApiResult<IEnumerable<VipLevelSetting>>();
             apiResult.ErrorCode = 0;
-            apiResult.Data = rebateManageBLL.GetVipLevel(vipLevelReq.SiteId);
+            //apiResult.Data = rebateManageBLL.GetVipLevel(vipLevelReq.SiteId);
+            apiResult.Data = vipLevelBLL.GetVipLevelSetting(vipLevelReq.SiteId);
             return apiResult;
         }
         public ApiResult<IEnumerable<TPCategory>> GetTPCategoryList()
@@ -74,9 +77,9 @@ namespace BackendSite.Controllers.Api
         {
             public int SiteId { get; set; }
             public int PeriodType { get; set; }
-            public int ?PeriodDay { get; set; }
+            public int? PeriodDay { get; set; }
             public int RedeemHours { get; set; }
-            
+
 
         }
         public ApiResult SetRebatePeriod(SetRebatePeriodReq setRebatePeriodReq)
@@ -104,7 +107,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult();
             apiResult.ErrorCode = 99;
-            bool result = rebateManageBLL.DelRebatePeriod(delRebatePeriodReq.SiteId); 
+            bool result = rebateManageBLL.DelRebatePeriod(delRebatePeriodReq.SiteId);
             if (result)
             {
                 apiResult.ErrorCode = 0;
@@ -166,7 +169,7 @@ namespace BackendSite.Controllers.Api
         }
         public ApiResult SetRebateCategory(SetRebateCategoryReq setRebateCategoryReq)
         {
-            var apiResult = new ApiResult ();
+            var apiResult = new ApiResult();
             apiResult.ErrorCode = 0;
             string UserName = authorizeBLL.GetAuthData().UserName;
             apiResult.ErrorCode = 99;
@@ -225,7 +228,8 @@ namespace BackendSite.Controllers.Api
             if (result)
             {
                 apiResult.ErrorCode = 0;
-            }else
+            }
+            else
             {
                 apiResult.ErrorCode = -1;
             }

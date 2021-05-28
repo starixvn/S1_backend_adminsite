@@ -190,7 +190,7 @@ export function reducer(state, action) {
 							...state.specific[selCurrency].lang,
 							[selLang]: {
 								...state.specific[selCurrency].lang[selLang],
-								[action.dataColumn]: action.value
+								[action.dataColumn]: action.value.trim()
 							}
 						}
 					}
