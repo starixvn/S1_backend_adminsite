@@ -477,20 +477,20 @@ const App = () => {
 	}
 
 
-	const HandleEdit = (dataColumn, idx) => {
+	const HandleEdit = (dataColumn, idx, data = "") => {
 		let i = dataColumn + idx;
 		let isEdit = state.initEdit[i] === true ? false : true;
-		dispatch({ type: defActionType.SET_EDIT, idx: i, val: isEdit });
+		dispatch({ type: defActionType.SET_EDIT, idx: i, val: isEdit, originalData: data });
 	};
 
 	let _options_site = state.initSiteList.map(s => {
 		return { value: s.siteId, displayText: s.siteName };
 	});
-	console.log("After state", state);
-	// console.log("Edit state", state.setData);
+	// console.log("After state", state);
+	console.log("Edit state", state.setData);
 	return (
 		<div className="container-fluid">
-			<h4 className="page-name">Banner Management</h4>
+			<h4 className="page-name">Vip Rebate Mangetment</h4>
 			<div className="filter" style={{ position: "sticky", top: 0, left: 0, zIndex: 999, width: "100%", height: "90px" }}>
 				<RadioBox
 					Title="Available Sites"

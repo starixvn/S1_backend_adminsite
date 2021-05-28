@@ -23,7 +23,13 @@ export default ({
 		);
 	});
 	let editStatus = state.initEdit["PeriodType"];
-	let data = editStatus === true ? state.setData : state.setRebatePeriodData;
+	let originalData = {
+		"periodType": (state.setRebatePeriodData.periodType ? state.setRebatePeriodData.periodType : 0),
+		"periodWeek": (state.setRebatePeriodData.periodWeek ? state.setRebatePeriodData.periodWeek : 0),
+		"periodMonth": (state.setRebatePeriodData.periodMonth ? state.setRebatePeriodData.periodMonth : 0),
+		"redeemHours": (state.setRebatePeriodData.redeemHours ? state.setRebatePeriodData.redeemHours : 0),
+	}
+	let data = editStatus === true ? state.setData : originalData;
 	return (
 		processArea == "RebatePeriod" ? null :
 			<>
@@ -70,15 +76,15 @@ export default ({
 						/>
 					</div>
 					{window.subFuncKeys && window.subFuncKeys.includes("f_vrm_edit") ? (
-						<div className="row-flex">
-							<ActionButtons
-								isEdit={(editStatus === true) ? true : false}
-								clickEdit={action.HandleEdit.bind(null, "PeriodType", "")}
-								clickCancel={action.HandleEdit.bind(null, "PeriodType", "")}
-								clickSubmit={action.SetRebatePeriod}
-								disabled={processing}
-							/>
-						</div>
+					<div className="row-flex">
+						<ActionButtons
+							isEdit={(editStatus === true) ? true : false}
+							clickEdit={action.HandleEdit.bind(null, "PeriodType", "", originalData)}
+							clickCancel={action.HandleEdit.bind(null, "PeriodType", "")}
+							clickSubmit={action.SetRebatePeriod}
+							disabled={processing}
+						/>
+					</div>
 					) : null}
 				</div>
 				<div className="filter noBGcolor tag">{currencyTabArr}</div>
@@ -130,8 +136,12 @@ const CategoryPanel = props => {
 const CategoryDataPanel = props => {
 	let vipListDataArr = props.state.siteVipList.map(item => {
 		let editStatus = props.state.initEdit["categoryDataLevel" + item.level];
-		let value = editStatus === true ? props.state.setData.categoryDataLevel : props.state.setCategoryData.categoryLevelList && Object.keys(props.state.setCategoryData.categoryLevelList).length !== 0 ?
-			props.state.setCategoryData.categoryLevelList.find(s => s.level === item.level).percentage : "No Setting";
+		let originalData = {
+			"categoryDataLevel": props.state.setCategoryData.categoryLevelList && Object.keys(props.state.setCategoryData.categoryLevelList).length !== 0 ?
+				props.state.setCategoryData.categoryLevelList.find(s => s.level === item.level).percentage : "No Setting"
+		}
+		let value = editStatus === true ? props.state.setData.categoryDataLevel : originalData.categoryDataLevel;
+		console.log(originalData);
 		return (
 			<div
 				className="row-flex"
@@ -145,20 +155,24 @@ const CategoryDataPanel = props => {
 					disabled={props.processing !== true && editStatus === true ? false : true}
 				/>
 				<div style={{ width: "25px", height: "25px" }}>%</div>
-				{window.subFuncKeys && window.subFuncKeys.includes("f_vrm_edit") ? (
-					<ActionButtons
-						isEdit={editStatus === true ? true : false}
-						clickEdit={props.action.HandleEdit.bind(null, "categoryDataLevel", item.level)}
-						clickCancel={props.action.HandleEdit.bind(null, "categoryDataLevel", item.level)}
-						clickSubmit={props.action.SetRebateCategory.bind(null, item.level)}
-						disabled={props.processing}
-					/>)
-					: null}
+				{window.subFuncKeys && window.subFuncKeys.includes("f_vrm_edit") ?
+				<ActionButtons
+					isEdit={editStatus === true ? true : false}
+					clickEdit={props.action.HandleEdit.bind(null, "categoryDataLevel", item.level, originalData)}
+					clickCancel={props.action.HandleEdit.bind(null, "categoryDataLevel", item.level)}
+					clickSubmit={props.action.SetRebateCategory.bind(null, item.level)}
+					disabled={props.processing}
+				/>
+				: null}
 			</div>
 		);
 	});
 	let editStatus = props.state.initEdit["Payout"];
-	let data = editStatus === true ? props.state.setData : (props.state.setCategoryPayoutData && Object.keys(props.state.setCategoryPayoutData).length !== 0) ? props.state.setCategoryPayoutData : null;
+	let originalData = {
+		"minPayout": props.state.setCategoryPayoutData && Object.keys(props.state.setCategoryPayoutData).length !== 0 ? props.state.setCategoryPayoutData.minPayout : "No Setting",
+		"maxPayout": props.state.setCategoryPayoutData && Object.keys(props.state.setCategoryPayoutData).length !== 0 ? props.state.setCategoryPayoutData.maxPayout : "No Setting"
+	}
+	let data = editStatus === true ? props.state.setData : originalData;
 	return (
 		<>
 			<div className="filter">
@@ -170,24 +184,25 @@ const CategoryDataPanel = props => {
 						Title="Min Payout"
 						OnChange={props.action.SetData}
 						dataColumn="minPayout"
-						value={data.minPayout ? data.minPayout : data.minPayout === 0 ? "No Limit" : null}
+						value={data ? data.minPayout : data.minPayout === 0 ? "No Limit" : null}
 						disabled={props.processing !== true && editStatus === true ? false : true}
 					/>
 					<InputBox
 						Title="Max Payout"
 						OnChange={props.action.SetData}
 						dataColumn="maxPayout"
-						value={data.maxPayout ? data.maxPayout : data.maxPayout === 0 ? "No Limit" : null}
+						value={data ? data.maxPayout : data.maxPayout === 0 ? "No Limit" : null}
 						disabled={props.processing !== true && editStatus === true ? false : true}
 					/>
-					{window.subFuncKeys && window.subFuncKeys.includes("f_vrm_edit") ? (
-						<ActionButtons
-							isEdit={editStatus === true ? true : false}
-							clickEdit={props.action.HandleEdit.bind(null, "Payout", "")}
-							clickCancel={props.action.HandleEdit.bind(null, "Payout", "")}
-							clickSubmit={props.action.SetRebatePayoutLimit}
-							disabled={props.processing}
-						/>) : null}
+					{window.subFuncKeys && window.subFuncKeys.includes("f_vrm_edit") ?
+					<ActionButtons
+						isEdit={editStatus === true ? true : false}
+						clickEdit={props.action.HandleEdit.bind(null, "Payout", "", originalData)}
+						clickCancel={props.action.HandleEdit.bind(null, "Payout", "")}
+						clickSubmit={props.action.SetRebatePayoutLimit}
+						disabled={props.processing}
+					/>
+					: null}
 				</div>
 			</div>
 			<div className="filter">
@@ -243,8 +258,11 @@ const TpGameTypePanel = props => {
 const TpGameTypeDataPanel = props => {
 	let vipListDataArr = props.state.siteVipList.map(item => {
 		let editStatus = props.state.initEdit["tpGameTypeLevel" + item.level];
-		let value = editStatus === true ? props.state.setData.tpGameTypeLevel : props.state.setGameTypeData && Object.keys(props.state.setGameTypeData).length !== 0 ?
-			props.state.setGameTypeData.find(s => s.level === item.level).percentage : "Base on category";
+		let originalData = {
+			"tpGameTypeLevel": props.state.setGameTypeData && Object.keys(props.state.setGameTypeData).length !== 0 ?
+				props.state.setGameTypeData.find(s => s.level === item.level).percentage : "Base on category"
+		}
+		let value = editStatus === true ? props.state.setData.tpGameTypeLevel : originalData.tpGameTypeLevel;
 		return (
 			<div
 				className="row-flex"
@@ -258,14 +276,15 @@ const TpGameTypeDataPanel = props => {
 					disabled={props.processing !== true && editStatus === true ? false : true}
 				/>
 				<div style={{ width: "25px", height: "25px" }}>%</div>
-				{window.subFuncKeys && window.subFuncKeys.includes("f_vrm_edit") ? (
-					<ActionButtons
-						isEdit={editStatus === true ? true : false}
-						clickEdit={props.action.HandleEdit.bind(null, "tpGameTypeLevel", item.level)}
-						clickCancel={props.action.HandleEdit.bind(null, "tpGameTypeLevel", item.level)}
-						clickSubmit={props.action.SetRebateGameType.bind(null, item.level)}
-						disabled={props.processing}
-					/>) : null}
+				{window.subFuncKeys && window.subFuncKeys.includes("f_vrm_edit") ?
+				<ActionButtons
+					isEdit={editStatus === true ? true : false}
+					clickEdit={props.action.HandleEdit.bind(null, "tpGameTypeLevel", item.level, originalData)}
+					clickCancel={props.action.HandleEdit.bind(null, "tpGameTypeLevel", item.level)}
+					clickSubmit={props.action.SetRebateGameType.bind(null, item.level)}
+					disabled={props.processing}
+				/>
+				: null}
 			</div>
 		);
 	});
