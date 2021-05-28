@@ -1,11 +1,7 @@
-﻿using BackendSite.Service.BLL;
+﻿using System.Collections.Generic;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1.Tsp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
@@ -77,7 +73,7 @@ namespace BackendSite.Controllers.Api
         {
             public int SiteId { get; set; }
             public int PeriodType { get; set; }
-            public int? PeriodDay { get; set; }
+            public int PeriodDay { get; set; }
             public int RedeemHours { get; set; }
 
 
