@@ -141,7 +141,6 @@ const CategoryDataPanel = props => {
 				props.state.setCategoryData.categoryLevelList.find(s => s.level === item.level).percentage : "No Setting"
 		}
 		let value = editStatus === true ? props.state.setData.categoryDataLevel : originalData.categoryDataLevel;
-		console.log(originalData);
 		return (
 			<div
 				className="row-flex"

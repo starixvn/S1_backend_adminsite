@@ -487,7 +487,7 @@ const App = () => {
 		return { value: s.siteId, displayText: s.siteName };
 	});
 	// console.log("After state", state);
-	console.log("Edit state", state.setData);
+	//console.log("Edit state", state.setData);
 	return (
 		<div className="container-fluid">
 			<h4 className="page-name">Vip Rebate Mangetment</h4>
