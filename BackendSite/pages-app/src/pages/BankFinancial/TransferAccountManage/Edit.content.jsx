@@ -7,8 +7,12 @@ import TextBox from "./Component/TextBox";
 import moment from "moment";
 import { initChannelType,initSiteId, initStatusType,initPurposeType } from "./defCols";
 
-export default ({ state, action, processing }) => {	
+export default ({ state, action, processing,isAdd }) => {	
 	const currencyList = state.currencyList;
+	if(!currencyList.find(x=>x==13))
+	{
+		currencyList.push(13);
+	}
 	const currencyOptions =[];
 	currencyOptions.push({value:0,displayText:" - Select Currency -"});
 	currencyList.map(i => {
@@ -33,12 +37,32 @@ export default ({ state, action, processing }) => {
 						<SelectBox
 							Title="Site"
 							Options={initSiteId}
-							HandleChange={action.EditMainValue}
+							HandleChange={action.EditSiteIdSelectBox}
 							dataColumn="siteId"
 							SelectedValue={state.siteId}
+							//Disabled={!isAdd}
+							Disabled={true}
+						/>
+						<InputBox
+							Title="SiteName"
+							OnChange={action.EditMainValue}
+							dataColumn="siteName"
+							value={state.siteName}
 							Disabled={true}
 						/>
 					</div>
+					<div className="row-flex">
+						<CheckBox
+							Options={initPurposeType}
+							Title="Purpose"
+							OnChange={action.EditPurposeCheckBox}
+							dataColumn="purpose"
+							Selected={state.purpose}
+						/>
+					</div>
+					<hr></hr>
+					<p>If edit <font color="#ff0000"> Currency, Bank Code, Channel, Pay, Agent, AccountNo, AccountName, AccountDisplayName, </font><br></br>
+					will update transfer data too.Please be carful and double check.</p>
 					<div className="row-flex">
 						<SelectBox
 							Title="Currency"
@@ -54,15 +78,6 @@ export default ({ state, action, processing }) => {
 							HandleChange={action.EditMainValue}
 							dataColumn="sysId"
 							SelectedValue={state.sysId}
-						/>
-					</div>
-					<div className="row-flex">
-						<CheckBox
-							Options={initPurposeType}
-							Title="Purpose"
-							OnChange={action.EditPurposeCheckBox}
-							dataColumn="purpose"
-							Selected={state.purpose}
 						/>
 					</div>
 					<div className="row-flex">
@@ -102,6 +117,7 @@ export default ({ state, action, processing }) => {
 							OnChange={action.EditMainValue}
 							dataColumn="accountNo"
 							value={state.accountNo}
+							//Disabled={!isAdd}
 						/>
 						<InputBox
 							Title="Account Name"
@@ -118,6 +134,7 @@ export default ({ state, action, processing }) => {
 							value={state.displayName}
 						/>
 					</div>
+					<hr></hr>
 					<div className="row-flex">
 						<InputBox
 							Title="Initial Amount"

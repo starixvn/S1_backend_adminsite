@@ -5,7 +5,7 @@ import { api } from '../../../module/WebAPI';
 
 if (process.env.NODE_ENV !== 'production') {
     window.i18n = {
-        "lbl_Currency1": "SGD", "lbl_Currency2": "MYR", "lbl_Currency3": "USD", "lbl_Currency4": "THB", "lbl_Currency6": "EURO", "lbl_Currency9": "AUD", "lbl_Currency12": "GBP", "lbl_Currency13": "RMB", "lbl_Currency15": "IDR", "lbl_Currency20": "UUS", "lbl_Currency32": "JPY", "lbl_Currency40": "WON", "lbl_Currency41": "CHF", "lbl_Currency45": "WON", "lbl_Currency51": "VND", "lbl_Save": "Save", "lbl_Success": "Success", "lbl_Action": "Action", "lbl_SelectSite": "Select site", "lbl_Point": "Point", "lbl_DepositLeast": "Deposit least", "lbl_BetLeast": "Bet least", "lbl_AddPointLevel": "Add point level", "lbl_AddNewPointLevel": "Add new point level", "lbl_Delete": "Delete", "lbl_AreYouSure": "Are you sure?", "lbl_OK": "OK", "lbl_Cancel": "Cancel", "lbl_Error": "Error"
+        "lbl_Currency1": "SGD", "lbl_Currency2": "MYR", "lbl_Currency3": "USD", "lbl_Currency4": "THB", "lbl_Currency6": "EURO", "lbl_Currency9": "AUD", "lbl_Currency12": "GBP", "lbl_Currency13": "RMB", "lbl_Currency15": "IDR", "lbl_Currency20": "UUS", "lbl_Currency32": "JPY", "lbl_Currency40": "WON", "lbl_Currency41": "CHF", "lbl_Currency45": "WON", "lbl_Currency51": "VND","lbl_Currency61":"INR", "lbl_Save": "Save", "lbl_Success": "Success", "lbl_Action": "Action", "lbl_SelectSite": "Select site", "lbl_Point": "Point", "lbl_DepositLeast": "Deposit least", "lbl_BetLeast": "Bet least", "lbl_AddPointLevel": "Add point level", "lbl_AddNewPointLevel": "Add new point level", "lbl_Delete": "Delete", "lbl_AreYouSure": "Are you sure?", "lbl_OK": "OK", "lbl_Cancel": "Cancel", "lbl_Error": "Error","lbl_Currency61":"INR"
     };
 }
 

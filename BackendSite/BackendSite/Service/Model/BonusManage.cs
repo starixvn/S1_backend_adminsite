@@ -31,6 +31,7 @@ namespace BackendSite.Service.Model
         public bool OnlyRegistered { get; set; }
         public int PromotionDeviceType { get; set; }
         public int? PromotionAction { get; set; }
+        public int AutoExtend { get; set; }
     }
 
     public class PromotionSpecific
@@ -52,6 +53,7 @@ namespace BackendSite.Service.Model
         public decimal MinPayout { get; set; }
         public string VN_AffIds { get; set; }
         public string VN_AffCodes { get; set; }
+        public int TotalUsageLimit { get; set; }
     }
     public class TpGameType
     {
@@ -114,5 +116,24 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public string ErrorMessage { get; set; }
 
+    }
+    public class ScratchCard
+    {
+        public string SpecialCode { get; set; }
+        public string ScratchCardCode { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public DateTime CreateTime { get; set; }
+        public DateTime UpdateTime { get; set; }
+        public string LastUpdateUser { get; set; }
+    }
+    public class ScratchCardExport
+    {
+        public string SpecialCode { get; set; }
+        public string ScratchCardCode { get; set; }
+        public string Joiner { get; set; }
+        public DateTime CreateTime { get; set; }
+        public DateTime UpdateTime { get; set; }
+        public string Creator { get; set; }
     }
 }

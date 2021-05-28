@@ -95,6 +95,10 @@ const App = () => {
 			if (isMountedRef.current) {
 				setProcessing(true);
 			}
+			if(siteId===null || siteId==="")
+			{
+				siteId=0;
+			}
 			let transferAccountData = {};
 			try {
 				const res = await WebAPI.PostData({
@@ -162,57 +166,65 @@ const App = () => {
 
 	const SetTransferAccount = account => {
 		if (!processing) {
-			if (isMountedRef.current) {
-				setProcessing(true);
+			if(!window.confirm("Update Account will Update Tranfer Data too. Aure you sure ?"))
+			{
+				setProcessing(false);
 			}
-			let a = account.purpose.join();
-			let _account = {
-				Id:account.id,
-				SiteId: Number(account.siteId),
-				CurrencyId: Number(account.currencyId),
-				SysId: Number(account.sysId),
-				Purpose: a,
-				Channel: Number(account.channel),
-				Agent: account.agent,
-				PayId: Number(account.payId),
-				AccountNo: account.accountNo,
-				AccountName: account.accountName,
-				DisplayName: account.displayName,
-				InitialAmount: Number(account.initialAmount),
-				MaxBalanceAlertAmount: Number(account.maxBalanceAlertAmount),
-				Reason: Number(account.reason),
-				Remark: account.remark === undefined ? null : account.remark,
-				Status: Number(account.status),
-				CreateTime:account.createTime,
-				Creator: Number(account.creator),
-				UpdateTime:account.updateTime,
-				Updator: Number(account.updator)
-			};
-
-			let param = {
-				Url: "TransferAccountManage/SetTransferAccount",
-				Data:_account
-			};
-			WebAPI.PostData(param).then(
-				res => {
-					if (isMountedRef.current) {
-						if (res.data.errorCode <= 2 ) {
-							dispatch({ type: defActionType.SET_TRANSFER_ACCOUNT });
-							GetSiteTransferAccountList(_account.SiteId);
-						} 
-						else {
-							alert(res.data.message ?? "failed to set data.");
-						}
-						setProcessing(false);
-					}
-				},
-				err => {
-					if (isMountedRef.current) {
-						alert("API Server Error.");
-						setProcessing(false);
-					}
+			else
+			{
+				if (isMountedRef.current) {
+					setProcessing(true);
 				}
-			);
+				let a = account.purpose.join();
+				let _account = {
+					Id:account.id,
+					SiteId: Number(account.siteId),
+					SiteName:account.siteName,
+					CurrencyId: Number(account.currencyId),
+					SysId: Number(account.sysId),
+					Purpose: a,
+					Channel: Number(account.channel),
+					Agent: account.agent,
+					PayId: Number(account.payId),
+					AccountNo: account.accountNo,
+					AccountName: account.accountName,
+					DisplayName: account.displayName,
+					InitialAmount: Number(account.initialAmount),
+					MaxBalanceAlertAmount: Number(account.maxBalanceAlertAmount),
+					Reason: Number(account.reason),
+					Remark: account.remark === undefined ? null : account.remark,
+					Status: Number(account.status),
+					CreateTime:account.createTime,
+					Creator: Number(account.creator),
+					UpdateTime:account.updateTime,
+					Updator: Number(account.updator)
+				};
+
+				let param = {
+					Url: "TransferAccountManage/SetTransferAccount",
+					Data:_account
+				};
+				WebAPI.PostData(param).then(
+					res => {
+						if (isMountedRef.current) {
+							if (res.data.errorCode <= 2 ) {
+								dispatch({ type: defActionType.SET_TRANSFER_ACCOUNT });
+								GetSiteTransferAccountList(_account.SiteId);
+							} 
+							else {
+								alert(res.data.message ?? "failed to set data.");
+							}
+							setProcessing(false);
+						}
+					},
+					err => {
+						if (isMountedRef.current) {
+							alert("API Server Error.");
+							setProcessing(false);
+						}
+					}
+				);
+			}
 		}
 	};
 

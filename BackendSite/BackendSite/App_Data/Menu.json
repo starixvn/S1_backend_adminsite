@@ -11,6 +11,24 @@
   },*/
   {
     "Key": "",
+    "Title": "Home",
+    "Icon": "icon-calendar",
+    "Roles": null,
+    "Childs": [
+      {
+        "Key": "",
+        "Title": "Dash Board",
+        "FuncKey": "Home/DashboardNew",
+        "Controller": "Home",
+        "Action": "DashboardNew",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      }
+    ]
+  },
+  {
+    "Key": "",
     "Title": "Reports",
     "Icon": "icon-reports",
     "Roles": null,
@@ -260,6 +278,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "WithdrawalLimitManagement",
+        "Title": "WithdrawalLimit Management",
+        "FuncKey": "Finance/WithdrawalLimitManagement",
+        "Controller": "Finance",
+        "Action": "WithdrawalLimitManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
@@ -466,6 +494,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "DomainManagement",
+        "Title": "Domain Management",
+        "FuncKey": "Marketing/DomainManage",
+        "Controller": "Marketing",
+        "Action": "DomainManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
@@ -481,6 +519,36 @@
         "FuncKey": "BankFinancial/TransferAccountManage",
         "Controller": "BankFinancial",
         "Action": "TransferAccountManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Transfer Management",
+        "FuncKey": "BankFinancial/TransferManage",
+        "Controller": "BankFinancial",
+        "Action": "TransferManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "TransferInfo Report",
+        "FuncKey": "BankFinancialReport/TransferInfoReport",
+        "Controller": "BankFinancial",
+        "Action": "TransferInfoReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Reason Management",
+        "FuncKey": "BankFinancial/ReasonManagement",
+        "Controller": "BankFinancial",
+        "Action": "ReasonManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null

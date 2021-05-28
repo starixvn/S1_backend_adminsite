@@ -14,7 +14,12 @@ import * as Loading from '../commJS/Loading.jsx';
         13: "RMB",
         15: "IDR",
         51: "VND",
-        96: "USDT",
+        61: "INR",
+    };
+    const defStatusType = {
+        1: "Running",
+        2: "Suspend",
+        3: "Closed"
     };
 
     class CustInfoRow extends React.Component {
@@ -96,7 +101,7 @@ import * as Loading from '../commJS/Loading.jsx';
         _Search = false;
         constructor(props) {
             super(props);
-            this.state = { SiteList: [], selectSite: [], searchData: null, UserName: "", TransId: "", Loading: false, CurrencyList: [], selectCurrency: [] };
+            this.state = { SiteList: [], selectSite: [], searchData: null, UserName: "", TransId: "", Loading: false, CurrencyList: [], selectCurrency: [] , selectStatus:[]};
             this.f_trigger_Start = React.createRef();
             this.selectdate_start = React.createRef();
             this.f_trigger_End = React.createRef();
@@ -151,6 +156,7 @@ import * as Loading from '../commJS/Loading.jsx';
                 AffId: !this.state.sAffId ? null : parseInt(this.state.sAffId),
                 SelectCurrency: !this.state.selectCurrency ? null : this.state.selectCurrency,
                 BankAccountNumber: !this.state.sBankAccountNumber ? null : this.state.sBankAccountNumber,
+                SelectStatus:!this.state.selectStatus ? null : this.state.selectStatus
             };
             axios.post('/api/CustManage/GetCustInfoList', data)
                 .then(function (response) {
@@ -187,7 +193,9 @@ import * as Loading from '../commJS/Loading.jsx';
                 AffId: !this.state.sAffId ? null : parseInt(this.state.sAffId),
                 SelectCurrency: !this.state.selectCurrency ? null : this.state.selectCurrency,
                 BankAccountNumber: !this.state.sBankAccountNumber ? null : this.state.sBankAccountNumber,
+                SelectStatus:!this.state.selectStatus ? null : this.state.selectStatus
             };
+            
 
             let ExportParam = [];
             for (var prop in data) {
@@ -255,6 +263,11 @@ import * as Loading from '../commJS/Loading.jsx';
                     let val = parseInt($(option).val()), index = state.selectSite.indexOf(val);
                     (checked) ? state.selectSite.push(val) : (index > -1) ? state.selectSite.splice(index, 1) : state.selectSite;
                     state.selectSite.sort();
+                },
+                onInitialized: function () {
+                    state.SiteList.forEach(function (obj) {
+                        state.selectSite.push(obj.siteId);
+                    });
                 }
             });
             $('#selectSite').multiselect('updateButtonText');
@@ -272,9 +285,7 @@ import * as Loading from '../commJS/Loading.jsx';
                 includeSelectAllOption: true,
                 selectAllText: 'Check all!',
                 onSelectAll: function () {
-                    console.log(state.selectCurrency);
                     state.selectCurrency.length = 0;
-                    console.log(state.selectCurrency);
                     // state.SiteList.forEach(function (obj) {
                     //     state.selectSite.push(obj.siteId);
                     // });
@@ -289,9 +300,51 @@ import * as Loading from '../commJS/Loading.jsx';
                     let val = parseInt($(option).val()), index = state.selectCurrency.indexOf(val);
                     (checked) ? state.selectCurrency.push(val) : (index > -1) ? state.selectCurrency.splice(index, 1) : state.selectCurrency;
                     state.selectCurrency.sort();
+                },
+                onInitialized: function () {
+                    state.selectCurrency.push(2);
+                    state.selectCurrency.push(4);
+                    state.selectCurrency.push(13);
+                    state.selectCurrency.push(15);
+                    state.selectCurrency.push(51);
+                    state.selectCurrency.push(61);
                 }
             });
             $('#selectCurrency').multiselect('updateButtonText');
+        }
+
+        getStatusList() {
+            let state = this.state;
+            this.buildSelectStatus();
+
+        }
+
+        buildSelectStatus = ()=>{
+            let state = this.state;
+            $("#selectStatus").multiselect({
+                includeSelectAllOption: true,
+                selectAllText: 'Check all!',
+                onSelectAll: function () {
+                    state.selectStatus.length = 0;
+                    Object.keys(defStatusType).forEach((key) => {
+                        state.selectStatus.push(parseInt(key));
+                    })
+                },
+                onDeselectAll: function () {
+                    state.selectStatus.length = 0;
+                },
+                onChange: function (option, checked, select) {
+                    let val = parseInt($(option).val()), index = state.selectStatus.indexOf(val);
+                    (checked) ? state.selectStatus.push(val) : (index > -1) ? state.selectStatus.splice(index, 1) : state.selectStatus;
+                    state.selectStatus.sort();
+                },
+                onInitialized: function () {
+                    state.selectStatus.push(1);
+                    state.selectStatus.push(2);
+                    state.selectStatus.push(3);
+                }
+            });
+            $('#selectStatus').multiselect('updateButtonText');
         }
 
         componentDidMount() {
@@ -316,6 +369,7 @@ import * as Loading from '../commJS/Loading.jsx';
             });
             this.getSiteList();
             this.getCurrencyList();
+            this.getStatusList();
         }
 
         render() {
@@ -340,13 +394,19 @@ import * as Loading from '../commJS/Loading.jsx';
             let StartDate = this.state.StartDate;
             let EndDate = this.state.EndDate;
             let siteList = this.state.SiteList.map(function (obj) {
-                return <option key={obj.siteId} value={obj.siteId}>{obj.siteName}</option>;
+                return <option key={obj.siteId} value={obj.siteId} selected="selected">{obj.siteName}</option>;
+                //return <option key={obj.siteId} value={obj.siteId}>{obj.siteName}</option>;
             }.bind(this));
             let currencyList = Object.keys(defCurrencyType).map((key) => {
-                return <option key={key} value={key}>{defCurrencyType[key]}</option>;
+                return <option key={key} value={key} selected="selected">{defCurrencyType[key]}</option>;
+                //return <option key={key} value={key}>{defCurrencyType[key]}</option>;
+            });
+            let statusList = Object.keys(defStatusType).map((key) => {
+                return <option key={key} value={key} selected="selected">{defStatusType[key]}</option>;
             });
             siteList = <select id="selectSite" name="selectSite[]" multiple="multiple">{siteList}</select>;
             currencyList = <select id="selectCurrency" name="selectCurrency[]" multiple="multiple">{currencyList}</select>;
+            statusList = <select id="selectStatus" name="selectStatus[]" multiple="multiple">{statusList}</select>;
             return (
                 <div>
                     <h4 className="page-name">Customer Search</h4>
@@ -439,6 +499,12 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <div className="date">
                                         <input ref={this.selectdate_end} type="text" defaultValue={!isNaN(EndDate) ? moment.unix(EndDate).format('l') : null} size="8" />
                                         <a className="icon-calendar" ref={this.f_trigger_End}>{/*<img ref={this.f_trigger_End} src="/css/Oneworks/images/icon-calendar.png" />*/}</a>
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Status</span>
+                                    <div className="field">
+                                        {statusList}
                                     </div>
                                 </div>
                                 <div className="button-group">

@@ -136,7 +136,7 @@ const userNameFormat = (userName, subData) => {
   );
 };
 const numberFormat = (number) => {
-  return number_format(number_toFixed(number, 0));
+  return number_format(number_toFixed(number, 2));
 };
 const dateFormat = (createTime) => {
   return moment(createTime).format("l LTS");

@@ -23,7 +23,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusInfoReport" })]
-        public ApiListResult<BonusInfoFrontEnd> GetBonusInfoReport([FromForm] IEnumerable<int> SelectSite, [FromForm] string BonusCode, [FromForm] string TransId, [FromForm] int CurrencyId, [FromForm] string UserName, [FromForm] int PromotionType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)
+        public ApiListResult<BonusInfoFrontEnd> GetBonusInfoReport([FromForm] IEnumerable<int> SelectSite, [FromForm] string BonusCode, [FromForm] string TransId, [FromForm] int CurrencyId, [FromForm] string UserName, [FromForm] int PromotionType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int BaseCurrencyId, [FromForm] decimal TotalAmountShow,[FromForm] int RebateCategoriesId)
         {
             var result = new ApiListResult<BonusInfoFrontEnd>();
             try
@@ -31,7 +31,7 @@ namespace BackendSite.Controllers.Api
                 int PageSize = 10;
                 int TotalPages = 0;
                 int RowCount = 0;
-                result.Data = bonusInfoBLL.GetBonusInfoReport(SelectSite, BonusCode, TransId, CurrencyId, UserName, PromotionType, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                result.Data = bonusInfoBLL.GetBonusInfoReport(SelectSite, BonusCode, TransId, CurrencyId, UserName, PromotionType, StartDate, EndDate, PageSize, BaseCurrencyId, TotalAmountShow, RebateCategoriesId, ref PageNumber, ref TotalPages, ref RowCount);
                 result.PageNumber = PageNumber;
                 result.RowCount = RowCount;
                 result.TotalPages = TotalPages;
@@ -49,9 +49,9 @@ namespace BackendSite.Controllers.Api
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusInfoReport" })]
         [HttpPost]
-        public IActionResult ExportBonusInfoReport(string SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, long StartDate, long EndDate)
+        public IActionResult ExportBonusInfoReport(string SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, long StartDate, long EndDate, int BaseCurrencyId,decimal TotalAmountShow,int RebateCategoriesId)
         {
-            var ExportData = bonusInfoBLL.GetBonusInfoExportReport(SelectSite, BonusCode, TransId, CurrencyId, UserName, PromotionType, StartDate, EndDate);
+            var ExportData = bonusInfoBLL.GetBonusInfoExportReport(SelectSite, BonusCode, TransId, CurrencyId, UserName, PromotionType, StartDate, EndDate, BaseCurrencyId, TotalAmountShow, RebateCategoriesId);
             var stream = excelBLL.Export(ExportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

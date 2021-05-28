@@ -88,11 +88,26 @@ const VipUpgrade = lazy(() => import("./pages/Marketing/VipUpgrade/index"));
 const LatestHighlightVideoManagement = lazy(() =>
   import("./pages/Marketing/LatestHighlightVideoManagement/index")
 );
+const TransferManage = lazy(() =>
+  import("./pages/BankFinancial/TransferManage/index")
+);
 const VipRebateInfoReport = lazy(() =>
   import("./pages/Marketing/VipRebateInfoReport/index")
 );
 const VipRebateMangetment = lazy(() =>
   import("./pages/Marketing/VipRebateMangetment/index")
+);
+
+const WithdrawalLimitManage = lazy(() =>
+  import("./pages/Finance/WithdrawalLimitManage/index")
+);
+
+const DomainManage = lazy(() => import("./pages/Marketing/DomainManage/index"));
+
+const DashBoardNew = lazy(() => import("./pages/Home/DashBoardNew/index"));
+
+const TransferInfoReport = lazy(() =>
+  import("./pages/BankFinancial/TransferInfoReport/index")
 );
 
 export const defaultPage = "VipRebateMangetment";
@@ -390,6 +405,19 @@ export const pages = {
     ],
     layout: layoutType.N88,
   },
+  DomainManage: {
+    comp: (
+      <Suspense fallback="loading...">
+        <DomainManage />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
   StatisticalReport: {
     comp: (
       <Suspense fallback="loading...">
@@ -560,6 +588,19 @@ export const pages = {
     ],
     layout: layoutType.N88,
   },
+  TransferManage: {
+    comp: (
+      <Suspense fallback="loading...">
+        <TransferManage />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
   VipRebateInfoReport: {
     comp: (
       <Suspense fallback="loading...">
@@ -577,6 +618,19 @@ export const pages = {
     comp: (
       <Suspense fallback="loading...">
         <VipRebateMangetment />
+        </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  WithdrawalLimitManage: {
+    comp: (
+      <Suspense fallback="loading...">
+        <WithdrawalLimitManage />
       </Suspense>
     ),
     css: [
@@ -585,5 +639,31 @@ export const pages = {
       "./css/css/vendor/DateTimePicker/DateTimePicker.css"
     ],
     layout: layoutType.N88,
-  }
+  },
+  DashBoardNew: {
+    comp: (
+      <Suspense fallback="loading...">
+        <DashBoardNew />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  TransferInfoReport: {
+    comp: (
+      <Suspense fallback="loading...">
+        <TransferInfoReport />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
 };

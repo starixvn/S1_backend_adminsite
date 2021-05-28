@@ -167,7 +167,7 @@ export default ({
 				{siteRows}
 			</div>
 			{
-				setSite != "" ?
+				setSite !=null && setSite >=0 ?
 					<>
 						<button
 							className="btn btn-add"

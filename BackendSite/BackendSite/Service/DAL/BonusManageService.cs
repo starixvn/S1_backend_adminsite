@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BackendSite.Service.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
@@ -14,10 +15,12 @@ namespace BackendSite.Service.DAL
     public class BonusManageService
     {
         private readonly IConfiguration configuration;
+        private readonly ILogger<BonusManageService> logger;
 
-        public BonusManageService(IConfiguration configuration)
+        public BonusManageService(IConfiguration configuration, ILogger<BonusManageService> logger)
         {
             this.configuration = configuration;
+            this.logger = logger;
         }
 
         public IEnumerable<PromotionInfo> GetPromotionList(string BonusCode, FilterPara filterPara)
@@ -61,7 +64,7 @@ namespace BackendSite.Service.DAL
             var promotion = conn.Query<PromotionInfo>("Admin_Promotion_Get", new { BonusCode, SiteId, PermissionSiteIds }, transaction: trans, commandType: CommandType.StoredProcedure).FirstOrDefault();
             if (promotion != null)
             {
-                promotion.Specific = conn.Query<PromotionSpecific>("Admin_PromotionSpecific_Get", new { BonusCode, SiteId }, transaction: trans, commandType: CommandType.StoredProcedure);
+                promotion.Specific = conn.Query<PromotionSpecific>("Admin_PromotionSpecificV2_Get", new { BonusCode, SiteId }, transaction: trans, commandType: CommandType.StoredProcedure);
 
                 if (promotion.Specific != null)
                 {
@@ -116,9 +119,10 @@ namespace BackendSite.Service.DAL
             p.Add("OnlyRegistered", promotion.OnlyRegistered);
             p.Add("PromotionDeviceType", promotion.PromotionDeviceType);
             p.Add("PromotionAction", promotion.PromotionAction);
+            p.Add("AutoExtend", promotion.AutoExtend);
             p.Add("ErrorCode", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            conn.Execute("Admin_Promotion_Set", p, transaction: trans, commandType: CommandType.StoredProcedure);
+            conn.Execute("Admin_PromotionV3_Set", p, transaction: trans, commandType: CommandType.StoredProcedure);
             errorCode = p.Get<int>("ErrorCode");
             if (errorCode == 0)
             {
@@ -140,11 +144,12 @@ namespace BackendSite.Service.DAL
                         LockedType = specific.LockedType,
                         MinPayout = specific.MinPayout,
                         VN_AffIds = !string.IsNullOrEmpty(specific.VN_AffIds) ? JsonConvert.SerializeObject(specific.VN_AffIds.Split(",")) : null,
-                        VN_AffCodes = !string.IsNullOrEmpty(specific.VN_AffCodes) ? JsonConvert.SerializeObject(specific.VN_AffCodes.Split(",")) : null
+                        VN_AffCodes = !string.IsNullOrEmpty(specific.VN_AffCodes) ? JsonConvert.SerializeObject(specific.VN_AffCodes.Split(",")) : null,
+                        TotalUsageLimit = specific.TotalUsageLimit
                     });
                 }
 
-                conn.Execute("Admin_PromotionSpecific_Set", new
+                conn.Execute("Admin_PromotionSpecificV3_Set", new
                 {
                     promotion.BonusCode,
                     promotion.SiteId,
@@ -324,6 +329,43 @@ namespace BackendSite.Service.DAL
                 Result.ErrorMessage = $"SiteId:{bonusImportPara.SiteId} UserName:{bonusImportPara.UserName} BonusAmount:{bonusImportPara.BonusAmount} " + ex.ToString();
             }
             return Result;
+        }
+        public int SetScratchCardCode(string specialCode, string scratchCardCode,string lastUpdateUser)
+        {
+            int errorCode = 0;
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+                {
+                    string SpName = "Admin_ScratchCardCode_set";
+                    conn.Execute(SpName, new { specialCode, scratchCardCode, lastUpdateUser }, commandType: CommandType.StoredProcedure);
+                   // logger.LogInformation($"success - SpecialCode:{SpecialCode} ScratchCardCode:{ScratchCardCode}");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+               // logger.LogInformation($"Fail - SpecialCode:{SpecialCode} ScratchCardCode:{ScratchCardCode} error:{e.Message}");
+            }
+
+            return errorCode;
+        }
+
+        public IEnumerable<ScratchCard> GetScratchCardList(string specialCode)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                string SpName = "Admin_ScratchCardCodeList_Get";
+                return conn.Query<ScratchCard>(SpName, new { SpecialCode = specialCode, CustId = -1 }, commandType: CommandType.StoredProcedure);
+            }
+        }
+        public IEnumerable<ScratchCardExport> GetScratchCardListExport(string specialCode)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                string SpName = "Admin_ScratchCardCodeListExport_Get";
+                return conn.Query<ScratchCardExport>(SpName, new { SpecialCode = specialCode}, commandType: CommandType.StoredProcedure);
+            }
         }
     }
 }

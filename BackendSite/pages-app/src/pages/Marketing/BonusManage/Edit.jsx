@@ -191,6 +191,10 @@ export default props => {
 		dispatch({ type: defActionType.ONLY_REGISTERED_SET_VALUE, value, dataColumn });
 	};
 
+	const EditAutoExtendValue = (value, dataColumn) => {
+		dispatch({ type: defActionType.AUTOEXTEND_SET_VALUE, value, dataColumn });
+	};
+
 	const GetPromoCategories = (isInit, walletType, value) => {
 		if (walletType !== value) {
 			let param = {
@@ -250,7 +254,8 @@ export default props => {
 					SelectTpId,
 					EditCurrencyAmountValue,
 					EditTpGameCategoryValue,
-					EditOnlyRegisteredValue
+					EditOnlyRegisteredValue,
+					EditAutoExtendValue
 				}}
 				siteList={props.SiteList}
 				IsAdd={props.IsAdd}

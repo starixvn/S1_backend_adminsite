@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace BackendSite.Service.BLL
 {
@@ -68,10 +70,10 @@ namespace BackendSite.Service.BLL
             {
                 cache.Set(key, vipLevelCache, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30)));
             }
-            
+
             return vipLevelCache;
         }
-        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency,string bankAccountNumber, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency,string bankAccountNumber, IEnumerable<int>  selectstatus, ref int pageNumber, out int totalPages, out int rowCount)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
             List<int> currncyList = new List<int>();
@@ -80,10 +82,10 @@ namespace BackendSite.Service.BLL
                 currncyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
 
-            return custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList()));
+            return custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, selectstatus, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList()));
         }
 
-        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int? AffId, IEnumerable<int> selectCurrency, string BankAccountNumber)
+        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int? AffId, IEnumerable<int> selectCurrency, string BankAccountNumber, IEnumerable<int> selectStatus)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
 
@@ -93,7 +95,7 @@ namespace BackendSite.Service.BLL
                 currncyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
 
-            return custInfoService.GetCustInfoExportList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, JsonConvert.SerializeObject(siteList), AffId, selectCurrency, BankAccountNumber, JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList()));
+            return custInfoService.GetCustInfoExportList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, JsonConvert.SerializeObject(siteList), AffId, selectCurrency, BankAccountNumber, JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList()), selectStatus);
         }
 
         public async Task<CustInfoDetail> GetCustInfoDetailAsync(int custId, string userName)
@@ -102,9 +104,11 @@ namespace BackendSite.Service.BLL
             var custInfoDetail = custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
             if (custInfoDetail != null)
             {
-                var DepositAndWithdrawalTime = custInfoService.GetCustDepositAndWithdrawalTime(custId);
-                custInfoDetail.LastDepositTime = DepositAndWithdrawalTime.LastDepositTime == null ? "": DepositAndWithdrawalTime.LastDepositTime?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.LastWithdrawlTime = DepositAndWithdrawalTime.LastWithdrawlTime == null ? "" : DepositAndWithdrawalTime.LastWithdrawlTime?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.LastDepositTime = custInfoDetail.LastDepositTimeRecord == null ? "" : custInfoDetail.LastDepositTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.LastWithdrawlTime = custInfoDetail.LastWithdrawalTimeRecord == null ? "" : custInfoDetail.LastWithdrawalTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.LastBettingTime = custInfoDetail.LastTpBetRecordTimeRecord == null ? "" : custInfoDetail.LastTpBetRecordTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.FirstDepositTime = custInfoDetail.FirstDepositTimeRecord == null ? "" : string.Format("{0} (+08:00)", custInfoDetail.FirstDepositTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture));
+
                 custInfoDetail.tpWallet = await tpBLL.GetTpWalletAsync(custInfoDetail.CustId);
                 custInfoDetail.promotions = promotionService.GetPromotionListByCustId(custInfoDetail.CustId);
                 if (custInfoDetail.promotions != null)
@@ -121,9 +125,9 @@ namespace BackendSite.Service.BLL
                         }
                         else
                         {
-                             promotion.custRollOver = new CustRollOver() { RollOver = 0,TurnOver = 0 };
+                            promotion.custRollOver = new CustRollOver() { RollOver = 0, TurnOver = 0 };
                         };
-                        
+
                     }
                 }
             }
@@ -147,30 +151,6 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.SetCustInfo(custId, Level, FullName, Birthday_Y, Birthday_M, Birthday_D, PhoneNumber, EMail, Operator);
         }
-        public CustPhotoId GetCustPhotoId(int custId)
-        {
-            return custInfoService.GetCustPhotoId(custId);
-        }
-        public int SetCustPhotoId(int custId, int siteId, string picFileName, byte[] photoIdPic)
-        {
-            return custInfoService.SetCustPhotoId(custId, siteId, picFileName, photoIdPic);
-        }
-        public bool DelCustPhotoId(int custId)
-        {
-            return custInfoService.DelCustPhotoId(custId);
-        }
-        public bool AddCustNote(int custId, string Note, string Operator)
-        {
-            return custInfoService.AddCustNote(custId, Note, Operator);
-        }
-        public IEnumerable<CustNote> GetCustNotes(int custId)
-        {
-            return custInfoService.GetCustNotes(custId);
-        }
-        public bool SetCustNotes(int custId, int noteId, string note, int type, string Operator)
-        {
-            return custInfoService.SetCustNotes(custId, noteId, note, type, Operator);
-        }
         public IEnumerable<LoginLog> GetLoginLogByCust(int CustId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             return custInfoService.GetLoginLogByCust(CustId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
@@ -191,10 +171,6 @@ namespace BackendSite.Service.BLL
         public bool ResetCustBankInfo(int CustId)
         {
             return custInfoService.ResetCustBankInfo(CustId);
-        }
-        public bool SetCustStatus(int CustId, int status)
-        {
-            return custInfoService.SetCustStatus(CustId, status);
         }
         public decimal GetWithdrawalAvailableBalance(int custId)
         {
@@ -240,19 +216,19 @@ namespace BackendSite.Service.BLL
             return custInfoService.GetTeleCSD(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut, PageNumber, PageSize);
         }
 
-        public int UpdateCustomerTele(int siteId,int custId,string Operator)
+        public int UpdateCustomerTele(int siteId, int custId, string Operator)
         {
             return custInfoService.UpdateCustomerTele(siteId, custId, Operator);
         }
 
         public IEnumerable<CustTeleExport> GetTeleCSDExportData(string SiteIds, string Currency, long StartDate, long EndDate, string Deposit, string DormantUser, string CallOut)
         {
-            return custInfoService.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);           
+            return custInfoService.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);
         }
 
-        public PromotionListData GetPromotionListByCustIdAndDate(int custId, long StartDate, long EndDate,int PageNumber, int PageSize)
+        public PromotionListData GetPromotionListByCustIdAndDate(int custId, long StartDate, long EndDate, int PageNumber, int PageSize)
         {
-            var result =  promotionService.GetPromotionListByCustIdAndDate(custId, StartDate, EndDate, PageNumber, PageSize);
+            var result = promotionService.GetPromotionListByCustIdAndDate(custId, StartDate, EndDate, PageNumber, PageSize);
             if (result.PromotionList != null)
             {
                 foreach (var promotion in result.PromotionList)
@@ -274,6 +250,171 @@ namespace BackendSite.Service.BLL
             }
             return result;
         }
+
+        #region
+
+        #endregion
+
+        #region Customer Photo
+
+        public CustPhotoId GetCustPhotoId(int custId)
+        {
+            return custInfoService.GetCustPhotoId(custId);
+        }
+        public int SetCustPhotoId(int custId, int siteId, string picFileName, byte[] photoIdPic)
+        {
+            return custInfoService.SetCustPhotoId(custId, siteId, picFileName, photoIdPic);
+        }
+        public bool DelCustPhotoId(int custId)
+        {
+            return custInfoService.DelCustPhotoId(custId);
+        }
+
+        #endregion
+
+        #region Customer Note
+
+        public bool AddCustNote(int custId, string Note, string Operator)
+        {
+            return custInfoService.AddCustNote(custId, Note, Operator);
+        }
+        public IEnumerable<CustNote> GetCustNotes(int custId)
+        {
+            return custInfoService.GetCustNotes(custId);
+        }
+        public bool SetCustNotes(int custId, int noteId, string note, int type, string Operator)
+        {
+            return custInfoService.SetCustNotes(custId, noteId, note, type, Operator);
+        }
+
+        #endregion
+
+        #region Customer Status Update
+
+        public bool SetCustStatus(string menu, int custId, int status, string reason, string action, string user)
+        {
+            bool result = false;
+            Dictionary<string, dynamic> mainInfo = new Dictionary<string, dynamic>();
+            Dictionary<string, dynamic> noteInfo = new Dictionary<string, dynamic>();
+            mainInfo.Add("MenuName", "Customer Info");
+            mainInfo.Add("Action", action);
+            noteInfo.Add("MenuName", "Customer Info");
+            noteInfo.Add("Action", "Add Note");
+
+            using (TransactionScope scope = new TransactionScope())
+            {
+                #region Update Status
+
+                result = custInfoService.SetCustStatus(custId, status);
+
+                if (!result)
+                {
+                    scope.Dispose();
+
+                    return false;
+                };
+
+                if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Update, mainInfo, user) <= 0)
+                {
+                    scope.Dispose();
+
+                    return false;
+                }
+
+                #endregion
+
+                if (result)
+                {
+                    #region Insert Reason For Update Status
+
+                    if (!custInfoService.AddCustNote(custId, action + " Reason : " + reason, user))
+                    {
+                        scope.Dispose();
+
+                        return false;
+                    }
+
+                    if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Create, noteInfo, user) <= 0)
+                    {
+                        scope.Dispose();
+
+                        return false;
+                    }
+
+                    #endregion
+                }
+
+                scope.Complete();
+            }
+
+            return result;
+
+        }
+
+        /// <summary>
+        /// 刪除在線使用者資料
+        /// </summary>
+        /// <param name="custId">客戶ID</param>
+        /// <returns></returns>
+        public int DeleteOnUserData(string menu, int custId, string reason, string user)
+        {
+            int result = 0;
+            Dictionary<string, dynamic> mainInfo = new Dictionary<string, dynamic>();
+            Dictionary<string, dynamic> noteInfo = new Dictionary<string, dynamic>();
+            mainInfo.Add("MenuName", "Customer Info");
+            mainInfo.Add("Action", "Kick Out");
+            noteInfo.Add("MenuName", "Customer Info");
+            noteInfo.Add("Action", "Add Note");
+
+            using (TransactionScope scope = new TransactionScope())
+            {
+                #region Kick Out User
+
+                result = custInfoService.DeleteOnUserData(custId);
+
+                if (result <= 0)
+                {
+                    scope.Dispose();
+
+                    return 0;
+                };
+
+                if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Delete, mainInfo, user) <= 0)
+                {
+                    scope.Dispose();
+
+                    return 0;
+                }
+
+                #endregion
+
+                if (result > 0)
+                {
+                    #region Insert Reason For Kick Out
+
+                    if (!custInfoService.AddCustNote(custId, "Kick Out Reason : " + reason, user))
+                    {
+                        scope.Dispose();
+
+                        return 0;
+                    }
+
+                    if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Create, noteInfo, user) <= 0)
+                    {
+                        scope.Dispose();
+
+                        return 0;
+                    }
+
+                    #endregion
+                }
+
+                scope.Complete();
+            }
+
+            return result;
+        }
+
+        #endregion
     }
 }
- 

@@ -12,7 +12,8 @@ export const defActionType = {
 	GET_TPGAME_CATEGORIES: "GET_TPGAME_CATEGORIES",
 	CURRENCY_SET_TpGame_VALUE: "CURRENCY_SET_TpGame_VALUE",
 	SPECIALBONUS_VALUE: "SPECIALBONUS_VALUE",
-	ONLY_REGISTERED_SET_VALUE: "ONLY_REGISTERED_SET_VALUE"
+	ONLY_REGISTERED_SET_VALUE: "ONLY_REGISTERED_SET_VALUE",
+	AUTOEXTEND_SET_VALUE: "AUTOEXTEND_SET_VALUE"
 };
 
 export const initialState = (IsAdd, datas, siteList) => {
@@ -49,7 +50,8 @@ export const initialState = (IsAdd, datas, siteList) => {
 			specialCode: "",
 			isSpecial: false,
 			specialBonusCheck: [],
-			onlyRegistered: []
+			onlyRegistered: [],
+			autoExtend: []
 		};
 	} else {
 		let _specific = SetSpecific(
@@ -88,6 +90,7 @@ export const initialState = (IsAdd, datas, siteList) => {
 			isSpecial: datas.isSpecial,
 			specialBonusCheck: datas.isSpecial ? [1] : [],
 			onlyRegistered: datas.onlyRegistered ? [1] : [],
+			autoExtend: datas.autoExtend ? [1] : [],
 		};
 	}
 };
@@ -103,6 +106,7 @@ const initSpecific = {
 	affid: "",
 	usage: "0",
 	rollOver: "",
+	totalUsageLimit:"0",
 	bonusAmountType: null,
 	bonus: "",
 	maxBonus: "",
@@ -213,7 +217,6 @@ export function reducer(state, action) {
 			};
 
 		case defActionType.MAIN_SET_VALUE:
-			console.log(action);
 			return {
 				...state,
 				[action.dataColumn]: action.value
@@ -373,10 +376,16 @@ export function reducer(state, action) {
 
 		case defActionType.ONLY_REGISTERED_SET_VALUE:
 			let newValue = state.onlyRegistered.includes(action.value) ? [] : [action.value];
-			console.log(newValue);
 			return {
 				...state,
 				onlyRegistered: newValue
+			};
+
+		case defActionType.AUTOEXTEND_SET_VALUE:
+			let newAutoValue = state.autoExtend.includes(action.value) ? [] : [action.value];
+			return {
+				...state,
+				autoExtend: newAutoValue
 			};
 
 		default:

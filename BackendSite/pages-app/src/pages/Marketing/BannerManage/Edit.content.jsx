@@ -4,7 +4,7 @@ import CheckBox from "./Component/Checkbox";
 import SelectBox from "./Component/SelectBox";
 import RadioBox from "./Component/RadioBox";
 import DateTimePickerElem from "./Component/DateTimePicker";
-import moment from "moment";
+import moment from "moment-timezone";
 import { initBannerType, initActionModeType, initShowStatusType } from "./defCols";
 
 export default ({ state, action, IsAdd, processing }) => {

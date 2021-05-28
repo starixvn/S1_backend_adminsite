@@ -56,6 +56,8 @@ namespace BackendSite.Service.Model
         public int Flag { set; get; }
         public DateTime? UpdateTime { set; get; }
         //public virtual IEnumerable<Comments> Comments { get; set; }
+        public bool HasPic { get; set; }
+        public int BankSlipPicCount { get; set; }
     }
     public class WithdrawalInfo
     {
@@ -134,6 +136,8 @@ namespace BackendSite.Service.Model
         public double WithdrawalMin { get; set; }
 
         public double WithdrawalMax { get; set; }
+        public DateTime UpdateTime { get; set; }
+        public string UpdateOperator { get; set; }
     }
 
     public class WithdrawalKYC
@@ -142,5 +146,22 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public double Amount { get; set; }
 
+    }
+    public class WithdrawalData
+    {
+        public bool HasDetail { get; set; }
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
+        public int WithdrawalMin { get; set; }
+    }
+    public class WithdrawalMinInfo
+    {
+        public int CurrencyId { get; set; }
+        public int WithdrawalMin { get; set; }
+    }
+    public class BankSlipPic
+    {
+        public int BankSlipPicCount { get; set; }
     }
 }

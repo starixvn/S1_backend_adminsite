@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,14 +69,16 @@ namespace BackendSite.Service.BLL
 
         #endregion
 
-        public IEnumerable<MainFinancialModel> GetMainFinancialReport(IEnumerable<int> CurrencyIds,
-                                                                      string siteIds,
+        public IEnumerable<MainFinancialModel> GetMainFinancialReport(string siteIds,
                                                                       string currencyIds,
                                                                       string startDate,
                                                                       string endDate)
         {
             Dictionary<string, MainFinancialModel> keyValuePairs = new Dictionary<string, MainFinancialModel>();
             string dateFormat = string.Empty;
+
+
+            List<int> CurrencyIds = JsonConvert.DeserializeObject<List<int>>(currencyIds);
 
             var reportList = reportService.GetMainFinancialReport(siteIds,
                                                                   currencyIds,
@@ -270,12 +273,14 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<StatisticalReportModel> GetStatisticalReport(string siteIds,
+                                                                        string timeZone,
                                                                         string startDate,
                                                                         string endDate)
         {
             Dictionary<string, StatisticalReportModel> keyValuePairs = new Dictionary<string, StatisticalReportModel>();
             string dateFormat = string.Empty;
             var statisticalList = reportService.GetStatisticalReport(siteIds,
+                                                                     timeZone,
                                                                      startDate,
                                                                      endDate);
 
@@ -407,15 +412,14 @@ namespace BackendSite.Service.BLL
             return Data;
         }
 
-        public IEnumerable<UserOnlineReportModel> GetUserOnlineReport(IEnumerable<int> siteList,
-                                                                      string siteIds,
+        public IEnumerable<UserOnlineReportModel> GetUserOnlineReport(string siteIds,
                                                                       string selectDate)
         {
             Dictionary<string, UserOnlineReportModel> keyValuePairs = new Dictionary<string, UserOnlineReportModel>();
             string dateTimeFormat = string.Empty;
             var userOnlineList = reportService.GetUserOnlineReport(siteIds,
                                                                    selectDate);
-
+            List<int> siteList = JsonConvert.DeserializeObject<List<int>>(siteIds);
             var serverInfoList = reportService.GetServerInfoList();
 
             #region Data Statistical

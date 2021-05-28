@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import WebAPI from "../../../module/WebAPI";
 import moment from "moment";
 import Edit from "./Edit";
+import ScratchList from "./ScratchList";
 import qs from "qs";
 import {
 	defActionType,
@@ -52,10 +53,10 @@ const App = () => {
 
 	useEffect(() => {
 		let param1 = {
-			Url: "Marketing/GetAllSites"
+			Url: "Common/AdminUserSiteList"
 		};
 		let aaa = [];
-		WebAPI.fetchData(param1).then(x => {
+		WebAPI.PostData(param1).then(x => {
 			if (isMountedRef.current) {
 				if (x.data.errorCode === 0) {
 					let initSitnemaFilter = GetInitSelectedSiteName(x.data.data);
@@ -93,9 +94,9 @@ const App = () => {
 
 	useEffect(() => {
 		let param = {
-			Url: "Marketing/GetAllSites"
+			Url: "Common/AdminUserSiteList"
 		};
-		WebAPI.fetchData(param).then(res => {
+		WebAPI.PostData(param).then(res => {
 			if (isMountedRef.current) {
 				if (res.data.errorCode === 0) {
 					dispatch({
@@ -183,7 +184,8 @@ const App = () => {
 						BeenUsed: info.beenUsed,
 						RebateList: tpGame,
 						MinPayout: Number(info.minPayout),
-						VN_AffCodes: info.affid
+						VN_AffCodes: info.affid,
+						TotalUsageLimit: info.totalUsageLimit
 					};
 				});
 
@@ -209,7 +211,8 @@ const App = () => {
 				RedeemHours: Number(promotion.redeemHours) ? Number(promotion.redeemHours) : 0,
 				SpecialCode: promotion.specialCode,
 				IsSpecial: promotion.isSpecial,
-				OnlyRegistered: promotion.onlyRegistered.length > 0 ? true : false
+				OnlyRegistered: promotion.onlyRegistered.length > 0 ? true : false,
+				AutoExtend: promotion.autoExtend.length > 0 ? 1 : 0
 			};
 			let _select = {
 				SiteidFilter: JSON.stringify(sitnemaFilter),
@@ -309,6 +312,49 @@ const App = () => {
 		}
 	};
 
+	const ClickEdit2 = async idx => {
+		if (!processing) {
+			if (isMountedRef.current) {
+				setProcessing(true);
+			}
+			const scratchCardData = await WebAPI.PostData({
+				Url: "BonusManage/GetScratchCardList",
+				Data: {
+					SpecialCode: state.promotionList[idx].specialCode,
+				}
+			}).then(
+				res => {
+					return {
+						errorCode: res.data.errorCode,
+						data: res.data.data,
+						msg: res.data.message
+					};
+				},
+				err => {
+					return { errorCode: 991 };
+				}
+			);
+			if (scratchCardData.errorCode === 0) {
+				dispatch({
+					type: defActionType.SCRATCH_CARD_LIST,
+					scratchCardData: scratchCardData.data,
+					specialCode: state.promotionList[idx].specialCode,
+					popBoxIsOpenGen: false,
+			        genNum: 0
+				});
+			} else {
+				let msg =
+				scratchCardData.errorCode === 991 
+						? "API Server Error."
+						: scratchCardData.msg;
+				alert(msg);
+			}
+
+			if (isMountedRef.current) {
+				setProcessing(false);
+			}
+		}
+	};
 	const UpdatePromotionStatus = idx => {
 		let _promo = state.promotionList[idx];
 		let msg =
@@ -358,9 +404,20 @@ const App = () => {
 			}
 		});
 	};
+	const ClickGen= async idx => {
+		dispatch({
+			type: defActionType.HANDEL_POPBOXGEN,
+			popBoxIsOpenGen: true,
+			genNum: 0
+			
+		});
+	};
 
 	const SetCloneValue = (value, dataColumn) => {
 		dispatch({ type: defActionType.SET_CLONE_VALUE, value, dataColumn });
+	};
+	const SetGenNumValue = (value) => {
+		dispatch({ type: defActionType.SET_GENNUM_VALUE, value });
 	};
 
 	const ClickCancle = () => {
@@ -368,6 +425,13 @@ const App = () => {
 			type: defActionType.HANDEL_POPBOX,
 			popBoxIsOpen: false,
 			promotionData: []
+		});
+	};
+	const ClickGenCancle = () => {
+		dispatch({
+			type: defActionType.HANDEL_POPBOXGEN,
+			popBoxIsOpenGen: false,
+			genNum: 0
 		});
 	};
 
@@ -410,7 +474,71 @@ const App = () => {
 			);
 		}
 	};
-
+	const GenerarStart = () => {
+		if (!processing && state.specialCode && state.genNum > 0) {
+			if (isMountedRef.current) {
+				setProcessing(true);
+			}
+			let param = {
+				Url: "BonusManage/GenScratchCardCode",
+				Data: {
+					SpecialCode: state.specialCode,
+					Num: state.genNum
+				}
+			};
+			WebAPI.PostData(param).then(
+				res => {
+					if (isMountedRef.current) {
+						if (res.data.errorCode === 0) {
+							let param = {
+								Url: "BonusManage/GetScratchCardList",
+								Data: {
+									SpecialCode: state.specialCode,
+								}
+							};
+							WebAPI.PostData(param).then(
+								res => {
+									if (isMountedRef.current) {
+										if (res.data.errorCode === 0) {
+											dispatch({
+												type: defActionType.SCRATCH_CARD_LIST,
+												scratchCardData: res.data.data,
+												specialCode: state.specialCode,
+												popBoxIsOpenGen: false,
+												genNum: 0
+											});
+										} else {
+											alert(res.data.message ?? "failed to get new ScratchCard List.");
+										}
+										setProcessing(false);
+									}
+								},
+								err => {
+									if (isMountedRef.current) {
+										alert("API Server Error.");
+										setProcessing(false);
+									}
+								}
+							);
+						} else {
+							alert(res.data.message ?? "failed to Generar ScratchCardCode.");
+						}
+						setProcessing(false);
+					}
+				},
+				err => {
+					if (isMountedRef.current) {
+						alert("API Server Error.");
+						setProcessing(false);
+					}
+				}
+			);
+		}else if(state.genNum <=0)
+		{
+			alert("Number cannot be zero");
+	    }
+	};
+    
 	const StateCheckBox = (value, dataColumn) => {
 		if (statusCheck.length > 0) {
 			setStatusCheck([])
@@ -446,41 +574,95 @@ const App = () => {
 
 	const skipField = {
 		"default": ["currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours", "minPayout", "specialCode", "promotionAction"],
+		"2": ["currentLang", "productCategory", "lockedType", "periodWeek", "periodMonth", "redeemHours", "minPayout", "specialCode", "promotionAction"],
 		"6": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "affid", "specialCode", "promotionAction"],
 		"7": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "affid", "specialCode", "promotionAction"],
 		"8": ["expiryDays", "walletType", "categoryId", "tpId", "rollOver", "minPayout", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours", "affid", "specialCode"],
 	}
 
-	return state.panelType === defPanelType.Main || state.panelType === defPanelType.Copy ? (
-		<Main
-			ClickCreateBonus={ClickCreateBonus}
-			ClickEdit={ClickEdit}
-			UpdatePromotionStatus={UpdatePromotionStatus}
-			SelectClick={SelectClick}
-			promotionList={state.promotionList}
-			Datas={state.promotionData}
-			NewDatas={state.clonePromotionData}
-			Action={{ ClickClone, ClickCancle, SetCloneValue, SubmitClone }}
-			IsOpen={state.popBoxIsOpen}
-			SiteList={state.siteList}
-			StateFilter={stateFilter}
-			SitnemaFilter={sitnemaFilter}
-			PromotionTypeFilter={promotionTypeFilter}
-			StatusCheck={statusCheck}
-			SetSitnemaFilter={setSitnameFilter}
-			SetPromotionTypeFilter={setPromotionTypeFilter}
-			StateCheckBox={StateCheckBox}
-		/>
-	) : (
-		<Edit
-			Datas={state.promotionData}
-			SiteList={state.siteList}
-			action={{ SetPromotion, ClickBack }}
-			IsAdd={state.panelType === defPanelType.Add}
-			processing={processing}
-			skipField={skipField}
-		/>
-	);
+	if(state.panelType === defPanelType.Main || state.panelType === defPanelType.Copy )
+	{
+		return (
+			<Main
+				ClickCreateBonus={ClickCreateBonus}
+				ClickEdit={ClickEdit}
+				ClickEdit2={ClickEdit2}
+				UpdatePromotionStatus={UpdatePromotionStatus}
+				SelectClick={SelectClick}
+				promotionList={state.promotionList}
+				Datas={state.promotionData}
+				NewDatas={state.clonePromotionData}
+				Action={{ ClickClone, ClickCancle, SetCloneValue, SubmitClone, ClickGen, ClickGenCancle, GenerarStart, SetGenNumValue}}
+				IsOpen={state.popBoxIsOpen}
+				SiteList={state.siteList}
+				StateFilter={stateFilter}
+				SitnemaFilter={sitnemaFilter}
+				PromotionTypeFilter={promotionTypeFilter}
+				StatusCheck={statusCheck}
+				SetSitnemaFilter={setSitnameFilter}
+				SetPromotionTypeFilter={setPromotionTypeFilter}
+				StateCheckBox={StateCheckBox}
+				IsOpenGen={state.popBoxIsOpenGen}
+			/>
+		) ;
+	} else if(state.panelType === defPanelType.SList)
+	{
+		return (
+			<ScratchList
+				Datas={state.scratchCardData}
+				action={{ ClickBack, ClickGen, GenerarStart, ClickGen, ClickGenCancle, GenerarStart, SetGenNumValue}}
+				processing={processing}
+				skipField={skipField}
+				IsOpenGen={state.popBoxIsOpenGen}
+			/>
+		);
+	}else 
+	{
+		return (
+			<Edit
+				Datas={state.promotionData}
+				SiteList={state.siteList}
+				action={{ SetPromotion, ClickBack }}
+				IsAdd={state.panelType === defPanelType.Add}
+				processing={processing}
+				skipField={skipField}
+			/>
+		);
+	}
+
+
+
+	// return state.panelType === defPanelType.Main || state.panelType === defPanelType.Copy ? (
+	// 	<Main
+	// 		ClickCreateBonus={ClickCreateBonus}
+	// 		ClickEdit={ClickEdit}
+	// 		ClickEdit2={ClickEdit2}
+	// 		UpdatePromotionStatus={UpdatePromotionStatus}
+	// 		SelectClick={SelectClick}
+	// 		promotionList={state.promotionList}
+	// 		Datas={state.promotionData}
+	// 		NewDatas={state.clonePromotionData}
+	// 		Action={{ ClickClone, ClickCancle, SetCloneValue, SubmitClone }}
+	// 		IsOpen={state.popBoxIsOpen}
+	// 		SiteList={state.siteList}
+	// 		StateFilter={stateFilter}
+	// 		SitnemaFilter={sitnemaFilter}
+	// 		PromotionTypeFilter={promotionTypeFilter}
+	// 		StatusCheck={statusCheck}
+	// 		SetSitnemaFilter={setSitnameFilter}
+	// 		SetPromotionTypeFilter={setPromotionTypeFilter}
+	// 		StateCheckBox={StateCheckBox}
+	// 	/>
+	// ) : (
+	// 	<Edit
+	// 		Datas={state.promotionData}
+	// 		SiteList={state.siteList}
+	// 		action={{ SetPromotion, ClickBack }}
+	// 		IsAdd={state.panelType === defPanelType.Add}
+	// 		processing={processing}
+	// 		skipField={skipField}
+	// 	/>
+	// );
 };
 
 export default App;

@@ -128,7 +128,7 @@ namespace BackendSite.Controllers
             return View();
         }
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManage" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         public IActionResult WithdrawalLimitManagement()
         {
             return View();
@@ -145,6 +145,11 @@ namespace BackendSite.Controllers
         }
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositSubmission" })]
         public IActionResult DepositSubmission()
+        {
+            return View();
+        }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManage" })]
+        public IActionResult WithdrawalLimitManage()
         {
             return View();
         }

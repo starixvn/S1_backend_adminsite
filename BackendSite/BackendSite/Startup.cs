@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using Microsoft.AspNetCore.Http;
 
 namespace BackendSite
@@ -45,47 +46,51 @@ namespace BackendSite
             services.AddSingleton<CodeGenerator>();
 
             /*DAL*/
-            services.AddSingleton<ServerInfoService>();
-            services.AddSingleton<PendingFundService>();
-            services.AddSingleton<AdminService>();
-            services.AddSingleton<DepositService>();
-            services.AddSingleton<WithdrawalService>();
-            services.AddSingleton<WalletService>();
-            services.AddSingleton<BankDetailService>();
-            services.AddSingleton<AdminUserService>();
-            services.AddSingleton<MessageService>();
-            services.AddSingleton<MenuService>();
-            services.AddSingleton<CustInfoService>();
-            services.AddSingleton<LocalBankService>();
-            services.AddSingleton<AdjustmentService>();
-            services.AddSingleton<ThirdPartyService>();
-            services.AddSingleton<MarketingService>();
-            services.AddSingleton<RollOverService>();
-            services.AddSingleton<WithdrawalLimitService>();
-            services.AddSingleton<PromotionService>();
-            services.AddSingleton<PermissionService>();
-            services.AddSingleton<AdminGroupService>();
-            services.AddSingleton<WinLostReportService>();
-            services.AddSingleton<PaymentAdjustmentReportService>();
-            services.AddSingleton<BonusInfoService>();
-            services.AddSingleton<PaymentManageService>();
-            services.AddSingleton<CustTurnoverService>();
-            services.AddSingleton<BonusCashBackService>();
-            services.AddSingleton<HomeService>();
-            services.AddSingleton<BonusManageService>();
-            services.AddSingleton<NewsServices>();
-            services.AddSingleton<RebateManageService>();
-            services.AddSingleton<ReportService>();
-            services.AddSingleton<BannerManageService>();
-            services.AddSingleton<ReferralManagementService>();
-            services.AddSingleton<SportsService>();
-            services.AddSingleton<PrizeService>();
-            services.AddSingleton<RebateManageService>();
-  
-            services.AddSingleton<VipLevelService>();
-            services.AddSingleton<GameCasinoManageService>();
-            services.AddSingleton<BankFinancialService>();
-            services.AddSingleton<LatestHighlightVideoManagementService>();
+            //services.AddSingleton<ServerInfoService>();
+            //services.AddSingleton<PendingFundService>();
+            //services.AddSingleton<AdminService>();
+            //services.AddSingleton<DepositService>();
+            //services.AddSingleton<WithdrawalService>();
+            //services.AddSingleton<WalletService>();
+            //services.AddSingleton<BankDetailService>();
+            //services.AddSingleton<AdminUserService>();
+            //services.AddSingleton<MessageService>();
+            //services.AddSingleton<MenuService>();
+            //services.AddSingleton<CustInfoService>();
+            //services.AddSingleton<LocalBankService>();
+            //services.AddSingleton<AdjustmentService>();
+            //services.AddSingleton<ThirdPartyService>();
+            //services.AddSingleton<MarketingService>();
+            //services.AddSingleton<RollOverService>();
+            //services.AddSingleton<WithdrawalLimitService>();
+            //services.AddSingleton<PromotionService>();
+            //services.AddSingleton<PermissionService>();
+            //services.AddSingleton<AdminGroupService>();
+            //services.AddSingleton<WinLostReportService>();
+            //services.AddSingleton<PaymentAdjustmentReportService>();
+            //services.AddSingleton<BonusInfoService>();
+            //services.AddSingleton<PaymentManageService>();
+            //services.AddSingleton<CustTurnoverService>();
+            //services.AddSingleton<BonusCashBackService>();
+            //services.AddSingleton<HomeService>();
+            //services.AddSingleton<BonusManageService>();
+            //services.AddSingleton<NewsServices>();
+            //services.AddSingleton<RebateManageService>();
+            //services.AddSingleton<ReportService>();
+            //services.AddSingleton<BannerManageService>();
+            //services.AddSingleton<ReferralManagementService>();
+            //services.AddSingleton<SportsService>();
+            //services.AddSingleton<PrizeService>();
+            //services.AddSingleton<RebateManageService>(); //重複了...
+
+            //services.AddSingleton<VipLevelService>();
+            //services.AddSingleton<GameCasinoManageService>();
+            //services.AddSingleton<BankFinancialService>();
+            //services.AddSingleton<LatestHighlightVideoManagementService>();
+            //services.AddSingleton<DomainTableService>();
+            //services.AddSingleton<ReasonManagementService>();
+            //services.AddSingleton<DashBoardService>();
+
             //var dal = AppDomain.CurrentDomain.GetAssemblies()
             //           .SelectMany(t => t.GetTypes())
             //           .Where(t => t.IsClass && t.Namespace == "BackendSite.Service.DAL");
@@ -95,56 +100,90 @@ namespace BackendSite
             //    services.AddSingleton(s);
             //}
 
-            /*BLL*/
-            services.AddSingleton<ServerInfoBLL>();
-            services.AddSingleton<PendingFundBLL>();
-            services.AddSingleton<AdminBLL>();
-            services.AddSingleton<SelLangBLL>();
-            services.AddSingleton<DepositBLL>();
-            services.AddSingleton<WithdrawalBLL>();
-            services.AddSingleton<BankDetailBLL>();
-            services.AddSingleton<MessageBLL>();
-            services.AddSingleton<AuthorizeBLL>();
-            services.AddSingleton<CustInfoBLL>();
-            services.AddSingleton<MarketingBLL>();
-            services.AddSingleton<PaymentBLL>();
-            services.AddSingleton<TpBLL>();
-            services.AddSingleton<ExcelBLL>();
-            services.AddSingleton<AdminGroupBLL>();
-            services.AddSingleton<PermissionBLL>();
-            services.AddSingleton<AdminUserBLL>();
-            services.AddSingleton<MenuBLL>();
-            services.AddSingleton<WinLostReportBLL>();
-            services.AddSingleton<PaymentAdjustmentReportBLL>();
-            services.AddSingleton<BonusInfoBLL>();
-            services.AddSingleton<PaymentManageBLL>();
-            services.AddSingleton<AdjustWithdrawalLimitBLL>();
-            services.AddSingleton<BonusCashBackBLL>();
-            services.AddSingleton<HomeBLL>();
-            services.AddSingleton<BonusManageBLL>();
-            services.AddSingleton<NewsBLL>();
-            services.AddSingleton<RebateManageBLL>();
-            
-            services.AddSingleton<ReportBLL>();
-            services.AddSingleton<BannerManageBLL>();
-            services.AddSingleton<ReportExcelBLL>();
-            services.AddSingleton<ReferralManagementBLL>();
-            services.AddSingleton<SportsBLL>();
-            services.AddSingleton<PrizeBLL>();
-            services.AddSingleton<RebateManageBLL>();
-            services.AddSingleton<VipLevelBLL>();
-            services.AddSingleton<GameCasinoManageBLL>();
-            services.AddSingleton<BankFinancialBLL>();
-            services.AddSingleton<LatestHighlightVideoManagementBLL>();
+            var daltest = AppDomain.CurrentDomain.GetAssemblies();
 
-            // var bll = AppDomain.CurrentDomain.GetAssemblies()
-            //.SelectMany(t => t.GetTypes())
-            //.Where(t => t.IsClass && t.Namespace == "BackendSite.Service.BLL");
+            foreach (var item in daltest)
+            {
+                var list = item.DefinedTypes.Where(t => t.IsClass
+                                                        && t.Namespace == "BackendSite.Service.DAL"
+                                                        && t.Name.Contains("Service")).ToList();
+
+                list.ForEach((type) =>
+                {
+                    services.AddSingleton(type, type);
+                });
+
+            }
+
+            /*BLL*/
+            //services.AddSingleton<ServerInfoBLL>();
+            //services.AddSingleton<PendingFundBLL>();
+            //services.AddSingleton<AdminBLL>();
+            //services.AddSingleton<SelLangBLL>();
+            //services.AddSingleton<DepositBLL>();
+            //services.AddSingleton<WithdrawalBLL>();
+            //services.AddSingleton<BankDetailBLL>();
+            //services.AddSingleton<MessageBLL>();
+            //services.AddSingleton<AuthorizeBLL>();
+            //services.AddSingleton<CustInfoBLL>();
+            //services.AddSingleton<MarketingBLL>();
+            //services.AddSingleton<PaymentBLL>();
+            //services.AddSingleton<TpBLL>();
+            //services.AddSingleton<ExcelBLL>();
+            //services.AddSingleton<AdminGroupBLL>();
+            //services.AddSingleton<PermissionBLL>();
+            //services.AddSingleton<AdminUserBLL>();
+            //services.AddSingleton<MenuBLL>();
+            //services.AddSingleton<WinLostReportBLL>();
+            //services.AddSingleton<PaymentAdjustmentReportBLL>();
+            //services.AddSingleton<BonusInfoBLL>();
+            //services.AddSingleton<PaymentManageBLL>();
+            //services.AddSingleton<AdjustWithdrawalLimitBLL>();
+            //services.AddSingleton<BonusCashBackBLL>();
+            //services.AddSingleton<HomeBLL>();
+            //services.AddSingleton<BonusManageBLL>();
+            //services.AddSingleton<NewsBLL>();
+            //services.AddSingleton<RebateManageBLL>();
+
+            //services.AddSingleton<ReportBLL>();
+            //services.AddSingleton<BannerManageBLL>();
+            //services.AddSingleton<ReportExcelBLL>();
+            //services.AddSingleton<ReferralManagementBLL>();
+            //services.AddSingleton<SportsBLL>();
+            //services.AddSingleton<PrizeBLL>();
+            ////services.AddSingleton<RebateManageBLL>(); //重複了...
+            //services.AddSingleton<VipLevelBLL>();
+            //services.AddSingleton<GameCasinoManageBLL>();
+            //services.AddSingleton<BankFinancialBLL>();
+            //services.AddSingleton<LatestHighlightVideoManagementBLL>();
+            //services.AddSingleton<DomainTableBLL>();
+            //services.AddSingleton<ReasonManagementBLL>();
+            //services.AddSingleton<DashBoardBLL>();
+            //services.AddSingleton<ResponseSettingBLL>();
+
+            //var bll = AppDomain.CurrentDomain.GetAssemblies()
+            //           .SelectMany(t => t.GetTypes())
+            //           .Where(t => t.IsClass && t.Namespace == "BackendSite.Service.BLL");
 
             // foreach (var s in bll)
             // {
             //     services.AddSingleton(s);
             // }
+
+            var test = AppDomain.CurrentDomain.GetAssemblies();
+
+            foreach (var item in test)
+            {
+                var list = item.DefinedTypes.Where(t => t.IsClass
+                                                        && t.Namespace == "BackendSite.Service.BLL"
+                                                        && t.Name.Contains("BLL")).ToList();
+
+                list.ForEach((type) =>
+                {
+                    services.AddSingleton(type, type);
+                });
+
+            }
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
@@ -185,6 +224,8 @@ namespace BackendSite
             app.UseCors(AllowSpecificOrigins);
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseRequestLogMiddleware();
+            app.UseResponseLogMiddleware();
 
             app.UseEndpoints(endpoints =>
             {

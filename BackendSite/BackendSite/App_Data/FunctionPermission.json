@@ -56,6 +56,10 @@
             "FuncKey": "ca_acc_close"
           },
           {
+            "DisplayKey": "KickOut",
+            "FuncKey": "ca_kickout"
+          },
+          {
             "DisplayKey": "Reset Password",
             "FuncKey": "ca_resetpwd"
           },
@@ -240,6 +244,11 @@
         "DisplayKey": "Deposit Submission",
         "FuncKey": "Finance/DepositSubmission",
         "Enable": false
+      },
+      {
+        "DisplayKey": "WithdrawalLimit Management",
+        "FuncKey": "Finance/WithdrawalLimitManagement",
+        "Enable": false
       }
     ]
   },
@@ -374,6 +383,11 @@
         "DisplayKey": "Vip Rebate Info",
         "FuncKey": "Marketing/VipRebateInfoReport",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Domain Management",
+        "FuncKey": "Marketing/DomainManage",
+        "Enable": false
       }
     ]
   },
@@ -384,7 +398,33 @@
         "DisplayKey": "Bank Transfer Account",
         "FuncKey": "BankFinancial/TransferAccountManage",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Transfer Management",
+        "FuncKey": "BankFinancial/TransferManage",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "TransferInfo Report",
+        "FuncKey": "BankFinancialReport/TransferInfoReport",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Reason Management",
+        "FuncKey": "BankFinancial/ReasonManagement",
+        "Enable": false
+      }
+    ]
+  },
+  {
+    "DisplayKey": "Home",
+    "Settings": [
+      {
+        "DisplayKey": "Dashboard",
+        "FuncKey": "Home/DashboardNew",
+        "Enable": false
       }
     ]
   }
+  
 ]

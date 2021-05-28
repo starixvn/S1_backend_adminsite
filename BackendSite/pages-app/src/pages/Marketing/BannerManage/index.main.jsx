@@ -1,5 +1,5 @@
 import React from "react";
-import moment from "moment";
+import moment from "moment-timezone";
 import { defBannerType, defActionModeType, defShowStatusType } from "./defCols";
 const SpecialItemType = {
 	actionBtn: "actionBtn",
@@ -107,8 +107,9 @@ export default ({
 	siteList,
 	setSite,
 	bannerList,
+	FilterOnchange,
+	BannerType
 }) => {
-
 	let siteRows = siteList.map((_data) => {
 		return (
 			<div key={`SiteOpt-${_data.siteId}`} className="custom-control custom-radio custom-control-inline">
@@ -156,6 +157,16 @@ export default ({
 			<div className="form-group">
 				<label className="col-form-label d-block">Available Sites</label>
 				{siteRows}
+				<DropDownBox
+				columnTitle="Banner Type"
+				options={Object.keys(defBannerType).map((key) => {
+					return { value: key, displayText: defBannerType[key] };
+				})}
+				hasAll={true}
+				selectedValue={BannerType}
+				dataColumn="BannerType"
+				onChange={FilterOnchange}
+			/>
 			</div>
 			{
 				setSite != "" ?
@@ -190,3 +201,29 @@ const ActionButtons = props => {
 		</div>
 	);
 };
+
+const DropDownBox = (props) => {
+	const onChange = (e) => {
+	  if (props.onChange) {
+		props.onChange(e.target.value, props.dataColumn);
+	  }
+	};
+	let optionRows = props.options.map((item) => {
+	  return (
+		<option key={`${props.ColumnTitle}-${item.value}`} value={item.value}>
+		  {item.displayText}
+		</option>
+	  );
+	});
+	return (
+	  <div className="input-item">
+		<span className="label">{props.columnTitle}</span>
+		<div className="field">
+		  <select defaultValue={props.selectedValue} onChange={onChange}>
+			{props.hasAll ? <option value="0">All</option> : null}
+			{optionRows}
+		  </select>
+		</div>
+	  </div>
+	);
+  };

@@ -44,6 +44,9 @@ export const specialBonusOptions = [
 export const onlyRegisteredBonusOptions = [
 	{ value: 1, displayText: "New Member"}
 ];
+export const AutoExtendOptions = [
+	{ value: 1, displayText: "Auto Extend"}
+];
 
 export const periodType = {
 	1: "Daily",

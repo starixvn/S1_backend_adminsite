@@ -15,6 +15,8 @@ import DateTimePicker from 'react-datetime';
 import TpBetRecord from './TpBetRecord/index';
 import VipLevel from './VipLevel/index';
 import PromotionReport from './PromotionReport/index';
+import SetCustStatusNote from './SetCustStatusNote/PopboxContentSetNote.js';
+import { DepositInfoPagination } from './CustInfo_DepositInfoPagination.jsx';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -129,7 +131,7 @@ import PromotionReport from './PromotionReport/index';
                             {rows}
                         </tbody>
                     </table>
-                    <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                    <DepositInfoPagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
                 </div>
             )
         }
@@ -398,14 +400,51 @@ import PromotionReport from './PromotionReport/index';
             this.props.ChangePage(pageNumber);
         }
 
+        // render() {
+        //     let rows = this.props.searchData.data.map(row =>
+        //         <tr key={row.id}>
+        //             <td>{moment(row.createTime).format('l LTS')}</td>
+        //             <td>{row.gameName ? row.gameName : "N/A"}</td>
+        //             <td>{row.rebateTypeName ? row.rebateTypeName : "N/A"}</td>
+        //             <td className="text-right">{number_format(row.redeemAmount)}</td>
+        //             <td>{row.bonusCode ? row.bonusCode : "N/A"}</td>
+        //         </tr>
+        //     );
+
+        //     return (
+        //         <div className="table">
+        //             <div className="table-options">
+        //                 <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>
+        //                     Refresh
+        //                 </button>
+        //             </div>
+        //             <table className="table table-striped">
+        //                 <thead>
+        //                     <tr>
+        //                         <th scope="col">Timexxxx {moment().format('(Z)')}</th>
+        //                         <th scope="col">Game Name</th>
+        //                         <th scope="col">Rebate Type Name</th>
+        //                         <th scope="col" className="text-right">Redeem Amount</th>
+        //                         <th scope="col">Bonus Code</th>
+        //                     </tr>
+        //                 </thead>
+        //                 <tbody>
+        //                     {rows}
+        //                 </tbody>
+        //             </table>
+        //             <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+        //         </div>
+        //     )
+        // }
+
+   
         render() {
             let rows = this.props.searchData.data.map(row =>
                 <tr key={row.id}>
                     <td>{moment(row.createTime).format('l LTS')}</td>
-                    <td>{row.gameName ? row.gameName : "N/A"}</td>
-                    <td>{row.rebateTypeName ? row.rebateTypeName : "N/A"}</td>
-                    <td className="text-right">{number_format(row.redeemAmount)}</td>
-                    <td>{row.bonusCode ? row.bonusCode : "N/A"}</td>
+                    <td>{row.categoryName }</td>
+                    <td className="text-right">{number_format(row.rcRedeemAmount)}</td>
+                    <td>{row.refId}</td>
                 </tr>
             );
 
@@ -419,11 +458,10 @@ import PromotionReport from './PromotionReport/index';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">Time {moment().format('(Z)')}</th>
-                                <th scope="col">Game Name</th>
-                                <th scope="col">Rebate Type Name</th>
-                                <th scope="col" className="text-right">Redeem Amount</th>
-                                <th scope="col">Bonus Code</th>
+                            <th scope="col">Time {"+08:00"}</th>  
+                            <th scope="col">Category</th>
+                            <th scope="col" className="text-right">Redeem Amount</th>
+                            <th scope="col">RefId</th>                            
                             </tr>
                         </thead>
                         <tbody>
@@ -845,9 +883,10 @@ import PromotionReport from './PromotionReport/index';
     }
 
     class CustInfo extends React.Component {
+        
         constructor(props) {
             super(props);
-            this.state = {};
+            this.state = {isOpen:false};
         }
         EditFiled = (v, datacolumn) => { this.setState({ ...this.state, [datacolumn]: v }); };
 
@@ -1018,13 +1057,16 @@ import PromotionReport from './PromotionReport/index';
         }
 
         onUnlock() {
+            if (!this.state.reason) { return alert("Please enter Reason For Unlock！"); }
             if (confirm('Are you sure set Unlock ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetUnlock', { CustId: data.custId })
+                axios.post('/api/CustManage/SetUnlock', { CustId: data.custId,Reason:this.state.reason })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
                         if (result.errorCode == 0) {
+                            alert(result.message);
+                            this.cancelSetReason();
                             this.props.onGetCustInfoDetail();
                         } else {
                             alert(result.message);
@@ -1037,13 +1079,16 @@ import PromotionReport from './PromotionReport/index';
         }
 
         onLock() {
+            if (!this.state.reason) { return alert("Please enter Reason For Lock！"); }
             if (confirm('Are you sure set Lock ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetLock', { CustId: data.custId })
+                axios.post('/api/CustManage/SetLock', { CustId: data.custId,Reason:this.state.reason })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
                         if (result.errorCode == 0) {
+                            alert(result.message);
+                            this.cancelSetReason();
                             this.props.onGetCustInfoDetail();
                         } else {
                             alert(result.message);
@@ -1055,14 +1100,85 @@ import PromotionReport from './PromotionReport/index';
             }
         }
 
+        setReason(action){
+            if(!this.state.isOpen)
+            {
+                switch(action)
+                {
+                    case "lock":
+                        this.setState({isOpen:true,
+                            reason:"",
+                            action:{Cancel:this.cancelSetReason.bind(this),
+                                    EditReason:this.editReason.bind(this),
+                                    Submit:this.onLock.bind(this)}});
+                    break;
+                    case "unlock":
+                        this.setState({isOpen:true,
+                            reason:"",
+                            action:{Cancel:this.cancelSetReason.bind(this),
+                                    EditReason:this.editReason.bind(this),
+                                    Submit:this.onUnlock.bind(this)}});
+                    break;
+                    case "closed":
+                        this.setState({isOpen:true,
+                            reason:"",
+                            action:{Cancel:this.cancelSetReason.bind(this),
+                                    EditReason:this.editReason.bind(this),
+                                    Submit:this.onClose.bind(this)}});
+                    break;
+                    case "kickout":
+                        this.setState({isOpen:true,
+                            reason:"",
+                            action:{Cancel:this.cancelSetReason.bind(this),
+                                    EditReason:this.editReason.bind(this),
+                                    Submit:this.kickOut.bind(this)}});
+                    break;
+                }
+            }
+        }
+
+        editReason(value){
+            this.setState({reason:value});
+        }
+
+        cancelSetReason(){
+            if(this.state.isOpen)
+            {
+                this.setState({isOpen:false,reason:"",action:null});
+            }
+        }
+
+        kickOut() {
+            if (!this.state.reason) { return alert("Please enter Reason For KickOut！"); }
+            if (confirm('Are you sure kick Out this Customer?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/api/CustManage/KickOut', { CustId: data.custId,Reason:this.state.reason })
+                    .then(function (response) {
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            alert(result.message);
+                            this.cancelSetReason();
+                        } else {
+                            alert(result.message);
+                            this.cancelSetReason();
+                        }
+                    }.bind(this)).catch(function (error) {
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
         onClose() {
+            if (!this.state.reason) { return alert("Please enter Reason For Closed！"); }
             if (confirm('Are you sure set Close ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetClose', { CustId: data.custId })
+                axios.post('/api/CustManage/SetClose', { CustId: data.custId,Reason:this.state.reason })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
                         if (result.errorCode == 0) {
+                            alert(result.message);
+                            this.cancelSetReason();
                             this.props.onGetCustInfoDetail();
                         } else {
                             alert(result.message);
@@ -1114,10 +1230,12 @@ import PromotionReport from './PromotionReport/index';
         }
 
         render() {
+
             let data = this.props.CustInfoData;
             let tpWallet = null;
             let elgibleWithdrawal = 0;
             let promotions = null;
+
             if (data != null) {
                 elgibleWithdrawal = data.withdrawalLimit - data.turnOver;
                 if (elgibleWithdrawal < 0) {
@@ -1159,9 +1277,10 @@ import PromotionReport from './PromotionReport/index';
                         <div className="button-block">
                             {data.phoneVerified || data.emailVerified ? null : <button className="btn btn-primary" onClick={this.onResetProfile.bind(this)}>Reset Profile</button>}
                             <button className="btn btn-primary" onClick={this.onResetCustBankInfo.bind(this)}>Reset Customer Bank Info.</button>
-                            {data.status == 1 && data.agent != null && subFuncKeys.indexOf("ca_acc_lock") > -1 ? <button className="btn btn-primary" onClick={this.onLock.bind(this)}>Lock</button> : null}
-                            {(data.status == 1 || data.status == 2) && data.agent != null && subFuncKeys.indexOf("ca_acc_close") > -1 ? <button className="btn btn-primary" onClick={this.onClose.bind(this)}>Closed</button> : null}
-                            {data.status == 2 && data.agent != null && subFuncKeys.indexOf("ca_unlock") > -1 ? <button className="btn btn-primary" onClick={this.onUnlock.bind(this)}>Unlock</button> : null}
+                            {data.status == 1 && data.agent != null && subFuncKeys.indexOf("ca_acc_lock") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"lock")}>Lock</button> : null}
+                            {(data.status == 1 || data.status == 2) && data.agent != null && subFuncKeys.indexOf("ca_acc_close") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"closed")}>Closed</button> : null}
+                            {data.status == 2 && data.agent != null && subFuncKeys.indexOf("ca_unlock") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"unlock")}>Unlock</button> : null}
+                            <button className="btn btn-primary" onClick={this.setReason.bind(this,"kickout")}>KickOut</button>
                         </div>
                         <div className="flex-wrap">
                             <table className="table table-detail ">
@@ -1476,7 +1595,7 @@ import PromotionReport from './PromotionReport/index';
                                     </tr>
                                     <tr>
                                         <th scope="row">First Deposit Time</th>
-                                        <td>{moment(data.firstDepositTime).format('l LTS (Z)')}</td>
+                                        <td>{data.firstDepositTime}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Last Activity Time</th>
@@ -1565,6 +1684,18 @@ import PromotionReport from './PromotionReport/index';
                                         <th scope="row">Eligible Withdrawal</th>
                                         <td>{number_format(elgibleWithdrawal)}</td>
                                     </tr>
+                                    <tr>
+                                        <th scope="row">Last Betting Time</th>
+                                        <td>{data.lastBettingTime}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Total Adjustment</th>
+                                        <td>{number_format(data.totalAdjustment)}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Total Bonus Claimed</th>
+                                        <td>{number_format(data.totalBonusClaimed)}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                             {data.RebateInfo != null ? <RebateInfo RebateInfo={data.RebateInfo} /> : null}
@@ -1605,18 +1736,26 @@ import PromotionReport from './PromotionReport/index';
                                     </tbody>
                                 </table>
                             </div>
-
+                            {
+				this.state.isOpen ?
+					<SetCustStatusNote
+						NewDatas={{reason:this.state.reason}}
+						Action={this.state.action}
+					/>
+					: null
+			}
 
 
                         </div>
                         {tpWallet}
                     </div>
+                    
             )
         }
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History", "VIP Level", "Promotion Report"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History", "VIP Level", "Promotion Report"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
         constructor(props) {
@@ -1671,13 +1810,34 @@ import PromotionReport from './PromotionReport/index';
             }
         }
 
+        // GetRebateLog(PageNumber) {
+        //     Loading.OnLoading();
+        //     let pageNumber = PageNumber || this.state.RebateLogData.pageNumber;
+        //     let CustId = getUrlParameter("custId");
+        //     if (!isNaN(CustId)) {
+        //         let iCustId = parseInt(CustId);
+        //         axios.post('/api/Payment/GetRebateLogByCust', { ...this.state.RebateLog, CustId: iCustId, PageNumber: pageNumber })
+        //             .then(function (response) {
+        //                 Loading.UnLoading();
+        //                 let result = response.data;
+        //                 if (result.errorCode == 0) {
+        //                     this.setState({ RebateLogData: result });
+        //                 } else {
+        //                     alert(result.message);
+        //                 }
+        //             }.bind(this)).catch(function (error) {
+        //                 Loading.UnLoading();
+        //                 alert(error);
+        //             }.bind(this));
+        //     }
+        // }
         GetRebateLog(PageNumber) {
             Loading.OnLoading();
             let pageNumber = PageNumber || this.state.RebateLogData.pageNumber;
             let CustId = getUrlParameter("custId");
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
-                axios.post('/api/Payment/GetRebateLogByCust', { ...this.state.RebateLog, CustId: iCustId, PageNumber: pageNumber })
+                axios.post('/api/Payment/GetVipRebateInfoListByCustId', { ...this.state.RebateLog, CustId: iCustId, PageNumber: pageNumber })
                     .then(function (response) {
                         Loading.UnLoading();
                         let result = response.data;
