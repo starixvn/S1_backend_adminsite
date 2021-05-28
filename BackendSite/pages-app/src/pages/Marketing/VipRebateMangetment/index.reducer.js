@@ -93,12 +93,13 @@ export function reducer(state, action) {
 				setGameTypeData: action.setGameTypeData
 			};
 		case defActionType.SET_EDIT:
+			let data = action.originalData ? action.originalData : {}
 			return {
 				...state,
 				initEdit: {
 					[action.idx]: action.val
 				},
-				setData: {}
+				setData: data
 			};
 		case defActionType.SET_DATA:
 			return {
