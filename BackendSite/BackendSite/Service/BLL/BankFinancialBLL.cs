@@ -3,14 +3,10 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using LazZiya.ImageResize;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Transactions;
 
 namespace BackendSite.Service.BLL
@@ -509,7 +505,7 @@ namespace BackendSite.Service.BLL
 
         #region Transfer Info Management
 
-        public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoList(bool isSetting,
+        public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetTransferInfoList(bool isSetting,
                                                                                      TransferTypeEnum? transferType,
                                                                                      string transFromDate,
                                                                                      string transToDate,
@@ -532,7 +528,7 @@ namespace BackendSite.Service.BLL
                                                              transferId));
         }
 
-        public (bool Status, int Count, string Message) SetTransferInfo(BankFinancialTransferInfoDetailModel bankFinancialTransferInfoDetail, IFormFile transferReceipt)
+        public (bool Status, int Count, string Message) SetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail, IFormFile transferReceipt)
         {
             bool status = false;
             int count = 0;
@@ -701,7 +697,7 @@ namespace BackendSite.Service.BLL
             if (transferId != null)
             {
                 //Step1:Get Data
-                IEnumerable<BankFinancialTransferInfoDetailModel> getdata = _bankFinancialService.GetTransferInfoList(true,
+                IEnumerable<BankFinancialTransferInfoTransDetailModel> getdata = _bankFinancialService.GetTransferInfoList(true,
                                                              null,
                                                              null,
                                                              null,
@@ -714,7 +710,7 @@ namespace BackendSite.Service.BLL
 
                 var transferInfoReceiptModel = _bankFinancialService.GetTransferInfoReceipt(transferId);
 
-                BankFinancialTransferInfoDetailModel data = new BankFinancialTransferInfoDetailModel();
+                BankFinancialTransferInfoTransDetailModel data = new BankFinancialTransferInfoTransDetailModel();
 
                 if (getdata.Count() == 1)
                 {
@@ -798,7 +794,7 @@ namespace BackendSite.Service.BLL
         /// <param name="bankFinancialTransferInfoDetail"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        private bool CheckSharedParameterForSetTransferInfo(BankFinancialTransferInfoDetailModel bankFinancialTransferInfoDetail,
+        private bool CheckSharedParameterForSetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail,
                                                             out string message)
         {
             message = String.Empty;
@@ -874,7 +870,7 @@ namespace BackendSite.Service.BLL
         /// <param name="bankFinancialTransferInfoDetail"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        private bool CheckParameterForSetTransferInfo(BankFinancialTransferInfoDetailModel bankFinancialTransferInfoDetail,
+        private bool CheckParameterForSetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail,
                                                       out string message)
         {
             message = String.Empty;
@@ -1076,7 +1072,7 @@ namespace BackendSite.Service.BLL
         /// <param name="transactionType"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        private bool CheckParameterWithTypeOtherForSetTransferInfo(BankFinancialTransferInfoDetailModel bankFinancialTransferInfoDetail,
+        private bool CheckParameterWithTypeOtherForSetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail,
                                                                    out string message)
         {
             message = String.Empty;
@@ -1278,7 +1274,7 @@ namespace BackendSite.Service.BLL
         /// </summary>
         /// <param name="bankFinancialTransferInfoDetail"></param>
         /// <returns></returns>
-        private (BankFinancialTransferInfoModel TransferInfoFromModel, BankFinancialTransferInfoModel TransferInfoToModel) SetParameterModelForSetTransferInfo(BankFinancialTransferInfoDetailModel bankFinancialTransferInfoDetail)
+        private (BankFinancialTransferInfoModel TransferInfoFromModel, BankFinancialTransferInfoModel TransferInfoToModel) SetParameterModelForSetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail)
         {
             var transferInfoFromModel = new BankFinancialTransferInfoModel();
             var transferInfoToModel = new BankFinancialTransferInfoModel();
@@ -1429,7 +1425,7 @@ namespace BackendSite.Service.BLL
         /// </summary>
         /// <param name="datas"></param>
         /// <returns></returns>
-        private IEnumerable<BankFinancialTransferInfoDetailModel> ConvertForDisplay(IEnumerable<BankFinancialTransferInfoDetailModel> datas)
+        private IEnumerable<BankFinancialTransferInfoTransDetailModel> ConvertForDisplay(IEnumerable<BankFinancialTransferInfoTransDetailModel> datas)
         {
 
             foreach (var data in datas.ToArray())
@@ -1444,5 +1440,20 @@ namespace BackendSite.Service.BLL
 
         #endregion
 
+
+        #region Transfer Info Report
+
+        public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoReport(int siteId,
+                                                                                       string accountNo,
+                                                                                       string startDate,
+                                                                                       string endDate)
+        {
+            return _bankFinancialService.GetTransferInfoReport(siteId,
+                                                               accountNo,
+                                                               startDate,
+                                                               endDate);
+        }
+
+        #endregion
     }
 }
