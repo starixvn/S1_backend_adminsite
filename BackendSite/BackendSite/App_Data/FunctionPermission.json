@@ -254,6 +254,11 @@
         "DisplayKey": "Deposit Time Report",
         "FuncKey": "Finance/DepositTimeReport",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Withdrawal Time Report",
+        "FuncKey": "Finance/WithdrawalTimeReport",
+        "Enable": false
       }
     ]
   },

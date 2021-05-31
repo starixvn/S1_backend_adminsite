@@ -298,6 +298,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "WithdrawalTimeReport",
+        "Title": "Withdrawal Time Report",
+        "FuncKey": "Finance/WithdrawalTimeReport",
+        "Controller": "Finance",
+        "Action": "WithdrawalTimeReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

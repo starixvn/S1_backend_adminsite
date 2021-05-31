@@ -272,5 +272,60 @@ namespace BackendSite.Service.BLL
         {
             return withdrawalService.GetWithdrawalPicCount(transId);
         }
+        public WithdrawalTimeData WithdrawalTimeReportGet(WithdrawalTimeReportPara para)
+        {
+            var result = withdrawalService.WithdrawalTimeReportGet(para);
+
+            if (result != null)
+            {
+                result.WithdrawalTimeList.ForEach(x =>
+                {
+                    TimeSpan ts1 = new TimeSpan(x.CreateTime.Ticks);
+                    TimeSpan ts2 = new TimeSpan(x.UpdateTime.Ticks);
+                    TimeSpan ts = ts1.Subtract(ts2).Duration();
+                    x.CompleteTime = GetTimeString(ts);
+                    if (x.VerifyTime > DateTime.Now.AddYears(-1000))
+                    {
+                        TimeSpan ts3 = new TimeSpan(x.VerifyTime.Ticks);
+                        TimeSpan tsv = ts1.Subtract(ts3).Duration();
+                        if (x.Status == 6)
+                        {
+                            TimeSpan tsa = ts3.Subtract(ts2).Duration();
+                            x.ToApprovedTime = GetTimeString(tsa);
+                        }                    
+                        x.ToVerifyTime = GetTimeString(tsv);                    
+                    }
+                });
+            }
+
+            return result;
+        }
+        private string GetTimeString(TimeSpan ts)
+        {
+            string tempDays = "";
+            string tempHours = "";
+            string tempMinutes = "";
+            string tempSeconds = "";
+            string result = "";
+            if (ts.Days != 0)
+            {
+                tempDays = string.Format("{0}Days", ts.Days.ToString());
+            }
+            if (ts.Hours != 0)
+            {
+                tempHours = string.Format("{0}Hours", ts.Hours.ToString());
+            }
+            if (ts.Minutes != 0)
+            {
+                tempMinutes = string.Format("{0}Minutes", ts.Minutes.ToString());
+            }
+            if (ts.Seconds != 0)
+            {
+                tempSeconds = string.Format("{0}Seconds", ts.Seconds.ToString());
+            }
+            result = string.Format("{0}{1}{2}{3}", tempDays, tempHours, tempMinutes, tempSeconds);
+            return result;
+        }
     }
 }
+
