@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace BackendSite.Service.DAL
@@ -305,6 +306,48 @@ namespace BackendSite.Service.DAL
             {
                 return conn.Execute("Admin_DepositLimitInfo_Del", new { SiteId = depositLimitInfo.SiteId, CurrencyId = depositLimitInfo.CurrencyId, VipLevel = depositLimitInfo.VipLevel }, commandType: CommandType.StoredProcedure);
             }
+        }
+
+        public DepositTimeData DepositTimeReportGet(DepositTimeReportPara para)
+        {
+            var SelectSite = JsonConvert.SerializeObject(para.SelectSite);
+            List<int> selectstatus = new List<int>();
+            if(para.Status == 0)
+            {
+                selectstatus.Add(3);
+                selectstatus.Add(4);
+                selectstatus.Add(5);
+            }
+            else
+            {
+                selectstatus.Add(para.Status);
+            }
+            var SelectStatus = JsonConvert.SerializeObject(selectstatus);
+
+            DepositTimeData SearchData = new DepositTimeData();
+            DynamicParameters props = new DynamicParameters();
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            int tempDepositId;
+            Int32.TryParse(para.DepositID, out tempDepositId);
+            
+            props.Add("SelectSite", SelectSite);
+            props.Add("DepositId", tempDepositId);
+            props.Add("StartDate", para.StartDate);
+            props.Add("EndDate", para.EndDate);
+            props.Add("SelectStatus", SelectStatus);
+            props.Add("CurrencyId", para.CurrencyId);
+            props.Add("PageNumber", para.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("PageSize", para.PageSize);
+            var result = conn.Query<DepositTimeList>("Admin_DepositStatusTime_Get", props, commandType: CommandType.StoredProcedure).ToList();
+
+            SearchData.DepositTimeList = result;
+            SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            SearchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
+            return SearchData;
         }
 
     }
