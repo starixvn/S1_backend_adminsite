@@ -296,19 +296,19 @@ namespace BackendSite.Service.BLL
                     string tempSeconds = "";
                     if (ts.Days != 0)
                     {
-                        tempDays = string.Format("{0}d", ts.Days.ToString());
+                        tempDays = string.Format("{0}Days", ts.Days.ToString());
                     }
                     if (ts.Hours != 0)
                     {
-                        tempHours = string.Format("{0}h", ts.Hours.ToString());
+                        tempHours = string.Format("{0}Hours", ts.Hours.ToString());
                     }
                     if (ts.Minutes != 0)
                     {
-                        tempMinutes = string.Format("{0}m", ts.Minutes.ToString());
+                        tempMinutes = string.Format("{0}Minutes", ts.Minutes.ToString());
                     }
                     if (ts.Seconds != 0)
                     {
-                        tempSeconds = string.Format("{0}s", ts.Seconds.ToString());
+                        tempSeconds = string.Format("{0}Seconds", ts.Seconds.ToString());
                     }
                     x.CompleteTime = string.Format("{0}{1}{2}{3}", tempDays, tempHours, tempMinutes, tempSeconds);
                     //x.CompleteTime = string.Format("{0}d{1}h{2}m{3}s", ts.Days.ToString(), ts.Hours.ToString(), ts.Minutes.ToString(), ts.Seconds.ToString());
@@ -317,5 +317,11 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+
+        //public IEnumerable<DrawPrizeExcelData> DepositTimeExportGet(string SelectSite, string StartDate, string EndDate, int CurrencyId, string EventName)
+        //{
+        //    //var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(SelectSite);
+        //    //return prizeService.GetExportData(siteList, StartDate, EndDate, CurrencyId, EventName);
+        //}
     }
 }

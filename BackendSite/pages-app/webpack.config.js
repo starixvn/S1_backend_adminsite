@@ -152,10 +152,10 @@ module.exports = {
     // 	 '@babel/polyfill',
     // 	"./src/pages/Marketing/VipRebateInfoReport/index.js"
     // ],
-    "Marketing/VipRebateMangetment.min": [
-      '@babel/polyfill',
-      "./src/pages/Marketing/VipRebateMangetment/index.jsx"
-    ],
+    // "Marketing/VipRebateMangetment.min": [
+    //   '@babel/polyfill',
+    //   "./src/pages/Marketing/VipRebateMangetment/index.jsx"
+    // ],
     // "Finance/WithdrawalLimitManage.min": [
     //   // '@babel/polyfill',
     //   "./src/pages/Finance/WithdrawalLimitManage/index.js",
@@ -181,9 +181,13 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/TransferInfoReport/index.js",
     // ],
-    "Finance/DepositTimeReport.min": [
+    // "Finance/DepositTimeReport.min": [
+    //   // '@babel/polyfill',
+    //   "./src/pages/Finance/DepositTimeReport/index.js",
+    // ],
+    "Finance/WithdrawalTimeReport.min": [
       // '@babel/polyfill',
-      "./src/pages/Finance/DepositTimeReport/index.js",
+      "./src/pages/Finance/WithdrawalTimeReport/index.js",
     ],
   },
   output: {

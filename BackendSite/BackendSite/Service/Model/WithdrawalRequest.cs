@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -163,5 +164,44 @@ namespace BackendSite.Service.Model
     public class BankSlipPic
     {
         public int BankSlipPicCount { get; set; }
+    }
+    public class WithdrawalTimeReportPara
+    {
+        public string WithdrawalID { get; set; }
+        public long StartDate { get; set; }
+        public long EndDate { get; set; }
+        public IEnumerable<int> SelectSite { get; set; }
+        public int CurrencyId { get; set; }
+        public int Status { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+    }
+    public class WithdrawalTimeData
+    {
+        public List<WithdrawalTimeList> WithdrawalTimeList { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
+    public class WithdrawalTimeList
+    {
+        public string SiteName { get; set; }
+        public int SiteId { get; set; }
+        public int Status { get; set; }
+        public DateTime CreateTime { get; set; }
+        public DateTime UpdateTime { get; set; }
+        public DateTime VerifyTime { get; set; }
+        public string TransId { get; set; }
+        public int WithdrawalType { get; set; }
+        public string UserName { get; set; }
+        public int CustId { get; set; }
+        public string IsoCode { get; set; }
+        public DateTime DepositTime { get; set; }
+        public string CompleteTime { get; set; }
+        public string WithdrawalTypeName => Enum.GetName(typeof(WithdrawalType), WithdrawalType);
+        public string StatusName => Enum.GetName(typeof(WithdrawalStatus), Status);
+        public int WithdrawalId { get; set; }
+        public string ToVerifyTime { get; set; }
+        public string ToApprovedTime { get; set; }
     }
 }

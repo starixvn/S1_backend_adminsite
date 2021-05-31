@@ -23,9 +23,11 @@ namespace BackendSite.Controllers.Api
         private readonly PendingFundBLL pendingFundBLL;
         private readonly CustInfoBLL custInfoBLL;
         private readonly BankDetailBLL bankDetailBLL;
+        private readonly ExcelBLL excelBLL;
         private readonly int mainWalletType;
 
-        public DepositController(IConfiguration configuration, DepositBLL depositBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, PendingFundBLL pendingFundBLL, CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL)
+
+        public DepositController(IConfiguration configuration, DepositBLL depositBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, PendingFundBLL pendingFundBLL, CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, ExcelBLL excelBLL)
         {
             this.depositBLL = depositBLL;
             this.selLangBLL = selLangBLL;
@@ -33,6 +35,7 @@ namespace BackendSite.Controllers.Api
             this.pendingFundBLL = pendingFundBLL;
             this.custInfoBLL = custInfoBLL;
             this.bankDetailBLL = bankDetailBLL;
+            this.excelBLL = excelBLL;
             mainWalletType = configuration.GetValue<int>("MainWalletType");
         }
         public class DepositListReq
@@ -402,5 +405,15 @@ namespace BackendSite.Controllers.Api
             }
             return apiListResult;
         }
+
+        //[HttpPost]
+        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
+        //public IActionResult ExportDepositTime(string SelectSite, string StartDate, string EndDate, int CurrencyId, string EventName)
+        //{
+        //    depositBLL.DepositTimeExportGet(para);
+        //    var ExportData = prizeBLL.GetExportData(SelectSite, StartDate, EndDate, CurrencyId, EventName);
+        //    var stream = excelBLL.Export(ExportData);
+        //    return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DrawPrize_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        //}
     }
 }

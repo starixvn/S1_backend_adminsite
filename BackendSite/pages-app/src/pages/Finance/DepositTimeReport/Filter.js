@@ -19,7 +19,6 @@ const defStatusType = {
   };
 
 const Panel = (props) => {
-  console.log(props.SiteList);
   let siteListOptions = [];
   if (props.SiteList) {
     siteListOptions = props.SiteList.map((i) => {
