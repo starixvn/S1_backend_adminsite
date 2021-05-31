@@ -381,6 +381,26 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
+        public ApiListResult<DepositTimeList> DepositTimeReportGet(DepositTimeReportPara para)
+        {
+            var apiListResult = new ApiListResult<DepositTimeList>();
+            try
+            {
+                var SearchResult = depositBLL.DepositTimeReportGet(para);
+                apiListResult.Data = SearchResult.DepositTimeList;
+                apiListResult.PageNumber = SearchResult.PageNumber;
+                apiListResult.TotalPages = SearchResult.TotalPages;
+                apiListResult.RowCount = SearchResult.RowCount;
+                apiListResult.ErrorCode = 0;
+            }
+            catch(Exception ex)
+            {
+                apiListResult.ErrorCode = 999;
+                apiListResult.Message = ex.Message;
+            }
+            return apiListResult;
+        }
     }
 }

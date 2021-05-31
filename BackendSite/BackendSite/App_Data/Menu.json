@@ -288,6 +288,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "DepositTimeReport",
+        "Title": "Deposit Time Report",
+        "FuncKey": "Finance/DepositTimeReport",
+        "Controller": "Finance",
+        "Action": "DepositTimeReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

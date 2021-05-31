@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System;
 using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -217,5 +219,42 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public string IsoCode { get; set; }
         public string Note { get; set; }
+    }
+    public class DepositTimeData
+    {
+        public List<DepositTimeList> DepositTimeList { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
+    public class DepositTimeList 
+    {
+        public string SiteName { get; set; }
+        public int SiteId { get; set; }
+        public int Status { get; set; }
+        public DateTime CreateTime { get; set; }
+        public DateTime UpdateTime { get; set; }
+        public string TransId { get; set; }
+        public int DepositType { get; set; }
+        public string UserName { get; set; }
+        public int CustId { get; set; }
+        public string IsoCode { get; set; }
+        public DateTime DepositTime { get; set; }
+        public string CompleteTime { get; set; }
+        public string DepositTypeName => Enum.GetName(typeof(DepositType), DepositType);
+        public string StatusName => Enum.GetName(typeof(DepositStatus), Status);
+        public int DepositId { get; set; }
+    }
+
+    public class DepositTimeReportPara
+    {
+        public string DepositID { get; set; }
+        public long StartDate { get; set; }
+        public long EndDate { get; set; }
+        public IEnumerable<int> SelectSite { get; set; }
+        public int CurrencyId { get; set; }
+        public int Status { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
     }
 }

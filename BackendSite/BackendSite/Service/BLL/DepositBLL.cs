@@ -278,5 +278,44 @@ namespace BackendSite.Service.BLL
             {"image/jpeg",System.Drawing.Imaging.ImageFormat.Jpeg},
             { "image/gif",System.Drawing.Imaging.ImageFormat.Gif}
         };
+
+        public DepositTimeData DepositTimeReportGet(DepositTimeReportPara para)
+        {
+             var result = depositService.DepositTimeReportGet(para);
+
+            if(result != null)
+            {
+                result.DepositTimeList.ForEach(x =>
+                {
+                    TimeSpan ts1 = new TimeSpan(x.CreateTime.Ticks);
+                    TimeSpan ts2 = new TimeSpan(x.UpdateTime.Ticks);
+                    TimeSpan ts = ts1.Subtract(ts2).Duration();
+                    string tempDays = "";
+                    string tempHours = "";
+                    string tempMinutes = "";
+                    string tempSeconds = "";
+                    if (ts.Days != 0)
+                    {
+                        tempDays = string.Format("{0}d", ts.Days.ToString());
+                    }
+                    if (ts.Hours != 0)
+                    {
+                        tempHours = string.Format("{0}h", ts.Hours.ToString());
+                    }
+                    if (ts.Minutes != 0)
+                    {
+                        tempMinutes = string.Format("{0}m", ts.Minutes.ToString());
+                    }
+                    if (ts.Seconds != 0)
+                    {
+                        tempSeconds = string.Format("{0}s", ts.Seconds.ToString());
+                    }
+                    x.CompleteTime = string.Format("{0}{1}{2}{3}", tempDays, tempHours, tempMinutes, tempSeconds);
+                    //x.CompleteTime = string.Format("{0}d{1}h{2}m{3}s", ts.Days.ToString(), ts.Hours.ToString(), ts.Minutes.ToString(), ts.Seconds.ToString());
+                });
+            }
+
+            return result;
+        }
     }
 }
