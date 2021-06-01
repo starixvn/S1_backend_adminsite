@@ -13,9 +13,9 @@ module.exports = {
         // "js/component/Finance/DepositSubmission.min": [
         //     '../BackendSite/wwwroot/js/component/Finance/DepositSubmission.jsx'
         // ], 
-        "js/component/Payment/BankInfoList.min": [
-            '../BackendSite/wwwroot/js/component/Payment/BankInfoList.jsx'
-        ],
+        // "js/component/Payment/BankInfoList.min": [
+        //     '../BackendSite/wwwroot/js/component/Payment/BankInfoList.jsx'
+        // ],
         // "js/component/Finance/PaymentAdjustment.min": [
         //     '../BackendSite/wwwroot/js/component/Finance/PaymentAdjustment.jsx'
         // ],

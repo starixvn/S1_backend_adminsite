@@ -723,5 +723,27 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalTimeReport" })]
+        public ApiListResult<WithdrawalTimeList> WithdrawalTimeReportGet(WithdrawalTimeReportPara para)
+        {
+            var apiListResult = new ApiListResult<WithdrawalTimeList>();
+            try
+            {
+                var SearchResult = withdrawalBLL.WithdrawalTimeReportGet(para);
+                apiListResult.Data = SearchResult.WithdrawalTimeList;
+                apiListResult.PageNumber = SearchResult.PageNumber;
+                apiListResult.TotalPages = SearchResult.TotalPages;
+                apiListResult.RowCount = SearchResult.RowCount;
+                apiListResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiListResult.ErrorCode = 999;
+                apiListResult.Message = ex.Message;
+            }
+            return apiListResult;
+        }
     }
 }
