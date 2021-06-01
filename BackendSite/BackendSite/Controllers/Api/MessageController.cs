@@ -480,6 +480,10 @@ namespace BackendSite.Controllers.Api
                             {
                                 apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Suspend Status." });
                             }
+                            else if (custInfoDetail.Status == 4)
+                            {
+                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Lock Status." });
+                            }
                             else
                             {
                                 apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Closed Status." });
