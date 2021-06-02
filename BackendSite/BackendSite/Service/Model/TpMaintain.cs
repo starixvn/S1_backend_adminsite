@@ -13,7 +13,7 @@ namespace BackendSite.Service.Model
         public int TpId { get; set; }
         public DateTime BeginDate { get; set; }
         public DateTime EndDate { get; set; }
-        public MaintainType MaintainType { get; set; }
+        public string MaintainType { get; set; }
         public int TypeValue { get; set; }
         public string BeginTime { get; set; }
         public string EndTime { get; set; }

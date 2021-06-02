@@ -257,11 +257,4 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    public enum MaintainType
-    {
-        Date,
-        Day,
-        Week,
-        Month
-    }
 }

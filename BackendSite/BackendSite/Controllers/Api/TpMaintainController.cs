@@ -96,7 +96,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpGet]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
         public ApiResult<IEnumerable<TpMaintain>> GetTpMaintainList()
         {
             try

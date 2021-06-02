@@ -34,8 +34,7 @@ namespace BackendSite.Service.DAL
         public bool InsertTpMaintain(TpMaintain input)
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var p = new DynamicParameters(input);
-            return conn.Execute("Admin_TpMaintain_Ins", p, commandType: CommandType.StoredProcedure) > 0;
+            return conn.QueryFirst<int>("Admin_TpMaintain_Ins", new DynamicParameters(input), commandType: CommandType.StoredProcedure) > 0;
         }
 
         public bool DeleteTpMaintain(TpMaintain input)
