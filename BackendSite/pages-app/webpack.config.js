@@ -181,10 +181,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/TransferInfoReport/index.js",
     // ],
-    // "Finance/DepositTimeReport.min": [
-    //   // '@babel/polyfill',
-    //   "./src/pages/Finance/DepositTimeReport/index.js",
-    // ],
+    "Finance/DepositTimeReport.min": [
+      // '@babel/polyfill',
+      "./src/pages/Finance/DepositTimeReport/index.js",
+    ],
     "Finance/WithdrawalTimeReport.min": [
       // '@babel/polyfill',
       "./src/pages/Finance/WithdrawalTimeReport/index.js",

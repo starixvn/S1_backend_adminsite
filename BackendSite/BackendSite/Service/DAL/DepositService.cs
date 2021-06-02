@@ -349,35 +349,35 @@ namespace BackendSite.Service.DAL
             SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
             return SearchData;
         }
-        //public IEnumerable<DrawPrizeExcelData> GetExportData(IEnumerable<int> SelectSite, string DepositID, long StartDate, long EndDate, int Status,int CurrencyId)
-        //{
-        //    var selectSite = JsonConvert.SerializeObject(SelectSite);
-        //    List<int> selectstatus = new List<int>();
-        //    if (Status == 0)
-        //    {
-        //        selectstatus.Add(3);
-        //        selectstatus.Add(4);
-        //        selectstatus.Add(5);
-        //    }
-        //    else
-        //    {
-        //        selectstatus.Add(Status);
-        //    }
-        //    var SelectStatus = JsonConvert.SerializeObject(selectstatus);
-        //    int tempDepositId;
-        //    Int32.TryParse(DepositID, out tempDepositId);
+        public List<DepositTimeList> GetExportData(IEnumerable<int> SelectSite, string DepositID, long StartDate, long EndDate, int Status, int CurrencyId)
+        {
+            var selectSite = JsonConvert.SerializeObject(SelectSite);
+            List<int> selectstatus = new List<int>();
+            if (Status == 0)
+            {
+                selectstatus.Add(3);
+                selectstatus.Add(4);
+                selectstatus.Add(5);
+            }
+            else
+            {
+                selectstatus.Add(Status);
+            }
+            var SelectStatus = JsonConvert.SerializeObject(selectstatus);
+            int tempDepositId;
+            Int32.TryParse(DepositID, out tempDepositId);
 
-        //    using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-        //    DynamicParameters props = new DynamicParameters();
-        //    props.Add("StartDate", StartDate);
-        //    props.Add("EndDate", EndDate);
-        //    props.Add("SelectSite", selectSite);
-        //    props.Add("CurrencyId", CurrencyId);
-        //    props.Add("DepositId", tempDepositId);
-        //    props.Add("SelectStatus", SelectStatus);
-        //    return conn.Query<DrawPrizeExcelData>("Admin_DrawPrizeExport_Get", props, commandType: CommandType.StoredProcedure);
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            DynamicParameters props = new DynamicParameters();
+            props.Add("StartDate", StartDate);
+            props.Add("EndDate", EndDate);
+            props.Add("SelectSite", selectSite);
+            props.Add("CurrencyId", CurrencyId);
+            props.Add("DepositId", tempDepositId);
+            props.Add("SelectStatus", SelectStatus);
+            return conn.Query<DepositTimeList>("Admin_DepositStatusTimeExport_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
-        //}
+        }
 
     }
 }

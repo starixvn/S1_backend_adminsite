@@ -155,6 +155,22 @@ const App = () => {
       });
   };
 
+  const Result_ExportToExcel = () => {
+    let param = {
+      Url: "Withdrawal/ExportWithdrawalTime",
+      Data: {
+        SelectSite: JSON.stringify(stateDatas.FilterInfo.SelectSite),
+        WithdrawalID: stateDatas.FilterInfo.WithdrawalID,
+        StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
+        EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
+        Status: parseInt(stateDatas.FilterInfo.Status, 10),
+        CurrencyId: parseInt(stateDatas.FilterInfo.Currency, 10)
+      },
+    };
+
+    WebAPI.DownloadData(param);
+  };
+
   return (
     <div className="container-fluid">
       <h4 className="page-name">Withdrawal Time Report</h4>
@@ -167,7 +183,7 @@ const App = () => {
         ClickSubmit={Filter_Submit}
       />
       {stateDatas.Datas === null ? null : (
-        <Result {...stateDatas} ChangePage={Result_ChangePage} />
+        <Result {...stateDatas} ChangePage={Result_ChangePage} ExportToExcel={Result_ExportToExcel}/>
       )}
     </div>
   );

@@ -406,14 +406,13 @@ namespace BackendSite.Controllers.Api
             return apiListResult;
         }
 
-        //[HttpPost]
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
-        //public IActionResult ExportDepositTime(string SelectSite, string StartDate, string EndDate, int CurrencyId, string EventName)
-        //{
-        //    depositBLL.DepositTimeExportGet(para);
-        //    var ExportData = prizeBLL.GetExportData(SelectSite, StartDate, EndDate, CurrencyId, EventName);
-        //    var stream = excelBLL.Export(ExportData);
-        //    return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DrawPrize_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
-        //}
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
+        public IActionResult ExportDepositTime(string SelectSite, string DepositID, long StartDate, long EndDate, int Status, int CurrencyId)
+        {
+            var ExportData = depositBLL.DepositTimeExportGet(SelectSite, DepositID, StartDate, EndDate, Status, CurrencyId);
+            var stream = excelBLL.Export(ExportData);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DepositTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
     }
 }

@@ -204,4 +204,19 @@ namespace BackendSite.Service.Model
         public string ToVerifyTime { get; set; }
         public string ToApprovedTime { get; set; }
     }
+
+    public class WithdrawalTimeExportData
+    {
+        public string SiteName { get; set; }
+        public int WithdrawalId { get; set; }
+        public string WithdrawalType { get; set; }
+        public string UserName { get; set; }
+        public string Currency { get; set; }
+        public string Status { get; set; }
+        public DateTime CreateTime { get; set; }
+        public DateTime UpdateTime { get; set; }
+        public string ToVerifyTime { get; set; }
+        public string ToApprovedTime { get; set; }
+        public string CompleteTime { get; set; }
+    }
 }
