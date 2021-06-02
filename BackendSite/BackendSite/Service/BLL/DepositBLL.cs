@@ -291,28 +291,6 @@ namespace BackendSite.Service.BLL
                     TimeSpan ts1 = new TimeSpan(x.CreateTime.Ticks);
                     TimeSpan ts2 = new TimeSpan(x.UpdateTime.Ticks);
                     TimeSpan ts = ts1.Subtract(ts2).Duration();
-                    //string tempDays = "";
-                    //string tempHours = "";
-                    //string tempMinutes = "";
-                    //string tempSeconds = "";
-                    //if (ts.Days != 0)
-                    //{
-                    //    tempDays = string.Format("{0}Days", ts.Days.ToString());
-                    //}
-                    //if (ts.Hours != 0)
-                    //{
-                    //    tempHours = string.Format("{0}Hours", ts.Hours.ToString());
-                    //}
-                    //if (ts.Minutes != 0)
-                    //{
-                    //    tempMinutes = string.Format("{0}Minutes", ts.Minutes.ToString());
-                    //}
-                    //if (ts.Seconds != 0)
-                    //{
-                    //    tempSeconds = string.Format("{0}Seconds", ts.Seconds.ToString());
-                    //}
-                    //x.CompleteTime = string.Format("{0}{1}{2}{3}", tempDays, tempHours, tempMinutes, tempSeconds);
-                    //x.CompleteTime = string.Format("{0}d{1}h{2}m{3}s", ts.Days.ToString(), ts.Hours.ToString(), ts.Minutes.ToString(), ts.Seconds.ToString());
                     x.CompleteTime = GetTimeString(ts);
                 });
             }
