@@ -398,6 +398,11 @@
         "Enable": false
       },
       {
+        "DisplayKey": "Bank Financial Report",
+        "FuncKey": "BankFinancialReport/BankFinancialReport",
+        "Enable": false
+      },
+      {
         "DisplayKey": "Reason Management",
         "FuncKey": "BankFinancial/ReasonManagement",
         "Enable": false

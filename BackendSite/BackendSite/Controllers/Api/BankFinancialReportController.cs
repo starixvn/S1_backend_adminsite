@@ -179,26 +179,24 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public IActionResult ExportBankFinancialReport(int SiteId,
-                                                    string AccountNo,
-                                                    string StartDate,
-                                                    string EndDate)
+        public IActionResult ExportBankFinancialReport(string SiteIds,
+                                                       string CurrencyIds,
+                                                       string StartDate,
+                                                       string EndDate)
         {
-            var data = _bankFinancialBLL.GetTransferInfoReport(SiteId,
-                                                                  AccountNo,
-                                                                  StartDate,
-                                                                  EndDate); ;
+            var data = _bankFinancialBLL.GetBankFinancialReport(SiteIds,
+                                                                CurrencyIds,
+                                                                StartDate,
+                                                                EndDate);
             var stream = _excelBLL.Export(data);
 
             return File(stream,
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        $"TransferInfoReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+                        $"BankFinancialReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
 
         #endregion
-
-
 
     }
 }

@@ -8,6 +8,7 @@ namespace BackendSite.Service.Model.BankFinancial
 {
     public class BankFinancialDataModel
     {
+
         public int SiteId
         {
             get;
@@ -39,6 +40,18 @@ namespace BackendSite.Service.Model.BankFinancial
         } 
 
         public string Agent
+        {
+            get;
+            set;
+        }
+
+        public int PayId
+        {
+            get;
+            set;
+        }
+
+        public string PayName
         {
             get;
             set;
@@ -78,11 +91,11 @@ namespace BackendSite.Service.Model.BankFinancial
             set;
         }
 
-        public decimal DepositAmountInBaseCurrency
-        {
-            get;
-            set;
-        }
+        //public decimal DepositAmountInBaseCurrency
+        //{
+        //    get;
+        //    set;
+        //}
 
         public decimal WithdrawalAmount
         {
@@ -90,11 +103,11 @@ namespace BackendSite.Service.Model.BankFinancial
             set;
         }
 
-        public decimal WithdrawalAmountInBaseCurrency
-        {
-            get;
-            set;
-        }
+        //public decimal WithdrawalAmountInBaseCurrency
+        //{
+        //    get;
+        //    set;
+        //}
 
         public decimal TransferAmount
         {
@@ -102,10 +115,10 @@ namespace BackendSite.Service.Model.BankFinancial
             set;
         }
 
-        public decimal TransferAmountInBaseCurrency
-        {
-            get;
-            set;
-        }
+        //public decimal TransferAmountInBaseCurrency
+        //{
+        //    get;
+        //    set;
+        //}
     }
 }

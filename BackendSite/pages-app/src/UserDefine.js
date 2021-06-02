@@ -106,7 +106,11 @@ const TransferInfoReport = lazy(() =>
   import("./pages/BankFinancial/TransferInfoReport/index")
 );
 
-export const defaultPage = "TransferInfoReport";
+const BankFinancialReport = lazy(() =>
+  import("./pages/BankFinancial/BankFinancialReport/index")
+);
+
+export const defaultPage = "BankFinancialReport";
 
 export const layoutType = {
   N88: "N88",
@@ -640,6 +644,19 @@ export const pages = {
     comp: (
       <Suspense fallback="loading...">
         <TransferInfoReport />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  BankFinancialReport: {
+    comp: (
+      <Suspense fallback="loading...">
+        <BankFinancialReport />
       </Suspense>
     ),
     css: [

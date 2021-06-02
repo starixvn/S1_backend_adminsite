@@ -26,25 +26,7 @@ namespace BackendSite.Service.Model.BankFinancial
             set;
         }
 
-        public int AccountId
-        {
-            get;
-            set;
-        }
-
         public string AccountNo
-        {
-            get;
-            set;
-        }
-
-        public string AccountName
-        {
-            get;
-            set;
-        }
-
-        public int AccountStatus
         {
             get;
             set;

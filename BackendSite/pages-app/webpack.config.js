@@ -163,10 +163,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/TransferManage/index.jsx",
     // ],
-    "Marketing/VipRebateInfoReport.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/VipRebateInfoReport/index.js",
-    ],
+    // "Marketing/VipRebateInfoReport.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/VipRebateInfoReport/index.js",
+    // ],
 
     // "Marketing/DomainManage.min": [
     // 	"./src/pages/Marketing/DomainManage/index.js"
@@ -180,6 +180,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/TransferInfoReport/index.js",
     // ],
+    "BankFinancial/BankFinancialReport.min": [
+      "@babel/polyfill",
+      "./src/pages/BankFinancial/BankFinancialReport/index.js",
+    ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
