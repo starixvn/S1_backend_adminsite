@@ -97,10 +97,10 @@ const App = () => {
       alert("Please Choose End Date.");
       return false;
     }
-
+    console.log(stateFilter.CurrencyIds);
     const currencyIds = [];
     stateFilter.CurrencyIds.map((o) => {
-      currencyIds.push(o.value);
+      currencyIds.push(Number(o.value));
     });
 
     let param = {
@@ -157,7 +157,7 @@ const App = () => {
 
     const currencyIds = [];
     stateFilter.CurrencyIds.map((o) => {
-      currencyIds.push(o.value);
+      currencyIds.push(Number(o.value));
     });
 
     let param = {
