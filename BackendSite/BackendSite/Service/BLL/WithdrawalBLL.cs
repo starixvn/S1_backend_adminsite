@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -299,6 +300,50 @@ namespace BackendSite.Service.BLL
             }
 
             return result;
+        }
+        public IEnumerable<WithdrawalTimeExportData> WithdrawalTimeExportGet(string SelectSite, string WithdrawalID, long StartDate, long EndDate, int Status, int CurrencyId)
+        {
+            List<WithdrawalTimeExportData> ExportDataToExcel = new List<WithdrawalTimeExportData>();
+            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(SelectSite);
+
+            var result = withdrawalService.GetExportData(siteList, WithdrawalID, StartDate, EndDate, Status, CurrencyId);
+
+            if (result != null)
+            {
+                result.ForEach(x => {
+                    TimeSpan ts1 = new TimeSpan(x.CreateTime.Ticks);
+                    TimeSpan ts2 = new TimeSpan(x.UpdateTime.Ticks);
+                    TimeSpan ts = ts1.Subtract(ts2).Duration();
+                    string tempToVerifyTime = "";
+                    string tempToApprovedTime = "";
+                    if (x.VerifyTime > DateTime.Now.AddYears(-1000))
+                    {
+                        TimeSpan ts3 = new TimeSpan(x.VerifyTime.Ticks);
+                        TimeSpan tsv = ts1.Subtract(ts3).Duration();
+                        if (x.Status == 6)
+                        {
+                            TimeSpan tsa = ts3.Subtract(ts2).Duration();
+                            tempToApprovedTime = GetTimeString(tsa);
+                        }
+                        tempToVerifyTime = GetTimeString(tsv);
+                    }
+                    ExportDataToExcel.Add(new WithdrawalTimeExportData
+                    {
+                        SiteName = x.SiteName,
+                        WithdrawalId = x.WithdrawalId,
+                        WithdrawalType = x.WithdrawalTypeName,
+                        UserName = x.UserName,
+                        Currency = x.IsoCode,
+                        Status = x.StatusName,
+                        CreateTime = x.CreateTime,
+                        UpdateTime = x.UpdateTime,
+                        ToVerifyTime = tempToVerifyTime,
+                        ToApprovedTime = tempToApprovedTime,
+                        CompleteTime = GetTimeString(ts)
+                    });
+                });
+            }
+            return ExportDataToExcel;
         }
         private string GetTimeString(TimeSpan ts)
         {
