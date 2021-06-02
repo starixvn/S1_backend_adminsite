@@ -76,15 +76,15 @@ export default ({
 						/>
 					</div>
 					{window.subFuncKeys && window.subFuncKeys.includes("f_vrm_edit") ? (
-					<div className="row-flex">
-						<ActionButtons
-							isEdit={(editStatus === true) ? true : false}
-							clickEdit={action.HandleEdit.bind(null, "PeriodType", "", originalData)}
-							clickCancel={action.HandleEdit.bind(null, "PeriodType", "")}
-							clickSubmit={action.SetRebatePeriod}
-							disabled={processing}
-						/>
-					</div>
+						<div className="row-flex">
+							<ActionButtons
+								isEdit={(editStatus === true) ? true : false}
+								clickEdit={action.HandleEdit.bind(null, "PeriodType", "", originalData)}
+								clickCancel={action.HandleEdit.bind(null, "PeriodType", "")}
+								clickSubmit={action.SetRebatePeriod}
+								disabled={processing}
+							/>
+						</div>
 					) : null}
 				</div>
 				<div className="filter noBGcolor tag">{currencyTabArr}</div>
@@ -137,9 +137,15 @@ const CategoryDataPanel = props => {
 	let vipListDataArr = props.state.siteVipList.map(item => {
 		let editStatus = props.state.initEdit["categoryDataLevel" + item.level];
 		let originalData = {
-			"categoryDataLevel": props.state.setCategoryData.categoryLevelList && Object.keys(props.state.setCategoryData.categoryLevelList).length !== 0 ?
-				props.state.setCategoryData.categoryLevelList.find(s => s.level === item.level).percentage : "No Setting"
+			"categoryDataLevel":
+				props.state.setCategoryData.categoryLevelList &&
+					Object.keys(props.state.setCategoryData.categoryLevelList).length !== 0 &&
+					props.state.setCategoryData.categoryLevelList.find(s => s.level === item.level) ?
+					props.state.setCategoryData.categoryLevelList.find(s => s.level === item.level).percentage : "No Setting"
 		}
+		// let originalData = {
+		// 	"categoryDataLevel": props.state.setCategoryData.categoryLevelList && Object.keys(props.state.setCategoryData.categoryLevelList).length !== 0 ? 0 : "No Setting"
+		// }
 		let value = editStatus === true ? props.state.setData.categoryDataLevel : originalData.categoryDataLevel;
 		return (
 			<div
@@ -155,14 +161,14 @@ const CategoryDataPanel = props => {
 				/>
 				<div style={{ width: "25px", height: "25px" }}>%</div>
 				{window.subFuncKeys && window.subFuncKeys.includes("f_vrm_edit") ?
-				<ActionButtons
-					isEdit={editStatus === true ? true : false}
-					clickEdit={props.action.HandleEdit.bind(null, "categoryDataLevel", item.level, originalData)}
-					clickCancel={props.action.HandleEdit.bind(null, "categoryDataLevel", item.level)}
-					clickSubmit={props.action.SetRebateCategory.bind(null, item.level)}
-					disabled={props.processing}
-				/>
-				: null}
+					<ActionButtons
+						isEdit={editStatus === true ? true : false}
+						clickEdit={props.action.HandleEdit.bind(null, "categoryDataLevel", item.level, originalData)}
+						clickCancel={props.action.HandleEdit.bind(null, "categoryDataLevel", item.level)}
+						clickSubmit={props.action.SetRebateCategory.bind(null, item.level)}
+						disabled={props.processing}
+					/>
+					: null}
 			</div>
 		);
 	});
@@ -194,14 +200,14 @@ const CategoryDataPanel = props => {
 						disabled={props.processing !== true && editStatus === true ? false : true}
 					/>
 					{window.subFuncKeys && window.subFuncKeys.includes("f_vrm_edit") ?
-					<ActionButtons
-						isEdit={editStatus === true ? true : false}
-						clickEdit={props.action.HandleEdit.bind(null, "Payout", "", originalData)}
-						clickCancel={props.action.HandleEdit.bind(null, "Payout", "")}
-						clickSubmit={props.action.SetRebatePayoutLimit}
-						disabled={props.processing}
-					/>
-					: null}
+						<ActionButtons
+							isEdit={editStatus === true ? true : false}
+							clickEdit={props.action.HandleEdit.bind(null, "Payout", "", originalData)}
+							clickCancel={props.action.HandleEdit.bind(null, "Payout", "")}
+							clickSubmit={props.action.SetRebatePayoutLimit}
+							disabled={props.processing}
+						/>
+						: null}
 				</div>
 			</div>
 			<div className="filter">
@@ -258,8 +264,11 @@ const TpGameTypeDataPanel = props => {
 	let vipListDataArr = props.state.siteVipList.map(item => {
 		let editStatus = props.state.initEdit["tpGameTypeLevel" + item.level];
 		let originalData = {
-			"tpGameTypeLevel": props.state.setGameTypeData && Object.keys(props.state.setGameTypeData).length !== 0 ?
-				props.state.setGameTypeData.find(s => s.level === item.level).percentage : "Base on category"
+			"tpGameTypeLevel":
+				props.state.setGameTypeData &&
+					Object.keys(props.state.setGameTypeData).length !== 0 &&
+					props.state.setGameTypeData.find(s => s.level === item.level) ?
+					props.state.setGameTypeData.find(s => s.level === item.level).percentage : "Base on category"
 		}
 		let value = editStatus === true ? props.state.setData.tpGameTypeLevel : originalData.tpGameTypeLevel;
 		return (
@@ -276,14 +285,14 @@ const TpGameTypeDataPanel = props => {
 				/>
 				<div style={{ width: "25px", height: "25px" }}>%</div>
 				{window.subFuncKeys && window.subFuncKeys.includes("f_vrm_edit") ?
-				<ActionButtons
-					isEdit={editStatus === true ? true : false}
-					clickEdit={props.action.HandleEdit.bind(null, "tpGameTypeLevel", item.level, originalData)}
-					clickCancel={props.action.HandleEdit.bind(null, "tpGameTypeLevel", item.level)}
-					clickSubmit={props.action.SetRebateGameType.bind(null, item.level)}
-					disabled={props.processing}
-				/>
-				: null}
+					<ActionButtons
+						isEdit={editStatus === true ? true : false}
+						clickEdit={props.action.HandleEdit.bind(null, "tpGameTypeLevel", item.level, originalData)}
+						clickCancel={props.action.HandleEdit.bind(null, "tpGameTypeLevel", item.level)}
+						clickSubmit={props.action.SetRebateGameType.bind(null, item.level)}
+						disabled={props.processing}
+					/>
+					: null}
 			</div>
 		);
 	});
