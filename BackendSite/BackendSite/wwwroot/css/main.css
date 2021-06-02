@@ -902,7 +902,7 @@ body {
         background-color: #00A254;
     }
 
-    .status.status-suspend, .status.status-pending, .status.status-hold {
+    .status.status-suspend, .status.status-lock, .status.status-pending, .status.status-hold {
         background-color: #FE792F;
     }
 

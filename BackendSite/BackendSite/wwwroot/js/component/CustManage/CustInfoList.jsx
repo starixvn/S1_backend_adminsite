@@ -6,6 +6,7 @@ import * as Loading from '../commJS/Loading.jsx';
         1: <span className="status status-active">Running</span>,
         2: <span className="status status-suspend">Suspend</span>,
         3: <span className="status status-closed">Closed</span>,
+        4: <span className="status status-lock">Lock</span>
     }
 
     const defCurrencyType = {
@@ -19,7 +20,8 @@ import * as Loading from '../commJS/Loading.jsx';
     const defStatusType = {
         1: "Running",
         2: "Suspend",
-        3: "Closed"
+        3: "Closed",
+        4: "Lock",
     };
 
     class CustInfoRow extends React.Component {
@@ -342,6 +344,7 @@ import * as Loading from '../commJS/Loading.jsx';
                     state.selectStatus.push(1);
                     state.selectStatus.push(2);
                     state.selectStatus.push(3);
+                    state.selectStatus.push(4);
                 }
             });
             $('#selectStatus').multiselect('updateButtonText');

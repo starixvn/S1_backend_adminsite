@@ -23,6 +23,7 @@ import { DepositInfoPagination } from './CustInfo_DepositInfoPagination.jsx';
         1: <span className="status status-active">Running</span>,
         2: <span className="status status-suspend">Suspend</span>,
         3: <span className="status status-closed">Closed</span>,
+        4: <span className="status status-lock">Lock</span>
     }
 
     const CustActStatusOp = {
