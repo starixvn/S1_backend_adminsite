@@ -23,9 +23,11 @@ namespace BackendSite.Controllers.Api
         private readonly PendingFundBLL pendingFundBLL;
         private readonly CustInfoBLL custInfoBLL;
         private readonly BankDetailBLL bankDetailBLL;
+        private readonly ExcelBLL excelBLL;
         private readonly int mainWalletType;
 
-        public DepositController(IConfiguration configuration, DepositBLL depositBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, PendingFundBLL pendingFundBLL, CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL)
+
+        public DepositController(IConfiguration configuration, DepositBLL depositBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, PendingFundBLL pendingFundBLL, CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, ExcelBLL excelBLL)
         {
             this.depositBLL = depositBLL;
             this.selLangBLL = selLangBLL;
@@ -33,6 +35,7 @@ namespace BackendSite.Controllers.Api
             this.pendingFundBLL = pendingFundBLL;
             this.custInfoBLL = custInfoBLL;
             this.bankDetailBLL = bankDetailBLL;
+            this.excelBLL = excelBLL;
             mainWalletType = configuration.GetValue<int>("MainWalletType");
         }
         public class DepositListReq
@@ -381,6 +384,35 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
+        public ApiListResult<DepositTimeList> DepositTimeReportGet(DepositTimeReportPara para)
+        {
+            var apiListResult = new ApiListResult<DepositTimeList>();
+            try
+            {
+                var SearchResult = depositBLL.DepositTimeReportGet(para);
+                apiListResult.Data = SearchResult.DepositTimeList;
+                apiListResult.PageNumber = SearchResult.PageNumber;
+                apiListResult.TotalPages = SearchResult.TotalPages;
+                apiListResult.RowCount = SearchResult.RowCount;
+                apiListResult.ErrorCode = 0;
+            }
+            catch(Exception ex)
+            {
+                apiListResult.ErrorCode = 999;
+                apiListResult.Message = ex.Message;
+            }
+            return apiListResult;
+        }
 
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
+        public IActionResult ExportDepositTime(string SelectSite, string DepositID, long StartDate, long EndDate, int Status, int CurrencyId)
+        {
+            var ExportData = depositBLL.DepositTimeExportGet(SelectSite, DepositID, StartDate, EndDate, Status, CurrencyId);
+            var stream = excelBLL.Export(ExportData);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DepositTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
     }
 }

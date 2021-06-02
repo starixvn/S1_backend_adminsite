@@ -29,6 +29,7 @@ namespace BackendSite.Controllers.Api
         private readonly MessageBLL messageBLL;
         private readonly CustInfoBLL custInfoBLL;
         private readonly BankDetailBLL bankDetailBLL;
+        private readonly ExcelBLL excelBLL;
         private readonly static BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
         private readonly string payApiUrl;
         private readonly CourierAdapter courierAdapter;
@@ -39,13 +40,14 @@ namespace BackendSite.Controllers.Api
         private readonly string awsWithdrawalBucketName;
         private readonly string ProxyHost;
         private readonly int ProxyPort;
-        public WithdrawalController(IConfiguration configuration, CourierAdapter courierAdapter, WithdrawalBLL withdrawalBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL)
+        public WithdrawalController(IConfiguration configuration, CourierAdapter courierAdapter, WithdrawalBLL withdrawalBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, ExcelBLL excelBLL)
         {
             this.withdrawalBLL = withdrawalBLL;
             this.selLangBLL = selLangBLL;
             this.messageBLL = messageBLL;
             this.custInfoBLL = custInfoBLL;
             this.bankDetailBLL = bankDetailBLL;
+            this.excelBLL = excelBLL;
             payApiUrl = configuration.GetValue<string>("PayService");
             this.courierAdapter = courierAdapter;
             awsKey = configuration.GetValue<string>("AWSKey");
@@ -722,6 +724,37 @@ namespace BackendSite.Controllers.Api
                 apiResult.Message = ex.Message;
             }
             return apiResult;
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalTimeReport" })]
+        public ApiListResult<WithdrawalTimeList> WithdrawalTimeReportGet(WithdrawalTimeReportPara para)
+        {
+            var apiListResult = new ApiListResult<WithdrawalTimeList>();
+            try
+            {
+                var SearchResult = withdrawalBLL.WithdrawalTimeReportGet(para);
+                apiListResult.Data = SearchResult.WithdrawalTimeList;
+                apiListResult.PageNumber = SearchResult.PageNumber;
+                apiListResult.TotalPages = SearchResult.TotalPages;
+                apiListResult.RowCount = SearchResult.RowCount;
+                apiListResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiListResult.ErrorCode = 999;
+                apiListResult.Message = ex.Message;
+            }
+            return apiListResult;
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalTimeReport" })]
+        public IActionResult ExportWithdrawalTime(string SelectSite, string WithdrawalID, long StartDate, long EndDate, int Status, int CurrencyId)
+        {
+            var ExportData = withdrawalBLL.WithdrawalTimeExportGet(SelectSite, WithdrawalID, StartDate, EndDate, Status, CurrencyId);
+            var stream = excelBLL.Export(ExportData);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"WithdrawalTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
     }
 }

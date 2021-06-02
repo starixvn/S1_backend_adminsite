@@ -153,5 +153,15 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
+        public IActionResult DepositTimeReport()
+        {
+            return View();
+        }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalTimeReport" })]
+        public IActionResult WithdrawalTimeReport()
+        {
+            return View();
+        }
     }
 }

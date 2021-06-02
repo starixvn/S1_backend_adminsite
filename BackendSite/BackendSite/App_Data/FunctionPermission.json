@@ -249,6 +249,16 @@
         "DisplayKey": "WithdrawalLimit Management",
         "FuncKey": "Finance/WithdrawalLimitManagement",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Deposit Time Report",
+        "FuncKey": "Finance/DepositTimeReport",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Withdrawal Time Report",
+        "FuncKey": "Finance/WithdrawalTimeReport",
+        "Enable": false
       }
     ]
   },
@@ -366,6 +376,18 @@
         "DisplayKey": "Latest Highlight Video Management",
         "FuncKey": "Marketing/LatestHighlightVideoManagement",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Vip Rebate Mangetment",
+        "FuncKey": "Marketing/VipRebateMangetment",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit",
+            "FuncKey": "f_vrm_edit"
+          }
+        ]
       },
       {
         "DisplayKey": "Vip Rebate Info",

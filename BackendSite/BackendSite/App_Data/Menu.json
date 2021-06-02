@@ -288,6 +288,26 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "DepositTimeReport",
+        "Title": "Deposit Time Report",
+        "FuncKey": "Finance/DepositTimeReport",
+        "Controller": "Finance",
+        "Action": "DepositTimeReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "WithdrawalTimeReport",
+        "Title": "Withdrawal Time Report",
+        "FuncKey": "Finance/WithdrawalTimeReport",
+        "Controller": "Finance",
+        "Action": "WithdrawalTimeReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
@@ -481,6 +501,16 @@
         "FuncKey": "Marketing/LatestHighlightVideoManagement",
         "Controller": "Marketing",
         "Action": "LatestHighlightVideoManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "VipRebateMangetment",
+        "Title": "Vip Rebate Mangetment",
+        "FuncKey": "Marketing/VipRebateMangetment",
+        "Controller": "Marketing",
+        "Action": "VipRebateMangetment",
         "Icon": "",
         "Roles": null,
         "Childs": null

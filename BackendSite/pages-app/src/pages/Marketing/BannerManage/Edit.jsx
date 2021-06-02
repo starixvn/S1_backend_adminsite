@@ -21,7 +21,6 @@ export default props => {
 					SportCategoryId: 1
 				}
 			};
-			console.log(props.Datas.sportLeaguesId);
 			WebAPI.PostData(SportLeaguesListParam).then(
 				res => {
 					if (isMountedRef.current) {
