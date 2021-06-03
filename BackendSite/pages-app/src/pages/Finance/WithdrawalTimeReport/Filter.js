@@ -99,7 +99,8 @@ const Panel = (props) => {
         <button
           className="btn btn-search"
           type="submit"
-          onClick={props.ClickSubmit}
+          onClick={props.SubmitBtnDisabled ? null : props.ClickSubmit}
+          disabled={props.SubmitBtnDisabled}
         >
           Submit
         </button>
