@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace BackendSite.Service.Model
+namespace BackendSite.Service.Model.BankFinancial
 {
     public class BankFinancialTransferInfoTransDetailModelForSet
     {

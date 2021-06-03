@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model;
+using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
@@ -502,6 +503,73 @@ namespace BackendSite.Service.DAL
                 });
                 string SpName = "Admin_BankFinancialTransferInfoReceipt_Del";
                 return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        #endregion
+
+        #region Bank Financial Report
+
+        public IEnumerable<BankFinancialDepositSummaryModel> GetDepositSummary(string siteIds,
+                                                                                string currencyIds,
+                                                                                string startDate,
+                                                                                string endDate)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                    SiteIds = siteIds,
+                    CurrencyIds = currencyIds,
+                    StartDate = startDate,
+                    EndDate = endDate
+                });
+
+                string SpName = "Admin_BankFinancialReport_Deposit_Get";
+                return conn.Query<BankFinancialDepositSummaryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public IEnumerable<BankFinancialWithdrawalSummaryModel> GetWithdrawalSummary(string siteIds,
+                                                                        string currencyIds,
+                                                                        string startDate,
+                                                                        string endDate)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                    SiteIds = siteIds,
+                    CurrencyIds = currencyIds,
+                    StartDate = startDate,
+                    EndDate = endDate
+                });
+
+                string SpName = "Admin_BankFinancialReport_Withdrawal_Get";
+                return conn.Query<BankFinancialWithdrawalSummaryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public IEnumerable<BankFinancialTransferSummaryModel> GetTransferSummary(string siteIds,
+                                                                        string currencyIds,
+                                                                        string startDate,
+                                                                        string endDate)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                var parameters = new DynamicParameters(
+                new
+                {
+                    SiteIds = siteIds,
+                    CurrencyIds = currencyIds,
+                    StartDate = startDate,
+                    EndDate = endDate
+                });
+
+                string SpName = "Admin_BankFinancialReport_Transfer_Get";
+                return conn.Query<BankFinancialTransferSummaryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
 

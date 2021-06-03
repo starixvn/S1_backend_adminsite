@@ -1,6 +1,7 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.BankFinancial;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -43,7 +44,7 @@ namespace BackendSite.Controllers.Api
 
         #region API Model
 
-        public class GetMainFinancialReportReq
+        public class GetTransferInfoReportReq
         {
             public int SiteId
             {
@@ -70,12 +71,40 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        public class GetBankFinancialReportReq
+        {
+            public IEnumerable<int> SiteIds
+            {
+                get;
+                set;
+            }
+
+            public IEnumerable<int> CurrencyIds
+            {
+                get;
+                set;
+            }
+
+            public string StartDate
+            {
+                get;
+                set;
+            }
+
+            public string EndDate
+            {
+                get;
+                set;
+            }
+        }
+
+
         #endregion
 
         #region Action
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/TransferInfoReport" })]
-        public IActionResult GetTransferInfoReport(GetMainFinancialReportReq request)
+        public IActionResult GetTransferInfoReport(GetTransferInfoReportReq request)
         {
             try
             {
@@ -119,6 +148,53 @@ namespace BackendSite.Controllers.Api
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         $"TransferInfoReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/BankFinancialReport" })]
+        public IActionResult GetBankFinancialReport(GetBankFinancialReportReq request)
+        {
+            try
+            {
+                var data = _bankFinancialBLL.GetBankFinancialReport(JsonConvert.SerializeObject(request.SiteIds),
+                                                                  JsonConvert.SerializeObject(request.CurrencyIds),
+                                                                  request.StartDate,
+                                                                  request.EndDate);
+                if (data.Count() == 0)
+                {
+                    return StatusCode(200,
+                  _responseSettingBLL.SetResponse<IEnumerable<BankFinancialDataModel>>(Service.Model.enums.ErrorMessageCodeEnum.NoData,
+                                                                         data));
+                }
+                else
+                {
+                    return StatusCode(200,
+                  _responseSettingBLL.SetResponse<IEnumerable<BankFinancialDataModel>>(Service.Model.enums.ErrorMessageCodeEnum.Success,
+                                                                         data));
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500,
+                                  _responseSettingBLL.SetResponse(ex));
+            }
+        }
+
+        [HttpPost]
+        public IActionResult ExportBankFinancialReport(string SiteIds,
+                                                       string CurrencyIds,
+                                                       string StartDate,
+                                                       string EndDate)
+        {
+            var data = _bankFinancialBLL.GetBankFinancialReport(SiteIds,
+                                                                CurrencyIds,
+                                                                StartDate,
+                                                                EndDate);
+            var stream = _excelBLL.Export(data);
+
+            return File(stream,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        $"BankFinancialReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
+
 
         #endregion
 

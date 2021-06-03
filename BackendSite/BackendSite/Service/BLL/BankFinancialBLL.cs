@@ -1,5 +1,7 @@
 ﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
 using LazZiya.ImageResize;
 using Microsoft.AspNetCore.Http;
@@ -17,6 +19,7 @@ namespace BackendSite.Service.BLL
 
         private readonly BankFinancialService _bankFinancialService;
         private readonly PaymentManageService _paymentManageService;
+        private readonly ReportService _reportService;
         private readonly SelLangBLL _selLangBLL;
 
         #endregion
@@ -25,10 +28,12 @@ namespace BackendSite.Service.BLL
 
         public BankFinancialBLL(BankFinancialService bankFinancialService,
                                 PaymentManageService paymentManageService,
+                                ReportService reportService,
                                 SelLangBLL selLangBLL)
         {
             _bankFinancialService = bankFinancialService;
             _paymentManageService = paymentManageService;
+            _reportService = reportService;
             _selLangBLL = selLangBLL;
         }
 
@@ -1453,6 +1458,218 @@ namespace BackendSite.Service.BLL
                                                                startDate,
                                                                endDate);
         }
+
+        #endregion
+
+        #region Bank Financial Report
+
+        public IEnumerable<BankFinancialDataModel> GetBankFinancialReport(string siteIds,
+                                                                               string currencyIds,
+                                                                               string startDate,
+                                                                               string endDate)
+        {
+
+            Dictionary<string, BankFinancialDataModel> keyValuePairs = new Dictionary<string, BankFinancialDataModel>();
+
+            var accountData = _bankFinancialService.GetTransferAccountList();
+            var payData = _paymentManageService.GetPayList();
+            var siteData = _reportService.GetServerInfoList();
+            var currencyData = _reportService.GetCurrencyList();
+
+            var depositData = _bankFinancialService.GetDepositSummary(siteIds,
+                                                               currencyIds,
+                                                               startDate,
+                                                               endDate);
+
+            var withdrawalData = _bankFinancialService.GetWithdrawalSummary(siteIds,
+                                                               currencyIds,
+                                                               startDate,
+                                                               endDate);
+
+            var transferData = _bankFinancialService.GetTransferSummary(siteIds,
+                                                               currencyIds,
+                                                               startDate,
+                                                               endDate);
+            #region Data Combine
+
+            foreach (var data in depositData)
+            {
+                BankFinancialDataModel bankFinancialDataModel = null;
+                //string channel = string.Empty;
+                //string AccountName = string.Empty;
+
+                if (data.DepositType == DepositType.LocalBank)
+                {
+                    var account = accountData.Where(x => x.AccountNo == data.AccountNo).FirstOrDefault();
+
+                    if (account != null)
+                    {
+
+                        if (!keyValuePairs.ContainsKey($"{account.Channel.GetDescription()}-{data.AccountNo}"))
+                        {
+                            bankFinancialDataModel = new BankFinancialDataModel();
+                            keyValuePairs.Add($"{account.Channel.GetDescription()}-{data.AccountNo}", bankFinancialDataModel);
+                            bankFinancialDataModel.SiteId = data.SiteId;
+                            bankFinancialDataModel.SiteName = siteData.Where(x => x.SiteId == data.SiteId).Select(x => x.SiteName).FirstOrDefault();
+                            bankFinancialDataModel.CurrencyId = data.CurrencyId;
+                            bankFinancialDataModel.IsoCode = currencyData.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
+                            bankFinancialDataModel.Channel = account.Channel;
+                            bankFinancialDataModel.Agent = account.Agent;
+                            bankFinancialDataModel.AccountNo = data.AccountNo;
+                            bankFinancialDataModel.AccountName = account.DisplayName;
+                            bankFinancialDataModel.Purpose = account.Purpose;
+                            bankFinancialDataModel.AccountStatus = account.Status;
+                        }
+
+                        bankFinancialDataModel = keyValuePairs[$"{account.Channel.GetDescription()}-{data.AccountNo}"];
+
+                        bankFinancialDataModel.DepositAmount = data.DepositSummary;
+                        //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+
+                    }
+                }
+                else
+                {
+                    var account = accountData.Where(x => x.PayId.ToString() == data.AccountNo && x.SiteId == data.SiteId && x.CurrencyId == data.CurrencyId).FirstOrDefault();
+                    var pay = payData.Where(x => x.Id.ToString() == data.AccountNo).FirstOrDefault();
+
+                    if (!keyValuePairs.ContainsKey($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}"))
+                    {
+                        TransferAccountStatusEnum status = pay.Status == 1 ? TransferAccountStatusEnum.Open : TransferAccountStatusEnum.Close;
+
+                        bankFinancialDataModel = new BankFinancialDataModel();
+                        keyValuePairs.Add($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}", bankFinancialDataModel);
+                        bankFinancialDataModel.SiteId = data.SiteId;
+                        bankFinancialDataModel.SiteName = siteData.Where(x => x.SiteId == data.SiteId).Select(x => x.SiteName).FirstOrDefault();
+                        bankFinancialDataModel.CurrencyId = data.CurrencyId;
+                        bankFinancialDataModel.IsoCode = currencyData.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
+                        bankFinancialDataModel.Channel = TransferChannelEnum.PSP;
+                        bankFinancialDataModel.PayId = account == null ? pay.Id : account.PayId;
+                        bankFinancialDataModel.PayName = account == null ? pay.PayName : account.PayName;
+                        bankFinancialDataModel.AccountNo = account == null ? pay.PayName + " " + bankFinancialDataModel.IsoCode : account.AccountNo;
+                        bankFinancialDataModel.AccountName = account == null ? pay.PayName + " " + bankFinancialDataModel.IsoCode : account.DisplayName;
+                        bankFinancialDataModel.Purpose = account == null ? "1,2,3" : account.Purpose;
+                        bankFinancialDataModel.AccountStatus = account == null ? status : account.Status;
+                    }
+                    bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}"];
+
+                    bankFinancialDataModel.DepositAmount = data.DepositSummary;
+                    //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+                }
+
+            }
+
+            foreach (var data in withdrawalData)
+            {
+                BankFinancialDataModel bankFinancialDataModel = null;
+
+                if (data.WithdrawalType == WithdrawalType.LocalBank)
+                {
+                    var account = accountData.Where(x => x.AccountNo == data.AccountNo).FirstOrDefault();
+
+                    if (account != null)
+                    {
+                        if (!keyValuePairs.ContainsKey($"{account.Channel.GetDescription()}-{data.AccountNo}"))
+                        {
+                            bankFinancialDataModel = new BankFinancialDataModel();
+                            keyValuePairs.Add($"{account.Channel.GetDescription()}-{data.AccountNo}", bankFinancialDataModel);
+                            bankFinancialDataModel.SiteId = data.SiteId;
+                            bankFinancialDataModel.SiteName = siteData.Where(x => x.SiteId == data.SiteId).Select(x => x.SiteName).FirstOrDefault();
+                            bankFinancialDataModel.CurrencyId = data.CurrencyId;
+                            bankFinancialDataModel.IsoCode = currencyData.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
+                            bankFinancialDataModel.Channel = account.Channel;
+                            bankFinancialDataModel.Agent = account.Agent;
+                            bankFinancialDataModel.AccountNo = data.AccountNo;
+                            bankFinancialDataModel.AccountName = account.DisplayName;
+                            bankFinancialDataModel.Purpose = account.Purpose;
+                            bankFinancialDataModel.AccountStatus = account.Status;
+                        }
+
+                        bankFinancialDataModel = keyValuePairs[$"{account.Channel.GetDescription()}-{data.AccountNo}"];
+
+                        bankFinancialDataModel.WithdrawalAmount = data.WithdrawalSummary;
+                        //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+                    }
+                }
+                else if (data.WithdrawalType == WithdrawalType.OnlinePayment)
+                {
+                    var account = accountData.Where(x => x.PayId.ToString() == data.AccountNo && x.SiteId == data.SiteId && x.CurrencyId == data.CurrencyId).FirstOrDefault();
+                    var pay = payData.Where(x => x.Id.ToString() == data.AccountNo).FirstOrDefault();
+
+                    if (!keyValuePairs.ContainsKey($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}"))
+                    {
+                        TransferAccountStatusEnum status = pay.Status == 1 ? TransferAccountStatusEnum.Open : TransferAccountStatusEnum.Close;
+
+                        bankFinancialDataModel = new BankFinancialDataModel();
+                        keyValuePairs.Add($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}", bankFinancialDataModel);
+                        bankFinancialDataModel.SiteId = data.SiteId;
+                        bankFinancialDataModel.SiteName = siteData.Where(x => x.SiteId == data.SiteId).Select(x => x.SiteName).FirstOrDefault();
+                        bankFinancialDataModel.CurrencyId = data.CurrencyId;
+                        bankFinancialDataModel.IsoCode = currencyData.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
+                        bankFinancialDataModel.Channel = TransferChannelEnum.PSP;
+                        bankFinancialDataModel.PayId = account == null ? pay.Id : account.PayId;
+                        bankFinancialDataModel.PayName = account == null ? pay.PayName : account.PayName;
+                        bankFinancialDataModel.AccountNo = account == null ? pay.PayName+" "+bankFinancialDataModel.IsoCode : account.AccountNo;
+                        bankFinancialDataModel.AccountName = account == null ? pay.PayName + " " + bankFinancialDataModel.IsoCode : account.DisplayName;
+                        bankFinancialDataModel.Purpose = account == null ? "1,2,3" : account.Purpose;
+                        bankFinancialDataModel.AccountStatus = account == null ? status : account.Status;
+                    }
+
+                    bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}"];
+
+                    bankFinancialDataModel.WithdrawalAmount = data.WithdrawalSummary;
+                    //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+                }
+
+            }
+
+            foreach (var data in transferData)
+            {
+                BankFinancialDataModel bankFinancialDataModel = null;
+
+                var account = accountData.Where(x => x.AccountNo == data.AccountNo).FirstOrDefault();
+
+                if (account != null)
+                {
+                    if (!keyValuePairs.ContainsKey($"{account.Channel.GetDescription()}-{data.AccountNo}"))
+                    {
+                        bankFinancialDataModel = new BankFinancialDataModel();
+                        keyValuePairs.Add($"{account.Channel.GetDescription()}-{data.AccountNo}", bankFinancialDataModel);
+                        bankFinancialDataModel.SiteId = data.SiteId;
+                        bankFinancialDataModel.SiteName = siteData.Where(x => x.SiteId == data.SiteId).Select(x => x.SiteName).FirstOrDefault();
+                        bankFinancialDataModel.CurrencyId = data.CurrencyId;
+                        bankFinancialDataModel.IsoCode = currencyData.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
+                        bankFinancialDataModel.Channel = account.Channel;
+                        bankFinancialDataModel.Agent = account.Agent;
+                        bankFinancialDataModel.PayId = account.PayId;
+                        bankFinancialDataModel.PayName = account.PayName;
+                        bankFinancialDataModel.AccountNo = data.AccountNo;
+                        bankFinancialDataModel.AccountName = account.DisplayName;
+                        bankFinancialDataModel.Purpose = account.Purpose;
+                        bankFinancialDataModel.AccountStatus = account.Status;
+                    }
+
+                    bankFinancialDataModel = keyValuePairs[$"{account.Channel.GetDescription()}-{data.AccountNo}"];
+
+                    bankFinancialDataModel.TransferAmount = data.TransferSummary;
+                    //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+                }
+            }
+
+            #endregion
+
+            #region 補0
+
+            #endregion
+
+            var Data = keyValuePairs.Select(s => s.Value);
+
+            return Data;
+
+        }
+
+
+
 
         #endregion
     }
