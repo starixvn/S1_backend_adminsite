@@ -12,11 +12,11 @@ export const dataColumnDefs = () => {
 			columnTitle: "SN" 
 		},
 		{
-			dataColumn: "siteId",
+			dataColumn: "siteName",
 			columnTitle: "SiteName"
 		},
 		{
-			dataColumn: "tpId",
+			dataColumn: "tpName",
 			columnTitle: "TpName"
 		},
 		{

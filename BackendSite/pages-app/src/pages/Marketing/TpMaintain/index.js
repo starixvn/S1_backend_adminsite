@@ -155,12 +155,12 @@ const App = () => {
   const DeleteTpMaintain = (idx) => {
     if (
       window.confirm(
-        `Delete Announcement which SN is ${stateDatas.Datas[idx].SN} ?`
+        `Delete Maintenance which SN is ${stateDatas.Datas[idx].sn} ?`
       )
     ) {
       let param = {
         Url: "TpMaintain/DeleteTpMaintain",
-        Data: `SN=${stateDatas.Datas[idx].SN}`,
+        Data: `sn=${stateDatas.Datas[idx].sn}`,
       };
       WebAPI.PostData(param).then((res) => {
         if (res.data.errorCode === 0) {

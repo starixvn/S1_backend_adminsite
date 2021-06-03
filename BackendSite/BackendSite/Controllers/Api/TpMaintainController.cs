@@ -30,7 +30,7 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
-        public ApiResult InsertTpMaintain(TpMaintain input)
+        public ApiResult InsertTpMaintain([FromForm] TpMaintain input)
         {
             try
             {
@@ -52,13 +52,13 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
-        public ApiResult DeleteTpMaintain(TpMaintain input)
+        public ApiResult DeleteTpMaintain([FromForm] int sn)
         {
             try
             {
                 return new ApiResult
                 {
-                    ErrorCode = tpMaintainBLL.DeleteTpMaintain(input) ? 0 : -1
+                    ErrorCode = tpMaintainBLL.DeleteTpMaintain(sn) ? 0 : -1
                 };
             }
             catch (Exception ex)

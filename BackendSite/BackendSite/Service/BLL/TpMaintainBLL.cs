@@ -29,13 +29,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<TpMaintain> GetTpMaintainList()
         {
-            var result = new List<TpMaintain>();
-            foreach (var item in serverInfoBLL.GetSiteList())
-            {
-                var list = tpMaintainService.GetTpMaintainList(item.SiteId);
-                result.AddRange(list);
-            }
-            return result;
+            return tpMaintainService.GetTpMaintainList();
         }
 
         public bool InsertTpMaintain(TpMaintain input)
@@ -43,9 +37,9 @@ namespace BackendSite.Service.BLL
             return tpMaintainService.InsertTpMaintain(input);
         }
 
-        public bool DeleteTpMaintain(TpMaintain input)
+        public bool DeleteTpMaintain(int sn)
         {
-            return tpMaintainService.DeleteTpMaintain(input);
+            return tpMaintainService.DeleteTpMaintain(sn);
         }
     }
 }

@@ -10,7 +10,9 @@ namespace BackendSite.Service.Model
     {
         public int SN { get; set; }
         public int SiteId { get; set; }
+        public string SiteName { get; set; }
         public int TpId { get; set; }
+        public string TpName { get; set; }
         public DateTime BeginDate { get; set; }
         public DateTime EndDate { get; set; }
         public string MaintainType { get; set; }
