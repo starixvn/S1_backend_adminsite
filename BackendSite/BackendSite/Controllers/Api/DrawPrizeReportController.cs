@@ -25,9 +25,9 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/DrawPrizeReport" })]
-        public ApiListResult<DrawPrize> PrizeSearch(PrizeSelect prizeSelect)
+        public ApiListResultCurrencyAmount<DrawPrize> PrizeSearch(PrizeSelect prizeSelect)
         {
-            var apiResult = new ApiListResult<DrawPrize>();
+            var apiResult = new ApiListResultCurrencyAmount<DrawPrize>();
             try
             {
                 var prizeSearchResult = prizeBLL.PrizeSearch(prizeSelect);
@@ -35,6 +35,7 @@ namespace BackendSite.Controllers.Api
                 apiResult.PageNumber = prizeSearchResult.PageNumber;
                 apiResult.TotalPages = prizeSearchResult.TotalPages;
                 apiResult.RowCount = prizeSearchResult.RowCount;
+                apiResult.CurrencyAmount = prizeSearchResult.CurrencyAmount;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)

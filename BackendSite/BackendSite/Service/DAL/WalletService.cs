@@ -88,8 +88,9 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return rebateLogList;
         }
-        public IEnumerable<RebateLog> GetRebateLog(IEnumerable<int> SelectSite, string userName, int rebateType, long startDate, long endDate, int pageSize, int currencyId, int baseCurrencyId, decimal totalAmountShow, int rebateCategoriesId, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<RebateLog> GetRebateLog(IEnumerable<int> SelectSite, string userName, int rebateType, long startDate, long endDate, int pageSize, int currencyId, int baseCurrencyId, decimal totalAmountShow, int rebateCategoriesId, ref int pageNumber, out int totalPages, out int rowCount, ref string CurrencyAmount)
         {
+            string tempCurrencyTotalAmount = string.Empty;
             var p = new DynamicParameters(new { SelectSite = JsonConvert.SerializeObject(SelectSite), UserName = userName, RebateType = rebateType
                 , StartDate = startDate, EndDate = endDate, PageSize = pageSize, CategoryType= rebateCategoriesId, CurrencyId= currencyId,BaseCurrencyId= baseCurrencyId,TotalAmountShow= totalAmountShow});
             p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
@@ -102,6 +103,21 @@ namespace BackendSite.Service.DAL
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
+
+            #region GetCurrencyTotalAmount
+            var para = new DynamicParameters(new { SelectSite = JsonConvert.SerializeObject(SelectSite), UserName = userName, RebateType = rebateType
+                , StartDate = startDate, EndDate = endDate, PageSize = pageSize, CategoryType= rebateCategoriesId, CurrencyId= currencyId,BaseCurrencyId= baseCurrencyId,TotalAmountShow= totalAmountShow});
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_RebateLogTotalAmount_Get", p, commandType: CommandType.StoredProcedure).ToList();
+            if (CurrencyTotalAmount.Count > 0)
+            {
+                CurrencyTotalAmount.ForEach(x =>
+                {
+                    tempCurrencyTotalAmount += string.Format("{0}:{1} ", x.Currency, x.Amount);
+                });
+            }
+            CurrencyAmount = tempCurrencyTotalAmount;
+            #endregion
+
             return rebateLogList;
         }
         public IEnumerable<RebateLog> GetRebateLogExport(string SelectSite, string userName, int rebateType, long startDate, long endDate, int currencyId, int baseCurrencyId, decimal totalAmountShow, int rebateCategoriesId)
@@ -189,8 +205,11 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int pageSize, int pageNumber,int CategoryId, int BaseCurrencyId, int RebateCategoriesId, decimal TotalAmountShow)
+        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int pageSize, int pageNumber,int CategoryId, int BaseCurrencyId, int RebateCategoriesId, string TotalAmountShow,ref string CurrencyAmount)
         {
+            decimal tempTotalAmountShow;
+            decimal.TryParse(TotalAmountShow, out tempTotalAmountShow);
+            string tempCurrencyTotalAmount = string.Empty;
             VipRebateInfoData SearchData = new VipRebateInfoData();
             DynamicParameters props = new DynamicParameters();
             props.Add("SelectSite", JsonConvert.SerializeObject(selectSite));
@@ -202,7 +221,7 @@ namespace BackendSite.Service.DAL
             props.Add("CategoryId", CategoryId);
             props.Add("BaseCurrencyId", BaseCurrencyId);
             props.Add("CategoryType", RebateCategoriesId);
-            props.Add("TotalAmountShow", TotalAmountShow);
+            props.Add("TotalAmountShow", tempTotalAmountShow);
             props.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -214,6 +233,30 @@ namespace BackendSite.Service.DAL
             SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
             SearchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
             SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
+
+            #region GetCurrencyTotalAmount
+            DynamicParameters para = new DynamicParameters();
+            props.Add("SelectSite", JsonConvert.SerializeObject(selectSite));
+            props.Add("Currency", currency);
+            props.Add("UserName", string.IsNullOrWhiteSpace(User) ? null : User);
+            props.Add("StartDate", startDate);
+            props.Add("EndDate", endDate);
+            props.Add("PageSize", pageSize);
+            props.Add("CategoryId", CategoryId);
+            props.Add("BaseCurrencyId", BaseCurrencyId);
+            props.Add("CategoryType", RebateCategoriesId);
+            props.Add("TotalAmountShow", tempTotalAmountShow);
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_VipRebateTotalAmount_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            if (CurrencyTotalAmount.Count > 0)
+            {
+                CurrencyTotalAmount.ForEach(x =>
+                {
+                    tempCurrencyTotalAmount += string.Format("{0}:{1} ", x.Currency, x.Amount);
+                });
+            }
+            CurrencyAmount = tempCurrencyTotalAmount;
+            #endregion
+
             return SearchData;
         }
         public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, long? startDate, long? endDate, int pageSize, int pageNumber)

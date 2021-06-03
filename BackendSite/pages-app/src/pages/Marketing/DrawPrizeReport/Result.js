@@ -95,6 +95,7 @@ const Panel = (props) => {
           totalPages: props.PageInfo.totalPages,
           pageNumber: props.PageInfo.pageNumber,
           rowCount: props.PageInfo.rowCount,
+          currencyAmount: props.PageInfo.currencyAmount
         }}
         ChangePage={props.ChangePage}
       />

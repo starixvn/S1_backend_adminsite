@@ -160,7 +160,8 @@ const Panel = (props)=>{
                     Data={{
                         totalPages:props.PageInfo.totalPages,
                         pageNumber:props.PageInfo.pageNumber,
-                        rowCount:props.PageInfo.rowCount
+                        rowCount:props.PageInfo.rowCount,
+                        currencyAmount:props.PageInfo.currencyAmount
                     }}
                     ChangePage={props.ChangePage}
                 />

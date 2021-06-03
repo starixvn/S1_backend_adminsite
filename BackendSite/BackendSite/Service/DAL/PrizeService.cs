@@ -23,12 +23,10 @@ namespace BackendSite.Service.DAL
         public PrizeSearchResult PrizeSearch(PrizeSelect prizeSelect)
         {
             PrizeSearchResult SearchResult = new PrizeSearchResult();
+            string tempCurrencyTotalAmount = string.Empty;
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             DynamicParameters props = new DynamicParameters();
-            props.Add("PageNumber", prizeSelect.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
             props.Add("PageSize", prizeSelect.PageSize);
             props.Add("StartDate", prizeSelect.StartDate);
             props.Add("EndDate", prizeSelect.EndDate);
@@ -36,12 +34,32 @@ namespace BackendSite.Service.DAL
             props.Add("CurrencyId", prizeSelect.CurrencyId);
             props.Add("EventName", string.IsNullOrWhiteSpace(prizeSelect.EventName.Trim()) ? null : prizeSelect.EventName);
 
+            #region GetCurrencyTotalAmount
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_DrawPrizeTotalAmount_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            if (CurrencyTotalAmount.Count > 0)
+            {
+                CurrencyTotalAmount.ForEach(x =>
+                {
+                    tempCurrencyTotalAmount += string.Format("{0}:{1} ", x.Currency, x.Amount);
+                });
+            }
+            SearchResult.CurrencyAmount = tempCurrencyTotalAmount;
+            #endregion
+
+            props.Add("PageNumber", prizeSelect.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
             var result = conn.Query<DrawPrize>("Admin_DrawPrize_GetV2", props, commandType: CommandType.StoredProcedure);
             
             SearchResult.DrawPrize = result.ToList();
             SearchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
             SearchResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
             SearchResult.RowCount = props.Get<int?>("RowCount") ?? 0;
+
+            
+
 
             return SearchResult;
         }
