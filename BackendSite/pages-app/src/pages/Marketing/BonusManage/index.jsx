@@ -156,6 +156,7 @@ const App = () => {
 					let lang = {};
 					info.selectedLang.forEach(l => {
 						lang[l] = info.lang[l];
+						lang[l].bannerUrl = (lang[l].bannerUrl) ? lang[l].bannerUrl.replace('\t', '').trim() : lang[l].bannerUrl
 					});
 					let maxBonus =
 						promotion.promotionType == 3
@@ -340,11 +341,11 @@ const App = () => {
 					scratchCardData: scratchCardData.data,
 					specialCode: state.promotionList[idx].specialCode,
 					popBoxIsOpenGen: false,
-			        genNum: 0
+					genNum: 0
 				});
 			} else {
 				let msg =
-				scratchCardData.errorCode === 991 
+					scratchCardData.errorCode === 991
 						? "API Server Error."
 						: scratchCardData.msg;
 				alert(msg);
@@ -404,12 +405,12 @@ const App = () => {
 			}
 		});
 	};
-	const ClickGen= async idx => {
+	const ClickGen = async idx => {
 		dispatch({
 			type: defActionType.HANDEL_POPBOXGEN,
 			popBoxIsOpenGen: true,
 			genNum: 0
-			
+
 		});
 	};
 
@@ -533,12 +534,11 @@ const App = () => {
 					}
 				}
 			);
-		}else if(state.genNum <=0)
-		{
+		} else if (state.genNum <= 0) {
 			alert("Number cannot be zero");
-	    }
+		}
 	};
-    
+
 	const StateCheckBox = (value, dataColumn) => {
 		if (statusCheck.length > 0) {
 			setStatusCheck([])
@@ -580,8 +580,7 @@ const App = () => {
 		"8": ["expiryDays", "walletType", "categoryId", "tpId", "rollOver", "minPayout", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours", "affid", "specialCode"],
 	}
 
-	if(state.panelType === defPanelType.Main || state.panelType === defPanelType.Copy )
-	{
+	if (state.panelType === defPanelType.Main || state.panelType === defPanelType.Copy) {
 		return (
 			<Main
 				ClickCreateBonus={ClickCreateBonus}
@@ -592,7 +591,7 @@ const App = () => {
 				promotionList={state.promotionList}
 				Datas={state.promotionData}
 				NewDatas={state.clonePromotionData}
-				Action={{ ClickClone, ClickCancle, SetCloneValue, SubmitClone, ClickGen, ClickGenCancle, GenerarStart, SetGenNumValue}}
+				Action={{ ClickClone, ClickCancle, SetCloneValue, SubmitClone, ClickGen, ClickGenCancle, GenerarStart, SetGenNumValue }}
 				IsOpen={state.popBoxIsOpen}
 				SiteList={state.siteList}
 				StateFilter={stateFilter}
@@ -604,20 +603,18 @@ const App = () => {
 				StateCheckBox={StateCheckBox}
 				IsOpenGen={state.popBoxIsOpenGen}
 			/>
-		) ;
-	} else if(state.panelType === defPanelType.SList)
-	{
+		);
+	} else if (state.panelType === defPanelType.SList) {
 		return (
 			<ScratchList
 				Datas={state.scratchCardData}
-				action={{ ClickBack, ClickGen, GenerarStart, ClickGen, ClickGenCancle, GenerarStart, SetGenNumValue}}
+				action={{ ClickBack, ClickGen, GenerarStart, ClickGen, ClickGenCancle, GenerarStart, SetGenNumValue }}
 				processing={processing}
 				skipField={skipField}
 				IsOpenGen={state.popBoxIsOpenGen}
 			/>
 		);
-	}else 
-	{
+	} else {
 		return (
 			<Edit
 				Datas={state.promotionData}
