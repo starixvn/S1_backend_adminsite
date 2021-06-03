@@ -35,8 +35,24 @@ const dataColumnDefs = () => {
         format: dateFormat,
       },
     },
-    { dataColumn: "toVerifyTime", columnTitle: "To Verify Time" },
-    { dataColumn: "toApprovedTime", columnTitle: "To Approved Time" },
+    {
+      dataColumn: "toVerifyTime",
+      columnTitle: "To Verify Time",
+      body: {
+        attr: {
+          class: "text-right",
+        },
+      },
+    },
+    {
+      dataColumn: "toApprovedTime",
+      columnTitle: "To Approved Time",
+      body: {
+        attr: {
+          class: "text-right",
+        },
+      },
+    },
     { dataColumn: "completeTime", columnTitle: "Complete Time" },
   ];
 };
