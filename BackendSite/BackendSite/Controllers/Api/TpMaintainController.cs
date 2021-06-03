@@ -72,7 +72,7 @@ namespace BackendSite.Controllers.Api
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
         public ApiResult<IEnumerable<CommonTpInfo>> GetCommonTpList()
         {
@@ -95,7 +95,7 @@ namespace BackendSite.Controllers.Api
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
         public ApiResult<IEnumerable<TpMaintain>> GetTpMaintainList()
         {
