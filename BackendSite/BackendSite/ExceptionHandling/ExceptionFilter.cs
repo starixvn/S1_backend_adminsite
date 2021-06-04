@@ -27,12 +27,8 @@ namespace BackendSite.ExceptionHandling
 
         public void OnException(ExceptionContext context)
         {
-            #region System Exception 裝載
-
-            //Status Code
             var code = HttpStatusCode.InternalServerError;
 
-            //Respone Object
             var exception = context.Exception;
             var result = JsonSerializer.Serialize(new
             {
@@ -43,16 +39,10 @@ namespace BackendSite.ExceptionHandling
                 StackTrace = exception.StackTrace
             });
 
-            #endregion
-
-            #region Logic Exception 裝載
-
             if (context.Exception.GetType() == typeof(AdminException))
             {
-                //Status Code
                 code = HttpStatusCode.OK;
 
-                //Response Object
                 AdminException adminException = context.Exception as AdminException;
                 string message = adminException.Message;
 
@@ -68,17 +58,11 @@ namespace BackendSite.ExceptionHandling
                 });
             }
 
-            #endregion
-
-            #region Response 裝載
-
             var httpContext = context.HttpContext;
 
             httpContext.Response.ContentType = "application/json";
             httpContext.Response.StatusCode = (int)code;
             httpContext.Response.WriteAsync(result);
-
-            #endregion
 
             context.ExceptionHandled = true;
 

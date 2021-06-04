@@ -2,15 +2,18 @@ import React from "react";
 import moment from "moment";
 import DateTimePicker from "react-datetime";
 import MultiSelect from "react-multi-select-component";
-console.log("aa", process.env.NODE_ENV);
-const defCurrencyType = {
-  2: "MYR",
-  4: "THB",
-  13: "RMB",
-  15: "IDR",
-  51: "VND",
-  61: "INR",
-};
+
+if (process.env.NODE_ENV !== "production") {
+  window.gCurrencyList = [2, 4, 13, 15, 51, 61];
+  window.i18n = {
+    lbl_Currency2: "MYR",
+    lbl_Currency4: "THB",
+    lbl_Currency13: "RMB",
+    lbl_Currency15: "IDR",
+    lbl_Currency51: "VND",
+    lbl_Currency61: "INR",
+  };
+}
 
 const Panel = (props) => {
   let siteListOptions = "";
@@ -38,8 +41,8 @@ const Panel = (props) => {
         ) : null}
         <CurrencyElem
           columnTitle="Currency"
-          options={Object.keys(defCurrencyType).map((key) => {
-            return { value: key, label: defCurrencyType[key] };
+          options={window.gCurrencyList.map((curr) => {
+            return { label: window.i18n["lbl_Currency" + curr], value: curr };
           })}
           dataColumn="CurrencyIds"
           onChange={props.onChange}
