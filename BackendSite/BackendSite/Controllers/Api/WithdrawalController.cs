@@ -74,18 +74,20 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiListResult<WithdrawalRequest> GetWithdrawalRequestList(WithdrawalListReq withdrawalListReq)
+        public ApiListResultCurrencyAmount<WithdrawalRequest> GetWithdrawalRequestList(WithdrawalListReq withdrawalListReq)
         {
-            var apiListResult = new ApiListResult<WithdrawalRequest>();
+            var apiListResult = new ApiListResultCurrencyAmount<WithdrawalRequest>();
             int pageNumber = withdrawalListReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
-            var withdrawalRequestList = withdrawalBLL.GetWithdrawalRequestList(withdrawalListReq.SelectSite, withdrawalListReq.withdrawalType, withdrawalListReq.startDate, withdrawalListReq.endDate, withdrawalListReq.WithdrawalId, withdrawalListReq.UserName, withdrawalListReq.CurrencyId, withdrawalListReq.status, withdrawalListReq.LevelStatus, 10, ref pageNumber, out totalPages, out rowCount);
+            string CurrencyAmount = string.Empty;
+            var withdrawalRequestList = withdrawalBLL.GetWithdrawalRequestList(withdrawalListReq.SelectSite, withdrawalListReq.withdrawalType, withdrawalListReq.startDate, withdrawalListReq.endDate, withdrawalListReq.WithdrawalId, withdrawalListReq.UserName, withdrawalListReq.CurrencyId, withdrawalListReq.status, withdrawalListReq.LevelStatus, 10, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
             apiListResult.Data = withdrawalRequestList;
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;
             apiListResult.TotalPages = totalPages;
             apiListResult.RowCount = rowCount;
+            apiListResult.CurrencyAmount = CurrencyAmount;
 
             return apiListResult;
         }

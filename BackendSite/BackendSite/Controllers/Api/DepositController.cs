@@ -53,18 +53,20 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiListResult<DepositRequest> GetDepositRequestList(DepositListReq depositListReq)
+        public ApiListResultCurrencyAmount<DepositRequest> GetDepositRequestList(DepositListReq depositListReq)
         {
-            var apiListResult = new ApiListResult<DepositRequest>();
+            var apiListResult = new ApiListResultCurrencyAmount<DepositRequest>();
             int pageNumber = depositListReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
-            var depositRequestList = depositBLL.GetDepositRequestList(depositListReq.SelectSite, depositListReq.DepositType, depositListReq.startDate, depositListReq.endDate, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, depositListReq.LevelStatus,10, ref pageNumber, out totalPages, out rowCount);
+            string CurrencyAmount = string.Empty;
+            var depositRequestList = depositBLL.GetDepositRequestList(depositListReq.SelectSite, depositListReq.DepositType, depositListReq.startDate, depositListReq.endDate, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, depositListReq.LevelStatus,10, ref pageNumber, out totalPages, out rowCount,ref CurrencyAmount);
             apiListResult.Data = depositRequestList;
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;
             apiListResult.TotalPages = totalPages;
             apiListResult.RowCount = rowCount;
+            apiListResult.CurrencyAmount = CurrencyAmount;
 
             return apiListResult;
         }

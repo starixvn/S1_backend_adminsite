@@ -20,7 +20,7 @@ namespace BackendSite.Service.BLL
             this.selLangBLL = selLangBLL;
         }
 
-        public IEnumerable<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport(string TransId, int Currency, string UserName, int AdjustType, long StartDate, long EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport(string TransId, int Currency, string UserName, int AdjustType, long StartDate, long EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount, ref string CurrencyAmount)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
             var datas = paymentAdjustmentService.GetPaymentAdjustmentReport(
@@ -34,7 +34,8 @@ namespace BackendSite.Service.BLL
                     PageSize, 
                     ref PageNumber, 
                     ref TotalPages, 
-                    ref RowCount
+                    ref RowCount,
+                    ref CurrencyAmount
                 );
 
             List<PaymentAdjustmentFrontEnd> result = new List<PaymentAdjustmentFrontEnd>();
