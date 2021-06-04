@@ -338,19 +338,31 @@ namespace BackendSite.Service.BLL
             {
                 tempDays = string.Format("{0}Days", ts.Days.ToString());
             }
-            if (ts.Hours != 0)
+            if (ts.Hours >= 10)
             {
-                tempHours = string.Format("{0}Hours", ts.Hours.ToString());
+                tempHours = string.Format("{0}", ts.Hours.ToString());
             }
-            if (ts.Minutes != 0)
+            else
             {
-                tempMinutes = string.Format("{0}Minutes", ts.Minutes.ToString());
+                tempHours = string.Format("0{0}", ts.Hours.ToString());
             }
-            if (ts.Seconds != 0)
+            if (ts.Minutes >= 10)
             {
-                tempSeconds = string.Format("{0}Seconds", ts.Seconds.ToString());
+                tempMinutes = string.Format("{0}", ts.Minutes.ToString());
             }
-            result = string.Format("{0}{1}{2}{3}", tempDays, tempHours, tempMinutes, tempSeconds);
+            else
+            {
+                tempMinutes = string.Format("0{0}", ts.Minutes.ToString());
+            }
+            if (ts.Seconds >= 10)
+            {
+                tempSeconds = string.Format("{0}", ts.Seconds.ToString());
+            }
+            else
+            {
+                tempSeconds = string.Format("0{0}", ts.Seconds.ToString());
+            }
+            result = string.Format("{0}{1}:{2}:{3}", tempDays, tempHours, tempMinutes, tempSeconds);
             return result;
         }
     }
