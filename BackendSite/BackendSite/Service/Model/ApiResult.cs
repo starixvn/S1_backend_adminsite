@@ -95,6 +95,6 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int PageNumber { get; set; }
         public int RowCount { get; set; }
-        public string CurrencyAmount { get; set; }
+        public List<string> CurrencyAmount { get; set; }
     }
 }

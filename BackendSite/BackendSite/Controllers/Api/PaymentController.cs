@@ -205,7 +205,7 @@ namespace BackendSite.Controllers.Api
             int PageSize = 10;
             int TotalPages = 0;
             int RowCount = 0;
-            string CurrencyAmount = string.Empty;
+            List<string> CurrencyAmount = new List<string>();
             apiListResult.Data = paymentBLL.GetRebateLog(SelectSite, UserName, RebateType, StartDate, EndDate, PageSize, CurrencyId, BaseCurrencyId, TotalAmountShow, RebateCategoriesId, ref PageNumber, out TotalPages, out RowCount,ref CurrencyAmount);
             apiListResult.PageNumber = PageNumber;
             apiListResult.RowCount = RowCount;
@@ -573,7 +573,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResultCurrencyAmount<VipRebateInfo>();
             try
             {
-                string CurrencyAmount = string.Empty;
+                List<string> CurrencyAmount = new List<string>();
                 var SearchResult = paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, para.StartDate, para.EndDate, para.User, para.PageSize, para.PageNumber,
                     para.CategoryId,para.BaseCurrencyId,para.RebateCategoriesId,para.TotalAmountShow, ref CurrencyAmount);
                 apiResult.Data = SearchResult.VipRebateInfoList;

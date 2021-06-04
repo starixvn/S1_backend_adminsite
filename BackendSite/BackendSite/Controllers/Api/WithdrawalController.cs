@@ -80,7 +80,7 @@ namespace BackendSite.Controllers.Api
             int pageNumber = withdrawalListReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
-            string CurrencyAmount = string.Empty;
+            List<string> CurrencyAmount = new List<string>();
             var withdrawalRequestList = withdrawalBLL.GetWithdrawalRequestList(withdrawalListReq.SelectSite, withdrawalListReq.withdrawalType, withdrawalListReq.startDate, withdrawalListReq.endDate, withdrawalListReq.WithdrawalId, withdrawalListReq.UserName, withdrawalListReq.CurrencyId, withdrawalListReq.status, withdrawalListReq.LevelStatus, 10, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
             apiListResult.Data = withdrawalRequestList;
             apiListResult.ErrorCode = 0;

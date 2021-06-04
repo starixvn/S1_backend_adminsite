@@ -31,7 +31,7 @@ namespace BackendSite.Controllers.Api
                 int PageSize = 10;
                 int TotalPages = 0;
                 int RowCount = 0;
-                string CurrencyAmount = string.Empty;
+                List<string> CurrencyAmount = new List<string>();
                 result.Data = paymentAdjustmentBLL.GetPaymentAdjustmentReport(TransId, CurrencyId, UserName, AdjustType, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount, ref CurrencyAmount);
                 result.PageNumber = PageNumber;
                 result.RowCount = RowCount;

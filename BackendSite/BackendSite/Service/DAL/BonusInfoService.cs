@@ -24,14 +24,13 @@ namespace BackendSite.Service.DAL
             this.withdrawalLimitService = withdrawalLimitService;
         }
 
-        public IEnumerable<BonusInfo> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, decimal TotalAmountShow, int RebateCategoriesId ,ref int PageNumber, ref int TotalPages, ref int RowCount,ref string CurrencyAmount)
+        public IEnumerable<BonusInfo> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, decimal TotalAmountShow, int RebateCategoriesId ,ref int PageNumber, ref int TotalPages, ref int RowCount,ref List<string> CurrencyAmount)
         {
             IEnumerable<BonusInfo> result = null;
-            string tempCurrencyTotalAmount = string.Empty;
+            List<string> tempCurrencyTotalAmount = new List<string>();
 
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             DynamicParameters props = new DynamicParameters();
-            props.Add("@PageSize", PageSize);
             props.Add("@SelectSite", JsonConvert.SerializeObject(SelectSite));
             props.Add("@BonusCode", BonusCode);
             props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
@@ -41,7 +40,6 @@ namespace BackendSite.Service.DAL
             props.Add("@TransID", TransId);
             props.Add("@StartDate", StartDate);
             props.Add("@EndDate", EndDate);
-            props.Add("@BaseCurrencyId", BaseCurrencyId);
             props.Add("@TotalAmountShow", TotalAmountShow);
             props.Add("@CategoryType", RebateCategoriesId);
 
@@ -51,12 +49,15 @@ namespace BackendSite.Service.DAL
             {
                 CurrencyTotalAmount.ForEach(x =>
                 {
-                    tempCurrencyTotalAmount += string.Format("{0}:{1} ", x.Currency, x.Amount);
+                    tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.Currency, Math.Round(x.Amount, 2)));
                 });
             }
             CurrencyAmount = tempCurrencyTotalAmount;
             #endregion
 
+
+            props.Add("@PageSize", PageSize);
+            props.Add("@BaseCurrencyId", BaseCurrencyId);
             props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -66,6 +67,7 @@ namespace BackendSite.Service.DAL
             PageNumber = props.Get<int?>("@PageNumber") ?? 0;
             TotalPages = props.Get<int?>("@TotalPages") ?? 0;
             RowCount = props.Get<int?>("@RowCount") ?? 0;
+
 
             return result;
         }

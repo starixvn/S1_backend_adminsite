@@ -23,7 +23,7 @@ namespace BackendSite.Service.DAL
         public PrizeSearchResult PrizeSearch(PrizeSelect prizeSelect)
         {
             PrizeSearchResult SearchResult = new PrizeSearchResult();
-            string tempCurrencyTotalAmount = string.Empty;
+            List<string> tempCurrencyTotalAmount = new List<string>();
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             DynamicParameters props = new DynamicParameters();
 
@@ -40,7 +40,7 @@ namespace BackendSite.Service.DAL
             {
                 CurrencyTotalAmount.ForEach(x =>
                 {
-                    tempCurrencyTotalAmount += string.Format("{0}:{1} ", x.Currency, x.Amount);
+                    tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.Currency, Math.Round(x.Amount, 2)));
                 });
             }
             SearchResult.CurrencyAmount = tempCurrencyTotalAmount;

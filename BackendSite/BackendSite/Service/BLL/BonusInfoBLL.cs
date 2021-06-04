@@ -21,7 +21,7 @@ namespace BackendSite.Service.BLL
             this.selLangBLL = selLangBLL;
         }
 
-        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, decimal TotalAmountShow, int RebateCategoriesId,ref int PageNumber, ref int TotalPages, ref int RowCount, ref string CurrencyAmount)
+        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, decimal TotalAmountShow, int RebateCategoriesId,ref int PageNumber, ref int TotalPages, ref int RowCount, ref List<string> CurrencyAmount)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
             var datas = bonusInfoService.GetBonusInfoReport(

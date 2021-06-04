@@ -25,7 +25,7 @@ namespace BackendSite.Service.DAL
             this.walletService = walletService;
         }
 
-        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite, IEnumerable<int> withdrawalType, long startDate, long endDate, int siteId, string WithdrawalId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount,ref string CurrencyAmount)
+        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite, IEnumerable<int> withdrawalType, long startDate, long endDate, int siteId, string WithdrawalId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount,ref List<string> CurrencyAmount)
         {
             var SelectSite = JsonConvert.SerializeObject(selectSite);
             var WithdrawalType = JsonConvert.SerializeObject(withdrawalType);
@@ -33,7 +33,7 @@ namespace BackendSite.Service.DAL
             var Status = JsonConvert.SerializeObject(status);
             var VipStatus = JsonConvert.SerializeObject(levelstatus);
             int withdrawalId = 0;
-            string tempCurrencyTotalAmount = string.Empty;
+            List<string> tempCurrencyTotalAmount = new List<string>();
             if (!string.IsNullOrWhiteSpace(WithdrawalId))
             {
                 Match m = Regex.Match(WithdrawalId, @"\d+");
@@ -48,7 +48,7 @@ namespace BackendSite.Service.DAL
             {
                 CurrencyTotalAmount.ForEach(x =>
                 {
-                    tempCurrencyTotalAmount += string.Format("{0}:{1} ", x.Currency, x.Amount);
+                    tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.Currency, Math.Round(x.Amount, 2)));
                 });
             }
             CurrencyAmount = tempCurrencyTotalAmount;
