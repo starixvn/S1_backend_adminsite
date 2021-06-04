@@ -23,19 +23,21 @@ namespace BackendSite.Controllers.Api
             this.excelBLL = excelBLL;
         }
 
-        public ApiListResult<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport([FromForm] string TransId, [FromForm] int CurrencyId, [FromForm] string UserName, [FromForm] int AdjustType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)
+        public ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport([FromForm] string TransId, [FromForm] int CurrencyId, [FromForm] string UserName, [FromForm] int AdjustType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)
         {
-            var result = new ApiListResult<PaymentAdjustmentFrontEnd>();
+            var result = new ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd>();
             try
             {
                 int PageSize = 10;
                 int TotalPages = 0;
                 int RowCount = 0;
-                result.Data = paymentAdjustmentBLL.GetPaymentAdjustmentReport(TransId, CurrencyId, UserName, AdjustType, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                string CurrencyAmount = string.Empty;
+                result.Data = paymentAdjustmentBLL.GetPaymentAdjustmentReport(TransId, CurrencyId, UserName, AdjustType, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount, ref CurrencyAmount);
                 result.PageNumber = PageNumber;
                 result.RowCount = RowCount;
                 result.TotalPages = TotalPages;
                 result.ErrorCode = 0;
+                result.CurrencyAmount = CurrencyAmount;
             }
             catch (Exception ex)
             {

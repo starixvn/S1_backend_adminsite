@@ -33,9 +33,9 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetRebateLogByCust(CustId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
-        public IEnumerable<RebateLog> GetRebateLog(IEnumerable<int> selectSite, string userName, int rebateType, long startDate, long endDate, int pageSize,int currencyId,int baseCurrencyId,decimal totalAmountShow,int rebateCategoriesId, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<RebateLog> GetRebateLog(IEnumerable<int> selectSite, string userName, int rebateType, long startDate, long endDate, int pageSize,int currencyId,int baseCurrencyId,decimal totalAmountShow,int rebateCategoriesId, ref int pageNumber, out int totalPages, out int rowCount, ref string CurrencyAmount)
         {
-            return walletService.GetRebateLog(selectSite, userName, rebateType, startDate, endDate, pageSize, currencyId, baseCurrencyId, totalAmountShow, rebateCategoriesId, ref pageNumber, out totalPages, out rowCount);
+            return walletService.GetRebateLog(selectSite, userName, rebateType, startDate, endDate, pageSize, currencyId, baseCurrencyId, totalAmountShow, rebateCategoriesId, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
         }
         public IEnumerable<RebateLog> GetRebateLogExport(string selectSite, string userName, int rebateType, long startDate, long endDate, int currencyId, int baseCurrencyId, decimal totalAmountShow, int rebateCategoriesId)
         {
@@ -77,9 +77,9 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetCustTpBetRecordDetailListbyGameType(custId, selDate, gameTypeId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
         }
-        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int pageSize, int pageNumber,int CategoryId,int BaseCurrencyId,int RebateCategoriesId,decimal TotalAmountShow)
+        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int pageSize, int pageNumber,int CategoryId,int BaseCurrencyId,int RebateCategoriesId, string TotalAmountShow,ref string CurrencyAmount)
         {
-            return walletService.GetVipRebateInfoList(selectSite, currency, startDate, endDate, User, pageSize, pageNumber, CategoryId, BaseCurrencyId, RebateCategoriesId, TotalAmountShow);
+            return walletService.GetVipRebateInfoList(selectSite, currency, startDate, endDate, User, pageSize, pageNumber, CategoryId, BaseCurrencyId, RebateCategoriesId, TotalAmountShow, ref CurrencyAmount);
         }
         public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, long? startDate, long? endDate, int pageSize, int pageNumber)
         {

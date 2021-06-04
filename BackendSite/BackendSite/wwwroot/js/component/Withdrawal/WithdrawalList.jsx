@@ -1,5 +1,5 @@
 ﻿import { number_format } from '../commJS/common';
-import { Pagination } from '../commJS/Pagination.jsx';
+import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
 import * as Loading from '../commJS/Loading.jsx';
 import DateTimePicker from 'react-datetime';
 
@@ -144,7 +144,7 @@ import DateTimePicker from 'react-datetime';
                             {rows}
                         </tbody>
                     </table>
-                    <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                    <PaginationTotalAmount Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
                 </div>
             )
         }

@@ -30,7 +30,10 @@ const Pagination = (props) => {
 
   return (
     <nav className="paging" aria-label="Page navigation example">
-      <span>Total records: {data.rowCount}</span>
+      <span>
+        <tr>{data.currencyAmount}</tr>
+        <tr>Total records: {data.rowCount}</tr>
+      </span>
       <ul className="pagination">
         <li className={"page-item" + (data.pageNumber == 1 ? " disabled" : "")}>
           <a

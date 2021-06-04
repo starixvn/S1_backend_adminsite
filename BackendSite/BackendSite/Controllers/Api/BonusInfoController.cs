@@ -23,19 +23,21 @@ namespace BackendSite.Controllers.Api
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusInfoReport" })]
-        public ApiListResult<BonusInfoFrontEnd> GetBonusInfoReport([FromForm] IEnumerable<int> SelectSite, [FromForm] string BonusCode, [FromForm] string TransId, [FromForm] int CurrencyId, [FromForm] string UserName, [FromForm] int PromotionType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int BaseCurrencyId, [FromForm] decimal TotalAmountShow,[FromForm] int RebateCategoriesId)
+        public ApiListResultCurrencyAmount<BonusInfoFrontEnd> GetBonusInfoReport([FromForm] IEnumerable<int> SelectSite, [FromForm] string BonusCode, [FromForm] string TransId, [FromForm] int CurrencyId, [FromForm] string UserName, [FromForm] int PromotionType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int BaseCurrencyId, [FromForm] decimal TotalAmountShow,[FromForm] int RebateCategoriesId)
         {
-            var result = new ApiListResult<BonusInfoFrontEnd>();
+            var result = new ApiListResultCurrencyAmount<BonusInfoFrontEnd>();
             try
             {
                 int PageSize = 10;
                 int TotalPages = 0;
                 int RowCount = 0;
-                result.Data = bonusInfoBLL.GetBonusInfoReport(SelectSite, BonusCode, TransId, CurrencyId, UserName, PromotionType, StartDate, EndDate, PageSize, BaseCurrencyId, TotalAmountShow, RebateCategoriesId, ref PageNumber, ref TotalPages, ref RowCount);
+                string CurrencyAmount = string.Empty;
+                result.Data = bonusInfoBLL.GetBonusInfoReport(SelectSite, BonusCode, TransId, CurrencyId, UserName, PromotionType, StartDate, EndDate, PageSize, BaseCurrencyId, TotalAmountShow, RebateCategoriesId, ref PageNumber, ref TotalPages, ref RowCount, ref CurrencyAmount);
                 result.PageNumber = PageNumber;
                 result.RowCount = RowCount;
                 result.TotalPages = TotalPages;
                 result.ErrorCode = 0;
+                result.CurrencyAmount = CurrencyAmount;
             }
             catch (Exception ex)
             {
