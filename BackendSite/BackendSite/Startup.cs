@@ -18,6 +18,7 @@ using Microsoft.Extensions.Hosting;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
 using Microsoft.AspNetCore.Http;
+using BackendSite.ExceptionHandling;
 
 namespace BackendSite
 {
@@ -205,6 +206,15 @@ namespace BackendSite
             });
             services.AddDataProtection().DisableAutomaticKeyGeneration();
             services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("CookieKeys")).SetApplicationName("SharedCookieApp");
+
+            #region Global Filter
+
+            services.AddMvc(config =>
+            {
+                config.Filters.Add(new ExceptionFilter());
+            });
+
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -233,6 +243,7 @@ namespace BackendSite
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}");
             });
+
         }
     }
 }
