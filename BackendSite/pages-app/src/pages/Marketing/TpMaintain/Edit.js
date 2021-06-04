@@ -2,75 +2,60 @@ import React, { useState } from "react";
 import DateTimePicker from "react-datetime";
 import moment from "moment";
 
-const allSiteDisplayText = "All";
-
 const elemType = {
-	SwitchBtn: "SwitchBtn",
 	DateTimePicker: "DateTimePicker"
 };
 
 const commonColDefs = [
 	{
-		datacolumn: "startTime",
-		columnTitle: "StartTime (UTC+0)",
+		datacolumn: "beginDate",
+		columnTitle: "BeginDate (UTC+0)",
 		elemType: elemType.DateTimePicker
 	},
 	{
-		datacolumn: "endTime",
-		columnTitle: "EndTime (UTC+0)",
+		datacolumn: "endDate",
+		columnTitle: "EndDate (UTC+0)",
 		elemType: elemType.DateTimePicker
 	}
 ];
 
 const EditPanel = props => {
 	const [stateData, updateData] = useState({
-		...props.Datas,
-		subject: props.IsAdd ? {} : JSON.parse(props.Datas.subject),
-		content: props.IsAdd ? {} : JSON.parse(props.Datas.content)
-	});
+		siteId: 1,
+		id: 1,
+		beginDate: moment().utc().format("YYYY-MM-DD HH:mm"),
+		endDate: moment().utc().add(1,"day").format("YYYY-MM-DD HH:mm"),
+		maintainType:"Date"
+	  });
 
-	const EditFiled = (v, datacolumn, subDatas) => {
-		if (subDatas && subDatas.lang) {
-			updateData({
-				...stateData,
-				[datacolumn]: {
-					...stateData[datacolumn],
-					[subDatas.lang]: v
-				}
-			});
-		} else if (datacolumn === "siteId") {
-			updateData({
-				...stateData,
-				[datacolumn]: v,
-				siteName: v == 0 ? allSiteDisplayText : props.siteList[v]
-			});
-		} else {
-			updateData({
-				...stateData,
-				[datacolumn]: v
-			});
-		}
+	const EditFiled = (v, datacolumn) => {
+		console.log(v,datacolumn);
+		updateData({
+			...stateData,
+			[datacolumn]: v
+		});		
 	};
 
-	const SetAnnouncement = () => {
+	const InsertTpMaintain = () => {
+		console.log(stateData);
 		let msg = "";
 		let check = true;
-		if (!stateData.startTime) {
+		if (!stateData.siteId) {
 			check = false;
-			msg = "Please select start time.";
-		} else if (!stateData.endTime) {
+			msg = "Please select SiteName.";
+		} else if (!stateData.id) {
 			check = false;
-			msg = "Please select end time.";
-		} else if (!stateData.subject || !stateData.subject.en) {
+			msg = "Please select TpName.";
+		} else if (!stateData.beginDate) {
 			check = false;
-			msg = "Please input en subject.";
-		} else if (!stateData.content || !stateData.content.en) {
+			msg = "Please select beginDate.";
+		} else if (!stateData.endDate) {
 			check = false;
-			msg = "Please input en content.";
+			msg = "Please select endDate.";
 		}
 
 		if (check) {
-			props.SetAnnouncement(stateData, props.IsAdd);
+			props.InsertTpMaintain(stateData);
 		} else {
 			alert(msg);
 		}
@@ -85,13 +70,11 @@ const EditPanel = props => {
 					key={key}
 					columnTitle={col.columnTitle}
 					dateTimePickerProps={{
-						defaultValue: props.IsAdd
-							? ""
-							: moment(stateData[col.datacolumn]).format("l LTS"),
+						defaultValue: moment(stateData[col.datacolumn]).format("YYYY-MM-DD HH:mm"),
 						onBlur: e => {
 							try {
 								EditFiled(
-									moment(e).format("l LTS"),
+									moment(e).format("YYYY-MM-DD HH:mm"),
 									col.datacolumn
 								);
 							} catch (ex) {}
@@ -99,26 +82,7 @@ const EditPanel = props => {
 					}}
 				/>
 			);
-		} else if (col.elemType === elemType.SwitchBtn) {
-			elem = (
-				<SwitchBtn
-					checked={stateData[col.datacolumn] == 1}
-					EditFiled={EditFiled.bind(
-						null,
-						stateData[col.datacolumn] ? 0 : 1,
-						col.datacolumn
-					)}
-					columnTitle={col.columnTitle}
-					Key={
-						props.IsAdd
-							? `s-c-new-${col.datacolumn}`
-							: `s-c-${props.Datas.id}-${col.datacolumn}`
-					}
-					key={key}
-				/>
-			);
-		}
-
+		} 
 		return elem;
 	});
 
@@ -129,13 +93,23 @@ const EditPanel = props => {
 				style={{ marginBottom: "20px" }}
 				onClick={props.ClickBack}>
 				Back
-			</button>
+			</button>	
+
 			<SiteList
 				siteList={props.siteList}
 				currentSelect={stateData.siteId}
 				onChange={EditFiled}
 				datacolumn={"siteId"}
-			/>
+			/>	
+
+			<DropDownBox
+				columnTitle="Tp Name"
+				options={GetTPOptions(props.tpList)}
+				selectedValue={props.id}
+				dataColumn={"id"}
+				onChange={EditFiled}
+			/>  
+			<br></br>
 			{commonRows}
 			<button
 				className="btn btn-add"
@@ -144,26 +118,10 @@ const EditPanel = props => {
 					marginBottom: "40px",
 					float: "right"
 				}}
-				onClick={SetAnnouncement}>
+				onClick={InsertTpMaintain}> 
 				Submit
 			</button>
 		</>
-	);
-};
-
-const SwitchBtn = props => {
-	return (
-		<div className="form-group">
-			<label>{props.columnTitle}</label>
-			<input
-				id={props.Key}
-				className="switch switch--flat"
-				type="checkbox"
-				checked={props.checked}
-				onChange={props.EditFiled}
-			/>
-			<label htmlFor={props.Key}></label>
-		</div>
 	);
 };
 
@@ -172,53 +130,6 @@ const DateTimePickerElem = props => {
 		<div className="form-group">
 			<span className="label">{props.columnTitle}</span>
 			<DateTimePicker {...props.dateTimePickerProps} />
-		</div>
-	);
-};
-
-const OuterPanel = props => {
-	return (
-		<div className="panel level-1 mt-20">
-			<a
-				style={{ justifyContent: "space-between" }}
-				className="panel-title">
-				{props.HeaderContent}
-			</a>
-			<div className="panel-body">
-				<div className="collapse show">{props.Content}</div>
-			</div>
-		</div>
-	);
-};
-
-const SettingContent = props => {
-	return (
-		<div className="panel-body">
-			<div className="form-group">
-				<label>Subject</label>
-				<input
-					type="text"
-					className="form-control"
-					defaultValue={props.subject}
-					onBlur={e => {
-						props.EditFiled(e.target.value, "subject", {
-							lang: props.lang
-						});
-					}}
-				/>
-			</div>
-			<div className="form-group">
-				<label>Content</label>
-				<textarea
-					className="form-control"
-					rows="8"
-					defaultValue={props.content}
-					onBlur={e => {
-						props.EditFiled(e.target.value, "content", {
-							lang: props.lang
-						});
-					}}></textarea>
-			</div>
 		</div>
 	);
 };
@@ -242,13 +153,6 @@ const SiteList = ({ siteList, onChange, currentSelect, datacolumn }) => {
 	return (
 		<div className="form-group">
 			<label className="col-form-label d-block">Site Name</label>
-			<RadioItem
-				value={0}
-				dispalyText={allSiteDisplayText}
-				id={`rb-site-0`}
-				onChange={onChange.bind(null, 0, datacolumn)}
-				checked={currentSelect === 0}
-			/>
 			{radio}
 		</div>
 	);
@@ -273,4 +177,40 @@ const RadioItem = ({ value, dispalyText, id, onChange, checked }) => {
 	);
 };
 
+const GetTPOptions = (tpList) => {
+	let TPOptions = [];	
+	if (tpList != null) {
+		tpList.forEach((x) => {
+		TPOptions.push({ value: x.id, displayText: x.tpName });
+	  });
+	}
+	return TPOptions;
+  };
+
+const DropDownBox = (props) => {
+	const onChange = (e) => {
+	  if (props.onChange) {
+		props.onChange(e.target.value, props.dataColumn);
+	  }
+	};
+	let optionRows = props.options.map((item) => {
+	  return (
+		<option key={`${props.ColumnTitle}-${item.value}`} value={item.value}>
+		  {item.displayText}
+		</option>
+	  );
+	});
+	return (
+		<div>
+			<div className="input-item">
+				<span className="label">{props.columnTitle}</span>
+				<div className="field">
+				<select onChange={onChange} value={props.value}>
+					{optionRows}
+				</select>
+				</div>
+			</div>
+	  	</div>	
+	);
+  };
 export default EditPanel;

@@ -17,7 +17,6 @@ const defaultModel = {
 const App = () => {
   const [stateDatas, updateDatas] = useState({
     Datas: null,
-    SettingDatas: null,
     ShowSettingPanel: false,
     IsAdd: false,
   });
@@ -27,8 +26,7 @@ const App = () => {
 
   useEffect(() => {
     let param = {
-      Url: "TpMaintain/GetTpMaintainList",
-      Data: `PageNumber=${1}`,
+      Url: "TpMaintain/GetTpMaintainList"
     };
 
     WebAPI.PostData(param).then((res) => {
@@ -55,11 +53,7 @@ const App = () => {
 
     WebAPI.PostData({ Url: "TpMaintain/GetCommonTpList" }).then((res) => {
       if (res.data.errorCode === 0) {
-        let _tpList = {};
-        res.data.data.forEach((s) => {
-          _tpList[s.id] = s.tpName;
-        });
-        setTpList(_tpList);
+        setTpList(res.data.data);
       } else {
         alert(res.data.message ?? "failed to get data.");
       }
@@ -67,85 +61,23 @@ const App = () => {
   }, []);
 
 
-  const SetAnnouncement = (datas, isAdd) => {
-    let newDatas = {};
-    Object.keys(datas).forEach((key) => {
-      newDatas[key.charAt(0).toUpperCase() + key.slice(1)] = datas[key];
-    });
-
-    let lastUpdTime = datas.lastUpdater ? datas.lastUpdateTime : new Date();
-
-    let subject = {};
-    Object.keys(datas.subject).forEach((k) => {
-      if (datas.subject[k] !== "") {
-        subject[k] = datas.subject[k];
-      }
-    });
-
-    let content = {};
-    Object.keys(datas.content).forEach((k) => {
-      if (datas.content[k] !== "") {
-        content[k] = datas.content[k];
-      }
-    });
-
-    let param = {
-      Url: isAdd ? "Message/AddAnnouncement" : "Message/UpdateAnnouncement",
-      Data: qs.stringify({
-        Datas: {
-          ...newDatas,
-          Subject: JSON.stringify(subject),
-          Content: JSON.stringify(content),
-          StartTime: moment(datas.startTime).toJSON(),
-          EndTime: moment(datas.endTime).toJSON(),
-          LastUpdateTime: moment(lastUpdTime).toJSON(),
-          CreateTime: moment(datas.createTime).toJSON(),
-        },
-        _StartTime: moment(datas.startTime).unix(),
-        _EndTime: moment(datas.endTime).unix(),
-      }),
+  const InsertTpMaintain = (datas) => {
+    let insertData = {
+      siteId: datas.siteId,
+      tpId: datas.id,
+      beginDate: moment(datas.beginDate).toJSON(),
+      endDate: moment(datas.endDate).toJSON(),
+      maintainType: "Date",
     };
 
+    let param = {
+      Url: "TpMaintain/InsertTpMaintain",
+      Data: qs.stringify(insertData),
+    };
+    console.log(param);
     WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {
-        let tmpDatas = [...stateDatas.Datas];
-        let appendDatas = isAdd
-          ? {
-              creator: res.data.data.creator,
-              createTime: res.data.data.createTime,
-              id: res.data.data.id,
-            }
-          : {
-              lastUpdater: res.data.data.lastUpdater,
-              lastUpdateTime: res.data.data.lastUpdateTime,
-            };
-
-        if (isAdd) {
-          tmpDatas.push({
-            ...datas,
-            subject: datas.subject.en,
-            content: datas.content.en,
-            ...appendDatas,
-          });
-
-          tmpDatas = tmpDatas.sort((a, b) => {
-            return b.id - a.id;
-          });
-        } else {
-          tmpDatas[stateDatas.CurrentIdx] = {
-            ...datas,
-            subject: datas.subject.en,
-            content: datas.content.en,
-            ...appendDatas,
-          };
-        }
-
-        updateDatas({
-          ...stateDatas,
-          Datas: tmpDatas,
-          SettingDatas: null,
-          ShowSettingPanel: false,
-        });
+        useEffect();
       } else {
         alert(res.data.message ?? "failed to get data.");
       }
@@ -177,39 +109,20 @@ const App = () => {
     }
   };
 
-  const Result_ChangePage = (PageNumber) => {
-    let param = {
-      Url: "TpMaintain/GetTpMaintainList",
-      Data: `PageNumber=${PageNumber}`,
-    };
-
-    WebAPI.PostData(param).then((res) => {
-      if (res.data.errorCode === 0) {
-        updateDatas({
-          Datas: [...res.data.data],
-        });
-      } else {
-        alert(res.data.message ?? "failed to get data.");
-      }
-    });
-  };
-
   return (
     <div className="container-fluid">
       <h4 className="page-name">Maintenance</h4>
       {stateDatas.ShowSettingPanel ? (
         <EditPanel
           siteList={siteList}
+          tpList={tpList}
           ClickBack={() => {
             updateDatas({
               ...stateDatas,
               ShowSettingPanel: false,
-              IsAdd: false,
             });
           }}
-          Datas={stateDatas.SettingDatas}
-          IsAdd={stateDatas.IsAdd}
-          SetAnnouncement={SetAnnouncement}
+          InsertTpMaintain={InsertTpMaintain}
         />
       ) : (
         <>
@@ -231,7 +144,6 @@ const App = () => {
             <Result
               Datas={stateDatas.Datas}
               ClickDelete={DeleteTpMaintain}
-              ChangePage={Result_ChangePage}
             />
           )}
         </>

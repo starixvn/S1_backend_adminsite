@@ -12,14 +12,11 @@ namespace BackendSite.Service.BLL
 {
     public class TpMaintainBLL
     {
-        private readonly TpMaintainService tpMaintainService;
-        private readonly ServerInfoBLL serverInfoBLL;
-       
+        private readonly TpMaintainService tpMaintainService;    
 
         public TpMaintainBLL(IServiceProvider provider)
         {
-            tpMaintainService = provider.GetRequiredService<TpMaintainService>();
-            serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
+           tpMaintainService = provider.GetRequiredService<TpMaintainService>();
         }
 
         public IEnumerable<CommonTpInfo> GetCommonTpList()
