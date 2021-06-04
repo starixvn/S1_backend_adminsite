@@ -27,11 +27,14 @@ const Pagination = (props) => {
   }
 
   let disableNext = data.pageNumber == data.totalPages || data.totalPages == 0;
-
+  let currencyAmountRows = [];
+  currencyAmountRows = data.currencyAmount.map((currency)=>{
+    return(<tr>{currency}</tr>)
+  });
   return (
     <nav className="paging" aria-label="Page navigation example">
       <span>
-        <tr>{data.currencyAmount}</tr>
+        {currencyAmountRows}
         <tr>Total records: {data.rowCount}</tr>
       </span>
       <ul className="pagination">

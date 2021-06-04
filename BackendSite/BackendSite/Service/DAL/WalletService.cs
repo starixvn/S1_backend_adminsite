@@ -88,9 +88,9 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return rebateLogList;
         }
-        public IEnumerable<RebateLog> GetRebateLog(IEnumerable<int> SelectSite, string userName, int rebateType, long startDate, long endDate, int pageSize, int currencyId, int baseCurrencyId, decimal totalAmountShow, int rebateCategoriesId, ref int pageNumber, out int totalPages, out int rowCount, ref string CurrencyAmount)
+        public IEnumerable<RebateLog> GetRebateLog(IEnumerable<int> SelectSite, string userName, int rebateType, long startDate, long endDate, int pageSize, int currencyId, int baseCurrencyId, decimal totalAmountShow, int rebateCategoriesId, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
         {
-            string tempCurrencyTotalAmount = string.Empty;
+            List<string> tempCurrencyTotalAmount = new List<string>();
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var p = new DynamicParameters(new { SelectSite = JsonConvert.SerializeObject(SelectSite), UserName = userName, RebateType = rebateType
                 , StartDate = startDate, EndDate = endDate, PageSize = pageSize, CategoryType= rebateCategoriesId, CurrencyId= currencyId,BaseCurrencyId= baseCurrencyId,TotalAmountShow= totalAmountShow});
@@ -101,7 +101,7 @@ namespace BackendSite.Service.DAL
             {
                 CurrencyTotalAmount.ForEach(x =>
                 {
-                    tempCurrencyTotalAmount += string.Format("{0}:{1} ", x.Currency, x.Amount);
+                    tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.Currency, Math.Round(x.Amount, 2)));
                 });
             }
             CurrencyAmount = tempCurrencyTotalAmount;
@@ -204,11 +204,11 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int pageSize, int pageNumber,int CategoryId, int BaseCurrencyId, int RebateCategoriesId, string TotalAmountShow,ref string CurrencyAmount)
+        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int pageSize, int pageNumber,int CategoryId, int BaseCurrencyId, int RebateCategoriesId, string TotalAmountShow,ref List<string> CurrencyAmount)
         {
             decimal tempTotalAmountShow;
             decimal.TryParse(TotalAmountShow, out tempTotalAmountShow);
-            string tempCurrencyTotalAmount = string.Empty;
+            List<string> tempCurrencyTotalAmount = new List<string>();
             VipRebateInfoData SearchData = new VipRebateInfoData();
             DynamicParameters props = new DynamicParameters();
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
@@ -229,7 +229,7 @@ namespace BackendSite.Service.DAL
             {
                 CurrencyTotalAmount.ForEach(x =>
                 {
-                    tempCurrencyTotalAmount += string.Format("{0}:{1} ", x.Currency, x.Amount);
+                    tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.Currency, Math.Round(x.Amount, 2)));
                 });
             }
             CurrencyAmount = tempCurrencyTotalAmount;
