@@ -25,19 +25,7 @@ const App = () => {
   const [tpList, setTpList] = useState([]);
 
   useEffect(() => {
-    let param = {
-      Url: "TpMaintain/GetTpMaintainList"
-    };
-
-    WebAPI.PostData(param).then((res) => {
-      if (res.data.errorCode === 0) {
-        updateDatas({
-          Datas: [...res.data.data],
-        });
-      } else {
-        alert(res.data.message ?? "failed to get data.");
-      }
-    });
+    GetTpMaintainList();
 
     WebAPI.PostData({ Url: "Common/AdminUserSiteList" }).then((res) => {
       if (res.data.errorCode === 0) {
@@ -60,6 +48,22 @@ const App = () => {
     });
   }, []);
 
+  const GetTpMaintainList = () => {
+    
+    let param = {
+      Url: "TpMaintain/GetTpMaintainList"
+    };
+
+    WebAPI.PostData(param).then((res) => {
+      if (res.data.errorCode === 0) {
+        updateDatas({
+          Datas: [...res.data.data],
+        });
+      } else {
+        alert(res.data.message ?? "failed to get data.");
+      }
+    });
+  };
 
   const InsertTpMaintain = (datas) => {
     let insertData = {
@@ -77,7 +81,7 @@ const App = () => {
     console.log(param);
     WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {
-        useEffect();
+        GetTpMaintainList();
       } else {
         alert(res.data.message ?? "failed to get data.");
       }
