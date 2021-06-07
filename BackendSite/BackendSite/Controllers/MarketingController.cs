@@ -120,5 +120,11 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
+        public IActionResult TpMaintain()
+        {
+            return View();
+        }
     }
 }

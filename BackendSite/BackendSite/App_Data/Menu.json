@@ -524,6 +524,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "VendersMaintenance",
+        "Title": "Venders Maintenance",
+        "FuncKey": "Marketing/TpMaintain",
+        "Controller": "Marketing",
+        "Action": "TpMaintain",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
