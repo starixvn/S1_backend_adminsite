@@ -10,12 +10,12 @@ const dateformat = "YYYY-MM-DD HH:mm";
 const commonColDefs = [
 	{
 		datacolumn: "beginDate",
-		columnTitle: "BeginDate (Local TimeZone)",
+		columnTitle: "BeginDate Time" + " (" + moment().format('Z') + ")",
 		elemType: elemType.DateTimePicker
 	},
 	{
 		datacolumn: "endDate",
-		columnTitle: "EndDate (Local TimeZone)",
+		columnTitle: "EndDate Time" + " (" + moment().format('Z') + ")",
 		elemType: elemType.DateTimePicker
 	}
 ];
