@@ -1505,10 +1505,10 @@ namespace BackendSite.Service.BLL
                     if (account != null)
                     {
 
-                        if (!keyValuePairs.ContainsKey($"{account.Channel.GetDescription()}-{data.AccountNo}"))
+                        if (!keyValuePairs.ContainsKey($"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"))
                         {
                             bankFinancialDataModel = new BankFinancialDataModel();
-                            keyValuePairs.Add($"{account.Channel.GetDescription()}-{data.AccountNo}", bankFinancialDataModel);
+                            keyValuePairs.Add($"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}", bankFinancialDataModel);
                             bankFinancialDataModel.SiteId = data.SiteId;
                             bankFinancialDataModel.SiteName = siteData.Where(x => x.SiteId == data.SiteId).Select(x => x.SiteName).FirstOrDefault();
                             bankFinancialDataModel.CurrencyId = data.CurrencyId;
@@ -1521,7 +1521,7 @@ namespace BackendSite.Service.BLL
                             bankFinancialDataModel.AccountStatus = account.Status;
                         }
 
-                        bankFinancialDataModel = keyValuePairs[$"{account.Channel.GetDescription()}-{data.AccountNo}"];
+                        bankFinancialDataModel = keyValuePairs[$"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
                         bankFinancialDataModel.DepositAmount = data.DepositSummary;
                         //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
@@ -1533,12 +1533,12 @@ namespace BackendSite.Service.BLL
                     var account = accountData.Where(x => x.PayId.ToString() == data.AccountNo && x.SiteId == data.SiteId && x.CurrencyId == data.CurrencyId).FirstOrDefault();
                     var pay = payData.Where(x => x.Id.ToString() == data.AccountNo).FirstOrDefault();
 
-                    if (!keyValuePairs.ContainsKey($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}"))
+                    if (!keyValuePairs.ContainsKey($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"))
                     {
                         TransferAccountStatusEnum status = pay.Status == 1 ? TransferAccountStatusEnum.Open : TransferAccountStatusEnum.Close;
 
                         bankFinancialDataModel = new BankFinancialDataModel();
-                        keyValuePairs.Add($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}", bankFinancialDataModel);
+                        keyValuePairs.Add($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}", bankFinancialDataModel);
                         bankFinancialDataModel.SiteId = data.SiteId;
                         bankFinancialDataModel.SiteName = siteData.Where(x => x.SiteId == data.SiteId).Select(x => x.SiteName).FirstOrDefault();
                         bankFinancialDataModel.CurrencyId = data.CurrencyId;
@@ -1551,7 +1551,7 @@ namespace BackendSite.Service.BLL
                         bankFinancialDataModel.Purpose = account == null ? "1,2,3" : account.Purpose;
                         bankFinancialDataModel.AccountStatus = account == null ? status : account.Status;
                     }
-                    bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}"];
+                    bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
                     bankFinancialDataModel.DepositAmount = data.DepositSummary;
                     //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
@@ -1569,10 +1569,10 @@ namespace BackendSite.Service.BLL
 
                     if (account != null)
                     {
-                        if (!keyValuePairs.ContainsKey($"{account.Channel.GetDescription()}-{data.AccountNo}"))
+                        if (!keyValuePairs.ContainsKey($"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"))
                         {
                             bankFinancialDataModel = new BankFinancialDataModel();
-                            keyValuePairs.Add($"{account.Channel.GetDescription()}-{data.AccountNo}", bankFinancialDataModel);
+                            keyValuePairs.Add($"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}", bankFinancialDataModel);
                             bankFinancialDataModel.SiteId = data.SiteId;
                             bankFinancialDataModel.SiteName = siteData.Where(x => x.SiteId == data.SiteId).Select(x => x.SiteName).FirstOrDefault();
                             bankFinancialDataModel.CurrencyId = data.CurrencyId;
@@ -1585,7 +1585,7 @@ namespace BackendSite.Service.BLL
                             bankFinancialDataModel.AccountStatus = account.Status;
                         }
 
-                        bankFinancialDataModel = keyValuePairs[$"{account.Channel.GetDescription()}-{data.AccountNo}"];
+                        bankFinancialDataModel = keyValuePairs[$"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
                         bankFinancialDataModel.WithdrawalAmount = data.WithdrawalSummary;
                         //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
@@ -1596,12 +1596,12 @@ namespace BackendSite.Service.BLL
                     var account = accountData.Where(x => x.PayId.ToString() == data.AccountNo && x.SiteId == data.SiteId && x.CurrencyId == data.CurrencyId).FirstOrDefault();
                     var pay = payData.Where(x => x.Id.ToString() == data.AccountNo).FirstOrDefault();
 
-                    if (!keyValuePairs.ContainsKey($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}"))
+                    if (!keyValuePairs.ContainsKey($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"))
                     {
                         TransferAccountStatusEnum status = pay.Status == 1 ? TransferAccountStatusEnum.Open : TransferAccountStatusEnum.Close;
 
                         bankFinancialDataModel = new BankFinancialDataModel();
-                        keyValuePairs.Add($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}", bankFinancialDataModel);
+                        keyValuePairs.Add($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}", bankFinancialDataModel);
                         bankFinancialDataModel.SiteId = data.SiteId;
                         bankFinancialDataModel.SiteName = siteData.Where(x => x.SiteId == data.SiteId).Select(x => x.SiteName).FirstOrDefault();
                         bankFinancialDataModel.CurrencyId = data.CurrencyId;
@@ -1615,7 +1615,7 @@ namespace BackendSite.Service.BLL
                         bankFinancialDataModel.AccountStatus = account == null ? status : account.Status;
                     }
 
-                    bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}"];
+                    bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
                     bankFinancialDataModel.WithdrawalAmount = data.WithdrawalSummary;
                     //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
@@ -1631,10 +1631,10 @@ namespace BackendSite.Service.BLL
 
                 if (account != null)
                 {
-                    if (!keyValuePairs.ContainsKey($"{account.Channel.GetDescription()}-{data.AccountNo}"))
+                    if (!keyValuePairs.ContainsKey($"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"))
                     {
                         bankFinancialDataModel = new BankFinancialDataModel();
-                        keyValuePairs.Add($"{account.Channel.GetDescription()}-{data.AccountNo}", bankFinancialDataModel);
+                        keyValuePairs.Add($"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}", bankFinancialDataModel);
                         bankFinancialDataModel.SiteId = data.SiteId;
                         bankFinancialDataModel.SiteName = siteData.Where(x => x.SiteId == data.SiteId).Select(x => x.SiteName).FirstOrDefault();
                         bankFinancialDataModel.CurrencyId = data.CurrencyId;
@@ -1649,7 +1649,7 @@ namespace BackendSite.Service.BLL
                         bankFinancialDataModel.AccountStatus = account.Status;
                     }
 
-                    bankFinancialDataModel = keyValuePairs[$"{account.Channel.GetDescription()}-{data.AccountNo}"];
+                    bankFinancialDataModel = keyValuePairs[$"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
                     bankFinancialDataModel.TransferAmount = data.TransferSummary;
                     //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
@@ -1662,7 +1662,10 @@ namespace BackendSite.Service.BLL
 
             #endregion
 
-            var Data = keyValuePairs.Select(s => s.Value);
+            var Data = keyValuePairs.Select(s => s.Value).OrderBy(value => value.SiteId)
+                                                         .ThenBy(value => value.CurrencyId)
+                                                         .ThenBy(value => value.Channel)
+                                                         .ThenBy(Value => Value.AccountNo);
 
             return Data;
 

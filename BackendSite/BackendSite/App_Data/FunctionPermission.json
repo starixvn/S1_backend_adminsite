@@ -398,6 +398,11 @@
         "DisplayKey": "Domain Management",
         "FuncKey": "Marketing/DomainManage",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Venders Maintenance",
+        "FuncKey": "Marketing/TpMaintain",
+        "Enable": false
       }
     ]
   },

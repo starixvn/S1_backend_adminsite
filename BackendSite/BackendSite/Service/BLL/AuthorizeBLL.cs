@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.ExceptionHandling;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -30,7 +31,7 @@ namespace BackendSite.Service.BLL
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public ErrorMessageCodeEnum UserLogin(string userName, 
+        public ErrorCodeEnum UserLogin(string userName, 
                                               string pwd, 
                                               string ip, 
                                               string fromUrl, 
@@ -39,30 +40,30 @@ namespace BackendSite.Service.BLL
         {
             if(string.IsNullOrEmpty(userName))
             {
-                return ErrorMessageCodeEnum.AccountInvalid;
+                return ErrorCodeEnum.AccountInvalid;
             }
             if(string.IsNullOrEmpty(pwd))
             {
-                return ErrorMessageCodeEnum.PasswordInvalid;
+                return ErrorCodeEnum.PasswordInvalid;
             }
 
             adminUser = adminUserService.GetAdminUserByUserName(userName);
 
             if (adminUser == null)
             {
-                return ErrorMessageCodeEnum.AccountError;
+                return ErrorCodeEnum.AccountError;
             }
             else if (adminUser.Userpwd != tools.MD5Encrypt(pwd))
             {
-                return ErrorMessageCodeEnum.PasswordError;
+                return ErrorCodeEnum.PasswordError;
             }
             else if (adminUser.Status != (int)AdminUserStatus.Running)
             {
-                return ErrorMessageCodeEnum.AccountLocked;
+                return ErrorCodeEnum.AccountLocked;
             }
             else
             {
-                return ErrorMessageCodeEnum.Success;
+                return ErrorCodeEnum.Success;
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.ExceptionHandling;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -61,7 +62,7 @@ namespace BackendSite.Service.BLL
             return adminService.ChangePwdAccount(serverInfo.SiteId, adminUser);
         }
 
-        public ErrorMessageCodeEnum ChangePwd(ChangePwd changePwd)
+        public ErrorCodeEnum ChangePwd(ChangePwd changePwd)
         {
             string Md5Userpwd = null;
             var serverInfo = serverInfoService.GetModel();
@@ -72,14 +73,14 @@ namespace BackendSite.Service.BLL
 
             if (adminService.ChangePwd(serverInfo.SiteId, userId, changePwd, out Md5Userpwd))
             {
-                return ErrorMessageCodeEnum.Success;
+                return ErrorCodeEnum.Success;
             }
             else
             {
                 if (Md5Userpwd != changePwd.Oldpwd)
-                    return ErrorMessageCodeEnum.OldpwdNotMatch;
+                    return ErrorCodeEnum.OldpwdNotMatch;
                 else
-                    return ErrorMessageCodeEnum.Fail;
+                    return ErrorCodeEnum.Fail;
             }
         }
     }
