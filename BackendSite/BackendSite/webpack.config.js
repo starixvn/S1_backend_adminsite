@@ -7,9 +7,9 @@ module.exports = {
         "js/component/Withdrawal/WithdrawalList.min": [
             '../BackendSite/wwwroot/js/component/Withdrawal/WithdrawalList.jsx'
         ],
-        //"js/component/Deposit/DepositList.min": [
-        //    '../BackendSite/wwwroot/js/component/Deposit/DepositList.jsx'
-        //],
+        "js/component/Deposit/DepositList.min": [
+           '../BackendSite/wwwroot/js/component/Deposit/DepositList.jsx'
+        ],
         // "js/component/Finance/DepositSubmission.min": [
         //     '../BackendSite/wwwroot/js/component/Finance/DepositSubmission.jsx'
         // ], 
