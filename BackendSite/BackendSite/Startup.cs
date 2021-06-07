@@ -220,14 +220,6 @@ namespace BackendSite
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (!env.IsProduction())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-            }
 
             app.UseStaticFiles();
             app.UseRouting();
@@ -236,6 +228,15 @@ namespace BackendSite
             app.UseAuthorization();
             app.UseRequestLogMiddleware();
             app.UseResponseLogMiddleware();
+
+            if (!env.IsProduction())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+            }
 
             app.UseEndpoints(endpoints =>
             {

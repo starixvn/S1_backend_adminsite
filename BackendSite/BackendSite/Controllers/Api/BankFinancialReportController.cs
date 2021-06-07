@@ -1,7 +1,9 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankFinancial;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +15,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class BankFinancialReportController : ControllerBase
@@ -104,31 +107,25 @@ namespace BackendSite.Controllers.Api
         #region Action
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/TransferInfoReport" })]
-        public IActionResult GetTransferInfoReport(GetTransferInfoReportReq request)
+        public ApiResult<IEnumerable<BankFinancialTransferInfoDetailModel>> GetTransferInfoReport(GetTransferInfoReportReq request)
         {
-            try
+
+            var data = _bankFinancialBLL.GetTransferInfoReport(request.SiteId,
+                                                              request.AccountNo,
+                                                              request.StartDate,
+                                                              request.EndDate);
+
+            if (data.Count() == 0)
             {
-                var data = _bankFinancialBLL.GetTransferInfoReport(request.SiteId,
-                                                                  request.AccountNo,
-                                                                  request.StartDate,
-                                                                  request.EndDate);
-                if (data.Count() == 0)
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<BankFinancialTransferInfoDetailModel>>(Service.Model.enums.ErrorMessageCodeEnum.NoData,
-                                                                         data));
-                }
-                else
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<BankFinancialTransferInfoDetailModel>>(Service.Model.enums.ErrorMessageCodeEnum.Success,
-                                                                         data));
-                }
+                throw new AdminException(ErrorCodeEnum.NoData);
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(500,
-                                  _responseSettingBLL.SetResponse(ex));
+                return new ApiResult<IEnumerable<BankFinancialTransferInfoDetailModel>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
             }
         }
 
@@ -150,31 +147,25 @@ namespace BackendSite.Controllers.Api
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/BankFinancialReport" })]
-        public IActionResult GetBankFinancialReport(GetBankFinancialReportReq request)
+        public ApiResult<IEnumerable<BankFinancialDataModel>> GetBankFinancialReport(GetBankFinancialReportReq request)
         {
-            try
+
+            var data = _bankFinancialBLL.GetBankFinancialReport(JsonConvert.SerializeObject(request.SiteIds),
+                                                              JsonConvert.SerializeObject(request.CurrencyIds),
+                                                              request.StartDate,
+                                                              request.EndDate);
+
+            if (data.Count() == 0)
             {
-                var data = _bankFinancialBLL.GetBankFinancialReport(JsonConvert.SerializeObject(request.SiteIds),
-                                                                  JsonConvert.SerializeObject(request.CurrencyIds),
-                                                                  request.StartDate,
-                                                                  request.EndDate);
-                if (data.Count() == 0)
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<BankFinancialDataModel>>(Service.Model.enums.ErrorMessageCodeEnum.NoData,
-                                                                         data));
-                }
-                else
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<BankFinancialDataModel>>(Service.Model.enums.ErrorMessageCodeEnum.Success,
-                                                                         data));
-                }
+                throw new AdminException(ErrorCodeEnum.NoData);
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(500,
-                                  _responseSettingBLL.SetResponse(ex));
+                return new ApiResult<IEnumerable<BankFinancialDataModel>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
             }
         }
 
