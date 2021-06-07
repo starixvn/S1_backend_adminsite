@@ -10,12 +10,12 @@ const dateformat = "YYYY-MM-DD HH:mm";
 const commonColDefs = [
 	{
 		datacolumn: "beginDate",
-		columnTitle: "BeginDate (UTC+0)",
+		columnTitle: "BeginDate (Local TimeZone)",
 		elemType: elemType.DateTimePicker
 	},
 	{
 		datacolumn: "endDate",
-		columnTitle: "EndDate (UTC+0)",
+		columnTitle: "EndDate (Local TimeZone)",
 		elemType: elemType.DateTimePicker
 	}
 ];
@@ -24,8 +24,8 @@ const EditPanel = props => {
 	const [stateData, updateData] = useState({
 		siteId: 0,
 		id: 1,
-		beginDate: moment().utc().format(dateformat),
-		endDate: moment().utc().add(1,"day").format(dateformat),
+		beginDate: moment().format(dateformat),
+		endDate: moment().add(1,"day").format(dateformat),
 		maintainType:"Date"
 	  });
 
@@ -65,7 +65,6 @@ const EditPanel = props => {
 					dateTimePickerProps={{
 						dateFormat:"YYYY-MM-DD",
 						timeFormat:"HH:mm",
-						utc:true,
 						defaultValue: moment(stateData[col.datacolumn]).format(dateformat),
 						onBlur: e => {
 							try {
