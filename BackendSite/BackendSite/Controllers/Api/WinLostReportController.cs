@@ -6,45 +6,61 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 
 namespace BackendSite.Controllers.Api
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class WinLostReportController : Controller
+    public class WinLostReportController : ControllerBase
     {
-        private readonly WinLostReportBLL winLostReportBLL;
-        private readonly ExcelBLL excelBLL;
+        #region Fields
 
-        public WinLostReportController(WinLostReportBLL winLostReportBLL, ExcelBLL excelBLL)
+        private readonly WinLostReportBLL _winLostReportBLL;
+        private readonly ExcelBLL _excelBLL;
+
+        #endregion
+
+        #region Constructors
+
+        public WinLostReportController(WinLostReportBLL winLostReportBLL,
+                                       ExcelBLL excelBLL)
         {
-            this.winLostReportBLL = winLostReportBLL;
-            this.excelBLL = excelBLL;
+            _winLostReportBLL = winLostReportBLL;
+            _excelBLL = excelBLL;
         }
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "LicWinLost/Report" })]
-        public ApiResult GetWinLostReport([FromForm]DateTime StartDate, [FromForm]DateTime EndDate, [FromForm]int Currency)
-        {
-            var result = new ApiResult<IEnumerable<WinLostReport>>();
-            try
-            {
-                result.Data = winLostReportBLL.GetWinLostReport(StartDate, EndDate, Currency,false);
-                result.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                result.RawMessage = ex.Message;
-                result.ErrorCode = 999;
-                result.Message = "something went wrong.";
-            }
+        #endregion
 
-            return result;
+        #region Action
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "LicWinLost/Report" })]
+        public ApiResult GetWinLostReport([FromForm] DateTime StartDate,
+                                          [FromForm] DateTime EndDate,
+                                          [FromForm] int Currency)
+        {
+            var data = _winLostReportBLL.GetWinLostReport(StartDate, EndDate, Currency, false);
+
+            if (data.Count() == 0)
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<WinLostReport>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
         }
 
         [HttpPost]
-        public IActionResult ExportReport(DateTime StartDate, DateTime EndDate, int Currency)
+        public IActionResult ExportReport(DateTime StartDate,
+                                          DateTime EndDate,
+                                          int Currency)
         {
-            var Datas = winLostReportBLL.GetWinLostReport(StartDate, EndDate, Currency,true);
+            var Datas = _winLostReportBLL.GetWinLostReport(StartDate, EndDate, Currency, true);
 
             List<Dictionary<string, dynamic>> byDate = new List<Dictionary<string, dynamic>>();
             List<Dictionary<string, dynamic>> Total = new List<Dictionary<string, dynamic>>();
@@ -61,11 +77,11 @@ namespace BackendSite.Controllers.Api
                 var date = item.SettledDate.ToString("MM/dd/yyyy");
 
                 var getByDateKey = $"{date}-{item.CurrencyId}";
-                var getByDateItem = byDate.FirstOrDefault(x => 
-                    x.Any(y=> y.Key == "Key" && (string)y.Value == getByDateKey)
+                var getByDateItem = byDate.FirstOrDefault(x =>
+                    x.Any(y => y.Key == "Key" && (string)y.Value == getByDateKey)
                 );
 
-                if (getByDateItem!=null && getByDateItem.TryGetValue("CurrencyId", out dynamic currencyId) && (int)currencyId == item.CurrencyId)
+                if (getByDateItem != null && getByDateItem.TryGetValue("CurrencyId", out dynamic currencyId) && (int)currencyId == item.CurrencyId)
                 {
                     getByDateItem.TryGetValue("TurnoverAmount", out dynamic stakeSummary);
                     getByDateItem["TurnoverAmount"] = (decimal)stakeSummary + item.StakeSummary;
@@ -103,7 +119,7 @@ namespace BackendSite.Controllers.Api
                 }
                 else
                 {
-                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>() 
+                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
                     {
                         { "Key", getByDateKey },
                         { "Date", date },
@@ -217,8 +233,11 @@ namespace BackendSite.Controllers.Api
                 new ExportDataToExcel(){SheetName="Total", Content = Total, Titles=TotalTitles.OrderBy(x=> x.Value).Select(x=> x.Key).ToList()},
             };
 
-            var stream = excelBLL.ExportToMultiSheet(d);
+            var stream = _excelBLL.ExportToMultiSheet(d);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"WinlostReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
+
+        #endregion
+
     }
 }

@@ -53,7 +53,10 @@
     <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.7.95/css/materialdesignicons.min.css" />
     <link href="~/css/style.css" rel="stylesheet" asp-append-version="true" />
-    @if (environment.EnvironmentName.Equals("Development", StringComparison.OrdinalIgnoreCase) || environment.EnvironmentName.Equals("Staging", StringComparison.OrdinalIgnoreCase) || environment.EnvironmentName.Equals("QA", StringComparison.OrdinalIgnoreCase))
+    @if (environment.EnvironmentName.Equals("Local", StringComparison.OrdinalIgnoreCase)
+        || environment.EnvironmentName.Equals("Development", StringComparison.OrdinalIgnoreCase)
+        || environment.EnvironmentName.Equals("Staging", StringComparison.OrdinalIgnoreCase)
+        || environment.EnvironmentName.Equals("QA", StringComparison.OrdinalIgnoreCase))
     {
         <link href="~/css/themeStaging.css" rel="stylesheet" asp-append-version="true" />
     }

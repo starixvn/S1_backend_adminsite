@@ -18,6 +18,7 @@ using Microsoft.Extensions.Hosting;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
 using Microsoft.AspNetCore.Http;
+using BackendSite.ExceptionHandling;
 
 namespace BackendSite
 {
@@ -205,19 +206,20 @@ namespace BackendSite
             });
             services.AddDataProtection().DisableAutomaticKeyGeneration();
             services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("CookieKeys")).SetApplicationName("SharedCookieApp");
+
+            #region Global Filter
+
+            services.AddMvc(config =>
+            {
+                config.Filters.Add(new ExceptionFilter());
+            });
+
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-            }
 
             app.UseStaticFiles();
             app.UseRouting();
@@ -227,12 +229,22 @@ namespace BackendSite
             app.UseRequestLogMiddleware();
             app.UseResponseLogMiddleware();
 
+            if (!env.IsProduction())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+            }
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}");
             });
+
         }
     }
 }
