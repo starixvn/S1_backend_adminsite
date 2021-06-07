@@ -168,7 +168,7 @@ namespace BackendSite.Controllers.Api
         #region MainFinancial Report
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/MainFinancialReport" })]
-        public ApiResult<IEnumerable<MainFinancialModel>> GetMainFinancialReport(GetMainFinancialReportReq request)
+        public ApiResult GetMainFinancialReport(GetMainFinancialReportReq request)
         {
             var data = _reportBLL.GetMainFinancialReport(JsonConvert.SerializeObject(request.SiteIds),
                                                               JsonConvert.SerializeObject(request.CurrencyIds),
@@ -515,7 +515,7 @@ namespace BackendSite.Controllers.Api
         #region StatisticalReport By Products
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/StatisticalReport" })]
-        public ApiResult<IEnumerable<StatisticalReportModel>> GetStatisticalReport(GetStatisticalReportReq request)
+        public ApiResult GetStatisticalReport(GetStatisticalReportReq request)
         {
             #region Date Caculate
 
@@ -1150,7 +1150,7 @@ namespace BackendSite.Controllers.Api
         #region UserOnlineReport
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/UserOnlineReport" })]
-        public ApiResult<IEnumerable<UserOnlineReportModel>> GetUserOnlineReport(GetUserOnlineReportReq request)
+        public ApiResult GetUserOnlineReport(GetUserOnlineReportReq request)
         {
             var data = _reportBLL.GetUserOnlineReport(JsonConvert.SerializeObject(request.SiteIds),
                                                            request.SelectDate);
@@ -1313,7 +1313,7 @@ namespace BackendSite.Controllers.Api
         #region Deposit Report
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/DepositReport" })]
-        public ApiResult<IEnumerable<DepositReportModel>> GetDepositReport(GetDepositReportReq request)
+        public ApiResult GetDepositReport(GetDepositReportReq request)
         {
             var data = _reportBLL.GetDepositReport(request.CurrencyIds,
                                                    JsonConvert.SerializeObject(request.SiteIds),
@@ -1927,7 +1927,7 @@ namespace BackendSite.Controllers.Api
         #region StatisticalReport By Customers
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/CustomerStatisticalReport" })]
-        public ApiResult<IEnumerable<CustomerStatisticalReportModel>> GetCustomerStatisticalReport(GetCustomerStatisticalReportReq request)
+        public ApiResult GetCustomerStatisticalReport(GetCustomerStatisticalReportReq request)
         {
 
             var data = _reportBLL.GetCustomerStatisticalReport(request.CurrencyIds,
@@ -2465,7 +2465,7 @@ namespace BackendSite.Controllers.Api
                         $"CustomerStatisticalReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
-        public ApiResult<IEnumerable<TpBetRecordDetailModel>> GetCustomerDetail(GetCustomerDetailReq request)
+        public ApiResult GetCustomerDetail(GetCustomerDetailReq request)
         {
             var data = _reportBLL.GetCustomerDetail(request.CustId,
                                                           request.GameId,

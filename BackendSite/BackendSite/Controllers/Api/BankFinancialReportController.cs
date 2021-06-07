@@ -109,7 +109,7 @@ namespace BackendSite.Controllers.Api
         #region TransferInfo Report
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/TransferInfoReport" })]
-        public ApiResult<IEnumerable<BankFinancialTransferInfoDetailModel>> GetTransferInfoReport(GetTransferInfoReportReq request)
+        public ApiResult GetTransferInfoReport(GetTransferInfoReportReq request)
         {
 
             var data = _bankFinancialBLL.GetTransferInfoReport(request.SiteId,
@@ -153,7 +153,7 @@ namespace BackendSite.Controllers.Api
         #region BankFinancial Report
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/BankFinancialReport" })]
-        public ApiResult<IEnumerable<BankFinancialDataModel>> GetBankFinancialReport(GetBankFinancialReportReq request)
+        public ApiResult GetBankFinancialReport(GetBankFinancialReportReq request)
         {
 
             var data = _bankFinancialBLL.GetBankFinancialReport(JsonConvert.SerializeObject(request.SiteIds),
