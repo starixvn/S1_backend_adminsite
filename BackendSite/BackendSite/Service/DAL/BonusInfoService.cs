@@ -42,6 +42,7 @@ namespace BackendSite.Service.DAL
             props.Add("@EndDate", EndDate);
             props.Add("@TotalAmountShow", TotalAmountShow);
             props.Add("@CategoryType", RebateCategoriesId);
+            props.Add("@BaseCurrencyId", BaseCurrencyId);
 
             #region GetCurrencyTotalAmount
             var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_BonusInfoTotalAmount_Get", props, commandType: CommandType.StoredProcedure).ToList();
@@ -57,7 +58,6 @@ namespace BackendSite.Service.DAL
 
 
             props.Add("@PageSize", PageSize);
-            props.Add("@BaseCurrencyId", BaseCurrencyId);
             props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
