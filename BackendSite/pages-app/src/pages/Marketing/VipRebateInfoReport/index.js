@@ -224,9 +224,8 @@ const App = () => {
           setDatas({
             ...stateDatas,
             PageInfo: {
-              totalPages: res.data.totalPages,
+              ...stateDatas.PageInfo,
               pageNumber: PageNumber,
-              rowCount: res.data.rowCount,
             },
             Datas: [...res.data.data],
           });

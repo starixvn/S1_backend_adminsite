@@ -2,9 +2,11 @@ import React from "react";
 import ReactPaginate from 'react-paginate';
 
 const Pagination = (props) => {
+  console.log(props);
   let data = props.Data;
   let handlePageClick = (e) => {
     const selectedPage = e.selected;
+    console.log(selectedPage);
     props.ChangePage(selectedPage+1);
   };
   let currencyAmountRows = [];
@@ -24,8 +26,8 @@ const Pagination = (props) => {
         breakClassName={"page-item"}
         breakLinkClassName={"page-link"}
         pageCount={data.totalPages}
-        marginPagesDisplayed={data.pageNumber}
-        pageRangeDisplayed={10}
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
         onPageChange={handlePageClick}
         containerClassName={"pagination"}
         activeClassName={"page-item active"}
@@ -36,6 +38,7 @@ const Pagination = (props) => {
         nextLinkClassName={"page-link"}
         previousClassName={"page-item"}
         previousLinkClassName={"page-link"}
+        disableInitialCallback={true}
       />
     </nav>
   );
