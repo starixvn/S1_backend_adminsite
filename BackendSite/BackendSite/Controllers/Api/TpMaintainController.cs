@@ -36,6 +36,8 @@ namespace BackendSite.Controllers.Api
         {
             try
             {
+                input.BeginDate = input.BeginDate.ToUniversalTime();
+                input.EndDate = input.EndDate.ToUniversalTime();
                 if (input.SiteId == 0)//處理ALL 
                 {
                     var list = serverInfoBLL.GetSiteListByLoginUser().Select(server => GetNewTpMaintainBySiteId(input, server));
