@@ -21,11 +21,17 @@ export const dataColumnDefs = () => {
 		},
 		{
 			dataColumn: "beginDate",
-			columnTitle: "BeginDate (UTC+0)",
+			columnTitle: "BeginDate Time" + " (" + moment().format('Z') + ")",
+			body:{
+				format:dateFormat
+			}
 		},
 		{
 			dataColumn: "endDate",
-			columnTitle: "EndDate (UTC+0)",
+			columnTitle: "EndDate Time" + " (" + moment().format('Z') + ")",
+			body:{
+				format:dateFormat
+			}
 		},
 		{
 			columnTitle: "Action",
@@ -126,5 +132,9 @@ const ActionButtons = props => {
 		</div>
 	);
 };
+
+const dateFormat = (time)=>{
+	return moment.utc(time).local().format('YYYY-MM-DD HH:mm');
+  }
 
 export default Panel;
