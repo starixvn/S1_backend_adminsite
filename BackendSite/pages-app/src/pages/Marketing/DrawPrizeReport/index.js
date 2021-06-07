@@ -123,6 +123,7 @@ const App = () => {
               totalPages: res.data.totalPages,
               pageNumber: 1,
               rowCount: res.data.rowCount,
+              currencyAmount: res.data.currencyAmount
             },
             Datas: [...res.data.data],
             FilterInfo: {

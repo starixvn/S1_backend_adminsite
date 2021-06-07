@@ -22,6 +22,7 @@ const App = () => {
     Datas: null,
     FilterInfo: null,
   });
+  const [SubmitStatus, setSubmitStatus] = useState(false);
 
   useEffect(() => {
     let param = {
@@ -83,7 +84,7 @@ const App = () => {
       alert("Please Choose at least one Site");
       return false;
     }
-
+    setSubmitStatus(true);
     let Data = {
         SelectSite: stateFilter.SelectSite,
         StartDate: moment(stateFilter.StartDate).unix(),
@@ -97,6 +98,7 @@ const App = () => {
     api
       .post("/api/Withdrawal/WithdrawalTimeReportGet", Data)
       .then(function (res) {
+        setSubmitStatus(false);
         if (res.data.errorCode === 0 || res.data.errorCode === 1) {
           setDatas({
             ...stateDatas,
@@ -120,6 +122,7 @@ const App = () => {
   };
 
   const Result_ChangePage = (PageNumber) => {
+    setSubmitStatus(true);
     let Data = {
       SelectSite: stateDatas.FilterInfo.SelectSite,
       StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
@@ -133,6 +136,7 @@ const App = () => {
     api
       .post("/api/Withdrawal/WithdrawalTimeReportGet", Data)
       .then(function (res) {
+        setSubmitStatus(false);
         if (res.data.errorCode === 0 || res.data.errorCode === 1) {
           setDatas({
             ...stateDatas,
@@ -155,6 +159,22 @@ const App = () => {
       });
   };
 
+  const Result_ExportToExcel = () => {
+    let param = {
+      Url: "Withdrawal/ExportWithdrawalTime",
+      Data: {
+        SelectSite: JSON.stringify(stateDatas.FilterInfo.SelectSite),
+        WithdrawalID: stateDatas.FilterInfo.WithdrawalID,
+        StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
+        EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
+        Status: parseInt(stateDatas.FilterInfo.Status, 10),
+        CurrencyId: parseInt(stateDatas.FilterInfo.Currency, 10)
+      },
+    };
+
+    WebAPI.DownloadData(param);
+  };
+
   return (
     <div className="container-fluid">
       <h4 className="page-name">Withdrawal Time Report</h4>
@@ -165,9 +185,10 @@ const App = () => {
         onChangeAllCheckBox={Filter_CheckBox_CheckAll}
         onChange={Filter_OnChange}
         ClickSubmit={Filter_Submit}
+        SubmitBtnDisabled={SubmitStatus}
       />
       {stateDatas.Datas === null ? null : (
-        <Result {...stateDatas} ChangePage={Result_ChangePage} />
+        <Result {...stateDatas} ChangePage={Result_ChangePage} ExportToExcel={Result_ExportToExcel}/>
       )}
     </div>
   );

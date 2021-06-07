@@ -23,6 +23,7 @@ import { DepositInfoPagination } from './CustInfo_DepositInfoPagination.jsx';
         1: <span className="status status-active">Running</span>,
         2: <span className="status status-suspend">Suspend</span>,
         3: <span className="status status-closed">Closed</span>,
+        4: <span className="status status-lock">Lock</span>
     }
 
     const CustActStatusOp = {
@@ -1278,8 +1279,8 @@ import { DepositInfoPagination } from './CustInfo_DepositInfoPagination.jsx';
                             {data.phoneVerified || data.emailVerified ? null : <button className="btn btn-primary" onClick={this.onResetProfile.bind(this)}>Reset Profile</button>}
                             <button className="btn btn-primary" onClick={this.onResetCustBankInfo.bind(this)}>Reset Customer Bank Info.</button>
                             {data.status == 1 && data.agent != null && subFuncKeys.indexOf("ca_acc_lock") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"lock")}>Lock</button> : null}
-                            {(data.status == 1 || data.status == 2) && data.agent != null && subFuncKeys.indexOf("ca_acc_close") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"closed")}>Closed</button> : null}
-                            {data.status == 2 && data.agent != null && subFuncKeys.indexOf("ca_unlock") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"unlock")}>Unlock</button> : null}
+                            {(data.status == 1 || data.status == 2 || data.status == 4) && data.agent != null && subFuncKeys.indexOf("ca_acc_close") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"closed")}>Closed</button> : null}
+                            {(data.status == 2 || data.status == 4) && data.agent != null && subFuncKeys.indexOf("ca_unlock") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"unlock")}>Unlock</button> : null}
                             <button className="btn btn-primary" onClick={this.setReason.bind(this,"kickout")}>KickOut</button>
                         </div>
                         <div className="flex-wrap">

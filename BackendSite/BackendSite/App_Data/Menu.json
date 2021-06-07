@@ -575,6 +575,16 @@
       },
       {
         "Key": "",
+        "Title": "BankFinancial Report",
+        "FuncKey": "BankFinancialReport/BankFinancialReport",
+        "Controller": "BankFinancial",
+        "Action": "BankFinancialReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
         "Title": "Reason Management",
         "FuncKey": "BankFinancial/ReasonManagement",
         "Controller": "BankFinancial",

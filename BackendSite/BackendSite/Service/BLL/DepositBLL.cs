@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using LazZiya.ImageResize;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -26,10 +27,10 @@ namespace BackendSite.Service.BLL
             this.custInfoBLL = custInfoBLL;
             this.authorizeBLL = authorizeBLL;
         }
-        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, long startDate, long endDate, string DepositId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, long startDate, long endDate, string DepositId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
         {
             var serverInfo = serverInfoService.GetModel();/*Check SiteID By Permission*/
-            return depositService.GetDepositRequestList(selectSite, depositType, startDate, endDate, serverInfo.SiteId/*Not require*/, DepositId, UserName, currencyId, status, levelstatus,pageSize, ref pageNumber, out totalPages, out rowCount);
+            return depositService.GetDepositRequestList(selectSite, depositType, startDate, endDate, serverInfo.SiteId/*Not require*/, DepositId, UserName, currencyId, status, levelstatus,pageSize, ref pageNumber, out totalPages, out rowCount,ref CurrencyAmount);
         }
 
         public IEnumerable<DepositRequest> GetDepositListByCust(int CustId, string TransId, int? Status, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount,out decimal totalAmount)
@@ -290,38 +291,79 @@ namespace BackendSite.Service.BLL
                     TimeSpan ts1 = new TimeSpan(x.CreateTime.Ticks);
                     TimeSpan ts2 = new TimeSpan(x.UpdateTime.Ticks);
                     TimeSpan ts = ts1.Subtract(ts2).Duration();
-                    string tempDays = "";
-                    string tempHours = "";
-                    string tempMinutes = "";
-                    string tempSeconds = "";
-                    if (ts.Days != 0)
-                    {
-                        tempDays = string.Format("{0}Days", ts.Days.ToString());
-                    }
-                    if (ts.Hours != 0)
-                    {
-                        tempHours = string.Format("{0}Hours", ts.Hours.ToString());
-                    }
-                    if (ts.Minutes != 0)
-                    {
-                        tempMinutes = string.Format("{0}Minutes", ts.Minutes.ToString());
-                    }
-                    if (ts.Seconds != 0)
-                    {
-                        tempSeconds = string.Format("{0}Seconds", ts.Seconds.ToString());
-                    }
-                    x.CompleteTime = string.Format("{0}{1}{2}{3}", tempDays, tempHours, tempMinutes, tempSeconds);
-                    //x.CompleteTime = string.Format("{0}d{1}h{2}m{3}s", ts.Days.ToString(), ts.Hours.ToString(), ts.Minutes.ToString(), ts.Seconds.ToString());
+                    x.CompleteTime = GetTimeString(ts);
                 });
             }
 
             return result;
         }
 
-        //public IEnumerable<DrawPrizeExcelData> DepositTimeExportGet(string SelectSite, string StartDate, string EndDate, int CurrencyId, string EventName)
-        //{
-        //    //var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(SelectSite);
-        //    //return prizeService.GetExportData(siteList, StartDate, EndDate, CurrencyId, EventName);
-        //}
+        public IEnumerable<DepositTimeExportData> DepositTimeExportGet(string SelectSite, string DepositID, long StartDate, long EndDate, int Status, int CurrencyId)
+        {
+            List<DepositTimeExportData> ExportDataToExcel = new List<DepositTimeExportData>();
+            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(SelectSite);
+
+            var result = depositService.GetExportData(siteList, DepositID, StartDate, EndDate, Status, CurrencyId);
+
+            if(result != null)
+            {
+                result.ForEach(x => {
+                    TimeSpan ts1 = new TimeSpan(x.CreateTime.Ticks);
+                    TimeSpan ts2 = new TimeSpan(x.UpdateTime.Ticks);
+                    TimeSpan ts = ts1.Subtract(ts2).Duration();
+                    ExportDataToExcel.Add(new DepositTimeExportData
+                    {
+                        SiteName = x.SiteName,
+                        DepositId = x.DepositId,
+                        DepositType = x.DepositTypeName,
+                        UserName = x.UserName,
+                        Currency = x.IsoCode,
+                        Status = x.StatusName,
+                        CreateTime = x.CreateTime,
+                        UpdateTime = x.UpdateTime,
+                        CompleteTime = GetTimeString(ts)
+                    });
+                });
+            }
+            return ExportDataToExcel;
+        }
+        private string GetTimeString(TimeSpan ts)
+        {
+            string tempDays = "";
+            string tempHours = "";
+            string tempMinutes = "";
+            string tempSeconds = "";
+            string result = "";
+            if (ts.Days != 0)
+            {
+                tempDays = string.Format("{0}Days", ts.Days.ToString());
+            }
+            if (ts.Hours >= 10)
+            {
+                tempHours = string.Format("{0}", ts.Hours.ToString());
+            }
+            else
+            {
+                tempHours = string.Format("0{0}", ts.Hours.ToString());
+            }
+            if (ts.Minutes >= 10)
+            {
+                tempMinutes = string.Format("{0}", ts.Minutes.ToString());
+            }
+            else
+            {
+                tempMinutes = string.Format("0{0}", ts.Minutes.ToString());
+            }
+            if (ts.Seconds >= 10)
+            {
+                tempSeconds = string.Format("{0}", ts.Seconds.ToString());
+            }
+            else
+            {
+                tempSeconds = string.Format("0{0}", ts.Seconds.ToString());
+            }
+            result = string.Format("{0}{1}:{2}:{3}", tempDays, tempHours, tempMinutes, tempSeconds);
+            return result;
+        }
     }
 }

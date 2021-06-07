@@ -25,7 +25,7 @@ namespace BackendSite.Service.DAL
             this.walletService = walletService;
         }
 
-        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite, IEnumerable<int> withdrawalType, long startDate, long endDate, int siteId, string WithdrawalId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite, IEnumerable<int> withdrawalType, long startDate, long endDate, int siteId, string WithdrawalId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount,ref List<string> CurrencyAmount)
         {
             var SelectSite = JsonConvert.SerializeObject(selectSite);
             var WithdrawalType = JsonConvert.SerializeObject(withdrawalType);
@@ -33,13 +33,27 @@ namespace BackendSite.Service.DAL
             var Status = JsonConvert.SerializeObject(status);
             var VipStatus = JsonConvert.SerializeObject(levelstatus);
             int withdrawalId = 0;
+            List<string> tempCurrencyTotalAmount = new List<string>();
             if (!string.IsNullOrWhiteSpace(WithdrawalId))
             {
                 Match m = Regex.Match(WithdrawalId, @"\d+");
                 int.TryParse(m.Value, out withdrawalId);
             }
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var p = new DynamicParameters(new { SelectSite, WithdrawalType, StartDate = startDate, EndDate = endDate, SiteId = siteId, WithdrawalId = withdrawalId, TransId = WithdrawalId, UserName, CurrencyId, Status, VipStatus= VipStatus, PageSize = pageSize });
+
+            #region GetCurrencyTotalAmount
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get", p, commandType: CommandType.StoredProcedure).ToList();
+            if (CurrencyTotalAmount.Count > 0)
+            {
+                CurrencyTotalAmount.ForEach(x =>
+                {
+                    tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.Currency, Math.Round(x.Amount, 2)));
+                });
+            }
+            CurrencyAmount = tempCurrencyTotalAmount;
+            #endregion
+
             p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -265,6 +279,38 @@ namespace BackendSite.Service.DAL
             SearchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
             SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
             return SearchData;
+        }
+
+        public List<WithdrawalTimeList> GetExportData(IEnumerable<int> SelectSite, string WithdrawalID, long StartDate, long EndDate, int Status, int CurrencyId)
+        {
+            var selectSite = JsonConvert.SerializeObject(SelectSite);
+            List<int> selectstatus = new List<int>();
+            if (Status == 0)
+            {
+                selectstatus.Add(3);
+                selectstatus.Add(4);
+                selectstatus.Add(5);
+                selectstatus.Add(6);
+                selectstatus.Add(7);
+            }
+            else
+            {
+                selectstatus.Add(Status);
+            }
+            var SelectStatus = JsonConvert.SerializeObject(selectstatus);
+            int tempWithdrawalId;
+            Int32.TryParse(WithdrawalID, out tempWithdrawalId);
+
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            DynamicParameters props = new DynamicParameters();
+            props.Add("StartDate", StartDate);
+            props.Add("EndDate", EndDate);
+            props.Add("SelectSite", selectSite);
+            props.Add("CurrencyId", CurrencyId);
+            props.Add("WithdrawalId", tempWithdrawalId);
+            props.Add("SelectStatus", SelectStatus);
+            return conn.Query<WithdrawalTimeList>("Admin_WithdrawalStatusTimeExport_Get", props, commandType: CommandType.StoredProcedure).ToList();
+
         }
     }
 }

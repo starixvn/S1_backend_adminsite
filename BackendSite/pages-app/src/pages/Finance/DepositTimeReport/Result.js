@@ -86,6 +86,15 @@ const Panel = (props) => {
 
   return (
     <div className="table">
+      <div className="table-options">
+        <button
+          type="button"
+          className="btn btn-approved"
+          onClick={props.ExportToExcel}
+        >
+          Export Excel
+        </button>
+      </div>
       <table className="table table-striped">
         <thead>
           <tr>{headerRows}</tr>

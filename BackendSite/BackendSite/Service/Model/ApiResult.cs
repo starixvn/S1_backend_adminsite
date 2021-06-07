@@ -85,4 +85,16 @@ namespace BackendSite.Service.Model
         public int RowCount { get; set; }
         public decimal TotalAmount { get; set; }
     }
+    public class ApiListResultCurrencyAmount<TData> : ApiResult
+    {
+        public ApiListResultCurrencyAmount() : this(9000, "") { }
+        public ApiListResultCurrencyAmount(ISelLang selLang) : this(9000, "") { SelLang = selLang; }
+        public ApiListResultCurrencyAmount(int ErrorCode, string Message) : base(ErrorCode, Message) { }
+        public IEnumerable<TData> Data { get; set; }
+
+        public int TotalPages { get; set; }
+        public int PageNumber { get; set; }
+        public int RowCount { get; set; }
+        public List<string> CurrencyAmount { get; set; }
+    }
 }

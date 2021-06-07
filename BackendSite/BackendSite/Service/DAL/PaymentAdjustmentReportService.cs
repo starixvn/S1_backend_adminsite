@@ -19,32 +19,42 @@ namespace BackendSite.Service.DAL
             this.configuration = configuration;
         }
 
-        public IEnumerable<PaymentAdjustment> GetPaymentAdjustmentReport(string TransId, int CurrencyId, string UserName, int AdjustType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<PaymentAdjustment> GetPaymentAdjustmentReport(string TransId, int CurrencyId, string UserName, int AdjustType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount, ref List<string> CurrencyAmount)
         {
             IEnumerable<PaymentAdjustment> result = null;
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            List<string> tempCurrencyTotalAmount = new List<string>();
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            DynamicParameters props = new DynamicParameters();
+            props.Add("@PageSize", PageSize);
+            props.Add("@TransID", TransId);
+            props.Add("@Currency", CurrencyId);
+            props.Add("@UserName", UserName);
+            props.Add("@AdjustType", AdjustType);
+            props.Add("@StartDate", StartDate);
+            props.Add("@EndDate", EndDate);
+            props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
+
+            #region GetCurrencyTotalAmount
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_AdjustmentTotalAmount_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            if (CurrencyTotalAmount.Count > 0)
             {
-                string SpName = "Admin_AdjustmentInfo_Get";
-                DynamicParameters props = new DynamicParameters();
-                props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-                props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-                props.Add("@PageSize", PageSize);
-                props.Add("@TransID",  TransId);
-                props.Add("@Currency", CurrencyId);
-                props.Add("@UserName", UserName);
-                props.Add("@AdjustType", AdjustType);
-                props.Add("@StartDate", StartDate);
-                props.Add("@EndDate", EndDate);
-                props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
-
-                result = conn.Query<PaymentAdjustment>(SpName, props, commandType: CommandType.StoredProcedure);
-                PageNumber = props.Get<int?>("@PageNumber") ?? 0;
-                TotalPages = props.Get<int?>("@TotalPages") ?? 0;
-                RowCount = props.Get<int?>("@RowCount") ?? 0;
+                CurrencyTotalAmount.ForEach(x =>
+                {
+                    tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.Currency, Math.Round(x.Amount, 2)));
+                });
             }
+            CurrencyAmount = tempCurrencyTotalAmount;
+            #endregion
+
+            props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            result = conn.Query<PaymentAdjustment>("Admin_AdjustmentInfo_Get", props, commandType: CommandType.StoredProcedure);
+            PageNumber = props.Get<int?>("@PageNumber") ?? 0;
+            TotalPages = props.Get<int?>("@TotalPages") ?? 0;
+            RowCount = props.Get<int?>("@RowCount") ?? 0;
 
             return result;
         }

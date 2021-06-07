@@ -16,7 +16,7 @@ const App = () => {
     User: "",
     Category: "0",
     BaseCurrency: 2,
-    TotalAmountShow: 0.0,
+    TotalAmountShow: "",
     RebateCategories: 0,
     DateQuickPicker:"0"
   });
@@ -170,7 +170,7 @@ const App = () => {
       PageNumber: 1,
       PageSize: 10,
       BaseCurrencyId: parseInt(stateFilter.BaseCurrency, 10),
-      TotalAmountShow: parseFloat(stateFilter.TotalAmountShow),
+      TotalAmountShow: stateFilter.TotalAmountShow,
       RebateCategoriesId: parseInt(stateFilter.RebateCategories, 10),
     };
     api
@@ -182,6 +182,7 @@ const App = () => {
               totalPages: res.data.totalPages,
               pageNumber: 1,
               rowCount: res.data.rowCount,
+              currencyAmount: res.data.currencyAmount
             },
             Datas: [...res.data.data],
             FilterInfo: {
@@ -212,7 +213,7 @@ const App = () => {
       PageNumber: PageNumber,
       PageSize: 10,
       BaseCurrencyId: parseInt(stateDatas.FilterInfo.BaseCurrency, 10),
-      TotalAmountShow: parseFloat(stateDatas.FilterInfo.TotalAmountShow),
+      TotalAmountShow: stateDatas.FilterInfo.TotalAmountShow,
       RebateCategoriesId: parseInt(stateDatas.FilterInfo.RebateCategories, 10),
     };
 

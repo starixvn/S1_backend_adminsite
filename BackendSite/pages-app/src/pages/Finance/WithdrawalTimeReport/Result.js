@@ -35,8 +35,24 @@ const dataColumnDefs = () => {
         format: dateFormat,
       },
     },
-    { dataColumn: "toVerifyTime", columnTitle: "To Verify Time" },
-    { dataColumn: "toApprovedTime", columnTitle: "To Approved Time" },
+    {
+      dataColumn: "toVerifyTime",
+      columnTitle: "To Verify Time",
+      body: {
+        attr: {
+          class: "text-right",
+        },
+      },
+    },
+    {
+      dataColumn: "toApprovedTime",
+      columnTitle: "To Approved Time",
+      body: {
+        attr: {
+          class: "text-right",
+        },
+      },
+    },
     { dataColumn: "completeTime", columnTitle: "Complete Time" },
   ];
 };
@@ -89,6 +105,15 @@ const Panel = (props) => {
 
   return (
     <div className="table">
+      <div className="table-options">
+        <button
+          type="button"
+          className="btn btn-approved"
+          onClick={props.ExportToExcel}
+        >
+          Export Excel
+        </button>
+      </div>
       <table className="table table-striped">
         <thead>
           <tr>{headerRows}</tr>

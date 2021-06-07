@@ -257,4 +257,17 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
     }
+
+    public class DepositTimeExportData
+    {
+        public string SiteName { get; set; }
+        public int DepositId { get; set; }
+        public string DepositType { get; set; }
+        public string UserName { get; set; }
+        public string Currency { get; set; }
+        public string Status { get; set; }
+        public DateTime CreateTime { get; set; }
+        public DateTime UpdateTime { get; set; }
+        public string CompleteTime { get; set; }      
+    }
 }

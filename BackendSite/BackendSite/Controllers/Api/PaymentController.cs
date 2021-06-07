@@ -199,17 +199,19 @@ namespace BackendSite.Controllers.Api
 
             return apiListResult;
         }
-        public ApiListResult<RebateLog> GetRebateLog([FromForm] IEnumerable<int> SelectSite, [FromForm] string UserName, [FromForm] int RebateType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int CurrencyId, [FromForm] int BaseCurrencyId, [FromForm] decimal TotalAmountShow, [FromForm] int RebateCategoriesId)
+        public ApiListResultCurrencyAmount<RebateLog> GetRebateLog([FromForm] IEnumerable<int> SelectSite, [FromForm] string UserName, [FromForm] int RebateType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int CurrencyId, [FromForm] int BaseCurrencyId, [FromForm] decimal TotalAmountShow, [FromForm] int RebateCategoriesId)
         {
-            var apiListResult = new ApiListResult<RebateLog>();
+            var apiListResult = new ApiListResultCurrencyAmount<RebateLog>();
             int PageSize = 10;
             int TotalPages = 0;
             int RowCount = 0;
-            apiListResult.Data = paymentBLL.GetRebateLog(SelectSite, UserName, RebateType, StartDate, EndDate, PageSize, CurrencyId, BaseCurrencyId, TotalAmountShow, RebateCategoriesId, ref PageNumber, out TotalPages, out RowCount);
+            List<string> CurrencyAmount = new List<string>();
+            apiListResult.Data = paymentBLL.GetRebateLog(SelectSite, UserName, RebateType, StartDate, EndDate, PageSize, CurrencyId, BaseCurrencyId, TotalAmountShow, RebateCategoriesId, ref PageNumber, out TotalPages, out RowCount,ref CurrencyAmount);
             apiListResult.PageNumber = PageNumber;
             apiListResult.RowCount = RowCount;
             apiListResult.TotalPages = TotalPages;
             apiListResult.ErrorCode = 0;
+            apiListResult.CurrencyAmount = CurrencyAmount;
 
             return apiListResult;
         }
@@ -525,6 +527,10 @@ namespace BackendSite.Controllers.Api
                             {
                                 apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Suspend Status." });
                             }
+                            else if (custInfoDetail.Status == 4)
+                            {
+                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Lock Status." });
+                            }
                             else
                             {
                                 apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Closed Status." });
@@ -559,21 +565,23 @@ namespace BackendSite.Controllers.Api
             public int CategoryId { get; set; }
             public int BaseCurrencyId { get; set; }
             public int RebateCategoriesId { get; set; }
-            public decimal TotalAmountShow { get; set; }
+            public string TotalAmountShow { get; set; }
         }
         [HttpPost]
-        public ApiListResult<VipRebateInfo> GetVipRebateInfoList(VipRebateInfoPara para)
+        public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoList(VipRebateInfoPara para)
         {
-            var apiResult = new ApiListResult<VipRebateInfo>();
+            var apiResult = new ApiListResultCurrencyAmount<VipRebateInfo>();
             try
             {
+                List<string> CurrencyAmount = new List<string>();
                 var SearchResult = paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, para.StartDate, para.EndDate, para.User, para.PageSize, para.PageNumber,
-                    para.CategoryId,para.BaseCurrencyId,para.RebateCategoriesId,para.TotalAmountShow);
+                    para.CategoryId,para.BaseCurrencyId,para.RebateCategoriesId,para.TotalAmountShow, ref CurrencyAmount);
                 apiResult.Data = SearchResult.VipRebateInfoList;
                 apiResult.PageNumber = SearchResult.PageNumber;
                 apiResult.TotalPages = SearchResult.TotalPages;
                 apiResult.RowCount = SearchResult.RowCount;
                 apiResult.ErrorCode = 0;
+                apiResult.CurrencyAmount = CurrencyAmount;
             }
             catch(Exception ex)
             {

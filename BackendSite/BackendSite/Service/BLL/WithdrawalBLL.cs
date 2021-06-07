@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,10 +25,10 @@ namespace BackendSite.Service.BLL
             this.reportService = reportService;
         }
 
-        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite, IEnumerable<int> withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite, IEnumerable<int> withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
         {
             var serverInfo = serverInfoService.GetModel();
-            return withdrawalService.GetWithdrawalRequestList(selectSite, withdrawalType, startDate, endDate, serverInfo.SiteId/*Not require*/, WithdrawalId, UserName, currencyId, status, levelstatus,pageSize, ref pageNumber, out totalPages, out rowCount);
+            return withdrawalService.GetWithdrawalRequestList(selectSite, withdrawalType, startDate, endDate, serverInfo.SiteId/*Not require*/, WithdrawalId, UserName, currencyId, status, levelstatus,pageSize, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
         }
 
         public WithdrawalRequest GetWithdrawalRequest(string transId)
@@ -300,6 +301,50 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+        public IEnumerable<WithdrawalTimeExportData> WithdrawalTimeExportGet(string SelectSite, string WithdrawalID, long StartDate, long EndDate, int Status, int CurrencyId)
+        {
+            List<WithdrawalTimeExportData> ExportDataToExcel = new List<WithdrawalTimeExportData>();
+            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(SelectSite);
+
+            var result = withdrawalService.GetExportData(siteList, WithdrawalID, StartDate, EndDate, Status, CurrencyId);
+
+            if (result != null)
+            {
+                result.ForEach(x => {
+                    TimeSpan ts1 = new TimeSpan(x.CreateTime.Ticks);
+                    TimeSpan ts2 = new TimeSpan(x.UpdateTime.Ticks);
+                    TimeSpan ts = ts1.Subtract(ts2).Duration();
+                    string tempToVerifyTime = "";
+                    string tempToApprovedTime = "";
+                    if (x.VerifyTime > DateTime.Now.AddYears(-1000))
+                    {
+                        TimeSpan ts3 = new TimeSpan(x.VerifyTime.Ticks);
+                        TimeSpan tsv = ts1.Subtract(ts3).Duration();
+                        if (x.Status == 6)
+                        {
+                            TimeSpan tsa = ts3.Subtract(ts2).Duration();
+                            tempToApprovedTime = GetTimeString(tsa);
+                        }
+                        tempToVerifyTime = GetTimeString(tsv);
+                    }
+                    ExportDataToExcel.Add(new WithdrawalTimeExportData
+                    {
+                        SiteName = x.SiteName,
+                        WithdrawalId = x.WithdrawalId,
+                        WithdrawalType = x.WithdrawalTypeName,
+                        UserName = x.UserName,
+                        Currency = x.IsoCode,
+                        Status = x.StatusName,
+                        CreateTime = x.CreateTime,
+                        UpdateTime = x.UpdateTime,
+                        ToVerifyTime = tempToVerifyTime,
+                        ToApprovedTime = tempToApprovedTime,
+                        CompleteTime = GetTimeString(ts)
+                    });
+                });
+            }
+            return ExportDataToExcel;
+        }
         private string GetTimeString(TimeSpan ts)
         {
             string tempDays = "";
@@ -311,19 +356,31 @@ namespace BackendSite.Service.BLL
             {
                 tempDays = string.Format("{0}Days", ts.Days.ToString());
             }
-            if (ts.Hours != 0)
+            if (ts.Hours >= 10)
             {
-                tempHours = string.Format("{0}Hours", ts.Hours.ToString());
+                tempHours = string.Format("{0}", ts.Hours.ToString());
             }
-            if (ts.Minutes != 0)
+            else
             {
-                tempMinutes = string.Format("{0}Minutes", ts.Minutes.ToString());
+                tempHours = string.Format("0{0}", ts.Hours.ToString());
             }
-            if (ts.Seconds != 0)
+            if (ts.Minutes >= 10)
             {
-                tempSeconds = string.Format("{0}Seconds", ts.Seconds.ToString());
+                tempMinutes = string.Format("{0}", ts.Minutes.ToString());
             }
-            result = string.Format("{0}{1}{2}{3}", tempDays, tempHours, tempMinutes, tempSeconds);
+            else
+            {
+                tempMinutes = string.Format("0{0}", ts.Minutes.ToString());
+            }
+            if (ts.Seconds >= 10)
+            {
+                tempSeconds = string.Format("{0}", ts.Seconds.ToString());
+            }
+            else
+            {
+                tempSeconds = string.Format("0{0}", ts.Seconds.ToString());
+            }
+            result = string.Format("{0}{1}:{2}:{3}", tempDays, tempHours, tempMinutes, tempSeconds);
             return result;
         }
     }
