@@ -20,20 +20,33 @@ namespace BackendSite.Controllers.Api
     public class TpMaintainController : ControllerBase
     {
         private readonly TpMaintainBLL tpMaintainBLL;
+        private readonly ServerInfoBLL serverInfoBLL;
         private readonly ILogger<TpMaintainController> logger;
 
         public TpMaintainController(IServiceProvider provider)
         {
             tpMaintainBLL = provider.GetRequiredService<TpMaintainBLL>();
+            serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
             logger = provider.GetRequiredService<ILogger<TpMaintainController>>();
         }
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
-        public ApiResult InsertTpMaintain([FromForm] TpMaintain input)
+        public async Task<ApiResult> InsertTpMaintainAsync([FromForm] TpMaintain input)
         {
             try
             {
+                if (input.SiteId == 0)//處理ALL 
+                {
+                    var list = serverInfoBLL.GetSiteListByLoginUser().Select(server => GetNewTpMaintainBySiteId(input, server));
+                    var Tasks = list.Select(item => Task.Run(() => tpMaintainBLL.InsertTpMaintain(item))).ToArray();
+                    var result  = await Task.WhenAll(Tasks);
+                    return new ApiResult
+                    {
+                        ErrorCode = result.Any(item => item == false) ? -1 : 0 ,
+                    };
+                }
+
                 return new ApiResult
                 {
                     ErrorCode = tpMaintainBLL.InsertTpMaintain(input) ? 0 : -1
@@ -117,5 +130,22 @@ namespace BackendSite.Controllers.Api
                 };
             }
         }
+
+        private TpMaintain GetNewTpMaintainBySiteId(TpMaintain input, ServerInfo server)
+        {
+            return new TpMaintain
+            {
+                SiteId = server.SiteId,
+                SiteName = server.SiteName,
+                TpId = input.TpId,
+                TpName = input.TpName,
+                BeginDate = input.BeginDate,
+                EndDate = input.EndDate,
+                MaintainType = input.MaintainType,
+                TypeValue = input.TypeValue,
+                BeginTime = input.BeginTime,
+                EndTime = input.EndTime
+            };
+        }       
     }
 }

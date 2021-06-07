@@ -5,6 +5,7 @@ import moment from "moment";
 const elemType = {
 	DateTimePicker: "DateTimePicker"
 };
+const dateformat = "YYYY-MM-DD HH:mm";
 
 const commonColDefs = [
 	{
@@ -21,10 +22,10 @@ const commonColDefs = [
 
 const EditPanel = props => {
 	const [stateData, updateData] = useState({
-		siteId: 1,
+		siteId: 0,
 		id: 1,
-		beginDate: moment().utc().format("YYYY-MM-DD HH:mm"),
-		endDate: moment().utc().add(1,"day").format("YYYY-MM-DD HH:mm"),
+		beginDate: moment().utc().format(dateformat),
+		endDate: moment().utc().add(1,"day").format(dateformat),
 		maintainType:"Date"
 	  });
 
@@ -40,13 +41,7 @@ const EditPanel = props => {
 		console.log(stateData);
 		let msg = "";
 		let check = true;
-		if (!stateData.siteId) {
-			check = false;
-			msg = "Please select SiteName.";
-		} else if (!stateData.id) {
-			check = false;
-			msg = "Please select TpName.";
-		} else if (!stateData.beginDate) {
+		if (!stateData.beginDate) {
 			check = false;
 			msg = "Please select beginDate.";
 		} else if (!stateData.endDate) {
@@ -68,13 +63,15 @@ const EditPanel = props => {
 			elem = (
 				<DateTimePickerElem
 					key={key}
-					columnTitle={col.columnTitle}
+					columnTitle={col.columnTitle}					
 					dateTimePickerProps={{
-						defaultValue: moment(stateData[col.datacolumn]).format("YYYY-MM-DD HH:mm"),
+						dateFormat:"YYYY-MM-DD",
+						timeFormat:"HH:mm",
+						defaultValue: moment(stateData[col.datacolumn]).format(dateformat),
 						onBlur: e => {
 							try {
 								EditFiled(
-									moment(e).format("YYYY-MM-DD HH:mm"),
+									moment(e).format(dateformat),
 									col.datacolumn
 								);
 							} catch (ex) {}
@@ -129,7 +126,9 @@ const DateTimePickerElem = props => {
 	return (
 		<div className="form-group">
 			<span className="label">{props.columnTitle}</span>
-			<DateTimePicker {...props.dateTimePickerProps} />
+			<DateTimePicker
+			 {...props.dateTimePickerProps} 
+			 />
 		</div>
 	);
 };

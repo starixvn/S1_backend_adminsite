@@ -30,6 +30,7 @@ const App = () => {
     WebAPI.PostData({ Url: "Common/AdminUserSiteList" }).then((res) => {
       if (res.data.errorCode === 0) {
         let _siteList = {};
+        _siteList[0] = 'ALL';
         res.data.data.forEach((s) => {
           _siteList[s.siteId] = s.siteName;
         });
@@ -81,6 +82,7 @@ const App = () => {
     console.log(param);
     WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {
+        alert("success.");
         GetTpMaintainList();
       } else {
         alert(res.data.message ?? "failed to get data.");
