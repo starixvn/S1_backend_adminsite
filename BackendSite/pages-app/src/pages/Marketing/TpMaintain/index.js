@@ -79,7 +79,7 @@ const App = () => {
       Url: "TpMaintain/InsertTpMaintain",
       Data: qs.stringify(insertData),
     };
-    console.log(param);
+    
     WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {
         alert("success.");

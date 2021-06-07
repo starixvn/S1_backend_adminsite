@@ -30,7 +30,6 @@ const EditPanel = props => {
 	  });
 
 	const EditFiled = (v, datacolumn) => {
-		console.log(v,datacolumn);
 		updateData({
 			...stateData,
 			[datacolumn]: v
@@ -38,7 +37,6 @@ const EditPanel = props => {
 	};
 
 	const InsertTpMaintain = () => {
-		console.log(stateData);
 		let msg = "";
 		let check = true;
 		if (!stateData.beginDate) {
