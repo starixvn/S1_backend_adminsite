@@ -1,4 +1,6 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authentication;
@@ -85,51 +87,45 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Signin([FromBody] LoginModel loginModel)
+        public async Task<ApiResult> Signin([FromBody] LoginModel loginModel)
         {
-            //var apiResult = new ApiResult(_selLangBLL);
-            try
+
+            AdminUser adminUser = null;
+
+            var userLoginResult = _authorizeBLL.UserLogin(loginModel.txtID,
+                                                          loginModel.txtPW,
+                                                          _tools.GetClientIP(HttpContext),
+                                                          _tools.GetFromUrl(HttpContext),
+                                                          Request.Headers["User-Agent"],
+                                                          ref adminUser);
+
+            if (userLoginResult != ErrorCodeEnum.Success)
             {
-                AdminUser adminUser = null;
+                throw new AdminException(userLoginResult);
+            }
 
-                var userLoginResult = _authorizeBLL.UserLogin(loginModel.txtID,
-                                                              loginModel.txtPW,
-                                                              _tools.GetClientIP(HttpContext),
-                                                              _tools.GetFromUrl(HttpContext),
-                                                              Request.Headers["User-Agent"],
-                                                              ref adminUser);
+            //if (userLoginResult != 0)
+            //{
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            //   return apiResult;
+            //}
 
-                if (userLoginResult != Service.Model.enums.ErrorMessageCodeEnum.Success)
-                {
-                    return StatusCode(200,
-                                      _responseSettingBLL.SetResponse(userLoginResult));
-                }
-
-                //if (userLoginResult != 0)
-                //{
-                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                //   return apiResult;
-                //}
-
-                var claims = new List<Claim>
+            var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name,adminUser.UserName ),
                     new Claim(ClaimTypes.NameIdentifier,adminUser.UserId.ToString())
                     //new Claim("LangId",? ),
                 };
 
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                                     new ClaimsPrincipal(claimsIdentity));
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                                 new ClaimsPrincipal(claimsIdentity));
 
-                return StatusCode(200, _responseSettingBLL.SetResponse(userLoginResult,
-                                                                                 custMessage: Url.Action("Index", "Home")));
-            }
-            catch (Exception ex)
+            return new ApiResult
             {
-                return StatusCode(500, _responseSettingBLL.SetResponse(ex));
-            }
-
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Message = Url.Action("Index", "Home")
+            };
         }
 
         /// <summary>
@@ -137,26 +133,15 @@ namespace BackendSite.Controllers.Api
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult CheckSignIn()
+        public ApiResult CheckSignIn()
         {
-            var result = new ApiResult();
-            try
+            if (User.Identity.IsAuthenticated)
             {
-                if (User.Identity.IsAuthenticated)
-                {
-                    return StatusCode(200,
-                                      _responseSettingBLL.SetResponse(Service.Model.enums.ErrorMessageCodeEnum.Success, custMessage: "Logining."));
-                }
-                else
-                {
-                    return StatusCode(200,
-                                      _responseSettingBLL.SetResponse(Service.Model.enums.ErrorMessageCodeEnum.Fail, custMessage: "Not logining."));
-                }
+                return new ApiResult { ErrorCode = (int)ErrorCodeEnum.Success };
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(500,
-                                  _responseSettingBLL.SetResponse(ex));
+                throw new AdminException(ErrorCodeEnum.Fail);
             }
         }
 
@@ -165,13 +150,16 @@ namespace BackendSite.Controllers.Api
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> Signout()
+        public async Task<ApiResult> Signout()
         {
 
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            return StatusCode(200,
-                              _responseSettingBLL.SetResponse(Service.Model.enums.ErrorMessageCodeEnum.Success, custMessage: Url.RouteUrl("default", new { action = "Signin", controller = "Home" })));
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Message = Url.RouteUrl("default", new { action = "Signin", controller = "Home" })
+            };
         }
 
         /// <summary>
@@ -179,59 +167,44 @@ namespace BackendSite.Controllers.Api
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult GetSiteList()
+        public ApiResult GetSiteList()
         {
-            try
-            {
-                var data = _serverInfoBLL.GetSiteList();
+            var data = _serverInfoBLL.GetSiteList();
 
-                if (data.Count() == 0)
-                {
-                    return StatusCode(200,
-                                      _responseSettingBLL.SetResponse<IEnumerable<ServerInfo>>(Service.Model.enums.ErrorMessageCodeEnum.NoData,
-                                                                                               data));
-                }
-                else
-                {
-                    return StatusCode(200,
-                                      _responseSettingBLL.SetResponse<IEnumerable<ServerInfo>>(Service.Model.enums.ErrorMessageCodeEnum.Success,
-                                                                                               data));
-                }
-            }
-            catch (Exception ex)
+            if (data.Count() == 0)
             {
-                return StatusCode(500,
-                                  _responseSettingBLL.SetResponse(ex));
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<ServerInfo>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
             }
         }
 
         [HttpPost]
-        public IActionResult ChangePwd([FromBody] ChangePwd changePwd)
+        public ApiResult ChangePwd([FromBody] ChangePwd changePwd)
         {
-            try
+
+            var result = _adminBLL.ChangePwd(changePwd);
+            string custMsg = string.Empty;
+
+            if (result != ErrorCodeEnum.Success)
             {
-                var result = _adminBLL.ChangePwd(changePwd);
-                string custMsg = string.Empty;
-
-                if (result == Service.Model.enums.ErrorMessageCodeEnum.Success)
-                {
-                    custMsg = "Update Successful.";
-                }
-                else if (result == Service.Model.enums.ErrorMessageCodeEnum.Fail)
-                {
-                    custMsg = "Update Fail.";
-                }
-
-                return StatusCode(200,
-                                  _responseSettingBLL.SetResponse(result, custMessage: custMsg));
-
-
+                if (result == ErrorCodeEnum.Fail)
+                    throw new AdminException(result, "Update Fail.");
+                else
+                    throw new AdminException(result);
             }
-            catch (Exception ex)
+
+            return new ApiResult
             {
-                return StatusCode(500,
-                                 _responseSettingBLL.SetResponse(ex));
-            }
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Message = "Update Success."
+            };
         }
 
         #region Temp,沒再使用
@@ -279,24 +252,18 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<DashBoardData> GetDashBoardData(DashBoardPara para)
         {
-            var apiResult = new ApiResult<DashBoardData>();
             List<int> CanSearchSite = new List<int>();
-            try
+
+            _serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x => CanSearchSite.Add(x.SiteId));
+            var result = _dashBoardBLL.GetDashBoardData(para.SiteId, para.CurrencyId, para.BaseCurrencyId, CanSearchSite);
+
+            return new ApiResult<DashBoardData>
             {
-                _serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x => CanSearchSite.Add(x.SiteId));
-                var result = _dashBoardBLL.GetDashBoardData(para.SiteId, para.CurrencyId, para.BaseCurrencyId, CanSearchSite);
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success,
 
-                apiResult.Data = result;
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.RawMessage = ex.ToString();
-            }
+            };
 
-
-            return apiResult;
         }
 
         /// <summary>
@@ -304,30 +271,22 @@ namespace BackendSite.Controllers.Api
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult GetMenu()
+        public ApiResult GetMenu()
         {
-            try
-            {
-                var data = _menuBLL.GetMenuData();
 
-                if (data.Count() == 0)
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<MenuItem>>(Service.Model.enums.ErrorMessageCodeEnum.NoData,
-                                                                         data,
-                                                                         custMessage: "No data."));
-                }
-                else
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<MenuItem>>(Service.Model.enums.ErrorMessageCodeEnum.Success,
-                                                                         data));
-                }
-            }
-            catch (Exception ex)
+            var data = _menuBLL.GetMenuData();
+
+            if (data.Count() == 0)
             {
-                return StatusCode(500,
-                                  _responseSettingBLL.SetResponse(ex));
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<MenuItem>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
             }
         }
 

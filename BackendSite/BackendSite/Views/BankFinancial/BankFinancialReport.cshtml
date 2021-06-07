@@ -15,16 +15,17 @@
     Layout = "~/Views/Shared/_LayoutPagesApp.cshtml";
     ViewData["Title"] = "Bank Financial Report";
 }
-@*@{
-        var currencyList = serverInfoBLL.GetCurrencyList();
-        var i18n = new Dictionary<string, string>();
+@{
+    var currencyList = serverInfoBLL.GetCurrencyList();
+    var i18n = new Dictionary<string, string>();
 
-        foreach (var currency in currencyList)
-        {
-            if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
-                i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
-        }
-    }*@
+    foreach (var currency in currencyList)
+    {
+        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
+            i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+    }
+
+}
 @*@section Style {
         <link href="~/css/page/report/LicenseeWinLost.css" asp-append-version="true" rel="stylesheet" />
         <link href="~/lib/Oneworks/jscalendar/calendar-blue.css" rel="stylesheet" />
@@ -34,10 +35,10 @@
 
 @section Scripts {
     <script type="text/javascript">
-        @*window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));*@
+        window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
         window.RootUrl = '@Url.Content("~/api")'
         window.LangCode = 'en'
-        @*window.gCurrencyList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(currencyList));*@
+        window.gCurrencyList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(currencyList));
     </script>
     <script src="~/js/component/BankFinancial/BankFinancialReport.min.js" asp-append-version="true"></script>
 }

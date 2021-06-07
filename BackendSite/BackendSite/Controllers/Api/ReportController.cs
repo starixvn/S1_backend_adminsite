@@ -1,4 +1,5 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Http;
@@ -167,31 +168,24 @@ namespace BackendSite.Controllers.Api
         #region MainFinancial Report
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/MainFinancialReport" })]
-        public IActionResult GetMainFinancialReport(GetMainFinancialReportReq request)
+        public ApiResult GetMainFinancialReport(GetMainFinancialReportReq request)
         {
-            try
+            var data = _reportBLL.GetMainFinancialReport(JsonConvert.SerializeObject(request.SiteIds),
+                                                              JsonConvert.SerializeObject(request.CurrencyIds),
+                                                              request.StartDate,
+                                                              request.EndDate);
+
+            if (data.Count() == 0)
             {
-                var data = _reportBLL.GetMainFinancialReport(JsonConvert.SerializeObject(request.SiteIds),
-                                                                  JsonConvert.SerializeObject(request.CurrencyIds),
-                                                                  request.StartDate,
-                                                                  request.EndDate);
-                if (data.Count() == 0)
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<MainFinancialModel>>(Service.Model.enums.ErrorMessageCodeEnum.NoData,
-                                                                         data));
-                }
-                else
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<MainFinancialModel>>(Service.Model.enums.ErrorMessageCodeEnum.Success,
-                                                                         data));
-                }
+                throw new AdminException(ErrorCodeEnum.NoData);
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(500,
-                                  _responseSettingBLL.SetResponse(ex));
+                return new ApiResult<IEnumerable<MainFinancialModel>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
             }
         }
 
@@ -521,38 +515,31 @@ namespace BackendSite.Controllers.Api
         #region StatisticalReport By Products
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/StatisticalReport" })]
-        public IActionResult GetStatisticalReport(GetStatisticalReportReq request)
+        public ApiResult GetStatisticalReport(GetStatisticalReportReq request)
         {
-            try
+            #region Date Caculate
+
+            DateTime endDate = Convert.ToDateTime(request.EndDate);
+            string StartDate = new DateTime(endDate.Year, endDate.Month, 1).AddMonths(-1).ToString("yyyy-MM-dd");
+
+            #endregion
+
+            var data = _reportBLL.GetStatisticalReport(JsonConvert.SerializeObject(request.SiteIds),
+                                                             request.TimeZone,
+                                                             StartDate,
+                                                             request.EndDate);
+
+            if (data.Count() == 0)
             {
-                #region Date Caculate
-
-                DateTime endDate = Convert.ToDateTime(request.EndDate);
-                string StartDate = new DateTime(endDate.Year, endDate.Month, 1).AddMonths(-1).ToString("yyyy-MM-dd");
-
-                #endregion
-
-                var data = _reportBLL.GetStatisticalReport(JsonConvert.SerializeObject(request.SiteIds),
-                                                                 request.TimeZone,
-                                                                 StartDate,
-                                                                 request.EndDate);
-                if (data.Count() == 0)
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<StatisticalReportModel>>(Service.Model.enums.ErrorMessageCodeEnum.NoData,
-                                                                         data));
-                }
-                else
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<StatisticalReportModel>>(Service.Model.enums.ErrorMessageCodeEnum.Success,
-                                                                         data));
-                }
+                throw new AdminException(ErrorCodeEnum.NoData);
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(500,
-                                  _responseSettingBLL.SetResponse(ex));
+                return new ApiResult<IEnumerable<StatisticalReportModel>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
             }
         }
 
@@ -1163,30 +1150,22 @@ namespace BackendSite.Controllers.Api
         #region UserOnlineReport
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/UserOnlineReport" })]
-        public IActionResult GetUserOnlineReport(GetUserOnlineReportReq request)
+        public ApiResult GetUserOnlineReport(GetUserOnlineReportReq request)
         {
-            try
-            {
+            var data = _reportBLL.GetUserOnlineReport(JsonConvert.SerializeObject(request.SiteIds),
+                                                           request.SelectDate);
 
-                var data = _reportBLL.GetUserOnlineReport(JsonConvert.SerializeObject(request.SiteIds),
-                                                               request.SelectDate);
-                if (data.Count() == 0)
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<UserOnlineReportModel>>(Service.Model.enums.ErrorMessageCodeEnum.NoData,
-                                                                         data));
-                }
-                else
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<UserOnlineReportModel>>(Service.Model.enums.ErrorMessageCodeEnum.Success,
-                                                                         data));
-                }
-            }
-            catch (Exception ex)
+            if (data.Count() == 0)
             {
-                return StatusCode(500,
-                                  _responseSettingBLL.SetResponse(ex));
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<UserOnlineReportModel>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
             }
         }
 
@@ -1334,35 +1313,26 @@ namespace BackendSite.Controllers.Api
         #region Deposit Report
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/DepositReport" })]
-        public IActionResult GetDepositReport(GetDepositReportReq request)
+        public ApiResult GetDepositReport(GetDepositReportReq request)
         {
-            try
-            {
-                var data = _reportBLL.GetDepositReport(request.CurrencyIds,
-                                                       JsonConvert.SerializeObject(request.SiteIds),
-                                                       JsonConvert.SerializeObject(request.CurrencyIds),
-                                                       request.StartDate,
-                                                       request.EndDate);
+            var data = _reportBLL.GetDepositReport(request.CurrencyIds,
+                                                   JsonConvert.SerializeObject(request.SiteIds),
+                                                   JsonConvert.SerializeObject(request.CurrencyIds),
+                                                   request.StartDate,
+                                                   request.EndDate);
 
-                if (data.Count() == 0)
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<DepositReportModel>>(Service.Model.enums.ErrorMessageCodeEnum.NoData,
-                                                                         data));
-                }
-                else
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<DepositReportModel>>(Service.Model.enums.ErrorMessageCodeEnum.Success,
-                                                                         data));
-                }
-            }
-            catch (Exception ex)
+            if (data.Count() == 0)
             {
-                return StatusCode(500,
-                                  _responseSettingBLL.SetResponse(ex));
+                throw new AdminException(ErrorCodeEnum.NoData);
             }
-
+            else
+            {
+                return new ApiResult<IEnumerable<DepositReportModel>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
         }
 
         [HttpPost]
@@ -1957,34 +1927,27 @@ namespace BackendSite.Controllers.Api
         #region StatisticalReport By Customers
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/CustomerStatisticalReport" })]
-        public IActionResult GetCustomerStatisticalReport(GetCustomerStatisticalReportReq request)
+        public ApiResult GetCustomerStatisticalReport(GetCustomerStatisticalReportReq request)
         {
-            try
-            {
-                var data = _reportBLL.GetCustomerStatisticalReport(request.CurrencyIds,
-                                                                         JsonConvert.SerializeObject(request.SiteIds),
-                                                                         JsonConvert.SerializeObject(request.CurrencyIds),
-                                                                         request.StartDate,
-                                                                         request.EndDate,
-                                                                         request.UserName);
 
-                if (data.Count() == 0)
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<CustomerStatisticalReportModel>>(Service.Model.enums.ErrorMessageCodeEnum.NoData,
-                                                                         data));
-                }
-                else
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<CustomerStatisticalReportModel>>(Service.Model.enums.ErrorMessageCodeEnum.Success,
-                                                                         data));
-                }
-            }
-            catch (Exception ex)
+            var data = _reportBLL.GetCustomerStatisticalReport(request.CurrencyIds,
+                                                                     JsonConvert.SerializeObject(request.SiteIds),
+                                                                     JsonConvert.SerializeObject(request.CurrencyIds),
+                                                                     request.StartDate,
+                                                                     request.EndDate,
+                                                                     request.UserName);
+
+            if (data.Count() == 0)
             {
-                return StatusCode(500,
-                                  _responseSettingBLL.SetResponse(ex));
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<CustomerStatisticalReportModel>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
             }
         }
 
@@ -2502,34 +2465,26 @@ namespace BackendSite.Controllers.Api
                         $"CustomerStatisticalReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
-        public IActionResult GetCustomerDetail(GetCustomerDetailReq request)
+        public ApiResult GetCustomerDetail(GetCustomerDetailReq request)
         {
-            try
-            {
-                var data = _reportBLL.GetCustomerDetail(request.CustId,
-                                                              request.GameId,
-                                                              request.Date);
+            var data = _reportBLL.GetCustomerDetail(request.CustId,
+                                                          request.GameId,
+                                                          request.Date);
 
-                if (data.Count() == 0)
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<TpBetRecordDetailModel>>(Service.Model.enums.ErrorMessageCodeEnum.NoData,
-                                                                         data));
-                }
-                else
-                {
-                    return StatusCode(200,
-                  _responseSettingBLL.SetResponse<IEnumerable<TpBetRecordDetailModel>>(Service.Model.enums.ErrorMessageCodeEnum.Success,
-                                                                         data));
-                }
-            }
-            catch (Exception ex)
+
+            if (data.Count() == 0)
             {
-                return StatusCode(500,
-                                  _responseSettingBLL.SetResponse(ex));
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<TpBetRecordDetailModel>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
             }
         }
-
 
         #endregion
 

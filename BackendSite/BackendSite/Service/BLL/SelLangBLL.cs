@@ -17,6 +17,11 @@ namespace BackendSite.Service.BLL
         private ConcurrentDictionary<string, ResourceManager> rm = new ConcurrentDictionary<string, ResourceManager>();
         private string sLangId;
 
+        public SelLangBLL()
+        {
+
+        }
+
         public SelLangBLL(IHttpContextAccessor httpContextAccessor)
         {
             this.httpContextAccessor = httpContextAccessor;
