@@ -65,6 +65,7 @@ const EditPanel = props => {
 					dateTimePickerProps={{
 						dateFormat:"YYYY-MM-DD",
 						timeFormat:"HH:mm",
+						utc:true,
 						defaultValue: moment(stateData[col.datacolumn]).format(dateformat),
 						onBlur: e => {
 							try {
