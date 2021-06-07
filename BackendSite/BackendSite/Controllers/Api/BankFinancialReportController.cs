@@ -106,6 +106,8 @@ namespace BackendSite.Controllers.Api
 
         #region Action
 
+        #region TransferInfo Report
+
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/TransferInfoReport" })]
         public ApiResult<IEnumerable<BankFinancialTransferInfoDetailModel>> GetTransferInfoReport(GetTransferInfoReportReq request)
         {
@@ -145,6 +147,10 @@ namespace BackendSite.Controllers.Api
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         $"TransferInfoReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
+
+        #endregion
+
+        #region BankFinancial Report
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/BankFinancialReport" })]
         public ApiResult<IEnumerable<BankFinancialDataModel>> GetBankFinancialReport(GetBankFinancialReportReq request)
@@ -186,8 +192,8 @@ namespace BackendSite.Controllers.Api
                         $"BankFinancialReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
-
         #endregion
 
+        #endregion
     }
 }
