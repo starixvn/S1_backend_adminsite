@@ -24,10 +24,10 @@ module.exports = {
     // 	// '@babel/polyfill',
     // 	"./src/pages/Administration/GroupAuthoritySetting/index.js"
     // ],
-    // "Report/LicenseeWinLost.min": [
-    // 	// '@babel/polyfill',
-    // 	"./src/pages/Report/LicenseeWinLost/index.js"
-    // ],
+    "Report/LicenseeWinLost.min": [
+      // '@babel/polyfill',
+      "./src/pages/Report/LicenseeWinLost/index.js",
+    ],
     // "Finance/PaymentAdjustmentReport.min": [
     // 	// '@babel/polyfill',
     // 	"./src/pages/Finance/PaymentAdjustmentReport/index.js"
@@ -181,10 +181,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/TransferInfoReport/index.js",
     // ],
-    "BankFinancial/BankFinancialReport.min": [
-      "@babel/polyfill",
-      "./src/pages/BankFinancial/BankFinancialReport/index.js",
-    ],
+    // "BankFinancial/BankFinancialReport.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/BankFinancial/BankFinancialReport/index.js",
+    // ],
     //"Finance/DepositTimeReport.min": [
     // // '@babel/polyfill',
     //"./src/pages/Finance/DepositTimeReport/index.js",

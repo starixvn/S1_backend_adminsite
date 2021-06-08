@@ -32,14 +32,28 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        #region API Model
+
+        public class GetWinLostReportReq
+        {
+            public string StartDate { get; set; }
+
+            public string EndDate { get; set; }
+
+            public int Currency { get; set; }
+        }
+
+        #endregion
+
         #region Action
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "LicWinLost/Report" })]
-        public ApiResult GetWinLostReport([FromForm] DateTime StartDate,
-                                          [FromForm] DateTime EndDate,
-                                          [FromForm] int Currency)
+        public ApiResult GetWinLostReport(GetWinLostReportReq request)
         {
-            var data = _winLostReportBLL.GetWinLostReport(StartDate, EndDate, Currency, false);
+            var data = _winLostReportBLL.GetWinLostReport(Convert.ToDateTime(request.StartDate),
+                                                          Convert.ToDateTime(request.EndDate),
+                                                          request.Currency,
+                                                  false);
 
             if (data.Count() == 0)
             {
@@ -56,11 +70,14 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public IActionResult ExportReport(DateTime StartDate,
-                                          DateTime EndDate,
+        public IActionResult ExportReport(string StartDate,
+                                          string EndDate,
                                           int Currency)
         {
-            var Datas = _winLostReportBLL.GetWinLostReport(StartDate, EndDate, Currency, true);
+            var Datas = _winLostReportBLL.GetWinLostReport(Convert.ToDateTime(StartDate),
+                                                           Convert.ToDateTime(EndDate),
+                                                           Currency,
+                                                           true);
 
             List<Dictionary<string, dynamic>> byDate = new List<Dictionary<string, dynamic>>();
             List<Dictionary<string, dynamic>> Total = new List<Dictionary<string, dynamic>>();
