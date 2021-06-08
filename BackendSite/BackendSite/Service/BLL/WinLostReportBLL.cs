@@ -9,9 +9,15 @@ namespace BackendSite.Service.BLL
 {
     public class WinLostReportBLL
     {
+        #region Fields
+
         private readonly WinLostReportService winLostReportService;
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly SelLangBLL selLangBLL;
+
+        #endregion
+
+        #region Constructors
 
         public WinLostReportBLL(WinLostReportService winLostReportService, ServerInfoBLL serverInfoBLL, SelLangBLL selLangBLL)
         {
@@ -20,11 +26,18 @@ namespace BackendSite.Service.BLL
             this.selLangBLL = selLangBLL;
         }
 
-        public IEnumerable<WinLostReport> GetWinLostReport(DateTime StartDate, DateTime EndDate, int Currency,bool isExport)
+        #endregion
+
+        #region Public Methods
+
+        public IEnumerable<WinLostReport> GetWinLostReport(DateTime StartDate,
+                                                           DateTime EndDate,
+                                                           int Currency,
+                                                           bool isExport)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
-            var report = winLostReportService.GetWinLostReport(StartDate, EndDate, siteList?.Select(x=>x.SiteId), Currency);
-            if(report != null && report.Any())
+            var report = winLostReportService.GetWinLostReport(StartDate, EndDate, siteList?.Select(x => x.SiteId), Currency);
+            if (report != null && report.Any())
             {
                 var gameTypeList = winLostReportService.GetAllGameType().ToDictionary(row => (int)row.Type, row => (string)row.TypeName);
                 foreach (var row in report)
@@ -43,5 +56,7 @@ namespace BackendSite.Service.BLL
 
             return report;
         }
+
+        #endregion
     }
 }
