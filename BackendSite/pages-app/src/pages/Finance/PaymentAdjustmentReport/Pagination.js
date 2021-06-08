@@ -36,6 +36,7 @@ const Pagination = (props) => {
         nextLinkClassName={"page-link"}
         previousClassName={"page-item"}
         previousLinkClassName={"page-link"}
+        forcePage={data.pageNumber-1}
       />
     </nav>
   );

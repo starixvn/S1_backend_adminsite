@@ -252,16 +252,32 @@ namespace BackendSite.Service.DAL
         public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, long? startDate, long? endDate, int pageSize, int pageNumber)
         {
             VipRebateInfoData SearchData = new VipRebateInfoData();
+            List<string> tempCurrencyTotalAmount = new List<string>();
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             DynamicParameters props = new DynamicParameters();
             props.Add("CustId", custId);
             props.Add("StartDate", startDate);
             props.Add("EndDate", endDate);
+
+            #region GetCurrencyTotalAmount
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_VipRebateTotalAmountbyCust_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            if (CurrencyTotalAmount.Count > 0)
+            {
+                CurrencyTotalAmount.ForEach(x =>
+                {
+                    tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.Currency, Math.Round(x.Amount, 2)));
+                });
+            }
+            SearchData.CurrencyAmount = tempCurrencyTotalAmount;
+            #endregion
+
+
             props.Add("PageSize", pageSize);
             props.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            
             var result = conn.Query<VipRebateInfo>("Admin_VipRebateReportListbyCust_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             SearchData.VipRebateInfoList = result;

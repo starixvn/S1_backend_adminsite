@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace BackendSite.Controllers.Api
 {
@@ -22,17 +23,19 @@ namespace BackendSite.Controllers.Api
             public string RefTransId { get; set; }
             public int PageNumber { get; set; }
         }
-        public ApiListResult<PaymentAdjustment> GetAdjustmentInfoByCust(GetAdjustmentInfoReq getAdjustmentInfoReq)
+        public ApiListResultCurrencyAmount<PaymentAdjustment> GetAdjustmentInfoByCust(GetAdjustmentInfoReq getAdjustmentInfoReq)
         {
             int pageNumber = getAdjustmentInfoReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
-            var apiListResult = new ApiListResult<PaymentAdjustment>();
-            apiListResult.Data = paymentAdjustmentBLL.GetAdjustmentInfoByCust(getAdjustmentInfoReq.CustId, getAdjustmentInfoReq.StartDate, getAdjustmentInfoReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount);
+            List<string> CurrencyAmount = new List<string>();
+            var apiListResult = new ApiListResultCurrencyAmount<PaymentAdjustment>();
+            apiListResult.Data = paymentAdjustmentBLL.GetAdjustmentInfoByCust(getAdjustmentInfoReq.CustId, getAdjustmentInfoReq.StartDate, getAdjustmentInfoReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount,ref CurrencyAmount);
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;
             apiListResult.TotalPages = totalPages;
             apiListResult.RowCount = rowCount;
+            apiListResult.CurrencyAmount = CurrencyAmount;
 
             return apiListResult;
         }

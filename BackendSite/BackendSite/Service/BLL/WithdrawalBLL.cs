@@ -178,9 +178,9 @@ namespace BackendSite.Service.BLL
             return withdrawalService.SetWithdrawalInfo(transId, withdrawalRequest.SiteId, comment, Operator, forStatus, WithdrawalStatus.ToKyc, null, (int?)null, out custId, out amount);
         }
         
-        public IEnumerable<WithdrawalRequest> GetWithdrawalListByCust(int CustId, string TransId, int? Status, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<WithdrawalRequest> GetWithdrawalListByCust(int CustId, string TransId, int? Status, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
         {
-            return withdrawalService.GetWithdrawalListByCust(CustId, TransId, Status, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+            return withdrawalService.GetWithdrawalListByCust(CustId, TransId, Status, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
         }
 
         public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(string selectSite, string withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, string currencyId, string status,string LevelStatus)

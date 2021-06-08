@@ -599,9 +599,9 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
         }
         [HttpPost]
-        public ApiListResult<VipRebateInfo> GetVipRebateInfoListByCustId(VipRebateInfoByCustIdPara para)
+        public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoListByCustId(VipRebateInfoByCustIdPara para)
         {
-            var apiResult = new ApiListResult<VipRebateInfo>();
+            var apiResult = new ApiListResultCurrencyAmount<VipRebateInfo>();
             try
             {
                 var SearchResult = paymentBLL.GetVipRebateInfoListByCustId(para.CustId, para.StartDate, para.EndDate, 10, para.PageNumber);
@@ -609,6 +609,7 @@ namespace BackendSite.Controllers.Api
                 apiResult.PageNumber = SearchResult.PageNumber;
                 apiResult.TotalPages = SearchResult.TotalPages;
                 apiResult.RowCount = SearchResult.RowCount;
+                apiResult.CurrencyAmount = SearchResult.CurrencyAmount;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
