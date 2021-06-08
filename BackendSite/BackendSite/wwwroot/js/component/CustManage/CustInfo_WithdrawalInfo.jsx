@@ -1,5 +1,6 @@
 import { Pagination } from '../commJS/Pagination.jsx';
 import { number_format } from '../commJS/common';
+import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
 
 const WithdrawalStatusOp = {
     1: <span className="status status-pending">{i18n["lbl_WithdrawalStatus1"]}</span>,
@@ -72,7 +73,7 @@ class WithdrawalInfoList extends React.Component {
                         {rows}
                     </tbody>
                 </table>
-                <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                <PaginationTotalAmount Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
             </div>
         )
     }

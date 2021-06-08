@@ -1,5 +1,7 @@
 import { Pagination } from '../commJS/Pagination.jsx';
 import { number_format } from '../commJS/common';
+import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
+
 class AdjustmentInfoList extends React.Component {
     constructor(props) {
         super(props);
@@ -58,7 +60,7 @@ class AdjustmentInfoList extends React.Component {
                         {rows}
                     </tbody>
                 </table>
-                <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                <PaginationTotalAmount Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
             </div>
         )
     }

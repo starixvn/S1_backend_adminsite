@@ -41,6 +41,7 @@ const Panel = () => {
               totalPages: res.data.totalPages,
               pageNumber: 1,
               rowCount: res.data.rowCount,
+              currencyAmount: res.data.currencyAmount
             },
             Datas: [...res.data.data],
             FilterInfo: {
@@ -75,6 +76,7 @@ const Panel = () => {
                 totalPages: response.data.totalPages,
                 pageNumber: PageNumber,
                 rowCount: response.data.rowCount,
+                currencyAmount: response.data.currencyAmount
               },
               Datas: [...response.data.data],
             });

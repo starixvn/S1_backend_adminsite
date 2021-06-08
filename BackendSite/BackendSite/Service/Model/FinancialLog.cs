@@ -116,6 +116,7 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
+        public List<string> CurrencyAmount { get; set; }
     }
     public class VipTPCategory
     {
