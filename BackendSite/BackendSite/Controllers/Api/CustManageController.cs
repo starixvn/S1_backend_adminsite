@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
@@ -24,6 +25,8 @@ namespace BackendSite.Controllers.Api
     [ApiController]
     public class CustManageController : ControllerBase
     {
+        #region Fields
+
         private readonly CustInfoBLL custInfoBLL;
         private readonly TpBLL tpBLL;
         private readonly WinLostReportService winLostReportService;
@@ -32,6 +35,10 @@ namespace BackendSite.Controllers.Api
         private readonly Common common;
         private readonly PaymentBLL paymentBLL;
         private readonly ExcelBLL excelBLL;
+
+        #endregion
+
+        #region Constructors
 
         public CustManageController(CustInfoBLL custInfoBLL, TpBLL tpBLL, WinLostReportService winLostReportService, PermissionBLL permissionBLL, ServerInfoBLL serverInfoBLL, Common common, PaymentBLL paymentBLL, ExcelBLL excelBLL)
         {
@@ -44,6 +51,11 @@ namespace BackendSite.Controllers.Api
             this.paymentBLL = paymentBLL;
             this.excelBLL = excelBLL;
         }
+
+        #endregion
+
+        #region API Model
+
         public class CustInfoListReq
         {
             public IEnumerable<int> SelectSite { get; set; }
@@ -67,22 +79,6 @@ namespace BackendSite.Controllers.Api
             public IEnumerable<int> SelectStatus { get; set; }
         }
 
-        [HttpPost]
-        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq custInfoListReq)
-        {
-            var apiResult = new ApiListResult<CustInfoDetail>();
-            int totalPages = 0, rowCount = 0;
-            int pageNumber = custInfoListReq.PageNumber;
-
-            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite, custInfoListReq.BirDate, custInfoListReq.BirMonth, custInfoListReq.BirYear, custInfoListReq.UserName, custInfoListReq.AccountName, custInfoListReq.LoginIp, custInfoListReq.TransId, custInfoListReq.TpUserName, custInfoListReq.Email, custInfoListReq.PhoneNo, custInfoListReq.StartDate, custInfoListReq.EndDate, custInfoListReq.PageSize, custInfoListReq.AffId, custInfoListReq.SelectCurrency, custInfoListReq.BankAccountNumber, custInfoListReq.SelectStatus, ref pageNumber, out totalPages, out rowCount);
-            apiResult.TotalPages = totalPages;
-            apiResult.PageNumber = pageNumber;
-            apiResult.RowCount = rowCount;
-            apiResult.ErrorCode = 0;
-
-            return apiResult;
-        }
-
         public class CustStatusSwitch
         {
             public int CustId { get; set; }
@@ -99,6 +95,131 @@ namespace BackendSite.Controllers.Api
             public int? Birthday_D { get; set; }
             public string PhoneNumber { get; set; }
             public string EMail { get; set; }
+        }
+
+        public class AddCustNoteReq
+        {
+            public int CustId { get; set; }
+            public string Note { get; set; }
+        }
+
+        public class SetCustNoteReq : AddCustNoteReq
+        {
+            public int NoteId { get; set; }
+            public int Type { get; set; }
+        }
+
+        public class CustInfoReq
+        {
+            public int CustId { get; set; }
+            public string UserName { get; set; }
+
+            public string Reason { get; set; }
+        }
+
+        public class DepositRep3
+        {
+            public string BankName { set; get; }
+            public string BankLogo { set; get; }
+            public string BankSite { set; get; }
+            public string AccountNo { get; set; }
+            public string AccountName { get; set; }
+            public string TransId { get; set; }
+            public string PostScript { get; set; }
+            public decimal MinAmount { get; set; }
+            public decimal MaxAmount { get; set; }
+        }
+
+        public class CustInfosReq : CustInfoReq
+        {
+            public string sabaId { get; set; }
+            public int SiteId { get; set; }
+        }
+
+        public class LoginLogReq
+        {
+            public int PageNumber { get; set; }
+            public int CustId { get; set; }
+            public long startDate { get; set; }
+            public long endDate { get; set; }
+        }
+
+        public class SetCustStatusReq
+        {
+            public int CustId { get; set; }
+            public int Status { get; set; }
+        }
+
+        public class BonusReq
+        {
+            public int CustId { get; set; }
+            public int BonusId { get; set; }
+        }
+
+        public class BankInfoLogListReq
+        {
+            public int CustId { get; set; }
+        }
+
+        public class CustBonusReq
+        {
+            public int CustId { get; set; }
+        }
+
+        #region TeleCSD
+
+        public class TeleCSDpara
+        {
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> Currency { get; set; }
+            public int Deposit { get; set; }
+            public int CallOut { get; set; }
+            public int DormantUser { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+            public TeleCSDpara()
+            {
+                //PageSize預設10
+                if (PageSize == 0)
+                    PageSize = 10;
+            }
+        }
+
+        public class TeleCSDUpdatepara
+        {
+            public int CustId { get; set; }
+            public int SiteId { get; set; }
+        }
+
+        #endregion
+
+        public class CustPromotionpara
+        {
+            public int CustId { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+        }
+
+        #endregion
+
+        [HttpPost]
+        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq custInfoListReq)
+        {
+            var apiResult = new ApiListResult<CustInfoDetail>();
+            int totalPages = 0, rowCount = 0;
+            int pageNumber = custInfoListReq.PageNumber;
+
+            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite, custInfoListReq.BirDate, custInfoListReq.BirMonth, custInfoListReq.BirYear, custInfoListReq.UserName, custInfoListReq.AccountName, custInfoListReq.LoginIp, custInfoListReq.TransId, custInfoListReq.TpUserName, custInfoListReq.Email, custInfoListReq.PhoneNo, custInfoListReq.StartDate, custInfoListReq.EndDate, custInfoListReq.PageSize, custInfoListReq.AffId, custInfoListReq.SelectCurrency, custInfoListReq.BankAccountNumber, custInfoListReq.SelectStatus, ref pageNumber, out totalPages, out rowCount);
+            apiResult.TotalPages = totalPages;
+            apiResult.PageNumber = pageNumber;
+            apiResult.RowCount = rowCount;
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
         }
 
         [HttpPost]
@@ -178,6 +299,8 @@ namespace BackendSite.Controllers.Api
             { "image/gif",System.Drawing.Imaging.ImageFormat.Gif}
         };
 
+        #region CustPhoto Setting
+
         [HttpPost]
         public ApiResult UploadCustPhotoId([FromForm] int CustId, [FromForm] IFormFile File)
         {
@@ -256,17 +379,9 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public class AddCustNoteReq
-        {
-            public int CustId { get; set; }
-            public string Note { get; set; }
-        }
+        #endregion
 
-        public class SetCustNoteReq : AddCustNoteReq
-        {
-            public int NoteId { get; set; }
-            public int Type { get; set; }
-        }
+        #region CustNote Setting
 
         public ApiResult<bool> AddCustNote(AddCustNoteReq addCustNoteReq)
         {
@@ -336,31 +451,8 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public class CustInfoReq
-        {
-            public int CustId { get; set; }
-            public string UserName { get; set; }
+        #endregion
 
-            public string Reason { get; set; }
-        }
-
-        public class DepositRep3
-        {
-            public string BankName { set; get; }
-            public string BankLogo { set; get; }
-            public string BankSite { set; get; }
-            public string AccountNo { get; set; }
-            public string AccountName { get; set; }
-            public string TransId { get; set; }
-            public string PostScript { get; set; }
-            public decimal MinAmount { get; set; }
-            public decimal MaxAmount { get; set; }
-        }
-        public class CustInfosReq : CustInfoReq
-        {
-            public string sabaId { get; set; }
-            public int SiteId { get; set; }
-        }
         public static string MaskPhone(string input)
         {
             if (string.IsNullOrEmpty(input))
@@ -436,13 +528,6 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public class LoginLogReq
-        {
-            public int PageNumber { get; set; }
-            public int CustId { get; set; }
-            public long startDate { get; set; }
-            public long endDate { get; set; }
-        }
 
         [HttpPost]
         public ApiListResult<LoginLog> GetLoginLogByCust(LoginLogReq loginLogReq)
@@ -511,11 +596,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public class SetCustStatusReq
-        {
-            public int CustId { get; set; }
-            public int Status { get; set; }
-        }
+        #region CustStatus Setting
 
         //[HttpPost]
         //public ApiResult SetCustStatus(SetCustStatusReq setCustStatusReq)
@@ -528,7 +609,6 @@ namespace BackendSite.Controllers.Api
 
         //    return apiResult;
         //}
-
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_unlock" })]
         [HttpPost]
@@ -579,7 +659,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        
+
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_close" })]
         [HttpPost]
         public ApiResult SetClose(CustInfoReq setCustStatusReq)
@@ -604,14 +684,16 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        
+
+        #endregion
+
         /// <summary>
         /// 強制讓客戶登出
         /// </summary>
         /// <param name="setCustStatusReq"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_kickout" })]
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_kickout" })]
         public ApiResult KickOut(CustInfoReq setCustStatusReq)
         {
             ApiResult apiResult = new ApiResult();
@@ -633,11 +715,6 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public class BonusReq
-        {
-            public int CustId { get; set; }
-            public int BonusId { get; set; }
-        }
         [HttpPost]
         public ApiResult CancelBonusByBonusId(BonusReq bonusReq)
         {
@@ -694,10 +771,7 @@ namespace BackendSite.Controllers.Api
 
             return result;
         }
-        public class BankInfoLogListReq
-        {
-            public int CustId { get; set; }
-        }
+
 
         [HttpPost]
         public ApiListResult<CustBankInfoLog> GetBankInfoLogList(BankInfoLogListReq bankInfoLogListReq)
@@ -708,10 +782,6 @@ namespace BackendSite.Controllers.Api
             var bankInfoPay = custInfoBLL.GetCustBankInfoLogList(bankInfoLogListReq.CustId, custInfo.SiteId);
             apiListResult.Data = bankInfoPay;
             return apiListResult;
-        }
-        public class CustBonusReq
-        {
-            public int CustId { get; set; }
         }
 
         [HttpPost]
@@ -732,91 +802,85 @@ namespace BackendSite.Controllers.Api
             return apiListResult;
         }
 
-        public class TeleCSDpara
-        {
-            public string SiteIds { get; set; }
-            public string Currency { get; set; }
-            public string Deposit { get; set; }
-            public string CallOut { get; set; }
-            public string DormantUser { get; set; }
-            public long StartDate { get; set; }
-            public long EndDate { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
-            public TeleCSDpara()
-            {
-                //PageSize預設10
-                if (PageSize == 0)
-                    PageSize = 10;
-            }
-        }
+
+        #region TeleCSD
 
         [HttpPost]
         public ApiListResult<CustTele> GetTeleCSD(TeleCSDpara para)
         {
-            var apiResult = new ApiListResult<CustTele>();
-            try
-            {
-                var SearchResult = custInfoBLL.GetTeleCSD(para.SiteIds, para.Currency, para.StartDate, para.EndDate, para.Deposit, para.DormantUser, para.CallOut, para.PageNumber, para.PageSize);
-                apiResult.Data = SearchResult.CustTeleList;
-                apiResult.PageNumber = SearchResult.PageNumber;
-                apiResult.TotalPages = SearchResult.TotalPages;
-                apiResult.RowCount = SearchResult.RowCount;
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = ex.Message;
-            }
-            return apiResult;
-        }
+            var SearchResult = custInfoBLL.GetTeleCSD(JsonConvert.SerializeObject(para.SiteIds),
+                                                     JsonConvert.SerializeObject(para.Currency),
+                                                      para.StartDate,
+                                                      para.EndDate,
+                                                      para.Deposit,
+                                                      para.DormantUser,
+                                                      para.CallOut,
+                                                      para.PageNumber,
+                                                      para.PageSize);
 
-        public class TeleCSDUpdatepara
-        {
-            public int CustId { get; set; }
-            public int SiteId { get; set; }
-        }
-        [HttpPost]
-        public ApiResult UpdateCustomerTele(TeleCSDUpdatepara para )
-        {
-            var apiResult = new ApiResult();
-            try
+            if (SearchResult.CustTeleList.Count() == 0)
             {
-                custInfoBLL.UpdateCustomerTele(para.SiteId, para.CustId, User.Identity.Name);
-                apiResult.ErrorCode = 0;
+                throw new AdminException(ErrorCodeEnum.NoData);
             }
-            catch (Exception ex)
+            else
             {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = ex.Message;
+                return new ApiListResult<CustTele>
+                {
+                    Data = SearchResult.CustTeleList,
+                    TotalPages = SearchResult.TotalPages,
+                    PageNumber = SearchResult.PageNumber,
+                    RowCount = SearchResult.RowCount,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
             }
-
-            return apiResult;
         }
 
         [HttpPost]
-        public IActionResult ExportTeleCSDData(string SiteIds, string Currency, string Deposit, string CallOut, string DormantUser, long StartDate, long EndDate)
+        public ApiResult UpdateCustomerTele(TeleCSDUpdatepara para)
         {
-            var ExportData = custInfoBLL.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);
+            if (custInfoBLL.UpdateCustomerTele(para.SiteId, para.CustId, User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Update Fail");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult ExportTeleCSDData(string SiteIds,
+                                               string Currency,
+                                               int Deposit,
+                                               int CallOut,
+                                               int DormantUser,
+                                               long StartDate,
+                                               long EndDate)
+        {
+            var ExportData = custInfoBLL.GetTeleCSDExportData(SiteIds,
+                                                              Currency,
+                                                              StartDate,
+                                                              EndDate,
+                                                              Deposit,
+                                                              DormantUser,
+                                                              CallOut);
             var stream = excelBLL.Export(ExportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"TeleCSD_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
-        public class CustPromotionpara
-        {
-            public int CustId { get; set; }
-            public long StartDate { get; set; }
-            public long EndDate { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
-        }
+
+        #endregion
+
         [HttpPost]
         public ApiListResultCurrencyAmount<Promotion> GetPromotionListByCustIdAndDate([FromForm] int CustId, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int PageSize)
         {
             var apiResult = new ApiListResultCurrencyAmount<Promotion>();
             try
             {
-                var SearchResult = custInfoBLL.GetPromotionListByCustIdAndDate(CustId,StartDate,EndDate,PageNumber,PageSize);
+                var SearchResult = custInfoBLL.GetPromotionListByCustIdAndDate(CustId, StartDate, EndDate, PageNumber, PageSize);
                 apiResult.Data = SearchResult.PromotionList;
                 apiResult.PageNumber = SearchResult.PageNumber;
                 apiResult.TotalPages = SearchResult.TotalPages;

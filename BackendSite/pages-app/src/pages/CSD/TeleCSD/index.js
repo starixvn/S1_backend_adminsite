@@ -13,9 +13,9 @@ const App = () => {
     Currency: [],
     StartDate: moment().add(-10, "days").format("l"),
     EndDate: moment().format("l"),
-    Deposit: "0",
-    CallOut: "0",
-    DormantUser: "3",
+    Deposit: 0,
+    CallOut: 0,
+    DormantUser: 3,
   });
   const [stateDatas, setDatas] = useState({
     PageInfo: null,
@@ -41,20 +41,33 @@ const App = () => {
       alert("Please Choose at least one Site and Currency");
       return false;
     }
-    let Data = {
-      SiteIds: JSON.stringify(stateFilter.SiteIds),
-      Currency: JSON.stringify(stateFilter.Currency),
-      Deposit: stateFilter.Deposit,
-      CallOut: stateFilter.CallOut,
-      DormantUser: stateFilter.DormantUser,
-      StartDate: moment(stateFilter.StartDate).unix(),
-      EndDate: moment(stateFilter.EndDate).unix(),
-      PageNumber: 1,
+
+    const siteIds = [];
+    stateFilter.SiteIds.map((o) => {
+      siteIds.push(o.value);
+    });
+
+    const currencyIds = [];
+    stateFilter.Currency.map((o) => {
+      currencyIds.push(Number(o.value));
+    });
+
+    let param = {
+      Url: "CustManage/GetTeleCSD",
+      Data: {
+        SiteIds: siteIds,
+        Currency: currencyIds,
+        Deposit: Number(stateFilter.Deposit),
+        CallOut: Number(stateFilter.CallOut),
+        DormantUser: Number(stateFilter.DormantUser),
+        StartDate: moment(stateFilter.StartDate).unix(),
+        EndDate: moment(stateFilter.EndDate).unix(),
+        PageNumber: 1,
+      },
     };
 
-    api
-      .post("/api/CustManage/GetTeleCSD", Data)
-      .then(function (res) {
+    WebAPI.PostData(param)
+      .then((res) => {
         if (res.data.errorCode === 0) {
           setDatas({
             ...stateDatas,
@@ -85,7 +98,7 @@ const App = () => {
   const Complete_once = (prop) => {
     let Data = {
       CustId: prop.custId,
-      SiteId: prop.siteId
+      SiteId: prop.siteId,
     };
     api
       .post("/api/CustManage/UpdateCustomerTele", Data)
@@ -100,20 +113,33 @@ const App = () => {
         alert(error);
       });
   };
-  const UpdateReset = ()=>{
-    let Data = {
-      SiteIds: JSON.stringify(stateDatas.FilterInfo.SiteIds),
-      Currency: JSON.stringify(stateDatas.FilterInfo.Currency),
-      Deposit: stateDatas.FilterInfo.Deposit,
-      CallOut: stateDatas.FilterInfo.CallOut,
-      DormantUser: stateDatas.FilterInfo.DormantUser,
-      StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
-      EndDate: moment(stateDatas.FilterInfo.EndDate).unix(),
-      PageNumber: stateDatas.PageInfo.pageNumber,
+  const UpdateReset = () => {
+    const siteIds = [];
+    stateDatas.FilterInfo.SiteIds.map((o) => {
+      siteIds.push(o.value);
+    });
+
+    const currencyIds = [];
+    stateDatas.FilterInfo.Currency.map((o) => {
+      currencyIds.push(Number(o.value));
+    });
+
+    let param = {
+      Url: "CustManage/GetTeleCSD",
+      Data: {
+        SiteIds: siteIds,
+        Currency: currencyIds,
+        Deposit: Number(stateDatas.FilterInfo.Deposit),
+        CallOut: Number(stateDatas.FilterInfo.CallOut),
+        DormantUser: Number(stateDatas.FilterInfo.DormantUser),
+        StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
+        EndDate: moment(stateDatas.FilterInfo.EndDate).unix(),
+        PageNumber: stateDatas.PageInfo.pageNumber,
+      },
     };
-    api
-      .post("/api/CustManage/GetTeleCSD", Data)
-      .then(function (res) {
+
+    WebAPI.PostData(param)
+      .then((res) => {
         if (res.data.errorCode === 0) {
           setDatas({
             ...stateDatas,
@@ -134,7 +160,7 @@ const App = () => {
       .catch(function (error) {
         alert(error);
       });
-  }
+  };
   const Result_ChangePage = (PageNumber) => {
     if (
       stateDatas.FilterInfo.SiteIds.length === 0 ||
@@ -143,19 +169,33 @@ const App = () => {
       alert("Please Choose at least one Site and Currency");
       return false;
     }
-    let Data = {
-      SiteIds: JSON.stringify(stateDatas.FilterInfo.SiteIds),
-      Currency: JSON.stringify(stateDatas.FilterInfo.Currency),
-      Deposit: stateDatas.FilterInfo.Deposit,
-      CallOut: stateDatas.FilterInfo.CallOut,
-      DormantUser: stateDatas.FilterInfo.DormantUser,
-      StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
-      EndDate: moment(stateDatas.FilterInfo.EndDate).unix(),
-      PageNumber: PageNumber,
+
+    const siteIds = [];
+    stateFilter.SiteIds.map((o) => {
+      siteIds.push(o.value);
+    });
+
+    const currencyIds = [];
+    stateFilter.Currency.map((o) => {
+      currencyIds.push(Number(o.value));
+    });
+
+    let param = {
+      Url: "CustManage/GetTeleCSD",
+      Data: {
+        SiteIds: siteIds,
+        Currency: currencyIds,
+        Deposit: Number(stateFilter.Deposit),
+        CallOut: Number(stateFilter.CallOut),
+        DormantUser: Number(stateFilter.DormantUser),
+        StartDate: moment(stateFilter.StartDate).unix(),
+        EndDate: moment(stateFilter.EndDate).unix(),
+        PageNumber: PageNumber,
+      },
     };
-    api
-      .post("/api/CustManage/GetTeleCSD", Data)
-      .then(function (res) {
+
+    WebAPI.PostData(param)
+      .then((res) => {
         if (res.data.errorCode === 0) {
           setDatas({
             ...stateDatas,
@@ -179,14 +219,24 @@ const App = () => {
   };
 
   const Result_ExportToExcel = () => {
+    const siteIds = [];
+    stateFilter.SiteIds.map((o) => {
+      siteIds.push(o.value);
+    });
+
+    const currencyIds = [];
+    stateFilter.Currency.map((o) => {
+      currencyIds.push(Number(o.value));
+    });
+
     let param = {
       Url: "CustManage/ExportTeleCSDData",
       Data: {
-        SiteIds: JSON.stringify(stateDatas.FilterInfo.SiteIds),
-        Currency: JSON.stringify(stateDatas.FilterInfo.Currency),
-        Deposit: stateDatas.FilterInfo.Deposit,
-        CallOut: stateDatas.FilterInfo.CallOut,
-        DormantUser: stateDatas.FilterInfo.DormantUser,
+        SiteIds: JSON.stringify(siteIds),
+        Currency: JSON.stringify(currencyIds),
+        Deposit: Number(stateDatas.FilterInfo.Deposit),
+        CallOut: Number(stateDatas.FilterInfo.CallOut),
+        DormantUser: Number(stateDatas.FilterInfo.DormantUser),
         StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
         EndDate: moment(stateDatas.FilterInfo.EndDate).unix(),
       },
