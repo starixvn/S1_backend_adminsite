@@ -24,10 +24,10 @@ module.exports = {
     // 	// '@babel/polyfill',
     // 	"./src/pages/Administration/GroupAuthoritySetting/index.js"
     // ],
-    "Report/LicenseeWinLost.min": [
-      // '@babel/polyfill',
-      "./src/pages/Report/LicenseeWinLost/index.js",
-    ],
+    // "Report/LicenseeWinLost.min": [
+    //   // '@babel/polyfill',
+    //   "./src/pages/Report/LicenseeWinLost/index.js",
+    // ],
     // "Finance/PaymentAdjustmentReport.min": [
     // 	// '@babel/polyfill',
     // 	"./src/pages/Finance/PaymentAdjustmentReport/index.js"
@@ -132,10 +132,7 @@ module.exports = {
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/GameCasinoManagement/index.js"
     // ]
-    // "CSD/TeleCSD.min": [
-    // 	"@babel/polyfill",
-    // 	"./src/pages/CSD/TeleCSD/index.js"
-    // ],
+    "CSD/TeleCSD.min": ["@babel/polyfill", "./src/pages/CSD/TeleCSD/index.js"],
     // "Marketing/VipUpgrade.min": [
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/VipUpgrade/index.js"

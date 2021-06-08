@@ -37,7 +37,7 @@ namespace BackendSite.Service.DAL
             {
                 SelectCurrency = JsonConvert.SerializeObject(selectCurrency);
             }
-            if(selectstatus != null)
+            if (selectstatus != null)
             {
                 if (selectstatus.ToList().Count == 0)
                 {
@@ -51,7 +51,7 @@ namespace BackendSite.Service.DAL
             }
             totalPages = 0;
 
-            var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TransId = transId, TpUserName = TpUserName, Email = Email, PhoneNo = PhoneNo, StartDate = startDate, EndDate = endDate, PageSize = pageSize, SelectCurrency=SelectCurrency,SiteList = siteList, AffId, CurrncyList = currncyList, BankAccountNumber = bankAccountNumber , SelectStatus = SelectStatus });
+            var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TransId = transId, TpUserName = TpUserName, Email = Email, PhoneNo = PhoneNo, StartDate = startDate, EndDate = endDate, PageSize = pageSize, SelectCurrency = SelectCurrency, SiteList = siteList, AffId, CurrncyList = currncyList, BankAccountNumber = bankAccountNumber, SelectStatus = SelectStatus });
             p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -90,7 +90,7 @@ namespace BackendSite.Service.DAL
                     SelectStatus = JsonConvert.SerializeObject(selectstatus);
                 }
             }
-            var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TpUserName = TpUserName, TransId = transId, Email = Email, PhoneNo = PhoneNo, StartDate = startDate, EndDate = endDate, SiteList = siteList, AffId , BankAccountNumber = BankAccountNumber, SelectCurrency = SelectCurrency, CurrncyList = currncyList, SelectStatus = SelectStatus });
+            var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TpUserName = TpUserName, TransId = transId, Email = Email, PhoneNo = PhoneNo, StartDate = startDate, EndDate = endDate, SiteList = siteList, AffId, BankAccountNumber = BankAccountNumber, SelectCurrency = SelectCurrency, CurrncyList = currncyList, SelectStatus = SelectStatus });
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExportV3_Get", p, commandType: CommandType.StoredProcedure);
@@ -120,7 +120,7 @@ namespace BackendSite.Service.DAL
         public LastDepositAndWithdrawalTime GetCustDepositAndWithdrawalTime(int custId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.QueryFirstOrDefault<LastDepositAndWithdrawalTime>("Admin_CustInfoOther", new { CustId = custId}, commandType: CommandType.StoredProcedure);
+            var result = conn.QueryFirstOrDefault<LastDepositAndWithdrawalTime>("Admin_CustInfoOther", new { CustId = custId }, commandType: CommandType.StoredProcedure);
             return result;
         }
 
@@ -232,37 +232,37 @@ namespace BackendSite.Service.DAL
             public int value { get; set; }
         }
 
-        public TeleCSDData GetTeleCSD(string SiteIds, string Currency, long StartDate, long EndDate, string Deposit, string DormantUser, string CallOut, int PageNumber, int PageSize)
+        public TeleCSDData GetTeleCSD(string SiteIds, string Currency, long StartDate, long EndDate, int Deposit, int DormantUser, int CallOut, int PageNumber, int PageSize)
         {
             TeleCSDData SearchData = new TeleCSDData();
             DynamicParameters props = new DynamicParameters();
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var SiteIdsObject = JsonConvert.DeserializeObject<MutiSelect[]>(SiteIds);
-            var CurrencyObject = JsonConvert.DeserializeObject<MutiSelect[]>(Currency);
+            //var SiteIdsObject = JsonConvert.DeserializeObject<MutiSelect[]>(SiteIds);
+            //var CurrencyObject = JsonConvert.DeserializeObject<MutiSelect[]>(Currency);
 
-            int siteidlength = SiteIdsObject == null ? 0 : SiteIdsObject.Length;
-            int Currencylength = CurrencyObject == null ? 0 : CurrencyObject.Length;
-            int[] SiteIdFilterArray = new int[siteidlength];
-            int[] CurrencyFilterArray = new int[Currencylength];
-            if (siteidlength > 0)
-            {
-                for (var i = 0; i < SiteIdsObject.Length; i++)
-                {
-                    SiteIdFilterArray[i] = SiteIdsObject[i].value;
-                }
-            }
-            if (Currencylength > 0)
-            {
-                for (var i = 0; i < CurrencyObject.Length; i++)
-                {
-                    CurrencyFilterArray[i] = CurrencyObject[i].value;
-                }
-            }
-            string SiteIdFilter = JsonConvert.SerializeObject(SiteIdFilterArray);
-            string CurrencyFilter = JsonConvert.SerializeObject(CurrencyFilterArray);
-            int ActStatus = int.Parse(Deposit);
-            int DayInactive = int.Parse(DormantUser);
-            int CallOutStatus = int.Parse(CallOut);
+            //int siteidlength = SiteIdsObject == null ? 0 : SiteIdsObject.Length;
+            //int Currencylength = CurrencyObject == null ? 0 : CurrencyObject.Length;
+            //int[] SiteIdFilterArray = new int[siteidlength];
+            //int[] CurrencyFilterArray = new int[Currencylength];
+            //if (siteidlength > 0)
+            //{
+            //    for (var i = 0; i < SiteIdsObject.Length; i++)
+            //    {
+            //        SiteIdFilterArray[i] = SiteIdsObject[i].value;
+            //    }
+            //}
+            //if (Currencylength > 0)
+            //{
+            //    for (var i = 0; i < CurrencyObject.Length; i++)
+            //    {
+            //        CurrencyFilterArray[i] = CurrencyObject[i].value;
+            //    }
+            //}
+            //string SiteIdFilter = JsonConvert.SerializeObject(SiteIdFilterArray);
+            //string CurrencyFilter = JsonConvert.SerializeObject(CurrencyFilterArray);
+            //int ActStatus = int.Parse(Deposit);
+            //int DayInactive = int.Parse(DormantUser);
+            //int CallOutStatus = int.Parse(CallOut);
 
             props.Add("PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -270,13 +270,13 @@ namespace BackendSite.Service.DAL
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("PageSize", PageSize);
 
-            props.Add("SelectSite", SiteIdFilter);
-            props.Add("CurrencyList", CurrencyFilter);
+            props.Add("SelectSite", SiteIds);
+            props.Add("CurrencyList", Currency);
             props.Add("StartDate", StartDate);
             props.Add("EndDate", EndDate);
-            props.Add("ActStatus", ActStatus);
-            props.Add("DayInactive", DayInactive);
-            props.Add("CallOutStatus", CallOutStatus);
+            props.Add("ActStatus", Deposit);
+            props.Add("DayInactive", DormantUser);
+            props.Add("CallOutStatus", CallOut);
             var result = conn.Query<CustTele>("Admin_CustTeleSearchV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             result.ForEach(x =>
@@ -286,7 +286,7 @@ namespace BackendSite.Service.DAL
                     string[] UpdateAtArray = x.UpdateAt.Split(',');
                     string[] OperatorArray = x.Operator.Split(',');
                     x.UpdateRemark = new List<string>();
-                    for(int i=0;i< UpdateAtArray.Count(); i++)
+                    for (int i = 0; i < UpdateAtArray.Count(); i++)
                     {
                         x.UpdateRemark.Add($"{UpdateAtArray[i]}-{OperatorArray[i]}");
                     }
@@ -295,7 +295,7 @@ namespace BackendSite.Service.DAL
                     {
                         x.CanUpdate = false;
                     }
-                }               
+                }
             });
 
             SearchData.CustTeleList = result;
@@ -306,7 +306,7 @@ namespace BackendSite.Service.DAL
             return SearchData;
         }
 
-        public int UpdateCustomerTele(int siteId, int custId,string Operator)
+        public int UpdateCustomerTele(int siteId, int custId, string Operator)
         {
             DynamicParameters props = new DynamicParameters();
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
@@ -318,43 +318,43 @@ namespace BackendSite.Service.DAL
             return conn.Execute("Admin_CustTele_Ins", props, commandType: CommandType.StoredProcedure);
         }
 
-        public List<CustTeleExport> GetTeleCSDExportData(string SiteIds, string Currency, long StartDate, long EndDate, string Deposit, string DormantUser, string CallOut)
+        public List<CustTeleExport> GetTeleCSDExportData(string SiteIds, string Currency, long StartDate, long EndDate, int Deposit, int DormantUser, int CallOut)
         {
             List<CustTeleExport> result = new List<CustTeleExport>();
             DynamicParameters props = new DynamicParameters();
-            var SiteIdsObject = JsonConvert.DeserializeObject<MutiSelect[]>(SiteIds);
-            var CurrencyObject = JsonConvert.DeserializeObject<MutiSelect[]>(Currency);
-            int siteidlength = SiteIdsObject == null ? 0 : SiteIdsObject.Length;
-            int Currencylength = CurrencyObject == null ? 0 : CurrencyObject.Length;
-            int[] SiteIdFilterArray = new int[siteidlength];
-            int[] CurrencyFilterArray = new int[Currencylength];
-            if (siteidlength > 0)
-            {
-                for (var i = 0; i < SiteIdsObject.Length; i++)
-                {
-                    SiteIdFilterArray[i] = SiteIdsObject[i].value;
-                }
-            }
-            if (Currencylength > 0)
-            {
-                for (var i = 0; i < CurrencyObject.Length; i++)
-                {
-                    CurrencyFilterArray[i] = CurrencyObject[i].value;
-                }
-            }
-            string SiteIdFilter = JsonConvert.SerializeObject(SiteIdFilterArray);
-            string CurrencyFilter = JsonConvert.SerializeObject(CurrencyFilterArray);
-            int ActStatus = int.Parse(Deposit);
-            int DayInactive = int.Parse(DormantUser);
-            int CallOutStatus = int.Parse(CallOut);
+            //var SiteIdsObject = JsonConvert.DeserializeObject<MutiSelect[]>(SiteIds);
+            //var CurrencyObject = JsonConvert.DeserializeObject<MutiSelect[]>(Currency);
+            //int siteidlength = SiteIdsObject == null ? 0 : SiteIdsObject.Length;
+            //int Currencylength = CurrencyObject == null ? 0 : CurrencyObject.Length;
+            //int[] SiteIdFilterArray = new int[siteidlength];
+            //int[] CurrencyFilterArray = new int[Currencylength];
+            //if (siteidlength > 0)
+            //{
+            //    for (var i = 0; i < SiteIdsObject.Length; i++)
+            //    {
+            //        SiteIdFilterArray[i] = SiteIdsObject[i].value;
+            //    }
+            //}
+            //if (Currencylength > 0)
+            //{
+            //    for (var i = 0; i < CurrencyObject.Length; i++)
+            //    {
+            //        CurrencyFilterArray[i] = CurrencyObject[i].value;
+            //    }
+            //}
+            //string SiteIdFilter = JsonConvert.SerializeObject(SiteIdFilterArray);
+            //string CurrencyFilter = JsonConvert.SerializeObject(CurrencyFilterArray);
+            //int ActStatus = int.Parse(Deposit);
+            //int DayInactive = int.Parse(DormantUser);
+            //int CallOutStatus = int.Parse(CallOut);
 
-            props.Add("SelectSite", SiteIdFilter);
-            props.Add("CurrencyList", CurrencyFilter);
+            props.Add("SelectSite", SiteIds);
+            props.Add("CurrencyList", Currency);
             props.Add("StartDate", StartDate);
             props.Add("EndDate", EndDate);
-            props.Add("ActStatus", ActStatus);
-            props.Add("DayInactive", DayInactive);
-            props.Add("CallOutStatus", CallOutStatus);
+            props.Add("ActStatus", Deposit);
+            props.Add("DayInactive", DormantUser);
+            props.Add("CallOutStatus", CallOut);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var tempresult = conn.Query<CustTeleExportTemp>("Admin_CustTeleExportV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
@@ -384,9 +384,10 @@ namespace BackendSite.Service.DAL
                         }
                     }
                 }
-                
-                result.Add(new CustTeleExport() {
-                                UserName = x.UserName,
+
+                result.Add(new CustTeleExport()
+                {
+                    UserName = x.UserName,
                     FullName = x.FullName,
                     DepositStatus = x.DepositStatus,
                     RegDate = x.RegDate,

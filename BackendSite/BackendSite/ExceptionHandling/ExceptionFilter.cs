@@ -48,7 +48,7 @@ namespace BackendSite.ExceptionHandling
 
                 if (String.IsNullOrEmpty(message))
                 {
-                    message = _selLangBLL.GetMsg(ErrorCodeEnum.SystemException.GetDescription());
+                    message = _selLangBLL.GetMsg(adminException.ErrorCode.GetDescription());
                 }
 
                 result = JsonSerializer.Serialize(new
