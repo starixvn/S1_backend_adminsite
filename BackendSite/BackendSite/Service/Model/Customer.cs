@@ -231,6 +231,7 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public decimal ThresholdAmount { get; set; }
         public string LastUpdateUser { get; set; }
+        public string SettleTime { get; set; }
     }
     public class VipUpgradeReviewData
     {
@@ -250,6 +251,7 @@ namespace BackendSite.Service.Model
         public decimal ThresholdAmount { get; set; }
         public decimal UpgradeBonus { get; set; }
         public string CalculateTime { get; set; }
+        public string SettleTime { get; set; }
         public int Status { get; set; }
         public string StatusName => Enum.GetName(typeof(VipStatus), Status) ;
     }

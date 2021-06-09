@@ -61,7 +61,7 @@ namespace BackendSite.Service.DAL
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("PageSize", PageSize);
-            var result = conn.Query<VipUpgradeList>("Service_VipUpgradeReview_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var result = conn.Query<VipUpgradeList>("Service_VipUpgradeReviewV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             SearchData.VipUpgradeList = result;
             SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
@@ -96,7 +96,7 @@ namespace BackendSite.Service.DAL
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<VipUpgradeExport>("Service_VipUpgradeReview_Get", props, commandType: CommandType.StoredProcedure);
+            return conn.Query<VipUpgradeExport>("Service_VipUpgradeReviewV2_Get", props, commandType: CommandType.StoredProcedure);
         }
     }
 }

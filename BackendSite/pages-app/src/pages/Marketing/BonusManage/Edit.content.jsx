@@ -629,6 +629,7 @@ const SubPanel = props => {
 										dataColumn="totalUsageLimit"
 										value={props.state.specific[props.currencyId].totalUsageLimit}
 									/>
+									<div>(0 = Unlimited)</div>
 								</div>
 								<RadioBox
 									Title="Bonus Amount Type"

@@ -68,6 +68,13 @@ const dataColumnDefs = () => {
           format:dateFormat
       }
     },
+    {
+      dataColumn: "settleTime",
+      columnTitle: "Settle Time" + " (" + moment().format('Z') + ")",
+      body:{
+          format:settletimeFormat
+      }
+    },
     { dataColumn: "lastUpdateUser", columnTitle: "LastUpdateUser" },
     { dataColumn: "status", columnTitle: "Status" },
     { dataColumn: "upgrade", columnTitle: "Upgrade" },
@@ -275,6 +282,12 @@ const numberFormat = (number)=>{
   return number_format(number_toFixed(number, 0));
 }
 const dateFormat = (createTime)=>{
+  return moment(createTime).format('l LTS');
+}
+const settletimeFormat = (createTime)=>{
+  if(createTime === ""){
+    return "";
+  }
   return moment(createTime).format('l LTS');
 }
 
