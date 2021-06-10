@@ -40,13 +40,13 @@ namespace BackendSite.Controllers.Api
 
         #region Constructors
 
-        public CustManageController(CustInfoBLL custInfoBLL, 
-                                    TpBLL tpBLL, 
-                                    WinLostReportService winLostReportService, 
-                                    PermissionBLL permissionBLL, 
-                                    ServerInfoBLL serverInfoBLL, 
-                                    Common common, 
-                                    PaymentBLL paymentBLL, 
+        public CustManageController(CustInfoBLL custInfoBLL,
+                                    TpBLL tpBLL,
+                                    WinLostReportService winLostReportService,
+                                    PermissionBLL permissionBLL,
+                                    ServerInfoBLL serverInfoBLL,
+                                    Common common,
+                                    PaymentBLL paymentBLL,
                                     ExcelBLL excelBLL)
         {
             this.custInfoBLL = custInfoBLL;
@@ -219,17 +219,76 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq custInfoListReq)
         {
-            var apiResult = new ApiListResult<CustInfoDetail>();
             int totalPages = 0, rowCount = 0;
             int pageNumber = custInfoListReq.PageNumber;
 
-            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite, custInfoListReq.BirDate, custInfoListReq.BirMonth, custInfoListReq.BirYear, custInfoListReq.UserName, custInfoListReq.AccountName, custInfoListReq.LoginIp, custInfoListReq.TransId, custInfoListReq.TpUserName, custInfoListReq.Email, custInfoListReq.PhoneNo, custInfoListReq.StartDate, custInfoListReq.EndDate, custInfoListReq.PageSize, custInfoListReq.AffId, custInfoListReq.SelectCurrency, custInfoListReq.BankAccountNumber, custInfoListReq.SelectStatus, ref pageNumber, out totalPages, out rowCount);
-            apiResult.TotalPages = totalPages;
-            apiResult.PageNumber = pageNumber;
-            apiResult.RowCount = rowCount;
-            apiResult.ErrorCode = 0;
+            var data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite,
+                                                   custInfoListReq.BirDate,
+                                                   custInfoListReq.BirMonth,
+                                                   custInfoListReq.BirYear,
+                                                   custInfoListReq.UserName,
+                                                   custInfoListReq.AccountName,
+                                                   custInfoListReq.LoginIp,
+                                                   custInfoListReq.TransId,
+                                                   custInfoListReq.TpUserName,
+                                                   custInfoListReq.Email,
+                                                   custInfoListReq.PhoneNo,
+                                                   custInfoListReq.StartDate,
+                                                   custInfoListReq.EndDate,
+                                                   custInfoListReq.PageSize,
+                                                   custInfoListReq.AffId,
+                                                   custInfoListReq.SelectCurrency,
+                                                   custInfoListReq.BankAccountNumber,
+                                                   custInfoListReq.SelectStatus,
+                                                   ref pageNumber,
+                                                   out totalPages,
+                                                   out rowCount);
 
-            return apiResult;
+            if (data.Count() == 0)
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiListResult<CustInfoDetail>
+                {
+                    Data = data,
+                    TotalPages = totalPages,
+                    PageNumber = pageNumber,
+                    RowCount = rowCount,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+        }
+
+        /// <summary>
+        /// New Code For Frontend
+        /// </summary>
+        /// <param name="custInfoReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [RequestSizeLimit(40000000)]
+        public IActionResult ExportCustInfoList(CustInfoListReq custInfoReq)
+        {
+            //List<int> selectSite = new List<int>();
+            //List<int> selectCurrency = new List<int>();
+            //List<int> selectStatus = new List<int>();
+            //if (custInfoReq.SelectSite != null)
+            //{
+            //    selectSite = Array.ConvertAll<string, int>(custInfoReq.SelectSite.Split(','), s => int.Parse(s)).ToList();
+            //}
+            //if (custInfoReq.SelectCurrency != null)
+            //{
+            //    selectCurrency = Array.ConvertAll<string, int>(custInfoReq.SelectCurrency.Split(','), s => int.Parse(s)).ToList();
+            //}
+            //if (custInfoReq.SelectStatus != null)
+            //{
+            //    selectStatus = Array.ConvertAll<string, int>(custInfoReq.SelectStatus.Split(','), s => int.Parse(s)).ToList();
+            //}
+            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(custInfoReq.SelectSite, custInfoReq.BirDate, custInfoReq.BirMonth, custInfoReq.BirYear, custInfoReq.UserName, custInfoReq.AccountName, custInfoReq.LoginIp, custInfoReq.TransId, custInfoReq.TpUserName, custInfoReq.Email, custInfoReq.PhoneNo, custInfoReq.StartDate, custInfoReq.EndDate, custInfoReq.AffId, custInfoReq.SelectCurrency, custInfoReq.BankAccountNumber, custInfoReq.SelectStatus);
+
+            var stream = excelBLL.Export(ExportCustInfo);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportCustInfo)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
         #endregion
@@ -287,12 +346,14 @@ namespace BackendSite.Controllers.Api
         /// <param name="custBonusReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiListResult<CustBonus> GetCustBonus(CustBonusReq custBonusReq)
+        public ApiResult GetCustBonus(CustBonusReq custBonusReq)
         {
-            var apiListResult = new ApiListResult<CustBonus>();
-            apiListResult.Data = custInfoBLL.GetCustBonus(custBonusReq.CustId);
-            apiListResult.ErrorCode = 0;
-            return apiListResult;
+            var data = custInfoBLL.GetCustBonus(custBonusReq.CustId);
+            return new ApiResult<IEnumerable<CustBonus>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
@@ -301,13 +362,14 @@ namespace BackendSite.Controllers.Api
         /// <param name="custBonusReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiListResult<RebateInfo> GetRebateInfoByCust(CustBonusReq custBonusReq)
+        public ApiResult GetRebateInfoByCust(CustBonusReq custBonusReq)
         {
-
-            var apiListResult = new ApiListResult<RebateInfo>();
-            apiListResult.Data = paymentBLL.GetRebateInfoByCust(custBonusReq.CustId);
-            apiListResult.ErrorCode = 0;
-            return apiListResult;
+            var data = paymentBLL.GetRebateInfoByCust(custBonusReq.CustId);
+            return new ApiResult<IEnumerable<RebateInfo>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         #endregion
@@ -348,7 +410,7 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_userEdit" })]
-        public ApiResult<bool> SetCustInfo(CustStatus custStatus)
+        public ApiResult SetCustInfo(CustStatus custStatus)
         {
             var apiResult = new ApiResult<bool>();
             bool data = custInfoBLL.SetCustInfo(custStatus.CustId, custStatus.Level, custStatus.FullName, custStatus.Birthday_Y, custStatus.Birthday_M, custStatus.Birthday_D, custStatus.PhoneNumber, custStatus.EMail, User.Identity.Name) > 0;
@@ -380,12 +442,17 @@ namespace BackendSite.Controllers.Api
                 }
 
                 serverInfoBLL.AdminOperateLog(null, custStatus.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
             }
-
-            apiResult.Data = data;
-            apiResult.ErrorCode = 0;
-
-            return apiResult;
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+            }
         }
 
         #endregion
@@ -486,6 +553,18 @@ namespace BackendSite.Controllers.Api
             apiResult.ErrorCode = 0;
 
             return apiResult;
+        }
+
+        [HttpGet]
+        public IActionResult GetCustPhotoId(int CustId)
+        {
+            var custPhotoId = custInfoBLL.GetCustPhotoId(CustId);
+            if (custPhotoId == null)
+            {
+                return StatusCode(404);
+            }
+            var image = custPhotoId.PhotoIdPic;
+            return File(image, "image/jpeg");
         }
 
         #endregion
