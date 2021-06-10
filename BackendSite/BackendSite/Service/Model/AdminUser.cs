@@ -28,7 +28,7 @@ namespace BackendSite.Service.Model
 
     public class ChangePwd
     {
-        public string Oldpwd { set; get; }
+        public string OldPwd { set; get; }
         public string NewPwd { set; get; }
 
         /*public string Token { set; get; }
