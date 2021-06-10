@@ -1,13 +1,19 @@
 export const defBannerType = {
 	1: "Main Banner",
 	2: "HotEvent",
-	3: "Slots"
+	3: "Slots",
+	4: "Live Casino",
+	5: "Fishing",
+	6: "Lottery"
 };
 
 export const initBannerType = [
 	{ value: 1, displayText: defBannerType[1] },
 	{ value: 2, displayText: defBannerType[2] },
-	{ value: 3, displayText: defBannerType[3] }
+	{ value: 3, displayText: defBannerType[3] },
+	{ value: 4, displayText: defBannerType[4] },
+	{ value: 5, displayText: defBannerType[5] },
+	{ value: 6, displayText: defBannerType[6] }
 ];
 
 export const defActionModeType = {
