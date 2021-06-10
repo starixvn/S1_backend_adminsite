@@ -1718,7 +1718,7 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
                                             <tr>
                                                 <td>
                                                     <div className="id-image">
-                                                        <img src={"/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" />
+                                                        <img src={"/api/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" />
                                                     </div>
                                                 </td>
                                                 <td>

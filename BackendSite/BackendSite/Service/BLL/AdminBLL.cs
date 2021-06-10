@@ -68,7 +68,7 @@ namespace BackendSite.Service.BLL
             var serverInfo = serverInfoService.GetModel();
             int userId = 0;
             int.TryParse(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.NameIdentifier).Value, out userId);
-            changePwd.Oldpwd = tools.MD5Encrypt(changePwd.Oldpwd);
+            changePwd.OldPwd = tools.MD5Encrypt(changePwd.OldPwd);
             changePwd.NewPwd = tools.MD5Encrypt(changePwd.NewPwd);
 
             if (adminService.ChangePwd(serverInfo.SiteId, userId, changePwd, out Md5Userpwd))
@@ -77,7 +77,7 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                if (Md5Userpwd != changePwd.Oldpwd)
+                if (Md5Userpwd != changePwd.OldPwd)
                     return ErrorCodeEnum.OldpwdNotMatch;
                 else
                     return ErrorCodeEnum.Fail;
