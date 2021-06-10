@@ -102,9 +102,9 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<PaymentAdjustment> GetAdjustmentInfoByCust(int CustId, long? startDate, long? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<PaymentAdjustment> GetAdjustmentInfoByCust(int CustId, long? startDate, long? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
         {
-            return paymentAdjustmentService.GetAdjustmentInfoByCust(CustId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+            return paymentAdjustmentService.GetAdjustmentInfoByCust(CustId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount,ref CurrencyAmount);
         }
     }
 }

@@ -420,18 +420,20 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiListResult<WithdrawalRequest> GetWithdrawalListByCust(WithdrawalReq4 withdrawalReq)
+        public ApiListResultCurrencyAmount<WithdrawalRequest> GetWithdrawalListByCust(WithdrawalReq4 withdrawalReq)
         {
-            var apiListResult = new ApiListResult<WithdrawalRequest>();
+            var apiListResult = new ApiListResultCurrencyAmount<WithdrawalRequest>();
             int pageNumber = withdrawalReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
-            var withdrawalList = withdrawalBLL.GetWithdrawalListByCust(withdrawalReq.CustId, withdrawalReq.TransId, withdrawalReq.Status, withdrawalReq.startDate, withdrawalReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
+            List<string> CurrencyAmount = new List<string>();
+            var withdrawalList = withdrawalBLL.GetWithdrawalListByCust(withdrawalReq.CustId, withdrawalReq.TransId, withdrawalReq.Status, withdrawalReq.startDate, withdrawalReq.endDate, 10, ref pageNumber, out totalPages, out rowCount,ref CurrencyAmount);
             apiListResult.Data = withdrawalList;
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;
             apiListResult.TotalPages = totalPages;
             apiListResult.RowCount = rowCount;
+            apiListResult.CurrencyAmount = CurrencyAmount;
 
             return apiListResult;
         }

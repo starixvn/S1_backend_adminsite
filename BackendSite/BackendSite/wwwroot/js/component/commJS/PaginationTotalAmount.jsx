@@ -2,7 +2,6 @@ import ReactPaginate from 'react-paginate';
 
 export class PaginationTotalAmount extends React.Component {
     constructor(props) {
-        console.log(props);
         super(props);
     }
 
@@ -12,7 +11,9 @@ export class PaginationTotalAmount extends React.Component {
     }
 
     render() {
+
         let data = this.props.Data;
+        console.log(data.pageNumber);
         let currencyAmountRows = [];
         currencyAmountRows = data.currencyAmount.map((currency)=>{
             return(<tr>{currency}</tr>)
@@ -42,6 +43,7 @@ export class PaginationTotalAmount extends React.Component {
                     nextLinkClassName={"page-link"}
                     previousClassName={"page-item"}
                     previousLinkClassName={"page-link"}
+                    forcePage={data.pageNumber-1}
                 />
             </nav>
         )

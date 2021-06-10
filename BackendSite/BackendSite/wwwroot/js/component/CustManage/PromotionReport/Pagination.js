@@ -1,40 +1,46 @@
 import React from "react";
+import ReactPaginate from 'react-paginate';
 
-const Pagination = (props)=>{
-    let data = props.Data;
-    let PageNum=[];
+const Pagination = (props) => {
+    console.log(props);
+  let data = props.Data;
+  let handlePageClick = (e) => {
+    const selectedPage = e.selected;
+    props.ChangePage(selectedPage+1);
+  };
+  let currencyAmountRows = [];
+  currencyAmountRows = data.currencyAmount.map((currency) => {
+    return <tr>{currency}</tr>;
+  });
+  return (
+    <nav className="paging" aria-label="Page navigation example">
+      <span>
+        {currencyAmountRows}
+        <tr>Total records: {data.rowCount}</tr>
+      </span>
+      <ReactPaginate
+        previousLabel={"<"}
+        nextLabel={">"}
+        breakLabel={"..."}
+        breakClassName={"page-item"}
+        breakLinkClassName={"page-link"}
+        pageCount={data.totalPages}
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={10}
+        onPageChange={handlePageClick}
+        containerClassName={"pagination"}
+        activeClassName={"page-item active"}
+        activeLinkClassName={"page-link"}
+        pageClassName={"page-item"}
+        pageLinkClassName={"page-link"}
+        nextClassName={"page-item"}
+        nextLinkClassName={"page-link"}
+        previousClassName={"page-item"}
+        previousLinkClassName={"page-link"}
+        forcePage={data.pageNumber-1}
+      />
+    </nav>
+  );
+};
 
-    for(let i = 1; i<=data.totalPages; i++){
-        PageNum.push(
-            <li className={"page-item"+(data.pageNumber==i?" active":"")} key={i}>
-                <a className="page-link" onClick={data.pageNumber==i ? null: ()=>{props.ChangePage(i)}}>{i}</a>
-            </li>
-        );
-    }
-
-    let disableNext=data.pageNumber==data.totalPages||data.totalPages==0;
-
-    return (
-        <nav className="paging" aria-label="Page navigation example">
-            <span>Total records: {data.rowCount}</span>
-            <ul className="pagination">
-                <li className={"page-item"+ (data.pageNumber==1?" disabled":"")}>
-                    <a className="page-link" tabIndex="-1" aria-disabled={data.pageNumber == 1} onClick={data.pageNumber == 1 ? null : ()=>{props.ChangePage(data.pageNumber - 1)}}>
-                        <span aria-hidden="true">&laquo;</span>
-                        <span className="sr-only">Previous</span>
-                    </a>
-                </li>
-                {PageNum}
-                <li className={"page-item"+ (disableNext?" disabled":"")}>
-                    <a className="page-link" tabIndex="+1" aria-disabled={disableNext} onClick={disableNext ? null : ()=>{props.ChangePage(data.pageNumber + 1)}}>
-                        <span aria-hidden="true">&raquo;</span>
-                        <span className="sr-only">Next</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    )
-    
-}    
-
-export default Pagination
+export default Pagination;

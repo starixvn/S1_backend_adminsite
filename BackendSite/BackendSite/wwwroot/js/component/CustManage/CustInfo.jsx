@@ -17,6 +17,7 @@ import VipLevel from './VipLevel/index';
 import PromotionReport from './PromotionReport/index';
 import SetCustStatusNote from './SetCustStatusNote/PopboxContentSetNote.js';
 import { DepositInfoPagination } from './CustInfo_DepositInfoPagination.jsx';
+import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -469,7 +470,7 @@ import { DepositInfoPagination } from './CustInfo_DepositInfoPagination.jsx';
                             {rows}
                         </tbody>
                     </table>
-                    <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                    <PaginationTotalAmount Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
                 </div>
             )
         }

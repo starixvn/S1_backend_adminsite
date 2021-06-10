@@ -935,10 +935,9 @@ namespace BackendSite.Controllers.Api
 
         #region CSD > Customer Administration > CustInfo > Promotion Report
 
-        [HttpPost]
-        public ApiListResult<Promotion> GetPromotionListByCustIdAndDate([FromForm] int CustId, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int PageSize)
+        public ApiListResultCurrencyAmount<Promotion> GetPromotionListByCustIdAndDate([FromForm] int CustId, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int PageSize)
         {
-            var apiResult = new ApiListResult<Promotion>();
+            var apiResult = new ApiListResultCurrencyAmount<Promotion>();
             try
             {
                 var SearchResult = custInfoBLL.GetPromotionListByCustIdAndDate(CustId, StartDate, EndDate, PageNumber, PageSize);
@@ -947,6 +946,7 @@ namespace BackendSite.Controllers.Api
                 apiResult.TotalPages = SearchResult.TotalPages;
                 apiResult.RowCount = SearchResult.RowCount;
                 apiResult.ErrorCode = 0;
+                apiResult.CurrencyAmount = SearchResult.CurrencyAmount;
             }
             catch (Exception ex)
             {
