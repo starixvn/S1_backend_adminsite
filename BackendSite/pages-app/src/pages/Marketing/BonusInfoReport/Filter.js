@@ -34,6 +34,7 @@ const defDateType = {
   6: "Last Month",
 };
 const defCurrencyType = {
+  0: "Original Currency",
   2: "MYR",
   4: "THB",
   13: "RMB",
@@ -102,7 +103,7 @@ const Panel = (props) => {
             return { value: key, displayText: defCurrencyType[key] };
           })}
           hasAll={false}
-          selectedValue={2}
+          selectedValue={0}
           dataColumn="BaseCurrency"
           onChange={props.onChange}
         />
@@ -160,12 +161,6 @@ const Panel = (props) => {
           columnTitle="BonusCode"
           defaultValue=""
           dataColumn="BonusCode"
-          onChange={props.onChange}
-        />
-        <InputField
-          columnTitle="Total Amount Show"
-          defaultValue=""
-          dataColumn="TotalAmountShow"
           onChange={props.onChange}
         />
         <DropDownBox

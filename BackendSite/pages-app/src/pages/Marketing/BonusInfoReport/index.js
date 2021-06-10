@@ -16,8 +16,7 @@ const App = () => {
     User: "",
     Type: 0,
     BonusCode: "",
-    BaseCurrency: 2,
-    TotalAmountShow:0.0,
+    BaseCurrency: 0,
     DateQuickPicker:"0",
     RebateCategories:0
   });
@@ -164,7 +163,6 @@ const App = () => {
         TransId: stateFilter.TransId,
         PageNumber: 1,
         BaseCurrencyId:parseInt(stateFilter.BaseCurrency,10),
-        TotalAmountShow:parseFloat(stateFilter.TotalAmountShow),
         RebateCategoriesId: parseInt(stateFilter.RebateCategories, 10),
       }),
     };
@@ -207,7 +205,6 @@ const App = () => {
         TransId: stateDatas.FilterInfo.TransId,
         PageNumber: PageNumber,
         BaseCurrencyId:parseInt(stateDatas.FilterInfo.BaseCurrency,10),
-        TotalAmountShow:parseFloat(stateDatas.FilterInfo.TotalAmountShow),
         RebateCategoriesId: parseInt(stateFilter.RebateCategories, 10),
       }),
     };
@@ -246,7 +243,6 @@ const App = () => {
         UserName: stateDatas.FilterInfo.User,
         TransId: stateDatas.FilterInfo.TransId,
         BaseCurrencyId:parseInt(stateDatas.FilterInfo.BaseCurrency,10),
-        TotalAmountShow:parseFloat(stateDatas.FilterInfo.TotalAmountShow),
         RebateCategoriesId: parseInt(stateFilter.RebateCategories, 10),
       },
     };

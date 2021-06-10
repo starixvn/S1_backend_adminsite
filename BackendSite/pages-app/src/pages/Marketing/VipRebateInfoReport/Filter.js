@@ -29,6 +29,15 @@ const defDateType = {
   5: "This Month",
   6: "Last Month",
 };
+const defBaseCurrencyType = {
+  0: "Original Currency",
+  2: "MYR",
+  4: "THB",
+  13: "RMB",
+  15: "IDR",
+  51: "VND",
+  61: "INR",
+};
 
 const Panel = (props) => {
   let siteListOptions = "";
@@ -65,11 +74,11 @@ const Panel = (props) => {
         />
         <DropDownBox
           columnTitle="Base Currency Show"
-          options={Object.keys(defCurrencyType).map((key) => {
-            return { value: key, displayText: defCurrencyType[key] };
+          options={Object.keys(defBaseCurrencyType).map((key) => {
+            return { value: key, displayText: defBaseCurrencyType[key] };
           })}
           hasAll={false}
-          selectedValue={2}
+          selectedValue={0}
           dataColumn="BaseCurrency"
           onChange={props.onChange}
         />
@@ -138,12 +147,6 @@ const Panel = (props) => {
           hasAll={true}
           selectedValue={0}
           dataColumn="RebateCategories"
-          onChange={props.onChange}
-        />
-        <InputField
-          columnTitle="Total Amount Show"
-          defaultValue=""
-          dataColumn="TotalAmountShow"
           onChange={props.onChange}
         />
         <div className="button-group">

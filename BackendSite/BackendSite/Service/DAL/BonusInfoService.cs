@@ -24,7 +24,7 @@ namespace BackendSite.Service.DAL
             this.withdrawalLimitService = withdrawalLimitService;
         }
 
-        public IEnumerable<BonusInfo> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, decimal TotalAmountShow, int RebateCategoriesId ,ref int PageNumber, ref int TotalPages, ref int RowCount,ref List<string> CurrencyAmount)
+        public IEnumerable<BonusInfo> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId ,ref int PageNumber, ref int TotalPages, ref int RowCount,ref List<string> CurrencyAmount)
         {
             IEnumerable<BonusInfo> result = null;
             List<string> tempCurrencyTotalAmount = new List<string>();
@@ -40,12 +40,11 @@ namespace BackendSite.Service.DAL
             props.Add("@TransID", TransId);
             props.Add("@StartDate", StartDate);
             props.Add("@EndDate", EndDate);
-            props.Add("@TotalAmountShow", TotalAmountShow);
             props.Add("@CategoryType", RebateCategoriesId);
             props.Add("@BaseCurrencyId", BaseCurrencyId);
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_BonusInfoTotalAmount_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_BonusInfoTotalAmountV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
                 CurrencyTotalAmount.ForEach(x =>
@@ -63,7 +62,7 @@ namespace BackendSite.Service.DAL
             props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            result = conn.Query<BonusInfo>("Admin_BonusInfoV3_Get", props, commandType: CommandType.StoredProcedure);
+            result = conn.Query<BonusInfo>("Admin_BonusInfoV4_Get", props, commandType: CommandType.StoredProcedure);
             PageNumber = props.Get<int?>("@PageNumber") ?? 0;
             TotalPages = props.Get<int?>("@TotalPages") ?? 0;
             RowCount = props.Get<int?>("@RowCount") ?? 0;
@@ -72,12 +71,12 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<BonusInfo> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int BaseCurrencyId, decimal TotalAmountShow, int RebateCategoriesId)
+        public IEnumerable<BonusInfo> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int BaseCurrencyId, int RebateCategoriesId)
         {
             IEnumerable<BonusInfo> result = null;
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                string SpName = "Admin_BonusInfoExportV3_Get";
+                string SpName = "Admin_BonusInfoExportV4_Get";
                 DynamicParameters props = new DynamicParameters();
                 props.Add("@SelectSite", SelectSite);
                 props.Add("@BonusCode", BonusCode);
@@ -89,7 +88,6 @@ namespace BackendSite.Service.DAL
                 props.Add("@StartDate", StartDate);
                 props.Add("@EndDate", EndDate);
                 props.Add("@BaseCurrencyId", BaseCurrencyId);
-                props.Add("@TotalAmountShow", TotalAmountShow);
                 props.Add("@CategoryType", RebateCategoriesId);
 
                 result = conn.Query<BonusInfo>(SpName, props, commandType: CommandType.StoredProcedure);

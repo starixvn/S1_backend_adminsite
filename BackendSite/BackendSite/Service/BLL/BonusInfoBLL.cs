@@ -21,7 +21,7 @@ namespace BackendSite.Service.BLL
             this.selLangBLL = selLangBLL;
         }
 
-        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, decimal TotalAmountShow, int RebateCategoriesId,ref int PageNumber, ref int TotalPages, ref int RowCount, ref List<string> CurrencyAmount)
+        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId,ref int PageNumber, ref int TotalPages, ref int RowCount, ref List<string> CurrencyAmount)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
             var datas = bonusInfoService.GetBonusInfoReport(
@@ -36,7 +36,6 @@ namespace BackendSite.Service.BLL
                     EndDate,
                     PageSize,
                     BaseCurrencyId,
-                    TotalAmountShow,
                     RebateCategoriesId,
                     ref PageNumber,
                     ref TotalPages,
@@ -73,7 +72,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate, int BaseCurrencyId, decimal TotalAmountShow, int RebateCategoriesId)
+        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate, int BaseCurrencyId, int RebateCategoriesId)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
             var datas = bonusInfoService.GetBonusInfoExportReport(
@@ -87,7 +86,6 @@ namespace BackendSite.Service.BLL
                     StartDate,
                     EndDate,
                     BaseCurrencyId,
-                    TotalAmountShow,
                     RebateCategoriesId
                 );
 
