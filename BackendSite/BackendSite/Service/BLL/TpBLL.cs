@@ -18,7 +18,7 @@ namespace BackendSite.Service.BLL
         private readonly string apiUrl;
         private readonly ThirdPartyService thirdPartyService;
         private readonly IMemoryCache cache;
-        private readonly int BalanceTimeOut;
+        private readonly int _balanceTimeoutSecond;
 
         public TpBLL(IMemoryCache cache, IConfiguration configuration, CourierAdapter courierAdapter, ThirdPartyService thirdPartyService, ServerInfoService serverInfoService)
         {
@@ -27,7 +27,7 @@ namespace BackendSite.Service.BLL
             this.thirdPartyService = thirdPartyService;
             this.cache = cache;
             this.serverInfoService = serverInfoService;
-            BalanceTimeOut = configuration.GetValue<int>("BalanceTimeOut");
+            _balanceTimeoutSecond = configuration.GetValue<int>("BalanceTimeoutSecond");
         }
         public IEnumerable<TpTransferInfo> GetTpTransferInfoByCust(int CustId, string TransId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
@@ -107,7 +107,7 @@ namespace BackendSite.Service.BLL
 
             try
             {
-                data = await courierAdapter.MyPostAsync<UserBalance, TpInfo>(myUrl, oTpInfo, BalanceTimeOut);
+                data = await courierAdapter.MyPostAsync<UserBalance, TpInfo>(myUrl, oTpInfo, _balanceTimeoutSecond);
             }
             catch (Exception ex)
             {
