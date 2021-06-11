@@ -12,6 +12,7 @@ import { Dropdown } from 'semantic-ui-react';
                 SiteList: [],
                 SiteId: 0,
                 UserName: "",
+                SabaId: "",
                 Amount: 0,
                 BankName: null,
                 AccountName: "",
@@ -30,7 +31,12 @@ import { Dropdown } from 'semantic-ui-react';
 
         componentDidMount() {
             this.getSiteList();
-            this.getAccountList();
+            // this.getAccountList();
+        }
+
+        handleSubmit(event){
+            event.preventDefault();
+            this.submitGetAccountList();
         }
 
         onChange(e) {
@@ -79,6 +85,37 @@ import { Dropdown } from 'semantic-ui-react';
             }));
 
             this.setState({ selectOptions: options });
+        }
+
+        submitGetAccountList(){
+            let msg = "";
+            let check = true;
+            if (!this.state.SabaId && !this.state.UserName) {
+                check = false;
+                msg = "Please input SabaId or UserName.";
+            }
+            if (!this.state.SiteId) {
+                check = false;
+                msg = "Please select Site.";
+            }
+            if (check) {
+                axios.post('/api/BankList/GetBankList', { SabaId: this.state.SabaId, UserName: this.state.UserName, SiteId: this.state.SiteId })
+                    .then(function (response) {
+                        // //Loading.UnLoading();
+                        // let result = response.data;
+                        // if (result.errorCode == 0) {
+                        //     this.setState({ CustData: result.data });
+                        // } else {
+                        //     alert(result.message);
+                        // }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+            else {
+                alert(msg);
+            }
         }
 
         onSiteChanged(e) {
@@ -178,74 +215,95 @@ import { Dropdown } from 'semantic-ui-react';
             }.bind(this));
 
             return (
-                <div className="card">
+                // <div className="card">
                     
-                    <form method="post" className="form-horizontal add-form" onSubmit={this.onSubmitDeposit.bind(this)}>
+                //     <form method="post" className="form-horizontal add-form" onSubmit={this.onSubmitDeposit.bind(this)}>
+                //         <div className="form-group">
+                //             <label className="col-form-label d-block">Site Name</label>
+                //             {siteList}
+                //         </div>
+                //         <div className="form-group">
+                //             <label className="col-form-label">Username</label>
+                //             <input className="form-control" type="text" name="UserName" onChange={this.onChange.bind(this)} value={this.state.UserName || ""}/>
+                //         </div>
+                //         <div className="form-group">
+                //             <label className="col-form-label">Amount</label>
+                //             <input className="form-control text-right" type="number" name="Amount" onChange={this.onChange.bind(this)} value={this.state.Amount || ""}/>
+                //         </div>
+                //         <div>--------------------------------------------------------------------------</div>
+                //         <div className="form-group">
+                //             <label className="col-form-label">Account No</label>
+                //             <Dropdown
+                //                 clearable
+                //                 fluid
+                //                 search
+                //                 selection
+                //                 options={this.state.selectOptions}
+                //                 placeholder='Deposited Account Number'
+                //                 onChange={this.onSelectedAccount.bind(this)}
+                //                 value={this.state.AccountNo || ''}
+                //                 /*onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}*/
+                //                 />
+                //         </div>
+                //         <div className="form-group">
+                //             <label className="col-form-label">Bank Name</label>
+                //             <input className="form-control" type="text" name="BankName" value={this.state.BankName || ""} onChange={this.onChange.bind(this)} disabled="disabled"/>
+                //         </div>
+                //         <div className="form-group">
+                //             <label className="col-form-label">Account Holder Name</label>
+                //             <input className="form-control" type="text" name="AccountName" value={this.state.AccountName || ""} onChange={this.onChange.bind(this)} disabled="disabled"/>
+                //         </div>
+                //             <div>--------------------------------------------------------------------------</div>
+                //         <div className="form-group">
+                //             <label className="col-form-label">Reference No</label>
+                //             <input className="form-control" type="text" name="ReferenceNumber" onChange={this.onChange.bind(this)} value={this.state.ReferenceNumber || ""}/>
+                //         </div>
+                //         <div className="form-group">
+                //             <label className="col-form-label">Submitted DateTime</label>
+                //             <div className="date">
+                //                 <DateTimePicker
+                //                     columnTitle="SubmittedDateTime"
+                //                     ref={this.DepositTime}
+                //                     dateTimePickerProps={{
+                //                         defaultValue: moment().format(
+                //                             "l LTS"
+                //                         )
+                //                     }}/>
+                //             </div>
+                //         </div>
+                //         <div className="form-group">
+                //             <label className="col-form-label">Remark</label>
+                //             <input className="form-control" type="text" name="Remark" onChange={this.onChange.bind(this)} value={this.state.Remark || ""}/>
+                //         </div>
+                //         <div>
+                //             <label className="col-form-label">Receipt</label>
+                //             <span>
+                //                 <input id="uploadReceipt" className="form-control" type="file" accept=".png, .jpg, .jpeg" onChange={e => this.setFile(e)}/>
+                //             </span>
+                //         </div>
+                //         <div className="button-group mt-10">
+                //             <button type="submit" className="btn btn-primary">Submit</button>
+                //         </div>
+                //     </form>
+                // </div>
+                <div className="filter">
+                    <form method="post" onSubmit={this.handleSubmit.bind(this)}>
                         <div className="form-group">
                             <label className="col-form-label d-block">Site Name</label>
                             {siteList}
                         </div>
-                        <div className="form-group">
+                        <div className="input-item">
                             <label className="col-form-label">Username</label>
                             <input className="form-control" type="text" name="UserName" onChange={this.onChange.bind(this)} value={this.state.UserName || ""}/>
                         </div>
-                        <div className="form-group">
-                            <label className="col-form-label">Amount</label>
-                            <input className="form-control text-right" type="number" name="Amount" onChange={this.onChange.bind(this)} value={this.state.Amount || ""}/>
+                        <div className="input-item">
+                            <label className="col-form-label">SabaId</label>
+                            <input className="form-control" type="text" name="SabaId" onChange={this.onChange.bind(this)} value={this.state.SabaId || ""}/>
                         </div>
-                        <div>--------------------------------------------------------------------------</div>
-                        <div className="form-group">
-                            <label className="col-form-label">Account No</label>
-                            <Dropdown
-                                clearable
-                                fluid
-                                search
-                                selection
-                                options={this.state.selectOptions}
-                                placeholder='Deposited Account Number'
-                                onChange={this.onSelectedAccount.bind(this)}
-                                value={this.state.AccountNo || ''}
-                                /*onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}*/
-                                />
-                        </div>
-                        <div className="form-group">
-                            <label className="col-form-label">Bank Name</label>
-                            <input className="form-control" type="text" name="BankName" value={this.state.BankName || ""} onChange={this.onChange.bind(this)} disabled="disabled"/>
-                        </div>
-                        <div className="form-group">
-                            <label className="col-form-label">Account Holder Name</label>
-                            <input className="form-control" type="text" name="AccountName" value={this.state.AccountName || ""} onChange={this.onChange.bind(this)} disabled="disabled"/>
-                        </div>
-                            <div>--------------------------------------------------------------------------</div>
-                        <div className="form-group">
-                            <label className="col-form-label">Reference No</label>
-                            <input className="form-control" type="text" name="ReferenceNumber" onChange={this.onChange.bind(this)} value={this.state.ReferenceNumber || ""}/>
-                        </div>
-                        <div className="form-group">
-                            <label className="col-form-label">Submitted DateTime</label>
-                            <div className="date">
-                                <DateTimePicker
-                                    columnTitle="SubmittedDateTime"
-                                    ref={this.DepositTime}
-                                    dateTimePickerProps={{
-                                        defaultValue: moment().format(
-                                            "l LTS"
-                                        )
-                                    }}/>
+                        <div className="row-flex">
+                            <div className="button-group">
+                                <button type="submit" className="btn btn-primary">Submit</button>
                             </div>
-                        </div>
-                        <div className="form-group">
-                            <label className="col-form-label">Remark</label>
-                            <input className="form-control" type="text" name="Remark" onChange={this.onChange.bind(this)} value={this.state.Remark || ""}/>
-                        </div>
-                        <div>
-                            <label className="col-form-label">Receipt</label>
-                            <span>
-                                <input id="uploadReceipt" className="form-control" type="file" accept=".png, .jpg, .jpeg" onChange={e => this.setFile(e)}/>
-                            </span>
-                        </div>
-                        <div className="button-group mt-10">
-                            <button type="submit" className="btn btn-primary">Submit</button>
                         </div>
                     </form>
                 </div>
