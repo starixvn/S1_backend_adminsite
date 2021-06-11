@@ -20,12 +20,17 @@ namespace BackendSite.Service.Library
         });
 
         private HttpClient client { get { return lazy.Value; } }
-        public async Task<ApiResult<T>> MyPostAsync<T, U>(string url, U oTpInfo)
+        public async Task<ApiResult<T>> MyPostAsync<T, U>(string url, U oTpInfo, int Timeout=0)
         {
             ApiResult<T> oApiResult = null;
 
             var fooJSON = JsonConvert.SerializeObject(oTpInfo);
             var fooContent = new StringContent(fooJSON, Encoding.UTF8, "application/json");
+
+            if(Timeout != 0)
+            {
+                client.Timeout = TimeSpan.FromSeconds(Timeout);
+            }
 
             HttpResponseMessage response = await client.PostAsync(url, fooContent);
 
