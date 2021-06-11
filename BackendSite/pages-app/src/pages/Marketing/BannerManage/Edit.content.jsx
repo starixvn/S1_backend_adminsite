@@ -8,6 +8,7 @@ import moment from "moment-timezone";
 import { initBannerType, initActionModeType, initShowStatusType } from "./defCols";
 
 export default ({ state, action, IsAdd, processing }) => {
+	console.log(state);
 	let TitleDetail = "https://docs.google.com/spreadsheets/d/1f2ONaTvR5Bj3nBuWK4W7fkuZO24pYVh41IThrrieqB8/edit#gid=0";
 	const newActionModeType = initActionModeType
 		.filter(i => {
@@ -17,12 +18,21 @@ export default ({ state, action, IsAdd, processing }) => {
 			if (state.bannerType == 3 && i.value === 3) {
 				return false;
 			}
+			if (state.bannerType == 4 && i.value === 3) {
+				return false;
+			}
+			if (state.bannerType == 5 && i.value === 3) {
+				return false;
+			}
+			if (state.bannerType == 6 && i.value === 3) {
+				return false;
+			}
 			return true
 		}).map(i => {
 			return i;
 		});
 
-
+	console.log(newActionModeType);
 	const currencyList = Object.keys(state.specific);
 	const currencyOptions = currencyList.map(i => {
 		return {
@@ -193,7 +203,7 @@ export default ({ state, action, IsAdd, processing }) => {
 											/>
 										</>
 										: null
-									: state.bannerType == 3 ?
+									: state.bannerType == 3  || state.bannerType == 4 || state.bannerType == 5 || state.bannerType == 6?
 										state.actionMode === 2 ?
 											<>
 												<InputBox
