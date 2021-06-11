@@ -156,6 +156,9 @@
   <data name="msg_Fail" xml:space="preserve">
     <value>Processed Fail.</value>
   </data>
+  <data name="msg_FileTypeNotMatch" xml:space="preserve">
+    <value>File type does not match.Please check.</value>
+  </data>
   <data name="msg_InsertFailed" xml:space="preserve">
     <value>Insert Failed</value>
   </data>

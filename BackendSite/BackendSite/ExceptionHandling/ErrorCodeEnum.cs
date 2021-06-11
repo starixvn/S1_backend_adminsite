@@ -19,6 +19,9 @@ namespace BackendSite.ExceptionHandling
         [Description("msg_NoData")]
         NoData = -2,
 
+        [Description("msg_FileTypeNotMatch")]
+        FileTypeNotMatch = -3,
+
         [Description("msg_SystemException")]
         SystemException = 9999,
 
