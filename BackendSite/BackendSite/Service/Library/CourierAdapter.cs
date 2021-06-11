@@ -15,7 +15,7 @@ namespace BackendSite.Service.Library
         public async Task<ApiResult<T>> MyPostAsync<T, U>(string url, U oTpInfo, int timeout = 0)
         {
             ApiResult<T> oApiResult = null;
-            HttpClient client = new HttpClient();
+            using var client = new HttpClient();
             var fooJSON = JsonConvert.SerializeObject(oTpInfo);
             var fooContent = new StringContent(fooJSON, Encoding.UTF8, "application/json");
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -25,11 +25,10 @@ namespace BackendSite.Service.Library
                 client.Timeout = TimeSpan.FromSeconds(timeout);
             }
 
-            HttpResponseMessage response = await client.PostAsync(url, fooContent);
-
+            using var response = await client.PostAsync(url, fooContent);
             if (response.IsSuccessStatusCode)
             {
-                string responseBody = await response.Content.ReadAsStringAsync();
+                var responseBody = await response.Content.ReadAsStringAsync();
                 oApiResult = JsonConvert.DeserializeObject<ApiResult<T>>(responseBody);
             }
 
