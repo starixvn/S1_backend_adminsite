@@ -105,7 +105,7 @@ namespace BackendSite.Service.BLL
 
             try
             {
-                data = await courierAdapter.MyPostAsync<UserBalance, TpInfo>(myUrl, oTpInfo);
+                data = await courierAdapter.MyPostAsync<UserBalance, TpInfo>(myUrl, oTpInfo,10);
             }
             catch (Exception ex)
             {
