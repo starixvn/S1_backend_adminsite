@@ -30,6 +30,9 @@ namespace BackendSite.Controllers
             return View();
         }
 
+        #region Old Code
+        //待前端改接API，此Action則不會用到，需刪除
+
         [HttpGet]
         public IActionResult GetCustPhotoId(int CustId)
         {
@@ -81,12 +84,14 @@ namespace BackendSite.Controllers
             if (custInfoReq.SelectStatus != null)
             {
                 selectStatus = Array.ConvertAll<string, int>(custInfoReq.SelectStatus.Split(','), s => int.Parse(s)).ToList();
-            }        
+            }
             var ExportCustInfo = custInfoBLL.GetCustInfoExportList(selectSite, custInfoReq.BirDate, custInfoReq.BirMonth, custInfoReq.BirYear, custInfoReq.UserName, custInfoReq.AccountName, custInfoReq.LoginIp, custInfoReq.TransId, custInfoReq.TpUserName, custInfoReq.Email, custInfoReq.PhoneNo, custInfoReq.StartDate, custInfoReq.EndDate, custInfoReq.AffId, selectCurrency, custInfoReq.BankAccountNumber, selectStatus);
 
             var stream = excelBLL.Export(ExportCustInfo);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportCustInfo)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
+
+        #endregion
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
         public IActionResult TeleCSD()

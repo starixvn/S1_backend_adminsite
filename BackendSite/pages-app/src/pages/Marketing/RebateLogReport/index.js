@@ -14,8 +14,7 @@ const App = () => {
     Type: 0,
     User: "",
     Currency: 0,
-    BaseCurrency: 2,
-    TotalAmountShow: 0.0,
+    BaseCurrency: 0,
     RebateCategories: 0,
     DateQuickPicker:"0"
   });
@@ -159,7 +158,6 @@ const App = () => {
         PageNumber: 1,
         CurrencyId: parseInt(stateFilter.Currency, 10),
         BaseCurrencyId: parseInt(stateFilter.BaseCurrency, 10),
-        TotalAmountShow: parseFloat(stateFilter.TotalAmountShow),
         RebateCategoriesId: parseInt(stateFilter.RebateCategories, 10),
       }),
     };
@@ -201,7 +199,6 @@ const App = () => {
         PageNumber: PageNumber,
         CurrencyId: parseInt(stateDatas.FilterInfo.Currency, 10),
         BaseCurrencyId: parseInt(stateDatas.FilterInfo.BaseCurrency, 10),
-        TotalAmountShow: parseFloat(stateDatas.FilterInfo.TotalAmountShow),
         RebateCategoriesId: parseInt(
           stateDatas.FilterInfo.RebateCategories,
           10)
@@ -238,6 +235,11 @@ const App = () => {
         EndDate:
           moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
         UserName: stateDatas.FilterInfo.User,
+        CurrencyId:parseInt(stateDatas.FilterInfo.Currency, 10),
+        BaseCurrencyId: parseInt(stateDatas.FilterInfo.BaseCurrency, 10),
+        RebateCategoriesId: parseInt(
+          stateDatas.FilterInfo.RebateCategories,
+          10)
       },
     };
 

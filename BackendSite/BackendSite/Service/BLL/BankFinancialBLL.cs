@@ -1523,7 +1523,7 @@ namespace BackendSite.Service.BLL
 
                         bankFinancialDataModel = keyValuePairs[$"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
-                        bankFinancialDataModel.DepositAmount = data.DepositSummary;
+                        bankFinancialDataModel.DepositAmount = bankFinancialDataModel.DepositAmount + data.DepositSummary;
                         //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
 
                     }
@@ -1553,7 +1553,7 @@ namespace BackendSite.Service.BLL
                     }
                     bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
-                    bankFinancialDataModel.DepositAmount = data.DepositSummary;
+                    bankFinancialDataModel.DepositAmount = bankFinancialDataModel.DepositAmount + data.DepositSummary;
                     //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
                 }
 
@@ -1587,7 +1587,7 @@ namespace BackendSite.Service.BLL
 
                         bankFinancialDataModel = keyValuePairs[$"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
-                        bankFinancialDataModel.WithdrawalAmount = data.WithdrawalSummary;
+                        bankFinancialDataModel.WithdrawalAmount = bankFinancialDataModel.WithdrawalAmount + data.WithdrawalSummary;
                         //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
                     }
                 }
@@ -1617,7 +1617,7 @@ namespace BackendSite.Service.BLL
 
                     bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
-                    bankFinancialDataModel.WithdrawalAmount = data.WithdrawalSummary;
+                    bankFinancialDataModel.WithdrawalAmount = bankFinancialDataModel.WithdrawalAmount + data.WithdrawalSummary;
                     //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
                 }
 
@@ -1651,7 +1651,7 @@ namespace BackendSite.Service.BLL
 
                     bankFinancialDataModel = keyValuePairs[$"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
-                    bankFinancialDataModel.TransferAmount = data.TransferSummary;
+                    bankFinancialDataModel.TransferAmount = bankFinancialDataModel.TransferAmount + data.TransferSummary;
                     //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
                 }
             }

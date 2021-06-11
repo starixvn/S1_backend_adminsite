@@ -40,7 +40,14 @@ namespace BackendSite.Controllers.Api
 
         #region Constructors
 
-        public CustManageController(CustInfoBLL custInfoBLL, TpBLL tpBLL, WinLostReportService winLostReportService, PermissionBLL permissionBLL, ServerInfoBLL serverInfoBLL, Common common, PaymentBLL paymentBLL, ExcelBLL excelBLL)
+        public CustManageController(CustInfoBLL custInfoBLL,
+                                    TpBLL tpBLL,
+                                    WinLostReportService winLostReportService,
+                                    PermissionBLL permissionBLL,
+                                    ServerInfoBLL serverInfoBLL,
+                                    Common common,
+                                    PaymentBLL paymentBLL,
+                                    ExcelBLL excelBLL)
         {
             this.custInfoBLL = custInfoBLL;
             this.tpBLL = tpBLL;
@@ -113,7 +120,6 @@ namespace BackendSite.Controllers.Api
         {
             public int CustId { get; set; }
             public string UserName { get; set; }
-
             public string Reason { get; set; }
         }
 
@@ -144,11 +150,11 @@ namespace BackendSite.Controllers.Api
             public long endDate { get; set; }
         }
 
-        public class SetCustStatusReq
-        {
-            public int CustId { get; set; }
-            public int Status { get; set; }
-        }
+        //public class SetCustStatusReq
+        //{
+        //    public int CustId { get; set; }
+        //    public int Status { get; set; }
+        //}
 
         public class BonusReq
         {
@@ -206,21 +212,169 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        #region Actions
+
+        #region CSD > Customer Administration
+
         [HttpPost]
         public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq custInfoListReq)
         {
-            var apiResult = new ApiListResult<CustInfoDetail>();
             int totalPages = 0, rowCount = 0;
             int pageNumber = custInfoListReq.PageNumber;
 
-            apiResult.Data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite, custInfoListReq.BirDate, custInfoListReq.BirMonth, custInfoListReq.BirYear, custInfoListReq.UserName, custInfoListReq.AccountName, custInfoListReq.LoginIp, custInfoListReq.TransId, custInfoListReq.TpUserName, custInfoListReq.Email, custInfoListReq.PhoneNo, custInfoListReq.StartDate, custInfoListReq.EndDate, custInfoListReq.PageSize, custInfoListReq.AffId, custInfoListReq.SelectCurrency, custInfoListReq.BankAccountNumber, custInfoListReq.SelectStatus, ref pageNumber, out totalPages, out rowCount);
-            apiResult.TotalPages = totalPages;
-            apiResult.PageNumber = pageNumber;
-            apiResult.RowCount = rowCount;
-            apiResult.ErrorCode = 0;
+            var data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite,
+                                                   custInfoListReq.BirDate,
+                                                   custInfoListReq.BirMonth,
+                                                   custInfoListReq.BirYear,
+                                                   custInfoListReq.UserName,
+                                                   custInfoListReq.AccountName,
+                                                   custInfoListReq.LoginIp,
+                                                   custInfoListReq.TransId,
+                                                   custInfoListReq.TpUserName,
+                                                   custInfoListReq.Email,
+                                                   custInfoListReq.PhoneNo,
+                                                   custInfoListReq.StartDate,
+                                                   custInfoListReq.EndDate,
+                                                   custInfoListReq.PageSize,
+                                                   custInfoListReq.AffId,
+                                                   custInfoListReq.SelectCurrency,
+                                                   custInfoListReq.BankAccountNumber,
+                                                   custInfoListReq.SelectStatus,
+                                                   ref pageNumber,
+                                                   out totalPages,
+                                                   out rowCount);
+
+            if (data.Count() == 0)
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiListResult<CustInfoDetail>
+                {
+                    Data = data,
+                    TotalPages = totalPages,
+                    PageNumber = pageNumber,
+                    RowCount = rowCount,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+        }
+
+        /// <summary>
+        /// New Code For Frontend
+        /// </summary>
+        /// <param name="custInfoReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [RequestSizeLimit(40000000)]
+        public IActionResult ExportCustInfoList(CustInfoListReq custInfoReq)
+        {
+            //List<int> selectSite = new List<int>();
+            //List<int> selectCurrency = new List<int>();
+            //List<int> selectStatus = new List<int>();
+            //if (custInfoReq.SelectSite != null)
+            //{
+            //    selectSite = Array.ConvertAll<string, int>(custInfoReq.SelectSite.Split(','), s => int.Parse(s)).ToList();
+            //}
+            //if (custInfoReq.SelectCurrency != null)
+            //{
+            //    selectCurrency = Array.ConvertAll<string, int>(custInfoReq.SelectCurrency.Split(','), s => int.Parse(s)).ToList();
+            //}
+            //if (custInfoReq.SelectStatus != null)
+            //{
+            //    selectStatus = Array.ConvertAll<string, int>(custInfoReq.SelectStatus.Split(','), s => int.Parse(s)).ToList();
+            //}
+            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(custInfoReq.SelectSite, custInfoReq.BirDate, custInfoReq.BirMonth, custInfoReq.BirYear, custInfoReq.UserName, custInfoReq.AccountName, custInfoReq.LoginIp, custInfoReq.TransId, custInfoReq.TpUserName, custInfoReq.Email, custInfoReq.PhoneNo, custInfoReq.StartDate, custInfoReq.EndDate, custInfoReq.AffId, custInfoReq.SelectCurrency, custInfoReq.BankAccountNumber, custInfoReq.SelectStatus);
+
+            var stream = excelBLL.Export(ExportCustInfo);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportCustInfo)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
+
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo
+
+        public static string MaskPhone(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            string pattern = @"(?<=[\w]{3})[\w-\._\+%]*(?=[\w]{3})";
+            return Regex.Replace(input, pattern, m => new string('*', m.Length));
+        }
+        public static string MaskEmail(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            string pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
+            return Regex.Replace(input, pattern, m => new string('*', m.Length));
+        }
+
+        /// <summary>
+        /// CustInfo
+        /// </summary>
+        /// <param name="custInfoReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<CustInfoDetail>> GetCustInfoDetailAsync(CustInfoReq custInfoReq)
+        {
+            var apiResult = new ApiResult<CustInfoDetail>();
+            var custInfoDetail = await custInfoBLL.GetCustInfoDetailAsync(custInfoReq.CustId, custInfoReq.UserName);
+            if (custInfoDetail != null)
+            {
+                if (!permissionBLL.CheckPermission("CustManage/CustInfoList", "ca_readDetail"))
+                {
+                    custInfoDetail.Email = MaskEmail(custInfoDetail.Email);
+                    custInfoDetail.PhoneNo = MaskPhone(custInfoDetail.PhoneNo);
+                }
+                apiResult.Data = custInfoDetail;
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.Message = "";
+            }
 
             return apiResult;
         }
+
+        /// <summary>
+        /// CustInfo > Bonus Wallet
+        /// </summary>
+        /// <param name="custBonusReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult GetCustBonus(CustBonusReq custBonusReq)
+        {
+            var data = custInfoBLL.GetCustBonus(custBonusReq.CustId);
+            return new ApiResult<IEnumerable<CustBonus>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// CustInfo > Rebate Info
+        /// </summary>
+        /// <param name="custBonusReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult GetRebateInfoByCust(CustBonusReq custBonusReq)
+        {
+            var data = paymentBLL.GetRebateInfoByCust(custBonusReq.CustId);
+            return new ApiResult<IEnumerable<RebateInfo>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        #endregion
+
+        #region CustInfo > Switch On IsKyc、IsRisk、PhoneVerified、EmailVerified
 
         [HttpPost]
         public ApiResult<bool> SetCustStatusSwitch(CustStatusSwitch custStatusSwitch)
@@ -250,9 +404,13 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_userEdit" })]
+        #endregion
+
+        #region CustInfo > Edit User Level、Full Name、Birthday (M/D/Y)、Phone Number、E-Mail
+
         [HttpPost]
-        public ApiResult<bool> SetCustInfo(CustStatus custStatus)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_userEdit" })]
+        public ApiResult SetCustInfo(CustStatus custStatus)
         {
             var apiResult = new ApiResult<bool>();
             bool data = custInfoBLL.SetCustInfo(custStatus.CustId, custStatus.Level, custStatus.FullName, custStatus.Birthday_Y, custStatus.Birthday_M, custStatus.Birthday_D, custStatus.PhoneNumber, custStatus.EMail, User.Identity.Name) > 0;
@@ -284,13 +442,22 @@ namespace BackendSite.Controllers.Api
                 }
 
                 serverInfoBLL.AdminOperateLog(null, custStatus.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
             }
-
-            apiResult.Data = data;
-            apiResult.ErrorCode = 0;
-
-            return apiResult;
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+            }
         }
+
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo Photo
 
         private readonly Dictionary<string, System.Drawing.Imaging.ImageFormat> _contentTypesCheck = new Dictionary<string, System.Drawing.Imaging.ImageFormat>(comparer: StringComparer.OrdinalIgnoreCase)
         {
@@ -299,8 +466,12 @@ namespace BackendSite.Controllers.Api
             { "image/gif",System.Drawing.Imaging.ImageFormat.Gif}
         };
 
-        #region CustPhoto Setting
-
+        /// <summary>
+        /// Upload
+        /// </summary>
+        /// <param name="CustId"></param>
+        /// <param name="File"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiResult UploadCustPhotoId([FromForm] int CustId, [FromForm] IFormFile File)
         {
@@ -358,6 +529,11 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// Ask Re-Upload
+        /// </summary>
+        /// <param name="custInfoReq"></param>
+        /// <returns></returns>
         public ApiResult<bool> DelCustPhotoId(CustInfoReq custInfoReq)
         {
             var apiResult = new ApiResult<bool>();
@@ -379,9 +555,252 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        [HttpGet]
+        public IActionResult GetCustPhotoId(int CustId)
+        {
+            var custPhotoId = custInfoBLL.GetCustPhotoId(CustId);
+            if (custPhotoId == null)
+            {
+                return StatusCode(404);
+            }
+            var image = custPhotoId.PhotoIdPic;
+            return File(image, "image/jpeg");
+        }
+
         #endregion
 
-        #region CustNote Setting
+        #region CSD > Customer Administration > CustInfo [ResetProfile]
+
+        [HttpPost]
+        public ApiResult ResetProfile(CustInfoReq custInfoReq)
+        {
+            ApiResult apiResult = new ApiResult();
+            if (custInfoBLL.ResetProfile(custInfoReq.CustId))
+            {
+                string Menu = "CustManage/CustInfoList";
+                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("Action", "Reset Profile");
+                serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
+                apiResult.ErrorCode = 0;
+            }
+
+            return apiResult;
+        }
+
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo [ResetCustBankInfo]
+
+        [HttpPost]
+        public ApiResult ResetCustBankInfo(CustInfoReq custInfoReq)
+        {
+            ApiResult apiResult = new ApiResult();
+            if (custInfoBLL.ResetCustBankInfo(custInfoReq.CustId))
+            {
+                string Menu = "CustManage/CustInfoList";
+                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("Action", "Reset Bank Info");
+                serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
+                apiResult.ErrorCode = 0;
+            }
+
+            return apiResult;
+        }
+
+        #endregion
+
+        #region CustStatus Setting
+
+        /// <summary>
+        /// 客戶狀態設定(舊code)
+        /// </summary>
+        /// <param name="setCustStatusReq"></param>
+        /// <returns></returns>
+        //[HttpPost]
+        //public ApiResult SetCustStatus(SetCustStatusReq setCustStatusReq)
+        //{
+        //    ApiResult apiResult = new ApiResult();
+        //    if (custInfoBLL.SetCustStatus(setCustStatusReq.CustId, setCustStatusReq.Status))
+        //    {
+        //        apiResult.ErrorCode = 0;
+        //    }
+
+        //    return apiResult;
+        //}
+
+        #region CSD > Customer Administration > CustInfo [Unlock]
+
+        /// <summary>
+        /// 將客戶狀態解鎖
+        /// </summary>
+        /// <param name="setCustStatusReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_unlock" })]
+        public ApiResult SetUnlock(CustInfoReq setCustStatusReq)
+        {
+            if (custInfoBLL.SetCustStatus("CustManage/CustInfoList",
+                                          setCustStatusReq.CustId,
+                                          1,
+                                          setCustStatusReq.Reason,
+                                          "Set Unlock",
+                                          User.Identity.Name))
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Set Unlock Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Set Unlock Fail.Please Contact admin.");
+            }
+        }
+
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo [Lock]
+
+        /// <summary>
+        /// 將客戶狀態鎖定
+        /// </summary>
+        /// <param name="setCustStatusReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_lock" })]
+        public ApiResult SetLock(CustInfoReq setCustStatusReq)
+        {
+            if (custInfoBLL.SetCustStatus("CustManage/CustInfoList",
+                                          setCustStatusReq.CustId,
+                                          2,
+                                          setCustStatusReq.Reason,
+                                          "Set Lock",
+                                          User.Identity.Name))
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Set Lock Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Set Lock Fail.Please Contact admin.");
+            }
+        }
+
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo [Close]
+
+        /// <summary>
+        /// 將客戶狀態關閉
+        /// </summary>
+        /// <param name="setCustStatusReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_close" })]
+        public ApiResult SetClose(CustInfoReq setCustStatusReq)
+        {
+            if (custInfoBLL.SetCustStatus("CustManage/CustInfoList",
+                                          setCustStatusReq.CustId,
+                                          3,
+                                          setCustStatusReq.Reason,
+                                          "Set Close",
+                                          User.Identity.Name))
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Set Close Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Set Close Fail.Please Contact admin.");
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo [Kick Out]
+
+        /// <summary>
+        /// 強制讓客戶登出
+        /// </summary>
+        /// <param name="setCustStatusReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_kickout" })]
+        public ApiResult KickOut(CustInfoReq setCustStatusReq)
+        {
+            if (custInfoBLL.DeleteOnUserData("CustManage/CustInfoList",
+                                                    setCustStatusReq.CustId,
+                                                    setCustStatusReq.Reason,
+                                                    User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Kick Out Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Kick out fail.Customer is not online now.");
+            }
+        }
+
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > Login Log
+
+        [HttpPost]
+        public ApiListResult<LoginLog> GetLoginLogByCust(LoginLogReq loginLogReq)
+        {
+            var apiListResult = new ApiListResult<LoginLog>();
+            int pageNumber = loginLogReq.PageNumber;
+            int totalPages = 0;
+            int rowCount = 0;
+            var withdrawalList = custInfoBLL.GetLoginLogByCust(loginLogReq.CustId, loginLogReq.startDate, loginLogReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
+            apiListResult.Data = withdrawalList;
+            apiListResult.ErrorCode = 0;
+            apiListResult.PageNumber = pageNumber;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.RowCount = rowCount;
+
+            return apiListResult;
+        }
+
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > Reset Password
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_resetpwd" })]
+        public ApiResult<string> SetResetPwd(CustInfoReq custInfoReq)
+        {
+            ApiResult<string> apiResult = new ApiResult<string>();
+            string NewPwd = "";
+            if (custInfoBLL.SetResetPwd(custInfoReq.CustId, out NewPwd))
+            {
+                apiResult.Data = NewPwd;
+                apiResult.ErrorCode = 0;
+            }
+
+            return apiResult;
+        }
+
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > Notes
 
         public ApiResult<bool> AddCustNote(AddCustNoteReq addCustNoteReq)
         {
@@ -402,6 +821,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
         public ApiResult<IEnumerable<CustNote>> GetCustNotes(AddCustNoteReq addCustNoteReq)
         {
             var apiResult = new ApiResult<IEnumerable<CustNote>>();
@@ -410,6 +830,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
         [HttpPost]
         public ApiResult<bool> SetCustNotes(SetCustNoteReq setCustNoteReq)
         {
@@ -453,284 +874,7 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
-        public static string MaskPhone(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return input;
-
-            string pattern = @"(?<=[\w]{3})[\w-\._\+%]*(?=[\w]{3})";
-            return Regex.Replace(input, pattern, m => new string('*', m.Length));
-        }
-        public static string MaskEmail(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return input;
-
-            string pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
-            return Regex.Replace(input, pattern, m => new string('*', m.Length));
-        }
-        [HttpPost]
-        public async Task<ApiResult<CustInfoDetail>> GetCustInfoDetailAsync(CustInfoReq custInfoReq)
-        {
-            var apiResult = new ApiResult<CustInfoDetail>();
-            var custInfoDetail = await custInfoBLL.GetCustInfoDetailAsync(custInfoReq.CustId, custInfoReq.UserName);
-            if (custInfoDetail != null)
-            {
-                if (!permissionBLL.CheckPermission("CustManage/CustInfoList", "ca_readDetail"))
-                {
-                    custInfoDetail.Email = MaskEmail(custInfoDetail.Email);
-                    custInfoDetail.PhoneNo = MaskPhone(custInfoDetail.PhoneNo);
-                }
-                apiResult.Data = custInfoDetail;
-                apiResult.ErrorCode = 0;
-            }
-            else
-            {
-                apiResult.Message = "";
-            }
-
-            return apiResult;
-        }
-
-        [HttpPost]
-        public ApiResult<CustInfoDetail> GetCustInfoDetails(CustInfosReq custInfosReq)
-        {
-            var apiResult = new ApiResult<CustInfoDetail>();
-
-            string custUsername = string.IsNullOrEmpty(custInfosReq.UserName) ? null : custInfosReq.UserName;
-            var custId = (string.IsNullOrEmpty(custInfosReq.sabaId)) ? null : common.TpIdToCustId(custInfosReq.sabaId);
-
-            var custInfosDetail = custInfoBLL.GetCustInfoDetails(custId, custUsername, custInfosReq.SiteId);
-
-            if (custInfosDetail != null)
-            {
-                if (custInfosDetail.Status == 1)
-                {
-                    apiResult.Data = custInfosDetail;
-                    apiResult.ErrorCode = 0;
-                }
-                else if (custInfosDetail.Status == 2)
-                {
-                    apiResult.Message = "Suspend Status.";
-                    apiResult.ErrorCode = 999;
-                }
-                else
-                {
-                    apiResult.Message = "Closed Status.";
-                    apiResult.ErrorCode = 999;
-                }
-            }
-            else
-            {
-                apiResult.Message = "No find";
-            }
-
-            return apiResult;
-        }
-
-
-        [HttpPost]
-        public ApiListResult<LoginLog> GetLoginLogByCust(LoginLogReq loginLogReq)
-        {
-            var apiListResult = new ApiListResult<LoginLog>();
-            int pageNumber = loginLogReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
-            var withdrawalList = custInfoBLL.GetLoginLogByCust(loginLogReq.CustId, loginLogReq.startDate, loginLogReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
-            apiListResult.Data = withdrawalList;
-            apiListResult.ErrorCode = 0;
-            apiListResult.PageNumber = pageNumber;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.RowCount = rowCount;
-
-            return apiListResult;
-        }
-
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_resetpwd" })]
-        public ApiResult<string> SetResetPwd(CustInfoReq custInfoReq)
-        {
-            ApiResult<string> apiResult = new ApiResult<string>();
-            string NewPwd = "";
-            if (custInfoBLL.SetResetPwd(custInfoReq.CustId, out NewPwd))
-            {
-                apiResult.Data = NewPwd;
-                apiResult.ErrorCode = 0;
-            }
-
-            return apiResult;
-        }
-
-        [HttpPost]
-        public ApiResult ResetProfile(CustInfoReq custInfoReq)
-        {
-            ApiResult apiResult = new ApiResult();
-            if (custInfoBLL.ResetProfile(custInfoReq.CustId))
-            {
-                string Menu = "CustManage/CustInfoList";
-                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
-                Info.Add("MenuName", "Customer Info");
-                Info.Add("Action", "Reset Profile");
-                serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
-
-                apiResult.ErrorCode = 0;
-            }
-
-            return apiResult;
-        }
-        [HttpPost]
-        public ApiResult ResetCustBankInfo(CustInfoReq custInfoReq)
-        {
-            ApiResult apiResult = new ApiResult();
-            if (custInfoBLL.ResetCustBankInfo(custInfoReq.CustId))
-            {
-                string Menu = "CustManage/CustInfoList";
-                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
-                Info.Add("MenuName", "Customer Info");
-                Info.Add("Action", "Reset Bank Info");
-                serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
-
-                apiResult.ErrorCode = 0;
-            }
-
-            return apiResult;
-        }
-
-        #region CustStatus Setting
-
-        //[HttpPost]
-        //public ApiResult SetCustStatus(SetCustStatusReq setCustStatusReq)
-        //{
-        //    ApiResult apiResult = new ApiResult();
-        //    if (custInfoBLL.SetCustStatus(setCustStatusReq.CustId, setCustStatusReq.Status))
-        //    {
-        //        apiResult.ErrorCode = 0;
-        //    }
-
-        //    return apiResult;
-        //}
-
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_unlock" })]
-        [HttpPost]
-        public ApiResult SetUnlock(CustInfoReq setCustStatusReq)
-        {
-            ApiResult apiResult = new ApiResult();
-
-            if (custInfoBLL.SetCustStatus("CustManage/CustInfoList",
-                                          setCustStatusReq.CustId,
-                                          1,
-                                          setCustStatusReq.Reason,
-                                          "Set Unlock",
-                                          User.Identity.Name))
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Message = "Set Unlock Success.";
-            }
-            else
-            {
-                apiResult.ErrorCode = -1;
-                apiResult.Message = "Set Unlock Fail.Please Contact admin.";
-            }
-
-            return apiResult;
-        }
-
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_lock" })]
-        [HttpPost]
-        public ApiResult SetLock(CustInfoReq setCustStatusReq)
-        {
-            ApiResult apiResult = new ApiResult();
-
-            if (custInfoBLL.SetCustStatus("CustManage/CustInfoList",
-                                          setCustStatusReq.CustId,
-                                          2,
-                                          setCustStatusReq.Reason,
-                                          "Set Lock",
-                                          User.Identity.Name))
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Message = "Set Lock Success.";
-            }
-            else
-            {
-                apiResult.ErrorCode = -1;
-                apiResult.Message = "Set Lock Fail.Please Contact admin.";
-            }
-
-            return apiResult;
-        }
-
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_close" })]
-        [HttpPost]
-        public ApiResult SetClose(CustInfoReq setCustStatusReq)
-        {
-            ApiResult apiResult = new ApiResult();
-
-            if (custInfoBLL.SetCustStatus("CustManage/CustInfoList",
-                                          setCustStatusReq.CustId,
-                                          3,
-                                          setCustStatusReq.Reason,
-                                          "Set Close",
-                                          User.Identity.Name))
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Message = "Set Close Success.";
-            }
-            else
-            {
-                apiResult.ErrorCode = -1;
-                apiResult.Message = "Set Close Fail.Please Contact admin.";
-            }
-
-            return apiResult;
-        }
-
-        #endregion
-
-        /// <summary>
-        /// 強制讓客戶登出
-        /// </summary>
-        /// <param name="setCustStatusReq"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_kickout" })]
-        public ApiResult KickOut(CustInfoReq setCustStatusReq)
-        {
-            ApiResult apiResult = new ApiResult();
-
-            if (custInfoBLL.DeleteOnUserData("CustManage/CustInfoList",
-                                                    setCustStatusReq.CustId,
-                                                    setCustStatusReq.Reason,
-                                                    User.Identity.Name) > 0)
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Message = "Kick out success.";
-            }
-            else
-            {
-                apiResult.ErrorCode = -1;
-                apiResult.Message = "Kick out fail.Customer is not online now.";
-            }
-
-            return apiResult;
-        }
-
-        [HttpPost]
-        public ApiResult CancelBonusByBonusId(BonusReq bonusReq)
-        {
-            ApiResult apiResult = new ApiResult();
-            custInfoBLL.CancelBonusByBonusId(bonusReq.BonusId);
-
-            string Menu = "CustManage/CustInfoList";
-            Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
-            Info.Add("MenuName", "Customer Info");
-            Info.Add("Action", "Cancel Bonus");
-            serverInfoBLL.AdminOperateLog(null, bonusReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
-
-            apiResult.ErrorCode = 0;
-
-            return apiResult;
-        }
+        #region CSD > Customer Administration > CustInfo  > Turover
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_turnoverReport" })]
@@ -772,6 +916,9 @@ namespace BackendSite.Controllers.Api
             return result;
         }
 
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > Bank Info Log
 
         [HttpPost]
         public ApiListResult<CustBankInfoLog> GetBankInfoLogList(BankInfoLogListReq bankInfoLogListReq)
@@ -784,28 +931,54 @@ namespace BackendSite.Controllers.Api
             return apiListResult;
         }
 
-        [HttpPost]
-        public ApiListResult<CustBonus> GetCustBonus(CustBonusReq custBonusReq)
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > Promotion Report
+
+        public ApiListResultCurrencyAmount<Promotion> GetPromotionListByCustIdAndDate([FromForm] int CustId, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int PageSize)
         {
-            var apiListResult = new ApiListResult<CustBonus>();
-            apiListResult.Data = custInfoBLL.GetCustBonus(custBonusReq.CustId);
-            apiListResult.ErrorCode = 0;
-            return apiListResult;
+            var apiResult = new ApiListResultCurrencyAmount<Promotion>();
+            try
+            {
+                var SearchResult = custInfoBLL.GetPromotionListByCustIdAndDate(CustId, StartDate, EndDate, PageNumber, PageSize);
+                apiResult.Data = SearchResult.PromotionList;
+                apiResult.PageNumber = SearchResult.PageNumber;
+                apiResult.TotalPages = SearchResult.TotalPages;
+                apiResult.RowCount = SearchResult.RowCount;
+                apiResult.ErrorCode = 0;
+                apiResult.CurrencyAmount = SearchResult.CurrencyAmount;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
         }
+
         [HttpPost]
-        public ApiListResult<RebateInfo> GetRebateInfoByCust(CustBonusReq custBonusReq)
+        public ApiResult CancelBonusByBonusId(BonusReq bonusReq)
         {
+            ApiResult apiResult = new ApiResult();
+            custInfoBLL.CancelBonusByBonusId(bonusReq.BonusId);
 
-            var apiListResult = new ApiListResult<RebateInfo>();
-            apiListResult.Data = paymentBLL.GetRebateInfoByCust(custBonusReq.CustId);
-            apiListResult.ErrorCode = 0;
-            return apiListResult;
+            string Menu = "CustManage/CustInfoList";
+            Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+            Info.Add("MenuName", "Customer Info");
+            Info.Add("Action", "Cancel Bonus");
+            serverInfoBLL.AdminOperateLog(null, bonusReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
         }
 
+        #endregion
 
-        #region TeleCSD
+        #region CSD > TeleCSD
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
         public ApiListResult<CustTele> GetTeleCSD(TeleCSDpara para)
         {
             var SearchResult = custInfoBLL.GetTeleCSD(JsonConvert.SerializeObject(para.SiteIds),
@@ -848,7 +1021,7 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                throw new AdminException(ErrorCodeEnum.Fail, "Update Fail");
+                throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
             }
         }
 
@@ -874,26 +1047,46 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        #region Financial > Balance Adjustment
+
         [HttpPost]
-        public ApiListResultCurrencyAmount<Promotion> GetPromotionListByCustIdAndDate([FromForm] int CustId, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int PageSize)
+        public ApiResult<CustInfoDetail> GetCustInfoDetails(CustInfosReq custInfosReq)
         {
-            var apiResult = new ApiListResultCurrencyAmount<Promotion>();
-            try
+            var apiResult = new ApiResult<CustInfoDetail>();
+
+            string custUsername = string.IsNullOrEmpty(custInfosReq.UserName) ? null : custInfosReq.UserName;
+            var custId = (string.IsNullOrEmpty(custInfosReq.sabaId)) ? null : common.TpIdToCustId(custInfosReq.sabaId);
+
+            var custInfosDetail = custInfoBLL.GetCustInfoDetails(custId, custUsername, custInfosReq.SiteId);
+
+            if (custInfosDetail != null)
             {
-                var SearchResult = custInfoBLL.GetPromotionListByCustIdAndDate(CustId, StartDate, EndDate, PageNumber, PageSize);
-                apiResult.Data = SearchResult.PromotionList;
-                apiResult.PageNumber = SearchResult.PageNumber;
-                apiResult.TotalPages = SearchResult.TotalPages;
-                apiResult.RowCount = SearchResult.RowCount;
-                apiResult.ErrorCode = 0;
-                apiResult.CurrencyAmount = SearchResult.CurrencyAmount;
+                if (custInfosDetail.Status == 1)
+                {
+                    apiResult.Data = custInfosDetail;
+                    apiResult.ErrorCode = 0;
+                }
+                else if (custInfosDetail.Status == 2)
+                {
+                    apiResult.Message = "Suspend Status.";
+                    apiResult.ErrorCode = 999;
+                }
+                else
+                {
+                    apiResult.Message = "Closed Status.";
+                    apiResult.ErrorCode = 999;
+                }
             }
-            catch (Exception ex)
+            else
             {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = ex.Message;
+                apiResult.Message = "No find";
             }
+
             return apiResult;
         }
+
+        #endregion
+
+        #endregion
     }
 }

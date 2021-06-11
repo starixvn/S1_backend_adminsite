@@ -92,7 +92,7 @@ export default props => {
 	const ClickSubmit = () => {
 		let checked = true;
 		let skipField = props.skipField[state.bannerType] ? props.skipField[state.bannerType] : props.skipField.default;
-
+		
 		for (let key in state) {
 			if (key === "specific") {
 				for (let c_key in state[key]) {

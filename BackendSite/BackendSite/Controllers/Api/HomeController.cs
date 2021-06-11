@@ -250,7 +250,7 @@ namespace BackendSite.Controllers.Api
         #endregion
 
         [HttpPost]
-        public ApiResult<DashBoardData> GetDashBoardData(DashBoardPara para)
+        public ApiResult GetDashBoardData(DashBoardPara para)
         {
             List<int> CanSearchSite = new List<int>();
 
@@ -261,9 +261,7 @@ namespace BackendSite.Controllers.Api
             {
                 Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success,
-
             };
-
         }
 
         /// <summary>

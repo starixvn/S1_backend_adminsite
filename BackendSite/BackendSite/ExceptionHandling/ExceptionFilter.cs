@@ -32,11 +32,11 @@ namespace BackendSite.ExceptionHandling
             var exception = context.Exception;
             var result = JsonSerializer.Serialize(new
             {
-                ErrorCode = (int)ErrorCodeEnum.SystemException,
-                Message = _selLangBLL.GetMsg(ErrorCodeEnum.SystemException.GetDescription()),
-                RawErrorCode = exception.HResult.ToString(),
-                RawMessage = exception.Message,
-                StackTrace = exception.StackTrace
+                errorCode = (int)ErrorCodeEnum.SystemException,
+                message = _selLangBLL.GetMsg(ErrorCodeEnum.SystemException.GetDescription()),
+                rawErrorCode = exception.HResult.ToString(),
+                rawMessage = exception.Message,
+                stackTrace = exception.StackTrace
             });
 
             if (context.Exception.GetType() == typeof(AdminException))
@@ -53,8 +53,8 @@ namespace BackendSite.ExceptionHandling
 
                 result = JsonSerializer.Serialize(new
                 {
-                    ErrorCode = adminException.ErrorCode,
-                    Message = message
+                    errorCode = adminException.ErrorCode,
+                    message = message
                 });
             }
 
