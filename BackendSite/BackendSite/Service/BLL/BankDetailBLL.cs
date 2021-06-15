@@ -135,5 +135,10 @@ namespace BackendSite.Service.BLL
             //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
             return CryptoPayList;
         }
+
+        public IEnumerable<BankInfoOff> GetBankAccountOffByCurrency(int currencyId)
+        {
+            return localBankService.GetBankAccountOffByCurrency(currencyId);
+        }
     }
 }

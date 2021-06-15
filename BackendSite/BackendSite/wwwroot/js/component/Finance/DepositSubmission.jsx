@@ -12,6 +12,7 @@ import { Dropdown } from 'semantic-ui-react';
                 SiteList: [],
                 SiteId: 0,
                 UserName: "",
+                SabaId: "",
                 Amount: 0,
                 BankName: null,
                 AccountName: "",
@@ -30,7 +31,11 @@ import { Dropdown } from 'semantic-ui-react';
 
         componentDidMount() {
             this.getSiteList();
-            this.getAccountList();
+        }
+
+        handleSubmit(event){
+            event.preventDefault();
+            this.submitGetAccountList();
         }
 
         onChange(e) {
@@ -60,25 +65,71 @@ import { Dropdown } from 'semantic-ui-react';
                 }.bind(this));
         }
 
-        async getAccountList() {
-            const res = await axios.get('/api/BankList/GetAllBankInfoOffList');
-            const data = res.data.data;
+        // async getAccountList() {
+        //     const res = await axios.get('/api/BankList/GetAllBankInfoOffList');
+        //     const data = res.data.data;
 
-            const options = data.map(d => ({
-                "key": d.accountNo + d.sysId,
-                "value": d.accountNo,
-                "text": d.accountNo + '   (' + d.bankCode + ' - ' + d.accountName + ') ',
-                "accountname": d.accountName,
-                "accountno": d.accountNo,
-                "accountstatus": d.accountStatus,
-                "sysid": d.sysId,
-                "currencyid": d.currencyId,
-                "bankcode": d.bankCode,
-                "bankname": d.bankName,
-                "bankstatus": d.bankStatus
-            }));
+        //     const options = data.map(d => ({
+        //         "key": d.accountNo + d.sysId,
+        //         "value": d.accountNo,
+        //         "text": d.accountNo + '   (' + d.bankCode + ' - ' + d.accountName + ') ',
+        //         "accountname": d.accountName,
+        //         "accountno": d.accountNo,
+        //         "accountstatus": d.accountStatus,
+        //         "sysid": d.sysId,
+        //         "currencyid": d.currencyId,
+        //         "bankcode": d.bankCode,
+        //         "bankname": d.bankName,
+        //         "bankstatus": d.bankStatus
+        //     }));
 
-            this.setState({ selectOptions: options });
+        //     this.setState({ selectOptions: options });
+        // }
+
+        submitGetAccountList(){
+            console.log("submit")
+            let msg = "";
+            let check = true;
+            if (!this.state.SabaId && !this.state.UserName) {
+                check = false;
+                msg = "Please input SabaId or UserName.";
+            }
+            if (!this.state.SiteId) {
+                check = false;
+                msg = "Please select Site.";
+            }
+            if (check) {
+                axios.post('/api/BankList/GetBankList', { SabaId: this.state.SabaId, UserName: this.state.UserName, SiteId: this.state.SiteId })
+                    .then(function (response) {
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            const options = result.data.map(d => ({
+                                "key": d.accountNo + d.sysId,
+                                "value": d.accountNo,
+                                "text": d.accountNo + '   (' + d.bankCode + ' - ' + d.accountName + ') ',
+                                "accountname": d.accountName,
+                                "accountno": d.accountNo,
+                                "accountstatus": d.accountStatus,
+                                "sysid": d.sysId,
+                                "currencyid": d.currencyId,
+                                "bankcode": d.bankCode,
+                                "bankname": d.bankName,
+                                "bankstatus": d.bankStatus
+                            }));
+                
+                            this.setState({ selectOptions: options });
+                            //alert(options);
+                        } else { 
+                            this.setState({ selectOptions: [] });
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        alert(error);
+                    }.bind(this));
+            }
+            else {
+                alert(msg);
+            }
         }
 
         onSiteChanged(e) {
@@ -100,9 +151,9 @@ import { Dropdown } from 'semantic-ui-react';
 
         onSubmitDeposit(event) {
             event.preventDefault();
-            if (this.state.UserName.length == 0) {
-                alert("Please enter username");
-                return;
+
+            if (!this.state.SabaId && !this.state.UserName) {
+                alert("Please input SabaId or UserName.");
             }
 
             if (this.state.Amount == 0 || isNaN(parseFloat(this.state.Amount))) {
@@ -134,7 +185,8 @@ import { Dropdown } from 'semantic-ui-react';
                 AccountHolderName: this.state.AccountName,
                 AccountNumber: this.state.AccountNo,
                 SysId: this.state.SysId,
-                CurrencyId: this.state.CurrencyId
+                CurrencyId: this.state.CurrencyId,
+                SabaId: this.state.SabaId
             };
 
             var bodyFormData = new FormData();
@@ -150,7 +202,6 @@ import { Dropdown } from 'semantic-ui-react';
                 .then((response) => {
                     if (response.data.errorCode === 1) {
                         this.setState({
-                            UserName: "",
                             Amount: 0.00,
                             BankName: null,
                             AccountName: "",
@@ -178,77 +229,91 @@ import { Dropdown } from 'semantic-ui-react';
             }.bind(this));
 
             return (
-                <div className="card">
-                    
-                    <form method="post" className="form-horizontal add-form" onSubmit={this.onSubmitDeposit.bind(this)}>
-                        <div className="form-group">
-                            <label className="col-form-label d-block">Site Name</label>
-                            {siteList}
-                        </div>
-                        <div className="form-group">
-                            <label className="col-form-label">Username</label>
-                            <input className="form-control" type="text" name="UserName" onChange={this.onChange.bind(this)} value={this.state.UserName || ""}/>
-                        </div>
-                        <div className="form-group">
-                            <label className="col-form-label">Amount</label>
-                            <input className="form-control text-right" type="number" name="Amount" onChange={this.onChange.bind(this)} value={this.state.Amount || ""}/>
-                        </div>
-                        <div>--------------------------------------------------------------------------</div>
-                        <div className="form-group">
-                            <label className="col-form-label">Account No</label>
-                            <Dropdown
-                                clearable
-                                fluid
-                                search
-                                selection
-                                options={this.state.selectOptions}
-                                placeholder='Deposited Account Number'
-                                onChange={this.onSelectedAccount.bind(this)}
-                                value={this.state.AccountNo || ''}
-                                /*onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}*/
-                                />
-                        </div>
-                        <div className="form-group">
-                            <label className="col-form-label">Bank Name</label>
-                            <input className="form-control" type="text" name="BankName" value={this.state.BankName || ""} onChange={this.onChange.bind(this)} disabled="disabled"/>
-                        </div>
-                        <div className="form-group">
-                            <label className="col-form-label">Account Holder Name</label>
-                            <input className="form-control" type="text" name="AccountName" value={this.state.AccountName || ""} onChange={this.onChange.bind(this)} disabled="disabled"/>
-                        </div>
-                            <div>--------------------------------------------------------------------------</div>
-                        <div className="form-group">
-                            <label className="col-form-label">Reference No</label>
-                            <input className="form-control" type="text" name="ReferenceNumber" onChange={this.onChange.bind(this)} value={this.state.ReferenceNumber || ""}/>
-                        </div>
-                        <div className="form-group">
-                            <label className="col-form-label">Submitted DateTime</label>
-                            <div className="date">
-                                <DateTimePicker
-                                    columnTitle="SubmittedDateTime"
-                                    ref={this.DepositTime}
-                                    dateTimePickerProps={{
-                                        defaultValue: moment().format(
-                                            "l LTS"
-                                        )
-                                    }}/>
+                <div>
+                    <div className="filter">
+                        <form method="post" onSubmit={this.handleSubmit.bind(this)}>
+                            <div className="form-group">
+                                <label className="col-form-label d-block">Site Name</label>
+                                {siteList}
                             </div>
-                        </div>
-                        <div className="form-group">
-                            <label className="col-form-label">Remark</label>
-                            <input className="form-control" type="text" name="Remark" onChange={this.onChange.bind(this)} value={this.state.Remark || ""}/>
-                        </div>
-                        <div>
-                            <label className="col-form-label">Receipt</label>
-                            <span>
-                                <input id="uploadReceipt" className="form-control" type="file" accept=".png, .jpg, .jpeg" onChange={e => this.setFile(e)}/>
-                            </span>
-                        </div>
-                        <div className="button-group mt-10">
-                            <button type="submit" className="btn btn-primary">Submit</button>
-                        </div>
-                    </form>
+                            <div className="input-item">
+                                <label className="col-form-label">Username</label>
+                                <input className="form-control" type="text" name="UserName" onChange={this.onChange.bind(this)} value={this.state.UserName || ""}/>
+                            </div>
+                            <div className="input-item">
+                                <label className="col-form-label">SabaId</label>
+                                <input className="form-control" type="text" name="SabaId" onChange={this.onChange.bind(this)} value={this.state.SabaId || ""}/>
+                            </div>
+                            <div className="row-flex">
+                                <div className="button-group">
+                                    <button type="submit" className="btn btn-primary">Submit</button>
+                                </div>
+                            </div>
+                        </form>                   
+                    </div>
+                    {this.state.selectOptions.length  != 0 ?
+                    <div>
+                        <form method="post" onSubmit={this.onSubmitDeposit.bind(this)}>
+                            <div className="form-group">
+                                <label className="col-form-label">Account No</label>
+                                <Dropdown
+                                    clearable
+                                    fluid
+                                    search
+                                    selection
+                                    options={this.state.selectOptions}
+                                    placeholder='Deposited Account Number'
+                                    onChange={this.onSelectedAccount.bind(this)}
+                                    value={this.state.AccountNo || ''}
+                                    /*onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}*/
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="col-form-label">Bank Name</label>
+                                <input className="form-control" type="text" name="BankName" value={this.state.BankName || ""} onChange={this.onChange.bind(this)} disabled="disabled"/>
+                            </div>
+                            <div className="form-group">
+                                <label className="col-form-label">Account Holder Name</label>
+                                <input className="form-control" type="text" name="AccountName" value={this.state.AccountName || ""} onChange={this.onChange.bind(this)} disabled="disabled"/>
+                            </div>
+                            <div className="form-group">
+                                <label className="col-form-label">Amount</label>
+                                <input className="form-control" type="number" name="Amount" onChange={this.onChange.bind(this)} value={this.state.Amount || ""}/>
+                            </div>
+                            <div className="form-group">
+                                <label className="col-form-label">Reference No</label>
+                                <input className="form-control" type="text" name="ReferenceNumber" onChange={this.onChange.bind(this)} value={this.state.ReferenceNumber || ""}/>
+                            </div>
+                            <div className="form-group">
+                                <label className="col-form-label">Submitted DateTime</label>
+                                <div className="date">
+                                    <DateTimePicker
+                                        columnTitle="SubmittedDateTime"
+                                        ref={this.DepositTime}
+                                        dateTimePickerProps={{
+                                            defaultValue: moment().format(
+                                                "l LTS"
+                                            )
+                                        }}/>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label className="col-form-label">Remark</label>
+                                <input className="form-control" type="text" name="Remark" onChange={this.onChange.bind(this)} value={this.state.Remark || ""}/>
+                            </div>
+                            <div>
+                                <label className="col-form-label">Receipt</label>
+                                <span>
+                                    <input id="uploadReceipt" className="form-control" type="file" accept=".png, .jpg, .jpeg" onChange={e => this.setFile(e)}/>
+                                </span>
+                            </div>
+                            <div className="button-group mt-10">
+                                <button type="submit" className="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                    </div>:null}
                 </div>
+                
             );
         }
     }

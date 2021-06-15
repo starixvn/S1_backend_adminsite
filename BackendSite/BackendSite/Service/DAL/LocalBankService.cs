@@ -42,5 +42,11 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<BankInfoPay>("Common_CryptoPayForPayout_Get", commandType: CommandType.StoredProcedure);
         }
+
+        public IEnumerable<BankInfoOff> GetBankAccountOffByCurrency(int currencyId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<BankInfoOff>("Admin_BankAccountOffByCurrency_Get", new { CurrencyId = currencyId }, commandType: CommandType.StoredProcedure);
+        }
     }
 }
