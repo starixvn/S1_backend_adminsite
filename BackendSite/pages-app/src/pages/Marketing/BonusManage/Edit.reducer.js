@@ -55,8 +55,8 @@ export const initialState = (IsAdd, datas, siteList) => {
 		};
 	} else {
 		let _specific = SetSpecific(
-			siteList[0].currencyList,
-			siteList[0].langList,
+			siteList[datas.siteId-1].currencyList,
+			siteList[datas.siteId-1].langList,
 			datas.specific
 		);
 		let _selectedCurrencies = datas.specific.map(s => {
