@@ -813,15 +813,19 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_resetpwd" })]
         public ApiResult<string> SetResetPwd(CustInfoReq custInfoReq)
         {
-            ApiResult<string> apiResult = new ApiResult<string>();
             string NewPwd = "";
             if (custInfoBLL.SetResetPwd(custInfoReq.CustId, out NewPwd))
             {
-                apiResult.Data = NewPwd;
-                apiResult.ErrorCode = 0;
+                return new ApiResult<string>
+                {
+                    Data = NewPwd,
+                    ErrorCode = 0
+                };
             }
-
-            return apiResult;
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
+            }
         }
 
         #endregion
@@ -927,19 +931,20 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_turnoverReport" })]
         public ApiResult GetAllGameTypeList()
         {
-            var result = new ApiResult<IEnumerable<GameType>>();
-            try
-            {
-                result.Data = winLostReportService.GetAllGameType();
-                result.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                result.ErrorCode = 999;
-                result.RawMessage = ex.ToString();
-            }
 
-            return result;
+            var data = winLostReportService.GetAllGameType();
+            if (data.Count() == 0)
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<GameType>>
+                {
+                    Data = data,
+                    ErrorCode = 0
+                };
+            }
         }
 
         #endregion

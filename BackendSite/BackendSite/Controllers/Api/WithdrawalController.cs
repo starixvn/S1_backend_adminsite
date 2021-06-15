@@ -16,6 +16,7 @@ using Amazon.S3.Model;
 using System.IO;
 using Amazon;
 using System.Net;
+using BackendSite.ExceptionHandling;
 
 namespace BackendSite.Controllers.Api
 {
@@ -117,7 +118,7 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                
+
                 if (withdrawalRequest.Status == 4 || withdrawalRequest.Status == 6)
                 {
                     var config = new AmazonS3Config
@@ -145,7 +146,7 @@ namespace BackendSite.Controllers.Api
                     withdrawalRequest.HasPic = false;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 withdrawalRequest.HasPic = false;
             }
@@ -272,9 +273,9 @@ namespace BackendSite.Controllers.Api
 
 
                         var myUrl = "";
-                        if (withdrawalReq.WithdrawalType == (int)WithdrawalType.CryptoPay) 
+                        if (withdrawalReq.WithdrawalType == (int)WithdrawalType.CryptoPay)
                             myUrl = $"{payApiUrl}CryptoWithdrawal";
-                        else 
+                        else
                             myUrl = $"{payApiUrl}Withdrawal";
 
                         var apiOnlineResult = await courierAdapter.MyPostAsync<bool, ReqWithdrawalOnline>(myUrl, reqWithdrawalOnline);
@@ -419,23 +420,43 @@ namespace BackendSite.Controllers.Api
             public long endDate { get; set; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Use：
+        /// CSD > Customer Administration > CustInfo > Withdrawal Info
+        /// </remarks>
+        /// <param name="withdrawalReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetWithdrawalListByCust(WithdrawalReq4 withdrawalReq)
         {
-            var apiListResult = new ApiListResultCurrencyAmount<WithdrawalRequest>();
             int pageNumber = withdrawalReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
             List<string> CurrencyAmount = new List<string>();
-            var withdrawalList = withdrawalBLL.GetWithdrawalListByCust(withdrawalReq.CustId, withdrawalReq.TransId, withdrawalReq.Status, withdrawalReq.startDate, withdrawalReq.endDate, 10, ref pageNumber, out totalPages, out rowCount,ref CurrencyAmount);
-            apiListResult.Data = withdrawalList;
-            apiListResult.ErrorCode = 0;
-            apiListResult.PageNumber = pageNumber;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.RowCount = rowCount;
-            apiListResult.CurrencyAmount = CurrencyAmount;
+            var data = withdrawalBLL.GetWithdrawalListByCust(withdrawalReq.CustId,
+                                                             withdrawalReq.TransId,
+                                                             withdrawalReq.Status,
+                                                             withdrawalReq.startDate,
+                                                             withdrawalReq.endDate,
+                                                             10,
+                                                             ref pageNumber,
+                                                             out totalPages,
+                                                             out rowCount,
+                                                             ref CurrencyAmount);
 
-            return apiListResult;
+            return new ApiListResultCurrencyAmount<WithdrawalRequest>()
+            {
+                Data = data,
+                TotalPages = totalPages,
+                PageNumber = pageNumber,
+                RowCount = rowCount,
+                CurrencyAmount = CurrencyAmount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
         }
 
         [HttpPost]
@@ -558,7 +579,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        public class InsertWithdrawalLimitPara 
+        public class InsertWithdrawalLimitPara
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
@@ -568,7 +589,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult InsertWithdrawalLimit(InsertWithdrawalLimitPara para)
         {
-            var result = withdrawalBLL.InsertWithdrawalLimit(para.SiteId, para.CurrencyId,para.WithdrawalMin, User.Identity.Name);
+            var result = withdrawalBLL.InsertWithdrawalLimit(para.SiteId, para.CurrencyId, para.WithdrawalMin, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result)
             {
@@ -591,7 +612,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult UpdateWithdrawalLimit(UpdateWithdrawalLimitPara para)
         {
-            var result = withdrawalBLL.UpdateWithdrawalLimit(para.SiteId, para.CurrencyId, para.WithdrawalMin,User.Identity.Name);
+            var result = withdrawalBLL.UpdateWithdrawalLimit(para.SiteId, para.CurrencyId, para.WithdrawalMin, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result)
             {
@@ -674,7 +695,7 @@ namespace BackendSite.Controllers.Api
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;

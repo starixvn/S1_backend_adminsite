@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.Linq;
+using BackendSite.ExceptionHandling;
 
 namespace BackendSite.Controllers.Api
 {
@@ -60,7 +62,7 @@ namespace BackendSite.Controllers.Api
             int totalPages = 0;
             int rowCount = 0;
             List<string> CurrencyAmount = new List<string>();
-            var depositRequestList = depositBLL.GetDepositRequestList(depositListReq.SelectSite, depositListReq.DepositType, depositListReq.startDate, depositListReq.endDate, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, depositListReq.LevelStatus,10, ref pageNumber, out totalPages, out rowCount,ref CurrencyAmount);
+            var depositRequestList = depositBLL.GetDepositRequestList(depositListReq.SelectSite, depositListReq.DepositType, depositListReq.startDate, depositListReq.endDate, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, depositListReq.LevelStatus, 10, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
             apiListResult.Data = depositRequestList;
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;
@@ -81,24 +83,45 @@ namespace BackendSite.Controllers.Api
             public long endDate { get; set; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Use：
+        /// CSD > Customer Administration > CustInfo > Deposit Info
+        /// </remarks>
+        /// <param name="depositListReq"></param>
+        /// <returns></returns>
         [HttpPost]
-        public ApiListResultTotalAmount<DepositRequest> GetDepositListByCust(DepositListReq1 depositListReq)
+        public ApiResult GetDepositListByCust(DepositListReq1 depositListReq)
         {
-            var apiListResult = new ApiListResultTotalAmount<DepositRequest>();
             int pageNumber = depositListReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
             decimal totalAmount = 0;
-            var depositRequestList = depositBLL.GetDepositListByCust(depositListReq.CustId, depositListReq.TransId, depositListReq.Status, depositListReq.startDate, depositListReq.endDate, 10, ref pageNumber, out totalPages, out rowCount,out totalAmount);
-            apiListResult.Data = depositRequestList;
-            apiListResult.ErrorCode = 0;
-            apiListResult.PageNumber = pageNumber;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.RowCount = rowCount;
-            apiListResult.TotalAmount = totalAmount;
+            var data = depositBLL.GetDepositListByCust(depositListReq.CustId,
+                                                       depositListReq.TransId,
+                                                       depositListReq.Status,
+                                                       depositListReq.startDate,
+                                                       depositListReq.endDate,
+                                                       10,
+                                                       ref pageNumber,
+                                                       out totalPages,
+                                                       out rowCount,
+                                                       out totalAmount);
 
-            return apiListResult;
+            return new ApiListResultTotalAmount<DepositRequest>
+            {
+                Data = data,
+                TotalPages = totalPages,
+                PageNumber = pageNumber,
+                RowCount = rowCount,
+                TotalAmount = totalAmount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
         }
+
         public class DepositReq
         {
             public string TransId { get; set; }
@@ -259,7 +282,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Finance/DepositSubmission"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositSubmission" })]
         public ApiResult DepositSubmission([FromForm] DepositDetailSubmission deposit)
         {
             var depositDetails = JsonConvert.DeserializeObject<DepositDetailInfo>(deposit.DepositDetails);
@@ -400,7 +423,7 @@ namespace BackendSite.Controllers.Api
                 apiListResult.RowCount = SearchResult.RowCount;
                 apiListResult.ErrorCode = 0;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 apiListResult.ErrorCode = 999;
                 apiListResult.Message = ex.Message;

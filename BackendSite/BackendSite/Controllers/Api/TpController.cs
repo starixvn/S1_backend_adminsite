@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Library;
 using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 
 namespace BackendSite.Controllers.Api
 {
@@ -36,21 +37,40 @@ namespace BackendSite.Controllers.Api
             public long startDate { get; set; }
             public long endDate { get; set; }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Use：
+        /// CSD > Customer Administration > CustInfo > Transfer Info
+        /// </remarks>
+        /// <param name="transferInfoReq"></param>
+        /// <returns></returns>
         public ApiListResult<TpTransferInfo> GetTpTransferInfoByCust(TransferInfoReq transferInfoReq)
         {
-            var apiListResult = new ApiListResult<TpTransferInfo>();
             int pageNumber = transferInfoReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
-            var transferInfoList = tpBLL.GetTpTransferInfoByCust(transferInfoReq.CustId, transferInfoReq.TransId, transferInfoReq.startDate, transferInfoReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
-            apiListResult.Data = transferInfoList;
-            apiListResult.ErrorCode = 0;
-            apiListResult.PageNumber = pageNumber;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.RowCount = rowCount;
+            var data = tpBLL.GetTpTransferInfoByCust(transferInfoReq.CustId,
+                                                     transferInfoReq.TransId,
+                                                     transferInfoReq.startDate,
+                                                     transferInfoReq.endDate,
+                                                     10,
+                                                     ref pageNumber,
+                                                     out totalPages,
+                                                     out rowCount);
 
-            return apiListResult;
+            return new ApiListResult<TpTransferInfo>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                TotalPages = totalPages,
+                PageNumber = pageNumber,
+                RowCount = rowCount
+            };
         }
+
         public class FixNegativeReq
         {
             public int CustId { get; set; }

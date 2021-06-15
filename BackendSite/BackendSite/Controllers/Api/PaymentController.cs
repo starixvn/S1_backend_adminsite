@@ -268,21 +268,16 @@ namespace BackendSite.Controllers.Api
             int rowCount = 0;
             var data = paymentBLL.GetFinancialLog(getFinancialLogReq.CustId, getFinancialLogReq.StartDate, getFinancialLogReq.EndDate, getFinancialLogReq.RefTransId, 10, ref pageNumber, out totalPages, out rowCount);
 
-            if (data.Count() == 0)
+
+            return new ApiListResult<FinancialLog>
             {
-                throw new AdminException(ErrorCodeEnum.NoData);
-            }
-            else
-            {
-                return new ApiListResult<FinancialLog>
-                {
-                    Data = data,
-                    TotalPages = totalPages,
-                    PageNumber = pageNumber,
-                    RowCount = rowCount,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-            }
+                Data = data,
+                TotalPages = totalPages,
+                PageNumber = pageNumber,
+                RowCount = rowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
         }
 
         /// <summary>
@@ -308,21 +303,16 @@ namespace BackendSite.Controllers.Api
                                               ref pageNumber,
                                               out totalPages,
                                               out rowCount);
-            if (data.Count() == 0)
+
+            return new ApiListResult<BonusLog>
             {
-                throw new AdminException(ErrorCodeEnum.NoData);
-            }
-            else
-            {
-                return new ApiListResult<BonusLog>
-                {
-                    Data = data,
-                    TotalPages = totalPages,
-                    PageNumber = pageNumber,
-                    RowCount = rowCount,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-            }
+                Data = data,
+                TotalPages = totalPages,
+                PageNumber = pageNumber,
+                RowCount = rowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
         }
 
         public ApiListResult<RebateLog> GetRebateLogByCust(GetRebateLogByCustReq getRebateLogByCustReq)
@@ -500,7 +490,7 @@ namespace BackendSite.Controllers.Api
             apiResult.TotalPages = TotalPages;
             return apiResult;
         }
-        
+
         [HttpPost]
         public async Task<ApiResult> AdjustmentAndWithdrawalLimitAsync(AdjustmentAndWithdrawalLimitReq adjustmentAndWithdrawalLimitReq)
         {
@@ -768,22 +758,17 @@ namespace BackendSite.Controllers.Api
                                                                        para.EndDate,
                                                                        10,
                                                                        para.PageNumber);
-            if (SearchResult.VipRebateInfoList.Count() == 0)
+
+            return new ApiListResultCurrencyAmount<VipRebateInfo>
             {
-                throw new AdminException(ErrorCodeEnum.NoData);
-            }
-            else
-            {
-                return new ApiListResultCurrencyAmount<VipRebateInfo>
-                {
-                    Data = SearchResult.VipRebateInfoList,
-                    TotalPages = SearchResult.TotalPages,
-                    PageNumber = SearchResult.PageNumber,
-                    RowCount = SearchResult.RowCount,
-                    CurrencyAmount = SearchResult.CurrencyAmount,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-            }
+                Data = SearchResult.VipRebateInfoList,
+                TotalPages = SearchResult.TotalPages,
+                PageNumber = SearchResult.PageNumber,
+                RowCount = SearchResult.RowCount,
+                CurrencyAmount = SearchResult.CurrencyAmount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
         }
 
         [HttpPost]
@@ -793,7 +778,7 @@ namespace BackendSite.Controllers.Api
             var stream = excelBLL.Export(SearchResult.VipRebateInfoList);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"VipRebateReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
-        
+
         public ApiResult<IEnumerable<VipTPCategory>> GetTPCategoryListByVipRebate()
         {
             var apiResult = new ApiResult<IEnumerable<VipTPCategory>>();
