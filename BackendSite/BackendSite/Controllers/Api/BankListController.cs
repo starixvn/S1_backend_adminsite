@@ -180,32 +180,32 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<IEnumerable<BankInfoOff>> GetBankList([FromBody] BankListPara bankDetail)
         {
+            var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
             var custId = (string.IsNullOrEmpty(bankDetail.SabaId)) ? null : common.TpIdToCustId(bankDetail.SabaId);
             var custInfosDetail = custInfoBLL.GetCustInfoDetails(custId, bankDetail.UserName, bankDetail.SiteId);
 
             if (custInfosDetail != null)
             {
+                var bankInfoOff = bankDetailBLL.GetBankAccountOffByCurrency(custInfosDetail.CurrencyId);
 
+                if(bankInfoOff != null)
+                {
+                    apiResult.Data = bankInfoOff;
+                    apiResult.ErrorCode = 0;
+                }
+                else
+                {
+                    apiResult.ErrorCode = 21;
+                    apiResult.Message = "BankAccount not found.";
+                }
             }
             else
             {
-
+                apiResult.ErrorCode = 21;
+                apiResult.Message = "Player not found.";
             }
-                //bool result = bankDetailBLL.EditBankInfo(bankDetail);
-                //var apiResult = new ApiResult();
-                //if (result)
-                //{
-                //    apiResult.ErrorCode = 0;
-                //    apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
-                //}
-                //else
-                //{
-                //    apiResult.ErrorCode = 9;
-                //    apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
-                //}
-                //return apiResult;
 
-                return null;
+            return apiResult;
         }
     }
 }

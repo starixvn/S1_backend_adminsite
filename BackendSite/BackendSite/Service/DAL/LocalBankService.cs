@@ -46,7 +46,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<BankInfoOff> GetBankAccountOffByCurrency(int currencyId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<BankInfoOff>("Admin_BankAccountOffV2_Get", new { CurrencyId = currencyId }, commandType: CommandType.StoredProcedure);
+            return conn.Query<BankInfoOff>("Admin_BankAccountOffByCurrency_Get", new { CurrencyId = currencyId }, commandType: CommandType.StoredProcedure);
         }
     }
 }

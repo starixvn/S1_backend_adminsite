@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using LazZiya.ImageResize;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using BackendSite.Service.Library;
 
 namespace BackendSite.Service.BLL
 {
@@ -18,14 +19,16 @@ namespace BackendSite.Service.BLL
         private readonly AdjustmentService adjustmentService;
         private readonly CustInfoBLL custInfoBLL;
         private readonly AuthorizeBLL authorizeBLL;
+        private readonly Common common;
 
-        public DepositBLL(DepositService depositService, ServerInfoService serverInfoService, AdjustmentService adjustmentService, CustInfoBLL custInfoBLL, AuthorizeBLL authorizeBLL)
+        public DepositBLL(DepositService depositService, ServerInfoService serverInfoService, AdjustmentService adjustmentService, CustInfoBLL custInfoBLL, AuthorizeBLL authorizeBLL, Common common)
         {
             this.depositService = depositService;
             this.serverInfoService = serverInfoService;
             this.adjustmentService = adjustmentService;
             this.custInfoBLL = custInfoBLL;
             this.authorizeBLL = authorizeBLL;
+            this.common = common;
         }
         public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, long startDate, long endDate, string DepositId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
         {
@@ -50,16 +53,19 @@ namespace BackendSite.Service.BLL
             };
             deposit.DepositInfo = Newtonsoft.Json.JsonConvert.SerializeObject(depositInfo);
 
-            var customer = custInfoBLL.GetCustInfoDetails(null, deposit.UserName, deposit.SiteId);
+            var custId = (string.IsNullOrEmpty(deposit.SabaId)) ? null : common.TpIdToCustId(deposit.SabaId);
+            var customer = custInfoBLL.GetCustInfoDetails(custId, deposit.UserName, deposit.SiteId);
             if (customer == null)
             {
                 return -1;
             }
             deposit.CurrencyId = customer.CurrencyId;
             deposit.CustId = customer.CustId;
+            deposit.UserName = customer.UserName;
 
             var creator = authorizeBLL.GetAuthData();
             deposit.Operator = creator.UserName;
+
 
             var transId = depositService.InsertDepositRequest(deposit);
 
