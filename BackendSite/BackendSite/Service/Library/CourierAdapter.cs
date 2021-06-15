@@ -12,28 +12,26 @@ namespace BackendSite.Service.Library
 {
     public class CourierAdapter
     {
-        private static Lazy<HttpClient> lazy = new Lazy<HttpClient>(() =>
-        {
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            return client;
-        });
-
-        private HttpClient client { get { return lazy.Value; } }
-        public async Task<ApiResult<T>> MyPostAsync<T, U>(string url, U oTpInfo)
+        public async Task<ApiResult<T>> MyPostAsync<T, U>(string url, U oTpInfo, int timeout = 0)
         {
             ApiResult<T> oApiResult = null;
-
+            using var client = new HttpClient();
             var fooJSON = JsonConvert.SerializeObject(oTpInfo);
             var fooContent = new StringContent(fooJSON, Encoding.UTF8, "application/json");
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            HttpResponseMessage response = await client.PostAsync(url, fooContent);
+            if (timeout != 0)
+            {
+                client.Timeout = TimeSpan.FromSeconds(timeout);
+            }
 
+            using var response = await client.PostAsync(url, fooContent);
             if (response.IsSuccessStatusCode)
             {
-                string responseBody = await response.Content.ReadAsStringAsync();
+                var responseBody = await response.Content.ReadAsStringAsync();
                 oApiResult = JsonConvert.DeserializeObject<ApiResult<T>>(responseBody);
             }
+
             return oApiResult;
         }
     }
