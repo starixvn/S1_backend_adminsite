@@ -54,9 +54,10 @@ export const initialState = (IsAdd, datas, siteList) => {
 			autoExtend: []
 		};
 	} else {
+		let site = siteList.find(s => s.siteId === datas.siteId);
 		let _specific = SetSpecific(
-			siteList[datas.siteId-1].currencyList,
-			siteList[datas.siteId-1].langList,
+			site.currencyList,
+			site.langList,
 			datas.specific
 		);
 		let _selectedCurrencies = datas.specific.map(s => {
