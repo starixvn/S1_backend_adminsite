@@ -254,7 +254,7 @@ import { Dropdown } from 'semantic-ui-react';
                     {this.state.selectOptions.length  != 0 ?
                     <div>
                         <form method="post" onSubmit={this.onSubmitDeposit.bind(this)}>
-                            <div className="form-group">
+                            <div className="form-group width-200">
                                 <label className="col-form-label">Account No</label>
                                 <Dropdown
                                     clearable
@@ -268,23 +268,23 @@ import { Dropdown } from 'semantic-ui-react';
                                     /*onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}*/
                                 />
                             </div>
-                            <div className="form-group">
+                            <div className="form-group width-200">
                                 <label className="col-form-label">Bank Name</label>
                                 <input className="form-control" type="text" name="BankName" value={this.state.BankName || ""} onChange={this.onChange.bind(this)} disabled="disabled"/>
                             </div>
-                            <div className="form-group">
+                            <div className="form-group width-200">
                                 <label className="col-form-label">Account Holder Name</label>
                                 <input className="form-control" type="text" name="AccountName" value={this.state.AccountName || ""} onChange={this.onChange.bind(this)} disabled="disabled"/>
                             </div>
-                            <div className="form-group">
+                            <div className="form-group width-200">
                                 <label className="col-form-label">Amount</label>
                                 <input className="form-control" type="number" name="Amount" onChange={this.onChange.bind(this)} value={this.state.Amount || ""}/>
                             </div>
-                            <div className="form-group">
+                            <div className="form-group width-200">
                                 <label className="col-form-label">Reference No</label>
                                 <input className="form-control" type="text" name="ReferenceNumber" onChange={this.onChange.bind(this)} value={this.state.ReferenceNumber || ""}/>
                             </div>
-                            <div className="form-group">
+                            <div className="form-group width-200">
                                 <label className="col-form-label">Submitted DateTime</label>
                                 <div className="date">
                                     <DateTimePicker
@@ -297,14 +297,14 @@ import { Dropdown } from 'semantic-ui-react';
                                         }}/>
                                 </div>
                             </div>
-                            <div className="form-group">
+                            <div className="form-group width-200">
                                 <label className="col-form-label">Remark</label>
                                 <input className="form-control" type="text" name="Remark" onChange={this.onChange.bind(this)} value={this.state.Remark || ""}/>
                             </div>
                             <div>
                                 <label className="col-form-label">Receipt</label>
                                 <span>
-                                    <input id="uploadReceipt" className="form-control" type="file" accept=".png, .jpg, .jpeg" onChange={e => this.setFile(e)}/>
+                                    <input id="uploadReceipt" className="form-control width-200" type="file" accept=".png, .jpg, .jpeg" onChange={e => this.setFile(e)}/>
                                 </span>
                             </div>
                             <div className="button-group mt-10">
