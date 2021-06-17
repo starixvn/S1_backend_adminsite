@@ -37,4 +37,11 @@ namespace BackendSite.Service.Model
         public int PointLevel { set; get; }
         public virtual int SysId { set; get; }
     }
+    public class BankListPara 
+    { 
+        public string SabaId { get; set; }
+        public string UserName { get; set; }
+        public int SiteId { get; set; }
+    }
+
 }

@@ -1,6 +1,8 @@
-﻿using BackendSite.Service.Model;
+﻿using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -13,10 +15,14 @@ namespace BackendSite.Service.DAL
     public class LocalBankService
     {
         private readonly IConfiguration configuration;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public LocalBankService(IConfiguration configuration)
+        public LocalBankService(IConfiguration configuration, ILogger<MySqlClient> logger)
         {
             this.configuration = configuration;
+             _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
+            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
         }
 
         public IEnumerable<BankInfoOff> GetAllBankAccountOff()
@@ -41,6 +47,11 @@ namespace BackendSite.Service.DAL
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<BankInfoPay>("Common_CryptoPayForPayout_Get", commandType: CommandType.StoredProcedure);
+        }
+
+        public IEnumerable<BankInfoOff> GetBankAccountOffByCurrency(int currencyId)
+        {
+            return _reportDbClient.Query<BankInfoOff>("Admin_BankAccountOffByCurrency_Get", new DynamicParameters(new { CurrencyId = currencyId }));
         }
     }
 }

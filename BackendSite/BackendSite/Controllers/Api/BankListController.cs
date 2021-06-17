@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +17,16 @@ namespace BackendSite.Controllers.Api
         private readonly SelLangBLL selLangBLL;
         private readonly BankDetailBLL bankDetailBLL;
         private readonly ServerInfoBLL serverInfoBLL;
+        private readonly CustInfoBLL custInfoBLL;
+        private readonly Common common;
 
-        public BankListController(BankDetailBLL bankDetailBLL, SelLangBLL selLangBLL, ServerInfoBLL serverInfoBLL)
+        public BankListController(BankDetailBLL bankDetailBLL, SelLangBLL selLangBLL, ServerInfoBLL serverInfoBLL, CustInfoBLL custInfoBLL, Common common)
         {
             this.bankDetailBLL = bankDetailBLL;
             this.selLangBLL = selLangBLL;
             this.serverInfoBLL = serverInfoBLL;
+            this.custInfoBLL = custInfoBLL;
+            this.common = common;
         }
 
         [HttpPost]
@@ -169,6 +174,37 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = 9;
                 apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
             }
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<BankInfoOff>> GetBankList([FromBody] BankListPara bankDetail)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
+            var custId = (string.IsNullOrEmpty(bankDetail.SabaId)) ? null : common.TpIdToCustId(bankDetail.SabaId);
+            var custInfosDetail = custInfoBLL.GetCustInfoDetails(custId, bankDetail.UserName, bankDetail.SiteId);
+
+            if (custInfosDetail != null)
+            {
+                var bankInfoOff = bankDetailBLL.GetBankAccountOffByCurrency(custInfosDetail.CurrencyId);
+
+                if(bankInfoOff != null)
+                {
+                    apiResult.Data = bankInfoOff;
+                    apiResult.ErrorCode = 0;
+                }
+                else
+                {
+                    apiResult.ErrorCode = 21;
+                    apiResult.Message = "BankAccount not found.";
+                }
+            }
+            else
+            {
+                apiResult.ErrorCode = 21;
+                apiResult.Message = "Player not found.";
+            }
+
             return apiResult;
         }
     }
