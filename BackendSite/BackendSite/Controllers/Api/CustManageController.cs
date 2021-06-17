@@ -172,6 +172,15 @@ namespace BackendSite.Controllers.Api
             public int CustId { get; set; }
         }
 
+        public class GetCustTurnOverReportReq
+        {
+            public int CustId { get; set; }
+            public long StartTime { get; set; }
+            public long EndTime { get; set; }
+
+            public IEnumerable<int> GameTypes { get; set; }
+        }
+
         #region TeleCSD
 
         public class TeleCSDpara
@@ -832,9 +841,9 @@ namespace BackendSite.Controllers.Api
 
         #region CSD > Customer Administration > CustInfo > Notes
 
-        public ApiResult<bool> AddCustNote(AddCustNoteReq addCustNoteReq)
+        public ApiResult AddCustNote(AddCustNoteReq addCustNoteReq)
         {
-            var apiResult = new ApiResult<bool>();
+
             bool data = custInfoBLL.AddCustNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name);
 
             if (data)
@@ -844,12 +853,18 @@ namespace BackendSite.Controllers.Api
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("Action", "Add Note");
                 serverInfoBLL.AdminOperateLog(null, addCustNoteReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
+                return new ApiResult
+                {
+                    ErrorCode = 0,
+                    Message = "Add Success."
+                };
+
             }
-
-            apiResult.Data = data;
-            apiResult.ErrorCode = 0;
-
-            return apiResult;
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Add Fail.");
+            }
         }
 
         public ApiResult<IEnumerable<CustNote>> GetCustNotes(AddCustNoteReq addCustNoteReq)
@@ -862,18 +877,15 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<bool> SetCustNotes(SetCustNoteReq setCustNoteReq)
+        public ApiResult SetCustNotes(SetCustNoteReq setCustNoteReq)
         {
-            var apiResult = new ApiResult<bool>();
             if (setCustNoteReq.Type == 1 && !permissionBLL.CheckPermission("CustManage/CustInfoList", "ca_noteEdit"))
             {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "No Edit Permission";
+                throw new AdminException(ErrorCodeEnum.PermissionDenied);
             }
             if (setCustNoteReq.Type == 2 && !permissionBLL.CheckPermission("CustManage/CustInfoList", "ca_noteDelete"))
             {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "No Delete Permission";
+                throw new AdminException(ErrorCodeEnum.PermissionDenied);
             }
             else
             {
@@ -881,7 +893,6 @@ namespace BackendSite.Controllers.Api
 
                 if (data)
                 {
-
                     string Menu = "CustManage/CustInfoList";
                     Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
                     Info.Add("MenuName", "Customer Info");
@@ -894,12 +905,18 @@ namespace BackendSite.Controllers.Api
                         Info.Add("Action", "Delete Note");
                     }
                     serverInfoBLL.AdminOperateLog(null, setCustNoteReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
-                }
 
-                apiResult.Data = data;
-                apiResult.ErrorCode = 0;
+                    return new ApiResult
+                    {
+                        ErrorCode = 0,
+                        Message = "Modify Success."
+                    };
+                }
+                else
+                {
+                    throw new AdminException(ErrorCodeEnum.Fail, "Modify Fail.");
+                }
             }
-            return apiResult;
         }
 
         #endregion
@@ -908,30 +925,23 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_turnoverReport" })]
-        public ApiResult GetCustTurnOverReport([FromForm] int CustId, [FromForm] int StartTime, [FromForm] int EndTime, [FromForm] string GameTypes)
+        public ApiResult GetCustTurnOverReport(GetCustTurnOverReportReq request)
         {
-            var result = new ApiResult<dynamic>();
-            try
+            var data = custInfoBLL.GetCustTurnover(request.CustId,
+                                                   JsonConvert.SerializeObject(request.GameTypes),
+                                                   request.StartTime,
+                                                   request.EndTime);
+            return new ApiResult<dynamic>
             {
-                string[] gameTypes = GameTypes == null ? new string[] { } : GameTypes.Split(",");
-                var data = custInfoBLL.GetCustTurnover(CustId, gameTypes, StartTime, EndTime);
-                result.Data = data.Select(x => new { x.GameName, x.Stake, x.UserName, x.WinlostAmount });
-                result.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                result.ErrorCode = 999;
-                result.RawMessage = ex.ToString();
-            }
-
-            return result;
+                Data = data.Select(x => new { x.GameName, x.Stake, x.UserName, x.WinlostAmount }),
+                ErrorCode = 0
+            };
         }
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_turnoverReport" })]
         public ApiResult GetAllGameTypeList()
         {
-
             var data = winLostReportService.GetAllGameType();
             if (data.Count() == 0)
             {

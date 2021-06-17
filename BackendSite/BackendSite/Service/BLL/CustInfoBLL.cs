@@ -181,7 +181,7 @@ namespace BackendSite.Service.BLL
             return promotionService.CancelBonusByBonusId(bonusId);
         }
 
-        public List<CustTurnover> GetCustTurnover(int CustId, string[] GameTypes, int StartTime, int EndTime)
+        public List<CustTurnover> GetCustTurnover(int CustId, string GameTypes, long StartTime, long EndTime)
         {
             var datas = custTurnoverService.GetCustTurnover(CustId, GameTypes, StartTime, EndTime);
 

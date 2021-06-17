@@ -90,6 +90,14 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// CSD > Customer Administration > CustInfo > Admin User Log
+        /// </remarks>
+        /// <param name="adminOperateLogReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiListResult<GetAdminOperateLog> GetAdminOperateLog(AdminOperateLogReq adminOperateLogReq)
         {
