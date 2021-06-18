@@ -1,4 +1,4 @@
-import Pagination from "./Pagination";
+import PaginationDetail from "./PaginationDetail";
 import React, { useEffect, useRef, useReducer, useState } from "react";
 import WebAPI from "../../../module/WebAPI";
 import { api } from "../../../module/WebAPI";
@@ -102,7 +102,7 @@ const Panel = (props) => {
         <tbody>{bodyRows}</tbody>
       </table>
       {stateDatas.PageInfo !== null ? (
-        <Pagination
+        <PaginationDetail
           Data={{
             totalPages: stateDatas.PageInfo.totalPages,
             pageNumber: stateDatas.PageInfo.pageNumber,
