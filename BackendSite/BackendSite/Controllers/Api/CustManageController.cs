@@ -201,6 +201,26 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        #region TagManagement
+        public class EditTagManagementpara 
+        { 
+            public int Id { get; set; }
+            public string TagName { get; set; }
+            public string TagColour { get; set; }
+            public string Description { get; set; }
+        }
+        public class GetTagDatapara
+        {
+            public int Status { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+        }
+        public class SetTagStatuspara
+        {
+            public int Id { get; set; }
+        }
+        #endregion
+
         public class CustPromotionpara
         {
             public int CustId { get; set; }
@@ -1085,6 +1105,64 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        #endregion
+
+        #region CSD > TagMamagement
+        [HttpPost]
+        public ApiResult EditTagMamagement(EditTagManagementpara para)
+        {
+            if (custInfoBLL.EditTagMamagement(para.Id, para.TagName,para.TagColour, para.Description, User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Edit Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+            }
+        }
+
+        [HttpPost]
+        public ApiListResult<TagData> GetTagData(GetTagDatapara para)
+        {
+            var apiResult = new ApiListResult<TagData>();
+            try
+            {
+                var SearchResult = custInfoBLL.GetTagData(para.Status, para.PageNumber, para.PageSize);
+                apiResult.Data = SearchResult.TagDatas;
+                apiResult.PageNumber = SearchResult.PageNumber;
+                apiResult.TotalPages = SearchResult.TotalPages;
+                apiResult.RowCount = SearchResult.RowCount;
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult SetTagStatus(SetTagStatuspara para)
+        {
+            if (custInfoBLL.SetTagStatus(para.Id, User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Edit Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+            }
+        }
         #endregion
 
         #endregion

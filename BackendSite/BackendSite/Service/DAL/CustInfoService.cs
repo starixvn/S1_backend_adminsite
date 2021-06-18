@@ -1,6 +1,8 @@
-﻿using BackendSite.Service.Model;
+﻿using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -12,10 +14,14 @@ namespace BackendSite.Service.DAL
     public class CustInfoService
     {
         private readonly IConfiguration configuration;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public CustInfoService(IConfiguration configuration)
+        public CustInfoService(IConfiguration configuration, ILogger<MySqlClient> logger)
         {
             this.configuration = configuration;
+            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
+            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
         }
 
         public Customer GetCustInfo(int custId)
@@ -420,5 +426,49 @@ namespace BackendSite.Service.DAL
                 return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
+
+        #region 
+        public int EditTagMamagement(int id, string tagName, string tagColour, string description, string Operator)
+        {
+            DynamicParameters props = new DynamicParameters();
+            props.Add("Id", id);
+            props.Add("TagName", tagName);
+            props.Add("TagColour", tagColour);
+            props.Add("Description", description);
+            props.Add("Operator", Operator);
+
+            return _mainDbClient.Execute("Admin_Tag_Set", props);
+        }
+
+        public GetTagDataResult GetTagData(int status,int pageNumber,int pageSize)
+        {
+            GetTagDataResult SearchResult = new GetTagDataResult();
+            DynamicParameters props = new DynamicParameters();
+            props.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("PageSize", pageSize);
+            props.Add("Status", status);
+
+            var result = _reportDbClient.Query<TagData>("Admin_Tag_Get", props);
+
+            SearchResult.TagDatas = result.ToList();
+            SearchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            SearchResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            SearchResult.RowCount = props.Get<int?>("RowCount") ?? 0;
+
+            return SearchResult;
+        }
+
+        public int SetTagStatus(int Id, string Operator)
+        {
+            DynamicParameters props = new DynamicParameters();
+            props.Add("Id", Id);
+            props.Add("Operator", Operator);
+
+            return _mainDbClient.Execute("Admin_TagStatus_Set", props);
+        }
+        #endregion
     }
 }

@@ -1,0 +1,31 @@
+﻿@using BackendSite.Service.BLL
+@using BackendSite.Service.DAL
+@inject SelLangBLL selLangBLL
+@inject AuthorizeBLL authorizeBLL
+@inject AdminUserService adminUserService
+@inject PermissionBLL permissionBLL
+@{
+    Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
+    ViewData["Title"] = "Tag Management";
+}
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/lib/bootstrap-multiselect/bootstrap-multiselect-modify.css" rel="stylesheet" />
+<link href="~/css/vendor/DateTimePicker/DateTimePicker.css" rel="stylesheet" />
+
+@{
+    var authData = authorizeBLL.GetAuthData();
+    var loginUser = adminUserService.GetUser(authData.UserId);
+
+}
+<div id="content">
+</div>
+@section Scripts {
+    <script src="~/js/component/CSD/TagManagement.min.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        //$('.collapse').collapse();
+        window.RootUrl = '@Url.Content("~/api")';
+        window.LangCode = 'en'
+    </script>
+}

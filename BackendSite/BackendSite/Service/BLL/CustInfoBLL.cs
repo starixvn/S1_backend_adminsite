@@ -416,5 +416,24 @@ namespace BackendSite.Service.BLL
         }
 
         #endregion
+
+        #region TagMamagement
+        public int EditTagMamagement(int id, string tagName,string tagColour, string description, string Operator)
+        {
+            return custInfoService.EditTagMamagement(id, tagName, tagColour, description, Operator);
+        }
+
+        public GetTagDataResult GetTagData(int status, int pageNumber, int pageSize)
+        {
+            return custInfoService.GetTagData(status, pageNumber, pageSize);
+        }
+
+        public int SetTagStatus(int Id, string Operator)
+        {
+            return custInfoService.SetTagStatus(Id, Operator);
+        }
+
+        #endregion
+
     }
 }

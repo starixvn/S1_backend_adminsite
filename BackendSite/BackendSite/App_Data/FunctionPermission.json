@@ -144,6 +144,11 @@
             "FuncKey": "tele_export_excel"
           }
         ]
+      },
+      {
+        "DisplayKey": "Tag Management",
+        "FuncKey": "CustManage/TagManagement",
+        "Enable": false
       }
     ]
   },

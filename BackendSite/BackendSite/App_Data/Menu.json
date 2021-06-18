@@ -160,6 +160,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Tag Management",
+        "FuncKey": "CustManage/TagManagement",
+        "Controller": "CustManage",
+        "Action": "TagManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
