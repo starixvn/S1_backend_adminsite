@@ -49,7 +49,7 @@ const Result_ExportToExcel = () => {
 		let param = {
 			Url: "BonusManage/GetScratchCardListExport",
 			Data: {
-				SpecialCode: props.specialCode,
+				SpecialCode: props.Datas[0].specialCode,
 			},
 		};
 		WebAPI.DownloadData(param);
