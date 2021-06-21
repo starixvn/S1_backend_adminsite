@@ -1,0 +1,232 @@
+import React, { useEffect, useRef, useReducer, useState } from "react";
+import ReactDOM from "react-dom";
+import WebAPI from "../../../module/WebAPI";
+import moment from "moment";
+import { api } from "../../../module/WebAPI";
+import Filter from "./Filter";
+import Result from "./Result";
+import Edit from "./Edit";
+
+const App = () => {
+  const [state, setstate] = useState(0);
+  const [showAll, setshowAll] = useState([]);
+  const [editData, seteditData] = useState({
+    Id: 0,
+    TagName: "",
+    TagColour: "#fff",
+    Description: "",
+  });
+  const [stateDatas, setDatas] = useState({
+    PageInfo: null,
+    Datas: null,
+    FilterInfo: null,
+  });
+
+  const Create = () => {
+    setstate(2);
+  };
+
+  const EditOnChange = (v, dataColumn) => {
+    seteditData({
+      ...editData,
+      [dataColumn]: v,
+    });
+  };
+
+  const ChangeColor = (color) => {
+    console.log(color);
+    seteditData({
+      ...editData,
+      TagColour: color.hex,
+    });
+  };
+
+  const ShowAllCheckBox = (value, dataColumn) => {
+    if (showAll.length > 0) {
+      setshowAll([]);
+    } else {
+      setshowAll([...showAll, value]);
+    }
+  };
+
+  const EditSubmit = () => {
+    let Data = {
+      Id: editData.Id,
+      Description: editData.Description,
+      TagName: editData.TagName,
+      TagColour: editData.TagColour,
+    };
+    api
+      .post("/api/CustManage/EditTagMamagement", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          EditBack();
+          // Resubmit();
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  };
+  const EditBack = () => {
+    seteditData({
+      Id: 0,
+      TagName: "",
+      TagColour: "#fff",
+      Description: "",
+    });
+    Resubmit();
+    setstate(0);
+  };
+
+  const ClickSubmit = () => {
+    let tempstatus=0;
+    if (showAll.length > 0) {
+      tempstatus=1;
+    }
+    let Data = {
+      Status: tempstatus,
+      PageSize: parseInt(10),
+      PageNumber: parseInt(1),
+    };
+    api
+      .post("/api/CustManage/GetTagData", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          setDatas({
+            ...stateDatas,
+            PageInfo: {
+              ...stateDatas.PageInfo,
+              pageNumber: 1,
+              totalPages: res.data.totalPages,
+              rowCount: res.data.rowCount,
+            },
+            Datas: [...res.data.data],
+            FilterInfo:{
+              status:tempstatus
+            }
+          });
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  };
+
+  const Resubmit = () => {
+    let Data = {
+      Status: stateDatas.FilterInfo.status,
+      PageSize: parseInt(10),
+      PageNumber: stateDatas.PageInfo.pageNumber,
+    };
+    api
+      .post("/api/CustManage/GetTagData", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          setDatas({
+            ...stateDatas,
+            Datas: [...res.data.data],
+            PageInfo: {
+              ...stateDatas.PageInfo,
+              totalPages: res.data.totalPages,
+              rowCount: res.data.rowCount,
+            },
+          });
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  };
+
+  const Detail=(Data)=>{
+    seteditData({
+      ...editData,
+      Id: Data.id,
+      TagName: Data.tagName,
+      TagColour: Data.tagColour,
+      Description: Data.description,
+    });
+    setstate(1);
+  }
+
+  const StatusChange=(value)=>{
+    if (window.confirm(`Are you sure change ${value.tagName} ?`)) {
+      let Data = {
+        Id: value.id,
+      };
+      api
+        .post("/api/CustManage/SetTagStatus", Data)
+        .then(function (res) {
+          if (res.data.errorCode === 0) {
+            Resubmit();
+          } else {
+            alert(res.data.message ?? "failed to get data.");
+          }
+        })
+        .catch(function (error) {
+          alert(error);
+        });
+    }
+  }
+  if (state === 0) {
+    return (
+      <div className="container-fluid">
+        <h4 className="page-name">Tag Management</h4>
+        <Filter
+          ShowAllCheckBox={ShowAllCheckBox}
+          ShowAll={showAll}
+          ClickSubmit={ClickSubmit}
+        />
+        {stateDatas.Datas === null ? null : (
+          <Result
+            {...stateDatas}
+            Resubmit={Resubmit}
+            Detail={Detail}
+            StatusChange={StatusChange}
+          />
+        )}
+        <div className="row-flex">
+          <div className="button-group">
+            <button
+              className="btn btn-search"
+              type="submit"
+              onClick={Create}
+              style={{
+                marginTop: "20px",
+                marginBottom: "40px",
+                marginRight: "10px",
+              }}
+            >
+              Create
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  } else if (state === 2 || state === 1) {
+    return (
+      <div>
+        <Edit
+          EditData={editData}
+          onChange={EditOnChange}
+          ChangeColor={ChangeColor}
+          Submit={EditSubmit}
+          Back={EditBack}
+        />
+      </div>
+    );
+  }
+};
+
+export default App;
+
+if (process.env.NODE_ENV === "production") {
+  ReactDOM.render(<App />, document.getElementById("content"));
+}

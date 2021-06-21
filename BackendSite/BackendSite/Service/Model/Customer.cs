@@ -263,4 +263,23 @@ namespace BackendSite.Service.Model
         public DateTime? LastBettingTime { get; set; }
         public decimal TotalBonusClaimed { get; set; }
     }
+    public class TagData
+    {
+        public int Id { get; set; }
+        public string TagName { get; set; }
+        public string TagColour { get; set; }
+        public int Status { get; set; }
+        public string Description { get; set; }
+        public string CreateTime { get; set; }
+        public string Creator { get; set; }
+        public string UpdateTime { get; set; }
+        public string Updator { get; set; }
+    }
+    public class GetTagDataResult
+    {
+        public List<TagData> TagDatas { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
 }
