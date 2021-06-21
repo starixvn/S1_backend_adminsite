@@ -18,7 +18,7 @@
 }
 @{
     var i18n = new Dictionary<string, string>();
-    for (var currency = 1; currency <= 51; currency++)
+    for (var currency = 1; currency <= 61; currency++)
     {
         if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
