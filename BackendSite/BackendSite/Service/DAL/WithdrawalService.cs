@@ -148,8 +148,14 @@ namespace BackendSite.Service.DAL
             }
             catch (Exception ex)
             {
+                var list = new Dictionary<string, string>();
+                foreach (var paraName in p.ParameterNames)
+                {
+                    var value = Convert.ToString(p.Get<dynamic>(paraName));
+                    list.Add(paraName, value);
+                }
                 SetWithdrawalLog(withdrawalId, siteId, ex.Message, (int)WithdrawalStatus.Error, Operator);
-                _logger.LogError(ex, "Admin_WithdrawalInfo_Set", p);
+                _logger.LogError(ex, $"SP:Admin_WithdrawalInfo_Set,Para:{Newtonsoft.Json.JsonConvert.SerializeObject(list)}");
             }
 
             return result;
