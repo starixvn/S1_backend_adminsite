@@ -1231,6 +1231,9 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
             }
         }
 
+        // setTag(){
+
+        // }
         render() {
 
             let data = this.props.CustInfoData;
@@ -1283,6 +1286,7 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
                             {(data.status == 1 || data.status == 2 || data.status == 4) && data.agent != null && subFuncKeys.indexOf("ca_acc_close") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"closed")}>Closed</button> : null}
                             {(data.status == 2 || data.status == 4) && data.agent != null && subFuncKeys.indexOf("ca_unlock") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"unlock")}>Unlock</button> : null}
                             <button className="btn btn-primary" onClick={this.setReason.bind(this,"kickout")}>KickOut</button>
+                            {/* <button className="btn btn-primary" onClick={this.setTag()}>Tag</button> */}
                         </div>
                         <div className="flex-wrap">
                             <table className="table table-detail ">
@@ -1584,6 +1588,16 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
                                         <td>{data.iovation ? CustIovationOp[data.iovation] : null}</td>
                                     </tr>
                                     <tr>
+                                        <th scope="row">Tag</th>
+                                        {
+                                            this.props.isEdit.Birthday ? (<td>
+
+                                            </td>):(<td>
+                                                {data.tagName}
+                                            </td>)                                    
+                                        }
+                                    </tr>
+                                    <tr>
                                         <th scope="row">Status</th>
                                         <td>{CustStatusOp[data.status]}</td>
                                     </tr>
@@ -1758,7 +1772,7 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
 
     class CustInfoPanel extends React.Component {
         _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History", "VIP Level", "Promotion Report"];
-        _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false };
+        _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false, Tag: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
         constructor(props) {
             super(props);

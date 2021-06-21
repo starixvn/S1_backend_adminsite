@@ -12,7 +12,7 @@ const dataColumnDefs = () => {
     { dataColumn: "description", columnTitle: "Description" },
     { dataColumn: "updateTime", columnTitle: "UpdateTime" },
     { dataColumn: "updator", columnTitle: "Updator" },
-    { dataColumn: "status", columnTitle: "Status" },
+    { dataColumn: "status", columnTitle: "Enable Promotion" },
     {
       dataColumn: "edit",
       columnTitle: "Edit",

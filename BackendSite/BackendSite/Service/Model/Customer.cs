@@ -83,6 +83,9 @@ namespace BackendSite.Service.Model
         public DateTime? LastDepositTimeRecord { get; set; }
         public DateTime? LastTpBetRecordTimeRecord { get; set; }
         public DateTime? FirstDepositTimeRecord { get; set; }
+        public int TagId { get; set; }
+        public string TagName { get; set; }
+        public int EnableBonus { get; set; }
     }
 
     public class CustInfoDetailForExport

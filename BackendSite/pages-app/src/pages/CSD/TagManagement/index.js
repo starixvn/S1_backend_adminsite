@@ -60,8 +60,15 @@ const App = () => {
       .post("/api/CustManage/EditTagMamagement", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
-          EditBack();
-          // Resubmit();
+          //EditBack();
+          seteditData({
+            Id: 0,
+            TagName: "",
+            TagColour: "#fff",
+            Description: "",
+          });
+          Resubmit();
+          setstate(0);
         } else {
           alert(res.data.message ?? "failed to get data.");
         }
@@ -77,7 +84,7 @@ const App = () => {
       TagColour: "#fff",
       Description: "",
     });
-    Resubmit();
+    //Resubmit();
     setstate(0);
   };
 
