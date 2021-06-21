@@ -2,6 +2,7 @@
 using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System;
@@ -18,11 +19,13 @@ namespace BackendSite.Service.DAL
         private readonly IConfiguration configuration;
         private readonly WalletService walletService;
         private int typePosition = 1000;
+        private readonly ILogger<WithdrawalService> _logger;
 
-        public WithdrawalService(IConfiguration configuration, WalletService walletService)
+        public WithdrawalService(IConfiguration configuration, WalletService walletService, ILogger<WithdrawalService> logger)
         {
             this.configuration = configuration;
             this.walletService = walletService;
+            _logger = logger;
         }
 
         public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite, IEnumerable<int> withdrawalType, long startDate, long endDate, int siteId, string WithdrawalId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount,ref List<string> CurrencyAmount)
@@ -87,6 +90,7 @@ namespace BackendSite.Service.DAL
             custId = 0;
             amount = 0m;
             int result = 0;
+            DynamicParameters p = new DynamicParameters();
             try
             {
                 using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
@@ -100,7 +104,7 @@ namespace BackendSite.Service.DAL
                 }
 
                 string sForStatus = Newtonsoft.Json.JsonConvert.SerializeObject(forStatus);
-                var p = new DynamicParameters(new { WithdrawalId = withdrawalId, SiteId = siteId, Comment = comment, ForStatus = sForStatus, Status = (int)status, WithdrawalInfo = refWithdrawalInfo, WithdrawalType = withdrawalType, RefId = (string)null, Operator = Operator });
+                p = new DynamicParameters(new { WithdrawalId = withdrawalId, SiteId = siteId, Comment = comment, ForStatus = sForStatus, Status = (int)status, WithdrawalInfo = refWithdrawalInfo, WithdrawalType = withdrawalType, RefId = (string)null, Operator = Operator });
                 p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
                 p.Add("Amount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
@@ -145,6 +149,7 @@ namespace BackendSite.Service.DAL
             catch (Exception ex)
             {
                 SetWithdrawalLog(withdrawalId, siteId, ex.Message, (int)WithdrawalStatus.Error, Operator);
+                _logger.LogError(ex, "Admin_WithdrawalInfo_Set", p);
             }
 
             return result;
