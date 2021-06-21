@@ -91,6 +91,7 @@ namespace BackendSite.Service.DAL
             amount = 0m;
             int result = 0;
             DynamicParameters p = new DynamicParameters();
+            Dictionary<string, string> paraLog = new Dictionary<string, string>();
             try
             {
                 using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
@@ -105,6 +106,11 @@ namespace BackendSite.Service.DAL
 
                 string sForStatus = Newtonsoft.Json.JsonConvert.SerializeObject(forStatus);
                 p = new DynamicParameters(new { WithdrawalId = withdrawalId, SiteId = siteId, Comment = comment, ForStatus = sForStatus, Status = (int)status, WithdrawalInfo = refWithdrawalInfo, WithdrawalType = withdrawalType, RefId = (string)null, Operator = Operator });
+                foreach (var paraName in p.ParameterNames)
+                {
+                    var value = Convert.ToString(p.Get<dynamic>(paraName));
+                    paraLog.Add(paraName, value);
+                }
                 p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
                 p.Add("Amount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
@@ -147,15 +153,9 @@ namespace BackendSite.Service.DAL
                 }
             }
             catch (Exception ex)
-            {
-                var list = new Dictionary<string, string>();
-                foreach (var paraName in p.ParameterNames)
-                {
-                    var value = Convert.ToString(p.Get<dynamic>(paraName));
-                    list.Add(paraName, value);
-                }
+            {          
                 SetWithdrawalLog(withdrawalId, siteId, ex.Message, (int)WithdrawalStatus.Error, Operator);
-                _logger.LogError(ex, $"SP:Admin_WithdrawalInfo_Set,Para:{Newtonsoft.Json.JsonConvert.SerializeObject(list)}");
+                _logger.LogError(ex, $"SP:Admin_WithdrawalInfo_Set,Para:{Newtonsoft.Json.JsonConvert.SerializeObject(paraLog)}");
             }
 
             return result;
