@@ -230,6 +230,12 @@ namespace BackendSite.Controllers.Api
             public int PageSize { get; set; }
         }
 
+        public class SetEnableDisableBonusPara 
+        {
+            public int CustId { get; set; }
+            public int EnableBonus { get; set; }
+        }
+
         #endregion
 
         #region Actions
@@ -750,6 +756,25 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        #region CSD > Customer Administration > CustInfo [Enable/Disable Bonus]
+        [HttpPost]
+        public ApiResult SetEnableDisableBonus(SetEnableDisableBonusPara para)
+        {
+            if (custInfoBLL.SetEnableDisableBonus(para.CustId, para.EnableBonus, User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Set Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Set Fail.");
+            }
+        }
+        #endregion
+
         #region CSD > Customer Administration > CustInfo [Kick Out]
 
         /// <summary>
@@ -1162,6 +1187,24 @@ namespace BackendSite.Controllers.Api
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
             }
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<TagData>> GetAllTag()
+        {
+            var apiResult = new ApiResult<IEnumerable<TagData>>();
+            try
+            {
+                apiResult.Data = custInfoBLL.GetAllTag();
+                apiResult.ErrorCode = 0;
+            }
+            catch(Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
+            }
+            return apiResult;
         }
         #endregion
 

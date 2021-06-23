@@ -27,10 +27,22 @@ import * as Loading from '../commJS/Loading.jsx';
     class CustInfoRow extends React.Component {
         render() {
             let data = this.props.dataRow;
+            let tagData = this.props.tagList;
+            let tagList = [];
+            if(data.iTagList.length > 0 &&　tagData !== null){
+                for(let i=0; i < data.iTagList.length;i++){
+                    tagData.forEach(element=>{
+                        if(element.id === data.iTagList[i]){
+                            tagList.push(element.tagName);
+                        }
+                    })
+                }
+            }
             return (
                 <tr key={data.custId}>
                     <td>{data.siteName}</td>
                     <td><a href={"/CustManage/CustInfo?UserName=" + data.userName + "&custId=" + data.custId + "&TransId=" + (this.props.transId || "")} target="_blank">{data.userName}</a></td>
+                    <td>{tagList.toString()}</td>
                     {
                         (data.siteName == "Nova88") ?
                             <td>{data.levelName}</td>
@@ -55,10 +67,11 @@ import * as Loading from '../commJS/Loading.jsx';
 
         render() {
             let data = this.props.searchData && this.props.searchData.data;
+            let tagList = this.props.TagList;
             let custInfoRows = null;
             let TransId = this.props.TransId;
             if (data != null) {
-                custInfoRows = <tbody>{data.map(x => <CustInfoRow transId={TransId} key={x.custId} dataRow={x} />)}</tbody>;
+                custInfoRows = <tbody>{data.map(x => <CustInfoRow transId={TransId} key={x.custId} dataRow={x} tagList={tagList}/>)}</tbody>;
             }
 
             return (
@@ -81,6 +94,7 @@ import * as Loading from '../commJS/Loading.jsx';
                                 <tr>
                                     <th scope="col">Site Name</th>
                                     <th scope="col">User Name</th>
+                                    <th scope="col">Tag</th>
                                     <th scope="col">Vip Level</th>
                                     <th scope="col">Currency</th>
                                     <th scope="col">Agent</th>
@@ -103,7 +117,7 @@ import * as Loading from '../commJS/Loading.jsx';
         _Search = false;
         constructor(props) {
             super(props);
-            this.state = { SiteList: [], selectSite: [], searchData: null, UserName: "", TransId: "", Loading: false, CurrencyList: [], selectCurrency: [] , selectStatus:[]};
+            this.state = { SiteList: [], selectSite: [], searchData: null, UserName: "", TransId: "", Loading: false, CurrencyList: [], selectCurrency: [] , selectStatus:[],TagList:null};
             this.f_trigger_Start = React.createRef();
             this.selectdate_start = React.createRef();
             this.f_trigger_End = React.createRef();
@@ -247,6 +261,24 @@ import * as Loading from '../commJS/Loading.jsx';
                 }.bind(this));
         }
 
+        GetAllTagData(){
+            axios.post('/api/CustManage/GetAllTag')
+                    .then(function (response) {
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({
+                                ...this.state,
+                                TagList:result.data
+                            })
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+        }
+
         buildSelectSite = () => {
             let state = this.state;
             $("#selectSite").multiselect({
@@ -373,6 +405,7 @@ import * as Loading from '../commJS/Loading.jsx';
             this.getSiteList();
             this.getCurrencyList();
             this.getStatusList();
+            this.GetAllTagData();
         }
 
         render() {
@@ -516,7 +549,7 @@ import * as Loading from '../commJS/Loading.jsx';
                             </div>
                         </div>
                     </form>
-                    {this._Search && this.state.searchData != null ? <CustInfoList onExport={this.onExport.bind(this)} searchData={this.state.searchData} TransId={this.state.sTransId} ChangePage={this.onSearch.bind(this)} /> : null}
+                    {this._Search && this.state.searchData != null ? <CustInfoList onExport={this.onExport.bind(this)} searchData={this.state.searchData} TransId={this.state.sTransId} ChangePage={this.onSearch.bind(this)} TagList={this.state.TagList}/> : null}
                     <div style={{ display: 'none' }}>
                         {this.state.ExportParam}
                     </div>

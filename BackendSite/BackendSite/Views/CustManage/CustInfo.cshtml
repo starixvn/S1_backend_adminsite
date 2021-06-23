@@ -11,6 +11,7 @@
     <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
     <link href="~/css/page/CusInfo.css" rel="stylesheet" asp-append-version="true" />
     <link href="~/css/vendor/DateTimePicker/DateTimePicker.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/lib/bootstrap-multiselect/bootstrap-multiselect-modify.css" rel="stylesheet" />
 }
 @{
     ViewData["Title"] = $"{ViewContext.HttpContext.Request.Query["UserName"]}";
@@ -55,6 +56,7 @@
 }
 @section Scripts {
     <script src="~/lib/clipboard.min.js"></script>
+    <script src="~/lib/bootstrap-multiselect/bootstrap-multiselect.js"></script>
     <script type="text/javascript">
         $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
         var subFuncKeys = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(subFuncKeys));
