@@ -82,7 +82,15 @@ namespace BackendSite.Service.BLL
                 currncyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
 
-            return custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, selectstatus, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList()));
+            var CustInfoList = custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, selectstatus, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList())).ToList();
+            if(CustInfoList.Count() > 0)
+            {
+                CustInfoList.ForEach(x =>
+                {
+                    x.ITagList = string.IsNullOrWhiteSpace(x.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(x.TagList);
+                });
+            }
+            return CustInfoList;
         }
 
         public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int? AffId, IEnumerable<int> selectCurrency, string BankAccountNumber, IEnumerable<int> selectStatus)
@@ -130,6 +138,7 @@ namespace BackendSite.Service.BLL
 
                     }
                 }
+                custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>(): JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
             }
             return custInfoDetail;
         }
@@ -433,7 +442,34 @@ namespace BackendSite.Service.BLL
             return custInfoService.SetTagStatus(Id, Operator);
         }
 
+        public IEnumerable<TagData> GetAllTag()
+        {
+            return custInfoService.GetAllTag();
+        }
         #endregion
 
+        public int SetEnableDisableBonus(int custId, int enableBonus, string Operator)
+        {
+            int result = 1;
+
+            using (TransactionScope scope = new TransactionScope())
+            {
+                if(!custInfoService.SetEnableDisableBonus(custId, enableBonus))
+                {
+                    scope.Dispose();
+
+                    return 0;
+                }
+                if (!custInfoService.AddCustNote(custId, enableBonus == 0 ? "Disable Bonus" : "Enable Bonus", Operator))
+                {
+                    scope.Dispose();
+
+                    return 0;
+                }
+
+                scope.Complete();
+            }
+            return result;
+        }
     }
 }

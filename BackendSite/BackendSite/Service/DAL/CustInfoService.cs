@@ -64,7 +64,7 @@ namespace BackendSite.Service.DAL
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.Query<CustInfoDetail>("Admin_CustInfoSearchV4_Get", p, commandType: CommandType.StoredProcedure);
+            var result = conn.Query<CustInfoDetail>("Admin_CustInfoSearchV5_Get", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -427,7 +427,7 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        #region 
+        #region Tag
         public int EditTagMamagement(int id, string tagName, string tagColour, string description, string Operator)
         {
             DynamicParameters props = new DynamicParameters();
@@ -469,6 +469,31 @@ namespace BackendSite.Service.DAL
 
             return _mainDbClient.Execute("Admin_TagStatus_Set", props);
         }
+
+        public IEnumerable<TagData> GetAllTag()
+        {
+            GetTagDataResult SearchResult = new GetTagDataResult();
+            DynamicParameters props = new DynamicParameters();
+            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("PageNumber", 0, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("PageSize", 0);
+            props.Add("Status", 1);
+            return _reportDbClient.Query<TagData>("Admin_Tag_Get", props);
+        }
         #endregion
+
+        public bool SetEnableDisableBonus(int custId, int enableBonus)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_CustInofoSetEnableBonus", new { CustId = custId, EnableBonus = enableBonus }, commandType: CommandType.StoredProcedure) > 0;
+
+            //DynamicParameters props = new DynamicParameters();
+            //props.Add("CustId", custId);
+            //props.Add("EnableBonus", enableBonus);
+
+            //return _mainDbClient.Execute("Admin_CustInofoSetEnableBonus", props);
+        }
     }
 }
