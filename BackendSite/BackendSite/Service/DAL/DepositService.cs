@@ -3,6 +3,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System;
@@ -20,13 +21,17 @@ namespace BackendSite.Service.DAL
         private readonly Common common;
         private readonly WithdrawalLimitService withdrawalLimitService;
         private int payTypePosition = 100;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public DepositService(IConfiguration configuration, WalletService walletService, Common common, WithdrawalLimitService withdrawalLimitService)
+        public DepositService(IConfiguration configuration, WalletService walletService, Common common, WithdrawalLimitService withdrawalLimitService, ILogger<MySqlClient> logger)
         {
             this.configuration = configuration;
             this.walletService = walletService;
             this.common = common;
             this.withdrawalLimitService = withdrawalLimitService;
+            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
+            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
         }
 
         public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, long startDate, long endDate, int siteId, string DepositId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
@@ -393,6 +398,18 @@ namespace BackendSite.Service.DAL
             return conn.Query<DepositTimeList>("Admin_DepositStatusTimeExport_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
         }
+        public int SetDepositRequestAmount(string transId, decimal amount, string Operator)
+        {
+            int depositId = 0;
+            Match m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out depositId);
 
+            DynamicParameters props = new DynamicParameters();
+            props.Add("DepositId", depositId);
+            props.Add("Amount", amount);
+            props.Add("Operator", Operator);
+
+            return _mainDbClient.Execute("Admin_DepositRequestAmount_Set", props);
+        }
     }
 }
