@@ -271,4 +271,10 @@ namespace BackendSite.Service.Model
         public DateTime UpdateTime { get; set; }
         public string CompleteTime { get; set; }      
     }
+    public class DepositRequestAmountPara 
+    {
+        public string TransId { get; set; }
+        public decimal Amount { get; set; }
+    }
+
 }

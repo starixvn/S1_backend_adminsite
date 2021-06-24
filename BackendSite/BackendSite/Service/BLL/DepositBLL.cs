@@ -371,5 +371,10 @@ namespace BackendSite.Service.BLL
             result = string.Format("{0}{1}:{2}:{3}", tempDays, tempHours, tempMinutes, tempSeconds);
             return result;
         }
+
+        public int SetDepositRequestAmount(string transId,decimal amount,string Operator)
+        {
+            return depositService.SetDepositRequestAmount(transId, amount, Operator);
+        }
     }
 }

@@ -176,6 +176,10 @@
           {
             "DisplayKey": "Execute",
             "FuncKey": "f_dp_execute"
+          },
+          {
+            "DisplayKey": "Edit Amount",
+            "FuncKey": "f_dp_editAmount"
           }
         ]
       },

@@ -69,9 +69,7 @@ import DateTimePicker from 'react-datetime';
             this.props.onRejectMultiple();
         }
         render() {
-            // console.log(this.props.searchData);
             let rows = this.props.searchData.data.map((row, idx) => {
-                // console.log(this.props.rejectChecks.list[idx]);
                 let styleblod = (row.flag === 0) ? { fontWeight: 'bold' } : {};
                 let showbankname = (row.depositType === 1) ? row.bankName + " ( " + row.payName + " ) " : (row.depositType === 2) ? row.channelName + " ( " + row.payName + " ) " : (row.depositType === 3) ? row.bankName : null;
                 //銅=>銀=>金=>白金=>水鑽藍=>紅寶石
@@ -204,10 +202,8 @@ import DateTimePicker from 'react-datetime';
             this._clipboard = new ClipboardJS(".js-copy");
 
             this._clipboard.on('success', function (e) {
-                //console.log(e);
             });
             this._clipboard.on('error', function (e) {
-                //console.log(e);
             });
         }
 
@@ -218,7 +214,7 @@ import DateTimePicker from 'react-datetime';
                     //Loading.UnLoading();
                     let result = response.data;
                     if (result.errorCode == 0) {
-                        this.setState({ Data: result.data, selectType: result.data.DepositType, GetData: true, Comment: result.data.comment });
+                        this.setState({ Data: result.data, selectType: result.data.DepositType, GetData: true, Comment: result.data.comment ,EditAmount:false,NewAmount:0});
                     } else {
                         alert(result.message);
                     }
@@ -301,8 +297,46 @@ import DateTimePicker from 'react-datetime';
             }
         }
 
+        editOnChange(e){
+            this.setState({
+                ...this.state,
+                NewAmount:e
+            });
+        }
+        onClickEdit(e){
+            this.setState({
+                ...this.state,
+                EditAmount: true,
+                NewAmount:e
+            });
+        }
+        AmountUpdate(){
+            let data = {TransId:this.props.transId,Amount:parseFloat(this.state.NewAmount)}
+            axios.post('/api/Deposit/SetDepositRequestAmount', data)
+            .then(function (response) {
+                Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    this.onGetData();
+                } else {
+                    alert(result.message);
+                    this.onGetComment();
+                }
+            }.bind(this)).catch(function (error) {
+                Loading.UnLoading();
+                alert(error);
+            }.bind(this));
+        }
+        AmountCancel(){
+            this.setState({
+                ...this.state,
+                EditAmount: false
+            });
+        }
+
         render() {
             let data = this.state.Data;
+            let isedit = this.state.EditAmount;
             let btnGroup = [];
             let PayFrom = [];
             if (data != null) {
@@ -408,7 +442,28 @@ import DateTimePicker from 'react-datetime';
                             </tr>
                             <tr>
                                 <th scope="row">Request Amount</th>
-                                <td>{number_format(data.amount)}<button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.amount}>Copy</button></td>
+                                {
+                                    isedit?(<td>
+                                        <input type="text" defaultValue={data.amount} onChange={(e) => this.editOnChange(e.target.value)} />
+                                        <div className="button-action float-right">
+                                            <button className="btn btn-save" onClick={this.AmountUpdate.bind(this)}>
+                                                <i className="icon-save"></i>
+                                            </button>
+                                            <button className="btn btn-icon-cancel" onClick={this.AmountCancel.bind(this)}>
+                                                <i className="icon-cancel"></i>
+                                            </button>
+                                        </div>
+                                    </td>):
+                                    (<td>
+                                        {number_format(data.amount)}
+                                        {(subFuncKeys.indexOf("f_dp_editAmount") > -1 && data.status == 1)?
+                                        (<button className="btn btn-edit" onClick={this.onClickEdit.bind(this,data.amount)}>
+                                            <i className="icon-edit"></i>
+                                        </button> ):null}
+                                        <button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.amount}>Copy
+                                        </button>
+                                    </td>)
+                                }
                             </tr>
                             <tr>
                                 <th scope="row">Deposit Type</th>
@@ -486,7 +541,6 @@ import DateTimePicker from 'react-datetime';
         }
 
         onSearch(pageNumber) {
-            console.log(pageNumber,"pageNumber");
             this.setState({ IsRefresh: true });
             if (this._myTimer != null) {
                 clearTimeout(this._myTimer);
