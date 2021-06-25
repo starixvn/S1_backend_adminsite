@@ -35,7 +35,6 @@ const Panel = (props) => {
                     let result = response.data;
                     if (result.errorCode == 0) {
                         let taglist = [];
-                        console.log(result.data.iTagList);
                         for (const child of result.data.iTagList) {
                             taglist.push(child);
                         }
@@ -53,7 +52,6 @@ const Panel = (props) => {
     }
     
     const Filter_CheckBox_OnChange = (v, dataColumn) => {
-        console.log(searchData,1)
         let isRemove = NewstateFilter[dataColumn].includes(v);
         let newChecked = isRemove
             ? NewstateFilter[dataColumn].filter((value) => value !== v)
@@ -71,7 +69,6 @@ const Panel = (props) => {
         setNewFilter({
             [dataColumn]: currentTab,
         });
-        console.log(searchData,2)
     };
 
     const Filter_CheckBox_CheckAll = (v, dataColumn, options) => {
@@ -95,6 +92,7 @@ const Panel = (props) => {
                     let result = response.data;
                     if (result.errorCode == 0) {
                         GetCustInfoDetail();
+                        props.onGetCustInfoDetail();
                     } else {
                         alert(result.message);
                     }
@@ -111,6 +109,7 @@ const Panel = (props) => {
                     let result = response.data;
                     if (result.errorCode == 0) {
                         GetCustInfoDetail();
+                        props.onGetCustInfoDetail();
                     } else {
                         alert(result.message);
                     }

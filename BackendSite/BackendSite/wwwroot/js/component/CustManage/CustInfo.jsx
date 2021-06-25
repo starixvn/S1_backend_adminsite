@@ -894,59 +894,6 @@ import Tag from './Tag/index';
 
         componentDidMount() {
             let _clipboard = new ClipboardJS(".js-copy");
-            //this.buildSelectTag();
-            //this.GetAllTagData();
-        }
-
-        componentDidUpdate(){
-            this.buildSelectTag();
-        }
-
-        buildSelectTag = () => {
-            let Data = this.props.CustInfoData;
-            let initdata = [];
-            // if(this.props.TagList.length >0){
-            //     $("#selectTag").multiselect({});
-            //     // $('#selectTag').multiselect('selectAll', false);
-            //     $('#selectTag').multiselect('updateButtonText');
-            // }
-
-            $("#selectTag").multiselect({
-                includeSelectAllOption: false,
-                onChange: function (option, checked, select) {
-                    let opened = $(this).parent().hasClass("open");
-                    if (! opened) {
-                        $('.btn-group').addClass('open');
-                        $("selectTag").attr('aria-expanded', 'true');
-                    } else {
-                        $('.btn-group').removeClass('open');
-                        $("selectTag").attr('aria-expanded', 'false');
-                    }
-                },
-                onInitialized: function () {
-                        // Data.iTagList.forEach(x=>{
-                        //     console.log(x,'iTagList');
-                        //     initdata.push(parseInt(x))
-                        //     this.setState({
-                        //         ...this.state,
-                        //         _newData:
-                        //         {
-                        //             ...this.state._newData,
-                        //             Tag: initdata
-                        //         }
-                        //     })
-                        // })
-                    
-                }
-            });
-            if(Data != null){
-                Data.iTagList.forEach(x=>{
-                    $('#selectTag').multiselect('select', x);
-                })
-            }
-            $('#selectTag').multiselect('updateButtonText');
-            
-            // console.log(initdata);
         }
 
         onKycChange(e) {
@@ -1396,12 +1343,6 @@ import Tag from './Tag/index';
                                         <td>{data.userName}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">
-                                            Vip Level&nbsp;<span class="status status-pending">New</span>
-                                        </th>
-                                        <td>{data.levelName}</td>
-                                    </tr>
-                                    <tr>
                                         <th scope="row">User Level</th>
                                         {
                                             this.props.isEdit.Level ? (
@@ -1686,21 +1627,6 @@ import Tag from './Tag/index';
                                     <tr>
                                         <th scope="row">Tag</th>
                                         <td>{tag}</td>
-                                        {/* {
-                                            this.props.isEdit.Tag ? (<td>
-                                                {tagSelectList}
-                                                
-                                            </td>):(<td>
-                                                {tag}
-                                                {
-                                                    <div className="button-action float-right">
-                                                        <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Tag, "Tag")}>
-                                                            <i className="icon-edit"></i>
-                                                        </button>
-                                                    </div >
-                                                }
-                                            </td>)                                    
-                                        } */}
                                     </tr>
                                     <tr>
                                         <th scope="row">Status</th>
@@ -2218,19 +2144,6 @@ import Tag from './Tag/index';
                             this.setState({ CustInfoData: result.data }, function () {
                                 let _clipboard = new ClipboardJS(".js-copy");
                             });
-                            // if(result.data.iTagList >0){
-                            //     result.data.iTagList.forEach(x=>{
-                            //         tagList.push(x);
-                            //     })
-                            //     this.setState({
-                            //         ...this.state,
-                            //         _newData:
-                            //         {
-                            //             ...this.state._newData,
-                            //             Tag: tagList
-                            //         }
-                            //     })
-                            // }
                             this.GetBonusWalletLog();
                             this.GetRebateInfoLog();
                         } else {
@@ -2480,7 +2393,7 @@ import Tag from './Tag/index';
             } else if (TabName == this._Tabs[18]) {
                 dataContainer = <PromotionReport />
             } else if (TabName == this._Tabs[19]) {
-                dataContainer = <Tag searchData={this.state.CustInfoData}/>
+                dataContainer = <Tag onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)}/>
             }
 
             let authSubKeys = {
