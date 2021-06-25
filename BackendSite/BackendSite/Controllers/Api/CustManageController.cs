@@ -219,6 +219,11 @@ namespace BackendSite.Controllers.Api
         {
             public int Id { get; set; }
         }
+        public class SetCustTagPara
+        {
+            public int CustId { get; set; }
+            public IEnumerable<int> SelectTag { get; set; }
+        }
         #endregion
 
         public class CustPromotionpara
@@ -1203,6 +1208,43 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong.";
                 apiResult.RawMessage = ex.Message;
+            }
+            return apiResult;
+        }
+         
+        [HttpPost]
+        public ApiResult SetCustTag(SetCustTagPara para)
+        {
+            if (custInfoBLL.SetCustTag(para.CustId,para.SelectTag, User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Edit Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+        }
+
+        [HttpPost]
+        public ApiResult<CustInfoDetail> GetCustData(CustInfoReq custInfoReq)
+        {
+            var apiResult = new ApiResult<CustInfoDetail>();
+
+            try
+            {
+                var custInfoDetail = custInfoBLL.GetCustData(custInfoReq.CustId, custInfoReq.UserName);
+                apiResult.Data = custInfoDetail;
+                apiResult.ErrorCode = 0;
+            }
+            catch
+            {
+                apiResult.ErrorCode = 999;
             }
             return apiResult;
         }
