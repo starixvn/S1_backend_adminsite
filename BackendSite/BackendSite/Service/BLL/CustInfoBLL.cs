@@ -446,6 +446,22 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.GetAllTag();
         }
+
+        public int SetCustTag(int custid, IEnumerable<int> SelectTag,string Operator)
+        {
+            return custInfoService.SetCustTag(custid, SelectTag);
+        }
+        public CustInfoDetail GetCustData(int custId, string userName)
+        {
+            var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
+            var custInfoDetail = custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
+            if(custInfoDetail != null)
+            {
+                custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
+            }
+            
+            return custInfoDetail;
+        }
         #endregion
 
         public int SetEnableDisableBonus(int custId, int enableBonus, string Operator)

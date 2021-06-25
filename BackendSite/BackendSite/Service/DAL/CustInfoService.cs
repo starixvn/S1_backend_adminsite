@@ -482,18 +482,27 @@ namespace BackendSite.Service.DAL
             props.Add("Status", 1);
             return _reportDbClient.Query<TagData>("Admin_Tag_Get", props);
         }
+
+        public int SetCustTag(int custid, IEnumerable<int> SelectTag)
+        {
+            List<int> temp = new List<int>();
+            string selectTag = JsonConvert.SerializeObject(temp); 
+            if (SelectTag != null && SelectTag.Any())
+            {
+                selectTag = JsonConvert.SerializeObject(SelectTag);
+            }
+            DynamicParameters props = new DynamicParameters();
+            props.Add("CustId", custid);
+            props.Add("TagList", selectTag);
+
+            return _mainDbClient.Execute("Admin_CustInofoTagList_Set", props);
+        }
         #endregion
 
         public bool SetEnableDisableBonus(int custId, int enableBonus)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_CustInofoSetEnableBonus", new { CustId = custId, EnableBonus = enableBonus }, commandType: CommandType.StoredProcedure) > 0;
-
-            //DynamicParameters props = new DynamicParameters();
-            //props.Add("CustId", custId);
-            //props.Add("EnableBonus", enableBonus);
-
-            //return _mainDbClient.Execute("Admin_CustInofoSetEnableBonus", props);
+            return conn.Execute("Admin_CustInofoEnableBonus_Set", new { CustId = custId, EnableBonus = enableBonus }, commandType: CommandType.StoredProcedure) > 0;
         }
     }
 }
