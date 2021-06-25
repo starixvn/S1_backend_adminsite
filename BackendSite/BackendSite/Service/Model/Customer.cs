@@ -86,7 +86,7 @@ namespace BackendSite.Service.Model
         public DateTime? FirstDepositTimeRecord { get; set; }
         public string TagList { get; set; }
         public List<int> ITagList { get; set; }
-        public int EnableBonus { get; set; }
+        public int EnablePromotion { get; set; }
     }
 
     public class CustInfoDetailForExport

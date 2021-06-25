@@ -499,10 +499,10 @@ namespace BackendSite.Service.DAL
         }
         #endregion
 
-        public bool SetEnableDisableBonus(int custId, int enableBonus)
+        public bool SetEnableDisablePromotion(int custId, int enablePromotion)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_CustInofoEnableBonus_Set", new { CustId = custId, EnableBonus = enableBonus }, commandType: CommandType.StoredProcedure) > 0;
+            return conn.Execute("Admin_CustInofoEnablePromotion_Set", new { CustId = custId, EnablePromotion = enablePromotion }, commandType: CommandType.StoredProcedure) > 0;
         }
     }
 }
