@@ -464,19 +464,19 @@ namespace BackendSite.Service.BLL
         }
         #endregion
 
-        public int SetEnableDisableBonus(int custId, int enableBonus, string Operator)
+        public int SetEnableDisablePromotion(int custId, int enablePromotion, string Operator)
         {
             int result = 1;
 
             using (TransactionScope scope = new TransactionScope())
             {
-                if(!custInfoService.SetEnableDisableBonus(custId, enableBonus))
+                if(!custInfoService.SetEnableDisablePromotion(custId, enablePromotion))
                 {
                     scope.Dispose();
 
                     return 0;
                 }
-                if (!custInfoService.AddCustNote(custId, enableBonus == 0 ? "Disable Bonus" : "Enable Bonus", Operator))
+                if (!custInfoService.AddCustNote(custId, enablePromotion == 0 ? "Disable Promotion" : "Enable Promotion", Operator))
                 {
                     scope.Dispose();
 

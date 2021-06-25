@@ -1038,10 +1038,10 @@ import Tag from './Tag/index';
             }
         }
 
-        onSetEnableDisableBonus(e){
-            if (confirm('Are you sure ' + (e==0 ?'Disable':'Enable') + ' Bonus')) {
+        onSetEnableDisablePromotion(e){
+            if (confirm('Are you sure ' + (e==0 ?'Disable':'Enable') + ' Promotion')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetEnableDisableBonus', { CustId: data.custId ,EnableBonus: e})
+                axios.post('/api/CustManage/SetEnableDisablePromotion', { CustId: data.custId ,EnablePromotion: e})
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1328,8 +1328,8 @@ import Tag from './Tag/index';
                             {(data.status == 1 || data.status == 2 || data.status == 4) && data.agent != null && subFuncKeys.indexOf("ca_acc_close") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"closed")}>Closed</button> : null}
                             {(data.status == 2 || data.status == 4) && data.agent != null && subFuncKeys.indexOf("ca_unlock") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"unlock")}>Unlock</button> : null}
                             <button className="btn btn-primary" onClick={this.setReason.bind(this,"kickout")}>KickOut</button>
-                            {(data.enableBonus == 0) ? <button className="btn btn-primary" onClick={this.onSetEnableDisableBonus.bind(this,1)}>Enable Bonus</button>:null}
-                            {(data.enableBonus == 1) ? <button className="btn btn-primary" onClick={this.onSetEnableDisableBonus.bind(this,0)}>Disable Bonus</button>:null}
+                            {(data.enablePromotion == 0) ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,1)}>Enable Promotion</button>:null}
+                            {(data.enablePromotion == 1) ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,0)}>Disable Promotion</button>:null}
                         </div>
                         <div className="flex-wrap">
                             <table className="table table-detail ">

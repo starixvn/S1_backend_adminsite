@@ -238,7 +238,7 @@ namespace BackendSite.Controllers.Api
         public class SetEnableDisableBonusPara 
         {
             public int CustId { get; set; }
-            public int EnableBonus { get; set; }
+            public int EnablePromotion { get; set; }
         }
 
         #endregion
@@ -763,9 +763,9 @@ namespace BackendSite.Controllers.Api
 
         #region CSD > Customer Administration > CustInfo [Enable/Disable Bonus]
         [HttpPost]
-        public ApiResult SetEnableDisableBonus(SetEnableDisableBonusPara para)
+        public ApiResult SetEnableDisablePromotion(SetEnableDisableBonusPara para)
         {
-            if (custInfoBLL.SetEnableDisableBonus(para.CustId, para.EnableBonus, User.Identity.Name) > 0)
+            if (custInfoBLL.SetEnableDisablePromotion(para.CustId, para.EnablePromotion, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
