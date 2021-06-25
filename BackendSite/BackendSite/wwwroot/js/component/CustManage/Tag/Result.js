@@ -1,7 +1,6 @@
 
 
 const Result = (props) => {
-    console.log(props);
     let rows =
         props.Data.length === 0
             ? null
