@@ -420,7 +420,12 @@ namespace BackendSite.Controllers.Api
         [HttpPost] 
         public ApiResult SetDepositRequestAmount(DepositRequestAmountPara para)
         {
-            if(depositBLL.SetDepositRequestAmount(para.TransId,para.Amount, User.Identity.Name) >0)
+            var depositRequest = depositBLL.GetDepositRequest(para.TransId);
+            if(depositRequest == null)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+            }
+            if (depositBLL.SetDepositRequestAmount(para.TransId,para.Amount, User.Identity.Name, depositRequest.CustId) >0)
             {
                 return new ApiResult
                 {
