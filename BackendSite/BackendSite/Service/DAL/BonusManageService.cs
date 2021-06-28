@@ -50,8 +50,9 @@ namespace BackendSite.Service.DAL
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 int? SiteId = null;
-                string SpName = "Admin_PromotionList_Get";
-                return conn.Query<PromotionInfo>(SpName, new { BonusCode, SiteId, SiteIdFilter, PermissionSiteIds, PromotionTypeFilter, Status = filterPara.Status }, commandType: CommandType.StoredProcedure);
+                string SpName = "Admin_PromotionListV2_Get";
+                return conn.Query<PromotionInfo>(SpName, new { BonusCode, SiteId, SiteIdFilter, PermissionSiteIds, PromotionTypeFilter, Status = filterPara.Status
+                    , StartDate =  filterPara.StartDate,EndDate = filterPara.EndDate}, commandType: CommandType.StoredProcedure);
             }
         }
 
