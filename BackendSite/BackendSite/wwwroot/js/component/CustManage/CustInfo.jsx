@@ -18,6 +18,7 @@ import PromotionReport from './PromotionReport/index';
 import SetCustStatusNote from './SetCustStatusNote/PopboxContentSetNote.js';
 import { DepositInfoPagination } from './CustInfo_DepositInfoPagination.jsx';
 import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
+import Tag from './Tag/index';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -893,59 +894,6 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
 
         componentDidMount() {
             let _clipboard = new ClipboardJS(".js-copy");
-            //this.buildSelectTag();
-            //this.GetAllTagData();
-        }
-
-        componentDidUpdate(){
-            this.buildSelectTag();
-        }
-
-        buildSelectTag = () => {
-            let Data = this.props.CustInfoData;
-            let initdata = [];
-            // if(this.props.TagList.length >0){
-            //     $("#selectTag").multiselect({});
-            //     // $('#selectTag').multiselect('selectAll', false);
-            //     $('#selectTag').multiselect('updateButtonText');
-            // }
-
-            $("#selectTag").multiselect({
-                includeSelectAllOption: false,
-                onChange: function (option, checked, select) {
-                    let opened = $(this).parent().hasClass("open");
-                    if (! opened) {
-                        $('.btn-group').addClass('open');
-                        $("selectTag").attr('aria-expanded', 'true');
-                    } else {
-                        $('.btn-group').removeClass('open');
-                        $("selectTag").attr('aria-expanded', 'false');
-                    }
-                },
-                onInitialized: function () {
-                        // Data.iTagList.forEach(x=>{
-                        //     console.log(x,'iTagList');
-                        //     initdata.push(parseInt(x))
-                        //     this.setState({
-                        //         ...this.state,
-                        //         _newData:
-                        //         {
-                        //             ...this.state._newData,
-                        //             Tag: initdata
-                        //         }
-                        //     })
-                        // })
-                    
-                }
-            });
-            if(Data != null){
-                Data.iTagList.forEach(x=>{
-                    $('#selectTag').multiselect('select', x);
-                })
-            }
-            $('#selectTag').multiselect('updateButtonText');
-            
-            // console.log(initdata);
         }
 
         onKycChange(e) {
@@ -1090,10 +1038,10 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
             }
         }
 
-        onSetEnableDisableBonus(e){
-            if (confirm('Are you sure ' + (e==0 ?'Disable':'Enable') + ' Bonus')) {
+        onSetEnableDisablePromotion(e){
+            if (confirm('Are you sure ' + (e==0 ?'Disable':'Enable') + ' Promotion')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetEnableDisableBonus', { CustId: data.custId ,EnableBonus: e})
+                axios.post('/api/CustManage/SetEnableDisablePromotion', { CustId: data.custId ,EnablePromotion: e})
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1380,8 +1328,8 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
                             {(data.status == 1 || data.status == 2 || data.status == 4) && data.agent != null && subFuncKeys.indexOf("ca_acc_close") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"closed")}>Closed</button> : null}
                             {(data.status == 2 || data.status == 4) && data.agent != null && subFuncKeys.indexOf("ca_unlock") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"unlock")}>Unlock</button> : null}
                             <button className="btn btn-primary" onClick={this.setReason.bind(this,"kickout")}>KickOut</button>
-                            {(data.enableBonus == 0) ? <button className="btn btn-primary" onClick={this.onSetEnableDisableBonus.bind(this,1)}>Enable Bonus</button>:null}
-                            {(data.enableBonus == 1) ? <button className="btn btn-primary" onClick={this.onSetEnableDisableBonus.bind(this,0)}>Disable Bonus</button>:null}
+                            {(data.enablePromotion == 0) ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,1)}>Enable Promotion</button>:null}
+                            {(data.enablePromotion == 1) ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,0)}>Disable Promotion</button>:null}
                         </div>
                         <div className="flex-wrap">
                             <table className="table table-detail ">
@@ -1393,12 +1341,6 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
                                     <tr>
                                         <th scope="row">User Name</th>
                                         <td>{data.userName}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">
-                                            Vip Level&nbsp;<span class="status status-pending">New</span>
-                                        </th>
-                                        <td>{data.levelName}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">User Level</th>
@@ -1685,21 +1627,6 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
                                     <tr>
                                         <th scope="row">Tag</th>
                                         <td>{tag}</td>
-                                        {/* {
-                                            this.props.isEdit.Tag ? (<td>
-                                                {tagSelectList}
-                                                
-                                            </td>):(<td>
-                                                {tag}
-                                                {
-                                                    <div className="button-action float-right">
-                                                        <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Tag, "Tag")}>
-                                                            <i className="icon-edit"></i>
-                                                        </button>
-                                                    </div >
-                                                }
-                                            </td>)                                    
-                                        } */}
                                     </tr>
                                     <tr>
                                         <th scope="row">Status</th>
@@ -1874,7 +1801,7 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History", "VIP Level", "Promotion Report"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History", "VIP Level", "Promotion Report","Tag"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false, Tag: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null ,Tag:null};
         constructor(props) {
@@ -2217,19 +2144,6 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
                             this.setState({ CustInfoData: result.data }, function () {
                                 let _clipboard = new ClipboardJS(".js-copy");
                             });
-                            // if(result.data.iTagList >0){
-                            //     result.data.iTagList.forEach(x=>{
-                            //         tagList.push(x);
-                            //     })
-                            //     this.setState({
-                            //         ...this.state,
-                            //         _newData:
-                            //         {
-                            //             ...this.state._newData,
-                            //             Tag: tagList
-                            //         }
-                            //     })
-                            // }
                             this.GetBonusWalletLog();
                             this.GetRebateInfoLog();
                         } else {
@@ -2478,6 +2392,8 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
                 dataContainer = <VipLevel />
             } else if (TabName == this._Tabs[18]) {
                 dataContainer = <PromotionReport />
+            } else if (TabName == this._Tabs[19]) {
+                dataContainer = <Tag onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)}/>
             }
 
             let authSubKeys = {

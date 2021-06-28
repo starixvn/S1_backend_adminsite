@@ -446,21 +446,37 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.GetAllTag();
         }
+
+        public int SetCustTag(int custid, IEnumerable<int> SelectTag,string Operator)
+        {
+            return custInfoService.SetCustTag(custid, SelectTag);
+        }
+        public CustInfoDetail GetCustData(int custId, string userName)
+        {
+            var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
+            var custInfoDetail = custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
+            if(custInfoDetail != null)
+            {
+                custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
+            }
+            
+            return custInfoDetail;
+        }
         #endregion
 
-        public int SetEnableDisableBonus(int custId, int enableBonus, string Operator)
+        public int SetEnableDisablePromotion(int custId, int enablePromotion, string Operator)
         {
             int result = 1;
 
             using (TransactionScope scope = new TransactionScope())
             {
-                if(!custInfoService.SetEnableDisableBonus(custId, enableBonus))
+                if(!custInfoService.SetEnableDisablePromotion(custId, enablePromotion))
                 {
                     scope.Dispose();
 
                     return 0;
                 }
-                if (!custInfoService.AddCustNote(custId, enableBonus == 0 ? "Disable Bonus" : "Enable Bonus", Operator))
+                if (!custInfoService.AddCustNote(custId, enablePromotion == 0 ? "Disable Promotion" : "Enable Promotion", Operator))
                 {
                     scope.Dispose();
 
