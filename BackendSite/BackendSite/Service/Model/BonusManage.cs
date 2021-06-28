@@ -80,7 +80,9 @@ namespace BackendSite.Service.Model
     {
         public string SiteidFilter { get; set; }
         public string PromotionTypeFilter { get; set; }
-        public bool Status { get; set; }
+        public int Status { get; set; }
+        public long StartDate { get; set; }
+        public long EndDate { get; set; }
     }
     public class Filter
     {
@@ -91,8 +93,10 @@ namespace BackendSite.Service.Model
     {
         public Filter[] SiteidFilter { get; set; }
         public Filter[] PromotionTypeFilter { get; set; }
-        public bool Status { get; set; }
+        public int Status { get; set; }
         public int[] SiteArray { get; set; }
+        public long StartDate { get; set; }
+        public long EndDate { get; set; }
     }
     public class BonusImportPara
     {

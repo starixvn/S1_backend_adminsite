@@ -6,6 +6,11 @@ import PopBoxContentforGen from "./Component/PopBoxContentforGen";
 import { initPromotionType } from "./defCols";
 import CheckBox from "./Component/Checkbox";
 import MultiSelect from "react-multi-select-component";
+import SelectBox from "./Component/SelectBox";
+import { initStatusType } from "./defCols";
+// import DateTimePickerElem from "./Component/DateTimePicker";
+import DateTimePicker from "react-datetime";
+
 const SpecialItemType = {
 	actionBtn: "actionBtn",
 	statusBtn: "statusBtn",
@@ -109,6 +114,14 @@ const titleData = [
 		body: { SpecialItem: SpecialItemType.actionBtn2 }
 	}
 ];
+const DateTimePickerElem = (props) => {
+	return (
+	  <div className="input-item">
+		<span className="label">{props.columnTitle}</span>
+		<DateTimePicker {...props.dateTimePickerProps} />
+	  </div>
+	);
+  };
 
 export default ({
 	ClickCreateBonus,
@@ -128,7 +141,8 @@ export default ({
 	StatusCheck,
 	SetSitnemaFilter,
 	SetPromotionTypeFilter,
-	StateCheckBox
+	StateCheckBox,
+	FilterOnchange
 }) => {
 	let headerRows = [];
 	titleData.forEach((e, i) => {
@@ -179,16 +193,16 @@ export default ({
 		return <tr key={`body-${d_idx}`}>{arr}</tr>;
 	});
 
-	let siteListOptions = "";
+	// let siteListOptions = "";
 
-	if (StateFilter.SelectSite) {
-		siteListOptions = StateFilter.SelectSite.map(i => {
-			return {
-				value: 1,
-				displayText: "Show ALL"
-			};
-		});
-	};
+	// if (StateFilter.SelectSite) {
+	// 	siteListOptions = StateFilter.SelectSite.map(i => {
+	// 		return {
+	// 			value: 1,
+	// 			displayText: "Show ALL"
+	// 		};
+	// 	});
+	// };
 
 	return (
 		<div className="container-fluid">
@@ -217,13 +231,52 @@ export default ({
 						labelledBy={"Select"}
 					/>
 					<pre>       </pre>
-					<CheckBox
+					{/* <CheckBox
 						Options={siteListOptions}
 						Title=""
 						OnChange={StateCheckBox}
 						dataColumn="checkStatus"
 						Selected={StatusCheck}
 						mainKey={null}
+					/> */}
+					<SelectBox
+						Title="Status"
+						Options={initStatusType}
+						HandleChange={FilterOnchange}
+						dataColumn="Status"
+						SelectedValue={StateFilter.Status}
+					/>
+					<DateTimePickerElem
+						columnTitle="From"
+						dateTimePickerProps={{
+							value: StateFilter.StartDate,
+							defaultValue: StateFilter.StartDate,
+							timeFormat: false,
+							onChange: e => {
+								try {
+									FilterOnchange(
+										e,
+										"StartDate"
+									);
+								} catch (ex) { }
+							}
+						}}
+					/>
+					<DateTimePickerElem
+						columnTitle="To"
+						dateTimePickerProps={{
+							value: StateFilter.EndDate,
+							defaultValue: StateFilter.EndDate,
+							timeFormat: false,
+							onChange: e => {
+								try {
+									FilterOnchange(
+										e,
+										"EndDate"
+									);
+								} catch (ex) { }
+							}
+						}}
 					/>
 					<button
 						className="btn btn-search"
