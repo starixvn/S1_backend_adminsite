@@ -44,11 +44,11 @@ namespace BackendSite.Service.DAL
 
             return conn.Execute("Admin_Banner_Set", p, commandType: CommandType.StoredProcedure);
         }
-        public IEnumerable<BannerInfoList> GetBannerList(int SiteId,int BannerTypeId)
+        public IEnumerable<BannerInfoList> GetBannerList(int SiteId,int BannerTypeId,int Status)
         {
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
-                return conn.Query<BannerInfoList>("Admin_BannerListV2_Get", new { SiteId, BannerTypeId }, commandType: CommandType.StoredProcedure);
+                return conn.Query<BannerInfoList>("Admin_BannerListV3_Get", new { SiteId, BannerTypeId, Status }, commandType: CommandType.StoredProcedure);
             }
         }
         public BannerInfo GetBanner(int SiteId, string BannerName)

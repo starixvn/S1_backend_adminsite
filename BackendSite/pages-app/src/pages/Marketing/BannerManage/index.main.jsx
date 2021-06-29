@@ -1,6 +1,6 @@
 import React from "react";
 import moment from "moment-timezone";
-import { defBannerType, defActionModeType, defShowStatusType } from "./defCols";
+import { defBannerType, defActionModeType, defShowStatusType,defStatusType } from "./defCols";
 const SpecialItemType = {
 	actionBtn: "actionBtn",
 	statusBtn: "statusBtn"
@@ -108,7 +108,8 @@ export default ({
 	setSite,
 	bannerList,
 	FilterOnchange,
-	BannerType
+	BannerType,
+	Status
 }) => {
 	let siteRows = siteList.map((_data) => {
 		return (
@@ -154,19 +155,31 @@ export default ({
 	return (
 		<div className="container-fluid">
 			<h4 className="page-name">Banner Management</h4>
-			<div className="form-group">
+			<div className="filter">
 				<label className="col-form-label d-block">Available Sites</label>
 				{siteRows}
-				<DropDownBox
-				columnTitle="Banner Type"
-				options={Object.keys(defBannerType).map((key) => {
-					return { value: key, displayText: defBannerType[key] };
-				})}
-				hasAll={true}
-				selectedValue={BannerType}
-				dataColumn="BannerType"
-				onChange={FilterOnchange}
-			/>
+				<div className="row-flex">
+					<DropDownBox
+					columnTitle="Banner Type"
+					options={Object.keys(defBannerType).map((key) => {
+						return { value: key, displayText: defBannerType[key] };
+					})}
+					hasAll={true}
+					selectedValue={BannerType}
+					dataColumn="BannerType"
+					onChange={FilterOnchange}
+					/>
+					<DropDownBox
+					columnTitle="Status"
+					options={Object.keys(defStatusType).map((key) => {
+						return { value: key, displayText: defStatusType[key] };
+					})}
+					hasAll={true}
+					selectedValue={Status}
+					dataColumn="Status"
+					onChange={FilterOnchange}
+					/>
+				</div>
 			</div>
 			{
 				setSite != "" ?
