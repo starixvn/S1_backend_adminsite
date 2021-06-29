@@ -52,8 +52,12 @@ const App = () => {
 	}, []);
 
 	const FilterOnchange=(v,dataColumn)=>{
-		console.log(v,dataColumn);
-		setBannerType(v);
+		if(dataColumn == "BannerType"){
+			setBannerType(v);
+		}
+		else{
+			setStatus(v);
+		}
 		if (!processing && Sitid !== 0) {
 			if (isMountedRef.current) {
 				setProcessing(true);
@@ -79,13 +83,6 @@ const App = () => {
 					})
 				};
 			}
-			// let param = {
-			// 	Url: "BannerManage/GetBannerList",
-			// 	Data: qs.stringify({
-			// 		SiteId: Sitid,
-			// 		BannerTypeId:parseInt(v)
-			// 	})
-			// };
 			let site = state.siteList.find(s => s.siteId === Sitid);
 			WebAPI.PostData(param).then(
 				res => {
@@ -125,7 +122,8 @@ const App = () => {
 				Url: "BannerManage/GetBannerList",
 				Data: qs.stringify({
 					SiteId: siteId,
-					BannerTypeId:BannerType
+					BannerTypeId:BannerType,
+					Status:Status
 				})
 			};
 			let site = state.siteList.find(s => s.siteId === siteId);
