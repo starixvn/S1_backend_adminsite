@@ -30,8 +30,10 @@ namespace BackendSite.Service.BLL
                 {
                     SiteidFilter = Select.SiteidFilter != null ? JsonConvert.DeserializeObject<Filter[]>(Select.SiteidFilter) : null,
                     PromotionTypeFilter = Select.PromotionTypeFilter != null ? JsonConvert.DeserializeObject<Filter[]>(Select.PromotionTypeFilter) : null,
-                    Status = Select != null ? Select.Status : false,
-                    SiteArray = siteArray
+                    Status = Select.Status,
+                    SiteArray = siteArray,
+                    StartDate = Select.StartDate,
+                    EndDate = Select.EndDate
                 };
             }
 

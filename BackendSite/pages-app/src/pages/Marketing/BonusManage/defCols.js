@@ -103,4 +103,10 @@ export const defPromotionAction = {
 	}
 };
 
+export const initStatusType = [
+	{ value: 0, displayText: "All" },
+	{ value: 1, displayText: "Active" },
+	{ value: 2, displayText: "Inactive" }
+];
+
 export const initPromotionAction = () => Object.values(defPromotionAction);

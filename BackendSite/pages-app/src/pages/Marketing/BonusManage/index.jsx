@@ -17,18 +17,31 @@ import { initPromotionType } from "./defCols";
 const App = () => {
 	const [state, dispatch] = useReducer(reducer, initState);
 	const [processing, setProcessing] = useState(false);
-	const [stateFilter, setFilter] = useState({
-		'SelectSite': ['checkStatus']
-	});
+	// const [stateFilter, setFilter] = useState({
+	// 	'SelectSite': ['checkStatus']
+	// });
 	const [sitnemaFilter, setSitnameFilter] = useState([]);
 	const [promotionTypeFilter, setPromotionTypeFilter] = useState([]);
 	const [statusCheck, setStatusCheck] = useState([]);
+	const [stateFilter, setFilter] = useState({
+		Status: 0,
+		StartDate: moment().add(-10, "days").format("l"),
+		EndDate: moment().format("l")
+	  });
+
 
 	const isMountedRef = useRef(null);
 	useEffect(() => {
 		isMountedRef.current = true;
 		return () => (isMountedRef.current = false);
 	});
+
+	const FilterOnchange = (value, dataColumn)=>{
+		setFilter({
+			...stateFilter,
+			[dataColumn]:value
+		});
+	}
 
 	const GetInitSelectedSiteName = (props) => {
 		let headerRows = [];
@@ -55,7 +68,6 @@ const App = () => {
 		let param1 = {
 			Url: "Common/AdminUserSiteList"
 		};
-		let aaa = [];
 		WebAPI.PostData(param1).then(x => {
 			if (isMountedRef.current) {
 				if (x.data.errorCode === 0) {
@@ -68,7 +80,9 @@ const App = () => {
 						Data: qs.stringify({
 							SiteidFilter: JSON.stringify(initSitnemaFilter),
 							PromotionTypeFilter: JSON.stringify(intPromotionTypeFilter),
-							Status: statusCheck
+							Status: 0,
+							StartDate: moment(stateFilter.StartDate).unix(),
+        					EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
 						})
 					};
 					WebAPI.PostData(param).then(res => {
@@ -218,7 +232,9 @@ const App = () => {
 			let _select = {
 				SiteidFilter: JSON.stringify(sitnemaFilter),
 				PromotionTypeFilter: JSON.stringify(promotionTypeFilter),
-				Status: statusCheck.length > 0
+				Status: parseInt(stateFilter.Status,10),
+				StartDate: moment(stateFilter.StartDate).unix(),
+        		EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
 			};
 			let param = {
 				Url: "BonusManage/SetPromotion",
@@ -554,7 +570,9 @@ const App = () => {
 			Data: qs.stringify({
 				SiteidFilter: JSON.stringify(sitnemaFilter),
 				PromotionTypeFilter: JSON.stringify(promotionTypeFilter),
-				Status: statusCheck.length > 0
+				Status: parseInt(stateFilter.Status,10),
+				StartDate: moment(stateFilter.StartDate).unix(),
+        		EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
 			})
 		};
 		WebAPI.PostData(param).then(res => {
@@ -602,6 +620,7 @@ const App = () => {
 				SetPromotionTypeFilter={setPromotionTypeFilter}
 				StateCheckBox={StateCheckBox}
 				IsOpenGen={state.popBoxIsOpenGen}
+				FilterOnchange={FilterOnchange}
 			/>
 		);
 	} else if (state.panelType === defPanelType.SList) {

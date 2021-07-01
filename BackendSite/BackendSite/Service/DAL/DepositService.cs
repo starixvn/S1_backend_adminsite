@@ -398,7 +398,7 @@ namespace BackendSite.Service.DAL
             return conn.Query<DepositTimeList>("Admin_DepositStatusTimeExport_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
         }
-        public int SetDepositRequestAmount(string transId, decimal amount, string Operator)
+        public bool SetDepositRequestAmount(string transId, decimal amount, string Operator)
         {
             int depositId = 0;
             Match m = Regex.Match(transId, @"\d+");
@@ -409,7 +409,10 @@ namespace BackendSite.Service.DAL
             props.Add("Amount", amount);
             props.Add("Operator", Operator);
 
-            return _mainDbClient.Execute("Admin_DepositRequestAmount_Set", props);
+            //return _mainDbClient.Execute("Admin_DepositRequestAmount_Set", props);
+
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_DepositRequestAmount_Set", props, commandType: CommandType.StoredProcedure) > 0;
         }
     }
 }

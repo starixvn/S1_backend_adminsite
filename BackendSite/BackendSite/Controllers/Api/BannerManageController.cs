@@ -59,12 +59,12 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         [HttpPost]
-        public ApiResult<IEnumerable<BannerInfoList>> GetBannerList([FromForm] int SiteId, [FromForm] int BannerTypeId)
+        public ApiResult<IEnumerable<BannerInfoList>> GetBannerList([FromForm] int SiteId, [FromForm] int BannerTypeId, [FromForm] int Status)
         {
             var apiResult = new ApiResult<IEnumerable<BannerInfoList>>();
             try
             {
-                apiResult.Data = bannerManageBLL.GetBannerList(SiteId, BannerTypeId);
+                apiResult.Data = bannerManageBLL.GetBannerList(SiteId, BannerTypeId, Status);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
