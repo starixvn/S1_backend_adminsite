@@ -3,6 +3,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -19,13 +20,17 @@ namespace BackendSite.Service.DAL
         private readonly Common common;
         private readonly WalletService walletService;
         private readonly WithdrawalLimitService withdrawalLimitService;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public AdjustmentService(IConfiguration configuration, Common common, WalletService walletService, WithdrawalLimitService withdrawalLimitService)
+        public AdjustmentService(IConfiguration configuration, Common common, WalletService walletService, WithdrawalLimitService withdrawalLimitService, ILogger<MySqlClient> logger)
         {
             this.configuration = configuration;
             this.common = common;
             this.walletService = walletService;
             this.withdrawalLimitService = withdrawalLimitService;
+            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
+            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
         }
         public int PaymentAdjustment(AdjustmentInfo adjustmentInfo, string Operator, out string transId)
         {
@@ -303,6 +308,11 @@ namespace BackendSite.Service.DAL
 
             }
             return result;
+        }
+
+        public AdjustmentLimtData GetAdjustmentData(int SiteId, int CurrencyId)
+        {
+            return _reportDbClient.Query<AdjustmentLimtData>("Admin_AdjustmentLimitInfo_Get", new DynamicParameters(new { SiteId = SiteId, CurrencyId= CurrencyId })).FirstOrDefault();
         }
     }
 }

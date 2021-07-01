@@ -123,4 +123,17 @@ namespace BackendSite.Service.Model
         public int CategoryId { get; set; }
         public String CategoryName { get; set; }
     }
+
+    #region Adjustment
+    public class AdjustmentLimtData
+    {
+        public int SiteId { get; set; }
+
+        public int CurrencyId { get; set; }
+
+        public double AdjustmentMax { get; set; }
+        public DateTime UpdateTime { get; set; }
+        public string UpdateOperator { get; set; }
+    }
+    #endregion
 }

@@ -93,5 +93,9 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetTPCategoryList();
         }
+        public AdjustmentLimtData GetAdjustmentData(int SiteId, int CurrencyId)
+        {
+            return adjustmentService.GetAdjustmentData(SiteId, CurrencyId);
+        }
     }
 }

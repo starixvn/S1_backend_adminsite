@@ -318,6 +318,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "AdjustmentLimitManagement",
+        "Title": "AdjustmentLimit Management",
+        "FuncKey": "Finance/AdjustmentLimitManagement",
+        "Controller": "Finance",
+        "Action": "AdjustmentLimitManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

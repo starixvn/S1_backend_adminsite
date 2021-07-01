@@ -206,7 +206,7 @@ namespace BackendSite.Controllers.Api
             int TotalPages = 0;
             int RowCount = 0;
             List<string> CurrencyAmount = new List<string>();
-            apiListResult.Data = paymentBLL.GetRebateLog(SelectSite, UserName, RebateType, StartDate, EndDate, PageSize, CurrencyId, BaseCurrencyId, RebateCategoriesId, ref PageNumber, out TotalPages, out RowCount,ref CurrencyAmount);
+            apiListResult.Data = paymentBLL.GetRebateLog(SelectSite, UserName, RebateType, StartDate, EndDate, PageSize, CurrencyId, BaseCurrencyId, RebateCategoriesId, ref PageNumber, out TotalPages, out RowCount, ref CurrencyAmount);
             apiListResult.PageNumber = PageNumber;
             apiListResult.RowCount = RowCount;
             apiListResult.TotalPages = TotalPages;
@@ -244,7 +244,7 @@ namespace BackendSite.Controllers.Api
             var stream = excelBLL.Export(ExportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
-        
+
 
         public ApiResult<IEnumerable<PromotionCategory>> GetPromotionCategory()
         {
@@ -574,7 +574,7 @@ namespace BackendSite.Controllers.Api
             {
                 List<string> CurrencyAmount = new List<string>();
                 var SearchResult = paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, para.StartDate, para.EndDate, para.User, para.PageSize, para.PageNumber,
-                    para.CategoryId,para.BaseCurrencyId,para.RebateCategoriesId, ref CurrencyAmount);
+                    para.CategoryId, para.BaseCurrencyId, para.RebateCategoriesId, ref CurrencyAmount);
                 apiResult.Data = SearchResult.VipRebateInfoList;
                 apiResult.PageNumber = SearchResult.PageNumber;
                 apiResult.TotalPages = SearchResult.TotalPages;
@@ -582,7 +582,7 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = 0;
                 apiResult.CurrencyAmount = CurrencyAmount;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
@@ -629,7 +629,7 @@ namespace BackendSite.Controllers.Api
             public int CategoryId { get; set; }
         }
         [HttpPost]
-        public IActionResult GetVipRebateInfoListExport(string SelectSite, int Currency, long StartDate, long EndDate, string User, int CategoryId,int BaseCurrencyId,int RebateCategoriesId)
+        public IActionResult GetVipRebateInfoListExport(string SelectSite, int Currency, long StartDate, long EndDate, string User, int CategoryId, int BaseCurrencyId, int RebateCategoriesId)
         {
             var SearchResult = paymentBLL.GetVipRebateInfoListExport(SelectSite, Currency, StartDate, EndDate, User, CategoryId, BaseCurrencyId, RebateCategoriesId);
             var stream = excelBLL.Export(SearchResult.VipRebateInfoList);
@@ -642,5 +642,22 @@ namespace BackendSite.Controllers.Api
             apiResult.Data = paymentBLL.GetTPCategoryList();
             return apiResult;
         }
+
+        #region Adjustment Limit
+        public class GetAdjustmentPara
+        {
+            public int SiteId { get; set; }
+
+            public int CurrencyId { get; set; }
+        }
+
+        [HttpPost]
+        public ApiResult<AdjustmentLimtData> GetAdjustmentData(GetAdjustmentPara para) 
+        {
+            var apiResult = new ApiResult<AdjustmentLimtData>();
+            apiResult.Data = paymentBLL.GetAdjustmentData(para.SiteId, para.CurrencyId);
+            return apiResult;
+        }
+        #endregion
     }
 }
