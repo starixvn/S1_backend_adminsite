@@ -41,7 +41,6 @@ const App = () => {
 			...stateFilter,
 			[dataColumn]:value
 		});
-		//console.log(value, dataColumn)
 	}
 
 	const GetInitSelectedSiteName = (props) => {
@@ -233,7 +232,9 @@ const App = () => {
 			let _select = {
 				SiteidFilter: JSON.stringify(sitnemaFilter),
 				PromotionTypeFilter: JSON.stringify(promotionTypeFilter),
-				Status: statusCheck.length > 0
+				Status: parseInt(stateFilter.Status,10),
+				StartDate: moment(stateFilter.StartDate).unix(),
+        		EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
 			};
 			let param = {
 				Url: "BonusManage/SetPromotion",
