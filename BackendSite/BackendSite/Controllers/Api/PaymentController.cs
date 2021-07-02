@@ -27,8 +27,8 @@ namespace BackendSite.Controllers.Api
         private readonly int mainWalletType;
         private readonly Common common;
         private readonly ExcelBLL excelBLL;
-
-        public PaymentController(IConfiguration configuration, PaymentBLL paymentBLL, CustInfoBLL custInfoBLL, TpBLL tpBLL, AuthorizeBLL authorizeBLL, Common common, ExcelBLL excelBLL)
+        private readonly SelLangBLL selLangBLL;
+        public PaymentController(IConfiguration configuration, PaymentBLL paymentBLL, CustInfoBLL custInfoBLL, TpBLL tpBLL, AuthorizeBLL authorizeBLL, Common common, ExcelBLL excelBLL, SelLangBLL selLangBLL)
         {
             this.paymentBLL = paymentBLL;
             this.custInfoBLL = custInfoBLL;
@@ -37,6 +37,7 @@ namespace BackendSite.Controllers.Api
             mainWalletType = configuration.GetValue<int>("MainWalletType");
             this.common = common;
             this.excelBLL = excelBLL;
+            this.selLangBLL = selLangBLL;
         }
         public class PaymentAdjustmentReq
         {
@@ -656,6 +657,32 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<AdjustmentLimtData>();
             apiResult.Data = paymentBLL.GetAdjustmentData(para.SiteId, para.CurrencyId);
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        public class AddAdjustmentLimitPara
+        {
+            public int SiteId { get; set; }
+
+            public int CurrencyId { get; set; }
+            public double AdjustmentMax { get; set; }
+        }
+        [HttpPost]
+        public ApiResult AddAdjustmentLimitInfo(AddAdjustmentLimitPara para)
+        {
+            var result = paymentBLL.AddAdjustmentLimitInfo(para.SiteId,para.CurrencyId,para.AdjustmentMax, User.Identity.Name);
+            var apiResult = new ApiResult();
+            if (result >0)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
             return apiResult;
         }
         #endregion

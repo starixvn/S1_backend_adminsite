@@ -22,9 +22,11 @@ const AdjustmentLimitInfo = () => {
     const [site, setSite] = useState([]);
     const optSite = (siteId, siteCurrencyList) => { 
         setOpt({ 
-            siteId, siteCurrencyList 
+            siteId:siteId, 
+            siteCurrencyList:siteCurrencyList
         }) 
     }
+
     let radio = "";
 
     useEffect(() => {
@@ -33,7 +35,7 @@ const AdjustmentLimitInfo = () => {
                 if (response.data.errorCode === 0) {
                     setSite(response.data === null ? [] : response.data);
                 } else {
-                    // alert(response.message);
+                    alert(response.message);
                 }
             }).catch(function (error) {
                 alert(error);
