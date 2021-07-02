@@ -163,5 +163,10 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/AdjustmentLimitManagement" })]
+        public IActionResult AdjustmentLimitManagement()
+        {
+            return View();
+        }
     }
 }

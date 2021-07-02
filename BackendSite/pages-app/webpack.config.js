@@ -190,9 +190,13 @@ module.exports = {
     //   //'@babel/polyfill',
     //"./src/pages/Finance/WithdrawalTimeReport/index.js",
     //],
-    "CSD/TagManagement.min": [
-      //'@babel/polyfill',
-    "./src/pages/CSD/TagManagement/index.js",
+    // "CSD/TagManagement.min": [
+    //   '@babel/polyfill',
+    // "./src/pages/CSD/TagManagement/index.js",
+    // ],
+    "Finance/AdjustmentLimitManagement.min": [
+      // '@babel/polyfill',
+      "./src/pages/Finance/AdjustmentLimitManagement/index.js",
     ],
   },
   output: {
