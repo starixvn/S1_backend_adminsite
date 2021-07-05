@@ -685,6 +685,24 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
+        public class CheckPassWordPara
+        {
+            public string PassWord { get; set; }
+        }
+        [HttpPost]
+        public ApiResult CheckPassWord(CheckPassWordPara para)
+        {
+            var apiResult = new ApiResult();
+            if (paymentBLL.CheckPassWord(para.PassWord, User.Identity.Name))
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = 1004;
+            }
+            return apiResult;
+        }
         #endregion
     }
 }
