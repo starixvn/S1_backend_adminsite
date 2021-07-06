@@ -7,7 +7,7 @@ import { initPromotionType } from "./defCols";
 import CheckBox from "./Component/Checkbox";
 import MultiSelect from "react-multi-select-component";
 import SelectBox from "./Component/SelectBox";
-import { initStatusType } from "./defCols";
+import { initStatusType,initDeviceType } from "./defCols";
 // import DateTimePickerElem from "./Component/DateTimePicker";
 import DateTimePicker from "react-datetime";
 
@@ -193,17 +193,6 @@ export default ({
 		return <tr key={`body-${d_idx}`}>{arr}</tr>;
 	});
 
-	// let siteListOptions = "";
-
-	// if (StateFilter.SelectSite) {
-	// 	siteListOptions = StateFilter.SelectSite.map(i => {
-	// 		return {
-	// 			value: 1,
-	// 			displayText: "Show ALL"
-	// 		};
-	// 	});
-	// };
-
 	return (
 		<div className="container-fluid">
 			<h4 className="page-name">Bonus Management</h4>
@@ -231,20 +220,19 @@ export default ({
 						labelledBy={"Select"}
 					/>
 					<pre>       </pre>
-					{/* <CheckBox
-						Options={siteListOptions}
-						Title=""
-						OnChange={StateCheckBox}
-						dataColumn="checkStatus"
-						Selected={StatusCheck}
-						mainKey={null}
-					/> */}
 					<SelectBox
 						Title="Status"
 						Options={initStatusType}
 						HandleChange={FilterOnchange}
 						dataColumn="Status"
 						SelectedValue={StateFilter.Status}
+					/>
+					<SelectBox
+						Title="Device"
+						Options={initDeviceType}
+						HandleChange={FilterOnchange}
+						dataColumn="Device"
+						SelectedValue={StateFilter.Device}
 					/>
 					<DateTimePickerElem
 						columnTitle="From"

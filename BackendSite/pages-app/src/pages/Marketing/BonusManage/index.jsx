@@ -26,7 +26,8 @@ const App = () => {
 	const [stateFilter, setFilter] = useState({
 		Status: 0,
 		StartDate: moment().add(-10, "days").format("l"),
-		EndDate: moment().format("l")
+		EndDate: moment().format("l"),
+		Device: 0
 	  });
 
 
@@ -83,6 +84,7 @@ const App = () => {
 							Status: 0,
 							StartDate: moment(stateFilter.StartDate).unix(),
         					EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
+							Device: 0
 						})
 					};
 					WebAPI.PostData(param).then(res => {
@@ -573,6 +575,7 @@ const App = () => {
 				Status: parseInt(stateFilter.Status,10),
 				StartDate: moment(stateFilter.StartDate).unix(),
         		EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
+				Device: parseInt(stateFilter.Device,10),
 			})
 		};
 		WebAPI.PostData(param).then(res => {
