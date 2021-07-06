@@ -52,7 +52,9 @@ namespace BackendSite.Service.DAL
                 int? SiteId = null;
                 string SpName = "Admin_PromotionListV2_Get";
                 return conn.Query<PromotionInfo>(SpName, new { BonusCode, SiteId, SiteIdFilter, PermissionSiteIds, PromotionTypeFilter, Status = filterPara.Status
-                    , StartDate =  filterPara.StartDate,EndDate = filterPara.EndDate}, commandType: CommandType.StoredProcedure);
+                    , StartDate =  filterPara.StartDate,EndDate = filterPara.EndDate,
+                    PromotionDeviceType = filterPara.Device
+                }, commandType: CommandType.StoredProcedure);
             }
         }
 

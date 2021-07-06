@@ -33,7 +33,8 @@ namespace BackendSite.Service.BLL
                     Status = Select.Status,
                     SiteArray = siteArray,
                     StartDate = Select.StartDate,
-                    EndDate = Select.EndDate
+                    EndDate = Select.EndDate,
+                    Device = Select.Device
                 };
             }
 

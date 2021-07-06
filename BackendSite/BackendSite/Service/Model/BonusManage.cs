@@ -83,6 +83,7 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public long StartDate { get; set; }
         public long EndDate { get; set; }
+        public int Device { get; set; }
     }
     public class Filter
     {
@@ -97,6 +98,7 @@ namespace BackendSite.Service.Model
         public int[] SiteArray { get; set; }
         public long StartDate { get; set; }
         public long EndDate { get; set; }
+        public int Device { get; set; }
     }
     public class BonusImportPara
     {
