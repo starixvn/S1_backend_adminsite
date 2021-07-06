@@ -103,4 +103,17 @@ export const defPromotionAction = {
 	}
 };
 
+export const initStatusType = [
+	{ value: 0, displayText: "All" },
+	{ value: 1, displayText: "Active" },
+	{ value: 2, displayText: "Inactive" }
+];
+
+export const initDeviceType = [
+	{ value: 0, displayText: "Select All" },
+	{ value: 1, displayText: "All" },
+	{ value: 2, displayText: "Web" },
+	{ value: 3, displayText: "App" }
+];
+
 export const initPromotionAction = () => Object.values(defPromotionAction);

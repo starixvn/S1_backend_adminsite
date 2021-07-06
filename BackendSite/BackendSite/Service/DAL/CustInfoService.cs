@@ -1,6 +1,8 @@
-﻿using BackendSite.Service.Model;
+﻿using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -12,10 +14,14 @@ namespace BackendSite.Service.DAL
     public class CustInfoService
     {
         private readonly IConfiguration configuration;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public CustInfoService(IConfiguration configuration)
+        public CustInfoService(IConfiguration configuration, ILogger<MySqlClient> logger)
         {
             this.configuration = configuration;
+            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
+            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
         }
 
         public Customer GetCustInfo(int custId)
@@ -58,7 +64,7 @@ namespace BackendSite.Service.DAL
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.Query<CustInfoDetail>("Admin_CustInfoSearchV4_Get", p, commandType: CommandType.StoredProcedure);
+            var result = conn.Query<CustInfoDetail>("Admin_CustInfoSearchV5_Get", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -106,7 +112,7 @@ namespace BackendSite.Service.DAL
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfoDetailSearchV4_Get", new { CustId = custId, UserName = userName, SiteList = siteList }, commandType: CommandType.StoredProcedure);
+            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfoDetailSearchV5_Get", new { CustId = custId, UserName = userName, SiteList = siteList }, commandType: CommandType.StoredProcedure);
             return result;
         }
 
@@ -419,6 +425,84 @@ namespace BackendSite.Service.DAL
                 string SpName = "Admin_OnUser_Del";
                 return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
+        }
+
+        #region Tag
+        public int EditTagMamagement(int id, string tagName, string tagColour, string description, string Operator)
+        {
+            DynamicParameters props = new DynamicParameters();
+            props.Add("Id", id);
+            props.Add("TagName", tagName);
+            props.Add("TagColour", tagColour);
+            props.Add("Description", description);
+            props.Add("Operator", Operator);
+
+            return _mainDbClient.Execute("Admin_Tag_Set", props);
+        }
+
+        public GetTagDataResult GetTagData(int status,int pageNumber,int pageSize)
+        {
+            GetTagDataResult SearchResult = new GetTagDataResult();
+            DynamicParameters props = new DynamicParameters();
+            props.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("PageSize", pageSize);
+            props.Add("Status", status);
+
+            var result = _reportDbClient.Query<TagData>("Admin_Tag_Get", props);
+
+            SearchResult.TagDatas = result.ToList();
+            SearchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            SearchResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            SearchResult.RowCount = props.Get<int?>("RowCount") ?? 0;
+
+            return SearchResult;
+        }
+
+        public int SetTagStatus(int Id, string Operator)
+        {
+            DynamicParameters props = new DynamicParameters();
+            props.Add("Id", Id);
+            props.Add("Operator", Operator);
+
+            return _mainDbClient.Execute("Admin_TagStatus_Set", props);
+        }
+
+        public IEnumerable<TagData> GetAllTag()
+        {
+            GetTagDataResult SearchResult = new GetTagDataResult();
+            DynamicParameters props = new DynamicParameters();
+            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("PageNumber", 0, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("PageSize", 0);
+            props.Add("Status", 1);
+            return _reportDbClient.Query<TagData>("Admin_Tag_Get", props);
+        }
+
+        public int SetCustTag(int custid, IEnumerable<int> SelectTag)
+        {
+            List<int> temp = new List<int>();
+            string selectTag = JsonConvert.SerializeObject(temp); 
+            if (SelectTag != null && SelectTag.Any())
+            {
+                selectTag = JsonConvert.SerializeObject(SelectTag);
+            }
+            DynamicParameters props = new DynamicParameters();
+            props.Add("CustId", custid);
+            props.Add("TagList", selectTag);
+
+            return _mainDbClient.Execute("Admin_CustInofoTagList_Set", props);
+        }
+        #endregion
+
+        public bool SetEnableDisablePromotion(int custId, int enablePromotion)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_CustInofoEnablePromotion_Set", new { CustId = custId, EnablePromotion = enablePromotion }, commandType: CommandType.StoredProcedure) > 0;
         }
     }
 }

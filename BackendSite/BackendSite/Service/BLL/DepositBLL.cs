@@ -9,6 +9,7 @@ using LazZiya.ImageResize;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using BackendSite.Service.Library;
+using System.Transactions;
 
 namespace BackendSite.Service.BLL
 {
@@ -20,8 +21,9 @@ namespace BackendSite.Service.BLL
         private readonly CustInfoBLL custInfoBLL;
         private readonly AuthorizeBLL authorizeBLL;
         private readonly Common common;
+        private readonly CustInfoService custInfoService;
 
-        public DepositBLL(DepositService depositService, ServerInfoService serverInfoService, AdjustmentService adjustmentService, CustInfoBLL custInfoBLL, AuthorizeBLL authorizeBLL, Common common)
+        public DepositBLL(DepositService depositService, ServerInfoService serverInfoService, AdjustmentService adjustmentService, CustInfoBLL custInfoBLL, AuthorizeBLL authorizeBLL, Common common, CustInfoService custInfoService)
         {
             this.depositService = depositService;
             this.serverInfoService = serverInfoService;
@@ -29,6 +31,7 @@ namespace BackendSite.Service.BLL
             this.custInfoBLL = custInfoBLL;
             this.authorizeBLL = authorizeBLL;
             this.common = common;
+            this.custInfoService = custInfoService;
         }
         public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, long startDate, long endDate, string DepositId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
         {
@@ -369,6 +372,30 @@ namespace BackendSite.Service.BLL
                 tempSeconds = string.Format("0{0}", ts.Seconds.ToString());
             }
             result = string.Format("{0}{1}:{2}:{3}", tempDays, tempHours, tempMinutes, tempSeconds);
+            return result;
+        }
+
+        public int SetDepositRequestAmount(string transId,decimal amount,string Operator,int CustId)
+        {
+            int result = 1;
+
+            using (TransactionScope scope = new TransactionScope())
+            {
+                if(!depositService.SetDepositRequestAmount(transId, amount, Operator))
+                {
+                    scope.Dispose();
+
+                    return 0;
+                }
+                if (!custInfoService.AddCustNote(CustId, $"SetDepositRequestAmount:{amount}", Operator))
+                {
+                    scope.Dispose();
+
+                    return 0;
+                }
+
+                scope.Complete();
+            }
             return result;
         }
     }

@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using System.Linq;
 using BackendSite.ExceptionHandling;
 
 namespace BackendSite.Controllers.Api
@@ -438,6 +437,27 @@ namespace BackendSite.Controllers.Api
             var ExportData = depositBLL.DepositTimeExportGet(SelectSite, DepositID, StartDate, EndDate, Status, CurrencyId);
             var stream = excelBLL.Export(ExportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DepositTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
+        [HttpPost] 
+        public ApiResult SetDepositRequestAmount(DepositRequestAmountPara para)
+        {
+            var depositRequest = depositBLL.GetDepositRequest(para.TransId);
+            if(depositRequest == null)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+            }
+            if (depositBLL.SetDepositRequestAmount(para.TransId,para.Amount, User.Identity.Name, depositRequest.CustId) >0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Edit Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+            }
         }
     }
 }

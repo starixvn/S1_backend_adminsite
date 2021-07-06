@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using System;
 using System.Collections.Generic;
@@ -11,11 +12,15 @@ namespace BackendSite.Service.BLL
     {
         private readonly AdjustmentService adjustmentService;
         private readonly WalletService walletService;
+        private readonly AdminUserService adminUserService;
+        private readonly Tools tools;
 
-        public PaymentBLL(AdjustmentService adjustmentService, WalletService walletService)
+        public PaymentBLL(AdjustmentService adjustmentService, WalletService walletService, AdminUserService adminUserService, Tools tools)
         {
             this.adjustmentService = adjustmentService;
             this.walletService = walletService;
+            this.adminUserService = adminUserService;
+            this.tools = tools;
         }
         public int PaymentAdjustment(AdjustmentInfo adjustmentInfo, string Operator, out string transId)
         {
@@ -92,6 +97,26 @@ namespace BackendSite.Service.BLL
         public IEnumerable<VipTPCategory> GetTPCategoryList()
         {
             return walletService.GetTPCategoryList();
+        }
+        public AdjustmentLimtData GetAdjustmentData(int SiteId, int CurrencyId)
+        {
+            return adjustmentService.GetAdjustmentData(SiteId, CurrencyId);
+        }
+        public int AddAdjustmentLimitInfo(int SiteId, int CurrencyId, double AdjustmentMax,string Operator)
+        {
+            return adjustmentService.AddAdjustmentLimitInfo(SiteId, CurrencyId, AdjustmentMax,Operator);
+        }
+        public bool CheckPassWord(string password, string Operator)
+        {
+            var adminUser = adminUserService.GetAdminUserByUserName(Operator);
+            if(adminUser == null)
+            {
+                return false;
+            }
+            else
+            {
+                return adminUser.Userpwd == tools.MD5Encrypt(password);
+            }
         }
     }
 }

@@ -160,6 +160,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Tag Management",
+        "FuncKey": "CustManage/TagManagement",
+        "Controller": "CustManage",
+        "Action": "TagManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
@@ -305,6 +315,16 @@
         "FuncKey": "Finance/WithdrawalTimeReport",
         "Controller": "Finance",
         "Action": "WithdrawalTimeReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "AdjustmentLimitManagement",
+        "Title": "AdjustmentLimit Management",
+        "FuncKey": "Finance/AdjustmentLimitManagement",
+        "Controller": "Finance",
+        "Action": "AdjustmentLimitManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null

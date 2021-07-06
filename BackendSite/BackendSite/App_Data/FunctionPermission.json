@@ -144,6 +144,11 @@
             "FuncKey": "tele_export_excel"
           }
         ]
+      },
+      {
+        "DisplayKey": "Tag Management",
+        "FuncKey": "CustManage/TagManagement",
+        "Enable": false
       }
     ]
   },
@@ -171,6 +176,10 @@
           {
             "DisplayKey": "Execute",
             "FuncKey": "f_dp_execute"
+          },
+          {
+            "DisplayKey": "Edit Amount",
+            "FuncKey": "f_dp_editAmount"
           }
         ]
       },
@@ -258,6 +267,11 @@
       {
         "DisplayKey": "Withdrawal Time Report",
         "FuncKey": "Finance/WithdrawalTimeReport",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "AdjustmentLimit Management",
+        "FuncKey": "Finance/AdjustmentLimitManagement",
         "Enable": false
       }
     ]

@@ -16,6 +16,7 @@ const App = () => {
 	const [state, dispatch] = useReducer(reducer, initState);
 	const [processing, setProcessing] = useState(false);
 	const [BannerType, setBannerType] = useState(0);
+	const [Status, setStatus] = useState(0);
 	const [Sitid, setSitid] = useState(0);
 	const isMountedRef = useRef(null);
 	useEffect(() => {
@@ -50,21 +51,38 @@ const App = () => {
 		);
 	}, []);
 
-	const FilterOnchange=(v)=>{
-		console.log(v);
-		setBannerType(v);
+	const FilterOnchange=(v,dataColumn)=>{
+		if(dataColumn == "BannerType"){
+			setBannerType(v);
+		}
+		else{
+			setStatus(v);
+		}
 		if (!processing && Sitid !== 0) {
 			if (isMountedRef.current) {
 				setProcessing(true);
 			}
-			let param = {
-				Url: "BannerManage/GetBannerList",
-				Data: qs.stringify({
-					SiteId: Sitid,
-					BannerTypeId:parseInt(v)
-				})
-			};
-			console.log(param);
+			let param = "";
+			if(dataColumn == "BannerType"){
+				param = {
+					Url: "BannerManage/GetBannerList",
+					Data: qs.stringify({
+						SiteId: Sitid,
+						BannerTypeId:parseInt(v),
+						Status:parseInt(Status)
+					})
+				};
+			}
+			else{
+				param = {
+					Url: "BannerManage/GetBannerList",
+					Data: qs.stringify({
+						SiteId: Sitid,
+						BannerTypeId:parseInt(BannerType),
+						Status:parseInt(v)
+					})
+				};
+			}
 			let site = state.siteList.find(s => s.siteId === Sitid);
 			WebAPI.PostData(param).then(
 				res => {
@@ -104,7 +122,8 @@ const App = () => {
 				Url: "BannerManage/GetBannerList",
 				Data: qs.stringify({
 					SiteId: siteId,
-					BannerTypeId:BannerType
+					BannerTypeId:BannerType,
+					Status:Status
 				})
 			};
 			let site = state.siteList.find(s => s.siteId === siteId);
@@ -310,6 +329,7 @@ const App = () => {
 			bannerList={state.bannerList}
 			FilterOnchange={FilterOnchange}
 			BannerType={BannerType}
+			Status={Status}
 		/>
 	) : (
 			<Edit

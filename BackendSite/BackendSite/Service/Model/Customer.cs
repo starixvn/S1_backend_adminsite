@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {
@@ -83,6 +84,9 @@ namespace BackendSite.Service.Model
         public DateTime? LastDepositTimeRecord { get; set; }
         public DateTime? LastTpBetRecordTimeRecord { get; set; }
         public DateTime? FirstDepositTimeRecord { get; set; }
+        public string TagList { get; set; }
+        public List<int> ITagList { get; set; }
+        public int EnablePromotion { get; set; }
     }
 
     public class CustInfoDetailForExport
@@ -262,5 +266,24 @@ namespace BackendSite.Service.Model
         public decimal TotalAdjustment { get; set; }
         public DateTime? LastBettingTime { get; set; }
         public decimal TotalBonusClaimed { get; set; }
+    }
+    public class TagData
+    {
+        public int Id { get; set; }
+        public string TagName { get; set; }
+        public string TagColour { get; set; }
+        public int Status { get; set; }
+        public string Description { get; set; }
+        public string CreateTime { get; set; }
+        public string Creator { get; set; }
+        public string UpdateTime { get; set; }
+        public string Updator { get; set; }
+    }
+    public class GetTagDataResult
+    {
+        public List<TagData> TagDatas { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
     }
 }

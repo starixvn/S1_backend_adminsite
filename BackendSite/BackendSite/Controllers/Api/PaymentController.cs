@@ -29,6 +29,7 @@ namespace BackendSite.Controllers.Api
         private readonly AuthorizeBLL authorizeBLL;
         private readonly Common common;
         private readonly ExcelBLL excelBLL;
+        private readonly SelLangBLL selLangBLL;
 
         private readonly int mainWalletType;
 
@@ -42,7 +43,8 @@ namespace BackendSite.Controllers.Api
                                  TpBLL tpBLL,
                                  AuthorizeBLL authorizeBLL,
                                  Common common,
-                                 ExcelBLL excelBLL)
+                                 ExcelBLL excelBLL,
+                                 SelLangBLL selLangBLL)
         {
             this.paymentBLL = paymentBLL;
             this.custInfoBLL = custInfoBLL;
@@ -50,8 +52,10 @@ namespace BackendSite.Controllers.Api
             this.authorizeBLL = authorizeBLL;
             this.common = common;
             this.excelBLL = excelBLL;
+            this.selLangBLL = selLangBLL;
 
             mainWalletType = configuration.GetValue<int>("MainWalletType");
+
         }
 
         #endregion
@@ -787,7 +791,68 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+
+        #region Adjustment Limit
+        public class GetAdjustmentPara
+        {
+            public int SiteId { get; set; }
+
+            public int CurrencyId { get; set; }
+        }
+
+        [HttpPost]
+        public ApiResult<AdjustmentLimtData> GetAdjustmentData(GetAdjustmentPara para) 
+        {
+            var apiResult = new ApiResult<AdjustmentLimtData>();
+            apiResult.Data = paymentBLL.GetAdjustmentData(para.SiteId, para.CurrencyId);
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        public class AddAdjustmentLimitPara
+        {
+            public int SiteId { get; set; }
+
+            public int CurrencyId { get; set; }
+            public double AdjustmentMax { get; set; }
+        }
+        [HttpPost]
+        public ApiResult AddAdjustmentLimitInfo(AddAdjustmentLimitPara para)
+        {
+            var result = paymentBLL.AddAdjustmentLimitInfo(para.SiteId,para.CurrencyId,para.AdjustmentMax, User.Identity.Name);
+            var apiResult = new ApiResult();
+            if (result >0)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+        public class CheckPassWordPara
+        {
+            public string PassWord { get; set; }
+        }
+        [HttpPost]
+        public ApiResult CheckPassWord(CheckPassWordPara para)
+        {
+            var apiResult = new ApiResult();
+            if (paymentBLL.CheckPassWord(para.PassWord, User.Identity.Name))
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = 1004;
+            }
+            return apiResult;
+        }
         #endregion
 
+        #endregion
     }
 }

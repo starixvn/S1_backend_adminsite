@@ -18,6 +18,7 @@ import PromotionReport from './PromotionReport/index';
 import SetCustStatusNote from './SetCustStatusNote/PopboxContentSetNote.js';
 import { DepositInfoPagination } from './CustInfo_DepositInfoPagination.jsx';
 import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
+import Tag from './Tag/index';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -885,7 +886,6 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
     }
 
     class CustInfo extends React.Component {
-        
         constructor(props) {
             super(props);
             this.state = {isOpen:false};
@@ -894,7 +894,6 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
 
         componentDidMount() {
             let _clipboard = new ClipboardJS(".js-copy");
-
         }
 
         onKycChange(e) {
@@ -1024,6 +1023,25 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
             if (confirm('Are you sure reset Profile ?')) {
                 let data = this.props.CustInfoData;
                 axios.post('/api/CustManage/ResetProfile', { CustId: data.custId })
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.props.onGetCustInfoDetail();
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
+        onSetEnableDisablePromotion(e){
+            if (confirm('Are you sure ' + (e==0 ?'Disable':'Enable') + ' Promotion')) {
+                let data = this.props.CustInfoData;
+                axios.post('/api/CustManage/SetEnableDisablePromotion', { CustId: data.custId ,EnablePromotion: e})
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1231,12 +1249,21 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
             }
         }
 
+        // setTag(){
+
+        // }
         render() {
 
             let data = this.props.CustInfoData;
+            let tagData = this.props.TagList;
             let tpWallet = null;
             let elgibleWithdrawal = 0;
             let promotions = null;
+            let tagList = [];
+            let selectTagList =[];
+            let selectTagValue = [];
+            let tag = "";
+            let tagSelectList = null;
 
             if (data != null) {
                 elgibleWithdrawal = data.withdrawalLimit - data.turnOver;
@@ -1267,6 +1294,24 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
                 if (data.promotions != null) {
                     promotions = <Promotion Promotions={data.promotions} CancelBonus={this.cancelBonus.bind(this)} />;
                 }
+
+                if(data.iTagList.length > 0){
+                    for(let i=0; i < data.iTagList.length;i++){
+                        tagData.forEach(element=>{
+                            if(element.id === data.iTagList[i]){
+                                tagList.push(element.tagName);
+                            }
+                        })
+                    }
+                }
+                
+
+                tag = tagList.toString();
+                tagSelectList = tagData.map(obj=>{
+                    return <option key={`tag-list-${obj.id}`} value={obj.id}>{obj.tagName}</option>;
+                })
+                tagSelectList = <select id="selectTag" name="selectTag[]" multiple="multiple">{tagSelectList}</select>;
+
             }
 
             return (
@@ -1283,6 +1328,8 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
                             {(data.status == 1 || data.status == 2 || data.status == 4) && data.agent != null && subFuncKeys.indexOf("ca_acc_close") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"closed")}>Closed</button> : null}
                             {(data.status == 2 || data.status == 4) && data.agent != null && subFuncKeys.indexOf("ca_unlock") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"unlock")}>Unlock</button> : null}
                             <button className="btn btn-primary" onClick={this.setReason.bind(this,"kickout")}>KickOut</button>
+                            {(data.enablePromotion == 0) ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,1)}>Enable Promotion</button>:null}
+                            {(data.enablePromotion == 1) ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,0)}>Disable Promotion</button>:null}
                         </div>
                         <div className="flex-wrap">
                             <table className="table table-detail ">
@@ -1294,12 +1341,6 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
                                     <tr>
                                         <th scope="row">User Name</th>
                                         <td>{data.userName}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">
-                                            Vip Level&nbsp;<span class="status status-pending">New</span>
-                                        </th>
-                                        <td>{data.levelName}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">User Level</th>
@@ -1584,6 +1625,10 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
                                         <td>{data.iovation ? CustIovationOp[data.iovation] : null}</td>
                                     </tr>
                                     <tr>
+                                        <th scope="row">Tag</th>
+                                        <td>{tag}</td>
+                                    </tr>
+                                    <tr>
                                         <th scope="row">Status</th>
                                         <td>{CustStatusOp[data.status]}</td>
                                     </tr>
@@ -1703,7 +1748,6 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
                             {data.RebateInfo != null ? <RebateInfo RebateInfo={data.RebateInfo} /> : null}
                             {data.BonusWallet != null ? <BonusWallet BonusWallet={data.BonusWallet} /> : null}
                             {promotions}
-
                             <div className="table-responsive-md table">
                                 <span class="label">Photo</span>
                                 <table className="table table-striped">
@@ -1757,12 +1801,12 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History", "VIP Level", "Promotion Report"];
-        _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false };
-        _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null };
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History", "VIP Level", "Promotion Report","Tag"];
+        _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false, Tag: false };
+        _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null ,Tag:null};
         constructor(props) {
             super(props);
-            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {} };
+            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {},TagList:{} };
         }
 
         onTab(idx, tabName) {
@@ -1770,6 +1814,7 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
         }
 
         componentDidMount() {
+            this.GetAllTagData();
             this.onGetCustInfoDetail();
         }
 
@@ -2094,6 +2139,7 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
+                        let tagList=[];
                         if (result.errorCode == 0) {
                             this.setState({ CustInfoData: result.data }, function () {
                                 let _clipboard = new ClipboardJS(".js-copy");
@@ -2283,12 +2329,33 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
             }
         }
 
+        GetAllTagData(){
+            axios.post('/api/CustManage/GetAllTag')
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({
+                                ...this.state,
+                                TagList:result.data
+                            })
+                            //this.buildSelectTag();
+                            //console.log(result.data)
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+        }
+
         render() {
             let dataContainer = null;
             let TabIdx = this.state.TabIdx;
             let TabName = this.state.TabName;
             if (TabName == this._Tabs[0]) {
-                dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)} isEdit={this.state.isEdit} onClickEdit={this.onClickEdit} editOnChange={this.editOnChange} editUpdate={this.editUpdate} />;
+                dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)} isEdit={this.state.isEdit} onClickEdit={this.onClickEdit} editOnChange={this.editOnChange} editUpdate={this.editUpdate} TagList={this.state.TagList}/>;
             } else if (TabName == this._Tabs[1]) {
                 dataContainer = <BonusLog GetPromotionCategory={this.GetPromotionCategory.bind(this)} PromotionCategoryData={this.state.PromotionCategoryData} GetBonusLog={this.GetBonusLog.bind(this)} searchData={this.state.BonusLogData} BonusLog={this.state.BonusLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[2]) {
@@ -2325,6 +2392,8 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
                 dataContainer = <VipLevel />
             } else if (TabName == this._Tabs[18]) {
                 dataContainer = <PromotionReport />
+            } else if (TabName == this._Tabs[19]) {
+                dataContainer = <Tag onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)}/>
             }
 
             let authSubKeys = {

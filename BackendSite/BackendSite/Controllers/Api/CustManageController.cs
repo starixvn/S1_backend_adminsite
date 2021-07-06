@@ -210,6 +210,31 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        #region TagManagement
+        public class EditTagManagementpara 
+        { 
+            public int Id { get; set; }
+            public string TagName { get; set; }
+            public string TagColour { get; set; }
+            public string Description { get; set; }
+        }
+        public class GetTagDatapara
+        {
+            public int Status { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+        }
+        public class SetTagStatuspara
+        {
+            public int Id { get; set; }
+        }
+        public class SetCustTagPara
+        {
+            public int CustId { get; set; }
+            public IEnumerable<int> SelectTag { get; set; }
+        }
+        #endregion
+
         public class CustPromotionpara
         {
             public int CustId { get; set; }
@@ -217,6 +242,12 @@ namespace BackendSite.Controllers.Api
             public long EndDate { get; set; }
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
+        }
+
+        public class SetEnableDisableBonusPara 
+        {
+            public int CustId { get; set; }
+            public int EnablePromotion { get; set; }
         }
 
         #endregion
@@ -765,6 +796,25 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        #region CSD > Customer Administration > CustInfo [Enable/Disable Bonus]
+        [HttpPost]
+        public ApiResult SetEnableDisablePromotion(SetEnableDisableBonusPara para)
+        {
+            if (custInfoBLL.SetEnableDisablePromotion(para.CustId, para.EnablePromotion, User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Set Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Set Fail.");
+            }
+        }
+        #endregion
+
         #region CSD > Customer Administration > CustInfo [Kick Out]
 
         /// <summary>
@@ -1126,6 +1176,119 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        #endregion
+
+        #region CSD > TagMamagement
+        [HttpPost]
+        public ApiResult EditTagMamagement(EditTagManagementpara para)
+        {
+            if (custInfoBLL.EditTagMamagement(para.Id, para.TagName,para.TagColour, para.Description, User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Edit Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+            }
+        }
+
+        [HttpPost]
+        public ApiListResult<TagData> GetTagData(GetTagDatapara para)
+        {
+            var apiResult = new ApiListResult<TagData>();
+            try
+            {
+                var SearchResult = custInfoBLL.GetTagData(para.Status, para.PageNumber, para.PageSize);
+                apiResult.Data = SearchResult.TagDatas;
+                apiResult.PageNumber = SearchResult.PageNumber;
+                apiResult.TotalPages = SearchResult.TotalPages;
+                apiResult.RowCount = SearchResult.RowCount;
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult SetTagStatus(SetTagStatuspara para)
+        {
+            if (custInfoBLL.SetTagStatus(para.Id, User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Edit Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+            }
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<TagData>> GetAllTag()
+        {
+            var apiResult = new ApiResult<IEnumerable<TagData>>();
+            try
+            {
+                apiResult.Data = custInfoBLL.GetAllTag();
+                apiResult.ErrorCode = 0;
+            }
+            catch(Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
+            }
+            return apiResult;
+        }
+         
+        [HttpPost]
+        public ApiResult SetCustTag(SetCustTagPara para)
+        {
+            if (custInfoBLL.SetCustTag(para.CustId,para.SelectTag, User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Edit Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+        }
+
+        [HttpPost]
+        public ApiResult<CustInfoDetail> GetCustData(CustInfoReq custInfoReq)
+        {
+            var apiResult = new ApiResult<CustInfoDetail>();
+
+            try
+            {
+                var custInfoDetail = custInfoBLL.GetCustData(custInfoReq.CustId, custInfoReq.UserName);
+                apiResult.Data = custInfoDetail;
+                apiResult.ErrorCode = 0;
+            }
+            catch
+            {
+                apiResult.ErrorCode = 999;
+            }
+            return apiResult;
+        }
         #endregion
 
         #endregion

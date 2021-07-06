@@ -46,3 +46,8 @@ export const initShowStatusType = [
 	{ value: 2, displayText: defShowStatusType[2] },
 	{ value: 3, displayText: defShowStatusType[3] },
 ];
+
+export const defStatusType = {
+	1: "Active",
+	2: "Inactive"
+};

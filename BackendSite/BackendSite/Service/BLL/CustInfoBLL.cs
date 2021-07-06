@@ -82,7 +82,15 @@ namespace BackendSite.Service.BLL
                 currncyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
 
-            return custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, selectstatus, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList()));
+            var CustInfoList = custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, selectstatus, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList())).ToList();
+            if(CustInfoList.Count() > 0)
+            {
+                CustInfoList.ForEach(x =>
+                {
+                    x.ITagList = string.IsNullOrWhiteSpace(x.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(x.TagList);
+                });
+            }
+            return CustInfoList;
         }
 
         public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int? AffId, IEnumerable<int> selectCurrency, string BankAccountNumber, IEnumerable<int> selectStatus)
@@ -130,6 +138,7 @@ namespace BackendSite.Service.BLL
 
                     }
                 }
+                custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>(): JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
             }
             return custInfoDetail;
         }
@@ -416,5 +425,67 @@ namespace BackendSite.Service.BLL
         }
 
         #endregion
+
+        #region TagMamagement
+        public int EditTagMamagement(int id, string tagName,string tagColour, string description, string Operator)
+        {
+            return custInfoService.EditTagMamagement(id, tagName, tagColour, description, Operator);
+        }
+
+        public GetTagDataResult GetTagData(int status, int pageNumber, int pageSize)
+        {
+            return custInfoService.GetTagData(status, pageNumber, pageSize);
+        }
+
+        public int SetTagStatus(int Id, string Operator)
+        {
+            return custInfoService.SetTagStatus(Id, Operator);
+        }
+
+        public IEnumerable<TagData> GetAllTag()
+        {
+            return custInfoService.GetAllTag();
+        }
+
+        public int SetCustTag(int custid, IEnumerable<int> SelectTag,string Operator)
+        {
+            return custInfoService.SetCustTag(custid, SelectTag);
+        }
+        public CustInfoDetail GetCustData(int custId, string userName)
+        {
+            var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
+            var custInfoDetail = custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
+            if(custInfoDetail != null)
+            {
+                custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
+            }
+            
+            return custInfoDetail;
+        }
+        #endregion
+
+        public int SetEnableDisablePromotion(int custId, int enablePromotion, string Operator)
+        {
+            int result = 1;
+
+            using (TransactionScope scope = new TransactionScope())
+            {
+                if(!custInfoService.SetEnableDisablePromotion(custId, enablePromotion))
+                {
+                    scope.Dispose();
+
+                    return 0;
+                }
+                if (!custInfoService.AddCustNote(custId, enablePromotion == 0 ? "Disable Promotion" : "Enable Promotion", Operator))
+                {
+                    scope.Dispose();
+
+                    return 0;
+                }
+
+                scope.Complete();
+            }
+            return result;
+        }
     }
 }
