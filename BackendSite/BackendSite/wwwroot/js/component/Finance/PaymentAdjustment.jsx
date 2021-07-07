@@ -302,6 +302,7 @@ import qs from 'qs';
                                                     amount={this.state.Amount}
                                                     ClickCancel={this.ClickCancel.bind(this)}
                                                     onSumbitPaymentAdjustmentByPassWord={this.onSumbitPaymentAdjustmentByPassWord.bind(this)}
+                                                    SiteId={this.state.SiteId}
                                                     />:null}
                         </div> : null}
                 </div>
@@ -315,13 +316,12 @@ import qs from 'qs';
             this.state = { password: ""};
         }
         onChange(event) {
-            console.log(event.target.value);
             this.setState({
                 password:event.target.value
             })
         }
         handleSave(){
-            axios.post('/api/Payment/CheckPassWord', { PassWord: this.state.password })
+            axios.post('/api/Payment/CheckPassWord', { PassWord: this.state.password ,SiteId:this.props.SiteId})
                 .then(function (response) {
                     let result = response.data;
                     if (result.errorCode == 0) {

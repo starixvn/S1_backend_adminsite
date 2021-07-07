@@ -23,6 +23,10 @@ namespace BackendSite.Controllers
         {
             return View();
         }
-
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Admin/SpecialPasswordManagement" })]
+        public IActionResult SpecialPasswordManagement()
+        {
+            return View();
+        }
     }
 }

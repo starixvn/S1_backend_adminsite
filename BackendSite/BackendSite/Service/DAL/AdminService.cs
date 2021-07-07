@@ -1,6 +1,8 @@
-﻿using BackendSite.Service.Model;
+﻿using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -13,10 +15,14 @@ namespace BackendSite.Service.DAL
     public class AdminService
     {
         private IConfiguration configuration;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public AdminService(IConfiguration configuration)
+        public AdminService(IConfiguration configuration, ILogger<MySqlClient> logger)
         {
             this.configuration = configuration;
+            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
+            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
         }
 
         public bool AddAccount(int siteId, AdminUser adminUser)
@@ -80,6 +86,21 @@ namespace BackendSite.Service.DAL
                 Md5Userpwd = p.Get<string>("Md5Userpwd");
                 return result > 0;
             }
+        }
+
+        public SpecialPasswordManagement GetSpecialPasswordData(int sitId)
+        {
+            return _reportDbClient.Query<SpecialPasswordManagement>("Admin_SpecialPassword_Get", new DynamicParameters(new { SiteId = sitId })).FirstOrDefault();
+        }
+
+        public int SetSpecialPasswordData(int SiteId, string Password, string Operator)
+        {
+            DynamicParameters props = new DynamicParameters();
+            props.Add("SiteId", SiteId);
+            props.Add("Password", Password);
+            props.Add("Operator", Operator);
+
+            return _mainDbClient.Execute("Admin_SpecialPassword_Set", props);
         }
     }
 }
