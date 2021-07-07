@@ -14,13 +14,15 @@ namespace BackendSite.Service.BLL
         private readonly WalletService walletService;
         private readonly AdminUserService adminUserService;
         private readonly Tools tools;
+        private readonly AdminService adminService;
 
-        public PaymentBLL(AdjustmentService adjustmentService, WalletService walletService, AdminUserService adminUserService, Tools tools)
+        public PaymentBLL(AdjustmentService adjustmentService, WalletService walletService, AdminUserService adminUserService, Tools tools, AdminService adminService)
         {
             this.adjustmentService = adjustmentService;
             this.walletService = walletService;
             this.adminUserService = adminUserService;
             this.tools = tools;
+            this.adminService = adminService;
         }
         public int PaymentAdjustment(AdjustmentInfo adjustmentInfo, string Operator, out string transId)
         {
@@ -106,16 +108,16 @@ namespace BackendSite.Service.BLL
         {
             return adjustmentService.AddAdjustmentLimitInfo(SiteId, CurrencyId, AdjustmentMax,Operator);
         }
-        public bool CheckPassWord(string password, string Operator)
+        public bool CheckPassWord(string password, int SiteId)
         {
-            var adminUser = adminUserService.GetAdminUserByUserName(Operator);
-            if(adminUser == null)
+            var result = adminService.GetSpecialPasswordData(SiteId);
+            if(result == null)
             {
-                return false;
+                return true;
             }
             else
             {
-                return adminUser.Userpwd == tools.MD5Encrypt(password);
+                return result.Password != password ? false : true;
             }
         }
     }

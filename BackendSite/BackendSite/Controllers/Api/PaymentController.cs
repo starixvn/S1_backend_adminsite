@@ -688,12 +688,13 @@ namespace BackendSite.Controllers.Api
         public class CheckPassWordPara
         {
             public string PassWord { get; set; }
+            public int SiteId { get; set; }
         }
         [HttpPost]
         public ApiResult CheckPassWord(CheckPassWordPara para)
         {
             var apiResult = new ApiResult();
-            if (paymentBLL.CheckPassWord(para.PassWord, User.Identity.Name))
+            if (paymentBLL.CheckPassWord(para.PassWord, para.SiteId))
             {
                 apiResult.ErrorCode = 0;
             }
