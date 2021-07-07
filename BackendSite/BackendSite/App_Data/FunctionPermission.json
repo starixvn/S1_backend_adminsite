@@ -288,6 +288,11 @@
         "DisplayKey": "User Setting",
         "FuncKey": "Admin/UserAuthoritySetting",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Special Password Management",
+        "FuncKey": "Admin/SpecialPasswordManagement",
+        "Enable": false
       }
     ]
   },

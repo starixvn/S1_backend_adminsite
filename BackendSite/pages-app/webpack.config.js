@@ -194,9 +194,13 @@ module.exports = {
     //   '@babel/polyfill',
     // "./src/pages/CSD/TagManagement/index.js",
     // ],
-    "Finance/AdjustmentLimitManagement.min": [
-      // '@babel/polyfill',
-      "./src/pages/Finance/AdjustmentLimitManagement/index.js",
+    // "Finance/AdjustmentLimitManagement.min": [
+    //   // '@babel/polyfill',
+    //   "./src/pages/Finance/AdjustmentLimitManagement/index.js",
+    // ],
+    "Administration/SpecialPasswordManagement.min": [
+    	// '@babel/polyfill',
+    	"./src/pages/Administration/SpecialPasswordManagement/index.js"
     ],
   },
   output: {

@@ -356,6 +356,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "SpecialPasswordManagement",
+        "Title": "Special Password Management",
+        "FuncKey": "Admin/SpecialPasswordManagement",
+        "Controller": "Admin",
+        "Action": "SpecialPasswordManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
