@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using BackendSite.Service.Model.TpMaintain;
+using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
 
 namespace BackendSite.Controllers.Api
 {
@@ -126,6 +128,29 @@ namespace BackendSite.Controllers.Api
             {
                 logger.LogError(ex, ex.Message);
                 return new ApiResult<IEnumerable<TpMaintain>>
+                {
+                    ErrorCode = 999,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
+        public ApiResult<IEnumerable<TpGameType>> GetTpGameTypeList()
+        {
+            try
+            {
+                return new ApiResult<IEnumerable<TpGameType>>
+                {
+                    Data = tpMaintainBLL.GetTpGameTypeList(),
+                    ErrorCode = 0
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return new ApiResult<IEnumerable<TpGameType>>
                 {
                     ErrorCode = 999,
                     Message = ex.Message,

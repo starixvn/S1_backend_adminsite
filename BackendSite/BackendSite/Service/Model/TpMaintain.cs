@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BackendSite.Service.Model
+namespace BackendSite.Service.Model.TpMaintain
 {
     public class TpMaintain
     {
@@ -13,6 +13,10 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int TpId { get; set; }
         public string TpName { get; set; }
+        public int TpGameType { get; set; }
+        public string TypeName { get; set; }
+        public int TpCategoryId { get; set; }
+        public string CategoryName { get; set; }
         public DateTime BeginDate { get; set; }
         public DateTime EndDate { get; set; }
         public string MaintainType { get; set; }
@@ -25,5 +29,13 @@ namespace BackendSite.Service.Model
     {
         public int Id { set; get; }
         public string TpName { set; get; }
+    }
+
+    public class TpGameType
+    {
+        public int Type { set; get; }
+        public string TypeName { set; get; }
+        public int TpId { set; get; }
+        public int CategoryId { set; get; }
     }
 }

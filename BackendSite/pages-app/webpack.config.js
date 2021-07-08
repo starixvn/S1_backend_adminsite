@@ -132,7 +132,7 @@ module.exports = {
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/GameCasinoManagement/index.js"
     // ]
-    "CSD/TeleCSD.min": ["@babel/polyfill", "./src/pages/CSD/TeleCSD/index.js"],
+    //"CSD/TeleCSD.min": ["@babel/polyfill", "./src/pages/CSD/TeleCSD/index.js"],
     // "Marketing/VipUpgrade.min": [
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/VipUpgrade/index.js"
@@ -190,6 +190,9 @@ module.exports = {
     //   //'@babel/polyfill',
     //"./src/pages/Finance/WithdrawalTimeReport/index.js",
     //],
+	  "Marketing/TpMaintain.min": [
+      "./src/pages/Marketing/TpMaintain/index.js",
+    ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

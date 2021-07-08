@@ -47,6 +47,16 @@ const App = () => {
         alert(res.data.message ?? "failed to get data.");
       }
     });
+
+    WebAPI.PostData({ Url: "TpMaintain/GetTpGameTypeList" }).then((res) => {
+      if (res.data.errorCode === 0) {
+        console.log(res.data.data)
+        //setTpList(res.data.data);
+      } else {
+        alert(res.data.message ?? "failed to get data.");
+      }
+    });
+
   }, []);
 
   const GetTpMaintainList = () => {

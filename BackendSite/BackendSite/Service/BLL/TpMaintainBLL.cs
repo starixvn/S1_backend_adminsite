@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using BackendSite.Service.Model.TpMaintain;
+using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
 
 namespace BackendSite.Service.BLL
 {
@@ -37,6 +39,11 @@ namespace BackendSite.Service.BLL
         public bool DeleteTpMaintain(int sn)
         {
             return tpMaintainService.DeleteTpMaintain(sn);
+        }
+
+        public IEnumerable<TpGameType> GetTpGameTypeList()
+        {
+            return tpMaintainService.GetTpGameTypeList();
         }
     }
 }
