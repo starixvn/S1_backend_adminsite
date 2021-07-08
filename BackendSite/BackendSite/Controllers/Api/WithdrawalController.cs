@@ -8,14 +8,12 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Amazon.S3;
 using Amazon.S3.Model;
 using System.IO;
 using Amazon;
-using System.Net;
 using BackendSite.ExceptionHandling;
 
 namespace BackendSite.Controllers.Api
@@ -41,7 +39,16 @@ namespace BackendSite.Controllers.Api
         private readonly string awsWithdrawalBucketName;
         private readonly string ProxyHost;
         private readonly int ProxyPort;
-        public WithdrawalController(IConfiguration configuration, CourierAdapter courierAdapter, WithdrawalBLL withdrawalBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, ExcelBLL excelBLL)
+        private readonly AuthorizeBLL _authorizeBLL;
+        public WithdrawalController(IConfiguration configuration,
+                                    CourierAdapter courierAdapter,
+                                    WithdrawalBLL withdrawalBLL,
+                                    SelLangBLL selLangBLL,
+                                    MessageBLL messageBLL,
+                                    CustInfoBLL custInfoBLL,
+                                    BankDetailBLL bankDetailBLL,
+                                    ExcelBLL excelBLL,
+                                    AuthorizeBLL authorizeBLL)
         {
             this.withdrawalBLL = withdrawalBLL;
             this.selLangBLL = selLangBLL;
@@ -49,6 +56,8 @@ namespace BackendSite.Controllers.Api
             this.custInfoBLL = custInfoBLL;
             this.bankDetailBLL = bankDetailBLL;
             this.excelBLL = excelBLL;
+            _authorizeBLL = authorizeBLL;
+
             payApiUrl = configuration.GetValue<string>("PayService");
             this.courierAdapter = courierAdapter;
             awsKey = configuration.GetValue<string>("AWSKey");
@@ -180,17 +189,17 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult(selLangBLL);
             //var apiResult = new ApiResult();
             var withdrawConfirmReuslt = -1;
-
+            var authData = _authorizeBLL.GetAuthData();
             if (withdrawalReq.Action == (int)WithdrawalStatus.Approved)
             {
-                withdrawConfirmReuslt = withdrawalBLL.WithdrawalApproved(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
+                withdrawConfirmReuslt = withdrawalBLL.WithdrawalApproved(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name, authData.UserId);
 
                 if (withdrawConfirmReuslt > 0)
                 {
                     var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
                     var userLang = custInfoBLL.GetCustInfoWithCache(withdrawalRequest.CustId).UserLang;
                     // Send message to player
-                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender", userLang);
+                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
                     string title = selLangBLL.GetResourceValue("lbl_WithdrawalApprovedTitle", userLang);
                     title = string.Format(title, withdrawalReq.TransId);
                     string content = selLangBLL.GetResourceValue("lbl_WithdrawalApprovedContent", userLang);
@@ -200,14 +209,14 @@ namespace BackendSite.Controllers.Api
             }
             else if (withdrawalReq.Action == (int)WithdrawalStatus.Rejected)
             {
-                withdrawConfirmReuslt = withdrawalBLL.WithdrawalRejectd(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
+                withdrawConfirmReuslt = withdrawalBLL.WithdrawalRejected(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
 
                 if (withdrawConfirmReuslt > 0)
                 {
-                    var depositRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
-                    var userLang = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId).UserLang;
+                    var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
+                    var userLang = custInfoBLL.GetCustInfoWithCache(withdrawalRequest.CustId).UserLang;
                     // Send message to player
-                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender", userLang);
+                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
                     string title = selLangBLL.GetResourceValue("lbl_WithdrawalRejectTitle", userLang);
                     title = string.Format(title, withdrawalReq.TransId);
                     string content = selLangBLL.GetResourceValue("lbl_WithdrawalRejectContent", userLang);
