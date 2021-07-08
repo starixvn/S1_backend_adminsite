@@ -455,13 +455,17 @@ import DateTimePicker from 'react-datetime';
                                         </div>
                                     </td>):
                                     (<td>
-                                        {number_format(data.amount)}
-                                        {(subFuncKeys.indexOf("f_dp_editAmount") > -1 && data.status == 1)?
-                                        (<button className="btn btn-edit" onClick={this.onClickEdit.bind(this,data.amount)}>
-                                            <i className="icon-edit"></i>
-                                        </button> ):null}
-                                        <button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.amount}>Copy
-                                        </button>
+                                        <div>
+                                            {number_format(data.amount)}
+                                            <div className="button-action float-right">
+                                                {(subFuncKeys.indexOf("f_dp_editAmount") > -1 && data.status == 1)?
+                                                (<button type="button" className="btn btn-edit" onClick={this.onClickEdit.bind(this,data.amount)}>
+                                                    <i className="icon-edit"></i>
+                                                </button>):null}
+                                            </div>
+                                            <button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.amount}>Copy
+                                            </button>
+                                        </div>
                                     </td>)
                                 }
                             </tr>
