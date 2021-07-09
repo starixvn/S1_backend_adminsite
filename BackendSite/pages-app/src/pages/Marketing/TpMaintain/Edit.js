@@ -26,14 +26,19 @@ const EditPanel = props => {
 		id: 1,
 		beginDate: moment().format(dateformat),
 		endDate: moment().add(1,"day").format(dateformat),
-		maintainType:"Date"
-	  });
+		maintainType:"Date",
+		typeList: props.typeList,
+		tpGameType: [],
+	});
 
 	const EditFiled = (v, datacolumn) => {
 		updateData({
 			...stateData,
 			[datacolumn]: v
-		});		
+		});	
+		if (datacolumn == "id"){
+			GetTpGameTypeOptions(stateData.typeList, v);
+		}			
 	};
 
 	const InsertTpMaintain = () => {
@@ -52,6 +57,46 @@ const EditPanel = props => {
 		} else {
 			alert(msg);
 		}
+	};
+
+
+	const CheckBox_OnChange = (v, dataColumn) => {
+		console.log("OnChange");
+		let isRemove = stateData[dataColumn].includes(v);
+		let newChecked = isRemove
+		  ? stateData[dataColumn].filter((value) => value !== v)
+		  : stateData[dataColumn].push(v);
+		let currentTab = stateData[dataColumn];
+		if (newChecked.length === 0) {
+		  currentTab = [];
+		} else if (currentTab === null) {
+		  currentTab = newChecked;
+		}
+	
+		if (isRemove && !newChecked.includes(currentTab)) {
+		  currentTab = newChecked.length === 0 ? [] : newChecked;
+		}
+		console.log(currentTab);
+		updateData({
+		  ...stateData,
+		  [dataColumn]: currentTab,
+		});
+	};
+	
+	const CheckBox_CheckAll = (v, dataColumn, options) => {
+		console.log("CheckAll");
+		if (v !== "All") return false;
+		let currentTab =
+			stateData[dataColumn].length === options.length
+			? []
+			: options.map((o) => {
+				return o.value;
+			  });
+		console.log(currentTab);
+		updateData({
+		  ...stateData,
+		  [dataColumn]: currentTab,
+		});
 	};
 
 	let commonRows = commonColDefs.map((col, cIdx) => {
@@ -103,7 +148,21 @@ const EditPanel = props => {
 				selectedValue={props.id}
 				dataColumn={"id"}
 				onChange={EditFiled}
-			/>  
+			/> 
+			<br></br>
+			 <div className="row-flex">
+				{stateData.typeList ? (
+				<CheckBoxElem
+					Title="Tp GameType"
+					Options={GetTpGameTypeOptions(stateData.typeList, stateData.id)}
+					Selected={stateData.tpGameType}
+					OnChange={CheckBox_OnChange}
+					OnChangeAll={CheckBox_CheckAll}
+					dataColumn="tpGameType"
+				/>
+				) : null}
+			</div> 
+			
 			<br></br>
 			{commonRows}
 			<button
@@ -182,7 +241,7 @@ const GetTPOptions = (tpList) => {
 	  });
 	}
 	return TPOptions;
-  };
+};
 
 const DropDownBox = (props) => {
 	const onChange = (e) => {
@@ -209,5 +268,75 @@ const DropDownBox = (props) => {
 			</div>
 	  	</div>	
 	);
-  };
+};
+
+const GetTpGameTypeOptions = (typeList, tpId) => {
+	let TpGameTypeOptions = [];	
+	if (typeList != null) {
+		typeList.forEach((x) => {
+			if	(tpId == x.tpId){
+				TpGameTypeOptions.push({ value: `${x.type}-${x.categoryId}`, displayText: x.typeName });
+			}			
+	  });
+	}
+	return TpGameTypeOptions;		
+};  
+
+const CheckBoxElem = ({
+	Title,
+	Options,
+	Selected = [],
+	OnChange,
+	OnChangeAll,
+	dataColumn,
+  }) => {
+	let opt = Options.map((o) => {
+	  return (
+		<CheckBox
+		  key={o.value}
+		  Options={null}
+		  onChange={OnChange}
+		  Title={o.displayText}
+		  checked={Selected.includes(o.value)}
+		  Value={o.value}
+		  dataColumn={dataColumn}
+		/>
+	  );
+	});
+	return (
+	  <div className="input-item" style={{ width: "auto" }}>
+		<span className="label">{Title}</span>
+		<div className="field">						
+			<CheckBox
+			onChange={OnChangeAll}
+			Title="All"
+			Options={Options}
+			checked={true}
+			Value="All"
+			dataColumn={dataColumn}
+			/>
+			{opt}
+		</div>
+	  </div>
+	);
+};
+  
+const CheckBox = (props) => {
+	const OnChange = (e) => {
+	  props.onChange(props.Value, props.dataColumn, props.Options);
+	};
+	return (
+	  <label className="checkbox checkbox-checked">
+		<input
+		  type="checkbox"
+		  style={{ width: "0" }}
+		  value={props.Value}
+		  checked={props.checked}
+		  onChange={OnChange}
+		/>
+		<i className="icon icon-checkbox"></i>
+		<span className="text">{props.Title}</span>
+	  </label>
+	);
+};
 export default EditPanel;
