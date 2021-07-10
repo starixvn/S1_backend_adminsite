@@ -13,9 +13,10 @@ namespace BackendSite.Service.Model.TpMaintain
         public string SiteName { get; set; }
         public int TpId { get; set; }
         public string TpName { get; set; }
-        public int TpGameType { get; set; }
+        public int TpGameType { get; set; } = 0;
+        public string TpGameTypeList{ get; set; }
         public string TypeName { get; set; }
-        public int TpCategoryId { get; set; }
+        public int TpCategoryId { get; set; } = 0;
         public string CategoryName { get; set; }
         public DateTime BeginDate { get; set; }
         public DateTime EndDate { get; set; }

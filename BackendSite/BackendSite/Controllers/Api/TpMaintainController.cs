@@ -53,7 +53,7 @@ namespace BackendSite.Controllers.Api
 
                 return new ApiResult
                 {
-                    ErrorCode = tpMaintainBLL.InsertTpMaintain(input) ? 0 : -1
+                    ErrorCode = await tpMaintainBLL.InsertTpMaintain(input) ? 0 : -1
                 };
             }
             catch (Exception ex)
@@ -166,6 +166,7 @@ namespace BackendSite.Controllers.Api
                 SiteName = server.SiteName,
                 TpId = input.TpId,
                 TpName = input.TpName,
+                TpGameTypeList = input.TpGameTypeList,
                 BeginDate = input.BeginDate,
                 EndDate = input.EndDate,
                 MaintainType = input.MaintainType,

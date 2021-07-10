@@ -28,7 +28,6 @@ const EditPanel = props => {
 		endDate: moment().add(1,"day").format(dateformat),
 		maintainType:"Date",
 		typeList: props.typeList,
-		tpGameType: [],
 	});
 
 	const EditFiled = (v, datacolumn) => {
@@ -37,6 +36,9 @@ const EditPanel = props => {
 			[datacolumn]: v
 		});	
 		if (datacolumn == "id"){
+			$("input[type='checkbox']").each(function() {
+				$(this).prop("checked", false);
+			});
 			GetTpGameTypeOptions(stateData.typeList, v);
 		}			
 	};
@@ -51,52 +53,33 @@ const EditPanel = props => {
 			check = false;
 			msg = "Please select endDate.";
 		}
+		let tpGametype = "";
+		if($("input[type='checkbox'][value='0']").prop("checked")) {
+			tpGametype="0";
+		} else {	
+			$("input[type='checkbox'][value!='0']:checked").each(function() {
+				tpGametype += `${$(this).val()},`;
+			});
+		}
 
 		if (check) {
-			props.InsertTpMaintain(stateData);
+			props.InsertTpMaintain(stateData, tpGametype);
 		} else {
 			alert(msg);
 		}
 	};
-
-
 	const CheckBox_OnChange = (v, dataColumn) => {
-		console.log("OnChange");
-		let isRemove = stateData[dataColumn].includes(v);
-		let newChecked = isRemove
-		  ? stateData[dataColumn].filter((value) => value !== v)
-		  : stateData[dataColumn].push(v);
-		let currentTab = stateData[dataColumn];
-		if (newChecked.length === 0) {
-		  currentTab = [];
-		} else if (currentTab === null) {
-		  currentTab = newChecked;
-		}
-	
-		if (isRemove && !newChecked.includes(currentTab)) {
-		  currentTab = newChecked.length === 0 ? [] : newChecked;
-		}
-		console.log(currentTab);
-		updateData({
-		  ...stateData,
-		  [dataColumn]: currentTab,
-		});
 	};
-	
-	const CheckBox_CheckAll = (v, dataColumn, options) => {
-		console.log("CheckAll");
-		if (v !== "All") return false;
-		let currentTab =
-			stateData[dataColumn].length === options.length
-			? []
-			: options.map((o) => {
-				return o.value;
-			  });
-		console.log(currentTab);
-		updateData({
-		  ...stateData,
-		  [dataColumn]: currentTab,
+
+	const CheckBox_OnChangeAll = (v, dataColumn) => {
+		$("input[type='checkbox'][value!='0']").each(function() {
+			$(this).prop("checked", false);
 		});
+		if($("input[type='checkbox'][value='0']").prop("checked")) {
+			$("#CheckItemGroup").hide();
+		} else {
+			$("#CheckItemGroup").show();
+		}
 	};
 
 	let commonRows = commonColDefs.map((col, cIdx) => {
@@ -155,9 +138,8 @@ const EditPanel = props => {
 				<CheckBoxElem
 					Title="Tp GameType"
 					Options={GetTpGameTypeOptions(stateData.typeList, stateData.id)}
-					Selected={stateData.tpGameType}
 					OnChange={CheckBox_OnChange}
-					OnChangeAll={CheckBox_CheckAll}
+					OnChangeAll={CheckBox_OnChangeAll}
 					dataColumn="tpGameType"
 				/>
 				) : null}
@@ -285,7 +267,6 @@ const GetTpGameTypeOptions = (typeList, tpId) => {
 const CheckBoxElem = ({
 	Title,
 	Options,
-	Selected = [],
 	OnChange,
 	OnChangeAll,
 	dataColumn,
@@ -293,32 +274,32 @@ const CheckBoxElem = ({
 	let opt = Options.map((o) => {
 	  return (
 		<CheckBox
-		  key={o.value}
-		  Options={null}
 		  onChange={OnChange}
+		  Options={null}
 		  Title={o.displayText}
-		  checked={Selected.includes(o.value)}
 		  Value={o.value}
 		  dataColumn={dataColumn}
 		/>
 	  );
 	});
-	return (
+ 	return (
 	  <div className="input-item" style={{ width: "auto" }}>
 		<span className="label">{Title}</span>
-		<div className="field">						
+		<div className="field">		
 			<CheckBox
 			onChange={OnChangeAll}
 			Title="All"
 			Options={Options}
-			checked={true}
-			Value="All"
+			Value="0"
 			dataColumn={dataColumn}
-			/>
+			/>		
+			<br />	
+			<div id="CheckItemGroup">	
 			{opt}
+			</div>
 		</div>
 	  </div>
-	);
+	); 
 };
   
 const CheckBox = (props) => {
@@ -331,7 +312,6 @@ const CheckBox = (props) => {
 		  type="checkbox"
 		  style={{ width: "0" }}
 		  value={props.Value}
-		  checked={props.checked}
 		  onChange={OnChange}
 		/>
 		<i className="icon icon-checkbox"></i>

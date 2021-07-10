@@ -76,15 +76,16 @@ const App = () => {
     });
   };
 
-  const InsertTpMaintain = (datas) => {
+  const InsertTpMaintain = (datas, tpGametype) => {
     let insertData = {
       siteId: datas.siteId,
       tpId: datas.id,
       beginDate: moment(datas.beginDate).toJSON(),
       endDate: moment(datas.endDate).toJSON(),
       maintainType: "Date",
+      tpGameTypeList: tpGametype
     };
-
+    
     let param = {
       Url: "TpMaintain/InsertTpMaintain",
       Data: qs.stringify(insertData),
