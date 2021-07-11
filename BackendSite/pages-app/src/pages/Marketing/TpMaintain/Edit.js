@@ -39,11 +39,21 @@ const EditPanel = props => {
 			$("input[type='checkbox']").each(function() {
 				$(this).prop("checked", false);
 			});
+			$("#CheckItemGroup").show();
 			GetTpGameTypeOptions(stateData.typeList, v);
 		}			
 	};
 
 	const InsertTpMaintain = () => {
+		let tpGametype = "";
+		if($("input[type='checkbox'][value='0']").prop("checked")) {
+			tpGametype="0";
+		} else {	
+			$("input[type='checkbox'][value!='0']:checked").each(function() {
+				tpGametype += `${$(this).val()},`;
+			});
+		}
+
 		let msg = "";
 		let check = true;
 		if (!stateData.beginDate) {
@@ -53,13 +63,9 @@ const EditPanel = props => {
 			check = false;
 			msg = "Please select endDate.";
 		}
-		let tpGametype = "";
-		if($("input[type='checkbox'][value='0']").prop("checked")) {
-			tpGametype="0";
-		} else {	
-			$("input[type='checkbox'][value!='0']:checked").each(function() {
-				tpGametype += `${$(this).val()},`;
-			});
+		else if (tpGametype == "") {
+			check = false;
+			msg = "Please select tpGametype.";
 		}
 
 		if (check) {
