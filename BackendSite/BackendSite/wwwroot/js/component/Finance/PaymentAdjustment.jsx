@@ -131,7 +131,7 @@ import qs from 'qs';
                 return;
             }
 
-            if(amount > adjustMentLimitMax && adjustMentLimitMax !== 0){
+            if(amount > adjustMentLimitMax && adjustMentLimitMax !== 0 && (parseInt(option) === 1 || parseInt(option) === 3)){
                 this.setState({ CheckPassword: true });
                 return;
             }
