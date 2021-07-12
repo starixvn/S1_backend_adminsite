@@ -140,7 +140,7 @@ namespace BackendSite.Service.DAL
                 using (var tran = conn.BeginTransaction())
                 {
                     string SpName = "Admin_PayCurrency_Set";
-                    conn.Execute(SpName, new { ChannelId, CurrencyId, MinAmount, MaxAmount, AmountRule, AmountShow }, commandType: CommandType.StoredProcedure);
+                    conn.Execute(SpName, new { ChannelId, CurrencyId, MinAmount, MaxAmount, AmountRule, AmountShow }, tran, commandType: CommandType.StoredProcedure);
 
                     var list = new Dictionary<string, string>();
 

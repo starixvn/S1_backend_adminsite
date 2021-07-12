@@ -289,7 +289,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         public ApiResult AddDepositLimitInfo(DepositLimitInfo depositLimitInfo)
         {
-            var result = depositBLL.AddDepositLimit(depositLimitInfo);
+            var result = depositBLL.AddDepositLimit(depositLimitInfo,User.Identity.Name);
             var apiResult = new ApiResult();
             if (result)
             {
@@ -308,7 +308,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         public ApiResult EditDepositLimitInfo(DepositLimitInfo depositLimitInfo)
         {
-            var result = depositBLL.EditDepositLimit(depositLimitInfo);
+            var result = depositBLL.EditDepositLimit(depositLimitInfo,User.Identity.Name);
             var apiResult = new ApiResult();
             if (result)
             {
@@ -327,7 +327,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult DeleteDepositLimitInfo(DepositLimitInfo depositLimitInfo)
         {
-            var result = depositBLL.DeleteDepositLimit(depositLimitInfo);
+            var result = depositBLL.DeleteDepositLimit(depositLimitInfo,User.Identity.Name);
             var apiResult = new ApiResult();
             if (result > 0)
             {
