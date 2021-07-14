@@ -37,6 +37,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<AdjustmentLogReport>();
             try
             {
+                adjustmentLogReportBLL.GetAdjustmentInfoLog(para);
                 //var prizeSearchResult = prizeBLL.PrizeSearch(prizeSelect);
                 //apiResult.Data = prizeSearchResult.DrawPrize;
                 //apiResult.PageNumber = prizeSearchResult.PageNumber;

@@ -15,6 +15,13 @@ namespace BackendSite.Service.Model
         public string Operator { get; set; }
 
     }
+    public class AdjustmentLogReportResult
+    {
+        public List<AdjustmentLogReport> AdjustmentLogReport { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
     public class AdjustmentInfoLogMenu
     {
         public string Menu { get; set; }
@@ -26,5 +33,6 @@ namespace BackendSite.Service.Model
         public string User { get; set; }
         public string Menu { get; set; }
         public int PageNumber { get; set; }
+        public int PageSize { get; set; }
     }
 }

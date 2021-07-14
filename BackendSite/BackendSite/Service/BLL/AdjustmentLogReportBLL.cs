@@ -18,5 +18,10 @@ namespace BackendSite.Service.BLL
         {
             return adjustmentLogReportService.GetAdjustmentInfoLogMenu();
         }
+        public AdjustmentLogReportResult GetAdjustmentInfoLog(GetAdjustmentInfoLogPara para)
+        {
+            //return adjustmentLogReportService.GetAdjustmentInfoLog(para); 
+            return null;
+        }
     }
 }

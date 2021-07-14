@@ -35,18 +35,18 @@ const App = () => {
   };
 
   const Submit = () => {
-    let param = {
-      Url: "AdjustmentLogReport/GetAdjustmentInfoLog",
-      Data: qs.stringify({
-        StartDate: moment(stateFilter.StartDate).unix(),
-        EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
-        User: stateFilter.User,
-        Menu: stateFilter.TransId,
-        PageNumber: 1,
-      }),
+    let Data = {
+      StartDate: moment(stateFilter.StartDate).unix(),
+      EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
+      User: stateFilter.User,
+      Menu: stateFilter.Menu,
+      PageNumber: 1,
+      PageSize: parseInt(10),
     };
-    WebAPI.PostData(param).then((res) => {
+    api.post("/api/AdjustmentLogReport/GetAdjustmentInfoLog",Data).then((res) => {
       if (res.data.errorCode === 0) {
+        console.log(res.data.data);
+        // setMenu(res.data.data);
       } else {
         alert(res.data.message ?? "failed to get data.");
       }
