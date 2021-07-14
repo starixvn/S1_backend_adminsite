@@ -204,7 +204,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int pageSize, int pageNumber,int CategoryId, int BaseCurrencyId, int RebateCategoriesId,ref List<string> CurrencyAmount)
+        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int pageSize, int pageNumber,int CategoryId, int BaseCurrencyId,ref List<string> CurrencyAmount)
         {
             List<string> tempCurrencyTotalAmount = new List<string>();
             VipRebateInfoData SearchData = new VipRebateInfoData();
@@ -218,10 +218,9 @@ namespace BackendSite.Service.DAL
             props.Add("PageSize", pageSize);
             props.Add("CategoryId", CategoryId);
             props.Add("BaseCurrencyId", BaseCurrencyId);
-            props.Add("CategoryType", RebateCategoriesId);
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_VipRebateTotalAmountV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_VipRebateTotalAmountV3_Get", props, commandType: CommandType.StoredProcedure).ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
                 CurrencyTotalAmount.ForEach(x =>
@@ -237,7 +236,7 @@ namespace BackendSite.Service.DAL
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<VipRebateInfo>("Admin_VipRebateReportListV4_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var result = conn.Query<VipRebateInfo>("Admin_VipRebateReportListV5_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             SearchData.VipRebateInfoList = result;
             SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;

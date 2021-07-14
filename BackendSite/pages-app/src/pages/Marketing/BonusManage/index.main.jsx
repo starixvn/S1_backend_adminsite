@@ -197,14 +197,8 @@ export default ({
 		<div className="container-fluid">
 			<h4 className="page-name">Bonus Management</h4>
 			<div className="filter">
-				{/* <div className="row-flex">
-					<pre>  </pre>
-					<p>SiteName</p>
-					<pre>                 </pre>
-					<p>PromotionType</p>
-				</div> */}
 				<div className="row-flex">
-					<div className="input-item" style={{ width: "200px", zIndex: "4" }}>
+					{/* <div className="input-item" style={{ width: "200px", zIndex: "4" }}>
 						<span className="label">SiteName</span>
 						<div className="field">
 							<MultiSelect
@@ -215,8 +209,20 @@ export default ({
 							labelledBy={"Select"}
 							/>
 						</div>
-					</div>
-					<div className="input-item" style={{ width: "200px", zIndex: "4" }}>
+					</div> */}
+					<OptionElem
+						columnTitle="SiteName"
+						options={GetSelectedSiteName(SiteList)}
+						onChange={SetSitnemaFilter}
+						values={SitnemaFilter}
+					/>
+					<OptionElem
+						columnTitle="PromotionType"
+						options={GetSelectedPromotionType(initPromotionType)}
+						onChange={SetPromotionTypeFilter}
+						values={PromotionTypeFilter}
+					/>
+					{/* <div className="input-item" style={{ width: "200px", zIndex: "4" }}>
 						<span className="label">PromotionType</span>
 						<div className="field">
 							<MultiSelect
@@ -227,7 +233,7 @@ export default ({
 							labelledBy={"Select"}
 							/>
 						</div>
-					</div>
+					</div> */}
 					<SelectBox
 						Title="Status"
 						Options={initStatusType}
@@ -358,3 +364,40 @@ const GetSelectedPromotionType = (props) => {
 	})
 	return headerRows;
 };
+
+const OptionElem = ({ columnTitle, options, onChange, values }) => {
+	const OnSelect = (value) => {
+	  onChange(value, "Currency");
+	};
+  
+	const itemRenderer = ({ checked, option, onClick }) => {
+	  return (
+		<div>
+		  <input
+			style={{ height: "15px", width: "20px" }}
+			id={option.label}
+			type="checkbox"
+			onChange={onClick}
+			checked={checked}
+		  />
+		  <label htmlFor={option.label}>{option.label}</label>
+		</div>
+	  );
+	};
+  
+	return (
+	  <div className="input-item" style={{ width: "200px", zIndex: "4" }}>
+		<span className="label">{columnTitle}</span>
+		<div className="field">
+		  <MultiSelect
+			disableSearch={"true"}
+			options={options}
+			value={values}
+			onChange={OnSelect}
+			labelledBy={"Select"}
+			ItemRenderer={itemRenderer}
+		  />
+		</div>
+	  </div>
+	);
+  };
