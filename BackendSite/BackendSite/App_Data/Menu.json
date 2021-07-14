@@ -328,6 +328,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "AdjustmentLogReport",
+        "Title": "Adjustment Log Report",
+        "FuncKey": "Finance/AdjustmentLogReport",
+        "Controller": "Finance",
+        "Action": "AdjustmentLogReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

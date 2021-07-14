@@ -198,9 +198,13 @@ module.exports = {
     //   // '@babel/polyfill',
     //   "./src/pages/Finance/AdjustmentLimitManagement/index.js",
     // ],
-    "Administration/SpecialPasswordManagement.min": [
-    	// '@babel/polyfill',
-    	"./src/pages/Administration/SpecialPasswordManagement/index.js"
+    // "Administration/SpecialPasswordManagement.min": [
+    // 	// '@babel/polyfill',
+    // 	"./src/pages/Administration/SpecialPasswordManagement/index.js"
+    // ],
+    "Finance/AdjustmentLogReport.min": [
+      // '@babel/polyfill',
+      "./src/pages/Finance/AdjustmentLogReport/index.js",
     ],
   },
   output: {
