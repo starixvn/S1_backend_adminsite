@@ -197,29 +197,37 @@ export default ({
 		<div className="container-fluid">
 			<h4 className="page-name">Bonus Management</h4>
 			<div className="filter">
-				<div className="row-flex">
+				{/* <div className="row-flex">
 					<pre>  </pre>
 					<p>SiteName</p>
 					<pre>                 </pre>
 					<p>PromotionType</p>
-				</div>
+				</div> */}
 				<div className="row-flex">
-					<MultiSelect
-					    disableSearch={"true"}
-						options={GetSelectedSiteName(SiteList)}
-						value={SitnemaFilter}
-						onChange={SetSitnemaFilter}
-						labelledBy={"Select"}
-					/>
-					<pre>              </pre>
-					<MultiSelect
-					    disableSearch={"true"}
-						options={GetSelectedPromotionType(initPromotionType)}
-						value={PromotionTypeFilter}
-						onChange={SetPromotionTypeFilter}
-						labelledBy={"Select"}
-					/>
-					<pre>       </pre>
+					<div className="input-item" style={{ width: "200px", zIndex: "4" }}>
+						<span className="label">SiteName</span>
+						<div className="field">
+							<MultiSelect
+							disableSearch={"true"}
+							options={GetSelectedSiteName(SiteList)}
+							value={SitnemaFilter}
+							onChange={SetSitnemaFilter}
+							labelledBy={"Select"}
+							/>
+						</div>
+					</div>
+					<div className="input-item" style={{ width: "200px", zIndex: "4" }}>
+						<span className="label">PromotionType</span>
+						<div className="field">
+							<MultiSelect
+							disableSearch={"true"}
+							options={GetSelectedPromotionType(initPromotionType)}
+							value={PromotionTypeFilter}
+							onChange={SetPromotionTypeFilter}
+							labelledBy={"Select"}
+							/>
+						</div>
+					</div>
 					<SelectBox
 						Title="Status"
 						Options={initStatusType}
