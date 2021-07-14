@@ -84,9 +84,9 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetCustTpBetRecordDetailListbyGameType(custId, selDate, gameTypeId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
         }
-        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int pageSize, int pageNumber,int CategoryId,int BaseCurrencyId,int RebateCategoriesId,ref List<string> CurrencyAmount)
+        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int pageSize, int pageNumber,int CategoryId,int BaseCurrencyId,ref List<string> CurrencyAmount)
         {
-            return walletService.GetVipRebateInfoList(selectSite, currency, startDate, endDate, User, pageSize, pageNumber, CategoryId, BaseCurrencyId, RebateCategoriesId, ref CurrencyAmount);
+            return walletService.GetVipRebateInfoList(selectSite, currency, startDate, endDate, User, pageSize, pageNumber, CategoryId, BaseCurrencyId, ref CurrencyAmount);
         }
         public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, long? startDate, long? endDate, int pageSize, int pageNumber)
         {

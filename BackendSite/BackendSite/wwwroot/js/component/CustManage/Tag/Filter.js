@@ -27,7 +27,7 @@ const Filter = (props) => {
             type="submit"
             onClick={props.ClickSubmit}
           >
-            Edit
+            Add
           </button>
           <button
             className="btn btn-search"
