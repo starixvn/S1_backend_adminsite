@@ -16,7 +16,6 @@ const App = () => {
     User: "",
     Category: "0",
     BaseCurrency: 0,
-    RebateCategories: 0,
     DateQuickPicker:"0"
   });
 
@@ -169,7 +168,6 @@ const App = () => {
       PageNumber: 1,
       PageSize: 10,
       BaseCurrencyId: parseInt(stateFilter.BaseCurrency, 10),
-      RebateCategoriesId: parseInt(stateFilter.RebateCategories, 10),
     };
     api
       .post("/api/Payment/GetVipRebateInfoList", Data)
@@ -211,7 +209,6 @@ const App = () => {
       PageNumber: PageNumber,
       PageSize: 10,
       BaseCurrencyId: parseInt(stateDatas.FilterInfo.BaseCurrency, 10),
-      RebateCategoriesId: parseInt(stateDatas.FilterInfo.RebateCategories, 10),
     };
 
     api
@@ -246,10 +243,6 @@ const App = () => {
         EndDate: moment(stateDatas.FilterInfo.EndDate).unix(),
         User: stateDatas.FilterInfo.User,
         BaseCurrencyId: parseInt(stateDatas.FilterInfo.BaseCurrency, 10),
-        RebateCategoriesId: parseInt(
-          stateDatas.FilterInfo.RebateCategories,
-          10
-        ),
       },
     };
 

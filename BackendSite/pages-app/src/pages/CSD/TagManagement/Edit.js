@@ -3,7 +3,6 @@ import moment from "moment";
 import { SketchPicker } from "react-color";
 
 const Panel = (props) => {
-  console.log(props);
   return (
     <div className="filter">
       <div>

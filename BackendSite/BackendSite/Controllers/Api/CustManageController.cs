@@ -1217,6 +1217,18 @@ namespace BackendSite.Controllers.Api
         {
             if (custInfoBLL.SetCustTag(para.CustId,para.SelectTag, User.Identity.Name) > 0)
             {
+                List<string> temp = new List<string>();
+                string selectTag = JsonConvert.SerializeObject(temp);
+                if (para.SelectTag != null && para.SelectTag.Any())
+                {
+                    var alltagDict = custInfoBLL.GetAllTag().ToDictionary(x=> x.Id,x=> x.TagName);
+                    para.SelectTag.ToList().ForEach(x =>
+                    {
+                        temp.Add(alltagDict[x]);
+                    });
+                    selectTag = JsonConvert.SerializeObject(temp);
+                }
+                custInfoBLL.AddCustNote(para.CustId, $"Set Cust Tag:{selectTag}", User.Identity.Name);
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,

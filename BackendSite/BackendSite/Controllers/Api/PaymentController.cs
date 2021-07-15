@@ -565,7 +565,6 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
             public int CategoryId { get; set; }
             public int BaseCurrencyId { get; set; }
-            public int RebateCategoriesId { get; set; }
         }
         [HttpPost]
         public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoList(VipRebateInfoPara para)
@@ -575,7 +574,7 @@ namespace BackendSite.Controllers.Api
             {
                 List<string> CurrencyAmount = new List<string>();
                 var SearchResult = paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, para.StartDate, para.EndDate, para.User, para.PageSize, para.PageNumber,
-                    para.CategoryId, para.BaseCurrencyId, para.RebateCategoriesId, ref CurrencyAmount);
+                    para.CategoryId, para.BaseCurrencyId, ref CurrencyAmount);
                 apiResult.Data = SearchResult.VipRebateInfoList;
                 apiResult.PageNumber = SearchResult.PageNumber;
                 apiResult.TotalPages = SearchResult.TotalPages;

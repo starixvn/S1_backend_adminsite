@@ -20,6 +20,14 @@ export const dataColumnDefs = () => {
 			columnTitle: "TpName"
 		},
 		{
+			dataColumn: "typeName",
+			columnTitle: "TpTypeName"
+		},
+		{
+			dataColumn: "categoryName",
+			columnTitle: "CategoryName"
+		},
+		{
 			dataColumn: "beginDate",
 			columnTitle: "BeginDate Time" + " (" + moment().format('Z') + ")",
 			body:{
