@@ -207,14 +207,14 @@ namespace BackendSite.Service.BLL
             return withdrawalLimitService.EditWithdrawalLimitInfo(withdrawalLimitInfoManage, UpdateOperator);
         }
 
-        public int DeleteWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        public int DeleteWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string Operator)
         {
             var currentUpperPoint = withdrawalLimitService.GetWithdrawalLimitInfo(withdrawalLimitInfoManage.SiteId, withdrawalLimitInfoManage.CurrencyId, withdrawalLimitInfoManage.VipLevel + 1);
 
             if (currentUpperPoint != null)
                 return 0;
 
-            return withdrawalLimitService.DeleteWithdrawalLimitInfo(withdrawalLimitInfoManage);
+            return withdrawalLimitService.DeleteWithdrawalLimitInfo(withdrawalLimitInfoManage, Operator);
         }
         public IEnumerable<WithdrawalKYC> GetWithdrawalKYCList(int SiteId)
         {

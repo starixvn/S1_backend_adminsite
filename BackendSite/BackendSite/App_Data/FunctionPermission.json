@@ -273,6 +273,11 @@
         "DisplayKey": "AdjustmentLimit Management",
         "FuncKey": "Finance/AdjustmentLimitManagement",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Adjustment Log Report",
+        "FuncKey": "Finance/AdjustmentLogReport",
+        "Enable": false
       }
     ]
   },

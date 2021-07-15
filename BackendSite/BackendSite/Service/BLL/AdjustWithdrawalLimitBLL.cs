@@ -47,9 +47,9 @@ namespace BackendSite.Service.BLL
             return adjustmentService.GetAdjustWithdrawalLimitsLog(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
         }
 
-        public int SetAdjustWithdrawalLimit(AdjustWithdrawalLimit withdrawalLimitInfo, string UserName, int CurrencyId, int SiteId)
+        public int SetAdjustWithdrawalLimit(AdjustWithdrawalLimit withdrawalLimitInfo, string UserName, int CurrencyId, int SiteId, string Operator)
         {
-            return adjustmentService.SetAdjustWithdrawalLimit(withdrawalLimitInfo, UserName, CurrencyId, SiteId);
+            return adjustmentService.SetAdjustWithdrawalLimit(withdrawalLimitInfo, UserName, CurrencyId, SiteId, Operator);
         }
     }
 }

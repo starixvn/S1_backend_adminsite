@@ -229,7 +229,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(int siteId, int depositType, int currencyId) => depositService.GetDepositLimitInfos(siteId, depositType,currencyId);
 
-        public bool AddDepositLimit(DepositLimitInfo depositLimitInfo)
+        public bool AddDepositLimit(DepositLimitInfo depositLimitInfo, string Operator)
         {
             //if (depositLimitInfo.VipLevel > 1)
             //{
@@ -244,10 +244,10 @@ namespace BackendSite.Service.BLL
             //        return false;
             //}
 
-            return depositService.AddDepositLimitInfo(depositLimitInfo);
+            return depositService.AddDepositLimitInfo(depositLimitInfo, Operator);
         }
 
-        public bool EditDepositLimit(DepositLimitInfo depositLimitInfo)
+        public bool EditDepositLimit(DepositLimitInfo depositLimitInfo,string Operator)
         {
             //var currentBelowLevel = depositService.GetDepositLimitInfo(depositLimitInfo.SiteId, depositLimitInfo.DepositType, depositLimitInfo.CurrencyId, depositLimitInfo.VipLevel - 1);
             //var currentUpperLevel = depositService.GetDepositLimitInfo(depositLimitInfo.SiteId, depositLimitInfo.DepositType, depositLimitInfo.CurrencyId, depositLimitInfo.VipLevel + 1);
@@ -269,17 +269,17 @@ namespace BackendSite.Service.BLL
             //        return false;
             //}
 
-            return depositService.EditDepositLimitInfo(depositLimitInfo);
+            return depositService.EditDepositLimitInfo(depositLimitInfo, Operator);
         }
 
-        public int DeleteDepositLimit(DepositLimitInfo depositLimitInfo)
+        public int DeleteDepositLimit(DepositLimitInfo depositLimitInfo, string Operator)
         {
             var currentUpperPoint = depositService.GetDepositLimitInfo(depositLimitInfo.SiteId, depositLimitInfo.DepositType, depositLimitInfo.CurrencyId, depositLimitInfo.VipLevel + 1);
 
             if (currentUpperPoint != null)
                 return 0;
 
-            return depositService.DeleteDepositLimitInfo(depositLimitInfo);
+            return depositService.DeleteDepositLimitInfo(depositLimitInfo, Operator);
         }
 
         private readonly Dictionary<string, System.Drawing.Imaging.ImageFormat> _contentTypesCheck = new Dictionary<string, System.Drawing.Imaging.ImageFormat>(comparer: StringComparer.OrdinalIgnoreCase)

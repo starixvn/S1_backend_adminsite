@@ -107,7 +107,7 @@ namespace BackendSite.Controllers.Api
                 adjustWithdrawalLimit.SiteName = custInfo.SiteName;
                 adjustWithdrawalLimit.Operator = authData.UserName;
                 adjustWithdrawalLimit.CustId = CustId;
-                var resultCode = adjustWithdrawalLimitBLL.SetAdjustWithdrawalLimit(adjustWithdrawalLimit, custInfo.UserName, custInfo.CurrencyId, custInfo.SiteId);
+                var resultCode = adjustWithdrawalLimitBLL.SetAdjustWithdrawalLimit(adjustWithdrawalLimit, custInfo.UserName, custInfo.CurrencyId, custInfo.SiteId,User.Identity.Name);
                 if (resultCode == 21)
                 {
                     result.ErrorCode = 21;
