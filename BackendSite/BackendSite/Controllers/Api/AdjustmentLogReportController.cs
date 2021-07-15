@@ -37,14 +37,12 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<AdjustmentLogReport>();
             try
             {
-                adjustmentLogReportBLL.GetAdjustmentInfoLog(para);
-                //var prizeSearchResult = prizeBLL.PrizeSearch(prizeSelect);
-                //apiResult.Data = prizeSearchResult.DrawPrize;
-                //apiResult.PageNumber = prizeSearchResult.PageNumber;
-                //apiResult.TotalPages = prizeSearchResult.TotalPages;
-                //apiResult.RowCount = prizeSearchResult.RowCount;
-                //apiResult.CurrencyAmount = prizeSearchResult.CurrencyAmount;
-                //apiResult.ErrorCode = 0;
+                var SearchResult = adjustmentLogReportBLL.GetAdjustmentInfoLog(para);
+                apiResult.Data = SearchResult.AdjustmentLogReport;
+                apiResult.PageNumber = SearchResult.PageNumber;
+                apiResult.TotalPages = SearchResult.TotalPages;
+                apiResult.RowCount = SearchResult.RowCount;
+                apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
             {

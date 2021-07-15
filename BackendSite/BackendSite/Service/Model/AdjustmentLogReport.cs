@@ -28,8 +28,8 @@ namespace BackendSite.Service.Model
     }
     public class GetAdjustmentInfoLogPara
     {
-        public decimal StartDate { get; set; }
-        public decimal EndDate { get; set; }
+        public long StartDate { get; set; }
+        public long EndDate { get; set; }
         public string User { get; set; }
         public string Menu { get; set; }
         public int PageNumber { get; set; }
