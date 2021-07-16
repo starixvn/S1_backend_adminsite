@@ -296,7 +296,7 @@ namespace BackendSite.Controllers.Api
 
         public ApiResult DeleteWithdrawalAccounting(DeleteWithdrawalAccountingRequest request)
         {
-            var result = _withdrawalBLL.DeleteWithdrawalAccounting(request.Id);
+            var result = _withdrawalBLL.DeleteWithdrawalAccounting(request.Id, out string transId, out int seq, out int uploadPicTimes);
 
             if (!result)
             {
@@ -304,6 +304,8 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
+                _ = DeleteAccountPictureAsync(transId, seq, uploadPicTimes);
+
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
@@ -315,56 +317,27 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public async Task<ApiResult> UploadAccountingPicture(UploadAccountingPictureRequest request)
         {
-            var apiResult = new ApiResult();
-            try
+            var result = _withdrawalBLL.UpdateWithdrawalAccountingForUploadPicture(request.Id, out int newUploadPictureTimes);
+            if (result)
             {
-                var result = _withdrawalBLL.UpdateWithdrawalAccountingForUploadPicture(request.Id,out int newUploadPictureTimes);
-                if (result)
+                string pictureBaseOnSixFour = request.Picture.Replace("data:image/png;base64,", "");
+                byte[] bytes = Convert.FromBase64String(pictureBaseOnSixFour);
+                MemoryStream stream = new MemoryStream(bytes);
+
+                if (await UploadAccountPictureAsync(stream, request.TransId, request.Seq, newUploadPictureTimes))
                 {
-                    var WithdrawalPic = _withdrawalBLL.GetWithdrawalPicCount(request.TransId);
-                    string x = request.Picture.Replace("data:image/png;base64,", "");
-                    byte[] bytes = Convert.FromBase64String(x);
-                    MemoryStream stream = new MemoryStream(bytes);
-                    var config = new AmazonS3Config
+                    return new ApiResult()
                     {
-                        RegionEndpoint = RegionEndpoint.APSoutheast1
+                        ErrorCode = (int)ErrorCodeEnum.Success
                     };
-
-                    if (!string.IsNullOrEmpty(ProxyHost))
-                    {
-                        config.ProxyHost = ProxyHost;
-                        config.ProxyPort = ProxyPort;
-                    }
-
-                    IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
-                    var putRequest = new PutObjectRequest()
-                    {
-                        BucketName = awsWithdrawalBucketName,
-                        ContentType = "image/png",
-                        InputStream = stream,
-                        Key = $"{awsWithdrawalAccountingFolder}/{request.TransId}_{request.Seq}_{newUploadPictureTimes}.png"
-                    };
-
-                    PutObjectResponse putResponse = await client.PutObjectAsync(putRequest);
-
-                    if (putResponse.HttpStatusCode == HttpStatusCode.OK)
-                    {
-                        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                    }
-                }
-                else
-                {
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
-                    apiResult.Message = "Upload Fail.";
                 }
             }
-            catch (AmazonS3Exception awsEx)
+
+            return new ApiResult()
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = "Aws Exception Error.";
-                apiResult.RawMessage = awsEx.Message;
-            }
-            return apiResult;
+                ErrorCode = (int)ErrorCodeEnum.Fail,
+                Message = "Upload Fail."
+            };
         }
 
         [HttpGet]
@@ -376,13 +349,44 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public async Task<ApiResult> DeleteAccountingPicture(DeleteAccountingPictureRequest request)
         {
-            var apiResult = new ApiResult()
+            var deletePicResult = DeleteAccountPictureAsync(request.TransId, request.Seq, request.UploadPicTimes);
+
+            if (!await deletePicResult)
             {
-                ErrorCode = (int)ErrorCodeEnum.Fail,
-                Message = "Delete Fail."
+                return new ApiResult()
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Delete Fail."
+                };
+            }
+            return new ApiResult()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Message = "Delete Successful."
             };
+        }
+
+        [HttpPost]
+        public async Task<ApiResult> CheckAccountingPicture(CheckAccountingPictureRequest request)
+        {
+            return new ApiResult<bool>()
+            {
+                Data = await CheckAccountingPictureAsync(request.TransId, request.Seq, request.UploadPicTimes),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        #region Private Methods
+
+        private async Task<bool> UploadAccountPictureAsync(MemoryStream stream, string transId, int seq, int uploadPicTimes)
+        {
             try
             {
+                if (await CheckAccountingPictureAsync(transId, seq, uploadPicTimes))
+                {
+                    return false;
+                }
+
                 var config = new AmazonS3Config
                 {
                     RegionEndpoint = RegionEndpoint.APSoutheast1
@@ -395,42 +399,77 @@ namespace BackendSite.Controllers.Api
                 }
 
                 IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
-                var deleeteRequest = new DeleteObjectRequest()
+                var putRequest = new PutObjectRequest()
                 {
                     BucketName = awsWithdrawalBucketName,
-                    Key = $"{awsWithdrawalAccountingFolder}/{request.TransId}_{request.Seq}_{request.UploadPicTimes}.png"
+                    ContentType = "image/png",
+                    InputStream = stream,
+                    Key = $"{awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png"
                 };
-                DeleteObjectResponse deleteResponse = await client.DeleteObjectAsync(deleeteRequest);
 
-                if (!await GetAccountingPictureAsync(request.TransId, request.Seq, request.UploadPicTimes))
+                PutObjectResponse putResponse = await client.PutObjectAsync(putRequest);
+
+                if (putResponse.HttpStatusCode != HttpStatusCode.OK)
                 {
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                    return false;
                 }
-
+                return true;
             }
             catch (AmazonS3Exception awsEx)
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = "Aws Exception Error.";
-                apiResult.RawMessage = awsEx.Message;
+                return false;
             }
-
-            return apiResult;
-        }
-
-        [HttpPost]
-        public async Task<ApiResult> CheckAccountingPicture(CheckAccountingPictureRequest request)
-        {
-            return new ApiResult<bool>()
+            catch (Exception ex)
             {
-                Data = await GetAccountingPictureAsync(request.TransId, request.Seq, request.UploadPicTimes),
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
+                return false;
+            }
         }
 
-        #region Private Methods
+        private async Task<bool> DeleteAccountPictureAsync(string transId, int seq, int uploadPicTimes)
+        {
+            try
+            {
+                var isExist = CheckAccountingPictureAsync(transId, seq, uploadPicTimes);
 
-        private async Task<bool> GetAccountingPictureAsync(string transId, int seq, int uploadPicTimes)
+                if (await isExist)
+                {
+                    var config = new AmazonS3Config
+                    {
+                        RegionEndpoint = RegionEndpoint.APSoutheast1
+                    };
+
+                    if (!string.IsNullOrEmpty(ProxyHost))
+                    {
+                        config.ProxyHost = ProxyHost;
+                        config.ProxyPort = ProxyPort;
+                    }
+
+                    IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
+                    var deleeteRequest = new DeleteObjectRequest()
+                    {
+                        BucketName = awsWithdrawalBucketName,
+                        Key = $"{awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png"
+                    };
+                    DeleteObjectResponse deleteResponse = await client.DeleteObjectAsync(deleeteRequest);
+
+                    if (await CheckAccountingPictureAsync(transId, seq, uploadPicTimes))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            catch (AmazonS3Exception awsEx)
+            {
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        private async Task<bool> CheckAccountingPictureAsync(string transId, int seq, int uploadPicTimes)
         {
             try
             {
@@ -464,6 +503,7 @@ namespace BackendSite.Controllers.Api
                 return false;
             }
         }
+
 
         #endregion
 

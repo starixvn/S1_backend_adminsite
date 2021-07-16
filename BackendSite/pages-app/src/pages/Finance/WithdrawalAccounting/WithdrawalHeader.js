@@ -27,7 +27,7 @@ const Panel = (props) => {
             <th scope="row">SiteName</th>
             <td>{props.TransIdData.Withdrawal.siteName}</td>
             <th scope="row">Currency</th>
-            <td>{props.TransIdData.Withdrawal.currencyId}</td>
+            <td>{props.TransIdData.IsoCode}</td>
           </tr>
           <tr>
             <th scope="row">UserName</th>
@@ -61,41 +61,49 @@ const Panel = (props) => {
       </table>
       <h5>
         Accounting Summary{" "}
-        <table className="table table-detail">
-          <tbody>
-            <tr>
-              <th scope="row">Total Count</th>
-              <td>{props.TransIdData.AccountingDatas.length}</td>
-            </tr>
-          </tbody>
-        </table>
+        <span style={{ color: "red", fontWeight: "bold" }}>
+          {"     Total Count: "}
+          {props.TransIdData.AccountingDatas.length}
+        </span>
       </h5>
       <table className="table table-detail">
         <tbody>
           <tr>
-            <th scope="row" colSpan="2">
-              Withdrawal Info
-            </th>
-            <th scope="row" colSpan="2">
-              Accounting Summary
-            </th>
-            <th scope="row" colSpan="2">
-              Compare Result
+            <th scope="row"></th>
+            <th scope="row">Withdrawal Info</th>
+            <th scope="row">Accounting Summary</th>
+            <th scope="row">Compare Result</th>
+            <th scope="row" style={{ width: "150px" }}>
+              Description
             </th>
           </tr>
           <tr>
             <th scope="row">Amount</th>
             <td>{props.TransIdData.Withdrawal.amount}</td>
-            <th scope="row">Amount</th>
             <td>{accountingAmount}</td>
-            <td>123</td>
+            {CompareResult(
+              accountingAmount,
+              props.TransIdData.Withdrawal.amount
+            )}
+            {CompareDescription(
+              "Amount",
+              accountingAmount,
+              props.TransIdData.Withdrawal.amount
+            )}
           </tr>
           <tr>
             <th scope="row">ChargeFee</th>
             <td> {props.TransIdData.Withdrawal.chargeFee}</td>
-            <th scope="row">ChargeFee</th>
             <td> {accountingChargeFee}</td>
-            <td>456</td>
+            {CompareResult(
+              accountingChargeFee,
+              props.TransIdData.Withdrawal.chargeFee
+            )}
+            {CompareDescription(
+              "ChargeFee",
+              accountingChargeFee,
+              props.TransIdData.Withdrawal.chargeFee
+            )}
           </tr>
         </tbody>
       </table>
@@ -126,6 +134,26 @@ const Panel = (props) => {
       </div>
     </div>
   );
+};
+
+const CompareResult = (accountingNum, withdrawalNum) => {
+  if (accountingNum > withdrawalNum) {
+    return <td style={{ fontWeight: "bold", background: "red" }}>Over</td>;
+  } else if (accountingNum < withdrawalNum) {
+    return <td style={{ fontWeight: "bold", background: "yellow" }}>Under</td>;
+  } else {
+    return <td style={{ fontWeight: "bold", background: "#04AA6D" }}>Equal</td>;
+  }
+};
+
+const CompareDescription = (text, accountingNum, withdrawalNum) => {
+  if (accountingNum > withdrawalNum) {
+    return <td>accounting num is MORE THAN withdrawal num.</td>;
+  } else if (accountingNum < withdrawalNum) {
+    return <td>accounting num is LESS THAN withdrawal num.</td>;
+  } else {
+    return <td>accounting num is EQUAL withdrawal num.</td>;
+  }
 };
 
 export default Panel;

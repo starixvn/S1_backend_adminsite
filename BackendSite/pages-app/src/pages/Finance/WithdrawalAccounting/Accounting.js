@@ -111,7 +111,7 @@ const EditPanel = (props) => {
         Value={stateData.amount}
         dataColumn="amount"
         defaultValue="0"
-        Size={500}
+        Size={250}
         type="number"
         onChange={EditFiled}
         AlreadyNum={nowAccountingAmount}
@@ -123,7 +123,7 @@ const EditPanel = (props) => {
         Value={stateData.chargeFee}
         dataColumn="chargeFee"
         defaultValue="0"
-        Size={500}
+        Size={250}
         type="number"
         onChange={EditFiled}
         Disabled={false}
@@ -269,9 +269,15 @@ const CompareInputField = (props) => {
           style={{ width: `${props.Size}px` }}
         />
       </div>
-      <h5 className="label" style={{ marginTop: "auto" }}>
-        +
-      </h5>
+      <div>
+        <span className="label">Display Num With Comma</span>
+        <h5
+          className="label"
+          style={{ marginTop: "auto", width: "250px", textAlign: "center" }}
+        >
+          {" " + number_format(props.Value) + " "}+
+        </h5>
+      </div>
       <div>
         <span className="label"> Already Accounting {props.columnTitle}</span>
         <input

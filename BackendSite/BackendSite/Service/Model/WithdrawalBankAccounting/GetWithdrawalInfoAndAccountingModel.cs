@@ -10,5 +10,7 @@ namespace BackendSite.Service.Model.WithdrawalBankAccounting
         public WithdrawalRequest Withdrawal { get; set; }
 
         public IEnumerable<GetWithdrawalBankAccountingModel> AccountingList { get; set; }
+
+        public string IsoCode { get; set; }
     }
 }

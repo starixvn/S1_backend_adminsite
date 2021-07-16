@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import * as Loading from "./Loading";
 import { api } from "../../../module/WebAPI";
 
 const PictureModal = ({ data, handleClose, show }) => {
@@ -10,6 +11,7 @@ const PictureModal = ({ data, handleClose, show }) => {
     : {};
 
   const Upload = (event) => {
+    Loading.OnLoading();
     let imgindex = 0;
     if (event.clipboardData.files.length) {
       for (var i = 0; i < event.clipboardData.items.length; i++) {
@@ -31,19 +33,14 @@ const PictureModal = ({ data, handleClose, show }) => {
         })
         .then(
           async function (response) {
+            Loading.UnLoading();
             if (response.data.errorCode == 0) {
-              //scope.onRefresh();
-              sethasPictureStatus(true);
-              // if (uploadPictureTimes == 0) {
-              //   setuploadPictureTimes(data.uploadPictureTimes + 1);
-              // } else {
-              //   setuploadPictureTimes(uploadPictureTimes + 1);
-              // }
               data.uploadPicTimes = data.uploadPicTimes + 1;
-              setStateData(data);
+              //setStateData(data);
+              sethasPictureStatus(true);
+              scope.onRefresh();
             } else {
             }
-            //window.location.reload();
           }.bind(this)
         )
         .catch(function (error) {}.bind(this));
@@ -58,18 +55,23 @@ const PictureModal = ({ data, handleClose, show }) => {
       Seq: data.seq,
       UploadPicTimes: data.uploadPicTimes,
     };
-    api
-      .post("/api/WithdrawalBankAccounting/DeleteAccountingPicture", Data)
-      .then(function (res) {
-        if (res.data.errorCode === 0) {
-          sethasPictureStatus(false);
-        } else {
-          alert(res.data.message ?? "check picture error.");
-        }
-      })
-      .catch(function (error) {
-        alert(error);
-      });
+    if (window.confirm(`Are you sure to delete picture ?`)) {
+      Loading.OnLoading();
+      api
+        .post("/api/WithdrawalBankAccounting/DeleteAccountingPicture", Data)
+        .then(function (res) {
+          Loading.UnLoading();
+          if (res.data.errorCode === 0) {
+            sethasPictureStatus(false);
+          } else {
+            alert(res.data.message ?? "check picture error.");
+          }
+        })
+        .catch(function (error) {
+          alert(error);
+        });
+    }
+    Loading.UnLoading();
   };
 
   const Check = () => {

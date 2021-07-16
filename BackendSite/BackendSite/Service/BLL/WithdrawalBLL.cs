@@ -462,9 +462,11 @@ namespace BackendSite.Service.BLL
                     && withdrawalInfo.Status == (int)WithdrawalStatus.Approved)
                 {
                     var accountingDatas = GetAccountingList(transId);
+                    string isoCode = _reportService.GetCurrencyList().Where(x => x.CurrencyId == withdrawalInfo.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
 
                     data.Withdrawal = withdrawalInfo;
                     data.AccountingList = accountingDatas;
+                    data.IsoCode = isoCode;
 
                     return true;
                 }
@@ -485,8 +487,7 @@ namespace BackendSite.Service.BLL
         {
             try
             {
-                var result = InsertWithdrawalBankAccounting(data);
-                if (result > 0)
+                if (InsertWithdrawalBankAccounting(data))
                 {
                     return true;
                 }
@@ -505,8 +506,7 @@ namespace BackendSite.Service.BLL
         {
             try
             {
-                var result = UpdateWithdrawalBankAccounting(data);
-                if (result > 0)
+                if (UpdateWithdrawalBankAccounting(data))
                 {
                     return true;
                 }
@@ -521,7 +521,7 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public bool UpdateWithdrawalAccountingForUploadPicture(int id,out int newUploadPicTimes)
+        public bool UpdateWithdrawalAccountingForUploadPicture(int id, out int newUploadPicTimes)
         {
             newUploadPicTimes = 0;
             try
@@ -529,8 +529,7 @@ namespace BackendSite.Service.BLL
                 var data = GetAccountingById(id);
                 newUploadPicTimes = data.UploadPicTimes + 1;
                 data.UploadPicTimes = data.UploadPicTimes + 1;
-                var result = UpdateWithdrawalBankAccounting(data);
-                if (result > 0)
+                if (UpdateWithdrawalBankAccounting(data))
                 {
                     return true;
                 }
@@ -545,16 +544,21 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public bool DeleteWithdrawalAccounting(int id)
+        public bool DeleteWithdrawalAccounting(int id, out string transId, out int seq, out int uploadPicTimes)
         {
+            transId = string.Empty;
+            seq = 0;
+            uploadPicTimes = 0;
+
             try
             {
-                var result = DeleteWithdrawalBankAccounting(new WithdrawalBankAccountingModel()
+                var item = GetAccountingById(id);
+
+                if (DeleteWithdrawalBankAccounting(item))
                 {
-                    Id = id
-                });
-                if (result > 0)
-                {
+                    transId = item.TransId;
+                    seq = item.Seq;
+                    uploadPicTimes = item.UploadPicTimes;
                     return true;
                 }
                 else
@@ -640,7 +644,7 @@ namespace BackendSite.Service.BLL
                 out rowCount);
         }
 
-        private IEnumerable<WithdrawalBankAccountingModel> GetAccountingList(string transId)
+        private IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingList(string transId)
         {
             return _withdrawalBankAccountingService.GetAccountingListByTransId(transId);
         }
@@ -650,24 +654,19 @@ namespace BackendSite.Service.BLL
             return _withdrawalBankAccountingService.GetById(id);
         }
 
-        private int InsertWithdrawalBankAccounting(WithdrawalBankAccountingModel model)
+        private bool InsertWithdrawalBankAccounting(WithdrawalBankAccountingModel model)
         {
-            return _withdrawalBankAccountingService.Insert(model);
+            return _withdrawalBankAccountingService.SetFlow(ActionType.Create, model);
         }
 
-        private int InsertWithdrawalBankAccountingLog(WithdrawalBankAccountingModel model)
+        private bool UpdateWithdrawalBankAccounting(WithdrawalBankAccountingModel model)
         {
-            return _withdrawalBankAccountingService.InsertLog(model);
+            return _withdrawalBankAccountingService.SetFlow(ActionType.Update, model);
         }
 
-        private int UpdateWithdrawalBankAccounting(WithdrawalBankAccountingModel model)
+        private bool DeleteWithdrawalBankAccounting(WithdrawalBankAccountingModel model)
         {
-            return _withdrawalBankAccountingService.Update(model);
-        }
-
-        private int DeleteWithdrawalBankAccounting(WithdrawalBankAccountingModel model)
-        {
-            return _withdrawalBankAccountingService.Delete(model);
+            return _withdrawalBankAccountingService.SetFlow(ActionType.Delete, model);
         }
 
         #endregion

@@ -5,9 +5,10 @@ import { api } from "../../../module/WebAPI";
 import moment from "moment";
 import Filter from "./Filter";
 import Result from "./Result";
-import DetailFilterPage from "./DetailFilter";
-import Detail from "./Detail";
+import WithdrawalHeader from "./WithdrawalHeader";
+import WithdrawalDetail from "./WithdrawalDetail";
 import Accounting from "./Accounting";
+import * as Loading from "./Loading";
 
 const App = () => {
   const [siteList, setSiteList] = useState([]);
@@ -29,6 +30,7 @@ const App = () => {
   });
   const [Page, setPage] = useState("main");
   const [transIdData, settransIdData] = useState({
+    IsoCode: null,
     Withdrawal: null,
     AccountingDatas: null,
   });
@@ -80,7 +82,7 @@ const App = () => {
       alert("Please Choose End Date");
       return false;
     }
-
+    Loading.OnLoading();
     setSubmitStatus(true);
     setDetailStatus(true);
 
@@ -112,7 +114,7 @@ const App = () => {
       .then(function (res) {
         setSubmitStatus(false);
         setDetailStatus(false);
-
+        Loading.UnLoading();
         if (res.data.errorCode === 0 || res.data.errorCode === 1) {
           setDatas({
             ...stateDatas,
@@ -137,7 +139,8 @@ const App = () => {
 
   //[Main] > [Detail]
   //Get Withdrawal Data For Show in Withdrawal Page.
-  const Click_Detail = (transId) => {
+  const Result_Detail = (transId) => {
+    Loading.OnLoading();
     let Data = {
       TransId: transId,
     };
@@ -147,9 +150,11 @@ const App = () => {
         Data
       )
       .then(function (res) {
+        Loading.UnLoading();
         if (res.data.errorCode === 0) {
           settransIdData({
             ...transIdData,
+            IsoCode: res.data.data.isoCode,
             Withdrawal: res.data.data.withdrawal,
             AccountingDatas: res.data.data.accountingList,
           });
@@ -166,6 +171,7 @@ const App = () => {
   //[Withdrawal] > [Create]
   //Get Default Value Before Create.
   const Create_Accounting = (props) => {
+    Loading.OnLoading();
     let maxSeq = 0;
     if (props.AccountingDatas.length > 0) {
       maxSeq = Math.max.apply(
@@ -175,7 +181,6 @@ const App = () => {
         })
       );
     }
-    console.log(maxSeq);
     let Data = {
       TransId: props.Withdrawal.transId,
       MaxSeq: maxSeq,
@@ -186,6 +191,7 @@ const App = () => {
         Data
       )
       .then(function (res) {
+        Loading.UnLoading();
         if (res.data.errorCode === 0) {
           //res.data.data.hasPicture = false;
           setAccountingData(res.data.data);
@@ -198,6 +204,7 @@ const App = () => {
       .catch(function (error) {
         alert(error);
       });
+    Loading.UnLoading();
   };
 
   //[Withdrawal] > [GoBack]
@@ -210,12 +217,14 @@ const App = () => {
   //[Withdrawal] > [Edit]
   //Get Previous Value Before Edit.
   const Click_Accounting_Edit = (id) => {
+    Loading.OnLoading();
     let Data = {
       Id: id,
     };
     api
       .post("/api/WithdrawalBankAccounting/GetWithdrawalBankAccounting", Data)
       .then(function (res) {
+        Loading.UnLoading();
         if (res.data.errorCode === 0) {
           //res.data.data.hasPicture = false;
           setAccountingData(res.data.data);
@@ -228,16 +237,17 @@ const App = () => {
       .catch(function (error) {
         alert(error);
       });
+    Loading.UnLoading();
   };
 
   //[Withdrawal] > [Delete]
   //Submit Delete Accounting Data.
   const Delete_Accounting = (data) => {
-    console.log(data);
     let Data = {
       Id: data.id,
     };
     if (window.confirm(`Are you sure to delete data ?`)) {
+      Loading.OnLoading();
       api
         .post("/api/WithdrawalBankAccounting/DeleteWithdrawalAccounting", Data)
         .then(function (res) {
@@ -251,6 +261,7 @@ const App = () => {
         .catch(function (error) {
           alert(error);
         });
+      Loading.UnLoading();
     }
   };
 
@@ -279,6 +290,10 @@ const App = () => {
   //[Accounting] > [Submit]
   //Submit Data to server when Create or Update.
   const Set_Accounting = (props) => {
+    if (props.bankAccountNo == null || props.bankAccountNo == "") {
+      alert("Please Choose bank AccountNo.");
+      return false;
+    }
     let Data = {
       Id: props.id,
       TransId: props.transId,
@@ -295,12 +310,14 @@ const App = () => {
     if (props.id == 0) {
       //Insert
       if (window.confirm(`Are you sure to Create data ?`)) {
+        Loading.OnLoading();
         api
           .post(
             "/api/WithdrawalBankAccounting/InsertWithdrawalAccounting",
             Data
           )
           .then(function (res) {
+            Loading.UnLoading();
             if (res.data.errorCode === 0) {
               alert("Create Successful!");
               GoBackToWithdrawal(props.transId);
@@ -316,12 +333,14 @@ const App = () => {
     } else {
       //Update
       if (window.confirm(`Are you sure to update data ?`)) {
+        Loading.OnLoading();
         api
           .post(
             "/api/WithdrawalBankAccounting/UpdateWithdrawalAccounting",
             Data
           )
           .then(function (res) {
+            Loading.UnLoading();
             if (res.data.errorCode === 0) {
               alert("Update Successful!");
               GoBackToWithdrawal(props.transId);
@@ -340,7 +359,7 @@ const App = () => {
   //[Accounting] > [GoBack]
   //Go Back From Accounting To Withdrawal.
   const GoBackToWithdrawal = (transId) => {
-    Click_Detail(transId);
+    Result_Detail(transId);
     setPage("withdrawal");
   };
 
@@ -354,8 +373,6 @@ const App = () => {
   //[Withdrawal] > [PicturePopout] > [Open]
   //Open Accounting Picture From Withdrawal.
   const PicturePopout_Open = (data) => {
-    console.log("PicturePopout", data);
-
     let Data = {
       TransId: data.transId,
       Seq: data.seq,
@@ -396,7 +413,7 @@ const App = () => {
             {...stateDatas}
             DetailBtnDisabled={DetailStatus}
             ChangePage={Result_ChangePage}
-            Detail={Click_Detail}
+            Detail={Result_Detail}
           />
         )}
       </div>
@@ -404,12 +421,12 @@ const App = () => {
   } else if (Page == "withdrawal") {
     return (
       <div className="container-fluid">
-        <DetailFilterPage
+        <WithdrawalHeader
           TransIdData={transIdData}
           Create={Create_Accounting}
           GoBack={GoBackToMain}
         />
-        <Detail
+        <WithdrawalDetail
           AccountingData={transIdData.AccountingDatas}
           PopOutData={accountingData}
           PopOutStatus={PopoutStatus}

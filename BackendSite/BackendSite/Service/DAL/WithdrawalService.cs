@@ -465,7 +465,7 @@ namespace BackendSite.Service.DAL
                                             Creator = userId
                                         };
                                         if (_withdrawalBankAccountingService.Insert(model, conn, trans) > 0
-                                            && _withdrawalBankAccountingService.InsertLog(model, conn, trans) > 0)
+                                            && _withdrawalBankAccountingService.InsertLog((int)ActionType.Create,model, conn, trans) > 0)
                                         {
                                             accountingResult = 1; //InsertAccounting Success.
                                         }

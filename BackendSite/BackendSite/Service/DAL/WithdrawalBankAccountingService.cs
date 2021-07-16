@@ -8,6 +8,7 @@ using System;
 using System.Data;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.DAL
 {
@@ -15,6 +16,7 @@ namespace BackendSite.Service.DAL
     {
         #region Fields
 
+        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
@@ -24,10 +26,10 @@ namespace BackendSite.Service.DAL
 
         public WithdrawalBankAccountingService(IServiceProvider provider)
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();
+            _configuration = provider.GetRequiredService<IConfiguration>();
             var logger = provider.GetRequiredService<ILogger<MySqlClient>>();
-            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
-            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
+            _mainDbClient = new MySqlClient(_configuration.GetConnectionString("ConnectionString"), logger);
+            _reportDbClient = new MySqlClient(_configuration.GetConnectionString("ConnectionStringReport"), logger);
         }
 
         #endregion
@@ -60,20 +62,20 @@ namespace BackendSite.Service.DAL
 
             var datas = _reportDbClient.Query<WithdrawalInfoAndAccountingListModel>("Admin_WithdrawalInfoAndAccounting_Get", parameter);
 
-         
+
             totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
             rowCount = parameter.Get<int?>("_RowCount") ?? 0;
 
             return datas;
         }
 
-        public IEnumerable<WithdrawalBankAccountingModel> GetAccountingListByTransId(string transId)
+        public IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingListByTransId(string transId)
         {
             var parameter = new DynamicParameters();
 
             parameter.Add("_TransId", transId);
 
-            return _reportDbClient.Query<WithdrawalBankAccountingModel>("Admin_WithdrawalBankAccounting_Get", parameter);
+            return _reportDbClient.Query<GetWithdrawalBankAccountingModel>("Admin_WithdrawalBankAccounting_Get", parameter);
         }
 
         public GetWithdrawalBankAccountingModel GetById(int id)
@@ -85,8 +87,52 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryFirst<GetWithdrawalBankAccountingModel>("Admin_WithdrawalBankAccountingById_Get", parameter);
         }
 
+        public bool SetFlow(ActionType action, WithdrawalBankAccountingModel model)
+        {
+            using (MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString")))
+            {
+                connection.Open();
+                using (MySqlTransaction transaction = connection.BeginTransaction())
+                {
+                    switch (action)
+                    {
+                        case ActionType.Create://Insert
+                            if (Insert(model, connection, transaction) == 0)
+                            {
+                                transaction.Rollback();
+                                return false;
+                            }
+                            break;
+                        case ActionType.Update://Update
+                            if (Update(model, connection, transaction) == 0)
+                            {
+                                transaction.Rollback();
+                                return false;
+                            }
+                            break;
+                        case ActionType.Delete://Delete
+                            if (Delete(model, connection, transaction) == 0)
+                            {
+                                transaction.Rollback();
+                                return false;
+                            }
+                            break;
+                    }
+
+                    if (InsertLog((int)action, model, connection, transaction) == 0)
+                    {
+                        transaction.Rollback();
+                        return false;
+                    }
+
+                    transaction.Commit();
+                    return true;
+                }
+            }
+        }
+
         public int Insert(WithdrawalBankAccountingModel model, MySqlConnection conn = null,
-            MySqlTransaction trans = null)
+            MySqlTransaction transaction = null)
         {
             var parameter = new DynamicParameters();
 
@@ -101,12 +147,12 @@ namespace BackendSite.Service.DAL
 
             return conn == null
                 ? _mainDbClient.Execute("Admin_WithdrawalBankAccounting_Ins", parameter)
-                : conn.Execute("Admin_WithdrawalBankAccounting_Ins", parameter, trans,
+                : conn.Execute("Admin_WithdrawalBankAccounting_Ins", parameter, transaction,
                     commandType: CommandType.StoredProcedure);
         }
 
-        public int InsertLog(WithdrawalBankAccountingModel model, MySqlConnection conn = null,
-            MySqlTransaction trans = null)
+        public int InsertLog(int action, WithdrawalBankAccountingModel model, MySqlConnection connection = null,
+            MySqlTransaction transaction = null)
         {
             var parameter = new DynamicParameters();
 
@@ -117,16 +163,17 @@ namespace BackendSite.Service.DAL
             parameter.Add("_ChargeFee", model.ChargeFee);
             parameter.Add("_UploadPicTimes", model.UploadPicTimes);
             parameter.Add("_Memo", model.Memo);
+            parameter.Add("_Mode", action);
             parameter.Add("_Creator", model.Creator);
 
-            return conn == null
+            return connection == null
                 ? _mainDbClient.Execute("Admin_WithdrawalBankAccountingLog_Ins", parameter)
-                : conn.Execute("Admin_WithdrawalBankAccountingLog_Ins", parameter, trans,
+                : connection.Execute("Admin_WithdrawalBankAccountingLog_Ins", parameter, transaction,
                     commandType: CommandType.StoredProcedure);
         }
 
-        public int Update(WithdrawalBankAccountingModel model, MySqlConnection conn = null,
-            MySqlTransaction trans = null)
+        public int Update(WithdrawalBankAccountingModel model, MySqlConnection connection = null,
+            MySqlTransaction transaction = null)
         {
             var parameter = new DynamicParameters();
 
@@ -140,30 +187,22 @@ namespace BackendSite.Service.DAL
             parameter.Add("_Memo", model.Memo);
             parameter.Add("_Operator", model.Creator);
 
-            return conn == null
+            return connection == null
                 ? _mainDbClient.Execute("Admin_WithdrawalBankAccounting_Upd", parameter)
-                : conn.Execute("Admin_WithdrawalBankAccounting_Upd", parameter, trans,
+                : connection.Execute("Admin_WithdrawalBankAccounting_Upd", parameter, transaction,
                     commandType: CommandType.StoredProcedure);
         }
 
-        /// <summary>
-        /// SP Not write yet.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="transId"></param>
-        /// <param name="conn"></param>
-        /// <param name="trans"></param>
-        /// <returns></returns>
-        public int Delete(WithdrawalBankAccountingModel model, MySqlConnection conn = null,
-            MySqlTransaction trans = null)
+        public int Delete(WithdrawalBankAccountingModel model, MySqlConnection connection = null,
+            MySqlTransaction transaction = null)
         {
             var parameter = new DynamicParameters();
 
             parameter.Add("_Id", model.Id);
 
-            return conn == null
+            return connection == null
                 ? _mainDbClient.Execute("Admin_WithdrawalBankAccounting_Del", parameter)
-                : conn.Execute("Admin_WithdrawalBankAccounting_Del", parameter, trans,
+                : connection.Execute("Admin_WithdrawalBankAccounting_Del", parameter, transaction,
                     commandType: CommandType.StoredProcedure);
         }
 
