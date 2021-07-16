@@ -19,6 +19,12 @@ namespace BackendSite.Service.Model.WithdrawalBankAccounting
             set;
         }
 
+        public int Seq
+        {
+            get;
+            set;
+        }
+        
         public string BankAccountNo
         {
             get;
@@ -37,12 +43,11 @@ namespace BackendSite.Service.Model.WithdrawalBankAccounting
             set;
         }
 
-        public bool HasPic
+        public int UploadPicTimes
         {
             get;
             set;
         }
-
         public string Memo
         {
             get;

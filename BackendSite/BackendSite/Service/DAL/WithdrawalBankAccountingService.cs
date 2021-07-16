@@ -7,6 +7,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Data;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 
 namespace BackendSite.Service.DAL
 {
@@ -33,12 +34,16 @@ namespace BackendSite.Service.DAL
 
         #region Methods
 
-        public int GetAccountingList(string siteIds,
+        public IEnumerable<WithdrawalInfoAndAccountingListModel> GetWithdrawalInfoAndAccountingList(string siteIds,
             string currencyIds,
             string startDate,
             string endDate,
             string transId,
-            string userName)
+            string userName,
+            int pageSize,
+            int startIndex,
+            out int totalPages,
+            out int rowCount)
         {
             var parameter = new DynamicParameters();
 
@@ -46,19 +51,38 @@ namespace BackendSite.Service.DAL
             parameter.Add("_CurrencyIds", currencyIds);
             parameter.Add("_StartDate", startDate);
             parameter.Add("_EndDate", endDate);
-            parameter.Add("_TransId", transId == "" ? null : transId);
-            parameter.Add("_UserName", userName == "" ? null : userName);
+            parameter.Add("_TransId", transId);
+            parameter.Add("_UserName", userName);
+            parameter.Add("_PageSize", pageSize);
+            parameter.Add("_StartIndex", startIndex);
+            parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            return _reportDbClient.Execute("Admin_WithdrawalInfoAndAccounting_Get", parameter);
+            var datas = _reportDbClient.Query<WithdrawalInfoAndAccountingListModel>("Admin_WithdrawalInfoAndAccounting_Get", parameter);
+
+         
+            totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
+            rowCount = parameter.Get<int?>("_RowCount") ?? 0;
+
+            return datas;
         }
 
-        public int GetAccountingListByTransId(string transId)
+        public IEnumerable<WithdrawalBankAccountingModel> GetAccountingListByTransId(string transId)
         {
             var parameter = new DynamicParameters();
 
             parameter.Add("_TransId", transId);
 
-            return _reportDbClient.Execute("Admin_WithdrawalBankAccounting_Get", parameter);
+            return _reportDbClient.Query<WithdrawalBankAccountingModel>("Admin_WithdrawalBankAccounting_Get", parameter);
+        }
+
+        public GetWithdrawalBankAccountingModel GetById(int id)
+        {
+            var parameter = new DynamicParameters();
+
+            parameter.Add("_Id", id);
+
+            return _reportDbClient.QueryFirst<GetWithdrawalBankAccountingModel>("Admin_WithdrawalBankAccountingById_Get", parameter);
         }
 
         public int Insert(WithdrawalBankAccountingModel model, MySqlConnection conn = null,
@@ -67,10 +91,11 @@ namespace BackendSite.Service.DAL
             var parameter = new DynamicParameters();
 
             parameter.Add("_TransId", model.TransId);
+            parameter.Add("_Seq", model.Seq);
             parameter.Add("_BankAccountNo", model.BankAccountNo);
             parameter.Add("_Amount", model.Amount);
             parameter.Add("_ChargeFee", model.ChargeFee);
-            parameter.Add("_HasPic", model.HasPic);
+            parameter.Add("_UploadPicTimes", model.UploadPicTimes);
             parameter.Add("_Memo", model.Memo);
             parameter.Add("_Creator", model.Creator);
 
@@ -86,10 +111,11 @@ namespace BackendSite.Service.DAL
             var parameter = new DynamicParameters();
 
             parameter.Add("_TransId", model.TransId);
+            parameter.Add("_Seq", model.Seq);
             parameter.Add("_BankAccountNo", model.BankAccountNo);
             parameter.Add("_Amount", model.Amount);
             parameter.Add("_ChargeFee", model.ChargeFee);
-            parameter.Add("_HasPic", model.HasPic);
+            parameter.Add("_UploadPicTimes", model.UploadPicTimes);
             parameter.Add("_Memo", model.Memo);
             parameter.Add("_Creator", model.Creator);
 
@@ -98,22 +124,25 @@ namespace BackendSite.Service.DAL
                 : conn.Execute("Admin_WithdrawalBankAccountingLog_Ins", parameter, trans,
                     commandType: CommandType.StoredProcedure);
         }
-        
+
         public int Update(WithdrawalBankAccountingModel model, MySqlConnection conn = null,
             MySqlTransaction trans = null)
         {
             var parameter = new DynamicParameters();
 
+            parameter.Add("_Id", model.Id);
+            parameter.Add("_TransId", model.TransId);
+            parameter.Add("_Seq", model.Seq);
             parameter.Add("_BankAccountNo", model.BankAccountNo);
             parameter.Add("_Amount", model.Amount);
             parameter.Add("_ChargeFee", model.ChargeFee);
-            parameter.Add("_HasPic", model.HasPic);
+            parameter.Add("_UploadPicTimes", model.UploadPicTimes);
             parameter.Add("_Memo", model.Memo);
-            parameter.Add("_Creator", model.Creator);
+            parameter.Add("_Operator", model.Creator);
 
             return conn == null
-                ? _mainDbClient.Execute("Admin_WithdrawalBankAccounting_Ins", parameter)
-                : conn.Execute("Admin_WithdrawalBankAccounting_Ins", parameter, trans,
+                ? _mainDbClient.Execute("Admin_WithdrawalBankAccounting_Upd", parameter)
+                : conn.Execute("Admin_WithdrawalBankAccounting_Upd", parameter, trans,
                     commandType: CommandType.StoredProcedure);
         }
 
@@ -125,13 +154,12 @@ namespace BackendSite.Service.DAL
         /// <param name="conn"></param>
         /// <param name="trans"></param>
         /// <returns></returns>
-        public int Delete(int id, string transId,MySqlConnection conn = null,
+        public int Delete(WithdrawalBankAccountingModel model, MySqlConnection conn = null,
             MySqlTransaction trans = null)
         {
             var parameter = new DynamicParameters();
 
-            parameter.Add("_Id",id);
-            parameter.Add("_TransId", transId);
+            parameter.Add("_Id", model.Id);
 
             return conn == null
                 ? _mainDbClient.Execute("Admin_WithdrawalBankAccounting_Del", parameter)

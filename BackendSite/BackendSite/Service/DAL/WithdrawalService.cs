@@ -372,7 +372,8 @@ namespace BackendSite.Service.DAL
             int? withdrawalType,
             out int custId,
             out decimal amount,
-            int userId = 0)
+            int userId = 0,
+            bool hasPic = false)
         {
             Match m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out int withdrawalId);
@@ -456,15 +457,15 @@ namespace BackendSite.Service.DAL
                                         var model = new WithdrawalBankAccountingModel()
                                         {
                                             TransId = withdrawalInfoItem.TransId,
+                                            Seq = 1,
                                             BankAccountNo = withdrawalInfoItem.FromAccountNo,
                                             Amount = withdrawalInfoItem.Amount,
                                             ChargeFee = withdrawalInfoItem.ChargeFee,
-                                            HasPic = withdrawalInfoItem.HasPic,
+                                            UploadPicTimes = hasPic ? 1 : 0,
                                             Creator = userId
                                         };
-
-                                        if (_withdrawalBankAccountingService.Insert(model, conn, trans) > 0 &&
-                                            _withdrawalBankAccountingService.InsertLog(model, conn, trans) > 0)
+                                        if (_withdrawalBankAccountingService.Insert(model, conn, trans) > 0
+                                            && _withdrawalBankAccountingService.InsertLog(model, conn, trans) > 0)
                                         {
                                             accountingResult = 1; //InsertAccounting Success.
                                         }

@@ -1,0 +1,131 @@
+import React, { useEffect, useRef, useReducer, useState } from "react";
+import WebAPI from "../../../module/WebAPI";
+import { api } from "../../../module/WebAPI";
+import moment from "moment";
+
+const Panel = (props) => {
+  console.log("props", props);
+
+  var accountingAmount = 0;
+  for (var i = 0; i < props.TransIdData.AccountingDatas.length; i++) {
+    accountingAmount += props.TransIdData.AccountingDatas[i].amount;
+  }
+
+  var accountingChargeFee = 0;
+  for (var i = 0; i < props.TransIdData.AccountingDatas.length; i++) {
+    accountingChargeFee += props.TransIdData.AccountingDatas[i].chargeFee;
+  }
+
+  return (
+    <div className="filter">
+      <h5>Withdrawal Info</h5>
+      <table className="table table-detail">
+        <tbody>
+          <tr>
+            <th scope="row">TransId</th>
+            <td>{props.TransIdData.Withdrawal.transId}</td>
+            <th scope="row">SiteName</th>
+            <td>{props.TransIdData.Withdrawal.siteName}</td>
+            <th scope="row">Currency</th>
+            <td>{props.TransIdData.Withdrawal.currencyId}</td>
+          </tr>
+          <tr>
+            <th scope="row">UserName</th>
+            <td>
+              <a
+                href={
+                  "/CustManage/CustInfo?UserName=" +
+                  props.TransIdData.Withdrawal.userName +
+                  "&custId=" +
+                  props.TransIdData.Withdrawal.custId +
+                  "&TransId=" +
+                  props.TransIdData.Withdrawal.transId
+                }
+                target="_blank"
+              >
+                {props.TransIdData.Withdrawal.userName}
+              </a>
+            </td>
+            <th scope="row">WithdrawalType</th>
+            <td>LocalBank</td>
+            <th scope="row">FromBankAccountNo</th>
+            <td>
+              {props.TransIdData.Withdrawal.bankCode}
+              {"-"}
+              {props.TransIdData.Withdrawal.fromAccountName}
+              {"-"}
+              {props.TransIdData.Withdrawal.fromAccountNo}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <h5>
+        Accounting Summary{" "}
+        <table className="table table-detail">
+          <tbody>
+            <tr>
+              <th scope="row">Total Count</th>
+              <td>{props.TransIdData.AccountingDatas.length}</td>
+            </tr>
+          </tbody>
+        </table>
+      </h5>
+      <table className="table table-detail">
+        <tbody>
+          <tr>
+            <th scope="row" colSpan="2">
+              Withdrawal Info
+            </th>
+            <th scope="row" colSpan="2">
+              Accounting Summary
+            </th>
+            <th scope="row" colSpan="2">
+              Compare Result
+            </th>
+          </tr>
+          <tr>
+            <th scope="row">Amount</th>
+            <td>{props.TransIdData.Withdrawal.amount}</td>
+            <th scope="row">Amount</th>
+            <td>{accountingAmount}</td>
+            <td>123</td>
+          </tr>
+          <tr>
+            <th scope="row">ChargeFee</th>
+            <td> {props.TransIdData.Withdrawal.chargeFee}</td>
+            <th scope="row">ChargeFee</th>
+            <td> {accountingChargeFee}</td>
+            <td>456</td>
+          </tr>
+        </tbody>
+      </table>
+      <div>
+        <button
+          className="btn btn-back"
+          type="back"
+          onClick={props.GoBack}
+          style={{
+            marginTop: "20px",
+            marginBottom: "40px",
+            marginRight: "10px",
+          }}
+        >
+          Back
+        </button>
+        <button
+          className="btn btn-add"
+          onClick={props.Create.bind(this, props.TransIdData)}
+          style={{
+            marginTop: "20px",
+            marginBottom: "40px",
+            marginRight: "10px",
+          }}
+        >
+          Create
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Panel;
