@@ -21,6 +21,7 @@ const Filter = (props) => {
             dataColumn="SelectTag"
           />
         ) : null}
+        {subFuncKeys.includes('ca_setCustTag') ? (
         <div className="button-group">
           <button
             className="btn btn-search"
@@ -37,6 +38,7 @@ const Filter = (props) => {
             Remove Tag
           </button>
         </div>
+        ) : null}
       </div>
     </div>
   );

@@ -114,7 +114,11 @@
           {
             "DisplayKey": "Set Enable/Disable Promotion",
             "FuncKey": "ca_promotion"
-          }
+          },
+          {
+            "DisplayKey": "Set Add/Remove CustTag",
+            "FuncKey": "ca_setCustTag"
+          }, 
         ]
       },
       {
