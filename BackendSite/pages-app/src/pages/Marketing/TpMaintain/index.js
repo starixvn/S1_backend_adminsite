@@ -15,6 +15,7 @@ const defaultModel = {
 };
 
 const App = () => {
+
   const [stateDatas, updateDatas] = useState({
     Datas: null,
     ShowSettingPanel: false,
@@ -23,7 +24,7 @@ const App = () => {
 
   const [siteList, setSiteList] = useState([]);
   const [tpList, setTpList] = useState([]);
-
+  const [typeList, setTypeList] = useState([]);
   useEffect(() => {
     GetTpMaintainList();
 
@@ -47,6 +48,15 @@ const App = () => {
         alert(res.data.message ?? "failed to get data.");
       }
     });
+
+    WebAPI.PostData({ Url: "TpMaintain/GetTpGameTypeList" }).then((res) => {
+      if (res.data.errorCode === 0) {    
+        setTypeList(res.data.data);
+      } else {
+        alert(res.data.message ?? "failed to get data.");
+      }
+    });
+
   }, []);
 
   const GetTpMaintainList = () => {
@@ -66,15 +76,16 @@ const App = () => {
     });
   };
 
-  const InsertTpMaintain = (datas) => {
+  const InsertTpMaintain = (datas, tpGametype) => {
     let insertData = {
       siteId: datas.siteId,
       tpId: datas.id,
       beginDate: moment(datas.beginDate).toJSON(),
       endDate: moment(datas.endDate).toJSON(),
       maintainType: "Date",
+      tpGameTypeList: tpGametype
     };
-
+    
     let param = {
       Url: "TpMaintain/InsertTpMaintain",
       Data: qs.stringify(insertData),
@@ -122,6 +133,7 @@ const App = () => {
         <EditPanel
           siteList={siteList}
           tpList={tpList}
+          typeList={typeList}
           ClickBack={() => {
             updateDatas({
               ...stateDatas,

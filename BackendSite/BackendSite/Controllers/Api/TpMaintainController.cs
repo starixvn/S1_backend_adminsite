@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using BackendSite.Service.Model.TpMaintain;
+using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
 
 namespace BackendSite.Controllers.Api
 {
@@ -51,7 +53,7 @@ namespace BackendSite.Controllers.Api
 
                 return new ApiResult
                 {
-                    ErrorCode = tpMaintainBLL.InsertTpMaintain(input) ? 0 : -1
+                    ErrorCode = await tpMaintainBLL.InsertTpMaintain(input) ? 0 : -1
                 };
             }
             catch (Exception ex)
@@ -133,6 +135,29 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
+        public ApiResult<IEnumerable<TpGameType>> GetTpGameTypeList()
+        {
+            try
+            {
+                return new ApiResult<IEnumerable<TpGameType>>
+                {
+                    Data = tpMaintainBLL.GetTpGameTypeList(),
+                    ErrorCode = 0
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return new ApiResult<IEnumerable<TpGameType>>
+                {
+                    ErrorCode = 999,
+                    Message = ex.Message,
+                };
+            }
+        }
+
         private TpMaintain GetNewTpMaintainBySiteId(TpMaintain input, ServerInfo server)
         {
             return new TpMaintain
@@ -141,6 +166,7 @@ namespace BackendSite.Controllers.Api
                 SiteName = server.SiteName,
                 TpId = input.TpId,
                 TpName = input.TpName,
+                TpGameTypeList = input.TpGameTypeList,
                 BeginDate = input.BeginDate,
                 EndDate = input.EndDate,
                 MaintainType = input.MaintainType,

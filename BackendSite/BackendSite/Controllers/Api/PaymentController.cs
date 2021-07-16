@@ -140,20 +140,6 @@ namespace BackendSite.Controllers.Api
             public decimal Percentage { set; get; }
         }
 
-        public class VipRebateInfoPara
-        {
-            public IEnumerable<int> SelectSite { get; set; }
-            public int Currency { get; set; }
-            public long StartDate { get; set; }
-            public long EndDate { get; set; }
-            public string User { get; set; }
-            public int PageSize { get; set; }
-            public int PageNumber { get; set; }
-            public int CategoryId { get; set; }
-            public int BaseCurrencyId { get; set; }
-            public int RebateCategoriesId { get; set; }
-        }
-
         public class VipRebateInfoByCustIdPara
         {
             public int CustId { get; set; }
@@ -720,6 +706,18 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        public class VipRebateInfoPara
+        {
+            public IEnumerable<int> SelectSite { get; set; }
+            public int Currency { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
+            public string User { get; set; }
+            public int PageSize { get; set; }
+            public int PageNumber { get; set; }
+            public int CategoryId { get; set; }
+            public int BaseCurrencyId { get; set; }
+        }
         [HttpPost]
         public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoList(VipRebateInfoPara para)
         {
@@ -728,7 +726,7 @@ namespace BackendSite.Controllers.Api
             {
                 List<string> CurrencyAmount = new List<string>();
                 var SearchResult = paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, para.StartDate, para.EndDate, para.User, para.PageSize, para.PageNumber,
-                    para.CategoryId, para.BaseCurrencyId, para.RebateCategoriesId, ref CurrencyAmount);
+                    para.CategoryId, para.BaseCurrencyId, ref CurrencyAmount);
                 apiResult.Data = SearchResult.VipRebateInfoList;
                 apiResult.PageNumber = SearchResult.PageNumber;
                 apiResult.TotalPages = SearchResult.TotalPages;
@@ -836,12 +834,13 @@ namespace BackendSite.Controllers.Api
         public class CheckPassWordPara
         {
             public string PassWord { get; set; }
+            public int SiteId { get; set; }
         }
         [HttpPost]
         public ApiResult CheckPassWord(CheckPassWordPara para)
         {
             var apiResult = new ApiResult();
-            if (paymentBLL.CheckPassWord(para.PassWord, User.Identity.Name))
+            if (paymentBLL.CheckPassWord(para.PassWord, para.SiteId))
             {
                 apiResult.ErrorCode = 0;
             }

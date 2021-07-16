@@ -89,5 +89,39 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
+        public ApiResult<SpecialPasswordManagement> GetSpecialPasswordData(GetSpecialPasswordData para)
+        {
+            var result = new ApiResult<SpecialPasswordManagement>();
+            try
+            {
+                result.Data = adminBLL.GetSpecialPasswordData(para.SiteId);
+                result.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                result.ErrorCode = 999;
+                result.RawMessage = ex.ToString();
+            }
+
+            return result;
+        }
+
+        public ApiResult SetSpecialPasswordData(SetSpecialPasswordData para)
+        {
+            var result = adminBLL.SetSpecialPasswordData(para.SiteId, para.Password, User.Identity.Name);
+            var apiResult = new ApiResult();
+            if (result > 0)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
     }
 }

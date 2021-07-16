@@ -1,6 +1,8 @@
-﻿using BackendSite.Service.Model;
+﻿using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -14,10 +16,14 @@ namespace BackendSite.Service.DAL
     public class ThirdPartyService
     {
         private readonly IConfiguration configuration;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public ThirdPartyService(IConfiguration configuration)
+        public ThirdPartyService(IConfiguration configuration, ILogger<MySqlClient> logger)
         {
             this.configuration = configuration;
+            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
+            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
         }
         public IEnumerable<TpWallet> GetTpWallet(int custId)
         {
@@ -77,6 +83,17 @@ namespace BackendSite.Service.DAL
             {
                 return conn.Query<SiteTpListIfo>("Admin_TpList_GetByCurrency", new { CurrencyId = TpDetailPara.Currency, SiteId = TpDetailPara.Site }, commandType: CommandType.StoredProcedure);
             }
+        }
+
+        public void SetAdjustmentTpCustInfoLog(string Menu, int ActionType, string DetailInfo, string Operator)
+        {
+            DynamicParameters props = new DynamicParameters();
+            props.Add("Menu", Menu);
+            props.Add("ActionType", ActionType);
+            props.Add("DetailInfo", DetailInfo);
+            props.Add("Operator", Operator);
+
+            _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", props);
         }
     }
 }
