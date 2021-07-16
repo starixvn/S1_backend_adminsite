@@ -3,7 +3,6 @@ import * as Loading from "./Loading";
 import { api } from "../../../module/WebAPI";
 
 const PictureModal = ({ data, handleClose, show }) => {
-  console.log("PictureModal", data);
   const [hasPictureStatus, sethasPictureStatus] = useState(null);
   const [stateData, setStateData] = useState(data);
   const showHideStyle = show
@@ -74,8 +73,7 @@ const PictureModal = ({ data, handleClose, show }) => {
     Loading.UnLoading();
   };
 
-  const Check = () => {
-    console.log(data);
+  const ShowPic = () => {
     if (data != null) {
       if (hasPictureStatus == null) {
         if (data.hasPicture) {
@@ -96,9 +94,8 @@ const PictureModal = ({ data, handleClose, show }) => {
   };
 
   let picrows = null;
-  console.log(Check());
   if (data != null) {
-    if (Check()) {
+    if (ShowPic()) {
       picrows = (
         <div>
           <img

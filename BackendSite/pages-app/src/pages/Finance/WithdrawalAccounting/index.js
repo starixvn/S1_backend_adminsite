@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useReducer, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import WebAPI from "../../../module/WebAPI";
 import { api } from "../../../module/WebAPI";
@@ -193,7 +193,6 @@ const App = () => {
       .then(function (res) {
         Loading.UnLoading();
         if (res.data.errorCode === 0) {
-          //res.data.data.hasPicture = false;
           setAccountingData(res.data.data);
           Accounting_BankList_Get(transIdData.Withdrawal);
           setPage("accounting");
@@ -226,7 +225,6 @@ const App = () => {
       .then(function (res) {
         Loading.UnLoading();
         if (res.data.errorCode === 0) {
-          //res.data.data.hasPicture = false;
           setAccountingData(res.data.data);
           Accounting_BankList_Get(transIdData.Withdrawal);
           setPage("accounting");
@@ -321,7 +319,6 @@ const App = () => {
             if (res.data.errorCode === 0) {
               alert("Create Successful!");
               GoBackToWithdrawal(props.transId);
-              //DetailSubmit();
             } else {
               alert(res.data.message ?? "failed to get data.");
             }
@@ -344,7 +341,6 @@ const App = () => {
             if (res.data.errorCode === 0) {
               alert("Update Successful!");
               GoBackToWithdrawal(props.transId);
-              //DetailSubmit();
             } else {
               alert(res.data.message ?? "failed to get data.");
             }
