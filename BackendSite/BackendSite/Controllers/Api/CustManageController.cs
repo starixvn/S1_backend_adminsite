@@ -763,6 +763,7 @@ namespace BackendSite.Controllers.Api
 
         #region CSD > Customer Administration > CustInfo [Enable/Disable Bonus]
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_promotion" })]
         public ApiResult SetEnableDisablePromotion(SetEnableDisableBonusPara para)
         {
             if (custInfoBLL.SetEnableDisablePromotion(para.CustId, para.EnablePromotion, User.Identity.Name) > 0)

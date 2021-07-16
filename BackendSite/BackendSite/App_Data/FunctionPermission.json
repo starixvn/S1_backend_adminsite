@@ -110,6 +110,10 @@
           {
             "DisplayKey": "VIP Level Edit",
             "FuncKey": "ca_vipLevelEdit"
+          },
+          {
+            "DisplayKey": "Set Enable/Disable Promotion",
+            "FuncKey": "ca_promotion"
           }
         ]
       },
