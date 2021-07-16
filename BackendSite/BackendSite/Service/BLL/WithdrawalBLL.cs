@@ -6,235 +6,289 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using BackendSite.Service.Model.WithdrawalBankAccounting;
 
 namespace BackendSite.Service.BLL
 {
     public class WithdrawalBLL
     {
-        private readonly WithdrawalService withdrawalService;
-        private readonly ServerInfoService serverInfoService;
-        private readonly WithdrawalLimitService withdrawalLimitService;
-        private readonly ReportService reportService;
+        #region Fields
 
-        public WithdrawalBLL(WithdrawalService withdrawalService, ServerInfoService serverInfoService, WithdrawalLimitService withdrawalLimitService, ReportService reportService)
+        private readonly WithdrawalService _withdrawalService;
+        private readonly ServerInfoService _serverInfoService;
+        private readonly WithdrawalLimitService _withdrawalLimitService;
+        private readonly ReportService _reportService;
+        private readonly WithdrawalBankAccountingService _withdrawalBankAccountingService;
+
+        #endregion
+
+        #region Constructors
+
+        public WithdrawalBLL(WithdrawalService withdrawalService,
+            ServerInfoService serverInfoService,
+            WithdrawalLimitService withdrawalLimitService,
+            ReportService reportService,
+            WithdrawalBankAccountingService withdrawalBankAccountingService)
         {
-            this.withdrawalService = withdrawalService;
-            this.serverInfoService = serverInfoService;
-            this.withdrawalLimitService = withdrawalLimitService;
-            this.reportService = reportService;
+            _withdrawalService = withdrawalService;
+            _serverInfoService = serverInfoService;
+            _withdrawalLimitService = withdrawalLimitService;
+            _reportService = reportService;
+            _withdrawalBankAccountingService = withdrawalBankAccountingService;
         }
 
-        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite, IEnumerable<int> withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,int pageSize, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
+        #endregion
+
+        #region Public Methods
+
+        public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite,
+            IEnumerable<int> withdrawalType, long startDate, long endDate, string withdrawalId, string userName,
+            IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus, int pageSize,
+            ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
         {
-            var serverInfo = serverInfoService.GetModel();
-            return withdrawalService.GetWithdrawalRequestList(selectSite, withdrawalType, startDate, endDate, serverInfo.SiteId/*Not require*/, WithdrawalId, UserName, currencyId, status, levelstatus,pageSize, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
+            var serverInfo = _serverInfoService.GetModel();
+            return _withdrawalService.GetWithdrawalRequestList(selectSite, withdrawalType, startDate, endDate,
+                serverInfo.SiteId /*Not require*/, withdrawalId, userName, currencyId, status, levelStatus, pageSize,
+                ref pageNumber, out totalPages, out rowCount, ref currencyAmount);
         }
 
         public WithdrawalRequest GetWithdrawalRequest(string transId)
         {
-            var serverInfo = serverInfoService.GetModel();
-            int withdrawalId = 0;
+            var serverInfo = _serverInfoService.GetModel();
 
             Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out withdrawalId);
-            return withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId/*Not require*/);
+            int.TryParse(m.Value, out int withdrawalId);
+            return _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId /*Not require*/);
         }
 
         public IEnumerable<Comments> GetWithdrawalRequestComment(string transId)
         {
             var withdrawalRequest = GetWithdrawalRequest(transId);
-            var results = withdrawalService.GetWithdrawalRequestComment(withdrawalRequest.WithdrawalId, withdrawalRequest.SiteId);
+            var results =
+                _withdrawalService.GetWithdrawalRequestComment(withdrawalRequest.WithdrawalId,
+                    withdrawalRequest.SiteId);
             return results;
         }
 
-        public int WithdrawalApproved(string transId, string comment, string Operator)
+        public int WithdrawalApproved(string transId, string comment, string updater, int userId, bool hasPic)
         {
-            var serverInfo = serverInfoService.GetModel();
-            List<int> forStatus = new List<int>();
-            forStatus.Add((int)WithdrawalStatus.Process);
-            int custId = 0;
-            decimal amount = 0m;
-            int withdrawalId = 0;
+            var serverInfo = _serverInfoService.GetModel();
+            var forStatus = new List<int> { (int)WithdrawalStatus.Process };
 
             Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out withdrawalId);
-            var withdrawalRequest = withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
-            var withdrawalInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalRequest.WithdrawalInfo);
+            int.TryParse(m.Value, out int withdrawalId);
+            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            var withdrawalInfo =
+                JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalRequest.WithdrawalInfo);
             withdrawalInfo.CurrencyId = withdrawalRequest.CurrencyId;
-            return withdrawalService.SetWithdrawalInfo(transId, withdrawalRequest.SiteId, comment, Operator, forStatus, WithdrawalStatus.Approved, Newtonsoft.Json.JsonConvert.SerializeObject(withdrawalInfo), withdrawalRequest.WithdrawalType, out custId, out amount);
+            return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
+                JsonConvert.SerializeObject(forStatus), updater,
+                WithdrawalStatus.Approved, JsonConvert.SerializeObject(withdrawalInfo),
+                withdrawalRequest.WithdrawalType, out _, out _, userId, hasPic);
         }
 
-        public int WithdrawalRejectd(string transId, string comment, string Operator)
+        public int WithdrawalRejected(string transId, string comment, string updater)
         {
-            var serverInfo = serverInfoService.GetModel();
-            List<int> forStatus = new List<int>();
-            forStatus.Add((int)WithdrawalStatus.OnHold);
-            forStatus.Add((int)WithdrawalStatus.Verify);
-            forStatus.Add((int)WithdrawalStatus.ToKyc);
-            forStatus.Add((int)WithdrawalStatus.Pending);
-            int custId = 0;
-            decimal amount = 0m;
-            int withdrawalId = 0;
+            var serverInfo = _serverInfoService.GetModel();
+            var forStatus = new List<int>
+            {
+                (int) WithdrawalStatus.OnHold,
+                (int) WithdrawalStatus.Verify,
+                (int) WithdrawalStatus.ToKyc,
+                (int) WithdrawalStatus.Pending
+            };
 
             Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out withdrawalId);
-            var withdrawalRequest = withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
-            return withdrawalService.SetWithdrawalInfo(transId, withdrawalRequest.SiteId, comment, Operator, forStatus, WithdrawalStatus.Rejected, null, (int?)null, out custId, out amount);
+            int.TryParse(m.Value, out int withdrawalId);
+            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
+                JsonConvert.SerializeObject(forStatus), updater,
+                WithdrawalStatus.Rejected, null, null, out _, out _);
         }
 
-        public int WithdrawalVerify(string transId, string comment, string Operator)
+        public int WithdrawalVerify(string transId, string comment, string updater)
         {
-            var serverInfo = serverInfoService.GetModel();
-            List<int> forStatus = new List<int>();
-            forStatus.Add((int)WithdrawalStatus.Pending);
-            forStatus.Add((int)WithdrawalStatus.OnHold);
-            forStatus.Add((int)WithdrawalStatus.Process);
-            //forStatus.Add((int)WithdrawalStatus.ToKyc);
-            int custId = 0;
-            decimal amount = 0m;
-            int withdrawalId = 0;
+            var serverInfo = _serverInfoService.GetModel();
+            var forStatus = new List<int>
+            {
+                (int) WithdrawalStatus.Pending,
+                (int) WithdrawalStatus.OnHold,
+                (int) WithdrawalStatus.Process
+                //(int)WithdrawalStatus.ToKyc
+            };
 
             Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out withdrawalId);
-            var withdrawalRequest = withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
-            return withdrawalService.SetWithdrawalInfo(transId, withdrawalRequest.SiteId, comment, Operator, forStatus, WithdrawalStatus.Verify, null, (int?)null, out custId, out amount);
+            int.TryParse(m.Value, out int withdrawalId);
+            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
+                JsonConvert.SerializeObject(forStatus), updater,
+                WithdrawalStatus.Verify, null, null, out _, out _);
         }
-        public int WithdrawalProcess(string transId, string comment, string Operator, string WithdrawalInfo, int? withdrawalType, out int custId, out decimal amount)
-        {
-            var serverInfo = serverInfoService.GetModel();
-            List<int> forStatus = new List<int>();
-            forStatus.Add((int)WithdrawalStatus.Verify);
 
-            int withdrawalId = 0;
+        public int WithdrawalProcess(string transId, string comment, string updater, string withdrawalInfo,
+            int? withdrawalType, out int custId, out decimal amount)
+        {
+            var serverInfo = _serverInfoService.GetModel();
+            var forStatus = new List<int>
+            {
+                (int) WithdrawalStatus.Verify
+            };
 
             Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out withdrawalId);
-            var withdrawalRequest = withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
-            return withdrawalService.SetWithdrawalInfo(transId, withdrawalRequest.SiteId, comment, Operator, forStatus, WithdrawalStatus.Process, WithdrawalInfo, withdrawalType, out custId, out amount);
+            int.TryParse(m.Value, out int withdrawalId);
+            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
+                JsonConvert.SerializeObject(forStatus), updater,
+                WithdrawalStatus.Process, withdrawalInfo, withdrawalType, out custId, out amount);
         }
-        public int WithdrawalOnHold(string transId, string comment, string Operator)
+
+        public int WithdrawalOnHold(string transId, string comment, string updater)
         {
-            var serverInfo = serverInfoService.GetModel();
-            List<int> forStatus = new List<int>();
-            //forStatus.Add((int)WithdrawalStatus.Verify);
-            forStatus.Add((int)WithdrawalStatus.Pending);
-            //forStatus.Add((int)WithdrawalStatus.ToKyc);
-            int custId = 0;
-            decimal amount = 0m;
-            int withdrawalId = 0;
+            var serverInfo = _serverInfoService.GetModel();
+            var forStatus = new List<int>
+            {
+                (int) WithdrawalStatus.Pending
+                //(int)WithdrawalStatus.Verify
+                //(int)WithdrawalStatus.ToKyc
+            };
 
             Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out withdrawalId);
-            var withdrawalRequest = withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
-            return withdrawalService.SetWithdrawalInfo(transId, withdrawalRequest.SiteId, comment, Operator, forStatus, WithdrawalStatus.OnHold, null, (int?)null, out custId, out amount);
+            int.TryParse(m.Value, out int withdrawalId);
+            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
+                JsonConvert.SerializeObject(forStatus), updater,
+                WithdrawalStatus.OnHold, null, null, out _, out _);
         }
-        public int WithdrawalDraft(string transId, string comment, string Operator)
+
+        public int WithdrawalDraft(string transId, string comment, string updater)
         {
-            var serverInfo = serverInfoService.GetModel();
-            List<int> forStatus = new List<int>();
-            forStatus.Add((int)WithdrawalStatus.Pending);
-            forStatus.Add((int)WithdrawalStatus.OnHold);
-            forStatus.Add((int)WithdrawalStatus.Verify);
-            forStatus.Add((int)WithdrawalStatus.Process);
-            forStatus.Add((int)WithdrawalStatus.ToKyc);
-            int custId = 0;
-            decimal amount = 0m;
-            int withdrawalId = 0;
+            var serverInfo = _serverInfoService.GetModel();
+            var forStatus = new List<int>
+            {
+                (int) WithdrawalStatus.Pending,
+                (int) WithdrawalStatus.OnHold,
+                (int) WithdrawalStatus.Verify,
+                (int) WithdrawalStatus.Process,
+                (int) WithdrawalStatus.ToKyc
+            };
 
             Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out withdrawalId);
-            var withdrawalRequest = withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
-            return withdrawalService.SetWithdrawalInfo(transId, withdrawalRequest.SiteId, comment, Operator, forStatus, WithdrawalStatus.Draft, null, (int?)null, out custId, out amount);
+            int.TryParse(m.Value, out int withdrawalId);
+            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
+                JsonConvert.SerializeObject(forStatus),
+                updater,
+                WithdrawalStatus.Draft, null, null, out _, out _);
         }
-        public int WithdrawalPending(string transId, string comment, string Operator)
+
+        public int WithdrawalPending(string transId, string comment, string updater)
         {
-            var serverInfo = serverInfoService.GetModel();
-            List<int> forStatus = new List<int>();
-            //forStatus.Add((int)WithdrawalStatus.OnHold);
-            forStatus.Add((int)WithdrawalStatus.Verify);
-            forStatus.Add((int)WithdrawalStatus.ToKyc);
-            int custId = 0;
-            decimal amount = 0m;
-            int withdrawalId = 0;
+            var serverInfo = _serverInfoService.GetModel();
+            var forStatus = new List<int>
+            {
+                (int) WithdrawalStatus.Verify,
+                (int) WithdrawalStatus.ToKyc
+                //(int)WithdrawalStatus.OnHold
+            };
 
             Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out withdrawalId);
-            var withdrawalRequest = withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
-            return withdrawalService.SetWithdrawalInfo(transId, withdrawalRequest.SiteId, comment, Operator, forStatus, WithdrawalStatus.Pending, null, (int?)null, out custId, out amount);
+            int.TryParse(m.Value, out int withdrawalId);
+            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
+                JsonConvert.SerializeObject(forStatus),
+                updater,
+                WithdrawalStatus.Pending, null, null, out _, out _);
         }
-        public int WithdrawalToKyc(string transId, string comment, string Operator)
+
+        public int WithdrawalToKyc(string transId, string comment, string updater)
         {
-            var serverInfo = serverInfoService.GetModel();
-            List<int> forStatus = new List<int>();
-            forStatus.Add((int)WithdrawalStatus.Pending);
-            int custId = 0;
-            decimal amount = 0m;
-            int withdrawalId = 0;
+            var serverInfo = _serverInfoService.GetModel();
+            var forStatus = new List<int>
+            {
+                (int) WithdrawalStatus.Pending
+            };
 
             Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out withdrawalId);
-            var withdrawalRequest = withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
-            return withdrawalService.SetWithdrawalInfo(transId, withdrawalRequest.SiteId, comment, Operator, forStatus, WithdrawalStatus.ToKyc, null, (int?)null, out custId, out amount);
-        }
-        
-        public IEnumerable<WithdrawalRequest> GetWithdrawalListByCust(int CustId, string TransId, int? Status, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
-        {
-            return withdrawalService.GetWithdrawalListByCust(CustId, TransId, Status, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
+            int.TryParse(m.Value, out int withdrawalId);
+            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
+                JsonConvert.SerializeObject(forStatus),
+                updater,
+                WithdrawalStatus.ToKyc, null, null, out _, out _);
         }
 
-        public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(string selectSite, string withdrawalType, long startDate, long endDate, string WithdrawalId, string UserName, string currencyId, string status,string LevelStatus)
+        public IEnumerable<WithdrawalRequest> GetWithdrawalListByCust(int custId, string transId, int? status,
+            long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount,
+            ref List<string> currencyAmount)
         {
-            return withdrawalService.GetWithdrawalExportList(selectSite, withdrawalType, startDate, endDate, WithdrawalId, UserName, currencyId, status, LevelStatus);
+            return _withdrawalService.GetWithdrawalListByCust(custId, transId, status, startDate, endDate, pageSize,
+                ref pageNumber, out totalPages, out rowCount, ref currencyAmount);
         }
-        public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(int siteId, int currencyId) => withdrawalLimitService.GetWithdrawalLimitInfos(siteId, currencyId);
 
-        public bool AddWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string UpdateOperator)
+        public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(string selectSite, string withdrawalType,
+            long startDate, long endDate, string withdrawalId, string userName, string currencyId, string status,
+            string levelStatus)
+        {
+            return _withdrawalService.GetWithdrawalExportList(selectSite, withdrawalType, startDate, endDate,
+                withdrawalId, userName, currencyId, status, levelStatus);
+        }
+
+        public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(int siteId, int currencyId) =>
+            _withdrawalLimitService.GetWithdrawalLimitInfos(siteId, currencyId);
+
+        public bool AddWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
         {
             if (withdrawalLimitInfoManage.WithdrawalMax < 0 || withdrawalLimitInfoManage.WithdrawalMin < 0)
             {
                 return false;
             }
-            return withdrawalLimitService.AddWithdrawalLimitInfo(withdrawalLimitInfoManage, UpdateOperator);
+
+            return _withdrawalLimitService.AddWithdrawalLimitInfo(withdrawalLimitInfoManage, updater);
         }
 
-        public bool EditWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage,string UpdateOperator)
+        public bool EditWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
         {
-            if(withdrawalLimitInfoManage.WithdrawalMax <0 || withdrawalLimitInfoManage.WithdrawalMin < 0)
+            if (withdrawalLimitInfoManage.WithdrawalMax < 0 || withdrawalLimitInfoManage.WithdrawalMin < 0)
             {
                 return false;
             }
-            return withdrawalLimitService.EditWithdrawalLimitInfo(withdrawalLimitInfoManage, UpdateOperator);
+
+            return _withdrawalLimitService.EditWithdrawalLimitInfo(withdrawalLimitInfoManage, updater);
         }
 
         public int DeleteWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string Operator)
         {
-            var currentUpperPoint = withdrawalLimitService.GetWithdrawalLimitInfo(withdrawalLimitInfoManage.SiteId, withdrawalLimitInfoManage.CurrencyId, withdrawalLimitInfoManage.VipLevel + 1);
+            var currentUpperPoint = _withdrawalLimitService.GetWithdrawalLimitInfo(withdrawalLimitInfoManage.SiteId,
+                withdrawalLimitInfoManage.CurrencyId, withdrawalLimitInfoManage.VipLevel + 1);
 
             if (currentUpperPoint != null)
                 return 0;
 
-            return withdrawalLimitService.DeleteWithdrawalLimitInfo(withdrawalLimitInfoManage, Operator);
+            return _withdrawalLimitService.DeleteWithdrawalLimitInfo(withdrawalLimitInfoManage, Operator);
         }
-        public IEnumerable<WithdrawalKYC> GetWithdrawalKYCList(int SiteId)
+
+        public IEnumerable<WithdrawalKYC> GetWithdrawalKYCList(int siteId)
         {
-            return withdrawalService.GetWithdrawalKYC(SiteId);
+            return _withdrawalService.GetWithdrawalKYC(siteId);
         }
 
         public bool EditWithdrawalKYCList(WithdrawalKYC withdrawalKYC)
         {
-            return withdrawalService.EditWithdrawalKYC(withdrawalKYC);
+            return _withdrawalService.EditWithdrawalKYC(withdrawalKYC);
         }
-        public List<WithdrawalData> GetWithdrawalLimitData(int SiteId)
+
+        public List<WithdrawalData> GetWithdrawalLimitData(int siteId)
         {
             //IEnumerable<CurrencyDataV2> CurrencyData = null;
-            IEnumerable<ServerInfo> SiteDataList = null;
+            IEnumerable<ServerInfo> siteDataList = null;
             List<WithdrawalData> result = new List<WithdrawalData>();
-            SiteDataList = serverInfoService.GetSiteList();
-            List<int> CurrencyData = SiteDataList.Where(x => x.SiteId == SiteId)?.FirstOrDefault().ICurrencyList.ToList();
-            Dictionary<int,string> currencyList = reportService.GetCurrencyList().ToDictionary(x=> x.CurrencyId,x=> x.IsoCode) ;
-            var WithdrawalMinInfo = withdrawalService.GetWithdrawalLimitData(SiteId).ToList();
-            CurrencyData.ForEach(x =>
+            siteDataList = _serverInfoService.GetSiteList();
+            List<int> currencyData =
+                siteDataList.Where(x => x.SiteId == siteId)?.FirstOrDefault().ICurrencyList.ToList();
+            Dictionary<int, string> currencyList =
+                _reportService.GetCurrencyList().ToDictionary(x => x.CurrencyId, x => x.IsoCode);
+            var WithdrawalMinInfo = _withdrawalService.GetWithdrawalLimitData(siteId).ToList();
+            currencyData.ForEach(x =>
             {
                 var target = WithdrawalMinInfo.Find(y => y.CurrencyId == x);
                 result.Add(new WithdrawalData()
@@ -242,40 +296,47 @@ namespace BackendSite.Service.BLL
                     HasDetail = target != null,
                     CurrencyId = x,
                     CurrencyName = currencyList[x],
-                    SiteId = SiteId,
+                    SiteId = siteId,
                     WithdrawalMin = target != null ? target.WithdrawalMin : 0
                 });
             });
             return result;
         }
-        public bool InsertWithdrawalLimit(int SiteId,int CurrencyId, int WithdrawalMin,string Operator)
+
+        public bool InsertWithdrawalLimit(int siteId, int currencyId, int withdrawalMin, string updater)
         {
-            var WithdrawalMinInfo = withdrawalService.GetWithdrawalLimitData(SiteId).ToList();
-            if(WithdrawalMinInfo.Exists(x=> x.CurrencyId == CurrencyId))
+            var withdrawalMinInfo = _withdrawalService.GetWithdrawalLimitData(siteId).ToList();
+            if (withdrawalMinInfo.Exists(x => x.CurrencyId == currencyId))
             {
                 return true;
             }
-            return withdrawalService.InsertWithdrawalLimit(SiteId, CurrencyId, WithdrawalMin, Operator);
+
+            return _withdrawalService.InsertWithdrawalLimit(siteId, currencyId, withdrawalMin, updater);
         }
-        public bool UpdateWithdrawalLimit(int SiteId, int CurrencyId, int WithdrawalMin,string Operator)
+
+        public bool UpdateWithdrawalLimit(int siteId, int currencyId, int withdrawalMin, string updater)
         {
-            return withdrawalService.UpdateWithdrawalLimit(SiteId, CurrencyId, WithdrawalMin, Operator);         
+            return _withdrawalService.UpdateWithdrawalLimit(siteId, currencyId, withdrawalMin, updater);
         }
-        public bool DeleteWithdrawalLimit(int SiteId, int CurrencyId)
+
+        public bool DeleteWithdrawalLimit(int siteId, int currencyId)
         {
-            return withdrawalService.DeleteWithdrawalLimit(SiteId, CurrencyId);
+            return _withdrawalService.DeleteWithdrawalLimit(siteId, currencyId);
         }
+
         public bool UpdateWithdrawalPicCount(string transId)
         {
-            return withdrawalService.UpdateWithdrawalPicCount(transId);
+            return _withdrawalService.UpdateWithdrawalPicCount(transId);
         }
+
         public BankSlipPic GetWithdrawalPicCount(string transId)
         {
-            return withdrawalService.GetWithdrawalPicCount(transId);
+            return _withdrawalService.GetWithdrawalPicCount(transId);
         }
+
         public WithdrawalTimeData WithdrawalTimeReportGet(WithdrawalTimeReportPara para)
         {
-            var result = withdrawalService.WithdrawalTimeReportGet(para);
+            var result = _withdrawalService.WithdrawalTimeReportGet(para);
 
             if (result != null)
             {
@@ -293,24 +354,29 @@ namespace BackendSite.Service.BLL
                         {
                             TimeSpan tsa = ts3.Subtract(ts2).Duration();
                             x.ToApprovedTime = GetTimeString(tsa);
-                        }                    
-                        x.ToVerifyTime = GetTimeString(tsv);                    
+                        }
+
+                        x.ToVerifyTime = GetTimeString(tsv);
                     }
                 });
             }
 
             return result;
         }
-        public IEnumerable<WithdrawalTimeExportData> WithdrawalTimeExportGet(string SelectSite, string WithdrawalID, long StartDate, long EndDate, int Status, int CurrencyId)
-        {
-            List<WithdrawalTimeExportData> ExportDataToExcel = new List<WithdrawalTimeExportData>();
-            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(SelectSite);
 
-            var result = withdrawalService.GetExportData(siteList, WithdrawalID, StartDate, EndDate, Status, CurrencyId);
+        public IEnumerable<WithdrawalTimeExportData> WithdrawalTimeExportGet(string selectSite, string withdrawalId,
+            long startDate, long endDate, int status, int currencyId)
+        {
+            var exportDataToExcel = new List<WithdrawalTimeExportData>();
+            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(selectSite);
+
+            var result =
+                _withdrawalService.GetExportData(siteList, withdrawalId, startDate, endDate, status, currencyId);
 
             if (result != null)
             {
-                result.ForEach(x => {
+                result.ForEach(x =>
+                {
                     TimeSpan ts1 = new TimeSpan(x.CreateTime.Ticks);
                     TimeSpan ts2 = new TimeSpan(x.UpdateTime.Ticks);
                     TimeSpan ts = ts1.Subtract(ts2).Duration();
@@ -325,9 +391,11 @@ namespace BackendSite.Service.BLL
                             TimeSpan tsa = ts3.Subtract(ts2).Duration();
                             tempToApprovedTime = GetTimeString(tsa);
                         }
+
                         tempToVerifyTime = GetTimeString(tsv);
                     }
-                    ExportDataToExcel.Add(new WithdrawalTimeExportData
+
+                    exportDataToExcel.Add(new WithdrawalTimeExportData
                     {
                         SiteName = x.SiteName,
                         WithdrawalId = x.WithdrawalId,
@@ -343,8 +411,173 @@ namespace BackendSite.Service.BLL
                     });
                 });
             }
-            return ExportDataToExcel;
+
+            return exportDataToExcel;
         }
+
+        #region WithdrawalBankAccounting
+
+        public GetWithdrawalInfoAndAccountingListModel GetWithdrawalInfoAndAccountingList(
+            IEnumerable<int> siteIds,
+            IEnumerable<int> currencyIds,
+            string startDate,
+            string endDate,
+            string transId,
+            string userName,
+            int pageNumber,
+            int pageSize)
+        {
+            var datas = GetWithdrawalInfoAndAccountingData(siteIds,
+                currencyIds,
+                startDate,
+                endDate,
+                transId,
+                userName,
+                pageNumber,
+                pageSize,
+                out int totalPages,
+                out int rowCount);
+
+            return new GetWithdrawalInfoAndAccountingListModel()
+            {
+                Datas = datas.ToList(),
+                PageNumber = Math.Abs(pageNumber),
+                RowCount = rowCount,
+                TotalPages = totalPages
+            };
+        }
+
+        public bool GetAccountingListByTransId(string transId, out GetWithdrawalInfoAndAccountingModel data)
+        {
+            data = new GetWithdrawalInfoAndAccountingModel();
+            var withdrawalInfo = _withdrawalService.GetWithdrawalInfo(0, transId);
+
+            if (withdrawalInfo == null)
+            {
+                return false;
+            }
+            else
+            {
+                if (withdrawalInfo.WithdrawalType == (int)WithdrawalType.LocalBank
+                    && withdrawalInfo.Status == (int)WithdrawalStatus.Approved)
+                {
+                    var accountingDatas = GetAccountingList(transId);
+                    string isoCode = _reportService.GetCurrencyList().Where(x => x.CurrencyId == withdrawalInfo.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
+
+                    data.Withdrawal = withdrawalInfo;
+                    data.AccountingList = accountingDatas;
+                    data.IsoCode = isoCode;
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        public bool GetWithdrawalBankAccountingById(int id, out GetWithdrawalBankAccountingModel data)
+        {
+            data = GetAccountingById(id);
+            return true;
+        }
+
+        public bool InsertWithdrawalAccounting(WithdrawalBankAccountingModel data)
+        {
+            try
+            {
+                if (InsertWithdrawalBankAccounting(data))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public bool UpdateWithdrawalAccounting(WithdrawalBankAccountingModel data)
+        {
+            try
+            {
+                if (UpdateWithdrawalBankAccounting(data))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public bool UpdateWithdrawalAccountingForUploadPicture(int id, out int newUploadPicTimes)
+        {
+            newUploadPicTimes = 0;
+            try
+            {
+                var data = GetAccountingById(id);
+                newUploadPicTimes = data.UploadPicTimes + 1;
+                data.UploadPicTimes = data.UploadPicTimes + 1;
+                if (UpdateWithdrawalBankAccounting(data))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public bool DeleteWithdrawalAccounting(int id, out string transId, out int seq, out int uploadPicTimes)
+        {
+            transId = string.Empty;
+            seq = 0;
+            uploadPicTimes = 0;
+
+            try
+            {
+                var item = GetAccountingById(id);
+
+                if (DeleteWithdrawalBankAccounting(item))
+                {
+                    transId = item.TransId;
+                    seq = item.Seq;
+                    uploadPicTimes = item.UploadPicTimes;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Private Methods
+
         private string GetTimeString(TimeSpan ts)
         {
             string tempDays = "";
@@ -356,6 +589,7 @@ namespace BackendSite.Service.BLL
             {
                 tempDays = string.Format("{0}Days", ts.Days.ToString());
             }
+
             if (ts.Hours >= 10)
             {
                 tempHours = string.Format("{0}", ts.Hours.ToString());
@@ -364,6 +598,7 @@ namespace BackendSite.Service.BLL
             {
                 tempHours = string.Format("0{0}", ts.Hours.ToString());
             }
+
             if (ts.Minutes >= 10)
             {
                 tempMinutes = string.Format("{0}", ts.Minutes.ToString());
@@ -372,6 +607,7 @@ namespace BackendSite.Service.BLL
             {
                 tempMinutes = string.Format("0{0}", ts.Minutes.ToString());
             }
+
             if (ts.Seconds >= 10)
             {
                 tempSeconds = string.Format("{0}", ts.Seconds.ToString());
@@ -380,9 +616,59 @@ namespace BackendSite.Service.BLL
             {
                 tempSeconds = string.Format("0{0}", ts.Seconds.ToString());
             }
+
             result = string.Format("{0}{1}:{2}:{3}", tempDays, tempHours, tempMinutes, tempSeconds);
             return result;
         }
+
+        private IEnumerable<WithdrawalInfoAndAccountingListModel> GetWithdrawalInfoAndAccountingData(IEnumerable<int> siteIds,
+            IEnumerable<int> currencyIds,
+            string startDate,
+            string endDate,
+            string transId,
+            string userName,
+            int pageNumber,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
+        {
+            return _withdrawalBankAccountingService.GetWithdrawalInfoAndAccountingList(JsonConvert.SerializeObject(siteIds),
+                JsonConvert.SerializeObject(currencyIds),
+                startDate,
+                endDate,
+                string.IsNullOrEmpty(transId) ? null : transId,
+                string.IsNullOrEmpty(userName) ? null : userName,
+                Math.Abs(pageSize),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                out totalPages,
+                out rowCount);
+        }
+
+        private IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingList(string transId)
+        {
+            return _withdrawalBankAccountingService.GetAccountingListByTransId(transId);
+        }
+
+        private GetWithdrawalBankAccountingModel GetAccountingById(int id)
+        {
+            return _withdrawalBankAccountingService.GetById(id);
+        }
+
+        private bool InsertWithdrawalBankAccounting(WithdrawalBankAccountingModel model)
+        {
+            return _withdrawalBankAccountingService.SetFlow(ActionType.Create, model);
+        }
+
+        private bool UpdateWithdrawalBankAccounting(WithdrawalBankAccountingModel model)
+        {
+            return _withdrawalBankAccountingService.SetFlow(ActionType.Update, model);
+        }
+
+        private bool DeleteWithdrawalBankAccounting(WithdrawalBankAccountingModel model)
+        {
+            return _withdrawalBankAccountingService.SetFlow(ActionType.Delete, model);
+        }
+
+        #endregion
     }
 }
-

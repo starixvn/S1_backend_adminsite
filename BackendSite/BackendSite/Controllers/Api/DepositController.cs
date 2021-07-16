@@ -196,7 +196,7 @@ namespace BackendSite.Controllers.Api
                         var depositRequest = depositBLL.GetDepositRequest(depositReq.TransId);
                         var userLang = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId).UserLang;
                         // Send message to player
-                        string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender", userLang);
+                        string sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
                         string title = selLangBLL.GetResourceValue("lbl_DepositApprovedTitle", userLang);
                         title = string.Format(title, depositReq.TransId);
                         string content = selLangBLL.GetResourceValue("lbl_DepositApprovedContent", userLang);
@@ -214,7 +214,7 @@ namespace BackendSite.Controllers.Api
                     var depositRequest = depositBLL.GetDepositRequest(depositReq.TransId);
                     var userLang = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId).UserLang;
                     // Send message to player
-                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender", userLang);
+                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
                     string title = selLangBLL.GetResourceValue("lbl_DepositRejectTitle", userLang);
                     title = string.Format(title, depositReq.TransId);
                     string content = selLangBLL.GetResourceValue("lbl_DepositRejectContent", userLang);
@@ -385,7 +385,7 @@ namespace BackendSite.Controllers.Api
                     var depositRequest = depositBLL.GetDepositRequest(_transId);
                     var userLang = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId).UserLang;
                     // Send message to player
-                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepoistWithdrawalSender", userLang);
+                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
                     string title = selLangBLL.GetResourceValue("lbl_DepositRejectTitle", userLang);
                     title = string.Format(title, _transId);
                     string content = selLangBLL.GetResourceValue("lbl_DepositRejectContent", userLang);

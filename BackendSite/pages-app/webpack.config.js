@@ -206,6 +206,10 @@ module.exports = {
       // '@babel/polyfill',
       "./src/pages/Finance/AdjustmentLogReport/index.js",
     ],
+    // "Finance/WithdrawalAccounting.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Finance/WithdrawalAccounting/index.js",
+    // ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

@@ -212,6 +212,11 @@
         ]
       },
       {
+        "DisplayKey": "Withdrawal Accounting",
+        "FuncKey": "Finance/WithdrawalAccountingList",
+        "Enable": false
+      },
+      {
         "DisplayKey": "Balance Adjustment",
         "FuncKey": "Finance/PaymentAdjustment",
         "Enable": false

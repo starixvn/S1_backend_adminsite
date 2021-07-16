@@ -211,6 +211,16 @@
       },
       {
         "Key": "",
+        "Title": "Withdrawal Accounting",
+        "FuncKey": "Finance/WithdrawalAccountingList",
+        "Controller": "Finance",
+        "Action": "WithdrawalAccountingList",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
         "Title": "Balance Adjustment",
         "FuncKey": "Finance/PaymentAdjustment",
         "Controller": "Finance",
