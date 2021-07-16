@@ -1214,6 +1214,7 @@ namespace BackendSite.Controllers.Api
         }
          
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_setCustTag" })]
         public ApiResult SetCustTag(SetCustTagPara para)
         {
             if (custInfoBLL.SetCustTag(para.CustId,para.SelectTag, User.Identity.Name) > 0)
