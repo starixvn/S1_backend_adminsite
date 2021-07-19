@@ -23,6 +23,15 @@ namespace BackendSite.Controllers.Api
             public string RefTransId { get; set; }
             public int PageNumber { get; set; }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Use：
+        /// CSD > Customer Administration > CustInfo > Adjustment Info
+        /// </remarks>
+        /// <param name="getAdjustmentInfoReq"></param>
+        /// <returns></returns>
         public ApiListResultCurrencyAmount<PaymentAdjustment> GetAdjustmentInfoByCust(GetAdjustmentInfoReq getAdjustmentInfoReq)
         {
             int pageNumber = getAdjustmentInfoReq.PageNumber;

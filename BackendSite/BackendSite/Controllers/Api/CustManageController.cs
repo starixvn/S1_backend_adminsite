@@ -172,6 +172,15 @@ namespace BackendSite.Controllers.Api
             public int CustId { get; set; }
         }
 
+        public class GetCustTurnOverReportReq
+        {
+            public int CustId { get; set; }
+            public long StartTime { get; set; }
+            public long EndTime { get; set; }
+
+            public IEnumerable<int> GameTypes { get; set; }
+        }
+
         #region TeleCSD
 
         public class TeleCSDpara
@@ -351,7 +360,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public async Task<ApiResult<CustInfoDetail>> GetCustInfoDetailAsync(CustInfoReq custInfoReq)
         {
-            var apiResult = new ApiResult<CustInfoDetail>();
+
             var custInfoDetail = await custInfoBLL.GetCustInfoDetailAsync(custInfoReq.CustId, custInfoReq.UserName);
             if (custInfoDetail != null)
             {
@@ -360,15 +369,18 @@ namespace BackendSite.Controllers.Api
                     custInfoDetail.Email = MaskEmail(custInfoDetail.Email);
                     custInfoDetail.PhoneNo = MaskPhone(custInfoDetail.PhoneNo);
                 }
-                apiResult.Data = custInfoDetail;
-                apiResult.ErrorCode = 0;
+
+                return new ApiResult<CustInfoDetail>
+                {
+                    Data = custInfoDetail,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+
             }
             else
             {
-                apiResult.Message = "";
+                throw new AdminException(ErrorCodeEnum.NoData);
             }
-
-            return apiResult;
         }
 
         /// <summary>
@@ -408,7 +420,7 @@ namespace BackendSite.Controllers.Api
         #region CustInfo > Switch On IsKyc、IsRisk、PhoneVerified、EmailVerified
 
         [HttpPost]
-        public ApiResult<bool> SetCustStatusSwitch(CustStatusSwitch custStatusSwitch)
+        public ApiResult SetCustStatusSwitch(CustStatusSwitch custStatusSwitch)
         {
             var apiResult = new ApiResult<bool>();
             bool data = custInfoBLL.SetCustStatusSwitch(custStatusSwitch.CustId, custStatusSwitch.Op) > 0;
@@ -427,12 +439,17 @@ namespace BackendSite.Controllers.Api
                     Info.Add("Action", "Change IsRisk Status");
                 }
                 serverInfoBLL.AdminOperateLog(null, custStatusSwitch.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
             }
-
-            apiResult.Data = data;
-            apiResult.ErrorCode = 0;
-
-            return apiResult;
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+            }
         }
 
         #endregion
@@ -497,6 +514,21 @@ namespace BackendSite.Controllers.Api
             { "image/gif",System.Drawing.Imaging.ImageFormat.Gif}
         };
 
+        [HttpGet]
+        public IActionResult GetCustPhotoId(int CustId)
+        {
+            var custPhotoId = custInfoBLL.GetCustPhotoId(CustId);
+            if (custPhotoId == null)
+            {
+                //return StatusCode(404);
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return File(custPhotoId.PhotoIdPic, "image/jpeg");
+            }
+        }
+
         /// <summary>
         /// Upload
         /// </summary>
@@ -507,7 +539,6 @@ namespace BackendSite.Controllers.Api
         public ApiResult UploadCustPhotoId([FromForm] int CustId, [FromForm] IFormFile File)
         {
             decimal xSize = 500m;
-            var apiResult = new ApiResult();
             var custInfo = custInfoBLL.GetCustInfoWithCache(CustId);
             decimal xCell = 1;
             if (_contentTypesCheck.ContainsKey(File.ContentType))
@@ -545,19 +576,21 @@ namespace BackendSite.Controllers.Api
 
                 if (result > 0)
                 {
-                    apiResult.ErrorCode = 0;
+                    return new ApiResult
+                    {
+                        ErrorCode = (int)ErrorCodeEnum.Success,
+                        Message = "Upload Success."
+                    };
                 }
                 else
                 {
-                    apiResult.ErrorCode = -1;
+                    throw new AdminException(ErrorCodeEnum.Fail, "Upload Fail.");
                 }
             }
             else
             {
-
+                throw new AdminException(ErrorCodeEnum.FileTypeNotMatch);
             }
-
-            return apiResult;
         }
 
         /// <summary>
@@ -565,10 +598,8 @@ namespace BackendSite.Controllers.Api
         /// </summary>
         /// <param name="custInfoReq"></param>
         /// <returns></returns>
-        public ApiResult<bool> DelCustPhotoId(CustInfoReq custInfoReq)
+        public ApiResult DelCustPhotoId(CustInfoReq custInfoReq)
         {
-            var apiResult = new ApiResult<bool>();
-
             bool data = custInfoBLL.DelCustPhotoId(custInfoReq.CustId);
 
             if (data)
@@ -578,24 +609,17 @@ namespace BackendSite.Controllers.Api
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("Action", "Delete Photo");
                 serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Delete Success."
+                };
             }
-
-            apiResult.Data = data;
-            apiResult.ErrorCode = 0;
-
-            return apiResult;
-        }
-
-        [HttpGet]
-        public IActionResult GetCustPhotoId(int CustId)
-        {
-            var custPhotoId = custInfoBLL.GetCustPhotoId(CustId);
-            if (custPhotoId == null)
+            else
             {
-                return StatusCode(404);
+                throw new AdminException(ErrorCodeEnum.Fail, "Delete Fail.");
             }
-            var image = custPhotoId.PhotoIdPic;
-            return File(image, "image/jpeg");
         }
 
         #endregion
@@ -605,7 +629,6 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult ResetProfile(CustInfoReq custInfoReq)
         {
-            ApiResult apiResult = new ApiResult();
             if (custInfoBLL.ResetProfile(custInfoReq.CustId))
             {
                 string Menu = "CustManage/CustInfoList";
@@ -614,10 +637,16 @@ namespace BackendSite.Controllers.Api
                 Info.Add("Action", "Reset Profile");
                 serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
-                apiResult.ErrorCode = 0;
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Reset Success."
+                };
             }
-
-            return apiResult;
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
+            }
         }
 
         #endregion
@@ -636,10 +665,16 @@ namespace BackendSite.Controllers.Api
                 Info.Add("Action", "Reset Bank Info");
                 serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
-                apiResult.ErrorCode = 0;
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Reset Success."
+                };
             }
-
-            return apiResult;
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
+            }
         }
 
         #endregion
@@ -838,24 +873,28 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_resetpwd" })]
         public ApiResult<string> SetResetPwd(CustInfoReq custInfoReq)
         {
-            ApiResult<string> apiResult = new ApiResult<string>();
             string NewPwd = "";
             if (custInfoBLL.SetResetPwd(custInfoReq.CustId, out NewPwd))
             {
-                apiResult.Data = NewPwd;
-                apiResult.ErrorCode = 0;
+                return new ApiResult<string>
+                {
+                    Data = NewPwd,
+                    ErrorCode = 0
+                };
             }
-
-            return apiResult;
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
+            }
         }
 
         #endregion
 
         #region CSD > Customer Administration > CustInfo > Notes
 
-        public ApiResult<bool> AddCustNote(AddCustNoteReq addCustNoteReq)
+        public ApiResult AddCustNote(AddCustNoteReq addCustNoteReq)
         {
-            var apiResult = new ApiResult<bool>();
+
             bool data = custInfoBLL.AddCustNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name);
 
             if (data)
@@ -865,12 +904,18 @@ namespace BackendSite.Controllers.Api
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("Action", "Add Note");
                 serverInfoBLL.AdminOperateLog(null, addCustNoteReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
+                return new ApiResult
+                {
+                    ErrorCode = 0,
+                    Message = "Add Success."
+                };
+
             }
-
-            apiResult.Data = data;
-            apiResult.ErrorCode = 0;
-
-            return apiResult;
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Add Fail.");
+            }
         }
 
         public ApiResult<IEnumerable<CustNote>> GetCustNotes(AddCustNoteReq addCustNoteReq)
@@ -883,18 +928,15 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<bool> SetCustNotes(SetCustNoteReq setCustNoteReq)
+        public ApiResult SetCustNotes(SetCustNoteReq setCustNoteReq)
         {
-            var apiResult = new ApiResult<bool>();
             if (setCustNoteReq.Type == 1 && !permissionBLL.CheckPermission("CustManage/CustInfoList", "ca_noteEdit"))
             {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "No Edit Permission";
+                throw new AdminException(ErrorCodeEnum.PermissionDenied);
             }
             if (setCustNoteReq.Type == 2 && !permissionBLL.CheckPermission("CustManage/CustInfoList", "ca_noteDelete"))
             {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "No Delete Permission";
+                throw new AdminException(ErrorCodeEnum.PermissionDenied);
             }
             else
             {
@@ -902,7 +944,6 @@ namespace BackendSite.Controllers.Api
 
                 if (data)
                 {
-
                     string Menu = "CustManage/CustInfoList";
                     Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
                     Info.Add("MenuName", "Customer Info");
@@ -915,12 +956,18 @@ namespace BackendSite.Controllers.Api
                         Info.Add("Action", "Delete Note");
                     }
                     serverInfoBLL.AdminOperateLog(null, setCustNoteReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
-                }
 
-                apiResult.Data = data;
-                apiResult.ErrorCode = 0;
+                    return new ApiResult
+                    {
+                        ErrorCode = 0,
+                        Message = "Modify Success."
+                    };
+                }
+                else
+                {
+                    throw new AdminException(ErrorCodeEnum.Fail, "Modify Fail.");
+                }
             }
-            return apiResult;
         }
 
         #endregion
@@ -929,42 +976,36 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_turnoverReport" })]
-        public ApiResult GetCustTurnOverReport([FromForm] int CustId, [FromForm] int StartTime, [FromForm] int EndTime, [FromForm] string GameTypes)
+        public ApiResult GetCustTurnOverReport(GetCustTurnOverReportReq request)
         {
-            var result = new ApiResult<dynamic>();
-            try
+            var data = custInfoBLL.GetCustTurnover(request.CustId,
+                                                   JsonConvert.SerializeObject(request.GameTypes),
+                                                   request.StartTime,
+                                                   request.EndTime);
+            return new ApiResult<dynamic>
             {
-                string[] gameTypes = GameTypes == null ? new string[] { } : GameTypes.Split(",");
-                var data = custInfoBLL.GetCustTurnover(CustId, gameTypes, StartTime, EndTime);
-                result.Data = data.Select(x => new { x.GameName, x.Stake, x.UserName, x.WinlostAmount });
-                result.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                result.ErrorCode = 999;
-                result.RawMessage = ex.ToString();
-            }
-
-            return result;
+                Data = data.Select(x => new { x.GameName, x.Stake, x.UserName, x.WinlostAmount }),
+                ErrorCode = 0
+            };
         }
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_turnoverReport" })]
         public ApiResult GetAllGameTypeList()
         {
-            var result = new ApiResult<IEnumerable<GameType>>();
-            try
+            var data = winLostReportService.GetAllGameType();
+            if (data.Count() == 0)
             {
-                result.Data = winLostReportService.GetAllGameType();
-                result.ErrorCode = 0;
+                throw new AdminException(ErrorCodeEnum.NoData);
             }
-            catch (Exception ex)
+            else
             {
-                result.ErrorCode = 999;
-                result.RawMessage = ex.ToString();
+                return new ApiResult<IEnumerable<GameType>>
+                {
+                    Data = data,
+                    ErrorCode = 0
+                };
             }
-
-            return result;
         }
 
         #endregion

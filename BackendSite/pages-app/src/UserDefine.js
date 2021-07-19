@@ -114,7 +114,11 @@ const BankFinancialReport = lazy(() =>
   import("./pages/BankFinancial/BankFinancialReport/index")
 );
 
-export const defaultPage = "BankFinancialReport";
+const WithdrawalAccounting = lazy(() =>
+  import("./pages/Finance/WithdrawalAccounting/index")
+);
+
+export const defaultPage = "WithdrawalAccounting";
 
 export const layoutType = {
   N88: "N88",
@@ -674,6 +678,19 @@ export const pages = {
     comp: (
       <Suspense fallback="loading...">
         <BankFinancialReport />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  WithdrawalAccounting: {
+    comp: (
+      <Suspense fallback="loading...">
+        <WithdrawalAccounting />
       </Suspense>
     ),
     css: [
