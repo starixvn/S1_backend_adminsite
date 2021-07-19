@@ -5,11 +5,6 @@ import {
   number_toFixed,
 } from "../../../module/Formatting/NumberFormat";
 
-const elemType = {
-  DateTimePicker: "DateTimePicker",
-};
-const dateformat = "YYYY-MM-DD HH:mm";
-
 const EditPanel = (props) => {
   var accountingAmount = 0;
   for (var i = 0; i < props.ForCaculateDatas.AccountingDatas.length; i++) {
@@ -45,14 +40,6 @@ const EditPanel = (props) => {
     updateData({
       ...stateData,
       [datacolumn]: v,
-    });
-  };
-
-  const EditBankAccountNoFiled = (v) => {
-    console.log(v);
-    updateData({
-      ...stateData,
-      bankAccountNo: v,
     });
   };
 
@@ -263,7 +250,7 @@ const CompareInputField = (props) => {
           className="form-control"
           value={props.Value}
           onChange={EditField}
-          onBlur={EditField}
+          //onBlur={EditField}
           disabled={props.Disabled}
           type={props.type ? props.type : "text"}
           style={{ width: `${props.Size}px` }}
@@ -284,7 +271,6 @@ const CompareInputField = (props) => {
           className="form-control"
           value={numberFormat(props.AlreadyNum)}
           disabled={true}
-          //type={props.type ? props.type : "text"}
           style={{ width: "200px" }}
         />
       </div>
@@ -299,7 +285,6 @@ const CompareInputField = (props) => {
           className="form-control"
           value={numberFormat(props.WithdrawalNum)}
           disabled={true}
-          //type={props.type ? props.type : "text"}
           style={{ width: "200px" }}
         />
       </div>
@@ -308,7 +293,6 @@ const CompareInputField = (props) => {
 };
 
 const CompareMessage = (nowNum, alreadyNum, withdrawalNum) => {
-  console.log(nowNum, alreadyNum, withdrawalNum);
   if (nowNum + alreadyNum > withdrawalNum) {
     return (
       <h5

@@ -73,7 +73,7 @@ namespace BackendSite.Service.BLL
         public int WithdrawalApproved(string transId, string comment, string updater, int userId, bool hasPic)
         {
             var serverInfo = _serverInfoService.GetModel();
-            var forStatus = new List<int> { (int)WithdrawalStatus.Process };
+            var forStatus = new List<int> {(int) WithdrawalStatus.Process};
 
             Match m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out int withdrawalId);
@@ -284,20 +284,20 @@ namespace BackendSite.Service.BLL
             List<WithdrawalData> result = new List<WithdrawalData>();
             siteDataList = _serverInfoService.GetSiteList();
             List<int> currencyData =
-                siteDataList.Where(x => x.SiteId == siteId)?.FirstOrDefault().ICurrencyList.ToList();
+                siteDataList.Where(x => x.SiteId == siteId)?.FirstOrDefault()?.ICurrencyList.ToList();
             Dictionary<int, string> currencyList =
                 _reportService.GetCurrencyList().ToDictionary(x => x.CurrencyId, x => x.IsoCode);
-            var WithdrawalMinInfo = _withdrawalService.GetWithdrawalLimitData(siteId).ToList();
+            var withdrawalMinInfo = _withdrawalService.GetWithdrawalLimitData(siteId).ToList();
             currencyData.ForEach(x =>
             {
-                var target = WithdrawalMinInfo.Find(y => y.CurrencyId == x);
+                var target = withdrawalMinInfo.Find(y => y.CurrencyId == x);
                 result.Add(new WithdrawalData()
                 {
                     HasDetail = target != null,
                     CurrencyId = x,
                     CurrencyName = currencyList[x],
                     SiteId = siteId,
-                    WithdrawalMin = target != null ? target.WithdrawalMin : 0
+                    WithdrawalMin = target?.WithdrawalMin ?? 0
                 });
             });
             return result;
@@ -427,7 +427,7 @@ namespace BackendSite.Service.BLL
             int pageNumber,
             int pageSize)
         {
-            var datas = GetWithdrawalInfoAndAccountingData(siteIds,
+            var data = GetWithdrawalInfoAndAccountingData(siteIds,
                 currencyIds,
                 startDate,
                 endDate,
@@ -435,12 +435,12 @@ namespace BackendSite.Service.BLL
                 userName,
                 pageNumber,
                 pageSize,
-                out int totalPages,
-                out int rowCount);
+                out var totalPages,
+                out var rowCount);
 
             return new GetWithdrawalInfoAndAccountingListModel()
             {
-                Datas = datas.ToList(),
+                Datas = data.ToList(),
                 PageNumber = Math.Abs(pageNumber),
                 RowCount = rowCount,
                 TotalPages = totalPages
@@ -458,14 +458,15 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                if (withdrawalInfo.WithdrawalType == (int)WithdrawalType.LocalBank
-                    && withdrawalInfo.Status == (int)WithdrawalStatus.Approved)
+                if (withdrawalInfo.WithdrawalType == (int) WithdrawalType.LocalBank
+                    && withdrawalInfo.Status == (int) WithdrawalStatus.Approved)
                 {
-                    var accountingDatas = GetAccountingList(transId);
-                    string isoCode = _reportService.GetCurrencyList().Where(x => x.CurrencyId == withdrawalInfo.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
+                    var accountingData = GetAccountingList(transId);
+                    var isoCode = _reportService.GetCurrencyList().Where(x => x.CurrencyId == withdrawalInfo.CurrencyId)
+                        .Select(x => x.IsoCode).FirstOrDefault();
 
                     data.Withdrawal = withdrawalInfo;
-                    data.AccountingList = accountingDatas;
+                    data.AccountingList = accountingData;
                     data.IsoCode = isoCode;
 
                     return true;
@@ -487,16 +488,9 @@ namespace BackendSite.Service.BLL
         {
             try
             {
-                if (InsertWithdrawalBankAccounting(data))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return InsertWithdrawalBankAccounting(data);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -506,16 +500,9 @@ namespace BackendSite.Service.BLL
         {
             try
             {
-                if (UpdateWithdrawalBankAccounting(data))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return UpdateWithdrawalBankAccounting(data);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -527,18 +514,11 @@ namespace BackendSite.Service.BLL
             try
             {
                 var data = GetAccountingById(id);
-                newUploadPicTimes = data.UploadPicTimes + 1;
-                data.UploadPicTimes = data.UploadPicTimes + 1;
-                if (UpdateWithdrawalBankAccounting(data))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                data.UploadPicTimes += 1;
+                newUploadPicTimes = data.UploadPicTimes;
+                return UpdateWithdrawalBankAccounting(data);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -566,7 +546,7 @@ namespace BackendSite.Service.BLL
                     return false;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -621,7 +601,8 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        private IEnumerable<WithdrawalInfoAndAccountingListModel> GetWithdrawalInfoAndAccountingData(IEnumerable<int> siteIds,
+        private IEnumerable<WithdrawalInfoAndAccountingListModel> GetWithdrawalInfoAndAccountingData(
+            IEnumerable<int> siteIds,
             IEnumerable<int> currencyIds,
             string startDate,
             string endDate,
@@ -632,7 +613,8 @@ namespace BackendSite.Service.BLL
             out int totalPages,
             out int rowCount)
         {
-            return _withdrawalBankAccountingService.GetWithdrawalInfoAndAccountingList(JsonConvert.SerializeObject(siteIds),
+            return _withdrawalBankAccountingService.GetWithdrawalInfoAndAccountingList(
+                JsonConvert.SerializeObject(siteIds),
                 JsonConvert.SerializeObject(currencyIds),
                 startDate,
                 endDate,

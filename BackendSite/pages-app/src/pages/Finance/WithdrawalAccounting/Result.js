@@ -1,7 +1,5 @@
 import React from "react";
 import Pagination from "./Pagination";
-import WebAPI from "../../../module/WebAPI";
-import { api } from "../../../module/WebAPI";
 import moment from "moment";
 import {
   number_format,
@@ -58,13 +56,6 @@ const dataColumnDefs = () => {
       dataColumn: "operator",
       columnTitle: "Operator",
     },
-    // {
-    //   dataColumn: "createTime",
-    //   columnTitle: "Create Time" + " (" + moment().format("Z") + ")",
-    //   body: {
-    //     format: dateFormat,
-    //   },
-    // },
     {
       dataColumn: "updateTime",
       columnTitle: "Approved Time" + " (" + moment().format("Z") + ")",

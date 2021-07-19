@@ -325,43 +325,41 @@ namespace BackendSite.Service.DAL
             return SearchData;
         }
 
-        public List<WithdrawalTimeList> GetExportData(IEnumerable<int> SelectSite, string WithdrawalID, long StartDate,
-            long EndDate, int Status, int CurrencyId)
+        public List<WithdrawalTimeList> GetExportData(IEnumerable<int> selectSite, string withdrawalId, long startDate,
+            long endDate, int status, int currencyId)
         {
-            var selectSite = JsonConvert.SerializeObject(SelectSite);
-            List<int> selectstatus = new List<int>();
-            if (Status == 0)
+            var selectSiteString = JsonConvert.SerializeObject(selectSite);
+            var selectStatus = new List<int>();
+            if (status == 0)
             {
-                selectstatus.Add(3);
-                selectstatus.Add(4);
-                selectstatus.Add(5);
-                selectstatus.Add(6);
-                selectstatus.Add(7);
+                selectStatus.Add(3);
+                selectStatus.Add(4);
+                selectStatus.Add(5);
+                selectStatus.Add(6);
+                selectStatus.Add(7);
             }
             else
             {
-                selectstatus.Add(Status);
+                selectStatus.Add(status);
             }
 
-            var SelectStatus = JsonConvert.SerializeObject(selectstatus);
+            var selectStatusString = JsonConvert.SerializeObject(selectStatus);
             int tempWithdrawalId;
-            Int32.TryParse(WithdrawalID, out tempWithdrawalId);
+            Int32.TryParse(withdrawalId, out tempWithdrawalId);
 
             using MySqlConnection conn =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             DynamicParameters props = new DynamicParameters();
-            props.Add("StartDate", StartDate);
-            props.Add("EndDate", EndDate);
-            props.Add("SelectSite", selectSite);
-            props.Add("CurrencyId", CurrencyId);
+            props.Add("StartDate", startDate);
+            props.Add("EndDate", endDate);
+            props.Add("SelectSite", selectSiteString);
+            props.Add("CurrencyId", currencyId);
             props.Add("WithdrawalId", tempWithdrawalId);
-            props.Add("SelectStatus", SelectStatus);
+            props.Add("SelectStatus", selectStatusString);
             return conn.Query<WithdrawalTimeList>("Admin_WithdrawalStatusTimeExport_Get", props,
                 commandType: CommandType.StoredProcedure).ToList();
         }
-
-        #region SetWithdrawalInfo Refactory
-
+        
         public int SetWithdrawalInfoFlow(string transId,
             int siteId,
             string comment,
@@ -563,8 +561,6 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-
-        #endregion
 
         /// <summary>
         /// 取得單筆提款單資訊

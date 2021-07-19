@@ -1,11 +1,6 @@
-import React, { useEffect, useRef, useReducer, useState } from "react";
-import WebAPI from "../../../module/WebAPI";
-import { api } from "../../../module/WebAPI";
-import moment from "moment";
+import React from "react";
 
 const Panel = (props) => {
-  console.log("props", props);
-
   var accountingAmount = 0;
   for (var i = 0; i < props.TransIdData.AccountingDatas.length; i++) {
     accountingAmount += props.TransIdData.AccountingDatas[i].amount;

@@ -30,13 +30,13 @@ namespace BackendSite.Controllers.Api
         private readonly WithdrawalBLL _withdrawalBLL;
         private readonly AuthorizeBLL _authorizeBLL;
 
-        private readonly string awsKey;
-        private readonly string awsSecretKey;
-        private readonly string awsWithdrawalAccountingFolder;
-        private readonly string awsWithdrawalUrl;
-        private readonly string awsWithdrawalBucketName;
-        private readonly string ProxyHost;
-        private readonly int ProxyPort;
+        private readonly string _awsKey;
+        private readonly string _awsSecretKey;
+        private readonly string _awsWithdrawalAccountingFolder;
+        private readonly string _awsWithdrawalUrl;
+        private readonly string _awsWithdrawalBucketName;
+        private readonly string _proxyHost;
+        private readonly int _proxyPort;
 
         #endregion
 
@@ -48,13 +48,13 @@ namespace BackendSite.Controllers.Api
             _authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             _logger = provider.GetRequiredService<ILogger<WithdrawalBankAccountingController>>();
 
-            awsKey = configuration.GetValue<string>("AWSKey");
-            awsSecretKey = configuration.GetValue<string>("AwsSecretKey");
-            awsWithdrawalAccountingFolder = configuration.GetValue<string>("AwsWithdrawalAccountingFolder");
-            awsWithdrawalUrl = configuration.GetValue<string>("AwsWithdrawalUrl");
-            awsWithdrawalBucketName = configuration.GetValue<string>("AwsWithdrawalBucketName");
-            ProxyHost = configuration.GetValue<string>("ProxyHost");
-            ProxyPort = configuration.GetValue<int>("ProxyPort");
+            _awsKey = configuration.GetValue<string>("AWSKey");
+            _awsSecretKey = configuration.GetValue<string>("AwsSecretKey");
+            _awsWithdrawalAccountingFolder = configuration.GetValue<string>("AwsWithdrawalAccountingFolder");
+            _awsWithdrawalUrl = configuration.GetValue<string>("AwsWithdrawalUrl");
+            _awsWithdrawalBucketName = configuration.GetValue<string>("AwsWithdrawalBucketName");
+            _proxyHost = configuration.GetValue<string>("ProxyHost");
+            _proxyPort = configuration.GetValue<int>("ProxyPort");
         }
 
         #endregion
@@ -112,7 +112,8 @@ namespace BackendSite.Controllers.Api
             public decimal ChargeFee { get; set; }
 
             public string Memo { get; set; }
-
+            
+            
             public int UploadPicTimes { get; set; }
 
             public int Creator { get; set; }
@@ -225,7 +226,7 @@ namespace BackendSite.Controllers.Api
                     Amount = 0,
                     ChargeFee = 0,
                     UploadPicTimes = 0,
-                    Memo = "",
+                    Memo = string.Empty,
                     Creator = authData.UserId,
                     CreatorName = authData.UserName,
                     CreateTime = DateTime.Now.AddHours(8),
@@ -343,7 +344,7 @@ namespace BackendSite.Controllers.Api
         [HttpGet]
         public ActionResult GetAccountingPicture(string transId, int seq, int uploadPicTimes)
         {
-            return Redirect($"{awsWithdrawalUrl}{awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png");
+            return Redirect($"{_awsWithdrawalUrl}{_awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png");
         }
 
         [HttpPost]
@@ -392,34 +393,30 @@ namespace BackendSite.Controllers.Api
                     RegionEndpoint = RegionEndpoint.APSoutheast1
                 };
 
-                if (!string.IsNullOrEmpty(ProxyHost))
+                if (!string.IsNullOrEmpty(_proxyHost))
                 {
-                    config.ProxyHost = ProxyHost;
-                    config.ProxyPort = ProxyPort;
+                    config.ProxyHost = _proxyHost;
+                    config.ProxyPort = _proxyPort;
                 }
 
-                IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
-                var putRequest = new PutObjectRequest()
+                IAmazonS3 client = new AmazonS3Client(_awsKey, _awsSecretKey, config);
+                var putRequest = new PutObjectRequest
                 {
-                    BucketName = awsWithdrawalBucketName,
+                    BucketName = _awsWithdrawalBucketName,
                     ContentType = "image/png",
                     InputStream = stream,
-                    Key = $"{awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png"
+                    Key = $"{_awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png"
                 };
 
-                PutObjectResponse putResponse = await client.PutObjectAsync(putRequest);
+                var putResponse = await client.PutObjectAsync(putRequest);
 
-                if (putResponse.HttpStatusCode != HttpStatusCode.OK)
-                {
-                    return false;
-                }
-                return true;
+                return putResponse.HttpStatusCode == HttpStatusCode.OK;
             }
-            catch (AmazonS3Exception awsEx)
+            catch (AmazonS3Exception)
             {
                 return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -429,41 +426,35 @@ namespace BackendSite.Controllers.Api
         {
             try
             {
-                var isExist = CheckAccountingPictureAsync(transId, seq, uploadPicTimes);
-
-                if (await isExist)
+                if (!await CheckAccountingPictureAsync(transId, seq, uploadPicTimes)) return false; //Picture not exist before delete.
+                
+                var config = new AmazonS3Config
                 {
-                    var config = new AmazonS3Config
-                    {
-                        RegionEndpoint = RegionEndpoint.APSoutheast1
-                    };
+                    RegionEndpoint = RegionEndpoint.APSoutheast1
+                };
 
-                    if (!string.IsNullOrEmpty(ProxyHost))
-                    {
-                        config.ProxyHost = ProxyHost;
-                        config.ProxyPort = ProxyPort;
-                    }
-
-                    IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
-                    var deleeteRequest = new DeleteObjectRequest()
-                    {
-                        BucketName = awsWithdrawalBucketName,
-                        Key = $"{awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png"
-                    };
-                    DeleteObjectResponse deleteResponse = await client.DeleteObjectAsync(deleeteRequest);
-
-                    if (await CheckAccountingPictureAsync(transId, seq, uploadPicTimes))
-                    {
-                        return false;
-                    }
+                if (!string.IsNullOrEmpty(_proxyHost))
+                {
+                    config.ProxyHost = _proxyHost;
+                    config.ProxyPort = _proxyPort;
                 }
-                return true;
+
+                IAmazonS3 client = new AmazonS3Client(_awsKey, _awsSecretKey, config);
+                var deleteRequest = new DeleteObjectRequest
+                {
+                    BucketName = _awsWithdrawalBucketName,
+                    Key = $"{_awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png"
+                };
+                    
+                await client.DeleteObjectAsync(deleteRequest);
+
+                return !await CheckAccountingPictureAsync(transId, seq, uploadPicTimes);//Picture not exist after delete.
             }
-            catch (AmazonS3Exception awsEx)
+            catch (AmazonS3Exception)
             {
                 return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -478,27 +469,27 @@ namespace BackendSite.Controllers.Api
                     RegionEndpoint = RegionEndpoint.APSoutheast1
                 };
 
-                if (!string.IsNullOrEmpty(ProxyHost))
+                if (!string.IsNullOrEmpty(_proxyHost))
                 {
-                    config.ProxyHost = ProxyHost;
-                    config.ProxyPort = ProxyPort;
+                    config.ProxyHost = _proxyHost;
+                    config.ProxyPort = _proxyPort;
                 }
 
-                IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
+                IAmazonS3 client = new AmazonS3Client(_awsKey, _awsSecretKey, config);
                 var request = new GetObjectRequest()
                 {
-                    BucketName = awsWithdrawalBucketName,
-                    Key = $"{awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png"
+                    BucketName = _awsWithdrawalBucketName,
+                    Key = $"{_awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png"
                 };
-                GetObjectResponse response = await client.GetObjectAsync(request);
+                var response = await client.GetObjectAsync(request);
 
                 return response.HttpStatusCode == HttpStatusCode.OK;
             }
-            catch (AmazonS3Exception ex)
+            catch (AmazonS3Exception)
             {
                 return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
