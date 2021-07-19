@@ -204,7 +204,7 @@ namespace BackendSite.Controllers.Api
             if (withdrawalReq.Action == (int) WithdrawalStatus.Approved)
             {
                 //Check has pic or not
-                bool hasPic = await GetWithdrawalPictureAsync(withdrawalReq.TransId);
+                bool hasPic = await CheckWithdrawalPictureAsync(withdrawalReq.TransId);
 
                 withdrawConfirmReuslt = withdrawalBLL.WithdrawalApproved(withdrawalReq.TransId, withdrawalReq.Comment,
                     User.Identity.Name, authData.UserId,hasPic);
@@ -865,7 +865,12 @@ namespace BackendSite.Controllers.Api
 
         #region Private Methods
 
-        private async Task<bool> GetWithdrawalPictureAsync(string transId)
+        /// <summary>
+        /// 確認是否存在提款單圖檔
+        /// </summary>
+        /// <param name="transId">提款單單號</param>
+        /// <returns>是否存在</returns>
+        private async Task<bool> CheckWithdrawalPictureAsync(string transId)
         {
             try
             {
@@ -899,11 +904,10 @@ namespace BackendSite.Controllers.Api
 
 
         /// <summary>
-        /// 
+        /// 複製提款單圖片檔
         /// </summary>
-        /// <param name="transId"></param>
-        /// <param name="accountingId"></param>
-        /// <returns></returns>
+        /// <param name="transId">提款單單號</param>
+        /// <returns>是否成功</returns>
         private async Task<bool> CopyWithdrawalPictureAsync(string transId)
         {
             try
@@ -932,6 +936,10 @@ namespace BackendSite.Controllers.Api
                 CopyObjectResponse response = await client.CopyObjectAsync(request);
 
                 return response.HttpStatusCode == HttpStatusCode.OK;
+            }
+            catch (AmazonS3Exception ex)
+            {
+                return false;
             }
             catch (Exception ex)
             {
