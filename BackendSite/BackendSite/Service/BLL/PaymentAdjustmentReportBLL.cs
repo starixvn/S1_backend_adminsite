@@ -53,7 +53,7 @@ namespace BackendSite.Service.BLL
                         UserName = row.UserName,
                         Amount = row.Amount,
                         CreateTime = row.CreateTime,
-                        StatusName = selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
+                        StatusName = row.AdjustType == 5 ? selLangBLL.GetResourceValue($"lbl_AdjustmentStatus2") : selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
                         Memo = row.Memo,
                         SabaID = row.SabaID,
                         Operator = row.Operator
@@ -92,7 +92,7 @@ namespace BackendSite.Service.BLL
                         SabaID = row.SabaID,
                         Amount = row.Amount,
                         CreateTime = row.CreateTime,
-                        StatusName = selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
+                        StatusName = row.AdjustType == 5 ? selLangBLL.GetResourceValue($"lbl_AdjustmentStatus2") : selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
                         Memo = row.Memo,
                         Operator = row.Operator
                     });

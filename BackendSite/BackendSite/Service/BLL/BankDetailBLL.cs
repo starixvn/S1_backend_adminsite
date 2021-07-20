@@ -31,13 +31,13 @@ namespace BackendSite.Service.BLL
             return bankDetailService.GetLoaclBankList(siteId);
         }
 
-        public int SetBankCard(int siteId, int SysId, string BankAccountName, string BankAccountNo, decimal MinAmount, decimal MaxAmount, decimal DailyLimitAmount, int PointLevel, int Purpose, int Status, int Sort)
+        public int SetBankCard(int siteId, int SysId, string BankAccountName, string BankAccountNo, decimal MinAmount, decimal MaxAmount, decimal DailyLimitAmount, int PointLevel, int Purpose, int Status, int Sort,string Operator)
         {
-            return bankDetailService.SetBankCard(siteId, SysId, BankAccountName, BankAccountNo, MinAmount, MaxAmount, DailyLimitAmount, PointLevel, Purpose, Status, Sort);
+            return bankDetailService.SetBankCard(siteId, SysId, BankAccountName, BankAccountNo, MinAmount, MaxAmount, DailyLimitAmount, PointLevel, Purpose, Status, Sort, Operator);
         }
-        public int DelBankCard(int siteId, int bankId)
+        public int DelBankCard(int siteId, int bankId, string Operator)
         {
-            return bankDetailService.DelBankCard(siteId, bankId);
+            return bankDetailService.DelBankCard(siteId, bankId, Operator);
         }
 
         public bool AddBankInfo(BankDetail bankDetail)

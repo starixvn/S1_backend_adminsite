@@ -256,7 +256,7 @@ namespace BackendSite.Service.BLL
             return _withdrawalLimitService.EditWithdrawalLimitInfo(withdrawalLimitInfoManage, updater);
         }
 
-        public int DeleteWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        public int DeleteWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string Operator)
         {
             var currentUpperPoint = _withdrawalLimitService.GetWithdrawalLimitInfo(withdrawalLimitInfoManage.SiteId,
                 withdrawalLimitInfoManage.CurrencyId, withdrawalLimitInfoManage.VipLevel + 1);
@@ -264,7 +264,7 @@ namespace BackendSite.Service.BLL
             if (currentUpperPoint != null)
                 return 0;
 
-            return _withdrawalLimitService.DeleteWithdrawalLimitInfo(withdrawalLimitInfoManage);
+            return _withdrawalLimitService.DeleteWithdrawalLimitInfo(withdrawalLimitInfoManage, Operator);
         }
 
         public IEnumerable<WithdrawalKYC> GetWithdrawalKYCList(int siteId)

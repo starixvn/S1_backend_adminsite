@@ -168,6 +168,11 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/AdjustmentLogReport" })]
+        public IActionResult AdjustmentLogReport()
+        {
+            return View();
+        }
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
         public IActionResult WithdrawalAccountingList()
         {

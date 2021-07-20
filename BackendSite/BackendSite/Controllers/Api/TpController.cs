@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Library;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.Api
 {
@@ -153,10 +154,22 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult();
             var custId = (string.IsNullOrEmpty(UserTpId)) ? null : common.TpIdToCustId(UserTpId);
             var custInfosDetail = custInfoBLL.GetCustInfoDetails(custId, UserName, SiteId);
-
+            
             AdminTpTransfer inTpTransfer = new AdminTpTransfer() { TpId = TpId, CustId = custInfosDetail.CustId, Amount = Amount, direction = (TpDirection)Opt, Operator = User.Identity.Name, Remarks = Memo };
 
             var result = await tpBLL.AdminAdjustmentTransferAsync(inTpTransfer);
+            if(result.ErrorCode == 0)
+            {
+                var param = new
+                {
+                    TpId,
+                    custInfosDetail.CustId,
+                    Amount,
+                    Opt,
+                    Remarks = Memo
+                };
+                tpBLL.SetAdjustmentTpCustInfoLog("3RDFundsAdjustment", 1, JsonConvert.SerializeObject(param), User.Identity.Name);
+            }
             apiResult.ErrorCode = result.ErrorCode;
             apiResult.Message = result.Data.ThirdId;
 

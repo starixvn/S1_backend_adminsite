@@ -45,7 +45,7 @@ namespace BackendSite.Controllers.Api
             var result = new ApiResult();
             try
             {
-                paymentManageBLL.UpdatePayList(PayId, Status);
+                paymentManageBLL.UpdatePayList(PayId, Status,User.Identity.Name);
                 result.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -64,7 +64,7 @@ namespace BackendSite.Controllers.Api
             var result = new ApiResult();
             try
             {
-                paymentManageBLL.UpdatePayChannel(ChannelId, Sort, Status, PointLevel);
+                paymentManageBLL.UpdatePayChannel(ChannelId, Sort, Status, PointLevel,User.Identity.Name);
                 result.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -83,7 +83,7 @@ namespace BackendSite.Controllers.Api
             var result = new ApiResult();
             try
             {
-                paymentManageBLL.UpdatePayCurrency(ChannelId, CurrencyId, MinAmount, MaxAmount, AmountRule, AmountShow);
+                paymentManageBLL.UpdatePayCurrency(ChannelId, CurrencyId, MinAmount, MaxAmount, AmountRule, AmountShow,User.Identity.Name);
                 result.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -102,7 +102,7 @@ namespace BackendSite.Controllers.Api
             var result = new ApiResult();
             try
             {
-                paymentManageBLL.UpdatePayCurrency(ChannelId, CurrencyId, MinAmount, MaxAmount);
+                paymentManageBLL.UpdatePayCurrency(ChannelId, CurrencyId, MinAmount, MaxAmount,User.Identity.Name);
                 result.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -140,7 +140,7 @@ namespace BackendSite.Controllers.Api
             var result = new ApiResult<IEnumerable<PayListBankInfoSys>>();
             try
             {
-                paymentManageBLL.UpdateBankInfo(PayId, SysId, Status);
+                paymentManageBLL.UpdateBankInfo(PayId, SysId, Status,User.Identity.Name);
                 result.ErrorCode = 0;
             }
             catch (Exception ex)

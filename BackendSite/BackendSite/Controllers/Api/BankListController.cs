@@ -100,7 +100,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult SetBankCard(bankCardReq bankCardReq)
         {
-            int result = bankDetailBLL.SetBankCard(bankCardReq.siteId, bankCardReq.SysId, bankCardReq.BankAccountName, bankCardReq.BankAccountNo, bankCardReq.MinAmount, bankCardReq.MaxAmount, bankCardReq.DailyLimitAmount, bankCardReq.PointLevel, bankCardReq.Purpose, bankCardReq.Status, bankCardReq.Sort);
+            int result = bankDetailBLL.SetBankCard(bankCardReq.siteId, bankCardReq.SysId, bankCardReq.BankAccountName, bankCardReq.BankAccountNo, bankCardReq.MinAmount, bankCardReq.MaxAmount, bankCardReq.DailyLimitAmount, bankCardReq.PointLevel, bankCardReq.Purpose, bankCardReq.Status, bankCardReq.Sort, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result > 0)
             {
@@ -124,7 +124,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult DelBankCard(DelbankCardReq bankCardReq)
         {
-            int result = bankDetailBLL.DelBankCard(bankCardReq.siteId, bankCardReq.bankId);
+            int result = bankDetailBLL.DelBankCard(bankCardReq.siteId, bankCardReq.bankId, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result > 0)
             {

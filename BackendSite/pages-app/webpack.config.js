@@ -198,10 +198,18 @@ module.exports = {
     //   // '@babel/polyfill',
     //   "./src/pages/Finance/AdjustmentLimitManagement/index.js",
     // ],
-    "Finance/WithdrawalAccounting.min": [
-      "@babel/polyfill",
-      "./src/pages/Finance/WithdrawalAccounting/index.js",
+    // "Administration/SpecialPasswordManagement.min": [
+    // 	// '@babel/polyfill',
+    // 	"./src/pages/Administration/SpecialPasswordManagement/index.js"
+    // ],
+    "Finance/AdjustmentLogReport.min": [
+      // '@babel/polyfill',
+      "./src/pages/Finance/AdjustmentLogReport/index.js",
     ],
+    // "Finance/WithdrawalAccounting.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Finance/WithdrawalAccounting/index.js",
+    // ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

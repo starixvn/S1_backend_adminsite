@@ -1327,9 +1327,9 @@ import Tag from './Tag/index';
                             {data.status == 1 && data.agent != null && subFuncKeys.indexOf("ca_acc_lock") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"lock")}>Lock</button> : null}
                             {(data.status == 1 || data.status == 2 || data.status == 4) && data.agent != null && subFuncKeys.indexOf("ca_acc_close") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"closed")}>Closed</button> : null}
                             {(data.status == 2 || data.status == 4) && data.agent != null && subFuncKeys.indexOf("ca_unlock") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"unlock")}>Unlock</button> : null}
-                            <button className="btn btn-primary" onClick={this.setReason.bind(this,"kickout")}>KickOut</button>
-                            {(data.enablePromotion == 0) ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,1)}>Enable Promotion</button>:null}
-                            {(data.enablePromotion == 1) ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,0)}>Disable Promotion</button>:null}
+                            {subFuncKeys.indexOf("ca_kickout") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"kickout")}>KickOut</button> : null}
+                            {(data.enablePromotion == 0) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,1)}>Enable Promotion</button> : null}
+                            {(data.enablePromotion == 1) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,0)}>Disable Promotion</button> : null}
                         </div>
                         <div className="flex-wrap">
                             <table className="table table-detail ">
@@ -1377,56 +1377,12 @@ import Tag from './Tag/index';
                                         <th scope="row">Point Level</th>
                                         <td>{data.vipLevel}</td>
                                     </tr>
-                                    {(data.siteName == "Nova88") ?
-                                        <tr>
-                                            <th scope="row">
-                                                Vip Level&nbsp;<span class="status status-pending">New</span>
-                                            </th>
-                                            <td>{data.levelName}</td>
-                                        </tr>
-                                        :
-                                        <>
-                                            <tr>
-                                                <th scope="row">User Level</th>
-                                                {
-                                                    this.props.isEdit.Level ? (
-                                                        <td>
-                                                            <input type="number" min="1" defaultValue={data.userLevel} onChange={(e) => this.props.editOnChange(e.target.value, "Level")} />
-                                                            <div className="button-action float-right">
-                                                                <button className="btn btn-save" onClick={this.props.editUpdate}>
-                                                                    <i className="icon-save"></i>
-                                                                </button>
-                                                                <button className="btn btn-icon-cancel" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Level, "Level")}>
-                                                                    <i className="icon-cancel"></i>
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    ) : (
-                                                            <td>
-                                                                {data.userLevel}
-                                                                {
-                                                                    subFuncKeys.includes('ca_userEdit') ? (
-                                                                        <div className="button-action float-right">
-                                                                            <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Level, "Level")}>
-                                                                                <i className="icon-edit"></i>
-                                                                            </button>
-                                                                        </div >
-                                                                    ) : null
-                                                                }
-                                                            </td>
-                                                        )
-                                                }
-                                            </tr>
-                                            <tr>
-                                                <th scope="row">Point Level</th>
-                                                <td>{data.pointLevel}</td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row">Vip Level</th>
-                                                <td>{data.vipLevel}</td>
-                                            </tr>
-                                        </>
-                                    }
+                                    <tr>
+                                        <th scope="row">
+                                            Vip Level&nbsp;<span class="status status-pending">New</span>
+                                        </th>
+                                        <td>{data.levelName}</td>
+                                    </tr>
                                     <tr>
                                         <th scope="row">Currency</th>
                                         <td>{i18n["lbl_Currency" + data.currencyId]}</td></tr>

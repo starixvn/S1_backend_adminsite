@@ -798,6 +798,7 @@ namespace BackendSite.Controllers.Api
 
         #region CSD > Customer Administration > CustInfo [Enable/Disable Bonus]
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_promotion" })]
         public ApiResult SetEnableDisablePromotion(SetEnableDisableBonusPara para)
         {
             if (custInfoBLL.SetEnableDisablePromotion(para.CustId, para.EnablePromotion, User.Identity.Name) > 0)
@@ -1254,10 +1255,23 @@ namespace BackendSite.Controllers.Api
         }
          
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_setCustTag" })]
         public ApiResult SetCustTag(SetCustTagPara para)
         {
             if (custInfoBLL.SetCustTag(para.CustId,para.SelectTag, User.Identity.Name) > 0)
             {
+                List<string> temp = new List<string>();
+                string selectTag = JsonConvert.SerializeObject(temp);
+                if (para.SelectTag != null && para.SelectTag.Any())
+                {
+                    var alltagDict = custInfoBLL.GetAllTag().ToDictionary(x=> x.Id,x=> x.TagName);
+                    para.SelectTag.ToList().ForEach(x =>
+                    {
+                        temp.Add(alltagDict[x]);
+                    });
+                    selectTag = JsonConvert.SerializeObject(temp);
+                }
+                custInfoBLL.AddCustNote(para.CustId, $"Set Cust Tag:{selectTag}", User.Identity.Name);
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,

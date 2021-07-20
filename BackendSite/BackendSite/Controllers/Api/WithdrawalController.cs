@@ -567,7 +567,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult DeleteWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
         {
-            var result = withdrawalBLL.DeleteWithdrawalLimit(withdrawalLimitInfoManage);
+            var result = withdrawalBLL.DeleteWithdrawalLimit(withdrawalLimitInfoManage,User.Identity.Name);
             var apiResult = new ApiResult();
             if (result > 0)
             {

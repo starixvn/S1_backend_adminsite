@@ -580,7 +580,13 @@
     <value>Debit</value>
   </data>
   <data name="lbl_AdjustmentType3" xml:space="preserve">
-    <value>Bonus</value>
+    <value>Increase Bonus</value>
+  </data>
+  <data name="lbl_AdjustmentType4" xml:space="preserve">
+    <value>Reduce Bonus</value>
+  </data>
+  <data name="lbl_AdjustmentType5" xml:space="preserve">
+    <value>3RD</value>
   </data>
   <data name="lbl_BonusStatus1" xml:space="preserve">
     <value>Running</value>
