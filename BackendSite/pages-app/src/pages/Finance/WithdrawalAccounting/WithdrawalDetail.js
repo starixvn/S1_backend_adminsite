@@ -9,7 +9,11 @@ import {
 const dataColumnDefs = () => {
   return [
     { dataColumn: "seq", columnTitle: "Seq" },
-    { dataColumn: "bankAccountNo", columnTitle: "Bank AccountNo." },
+    {
+      dataColumn: "bankAccountNo",
+      columnTitle: "Bank AccountNo.",
+      body: { format: bankAccountFormat },
+    },
     {
       dataColumn: "amount",
       columnTitle: "Amount",
@@ -67,46 +71,67 @@ const Panel = (props) => {
           subData[s] = data[s];
         });
       }
-      return element.dataColumn === "action" ? (
-        <td key={`td-${element.dataColumn}-${idx}`}>
-          <div>
-            <div className="button-action">
-              <button
-                className="btn btn-edit"
-                onClick={props.GetById.bind(this, data.id)}
-              >
-                <i className="icon-edit"></i>
-              </button>
-              <button
-                className="btn btn-approved"
-                type="submit"
-                onClick={props.PopOut_Open.bind(this, data)}
-              >
-                Pic
-              </button>
-              <button
-                className="btn btn-delete"
-                onClick={props.Delete.bind(this, data)}
-              >
-                <i className="icon-delete"></i>
-              </button>
+      if (element.dataColumn === "action") {
+        return (
+          <td key={`td-${element.dataColumn}-${idx}`}>
+            <div>
+              <div className="button-action">
+                <button
+                  className="btn btn-edit"
+                  onClick={props.GetById.bind(this, data.id)}
+                >
+                  <i className="icon-edit"></i>
+                </button>
+                <button
+                  className="btn btn-approved"
+                  type="submit"
+                  onClick={props.PopOut_Open.bind(this, data)}
+                >
+                  Pic
+                </button>
+                <button
+                  className="btn btn-delete"
+                  onClick={props.Delete.bind(this, data)}
+                >
+                  <i className="icon-delete"></i>
+                </button>
+              </div>
             </div>
-          </div>
-        </td>
-      ) : (
-        <td
-          key={`td-${element.dataColumn}-${idx}`}
-          className={
-            element.body && element.body.attr && element.body.attr.class
-              ? element.body.attr.class
-              : ""
-          }
-        >
-          {element.body && element.body.format
-            ? element.body.format(data[element.dataColumn], subData)
-            : data[element.dataColumn]}
-        </td>
-      );
+          </td>
+        );
+      } else if (element.dataColumn === "bankAccountNo") {
+        return (
+          <td
+            key={`td-${element.dataColumn}-${idx}`}
+            className={
+              element.body && element.body.attr && element.body.attr.class
+                ? element.body.attr.class
+                : ""
+            }
+          >
+            {element.body.format(
+              data.bankCode,
+              data.bankAccountName,
+              data.bankAccountNo
+            )}
+          </td>
+        );
+      } else {
+        return (
+          <td
+            key={`td-${element.dataColumn}-${idx}`}
+            className={
+              element.body && element.body.attr && element.body.attr.class
+                ? element.body.attr.class
+                : ""
+            }
+          >
+            {element.body && element.body.format
+              ? element.body.format(data[element.dataColumn], subData)
+              : data[element.dataColumn]}
+          </td>
+        );
+      }
     });
 
     return <tr key={`accounting-body-${dataidx}`}>{row}</tr>;
@@ -135,6 +160,10 @@ const numberFormat = (number) => {
 
 const dateFormat = (datetime) => {
   return moment(datetime).format("l LTS");
+};
+
+const bankAccountFormat = (bankCode, bankAccountName, bankAccountNo) => {
+  return bankCode + "-" + bankAccountName + "-" + bankAccountNo;
 };
 
 export default Panel;

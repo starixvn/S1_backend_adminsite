@@ -73,7 +73,7 @@ namespace BackendSite.Service.BLL
         public int WithdrawalApproved(string transId, string comment, string updater, int userId, bool hasPic)
         {
             var serverInfo = _serverInfoService.GetModel();
-            var forStatus = new List<int> {(int) WithdrawalStatus.Process};
+            var forStatus = new List<int> { (int)WithdrawalStatus.Process };
 
             Match m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out int withdrawalId);
@@ -458,10 +458,10 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                if (withdrawalInfo.WithdrawalType == (int) WithdrawalType.LocalBank
-                    && withdrawalInfo.Status == (int) WithdrawalStatus.Approved)
+                if (withdrawalInfo.WithdrawalType == (int)WithdrawalType.LocalBank
+                    && withdrawalInfo.Status == (int)WithdrawalStatus.Approved)
                 {
-                    var accountingData = GetAccountingList(transId);
+                    var accountingData = GetAccountingList(transId, withdrawalInfo.SiteId);
                     var isoCode = _reportService.GetCurrencyList().Where(x => x.CurrencyId == withdrawalInfo.CurrencyId)
                         .Select(x => x.IsoCode).FirstOrDefault();
 
@@ -626,9 +626,9 @@ namespace BackendSite.Service.BLL
                 out rowCount);
         }
 
-        private IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingList(string transId)
+        private IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingList(string transId, int siteId)
         {
-            return _withdrawalBankAccountingService.GetAccountingListByTransId(transId);
+            return _withdrawalBankAccountingService.GetAccountingListByTransId(transId, siteId);
         }
 
         private GetWithdrawalBankAccountingModel GetAccountingById(int id)

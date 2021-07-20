@@ -45,7 +45,7 @@ const Panel = (props) => {
             <td>LocalBank</td>
             <th scope="row">FromBankAccountNo</th>
             <td>
-              {props.TransIdData.Withdrawal.bankCode}
+              {props.TransIdData.Withdrawal.fromBankCode}
               {"-"}
               {props.TransIdData.Withdrawal.fromAccountName}
               {"-"}
