@@ -35,7 +35,7 @@ namespace BackendSite.Service.DAL
             props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_AdjustmentTotalAmount_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_AdjustmentTotalAmountV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
                 CurrencyTotalAmount.ForEach(x =>
@@ -51,7 +51,7 @@ namespace BackendSite.Service.DAL
             props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            result = conn.Query<PaymentAdjustment>("Admin_AdjustmentInfo_Get", props, commandType: CommandType.StoredProcedure);
+            result = conn.Query<PaymentAdjustment>("Admin_AdjustmentInfoV2_Get", props, commandType: CommandType.StoredProcedure);
             PageNumber = props.Get<int?>("@PageNumber") ?? 0;
             TotalPages = props.Get<int?>("@TotalPages") ?? 0;
             RowCount = props.Get<int?>("@RowCount") ?? 0;
@@ -64,7 +64,7 @@ namespace BackendSite.Service.DAL
             IEnumerable<PaymentAdjustment> result = null;
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                string SpName = "Admin_AdjustmentInfoExport_Get";
+                string SpName = "Admin_AdjustmentInfoExportV2_Get";
                 DynamicParameters props = new DynamicParameters();
                 props.Add("@TransID", TransId);
                 props.Add("@Currency", CurrencyId);
