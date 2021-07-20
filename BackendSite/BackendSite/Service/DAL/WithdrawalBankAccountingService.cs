@@ -69,11 +69,12 @@ namespace BackendSite.Service.DAL
             return data;
         }
 
-        public IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingListByTransId(string transId)
+        public IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingListByTransId(string transId,int siteId)
         {
             var parameter = new DynamicParameters();
 
             parameter.Add("_TransId", transId);
+            parameter.Add("_SiteId", siteId);
 
             return _reportDbClient.Query<GetWithdrawalBankAccountingModel>("Admin_WithdrawalBankAccounting_Get", parameter);
         }
