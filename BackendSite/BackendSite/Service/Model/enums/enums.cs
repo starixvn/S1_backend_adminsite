@@ -79,7 +79,9 @@ namespace BackendSite.Service.Model.enums
     {
         Debit = 1,
         Credit = 2,
-        Bonus = 3
+        IncreaseBonus = 3,
+        ReduceBonus = 4,
+        Third = 5
     }
 
     public enum AdminUserStatus
