@@ -470,7 +470,7 @@ namespace BackendSite.Service.DAL
             //return _mainDbClient.Execute("Admin_DepositRequestAmount_Set", props);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_DepositRequestAmount_SetV2", props, commandType: CommandType.StoredProcedure) > 0;
+            return conn.Execute("Admin_DepositRequestAmountV2_Set", props, commandType: CommandType.StoredProcedure) > 0;
         }
     }
 }
