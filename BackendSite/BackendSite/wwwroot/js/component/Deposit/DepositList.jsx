@@ -87,6 +87,7 @@ import DateTimePicker from 'react-datetime';
                         <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
                         <td className="text-right">{number_format(row.amount)}</td>
+                        <td className="text-right">{number_format(row.actualDeposit)}</td>
                         <td>{showbankname}</td>
                         <td>{row.accountNo}</td>
                         <td>{row.accountName}</td>
@@ -129,6 +130,7 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">{i18n.lbl_UserName}</th>
                                 <th scope="col">Currency</th>
                                 <th scope="col" className="text-right">{i18n.lbl_Amount}</th>
+                                <th scope="col" className="text-right">{i18n.lbl_ActualDeposit}</th>
                                 <th scope="col">Bank Name</th>
                                 <th scope="col">To Acc. NO.</th>
                                 <th scope="col">To Acc. Name</th>

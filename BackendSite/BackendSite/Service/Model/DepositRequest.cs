@@ -77,6 +77,7 @@ namespace BackendSite.Service.Model
         public string SiteName { set; get; }
         public bool IsTest { set; get; }
         public decimal Amount { set; get; }
+        public decimal ActualDeposit { set; get; }
         public string Comment { set; get; }
         public DateTime CreateTime { set; get; }
         public bool FirstDeposit { set; get; }
