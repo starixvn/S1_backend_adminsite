@@ -13,6 +13,7 @@ import * as Loading from "./Loading";
 const App = () => {
   const [siteList, setSiteList] = useState([]);
   const [SubmitStatus, setSubmitStatus] = useState(false);
+  const [ExportStatus, setExportStatus] = useState(false);
   const [DetailStatus, setDetailStatus] = useState(false);
   const [PopoutStatus, setPopoutStatus] = useState(false);
   const [stateFilter, setFilter] = useState({
@@ -84,6 +85,7 @@ const App = () => {
     }
     Loading.OnLoading();
     setSubmitStatus(true);
+    setExportStatus(true);
     setDetailStatus(true);
 
     const siteIds = [];
@@ -113,6 +115,7 @@ const App = () => {
       )
       .then(function (res) {
         setSubmitStatus(false);
+        setExportStatus(false);
         setDetailStatus(false);
         Loading.UnLoading();
         if (res.data.errorCode === 0 || res.data.errorCode === 1) {
@@ -135,6 +138,60 @@ const App = () => {
       .catch(function (error) {
         alert(error);
       });
+  };
+
+  //[Main] > [ExportExcel]
+  //Get Withdrawal Summary Data For Show in Main Page.
+  const Result_ExportExcel = () => {
+    if (stateFilter.SiteIds.length === 0) {
+      alert("Please Choose at least one Site");
+      return false;
+    }
+    if (stateFilter.CurrencyIds.length === 0) {
+      alert("Please Choose at least one Currency");
+      return false;
+    }
+    if (!moment(stateFilter.StartDate).unix()) {
+      alert("Please Choose Start Date");
+      return false;
+    }
+    if (!moment(stateFilter.EndDate).unix()) {
+      alert("Please Choose End Date");
+      return false;
+    }
+    setSubmitStatus(true);
+    setExportStatus(true);
+    setDetailStatus(true);
+
+    const siteIds = [];
+    stateFilter.SiteIds.map((o) => {
+      siteIds.push(o.value);
+    });
+
+    const currencyIds = [];
+    stateFilter.CurrencyIds.map((o) => {
+      currencyIds.push(Number(o.value));
+    });
+
+    let param = {
+      Url: "WithdrawalBankAccounting/ExportWithdrawalAccountingList",
+      Data: {
+        siteIds: JSON.stringify(siteIds),
+        currencyIds: JSON.stringify(currencyIds),
+        startDate: moment(stateFilter.StartDate).format("YYYY-MM-DD"),
+        endDate: moment(stateFilter.EndDate).format("YYYY-MM-DD"),
+        transId: stateFilter.TransId,
+        userName: stateFilter.UserName,
+      },
+    };
+
+    WebAPI.DownloadData(param);
+
+    setTimeout(() => {
+      setSubmitStatus(false);
+      setExportStatus(false);
+      setDetailStatus(false);
+    }, 5000);
   };
 
   //[Main] > [Detail]
@@ -410,6 +467,8 @@ const App = () => {
             DetailBtnDisabled={DetailStatus}
             ChangePage={Result_ChangePage}
             Detail={Result_Detail}
+            ExportToExcel={Result_ExportExcel}
+            ExportBtnDisabled={ExportStatus}
           />
         )}
       </div>
