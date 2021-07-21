@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL
 {
@@ -20,14 +21,14 @@ namespace BackendSite.Service.BLL
             this.selLangBLL = selLangBLL;
         }
 
-        public IEnumerable<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport(string TransId, int Currency, string UserName, int AdjustType, long StartDate, long EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount, ref List<string> CurrencyAmount)
+        public IEnumerable<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport(string TransId, int Currency, string UserName, int adjustType, long StartDate, long EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount, ref List<string> CurrencyAmount)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
             var datas = paymentAdjustmentService.GetPaymentAdjustmentReport(
                     TransId, 
                     Currency, 
                     UserName,
-                    AdjustType, 
+                    adjustType, 
                     siteList?.Select(x => x.SiteId), 
                     StartDate, 
                     EndDate, 
@@ -53,7 +54,7 @@ namespace BackendSite.Service.BLL
                         UserName = row.UserName,
                         Amount = row.Amount,
                         CreateTime = row.CreateTime,
-                        StatusName = row.AdjustType == 5 ? selLangBLL.GetResourceValue($"lbl_AdjustmentStatus2") : selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
+                        StatusName = row.AdjustType == (int)AdjustType.Third ? selLangBLL.GetResourceValue($"lbl_AdjustmentStatus2") : selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
                         Memo = row.Memo,
                         SabaID = row.SabaID,
                         Operator = row.Operator
@@ -64,14 +65,14 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public List<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentExportReport(string TransId, int Currency, string UserName, int AdjustType, long StartDate, long EndDate)
+        public List<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentExportReport(string TransId, int Currency, string UserName, int adjustType, long StartDate, long EndDate)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
             var datas = paymentAdjustmentService.GetPaymentAdjustmentExportReport(
                     TransId,
                     Currency,
                     UserName,
-                    AdjustType,
+                    adjustType,
                     siteList?.Select(x => x.SiteId),
                     StartDate,
                     EndDate
@@ -92,7 +93,7 @@ namespace BackendSite.Service.BLL
                         SabaID = row.SabaID,
                         Amount = row.Amount,
                         CreateTime = row.CreateTime,
-                        StatusName = row.AdjustType == 5 ? selLangBLL.GetResourceValue($"lbl_AdjustmentStatus2") : selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
+                        StatusName = row.AdjustType == (int)AdjustType.Third ? selLangBLL.GetResourceValue($"lbl_AdjustmentStatus2") : selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
                         Memo = row.Memo,
                         Operator = row.Operator
                     });
