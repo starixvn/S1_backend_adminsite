@@ -283,7 +283,7 @@ namespace BackendSite.Service.DAL
             props.Add("ActStatus", Deposit);
             props.Add("DayInactive", DormantUser);
             props.Add("CallOutStatus", CallOut);
-            var result = conn.Query<CustTele>("Admin_CustTeleSearchV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var result = conn.Query<CustTele>("Admin_CustTeleSearchV3_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             result.ForEach(x =>
             {
@@ -363,7 +363,7 @@ namespace BackendSite.Service.DAL
             props.Add("CallOutStatus", CallOut);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var tempresult = conn.Query<CustTeleExportTemp>("Admin_CustTeleExportV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var tempresult = conn.Query<CustTeleExportTemp>("Admin_CustTeleExportV3_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             tempresult.ForEach(x =>
             {
@@ -451,7 +451,7 @@ namespace BackendSite.Service.DAL
             props.Add("PageSize", pageSize);
             props.Add("Status", status);
 
-            var result = _reportDbClient.Query<TagData>("Admin_Tag_Get", props);
+            var result = _reportDbClient.Query<TagData>("Admin_TagV2_Get", props);
 
             SearchResult.TagDatas = result.ToList();
             SearchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;

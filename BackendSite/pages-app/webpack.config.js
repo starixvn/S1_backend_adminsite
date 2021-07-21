@@ -40,13 +40,13 @@ module.exports = {
     // 	// '@babel/polyfill',
     // 	"./src/pages/Finance/PaymentManagement/index.js"
     // ],
-    "CSD/Announcement.min": ["./src/pages/CSD/Announcement/index.js"],
-    "Finance/WithdrawalLimitAdjust.min": [
-      "./src/pages/Finance/WithdrawalLimitAdjust/index.js",
-    ],
-    "CSD/PersonalMsgBatch.min": [
-    	"./src/pages/CSD/PersonalMsgBatch/index.js"
-    ],
+    // "CSD/Announcement.min": ["./src/pages/CSD/Announcement/index.js"],
+    // "Finance/WithdrawalLimitAdjust.min": [
+    //   "./src/pages/Finance/WithdrawalLimitAdjust/index.js",
+    // ],
+    // "CSD/PersonalMsgBatch.min": [
+    // 	"./src/pages/CSD/PersonalMsgBatch/index.js"
+    // ],
     // "Marketing/PointLevelList.min": [
     // 	"./src/pages/Marketing/PointLevelManagement/index.js"
     // ],
@@ -202,10 +202,10 @@ module.exports = {
     // 	// '@babel/polyfill',
     // 	"./src/pages/Administration/SpecialPasswordManagement/index.js"
     // ],
-    // "Finance/AdjustmentLogReport.min": [
-    //   // '@babel/polyfill',
-    //   "./src/pages/Finance/AdjustmentLogReport/index.js",
-    // ],
+    "Finance/AdjustmentLogReport.min": [
+      // '@babel/polyfill',
+      "./src/pages/Finance/AdjustmentLogReport/index.js",
+    ],
     // "Finance/WithdrawalAccounting.min": [
     //   "@babel/polyfill",
     //   "./src/pages/Finance/WithdrawalAccounting/index.js",
