@@ -477,7 +477,7 @@ namespace BackendSite.Service.BLL
                 if (withdrawalInfo.WithdrawalType == (int) WithdrawalType.LocalBank
                     && withdrawalInfo.Status == (int) WithdrawalStatus.Approved)
                 {
-                    var accountingData = GetAccountingList(transId, withdrawalInfo.SiteId);
+                    var accountingData = GetAccountingList(transId, withdrawalInfo.SiteId,withdrawalInfo.CurrencyId);
                     var isoCode = _reportService.GetCurrencyList().Where(x => x.CurrencyId == withdrawalInfo.CurrencyId)
                         .Select(x => x.IsoCode).FirstOrDefault();
 
@@ -659,9 +659,9 @@ namespace BackendSite.Service.BLL
                 string.IsNullOrEmpty(userName) ? null : userName);
         }
 
-        private IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingList(string transId, int siteId)
+        private IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingList(string transId, int siteId,int currencyId)
         {
-            return _withdrawalBankAccountingService.GetAccountingListByTransId(transId, siteId);
+            return _withdrawalBankAccountingService.GetAccountingListByTransId(transId, siteId,currencyId);
         }
 
         private GetWithdrawalBankAccountingModel GetAccountingById(int id)
