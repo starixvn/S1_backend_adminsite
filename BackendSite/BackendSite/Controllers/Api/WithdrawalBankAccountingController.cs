@@ -29,6 +29,7 @@ namespace BackendSite.Controllers.Api
         private readonly ILogger<WithdrawalBankAccountingController> _logger;
         private readonly WithdrawalBLL _withdrawalBLL;
         private readonly AuthorizeBLL _authorizeBLL;
+        private readonly ExcelBLL _excelBLL;
 
         private readonly string _awsKey;
         private readonly string _awsSecretKey;
@@ -47,6 +48,7 @@ namespace BackendSite.Controllers.Api
             _withdrawalBLL = provider.GetRequiredService<WithdrawalBLL>();
             _authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             _logger = provider.GetRequiredService<ILogger<WithdrawalBankAccountingController>>();
+            _excelBLL = provider.GetRequiredService<ExcelBLL>();
 
             _awsKey = configuration.GetValue<string>("AWSKey");
             _awsSecretKey = configuration.GetValue<string>("AwsSecretKey");
@@ -112,8 +114,8 @@ namespace BackendSite.Controllers.Api
             public decimal ChargeFee { get; set; }
 
             public string Memo { get; set; }
-            
-            
+
+
             public int UploadPicTimes { get; set; }
 
             public int Creator { get; set; }
@@ -151,7 +153,7 @@ namespace BackendSite.Controllers.Api
         #region Action
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute),
-            Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
+            Arguments = new object[] {"Finance/WithdrawalAccountingList"})]
         public ApiResult GetWithdrawalInfoAndAccountingList(GetWithdrawalInfoAndAccountingListRequest request)
         {
             var result = _withdrawalBLL.GetWithdrawalInfoAndAccountingList(request.SiteIds,
@@ -166,11 +168,31 @@ namespace BackendSite.Controllers.Api
             return new ApiListResult<WithdrawalInfoAndAccountingListModel>
             {
                 Data = result.Datas,
-                ErrorCode = (int)ErrorCodeEnum.Success,
+                ErrorCode = (int) ErrorCodeEnum.Success,
                 PageNumber = result.PageNumber,
                 TotalPages = result.TotalPages,
                 RowCount = result.RowCount
             };
+        }
+
+        public IActionResult ExportWithdrawalAccountingList(string siteIds,
+            string currencyIds,
+            string startDate,
+            string endDate,
+            string transId,
+            string userName)
+        {
+            var data = _withdrawalBLL.GetWithdrawalInfoAndAccountingListForExport(siteIds,
+                currencyIds,
+                startDate,
+                endDate,
+                transId,
+                userName);
+            var stream = _excelBLL.Export(data);
+
+            return File(stream,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"WithdrawalInfoAndAccountList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
         public ApiResult GetWithdrawalInfoAndAccountingByTransId(GetWithdrawalInfoAndAccountingByTransIdRequest request)
@@ -187,27 +209,28 @@ namespace BackendSite.Controllers.Api
                 return new ApiResult<GetWithdrawalInfoAndAccountingModel>
                 {
                     Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
+                    ErrorCode = (int) ErrorCodeEnum.Success
                 };
             }
         }
 
         public ApiResult GetWithdrawalBankAccounting(GetWithdrawalBankAccountingRequest request)
         {
-            var result = _withdrawalBLL.GetWithdrawalBankAccountingById(request.Id, out GetWithdrawalBankAccountingModel data);
+            var result =
+                _withdrawalBLL.GetWithdrawalBankAccountingById(request.Id, out GetWithdrawalBankAccountingModel data);
 
             if (!result)
             {
                 return new ApiResult
                 {
-                    ErrorCode = (int)ErrorCodeEnum.Fail
+                    ErrorCode = (int) ErrorCodeEnum.Fail
                 };
             }
             else
                 return new ApiResult<GetWithdrawalBankAccountingModel>
                 {
                     Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
+                    ErrorCode = (int) ErrorCodeEnum.Success
                 };
         }
 
@@ -233,9 +256,8 @@ namespace BackendSite.Controllers.Api
                     Operator = authData.UserId,
                     OperatorName = authData.UserName,
                     OperateTime = DateTime.Now.AddHours(8)
-
                 },
-                ErrorCode = (int)ErrorCodeEnum.Success
+                ErrorCode = (int) ErrorCodeEnum.Success
             };
         }
 
@@ -261,7 +283,7 @@ namespace BackendSite.Controllers.Api
             {
                 return new ApiResult
                 {
-                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    ErrorCode = (int) ErrorCodeEnum.Success,
                     Message = "Insert Successful."
                 };
             }
@@ -289,7 +311,7 @@ namespace BackendSite.Controllers.Api
             {
                 return new ApiResult
                 {
-                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    ErrorCode = (int) ErrorCodeEnum.Success,
                     Message = "Update Successful."
                 };
             }
@@ -297,7 +319,8 @@ namespace BackendSite.Controllers.Api
 
         public ApiResult DeleteWithdrawalAccounting(DeleteWithdrawalAccountingRequest request)
         {
-            var result = _withdrawalBLL.DeleteWithdrawalAccounting(request.Id, out string transId, out int seq, out int uploadPicTimes);
+            var result = _withdrawalBLL.DeleteWithdrawalAccounting(request.Id, out string transId, out int seq,
+                out int uploadPicTimes);
 
             if (!result)
             {
@@ -309,7 +332,7 @@ namespace BackendSite.Controllers.Api
 
                 return new ApiResult
                 {
-                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    ErrorCode = (int) ErrorCodeEnum.Success,
                     Message = "Delete Successful."
                 };
             }
@@ -318,7 +341,8 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public async Task<ApiResult> UploadAccountingPicture(UploadAccountingPictureRequest request)
         {
-            var result = _withdrawalBLL.UpdateWithdrawalAccountingForUploadPicture(request.Id, out int newUploadPictureTimes);
+            var result =
+                _withdrawalBLL.UpdateWithdrawalAccountingForUploadPicture(request.Id, out int newUploadPictureTimes);
             if (result)
             {
                 string pictureBaseOnSixFour = request.Picture.Replace("data:image/png;base64,", "");
@@ -329,14 +353,14 @@ namespace BackendSite.Controllers.Api
                 {
                     return new ApiResult()
                     {
-                        ErrorCode = (int)ErrorCodeEnum.Success
+                        ErrorCode = (int) ErrorCodeEnum.Success
                     };
                 }
             }
 
             return new ApiResult()
             {
-                ErrorCode = (int)ErrorCodeEnum.Fail,
+                ErrorCode = (int) ErrorCodeEnum.Fail,
                 Message = "Upload Fail."
             };
         }
@@ -344,7 +368,8 @@ namespace BackendSite.Controllers.Api
         [HttpGet]
         public ActionResult GetAccountingPicture(string transId, int seq, int uploadPicTimes)
         {
-            return Redirect($"{_awsWithdrawalUrl}{_awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png");
+            return Redirect(
+                $"{_awsWithdrawalUrl}{_awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png");
         }
 
         [HttpPost]
@@ -356,13 +381,14 @@ namespace BackendSite.Controllers.Api
             {
                 return new ApiResult()
                 {
-                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    ErrorCode = (int) ErrorCodeEnum.Fail,
                     Message = "Delete Fail."
                 };
             }
+
             return new ApiResult()
             {
-                ErrorCode = (int)ErrorCodeEnum.Success,
+                ErrorCode = (int) ErrorCodeEnum.Success,
                 Message = "Delete Successful."
             };
         }
@@ -373,13 +399,14 @@ namespace BackendSite.Controllers.Api
             return new ApiResult<bool>()
             {
                 Data = await CheckAccountingPictureAsync(request.TransId, request.Seq, request.UploadPicTimes),
-                ErrorCode = (int)ErrorCodeEnum.Success
+                ErrorCode = (int) ErrorCodeEnum.Success
             };
         }
 
         #region Private Methods
 
-        private async Task<bool> UploadAccountPictureAsync(MemoryStream stream, string transId, int seq, int uploadPicTimes)
+        private async Task<bool> UploadAccountPictureAsync(MemoryStream stream, string transId, int seq,
+            int uploadPicTimes)
         {
             try
             {
@@ -426,8 +453,9 @@ namespace BackendSite.Controllers.Api
         {
             try
             {
-                if (!await CheckAccountingPictureAsync(transId, seq, uploadPicTimes)) return false; //Picture not exist before delete.
-                
+                if (!await CheckAccountingPictureAsync(transId, seq, uploadPicTimes))
+                    return false; //Picture not exist before delete.
+
                 var config = new AmazonS3Config
                 {
                     RegionEndpoint = RegionEndpoint.APSoutheast1
@@ -445,10 +473,11 @@ namespace BackendSite.Controllers.Api
                     BucketName = _awsWithdrawalBucketName,
                     Key = $"{_awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png"
                 };
-                    
+
                 await client.DeleteObjectAsync(deleteRequest);
 
-                return !await CheckAccountingPictureAsync(transId, seq, uploadPicTimes);//Picture not exist after delete.
+                return !await CheckAccountingPictureAsync(transId, seq,
+                    uploadPicTimes); //Picture not exist after delete.
             }
             catch (AmazonS3Exception)
             {
@@ -494,7 +523,6 @@ namespace BackendSite.Controllers.Api
                 return false;
             }
         }
-
 
         #endregion
 

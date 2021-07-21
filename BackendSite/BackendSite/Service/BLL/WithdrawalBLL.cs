@@ -73,7 +73,7 @@ namespace BackendSite.Service.BLL
         public int WithdrawalApproved(string transId, string comment, string updater, int userId, bool hasPic)
         {
             var serverInfo = _serverInfoService.GetModel();
-            var forStatus = new List<int> { (int)WithdrawalStatus.Process };
+            var forStatus = new List<int> {(int) WithdrawalStatus.Process};
 
             Match m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out int withdrawalId);
@@ -447,6 +447,22 @@ namespace BackendSite.Service.BLL
             };
         }
 
+        public IEnumerable<WithdrawalInfoAndAccountingListForExportModel> GetWithdrawalInfoAndAccountingListForExport(
+            string siteIds,
+            string currencyIds,
+            string startDate,
+            string endDate,
+            string transId,
+            string userName)
+        {
+            return GetWithdrawalInfoAndAccountingDataForExport(siteIds,
+                currencyIds,
+                startDate,
+                endDate,
+                transId,
+                userName);
+        }
+
         public bool GetAccountingListByTransId(string transId, out GetWithdrawalInfoAndAccountingModel data)
         {
             data = new GetWithdrawalInfoAndAccountingModel();
@@ -458,8 +474,8 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                if (withdrawalInfo.WithdrawalType == (int)WithdrawalType.LocalBank
-                    && withdrawalInfo.Status == (int)WithdrawalStatus.Approved)
+                if (withdrawalInfo.WithdrawalType == (int) WithdrawalType.LocalBank
+                    && withdrawalInfo.Status == (int) WithdrawalStatus.Approved)
                 {
                     var accountingData = GetAccountingList(transId, withdrawalInfo.SiteId);
                     var isoCode = _reportService.GetCurrencyList().Where(x => x.CurrencyId == withdrawalInfo.CurrencyId)
@@ -624,6 +640,23 @@ namespace BackendSite.Service.BLL
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
+        }
+
+        private IEnumerable<WithdrawalInfoAndAccountingListForExportModel> GetWithdrawalInfoAndAccountingDataForExport(
+            string siteIds,
+            string currencyIds,
+            string startDate,
+            string endDate,
+            string transId,
+            string userName)
+        {
+            return _withdrawalBankAccountingService.GetWithdrawalInfoAndAccountingListForExport(
+                siteIds,
+                currencyIds,
+                startDate,
+                endDate,
+                string.IsNullOrEmpty(transId) ? null : transId,
+                string.IsNullOrEmpty(userName) ? null : userName);
         }
 
         private IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingList(string transId, int siteId)
