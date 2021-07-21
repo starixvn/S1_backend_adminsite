@@ -5,9 +5,10 @@ import Result from './Result';
 import Filter from './Filter';
 import WebAPI from '../../../module/WebAPI';
 import qs from 'qs';
-import moment from 'moment';
+import moment from "moment-timezone";
 
 const Panel = () => {
+    moment.tz.setDefault("Asia/Taipei");
     const [stateFilter, setFilter] = useState({
         'SelectSite': [],
         'StartDate': moment().add(-10, 'days').format('l'),
