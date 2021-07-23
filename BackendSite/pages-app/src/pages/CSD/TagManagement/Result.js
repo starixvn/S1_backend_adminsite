@@ -1,6 +1,6 @@
 import React from "react";
 import Pagination from "./Pagination";
-import moment from "moment";
+import moment from "moment-timezone";
 import { api } from "../../../module/WebAPI";
 const SpecialItemType = {
   statusBtn: "statusBtn",

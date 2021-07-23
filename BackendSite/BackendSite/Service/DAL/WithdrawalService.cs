@@ -153,7 +153,7 @@ namespace BackendSite.Service.DAL
 
             #region GetCurrencyTotalAmount
 
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_WithdrawalTotalAmountByCust_Get", p,
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_WithdrawalTotalAmountByCustV2_Get", p,
                 commandType: CommandType.StoredProcedure).ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
@@ -174,7 +174,7 @@ namespace BackendSite.Service.DAL
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
 
-            var depositList = conn.Query<WithdrawalRequest>("Admin_WithdrawalListByCust_Get", p,
+            var depositList = conn.Query<WithdrawalRequest>("Admin_WithdrawalListByCustV2_Get", p,
                 commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;

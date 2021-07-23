@@ -1,9 +1,9 @@
 import Setting from './Setting';
 import Log from './Log';
 import { getUrlParameter } from '../../commJS/common';
-
+import moment from "moment-timezone";
 const Panel = () => {
-
+    moment.tz.setDefault("Asia/Taipei");
     let defaultData = {
         manually: 0,
         vipLevel: 0

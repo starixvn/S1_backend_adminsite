@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import DateTimePicker from "react-datetime";
-import moment from "moment";
+import moment from "moment-timezone";
 
 const allSiteDisplayText = "All";
 

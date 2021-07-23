@@ -112,10 +112,10 @@ namespace BackendSite.Service.BLL
             var custInfoDetail = custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
             if (custInfoDetail != null)
             {
-                custInfoDetail.LastDepositTime = custInfoDetail.LastDepositTimeRecord == null ? "" : custInfoDetail.LastDepositTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.LastWithdrawlTime = custInfoDetail.LastWithdrawalTimeRecord == null ? "" : custInfoDetail.LastWithdrawalTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.LastBettingTime = custInfoDetail.LastTpBetRecordTimeRecord == null ? "" : custInfoDetail.LastTpBetRecordTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.FirstDepositTime = custInfoDetail.FirstDepositTimeRecord == null ? "" : string.Format("{0} (+08:00)", custInfoDetail.FirstDepositTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture));
+                custInfoDetail.LastDepositTime = custInfoDetail.LastDepositTimeRecord == null ? "N/A" : custInfoDetail.LastDepositTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.LastWithdrawlTime = custInfoDetail.LastWithdrawalTimeRecord == null ? "N/A" : custInfoDetail.LastWithdrawalTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.LastBettingTime = custInfoDetail.LastTpBetRecordTimeRecord == null ? "N/A" : custInfoDetail.LastTpBetRecordTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.FirstDepositTime = custInfoDetail.FirstDepositTimeRecord == null ? "N/A" : custInfoDetail.FirstDepositTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
 
                 custInfoDetail.tpWallet = await tpBLL.GetTpWalletAsync(custInfoDetail.CustId);
                 custInfoDetail.promotions = promotionService.GetPromotionListByCustId(custInfoDetail.CustId);

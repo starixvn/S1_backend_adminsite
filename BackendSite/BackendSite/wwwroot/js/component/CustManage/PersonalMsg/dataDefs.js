@@ -1,5 +1,5 @@
 export const dateFormat = (createTime)=>{
-    return moment(createTime).format('l LTS');
+    return moment.utc(createTime).add(8,'hour').format('l LTS');
 }
 
 export const boolFormat = (v)=>{
@@ -9,7 +9,7 @@ export const boolFormat = (v)=>{
 export const columnDefs = [
     {
         dataColumn:'createTime', 
-        columnTitle:`CreateTime ${moment().format('(Z)')}`,
+        columnTitle:`CreateTime`,
         body:{
             format:dateFormat
         }

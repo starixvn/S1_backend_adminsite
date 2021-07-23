@@ -1,6 +1,6 @@
 import React from "react";
-import Pagination from "../../../component/Pagination";
-import moment from "moment";
+import Pagination from './Pagination';
+import moment from "moment-timezone";
 
 const SpecialItemType = {
 	actionBtn: "actionBtn"

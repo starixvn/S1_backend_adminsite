@@ -38,7 +38,7 @@ namespace BackendSite.Service.DAL
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var tpTransferInfoList = conn.Query<TpTransferInfo>("Admin_TpTransferInfoByCust_Get", p, commandType: CommandType.StoredProcedure);
+            var tpTransferInfoList = conn.Query<TpTransferInfo>("Admin_TpTransferInfoByCustV2_Get", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
