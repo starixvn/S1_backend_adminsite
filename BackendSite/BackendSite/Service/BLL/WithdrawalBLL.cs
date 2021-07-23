@@ -447,6 +447,22 @@ namespace BackendSite.Service.BLL
             };
         }
 
+        public IEnumerable<WithdrawalInfoAndAccountingListForExportModel> GetWithdrawalInfoAndAccountingListForExport(
+            string siteIds,
+            string currencyIds,
+            string startDate,
+            string endDate,
+            string transId,
+            string userName)
+        {
+            return GetWithdrawalInfoAndAccountingDataForExport(siteIds,
+                currencyIds,
+                startDate,
+                endDate,
+                transId,
+                userName);
+        }
+
         public bool GetAccountingListByTransId(string transId, out GetWithdrawalInfoAndAccountingModel data)
         {
             data = new GetWithdrawalInfoAndAccountingModel();
@@ -461,7 +477,7 @@ namespace BackendSite.Service.BLL
                 if (withdrawalInfo.WithdrawalType == (int) WithdrawalType.LocalBank
                     && withdrawalInfo.Status == (int) WithdrawalStatus.Approved)
                 {
-                    var accountingData = GetAccountingList(transId);
+                    var accountingData = GetAccountingList(transId, withdrawalInfo.SiteId,withdrawalInfo.CurrencyId);
                     var isoCode = _reportService.GetCurrencyList().Where(x => x.CurrencyId == withdrawalInfo.CurrencyId)
                         .Select(x => x.IsoCode).FirstOrDefault();
 
@@ -626,9 +642,26 @@ namespace BackendSite.Service.BLL
                 out rowCount);
         }
 
-        private IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingList(string transId)
+        private IEnumerable<WithdrawalInfoAndAccountingListForExportModel> GetWithdrawalInfoAndAccountingDataForExport(
+            string siteIds,
+            string currencyIds,
+            string startDate,
+            string endDate,
+            string transId,
+            string userName)
         {
-            return _withdrawalBankAccountingService.GetAccountingListByTransId(transId);
+            return _withdrawalBankAccountingService.GetWithdrawalInfoAndAccountingListForExport(
+                siteIds,
+                currencyIds,
+                startDate,
+                endDate,
+                string.IsNullOrEmpty(transId) ? null : transId,
+                string.IsNullOrEmpty(userName) ? null : userName);
+        }
+
+        private IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingList(string transId, int siteId,int currencyId)
+        {
+            return _withdrawalBankAccountingService.GetAccountingListByTransId(transId, siteId,currencyId);
         }
 
         private GetWithdrawalBankAccountingModel GetAccountingById(int id)

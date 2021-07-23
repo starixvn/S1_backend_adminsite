@@ -463,14 +463,14 @@ namespace BackendSite.Service.DAL
             int.TryParse(m.Value, out depositId);
 
             DynamicParameters props = new DynamicParameters();
-            props.Add("DepositId", depositId);
-            props.Add("Amount", amount);
-            props.Add("Operator", Operator);
+            props.Add("_DepositId", depositId);
+            props.Add("_Amount", amount);
+            props.Add("_Operator", Operator);
 
             //return _mainDbClient.Execute("Admin_DepositRequestAmount_Set", props);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_DepositRequestAmount_Set", props, commandType: CommandType.StoredProcedure) > 0;
+            return conn.Execute("Admin_DepositRequestAmountV2_Set", props, commandType: CommandType.StoredProcedure) > 0;
         }
     }
 }
