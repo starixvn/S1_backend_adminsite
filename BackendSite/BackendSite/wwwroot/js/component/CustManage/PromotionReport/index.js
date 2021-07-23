@@ -1,8 +1,9 @@
 import { getUrlParameter } from "../../commJS/common";
 import Filter from "./Filter";
 import Result from "./Result";
-
+import moment from "moment-timezone";
 const Panel = () => {
+  moment.tz.setDefault("Asia/Taipei");
   const [DateRangeDatas, setDateRange] = React.useState({
     StartTime: moment(new Date()).add(-10, "days").format("l"),
     EndTime: moment(new Date()).format("l"),

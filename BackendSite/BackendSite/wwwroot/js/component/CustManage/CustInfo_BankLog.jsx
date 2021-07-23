@@ -12,7 +12,7 @@ export class BankLog extends React.Component {
                     <th>{row.bankName}</th>
                     <th>{row.accountName}</th>
                     <th>{row.accountNum}</th>
-                    <td>{moment(row.createTime).format('l LTS')}</td>
+                    <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                 </tr>
             );
         }) : null;
@@ -25,7 +25,7 @@ export class BankLog extends React.Component {
                             <th scope="col">BankName</th>
                             <th scope="col">AccountName</th>
                             <th scope="col">AccountNum</th>
-                            <th scope="col">Create Time {moment().format('(Z)')}</th>
+                            <th scope="col">Create Time</th>
                         </tr>
                     </thead>
                     <tbody>

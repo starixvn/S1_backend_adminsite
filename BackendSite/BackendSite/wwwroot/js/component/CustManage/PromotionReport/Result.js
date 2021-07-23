@@ -1,5 +1,5 @@
 import { number_format } from "../../commJS/common";
-import moment from "moment";
+import moment from "moment-timezone";
 import Pagination from "./Pagination";
 
 const BonusInfoStatus = {

@@ -40,7 +40,7 @@ class WithdrawalInfoList extends React.Component {
     render() {
         let rows = this.props.searchData.data.map(row =>
             <tr key={row.transId}>
-                <td>{moment(row.createTime).format('l LTS')}</td>
+                <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                 <th scope="row">{row.transId}</th>
                 <td>{i18n["lbl_WithdrawalType" + row.withdrawalType]}</td>
                 <td className="text-right">{number_format(row.amount)}</td>
@@ -60,7 +60,7 @@ class WithdrawalInfoList extends React.Component {
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">CreateTime {moment().format('(Z)')}</th>
+                            <th scope="col">CreateTime</th>
                             <th scope="col">Trxn.ID</th>
                             <th scope="col">withdrawal Type</th>
                             <th scope="col" className="text-right">Amount</th>

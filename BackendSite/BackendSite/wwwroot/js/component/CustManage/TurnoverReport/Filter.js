@@ -2,8 +2,8 @@ import DateTimePicker from "react-datetime";
 
 const Filter = (props) => {
   const [DateRangeDatas, setDateRange] = React.useState({
-    StartTime: moment(new Date()).add(-1, "days").format("l LTS"),
-    EndTime: moment(new Date()).format("l LTS"),
+    StartTime: moment.utc(new Date()).add(8,'hour').add(-1, "days").format("l LTS"),
+    EndTime: moment.utc(new Date()).add(8,'hour').format("l LTS"),
   });
 
   const EditDateRangeFiled = (v, col) => {

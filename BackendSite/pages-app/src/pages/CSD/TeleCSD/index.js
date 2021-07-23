@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useReducer, useState } from "react";
 import ReactDOM from "react-dom";
 import WebAPI from "../../../module/WebAPI";
-import moment from "moment";
+import moment from "moment-timezone";
 import { api } from "../../../module/WebAPI";
 import Filter from "./Filter";
 import Result from "./Result";
 
 const App = () => {
+  moment.tz.setDefault("Asia/Taipei");
   const [siteList, setSiteList] = useState([]);
   const [stateFilter, setFilter] = useState({
     SiteIds: [],

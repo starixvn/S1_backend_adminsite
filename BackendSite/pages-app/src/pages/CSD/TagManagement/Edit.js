@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useReducer, useState } from "react";
-import moment from "moment";
+import moment from "moment-timezone";
 import { SketchPicker } from "react-color";
 
 const Panel = (props) => {

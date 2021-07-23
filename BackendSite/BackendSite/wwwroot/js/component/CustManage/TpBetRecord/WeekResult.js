@@ -1,5 +1,5 @@
 import { number_format } from '../../commJS/common';
-
+import moment from "moment-timezone";
 const Result = (props) => {
     let rows = props.Datas.length === 0 ? <tr><td>No Data.</td><td /><td /><td /><td /></tr> : props.Datas.map((d, dIdx) => {
         return (
