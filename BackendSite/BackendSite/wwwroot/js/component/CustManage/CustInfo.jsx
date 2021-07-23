@@ -19,6 +19,7 @@ import SetCustStatusNote from './SetCustStatusNote/PopboxContentSetNote.js';
 import { DepositInfoPagination } from './CustInfo_DepositInfoPagination.jsx';
 import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
 import Tag from './Tag/index';
+import { NewPagination } from '../commJS/NewPagination.jsx';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -95,7 +96,7 @@ import Tag from './Tag/index';
         render() {
             let rows = this.props.searchData.data.map(row =>
                 <tr key={row.transId}>
-                    <td>{moment(row.createTime).format('l LTS')}</td>
+                    <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                     <th scope="row">{row.transId}</th>
                     <td>{i18n["lbl_DepositType" + row.depositType]}</td>
                     <td className="text-right">{number_format(row.amount)}</td>
@@ -103,8 +104,8 @@ import Tag from './Tag/index';
                     <td>{row.accountName}</td>
                     <td>{DepositStatusOp[row.status]}</td>
                     <td>{row.refId}</td>
-                    <td>{moment(row.depositTime).format('l LTS')}</td>
-                    <td>{moment(row.updateTime).format('l LTS')}</td>
+                    <td>{moment.utc(row.depositTime).add(8,'hour').format('l LTS')}</td>
+                    <td>{moment.utc(row.updateTime).add(8,'hour').format('l LTS')}</td>
                 </tr>
             );
 
@@ -118,7 +119,7 @@ import Tag from './Tag/index';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">CreateTime {moment().format('(Z)')}</th>
+                                <th scope="col">CreateTime</th>
                                 <th scope="col">Trxn.ID</th>
                                 <th scope="col">Deposit Type</th>
                                 <th scope="col" className="text-right">Amount</th>
@@ -126,8 +127,8 @@ import Tag from './Tag/index';
                                 <th scope="col">To Acc. Name</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">RefId</th>
-                                <th scope="col">DepositTime {moment().format('(Z)')}</th>
-                                <th scope="col">UpdateTime {moment().format('(Z)')}</th>
+                                <th scope="col">DepositTime</th>
+                                <th scope="col">UpdateTime</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -174,7 +175,7 @@ import Tag from './Tag/index';
 
         handleSubmit(event) {
             event.preventDefault();
-            this.props.onChangeValue("DepositList", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, Status: this.state.DepositStatus === 0 ? null : parseInt(this.state.DepositStatus) });
+            this.props.onChangeValue("DepositList", { StartDate: moment.utc(this.startDate.current.value).add(-8,'hour').unix(), EndDate: moment.utc(this.endDate.current.value).add(-8,'hour').add(1, 'days').unix() - 1, Status: this.state.DepositStatus === 0 ? null : parseInt(this.state.DepositStatus) });
             this.props.GetDepositListByCust(1);
         }
 
@@ -486,17 +487,19 @@ import Tag from './Tag/index';
         ChangePage(pageNumber) {
             this.props.ChangePage(pageNumber);
         }
-
+    
         render() {
             let rows = this.props.searchData.data.map((row, idx) =>
-                <tr key={idx}>
+                <tr key={idx}>             
                     <th>{row.userName}</th>
                     <th>{row.currency}</th>
-                    <th>{row.registerDate}</th>
+                    <th>{moment.utc(row.registerDate).add(8,'hour').format('l LTS')}</th>
+                    {/* <th>{row.registerDate}</th> */}
                     <th>{row.totalDeposit}/{row.depositC}</th>
                     <th>{row.totalBet}/{row.vaildBetC}</th>
                     <th>{row.bonusAmount}</th>
-                    <th>{row.rewardTime}</th>
+                    {/* <th>{row.rewardTime}</th> */}
+                    <th>{row.rewardTime ? moment.utc(row.rewardTime).add(8,'hour').format('l LTS') : null}</th>
                     <th>{row.statusName}</th>
                 </tr>
             );
@@ -520,7 +523,7 @@ import Tag from './Tag/index';
                             {rows}
                         </tbody>
                     </table>
-                    <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                    <NewPagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
                 </div>
             )
 

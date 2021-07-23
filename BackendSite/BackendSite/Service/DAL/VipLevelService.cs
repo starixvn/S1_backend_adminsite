@@ -31,7 +31,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<VipLevelLog> GetVipLevelLog(int CustId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var GetVipLevelLog = conn.Query<VipLevelLog>("Admin_CustVipLevelLog_Get", new { CustId }, commandType: CommandType.StoredProcedure);
+            var GetVipLevelLog = conn.Query<VipLevelLog>("Admin_CustVipLevelLogV2_Get", new { CustId }, commandType: CommandType.StoredProcedure);
             return GetVipLevelLog;
         }
         public int SetVipLevel(int SiteId, int CustId, string UserName, int VipLevel, string Memo, string Operator)

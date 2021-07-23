@@ -3,6 +3,7 @@ import AddPersonalMsg from './AddPersonalMsg';
 import { Pagination } from '../../commJS/Pagination.jsx';
 import { columnDefs } from './dataDefs';
 import ViewDetail from './DetailMsg';
+import { NewPagination } from '../../commJS/NewPagination.jsx';
 
 const page = {
     'main': 'main',
@@ -200,7 +201,7 @@ const PersonalMsg = (props) => {
                         </tbody>
                     </table>
                 </div>
-                <Pagination
+                <NewPagination
                     Data={{
                         totalPages: stateDatas.PageInfo.totalPages,
                         pageNumber: stateDatas.PageInfo.pageNumber,

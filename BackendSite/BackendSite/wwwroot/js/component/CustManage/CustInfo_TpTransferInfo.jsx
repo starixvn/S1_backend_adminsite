@@ -1,5 +1,6 @@
 import { Pagination } from '../commJS/Pagination.jsx';
 import { number_format } from '../commJS/common';
+import { NewPagination } from '../commJS/NewPagination.jsx';
 class TpTransferInfoList extends React.Component {
     constructor(props) {
         super(props);
@@ -27,7 +28,7 @@ class TpTransferInfoList extends React.Component {
 
         let rows = this.props.searchData.data.map(row =>
             <tr key={row.transId}>
-                <td>{moment(row.createTime).format('l LTS')}</td>
+                <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                 <th scope="row">{row.transId}</th>
                 <td>{row.tpName}</td>
                 <td>{Direction[row.direction]}</td>
@@ -48,7 +49,7 @@ class TpTransferInfoList extends React.Component {
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">CreateTime {moment().format('(Z)')}</th>
+                            <th scope="col">CreateTime</th>
                             <th scope="col">Trxn.ID</th>
                             <th scope="col">Third-Party Name</th>
                             <th scope="col">Direction</th>
@@ -62,7 +63,7 @@ class TpTransferInfoList extends React.Component {
                         {rows}
                     </tbody>
                 </table>
-                <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                <NewPagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
             </div>
         )
     }
@@ -97,7 +98,7 @@ export class TpTransferInfo extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        this.props.onChangeValue("TpTransferInfo", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1 });
+        this.props.onChangeValue("TpTransferInfo", { StartDate: moment.utc(this.startDate.current.value).add(-8,'hour').unix(), EndDate: moment.utc(this.endDate.current.value).add(-8,'hour').add(1, 'days').unix() - 1 });
         this.props.GetTpTransferInfoByCust(1);
     }
 

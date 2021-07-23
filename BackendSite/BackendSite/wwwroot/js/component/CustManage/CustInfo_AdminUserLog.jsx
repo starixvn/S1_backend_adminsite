@@ -1,5 +1,5 @@
 import { Pagination } from '../commJS/Pagination.jsx';
-
+import { NewPagination } from '../commJS/NewPagination.jsx';
 class AdminUserLogList extends React.Component {
     constructor(props) {
         super(props);
@@ -29,7 +29,8 @@ class AdminUserLogList extends React.Component {
                     <td>{actionTypeStatus[row.actionType]}</td>
                     <td style={{ display: "flex", flexDirection: "column", maxWidth: "initial" }}>{datadetailInfo}</td>
                     {/* <td>{moment(row.createTime).format('l LTS')}</td> */}
-                    <td>{row.createTime}</td>
+                    {/* <td>{row.createTime}</td> */}
+                    <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                     <td>{row.operator}</td>
                 </tr>
             );
@@ -49,7 +50,7 @@ class AdminUserLogList extends React.Component {
                             <th scope="col">ActionType</th>
                             <th scope="col">DetailInfo</th>
                             {/* <th scope="col">Create Time {moment().format('(Z)')}</th> */}
-                            <th scope="col">Create Time(UTC +8:00)</th>
+                            <th scope="col">Create Time</th>
                             <th scope="col">Operator</th>
                         </tr>
                     </thead>
@@ -57,7 +58,7 @@ class AdminUserLogList extends React.Component {
                         {rows}
                     </tbody>
                 </table>
-                <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                <NewPagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
             </div>
         )
     }
@@ -92,7 +93,7 @@ export class AdminUserLog extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        this.props.onChangeValue("AdminUserLog", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1 });
+        this.props.onChangeValue("AdminUserLog", { StartDate: moment.utc(this.startDate.current.value).add(-8,'hour').unix(), EndDate: moment.utc(this.endDate.current.value).add(-8,'hour').add(1, 'days').unix() - 1 });
         this.props.GetAdminUserLogByCust(1);
     }
 

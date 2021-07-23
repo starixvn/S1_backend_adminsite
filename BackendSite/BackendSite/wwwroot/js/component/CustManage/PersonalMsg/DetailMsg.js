@@ -8,7 +8,7 @@ const contentFormat = (v, id)=>{
 
 const columnDefs = [
     { 
-        dataColumn:'createTime', columnTitle:`CreateTime ${moment().format('(Z)')}`,
+        dataColumn:'createTime', columnTitle:`CreateTime`,
         body:{
             format:dateFormat
         }

@@ -31,7 +31,7 @@ class AdjustmentInfoList extends React.Component {
 
         let rows = this.props.searchData.data.map(row =>
             <tr key={row.transId}>
-                <td>{moment(row.createTime).format('l LTS')}</td>
+                <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                 <th scope="row">{row.transId}</th>
                 <td>{i18n["lbl_Currency" + row.currencyId]}</td>
                 <td className="text-right">{Direction[row.adjustType] + number_format(row.amount)}</td>
@@ -49,7 +49,7 @@ class AdjustmentInfoList extends React.Component {
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">CreateTime {moment().format('(Z)')}</th>
+                            <th scope="col">CreateTime</th>
                             <th scope="col">TransId</th>
                             <th scope="col">Currency</th>
                             <th scope="col" className="text-right">Amount</th>
@@ -95,7 +95,7 @@ export class AdjustmentInfo extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        this.props.onChangeValue("AdjustmentInfo", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1 });
+        this.props.onChangeValue("AdjustmentInfo", { StartDate: moment.utc(this.startDate.current.value).add(-8,'hour').unix(), EndDate: moment.utc(this.endDate.current.value).add(-8,'hour').add(1, 'days').unix() - 1 });
         this.props.GetAdjustmentInfoByCust(1);
     }
 

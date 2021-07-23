@@ -1,5 +1,5 @@
 import {Pagination} from '../commJS/Pagination.jsx';
-
+import { NewPagination } from '../commJS/NewPagination.jsx';
 class LoginLogList extends React.Component {
     constructor(props) {
         super(props);
@@ -17,7 +17,7 @@ class LoginLogList extends React.Component {
     render() {
         let rows = this.props.searchData.data.map(row => 
             <tr key={row.Id}>
-                <td>{moment(row.loginTime).format('l LTS')}</td>                
+                <td>{moment.utc(row.loginTime).add(8,'hour').format('l LTS')}</td>                
                 <th scope="row">{row.loginIp}</th>
                 <td>{row.fromUrl}</td>
                 <td>{row.userAgent}</td>
@@ -34,7 +34,7 @@ class LoginLogList extends React.Component {
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">Login Time {moment().format('(Z)')}</th>                            
+                            <th scope="col">Login Time</th>                            
                             <th scope="col">Login IP</th>
                             <th scope="col">From Url</th>
                             <th scope="col">User Agent</th>
@@ -44,7 +44,7 @@ class LoginLogList extends React.Component {
                         {rows}
                     </tbody>
                 </table>
-                <Pagination Data={{...this.props.searchData}} ChangePage={this.props.ChangePage}/>
+                <NewPagination Data={{...this.props.searchData}} ChangePage={this.props.ChangePage}/>
             </div>
         )
     }
@@ -79,7 +79,7 @@ export class LoginLog extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        this.props.onChangeValue("LoginLog", {StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix()-1});
+        this.props.onChangeValue("LoginLog", {StartDate: moment.utc(this.startDate.current.value).add(-8,'hour').unix(), EndDate: moment.utc(this.endDate.current.value).add(-8,'hour').add(1, 'days').unix()-1});
         this.props.GetLoginLogByCust(1);
     }
 
