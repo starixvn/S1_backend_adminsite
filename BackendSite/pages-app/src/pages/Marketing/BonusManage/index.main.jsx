@@ -370,21 +370,6 @@ const OptionElem = ({ columnTitle, options, onChange, values }) => {
 	  onChange(value, "Currency");
 	};
   
-	const itemRenderer = ({ checked, option, onClick }) => {
-	  return (
-		<div>
-		  <input
-			style={{ height: "15px", width: "20px" }}
-			id={option.label}
-			type="checkbox"
-			onChange={onClick}
-			checked={checked}
-		  />
-		  <label htmlFor={option.label}>{option.label}</label>
-		</div>
-	  );
-	};
-  
 	return (
 	  <div className="input-item" style={{ width: "200px", zIndex: "4" }}>
 		<span className="label">{columnTitle}</span>
@@ -398,6 +383,21 @@ const OptionElem = ({ columnTitle, options, onChange, values }) => {
 			ItemRenderer={itemRenderer}
 		  />
 		</div>
+	  </div>
+	);
+  };
+
+  const itemRenderer = ({ checked, option, onClick }) => {
+	return (
+	  <div>
+		<input
+		  style={{ height: "15px", width: "20px" }}
+		  id={option.label}
+		  type="checkbox"
+		  onChange={onClick}
+		  checked={checked}
+		/>
+		<label htmlFor={option.label}>{option.label}</label>
 	  </div>
 	);
   };

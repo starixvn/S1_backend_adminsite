@@ -145,6 +145,11 @@ namespace BackendSite.Service.Model.enums
         vn = 5
     }
 
+    public enum PromotionDisplayConditionType
+    {
+        VipLevel=1
+    }
+    
     #region Bank Financial Account
 
     /// <summary>

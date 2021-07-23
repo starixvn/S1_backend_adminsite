@@ -238,12 +238,17 @@ const App = () => {
 				StartDate: moment(stateFilter.StartDate).unix(),
         		EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
 			};
+			let _vipLevelCondition={
+				IsForVipLevel:promotion.forVipLevel.includes(1) ? true : false,
+				SelectedVipLevel:promotion.selectedVipLevel
+			}
 			let param = {
 				Url: "BonusManage/SetPromotion",
 				Data: qs.stringify({
 					IsAdd: state.panelType === defPanelType.Add,
 					Promotion: _promo,
-					Select: _select
+					Select: _select,
+					vipLevelCondition:_vipLevelCondition
 				})
 			};
 			WebAPI.PostData(param).then(

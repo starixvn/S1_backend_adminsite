@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
@@ -486,6 +487,11 @@ namespace BackendSite.Service.BLL
                 scope.Complete();
             }
             return result;
+        }
+
+        public IEnumerable<VipLevelModel> GetAllSiteVipLevelList()
+        {
+            return custInfoService.GetAllSiteVipLevelList();
         }
     }
 }

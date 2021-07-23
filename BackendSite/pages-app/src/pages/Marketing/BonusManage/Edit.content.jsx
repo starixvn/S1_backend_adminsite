@@ -6,7 +6,7 @@ import DateTimePickerElem from "./Component/DateTimePicker";
 import moment from "moment";
 import RadioBox from "./Component/RadioBox";
 import RichText from "./Component/RichText.jsx";
-import { initWalletType, initPromotionType, initWeekOptions, initPeriodType, weekOptions, initSpecialBonusPromotionType, specialBonusOptions, onlyRegisteredBonusOptions, initPromotionDeviceType, initPromotionAction, AutoExtendOptions } from "./defCols";
+import { initWalletType, initPromotionType, initWeekOptions, initPeriodType, weekOptions, initSpecialBonusPromotionType, specialBonusOptions, onlyRegisteredBonusOptions, initPromotionDeviceType, initPromotionAction, AutoExtendOptions,VipLevelOptions } from "./defCols";
 import { defActionType } from "./Edit.reducer";
 
 const initBonusAmountType = promoType => {
@@ -234,6 +234,31 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 						/>
 						: null}
 				</div>
+				<div className="filter">
+					<h5>Display Condition</h5>	
+					<div className="row-flex" style={{ marginLeft: "auto" }}>
+						<CheckBox
+							Options={VipLevelOptions}
+							Title=""
+							OnChange={action.EditForVipLevelValue}
+							dataColumn="ForVipLevel"
+							Selected={state.forVipLevel}
+							mainKey={state.siteId}
+						/>
+					</div>		
+					{(state.forVipLevel==1)?
+						<CheckBox
+							Options={state.vipLevelList}
+							Title=""
+							OnChange={action.EditSelectedVipLevel}
+							dataColumn="selectedVipLevel"
+							Selected={state.selectedVipLevel}
+							mainKey={state.siteId}
+						/>	
+					:
+					null}	
+				</div>
+						
 
 				{/* <div className="filter">
 						<RadioBox
@@ -583,8 +608,8 @@ const SubPanel = props => {
 								/>
 							</div>
 							<div className="row-flex ">
-								<div class="input-item">
-									<label class="label">Tp Games</label>
+								<div className="input-item">
+									<label className="label">Tp Games</label>
 								</div>
 							</div>
 							<div className="row-flex ">
