@@ -25,7 +25,7 @@ namespace BackendSite.Service.DAL
         public VipLevelInfo GetVipLevelInfo(int CustId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var vipLevelInfo = conn.QueryFirstOrDefault<VipLevelInfo>("Admin_CustVipLevel_Get", new { CustId }, commandType: CommandType.StoredProcedure);
+            var vipLevelInfo = conn.QueryFirstOrDefault<VipLevelInfo>("Admin_CustVipLevelV2_Get", new { CustId }, commandType: CommandType.StoredProcedure);
             return vipLevelInfo;
         }
         public IEnumerable<VipLevelLog> GetVipLevelLog(int CustId)

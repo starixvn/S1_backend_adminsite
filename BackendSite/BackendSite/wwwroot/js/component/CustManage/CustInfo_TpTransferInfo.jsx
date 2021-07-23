@@ -98,7 +98,7 @@ export class TpTransferInfo extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        this.props.onChangeValue("TpTransferInfo", { StartDate: moment.utc(this.startDate.current.value).add(-8,'hour').unix(), EndDate: moment.utc(this.endDate.current.value).add(-8,'hour').add(1, 'days').unix() - 1 });
+        this.props.onChangeValue("TpTransferInfo", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1 });
         this.props.GetTpTransferInfoByCust(1);
     }
 

@@ -95,7 +95,7 @@ export class AdjustmentInfo extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        this.props.onChangeValue("AdjustmentInfo", { StartDate: moment.utc(this.startDate.current.value).add(-8,'hour').unix(), EndDate: moment.utc(this.endDate.current.value).add(-8,'hour').add(1, 'days').unix() - 1 });
+        this.props.onChangeValue("AdjustmentInfo", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1 });
         this.props.GetAdjustmentInfoByCust(1);
     }
 

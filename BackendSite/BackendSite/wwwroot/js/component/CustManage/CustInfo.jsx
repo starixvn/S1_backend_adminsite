@@ -175,7 +175,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
 
         handleSubmit(event) {
             event.preventDefault();
-            this.props.onChangeValue("DepositList", { StartDate: moment.utc(this.startDate.current.value).add(-8,'hour').unix(), EndDate: moment.utc(this.endDate.current.value).add(-8,'hour').add(1, 'days').unix() - 1, Status: this.state.DepositStatus === 0 ? null : parseInt(this.state.DepositStatus) });
+            this.props.onChangeValue("DepositList", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, Status: parseInt(this.state.DepositStatus) === 0 ? null : parseInt(this.state.DepositStatus) });
             this.props.GetDepositListByCust(1);
         }
 
@@ -246,7 +246,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
         render() {
             let rows = this.props.searchData.data.map(row =>
                 <tr key={row.id}>
-                    <td>{moment(row.createTime).format('l LTS')}</td>
+                    <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                     <td>{row.typeName ? row.typeName : "N/A"}</td>
                     <td className="text-right">{Direction[row.direction] + number_format(row.changeBonus)}</td>
                     <td className="text-right">{number_format(row.beforeBonus)}</td>
@@ -266,7 +266,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">Time {moment().format('(Z)')}</th>
+                                <th scope="col">Time</th>
                                 <th scope="col">Type</th>
                                 <th scope="col" className="text-right">Change Bonus</th>
                                 <th scope="col" className="text-right">Before Bonus</th>
@@ -279,7 +279,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                             {rows}
                         </tbody>
                     </table>
-                    <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                    <NewPagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
                 </div>
             )
         }
@@ -445,7 +445,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
         render() {
             let rows = this.props.searchData.data.map(row =>
                 <tr key={row.id}>
-                    <td>{moment(row.createTime).format('l LTS')}</td>
+                    <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                     <td>{row.categoryName }</td>
                     <td className="text-right">{number_format(row.rcRedeemAmount)}</td>
                     <td>{row.refId}</td>
@@ -462,7 +462,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                            <th scope="col">Time {"+08:00"}</th>  
+                            <th scope="col">Time</th>  
                             <th scope="col">Category</th>
                             <th scope="col" className="text-right">Redeem Amount</th>
                             <th scope="col">RefId</th>                            
@@ -649,7 +649,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
         render() {
             let rows = this.props.searchData.data.map(row =>
                 <tr key={row.id}>
-                    <td>{moment(row.createTime).format('l LTS')}</td>
+                    <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                     <td>{row.typeName}</td>
                     <td className="text-right">{Direction[row.direction] + number_format(row.changeAmount)}</td>
                     <td className="text-right">{number_format(row.beforeAmount)}</td>
@@ -669,7 +669,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">Time {moment().format('(Z)')}</th>
+                                <th scope="col">Time</th>
                                 <th scope="col">Type</th>
                                 <th scope="col" className="text-right">Change Amount</th>
                                 <th scope="col" className="text-right">Before Amount</th>
@@ -682,7 +682,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                             {rows}
                         </tbody>
                     </table>
-                    <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                    <NewPagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
                 </div>
             )
         }
@@ -1593,11 +1593,11 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                     </tr>
                                     <tr>
                                         <th scope="row">Registration Time</th>
-                                        <td>{moment(data.regTime).format('l LTS (Z)')}</td>
+                                        <td>{moment(data.regTime).format('l LTS')}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Last Login Time</th>
-                                        <td>{moment(data.lastLoginTime).format('l LTS (Z)')}</td>
+                                        <td>{moment(data.lastLoginTime).format('l LTS')}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">First Deposit Time</th>
@@ -1605,7 +1605,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                     </tr>
                                     <tr>
                                         <th scope="row">Last Activity Time</th>
-                                        <td>{(typeof data.reloadTime === 'undefined') ? "N/A" : moment(data.reloadTime).format('l LTS (Z)')}</td>
+                                        <td>{(typeof data.reloadTime === 'undefined') ? "N/A" : moment(data.reloadTime).format('l LTS')}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Last Activity IP</th>

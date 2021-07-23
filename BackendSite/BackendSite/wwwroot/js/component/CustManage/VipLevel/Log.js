@@ -29,7 +29,7 @@ const Log = (props) => {
                         <th scope="col">Old Level</th>
                         <th scope="col">New Level</th>
                         <th scope="col">Memo</th>
-                        <th scope="col">Operating time {moment().format('(Z)')}</th>
+                        <th scope="col">Operating time</th>
                         <th scope="col">Operator</th>
                     </tr>
                 </thead>

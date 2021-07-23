@@ -1,4 +1,5 @@
 import { number_format } from '../commJS/common';
+import ReactPaginate from 'react-paginate';
 
 export class DepositInfoPagination extends React.Component {
     constructor(props) {
@@ -7,7 +8,8 @@ export class DepositInfoPagination extends React.Component {
     }
 
     ChangePage(pageNumber) {
-        this.props.ChangePage(pageNumber);
+        const selectedPage = pageNumber.selected;
+        this.props.ChangePage(selectedPage+1);
     }
 
     render() {
@@ -26,21 +28,27 @@ export class DepositInfoPagination extends React.Component {
                     <tr>Total approved amount: {number_format(data.totalAmount)}</tr>  
                     <tr>Total records: {data.rowCount}</tr>                             
                 </span>
-                <ul className="pagination">
-                    <li className={"page-item"+ (data.pageNumber==1?" disabled":"")}>
-                        <a className="page-link" tabIndex="-1" aria-disabled={data.pageNumber == 1} onClick={data.pageNumber == 1 ? null : this.ChangePage.bind(this, data.pageNumber - 1)}>
-                            <span aria-hidden="true">&laquo;</span>
-                            <span className="sr-only">Previous</span>
-                        </a>
-                    </li>
-                    {PageNum}
-                    <li className={"page-item"+ (disableNext?" disabled":"")}>
-                        <a className="page-link" tabIndex="+1" aria-disabled={disableNext} onClick={disableNext ? null : this.ChangePage.bind(this, data.pageNumber + 1)}>
-                            <span aria-hidden="true">&raquo;</span>
-                            <span className="sr-only">Next</span>
-                        </a>
-                    </li>
-                </ul>
+                <ReactPaginate
+                    previousLabel={"<"}
+                    nextLabel={">"}
+                    breakLabel={"..."}
+                    breakClassName={"page-item"}
+                    breakLinkClassName={"page-link"}
+                    pageCount={data.totalPages}
+                    marginPagesDisplayed={2}
+                    pageRangeDisplayed={10}
+                    onPageChange={this.ChangePage.bind(this)}
+                    containerClassName={"pagination"}
+                    activeClassName={"page-item active"}
+                    activeLinkClassName={"page-link"}
+                    pageClassName={"page-item"}
+                    pageLinkClassName={"page-link"}
+                    nextClassName={"page-item"}
+                    nextLinkClassName={"page-link"}
+                    previousClassName={"page-item"}
+                    previousLinkClassName={"page-link"}
+                    forcePage={data.pageNumber-1}
+                />
             </nav>
         )
     }
