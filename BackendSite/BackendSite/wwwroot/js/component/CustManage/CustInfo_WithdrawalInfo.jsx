@@ -60,7 +60,7 @@ class WithdrawalInfoList extends React.Component {
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">CreateTime</th>
+                            <th scope="col">CreateTime(Adjusted to GMT+8)</th>
                             <th scope="col">Trxn.ID</th>
                             <th scope="col">withdrawal Type</th>
                             <th scope="col" className="text-right">Amount</th>
@@ -158,6 +158,7 @@ export class WithdrawalInfo extends React.Component {
                         </div>
                     </div>
                     <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
+                    <div>(Adjusted to GMT+8)</div>
                 </form>
                 {searchData != null ? <WithdrawalInfoList searchData={searchData} ChangePage={this.props.GetWithdrawalListByCust} /> : null}
             </div>

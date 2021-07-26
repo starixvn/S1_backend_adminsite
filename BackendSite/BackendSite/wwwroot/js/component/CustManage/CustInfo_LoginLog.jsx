@@ -35,7 +35,7 @@ class LoginLogList extends React.Component {
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">Login Time</th>                            
+                            <th scope="col">Login Time(Adjusted to GMT+8)</th>                            
                             <th scope="col">Login IP</th>
                             <th scope="col">From Url</th>
                             <th scope="col">User Agent</th>
@@ -106,6 +106,7 @@ export class LoginLog extends React.Component {
                         </div>                            
                     </div>
                     <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
+                    <div>(Adjusted to GMT+8)</div>
                 </form>
                 {searchData!=null ? <LoginLogList searchData={searchData} ChangePage={this.props.GetLoginLogByCust} /> : null}
             </div>

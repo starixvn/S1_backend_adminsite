@@ -25,7 +25,7 @@ export class BankLog extends React.Component {
                             <th scope="col">BankName</th>
                             <th scope="col">AccountName</th>
                             <th scope="col">AccountNum</th>
-                            <th scope="col">Create Time</th>
+                            <th scope="col">Create Time(Adjusted to GMT+8)</th>
                         </tr>
                     </thead>
                     <tbody>
