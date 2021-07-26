@@ -1,5 +1,6 @@
 import {Pagination} from '../commJS/Pagination.jsx';
 import { NewPagination } from '../commJS/NewPagination.jsx';
+import moment from 'moment';
 class LoginLogList extends React.Component {
     constructor(props) {
         super(props);
@@ -79,7 +80,8 @@ export class LoginLog extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        this.props.onChangeValue("LoginLog", {StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix()-1});
+        this.props.onChangeValue("LoginLog", {StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix()-1,
+                                UTCStartDate:moment.utc(this.startDate.current.value).unix(),UTCEndDate:moment.utc(this.endDate.current.value).add(1, 'days').unix()-1});
         this.props.GetLoginLogByCust(1);
     }
 
