@@ -50,7 +50,7 @@ class AdminUserLogList extends React.Component {
                             <th scope="col">ActionType</th>
                             <th scope="col">DetailInfo</th>
                             {/* <th scope="col">Create Time {moment().format('(Z)')}</th> */}
-                            <th scope="col">Create Time</th>
+                            <th scope="col">Create Time(Adjusted to GMT+8)</th>
                             <th scope="col">Operator</th>
                         </tr>
                     </thead>
@@ -119,6 +119,7 @@ export class AdminUserLog extends React.Component {
                         </div>
                     </div>
                     <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
+                    <div>(Adjusted to GMT+8)</div>
                 </form>
                 {searchData != null ? <AdminUserLogList searchData={searchData} ChangePage={this.props.GetAdminUserLogByCust} /> : null}
             </div>
