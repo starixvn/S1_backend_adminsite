@@ -93,7 +93,8 @@ export class AdminUserLog extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        this.props.onChangeValue("AdminUserLog", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1 });
+        this.props.onChangeValue("AdminUserLog", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1,
+                                UTCStartDate:moment.utc(this.startDate.current.value).unix(),UTCEndDate:moment.utc(this.endDate.current.value).add(1, 'days').unix()-1 });
         this.props.GetAdminUserLogByCust(1);
     }
 
