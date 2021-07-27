@@ -118,7 +118,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult SetBankCardwithIFSC(bankCardReq bankCardReq)
         {
-            int result = bankDetailBLL.SetBankCardwithIFSC(bankCardReq.siteId, bankCardReq.SysId, bankCardReq.BankAccountName, bankCardReq.BankAccountNo, bankCardReq.IFSCCode, bankCardReq.MinAmount, bankCardReq.MaxAmount, bankCardReq.DailyLimitAmount, bankCardReq.PointLevel, bankCardReq.Purpose, bankCardReq.Status, bankCardReq.Sort);
+            int result = bankDetailBLL.SetBankCardwithIFSC(bankCardReq.siteId, bankCardReq.SysId, bankCardReq.BankAccountName, bankCardReq.BankAccountNo, bankCardReq.IFSCCode, bankCardReq.MinAmount, bankCardReq.MaxAmount, bankCardReq.DailyLimitAmount, bankCardReq.PointLevel, bankCardReq.Purpose, bankCardReq.Status, bankCardReq.Sort, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result > 0)
             {

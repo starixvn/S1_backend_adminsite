@@ -36,9 +36,9 @@ namespace BackendSite.Service.BLL
             return bankDetailService.SetBankCard(siteId, SysId, BankAccountName, BankAccountNo, MinAmount, MaxAmount, DailyLimitAmount, PointLevel, Purpose, Status, Sort, Operator);
         }
 
-        public int SetBankCardwithIFSC(int siteId, int SysId, string BankAccountName, string BankAccountNo, string IFSC, decimal MinAmount, decimal MaxAmount, decimal DailyLimitAmount, int PointLevel, int Purpose, int Status, int Sort)
+        public int SetBankCardwithIFSC(int siteId, int SysId, string BankAccountName, string BankAccountNo, string IFSC, decimal MinAmount, decimal MaxAmount, decimal DailyLimitAmount, int PointLevel, int Purpose, int Status, int Sort, string Operator)
         {
-            return bankDetailService.SetBankCardwithIFSC(siteId, SysId, BankAccountName, BankAccountNo, IFSC, MinAmount, MaxAmount, DailyLimitAmount, PointLevel, Purpose, Status, Sort);
+            return bankDetailService.SetBankCardwithIFSC(siteId, SysId, BankAccountName, BankAccountNo, IFSC, MinAmount, MaxAmount, DailyLimitAmount, PointLevel, Purpose, Status, Sort, Operator);
 
         }
 
