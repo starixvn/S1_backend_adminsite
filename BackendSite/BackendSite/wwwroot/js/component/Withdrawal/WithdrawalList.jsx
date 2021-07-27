@@ -221,7 +221,7 @@ import DateTimePicker from 'react-datetime';
                     Loading.UnLoading();
                     let result = response.data;
                     if (result.errorCode == 0) {
-
+                       // console.log(' onGetData()',result.data);
                         if (result.data.status == 3) {
                             await this.onGetPayList(result.data.currencyId, result.data.sysId);
                             await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId, result.data.siteId);
@@ -570,7 +570,7 @@ import DateTimePicker from 'react-datetime';
                     }
                 }
             }
-
+//console.log('return',data);
             return (
                 data != null ? <div>
                     <table className="table table-detail">
@@ -622,6 +622,15 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="row">Account Name</th>
                                 <td>{data.accountName}<button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.accountName}>Copy</button></td>
                             </tr>
+                            {data.currencyId == 61 ?
+                            <tr>
+                                <th scope="row">IFSC Code</th>
+                                <td>
+                                    {data.ifscCode}
+                                    <button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.ifscCode}>Copy</button>
+                                </td>
+                            </tr>
+                            : null}
                             <tr>
                                 <th scope="row">Currency</th>
                                 <td>{i18n["lbl_Currency" + data.currencyId]}</td>

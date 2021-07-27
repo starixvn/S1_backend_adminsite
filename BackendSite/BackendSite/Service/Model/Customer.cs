@@ -159,6 +159,7 @@ namespace BackendSite.Service.Model
         public string AccountName { set; get; }
         public string BankName { set; get; }
         public string AccountNum { set; get; }
+        public string IFSCCode { set; get; }
         public string CreateTime { set; get; }
     }
     public class CustBonus

@@ -27,6 +27,11 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("BankCard_Set", new { SiteId = siteId, SysId, BankAccountName, BankAccountNo, MinAmount, MaxAmount, DailyLimitAmount, PointLevel, Purpose, Status, Sort }, commandType: CommandType.StoredProcedure);
         }
+        public int SetBankCardwithIFSC(int siteId, int SysId, string BankAccountName, string BankAccountNo, string IFSC, decimal MinAmount, decimal MaxAmount, decimal DailyLimitAmount, int PointLevel, int Purpose, int Status, int Sort)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("BankCardwithIFSC_Set", new { SiteId = siteId, SysId, BankAccountName, BankAccountNo, IFSCCode = IFSC, MinAmount, MaxAmount, DailyLimitAmount, PointLevel, Purpose, Status, Sort }, commandType: CommandType.StoredProcedure);
+        }
         public int DelBankCard(int siteId, int bankId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));

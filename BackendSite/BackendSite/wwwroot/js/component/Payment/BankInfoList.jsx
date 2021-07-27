@@ -28,22 +28,24 @@ import { number_format } from '../commJS/common';
         }
 
         onSaveBankCard() {
+            console.log('onSaveBankCard()',this.state.row);
             let thisState = this.state.row;
             let status = parseInt(thisState.status);
             status = status == 0 ? 1 : status;
-            let data = { siteId: this.props.SiteId, SysId: thisState.sysId, BankAccountName: thisState.accountName, BankAccountNo: thisState.accountNo, MaxAmount: parseFloat(thisState.maxAmount), MinAmount: parseFloat(thisState.minAmount), DailyLimitAmount: parseFloat(thisState.dailyLimitAmount), PointLevel: parseInt(thisState.pointLevel), Purpose: parseInt(thisState.purpose), Status: status, Sort: parseInt(thisState.bSort) };
+            let data = { currencyId: thisState.CurrencyId, siteId: this.props.SiteId, SysId: thisState.sysId, BankAccountName: thisState.accountName, BankAccountNo: thisState.accountNo, IFSCCode: thisState.ifscCode, MaxAmount: parseFloat(thisState.maxAmount), MinAmount: parseFloat(thisState.minAmount), DailyLimitAmount: parseFloat(thisState.dailyLimitAmount), PointLevel: parseInt(thisState.pointLevel), Purpose: parseInt(thisState.purpose), Status: status, Sort: parseInt(thisState.bSort) };
             let finishFunc = this.onCancel.bind(this, thisState.bankId);
             this.props.onSaveBankCard(data, finishFunc);
         }
 
         render() {
             let row = this.state.row;
-            console.log(row)
+           // console.log("render1",row);
             return (
                 <tr>
                     <th scope="row">{row.bankCode}</th>
                     <td>{row.bankName}</td>
                     <td>{row.accountNo}</td>
+                    <td>{row.ifscCode}</td>
                     <td>{row.accountName}</td>
                     <td>
                         <select className="custom-select width-50" name="pointLevel" onChange={this.onChange.bind(this)} value={row.pointLevel}>
@@ -103,11 +105,15 @@ import { number_format } from '../commJS/common';
 
         render() {
             let row = this.props.row;
+         //   console.log("render2",row);
+          //  console.log("render3",this.props);
+
             return (
                 <tr>
                     <th scope="row">{row.bankCode}</th>
                     <td>{row.bankName}</td>
                     <td>{row.accountNo}</td>
+                    {this.props.CurrencyId == 61 ? <td>{row.ifscCode == ''?'N/A':row.ifscCode}</td> : null}
                     <td>{row.accountName}</td>
                     <td>{row.pointLevel}</td>
                     <td className="text-right">{number_format(row.minAmount)}</td>
@@ -197,10 +203,11 @@ import { number_format } from '../commJS/common';
                         return 0;
                     }
                 }
-            }).map(row => onEdit.indexOf(row.bankId) > -1 ? <EditRow SiteId={this.props.SiteId} onSaveBankCard={this.props.onSaveBankCard} key={row.bankId} row={row} onCancel={this.onCancel.bind(this)} /> : <DataRow key={row.bankId} row={row} onDelete={this.onDelete.bind(this)} onEdit={this.onEdit.bind(this)} />
+            }).map(row => onEdit.indexOf(row.bankId) > -1 ? <EditRow SiteId={this.props.SiteId} CurrencyId={this.props.CurrencyId} onSaveBankCard={this.props.onSaveBankCard} key={row.bankId} row={row} onCancel={this.onCancel.bind(this)} /> : <DataRow key={row.bankId} CurrencyId={this.props.CurrencyId} row={row} onDelete={this.onDelete.bind(this)} onEdit={this.onEdit.bind(this)} />
             );
-
+          //  console.log(this.props.CurrencyId);
             return (
+                
                 <div className="table">
                     <div className="table-options">
                         <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>
@@ -213,6 +220,7 @@ import { number_format } from '../commJS/common';
                                 <th scope="col">Bank Code</th>
                                 <th scope="col">Bank Name</th>
                                 <th scope="col">Acc. NO.</th>
+                                {this.props.CurrencyId == 61 ? <th scope="col">IFSC.</th> : null}
                                 <th scope="col">Acc. Name</th>
                                 <th scope="col">VIP Level</th>
                                 <th scope="col" className="text-right">Min Amount</th>
@@ -253,7 +261,7 @@ import { number_format } from '../commJS/common';
                     </a>
                     <div className="panel-body">
                         <div className="collapse show" id={"collapseExample-" + this.props.currencyId}>
-                            <BankCardInfoList SiteId={this.props.SiteId} onSaveBankCard={this.props.onSaveBankCard} searchData={this.props.searchData} onRefresh={this.props.onRefresh} />
+                            <BankCardInfoList SiteId={this.props.SiteId} CurrencyId={this.props.currencyId} onSaveBankCard={this.props.onSaveBankCard} searchData={this.props.searchData} onRefresh={this.props.onRefresh} />
                         </div>
                     </div>
                 </div>
@@ -326,8 +334,11 @@ import { number_format } from '../commJS/common';
                 alert('Please Select Purpose');
                 return;
             }
+            
 
-            let data = { siteId: SelSite.siteId, SysId: thisState.SelSysId, BankAccountName: thisState.BankAccountName, BankAccountNo: thisState.BankAccountNo, MaxAmount: parseFloat(thisState.MaxAmount), MinAmount: parseFloat(thisState.MinAmount), DailyLimitAmount: parseFloat(thisState.DailyLimitAmount), PointLevel: parseInt(thisState.PointLevel), Purpose: parseInt(thisState.Purpose), Status: thisState.Status, Sort: thisState.Sort }
+            let data = { currencyId: thisState.SelCcyId , siteId: SelSite.siteId, SysId: thisState.SelSysId, BankAccountName: thisState.BankAccountName, BankAccountNo: thisState.BankAccountNo, IFSCCode: thisState.IFSCCode, MaxAmount: parseFloat(thisState.MaxAmount), MinAmount: parseFloat(thisState.MinAmount), DailyLimitAmount: parseFloat(thisState.DailyLimitAmount), PointLevel: parseInt(thisState.PointLevel), Purpose: parseInt(thisState.Purpose), Status: thisState.Status, Sort: thisState.Sort }
+
+           // console.log('handleSubmit', thisState, data);
             this.props.onSaveBankCard(data);
         }
 
@@ -359,6 +370,7 @@ import { number_format } from '../commJS/common';
         onChange(event) {
             let obj = {};
             obj[event.target.name] = event.target.value;
+            //console.log('onChange',event.target);
             this.setState(obj);
         }
 
@@ -416,6 +428,13 @@ import { number_format } from '../commJS/common';
                             <label className="col-form-label">Account No</label>
                             <input className="form-control" type="text" name="BankAccountNo" onChange={this.onChange.bind(this)} />
                         </div>
+                        {this.state.SelCcyId == 61 ?
+                        <div className="form-group">
+                            <label className="col-form-label">IFSC.</label>
+                            <input className="form-control" type="text" name="IFSCCode" onChange={this.onChange.bind(this)} />
+                        </div>
+                        :null
+                        }
                         <div className="form-group">
                             <label className="col-form-label">Min Amount (0 is not checked)</label>
                             <input className="form-control text-right" type="number" name="MinAmount" onChange={this.onChange.bind(this)} />
@@ -546,7 +565,7 @@ import { number_format } from '../commJS/common';
             /*if(this.state.selectCurrency!=""){
                 data.CurrencyID = parseInt(this.state.selectCurrency);
             }*/
-
+            
             axios.post('/api/BankList/GetLoaclBankList', data)
                 .then(function (response) {
                     //Loading.UnLoading();
@@ -571,26 +590,55 @@ import { number_format } from '../commJS/common';
         }
 
         onSaveBankCard(data, finishFunc) {
-            axios.post('/api/BankList/SetBankCard', data)
-                .then(function (response) {
-                    //Loading.UnLoading();
-                    let result = response.data;
-                    if (result.errorCode == 0) {
-                        alert(result.message);
-                        if (finishFunc != null) {
-                            finishFunc();
-                            this.onSearch();
+            //console.log('onSaveBankCard func',data);
+            if(data.currencyId == 61)
+            {
+               // console.log('axios.post(/api/BankList/SetBankCardwithIFSC, data)');
+                axios.post('/api/BankList/SetBankCardwithIFSC', data)
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            alert(result.message);
+                            if (finishFunc != null) {
+                                finishFunc();
+                                this.onSearch();
+                            } else {
+                                this.setState({ ShowForm: false });
+                                this.onSearch();
+                            }
                         } else {
-                            this.setState({ ShowForm: false });
-                            this.onSearch();
+                            alert(result.message);
                         }
-                    } else {
-                        alert(result.message);
-                    }
-                }.bind(this)).catch(function (error) {
-                    //Loading.UnLoading();
-                    alert(error);
-                }.bind(this));
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+
+            }else
+            {
+               // console.log('axios.post(/api/BankList/SetBankCard, data)');
+                axios.post('/api/BankList/SetBankCard', data)
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            alert(result.message);
+                            if (finishFunc != null) {
+                                finishFunc();
+                                this.onSearch();
+                            } else {
+                                this.setState({ ShowForm: false });
+                                this.onSearch();
+                            }
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
         }
 
         componentDidMount() {
