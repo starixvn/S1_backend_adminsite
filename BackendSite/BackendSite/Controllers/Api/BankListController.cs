@@ -88,6 +88,7 @@ namespace BackendSite.Controllers.Api
             public int SysId { get; set; }
             public string BankAccountName { get; set; }
             public string BankAccountNo { get; set; }
+            public string IFSCCode { get; set; }
             public decimal MinAmount { get; set; }
             public decimal MaxAmount { get; set; }
             public decimal DailyLimitAmount { get; set; }
@@ -101,6 +102,23 @@ namespace BackendSite.Controllers.Api
         public ApiResult SetBankCard(bankCardReq bankCardReq)
         {
             int result = bankDetailBLL.SetBankCard(bankCardReq.siteId, bankCardReq.SysId, bankCardReq.BankAccountName, bankCardReq.BankAccountNo, bankCardReq.MinAmount, bankCardReq.MaxAmount, bankCardReq.DailyLimitAmount, bankCardReq.PointLevel, bankCardReq.Purpose, bankCardReq.Status, bankCardReq.Sort, User.Identity.Name);
+            var apiResult = new ApiResult();
+            if (result > 0)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+        [HttpPost]
+        public ApiResult SetBankCardwithIFSC(bankCardReq bankCardReq)
+        {
+            int result = bankDetailBLL.SetBankCardwithIFSC(bankCardReq.siteId, bankCardReq.SysId, bankCardReq.BankAccountName, bankCardReq.BankAccountNo, bankCardReq.IFSCCode, bankCardReq.MinAmount, bankCardReq.MaxAmount, bankCardReq.DailyLimitAmount, bankCardReq.PointLevel, bankCardReq.Purpose, bankCardReq.Status, bankCardReq.Sort);
             var apiResult = new ApiResult();
             if (result > 0)
             {

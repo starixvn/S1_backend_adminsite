@@ -38,6 +38,7 @@ namespace BackendSite.Service.Model
         public int BankId { set; get; }
         public string AccountNo { set; get; }
         public string AccountName { set; get; }
+        public string IFSCCode { set; get; }
         public string RefId { set; get; }
         public bool HasPhotoId { set; get; }
         public string VipLevelName { set; get; }

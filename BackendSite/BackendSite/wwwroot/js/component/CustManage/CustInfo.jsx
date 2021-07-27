@@ -2389,7 +2389,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
             } else if (TabName == this._Tabs[14]) {
                 dataContainer = <AdminUserLog GetAdminUserLogByCust={this.GetAdminUserLogByCust.bind(this)} searchData={this.state.AdminUserLogData} AdminUserLog={this.state.AdminUserLog} onChangeValue={this.onChangeValue.bind(this)} />
             } else if (TabName == this._Tabs[15]) {
-                dataContainer = <BankLog GetBankLog={this.GetBankLog.bind(this)} searchData={this.state.BankLogData} />
+                dataContainer = <BankLog GetBankLog={this.GetBankLog.bind(this)} searchData={this.state.BankLogData} CurrencyId={this.state.CustInfoData.currencyId}/>
             } else if (TabName == this._Tabs[16]) {
                 dataContainer = <ReferralHistory GetReferralHistory={this.GetReferralHistory.bind(this)} searchData={this.state.ReferralHistoryData} ReferralHistory={this.state.ReferralHistory} onChangeValue={this.onChangeValue.bind(this)} />
             } else if (TabName == this._Tabs[17]) {
