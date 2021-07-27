@@ -49,7 +49,7 @@ class TpTransferInfoList extends React.Component {
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">CreateTime(Adjusted to GMT+8)</th>
+                            <th scope="col">CreateTime (Adjusted to GMT+8)</th>
                             <th scope="col">Trxn.ID</th>
                             <th scope="col">Third-Party Name</th>
                             <th scope="col">Direction</th>

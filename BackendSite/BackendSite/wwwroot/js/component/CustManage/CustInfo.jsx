@@ -119,7 +119,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">CreateTime(Adjusted to GMT+8)</th>
+                                <th scope="col">CreateTime (Adjusted to GMT+8)</th>
                                 <th scope="col">Trxn.ID</th>
                                 <th scope="col">Deposit Type</th>
                                 <th scope="col" className="text-right">Amount</th>
@@ -127,8 +127,8 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                 <th scope="col">To Acc. Name</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">RefId</th>
-                                <th scope="col">DepositTime(Adjusted to GMT+8)</th>
-                                <th scope="col">UpdateTime(Adjusted to GMT+8)</th>
+                                <th scope="col">DepositTime (Adjusted to GMT+8)</th>
+                                <th scope="col">UpdateTime (Adjusted to GMT+8)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -268,7 +268,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">Time(Adjusted to GMT+8)</th>
+                                <th scope="col">Time (Adjusted to GMT+8)</th>
                                 <th scope="col">Type</th>
                                 <th scope="col" className="text-right">Change Bonus</th>
                                 <th scope="col" className="text-right">Before Bonus</th>
@@ -466,7 +466,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                            <th scope="col">Time(Adjusted to GMT+8)</th>  
+                            <th scope="col">Time (Adjusted to GMT+8)</th>  
                             <th scope="col">Category</th>
                             <th scope="col" className="text-right">Redeem Amount</th>
                             <th scope="col">RefId</th>                            
@@ -515,11 +515,11 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                             <tr>
                                 <th scope="col">UserName</th>
                                 <th scope="col">Currency</th>
-                                <th scope="col">Reg Time(Adjusted to GMT+8)</th>
+                                <th scope="col">Reg Time (Adjusted to GMT+8)</th>
                                 <th scope="col">TotalDeposit</th>
                                 <th scope="col">TotalBet</th>
                                 <th scope="col">Reward Amount</th>
-                                <th scope="col">Reward Time(Adjusted to GMT+8)</th>
+                                <th scope="col">Reward Time (Adjusted to GMT+8)</th>
                                 <th scope="col">Status</th>
                             </tr>
                         </thead>
@@ -675,7 +675,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">Time(Adjusted to GMT+8)</th>
+                                <th scope="col">Time (Adjusted to GMT+8)</th>
                                 <th scope="col">Type</th>
                                 <th scope="col" className="text-right">Change Amount</th>
                                 <th scope="col" className="text-right">Before Amount</th>
@@ -1600,19 +1600,19 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                         <td>{CustStatusOp[data.status]}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Registration Time(Adjusted to GMT+8)</th>
+                                        <th scope="row">Registration Time (Adjusted to GMT+8)</th>
                                         <td>{moment.utc(data.regTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Last Login Time(Adjusted to GMT+8)</th>
+                                        <th scope="row">Last Login Time (Adjusted to GMT+8)</th>
                                         <td>{moment.utc(data.lastLoginTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">First Deposit Time(Adjusted to GMT+8)</th>
+                                        <th scope="row">First Deposit Time (Adjusted to GMT+8)</th>
                                         <td>{data.firstDepositTime}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Last Activity Time(Adjusted to GMT+8)</th>
+                                        <th scope="row">Last Activity Time (Adjusted to GMT+8)</th>
                                         <td>{(typeof data.reloadTime === 'undefined') ? "N/A" : moment.utc(data.reloadTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
                                     <tr>
@@ -1659,7 +1659,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                         <td>{number_format(data.balance)}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Last Deposit Time(Adjusted to GMT+8)</th>
+                                        <th scope="row">Last Deposit Time (Adjusted to GMT+8)</th>
                                         <td>{data.lastDepositTime}</td>
                                     </tr>
                                     <tr>
@@ -1667,7 +1667,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                         <td>{number_format(data.depositSum)}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Last Withdrawal Time(Adjusted to GMT+8)</th>
+                                        <th scope="row">Last Withdrawal Time (Adjusted to GMT+8)</th>
                                         <td>{data.lastWithdrawlTime}</td>
                                     </tr>
                                     <tr>
@@ -1699,7 +1699,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                         <td>{number_format(elgibleWithdrawal)}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Last Betting Time(Adjusted to GMT+8)</th>
+                                        <th scope="row">Last Betting Time (Adjusted to GMT+8)</th>
                                         <td>{data.lastBettingTime}</td>
                                     </tr>
                                     <tr>

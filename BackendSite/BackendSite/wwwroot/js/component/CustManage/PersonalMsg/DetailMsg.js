@@ -8,7 +8,7 @@ const contentFormat = (v, id)=>{
 
 const columnDefs = [
     { 
-        dataColumn:'createTime', columnTitle:`CreateTime(Adjusted to GMT+8)`,
+        dataColumn:'createTime', columnTitle:`CreateTime (Adjusted to GMT+8)`,
         body:{
             format:dateFormat
         }

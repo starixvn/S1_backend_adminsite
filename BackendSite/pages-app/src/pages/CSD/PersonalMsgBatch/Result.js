@@ -11,7 +11,7 @@ const dataColumnDefs = () => {
         { dataColumn: "author", columnTitle: "LastUpdateUser", },
         {
             dataColumn: "updateTime",
-            columnTitle: "LastUpdateTime(Adjusted to GMT+8)",
+            columnTitle: "LastUpdateTime (Adjusted to GMT+8)",
             body: { format: dateFormat }
         },
         {

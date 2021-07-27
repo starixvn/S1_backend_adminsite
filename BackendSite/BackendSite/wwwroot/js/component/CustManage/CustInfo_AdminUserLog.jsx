@@ -50,7 +50,7 @@ class AdminUserLogList extends React.Component {
                             <th scope="col">ActionType</th>
                             <th scope="col">DetailInfo</th>
                             {/* <th scope="col">Create Time {moment().format('(Z)')}</th> */}
-                            <th scope="col">Create Time(Adjusted to GMT+8)</th>
+                            <th scope="col">Create Time (Adjusted to GMT+8)</th>
                             <th scope="col">Operator</th>
                         </tr>
                     </thead>

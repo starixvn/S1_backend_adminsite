@@ -29,7 +29,7 @@ const Log = (props) => {
                         <th scope="col">Old Level</th>
                         <th scope="col">New Level</th>
                         <th scope="col">Memo</th>
-                        <th scope="col">Operating time(Adjusted to GMT+8)</th>
+                        <th scope="col">Operating time (Adjusted to GMT+8)</th>
                         <th scope="col">Operator</th>
                     </tr>
                 </thead>
