@@ -220,7 +220,7 @@ namespace BackendSite.Service.DAL
             props.Add("BaseCurrencyId", BaseCurrencyId);
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_VipRebateTotalAmountV3_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_VipRebateTotalAmountV4_Get", props, commandType: CommandType.StoredProcedure).ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
                 CurrencyTotalAmount.ForEach(x =>
@@ -236,7 +236,7 @@ namespace BackendSite.Service.DAL
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<VipRebateInfo>("Admin_VipRebateReportListV5_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var result = conn.Query<VipRebateInfo>("Admin_VipRebateReportListV6_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             SearchData.VipRebateInfoList = result;
             SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;

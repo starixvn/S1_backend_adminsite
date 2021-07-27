@@ -15,14 +15,14 @@ export const dataColumnDefs = () => {
 		},
 		{
 			dataColumn: "startTime",
-			columnTitle: "StartTime(Adjusted to GMT+8)",
+			columnTitle: "StartTime (Adjusted to GMT+8)",
 			body: {
 				format: dateFormat
 			}
 		},
 		{
 			dataColumn: "endTime",
-			columnTitle: "EndTime(Adjusted to GMT+8)",
+			columnTitle: "EndTime (Adjusted to GMT+8)",
 			body: {
 				format: dateFormat
 			}
@@ -41,7 +41,7 @@ export const dataColumnDefs = () => {
 		{ dataColumn: "creator", columnTitle: "Creator" },
 		{
 			dataColumn: "createTime",
-			columnTitle: "CreateTime(Adjusted to GMT+8)",
+			columnTitle: "CreateTime (Adjusted to GMT+8)",
 			body: {
 				format: dateFormat
 			}
@@ -49,7 +49,7 @@ export const dataColumnDefs = () => {
 		{ dataColumn: "lastUpdater", columnTitle: "LastUpdater" },
 		{
 			dataColumn: "lastUpdateTime",
-			columnTitle: "LastUpdateTime(Adjusted to GMT+8)",
+			columnTitle: "LastUpdateTime (Adjusted to GMT+8)",
 			body: {
 				format: lastUpdateTime,
 				subData: ["lastUpdater"]
