@@ -12,9 +12,9 @@ const dataColumnDefs = () => {
     },
     { dataColumn: "accountName", columnTitle: "Full name" },
     { dataColumn: "actStatus", columnTitle: "Deposit Status" },
-    { dataColumn: "regTime", columnTitle: "Reg Data" },
+    { dataColumn: "regTime", columnTitle: "Reg Data (Adjusted to GMT+8)" },
     { dataColumn: "phoneNo", columnTitle: "Phone number" },
-    { dataColumn: "callOutStatus", columnTitle: "Remark" },
+    { dataColumn: "callOutStatus", columnTitle: "Remark (Adjusted to GMT+8)" },
   ];
 };
 const Panel = (props) => {

@@ -119,7 +119,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">CreateTime</th>
+                                <th scope="col">CreateTime (Adjusted to GMT+8)</th>
                                 <th scope="col">Trxn.ID</th>
                                 <th scope="col">Deposit Type</th>
                                 <th scope="col" className="text-right">Amount</th>
@@ -127,8 +127,8 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                 <th scope="col">To Acc. Name</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">RefId</th>
-                                <th scope="col">DepositTime</th>
-                                <th scope="col">UpdateTime</th>
+                                <th scope="col">DepositTime (Adjusted to GMT+8)</th>
+                                <th scope="col">UpdateTime (Adjusted to GMT+8)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -219,6 +219,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                             </div>
                         </div>
                         <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
+                        <div>(Adjusted to GMT+8)</div>
                     </form>
                     {searchData != null ? <DepositList searchData={searchData} ChangePage={this.props.GetDepositListByCust} /> : null}
                 </div>
@@ -267,7 +268,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">Time</th>
+                                <th scope="col">Time (Adjusted to GMT+8)</th>
                                 <th scope="col">Type</th>
                                 <th scope="col" className="text-right">Change Bonus</th>
                                 <th scope="col" className="text-right">Before Bonus</th>
@@ -381,6 +382,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                             </div>
                         </div>
                         <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
+                        <div>(Adjusted to GMT+8)</div>
                     </form>
                     {searchData != null ? <BonusLogList searchData={searchData} ChangePage={this.props.GetBonusLog} /> : null}
                 </div>
@@ -464,7 +466,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                            <th scope="col">Time</th>  
+                            <th scope="col">Time (Adjusted to GMT+8)</th>  
                             <th scope="col">Category</th>
                             <th scope="col" className="text-right">Redeem Amount</th>
                             <th scope="col">RefId</th>                            
@@ -513,11 +515,11 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                             <tr>
                                 <th scope="col">UserName</th>
                                 <th scope="col">Currency</th>
-                                <th scope="col">Reg Time</th>
+                                <th scope="col">Reg Time (Adjusted to GMT+8)</th>
                                 <th scope="col">TotalDeposit</th>
                                 <th scope="col">TotalBet</th>
                                 <th scope="col">Reward Amount</th>
-                                <th scope="col">Reward Time</th>
+                                <th scope="col">Reward Time (Adjusted to GMT+8)</th>
                                 <th scope="col">Status</th>
                             </tr>
                         </thead>
@@ -600,6 +602,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                             </div>
                         </div>
                         <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
+                        <div>(Adjusted to GMT+8)</div>
                     </form>
                     {searchData != null ? <RebateLogList searchData={searchData} ChangePage={this.props.GetRebateLog} /> : null}
                 </div>
@@ -672,7 +675,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">Time</th>
+                                <th scope="col">Time (Adjusted to GMT+8)</th>
                                 <th scope="col">Type</th>
                                 <th scope="col" className="text-right">Change Amount</th>
                                 <th scope="col" className="text-right">Before Amount</th>
@@ -752,6 +755,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                             </div>
                         </div>
                         <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
+                        <div>(Adjusted to GMT+8)</div>
                     </form>
                     {searchData != null ? <FinancialLogList searchData={searchData} ChangePage={this.props.GetFinancialLog} /> : null}
                 </div>
@@ -1596,19 +1600,19 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                         <td>{CustStatusOp[data.status]}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Registration Time</th>
+                                        <th scope="row">Registration Time (Adjusted to GMT+8)</th>
                                         <td>{moment.utc(data.regTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Last Login Time</th>
+                                        <th scope="row">Last Login Time (Adjusted to GMT+8)</th>
                                         <td>{moment.utc(data.lastLoginTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">First Deposit Time</th>
+                                        <th scope="row">First Deposit Time (Adjusted to GMT+8)</th>
                                         <td>{data.firstDepositTime}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Last Activity Time</th>
+                                        <th scope="row">Last Activity Time (Adjusted to GMT+8)</th>
                                         <td>{(typeof data.reloadTime === 'undefined') ? "N/A" : moment.utc(data.reloadTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
                                     <tr>
@@ -1655,7 +1659,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                         <td>{number_format(data.balance)}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Last Deposit Time</th>
+                                        <th scope="row">Last Deposit Time (Adjusted to GMT+8)</th>
                                         <td>{data.lastDepositTime}</td>
                                     </tr>
                                     <tr>
@@ -1663,7 +1667,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                         <td>{number_format(data.depositSum)}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Last Withdrawal Time</th>
+                                        <th scope="row">Last Withdrawal Time (Adjusted to GMT+8)</th>
                                         <td>{data.lastWithdrawlTime}</td>
                                     </tr>
                                     <tr>
@@ -1695,7 +1699,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                         <td>{number_format(elgibleWithdrawal)}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Last Betting Time</th>
+                                        <th scope="row">Last Betting Time (Adjusted to GMT+8)</th>
                                         <td>{data.lastBettingTime}</td>
                                     </tr>
                                     <tr>
@@ -1802,13 +1806,14 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
             Loading.OnLoading();
             let pageNumber = PageNumber || this.state.BonusLogData.pageNumber;
             let CustId = getUrlParameter("custId");
-            const {UTCStartDate,UTCEndDate} = this.state.BonusLog;
+            const {UTCStartDate,UTCEndDate,PromoCategoryId} = this.state.BonusLog;
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
                 axios.post('/api/Payment/GetBonusLog', { StartDate: UTCStartDate,
                                                         EndDate: UTCEndDate, 
                                                         CustId: iCustId, 
-                                                        PageNumber: pageNumber })
+                                                        PageNumber: pageNumber,
+                                                        PromoCategoryId: PromoCategoryId})
                     .then(function (response) {
                         Loading.UnLoading();
                         let result = response.data;

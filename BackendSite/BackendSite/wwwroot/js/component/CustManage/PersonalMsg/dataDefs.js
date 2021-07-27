@@ -9,7 +9,7 @@ export const boolFormat = (v)=>{
 export const columnDefs = [
     {
         dataColumn:'createTime', 
-        columnTitle:`CreateTime`,
+        columnTitle:`CreateTime (Adjusted to GMT+8)`,
         body:{
             format:dateFormat
         }

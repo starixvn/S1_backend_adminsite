@@ -63,6 +63,7 @@ const Panel = (props) => {
                     }}
                 />
                 <button className="btn btn-search" type="submit" onClick={props.ClickSubmit}>Submit</button>
+                (Adjusted to GMT+8)
             </div>
         </div>
     )

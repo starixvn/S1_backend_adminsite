@@ -112,6 +112,7 @@ const Filter = (props) => {
             Submit
           </button>
         </div>
+        <div>(Adjusted to GMT+8)</div>
       </div>
     </form>
   );
