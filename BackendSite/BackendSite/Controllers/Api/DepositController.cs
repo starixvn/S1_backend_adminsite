@@ -1,15 +1,15 @@
-﻿using BackendSite.Attributes;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
-using BackendSite.ExceptionHandling;
 
 namespace BackendSite.Controllers.Api
 {
@@ -212,7 +212,8 @@ namespace BackendSite.Controllers.Api
                 if (depositConfirmReuslt > 0)
                 {
                     var depositRequest = depositBLL.GetDepositRequest(depositReq.TransId);
-                    var userLang = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId).UserLang;
+                    var custInfo = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId);
+                    var userLang = custInfo.UserLang;
                     // Send message to player
                     string sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
                     string title = selLangBLL.GetResourceValue("lbl_DepositRejectTitle", userLang);
@@ -220,6 +221,10 @@ namespace BackendSite.Controllers.Api
                     string content = selLangBLL.GetResourceValue("lbl_DepositRejectContent", userLang);
                     content = string.Format(content, depositReq.TransId);
                     messageBLL.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
+                    if (custInfo.SiteId == 1)
+                    {
+                        messageBLL.SendSMSMessageToPlayer(depositRequest.CustId);
+                    }
                 }
             }
             else if (depositReq.Action == (int)DepositStatus.Draft)
@@ -310,7 +315,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         public ApiResult AddDepositLimitInfo(DepositLimitInfo depositLimitInfo)
         {
-            var result = depositBLL.AddDepositLimit(depositLimitInfo,User.Identity.Name);
+            var result = depositBLL.AddDepositLimit(depositLimitInfo, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result)
             {
@@ -329,7 +334,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         public ApiResult EditDepositLimitInfo(DepositLimitInfo depositLimitInfo)
         {
-            var result = depositBLL.EditDepositLimit(depositLimitInfo,User.Identity.Name);
+            var result = depositBLL.EditDepositLimit(depositLimitInfo, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result)
             {
@@ -348,7 +353,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult DeleteDepositLimitInfo(DepositLimitInfo depositLimitInfo)
         {
-            var result = depositBLL.DeleteDepositLimit(depositLimitInfo,User.Identity.Name);
+            var result = depositBLL.DeleteDepositLimit(depositLimitInfo, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result > 0)
             {
@@ -438,15 +443,15 @@ namespace BackendSite.Controllers.Api
             var stream = excelBLL.Export(ExportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DepositTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
-        [HttpPost] 
+        [HttpPost]
         public ApiResult SetDepositRequestAmount(DepositRequestAmountPara para)
         {
             var depositRequest = depositBLL.GetDepositRequest(para.TransId);
-            if(depositRequest == null)
+            if (depositRequest == null)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
             }
-            if (depositBLL.SetDepositRequestAmount(para.TransId,para.Amount, User.Identity.Name, depositRequest.CustId) >0)
+            if (depositBLL.SetDepositRequestAmount(para.TransId, para.Amount, User.Identity.Name, depositRequest.CustId) > 0)
             {
                 return new ApiResult
                 {
