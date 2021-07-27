@@ -1806,13 +1806,14 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
             Loading.OnLoading();
             let pageNumber = PageNumber || this.state.BonusLogData.pageNumber;
             let CustId = getUrlParameter("custId");
-            const {UTCStartDate,UTCEndDate} = this.state.BonusLog;
+            const {UTCStartDate,UTCEndDate,PromoCategoryId} = this.state.BonusLog;
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
                 axios.post('/api/Payment/GetBonusLog', { StartDate: UTCStartDate,
                                                         EndDate: UTCEndDate, 
                                                         CustId: iCustId, 
-                                                        PageNumber: pageNumber })
+                                                        PageNumber: pageNumber,
+                                                        PromoCategoryId: PromoCategoryId})
                     .then(function (response) {
                         Loading.UnLoading();
                         let result = response.data;
