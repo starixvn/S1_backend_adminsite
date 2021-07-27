@@ -35,7 +35,7 @@ class LoginLogList extends React.Component {
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">Login Time(Adjusted to GMT+8)</th>                            
+                            <th scope="col">Login Time (Adjusted to GMT+8)</th>                            
                             <th scope="col">Login IP</th>
                             <th scope="col">From Url</th>
                             <th scope="col">User Agent</th>

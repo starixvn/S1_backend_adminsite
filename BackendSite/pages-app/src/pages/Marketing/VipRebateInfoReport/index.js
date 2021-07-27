@@ -4,10 +4,11 @@ import Filter from "./Filter";
 import Result from "./Result";
 import WebAPI from "../../../module/WebAPI";
 import qs from "qs";
-import moment from "moment";
+import moment from "moment-timezone";
 import { api } from "../../../module/WebAPI";
 
 const App = () => {
+  moment.tz.setDefault("Asia/Taipei");
   const [stateFilter, setFilter] = useState({
     SelectSite: [],
     StartDate: moment().add(-10, "days").format("l"),
@@ -162,8 +163,8 @@ const App = () => {
       SelectSite: stateFilter.SelectSite,
       Currency: parseInt(stateFilter.Currency),
       CategoryId: parseInt(stateFilter.Category),
-      StartDate: moment(stateFilter.StartDate).unix(),
-      EndDate: moment(stateFilter.EndDate).unix(),
+      StartDate: moment.utc(stateFilter.StartDate).unix(),
+      EndDate: moment.utc(stateFilter.EndDate).unix(),
       User: stateFilter.User,
       PageNumber: 1,
       PageSize: 10,
