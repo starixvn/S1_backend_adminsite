@@ -3,8 +3,9 @@ import WeekResult from './WeekResult';
 import DayResult from './DayResult';
 import CategoryResult from './CategoryResult';
 import GameResult from './GameResult';
-
+import moment from "moment-timezone";
 const Panel = () => {
+    moment.tz.setDefault("Asia/Taipei");
     const [stateWeekDatas, setWeekDatas] = React.useState();
     const [stateDayDatas, setDayDatas] = React.useState();
     const [stateCategoryDatas, setCategoryDatas] = React.useState();

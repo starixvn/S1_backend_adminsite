@@ -110,7 +110,15 @@
           {
             "DisplayKey": "VIP Level Edit",
             "FuncKey": "ca_vipLevelEdit"
-          }
+          },
+          {
+            "DisplayKey": "Set Enable/Disable Promotion",
+            "FuncKey": "ca_promotion"
+          },
+          {
+            "DisplayKey": "Set Add/Remove CustTag",
+            "FuncKey": "ca_setCustTag"
+          }, 
         ]
       },
       {
@@ -204,6 +212,11 @@
         ]
       },
       {
+        "DisplayKey": "Withdrawal Accounting",
+        "FuncKey": "Finance/WithdrawalAccountingList",
+        "Enable": false
+      },
+      {
         "DisplayKey": "Balance Adjustment",
         "FuncKey": "Finance/PaymentAdjustment",
         "Enable": false
@@ -273,6 +286,11 @@
         "DisplayKey": "AdjustmentLimit Management",
         "FuncKey": "Finance/AdjustmentLimitManagement",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Adjustment Log Report",
+        "FuncKey": "Finance/AdjustmentLogReport",
+        "Enable": false
       }
     ]
   },
@@ -287,6 +305,11 @@
       {
         "DisplayKey": "User Setting",
         "FuncKey": "Admin/UserAuthoritySetting",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Special Password Management",
+        "FuncKey": "Admin/SpecialPasswordManagement",
         "Enable": false
       }
     ]

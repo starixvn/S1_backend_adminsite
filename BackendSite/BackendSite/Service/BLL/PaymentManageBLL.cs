@@ -26,25 +26,25 @@ namespace BackendSite.Service.BLL
             };
         }
 
-        public void UpdatePayList(int PayId, int Status)
+        public void UpdatePayList(int PayId, int Status,string Operator)
         {
-            paymentManageService.UpdatePayList(PayId, Status);
+            paymentManageService.UpdatePayList(PayId, Status, Operator);
         }
 
-        public void UpdatePayChannel(int ChannelId, int Sort, int Status, int PointLevel)
+        public void UpdatePayChannel(int ChannelId, int Sort, int Status, int PointLevel, string Operator)
         {
-            paymentManageService.UpdatePayChannel(ChannelId, Sort, Status, PointLevel);
+            paymentManageService.UpdatePayChannel(ChannelId, Sort, Status, PointLevel, Operator);
         }
 
-        public void UpdatePayCurrency(int ChannelId, int CurrencyId, decimal MinAmount, decimal MaxAmount, int AmountRule, string AmountShow)
+        public void UpdatePayCurrency(int ChannelId, int CurrencyId, decimal MinAmount, decimal MaxAmount, int AmountRule, string AmountShow, string Operator)
         {
             AmountShow = string.IsNullOrEmpty(AmountShow) ? null : AmountShow;
-            paymentManageService.UpdatePayCurrency(ChannelId, CurrencyId, MinAmount, MaxAmount, AmountRule, AmountShow);
+            paymentManageService.UpdatePayCurrency(ChannelId, CurrencyId, MinAmount, MaxAmount, AmountRule, AmountShow, Operator);
         }
 
-        public void UpdatePayCurrency(int ChannelId, int CurrencyId, decimal MinAmount, decimal MaxAmount)
+        public void UpdatePayCurrency(int ChannelId, int CurrencyId, decimal MinAmount, decimal MaxAmount, string Operator)
         {
-            paymentManageService.UpdatePayCurrencyAmount(ChannelId, CurrencyId, MinAmount, MaxAmount);
+            paymentManageService.UpdatePayCurrencyAmount(ChannelId, CurrencyId, MinAmount, MaxAmount, Operator);
         }
 
         public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int PayId)
@@ -52,9 +52,9 @@ namespace BackendSite.Service.BLL
             return paymentManageService.GetBankSysInfoList(PayId).OrderBy(x=>x.CurrencyId);
         }
 
-        public void UpdateBankInfo(int PayId, int SysId, int Status)
+        public void UpdateBankInfo(int PayId, int SysId, int Status, string Operator)
         {
-            paymentManageService.UpdateBankInfo(PayId, SysId, Status);
+            paymentManageService.UpdateBankInfo(PayId, SysId, Status, Operator);
         }
     }
 }

@@ -52,7 +52,7 @@ namespace BackendSite.Service.DAL
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var depositList = conn.Query<FinancialLog>("Admin_FinancialLogList_Get", p, commandType: CommandType.StoredProcedure);
+            var depositList = conn.Query<FinancialLog>("Admin_FinancialLogListV2_Get", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -67,7 +67,7 @@ namespace BackendSite.Service.DAL
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var depositList = conn.Query<BonusLog>("Admin_BonusLogList_Get", p, commandType: CommandType.StoredProcedure);
+            var depositList = conn.Query<BonusLog>("Admin_BonusLogListV2_Get", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -204,7 +204,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int pageSize, int pageNumber,int CategoryId, int BaseCurrencyId, int RebateCategoriesId,ref List<string> CurrencyAmount)
+        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int pageSize, int pageNumber,int CategoryId, int BaseCurrencyId,ref List<string> CurrencyAmount)
         {
             List<string> tempCurrencyTotalAmount = new List<string>();
             VipRebateInfoData SearchData = new VipRebateInfoData();
@@ -218,10 +218,9 @@ namespace BackendSite.Service.DAL
             props.Add("PageSize", pageSize);
             props.Add("CategoryId", CategoryId);
             props.Add("BaseCurrencyId", BaseCurrencyId);
-            props.Add("CategoryType", RebateCategoriesId);
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_VipRebateTotalAmountV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_VipRebateTotalAmountV4_Get", props, commandType: CommandType.StoredProcedure).ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
                 CurrencyTotalAmount.ForEach(x =>
@@ -237,7 +236,7 @@ namespace BackendSite.Service.DAL
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<VipRebateInfo>("Admin_VipRebateReportListV4_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var result = conn.Query<VipRebateInfo>("Admin_VipRebateReportListV6_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             SearchData.VipRebateInfoList = result;
             SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
@@ -257,7 +256,7 @@ namespace BackendSite.Service.DAL
             props.Add("EndDate", endDate);
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_VipRebateTotalAmountbyCust_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_VipRebateTotalAmountbyCustV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
                 CurrencyTotalAmount.ForEach(x =>
@@ -275,7 +274,7 @@ namespace BackendSite.Service.DAL
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
             
-            var result = conn.Query<VipRebateInfo>("Admin_VipRebateReportListbyCust_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var result = conn.Query<VipRebateInfo>("Admin_VipRebateReportListbyCustV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             SearchData.VipRebateInfoList = result;
             SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;

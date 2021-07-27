@@ -1,6 +1,6 @@
 import React from "react";
-import Pagination from "../../../component/Pagination";
-import moment from "moment";
+import Pagination from './Pagination';
+import moment from "moment-timezone";
 
 const SpecialItemType = {
 	actionBtn: "actionBtn"
@@ -15,14 +15,14 @@ export const dataColumnDefs = () => {
 		},
 		{
 			dataColumn: "startTime",
-			columnTitle: "StartTime",
+			columnTitle: "StartTime (Adjusted to GMT+8)",
 			body: {
 				format: dateFormat
 			}
 		},
 		{
 			dataColumn: "endTime",
-			columnTitle: "EndTime",
+			columnTitle: "EndTime (Adjusted to GMT+8)",
 			body: {
 				format: dateFormat
 			}
@@ -41,7 +41,7 @@ export const dataColumnDefs = () => {
 		{ dataColumn: "creator", columnTitle: "Creator" },
 		{
 			dataColumn: "createTime",
-			columnTitle: "CreateTime",
+			columnTitle: "CreateTime (Adjusted to GMT+8)",
 			body: {
 				format: dateFormat
 			}
@@ -49,7 +49,7 @@ export const dataColumnDefs = () => {
 		{ dataColumn: "lastUpdater", columnTitle: "LastUpdater" },
 		{
 			dataColumn: "lastUpdateTime",
-			columnTitle: "LastUpdateTime",
+			columnTitle: "LastUpdateTime (Adjusted to GMT+8)",
 			body: {
 				format: lastUpdateTime,
 				subData: ["lastUpdater"]

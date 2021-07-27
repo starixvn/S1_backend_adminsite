@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -20,25 +21,47 @@ namespace BackendSite.Controllers.Api
     [ApiController]
     public class PaymentController : ControllerBase
     {
+        #region Fields
+
         private readonly PaymentBLL paymentBLL;
         private readonly CustInfoBLL custInfoBLL;
         private readonly TpBLL tpBLL;
         private readonly AuthorizeBLL authorizeBLL;
-        private readonly int mainWalletType;
         private readonly Common common;
         private readonly ExcelBLL excelBLL;
         private readonly SelLangBLL selLangBLL;
-        public PaymentController(IConfiguration configuration, PaymentBLL paymentBLL, CustInfoBLL custInfoBLL, TpBLL tpBLL, AuthorizeBLL authorizeBLL, Common common, ExcelBLL excelBLL, SelLangBLL selLangBLL)
+
+        private readonly int mainWalletType;
+
+        #endregion
+
+        #region Constructors
+
+        public PaymentController(IConfiguration configuration,
+                                 PaymentBLL paymentBLL,
+                                 CustInfoBLL custInfoBLL,
+                                 TpBLL tpBLL,
+                                 AuthorizeBLL authorizeBLL,
+                                 Common common,
+                                 ExcelBLL excelBLL,
+                                 SelLangBLL selLangBLL)
         {
             this.paymentBLL = paymentBLL;
             this.custInfoBLL = custInfoBLL;
             this.tpBLL = tpBLL;
             this.authorizeBLL = authorizeBLL;
-            mainWalletType = configuration.GetValue<int>("MainWalletType");
             this.common = common;
             this.excelBLL = excelBLL;
             this.selLangBLL = selLangBLL;
+
+            mainWalletType = configuration.GetValue<int>("MainWalletType");
+
         }
+
+        #endregion
+
+        #region API Model
+
         public class PaymentAdjustmentReq
         {
             public int CustId { get; set; }
@@ -52,6 +75,92 @@ namespace BackendSite.Controllers.Api
             public int WithdrawalLimitOption { get; set; }
             public string Memo { set; get; }
         }
+
+        public class GetFinancialLogReq
+        {
+            public int CustId { get; set; }
+            public long? StartDate { get; set; }
+            public long? EndDate { get; set; }
+            public string RefTransId { get; set; }
+            public int PageNumber { get; set; }
+        }
+
+        public class GetBonusLogReq
+        {
+            public int CustId { get; set; }
+            public int PromoCategoryId { get; set; }
+            public long? StartDate { get; set; }
+            public long? EndDate { get; set; }
+            public string RefTransId { get; set; }
+            public int PageNumber { get; set; }
+        }
+
+        public class GetRebateLogByCustReq
+        {
+            public int CustId { get; set; }
+            public long? StartDate { get; set; }
+            public long? EndDate { get; set; }
+            public int PageNumber { get; set; }
+        }
+
+        public class CustTpBetRecordListOneWeekReq
+        {
+            public int CustId { get; set; }
+        }
+
+        public class CustTpBetRecordListOneDayReq
+        {
+            public int CustId { get; set; }
+            public string SelDate { get; set; }
+        }
+
+        public class CustTpBetRecordListbyCategoryIdReq
+        {
+            public int CustId { get; set; }
+            public string SelDate { get; set; }
+            public int CategoryId { get; set; }
+        }
+
+        public class CustTpBetRecordDetailListbyGameTypeReq
+        {
+            public int CustId { get; set; }
+            public string SelDate { get; set; }
+            public int GameTypeId { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+
+        }
+
+        public class BonusCashBackInfoListDetail
+        {
+            public int errorCode { set; get; }
+            public string custName { set; get; }
+            public string massage { set; get; }
+            public decimal WinlostAmountCountCalculation { set; get; }
+            public decimal Percentage { set; get; }
+        }
+
+        public class VipRebateInfoByCustIdPara
+        {
+            public int CustId { get; set; }
+            public long? StartDate { get; set; }
+            public long? EndDate { get; set; }
+            public int PageNumber { get; set; }
+        }
+
+        public class VipRebateInfoParaExport
+        {
+            public string SelectSite { get; set; }
+            public int Currency { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
+            public string User { get; set; }
+            public int CategoryId { get; set; }
+        }
+
+        #endregion
+
+        #region Actions
 
         [HttpPost]
         public async Task<ApiResult> PaymentAdjustmentAsync(PaymentAdjustmentReq paymentAdjustmentReq)
@@ -133,59 +242,69 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public class GetFinancialLogReq
-        {
-            public int CustId { get; set; }
-            public long? StartDate { get; set; }
-            public long? EndDate { get; set; }
-            public string RefTransId { get; set; }
-            public int PageNumber { get; set; }
-        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Use：
+        /// CSD > Customer Administration > CustInfo > Financial Log
+        /// </remarks>
+        /// <param name="getFinancialLogReq"></param>
+        /// <returns></returns>
         public ApiListResult<FinancialLog> GetFinancialLog(GetFinancialLogReq getFinancialLogReq)
         {
             int pageNumber = getFinancialLogReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
-            var apiListResult = new ApiListResult<FinancialLog>();
-            apiListResult.Data = paymentBLL.GetFinancialLog(getFinancialLogReq.CustId, getFinancialLogReq.StartDate, getFinancialLogReq.EndDate, getFinancialLogReq.RefTransId, 10, ref pageNumber, out totalPages, out rowCount);
-            apiListResult.ErrorCode = 0;
-            apiListResult.PageNumber = pageNumber;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.RowCount = rowCount;
+            var data = paymentBLL.GetFinancialLog(getFinancialLogReq.CustId, getFinancialLogReq.StartDate, getFinancialLogReq.EndDate, getFinancialLogReq.RefTransId, 10, ref pageNumber, out totalPages, out rowCount);
 
-            return apiListResult;
+
+            return new ApiListResult<FinancialLog>
+            {
+                Data = data,
+                TotalPages = totalPages,
+                PageNumber = pageNumber,
+                RowCount = rowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
         }
 
-        public class GetBonusLogReq
-        {
-            public int CustId { get; set; }
-            public int PromoCategoryId { get; set; }
-            public long? StartDate { get; set; }
-            public long? EndDate { get; set; }
-            public string RefTransId { get; set; }
-            public int PageNumber { get; set; }
-        }
-        public ApiListResult<BonusLog> GetBonusLog(GetBonusLogReq getBonusLogReq)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Use：
+        /// CSD > Customer Administration > CustInfo > Bonus Log
+        /// </remarks>
+        /// <param name="getBonusLogReq"></param>
+        /// <returns></returns>
+        public ApiResult GetBonusLog(GetBonusLogReq getBonusLogReq)
         {
             int pageNumber = getBonusLogReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
-            var apiListResult = new ApiListResult<BonusLog>();
-            apiListResult.Data = paymentBLL.GetBonusLog(getBonusLogReq.CustId, getBonusLogReq.PromoCategoryId, getBonusLogReq.StartDate, getBonusLogReq.EndDate, getBonusLogReq.RefTransId, 10, ref pageNumber, out totalPages, out rowCount);
-            apiListResult.ErrorCode = 0;
-            apiListResult.PageNumber = pageNumber;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.RowCount = rowCount;
+            var data = paymentBLL.GetBonusLog(getBonusLogReq.CustId,
+                                              getBonusLogReq.PromoCategoryId,
+                                              getBonusLogReq.StartDate,
+                                              getBonusLogReq.EndDate,
+                                              getBonusLogReq.RefTransId,
+                                              10,
+                                              ref pageNumber,
+                                              out totalPages,
+                                              out rowCount);
 
-            return apiListResult;
+            return new ApiListResult<BonusLog>
+            {
+                Data = data,
+                TotalPages = totalPages,
+                PageNumber = pageNumber,
+                RowCount = rowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
         }
-        public class GetRebateLogByCustReq
-        {
-            public int CustId { get; set; }
-            public long? StartDate { get; set; }
-            public long? EndDate { get; set; }
-            public int PageNumber { get; set; }
-        }
+
         public ApiListResult<RebateLog> GetRebateLogByCust(GetRebateLogByCustReq getRebateLogByCustReq)
         {
             int pageNumber = getRebateLogByCustReq.PageNumber;
@@ -200,6 +319,7 @@ namespace BackendSite.Controllers.Api
 
             return apiListResult;
         }
+
         public ApiListResultCurrencyAmount<RebateLog> GetRebateLog([FromForm] IEnumerable<int> SelectSite, [FromForm] string UserName, [FromForm] int RebateType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int CurrencyId, [FromForm] int BaseCurrencyId, [FromForm] int RebateCategoriesId)
         {
             var apiListResult = new ApiListResultCurrencyAmount<RebateLog>();
@@ -216,6 +336,7 @@ namespace BackendSite.Controllers.Api
 
             return apiListResult;
         }
+
         [HttpPost]
         public IActionResult ExportRebateLog(string SelectSite, string UserName, int RebateType, long StartDate, long EndDate, int CurrencyId, int BaseCurrencyId, int RebateCategoriesId)
         {
@@ -246,19 +367,40 @@ namespace BackendSite.Controllers.Api
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Use：
+        /// CSD > Customer Administration > CustInfo > Bonus Log [Promotion Category]
+        /// </remarks>
+        /// <returns></returns>
         public ApiResult<IEnumerable<PromotionCategory>> GetPromotionCategory()
         {
+            var data = paymentBLL.GetPromotionCategory();
+            if (data.Count() == 0)
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<PromotionCategory>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+        }
 
-            var apiResult = new ApiResult<IEnumerable<PromotionCategory>>();
-            apiResult.ErrorCode = 0;
-            apiResult.Data = paymentBLL.GetPromotionCategory();
-            return apiResult;
-        }
-        public class CustTpBetRecordListOneWeekReq
-        {
-            public int CustId { get; set; }
-        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Use：
+        /// CSD > Customer Administration > CustInfo > Statement
+        /// </remarks>
+        /// <param name="custTpBetRecordListOneWeekReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordListOneWeek>> GetCustTpBetRecordListOneWeek(CustTpBetRecordListOneWeekReq custTpBetRecordListOneWeekReq)
         {
@@ -267,43 +409,55 @@ namespace BackendSite.Controllers.Api
             apiResult.Data = paymentBLL.GetCustTpBetRecordListOneWeek(custTpBetRecordListOneWeekReq.CustId);
             return apiResult;
         }
-        public class CustTpBetRecordListOneDayReq
-        {
-            public int CustId { get; set; }
-            public string selDate { get; set; }
-        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Use：
+        /// CSD > Customer Administration > CustInfo > Statement
+        /// </remarks>
+        /// <param name="custTpBetRecordListOneDayReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordListOneDay>> GetCustTpBetRecordListOneDay(CustTpBetRecordListOneDayReq custTpBetRecordListOneDayReq)
         {
             var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneDay>>();
             apiResult.ErrorCode = 0;
-            apiResult.Data = paymentBLL.GetCustTpBetRecordListOneDay(custTpBetRecordListOneDayReq.CustId, custTpBetRecordListOneDayReq.selDate);
+            apiResult.Data = paymentBLL.GetCustTpBetRecordListOneDay(custTpBetRecordListOneDayReq.CustId,
+                                                                     custTpBetRecordListOneDayReq.SelDate);
             return apiResult;
         }
-        public class CustTpBetRecordListbyCategoryIdReq
-        {
-            public int CustId { get; set; }
-            public string selDate { get; set; }
-            public int CategoryId { get; set; }
-        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Use：
+        /// CSD > Customer Administration > CustInfo > Statement
+        /// </remarks>
+        /// <param name="custTpBetRecordListbyCategoryIdReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordbyCategoryId>> GetCustTpBetRecordListbyCategoryId(CustTpBetRecordListbyCategoryIdReq custTpBetRecordListbyCategoryIdReq)
         {
             var apiResult = new ApiResult<IEnumerable<TpBetRecordbyCategoryId>>();
             apiResult.ErrorCode = 0;
-            apiResult.Data = paymentBLL.GetCustTpBetRecordListbyCategoryId(custTpBetRecordListbyCategoryIdReq.CustId, custTpBetRecordListbyCategoryIdReq.selDate, custTpBetRecordListbyCategoryIdReq.CategoryId);
-
+            apiResult.Data = paymentBLL.GetCustTpBetRecordListbyCategoryId(custTpBetRecordListbyCategoryIdReq.CustId,
+                                                                           custTpBetRecordListbyCategoryIdReq.SelDate,
+                                                                           custTpBetRecordListbyCategoryIdReq.CategoryId);
             return apiResult;
         }
-        public class CustTpBetRecordDetailListbyGameTypeReq
-        {
-            public int CustId { get; set; }
-            public string selDate { get; set; }
-            public int gameTypeId { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
 
-        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Use：
+        /// CSD > Customer Administration > CustInfo > Statement
+        /// </remarks>
+        /// <param name="custTpBetRecordDetailListbyGameTypeReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiListResult<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(CustTpBetRecordDetailListbyGameTypeReq custTpBetRecordDetailListbyGameTypeReq)
         {
@@ -314,12 +468,19 @@ namespace BackendSite.Controllers.Api
             int PageNumber = custTpBetRecordDetailListbyGameTypeReq.PageNumber;
 
             apiResult.ErrorCode = 0;
-            apiResult.Data = paymentBLL.GetCustTpBetRecordDetailListbyGameType(custTpBetRecordDetailListbyGameTypeReq.CustId, custTpBetRecordDetailListbyGameTypeReq.selDate, custTpBetRecordDetailListbyGameTypeReq.gameTypeId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            apiResult.Data = paymentBLL.GetCustTpBetRecordDetailListbyGameType(custTpBetRecordDetailListbyGameTypeReq.CustId,
+                                                                               custTpBetRecordDetailListbyGameTypeReq.SelDate,
+                                                                               custTpBetRecordDetailListbyGameTypeReq.GameTypeId,
+                                                                               PageSize,
+                                                                               ref PageNumber,
+                                                                               ref TotalPages,
+                                                                               ref RowCount);
             apiResult.PageNumber = PageNumber;
             apiResult.RowCount = RowCount;
             apiResult.TotalPages = TotalPages;
             return apiResult;
         }
+
         [HttpPost]
         public async Task<ApiResult> AdjustmentAndWithdrawalLimitAsync(AdjustmentAndWithdrawalLimitReq adjustmentAndWithdrawalLimitReq)
         {
@@ -404,15 +565,6 @@ namespace BackendSite.Controllers.Api
             }
 
             return apiResult;
-        }
-
-        public class BonusCashBackInfoListDetail
-        {
-            public int errorCode { set; get; }
-            public string custName { set; get; }
-            public string massage { set; get; }
-            public decimal WinlostAmountCountCalculation { set; get; }
-            public decimal Percentage { set; get; }
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BalanceAdjustmentBatch" })]
@@ -565,7 +717,6 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
             public int CategoryId { get; set; }
             public int BaseCurrencyId { get; set; }
-            public int RebateCategoriesId { get; set; }
         }
         [HttpPost]
         public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoList(VipRebateInfoPara para)
@@ -575,7 +726,7 @@ namespace BackendSite.Controllers.Api
             {
                 List<string> CurrencyAmount = new List<string>();
                 var SearchResult = paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, para.StartDate, para.EndDate, para.User, para.PageSize, para.PageNumber,
-                    para.CategoryId, para.BaseCurrencyId, para.RebateCategoriesId, ref CurrencyAmount);
+                    para.CategoryId, para.BaseCurrencyId, ref CurrencyAmount);
                 apiResult.Data = SearchResult.VipRebateInfoList;
                 apiResult.PageNumber = SearchResult.PageNumber;
                 apiResult.TotalPages = SearchResult.TotalPages;
@@ -591,44 +742,37 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        public class VipRebateInfoByCustIdPara
-        {
-            public int CustId { get; set; }
-            public long? StartDate { get; set; }
-            public long? EndDate { get; set; }
-            public int PageNumber { get; set; }
-        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Use：
+        /// CSD > Customer Administration > CustInfo > Vip Rebate Log
+        /// </remarks>
+        /// <param name="para"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoListByCustId(VipRebateInfoByCustIdPara para)
         {
-            var apiResult = new ApiListResultCurrencyAmount<VipRebateInfo>();
-            try
-            {
-                var SearchResult = paymentBLL.GetVipRebateInfoListByCustId(para.CustId, para.StartDate, para.EndDate, 10, para.PageNumber);
-                apiResult.Data = SearchResult.VipRebateInfoList;
-                apiResult.PageNumber = SearchResult.PageNumber;
-                apiResult.TotalPages = SearchResult.TotalPages;
-                apiResult.RowCount = SearchResult.RowCount;
-                apiResult.CurrencyAmount = SearchResult.CurrencyAmount;
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = ex.Message;
-            }
+            var SearchResult = paymentBLL.GetVipRebateInfoListByCustId(para.CustId,
+                                                                       para.StartDate,
+                                                                       para.EndDate,
+                                                                       10,
+                                                                       para.PageNumber);
 
-            return apiResult;
+            return new ApiListResultCurrencyAmount<VipRebateInfo>
+            {
+                Data = SearchResult.VipRebateInfoList,
+                TotalPages = SearchResult.TotalPages,
+                PageNumber = SearchResult.PageNumber,
+                RowCount = SearchResult.RowCount,
+                CurrencyAmount = SearchResult.CurrencyAmount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
         }
-        public class VipRebateInfoParaExport
-        {
-            public string SelectSite { get; set; }
-            public int Currency { get; set; }
-            public long StartDate { get; set; }
-            public long EndDate { get; set; }
-            public string User { get; set; }
-            public int CategoryId { get; set; }
-        }
+
         [HttpPost]
         public IActionResult GetVipRebateInfoListExport(string SelectSite, int Currency, long StartDate, long EndDate, string User, int CategoryId, int BaseCurrencyId, int RebateCategoriesId)
         {
@@ -636,6 +780,7 @@ namespace BackendSite.Controllers.Api
             var stream = excelBLL.Export(SearchResult.VipRebateInfoList);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"VipRebateReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
+
         public ApiResult<IEnumerable<VipTPCategory>> GetTPCategoryListByVipRebate()
         {
             var apiResult = new ApiResult<IEnumerable<VipTPCategory>>();
@@ -643,6 +788,7 @@ namespace BackendSite.Controllers.Api
             apiResult.Data = paymentBLL.GetTPCategoryList();
             return apiResult;
         }
+
 
         #region Adjustment Limit
         public class GetAdjustmentPara
@@ -688,12 +834,13 @@ namespace BackendSite.Controllers.Api
         public class CheckPassWordPara
         {
             public string PassWord { get; set; }
+            public int SiteId { get; set; }
         }
         [HttpPost]
         public ApiResult CheckPassWord(CheckPassWordPara para)
         {
             var apiResult = new ApiResult();
-            if (paymentBLL.CheckPassWord(para.PassWord, User.Identity.Name))
+            if (paymentBLL.CheckPassWord(para.PassWord, para.SiteId))
             {
                 apiResult.ErrorCode = 0;
             }
@@ -703,6 +850,8 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
+        #endregion
+
         #endregion
     }
 }

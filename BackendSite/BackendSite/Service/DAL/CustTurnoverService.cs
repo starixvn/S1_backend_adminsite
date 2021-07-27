@@ -19,12 +19,12 @@ namespace BackendSite.Service.DAL
             this.configuration = configuration;
         }
 
-        public IEnumerable<CustTurnover> GetCustTurnover(int CustId, string[]GameTypes, int StartTime, int EndTime)
+        public IEnumerable<CustTurnover> GetCustTurnover(int CustId, string GameTypes, long StartTime, long EndTime)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<CustTurnover>("Admin_TpBetRecord_GetByCustId", new { 
                 CustId = CustId, 
-                GameList=Newtonsoft.Json.JsonConvert.SerializeObject(GameTypes),
+                GameList=GameTypes,
                 StartDate=StartTime,
                 EndDate=EndTime
             }, commandType: CommandType.StoredProcedure);

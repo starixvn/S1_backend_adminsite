@@ -1,5 +1,5 @@
 import { number_format } from '../../commJS/common';
-
+import moment from "moment-timezone";
 const Setting = (props) => {
 
     let levelSetting = null;
@@ -24,7 +24,7 @@ const Setting = (props) => {
                 <tr>
                     <th scope="col">Manually</th>
                     <th scope="col">Level</th>
-                    <th scope="col">Qualified Time</th>
+                    <th scope="col">Qualified Time (Adjusted to GMT+8)</th>
                     <th scope="col">Action</th>
                 </tr>
             </thead>

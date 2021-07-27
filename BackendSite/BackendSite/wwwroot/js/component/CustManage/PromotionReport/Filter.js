@@ -1,5 +1,5 @@
 import DateTimePicker from "react-datetime";
-
+import moment from "moment-timezone";
 const Filter = (props) => {
   return (
     <form className="filter" style={{ display: "block" }}>
@@ -40,6 +40,7 @@ const Filter = (props) => {
             Submit
           </button>
         </div>
+        <div>(Adjusted to GMT+8)</div>
       </div>
     </form>
   );

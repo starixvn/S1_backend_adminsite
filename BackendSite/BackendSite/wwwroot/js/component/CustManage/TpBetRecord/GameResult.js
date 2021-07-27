@@ -1,6 +1,7 @@
 import { number_format } from '../../commJS/common';
 import { Pagination } from '../../commJS/Pagination.jsx';
-
+import { NewPagination } from '../../commJS/NewPagination.jsx';
+import moment from "moment-timezone";
 const Result = (props) => {
     let rows = props.Datas.data.length === 0 ? <tr><td>No Data.</td><td /><td /><td /><td /><td /><td /></tr> : props.Datas.data.map((d, dIdx) => {
         return (
@@ -37,7 +38,7 @@ const Result = (props) => {
                 </table>
 
             </div>
-            <Pagination
+            <NewPagination
                 Data={{
                     totalPages: props.Datas.totalPages,
                     pageNumber: props.Datas.pageNumber,

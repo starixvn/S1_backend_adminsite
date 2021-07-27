@@ -1,6 +1,6 @@
 import React from "react";
 import Pagination from "./Pagination";
-import moment from "moment";
+import moment from "moment-timezone";
 import { api } from "../../../module/WebAPI";
 const SpecialItemType = {
   statusBtn: "statusBtn",
@@ -10,7 +10,7 @@ const dataColumnDefs = () => {
     { dataColumn: "tagName", columnTitle: "TagName" },
     { dataColumn: "tagColour", columnTitle: "TagColour" },
     { dataColumn: "description", columnTitle: "Description" },
-    { dataColumn: "updateTime", columnTitle: "UpdateTime" },
+    { dataColumn: "updateTime", columnTitle: "UpdateTime (Adjusted to GMT+8)" },
     { dataColumn: "updator", columnTitle: "Updator" },
     { dataColumn: "status", columnTitle: "Status" },
     {

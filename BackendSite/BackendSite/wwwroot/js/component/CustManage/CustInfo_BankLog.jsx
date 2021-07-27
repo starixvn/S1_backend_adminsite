@@ -17,7 +17,7 @@ export class BankLog extends React.Component {
                     { this.props.CurrencyId == 61 ?
                         <th>{row.ifscCode}</th>
                     :null}          
-                    <td>{moment(row.createTime).format('l LTS')}</td>
+                    <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                 </tr>
             );
         }) : null;
@@ -33,7 +33,7 @@ export class BankLog extends React.Component {
                             { this.props.CurrencyId == 61 ?
                                 <th scope="col">IFSC Code</th>
                             :null}
-                            <th scope="col">Create Time {moment().format('(Z)')}</th>
+                            <th scope="col">Create Time (Adjusted to GMT+8)</th>
                         </tr>
                     </thead>
                     <tbody>

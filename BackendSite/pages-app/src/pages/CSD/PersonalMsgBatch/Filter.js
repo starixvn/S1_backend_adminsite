@@ -1,5 +1,5 @@
 import React from "react";
-import moment from 'moment';
+import moment from "moment-timezone";
 import DateTimePicker from "react-datetime";
 
 const Panel = (props) => {
@@ -63,6 +63,7 @@ const Panel = (props) => {
                     }}
                 />
                 <button className="btn btn-search" type="submit" onClick={props.ClickSubmit}>Submit</button>
+                (Adjusted to GMT+8)
             </div>
         </div>
     )

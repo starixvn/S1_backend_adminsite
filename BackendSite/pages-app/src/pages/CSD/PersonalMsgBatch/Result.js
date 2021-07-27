@@ -1,6 +1,6 @@
 import React from "react";
 import Pagination from './Pagination';
-import moment from 'moment';
+import moment from "moment-timezone";
 import { number_format, number_toFixed } from '../../../module/Formatting/NumberFormat';
 
 const dataColumnDefs = () => {
@@ -11,7 +11,7 @@ const dataColumnDefs = () => {
         { dataColumn: "author", columnTitle: "LastUpdateUser", },
         {
             dataColumn: "updateTime",
-            columnTitle: "LastUpdateTime",
+            columnTitle: "LastUpdateTime (Adjusted to GMT+8)",
             body: { format: dateFormat }
         },
         {

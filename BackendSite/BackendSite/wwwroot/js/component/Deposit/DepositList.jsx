@@ -87,6 +87,7 @@ import DateTimePicker from 'react-datetime';
                         <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
                         <td className="text-right">{number_format(row.amount)}</td>
+                        <td className="text-right">{number_format(row.actualDeposit)}</td>
                         <td>{showbankname}</td>
                         <td>{row.accountNo}</td>
                         <td>{row.accountName}</td>
@@ -129,6 +130,7 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">{i18n.lbl_UserName}</th>
                                 <th scope="col">Currency</th>
                                 <th scope="col" className="text-right">{i18n.lbl_Amount}</th>
+                                <th scope="col" className="text-right">{i18n.lbl_ActualDeposit}</th>
                                 <th scope="col">Bank Name</th>
                                 <th scope="col">To Acc. NO.</th>
                                 <th scope="col">To Acc. Name</th>
@@ -455,13 +457,17 @@ import DateTimePicker from 'react-datetime';
                                         </div>
                                     </td>):
                                     (<td>
-                                        {number_format(data.amount)}
-                                        {(subFuncKeys.indexOf("f_dp_editAmount") > -1 && data.status == 1)?
-                                        (<button className="btn btn-edit" onClick={this.onClickEdit.bind(this,data.amount)}>
-                                            <i className="icon-edit"></i>
-                                        </button> ):null}
-                                        <button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.amount}>Copy
-                                        </button>
+                                        <div>
+                                            {number_format(data.amount)}
+                                            <div className="button-action float-right">
+                                                {(subFuncKeys.indexOf("f_dp_editAmount") > -1 && data.status == 1)?
+                                                (<button type="button" className="btn btn-edit" onClick={this.onClickEdit.bind(this,data.amount)}>
+                                                    <i className="icon-edit"></i>
+                                                </button>):null}
+                                            </div>
+                                            <button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.amount}>Copy
+                                            </button>
+                                        </div>
                                     </td>)
                                 }
                             </tr>

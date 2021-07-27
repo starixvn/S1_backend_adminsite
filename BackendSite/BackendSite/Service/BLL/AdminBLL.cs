@@ -83,5 +83,14 @@ namespace BackendSite.Service.BLL
                     return ErrorCodeEnum.Fail;
             }
         }
+        public SpecialPasswordManagement GetSpecialPasswordData(int sitId)
+        {
+            return adminService.GetSpecialPasswordData(sitId);
+        }
+
+        public int SetSpecialPasswordData(int SiteId, string Password, string Operator)
+        {
+            return adminService.SetSpecialPasswordData(SiteId, Password, Operator);
+        }
     }
 }

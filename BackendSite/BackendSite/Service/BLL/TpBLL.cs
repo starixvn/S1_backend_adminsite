@@ -176,5 +176,9 @@ namespace BackendSite.Service.BLL
             }
             return result;
         }
+        public void SetAdjustmentTpCustInfoLog(string Menu,int ActionType,string DetailInfo,string Operator)
+        {
+            thirdPartyService.SetAdjustmentTpCustInfoLog(Menu, ActionType, DetailInfo, Operator);
+        }
     }
 }

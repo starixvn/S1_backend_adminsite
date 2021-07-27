@@ -1,5 +1,5 @@
 import { number_format } from "../../commJS/common";
-import moment from "moment";
+import moment from "moment-timezone";
 import Pagination from "./Pagination";
 
 const BonusInfoStatus = {
@@ -50,7 +50,7 @@ const Result = (props) => {
               <th scope="col">Locked Amount</th>
               <th scope="col">Rollover</th>
               <th scope="col">Turnover</th>
-              <th scope="col">ClaimDate</th>
+              <th scope="col">ClaimDate (Adjusted to GMT+8)</th>
               <th scope="col">Status</th>
               <th scope="col"></th>
             </tr>

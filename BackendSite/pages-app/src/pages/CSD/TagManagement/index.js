@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useReducer, useState } from "react";
 import ReactDOM from "react-dom";
 import WebAPI from "../../../module/WebAPI";
-import moment from "moment";
+import moment from "moment-timezone";
 import { api } from "../../../module/WebAPI";
 import Filter from "./Filter";
 import Result from "./Result";
 import Edit from "./Edit";
 
 const App = () => {
+  moment.tz.setDefault("Asia/Taipei");
   const [state, setstate] = useState(0);
   const [showAll, setshowAll] = useState([]);
   const [editData, seteditData] = useState({
@@ -17,9 +18,9 @@ const App = () => {
     Description: "",
   });
   const [stateDatas, setDatas] = useState({
-    PageInfo: null,
+    PageInfo: { pageNumber: 1 },
     Datas: null,
-    FilterInfo: null,
+    FilterInfo: { status: 0 },
   });
 
   const Create = () => {
@@ -34,7 +35,6 @@ const App = () => {
   };
 
   const ChangeColor = (color) => {
-    console.log(color);
     seteditData({
       ...editData,
       TagColour: color.hex,
@@ -89,9 +89,9 @@ const App = () => {
   };
 
   const ClickSubmit = () => {
-    let tempstatus=0;
+    let tempstatus = 0;
     if (showAll.length > 0) {
-      tempstatus=1;
+      tempstatus = 1;
     }
     let Data = {
       Status: tempstatus,
@@ -111,9 +111,44 @@ const App = () => {
               rowCount: res.data.rowCount,
             },
             Datas: [...res.data.data],
-            FilterInfo:{
-              status:tempstatus
-            }
+            FilterInfo: {
+              status: tempstatus,
+            },
+          });
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  };
+  const ChangePage = (PageNumber) => {
+    let tempstatus = 0;
+    if (showAll.length > 0) {
+      tempstatus = 1;
+    }
+    let Data = {
+      Status: tempstatus,
+      PageSize: parseInt(10),
+      PageNumber: parseInt(PageNumber),
+    };
+    api
+      .post("/api/CustManage/GetTagData", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          setDatas({
+            ...stateDatas,
+            PageInfo: {
+              ...stateDatas.PageInfo,
+              pageNumber: PageNumber,
+              totalPages: res.data.totalPages,
+              rowCount: res.data.rowCount,
+            },
+            Datas: [...res.data.data],
+            FilterInfo: {
+              status: tempstatus,
+            },
           });
         } else {
           alert(res.data.message ?? "failed to get data.");
@@ -152,7 +187,7 @@ const App = () => {
       });
   };
 
-  const Detail=(Data)=>{
+  const Detail = (Data) => {
     seteditData({
       ...editData,
       Id: Data.id,
@@ -161,9 +196,9 @@ const App = () => {
       Description: Data.description,
     });
     setstate(1);
-  }
+  };
 
-  const StatusChange=(value)=>{
+  const StatusChange = (value) => {
     if (window.confirm(`Are you sure change ${value.tagName} ?`)) {
       let Data = {
         Id: value.id,
@@ -181,7 +216,7 @@ const App = () => {
           alert(error);
         });
     }
-  }
+  };
   if (state === 0) {
     return (
       <div className="container-fluid">
@@ -197,6 +232,7 @@ const App = () => {
             Resubmit={Resubmit}
             Detail={Detail}
             StatusChange={StatusChange}
+            ChangePage={ChangePage}
           />
         )}
         <div className="row-flex">

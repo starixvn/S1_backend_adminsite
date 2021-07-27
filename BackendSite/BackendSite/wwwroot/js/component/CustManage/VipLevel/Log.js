@@ -1,4 +1,5 @@
 import { number_format } from '../../commJS/common';
+import moment from "moment-timezone";
 const Log = (props) => {
 
     let levelSettingArr = {};
@@ -28,7 +29,7 @@ const Log = (props) => {
                         <th scope="col">Old Level</th>
                         <th scope="col">New Level</th>
                         <th scope="col">Memo</th>
-                        <th scope="col">Operating time {moment().format('(Z)')}</th>
+                        <th scope="col">Operating time (Adjusted to GMT+8)</th>
                         <th scope="col">Operator</th>
                     </tr>
                 </thead>

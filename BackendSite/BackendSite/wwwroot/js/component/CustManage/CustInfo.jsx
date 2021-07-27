@@ -19,6 +19,7 @@ import SetCustStatusNote from './SetCustStatusNote/PopboxContentSetNote.js';
 import { DepositInfoPagination } from './CustInfo_DepositInfoPagination.jsx';
 import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
 import Tag from './Tag/index';
+import { NewPagination } from '../commJS/NewPagination.jsx';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -95,7 +96,7 @@ import Tag from './Tag/index';
         render() {
             let rows = this.props.searchData.data.map(row =>
                 <tr key={row.transId}>
-                    <td>{moment(row.createTime).format('l LTS')}</td>
+                    <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                     <th scope="row">{row.transId}</th>
                     <td>{i18n["lbl_DepositType" + row.depositType]}</td>
                     <td className="text-right">{number_format(row.amount)}</td>
@@ -103,8 +104,8 @@ import Tag from './Tag/index';
                     <td>{row.accountName}</td>
                     <td>{DepositStatusOp[row.status]}</td>
                     <td>{row.refId}</td>
-                    <td>{moment(row.depositTime).format('l LTS')}</td>
-                    <td>{moment(row.updateTime).format('l LTS')}</td>
+                    <td>{moment.utc(row.depositTime).add(8,'hour').format('l LTS')}</td>
+                    <td>{moment.utc(row.updateTime).add(8,'hour').format('l LTS')}</td>
                 </tr>
             );
 
@@ -118,7 +119,7 @@ import Tag from './Tag/index';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">CreateTime {moment().format('(Z)')}</th>
+                                <th scope="col">CreateTime (Adjusted to GMT+8)</th>
                                 <th scope="col">Trxn.ID</th>
                                 <th scope="col">Deposit Type</th>
                                 <th scope="col" className="text-right">Amount</th>
@@ -126,8 +127,8 @@ import Tag from './Tag/index';
                                 <th scope="col">To Acc. Name</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">RefId</th>
-                                <th scope="col">DepositTime {moment().format('(Z)')}</th>
-                                <th scope="col">UpdateTime {moment().format('(Z)')}</th>
+                                <th scope="col">DepositTime (Adjusted to GMT+8)</th>
+                                <th scope="col">UpdateTime (Adjusted to GMT+8)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -174,7 +175,8 @@ import Tag from './Tag/index';
 
         handleSubmit(event) {
             event.preventDefault();
-            this.props.onChangeValue("DepositList", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, Status: this.state.DepositStatus === 0 ? null : parseInt(this.state.DepositStatus) });
+            this.props.onChangeValue("DepositList", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, Status: parseInt(this.state.DepositStatus) === 0 ? null : parseInt(this.state.DepositStatus),
+                                    UTCStartDate:moment.utc(this.startDate.current.value).unix(),UTCEndDate:moment.utc(this.endDate.current.value).add(1, 'days').unix()-1 });
             this.props.GetDepositListByCust(1);
         }
 
@@ -217,6 +219,7 @@ import Tag from './Tag/index';
                             </div>
                         </div>
                         <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
+                        <div>(Adjusted to GMT+8)</div>
                     </form>
                     {searchData != null ? <DepositList searchData={searchData} ChangePage={this.props.GetDepositListByCust} /> : null}
                 </div>
@@ -245,7 +248,7 @@ import Tag from './Tag/index';
         render() {
             let rows = this.props.searchData.data.map(row =>
                 <tr key={row.id}>
-                    <td>{moment(row.createTime).format('l LTS')}</td>
+                    <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                     <td>{row.typeName ? row.typeName : "N/A"}</td>
                     <td className="text-right">{Direction[row.direction] + number_format(row.changeBonus)}</td>
                     <td className="text-right">{number_format(row.beforeBonus)}</td>
@@ -265,7 +268,7 @@ import Tag from './Tag/index';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">Time {moment().format('(Z)')}</th>
+                                <th scope="col">Time (Adjusted to GMT+8)</th>
                                 <th scope="col">Type</th>
                                 <th scope="col" className="text-right">Change Bonus</th>
                                 <th scope="col" className="text-right">Before Bonus</th>
@@ -278,7 +281,7 @@ import Tag from './Tag/index';
                             {rows}
                         </tbody>
                     </table>
-                    <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                    <NewPagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
                 </div>
             )
         }
@@ -321,7 +324,8 @@ import Tag from './Tag/index';
 
         handleSubmit(event) {
             event.preventDefault();
-            this.props.onChangeValue("BonusLog", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, RefTransId: this.state.RefTransId.trim() == '' ? null : this.state.RefTransId, PromoCategoryId: this.state.PromotionCategory == '' ? null : parseInt(this.state.PromotionCategory) });
+            this.props.onChangeValue("BonusLog", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, RefTransId: this.state.RefTransId.trim() == '' ? null : this.state.RefTransId, PromoCategoryId: this.state.PromotionCategory == '' ? null : parseInt(this.state.PromotionCategory),
+                                    UTCStartDate:moment.utc(this.startDate.current.value).unix(),UTCEndDate:moment.utc(this.endDate.current.value).add(1, 'days').unix()-1 });
             this.props.GetBonusLog(1);
         }
 
@@ -378,6 +382,7 @@ import Tag from './Tag/index';
                             </div>
                         </div>
                         <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
+                        <div>(Adjusted to GMT+8)</div>
                     </form>
                     {searchData != null ? <BonusLogList searchData={searchData} ChangePage={this.props.GetBonusLog} /> : null}
                 </div>
@@ -444,7 +449,7 @@ import Tag from './Tag/index';
         render() {
             let rows = this.props.searchData.data.map(row =>
                 <tr key={row.id}>
-                    <td>{moment(row.createTime).format('l LTS')}</td>
+                    <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                     <td>{row.categoryName }</td>
                     <td className="text-right">{number_format(row.rcRedeemAmount)}</td>
                     <td>{row.refId}</td>
@@ -461,7 +466,7 @@ import Tag from './Tag/index';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                            <th scope="col">Time {"+08:00"}</th>  
+                            <th scope="col">Time (Adjusted to GMT+8)</th>  
                             <th scope="col">Category</th>
                             <th scope="col" className="text-right">Redeem Amount</th>
                             <th scope="col">RefId</th>                            
@@ -486,17 +491,19 @@ import Tag from './Tag/index';
         ChangePage(pageNumber) {
             this.props.ChangePage(pageNumber);
         }
-
+    
         render() {
             let rows = this.props.searchData.data.map((row, idx) =>
-                <tr key={idx}>
+                <tr key={idx}>             
                     <th>{row.userName}</th>
                     <th>{row.currency}</th>
-                    <th>{row.registerDate}</th>
+                    <th>{moment.utc(row.registerDate).add(8,'hour').format('l LTS')}</th>
+                    {/* <th>{row.registerDate}</th> */}
                     <th>{row.totalDeposit}/{row.depositC}</th>
                     <th>{row.totalBet}/{row.vaildBetC}</th>
                     <th>{row.bonusAmount}</th>
-                    <th>{row.rewardTime}</th>
+                    {/* <th>{row.rewardTime}</th> */}
+                    <th>{row.rewardTime ? moment.utc(row.rewardTime).add(8,'hour').format('l LTS') : null}</th>
                     <th>{row.statusName}</th>
                 </tr>
             );
@@ -508,11 +515,11 @@ import Tag from './Tag/index';
                             <tr>
                                 <th scope="col">UserName</th>
                                 <th scope="col">Currency</th>
-                                <th scope="col">Reg Time</th>
+                                <th scope="col">Reg Time (Adjusted to GMT+8)</th>
                                 <th scope="col">TotalDeposit</th>
                                 <th scope="col">TotalBet</th>
                                 <th scope="col">Reward Amount</th>
-                                <th scope="col">Reward Time</th>
+                                <th scope="col">Reward Time (Adjusted to GMT+8)</th>
                                 <th scope="col">Status</th>
                             </tr>
                         </thead>
@@ -520,7 +527,7 @@ import Tag from './Tag/index';
                             {rows}
                         </tbody>
                     </table>
-                    <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                    <NewPagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
                 </div>
             )
 
@@ -563,7 +570,8 @@ import Tag from './Tag/index';
 
         handleSubmit(event) {
             event.preventDefault();
-            this.props.onChangeValue("RebateLog", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1 });
+            this.props.onChangeValue("RebateLog", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1,
+                                    UTCStartDate:moment.utc(this.startDate.current.value).unix(),UTCEndDate:moment.utc(this.endDate.current.value).add(1, 'days').unix()-1 });
             this.props.GetRebateLog(1);
         }
 
@@ -594,6 +602,7 @@ import Tag from './Tag/index';
                             </div>
                         </div>
                         <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
+                        <div>(Adjusted to GMT+8)</div>
                     </form>
                     {searchData != null ? <RebateLogList searchData={searchData} ChangePage={this.props.GetRebateLog} /> : null}
                 </div>
@@ -646,7 +655,7 @@ import Tag from './Tag/index';
         render() {
             let rows = this.props.searchData.data.map(row =>
                 <tr key={row.id}>
-                    <td>{moment(row.createTime).format('l LTS')}</td>
+                    <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                     <td>{row.typeName}</td>
                     <td className="text-right">{Direction[row.direction] + number_format(row.changeAmount)}</td>
                     <td className="text-right">{number_format(row.beforeAmount)}</td>
@@ -666,7 +675,7 @@ import Tag from './Tag/index';
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">Time {moment().format('(Z)')}</th>
+                                <th scope="col">Time (Adjusted to GMT+8)</th>
                                 <th scope="col">Type</th>
                                 <th scope="col" className="text-right">Change Amount</th>
                                 <th scope="col" className="text-right">Before Amount</th>
@@ -679,7 +688,7 @@ import Tag from './Tag/index';
                             {rows}
                         </tbody>
                     </table>
-                    <Pagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
+                    <NewPagination Data={{ ...this.props.searchData }} ChangePage={this.props.ChangePage} />
                 </div>
             )
         }
@@ -720,7 +729,8 @@ import Tag from './Tag/index';
 
         handleSubmit(event) {
             event.preventDefault();
-            this.props.onChangeValue("FinancialLog", { StartDate: moment(this.startDate.current.state.inputValue).unix(), EndDate: moment(this.endDate.current.state.inputValue).unix(), RefTransId: this.state.RefTransId.trim() == '' ? null : this.state.RefTransId });
+            this.props.onChangeValue("FinancialLog", { StartDate: moment(this.startDate.current.state.inputValue).unix(), EndDate: moment(this.endDate.current.state.inputValue).unix(), RefTransId: this.state.RefTransId.trim() == '' ? null : this.state.RefTransId,
+                                    UTCStartDate:moment.utc(this.startDate.current.state.inputValue).unix(),UTCEndDate:moment.utc(this.endDate.current.state.inputValue).add(1, 'days').unix()-1 });
             this.props.GetFinancialLog(1);
         }
 
@@ -745,6 +755,7 @@ import Tag from './Tag/index';
                             </div>
                         </div>
                         <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
+                        <div>(Adjusted to GMT+8)</div>
                     </form>
                     {searchData != null ? <FinancialLogList searchData={searchData} ChangePage={this.props.GetFinancialLog} /> : null}
                 </div>
@@ -1327,9 +1338,9 @@ import Tag from './Tag/index';
                             {data.status == 1 && data.agent != null && subFuncKeys.indexOf("ca_acc_lock") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"lock")}>Lock</button> : null}
                             {(data.status == 1 || data.status == 2 || data.status == 4) && data.agent != null && subFuncKeys.indexOf("ca_acc_close") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"closed")}>Closed</button> : null}
                             {(data.status == 2 || data.status == 4) && data.agent != null && subFuncKeys.indexOf("ca_unlock") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"unlock")}>Unlock</button> : null}
-                            <button className="btn btn-primary" onClick={this.setReason.bind(this,"kickout")}>KickOut</button>
-                            {(data.enablePromotion == 0) ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,1)}>Enable Promotion</button>:null}
-                            {(data.enablePromotion == 1) ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,0)}>Disable Promotion</button>:null}
+                            {subFuncKeys.indexOf("ca_kickout") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"kickout")}>KickOut</button> : null}
+                            {(data.enablePromotion == 0) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,1)}>Enable Promotion</button> : null}
+                            {(data.enablePromotion == 1) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,0)}>Disable Promotion</button> : null}
                         </div>
                         <div className="flex-wrap">
                             <table className="table table-detail ">
@@ -1377,56 +1388,12 @@ import Tag from './Tag/index';
                                         <th scope="row">Point Level</th>
                                         <td>{data.vipLevel}</td>
                                     </tr>
-                                    {(data.siteName == "Nova88") ?
-                                        <tr>
-                                            <th scope="row">
-                                                Vip Level&nbsp;<span class="status status-pending">New</span>
-                                            </th>
-                                            <td>{data.levelName}</td>
-                                        </tr>
-                                        :
-                                        <>
-                                            <tr>
-                                                <th scope="row">User Level</th>
-                                                {
-                                                    this.props.isEdit.Level ? (
-                                                        <td>
-                                                            <input type="number" min="1" defaultValue={data.userLevel} onChange={(e) => this.props.editOnChange(e.target.value, "Level")} />
-                                                            <div className="button-action float-right">
-                                                                <button className="btn btn-save" onClick={this.props.editUpdate}>
-                                                                    <i className="icon-save"></i>
-                                                                </button>
-                                                                <button className="btn btn-icon-cancel" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Level, "Level")}>
-                                                                    <i className="icon-cancel"></i>
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    ) : (
-                                                            <td>
-                                                                {data.userLevel}
-                                                                {
-                                                                    subFuncKeys.includes('ca_userEdit') ? (
-                                                                        <div className="button-action float-right">
-                                                                            <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Level, "Level")}>
-                                                                                <i className="icon-edit"></i>
-                                                                            </button>
-                                                                        </div >
-                                                                    ) : null
-                                                                }
-                                                            </td>
-                                                        )
-                                                }
-                                            </tr>
-                                            <tr>
-                                                <th scope="row">Point Level</th>
-                                                <td>{data.pointLevel}</td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row">Vip Level</th>
-                                                <td>{data.vipLevel}</td>
-                                            </tr>
-                                        </>
-                                    }
+                                    <tr>
+                                        <th scope="row">
+                                            Vip Level&nbsp;<span class="status status-pending">New</span>
+                                        </th>
+                                        <td>{data.levelName}</td>
+                                    </tr>
                                     <tr>
                                         <th scope="row">Currency</th>
                                         <td>{i18n["lbl_Currency" + data.currencyId]}</td></tr>
@@ -1633,20 +1600,20 @@ import Tag from './Tag/index';
                                         <td>{CustStatusOp[data.status]}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Registration Time</th>
-                                        <td>{moment(data.regTime).format('l LTS (Z)')}</td>
+                                        <th scope="row">Registration Time (Adjusted to GMT+8)</th>
+                                        <td>{moment.utc(data.regTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Last Login Time</th>
-                                        <td>{moment(data.lastLoginTime).format('l LTS (Z)')}</td>
+                                        <th scope="row">Last Login Time (Adjusted to GMT+8)</th>
+                                        <td>{moment.utc(data.lastLoginTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">First Deposit Time</th>
+                                        <th scope="row">First Deposit Time (Adjusted to GMT+8)</th>
                                         <td>{data.firstDepositTime}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Last Activity Time</th>
-                                        <td>{(typeof data.reloadTime === 'undefined') ? "N/A" : moment(data.reloadTime).format('l LTS (Z)')}</td>
+                                        <th scope="row">Last Activity Time (Adjusted to GMT+8)</th>
+                                        <td>{(typeof data.reloadTime === 'undefined') ? "N/A" : moment.utc(data.reloadTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Last Activity IP</th>
@@ -1692,7 +1659,7 @@ import Tag from './Tag/index';
                                         <td>{number_format(data.balance)}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Last Deposit Time</th>
+                                        <th scope="row">Last Deposit Time (Adjusted to GMT+8)</th>
                                         <td>{data.lastDepositTime}</td>
                                     </tr>
                                     <tr>
@@ -1700,7 +1667,7 @@ import Tag from './Tag/index';
                                         <td>{number_format(data.depositSum)}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Last Withdrawal Time</th>
+                                        <th scope="row">Last Withdrawal Time (Adjusted to GMT+8)</th>
                                         <td>{data.lastWithdrawlTime}</td>
                                     </tr>
                                     <tr>
@@ -1732,7 +1699,7 @@ import Tag from './Tag/index';
                                         <td>{number_format(elgibleWithdrawal)}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Last Betting Time</th>
+                                        <th scope="row">Last Betting Time (Adjusted to GMT+8)</th>
                                         <td>{data.lastBettingTime}</td>
                                     </tr>
                                     <tr>
@@ -1839,9 +1806,14 @@ import Tag from './Tag/index';
             Loading.OnLoading();
             let pageNumber = PageNumber || this.state.BonusLogData.pageNumber;
             let CustId = getUrlParameter("custId");
+            const {UTCStartDate,UTCEndDate,PromoCategoryId} = this.state.BonusLog;
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
-                axios.post('/api/Payment/GetBonusLog', { ...this.state.BonusLog, CustId: iCustId, PageNumber: pageNumber })
+                axios.post('/api/Payment/GetBonusLog', { StartDate: UTCStartDate,
+                                                        EndDate: UTCEndDate, 
+                                                        CustId: iCustId, 
+                                                        PageNumber: pageNumber,
+                                                        PromoCategoryId: PromoCategoryId})
                     .then(function (response) {
                         Loading.UnLoading();
                         let result = response.data;
@@ -1882,9 +1854,13 @@ import Tag from './Tag/index';
             Loading.OnLoading();
             let pageNumber = PageNumber || this.state.RebateLogData.pageNumber;
             let CustId = getUrlParameter("custId");
+            const {UTCStartDate,UTCEndDate} = this.state.RebateLog;
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
-                axios.post('/api/Payment/GetVipRebateInfoListByCustId', { ...this.state.RebateLog, CustId: iCustId, PageNumber: pageNumber })
+                axios.post('/api/Payment/GetVipRebateInfoListByCustId', { StartDate: UTCStartDate,
+                                                                        EndDate: UTCEndDate, 
+                                                                        CustId: iCustId, 
+                                                                        PageNumber: pageNumber })
                     .then(function (response) {
                         Loading.UnLoading();
                         let result = response.data;
@@ -1926,9 +1902,13 @@ import Tag from './Tag/index';
             Loading.OnLoading();
             let pageNumber = PageNumber || this.state.FinancialLogData.pageNumber;
             let CustId = getUrlParameter("custId");
+            const {UTCStartDate,UTCEndDate} = this.state.FinancialLog;
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
-                axios.post('/api/Payment/GetFinancialLog', { ...this.state.FinancialLog, CustId: iCustId, PageNumber: pageNumber })
+                axios.post('/api/Payment/GetFinancialLog', { StartDate: UTCStartDate,
+                                                            EndDate: UTCEndDate, 
+                                                            CustId: iCustId, 
+                                                            PageNumber: pageNumber })
                     .then(function (response) {
                         Loading.UnLoading();
                         let result = response.data;
@@ -1947,9 +1927,13 @@ import Tag from './Tag/index';
         GetDepositListByCust(PageNumber) {
             let pageNumber = PageNumber || this.state.DepositListData.pageNumber;
             let CustId = getUrlParameter("custId");
+            const {UTCStartDate,UTCEndDate} = this.state.DepositList;
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
-                axios.post('/api/Deposit/GetDepositListByCust', { ...this.state.DepositList, CustId: iCustId, PageNumber: pageNumber })
+                axios.post('/api/Deposit/GetDepositListByCust', { StartDate: UTCStartDate,
+                                                                EndDate: UTCEndDate, 
+                                                                CustId: iCustId, 
+                                                                PageNumber: pageNumber })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1968,9 +1952,13 @@ import Tag from './Tag/index';
         GetWithdrawalListByCust(PageNumber) {
             let pageNumber = PageNumber || this.state.WithdrawalListData.pageNumber;
             let CustId = getUrlParameter("custId");
+            const {UTCStartDate,UTCEndDate} = this.state.WithdrawalInfo;
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
-                axios.post('/api/Withdrawal/GetWithdrawalListByCust', { ...this.state.WithdrawalInfo, CustId: iCustId, PageNumber: pageNumber })
+                axios.post('/api/Withdrawal/GetWithdrawalListByCust', { StartDate: UTCStartDate,
+                                                                    EndDate: UTCEndDate, 
+                                                                    CustId: iCustId, 
+                                                                    PageNumber: pageNumber })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1989,9 +1977,13 @@ import Tag from './Tag/index';
         GetTpTransferInfoByCust(PageNumber) {
             let pageNumber = PageNumber || this.state.TpTransferInfoData.pageNumber;
             let CustId = getUrlParameter("custId");
+            const {UTCStartDate,UTCEndDate} = this.state.TpTransferInfo;
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
-                axios.post('/api/Tp/GetTpTransferInfoByCust', { ...this.state.TpTransferInfo, CustId: iCustId, PageNumber: pageNumber })
+                axios.post('/api/Tp/GetTpTransferInfoByCust', { StartDate: UTCStartDate,
+                                                            EndDate: UTCEndDate, 
+                                                            CustId: iCustId, 
+                                                            PageNumber: pageNumber })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -2011,9 +2003,13 @@ import Tag from './Tag/index';
             Loading.OnLoading();
             let pageNumber = PageNumber || this.state.AdjustmentInfoData.pageNumber;
             let CustId = getUrlParameter("custId");
+            const {UTCStartDate,UTCEndDate} = this.state.AdjustmentInfo;
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
-                axios.post('/api/PaymentAdjustmentInfo/GetAdjustmentInfoByCust', { ...this.state.AdjustmentInfo, CustId: iCustId, PageNumber: pageNumber })
+                axios.post('/api/PaymentAdjustmentInfo/GetAdjustmentInfoByCust', { StartDate: UTCStartDate,
+                                                                                EndDate: UTCEndDate, 
+                                                                                CustId: iCustId, 
+                                                                                PageNumber: pageNumber })
                     .then(function (response) {
                         Loading.UnLoading();
                         let result = response.data;
@@ -2032,9 +2028,13 @@ import Tag from './Tag/index';
         GetLoginLogByCust(PageNumber) {
             let pageNumber = PageNumber || this.state.LoginLogData.pageNumber;
             let CustId = getUrlParameter("custId");
+            const {UTCStartDate,UTCEndDate} = this.state.LoginLog;
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
-                axios.post('/api/CustManage/GetLoginLogByCust', { ...this.state.LoginLog, CustId: iCustId, PageNumber: pageNumber })
+                axios.post('/api/CustManage/GetLoginLogByCust', {StartDate: UTCStartDate,
+                                                                EndDate: UTCEndDate,
+                                                                CustId: iCustId, 
+                                                                PageNumber: pageNumber })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -2053,9 +2053,13 @@ import Tag from './Tag/index';
         GetAdminUserLogByCust(PageNumber) {
             let pageNumber = PageNumber || this.state.AdminUserLogData.pageNumber;
             let CustId = getUrlParameter("custId");
+            const {UTCStartDate,UTCEndDate} = this.state.AdminUserLog;
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
-                axios.post('/api/Common/GetAdminOperateLog', { ...this.state.AdminUserLog, CustId: iCustId, PageNumber: pageNumber })
+                axios.post('/api/Common/GetAdminOperateLog', { StartDate: UTCStartDate,
+                                                            EndDate: UTCEndDate, 
+                                                            CustId: iCustId, 
+                                                            PageNumber: pageNumber })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;

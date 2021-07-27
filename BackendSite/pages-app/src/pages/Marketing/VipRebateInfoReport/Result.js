@@ -1,6 +1,6 @@
 import React from "react";
 import Pagination from "./Pagination";
-import moment from "moment";
+import moment from "moment-timezone";
 import {
   number_format,
   number_toFixed,
@@ -37,7 +37,7 @@ const dataColumnDefs = () => {
     { dataColumn: "refId", columnTitle: "RefId" },
     {
       dataColumn: "createTime",
-      columnTitle: "CreateTime",
+      columnTitle: "CreateTime (Adjusted to GMT+8)",
       body: {
         format: dateFormat,
       },
@@ -140,7 +140,7 @@ const numberFormat = (number) => {
   return number_format(number_toFixed(number, 2));
 };
 const dateFormat = (createTime) => {
-  return moment(createTime).format("l LTS");
+  return moment(createTime).add(8,'hour').format("l LTS");
 };
 
 export default Panel;

@@ -182,7 +182,7 @@ namespace BackendSite.Service.DAL
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var depositList = conn.Query<LoginLog>("Admin_LoginLogByCust_Get", p, commandType: CommandType.StoredProcedure);
+            var depositList = conn.Query<LoginLog>("Admin_LoginLogByCustV2_Get", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -283,7 +283,7 @@ namespace BackendSite.Service.DAL
             props.Add("ActStatus", Deposit);
             props.Add("DayInactive", DormantUser);
             props.Add("CallOutStatus", CallOut);
-            var result = conn.Query<CustTele>("Admin_CustTeleSearchV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var result = conn.Query<CustTele>("Admin_CustTeleSearchV3_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             result.ForEach(x =>
             {
@@ -363,7 +363,7 @@ namespace BackendSite.Service.DAL
             props.Add("CallOutStatus", CallOut);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var tempresult = conn.Query<CustTeleExportTemp>("Admin_CustTeleExportV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var tempresult = conn.Query<CustTeleExportTemp>("Admin_CustTeleExportV3_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             tempresult.ForEach(x =>
             {
@@ -451,7 +451,7 @@ namespace BackendSite.Service.DAL
             props.Add("PageSize", pageSize);
             props.Add("Status", status);
 
-            var result = _reportDbClient.Query<TagData>("Admin_Tag_Get", props);
+            var result = _reportDbClient.Query<TagData>("Admin_TagV2_Get", props);
 
             SearchResult.TagDatas = result.ToList();
             SearchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;

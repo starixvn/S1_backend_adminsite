@@ -57,7 +57,7 @@ export class Notes extends React.Component {
                                     )}
                                 <p className="author">
                                     <span className="user" style={{ paddingRight: "10px" }}>{note.operator}</span>
-                                    <span className="date">{(note.updateTime) ? moment(note.updateTime).format('l LTS (Z)') : moment(note.createTime).format('l LTS (Z)')}</span>
+                                    <span className="date">{(note.updateTime) ? moment.utc(note.updateTime).add(8,'hour').format('l LTS') : moment.utc(note.createTime).add(8,'hour').format('l LTS')}</span>
                                 </p>
                                 <p id="fonts-wrapper">
                                     {

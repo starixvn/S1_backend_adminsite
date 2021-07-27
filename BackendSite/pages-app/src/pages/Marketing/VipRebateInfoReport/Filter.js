@@ -1,5 +1,5 @@
 import React from "react";
-import moment from "moment";
+import moment from "moment-timezone";
 import DateTimePicker from "react-datetime";
 
 const defCurrencyType = {
@@ -9,16 +9,6 @@ const defCurrencyType = {
   15: "IDR",
   51: "VND",
   61: "INR",
-};
-const defCategoryType = {
-  1: "Sports",
-  2: "Slots",
-  3: "Live Casino",
-  4: "Fishing",
-  5: "Cockfighting",
-  6: "Lottery",
-  7: "Virtual Sports",
-  8: "Poker",
 };
 const defDateType = {
   0: "",
@@ -139,16 +129,6 @@ const Panel = (props) => {
           dataColumn="DateQuickPicker"
           onChange={props.datePickeronChange}
         />
-        <DropDownBox
-          columnTitle="Rebate Categories"
-          options={Object.keys(defCategoryType).map((key) => {
-            return { value: key, displayText: defCategoryType[key] };
-          })}
-          hasAll={true}
-          selectedValue={0}
-          dataColumn="RebateCategories"
-          onChange={props.onChange}
-        />
         <div className="button-group">
           <button
             className="btn btn-search"
@@ -158,6 +138,7 @@ const Panel = (props) => {
             Submit
           </button>
         </div>
+        <div> (Adjusted to GMT+8)</div>
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import Result from "./Result";
 import WebAPI from "../../../module//WebAPI";
 import EditPanel from "./Edit";
-import moment from "moment";
+import moment from "moment-timezone";
 import qs from "qs";
 
 const defaultModel = {
@@ -16,6 +16,7 @@ const defaultModel = {
 };
 
 const App = () => {
+  moment.tz.setDefault("Asia/Taipei");
   const [stateDatas, updateDatas] = useState({
     Datas: null,
     PageInfo: null,

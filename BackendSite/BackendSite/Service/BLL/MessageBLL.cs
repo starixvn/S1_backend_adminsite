@@ -1,9 +1,7 @@
-﻿using BackendSite.Service.DAL;
-using BackendSite.Service.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using BackendSite.Service.DAL;
+using BackendSite.Service.Model;
 namespace BackendSite.Service.BLL
 {
     public class MessageBLL
@@ -97,8 +95,9 @@ namespace BackendSite.Service.BLL
         {
             return messageService.GetBatchMessageList(SelectSite, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
         }
-
-
-
+        public async Task<ApiResult> SendSMSMessageToPlayer(int CustId)
+        {
+            return await messageService.SendSMSMessageToPlayerAsync(CustId);
+        }
     }
 }

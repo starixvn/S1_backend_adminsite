@@ -211,6 +211,16 @@
       },
       {
         "Key": "",
+        "Title": "Withdrawal Accounting",
+        "FuncKey": "Finance/WithdrawalAccountingList",
+        "Controller": "Finance",
+        "Action": "WithdrawalAccountingList",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
         "Title": "Balance Adjustment",
         "FuncKey": "Finance/PaymentAdjustment",
         "Controller": "Finance",
@@ -328,6 +338,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "AdjustmentLogReport",
+        "Title": "Adjustment Log Report",
+        "FuncKey": "Finance/AdjustmentLogReport",
+        "Controller": "Finance",
+        "Action": "AdjustmentLogReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
@@ -353,6 +373,16 @@
         "FuncKey": "Admin/UserAuthoritySetting",
         "Controller": "Admin",
         "Action": "UserAuthoritySetting",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "SpecialPasswordManagement",
+        "Title": "Special Password Management",
+        "FuncKey": "Admin/SpecialPasswordManagement",
+        "Controller": "Admin",
+        "Action": "SpecialPasswordManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null

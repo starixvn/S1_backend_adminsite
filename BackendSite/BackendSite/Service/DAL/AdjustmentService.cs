@@ -5,6 +5,7 @@ using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -159,7 +160,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int SetAdjustWithdrawalLimit(AdjustWithdrawalLimit withdrawalLimitInfo, string UserName, int CurrencyId, int SiteId)
+        public int SetAdjustWithdrawalLimit(AdjustWithdrawalLimit withdrawalLimitInfo, string UserName, int CurrencyId, int SiteId, string Operator)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
@@ -208,6 +209,22 @@ namespace BackendSite.Service.DAL
                 {
                     decimal amount = withdrawalLimitInfo.AdjustType == 2 ? withdrawalLimitInfo.Amount * -1 : withdrawalLimitInfo.Amount;
                     withdrawalLimitService.SetWithdrawalLimit(withdrawalLimitInfo.CustId, UserName, SiteId, amount, withdrawalLimitInfo.Memo, transId, out decimal AfterAmount, conn, trans);
+
+                    #region propsLog
+                    DynamicParameters propsLog = new DynamicParameters();
+                    var list = new Dictionary<string, string>();
+                    foreach (var paraName in p.ParameterNames)
+                    {
+                        var value = Convert.ToString(p.Get<dynamic>(paraName));
+                        list.Add(paraName, value);
+                    }
+                    propsLog.Add("Menu", "WithdrawalLimitAdjustment");
+                    propsLog.Add("ActionType", 1);
+                    propsLog.Add("DetailInfo", JsonConvert.SerializeObject(list));
+                    propsLog.Add("Operator", Operator);
+                    #endregion
+
+                    conn.Execute("Admin_AdjustmentInfoLog_Set", propsLog, trans, commandType: CommandType.StoredProcedure);
                     trans.Commit();
                     return 0;
                 }
