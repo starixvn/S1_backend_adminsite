@@ -1,23 +1,27 @@
-﻿using BackendSite.Service.Model;
+﻿using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.DAL
 {
     public class MessageService
     {
         private readonly IConfiguration configuration;
+        private readonly string commonServiceUrl;
+        private readonly CourierAdapter courierAdapter;
 
-        public MessageService(IConfiguration configuration)
+        public MessageService(IConfiguration configuration, CourierAdapter courierAdapter)
         {
             this.configuration = configuration;
+            commonServiceUrl = configuration.GetValue<string>("CommonService");
+            this.courierAdapter = courierAdapter;
         }
 
         public int SendMessageToPlayer(int siteId, string sender, string title, string content, int custId, string CustUserName, string lang)
@@ -230,6 +234,11 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-
+        public async Task<ApiResult> SendSMSMessageToPlayerAsync(int CustId)
+        {
+            string apiUrl = $"{commonServiceUrl}OTPSMS/SendSMS";
+            ApiResult apiResult = await courierAdapter.MyPostAsync<IEnumerable<FireBaseReturn>, dynamic>(apiUrl, new { CustId });
+            return apiResult;
+        }
     }
 }
