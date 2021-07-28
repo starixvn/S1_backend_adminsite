@@ -20,6 +20,7 @@ namespace BackendSite.Service.Model
         public int BankId { set; get; }
         public string AccountName { set; get; }
         public string AccountNo { set; get; }
+        public string IFSCCode { set; get; }
         public decimal MinAmount { set; get; }
         public decimal MaxAmount { set; get; }
         public decimal DailyLimitAmount { set; get; }

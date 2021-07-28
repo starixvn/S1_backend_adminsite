@@ -6,12 +6,17 @@ export class BankLog extends React.Component {
         this.props.GetBankLog();
     }
     render() {
+        
+        console.log(this.props);
         let rows = this.props.searchData.length != 0 ? this.props.searchData.map((row, idx) => {
             return (
                 <tr key={"data-" + idx}>
                     <th>{row.bankName}</th>
                     <th>{row.accountName}</th>
                     <th>{row.accountNum}</th>
+                    { this.props.CurrencyId == 61 ?
+                        <th>{row.ifscCode}</th>
+                    :null}          
                     <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                 </tr>
             );
@@ -25,7 +30,10 @@ export class BankLog extends React.Component {
                             <th scope="col">BankName</th>
                             <th scope="col">AccountName</th>
                             <th scope="col">AccountNum</th>
-                            <th scope="col">Create Time</th>
+                            { this.props.CurrencyId == 61 ?
+                                <th scope="col">IFSC Code</th>
+                            :null}
+                            <th scope="col">Create Time (Adjusted to GMT+8)</th>
                         </tr>
                     </thead>
                     <tbody>

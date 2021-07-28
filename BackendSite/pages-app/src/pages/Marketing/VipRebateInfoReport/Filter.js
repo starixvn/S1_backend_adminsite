@@ -1,5 +1,5 @@
 import React from "react";
-import moment from "moment";
+import moment from "moment-timezone";
 import DateTimePicker from "react-datetime";
 
 const defCurrencyType = {
@@ -138,6 +138,7 @@ const Panel = (props) => {
             Submit
           </button>
         </div>
+        <div> (Adjusted to GMT+8)</div>
       </div>
     </div>
   );

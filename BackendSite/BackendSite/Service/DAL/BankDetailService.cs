@@ -79,6 +79,55 @@ namespace BackendSite.Service.DAL
             }
             return result;
         }
+
+        public int SetBankCardwithIFSC(int siteId, int SysId, string BankAccountName, string BankAccountNo, string IFSC, decimal MinAmount, decimal MaxAmount, decimal DailyLimitAmount, int PointLevel, int Purpose, int Status, int Sort, string Operator)
+        {
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            DynamicParameters props = new DynamicParameters();
+            DynamicParameters propsLog = new DynamicParameters();
+
+            #region props
+            props.Add("SiteId", siteId);
+            props.Add("SysId", SysId);
+            props.Add("BankAccountName", BankAccountName);
+            props.Add("BankAccountNo", BankAccountNo);
+            props.Add("IFSCCode", IFSC);
+            props.Add("MinAmount", MinAmount);
+            props.Add("MaxAmount", MaxAmount);
+            props.Add("DailyLimitAmount", DailyLimitAmount);
+            props.Add("PointLevel", PointLevel);
+            props.Add("Purpose", Purpose);
+            props.Add("Status", Status);
+            props.Add("Sort", Sort);
+            #endregion
+
+            #region propsLog
+            var list = new Dictionary<string, string>();
+            foreach (var paraName in props.ParameterNames)
+            {
+                var value = Convert.ToString(props.Get<dynamic>(paraName));
+                list.Add(paraName, value);
+            }
+            propsLog.Add("Menu", "BankCardManagement");
+            propsLog.Add("ActionType", 1);
+            propsLog.Add("DetailInfo", JsonConvert.SerializeObject(list));
+            propsLog.Add("Operator", Operator);
+            #endregion
+
+            _mainDbClient.Execute("BankCardwithIFSC_Set", props, trans);
+            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, trans);
+            if (result > 0)
+            {
+                trans.Commit();
+            }
+            else
+            {
+                trans.Rollback();
+            }
+            return result;
+        }
         public int DelBankCard(int siteId, int bankId, string Operator)
         {
             using var conn = new MySqlConnection(_connectionString);

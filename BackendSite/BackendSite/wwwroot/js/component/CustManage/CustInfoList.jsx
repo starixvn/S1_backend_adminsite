@@ -98,7 +98,7 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <th scope="col">Currency</th>
                                     <th scope="col">Agent</th>
                                     <th scope="col">IsTest</th>
-                                    <th scope="col">Registration time</th>
+                                    <th scope="col">Registration time (Adjusted to GMT+8)</th>
                                     <th scope="col">Saba ID</th>
                                     <th scope="col">Status</th>
                                 </tr>

@@ -169,7 +169,10 @@ namespace BackendSite.Service.BLL
                 (int) WithdrawalStatus.OnHold,
                 (int) WithdrawalStatus.Verify,
                 (int) WithdrawalStatus.Process,
-                (int) WithdrawalStatus.ToKyc
+                (int) WithdrawalStatus.ToKyc,
+                (int) WithdrawalStatus.Cancelled,
+                (int) WithdrawalStatus.Rejected,
+                (int) WithdrawalStatus.Approved
             };
 
             Match m = Regex.Match(transId, @"\d+");

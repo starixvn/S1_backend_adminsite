@@ -49,7 +49,7 @@ class TpTransferInfoList extends React.Component {
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">CreateTime</th>
+                            <th scope="col">CreateTime (Adjusted to GMT+8)</th>
                             <th scope="col">Trxn.ID</th>
                             <th scope="col">Third-Party Name</th>
                             <th scope="col">Direction</th>
@@ -124,6 +124,7 @@ export class TpTransferInfo extends React.Component {
                         </div>
                     </div>
                     <div className="button-group"><button className="btn btn-search" type="submit"><span>Search</span></button></div>
+                    <div>(Adjusted to GMT+8)</div>
                 </form>
                 {searchData != null ? <TpTransferInfoList searchData={searchData} ChangePage={this.props.GetTpTransferInfoByCust} /> : null}
             </div>

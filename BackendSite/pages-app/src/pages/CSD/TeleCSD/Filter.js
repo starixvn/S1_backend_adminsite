@@ -220,6 +220,7 @@ const Panel = (props) => {
               Submit
             </button>
           </div>
+          (Adjusted to GMT+8)
         </div>
       </div>
     </div>
