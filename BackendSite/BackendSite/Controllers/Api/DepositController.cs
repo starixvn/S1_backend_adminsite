@@ -221,10 +221,10 @@ namespace BackendSite.Controllers.Api
                     string content = selLangBLL.GetResourceValue("lbl_DepositRejectContent", userLang);
                     content = string.Format(content, depositReq.TransId);
                     messageBLL.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
-                    if (custInfo.SiteId == 1)
-                    {
-                        messageBLL.SendSMSMessageToPlayer(depositRequest.CustId);
-                    }
+                    // if (custInfo.SiteId == 1)
+                    // {
+                    //     messageBLL.SendSMSMessageToPlayer(depositRequest.CustId);
+                    // }
                 }
             }
             else if (depositReq.Action == (int)DepositStatus.Draft)
