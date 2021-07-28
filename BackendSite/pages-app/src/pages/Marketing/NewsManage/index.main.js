@@ -1,5 +1,6 @@
 import React from "react";
 import moment from "moment";
+import Filter from "./Filter";
 const SpecialItemType = {
 	actionBtn: "actionBtn",
 	statusBtn: "statusBtn"
@@ -72,7 +73,7 @@ const titleData = [
 	}
 ];
 
-export default ({ ClickAdd, ClickEdit, dataList, UpdateStatus, siteList }) => {
+export default ({ ClickAdd, ClickEdit, dataList, UpdateStatus, siteList,newsiteList,stateFilter,Filter_CheckBox_OnChange,Filter_CheckBox_CheckAll,Filter_OnChange,Filter_Submit }) => {
 	let headerRows = [];
 	titleData.forEach((e, i) => {
 		headerRows.push(<th key={`title-${i}`}>{e.columnTitle}</th>);
@@ -118,6 +119,14 @@ export default ({ ClickAdd, ClickEdit, dataList, UpdateStatus, siteList }) => {
 	return (
 		<div className="container-fluid">
 			<h4 className="page-name">News Management</h4>
+			<Filter
+				SiteList={newsiteList}
+				filterInfo={stateFilter}
+				onChangeCheckBox={Filter_CheckBox_OnChange}
+				onChangeAllCheckBox={Filter_CheckBox_CheckAll}
+				onChange={Filter_OnChange}
+				ClickSubmit={Filter_Submit}
+			/>
 			<button
 				className="btn btn-add"
 				style={{ marginBottom: "20px" }}

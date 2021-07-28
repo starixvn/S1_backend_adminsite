@@ -2,6 +2,7 @@
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -18,8 +19,15 @@ namespace BackendSite.Service.DAL
             this.configuration = configuration;
         }
 
-        public IEnumerable<News> GetNewsList()
+        public IEnumerable<News> GetNewsList(IEnumerable<int> SelectSite, long StartDate, long EndDate, int PageSize, int PageNumber, int Status)
         {
+            NewsData SearchData = new NewsData();
+            DynamicParameters props = new DynamicParameters();
+            props.Add("SelectSite", JsonConvert.SerializeObject(SelectSite));
+            props.Add("StartDate", StartDate);
+            props.Add("EndDate", EndDate);
+            props.Add("PageSize", PageSize);
+            props.Add("Status", Status);
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.Query<News>("Admin_News_Get", commandType: CommandType.StoredProcedure);

@@ -46,15 +46,25 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        public class GetNewsPara 
+        {
+            public IEnumerable<int> SelectSite { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
+            public int PageSize { get; set; }
+            public int PageNumber { get; set; }
+            public int Status { get; set; }
+        }
+
         [HttpPost]
-        public ApiResult<IEnumerable<News>> GetNewsList()
+        public ApiResult<IEnumerable<News>> GetNewsList(GetNewsPara para)
         {
             var result = new ApiResult<IEnumerable<News>>();
 
             try
             {
                 var siteList = serverInfoBLL.GetSiteListByLoginUser();
-                result.Data = newsBLL.GetNewsList().Where(n=> siteList.Any(s=> s.SiteId == n.SiteId));
+                result.Data = newsBLL.GetNewsList(para.SelectSite,para.StartDate, para.EndDate, para.PageSize, para.PageNumber, para.Status).Where(n=> siteList.Any(s=> s.SiteId == n.SiteId));
                 result.ErrorCode = 0;
             }
             catch (Exception ex)
