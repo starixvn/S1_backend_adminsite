@@ -206,6 +206,7 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 							OnChange={action.EditMainValue}
 							dataColumn="sort"
 							value={state.sort}
+							type="number"
 						/>
 						<CheckBox
 							Options={AutoExtendOptions}
@@ -392,6 +393,7 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 									OnChange={action.EditMainValue}
 									dataColumn="expiryDays"
 									value={state.expiryDays}
+									type="number"
 								/>
 							</div>
 							<RadioBox
