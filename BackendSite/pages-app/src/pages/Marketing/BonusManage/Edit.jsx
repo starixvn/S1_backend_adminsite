@@ -60,7 +60,6 @@ export default props => {
 
 	const ClickSubmit = () => {
 		let checked = true;
-		console.log(state.forVipLevel,state.selectedVipLevel,state.selectedVipLevel.length);
 		let skipField = props.skipField[state.promotionType] ? props.skipField[state.promotionType] : props.skipField.default;
 		for (let key in state) {
 			if (key === "specific") {

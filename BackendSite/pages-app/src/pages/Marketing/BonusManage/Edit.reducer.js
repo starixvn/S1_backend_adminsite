@@ -72,7 +72,7 @@ export const initialState = (IsAdd, datas, siteList) => {
     });
 
     //promotion display condiction
-    let _forVipLevel = [0];
+    let _forVipLevel = [];
     let _selcectedVipLevel = [];
     if (datas.promotionDisplayCondition.length > 0) {
       let _setVipLevel = SetVipLevel(datas.promotionDisplayCondition);
@@ -203,7 +203,7 @@ const SetSpecific = (currencyList, langList, data) => {
 };
 
 const SetVipLevel = (data) => {
-  let _isForVipLevel = [0];
+  let _isForVipLevel = [];
   let _vipLevel = {};
   data.map((s) => {
     if (s.conditionType == 1) {

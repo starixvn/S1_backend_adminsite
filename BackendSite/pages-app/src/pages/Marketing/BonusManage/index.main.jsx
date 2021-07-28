@@ -123,6 +123,26 @@ const DateTimePickerElem = (props) => {
 	);
   };
 
+  const InputField = (props) => {
+	const onChange = (e) => {
+	  if (props.onChange) {
+		props.onChange(e.target.value, props.dataColumn);
+	  }
+	};
+	return (
+	  <div className="input-item">
+		<span className="label">{props.columnTitle}</span>
+		<div className="field">
+		  <input
+			type="text"
+			defaultValue={props.defaultValue}
+			onChange={onChange}
+		  />
+		</div>
+	  </div>
+	);
+  };
+
 export default ({
 	ClickCreateBonus,
 	ClickEdit,
@@ -136,10 +156,10 @@ export default ({
 	IsOpen,
 	SiteList,
 	StateFilter,
-	SitnemaFilter,
+	SiteNameFilter,
 	PromotionTypeFilter,
 	StatusCheck,
-	SetSitnemaFilter,
+	SetSiteNameFilter,
 	SetPromotionTypeFilter,
 	StateCheckBox,
 	FilterOnchange
@@ -198,23 +218,11 @@ export default ({
 			<h4 className="page-name">Bonus Management</h4>
 			<div className="filter">
 				<div className="row-flex">
-					{/* <div className="input-item" style={{ width: "200px", zIndex: "4" }}>
-						<span className="label">SiteName</span>
-						<div className="field">
-							<MultiSelect
-							disableSearch={"true"}
-							options={GetSelectedSiteName(SiteList)}
-							value={SitnemaFilter}
-							onChange={SetSitnemaFilter}
-							labelledBy={"Select"}
-							/>
-						</div>
-					</div> */}
 					<OptionElem
 						columnTitle="SiteName"
 						options={GetSelectedSiteName(SiteList)}
-						onChange={SetSitnemaFilter}
-						values={SitnemaFilter}
+						onChange={SetSiteNameFilter}
+						values={SiteNameFilter}
 					/>
 					<OptionElem
 						columnTitle="PromotionType"
@@ -222,18 +230,6 @@ export default ({
 						onChange={SetPromotionTypeFilter}
 						values={PromotionTypeFilter}
 					/>
-					{/* <div className="input-item" style={{ width: "200px", zIndex: "4" }}>
-						<span className="label">PromotionType</span>
-						<div className="field">
-							<MultiSelect
-							disableSearch={"true"}
-							options={GetSelectedPromotionType(initPromotionType)}
-							value={PromotionTypeFilter}
-							onChange={SetPromotionTypeFilter}
-							labelledBy={"Select"}
-							/>
-						</div>
-					</div> */}
 					<SelectBox
 						Title="Status"
 						Options={initStatusType}
@@ -280,6 +276,12 @@ export default ({
 							}
 						}}
 					/>
+					<InputField
+          columnTitle="Bonus Code"
+          defaultValue={StateFilter.BonusCode}
+          dataColumn="BonusCode"
+          onChange={FilterOnchange}
+        />
 					<button
 						className="btn btn-search"
 						style={{ marginBottom: "10px" }}

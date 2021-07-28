@@ -25,35 +25,31 @@ namespace BackendSite.Service.BLL
             _authorizeBLL = authorizeBLL;
         }
 
-        public IEnumerable<PromotionInfo> GetPromotionList(int[] siteArray, PromotionSelect select = null)
+        public IEnumerable<PromotionInfo> GetPromotionList(IEnumerable<int> siteIds,
+            IEnumerable<int> promotionTypes,
+            int status,
+            long startDate,
+            long endDate,
+            int device,
+            string bonusCode)
         {
-            FilterPara filterPara = new FilterPara();
-            if (select != null)
-            {
-                filterPara = new FilterPara()
-                {
-                    SiteidFilter = select.SiteidFilter != null
-                        ? JsonConvert.DeserializeObject<Filter[]>(select.SiteidFilter)
-                        : null,
-                    PromotionTypeFilter = select.PromotionTypeFilter != null
-                        ? JsonConvert.DeserializeObject<Filter[]>(select.PromotionTypeFilter)
-                        : null,
-                    Status = select.Status,
-                    SiteArray = siteArray,
-                    StartDate = select.StartDate,
-                    EndDate = select.EndDate,
-                    Device = select.Device
-                };
-            }
 
-            var result = _bonusManageService.GetPromotionList(null, filterPara);
-            return result;
+            var siteList = _serverInfoBLL.GetSiteListByLoginUser().Select(x => x.SiteId);
+
+            return _bonusManageService.GetPromotionList(JsonConvert.SerializeObject(siteIds),
+                        JsonConvert.SerializeObject(promotionTypes),
+                        status,
+                        startDate,
+                        endDate,
+                        device,
+                        bonusCode,
+                        JsonConvert.SerializeObject(siteList));
         }
 
         public PromotionInfo GetPromotion(string bonusCode, int siteId)
         {
-            //var promotion = bonusManageService.GetPromotion(BonusCode, SiteId);
             var promotion = _bonusManageService.GetPromotionFlow(bonusCode, siteId);
+            
             //Convert Condition Description
             if (promotion.PromotionDisplayCondition.Any())
             {
@@ -100,16 +96,29 @@ namespace BackendSite.Service.BLL
                 promotionDisplayConditionList.Add(new PromotionDisplayConditionModel()
                 {
                     ConditionType = PromotionDisplayConditionType.VipLevel,
-                    Description = new VipLevelCondictionModel() {VipLevel = vipLevelCondition.SelectedVipLevel}
+                    Description = new VipLevelCondictionModel() { VipLevel = vipLevelCondition.SelectedVipLevel }
                 });
             }
 
-            return _bonusManageService.SetPromotionFlow(isAdd, promotion, promotionDisplayConditionList, 0, 0, 0);
+            return _bonusManageService.SetPromotionFlow(isAdd, promotion, promotionDisplayConditionList,
+                0, 0, 0);
         }
 
-        public int DuplicatePromotion(string bonusCode, int siteId, string newBonusCode)
+        public bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode)
         {
-            return _bonusManageService.DuplicatePromotion(bonusCode, siteId, newBonusCode);
+            //return _bonusManageService.DuplicatePromotion(bonusCode, siteId, newBonusCode);
+
+            var expectedSpecificRow = _bonusManageService.GetPromotionSpecific(bonusCode, siteId).Count();
+            var expectedRebateRow = _bonusManageService.GetPromotionRebate(bonusCode, siteId).Count();
+            var expectedConditionRow = _bonusManageService.GetPromotionDisplayCondition(bonusCode, siteId).Count();
+
+
+            return _bonusManageService.DuplicatePromotionFlow(bonusCode,
+                 siteId,
+                 newBonusCode,
+                 expectedSpecificRow,
+                 expectedRebateRow,
+                 expectedConditionRow);
         }
 
         public int SetPromotionStatus(string bonusCode, int siteId, int status)

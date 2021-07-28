@@ -84,14 +84,15 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
     }
 
-    public class PromotionSelect
+    public class GetPromotionListReq
     {
-        public string SiteidFilter { get; set; }
-        public string PromotionTypeFilter { get; set; }
+        public IEnumerable<int> SiteIds { get; set; }
+        public IEnumerable<int> PromotionTypes { get; set; }
         public int Status { get; set; }
         public long StartDate { get; set; }
         public long EndDate { get; set; }
         public int Device { get; set; }
+        public string BonusCode { get; set; }
     }
 
     public class Filter

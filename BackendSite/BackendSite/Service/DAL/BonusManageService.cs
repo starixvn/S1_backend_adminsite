@@ -25,70 +25,6 @@ namespace BackendSite.Service.DAL
             _logger = logger;
         }
 
-        public IEnumerable<PromotionInfo> GetPromotionList(string bonusCode, FilterPara filterPara)
-        {
-            int siteidlength = filterPara.SiteidFilter == null ? 0 : filterPara.SiteidFilter.Length;
-            int promotionTypelength =
-                filterPara.PromotionTypeFilter == null ? 0 : filterPara.PromotionTypeFilter.Length;
-            int[] siteIdFilterArray = new int[siteidlength];
-            int[] promotionTypeFilterArray = new int[promotionTypelength];
-
-            if (siteidlength > 0)
-            {
-                for (var i = 0; i < siteidlength; i++)
-                {
-                    siteIdFilterArray[i] = filterPara.SiteidFilter[i].value;
-                }
-            }
-
-            if (promotionTypelength > 0)
-            {
-                for (var i = 0; i < promotionTypelength; i++)
-                {
-                    promotionTypeFilterArray[i] = filterPara.PromotionTypeFilter[i].value;
-                }
-            }
-
-            string siteIdFilter = JsonConvert.SerializeObject(siteIdFilterArray);
-            string promotionTypeFilter = JsonConvert.SerializeObject(promotionTypeFilterArray);
-            string permissionSiteIds = JsonConvert.SerializeObject(filterPara.SiteArray);
-            using (MySqlConnection conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString")))
-            {
-                int? siteId = null;
-                return conn.Query<PromotionInfo>("Admin_PromotionListV2_Get", new
-                {
-                    bonusCode,
-                    siteId,
-                    siteIdFilter,
-                    promotionTypeFilter,
-                    permissionSiteIds,
-                    Status = filterPara.Status,
-                    StartDate = filterPara.StartDate,
-                    EndDate = filterPara.EndDate,
-                    PromotionDeviceType = filterPara.Device
-                }, commandType: CommandType.StoredProcedure);
-            }
-        }
-
-        public int DuplicatePromotion(string bonusCode, int siteId, string newBonusCode)
-        {
-            int errorCode = 0;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            conn.Open();
-            using var trans = conn.BeginTransaction();
-            var result = conn.Execute("Admin_PromotionDuplicate_Set",
-                new {BonusCode = bonusCode, SiteId = siteId, NewBonusCode = newBonusCode}, transaction: trans,
-                commandType: CommandType.StoredProcedure);
-            trans.Commit();
-
-            if (result == 0)
-            {
-                errorCode = 1;
-            }
-
-            return errorCode;
-        }
-
         public int SetPromotionStatus(string bonusCode, int siteId, int status, string lastUpdateUser)
         {
             int errorCode = 0;
@@ -110,13 +46,13 @@ namespace BackendSite.Service.DAL
             return errorCode;
         }
 
-        public IEnumerable<PromoCategory> GetPromoCategories(int WalletType)
+        public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
         {
             using (MySqlConnection conn =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport")))
             {
                 string SpName = "Admin_PromotionCategory_Get";
-                return conn.Query<PromoCategory>(SpName, new {WalletType}, commandType: CommandType.StoredProcedure);
+                return conn.Query<PromoCategory>(SpName, new {walletType}, commandType: CommandType.StoredProcedure);
             }
         }
 
@@ -279,6 +215,45 @@ namespace BackendSite.Service.DAL
         #region Public Method
 
         /// <summary>
+        /// 取得促銷資料清單
+        /// </summary>
+        /// <param name="siteIds"></param>
+        /// <param name="promotionTypes"></param>
+        /// <param name="status"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <param name="device"></param>
+        /// <param name="bonusCode"></param>
+        /// <param name="permissionSiteIds"></param>
+        /// <returns></returns>
+        public IEnumerable<PromotionInfo> GetPromotionList(string siteIds,
+            string promotionTypes,
+            int status,
+            long startDate,
+            long endDate,
+            int device,
+            string bonusCode,
+            string permissionSiteIds)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteIds", siteIds);
+            p.Add("_PromotionTypes", promotionTypes);
+            p.Add("_Status", status);
+            p.Add("_StartDate", startDate);
+            p.Add("_EndDate", endDate);
+            p.Add("_Device", device);
+            p.Add("_BonusCode", bonusCode);
+            p.Add("_PermissionSiteIds", permissionSiteIds);
+
+            using (MySqlConnection conn =
+                new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                return conn.Query<PromotionInfo>("Admin_PromotionListV3_Get", p,
+                    commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        /// <summary>
         /// 取得指定促銷流程
         /// </summary>
         /// <param name="bonusCode"></param>
@@ -340,22 +315,20 @@ namespace BackendSite.Service.DAL
             MySqlTransaction transaction = null)
         {
             var p = new DynamicParameters();
-            string PermissionSiteIds = null;
             p.Add("_BonusCode", bonusCode);
             p.Add("_SiteId", siteId);
-            p.Add("_PermissionSiteIds", (string) null);
 
             if (connection == null)
             {
                 using MySqlConnection conn =
                     new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-                return conn.QueryFirst<PromotionInfo>("Admin_Promotion_Get", new {bonusCode, siteId, PermissionSiteIds},
+                return conn.QueryFirst<PromotionInfo>("Admin_PromotionV2_Get", p,
                     commandType: CommandType.StoredProcedure);
             }
             else
             {
-                return connection.QueryFirst<PromotionInfo>("Admin_Promotion_Get",
-                    new {bonusCode, siteId, PermissionSiteIds}, transaction: transaction,
+                return connection.QueryFirst<PromotionInfo>("Admin_PromotionV2_Get",
+                    p, transaction: transaction,
                     commandType: CommandType.StoredProcedure);
             }
         }
@@ -584,6 +557,71 @@ namespace BackendSite.Service.DAL
             return true;
         }
 
+        /// <summary>
+        /// 複製促銷流程
+        /// </summary>
+        /// <param name="bonusCode"></param>
+        /// <param name="siteId"></param>
+        /// <param name="newBonusCode"></param>
+        /// <param name="expectedSpecificRow"></param>
+        /// <param name="expectedRebateRow"></param>
+        /// <param name="expectedConditionRow"></param>
+        /// <returns></returns>
+        public bool DuplicatePromotionFlow(string bonusCode, int siteId, string newBonusCode, int expectedSpecificRow,
+            int expectedRebateRow, int expectedConditionRow)
+        {
+            using (MySqlConnection connection =
+                new MySqlConnection(_configuration.GetConnectionString("ConnectionString")))
+            {
+                connection.Open();
+                using var transaction = connection.BeginTransaction();
+
+                var promotionRessult = DuplicatePromotion(bonusCode, siteId, newBonusCode, connection, transaction);
+
+                if (!promotionRessult)
+                {
+                    transaction.Rollback();
+                    return false;
+                }
+
+                var promotionSpecificRessult = DuplicatePromotionSpecific(bonusCode, siteId, newBonusCode,
+                    expectedSpecificRow, connection, transaction);
+
+                if (!promotionSpecificRessult)
+                {
+                    transaction.Rollback();
+                    return false;
+                }
+
+                if (expectedRebateRow > 0)
+                {
+                    var promotionRebateRessult = DuplicatePromotionRebate(bonusCode, siteId, newBonusCode,
+                        expectedRebateRow, connection, transaction);
+
+                    if (!promotionRebateRessult)
+                    {
+                        transaction.Rollback();
+                        return false;
+                    }
+                }
+
+                if (expectedConditionRow > 0)
+                {
+                    var promotionConditionRessult = DuplicatePromotionDisplayCondition(bonusCode, siteId, newBonusCode,
+                        expectedConditionRow, connection, transaction);
+
+                    if (!promotionConditionRessult)
+                    {
+                        transaction.Rollback();
+                        return false;
+                    }
+                }
+
+                transaction.Commit();
+                return true;
+            }
+        }
+
         #endregion
 
         #region Private Methods
@@ -666,12 +704,12 @@ namespace BackendSite.Service.DAL
         /// <param name="bonusCode"></param>
         /// <param name="siteId"></param>
         /// <param name="specificList"></param>
-        /// <param name="expectedDelSpecificRow"></param>
+        /// <param name="expectedRow"></param>
         /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         private bool DeletePromotionSpecific(string bonusCode, int siteId, List<PromotionSpecific> specificList,
-            int expectedDelSpecificRow,
+            int expectedRow,
             MySqlConnection connection,
             MySqlTransaction transaction)
         {
@@ -687,7 +725,7 @@ namespace BackendSite.Service.DAL
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
-            return affectCount == expectedDelSpecificRow;
+            return affectCount == expectedRow;
         }
 
         /// <summary>
@@ -724,12 +762,12 @@ namespace BackendSite.Service.DAL
         /// <param name="bonusCode"></param>
         /// <param name="siteId"></param>
         /// <param name="rebateList"></param>
-        /// <param name="expectedDelRebateRow"></param>
+        /// <param name="expectedRow"></param>
         /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         private bool DeletePromotionRebate(string bonusCode, int siteId, List<PromotionRebate1> rebateList,
-            int expectedDelRebateRow,
+            int expectedRow,
             MySqlConnection connection,
             MySqlTransaction transaction)
         {
@@ -745,7 +783,7 @@ namespace BackendSite.Service.DAL
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
-            return affectCount == expectedDelRebateRow;
+            return affectCount == expectedRow;
         }
 
         /// <summary>
@@ -783,13 +821,13 @@ namespace BackendSite.Service.DAL
         /// <param name="bonusCode"></param>
         /// <param name="siteId"></param>
         /// <param name="conditionData"></param>
-        /// <param name="expectedDelRebateRow"></param>
+        /// <param name="expectedRow"></param>
         /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         private bool DeletePromotionDisplayCondition(string bonusCode, int siteId,
             List<PromotionDisplayConditionModel> conditionData,
-            int expectedDelRebateRow,
+            int expectedRow,
             MySqlConnection connection,
             MySqlTransaction transaction)
         {
@@ -805,12 +843,177 @@ namespace BackendSite.Service.DAL
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
-            return affectCount == expectedDelRebateRow;
+            return affectCount == expectedRow;
+        }
+
+        /// <summary>
+        /// 複製促銷基本資料
+        /// </summary>
+        /// <param name="bonusCode"></param>
+        /// <param name="siteId"></param>
+        /// <param name="newBonusCode"></param>
+        /// <param name="connection"></param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        private bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode, MySqlConnection connection,
+            MySqlTransaction transaction)
+        {
+            var p = new DynamicParameters();
+
+            p.Add("_BonusCode", bonusCode);
+            p.Add("_SiteId", siteId);
+            p.Add("_NewBonusCode", newBonusCode);
+            p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            connection.Execute("Admin_PromotionDuplicateV2_Set", p, transaction: transaction,
+                commandType: CommandType.StoredProcedure);
+
+            var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
+
+            return affectCount == 1;
+        }
+
+        /// <summary>
+        /// 複製促銷規則??
+        /// </summary>
+        /// <param name="bonusCode"></param>
+        /// <param name="siteId"></param>
+        /// <param name="newBonusCode"></param>
+        /// <param name="expectedRow"></param>
+        /// <param name="connection"></param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        private bool DuplicatePromotionSpecific(string bonusCode, int siteId, string newBonusCode, int expectedRow,
+            MySqlConnection connection,
+            MySqlTransaction transaction)
+        {
+            var p = new DynamicParameters();
+
+            p.Add("_BonusCode", bonusCode);
+            p.Add("_SiteId", siteId);
+            p.Add("_NewBonusCode", newBonusCode);
+            p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            connection.Execute("Admin_PromotionSpecificDuplicate_Set", p, transaction: transaction,
+                commandType: CommandType.StoredProcedure);
+
+            var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
+
+            return affectCount == expectedRow;
+        }
+
+        /// <summary>
+        /// 複製促銷回饋
+        /// </summary>
+        /// <param name="bonusCode"></param>
+        /// <param name="siteId"></param>
+        /// <param name="newBonusCode"></param>
+        /// <param name="expectedRow"></param>
+        /// <param name="connection"></param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        private bool DuplicatePromotionRebate(string bonusCode, int siteId, string newBonusCode, int expectedRow,
+            MySqlConnection connection,
+            MySqlTransaction transaction)
+        {
+            var p = new DynamicParameters();
+
+            p.Add("_BonusCode", bonusCode);
+            p.Add("_SiteId", siteId);
+            p.Add("_NewBonusCode", newBonusCode);
+            p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            connection.Execute("Admin_PromotionSpecificDuplicate_Set", p, transaction: transaction,
+                commandType: CommandType.StoredProcedure);
+
+            var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
+
+            return affectCount == expectedRow;
+        }
+
+        /// <summary>
+        /// 複製促銷顯示條件
+        /// </summary>
+        /// <param name="bonusCode"></param>
+        /// <param name="siteId"></param>
+        /// <param name="newBonusCode"></param>
+        /// <param name="expectedRow"></param>
+        /// <param name="connection"></param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        private bool DuplicatePromotionDisplayCondition(string bonusCode, int siteId, string newBonusCode,
+            int expectedRow, MySqlConnection connection,
+            MySqlTransaction transaction)
+        {
+            var p = new DynamicParameters();
+
+            p.Add("_BonusCode", bonusCode);
+            p.Add("_SiteId", siteId);
+            p.Add("_NewBonusCode", newBonusCode);
+            p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            connection.Execute("Admin_PromotionDisplayConditionDuplicate_Set", p, transaction: transaction,
+                commandType: CommandType.StoredProcedure);
+
+            var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
+
+            return affectCount == expectedRow;
         }
 
         #endregion
 
         #region Refactory Old Code
+
+        /// <summary>
+        ///  Get PromotionList old flow.not use in temp.
+        /// </summary>
+        /// <param name="bonusCode"></param>
+        /// <param name="filterPara"></param>
+        /// <returns></returns>
+        //public IEnumerable<PromotionInfo> GetPromotionList(string bonusCode, FilterPara filterPara)
+        //{
+        //    int siteidlength = filterPara.SiteidFilter == null ? 0 : filterPara.SiteidFilter.Length;
+        //    int promotionTypelength =
+        //        filterPara.PromotionTypeFilter == null ? 0 : filterPara.PromotionTypeFilter.Length;
+        //    int[] siteIdFilterArray = new int[siteidlength];
+        //    int[] promotionTypeFilterArray = new int[promotionTypelength];
+
+        //    if (siteidlength > 0)
+        //    {
+        //        for (var i = 0; i < siteidlength; i++)
+        //        {
+        //            siteIdFilterArray[i] = filterPara.SiteidFilter[i].value;
+        //        }
+        //    }
+
+        //    if (promotionTypelength > 0)
+        //    {
+        //        for (var i = 0; i < promotionTypelength; i++)
+        //        {
+        //            promotionTypeFilterArray[i] = filterPara.PromotionTypeFilter[i].value;
+        //        }
+        //    }
+
+        //    string siteIdFilter = JsonConvert.SerializeObject(siteIdFilterArray);
+        //    string promotionTypeFilter = JsonConvert.SerializeObject(promotionTypeFilterArray);
+        //    string permissionSiteIds = JsonConvert.SerializeObject(filterPara.SiteArray);
+        //    using (MySqlConnection conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString")))
+        //    {
+        //        int? siteId = null;
+        //        return conn.Query<PromotionInfo>("Admin_PromotionListV2_Get", new
+        //        {
+        //            bonusCode,
+        //            siteId,
+        //            siteIdFilter,
+        //            promotionTypeFilter,
+        //            permissionSiteIds,
+        //            Status = filterPara.Status,
+        //            StartDate = filterPara.StartDate,
+        //            EndDate = filterPara.EndDate,
+        //            PromotionDeviceType = filterPara.Device
+        //        }, commandType: CommandType.StoredProcedure);
+        //    }
+        //}
 
         /// <summary>
         ///  Get Promotion old flow.not use in temp.
@@ -972,6 +1175,30 @@ namespace BackendSite.Service.DAL
         //        trans.Rollback();
         //        return false;
         //    }
+        //}
+
+        /// <summary>
+        /// Duplicate Promotion old flow.not use in temp.
+        /// </summary>
+        /// <param name="promotion"></param>
+        /// <returns></returns>
+        //public int DuplicatePromotion(string bonusCode, int siteId, string newBonusCode)
+        //{
+        //    int errorCode = 0;
+        //    using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+        //    conn.Open();
+        //    using var trans = conn.BeginTransaction();
+        //    var result = conn.Execute("Admin_PromotionDuplicate_Set",
+        //        new { BonusCode = bonusCode, SiteId = siteId, NewBonusCode = newBonusCode }, transaction: trans,
+        //        commandType: CommandType.StoredProcedure);
+        //    trans.Commit();
+
+        //    if (result == 0)
+        //    {
+        //        errorCode = 1;
+        //    }
+
+        //    return errorCode;
         //}
 
         #endregion

@@ -18,7 +18,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Marketing/BonusManage"})]
+    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusManage" })]
     public class BonusManageController : Controller
     {
         #region Fields
@@ -100,17 +100,20 @@ namespace BackendSite.Controllers.Api
         #region Action
 
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> GetPromotionList([FromForm] PromotionSelect Select)
+        public ApiResult<IEnumerable<PromotionInfo>> GetPromotionList([FromForm] GetPromotionListReq request)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
 
             try
             {
-                var siteList = _serverInfoBLL.GetSiteListByLoginUser();
-                int[] siteArray = siteList.Select(x => x.SiteId).ToArray();
+                apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
+                    request.PromotionTypes,
+                    request.Status,
+                    request.StartDate,
+                    request.EndDate,
+                    request.Device,
+                    request.BonusCode);
 
-                apiResult.Data = _bonusManageBLL.GetPromotionList(siteArray, Select)
-                    .Where(b => siteList.Any(s => s.SiteId == b.SiteId));
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -149,7 +152,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 apiResult.Data = _serverInfoBLL.GetSiteListByLoginUser()?.Select(x =>
-                    new {x.SiteName, x.SiteId, CurrencyList = x.ICurrencyList, LangList = x.ILangList});
+                    new { x.SiteName, x.SiteId, CurrencyList = x.ICurrencyList, LangList = x.ILangList });
                 if (SiteId != null && apiResult.Data != null && apiResult.Data.Any())
                 {
                     apiResult.Data = apiResult.Data.Where(s => s.SiteId == SiteId);
@@ -168,18 +171,25 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> SetPromotion([FromForm] bool IsAdd,
-            [FromForm] PromotionInfo Promotion, [FromForm] PromotionSelect Select,
+        public ApiResult<IEnumerable<PromotionInfo>> SetPromotion([FromForm] bool isAdd,
+            [FromForm] PromotionInfo promotion,
+            [FromForm] GetPromotionListReq request,
             [FromForm] DisplayConditionAbountVipLevel vipLevelCondition)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
             try
             {
                 //var errorCode = _bonusManageBLL.SetPromotion(IsAdd, Promotion);
-                var errorCode = _bonusManageBLL.SetPromotion(IsAdd, Promotion, vipLevelCondition) ? 0 : 1;
-                var siteList = _serverInfoBLL.GetSiteListByLoginUser();
-                int[] siteArray = siteList.Select(x => x.SiteId).ToArray();
-                apiResult.Data = _bonusManageBLL.GetPromotionList(siteArray, Select);
+                var errorCode = _bonusManageBLL.SetPromotion(isAdd, promotion, vipLevelCondition) ? 0 : 1;
+
+                apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
+                    request.PromotionTypes,
+                    request.Status,
+                    request.StartDate,
+                    request.EndDate,
+                    request.Device,
+                    request.BonusCode);
+
                 apiResult.ErrorCode = errorCode;
                 apiResult.Message = errorCode == 1
                     ? "The bonus setting already exists which with same promotion-type & product-category."
@@ -202,18 +212,19 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> DuplicatePromotion(DuplicateReq duplicateReq)
+        public ApiResult<IEnumerable<PromotionInfo>> DuplicatePromotion([FromForm] DuplicateReq duplicateRequest,
+            [FromForm] GetPromotionListReq request)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
 
             try
             {
-                var errorCode = _bonusManageBLL.DuplicatePromotion(duplicateReq.BonusCode, duplicateReq.SiteId,
-                    duplicateReq.NewBonusCode);
-                apiResult.ErrorCode = errorCode;
-                apiResult.Message = errorCode == 1
-                    ? "The bonus setting already exists which with same promotion-type & product-category."
-                    : "";
+                apiResult.ErrorCode = _bonusManageBLL.DuplicatePromotion(duplicateRequest.BonusCode,
+                    duplicateRequest.SiteId,
+                    duplicateRequest.NewBonusCode) ? 0 : 1;
+                apiResult.Message = apiResult.ErrorCode == 1
+                    ? "Duplicate fail.The bonus setting already exists which with same promotion-type & product-category."
+                    : string.Empty;
             }
             catch (MySqlException sqlException)
             {
@@ -228,9 +239,13 @@ namespace BackendSite.Controllers.Api
                 apiResult.RawMessage = ex.ToString();
             }
 
-            var siteList = _serverInfoBLL.GetSiteListByLoginUser();
-            int[] siteArray = siteList.Select(x => x.SiteId).ToArray();
-            apiResult.Data = _bonusManageBLL.GetPromotionList(siteArray);
+            apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
+                    request.PromotionTypes,
+                    request.Status,
+                    request.StartDate,
+                    request.EndDate,
+                    request.Device,
+                    request.BonusCode);
 
             return apiResult;
         }
@@ -244,7 +259,7 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = _bonusManageBLL.SetPromotionStatus(BonusCode, SiteId, Status);
                 var promotion = _bonusManageBLL.GetPromotion(BonusCode, SiteId);
-                apiResult.Data = new {promotion.LastUpdateUser, promotion.LastUpdateTime};
+                apiResult.Data = new { promotion.LastUpdateUser, promotion.LastUpdateTime };
             }
             catch (Exception ex)
             {
@@ -257,45 +272,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<PromoCategory>> GetPromoCategories([FromForm] int WalletType)
-        {
-            var apiResult = new ApiResult<IEnumerable<PromoCategory>>();
-
-            try
-            {
-                apiResult.Data = _bonusManageBLL.GetPromoCategories(WalletType);
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.RawMessage = ex.ToString();
-            }
-
-            return apiResult;
-        }
-
-        [HttpPost]
-        public ApiResult<IEnumerable<TpGameType>> GetTpGameList()
-        {
-            var apiResult = new ApiResult<IEnumerable<TpGameType>>();
-
-            try
-            {
-                apiResult.Data = _bonusManageBLL.GetTpGameList();
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.RawMessage = ex.ToString();
-            }
-
-            return apiResult;
-        }
-
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Marketing/BonusImport"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusImport" })]
         public async Task<ApiResult<List<BonusImportResult>>> BonusImport([FromForm] int TpId,
             [FromForm] int CategoryId, [FromForm] IFormFile excelUpload)
         {
@@ -570,6 +547,45 @@ namespace BackendSite.Controllers.Api
 
         #region For Select List
 
+        [HttpPost]
+        public ApiResult<IEnumerable<PromoCategory>> GetPromoCategories([FromForm] int WalletType)
+        {
+            var apiResult = new ApiResult<IEnumerable<PromoCategory>>();
+
+            try
+            {
+                apiResult.Data = _bonusManageBLL.GetPromoCategories(WalletType);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<TpGameType>> GetTpGameList()
+        {
+            var apiResult = new ApiResult<IEnumerable<TpGameType>>();
+
+            try
+            {
+                apiResult.Data = _bonusManageBLL.GetTpGameList();
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
         public ApiResult<IEnumerable<VipLevelModel>> GetAllSiteVipLevelList()
         {
             return new ApiResult<IEnumerable<VipLevelModel>>
