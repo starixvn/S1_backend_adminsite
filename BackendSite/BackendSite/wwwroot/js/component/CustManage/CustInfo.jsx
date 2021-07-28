@@ -1806,14 +1806,15 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
             Loading.OnLoading();
             let pageNumber = PageNumber || this.state.BonusLogData.pageNumber;
             let CustId = getUrlParameter("custId");
-            const {UTCStartDate,UTCEndDate,PromoCategoryId} = this.state.BonusLog;
+            const {UTCStartDate,UTCEndDate,PromoCategoryId,RefTransId} = this.state.BonusLog;
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
                 axios.post('/api/Payment/GetBonusLog', { StartDate: UTCStartDate,
                                                         EndDate: UTCEndDate, 
                                                         CustId: iCustId, 
                                                         PageNumber: pageNumber,
-                                                        PromoCategoryId: PromoCategoryId})
+                                                        PromoCategoryId: PromoCategoryId,
+                                                        RefTransId: RefTransId})
                     .then(function (response) {
                         Loading.UnLoading();
                         let result = response.data;
@@ -1902,13 +1903,14 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
             Loading.OnLoading();
             let pageNumber = PageNumber || this.state.FinancialLogData.pageNumber;
             let CustId = getUrlParameter("custId");
-            const {UTCStartDate,UTCEndDate} = this.state.FinancialLog;
+            const {UTCStartDate,UTCEndDate,RefTransId} = this.state.FinancialLog;
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
                 axios.post('/api/Payment/GetFinancialLog', { StartDate: UTCStartDate,
                                                             EndDate: UTCEndDate, 
                                                             CustId: iCustId, 
-                                                            PageNumber: pageNumber })
+                                                            PageNumber: pageNumber,
+                                                            RefTransId: RefTransId })
                     .then(function (response) {
                         Loading.UnLoading();
                         let result = response.data;
@@ -1927,11 +1929,12 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
         GetDepositListByCust(PageNumber) {
             let pageNumber = PageNumber || this.state.DepositListData.pageNumber;
             let CustId = getUrlParameter("custId");
-            const {UTCStartDate,UTCEndDate} = this.state.DepositList;
+            const {UTCStartDate,UTCEndDate,Status} = this.state.DepositList;
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
                 axios.post('/api/Deposit/GetDepositListByCust', { StartDate: UTCStartDate,
-                                                                EndDate: UTCEndDate, 
+                                                                EndDate: UTCEndDate,
+                                                                Status: Status,
                                                                 CustId: iCustId, 
                                                                 PageNumber: pageNumber })
                     .then(function (response) {
@@ -1952,11 +1955,12 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
         GetWithdrawalListByCust(PageNumber) {
             let pageNumber = PageNumber || this.state.WithdrawalListData.pageNumber;
             let CustId = getUrlParameter("custId");
-            const {UTCStartDate,UTCEndDate} = this.state.WithdrawalInfo;
+            const {UTCStartDate,UTCEndDate,Status} = this.state.WithdrawalInfo;
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
                 axios.post('/api/Withdrawal/GetWithdrawalListByCust', { StartDate: UTCStartDate,
-                                                                    EndDate: UTCEndDate, 
+                                                                    EndDate: UTCEndDate,
+                                                                    Status: Status,
                                                                     CustId: iCustId, 
                                                                     PageNumber: pageNumber })
                     .then(function (response) {
