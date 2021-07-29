@@ -61,37 +61,37 @@ const App = () => {
     });
   }, []);
 
-    // useEffect(() => {
-    //   WebAPI.PostData({
-    //     Url: "News/GetNewsList",
-    //   }).then((res) => {
-    //     if (isMountedRef.current) {
-    //       if (res.data.errorCode === 0) {
-    //         dispatch({
-    //           type: defActionType.SET_DATA_LIST,
-    //           dataList: res.data.data,
-    //         });
-    //       } else {
-    //         alert(res.data.message ?? "failed to get data.");
-    //       }
-    //     }
-    //   });
+  // useEffect(() => {
+  //   WebAPI.PostData({
+  //     Url: "News/GetNewsList",
+  //   }).then((res) => {
+  //     if (isMountedRef.current) {
+  //       if (res.data.errorCode === 0) {
+  //         dispatch({
+  //           type: defActionType.SET_DATA_LIST,
+  //           dataList: res.data.data,
+  //         });
+  //       } else {
+  //         alert(res.data.message ?? "failed to get data.");
+  //       }
+  //     }
+  //   });
 
-    //   WebAPI.PostData({
-    //     Url: "News/GetSiteListByLoginUser",
-    //   }).then((res) => {
-    //     if (isMountedRef.current) {
-    //       if (res.data.errorCode === 0) {
-    //         dispatch({
-    //           type: defActionType.SET_SITE_LIST,
-    //           siteList: res.data.data,
-    //         });
-    //       } else {
-    //         alert(res.data.message ?? "failed to get data.");
-    //       }
-    //     }
-    //   });
-    // }, []);
+  //   WebAPI.PostData({
+  //     Url: "News/GetSiteListByLoginUser",
+  //   }).then((res) => {
+  //     if (isMountedRef.current) {
+  //       if (res.data.errorCode === 0) {
+  //         dispatch({
+  //           type: defActionType.SET_SITE_LIST,
+  //           siteList: res.data.data,
+  //         });
+  //       } else {
+  //         alert(res.data.message ?? "failed to get data.");
+  //       }
+  //     }
+  //   });
+  // }, []);
 
   const Filter_Submit = () => {
     if (stateFilter.SelectSite.length === 0) {
@@ -100,11 +100,11 @@ const App = () => {
     }
     let Data = {
       SelectSite: stateFilter.SelectSite,
-      StartDate: moment.utc(stateFilter.StartDate).unix(),
-      EndDate: moment.utc(stateFilter.EndDate).unix(),
+      StartDate: moment(stateFilter.StartDate).unix(),
+      EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
       Status: parseInt(stateFilter.Status, 10),
       PageNumber: 1,
-      PageSize: 2,
+      PageSize: 10,
     };
     api
       .post("/api/News/GetNewsList", Data)
@@ -113,12 +113,12 @@ const App = () => {
           dispatch({
             type: defActionType.SET_DATA_LIST,
             dataList: res.data.data,
-          });          
+          });
           setDatas({
             PageInfo: {
               totalPages: res.data.totalPages,
               pageNumber: 1,
-              rowCount: res.data.rowCount
+              rowCount: res.data.rowCount,
             },
             FilterInfo: {
               ...stateFilter,
@@ -140,11 +140,11 @@ const App = () => {
     }
     let Data = {
       SelectSite: stateDatas.FilterInfo.SelectSite,
-      StartDate: moment.utc(stateDatas.FilterInfo.StartDate).unix(),
-      EndDate: moment.utc(stateDatas.FilterInfo.EndDate).unix(),
+      StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
+      EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
       Status: parseInt(stateDatas.FilterInfo.Status, 10),
       PageNumber: PageNumber,
-      PageSize: 2,
+      PageSize: 10,
     };
     api
       .post("/api/News/GetNewsList", Data)
@@ -159,8 +159,8 @@ const App = () => {
             PageInfo: {
               totalPages: res.data.totalPages,
               pageNumber: PageNumber,
-              rowCount: res.data.rowCount
-            }
+              rowCount: res.data.rowCount,
+            },
           });
         } else {
           alert(res.data.message ?? "failed to get data.");
@@ -258,22 +258,63 @@ const App = () => {
         (res) => {
           if (isMountedRef.current) {
             if (res.data.errorCode === 0) {
-              WebAPI.PostData({
-                Url: "News/GetNewsList",
-              }).then((res) => {
-                if (isMountedRef.current) {
-                  if (res.data.errorCode === 0) {
-                    dispatch({
-                      type: defActionType.SET_DATA_LIST,
-                      dataList: res.data.data,
-                    });
-                  } else {
-                    alert(res.data.message ?? "failed to get data.");
-                  }
+              if (stateFilter.SelectSite.length === 0) {
+                dispatch({
+                  type: defActionType.SET_DATA_LIST,
+                  dataList: [],
+                });
+              } else {
+                let Data = {
+                  SelectSite: stateFilter.SelectSite,
+                  StartDate: moment(stateFilter.StartDate).unix(),
+                  EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
+                  Status: parseInt(stateFilter.Status, 10),
+                  PageNumber: 1,
+                  PageSize: 10,
+                };
+                api
+                  .post("/api/News/GetNewsList", Data)
+                  .then(function (res) {
+                    if (res.data.errorCode === 0) {
+                      dispatch({
+                        type: defActionType.SET_DATA_LIST,
+                        dataList: res.data.data,
+                      });
+                      setDatas({
+                        PageInfo: {
+                          totalPages: res.data.totalPages,
+                          pageNumber: 1,
+                          rowCount: res.data.rowCount,
+                        },
+                        FilterInfo: {
+                          ...stateFilter,
+                        },
+                      });
+                    } else {
+                      alert(res.data.message ?? "failed to get data.");
+                    }
+                  })
+                  .catch(function (error) {
+                    alert(error);
+                  });
+              }
+              setProcessing(false);
+              // WebAPI.PostData({
+              //   Url: "News/GetNewsList",
+              // }).then((res) => {
+              //   if (isMountedRef.current) {
+              //     if (res.data.errorCode === 0) {
+              //       dispatch({
+              //         type: defActionType.SET_DATA_LIST,
+              //         dataList: res.data.data,
+              //       });
+              //     } else {
+              //       alert(res.data.message ?? "failed to get data.");
+              //     }
 
-                  setProcessing(false);
-                }
-              });
+              //     setProcessing(false);
+              //   }
+              // });
             } else {
               alert(res.data.message ?? "failed to set data.");
               setProcessing(false);
