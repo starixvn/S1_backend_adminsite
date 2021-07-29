@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.CustVipLevel;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -503,6 +504,11 @@ namespace BackendSite.Service.DAL
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_CustInofoEnablePromotion_Set", new { CustId = custId, EnablePromotion = enablePromotion }, commandType: CommandType.StoredProcedure) > 0;
+        }
+
+        public IEnumerable<VipLevelModel> GetAllSiteVipLevelList()
+        {
+            return _reportDbClient.Query<VipLevelModel>("Common_VipLevel_Get");
         }
     }
 }

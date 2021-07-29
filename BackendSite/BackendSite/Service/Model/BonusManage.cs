@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.PromotionDisplayCondition;
 
 namespace BackendSite.Service.Model
 {
@@ -32,6 +34,7 @@ namespace BackendSite.Service.Model
         public int PromotionDeviceType { get; set; }
         public int? PromotionAction { get; set; }
         public int AutoExtend { get; set; }
+        public IEnumerable<PromotionDisplayConditionModel> PromotionDisplayCondition { get; set; }
     }
 
     public class PromotionSpecific
@@ -55,41 +58,49 @@ namespace BackendSite.Service.Model
         public string VN_AffCodes { get; set; }
         public int TotalUsageLimit { get; set; }
     }
+
     public class TpGameType
     {
         public int Type { get; set; }
         public string TypeName { get; set; }
     }
+
     public class PromoCategory
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public int TpId { get; set; }
     }
+
     public class PromotionRebate
     {
         public int GameType { get; set; }
         public decimal Percentage { get; set; }
         public int Status { get; set; }
     }
+
     public class PromotionRebate1 : PromotionRebate
     {
         public int CurrencyId { get; set; }
     }
-    public class PromotionSelect
+
+    public class GetPromotionListReq
     {
-        public string SiteidFilter { get; set; }
-        public string PromotionTypeFilter { get; set; }
+        public IEnumerable<int> SiteIds { get; set; }
+        public IEnumerable<int> PromotionTypes { get; set; }
         public int Status { get; set; }
         public long StartDate { get; set; }
         public long EndDate { get; set; }
         public int Device { get; set; }
+        public string BonusCode { get; set; }
     }
+
     public class Filter
     {
         public string label { get; set; }
         public int value { get; set; }
     }
+
     public class FilterPara
     {
         public Filter[] SiteidFilter { get; set; }
@@ -100,6 +111,7 @@ namespace BackendSite.Service.Model
         public long EndDate { get; set; }
         public int Device { get; set; }
     }
+
     public class BonusImportPara
     {
         public int SiteId { get; set; }
@@ -111,6 +123,7 @@ namespace BackendSite.Service.Model
         public int TpId { get; set; }
         public int CategoryId { get; set; }
     }
+
     public class BonusImportResult
     {
         public int SiteId { get; set; }
@@ -121,8 +134,8 @@ namespace BackendSite.Service.Model
         public string Memo { get; set; }
         public int Status { get; set; }
         public string ErrorMessage { get; set; }
-
     }
+
     public class ScratchCard
     {
         public string SpecialCode { get; set; }
@@ -133,6 +146,7 @@ namespace BackendSite.Service.Model
         public DateTime UpdateTime { get; set; }
         public string LastUpdateUser { get; set; }
     }
+
     public class ScratchCardExport
     {
         public string SpecialCode { get; set; }
@@ -141,5 +155,12 @@ namespace BackendSite.Service.Model
         public DateTime CreateTime { get; set; }
         public DateTime UpdateTime { get; set; }
         public string Creator { get; set; }
+    }
+
+    public class DisplayConditionAbountVipLevel
+    {
+        public bool IsForVipLevel  { get; set; }
+
+        public IEnumerable<int> SelectedVipLevel { get; set; }
     }
 }
