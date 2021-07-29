@@ -16,7 +16,7 @@ namespace BackendSite.Service.BLL
             this.newsServices = newsServices;
         }
 
-        public IEnumerable<News> GetNewsList(IEnumerable<int> SelectSite, long StartDate, long EndDate, int PageSize, int PageNumber, int Status)
+        public NewsData GetNewsList(IEnumerable<int> SelectSite, long StartDate, long EndDate, int PageSize, int PageNumber, int Status)
         {
             return newsServices.GetNewsList(SelectSite, StartDate, EndDate, PageSize, PageNumber, Status);
         }

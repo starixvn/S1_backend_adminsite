@@ -57,23 +57,32 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<News>> GetNewsList(GetNewsPara para)
+        public ApiListResult<News> GetNewsList(GetNewsPara para)
         {
-            var result = new ApiResult<IEnumerable<News>>();
-
+            //var result = new ApiResult<IEnumerable<News>>();
+            var apiResult = new ApiListResult<News>();
             try
             {
-                var siteList = serverInfoBLL.GetSiteListByLoginUser();
-                result.Data = newsBLL.GetNewsList(para.SelectSite,para.StartDate, para.EndDate, para.PageSize, para.PageNumber, para.Status).Where(n=> siteList.Any(s=> s.SiteId == n.SiteId));
-                result.ErrorCode = 0;
+                var SearchResult = newsBLL.GetNewsList(para.SelectSite, para.StartDate, para.EndDate, para.PageSize, para.PageNumber, para.Status);
+                apiResult.Data = SearchResult.NewsList;
+                apiResult.PageNumber = SearchResult.PageNumber;
+                apiResult.TotalPages = SearchResult.TotalPages;
+                apiResult.RowCount = SearchResult.RowCount;
+                apiResult.ErrorCode = 0;
+                //var siteList = serverInfoBLL.GetSiteListByLoginUser();
+                //result.Data = newsBLL.GetNewsList(para.SelectSite,para.StartDate, para.EndDate, para.PageSize, para.PageNumber, para.Status).Where(n=> siteList.Any(s=> s.SiteId == n.SiteId));
+                //result.ErrorCode = 0;
             }
             catch (Exception ex)
             {
-                result.ErrorCode = 999;
-                result.RawMessage = ex.Message;
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+                //result.ErrorCode = 999;
+                //result.RawMessage = ex.Message;
             }
 
-            return result;
+            //return result;
+            return apiResult;
         }
 
         [HttpPost]

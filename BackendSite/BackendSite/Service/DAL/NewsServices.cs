@@ -19,7 +19,7 @@ namespace BackendSite.Service.DAL
             this.configuration = configuration;
         }
 
-        public IEnumerable<News> GetNewsList(IEnumerable<int> SelectSite, long StartDate, long EndDate, int PageSize, int PageNumber, int Status)
+        public NewsData GetNewsList(IEnumerable<int> SelectSite, long StartDate, long EndDate, int PageSize, int PageNumber, int Status)
         {
             NewsData SearchData = new NewsData();
             DynamicParameters props = new DynamicParameters();
@@ -28,10 +28,24 @@ namespace BackendSite.Service.DAL
             props.Add("EndDate", EndDate);
             props.Add("PageSize", PageSize);
             props.Add("Status", Status);
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                return conn.Query<News>("Admin_News_Get", commandType: CommandType.StoredProcedure);
-            }
+            props.Add("PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+
+            var result = conn.Query<News>("Admin_NewsV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
+
+            SearchData.NewsList = result;
+            SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            SearchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
+
+            return SearchData;
+            //using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            //{
+            //    return conn.Query<News>("Admin_News_Get", commandType: CommandType.StoredProcedure);
+            //}
         }
 
         public News GetNewsById(int NewsId)
