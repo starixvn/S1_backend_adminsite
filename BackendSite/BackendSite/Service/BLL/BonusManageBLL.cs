@@ -124,13 +124,23 @@ namespace BackendSite.Service.BLL
             }
             return 0;
         }
-        public IEnumerable<ScratchCard> GetScratchCardList(string specialCode)
+        public IEnumerable<ScratchCard> GetScratchCardList(string specialCode, int filterType)
         {
-            return bonusManageService.GetScratchCardList(specialCode);
+            var ScratchCardList = bonusManageService.GetScratchCardList(specialCode);
+            if(filterType == 1) //unused
+                 ScratchCardList = ScratchCardList.Where(x => x.CustId == 0);
+            else if (filterType == 2) //used
+                ScratchCardList = ScratchCardList.Where(x => x.CustId != 0);
+            return ScratchCardList;
         }
-        public IEnumerable<ScratchCardExport> GetScratchCardListExport(string specialCode)
+        public IEnumerable<ScratchCardExport> GetScratchCardListExport(string specialCode, int filterType)
         {
-            return bonusManageService.GetScratchCardListExport(specialCode);
+            var ScratchCardList = bonusManageService.GetScratchCardListExport(specialCode);
+            if (filterType == 1) //unused
+                ScratchCardList = ScratchCardList.Where(x => x.Joiner == null);
+            else if (filterType == 2) //used
+                ScratchCardList = ScratchCardList.Where(x => x.Joiner != null);
+            return ScratchCardList;
         }
     }
 }

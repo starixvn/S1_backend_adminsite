@@ -485,6 +485,7 @@ namespace BackendSite.Controllers.Api
         public class GetScratchCardListReq
         {
             public string SpecialCode { get; set; }
+            public int FilterType { get; set; }
         }
         [HttpPost]
         public ApiResult<IEnumerable<ScratchCard>> GetScratchCardList(GetScratchCardListReq getScratchCardListReq)
@@ -492,7 +493,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<ScratchCard>>();
             try
             {
-                apiResult.Data = bonusManageBLL.GetScratchCardList(getScratchCardListReq.SpecialCode);
+                apiResult.Data = bonusManageBLL.GetScratchCardList(getScratchCardListReq.SpecialCode, getScratchCardListReq.FilterType);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -504,10 +505,10 @@ namespace BackendSite.Controllers.Api
         }
   
         [HttpPost]
-        public IActionResult GetScratchCardListExport(string SpecialCode)
+        public IActionResult GetScratchCardListExport(string SpecialCode, int FilterType)
         {
 
-            var ExportData = bonusManageBLL.GetScratchCardListExport(SpecialCode);
+            var ExportData = bonusManageBLL.GetScratchCardListExport(SpecialCode, FilterType);
            
             var stream = excelBLL.Export(ExportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"ScratchCardList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

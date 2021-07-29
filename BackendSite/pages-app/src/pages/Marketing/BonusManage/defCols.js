@@ -115,5 +115,9 @@ export const initDeviceType = [
 	{ value: 2, displayText: "Web" },
 	{ value: 3, displayText: "App" }
 ];
-
+export const initFilterType = [
+	{ value: 0, displayText: "All" },
+	{ value: 1, displayText: "New" },
+	{ value: 2, displayText: "Used" }
+];
 export const initPromotionAction = () => Object.values(defPromotionAction);
