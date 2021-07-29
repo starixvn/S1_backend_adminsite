@@ -244,6 +244,8 @@ export default ({
 						dataColumn="Device"
 						SelectedValue={StateFilter.Device}
 					/>
+				</div>
+				<div className="row-flex">
 					<DateTimePickerElem
 						columnTitle="From"
 						dateTimePickerProps={{
@@ -277,11 +279,11 @@ export default ({
 						}}
 					/>
 					<InputField
-          columnTitle="Bonus Code"
-          defaultValue={StateFilter.BonusCode}
-          dataColumn="BonusCode"
-          onChange={FilterOnchange}
-        />
+                        columnTitle="Bonus Code"
+                        defaultValue={StateFilter.BonusCode}
+                        dataColumn="BonusCode"
+                        onChange={FilterOnchange}
+                    />
 					<button
 						className="btn btn-search"
 						style={{ marginBottom: "10px" }}
