@@ -52,7 +52,7 @@ const App = () => {
       if (res.data.errorCode === 0) {
         let _siteList = {};
         res.data.data.forEach((s) => {
-          _siteList[s.siteId] = s.siteName;
+          _siteList[s.siteId] = s;
         });
         setSiteList(_siteList);
       } else {

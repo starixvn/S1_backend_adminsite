@@ -38,8 +38,8 @@ const EditPanel = props => {
 		subject: props.IsAdd ? {} : JSON.parse(props.Datas.subject),
 		content: props.IsAdd ? {} : JSON.parse(props.Datas.content)
 	});
-
-	let allLang = ["en", "cs", "ch", "th", "id", "vn"];
+	const [langDatas, setlangDatas] = useState(null);
+    let allLang = ["en", "cs", "ch", "th", "id", "vn"];
 
 	const EditFiled = (v, datacolumn, subDatas) => {
 		if (subDatas && subDatas.lang) {
@@ -54,8 +54,9 @@ const EditPanel = props => {
 			updateData({
 				...stateData,
 				[datacolumn]: v,
-				siteName: v == 0 ? allSiteDisplayText : props.siteList[v]
+				siteName: v == 0 ? allSiteDisplayText : props.siteList[v].siteName
 			});
+			setlangDatas( props.siteList[v == 0?1:v].iLangList);
 		} else {
 			updateData({
 				...stateData,
@@ -87,8 +88,9 @@ const EditPanel = props => {
 			alert(msg);
 		}
 	};
+	
 
-	let langPanels = allLang.map(lang => {
+	let langPanels = ( langDatas != null ? langDatas.map(lang => {
 		return (
 			<OuterPanel
 				key={`set-panel-${lang}`}
@@ -103,8 +105,7 @@ const EditPanel = props => {
 				}
 			/>
 		);
-	});
-
+	}):null);
 	let commonRows = commonColDefs.map((col, cIdx) => {
 		let elem = <></>;
 		let key = `common-col-${cIdx}`;
@@ -166,7 +167,12 @@ const EditPanel = props => {
 				datacolumn={"siteId"}
 			/>
 			{commonRows}
-			{langPanels}
+			{
+				langDatas !=null?
+        		langPanels
+				:null
+			}
+
 			<button
 				className="btn btn-add"
 				style={{
@@ -257,7 +263,7 @@ const SiteList = ({ siteList, onChange, currentSelect, datacolumn }) => {
 	let radio =
 		siteList &&
 		Object.keys(siteList).map(siteId => {
-			let siteName = siteList[siteId];
+			let siteName = siteList[siteId].siteName;
 			return (
 				<RadioItem
 					key={`opt-site-${siteId}`}

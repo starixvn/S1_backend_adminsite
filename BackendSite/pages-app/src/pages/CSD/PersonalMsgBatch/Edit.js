@@ -22,11 +22,14 @@ const EditPanel = (props) => {
         defaultData.optSite = props.DetailDatas.siteId;
         defaultData.subject = Title;
         defaultData.content = Content;
+        // console.log('props.DetailDatas.siteId = '+props.DetailDatas.siteId,'iLangList = '+props.SiteList[props.DetailDatas.siteId-1].iLangList);
+        // setlangDatas( props.SiteList[props.DetailDatas.siteId-1].iLangList);
     }
 
     const [stateData, updateData] = useState(defaultData);
     const [stateSend, updateSend] = useState(false);
     const [sendData, updateSendData] = useState([]);
+    const [langDatas, setlangDatas] = useState(props.DetailDatas !== null?props.SiteList[props.DetailDatas.siteId-1].iLangList:null );
     const isMountedRef = useRef(null);
     useEffect(() => {
         isMountedRef.current = true;
@@ -45,12 +48,17 @@ const EditPanel = (props) => {
                     [subDatas.lang]: v
                 }
             });
+           // console.log('1v = '+v,'datacolumn = '+datacolumn, 'subDatas = '+subDatas);
+            
         } else {
             updateData({
                 ...stateData,
                 [datacolumn]: v
             });
+            //console.log('2v = '+v,'datacolumn = '+datacolumn, 'subDatas = '+subDatas);
+            setlangDatas( props.SiteList[v-1].iLangList);
         }
+        
     }
 
     const SetMsg = () => {
@@ -73,12 +81,15 @@ const EditPanel = (props) => {
 
             if (check && window.confirm("Are you sure to import data to " + _site[stateData.optSite] + "?")) {
                 let msg = {};
-                allLang.forEach(lang => {
-                    msg[lang] = {
-                        Title: stateData.subject.en,
-                        Content: stateData.content.en
-                    }
-                });
+                if(langDatas != null)
+                {
+                    langDatas.forEach(lang => {
+                        msg[lang] = {
+                            Title: stateData.subject.en,
+                            Content: stateData.content.en
+                        }
+                    });
+                }
 
                 Object.keys(stateData.subject).forEach(sKey => {
                     if (stateData.subject[sKey]) {
@@ -163,12 +174,15 @@ const EditPanel = (props) => {
 
             if (check && window.confirm("Are you sure to update data to " + _site[stateData.optSite] + "?")) {
                 let msg = {};
-                allLang.forEach(lang => {
-                    msg[lang] = {
-                        Title: stateData.subject.en,
-                        Content: stateData.content.en
-                    }
-                });
+                if(langDatas != null)
+                {
+                    langDatas.forEach(lang => {
+                        msg[lang] = {
+                            Title: stateData.subject.en,
+                            Content: stateData.content.en
+                        }
+                    });
+                }
 
                 Object.keys(stateData.subject).forEach(sKey => {
                     if (stateData.subject[sKey]) {
@@ -252,6 +266,7 @@ const EditPanel = (props) => {
                     null
             )
         });
+        
     } else {
         radio = props.SiteList.map((value) => {
             _site[value.siteId] = value.siteName;
@@ -264,7 +279,7 @@ const EditPanel = (props) => {
         });
     }
 
-    let langPanels = allLang.map(lang => {
+    let langPanels = langDatas != null ?langDatas.map(lang => {
         return (
             <OuterPanel
                 key={`set-panel-${lang}`}
@@ -278,7 +293,7 @@ const EditPanel = (props) => {
                 }
             />
         );
-    });
+    }) : null;
     let result = sendData.map((value, key) => { return <p key={`result-${key}`}>{value.message}</p> })
     return (
         <>
