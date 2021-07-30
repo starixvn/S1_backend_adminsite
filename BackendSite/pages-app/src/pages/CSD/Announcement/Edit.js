@@ -38,9 +38,8 @@ const EditPanel = props => {
 		subject: props.IsAdd ? {} : JSON.parse(props.Datas.subject),
 		content: props.IsAdd ? {} : JSON.parse(props.Datas.content)
 	});
-	const [langDatas, setlangDatas] = useState(null);
+	const [langDatas, setlangDatas] = useState(props.IsAdd ? null : props.siteList[props.Datas.siteId == 0?1:props.Datas.siteId].iLangList);
     let allLang = ["en", "cs", "ch", "th", "id", "vn"];
-
 	const EditFiled = (v, datacolumn, subDatas) => {
 		if (subDatas && subDatas.lang) {
 			updateData({
