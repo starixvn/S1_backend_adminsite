@@ -20,6 +20,7 @@ namespace BackendSite.Service.Model
         public int IsTest { set; get; }
         public string SabaID { get; set; }
         public string Operator { get; set; }
+        public string WalletType { get; set; }
     }
 
     public class PaymentAdjustmentFrontEnd
@@ -36,5 +37,6 @@ namespace BackendSite.Service.Model
         public string Memo { set; get; }
         public string SabaID { get; set; }
         public string Operator { get; set; }
+        public string WalletType { get; set; }
     }
 }
