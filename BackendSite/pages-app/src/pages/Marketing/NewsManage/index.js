@@ -30,7 +30,9 @@ const App = () => {
   });
   const [stateDatas, setDatas] = useState({
     PageInfo: null,
-    FilterInfo: null,
+    FilterInfo: {
+      SelectSite: []
+    },
   });
 
   useEffect(() => {
@@ -61,38 +63,6 @@ const App = () => {
     });
   }, []);
 
-  // useEffect(() => {
-  //   WebAPI.PostData({
-  //     Url: "News/GetNewsList",
-  //   }).then((res) => {
-  //     if (isMountedRef.current) {
-  //       if (res.data.errorCode === 0) {
-  //         dispatch({
-  //           type: defActionType.SET_DATA_LIST,
-  //           dataList: res.data.data,
-  //         });
-  //       } else {
-  //         alert(res.data.message ?? "failed to get data.");
-  //       }
-  //     }
-  //   });
-
-  //   WebAPI.PostData({
-  //     Url: "News/GetSiteListByLoginUser",
-  //   }).then((res) => {
-  //     if (isMountedRef.current) {
-  //       if (res.data.errorCode === 0) {
-  //         dispatch({
-  //           type: defActionType.SET_SITE_LIST,
-  //           siteList: res.data.data,
-  //         });
-  //       } else {
-  //         alert(res.data.message ?? "failed to get data.");
-  //       }
-  //     }
-  //   });
-  // }, []);
-
   const Filter_Submit = () => {
     if (stateFilter.SelectSite.length === 0) {
       alert("Please Choose at least one Site");
@@ -121,7 +91,12 @@ const App = () => {
               rowCount: res.data.rowCount,
             },
             FilterInfo: {
-              ...stateFilter,
+              SelectSite: stateFilter.SelectSite,
+              StartDate: stateFilter.StartDate,
+              EndDate: stateFilter.EndDate,
+              Status: stateFilter.Status,
+              PageNumber: Data.PageNumber,
+              PageSize: 10,
             },
           });
         } else {
@@ -160,6 +135,14 @@ const App = () => {
               totalPages: res.data.totalPages,
               pageNumber: PageNumber,
               rowCount: res.data.rowCount,
+            },
+            FilterInfo: {
+              SelectSite: stateDatas.FilterInfo.SelectSite,
+              StartDate: stateDatas.FilterInfo.StartDate,
+              EndDate: stateDatas.FilterInfo.EndDate,
+              Status: stateDatas.FilterInfo.Status,
+              PageNumber: PageNumber,
+              PageSize: 10,
             },
           });
         } else {
@@ -258,18 +241,18 @@ const App = () => {
         (res) => {
           if (isMountedRef.current) {
             if (res.data.errorCode === 0) {
-              if (stateFilter.SelectSite.length === 0) {
+              if (stateDatas.FilterInfo.SelectSite.length === 0) {
                 dispatch({
                   type: defActionType.SET_DATA_LIST,
                   dataList: [],
                 });
               } else {
                 let Data = {
-                  SelectSite: stateFilter.SelectSite,
-                  StartDate: moment(stateFilter.StartDate).unix(),
-                  EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
-                  Status: parseInt(stateFilter.Status, 10),
-                  PageNumber: 1,
+                  SelectSite: stateDatas.FilterInfo.SelectSite,
+                  StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
+                  EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
+                  Status: parseInt(stateDatas.FilterInfo.Status, 10),
+                  PageNumber: stateDatas.FilterInfo.PageNumber,
                   PageSize: 10,
                 };
                 api
@@ -281,14 +264,12 @@ const App = () => {
                         dataList: res.data.data,
                       });
                       setDatas({
+                        ...stateDatas,
                         PageInfo: {
                           totalPages: res.data.totalPages,
-                          pageNumber: 1,
+                          pageNumber: stateDatas.FilterInfo.PageNumber,
                           rowCount: res.data.rowCount,
-                        },
-                        FilterInfo: {
-                          ...stateFilter,
-                        },
+                        }
                       });
                     } else {
                       alert(res.data.message ?? "failed to get data.");
@@ -299,22 +280,6 @@ const App = () => {
                   });
               }
               setProcessing(false);
-              // WebAPI.PostData({
-              //   Url: "News/GetNewsList",
-              // }).then((res) => {
-              //   if (isMountedRef.current) {
-              //     if (res.data.errorCode === 0) {
-              //       dispatch({
-              //         type: defActionType.SET_DATA_LIST,
-              //         dataList: res.data.data,
-              //       });
-              //     } else {
-              //       alert(res.data.message ?? "failed to get data.");
-              //     }
-
-              //     setProcessing(false);
-              //   }
-              // });
             } else {
               alert(res.data.message ?? "failed to set data.");
               setProcessing(false);

@@ -42,10 +42,6 @@ namespace BackendSite.Service.DAL
             SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
 
             return SearchData;
-            //using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            //{
-            //    return conn.Query<News>("Admin_News_Get", commandType: CommandType.StoredProcedure);
-            //}
         }
 
         public News GetNewsById(int NewsId)

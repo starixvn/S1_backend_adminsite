@@ -59,7 +59,6 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<News> GetNewsList(GetNewsPara para)
         {
-            //var result = new ApiResult<IEnumerable<News>>();
             var apiResult = new ApiListResult<News>();
             try
             {
@@ -69,19 +68,13 @@ namespace BackendSite.Controllers.Api
                 apiResult.TotalPages = SearchResult.TotalPages;
                 apiResult.RowCount = SearchResult.RowCount;
                 apiResult.ErrorCode = 0;
-                //var siteList = serverInfoBLL.GetSiteListByLoginUser();
-                //result.Data = newsBLL.GetNewsList(para.SelectSite,para.StartDate, para.EndDate, para.PageSize, para.PageNumber, para.Status).Where(n=> siteList.Any(s=> s.SiteId == n.SiteId));
-                //result.ErrorCode = 0;
             }
             catch (Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
-                //result.ErrorCode = 999;
-                //result.RawMessage = ex.Message;
             }
 
-            //return result;
             return apiResult;
         }
 
