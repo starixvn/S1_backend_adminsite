@@ -226,7 +226,7 @@ const App = () => {
         Content: JSON.stringify(content),
         ImageURL: JSON.stringify(imageURL),
         Status: data.status,
-        UnixPostTime: moment(data.UnixPostTime).unix(),
+        UnixPostTime: moment(data.postTime).unix(),
         Sort: data.sort,
         NewsId: data.newsId,
       };
