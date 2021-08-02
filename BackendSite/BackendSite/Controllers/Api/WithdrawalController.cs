@@ -312,8 +312,8 @@ namespace BackendSite.Controllers.Api
                             PayId = withdrawalInfo.PayId ?? 0,
                             AccountName = withdrawalInfo.AccountName,
                             AccountNo = withdrawalInfo.AccountNo,
-                            IFSCCode = withdrawalInfo.IFSCCode,
-                            ReturnUrl = Url.RouteUrl("desktop", new { action = "Deposit", controller = "Cashier", authData.LangId }, protocol: Request.Scheme, host: Request.Host.Port == 80 ? Request.Host.Host : $"{Request.Host.Host}:{Request.Host.Port}")
+                            IFSCCode = withdrawalInfo.IFSCCode
+                            //ReturnUrl = Url.RouteUrl("desktop", new { action = "Deposit", controller = "Cashier", authData.LangId }, protocol: Request.Scheme, host: Request.Host.Port == 80 ? Request.Host.Host : $"{Request.Host.Host}:{Request.Host.Port}")
                         };
 
 

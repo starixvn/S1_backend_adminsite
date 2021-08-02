@@ -78,7 +78,7 @@ namespace BackendSite.Service.BLL
                 authData.UserId = userId;
                 authData.UserName = httpContextAccessor.HttpContext.User.Identity.Name;
                 //authData.Token = httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == "Token").Value;
-                authData.LangId = httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == "LangId").Value;
+                //authData.LangId = httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == "LangId").Value;
             }
 
             return authData;
