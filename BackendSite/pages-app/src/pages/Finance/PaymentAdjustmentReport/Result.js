@@ -27,6 +27,10 @@ const dataColumnDefs = () => {
             columnTitle: 'Currency',
         },
         {
+            dataColumn: 'walletType',
+            columnTitle: 'WalletType',
+        },
+        {
             dataColumn: 'amount',
             columnTitle: 'Amount',
             header: {

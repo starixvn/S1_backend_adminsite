@@ -586,7 +586,10 @@
     <value>Reduce Bonus</value>
   </data>
   <data name="lbl_AdjustmentType5" xml:space="preserve">
-    <value>3RD</value>
+    <value>3RD Add</value>
+  </data>
+  <data name="lbl_AdjustmentType6" xml:space="preserve">
+    <value>3RD Minus</value>
   </data>
   <data name="lbl_BonusStatus1" xml:space="preserve">
     <value>Running</value>
