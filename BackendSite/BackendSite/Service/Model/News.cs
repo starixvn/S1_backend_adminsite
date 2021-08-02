@@ -22,4 +22,11 @@ namespace BackendSite.Service.Model
         public string LastUpdateUser { get; set; }
         public int? Sort { get; set; }
     }
+    public class NewsData 
+    {
+        public List<News> NewsList { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
 }
