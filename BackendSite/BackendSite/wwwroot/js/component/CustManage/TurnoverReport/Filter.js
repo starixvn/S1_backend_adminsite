@@ -1,9 +1,20 @@
 import DateTimePicker from "react-datetime";
 
+const defDateType = {
+  0: "",
+  1: "Today",
+  2: "Yesterday",
+  3: "This Week",
+  4: "Last Week",
+  5: "This Month",
+  6: "Last Month",
+};
+
 const Filter = (props) => {
   const [DateRangeDatas, setDateRange] = React.useState({
     StartTime: moment.utc(new Date()).add(8,'hour').add(-1, "days").format("l LTS"),
     EndTime: moment.utc(new Date()).add(8,'hour').format("l LTS"),
+    DateQuickPicker: "0"
   });
 
   const EditDateRangeFiled = (v, col) => {
@@ -12,6 +23,58 @@ const Filter = (props) => {
       [col]: v,
     });
   };
+  const EditDate = (v, col) =>{
+    let _startDate = "";
+    let _endDate = "";
+
+    switch (v) {
+      case "1":
+          _startDate = moment().startOf("day");
+          _endDate = moment().endOf("day");
+        break;
+      case "2":
+        _startDate = moment().subtract(1, "days");
+        _endDate = moment().subtract(1, "days");
+
+        break;
+      case "3":
+        _startDate = moment().startOf("week");
+        _endDate = moment().endOf("week");
+
+        break;
+      case "4":
+        _startDate = moment().subtract(1, "week").startOf("week");
+        _endDate = moment().subtract(1, "week").endOf("week");
+
+        break;
+      case "5":
+        _startDate = moment().startOf("month");
+        _endDate = moment().endOf("month");
+
+        break;
+      case "6":
+        _startDate = moment().subtract(1, "month").startOf("month");
+        _endDate = moment().subtract(1, "month").endOf("month");
+
+        break;
+      default:
+        break;
+    }
+
+    if (v !== "0") {
+      setDateRange({
+        ...DateRangeDatas,
+        ["StartTime"]: _startDate,
+        ["EndTime"]: _endDate,
+        ["DateQuickPicker"]:v
+      });
+    }else{
+      setDateRange({
+        ...DateRangeDatas,
+        ["DateQuickPicker"]:v
+      });
+    }
+  }
 
   const [GameListDatas, setGameList] = React.useState([]);
   React.useEffect(() => {
@@ -77,6 +140,7 @@ const Filter = (props) => {
         <DateTimePickerElem
           columnTitle="StartTime"
           dateTimePickerProps={{
+            value:DateRangeDatas.StartTime,
             defaultValue: DateRangeDatas.StartTime,
             onBlur: (e) => {
               try {
@@ -88,6 +152,7 @@ const Filter = (props) => {
         <DateTimePickerElem
           columnTitle="EndTime"
           dateTimePickerProps={{
+            value:DateRangeDatas.EndTime,
             defaultValue: DateRangeDatas.EndTime,
             onBlur: (e) => {
               try {
@@ -95,6 +160,16 @@ const Filter = (props) => {
               } catch (ex) {}
             },
           }}
+        />
+        <DropDownBox
+          columnTitle="Date Quick Picker"
+          options={Object.keys(defDateType).map((key) => {
+            return { value: key, displayText: defDateType[key] };
+          })}
+          hasAll={false}
+          value={DateRangeDatas.DateQuickPicker}
+          dataColumn="DateQuickPicker"
+          onChange={(e)=>EditDate(e,"DateQuickPicker")}
         />
       </div>
       <div className="row-flex">
@@ -171,6 +246,32 @@ const CheckBox = (props) => {
       <i className="icon icon-checkbox"></i>
       <span className="text">{props.Title}</span>
     </label>
+  );
+};
+
+const DropDownBox = (props) => {
+  const onChange = (e) => {
+    if (props.onChange) {
+      props.onChange(e.target.value, props.dataColumn);
+    }
+  };
+  let optionRows = props.options.map((item) => {
+    return (
+      <option key={`${props.ColumnTitle}-${item.value}`} value={item.value}>
+        {item.displayText}
+      </option>
+    );
+  });
+  return (
+    <div className="input-item">
+      <span className="label">{props.columnTitle}</span>
+      <div className="field">
+        <select value={props.value} onChange={onChange}>
+          {props.hasAll ? <option value="0">All</option> : null}
+          {optionRows}
+        </select>
+      </div>
+    </div>
   );
 };
 
