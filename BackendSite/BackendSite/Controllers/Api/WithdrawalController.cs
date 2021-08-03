@@ -312,6 +312,7 @@ namespace BackendSite.Controllers.Api
                             PayId = withdrawalInfo.PayId ?? 0,
                             AccountName = withdrawalInfo.AccountName,
                             AccountNo = withdrawalInfo.AccountNo,
+                            IFSCCode = withdrawalInfo.IFSCCode
                             //ReturnUrl = Url.RouteUrl("desktop", new { action = "Deposit", controller = "Cashier", authData.LangId }, protocol: Request.Scheme, host: Request.Host.Port == 80 ? Request.Host.Host : $"{Request.Host.Host}:{Request.Host.Port}")
                         };
 
@@ -388,6 +389,7 @@ namespace BackendSite.Controllers.Api
             //public string ClientIP { set; get; }
             public string AccountName { set; get; }
             public string AccountNo { set; get; }
+            public string IFSCCode { set; get; }
             public string ReturnUrl { set; get; }
         }
 
