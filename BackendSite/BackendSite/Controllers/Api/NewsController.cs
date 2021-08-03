@@ -46,24 +46,36 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        [HttpPost]
-        public ApiResult<IEnumerable<News>> GetNewsList()
+        public class GetNewsPara 
         {
-            var result = new ApiResult<IEnumerable<News>>();
+            public IEnumerable<int> SelectSite { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
+            public int PageSize { get; set; }
+            public int PageNumber { get; set; }
+            public int Status { get; set; }
+        }
 
+        [HttpPost]
+        public ApiListResult<News> GetNewsList(GetNewsPara para)
+        {
+            var apiResult = new ApiListResult<News>();
             try
             {
-                var siteList = serverInfoBLL.GetSiteListByLoginUser();
-                result.Data = newsBLL.GetNewsList().Where(n=> siteList.Any(s=> s.SiteId == n.SiteId));
-                result.ErrorCode = 0;
+                var SearchResult = newsBLL.GetNewsList(para.SelectSite, para.StartDate, para.EndDate, para.PageSize, para.PageNumber, para.Status);
+                apiResult.Data = SearchResult.NewsList;
+                apiResult.PageNumber = SearchResult.PageNumber;
+                apiResult.TotalPages = SearchResult.TotalPages;
+                apiResult.RowCount = SearchResult.RowCount;
+                apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
             {
-                result.ErrorCode = 999;
-                result.RawMessage = ex.Message;
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
             }
 
-            return result;
+            return apiResult;
         }
 
         [HttpPost]

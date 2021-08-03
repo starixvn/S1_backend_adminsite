@@ -35,6 +35,24 @@ export default props => {
 	}, []);
 
 	useEffect(() => {
+		let param = {
+			Url: "BonusManage/GetAllSiteVipLevelList"
+		};
+		WebAPI.PostData(param).then(res => {
+			if (isMountedRef.current) {
+				if (res.data.errorCode === 0) {
+					dispatch({
+						type: defActionType.GET_SITE_VIPLEVEL,
+						allSiteVipLevelList: res.data.data
+					});
+				} else {
+					alert(res.data.message ?? "failed to get data.");
+				}
+			}
+		});
+	}, []);
+
+	useEffect(() => {
 		if (!props.IsAdd) {
 			GetPromoCategories(true, -1, props.Datas.walletType);
 		}
@@ -102,6 +120,14 @@ export default props => {
 				state[key].length === 0
 			) {
 				alert("Please select at least one currency.");
+				checked = false;
+				break;
+			}else if (
+				key === "forVipLevel" &&
+				state.forVipLevel.length === 1 &&
+				state.selectedVipLevel.length === 0
+			) {
+				alert("[For Vip Level] is Open. Please select at least one level.");
 				checked = false;
 				break;
 			}
@@ -195,6 +221,18 @@ export default props => {
 		dispatch({ type: defActionType.AUTOEXTEND_SET_VALUE, value, dataColumn });
 	};
 
+	const EditForVipLevelValue = (value, dataColumn) => {
+		dispatch({ type: defActionType.FORVIPLEVEL_SET_VALUE, value, dataColumn });
+	};
+
+	const EditSelectedVipLevel = (value, dataColumn) => {
+		dispatch({
+			type: defActionType.VIPLEVEL_SET_VALUE,
+			value,
+			dataColumn
+		});
+	};
+
 	const GetPromoCategories = (isInit, walletType, value) => {
 		if (walletType !== value) {
 			let param = {
@@ -227,7 +265,6 @@ export default props => {
 			dataColumn
 		});
 	};
-
 	return (
 		<>
 			<div className="filter noBGcolor">
@@ -237,6 +274,7 @@ export default props => {
 					OnChange={SelectSite}
 					dataColumn="availableSites"
 					Selected={state.siteId}
+					Disable={!props.IsAdd}
 				/>
 			</div>
 			<Panel
@@ -255,7 +293,9 @@ export default props => {
 					EditCurrencyAmountValue,
 					EditTpGameCategoryValue,
 					EditOnlyRegisteredValue,
-					EditAutoExtendValue
+					EditAutoExtendValue,
+					EditForVipLevelValue,
+					EditSelectedVipLevel
 				}}
 				siteList={props.SiteList}
 				IsAdd={props.IsAdd}

@@ -81,7 +81,8 @@ namespace BackendSite.Service.Model.enums
         Credit = 2,
         IncreaseBonus = 3,
         ReduceBonus = 4,
-        Third = 5
+        ThirdAdd = 5,
+        ThirdMinus = 6
     }
 
     public enum AdminUserStatus
@@ -145,6 +146,11 @@ namespace BackendSite.Service.Model.enums
         vn = 5
     }
 
+    public enum PromotionDisplayConditionType
+    {
+        VipLevel=1
+    }
+    
     #region Bank Financial Account
 
     /// <summary>

@@ -20,14 +20,15 @@ const App = () => {
 	// const [stateFilter, setFilter] = useState({
 	// 	'SelectSite': ['checkStatus']
 	// });
-	const [sitnemaFilter, setSitnameFilter] = useState([]);
+	const [siteNameFilter, setSiteNameFilter] = useState([]);
 	const [promotionTypeFilter, setPromotionTypeFilter] = useState([]);
 	const [statusCheck, setStatusCheck] = useState([]);
 	const [stateFilter, setFilter] = useState({
 		Status: 0,
 		StartDate: moment().add(-10, "days").format("l"),
 		EndDate: moment().format("l"),
-		Device: 0
+		Device: 0,
+		BonusCode:null
 	  });
 
 
@@ -72,19 +73,29 @@ const App = () => {
 		WebAPI.PostData(param1).then(x => {
 			if (isMountedRef.current) {
 				if (x.data.errorCode === 0) {
-					let initSitnemaFilter = GetInitSelectedSiteName(x.data.data);
+					let initSiteNameFilter = GetInitSelectedSiteName(x.data.data);
 					let intPromotionTypeFilter = GetInitSelectedPromotionType(initPromotionType);
-					setSitnameFilter(initSitnemaFilter);
-					setPromotionTypeFilter(initPromotionType);
+					setSiteNameFilter(initSiteNameFilter);
+					setPromotionTypeFilter(intPromotionTypeFilter);
+					
+					const SiteIds = [];
+					initSiteNameFilter.map((o) => {
+						SiteIds.push(o.value);
+					});
+					const PromotionTypes = [];
+					initPromotionType.map((o) => {
+						PromotionTypes.push(o.value);
+					});
 					let param = {
 						Url: "BonusManage/GetPromotionList",
 						Data: qs.stringify({
-							SiteidFilter: JSON.stringify(initSitnemaFilter),
-							PromotionTypeFilter: JSON.stringify(intPromotionTypeFilter),
+							SiteIds: SiteIds,
+							PromotionTypes: PromotionTypes,
 							Status: 0,
 							StartDate: moment(stateFilter.StartDate).unix(),
         					EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
-							Device: 0
+							Device: 0,
+							BonusCode:stateFilter.BonusCode
 						})
 					};
 					WebAPI.PostData(param).then(res => {
@@ -231,19 +242,33 @@ const App = () => {
 				OnlyRegistered: promotion.onlyRegistered.length > 0 ? true : false,
 				AutoExtend: promotion.autoExtend.length > 0 ? 1 : 0
 			};
+			const SiteIds = [];
+			siteNameFilter.map((o) => {
+				SiteIds.push(o.value);
+			});
+			const PromotionTypes = [];
+			promotionTypeFilter.map((o) => {
+				PromotionTypes.push(o.value);
+			});
 			let _select = {
-				SiteidFilter: JSON.stringify(sitnemaFilter),
-				PromotionTypeFilter: JSON.stringify(promotionTypeFilter),
+				SiteIds: SiteIds,
+				PromotionTypes: PromotionTypes,
 				Status: parseInt(stateFilter.Status,10),
 				StartDate: moment(stateFilter.StartDate).unix(),
         		EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
+				BonusCode:stateFilter.BonusCode
 			};
+			let _vipLevelCondition={
+				IsForVipLevel:promotion.forVipLevel.includes(1) ? true : false,
+				SelectedVipLevel:promotion.selectedVipLevel
+			}
 			let param = {
 				Url: "BonusManage/SetPromotion",
 				Data: qs.stringify({
-					IsAdd: state.panelType === defPanelType.Add,
-					Promotion: _promo,
-					Select: _select
+					isAdd: state.panelType === defPanelType.Add,
+					promotion: _promo,
+					request: _select,
+					vipLevelCondition:_vipLevelCondition
 				})
 			};
 			WebAPI.PostData(param).then(
@@ -459,25 +484,47 @@ const App = () => {
 			if (isMountedRef.current) {
 				setProcessing(true);
 			}
+			let _duplicateRequest={
+				BonusCode: state.clonePromotionData.bonusCode,
+				SiteId: state.clonePromotionData.siteId,
+				NewBonusCode: state.clonePromotionData.cloneBonusCode,
+			};
+			const SiteIds = [];
+			siteNameFilter.map((o) => {
+				SiteIds.push(o.value);
+			});
+			const PromotionTypes = [];
+			promotionTypeFilter.map((o) => {
+				PromotionTypes.push(o.value);
+			});
+			let _select = {
+				SiteIds: SiteIds,
+				PromotionTypes: PromotionTypes,
+				Status: parseInt(stateFilter.Status,10),
+				StartDate: moment(stateFilter.StartDate).unix(),
+        		EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
+				BonusCode:stateFilter.BonusCode
+			};
 			let param = {
 				Url: "BonusManage/DuplicatePromotion",
-				Data: {
-					BonusCode: state.clonePromotionData.bonusCode,
-					SiteId: state.clonePromotionData.siteId,
-					NewBonusCode: state.clonePromotionData.cloneBonusCode,
-				}
+				Data: qs.stringify({
+					duplicateRequest: _duplicateRequest,
+					request: _select
+				})
 			};
 			WebAPI.PostData(param).then(
 				res => {
 					if (isMountedRef.current) {
 						if (res.data.errorCode === 0) {
+							alert("Duplicate Successful.")
 							dispatch({
 								type: defActionType.SET_PROMOTION,
 								promotionList: res.data.data,
 								popBoxIsOpen: false,
 							});
+							SelectClick();
 						} else if (res.data.errorCode === 1062) {
-							alert("Duplicate Bonus Code.");
+							alert("Duplicate datas abount Bonus Code.");
 						} else {
 							alert(res.data.message ?? "failed to set data.");
 						}
@@ -567,17 +614,36 @@ const App = () => {
 	};
 
 	const SelectClick = () => {
+		if (siteNameFilter.length === 0) {
+			alert("Please Choose at least one Site");
+			return false;
+		  }
+	  
+		  if (promotionTypeFilter.length === 0) {
+			alert("Please Choose at least one promotion Type");
+			return false;
+		  }
+		const SiteIds = [];
+		siteNameFilter.map((o) => {
+			SiteIds.push(o.value);
+		});
+		const PromotionTypes = [];
+		promotionTypeFilter.map((o) => {
+			PromotionTypes.push(o.value);
+		});
 		let param = {
 			Url: "BonusManage/GetPromotionList",
 			Data: qs.stringify({
-				SiteidFilter: JSON.stringify(sitnemaFilter),
-				PromotionTypeFilter: JSON.stringify(promotionTypeFilter),
+				SiteIds: SiteIds,
+				PromotionTypes: PromotionTypes,
 				Status: parseInt(stateFilter.Status,10),
 				StartDate: moment(stateFilter.StartDate).unix(),
-        		EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
+				EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
 				Device: parseInt(stateFilter.Device,10),
+				BonusCode:stateFilter.BonusCode
 			})
 		};
+
 		WebAPI.PostData(param).then(res => {
 			if (isMountedRef.current) {
 				if (res.data.errorCode === 0) {
@@ -616,10 +682,10 @@ const App = () => {
 				IsOpen={state.popBoxIsOpen}
 				SiteList={state.siteList}
 				StateFilter={stateFilter}
-				SitnemaFilter={sitnemaFilter}
+				SiteNameFilter={siteNameFilter}
 				PromotionTypeFilter={promotionTypeFilter}
 				StatusCheck={statusCheck}
-				SetSitnemaFilter={setSitnameFilter}
+				SetSiteNameFilter={setSiteNameFilter}
 				SetPromotionTypeFilter={setPromotionTypeFilter}
 				StateCheckBox={StateCheckBox}
 				IsOpenGen={state.popBoxIsOpenGen}

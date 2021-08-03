@@ -4,112 +4,173 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.PromotionDisplayCondition;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
     public class BonusManageBLL
     {
-        private readonly BonusManageService bonusManageService;
-        private readonly ServerInfoBLL serverInfoBLL;
-        private readonly AuthorizeBLL authorizeBLL;
+        private readonly BonusManageService _bonusManageService;
+        private readonly ServerInfoBLL _serverInfoBLL;
+        private readonly AuthorizeBLL _authorizeBLL;
 
-        public BonusManageBLL(BonusManageService bonusManageService, ServerInfoBLL serverInfoBLL, AuthorizeBLL authorizeBLL)
+        public BonusManageBLL(BonusManageService bonusManageService,
+            ServerInfoBLL serverInfoBLL,
+            AuthorizeBLL authorizeBLL)
         {
-            this.bonusManageService = bonusManageService;
-            this.serverInfoBLL = serverInfoBLL;
-            this.authorizeBLL = authorizeBLL;
+            _bonusManageService = bonusManageService;
+            _serverInfoBLL = serverInfoBLL;
+            _authorizeBLL = authorizeBLL;
         }
 
-        public IEnumerable<PromotionInfo> GetPromotionList(int[] siteArray, PromotionSelect Select = null)
+        public IEnumerable<PromotionInfo> GetPromotionList(IEnumerable<int> siteIds,
+            IEnumerable<int> promotionTypes,
+            int status,
+            long startDate,
+            long endDate,
+            int device,
+            string bonusCode)
         {
-            FilterPara filterPara = new FilterPara();
-            if (Select != null)
+
+            var siteList = _serverInfoBLL.GetSiteListByLoginUser().Select(x => x.SiteId);
+
+            return _bonusManageService.GetPromotionList(JsonConvert.SerializeObject(siteIds),
+                        JsonConvert.SerializeObject(promotionTypes),
+                        status,
+                        startDate,
+                        endDate,
+                        device,
+                        bonusCode,
+                        JsonConvert.SerializeObject(siteList));
+        }
+
+        public PromotionInfo GetPromotion(string bonusCode, int siteId)
+        {
+            var promotion = _bonusManageService.GetPromotionFlow(bonusCode, siteId);
+            
+            //Convert Condition Description
+            if (promotion.PromotionDisplayCondition.Any())
             {
-                filterPara = new FilterPara()
+                foreach (var condition in promotion.PromotionDisplayCondition)
                 {
-                    SiteidFilter = Select.SiteidFilter != null ? JsonConvert.DeserializeObject<Filter[]>(Select.SiteidFilter) : null,
-                    PromotionTypeFilter = Select.PromotionTypeFilter != null ? JsonConvert.DeserializeObject<Filter[]>(Select.PromotionTypeFilter) : null,
-                    Status = Select.Status,
-                    SiteArray = siteArray,
-                    StartDate = Select.StartDate,
-                    EndDate = Select.EndDate,
-                    Device = Select.Device
-                };
+                    switch (condition.ConditionType)
+                    {
+                        case PromotionDisplayConditionType.VipLevel:
+                            condition.Description =
+                                JsonConvert.DeserializeObject<VipLevelCondictionModel>(condition.Description);
+                            break;
+                    }
+                }
             }
 
-            var result = bonusManageService.GetPromotionList(null, filterPara);
-            return result;
+            return promotion;
         }
 
-        public PromotionInfo GetPromotion(string BonusCode, int SiteId)
+        public bool SetPromotion(bool isAdd, PromotionInfo promotion, DisplayConditionAbountVipLevel vipLevelCondition)
         {
-            return bonusManageService.GetPromotion(BonusCode, SiteId);
-        }
+            promotion.LastUpdateUser = isAdd ? "" : _authorizeBLL.GetAuthData().UserName;
+            var promotionDisplayConditionList = new List<PromotionDisplayConditionModel>();
 
-        public int SetPromotion(bool IsAdd, PromotionInfo promotion)
-        {
-            promotion.LastUpdateUser = IsAdd ? "" : authorizeBLL.GetAuthData().UserName;
-            if (IsAdd)
+            //TODO:(Pending) If update,how to check expected delete row
+            //PromotionSpecific/PrmotionRebate/PromotionDisplayCondiction
+            // int expectedDelSpecificRow = 0;
+            // int expectedDelRebateRow = 0;
+            //
+            // if (!isAdd)
+            // {
+            //     var oldPromotionSpecificList =
+            //         bonusManageService.GetPromotionSpecific(promotion.BonusCode, promotion.SiteId);
+            //
+            //     if (promotion.PromotionType == 6 || promotion.PromotionType == 7)
+            //     {
+            //         var oldPromotionRebateList =
+            //             bonusManageService.GetPromotionRebate(promotion.BonusCode, promotion.SiteId);
+            //     }
+            // }
+
+            //Display Condition Logic Process
+            if (vipLevelCondition.IsForVipLevel)
             {
-                //promotion.SiteId = serverInfoBLL.GetServerInfo().SiteId;
-                //promotion.CategoryId = 1;
-                //promotion.Sort = 1;
-                promotion.Status = 2;
+                promotionDisplayConditionList.Add(new PromotionDisplayConditionModel()
+                {
+                    ConditionType = PromotionDisplayConditionType.VipLevel,
+                    Description = new VipLevelCondictionModel() { VipLevel = vipLevelCondition.SelectedVipLevel }
+                });
             }
 
-            return bonusManageService.SetPromotion(IsAdd, promotion);
+            return _bonusManageService.SetPromotionFlow(isAdd, promotion, promotionDisplayConditionList,
+                0, 0, 0);
         }
 
-        public int DuplicatePromotion(string bonusCode, int siteId, string newBonusCode)
+        public bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode)
         {
-            return bonusManageService.DuplicatePromotion(bonusCode, siteId, newBonusCode);
+            //return _bonusManageService.DuplicatePromotion(bonusCode, siteId, newBonusCode);
+
+            var expectedSpecificRow = _bonusManageService.GetPromotionSpecific(bonusCode, siteId).Count();
+            var expectedRebateRow = _bonusManageService.GetPromotionRebate(bonusCode, siteId).Count();
+            var expectedConditionRow = _bonusManageService.GetPromotionDisplayCondition(bonusCode, siteId).Count();
+
+
+            return _bonusManageService.DuplicatePromotionFlow(bonusCode,
+                 siteId,
+                 newBonusCode,
+                 expectedSpecificRow,
+                 expectedRebateRow,
+                 expectedConditionRow);
         }
 
-        public int SetPromotionStatus(string BonusCode, int SiteId, int Status)
+        public int SetPromotionStatus(string bonusCode, int siteId, int status)
         {
-            return bonusManageService.SetPromotionStatus(BonusCode, SiteId, Status, authorizeBLL.GetAuthData().UserName);
+            return _bonusManageService.SetPromotionStatus(bonusCode, siteId, status,
+                _authorizeBLL.GetAuthData().UserName);
         }
-        public IEnumerable<PromoCategory> GetPromoCategories(int WalletType)
+
+        public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
         {
-            return bonusManageService.GetPromoCategories(WalletType);
+            return _bonusManageService.GetPromoCategories(walletType);
         }
+
         public IEnumerable<TpGameType> GetTpGameList()
         {
-            return bonusManageService.GetTpGameList();
+            return _bonusManageService.GetTpGameList();
         }
 
         public async Task<BonusImportResult> BonusImportAsync(BonusImportPara bonusImportPara)
         {
-            return await bonusManageService.BonusImportAsync(bonusImportPara);
+            return await _bonusManageService.BonusImportAsync(bonusImportPara);
         }
+
         private static Random random = new Random();
-        public static string RandomString(int length,int type)
+
+        public static string RandomString(int length, int type)
         {
             const string chars1 = "0123456789";
             const string chars2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            const string chars3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; 
+            const string chars3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             string chars = chars3;
             if (type == 1)
             {
                 chars = chars1;
-            } else if(type == 2)
+            }
+            else if (type == 2)
             {
                 chars = chars2;
             }
 
             return new string(Enumerable.Repeat(chars, length)
-              .Select(s => s[random.Next(s.Length)]).ToArray());
+                .Select(s => s[random.Next(s.Length)]).ToArray());
         }
-       
-        public int GenScratchCardCode(string specialCode,int num, string lastUpdateUser)
+
+        public int GenScratchCardCode(string specialCode, int num, string lastUpdateUser)
         {
             int count = num;
             int errorcount = 0;
             while (count > 0 && errorcount < 30)
             {
-                string ScratchCardCode = $"{RandomString(5, 2)}-{RandomString(6, 3)}";
-                if (bonusManageService.SetScratchCardCode(specialCode, ScratchCardCode, lastUpdateUser) == 0)
+                string scratchCardCode = $"{RandomString(5, 2)}-{RandomString(6, 3)}";
+                if (_bonusManageService.SetScratchCardCode(specialCode, scratchCardCode, lastUpdateUser) == 0)
                 {
                     count--;
                 }
@@ -118,15 +179,17 @@ namespace BackendSite.Service.BLL
                     errorcount++; //Prevent infinite loops
                 }
             }
-            if(errorcount>=30)
+
+            if (errorcount >= 30)
             {
                 return 90;
             }
+
             return 0;
         }
         public IEnumerable<ScratchCard> GetScratchCardList(string specialCode, int filterType)
         {
-            var ScratchCardList = bonusManageService.GetScratchCardList(specialCode);
+            var ScratchCardList = _bonusManageService.GetScratchCardList(specialCode);
             if(filterType == 1) //unused
                  ScratchCardList = ScratchCardList.Where(x => x.CustId == 0);
             else if (filterType == 2) //used
@@ -135,7 +198,7 @@ namespace BackendSite.Service.BLL
         }
         public IEnumerable<ScratchCardExport> GetScratchCardListExport(string specialCode, int filterType)
         {
-            var ScratchCardList = bonusManageService.GetScratchCardListExport(specialCode);
+            var ScratchCardList = _bonusManageService.GetScratchCardListExport(specialCode);
             if (filterType == 1) //unused
                 ScratchCardList = ScratchCardList.Where(x => x.Joiner == "-");
             else if (filterType == 2) //used
