@@ -158,6 +158,13 @@ namespace BackendSite.Controllers.Api
             public int CategoryId { get; set; }
         }
 
+        public class CustTpBetRecordListReq
+        {
+            public int CustId { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
+        }
+
         #endregion
 
         #region Actions
@@ -407,6 +414,15 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneWeek>>();
             apiResult.ErrorCode = 0;
             apiResult.Data = paymentBLL.GetCustTpBetRecordListOneWeek(custTpBetRecordListOneWeekReq.CustId);
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<TpBetRecordListOneWeek>> GetCustTpBetRecordList(CustTpBetRecordListReq custTpBetRecordListReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneWeek>>();
+            apiResult.Data = paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId, custTpBetRecordListReq.StartDate, custTpBetRecordListReq.EndDate);
+            apiResult.ErrorCode = 0;
             return apiResult;
         }
 
