@@ -120,4 +120,5 @@ export const initFilterType = [
 	{ value: 1, displayText: "New" },
 	{ value: 2, displayText: "Used" }
 ];
+
 export const initPromotionAction = () => Object.values(defPromotionAction);

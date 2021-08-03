@@ -137,9 +137,9 @@ namespace BackendSite.Service.BLL
         {
             var ScratchCardList = bonusManageService.GetScratchCardListExport(specialCode);
             if (filterType == 1) //unused
-                ScratchCardList = ScratchCardList.Where(x => x.Joiner == null);
+                ScratchCardList = ScratchCardList.Where(x => x.Joiner == "-");
             else if (filterType == 2) //used
-                ScratchCardList = ScratchCardList.Where(x => x.Joiner != null);
+                ScratchCardList = ScratchCardList.Where(x => x.Joiner != "-");
             return ScratchCardList;
         }
     }
