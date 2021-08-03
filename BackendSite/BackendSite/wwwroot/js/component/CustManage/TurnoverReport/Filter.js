@@ -1,4 +1,5 @@
 import DateTimePicker from "react-datetime";
+import { Label } from "semantic-ui-react";
 
 const defDateType = {
   0: "",
@@ -172,6 +173,7 @@ const Filter = (props) => {
           onChange={(e)=>EditDate(e,"DateQuickPicker")}
         />
       </div>
+      <div><label>※Allow search data up to 12 months</label></div>
       <div className="row-flex">
         <GameList
           SelectedGames={SelectedGames}
