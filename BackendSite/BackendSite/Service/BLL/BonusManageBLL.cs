@@ -68,7 +68,7 @@ namespace BackendSite.Service.BLL
             return promotion;
         }
 
-        public bool SetPromotion(bool isAdd, PromotionInfo promotion, DisplayConditionAbountVipLevel vipLevelCondition)
+        public bool SetPromotion(bool isAdd, PromotionInfo promotion, DisplayConditionAbountVipLevel vipLevelCondition,string Operator)
         {
             promotion.LastUpdateUser = isAdd ? "" : _authorizeBLL.GetAuthData().UserName;
             var promotionDisplayConditionList = new List<PromotionDisplayConditionModel>();
@@ -101,7 +101,7 @@ namespace BackendSite.Service.BLL
             }
 
             return _bonusManageService.SetPromotionFlow(isAdd, promotion, promotionDisplayConditionList,
-                0, 0, 0);
+                0, 0, 0, Operator);
         }
 
         public bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode)
