@@ -26,7 +26,18 @@ namespace BackendSite.Service.BLL
         private readonly PromotionService promotionService;
         private readonly RollOverService rolloverService;
         private readonly CustTurnoverService custTurnoverService;
-        public CustInfoBLL(IMemoryCache cache, WalletService walletService, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL, TpBLL tpBLL, Tools tools, CodeGenerator codeGenerator, PromotionService promotionService, RollOverService rolloverService, CustTurnoverService custTurnoverService)
+        private readonly BonusInfoService _bonusInfoService;
+        public CustInfoBLL(IMemoryCache cache,
+            WalletService walletService,
+            CustInfoService custInfoService,
+            ServerInfoBLL serverInfoBLL,
+            TpBLL tpBLL,
+            Tools tools,
+            CodeGenerator codeGenerator,
+            PromotionService promotionService,
+            RollOverService rolloverService,
+            CustTurnoverService custTurnoverService,
+            BonusInfoService bonusInfoService)
         {
             this.custInfoService = custInfoService;
             this.serverInfoBLL = serverInfoBLL;
@@ -38,6 +49,7 @@ namespace BackendSite.Service.BLL
             this.promotionService = promotionService;
             this.rolloverService = rolloverService;
             this.custTurnoverService = custTurnoverService;
+            _bonusInfoService = bonusInfoService;
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -188,7 +200,7 @@ namespace BackendSite.Service.BLL
         }
         public int CancelBonusByBonusId(int bonusId)
         {
-            return promotionService.CancelBonusByBonusId(bonusId);
+            return _bonusInfoService.CancelBonusByBonusId(bonusId,out int custId);
         }
 
         public List<CustTurnover> GetCustTurnover(int CustId, string GameTypes, long StartTime, long EndTime)

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
@@ -23,8 +24,18 @@ namespace BackendSite.Service.BLL
         private readonly string apiUrl;
         private readonly WalletService walletService;
         private readonly BonusInfoService bonusInfoService;
+        private readonly ServerInfoBLL _serverInfoBLL;
+        private readonly AuthorizeBLL _authorizeBLL;
 
-        public PendingFundBLL(CourierAdapter courierAdapter, IConfiguration configuration, Tools tools, PendingFundService pendingFundService, ServerInfoService serverInfoService, WalletService walletService, BonusInfoService bonusInfoService)
+        public PendingFundBLL(CourierAdapter courierAdapter,
+            IConfiguration configuration,
+            Tools tools,
+            PendingFundService pendingFundService,
+            ServerInfoService serverInfoService,
+            WalletService walletService,
+            BonusInfoService bonusInfoService,
+            ServerInfoBLL serverInfoBLL,
+            AuthorizeBLL authorizeBLL)
         {
             this.courierAdapter = courierAdapter;
             this.configuration = configuration;
@@ -32,6 +43,8 @@ namespace BackendSite.Service.BLL
             this.serverInfoService = serverInfoService;
             this.walletService = walletService;
             this.bonusInfoService = bonusInfoService;
+            _serverInfoBLL = serverInfoBLL;
+            _authorizeBLL = authorizeBLL;
             apiUrl = configuration.GetValue<string>("TpService");
         }
 
@@ -79,6 +92,7 @@ namespace BackendSite.Service.BLL
             public long ExpiryTime { set; get; }
             public Dictionary<string, string> inputs { set; get; }
         }
+
         public async Task<ApiResult<TransferResult>> BonusTransferAsync(int custId)
         {
             var apiResult = new ApiResult<TransferResult>();
@@ -95,18 +109,27 @@ namespace BackendSite.Service.BLL
 
             return apiResult;
         }
+
         public ApiResult BonusCancel(int bonusId)
         {
             var apiResult = new ApiResult();
 
-            var result = bonusInfoService.CancelBonusByBonusId(bonusId);
+            var result = bonusInfoService.CancelBonusByBonusId(bonusId, out int custId);
+            
             if (result > 0)
             {
+                var userData = _authorizeBLL.GetAuthData();
+                string Menu = "Pending Bonus/Cancel";
+                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("Action", "Cancel Bonus");
+                _serverInfoBLL.AdminOperateLog(null, custId, Menu, ActionType.Update, Info, userData.UserName);
                 apiResult.ErrorCode = 0;
             }
 
             return apiResult;
         }
+
         public async Task<ApiResult> BonusTransferAllAsync()
         {
             var apiResult = new ApiResult();
