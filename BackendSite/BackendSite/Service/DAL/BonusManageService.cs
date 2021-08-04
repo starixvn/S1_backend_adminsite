@@ -1218,42 +1218,11 @@ namespace BackendSite.Service.DAL
         private int InsertAdjustmentInfoLog(PromotionInfo promotion, MySqlConnection connection,
             MySqlTransaction transaction,string Operator)
         {
-            var p = new DynamicParameters();
             DynamicParameters propsLog = new DynamicParameters();
-
-            p.Add("_BonusCode", promotion.BonusCode);
-            p.Add("_Description", promotion.Description);
-            p.Add("_PromotionType", promotion.PromotionType);
-            p.Add("_CategoryId", promotion.CategoryId);
-            p.Add("_PeriodFrom", promotion.UnixPeriodFrom);
-            p.Add("_PeriodTo", promotion.UnixPeriodTo);
-            p.Add("_ExpiryDays", promotion.ExpiryDays);
-            p.Add("_Sort", promotion.Sort);
-            p.Add("_Status", promotion.Status);
-            p.Add("_LastUpdateUser", promotion.LastUpdateUser);
-            p.Add("_SiteId", promotion.SiteId);
-            p.Add("_WalletType", promotion.WalletType);
-            p.Add("_TpId", promotion.TpId);
-            p.Add("_RedeemHours", promotion.RedeemHours);
-            p.Add("_PeriodType", promotion.PeriodType);
-            p.Add("_PeriodDay", promotion.PeriodDay);
-            p.Add("_SpecialCode", promotion.SpecialCode);
-            p.Add("_IsSpecial", promotion.IsSpecial);
-            p.Add("_OnlyRegistered", promotion.OnlyRegistered);
-            p.Add("_PromotionDeviceType", promotion.PromotionDeviceType);
-            p.Add("_PromotionAction", promotion.PromotionAction);
-            p.Add("_AutoExtend", promotion.AutoExtend);
-
-            var list = new Dictionary<string, string>();
-            foreach (var paraName in p.ParameterNames)
-            {
-                var value = Convert.ToString(p.Get<dynamic>(paraName));
-                list.Add(paraName, value);
-            }
 
             propsLog.Add("Menu", "BonusManagement");
             propsLog.Add("ActionType", 1);
-            propsLog.Add("DetailInfo", JsonConvert.SerializeObject(list));
+            propsLog.Add("DetailInfo", JsonConvert.SerializeObject(promotion));
             propsLog.Add("Operator", Operator);
             return connection.Execute("Admin_AdjustmentInfoLog_Set", propsLog, transaction: transaction,
                 commandType: CommandType.StoredProcedure);
