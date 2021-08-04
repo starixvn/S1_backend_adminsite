@@ -120,5 +120,9 @@ namespace BackendSite.Service.BLL
                 return result.Password != password ? false : true;
             }
         }
+        public IEnumerable<TpBetRecordListOneWeek> GetCustTpBetRecordList(int custId, long startDate, long endDate)
+        {
+            return walletService.GetCustTpBetRecordList(custId, startDate, endDate);
+        }
     }
 }

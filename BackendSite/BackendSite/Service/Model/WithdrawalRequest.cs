@@ -66,6 +66,7 @@ namespace BackendSite.Service.Model
         public int SysId { get; set; }
         public string AccountName { get; set; }
         public string AccountNo { get; set; }
+        public string IFSCCode { get; set; }
         //[JsonIgnore]
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int? FromSysId { get; set; }
