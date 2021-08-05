@@ -24,7 +24,7 @@ namespace BackendSite.Service.DAL
             this.withdrawalLimitService = withdrawalLimitService;
         }
 
-        public IEnumerable<BonusInfo> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId ,ref int PageNumber, ref int TotalPages, ref int RowCount,ref List<string> CurrencyAmount)
+        public IEnumerable<BonusInfo> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId, ref int PageNumber, ref int TotalPages, ref int RowCount, ref List<string> CurrencyAmount)
         {
             IEnumerable<BonusInfo> result = null;
             List<string> tempCurrencyTotalAmount = new List<string>();
@@ -104,7 +104,7 @@ namespace BackendSite.Service.DAL
                 return conn.Query<PendingBonus>(SpName, commandType: CommandType.StoredProcedure);
             }
         }
-        public int CancelBonusByBonusId(int bonusId,out int custId)
+        public int CancelBonusByBonusId(bool isReturnAmount,int bonusId, out int custId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
@@ -125,22 +125,25 @@ namespace BackendSite.Service.DAL
             decimal bonusAmount = p.Get<decimal?>("BonusAmount") ?? 0;
             decimal bonus = p.Get<decimal?>("Bonus") ?? 0;
 
-            decimal backAmount = 0;
-            if (bonus >= lockedAmount + bonusAmount)
+            if (isReturnAmount)
             {
-                backAmount = lockedAmount;
-            }
-            else
-            {
-                backAmount = bonus - bonusAmount;
-            }
+                decimal backAmount = 0;
+                if (bonus >= lockedAmount + bonusAmount)
+                {
+                    backAmount = lockedAmount;
+                }
+                else
+                {
+                    backAmount = bonus - bonusAmount;
+                }
 
-            if (backAmount > 0)
-            {
-                result = walletService.SetBalance(custId, siteId, userName, backAmount, 7, $"Cancel Bonus({bonus.ToString("#,##0.##")}), Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out decimal afterAmount, out byte is1stDepoist, conn, trans);
+                if (backAmount > 0)
+                {
+                    result = walletService.SetBalance(custId, siteId, userName, backAmount, 7, $"Cancel Bonus({bonus.ToString("#,##0.##")}), Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out decimal afterAmount, out byte is1stDepoist, conn, trans);
 
-                if (result > 0)
-                    result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, $"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out decimal afterWithdrawalLimit, conn, trans);
+                    if (result > 0)
+                        result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, $"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out decimal afterWithdrawalLimit, conn, trans);
+                }
             }
 
             if (result > 0)
