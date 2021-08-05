@@ -86,7 +86,7 @@ namespace BackendSite.Service.BLL
 
             return vipLevelCache;
         }
-        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency,string bankAccountNumber, IEnumerable<int>  selectstatus, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency, string bankAccountNumber, IEnumerable<int> selectstatus, ref int pageNumber, out int totalPages, out int rowCount)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
             List<int> currncyList = new List<int>();
@@ -96,7 +96,7 @@ namespace BackendSite.Service.BLL
             });
 
             var CustInfoList = custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, selectstatus, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList())).ToList();
-            if(CustInfoList.Count() > 0)
+            if (CustInfoList.Count() > 0)
             {
                 CustInfoList.ForEach(x =>
                 {
@@ -151,7 +151,7 @@ namespace BackendSite.Service.BLL
 
                     }
                 }
-                custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>(): JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
+                custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
             }
             return custInfoDetail;
         }
@@ -200,7 +200,13 @@ namespace BackendSite.Service.BLL
         }
         public int CancelBonusByBonusId(int bonusId)
         {
-            return _bonusInfoService.CancelBonusByBonusId(false,bonusId,out int CustId);
+            var statusList = new List<int>
+            {
+                (int) BonusStatusType.Initial,
+                (int) BonusStatusType.Running,
+                (int) BonusStatusType.TrasferOut,
+            };
+            return _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), out int CustId);
         }
 
         public List<CustTurnover> GetCustTurnover(int CustId, string GameTypes, long StartTime, long EndTime)
@@ -440,7 +446,7 @@ namespace BackendSite.Service.BLL
         #endregion
 
         #region TagMamagement
-        public int EditTagMamagement(int id, string tagName,string tagColour, string description, string Operator)
+        public int EditTagMamagement(int id, string tagName, string tagColour, string description, string Operator)
         {
             return custInfoService.EditTagMamagement(id, tagName, tagColour, description, Operator);
         }
@@ -460,7 +466,7 @@ namespace BackendSite.Service.BLL
             return custInfoService.GetAllTag();
         }
 
-        public int SetCustTag(int custid, IEnumerable<int> SelectTag,string Operator)
+        public int SetCustTag(int custid, IEnumerable<int> SelectTag, string Operator)
         {
             return custInfoService.SetCustTag(custid, SelectTag);
         }
@@ -468,11 +474,11 @@ namespace BackendSite.Service.BLL
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
             var custInfoDetail = custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
-            if(custInfoDetail != null)
+            if (custInfoDetail != null)
             {
                 custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
             }
-            
+
             return custInfoDetail;
         }
         #endregion
@@ -483,7 +489,7 @@ namespace BackendSite.Service.BLL
 
             using (TransactionScope scope = new TransactionScope())
             {
-                if(!custInfoService.SetEnableDisablePromotion(custId, enablePromotion))
+                if (!custInfoService.SetEnableDisablePromotion(custId, enablePromotion))
                 {
                     scope.Dispose();
 

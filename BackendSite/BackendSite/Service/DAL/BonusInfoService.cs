@@ -104,26 +104,26 @@ namespace BackendSite.Service.DAL
                 return conn.Query<PendingBonus>(SpName, commandType: CommandType.StoredProcedure);
             }
         }
-        public int CancelBonusByBonusId(bool isReturnAmount,int bonusId, out int custId)
+        public int CancelBonusByBonusId(bool isReturnAmount, int bonusId, string statusList, out int custId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var p = new DynamicParameters(new { BonusId = bonusId });
-            p.Add("SiteId", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
-            p.Add("LockedAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-            p.Add("BonusAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-            p.Add("Bonus", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-            int result = conn.Execute("Common_CancelBonusByBonusId_SetV2", p, transaction: trans, commandType: CommandType.StoredProcedure);
+            var p = new DynamicParameters(new { _BonusId = bonusId, _StatusList = statusList });
+            p.Add("_SiteId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_UserName", dbType: DbType.String, direction: ParameterDirection.Output);
+            p.Add("_LockedAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            p.Add("_BonusAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            p.Add("_Bonus", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            int result = conn.Execute("Common_CancelBonusByBonusId_SetV3", p, transaction: trans, commandType: CommandType.StoredProcedure);
 
-            int siteId = p.Get<int?>("SiteId") ?? 0;
-            custId = p.Get<int?>("CustId") ?? 0;
-            string userName = p.Get<string>("UserName");
-            decimal lockedAmount = p.Get<decimal?>("LockedAmount") ?? 0;
-            decimal bonusAmount = p.Get<decimal?>("BonusAmount") ?? 0;
-            decimal bonus = p.Get<decimal?>("Bonus") ?? 0;
+            int siteId = p.Get<int?>("_SiteId") ?? 0;
+            custId = p.Get<int?>("_CustId") ?? 0;
+            string userName = p.Get<string>("_UserName");
+            decimal lockedAmount = p.Get<decimal?>("_LockedAmount") ?? 0;
+            decimal bonusAmount = p.Get<decimal?>("_BonusAmount") ?? 0;
+            decimal bonus = p.Get<decimal?>("_Bonus") ?? 0;
 
             if (isReturnAmount)
             {
