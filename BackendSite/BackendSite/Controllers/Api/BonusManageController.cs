@@ -181,7 +181,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 //var errorCode = _bonusManageBLL.SetPromotion(IsAdd, Promotion);
-                var errorCode = _bonusManageBLL.SetPromotion(isAdd, promotion, vipLevelCondition) ? 0 : 1;
+                var errorCode = _bonusManageBLL.SetPromotion(isAdd, promotion, vipLevelCondition, User.Identity.Name) ? 0 : 1;
 
                 apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
                     request.PromotionTypes,
