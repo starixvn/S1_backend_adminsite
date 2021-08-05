@@ -104,7 +104,7 @@ namespace BackendSite.Service.DAL
                 return conn.Query<PendingBonus>(SpName, commandType: CommandType.StoredProcedure);
             }
         }
-        public int CancelBonusByBonusId(string fromFunc, int bonusId, out int custId)
+        public int CancelBonusByBonusId(bool isReturnAmount,int bonusId, out int custId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
@@ -125,7 +125,7 @@ namespace BackendSite.Service.DAL
             decimal bonusAmount = p.Get<decimal?>("BonusAmount") ?? 0;
             decimal bonus = p.Get<decimal?>("Bonus") ?? 0;
 
-            if (fromFunc != "CustInfo")
+            if (isReturnAmount)
             {
                 decimal backAmount = 0;
                 if (bonus >= lockedAmount + bonusAmount)

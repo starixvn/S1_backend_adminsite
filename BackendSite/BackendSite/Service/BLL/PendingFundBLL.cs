@@ -114,7 +114,7 @@ namespace BackendSite.Service.BLL
         {
             var apiResult = new ApiResult();
 
-            var result = bonusInfoService.CancelBonusByBonusId("Pending Bonus",bonusId, out int custId);
+            var result = bonusInfoService.CancelBonusByBonusId(true,bonusId, out int custId);
             
             if (result > 0)
             {

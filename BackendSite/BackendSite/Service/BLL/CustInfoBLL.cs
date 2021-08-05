@@ -200,7 +200,7 @@ namespace BackendSite.Service.BLL
         }
         public int CancelBonusByBonusId(int bonusId)
         {
-            return _bonusInfoService.CancelBonusByBonusId("CustInfo",bonusId,out int CustId);
+            return _bonusInfoService.CancelBonusByBonusId(false,bonusId,out int CustId);
         }
 
         public List<CustTurnover> GetCustTurnover(int CustId, string GameTypes, long StartTime, long EndTime)
