@@ -11,6 +11,7 @@ using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -114,8 +115,13 @@ namespace BackendSite.Service.BLL
         {
             var apiResult = new ApiResult();
 
-            var result = bonusInfoService.CancelBonusByBonusId(true,bonusId, out int custId);
-            
+            var statusList = new List<int>
+            {
+                (int) BonusStatusType.Running,
+            };
+
+            var result = bonusInfoService.CancelBonusByBonusId(true, bonusId, JsonConvert.SerializeObject(statusList), out int custId);
+
             if (result > 0)
             {
                 var userData = _authorizeBLL.GetAuthData();
