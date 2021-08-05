@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace BackendSite.Service.DAL
 {
@@ -1220,9 +1221,20 @@ namespace BackendSite.Service.DAL
         {
             DynamicParameters propsLog = new DynamicParameters();
 
+            var temppromotion = JsonConvert.SerializeObject(promotion);
+            JObject jobject = JObject.Parse(temppromotion);
+            JArray tokenselect = jobject.SelectToken("Specific") as JArray;
+            if(tokenselect != null)
+            {
+                foreach (JObject item in tokenselect)
+                {
+                    item.Remove("Details");
+                }
+            }
+            string DetailInfo = JsonConvert.SerializeObject(jobject);
             propsLog.Add("Menu", "BonusManagement");
             propsLog.Add("ActionType", 1);
-            propsLog.Add("DetailInfo", JsonConvert.SerializeObject(promotion));
+            propsLog.Add("DetailInfo", DetailInfo);
             propsLog.Add("Operator", Operator);
             return connection.Execute("Admin_AdjustmentInfoLog_Set", propsLog, transaction: transaction,
                 commandType: CommandType.StoredProcedure);
