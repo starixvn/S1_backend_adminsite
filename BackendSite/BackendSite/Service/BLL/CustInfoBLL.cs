@@ -505,5 +505,20 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.GetAllSiteVipLevelList();
         }
+
+        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency,int depositStatus,int status,string username,int pagenumber,int pagesize,int sort)
+        {
+            return custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pagenumber, pagesize, sort);
+        }
+
+        public int SetRegLiveStatus(int custid,int status,int siteid,string Operator)
+        {
+            return custInfoService.SetRegLiveStatus(custid, status, siteid, Operator);
+        }
+
+        public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
+        {
+            return custInfoService.GetRegLiveStatusNotes(custId);
+        }
     }
 }

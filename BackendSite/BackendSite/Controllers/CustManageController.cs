@@ -105,5 +105,10 @@ namespace BackendSite.Controllers
             return View();
         }
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
+        public IActionResult RegistrationManagement()
+        {
+            return View();
+        }
     }
 }

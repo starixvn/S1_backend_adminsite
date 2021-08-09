@@ -510,5 +510,45 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<VipLevelModel>("Common_VipLevel_Get");
         }
+
+        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency, int depositStatus, int status, string username, int pagenumber, int pagesize, int sort)
+        {
+            RegLiveStatusResult SearchData = new RegLiveStatusResult();
+            DynamicParameters props = new DynamicParameters();
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+
+            props.Add("SelectSite", JsonConvert.SerializeObject(selectSite));
+            props.Add("Currency", currency);
+            props.Add("UserName", string.IsNullOrWhiteSpace(username) ? null : username);
+            props.Add("DepositStatus", depositStatus);
+            props.Add("Status", status);
+            props.Add("Sort", sort);
+            props.Add("PageSize", pagesize);
+            props.Add("PageNumber", pagenumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = conn.Query<RegLiveStatus>("Admin_CustRegLiveStatus_Get", props, commandType: CommandType.StoredProcedure).ToList();
+
+            SearchData.RegLiveStatusDatas = result;
+            SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            SearchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
+
+            return SearchData;
+        }
+
+        public int SetRegLiveStatus(int custid,int status, int siteid, string Operator)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_RegLiveStatus_Set", new { CustId = custid, Status = status, SiteId= siteid, Operator= Operator }, commandType: CommandType.StoredProcedure);
+        }
+
+        public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<RegLiveStatusNotes>("Admin_CustRegLiveStatusNotes_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+        }
     }
 }

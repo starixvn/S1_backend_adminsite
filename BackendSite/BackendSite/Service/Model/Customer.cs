@@ -287,4 +287,35 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
     }
+    public class RegLiveStatus 
+    { 
+        public string UserName { get; set; }
+        public int ActStatus { get; set; }
+        public DateTime RegTime { get; set; }
+        public string AccountName { get; set; }
+        public int CustId { get; set; }
+        public int SiteId { get; set; }
+        public int PhoneVerified { get; set; }
+        public string PhoneNo { get; set; }
+        public int Status { get; set; }
+        public string Currency { get; set; }
+        public string SiteName { get; set; }
+    }
+    public class RegLiveStatusResult
+    {
+        public List<RegLiveStatus> RegLiveStatusDatas { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
+
+    public class RegLiveStatusNotes
+    {
+        public int Id { get; set; }
+        public int CustId { get; set; }
+        public string Note { get; set; }
+        public DateTime CreateTime { get; set; }
+        public DateTime? UpdateTime { get; set; }
+        public string Operator { get; set; }
+    }
 }
