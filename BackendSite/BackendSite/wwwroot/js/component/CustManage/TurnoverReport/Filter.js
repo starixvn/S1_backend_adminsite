@@ -143,7 +143,7 @@ const Filter = (props) => {
           dateTimePickerProps={{
             value:DateRangeDatas.StartTime,
             defaultValue: DateRangeDatas.StartTime,
-            onBlur: (e) => {
+            onChange: (e) => {
               try {
                 EditDateRangeFiled(moment(e).format("l LTS"), "StartTime");
               } catch (ex) {}
@@ -155,7 +155,7 @@ const Filter = (props) => {
           dateTimePickerProps={{
             value:DateRangeDatas.EndTime,
             defaultValue: DateRangeDatas.EndTime,
-            onBlur: (e) => {
+            onChange: (e) => {
               try {
                 EditDateRangeFiled(moment(e).format("l LTS"), "EndTime");
               } catch (ex) {}
