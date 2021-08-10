@@ -115,7 +115,7 @@ const Panel = (props) => {
             timeFormat: false,
             onChange: (e) => {
               try {
-                props.onChange(e, "StartDate");
+                props.ExportOnChange(e, "StartDate");
               } catch (ex) {}
             },
           }}
@@ -128,7 +128,7 @@ const Panel = (props) => {
             timeFormat: false,
             onChange: (e) => {
               try {
-                props.onChange(e, "EndDate");
+                props.ExportOnChange(e, "EndDate");
               } catch (ex) {}
             },
           }}

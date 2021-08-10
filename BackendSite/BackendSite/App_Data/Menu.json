@@ -170,6 +170,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Registration Management",
+        "FuncKey": "CustManage/RegistrationManagement",
+        "Controller": "CustManage",
+        "Action": "RegistrationManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

@@ -511,5 +511,57 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.GetAllSiteVipLevelList();
         }
+
+        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency,int depositStatus,int status,string username,int pagenumber,int pagesize,int sort)
+        {
+            return custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pagenumber, pagesize, sort);
+        }
+
+        public int SetRegLiveStatus(int custid,int status,int siteid,string Operator)
+        {
+            return custInfoService.SetRegLiveStatus(custid, status, siteid, Operator);
+        }
+
+        public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
+        {
+            return custInfoService.GetRegLiveStatusNotes(custId);
+        }
+
+        public int AddRegLiveStatusNote(int custid,string note, string Operator)
+        {
+            return custInfoService.AddRegLiveStatusNote(custid, note, Operator);
+        }
+
+        public int DeleteRegLiveStatusNote(int custid,int id)
+        {
+            return custInfoService.DeleteRegLiveStatusNote(custid, id);
+        }
+
+        public int EditRegLiveStatusNote(int custid,int id, string note, string Operator)
+        {
+            return custInfoService.EditRegLiveStatusNote(custid, id, note, Operator);
+        }
+
+        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate)
+        {
+            List<RegLiveStatusExport> list = new List<RegLiveStatusExport>();
+            var result =  custInfoService.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate);
+            result.ToList().ForEach(x =>
+            {
+                list.Add(new RegLiveStatusExport()
+                {
+                    Site = x.SiteName,
+                    Currency = x.Currency,
+                    UserName= x.UserName,
+                    FullName = x.AccountName,
+                    PhoneNo = x.PhoneNo,
+                    Verify = Enum.GetName(typeof(VerifyType), x.PhoneVerified),
+                    RegTime = x.RegTime.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture),
+                    DepositStatus = Enum.GetName(typeof(DepositStatusType), x.ActStatus),
+                    Status = Enum.GetName(typeof(RegLiveStatusType), x.Status),
+                });
+            });
+            return list;
+        }
     }
 }

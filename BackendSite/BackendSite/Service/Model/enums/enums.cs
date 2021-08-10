@@ -275,4 +275,20 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    public enum VerifyType
+    {
+        No = 0,
+        Verfified = 1
+    }
+    public enum DepositStatusType
+    {
+        Nondeposit = 1,
+        Deposited = 2
+    }
+    public enum RegLiveStatusType
+    {
+        Pending=1,
+        Done = 2,
+        Invalid = 3
+    }
 }

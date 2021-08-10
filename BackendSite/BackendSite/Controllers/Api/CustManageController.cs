@@ -250,6 +250,45 @@ namespace BackendSite.Controllers.Api
             public int EnablePromotion { get; set; }
         }
 
+        #region RegLiveStatus
+        public class RegLiveStatusPara 
+        {
+            public IEnumerable<int> SiteIds { get; set; }
+            public int Currency { get; set; }
+            public int DepositStatus { get; set; }
+            public int Status { get; set; }
+            public string User { get; set; }
+            public int Sort { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+        }
+
+        public class SetRegLiveStatusPara 
+        {
+            public int CustId { get; set; }
+            public int Status { get; set; }
+            public int SiteId { get; set; }
+        }
+
+        public class AddRegLiveStatusNotes
+        {
+            public int CustId { get; set; }
+            public string Note { get; set; }
+        }
+        public class DeleteRegLiveStatusNotes
+        {
+            public int CustId { get; set; }
+            public int Id { get; set; }
+        }
+        public class EditRegLiveStatusNotes 
+        {
+            public int CustId { get; set; }
+            public int Id { get; set; }
+            public string Note { get; set; }
+        }
+
+        #endregion
+
         #endregion
 
         #region Actions
@@ -1305,6 +1344,111 @@ namespace BackendSite.Controllers.Api
         }
         #endregion
 
+        [HttpPost]
+        public ApiListResult<RegLiveStatus> GetRegLiveStatusData(RegLiveStatusPara custInfoReq)
+        {
+            var apiResult = new ApiListResult<RegLiveStatus>();
+            try
+            {
+                var SearchResult = custInfoBLL.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status
+                , custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort);
+
+                apiResult.Data = SearchResult.RegLiveStatusDatas;
+                apiResult.PageNumber = SearchResult.PageNumber;
+                apiResult.TotalPages = SearchResult.TotalPages;
+                apiResult.RowCount = SearchResult.RowCount;
+                apiResult.ErrorCode = 0;
+            }
+            catch(Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+            
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult SetRegLiveStatus(SetRegLiveStatusPara para)
+        {
+            ApiResult apiResult = new ApiResult();
+            if (custInfoBLL.SetRegLiveStatus(para.CustId, para.Status,para.SiteId,User.Identity.Name) > 0)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "update fail";
+            }
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(AddRegLiveStatusNotes addCustNoteReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<RegLiveStatusNotes>>();
+            apiResult.Data = custInfoBLL.GetRegLiveStatusNotes(addCustNoteReq.CustId);
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult AddRegLiveStatusNote(AddRegLiveStatusNotes addCustNoteReq)
+        {
+            ApiResult apiResult = new ApiResult();
+            if (custInfoBLL.AddRegLiveStatusNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name) > 0)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "update fail";
+            }
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult DeleteRegLiveStatusNote(DeleteRegLiveStatusNotes deleteCustNoteReq)
+        {
+            ApiResult apiResult = new ApiResult();
+            if (custInfoBLL.DeleteRegLiveStatusNote(deleteCustNoteReq.CustId, deleteCustNoteReq.Id) > 0)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "update fail";
+            }
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult EditRegLiveStatusNote(EditRegLiveStatusNotes EditRegLiveStatusNote)
+        {
+            ApiResult apiResult = new ApiResult();
+            if (custInfoBLL.EditRegLiveStatusNote(EditRegLiveStatusNote.CustId, EditRegLiveStatusNote.Id, EditRegLiveStatusNote.Note, User.Identity.Name) > 0)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "update fail";
+            }
+            return apiResult;
+        }
+
+        [HttpPost]
+        public IActionResult ExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate)
+        {
+            var ExportData = custInfoBLL.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate);
+            var stream = excelBLL.Export(ExportData);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
         #endregion
     }
 }
