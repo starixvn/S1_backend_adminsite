@@ -19,7 +19,10 @@ export const InputBoxFormat = {
 
 export const Type = {
     1:'Online Banking',
-    2:'Mobile Pay'
+    2:'Mobile Pay',
+    3:'Local Banking',
+    4:'Crypto Pay',
+    5:'Load Card'
 }
 
 export const Mode = {
