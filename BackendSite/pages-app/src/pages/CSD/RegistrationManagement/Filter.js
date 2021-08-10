@@ -105,6 +105,34 @@ const Panel = (props) => {
           </button>
         </div>
       </div>
+      <div className="row-flex">
+        <DateTimePickerElem
+          columnTitle="Export From Date"
+          dateTimePickerProps={{
+            value: props.exportFilter.StartDate,
+            defaultValue: props.exportFilter.StartDate,
+            timeFormat: false,
+            onChange: (e) => {
+              try {
+                props.ExportOnChange(e, "StartDate");
+              } catch (ex) {}
+            },
+          }}
+        />
+        <DateTimePickerElem
+          columnTitle="Export To Date"
+          dateTimePickerProps={{
+            value: props.exportFilter.EndDate,
+            defaultValue: props.exportFilter.EndDate,
+            timeFormat: false,
+            onChange: (e) => {
+              try {
+                props.ExportOnChange(e, "EndDate");
+              } catch (ex) {}
+            },
+          }}
+        />
+      </div>
     </div>
   );
 };
@@ -208,6 +236,15 @@ const InputField = (props) => {
           onChange={onChange}
         />
       </div>
+    </div>
+  );
+};
+
+const DateTimePickerElem = (props) => {
+  return (
+    <div className="input-item">
+      <span className="label">{props.columnTitle}</span>
+      <DateTimePicker {...props.dateTimePickerProps} />
     </div>
   );
 };

@@ -18,8 +18,8 @@
     var authData = authorizeBLL.GetAuthData();
     var loginUser = adminUserService.GetUser(authData.UserId);
 
-    //IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("CustManage/TeleCSD");
-    //subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
+    IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("CustManage/RegistrationManagement");
+    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
 
     var i18n = new Dictionary<string, string>();
 
@@ -45,6 +45,6 @@
         window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
         window.RootUrl = '@Url.Content("~/api")';
         window.LangCode = 'en'
-        @*window.subFuncKeys = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(subFuncKeys));*@
+        window.subFuncKeys = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(subFuncKeys));
     </script>
 }

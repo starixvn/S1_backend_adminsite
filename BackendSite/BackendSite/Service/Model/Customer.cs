@@ -318,4 +318,16 @@ namespace BackendSite.Service.Model
         public DateTime? UpdateTime { get; set; }
         public string Operator { get; set; }
     }
+    public class RegLiveStatusExport
+    {
+        public string Site { get; set; }
+        public string Currency { get; set; }
+        public string UserName { get; set; }
+        public string FullName { get; set; }
+        public string PhoneNo { get; set; }
+        public string Verify { get; set; }
+        public string RegTime { get; set; }
+        public string DepositStatus { get; set; }
+        public string Status { get; set; }
+    }
 }

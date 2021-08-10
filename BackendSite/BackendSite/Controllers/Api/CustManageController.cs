@@ -275,6 +275,18 @@ namespace BackendSite.Controllers.Api
             public int CustId { get; set; }
             public string Note { get; set; }
         }
+        public class DeleteRegLiveStatusNotes
+        {
+            public int CustId { get; set; }
+            public int Id { get; set; }
+        }
+        public class EditRegLiveStatusNotes 
+        {
+            public int CustId { get; set; }
+            public int Id { get; set; }
+            public string Note { get; set; }
+        }
+
         #endregion
 
         #endregion
@@ -1380,6 +1392,62 @@ namespace BackendSite.Controllers.Api
             apiResult.ErrorCode = 0;
 
             return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult AddRegLiveStatusNote(AddRegLiveStatusNotes addCustNoteReq)
+        {
+            ApiResult apiResult = new ApiResult();
+            if (custInfoBLL.AddRegLiveStatusNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name) > 0)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "update fail";
+            }
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult DeleteRegLiveStatusNote(DeleteRegLiveStatusNotes deleteCustNoteReq)
+        {
+            ApiResult apiResult = new ApiResult();
+            if (custInfoBLL.DeleteRegLiveStatusNote(deleteCustNoteReq.CustId, deleteCustNoteReq.Id) > 0)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "update fail";
+            }
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult EditRegLiveStatusNote(EditRegLiveStatusNotes EditRegLiveStatusNote)
+        {
+            ApiResult apiResult = new ApiResult();
+            if (custInfoBLL.EditRegLiveStatusNote(EditRegLiveStatusNote.CustId, EditRegLiveStatusNote.Id, EditRegLiveStatusNote.Note, User.Identity.Name) > 0)
+            {
+                apiResult.ErrorCode = 0;
+            }
+            else
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "update fail";
+            }
+            return apiResult;
+        }
+
+        [HttpPost]
+        public IActionResult ExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate)
+        {
+            var ExportData = custInfoBLL.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate);
+            var stream = excelBLL.Export(ExportData);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
         #endregion
     }

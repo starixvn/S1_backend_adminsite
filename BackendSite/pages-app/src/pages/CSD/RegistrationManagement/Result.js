@@ -121,7 +121,11 @@ const Panel = (props) => {
       ) : element.dataColumn === "note" ? (
         <td key={`td-${element.dataColumn}-${idx}`}>
           <div className="button-action">
-            <button className="btn btn-edit" type="submit" onClick={props.EditNote.bind(this,data["custId"])}>
+            <button
+              className="btn btn-edit"
+              type="submit"
+              onClick={props.EditNote.bind(this, data["custId"])}
+            >
               <i className="icon-edit"></i>
             </button>
           </div>
@@ -148,13 +152,35 @@ const Panel = (props) => {
   return (
     <div className="table">
       <div className="table-options">
-        {/* <button
+        {props.Isloading === true ? (
+          <div>
+            <button
+              type="button"
+              className="btn btn-refresh"
+              disabled={true}
+              onClick={null}
+            >
+              Loading
+            </button>
+          </div>
+        ) : (
+          <div>
+            <button
+              type="button"
+              className="btn btn-refresh"
+              onClick={props.Refresh}
+            >
+              Refresh({props.Count})
+            </button>
+          </div>
+        )}
+        <button
           type="button"
           className="btn btn-approved"
-          onClick={props.ExportToExcel}
+          onClick={props.Result_ExportToExcel}
         >
           Export Excel
-        </button> */}
+        </button>
       </div>
       <table className="table table-striped">
         <thead>

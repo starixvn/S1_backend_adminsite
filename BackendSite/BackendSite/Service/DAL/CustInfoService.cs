@@ -550,5 +550,44 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<RegLiveStatusNotes>("Admin_CustRegLiveStatusNotes_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
         }
+
+        public int AddRegLiveStatusNote(int custid, string note, string Operator)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_CustRegLiveStatusNotes_Ins", new { CustId = custid, Note = note, Operator = Operator }, commandType: CommandType.StoredProcedure);
+        }
+
+        public int DeleteRegLiveStatusNote(int custid,int id)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_CustRegLiveStatusNotes_Del", new { CustId = custid, Id = id }, commandType: CommandType.StoredProcedure);
+        }
+
+        public int EditRegLiveStatusNote(int custid, int id, string note, string Operator)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_CustRegLiveStatusNotes_Set", new { CustId = custid, Id = id, Note = note, Operator = Operator }, commandType: CommandType.StoredProcedure);
+        }
+        public IEnumerable<RegLiveStatus> GetExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate)
+        {
+            IEnumerable<RegLiveStatus> result = null;
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                string SpName = "Admin_CustRegLiveStatusExport_Get";
+                DynamicParameters props = new DynamicParameters();
+                props.Add("SelectSite", SelectSite);
+                props.Add("Currency", Currency);
+                props.Add("UserName", string.IsNullOrWhiteSpace(User) ? null : User);
+                props.Add("DepositStatus", DepositStatus);
+                props.Add("Status", Status);
+                props.Add("Sort", Sort);
+                props.Add("StartDate", StartDate);
+                props.Add("EndDate", EndDate);
+
+                result = conn.Query<RegLiveStatus>(SpName, props, commandType: CommandType.StoredProcedure);
+            }
+
+            return result;
+        }
     }
 }
