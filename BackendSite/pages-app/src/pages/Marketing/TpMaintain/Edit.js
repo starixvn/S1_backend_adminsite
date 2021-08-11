@@ -6,7 +6,6 @@ const elemType = {
 	DateTimePicker: "DateTimePicker"
 };
 const dateformat = "YYYY-MM-DD HH:mm";
-
 const commonColDefs = [
 	{
 		datacolumn: "beginDate",
@@ -22,20 +21,31 @@ const commonColDefs = [
 
 const EditPanel = props => {
 	const [stateData, updateData] = useState({
-		siteId: 0,
-		id: 1,
-		beginDate: moment().format(dateformat),
-		endDate: moment().add(1,"day").format(dateformat),
-		maintainType:"Date",
+		siteId: props.IsAdd ? 0 : props.Datas.siteId,
+		tpId: props.IsAdd ? 1 : props.Datas.tpId,
+		beginDate: props.IsAdd ? moment().format(dateformat) : UtcToLocal(props.Datas.beginDate),
+		endDate: props.IsAdd ? moment().add(1,"day").format(dateformat) : UtcToLocal(props.Datas.endDate),
+		maintainType: props.IsAdd ? "Date" : props.Datas.maintainType,
 		typeList: props.typeList,
+		sn: props.IsAdd ? null : props.Datas.sn,
+		tpGameType: props.IsAdd ? null : props.Datas.tpGameType,
 	});
+	
+	if (!props.IsAdd) {
+		console.log(stateData);
+		if($("input[type='checkbox'][value='0']").prop("checked")) {
+			$("#CheckItemGroup").hide();
+		} else {
+			$("#CheckItemGroup").show();
+		}
+	}			
 
 	const EditFiled = (v, datacolumn) => {
 		updateData({
 			...stateData,
 			[datacolumn]: v
 		});	
-		if (datacolumn == "id"){
+		if (datacolumn == "tpId"){
 			$("input[type='checkbox']").each(function() {
 				$(this).prop("checked", false);
 			});
@@ -44,13 +54,13 @@ const EditPanel = props => {
 		}			
 	};
 
-	const InsertTpMaintain = () => {
-		let tpGametype = "";
+	const SetTpMaintain = () => {
+		let tpGameTypeList = "";
 		if($("input[type='checkbox'][value='0']").prop("checked")) {
-			tpGametype="0";
+			tpGameTypeList = "0";
 		} else {	
 			$("input[type='checkbox'][value!='0']:checked").each(function() {
-				tpGametype += `${$(this).val()},`;
+				tpGameTypeList += `${$(this).val()},`;
 			});
 		}
 
@@ -69,11 +79,12 @@ const EditPanel = props => {
 		}
 
 		if (check) {
-			props.InsertTpMaintain(stateData, tpGametype);
+			props.SetTpMaintain(stateData, tpGameTypeList);
 		} else {
 			alert(msg);
 		}
 	};
+
 	const CheckBox_OnChange = (v, dataColumn) => {
 	};
 
@@ -128,14 +139,14 @@ const EditPanel = props => {
 				siteList={props.siteList}
 				currentSelect={stateData.siteId}
 				onChange={EditFiled}
-				datacolumn={"siteId"}
+				datacolumn="siteId"
 			/>	
 
 			<DropDownBox
 				columnTitle="Tp Name"
 				options={GetTPOptions(props.tpList)}
-				selectedValue={props.id}
-				dataColumn={"id"}
+				currentSelect={stateData.tpId}
+				dataColumn="tpId"
 				onChange={EditFiled}
 			/> 
 			<br></br>
@@ -143,10 +154,11 @@ const EditPanel = props => {
 				{stateData.typeList ? (
 				<CheckBoxElem
 					Title="Tp GameType"
-					Options={GetTpGameTypeOptions(stateData.typeList, stateData.id)}
+					Options={GetTpGameTypeOptions(stateData.typeList, stateData.tpId)}
 					OnChange={CheckBox_OnChange}
 					OnChangeAll={CheckBox_OnChangeAll}
 					dataColumn="tpGameType"
+					currentSelect={stateData.tpGameType}
 				/>
 				) : null}
 			</div> 
@@ -160,7 +172,7 @@ const EditPanel = props => {
 					marginBottom: "40px",
 					float: "right"
 				}}
-				onClick={InsertTpMaintain}> 
+				onClick={SetTpMaintain}> 
 				Submit
 			</button>
 		</>
@@ -239,7 +251,7 @@ const DropDownBox = (props) => {
 	};
 	let optionRows = props.options.map((item) => {
 	  return (
-		<option key={`${props.ColumnTitle}-${item.value}`} value={item.value}>
+		<option key={`${props.ColumnTitle}-${item.value}`} value={item.value} selected={props.currentSelect == item.value}>
 		  {item.displayText}
 		</option>
 	  );
@@ -263,7 +275,7 @@ const GetTpGameTypeOptions = (typeList, tpId) => {
 	if (typeList != null) {
 		typeList.forEach((x) => {
 			if	(tpId == x.tpId){
-				TpGameTypeOptions.push({ value: `${x.type}-${x.categoryId}`, displayText: x.typeName });
+				TpGameTypeOptions.push({ value: `${x.type}-${x.categoryId}`, displayText: x.typeName, id: x.type });
 			}			
 	  });
 	}
@@ -275,7 +287,7 @@ const CheckBoxElem = ({
 	Options,
 	OnChange,
 	OnChangeAll,
-	dataColumn,
+	dataColumn
   }) => {
 	let opt = Options.map((o) => {
 	  return (
@@ -285,6 +297,7 @@ const CheckBoxElem = ({
 		  Title={o.displayText}
 		  Value={o.value}
 		  dataColumn={dataColumn}
+		  id={o.id}
 		/>
 	  );
 	});
@@ -293,11 +306,12 @@ const CheckBoxElem = ({
 		<span className="label">{Title}</span>
 		<div className="field">		
 			<CheckBox
-			onChange={OnChangeAll}
-			Title="All"
-			Options={Options}
-			Value="0"
-			dataColumn={dataColumn}
+				onChange={OnChangeAll}
+				Title="All"
+				Options={Options}
+				Value="0"
+				dataColumn={dataColumn}
+				id="0"
 			/>		
 			<br />	
 			<div id="CheckItemGroup">	
@@ -319,10 +333,15 @@ const CheckBox = (props) => {
 		  style={{ width: "0" }}
 		  value={props.Value}
 		  onChange={OnChange}
+		  id={props.id}
 		/>
 		<i className="icon icon-checkbox"></i>
 		<span className="text">{props.Title}</span>
 	  </label>
 	);
 };
+
+const UtcToLocal = (time)=>{
+	return moment.utc(time).local().format('YYYY-MM-DD HH:mm');
+  }
 export default EditPanel;

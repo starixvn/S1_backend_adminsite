@@ -76,19 +76,19 @@ const App = () => {
     });
   };
 
-  const InsertTpMaintain = (datas, tpGametype) => {
-    let insertData = {
+  const SetTpMaintain = (datas, tpGameTypeList, isAdd) => {
+    let SetData = {
       siteId: datas.siteId,
-      tpId: datas.id,
+      tpId: datas.tpId,
       beginDate: moment(datas.beginDate).toJSON(),
       endDate: moment(datas.endDate).toJSON(),
       maintainType: "Date",
-      tpGameTypeList: tpGametype
+      tpGameTypeList: tpGameTypeList
     };
     
     let param = {
-      Url: "TpMaintain/InsertTpMaintain",
-      Data: qs.stringify(insertData),
+      Url: isAdd ? "TpMaintain/InsertTpMaintain" : "TpMaintain/UpdateTpMaintain",
+      Data: qs.stringify(SetData),
     };
     
     WebAPI.PostData(param).then((res) => {
@@ -126,13 +126,21 @@ const App = () => {
     }
   };
 
-  const UpdateTpMaintain = (idx) => {
-      window.confirm(`SN is ${stateDatas.Datas[idx].sn}`)
+  const EditTpMaintain = (idx) => {
+      console.log(stateDatas.Datas[idx]);
+      updateDatas({
+        ...stateDatas,
+        ShowSettingPanel: true,
+        SettingDatas: stateDatas.Datas[idx],
+        IsAdd: false,
+      });
   };
 
   return (
     <div className="container-fluid">
-      <h4 className="page-name">Maintenance</h4>
+      <h4 className="page-name">{`${
+        stateDatas.ShowSettingPanel ? (stateDatas.IsAdd ? "Add " : "Edit ") : ""
+      }Maintenance`} </h4>
       {stateDatas.ShowSettingPanel ? (
         <EditPanel
           siteList={siteList}
@@ -144,7 +152,9 @@ const App = () => {
               ShowSettingPanel: false,
             });
           }}
-          InsertTpMaintain={InsertTpMaintain}
+          Datas={stateDatas.SettingDatas}
+          IsAdd={stateDatas.IsAdd}
+          SetTpMaintain={SetTpMaintain}
         />
       ) : (
         <>
@@ -166,7 +176,7 @@ const App = () => {
             <Result
               Datas={stateDatas.Datas}
               ClickDelete={DeleteTpMaintain}
-              ClickEdit={UpdateTpMaintain}
+              ClickEdit={EditTpMaintain}
             />
           )}
         </>
