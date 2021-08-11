@@ -172,6 +172,7 @@ namespace BackendSite.Controllers.Api
             }
             apiResult.ErrorCode = result.ErrorCode;
             apiResult.Message = result.Data.ThirdId;
+            apiResult.RawMessage = result.RawMessage;
 
             return apiResult;
         }
