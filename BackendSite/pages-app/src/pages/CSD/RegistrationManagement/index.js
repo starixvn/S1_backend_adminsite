@@ -8,7 +8,7 @@ import Result from "./Result";
 import Note from "./Note";
 
 const App = () => {
-  const [siteList, setSiteList] = useState();
+  const [siteList, setSiteList] = useState([]);
   const [stateFilter, setFilter] = useState({
     SelectSite: [],
     Currency: 0,
@@ -40,6 +40,9 @@ const App = () => {
   });
   const [count, setCount] = useState(30);
   const [isloading, setisloading] = useState(true);
+  const [editstatus, seteditstatus] = useState({
+    CustId: 0,
+  });
 
   useEffect(() => {
     let id = setInterval(() => {
@@ -62,40 +65,40 @@ const App = () => {
       }
     });
   }, []);
-  const Filter_CheckBox_OnChange = (v, dataColumn) => {
-    let isRemove = stateFilter[dataColumn].includes(v);
-    let newChecked = isRemove
-      ? stateFilter[dataColumn].filter((value) => value !== v)
-      : stateFilter[dataColumn].push(v);
-    let currentTab = stateFilter[dataColumn];
-    if (newChecked.length === 0) {
-      currentTab = [];
-    } else if (currentTab === null) {
-      currentTab = newChecked;
-    }
+  // const Filter_CheckBox_OnChange = (v, dataColumn) => {
+  //   let isRemove = stateFilter[dataColumn].includes(v);
+  //   let newChecked = isRemove
+  //     ? stateFilter[dataColumn].filter((value) => value !== v)
+  //     : stateFilter[dataColumn].push(v);
+  //   let currentTab = stateFilter[dataColumn];
+  //   if (newChecked.length === 0) {
+  //     currentTab = [];
+  //   } else if (currentTab === null) {
+  //     currentTab = newChecked;
+  //   }
 
-    if (isRemove && !newChecked.includes(currentTab)) {
-      currentTab = newChecked.length === 0 ? [] : newChecked;
-    }
-    setFilter({
-      ...stateFilter,
-      [dataColumn]: currentTab,
-    });
-  };
+  //   if (isRemove && !newChecked.includes(currentTab)) {
+  //     currentTab = newChecked.length === 0 ? [] : newChecked;
+  //   }
+  //   setFilter({
+  //     ...stateFilter,
+  //     [dataColumn]: currentTab,
+  //   });
+  // };
 
-  const Filter_CheckBox_CheckAll = (v, dataColumn, options) => {
-    if (v !== "All") return false;
-    let currentTab =
-      stateFilter[dataColumn].length === options.length
-        ? []
-        : options.map((o) => {
-            return o.value;
-          });
-    setFilter({
-      ...stateFilter,
-      [dataColumn]: currentTab,
-    });
-  };
+  // const Filter_CheckBox_CheckAll = (v, dataColumn, options) => {
+  //   if (v !== "All") return false;
+  //   let currentTab =
+  //     stateFilter[dataColumn].length === options.length
+  //       ? []
+  //       : options.map((o) => {
+  //           return o.value;
+  //         });
+  //   setFilter({
+  //     ...stateFilter,
+  //     [dataColumn]: currentTab,
+  //   });
+  // };
 
   const Filter_OnChange = (v, dataColumn) => {
     setFilter({
@@ -116,11 +119,15 @@ const App = () => {
       alert("Please Choose at least one Site");
       return false;
     }
+    const siteIds = [];
+    stateFilter.SelectSite.map((o) => {
+      siteIds.push(o.value);
+    });
     setisloading(true);
     let param = {
       Url: "CustManage/GetRegLiveStatusData",
       Data: {
-        SiteIds: stateFilter.SelectSite,
+        SiteIds: siteIds,
         Currency: Number(stateFilter.Currency),
         DepositStatus: Number(stateFilter.DepositStatus),
         Status: Number(stateFilter.Status),
@@ -163,10 +170,14 @@ const App = () => {
   useEffect(() => {
     if (count === 0 && stateDatas.FilterInfo !== null) {
       setisloading(true);
+      const siteIds = [];
+      stateDatas.FilterInfo.SelectSite.map((o) => {
+        siteIds.push(o.value);
+      });
       let param = {
         Url: "CustManage/GetRegLiveStatusData",
         Data: {
-          SiteIds: stateDatas.FilterInfo.SelectSite,
+          SiteIds: siteIds,
           Currency: Number(stateDatas.FilterInfo.Currency),
           DepositStatus: Number(stateDatas.FilterInfo.DepositStatus),
           Status: Number(stateDatas.FilterInfo.Status),
@@ -207,10 +218,14 @@ const App = () => {
       alert("Please Choose at least one Site");
       return false;
     }
+    const siteIds = [];
+    stateFilter.SelectSite.map((o) => {
+      siteIds.push(o.value);
+    });
     let param = {
       Url: "CustManage/ExportRegLiveStatus",
       Data: {
-        SelectSite: JSON.stringify(stateFilter.SelectSite),
+        SelectSite: JSON.stringify(siteIds),
         Currency: Number(stateFilter.Currency),
         DepositStatus: Number(stateFilter.DepositStatus),
         Status: Number(stateFilter.Status),
@@ -226,10 +241,14 @@ const App = () => {
 
   const Result_ChangePage = (PageNumber) => {
     setisloading(true);
+    const siteIds = [];
+    stateDatas.FilterInfo.SelectSite.map((o) => {
+      siteIds.push(o.value);
+    });
     let param = {
       Url: "CustManage/GetRegLiveStatusData",
       Data: {
-        SiteIds: stateDatas.FilterInfo.SelectSite,
+        SiteIds: siteIds,
         Currency: Number(stateDatas.FilterInfo.Currency),
         DepositStatus: Number(stateDatas.FilterInfo.DepositStatus),
         Status: Number(stateDatas.FilterInfo.Status),
@@ -284,10 +303,14 @@ const App = () => {
       });
   };
   const UpdateReset = () => {
+    const siteIds = [];
+    stateDatas.FilterInfo.SelectSite.map((o) => {
+      siteIds.push(o.value);
+    });
     let param = {
       Url: "CustManage/GetRegLiveStatusData",
       Data: {
-        SiteIds: stateDatas.FilterInfo.SelectSite,
+        SiteIds: siteIds,
         Currency: Number(stateDatas.FilterInfo.Currency),
         DepositStatus: Number(stateDatas.FilterInfo.DepositStatus),
         Status: Number(stateDatas.FilterInfo.Status),
@@ -342,6 +365,18 @@ const App = () => {
       CustId: custid,
     });
   };
+
+  const ChangeStatus = (custid) => {
+    seteditstatus({
+      CustId: custid,
+    });
+  };
+  const CancelChangeStatus = () => {
+    seteditstatus({
+      CustId: 0,
+    });
+  };
+
   const Back = () => {
     seteditNoteData({
       Id: 0,
@@ -495,8 +530,8 @@ const App = () => {
       <h4 className="page-name">Registration Management</h4>
       <Filter
         SiteList={siteList}
-        onChangeCheckBox={Filter_CheckBox_OnChange}
-        onChangeAllCheckBox={Filter_CheckBox_CheckAll}
+        // onChangeCheckBox={Filter_CheckBox_OnChange}
+        // onChangeAllCheckBox={Filter_CheckBox_CheckAll}
         filterInfo={stateFilter}
         onChange={Filter_OnChange}
         ClickSubmit={Submit}
@@ -513,6 +548,9 @@ const App = () => {
           Isloading={isloading}
           Count={count}
           Refresh={Refresh}
+          Editstatus={editstatus}
+          ChangeStatus={ChangeStatus}
+          CancelChangeStatus={CancelChangeStatus}
         />
       )}
     </div>
