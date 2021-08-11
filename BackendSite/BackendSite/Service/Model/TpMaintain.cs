@@ -24,6 +24,7 @@ namespace BackendSite.Service.Model.TpMaintain
         public int TypeValue { get; set; }
         public string BeginTime { get; set; }
         public string EndTime { get; set; }
+        public string UpdateUser { get; set; }
     }
 
     public class CommonTpInfo

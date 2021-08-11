@@ -126,6 +126,10 @@ const App = () => {
     }
   };
 
+  const UpdateTpMaintain = (idx) => {
+      window.confirm(`SN is ${stateDatas.Datas[idx].sn}`)
+  };
+
   return (
     <div className="container-fluid">
       <h4 className="page-name">Maintenance</h4>
@@ -162,6 +166,7 @@ const App = () => {
             <Result
               Datas={stateDatas.Datas}
               ClickDelete={DeleteTpMaintain}
+              ClickEdit={UpdateTpMaintain}
             />
           )}
         </>

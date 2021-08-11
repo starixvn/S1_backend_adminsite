@@ -202,14 +202,17 @@ module.exports = {
     // 	// '@babel/polyfill',
     // 	"./src/pages/Administration/SpecialPasswordManagement/index.js"
     // ],
-    "Finance/AdjustmentLogReport.min": [
+    //"Finance/AdjustmentLogReport.min": [
       // '@babel/polyfill',
-      "./src/pages/Finance/AdjustmentLogReport/index.js",
-    ],
+      //"./src/pages/Finance/AdjustmentLogReport/index.js",
+    //],
     // "Finance/WithdrawalAccounting.min": [
     //   "@babel/polyfill",
     //   "./src/pages/Finance/WithdrawalAccounting/index.js",
     // ],
+    "Marketing/TpMaintain.min": [
+      "./src/pages/Marketing/TpMaintain/index.js",
+    ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

@@ -42,6 +42,10 @@ export const dataColumnDefs = () => {
 			}
 		},
 		{
+			dataColumn: "updateUser",
+			columnTitle: "LastUpdateUser"
+		},
+		{
 			columnTitle: "Action",
 			header: {
 				attr: {
@@ -84,6 +88,7 @@ const Panel = props => {
 					body_content = (
 						<ActionButtons
 							ClickDelete={props.ClickDelete.bind(null, d_idx)}
+							ClickEdit={props.ClickEdit.bind(null, d_idx)}
 						/>
 					);
 				}
@@ -134,6 +139,9 @@ const Panel = props => {
 const ActionButtons = props => {
 	return (
 		<div className="button-action">
+			<button className="btn btn-edit" onClick={props.ClickEdit}>
+				<i className="icon-edit"></i>
+			</button>
 			<button className="btn btn-icon-delete" onClick={props.ClickDelete}>
 				<i className="icon-delete"></i>
 			</button>

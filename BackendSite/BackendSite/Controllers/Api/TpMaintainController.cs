@@ -172,7 +172,8 @@ namespace BackendSite.Controllers.Api
                 MaintainType = input.MaintainType,
                 TypeValue = input.TypeValue,
                 BeginTime = input.BeginTime,
-                EndTime = input.EndTime
+                EndTime = input.EndTime,
+                UpdateUser = input.UpdateUser             
             };
         }       
     }
