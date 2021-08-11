@@ -554,7 +554,7 @@ namespace BackendSite.Service.DAL
         public int AddRegLiveStatusNote(int custid, string note, string Operator)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_CustRegLiveStatusNotes_Ins", new { CustId = custid, Note = note, Operator = Operator }, commandType: CommandType.StoredProcedure);
+            return conn.Execute("Admin_CustRegLiveStatusNotes_Ins", new { CustId = custid, Note = string.IsNullOrWhiteSpace(note) ? "" : note, Operator = Operator }, commandType: CommandType.StoredProcedure);
         }
 
         public int DeleteRegLiveStatusNote(int custid,int id)

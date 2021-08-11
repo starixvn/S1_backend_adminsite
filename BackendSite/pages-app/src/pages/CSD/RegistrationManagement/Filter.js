@@ -1,6 +1,7 @@
 import React from "react";
 import moment from "moment-timezone";
 import DateTimePicker from "react-datetime";
+import MultiSelect from "react-multi-select-component";
 
 const defCurrencyType = {
   2: "MYR",
@@ -25,19 +26,31 @@ const defRegTimeType = {
 };
 
 const Panel = (props) => {
-  let siteListOptions = "";
-  if (props.SiteList) {
-    siteListOptions = props.SiteList.map((i) => {
-      return {
-        value: Number(i.siteId),
-        displayText: i.siteName,
-      };
-    });
-  }
+  // let siteListOptions = "";
+  // if (props.SiteList) {
+  //   siteListOptions = props.SiteList.map((i) => {
+  //     return {
+  //       value: Number(i.siteId),
+  //       displayText: i.siteName,
+  //     };
+  //   });
+  // }
+
+  let siteList = props.SiteList.map((x) => {
+    return {
+      label: x.siteName,
+      value: x.siteId,
+    };
+  });
+  const SiteIdsChange = (x) => {
+    props.onChange(x,"SelectSite");
+  };
+
   return (
     <div className="filter">
       <div className="row-flex">
-        {siteListOptions ? (
+
+        {/* {siteListOptions ? (
           <CheckBoxElem
             Title="Site"
             Options={siteListOptions}
@@ -46,7 +59,22 @@ const Panel = (props) => {
             OnChangeAll={props.onChangeAllCheckBox}
             dataColumn="SelectSite"
           />
-        ) : null}
+        ) : null} */}
+
+        <div className="input-item" style={{ width: "200px", zIndex: "999" }}>
+          <span className="label">Site</span>
+          <div className="field">
+            <MultiSelect
+              disableSearch={"true"}
+              options={siteList}
+              value={props.filterInfo.SelectSite}
+              onChange={SiteIdsChange}
+              labelledBy={"Select"}
+              ItemRenderer={itemRenderer}
+            />
+          </div>
+        </div>
+
         <DropDownBox
           columnTitle="Currency"
           options={Object.keys(defCurrencyType).map((key) => {
@@ -249,4 +277,18 @@ const DateTimePickerElem = (props) => {
   );
 };
 
+const itemRenderer = ({ checked, option, onClick }) => {
+  return (
+    <div>
+      <input
+        style={{ height: "15px", width: "20px" }}
+        id={option.label}
+        type="checkbox"
+        onChange={onClick}
+        checked={checked}
+      />
+      <label htmlFor={option.label}>{option.label}</label>
+    </div>
+  );
+};
 export default Panel;

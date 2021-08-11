@@ -141,7 +141,10 @@ const Panel = (props) => {
               defaultValue=""
               dataColumn="AddNote"
               onChange={props.AddNote}
+              Size={800}
             />
+          </div>
+          <div className="row-flex">
             <div className="button-group">
               <button
                 className="btn btn-search"
@@ -184,6 +187,7 @@ const InputField = (props) => {
           defaultValue={props.defaultValue}
           onChange={onChange}
           placeholder="Add a note..."
+          style={{ width: `${props.Size}px` }}
         />
       </div>
     </div>

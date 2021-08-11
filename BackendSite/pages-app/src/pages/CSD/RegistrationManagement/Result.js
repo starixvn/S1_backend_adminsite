@@ -98,26 +98,57 @@ const Panel = (props) => {
           {"Call"}
         </td>
       ) : element.dataColumn === "status" ? (
-        <td
-          key={`td-${element.dataColumn}-${idx}`}
-          className={
-            element.body && element.body.attr && element.body.attr.class
-              ? element.body.attr.class
-              : ""
-          }
-        >
-          <DropDownBox
-            options={Object.keys(defStatusType).map((key) => {
-              return { value: key, displayText: defStatusType[key] };
-            })}
-            hasAll={false}
-            selectedValue={data[element.dataColumn]}
-            dataColumn="Status"
-            onChange={props.UpdateStatus}
-            custId={data["custId"]}
-            siteId={data["siteId"]}
-          />
-        </td>
+        props.Editstatus.CustId === data["custId"] ? (
+          <td
+            key={`td-${element.dataColumn}-${idx}`}
+            className={
+              element.body && element.body.attr && element.body.attr.class
+                ? element.body.attr.class
+                : ""
+            }
+          >
+            <DropDownBox
+              options={Object.keys(defStatusType).map((key) => {
+                return { value: key, displayText: defStatusType[key] };
+              })}
+              hasAll={false}
+              selectedValue={data[element.dataColumn]}
+              dataColumn="Status"
+              onChange={props.UpdateStatus}
+              custId={data["custId"]}
+              siteId={data["siteId"]}
+              CancelChangeStatus={props.CancelChangeStatus}
+            />
+            {/* <div className="button-action">
+              <button
+                className="btn btn-cancel"
+                type="submit"
+                onClick={props.CancelChangeStatus.bind(this)}
+              >
+                <i className="icon-cancel"></i>
+              </button>
+            </div> */}
+          </td>
+        ) : (
+          <td key={`td-${element.dataColumn}-${idx}`}>
+            <div>
+              <div className="button-action">
+                {data["status"] === 1
+                  ? "Pending"
+                  : data["status"] === 2
+                  ? "Done"
+                  : "Invalid"}
+                <button
+                  className="btn btn-edit"
+                  type="submit"
+                  onClick={props.ChangeStatus.bind(this, data["custId"])}
+                >
+                  <i className="icon-edit"></i>
+                </button>
+              </div>
+            </div>
+          </td>
+        )
       ) : element.dataColumn === "note" ? (
         <td key={`td-${element.dataColumn}-${idx}`}>
           <div className="button-action">
@@ -237,16 +268,31 @@ const DropDownBox = (props) => {
   });
   return (
     <div className="input-item">
-      <div className="field">
-        <select
-          defaultValue={props.selectedValue}
-          value={props.selectedValue}
-          onChange={onChange}
-        >
-          {props.hasAll ? <option value="0">All</option> : null}
-          {optionRows}
-        </select>
-      </div>
+      <tr>
+        <td>
+          <div className="field">
+            <select
+              defaultValue={props.selectedValue}
+              value={props.selectedValue}
+              onChange={onChange}
+            >
+              {props.hasAll ? <option value="0">All</option> : null}
+              {optionRows}
+            </select>
+          </div>
+        </td>
+        <td>
+          <div className="button-action">
+            <button
+              className="btn btn-cancel"
+              type="submit"
+              onClick={props.CancelChangeStatus.bind(this)}
+            >
+              <i className="icon-cancel"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
     </div>
   );
 };
