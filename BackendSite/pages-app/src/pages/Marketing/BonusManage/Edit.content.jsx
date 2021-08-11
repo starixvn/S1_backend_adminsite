@@ -345,7 +345,7 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 
 
 
-				{(state.promotionType == 6 || state.promotionType == 7) ?
+				{(state.promotionType == 6) ?
 					(<div className="filter">
 						<RadioBox
 							Title="Period Type"
