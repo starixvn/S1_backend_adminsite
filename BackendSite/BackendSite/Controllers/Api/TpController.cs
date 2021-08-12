@@ -150,7 +150,7 @@ namespace BackendSite.Controllers.Api
         }
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/ThirdPartyAdjustment" })]
-        public async Task<ApiResult> SetAdjustmentTpCustInfo([FromForm] int SiteId, [FromForm] int TpId, [FromForm] string UserName, [FromForm] string UserTpId, [FromForm] int Opt, [FromForm] int Amount, [FromForm] string Memo)
+        public async Task<ApiResult> SetAdjustmentTpCustInfo([FromForm] int SiteId, [FromForm] int TpId, [FromForm] string UserName, [FromForm] string UserTpId, [FromForm] int Opt, [FromForm] decimal Amount, [FromForm] string Memo)
         {
             var apiResult = new ApiResult();
             var custId = (string.IsNullOrEmpty(UserTpId)) ? null : common.TpIdToCustId(UserTpId);
