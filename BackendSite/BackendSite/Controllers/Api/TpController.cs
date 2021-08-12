@@ -11,6 +11,7 @@ using BackendSite.Service.Library;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using Newtonsoft.Json;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Controllers.Api
 {
@@ -158,7 +159,7 @@ namespace BackendSite.Controllers.Api
             AdminTpTransfer inTpTransfer = new AdminTpTransfer() { TpId = TpId, CustId = custInfosDetail.CustId, Amount = Amount, direction = (TpDirection)Opt, Operator = User.Identity.Name, Remarks = Memo };
 
             var result = await tpBLL.AdminAdjustmentTransferAsync(inTpTransfer);
-            if(result.ErrorCode == 0)
+            if (result.ErrorCode == (int)ErrorCodeType.Success)
             {
                 var param = new
                 {
@@ -171,7 +172,7 @@ namespace BackendSite.Controllers.Api
                 tpBLL.SetAdjustmentTpCustInfoLog("3RDFundsAdjustment", 1, JsonConvert.SerializeObject(param), User.Identity.Name);
             }
             apiResult.ErrorCode = result.ErrorCode;
-            apiResult.Message = string.IsNullOrWhiteSpace(result.Data.ThirdId) ? result.RawMessage : result.Data.ThirdId;
+            apiResult.Message = string.IsNullOrWhiteSpace(result.Message) ? result.RawMessage : result.Message;
 
             return apiResult;
         }
