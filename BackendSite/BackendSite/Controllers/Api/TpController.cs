@@ -171,8 +171,7 @@ namespace BackendSite.Controllers.Api
                 tpBLL.SetAdjustmentTpCustInfoLog("3RDFundsAdjustment", 1, JsonConvert.SerializeObject(param), User.Identity.Name);
             }
             apiResult.ErrorCode = result.ErrorCode;
-            apiResult.Message = result.Data.ThirdId;
-            apiResult.RawMessage = result.RawMessage;
+            apiResult.Message = string.IsNullOrWhiteSpace(result.Data.ThirdId) ? result.RawMessage : result.Data.ThirdId;
 
             return apiResult;
         }

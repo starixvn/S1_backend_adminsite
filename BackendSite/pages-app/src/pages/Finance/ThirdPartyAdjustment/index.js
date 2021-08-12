@@ -122,7 +122,7 @@ const App = () => {
                                 ClickSearch();
                                 setSendData({ adjustmentOpt: "", amount: "", memo: "" });
                             } else {
-                                alert(result.rawMessage);
+                                alert(result.message);
                             }
                         }
                     }).catch((error) => {
