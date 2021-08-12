@@ -43,6 +43,11 @@ namespace BackendSite.Service.BLL
             return tpMaintainService.InsertTpMaintain(input);
         }
 
+        public bool UpdateTpMaintain(TpMaintain input)
+        {
+            return tpMaintainService.UpdateTpMaintain(input);
+        }
+
         public bool DeleteTpMaintain(int sn)
         {
             return tpMaintainService.DeleteTpMaintain(sn);
@@ -76,7 +81,9 @@ namespace BackendSite.Service.BLL
                         MaintainType = input.MaintainType,
                         TypeValue = input.TypeValue,
                         BeginTime = input.BeginTime,
-                        EndTime = input.EndTime
+                        EndTime = input.EndTime,
+                        UpdateUser = input.UpdateUser,
+                        
                     });
                 }
             }

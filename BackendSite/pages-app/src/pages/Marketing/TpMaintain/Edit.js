@@ -29,16 +29,24 @@ const EditPanel = props => {
 		typeList: props.typeList,
 		sn: props.IsAdd ? null : props.Datas.sn,
 		tpGameType: props.IsAdd ? null : props.Datas.tpGameType,
-	});
-	
-	if (!props.IsAdd) {
-		console.log(stateData);
-		if($("input[type='checkbox'][value='0']").prop("checked")) {
-			$("#CheckItemGroup").hide();
-		} else {
-			$("#CheckItemGroup").show();
+	});	
+
+	React.useEffect(() => {
+		if (!props.IsAdd) {
+			$("input[type='checkbox']").each(function() {
+				$(this).prop('disabled', true);
+				if($(this).prop('id') == stateData.tpGameType){
+					$(this).prop("checked", true)
+				}		
+			});
+
+			if($("input[type='checkbox'][value='0']").prop("checked")) {
+				$("#CheckItemGroup").hide();
+			} else {
+				$("#CheckItemGroup").show();
+			}
 		}
-	}			
+	  });	
 
 	const EditFiled = (v, datacolumn) => {
 		updateData({
@@ -73,13 +81,13 @@ const EditPanel = props => {
 			check = false;
 			msg = "Please select endDate.";
 		}
-		else if (tpGametype == "") {
+		else if (tpGameTypeList == "") {
 			check = false;
 			msg = "Please select tpGametype.";
 		}
 
 		if (check) {
-			props.SetTpMaintain(stateData, tpGameTypeList);
+			props.SetTpMaintain(stateData, tpGameTypeList, props.IsAdd);
 		} else {
 			alert(msg);
 		}
@@ -140,6 +148,7 @@ const EditPanel = props => {
 				currentSelect={stateData.siteId}
 				onChange={EditFiled}
 				datacolumn="siteId"
+				IsAdd={props.IsAdd}
 			/>	
 
 			<DropDownBox
@@ -148,6 +157,7 @@ const EditPanel = props => {
 				currentSelect={stateData.tpId}
 				dataColumn="tpId"
 				onChange={EditFiled}
+				IsAdd={props.IsAdd}
 			/> 
 			<br></br>
 			 <div className="row-flex">
@@ -176,7 +186,7 @@ const EditPanel = props => {
 				Submit
 			</button>
 		</>
-	);
+	);	
 };
 
 const DateTimePickerElem = props => {
@@ -190,7 +200,7 @@ const DateTimePickerElem = props => {
 	);
 };
 
-const SiteList = ({ siteList, onChange, currentSelect, datacolumn }) => {
+const SiteList = ({ siteList, onChange, currentSelect, datacolumn, IsAdd }) => {
 	let radio =
 		siteList &&
 		Object.keys(siteList).map(siteId => {
@@ -203,6 +213,7 @@ const SiteList = ({ siteList, onChange, currentSelect, datacolumn }) => {
 					id={`rb-site-${siteId}`}
 					onChange={onChange.bind(null, siteId, datacolumn)}
 					checked={currentSelect == siteId}
+					IsAdd={IsAdd}
 				/>
 			);
 		});
@@ -214,10 +225,10 @@ const SiteList = ({ siteList, onChange, currentSelect, datacolumn }) => {
 	);
 };
 
-const RadioItem = ({ value, dispalyText, id, onChange, checked }) => {
+const RadioItem = ({ value, dispalyText, id, onChange, checked, IsAdd }) => {
 	return (
 		<div className="custom-control custom-radio custom-control-inline">
-			<input
+			<input disabled={IsAdd ? false : true}
 				type="radio"
 				id={id}
 				name="SiteList"
@@ -261,7 +272,7 @@ const DropDownBox = (props) => {
 			<div className="input-item">
 				<span className="label">{props.columnTitle}</span>
 				<div className="field">
-				<select onChange={onChange} value={props.value}>
+				<select onChange={onChange} value={props.value} disabled={props.IsAdd ? false : true}>
 					{optionRows}
 				</select>
 				</div>
@@ -302,7 +313,7 @@ const CheckBoxElem = ({
 	  );
 	});
  	return (
-	  <div className="input-item" style={{ width: "auto" }}>
+	  <div className="input-item" style={{ width: "auto" }} >
 		<span className="label">{Title}</span>
 		<div className="field">		
 			<CheckBox

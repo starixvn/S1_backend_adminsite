@@ -139,7 +139,7 @@ const Panel = props => {
 const ActionButtons = props => {
 	return (
 		<div className="button-action">
-			<button className="btn btn-edit" onClick={props.ClickEdit}>
+			<button className="btn btn-edit" title="Only can edit time column." onClick={props.ClickEdit}>
 				<i className="icon-edit"></i>
 			</button>
 			<button className="btn btn-icon-delete" onClick={props.ClickDelete}>

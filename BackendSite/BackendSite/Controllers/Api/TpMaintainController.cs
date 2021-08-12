@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using BackendSite.Service.Model.TpMaintain;
 using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
+using BackendSite.Service.DAL;
 
 namespace BackendSite.Controllers.Api
 {
@@ -23,12 +24,14 @@ namespace BackendSite.Controllers.Api
     {
         private readonly TpMaintainBLL tpMaintainBLL;
         private readonly ServerInfoBLL serverInfoBLL;
+        private readonly AuthorizeBLL authorizeBLL;
         private readonly ILogger<TpMaintainController> logger;
 
         public TpMaintainController(IServiceProvider provider)
         {
             tpMaintainBLL = provider.GetRequiredService<TpMaintainBLL>();
             serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
+            authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             logger = provider.GetRequiredService<ILogger<TpMaintainController>>();
         }
 
@@ -40,6 +43,8 @@ namespace BackendSite.Controllers.Api
             {
                 input.BeginDate = input.BeginDate.ToUniversalTime();
                 input.EndDate = input.EndDate.ToUniversalTime();
+                input.UpdateUser = authorizeBLL.GetAuthData().UserName;
+
                 if (input.SiteId == 0)//處理ALL 
                 {
                     var list = serverInfoBLL.GetSiteListByLoginUser().Select(server => GetNewTpMaintainBySiteId(input, server));
@@ -54,6 +59,32 @@ namespace BackendSite.Controllers.Api
                 return new ApiResult
                 {
                     ErrorCode = await tpMaintainBLL.InsertTpMaintain(input) ? 0 : -1
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return new ApiResult
+                {
+                    ErrorCode = 999,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
+        public ApiResult UpdateTpMaintainAsync([FromForm] TpMaintain input)
+        {
+            try
+            {
+                input.BeginDate = input.BeginDate.ToUniversalTime();
+                input.EndDate = input.EndDate.ToUniversalTime();
+                input.UpdateUser = authorizeBLL.GetAuthData().UserName;
+
+                return new ApiResult
+                {
+                    ErrorCode = tpMaintainBLL.UpdateTpMaintain(input) ? 0 : -1
                 };
             }
             catch (Exception ex)

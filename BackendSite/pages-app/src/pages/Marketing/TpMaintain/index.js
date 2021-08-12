@@ -83,14 +83,15 @@ const App = () => {
       beginDate: moment(datas.beginDate).toJSON(),
       endDate: moment(datas.endDate).toJSON(),
       maintainType: "Date",
-      tpGameTypeList: tpGameTypeList
+      tpGameTypeList: tpGameTypeList,
+      sn: datas.sn
     };
-    
+   
     let param = {
       Url: isAdd ? "TpMaintain/InsertTpMaintain" : "TpMaintain/UpdateTpMaintain",
       Data: qs.stringify(SetData),
     };
-    
+    console.log(param);
     WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {
         alert("success.");
@@ -127,13 +128,13 @@ const App = () => {
   };
 
   const EditTpMaintain = (idx) => {
-      console.log(stateDatas.Datas[idx]);
+      alert("Only can edit time column.");
       updateDatas({
         ...stateDatas,
         ShowSettingPanel: true,
         SettingDatas: stateDatas.Datas[idx],
         IsAdd: false,
-      });
+      });    
   };
 
   return (

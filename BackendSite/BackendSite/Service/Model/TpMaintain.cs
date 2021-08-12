@@ -8,7 +8,7 @@ namespace BackendSite.Service.Model.TpMaintain
 {
     public class TpMaintain
     {
-        public int SN { get; set; }
+        public int? SN { get; set; }
         public int SiteId { get; set; }
         public string SiteName { get; set; }
         public int TpId { get; set; }
