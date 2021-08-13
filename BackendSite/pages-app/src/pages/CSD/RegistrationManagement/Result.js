@@ -117,7 +117,7 @@ const Panel = (props) => {
               onChange={props.UpdateStatus}
               custId={data["custId"]}
               siteId={data["siteId"]}
-              CancelChangeStatus={props.CancelChangeStatus}
+              // CancelChangeStatus={props.CancelChangeStatus}
             />
             {/* <div className="button-action">
               <button
@@ -281,7 +281,7 @@ const DropDownBox = (props) => {
             </select>
           </div>
         </td>
-        <td>
+        {/* <td>
           <div className="button-action">
             <button
               className="btn btn-cancel"
@@ -291,7 +291,7 @@ const DropDownBox = (props) => {
               <i className="icon-cancel"></i>
             </button>
           </div>
-        </td>
+        </td> */}
       </tr>
     </div>
   );

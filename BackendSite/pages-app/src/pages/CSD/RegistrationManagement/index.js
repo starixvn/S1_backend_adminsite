@@ -294,8 +294,11 @@ const App = () => {
       .then(function (res) {
         if (res.data.errorCode === 0) {
           UpdateReset();
+          CancelChangeStatus();
         } else {
           alert(res.data.message);
+          UpdateReset();
+          CancelChangeStatus();
         }
       })
       .catch(function (error) {
