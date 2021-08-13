@@ -125,12 +125,26 @@ namespace BackendSite.Service.Model.enums
         Delete = 4
     }
 
+    public enum VipTypeEnum
+    {
+        Upgrade = 1,
+        Downgrade = 2
+    }
+
+    public enum VipPreviousDateRangeType
+    {
+        LastMonth = 1,
+        LastThreeMonth = 2
+    }
+
     public enum VipStatus
     {
         Pending = 1,
         Approved = 2,
-        Rejected = 3
+        Rejected = 3,
+        Settled = 4 //已異動
     }
+
     public enum GetVipUpgradeReviewErrorCode
     {
         CanUpgrade = 0,

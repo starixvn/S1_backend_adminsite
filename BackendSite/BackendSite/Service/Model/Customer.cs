@@ -217,49 +217,49 @@ namespace BackendSite.Service.Model
         public string UpdateAt { get; set; }
         public string Operator { get; set; }
     }
-    public class VipUpgradeList
-    {
-        public int SiteId { get; set; }
-        public string SiteName { get; set; }
-        public int CustId { get; set; }
-        public string UserName { get; set; }
-        public int CurrentVipLevel { get; set; }
-        public int UpgradeVipLevel { get; set; }
-        public string CurrentVipName { get; set; }
-        public string UpgradeVipName { get; set; }
-        public string Currency { get; set; }
-        public decimal DepositAmount { get; set; }
-        public decimal UpgradeBonus { get; set; }
-        public string CalculateTime { get; set; }
-        public int Status { get; set; }
-        public string StatusName { get; set; }
-        public int CurrencyId { get; set; }
-        public decimal ThresholdAmount { get; set; }
-        public string LastUpdateUser { get; set; }
-        public string SettleTime { get; set; }
-    }
-    public class VipUpgradeReviewData
-    {
-        public List<VipUpgradeList> VipUpgradeList { get; set; }
-        public int PageNumber { get; set; }
-        public int TotalPages { get; set; }
-        public int RowCount { get; set; }
-    }
-    public class VipUpgradeExport
-    {
-        public string SiteName { get; set; }
-        public string UserName { get; set; }
-        public string CurrentVipLevel { get; set; }
-        public string UpgradeVipLevel { get; set; }
-        public string Currency { get; set; }
-        public decimal DepositAmount { get; set; }
-        public decimal ThresholdAmount { get; set; }
-        public decimal UpgradeBonus { get; set; }
-        public string CalculateTime { get; set; }
-        public string SettleTime { get; set; }
-        public int Status { get; set; }
-        public string StatusName => Enum.GetName(typeof(VipStatus), Status) ;
-    }
+    //public class VipUpgradeList
+    //{
+    //    public int SiteId { get; set; }
+    //    public string SiteName { get; set; }
+    //    public int CustId { get; set; }
+    //    public string UserName { get; set; }
+    //    public int CurrentVipLevel { get; set; }
+    //    public int UpgradeVipLevel { get; set; }
+    //    public string CurrentVipName { get; set; }
+    //    public string UpgradeVipName { get; set; }
+    //    public string Currency { get; set; }
+    //    public decimal DepositAmount { get; set; }
+    //    public decimal UpgradeBonus { get; set; }
+    //    public string CalculateTime { get; set; }
+    //    public int Status { get; set; }
+    //    public string StatusName { get; set; }
+    //    public int CurrencyId { get; set; }
+    //    public decimal ThresholdAmount { get; set; }
+    //    public string LastUpdateUser { get; set; }
+    //    public string SettleTime { get; set; }
+    //}
+    //public class VipUpgradeReviewData
+    //{
+    //    public List<VipUpgradeList> VipUpgradeList { get; set; }
+    //    public int PageNumber { get; set; }
+    //    public int TotalPages { get; set; }
+    //    public int RowCount { get; set; }
+    //}
+    //public class VipUpgradeExport
+    //{
+    //    public string SiteName { get; set; }
+    //    public string UserName { get; set; }
+    //    public string CurrentVipLevel { get; set; }
+    //    public string UpgradeVipLevel { get; set; }
+    //    public string Currency { get; set; }
+    //    public decimal DepositAmount { get; set; }
+    //    public decimal ThresholdAmount { get; set; }
+    //    public decimal UpgradeBonus { get; set; }
+    //    public string CalculateTime { get; set; }
+    //    public string SettleTime { get; set; }
+    //    public int Status { get; set; }
+    //    public string StatusName => Enum.GetName(typeof(VipStatus), Status) ;
+    //}
     public class LastDepositAndWithdrawalTime
     {
         public DateTime? LastDepositTime { get; set; }
