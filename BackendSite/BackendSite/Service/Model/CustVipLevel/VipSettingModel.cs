@@ -16,8 +16,8 @@ namespace BackendSite.Service.Model.CustVipLevel
         public DateTime SettleTime { get; set; }
         public DateTime LastUpdateTime { get; set; }
         public int AssignReviewDate { get; set; }
-        public DateTime LastReviewTime { get; set; }
-        public int AssignSettledDate { get; set; }
+        public DateTime LastReviewedTime { get; set; }
+        public int AssignSettleDate { get; set; }
         public DateTime LastSettledTime { get; set; }
     }
 }

@@ -254,7 +254,7 @@ namespace BackendSite.Service.BLL
                         new DateTime(previousDateTime.Year, previousDateTime.Month, 1).Date.ToString("yyyyMM");
 
                     return canUpdateYearMonth == calculateYearMonth
-                           && currentDay <= siteVipSetting.AssignSettledDate;
+                           && currentDay <= siteVipSetting.AssignSettleDate;
 
                 case (int)VipPreviousDateRangeType.LastThreeMonth:
 
@@ -264,7 +264,7 @@ namespace BackendSite.Service.BLL
                         + new DateTime(previousDateTime.Year, previousDateTime.Month, 1).Date.ToString("yyyyMM");
 
                     return canUpdateYearMonth == calculateYearMonth
-                           && currentDay <= siteVipSetting.AssignSettledDate;
+                           && currentDay <= siteVipSetting.AssignSettleDate;
                 default:
                     return false;
             }
