@@ -5,6 +5,7 @@ import WebAPI from "../../../module//WebAPI";
 import EditPanel from "./Edit";
 import moment from "moment";
 import qs from "qs";
+import Filter from "./Filter";
 
 const defaultModel = {
   SN: "",
@@ -15,16 +16,23 @@ const defaultModel = {
 };
 
 const App = () => {
-
+  
   const [stateDatas, updateDatas] = useState({
     Datas: null,
     ShowSettingPanel: false,
     IsAdd: false,
   });
-
   const [siteList, setSiteList] = useState([]);
   const [tpList, setTpList] = useState([]);
   const [typeList, setTypeList] = useState([]);
+  
+  const dateformat = "YYYY-MM-DD";
+  const [stateFilter, setFilter] = useState({
+    SelectSite: [],
+    StartDate: moment().add(-10, "days").format(dateformat),
+    EndDate: moment().format(dateformat),
+  });
+
   useEffect(() => {
     GetTpMaintainList();
 
@@ -91,7 +99,6 @@ const App = () => {
       Url: isAdd ? "TpMaintain/InsertTpMaintain" : "TpMaintain/UpdateTpMaintain",
       Data: qs.stringify(SetData),
     };
-    console.log(param);
     WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {
         alert("success.");
@@ -137,6 +144,53 @@ const App = () => {
       });    
   };
 
+  const Filter_CheckBox_OnChange = (v, dataColumn) => {
+    let isRemove = stateFilter[dataColumn].includes(v);
+    let newChecked = isRemove
+      ? stateFilter[dataColumn].filter((value) => value !== v)
+      : stateFilter[dataColumn].push(v);
+    let currentTab = stateFilter[dataColumn];
+    if (newChecked.length === 0) {
+      currentTab = [];
+    } else if (currentTab === null) {
+      currentTab = newChecked;
+    }
+
+    if (isRemove && !newChecked.includes(currentTab)) {
+      currentTab = newChecked.length === 0 ? [] : newChecked;
+    }
+    setFilter({
+      ...stateFilter,
+      [dataColumn]: currentTab,
+    });
+  };
+
+  const Filter_CheckBox_CheckAll = (v, dataColumn, options) => {
+    if (v !== "ALL") return false;
+    let currentTab =
+      stateFilter[dataColumn].length === options.length
+        ? []
+        : options.map((o) => {
+            return o.value;
+          });
+    setFilter({
+      ...stateFilter,
+      [dataColumn]: currentTab,
+    });
+  };
+
+  const Filter_OnChange = (v, dataColumn) => {
+    setFilter({
+      ...stateFilter,
+      [dataColumn]: v,
+    });
+  };
+
+  const Filter_Search= () => {
+    alert("search");
+  };
+
+
   return (
     <div className="container-fluid">
       <h4 className="page-name">{`${
@@ -159,6 +213,16 @@ const App = () => {
         />
       ) : (
         <>
+          <Filter
+            filterInfo={stateFilter}
+            SiteList={siteList}
+
+            onChange={Filter_OnChange}
+            onChangeCheckBox={Filter_CheckBox_OnChange}
+            onChangeAllCheckBox={Filter_CheckBox_CheckAll}
+            ClickSearch={Filter_Search}
+          />
+
           <button
             className="btn btn-add"
             style={{ marginBottom: "20px" }}
@@ -171,7 +235,7 @@ const App = () => {
               });
             }}
           >
-            Add Maintenance
+          Add Maintenance
           </button>
           {stateDatas.Datas === null ? null : (
             <Result
