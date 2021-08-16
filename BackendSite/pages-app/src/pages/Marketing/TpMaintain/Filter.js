@@ -8,12 +8,15 @@ const Panel = (props) => {
 
 	let siteListOptions = [];
 	if (props.SiteList) {	
-		siteListOptions = Object.keys(props.SiteList).map(siteId => {	
-			console.log(`siteId =${siteId}`);
+		siteListOptions = Object.keys(props.SiteList)
+		.map(siteId => {	
 			return {
 				value: Number(siteId),
 				displayText: props.SiteList[siteId],
-			};			
+			};	
+		})
+		.filter(item => {
+			return item.value != 0;
 		});
   	}
 

@@ -166,6 +166,7 @@ const App = () => {
   };
 
   const Filter_CheckBox_CheckAll = (v, dataColumn, options) => {
+    console.log(`all:${v}`);
     if (v !== "ALL") return false;
     let currentTab =
       stateFilter[dataColumn].length === options.length
