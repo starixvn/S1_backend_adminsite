@@ -174,7 +174,7 @@ namespace BackendSite.Controllers.Api
             {
                 return new ApiResult<IEnumerable<TpGameType>>
                 {
-                    Data = tpMaintainBLL.GetTpGameTypeList(),
+                    Data = tpMaintainBLL.GetTpGameTypeList().OrderBy(i => i.Type),
                     ErrorCode = 0
                 };
             }
@@ -182,6 +182,29 @@ namespace BackendSite.Controllers.Api
             {
                 logger.LogError(ex, ex.Message);
                 return new ApiResult<IEnumerable<TpGameType>>
+                {
+                    ErrorCode = 999,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
+        public ApiResult<IEnumerable<TpCategory>> GetTPCategoryList()
+        {
+            try
+            {
+                return new ApiResult<IEnumerable<TpCategory>>
+                {
+                    Data = tpMaintainBLL.GetTPCategoryList(),
+                    ErrorCode = 0
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return new ApiResult<IEnumerable<TpCategory>>
                 {
                     ErrorCode = 999,
                     Message = ex.Message,

@@ -40,4 +40,10 @@ namespace BackendSite.Service.Model.TpMaintain
         public int TpId { set; get; }
         public int CategoryId { set; get; }
     }
+
+    public class TpCategory
+    {
+        public int CategoryId { set; get; }
+        public string CategoryName { set; get; }
+    }
 }

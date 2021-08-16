@@ -16,7 +16,7 @@ const defaultModel = {
 };
 
 const App = () => {
-  
+
   const [stateDatas, updateDatas] = useState({
     Datas: null,
     ShowSettingPanel: false,
@@ -25,7 +25,8 @@ const App = () => {
   const [siteList, setSiteList] = useState([]);
   const [tpList, setTpList] = useState([]);
   const [typeList, setTypeList] = useState([]);
-  
+  const [tpCategoryList, setTpCategoryList] = useState([]);
+
   const dateformat = "YYYY-MM-DD";
   const [stateFilter, setFilter] = useState({
     SelectSite: [],
@@ -58,8 +59,16 @@ const App = () => {
     });
 
     WebAPI.PostData({ Url: "TpMaintain/GetTpGameTypeList" }).then((res) => {
-      if (res.data.errorCode === 0) {    
+      if (res.data.errorCode === 0) {
         setTypeList(res.data.data);
+      } else {
+        alert(res.data.message ?? "failed to get data.");
+      }
+    });
+
+    WebAPI.PostData({ Url: "TpMaintain/GetTPCategoryList" }).then((res) => {
+      if (res.data.errorCode === 0) {
+        setTpCategoryList(res.data.data);
       } else {
         alert(res.data.message ?? "failed to get data.");
       }
@@ -68,7 +77,7 @@ const App = () => {
   }, []);
 
   const GetTpMaintainList = () => {
-    
+
     let param = {
       Url: "TpMaintain/GetTpMaintainList"
     };
@@ -94,7 +103,7 @@ const App = () => {
       tpGameTypeList: tpGameTypeList,
       sn: datas.sn
     };
-   
+
     let param = {
       Url: isAdd ? "TpMaintain/InsertTpMaintain" : "TpMaintain/UpdateTpMaintain",
       Data: qs.stringify(SetData),
@@ -135,13 +144,13 @@ const App = () => {
   };
 
   const EditTpMaintain = (idx) => {
-      alert("Only can edit time column.");
-      updateDatas({
-        ...stateDatas,
-        ShowSettingPanel: true,
-        SettingDatas: stateDatas.Datas[idx],
-        IsAdd: false,
-      });    
+    alert("Only can edit time column.");
+    updateDatas({
+      ...stateDatas,
+      ShowSettingPanel: true,
+      SettingDatas: stateDatas.Datas[idx],
+      IsAdd: false,
+    });
   };
 
   const Filter_CheckBox_OnChange = (v, dataColumn) => {
@@ -166,14 +175,13 @@ const App = () => {
   };
 
   const Filter_CheckBox_CheckAll = (v, dataColumn, options) => {
-    console.log(`all:${v}`);
     if (v !== "ALL") return false;
     let currentTab =
       stateFilter[dataColumn].length === options.length
         ? []
         : options.map((o) => {
-            return o.value;
-          });
+          return o.value;
+        });
     setFilter({
       ...stateFilter,
       [dataColumn]: currentTab,
@@ -187,16 +195,15 @@ const App = () => {
     });
   };
 
-  const Filter_Search= () => {
+  const Filter_Search = () => {
     alert("search");
   };
 
 
   return (
     <div className="container-fluid">
-      <h4 className="page-name">{`${
-        stateDatas.ShowSettingPanel ? (stateDatas.IsAdd ? "Add " : "Edit ") : ""
-      }Maintenance`} </h4>
+      <h4 className="page-name">{`${stateDatas.ShowSettingPanel ? (stateDatas.IsAdd ? "Add " : "Edit ") : ""
+        }Maintenance`} </h4>
       {stateDatas.ShowSettingPanel ? (
         <EditPanel
           siteList={siteList}
@@ -217,7 +224,9 @@ const App = () => {
           <Filter
             filterInfo={stateFilter}
             SiteList={siteList}
-
+            tpList={tpList}
+            typeList={typeList}
+            tpCategoryList={tpCategoryList}
             onChange={Filter_OnChange}
             onChangeCheckBox={Filter_CheckBox_OnChange}
             onChangeAllCheckBox={Filter_CheckBox_CheckAll}
@@ -236,7 +245,7 @@ const App = () => {
               });
             }}
           >
-          Add Maintenance
+            Add Maintenance
           </button>
           {stateDatas.Datas === null ? null : (
             <Result

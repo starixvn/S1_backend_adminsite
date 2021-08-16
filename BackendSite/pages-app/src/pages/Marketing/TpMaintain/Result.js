@@ -7,9 +7,9 @@ const SpecialItemType = {
 
 export const dataColumnDefs = () => {
 	return [
-		{ 
-			dataColumn: "sn", 
-			columnTitle: "SN" 
+		{
+			dataColumn: "sn",
+			columnTitle: "SN"
 		},
 		{
 			dataColumn: "siteName",
@@ -30,15 +30,15 @@ export const dataColumnDefs = () => {
 		{
 			dataColumn: "beginDate",
 			columnTitle: "BeginDate Time" + " (" + moment().format('Z') + ")",
-			body:{
-				format:dateFormat
+			body: {
+				format: dateFormat
 			}
 		},
 		{
 			dataColumn: "endDate",
 			columnTitle: "EndDate Time" + " (" + moment().format('Z') + ")",
-			body:{
-				format:dateFormat
+			body: {
+				format: dateFormat
 			}
 		},
 		{
@@ -70,8 +70,8 @@ const Panel = props => {
 				scope="col"
 				className={
 					element.header &&
-					element.header.attr &&
-					element.header.attr.class
+						element.header.attr &&
+						element.header.attr.class
 						? element.header.attr.class
 						: ""
 				}>
@@ -111,8 +111,8 @@ const Panel = props => {
 					key={`td-${element.dataColumn}-${c_idx}`}
 					className={
 						element.body &&
-						element.body.attr &&
-						element.body.attr.class
+							element.body.attr &&
+							element.body.attr.class
 							? element.body.attr.class
 							: ""
 					}>
@@ -149,8 +149,8 @@ const ActionButtons = props => {
 	);
 };
 
-const dateFormat = (time)=>{
+const dateFormat = (time) => {
 	return moment.utc(time).local().format('YYYY-MM-DD HH:mm');
-  }
+}
 
 export default Panel;
