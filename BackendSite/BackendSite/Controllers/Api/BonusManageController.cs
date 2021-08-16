@@ -96,6 +96,11 @@ namespace BackendSite.Controllers.Api
             public int FilterType { get; set; }
         }
 
+        public class GetTpGameListReq
+        {
+            public int TpId { get; set; }
+            public int CategoryId { get; set; }
+        }
         #endregion
 
         #region Action
@@ -576,6 +581,24 @@ namespace BackendSite.Controllers.Api
             try
             {
                 apiResult.Data = _bonusManageBLL.GetTpGameList();
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+        [HttpPost]
+        public ApiResult<IEnumerable<TpGames>> GetTpGameListV2([FromForm] GetTpGameListReq para)
+        {
+            var apiResult = new ApiResult<IEnumerable<TpGames>>();
+
+            try
+            {
+                apiResult.Data = _bonusManageBLL.GetTpGameList(para.TpId,para.CategoryId);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)

@@ -137,6 +137,11 @@ namespace BackendSite.Service.BLL
             return _bonusManageService.GetTpGameList();
         }
 
+        public IEnumerable<TpGames> GetTpGameList(int tpId,int categoryId)
+        {
+            return _bonusManageService.GetTpGameList(tpId, categoryId);
+        }
+
         public async Task<BonusImportResult> BonusImportAsync(BonusImportPara bonusImportPara)
         {
             return await _bonusManageService.BonusImportAsync(bonusImportPara);

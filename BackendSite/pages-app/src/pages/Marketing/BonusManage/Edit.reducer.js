@@ -375,11 +375,23 @@ export function reducer(state, action) {
         categoryId: _categoryId,
       };
 
+    // case defActionType.GET_TPGAME_CATEGORIES:
+    //   let tpGameCategory = action.tpGameCategory.map((item) => {
+    //     return {
+    //       value: item.type,
+    //       displayText: item.typeName,
+    //     };
+    //   });
+    //   return {
+    //     ...state,
+    //     tpGameCategory: tpGameCategory,
+    //   };
+
     case defActionType.GET_TPGAME_CATEGORIES:
       let tpGameCategory = action.tpGameCategory.map((item) => {
         return {
-          value: item.type,
-          displayText: item.typeName,
+          value: item.categoryId,
+          displayText: item.gameName,
         };
       });
       return {
@@ -388,6 +400,7 @@ export function reducer(state, action) {
       };
 
     case defActionType.CURRENCY_SET_TpGame_VALUE:
+      console.log(action,'action');
       return {
         ...state,
         specific: {

@@ -64,6 +64,13 @@ namespace BackendSite.Service.DAL
             return conn.Query<TpGameType>("Admin_TpGameType_Get", commandType: CommandType.StoredProcedure);
         }
 
+        public IEnumerable<TpGames> GetTpGameList(int tpId, int categoryId)
+        {
+            using MySqlConnection conn =
+                new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<TpGames>("Admin_TpGameTypeV2_Get", new { TpId = tpId , PromoCategoryId = categoryId } ,commandType: CommandType.StoredProcedure);
+        }
+
         public async Task<BonusImportResult> BonusImportAsync(BonusImportPara bonusImportPara)
         {
             BonusImportResult result = new BonusImportResult()

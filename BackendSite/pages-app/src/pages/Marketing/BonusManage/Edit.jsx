@@ -16,23 +16,47 @@ export default props => {
 		initialState(props.IsAdd, props.Datas, props.SiteList)
 	);
 
+	// useEffect(() => {
+	// 	let param = {
+	// 		Url: "BonusManage/GetTpGameList"
+	// 	};
+	// 	WebAPI.PostData(param).then(res => {
+	// 		if (isMountedRef.current) {
+	// 			if (res.data.errorCode === 0) {
+	// 				dispatch({
+	// 					type: defActionType.GET_TPGAME_CATEGORIES,
+	// 					tpGameCategory: res.data.data
+	// 				});
+	// 			} else {
+	// 				alert(res.data.message ?? "failed to get data.");
+	// 			}
+	// 		}
+	// 	});
+	// }, []);
+
 	useEffect(() => {
-		let param = {
-			Url: "BonusManage/GetTpGameList"
-		};
-		WebAPI.PostData(param).then(res => {
-			if (isMountedRef.current) {
-				if (res.data.errorCode === 0) {
-					dispatch({
-						type: defActionType.GET_TPGAME_CATEGORIES,
-						tpGameCategory: res.data.data
-					});
-				} else {
-					alert(res.data.message ?? "failed to get data.");
+		if(state.tpId !== null){
+			let param = {
+				Url: "BonusManage/GetTpGameListV2",
+				Data: qs.stringify({
+					TpId: Number(state.tpId),
+					CategoryId: Number(state.categoryId)
+				})
+			};
+			WebAPI.PostData(param).then(res => {
+				if (isMountedRef.current) {
+					if (res.data.errorCode === 0) {
+						dispatch({
+							type: defActionType.GET_TPGAME_CATEGORIES,
+							tpGameCategory: res.data.data
+						});
+					} else {
+						alert(res.data.message ?? "failed to get data.");
+					}
 				}
-			}
-		});
-	}, []);
+			});
+		}
+	}, [state.categoryId]);
 
 	useEffect(() => {
 		let param = {

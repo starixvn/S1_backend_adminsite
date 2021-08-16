@@ -77,6 +77,7 @@ namespace BackendSite.Service.Model
         public int GameType { get; set; }
         public decimal Percentage { get; set; }
         public int Status { get; set; }
+        public decimal LossAmount { get; set; }
     }
 
     public class PromotionRebate1 : PromotionRebate
@@ -162,5 +163,10 @@ namespace BackendSite.Service.Model
         public bool IsForVipLevel  { get; set; }
 
         public IEnumerable<int> SelectedVipLevel { get; set; }
+    }
+    public class TpGames
+    {
+        public string GameName { get; set; }
+        public int CategoryId { get; set; }
     }
 }

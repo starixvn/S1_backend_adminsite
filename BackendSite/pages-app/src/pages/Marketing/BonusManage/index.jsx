@@ -195,6 +195,7 @@ const App = () => {
 							GameType: t.value,
 							Percentage: info.tpGames[t.value]?.percentage ? Number(info.tpGames[t.value].percentage) : 0,
 							Status: info.tpGames[t.value]?.status ? Number(info.tpGames[t.value].status) : 0,
+							LossAmount: info.tpGames[t.value]?.lossAmount ? Number(info.tpGames[t.value].lossAmount) : 0,
 						}
 					}) : null;
 
