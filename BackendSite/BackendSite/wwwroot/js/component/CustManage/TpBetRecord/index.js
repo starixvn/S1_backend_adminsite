@@ -17,11 +17,7 @@ const Panel = () => {
   const [stateInfoType, setInfoType] = React.useState();
   let CustId = parseInt(getUrlParameter("custId"));
   const [filterData, setfilterData] = React.useState({
-    StartTime: moment
-      .utc(new Date())
-      .add(8, "hour")
-      .add(-1, "days")
-      .format("l LTS"),
+    StartTime: moment.utc(new Date()).add(8, "hour").add(-1, "days").format("l LTS"),
     EndTime: moment.utc(new Date()).add(8, "hour").format("l LTS"),
     DateQuickPicker: "0",
   });
@@ -43,8 +39,8 @@ const Panel = () => {
         _endDate = moment().endOf("day");
         break;
       case "2":
-        _startDate = moment().subtract(1, "days");
-        _endDate = moment().subtract(1, "days");
+        _startDate = moment().subtract(1, "days").startOf("days");
+        _endDate = moment().subtract(1, "days").endOf("days");
 
         break;
       case "3":

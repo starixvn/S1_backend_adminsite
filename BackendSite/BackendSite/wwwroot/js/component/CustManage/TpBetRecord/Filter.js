@@ -22,7 +22,7 @@ const Filter = (props) => {
             defaultValue: props.FilterData.StartTime,
             onChange: (e) => {
               try {
-                props.EditfilterData(moment(e).format("l LTS"), "StartTime");
+                props.EditfilterData(e, "StartTime");
               } catch (ex) {
                 console.log(ex);
               }
@@ -36,7 +36,7 @@ const Filter = (props) => {
             defaultValue: props.FilterData.EndTime,
             onChange: (e) => {
               try {
-                props.EditfilterData(moment(e).format("l LTS"), "EndTime");
+                props.EditfilterData(e, "EndTime");
               } catch (ex) {
                 console.log(ex);
               }
