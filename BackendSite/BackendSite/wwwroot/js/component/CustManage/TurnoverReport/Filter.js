@@ -19,6 +19,7 @@ const Filter = (props) => {
   });
 
   const EditDateRangeFiled = (v, col) => {
+    console.log(v,col);
     setDateRange({
       ...DateRangeDatas,
       [col]: v,
@@ -34,8 +35,8 @@ const Filter = (props) => {
           _endDate = moment().endOf("day");
         break;
       case "2":
-        _startDate = moment().subtract(1, "days");
-        _endDate = moment().subtract(1, "days");
+        _startDate = moment().subtract(1, "days").startOf("days");
+        _endDate = moment().subtract(1, "days").endOf("days");
 
         break;
       case "3":
@@ -145,7 +146,7 @@ const Filter = (props) => {
             defaultValue: DateRangeDatas.StartTime,
             onChange: (e) => {
               try {
-                EditDateRangeFiled(moment(e).format("l LTS"), "StartTime");
+                EditDateRangeFiled(e, "StartTime");
               } catch (ex) {}
             },
           }}
@@ -157,7 +158,7 @@ const Filter = (props) => {
             defaultValue: DateRangeDatas.EndTime,
             onChange: (e) => {
               try {
-                EditDateRangeFiled(moment(e).format("l LTS"), "EndTime");
+                EditDateRangeFiled(e, "EndTime");
               } catch (ex) {}
             },
           }}
