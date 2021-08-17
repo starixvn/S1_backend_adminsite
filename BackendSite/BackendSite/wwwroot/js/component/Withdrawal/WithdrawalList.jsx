@@ -71,9 +71,9 @@ import DateTimePicker from 'react-datetime';
         onExport() {
             this.props.onExport();
         }
-
+        
         render() {
-
+   //         console.log('render',this.props.searchData.data);
             let rows = this.props.searchData.data.map(row => {
                 let styleblod = (row.flag === 0) ? { fontWeight: 'bold' } : {};
                 //銅=>銀=>金=>白金=>水鑽藍=>紅寶石
@@ -90,7 +90,8 @@ import DateTimePicker from 'react-datetime';
                         <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
                         <td className="text-right">{number_format(row.amount)}</td>
-                        <td>{row.bankName}</td>
+                        {(row.bankName == null&& row.accountType != null)?
+                        <td>{row.accountType}</td>:<td>{row.bankName}</td>}
                         {/* <td>{row.accountNo}</td>
                         <td>{row.accountName}</td> */}
                         <td>{moment(row.createTime).format('l LTS')}</td>
@@ -221,13 +222,13 @@ import DateTimePicker from 'react-datetime';
                     Loading.UnLoading();
                     let result = response.data;
                     if (result.errorCode == 0) {
-                       // console.log(' onGetData()',result.data);
+                        console.log(' onGetData()',result.data);
                         if (result.data.status == 3) {
                             await this.onGetPayList(result.data.currencyId, result.data.sysId);
                             await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId, result.data.siteId);
                             await this.onGetCryptoPayList(result.data.currencyId, result.data.sysId);
                         }
-
+                        
                         let SelId = null;
                         if (result.data.withdrawalType == 1) {
                             SelId = result.data.payId;
@@ -311,7 +312,7 @@ import DateTimePicker from 'react-datetime';
                     data.SelId = parseInt(this.state.SelId);
                     data.WithdrawalType = this.state.selectType;
                 }
-
+                 
                 axios.post('/api/Withdrawal/WithdrawalConfirm', data)
                     .then(function (response) {
                         Loading.UnLoading();
@@ -479,12 +480,18 @@ import DateTimePicker from 'react-datetime';
                 if (data.status == 3) {
                     let selectOp = [];
                     selectOp.push(<option key={0} value="0">Undefine</option>);
-                    if (this.state.PayList.length > 0)
-                        selectOp.push(<option key={1} value="1">Online Payment</option>);
-                    if (this.state.BankInfoOffList.length > 0)
-                        selectOp.push(<option key={2} value="2">Local Bank</option>);
-                    if (this.state.CryptoPayList.length > 0)
-                        selectOp.push(<option key={4} value="4">Crypto Pay</option>);
+                    //console.log(this.state);
+                    if(this.state.Data.accountType == 'USDT')
+                    {
+                        if (this.state.CryptoPayList.length > 0)
+                            selectOp.push(<option key={4} value="4">Crypto Pay</option>);
+                    }else
+                    {
+                        if (this.state.PayList.length > 0)
+                            selectOp.push(<option key={1} value="1">Online Payment</option>);
+                        if (this.state.BankInfoOffList.length > 0)
+                            selectOp.push(<option key={2} value="2">Local Bank</option>);
+                    }
                     selectType = <select className="form-control" onChange={this.onSelectType.bind(this)} value={this.state.selectType}>
                         {selectOp}
                     </select>;
@@ -607,10 +614,18 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="row">{"Date" + " (" + moment().format('Z') + ")"}</th>
                                 <td>{moment(data.createTime).format('l LTS')}</td>
                             </tr>
+                            {data.bankName != null ?
                             <tr>
                                 <th scope="row">Name of Bank</th>
                                 <td>{data.bankName}</td>
                             </tr>
+                            : null}
+                            {data.accountType != null ?
+                            <tr>
+                                <th scope="row">Account Type</th>
+                                <td>{data.accountType}</td>
+                            </tr>
+                            : null}
                             <tr>
                                 <th scope="row">Account No</th>
                                 <td>
