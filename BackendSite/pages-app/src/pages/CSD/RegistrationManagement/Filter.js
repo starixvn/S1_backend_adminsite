@@ -26,15 +26,6 @@ const defRegTimeType = {
 };
 
 const Panel = (props) => {
-  // let siteListOptions = "";
-  // if (props.SiteList) {
-  //   siteListOptions = props.SiteList.map((i) => {
-  //     return {
-  //       value: Number(i.siteId),
-  //       displayText: i.siteName,
-  //     };
-  //   });
-  // }
 
   let siteList = props.SiteList.map((x) => {
     return {
@@ -49,18 +40,6 @@ const Panel = (props) => {
   return (
     <div className="filter">
       <div className="row-flex">
-
-        {/* {siteListOptions ? (
-          <CheckBoxElem
-            Title="Site"
-            Options={siteListOptions}
-            Selected={props.filterInfo.SelectSite}
-            OnChange={props.onChangeCheckBox}
-            OnChangeAll={props.onChangeAllCheckBox}
-            dataColumn="SelectSite"
-          />
-        ) : null} */}
-
         <div className="input-item" style={{ width: "200px", zIndex: "999" }}>
           <span className="label">Site</span>
           <div className="field">
@@ -135,27 +114,27 @@ const Panel = (props) => {
       </div>
       <div className="row-flex">
         <DateTimePickerElem
-          columnTitle="Export From Date"
+          columnTitle="From Date"
           dateTimePickerProps={{
-            value: props.exportFilter.StartDate,
-            defaultValue: props.exportFilter.StartDate,
+            value: props.filterInfo.StartDate,
+            defaultValue: props.filterInfo.StartDate,
             timeFormat: false,
             onChange: (e) => {
               try {
-                props.ExportOnChange(e, "StartDate");
+                props.onChange(e, "StartDate");
               } catch (ex) {}
             },
           }}
         />
         <DateTimePickerElem
-          columnTitle="Export To Date"
+          columnTitle="To Date"
           dateTimePickerProps={{
-            value: props.exportFilter.EndDate,
-            defaultValue: props.exportFilter.EndDate,
+            value: props.filterInfo.EndDate,
+            defaultValue: props.filterInfo.EndDate,
             timeFormat: false,
             onChange: (e) => {
               try {
-                props.ExportOnChange(e, "EndDate");
+                props.onChange(e, "EndDate");
               } catch (ex) {}
             },
           }}

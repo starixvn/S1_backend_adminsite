@@ -511,7 +511,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<VipLevelModel>("Common_VipLevel_Get");
         }
 
-        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency, int depositStatus, int status, string username, int pagenumber, int pagesize, int sort)
+        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency, int depositStatus, int status, string username, int pagenumber, int pagesize, int sort, long StartDate, long EndDate)
         {
             RegLiveStatusResult SearchData = new RegLiveStatusResult();
             DynamicParameters props = new DynamicParameters();
@@ -524,12 +524,14 @@ namespace BackendSite.Service.DAL
             props.Add("Status", status);
             props.Add("Sort", sort);
             props.Add("PageSize", pagesize);
+            props.Add("StartDate", StartDate);
+            props.Add("EndDate", EndDate);
             props.Add("PageNumber", pagenumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<RegLiveStatus>("Admin_CustRegLiveStatus_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var result = conn.Query<RegLiveStatus>("Admin_CustRegLiveStatusV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             SearchData.RegLiveStatusDatas = result;
             SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
@@ -573,7 +575,7 @@ namespace BackendSite.Service.DAL
             IEnumerable<RegLiveStatus> result = null;
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
-                string SpName = "Admin_CustRegLiveStatusExport_Get";
+                string SpName = "Admin_CustRegLiveStatusExportV2_Get";
                 DynamicParameters props = new DynamicParameters();
                 props.Add("SelectSite", SelectSite);
                 props.Add("Currency", Currency);
