@@ -8,6 +8,7 @@ using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.TpBetRecordDetail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,39 +24,38 @@ namespace BackendSite.Controllers.Api
     {
         #region Fields
 
-        private readonly PaymentBLL paymentBLL;
-        private readonly CustInfoBLL custInfoBLL;
-        private readonly TpBLL tpBLL;
-        private readonly AuthorizeBLL authorizeBLL;
-        private readonly Common common;
-        private readonly ExcelBLL excelBLL;
-        private readonly SelLangBLL selLangBLL;
+        private readonly PaymentBLL _paymentBLL;
+        private readonly CustInfoBLL _custInfoBLL;
+        private readonly TpBLL _tpBLL;
+        private readonly AuthorizeBLL _authorizeBLL;
+        private readonly Common _common;
+        private readonly ExcelBLL _excelBLL;
+        private readonly SelLangBLL _selLangBLL;
 
-        private readonly int mainWalletType;
+        private readonly int _mainWalletType;
 
         #endregion
 
         #region Constructors
 
         public PaymentController(IConfiguration configuration,
-                                 PaymentBLL paymentBLL,
-                                 CustInfoBLL custInfoBLL,
-                                 TpBLL tpBLL,
-                                 AuthorizeBLL authorizeBLL,
-                                 Common common,
-                                 ExcelBLL excelBLL,
-                                 SelLangBLL selLangBLL)
+            PaymentBLL paymentBLL,
+            CustInfoBLL custInfoBLL,
+            TpBLL tpBLL,
+            AuthorizeBLL authorizeBLL,
+            Common common,
+            ExcelBLL excelBLL,
+            SelLangBLL selLangBLL)
         {
-            this.paymentBLL = paymentBLL;
-            this.custInfoBLL = custInfoBLL;
-            this.tpBLL = tpBLL;
-            this.authorizeBLL = authorizeBLL;
-            this.common = common;
-            this.excelBLL = excelBLL;
-            this.selLangBLL = selLangBLL;
+            _paymentBLL = paymentBLL;
+            _custInfoBLL = custInfoBLL;
+            _tpBLL = tpBLL;
+            _authorizeBLL = authorizeBLL;
+            _common = common;
+            _excelBLL = excelBLL;
+            _selLangBLL = selLangBLL;
 
-            mainWalletType = configuration.GetValue<int>("MainWalletType");
-
+            _mainWalletType = configuration.GetValue<int>("MainWalletType");
         }
 
         #endregion
@@ -128,7 +128,6 @@ namespace BackendSite.Controllers.Api
             public int GameTypeId { get; set; }
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
-
         }
 
         public class BonusCashBackInfoListDetail
@@ -165,6 +164,12 @@ namespace BackendSite.Controllers.Api
             public long EndDate { get; set; }
         }
 
+        public class GetTpBetRecordDetailRequest
+        {
+            public int GameType { get; set; }
+            public string TransId { get; set; }
+        }
+
         #endregion
 
         #region Actions
@@ -174,7 +179,7 @@ namespace BackendSite.Controllers.Api
         {
             ApiResult apiResult = new ApiResult();
             AdjustmentInfo adjustmentInfo = new AdjustmentInfo();
-            var custInfo = custInfoBLL.GetCustInfoWithCache(paymentAdjustmentReq.CustId);
+            var custInfo = _custInfoBLL.GetCustInfoWithCache(paymentAdjustmentReq.CustId);
             if (custInfo != null)
             {
                 adjustmentInfo.CustId = custInfo.CustId;
@@ -187,19 +192,21 @@ namespace BackendSite.Controllers.Api
                 string transId = null;
                 if (adjustmentInfo.AdjustType == 2)
                 {
-                    var balance = custInfoBLL.GetBalance(custInfo.CustId);
+                    var balance = _custInfoBLL.GetBalance(custInfo.CustId);
                     if (balance < adjustmentInfo.Amount)
                     {
-                        if (mainWalletType == 2)
+                        if (_mainWalletType == 2)
                         {
                             var deAmount = adjustmentInfo.Amount - balance;
-                            TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = deAmount, CustId = custInfo.CustId, direction = TpDirection.ToMain };
+                            TpTransfer inTpTransfer = new TpTransfer()
+                                {TpId = 1, Amount = deAmount, CustId = custInfo.CustId, direction = TpDirection.ToMain};
 
-                            var acc = await tpBLL.TransferAsync(inTpTransfer);
+                            var acc = await _tpBLL.TransferAsync(inTpTransfer);
                             if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
                             {
                                 apiResult.ErrorCode = 1001;
-                                apiResult.Message = $"{balance.ToString("#,##0.##")}<{adjustmentInfo.Amount.ToString("#,##0.##")}";
+                                apiResult.Message =
+                                    $"{balance.ToString("#,##0.##")}<{adjustmentInfo.Amount.ToString("#,##0.##")}";
                                 return apiResult;
                             }
 
@@ -213,24 +220,26 @@ namespace BackendSite.Controllers.Api
                         }
                     }
 
-                    balance = custInfoBLL.GetBalance(custInfo.CustId);
+                    balance = _custInfoBLL.GetBalance(custInfo.CustId);
 
                     if (balance < adjustmentInfo.Amount)
                     {
                         apiResult.ErrorCode = 1002;
-                        apiResult.Message = $"{balance.ToString("#,##0.##")} < {adjustmentInfo.Amount.ToString("#,##0.##")}";
+                        apiResult.Message =
+                            $"{balance.ToString("#,##0.##")} < {adjustmentInfo.Amount.ToString("#,##0.##")}";
                         return apiResult;
                     }
                 }
 
-                if (paymentBLL.PaymentAdjustment(adjustmentInfo, User.Identity.Name, out transId) > 0)
+                if (_paymentBLL.PaymentAdjustment(adjustmentInfo, User.Identity.Name, out transId) > 0)
                 {
-                    if (mainWalletType == 2 && adjustmentInfo.AdjustType == 1)
+                    if (_mainWalletType == 2 && adjustmentInfo.AdjustType == 1)
                     {
-                        var balance = custInfoBLL.GetBalance(custInfo.CustId);
-                        TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = balance, CustId = custInfo.CustId, direction = TpDirection.ToTp };
+                        var balance = _custInfoBLL.GetBalance(custInfo.CustId);
+                        TpTransfer inTpTransfer = new TpTransfer()
+                            {TpId = 1, Amount = balance, CustId = custInfo.CustId, direction = TpDirection.ToTp};
 
-                        var acc = await tpBLL.TransferAsync(inTpTransfer);
+                        var acc = await _tpBLL.TransferAsync(inTpTransfer);
                         if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
                         {
                             apiResult.ErrorCode = 0;
@@ -242,7 +251,6 @@ namespace BackendSite.Controllers.Api
                         apiResult.ErrorCode = 0;
                         apiResult.Message = $"Success. ID is {transId}";
                     }
-
                 }
             }
 
@@ -263,7 +271,9 @@ namespace BackendSite.Controllers.Api
             int pageNumber = getFinancialLogReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
-            var data = paymentBLL.GetFinancialLog(getFinancialLogReq.CustId, getFinancialLogReq.StartDate, getFinancialLogReq.EndDate, getFinancialLogReq.RefTransId, 10, ref pageNumber, out totalPages, out rowCount);
+            var data = _paymentBLL.GetFinancialLog(getFinancialLogReq.CustId, getFinancialLogReq.StartDate,
+                getFinancialLogReq.EndDate, getFinancialLogReq.RefTransId, 10, ref pageNumber, out totalPages,
+                out rowCount);
 
 
             return new ApiListResult<FinancialLog>
@@ -272,9 +282,8 @@ namespace BackendSite.Controllers.Api
                 TotalPages = totalPages,
                 PageNumber = pageNumber,
                 RowCount = rowCount,
-                ErrorCode = (int)ErrorCodeEnum.Success
+                ErrorCode = (int) ErrorCodeEnum.Success
             };
-
         }
 
         /// <summary>
@@ -291,15 +300,15 @@ namespace BackendSite.Controllers.Api
             int pageNumber = getBonusLogReq.PageNumber;
             int totalPages = 0;
             int rowCount = 0;
-            var data = paymentBLL.GetBonusLog(getBonusLogReq.CustId,
-                                              getBonusLogReq.PromoCategoryId,
-                                              getBonusLogReq.StartDate,
-                                              getBonusLogReq.EndDate,
-                                              getBonusLogReq.RefTransId,
-                                              10,
-                                              ref pageNumber,
-                                              out totalPages,
-                                              out rowCount);
+            var data = _paymentBLL.GetBonusLog(getBonusLogReq.CustId,
+                getBonusLogReq.PromoCategoryId,
+                getBonusLogReq.StartDate,
+                getBonusLogReq.EndDate,
+                getBonusLogReq.RefTransId,
+                10,
+                ref pageNumber,
+                out totalPages,
+                out rowCount);
 
             return new ApiListResult<BonusLog>
             {
@@ -307,9 +316,8 @@ namespace BackendSite.Controllers.Api
                 TotalPages = totalPages,
                 PageNumber = pageNumber,
                 RowCount = rowCount,
-                ErrorCode = (int)ErrorCodeEnum.Success
+                ErrorCode = (int) ErrorCodeEnum.Success
             };
-
         }
 
         public ApiListResult<RebateLog> GetRebateLogByCust(GetRebateLogByCustReq getRebateLogByCustReq)
@@ -318,7 +326,9 @@ namespace BackendSite.Controllers.Api
             int totalPages = 0;
             int rowCount = 0;
             var apiListResult = new ApiListResult<RebateLog>();
-            apiListResult.Data = paymentBLL.GetRebateLogByCust(getRebateLogByCustReq.CustId, getRebateLogByCustReq.StartDate, getRebateLogByCustReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount);
+            apiListResult.Data = _paymentBLL.GetRebateLogByCust(getRebateLogByCustReq.CustId,
+                getRebateLogByCustReq.StartDate, getRebateLogByCustReq.EndDate, 10, ref pageNumber, out totalPages,
+                out rowCount);
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;
             apiListResult.TotalPages = totalPages;
@@ -327,14 +337,20 @@ namespace BackendSite.Controllers.Api
             return apiListResult;
         }
 
-        public ApiListResultCurrencyAmount<RebateLog> GetRebateLog([FromForm] IEnumerable<int> SelectSite, [FromForm] string UserName, [FromForm] int RebateType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int CurrencyId, [FromForm] int BaseCurrencyId, [FromForm] int RebateCategoriesId)
+        public ApiListResultCurrencyAmount<RebateLog> GetRebateLog([FromForm] IEnumerable<int> SelectSite,
+            [FromForm] string UserName, [FromForm] int RebateType, [FromForm] long StartDate, [FromForm] long EndDate,
+            [FromForm] int PageNumber, [FromForm] int CurrencyId, [FromForm] int BaseCurrencyId,
+            [FromForm] int RebateCategoriesId)
         {
             var apiListResult = new ApiListResultCurrencyAmount<RebateLog>();
             int PageSize = 10;
             int TotalPages = 0;
             int RowCount = 0;
             List<string> CurrencyAmount = new List<string>();
-            apiListResult.Data = paymentBLL.GetRebateLog(SelectSite, UserName, RebateType, StartDate, EndDate, PageSize, CurrencyId, BaseCurrencyId, RebateCategoriesId, ref PageNumber, out TotalPages, out RowCount, ref CurrencyAmount);
+            apiListResult.Data = _paymentBLL.GetRebateLog(SelectSite, UserName, RebateType, StartDate, EndDate,
+                PageSize,
+                CurrencyId, BaseCurrencyId, RebateCategoriesId, ref PageNumber, out TotalPages, out RowCount,
+                ref CurrencyAmount);
             apiListResult.PageNumber = PageNumber;
             apiListResult.RowCount = RowCount;
             apiListResult.TotalPages = TotalPages;
@@ -345,20 +361,26 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public IActionResult ExportRebateLog(string SelectSite, string UserName, int RebateType, long StartDate, long EndDate, int CurrencyId, int BaseCurrencyId, int RebateCategoriesId)
+        public IActionResult ExportRebateLog(string SelectSite, string UserName, int RebateType, long StartDate,
+            long EndDate, int CurrencyId, int BaseCurrencyId, int RebateCategoriesId)
         {
-            var ExportData = paymentBLL.GetRebateLogExport(SelectSite, UserName, RebateType, StartDate, EndDate, CurrencyId, BaseCurrencyId, RebateCategoriesId);
-            var stream = excelBLL.Export(ExportData);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            var ExportData = _paymentBLL.GetRebateLogExport(SelectSite, UserName, RebateType, StartDate, EndDate,
+                CurrencyId, BaseCurrencyId, RebateCategoriesId);
+            var stream = _excelBLL.Export(ExportData);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
-        public ApiListResult<RebateInfo> GetRebateInfoList([FromForm] IEnumerable<int> SelectSite, [FromForm] string UserName, [FromForm] int RebateType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)
+        public ApiListResult<RebateInfo> GetRebateInfoList([FromForm] IEnumerable<int> SelectSite,
+            [FromForm] string UserName, [FromForm] int RebateType, [FromForm] long StartDate, [FromForm] long EndDate,
+            [FromForm] int PageNumber)
         {
             var apiListResult = new ApiListResult<RebateInfo>();
             int PageSize = 10;
             int TotalPages = 0;
             int RowCount = 0;
-            apiListResult.Data = paymentBLL.GetRebateInfoList(SelectSite, UserName, RebateType, StartDate, EndDate, PageSize, ref PageNumber, out TotalPages, out RowCount);
+            apiListResult.Data = _paymentBLL.GetRebateInfoList(SelectSite, UserName, RebateType, StartDate, EndDate,
+                PageSize, ref PageNumber, out TotalPages, out RowCount);
             apiListResult.PageNumber = PageNumber;
             apiListResult.RowCount = RowCount;
             apiListResult.TotalPages = TotalPages;
@@ -366,12 +388,15 @@ namespace BackendSite.Controllers.Api
 
             return apiListResult;
         }
+
         [HttpPost]
-        public IActionResult ExportRebateInfo(string SelectSite, string UserName, int RebateType, long StartDate, long EndDate)
+        public IActionResult ExportRebateInfo(string SelectSite, string UserName, int RebateType, long StartDate,
+            long EndDate)
         {
-            var ExportData = paymentBLL.GetRebateInfoExport(SelectSite, UserName, RebateType, StartDate, EndDate);
-            var stream = excelBLL.Export(ExportData);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            var ExportData = _paymentBLL.GetRebateInfoExport(SelectSite, UserName, RebateType, StartDate, EndDate);
+            var stream = _excelBLL.Export(ExportData);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
         /// <summary>
@@ -384,7 +409,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         public ApiResult<IEnumerable<PromotionCategory>> GetPromotionCategory()
         {
-            var data = paymentBLL.GetPromotionCategory();
+            var data = _paymentBLL.GetPromotionCategory();
             if (data.Count() == 0)
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
@@ -394,7 +419,7 @@ namespace BackendSite.Controllers.Api
                 return new ApiResult<IEnumerable<PromotionCategory>>
                 {
                     Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
+                    ErrorCode = (int) ErrorCodeEnum.Success
                 };
             }
         }
@@ -409,19 +434,22 @@ namespace BackendSite.Controllers.Api
         /// <param name="custTpBetRecordListOneWeekReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<TpBetRecordListOneWeek>> GetCustTpBetRecordListOneWeek(CustTpBetRecordListOneWeekReq custTpBetRecordListOneWeekReq)
+        public ApiResult<IEnumerable<TpBetRecordListOneWeek>> GetCustTpBetRecordListOneWeek(
+            CustTpBetRecordListOneWeekReq custTpBetRecordListOneWeekReq)
         {
             var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneWeek>>();
             apiResult.ErrorCode = 0;
-            apiResult.Data = paymentBLL.GetCustTpBetRecordListOneWeek(custTpBetRecordListOneWeekReq.CustId);
+            apiResult.Data = _paymentBLL.GetCustTpBetRecordListOneWeek(custTpBetRecordListOneWeekReq.CustId);
             return apiResult;
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<TpBetRecordListOneWeek>> GetCustTpBetRecordList(CustTpBetRecordListReq custTpBetRecordListReq)
+        public ApiResult<IEnumerable<TpBetRecordListOneWeek>> GetCustTpBetRecordList(
+            CustTpBetRecordListReq custTpBetRecordListReq)
         {
             var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneWeek>>();
-            apiResult.Data = paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId, custTpBetRecordListReq.StartDate, custTpBetRecordListReq.EndDate);
+            apiResult.Data = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId,
+                custTpBetRecordListReq.StartDate, custTpBetRecordListReq.EndDate);
             apiResult.ErrorCode = 0;
             return apiResult;
         }
@@ -436,12 +464,13 @@ namespace BackendSite.Controllers.Api
         /// <param name="custTpBetRecordListOneDayReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<TpBetRecordListOneDay>> GetCustTpBetRecordListOneDay(CustTpBetRecordListOneDayReq custTpBetRecordListOneDayReq)
+        public ApiResult<IEnumerable<TpBetRecordListOneDay>> GetCustTpBetRecordListOneDay(
+            CustTpBetRecordListOneDayReq custTpBetRecordListOneDayReq)
         {
             var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneDay>>();
             apiResult.ErrorCode = 0;
-            apiResult.Data = paymentBLL.GetCustTpBetRecordListOneDay(custTpBetRecordListOneDayReq.CustId,
-                                                                     custTpBetRecordListOneDayReq.SelDate);
+            apiResult.Data = _paymentBLL.GetCustTpBetRecordListOneDay(custTpBetRecordListOneDayReq.CustId,
+                custTpBetRecordListOneDayReq.SelDate);
             return apiResult;
         }
 
@@ -455,13 +484,14 @@ namespace BackendSite.Controllers.Api
         /// <param name="custTpBetRecordListbyCategoryIdReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<TpBetRecordbyCategoryId>> GetCustTpBetRecordListbyCategoryId(CustTpBetRecordListbyCategoryIdReq custTpBetRecordListbyCategoryIdReq)
+        public ApiResult<IEnumerable<TpBetRecordbyCategoryId>> GetCustTpBetRecordListbyCategoryId(
+            CustTpBetRecordListbyCategoryIdReq custTpBetRecordListbyCategoryIdReq)
         {
             var apiResult = new ApiResult<IEnumerable<TpBetRecordbyCategoryId>>();
             apiResult.ErrorCode = 0;
-            apiResult.Data = paymentBLL.GetCustTpBetRecordListbyCategoryId(custTpBetRecordListbyCategoryIdReq.CustId,
-                                                                           custTpBetRecordListbyCategoryIdReq.SelDate,
-                                                                           custTpBetRecordListbyCategoryIdReq.CategoryId);
+            apiResult.Data = _paymentBLL.GetCustTpBetRecordListbyCategoryId(custTpBetRecordListbyCategoryIdReq.CustId,
+                custTpBetRecordListbyCategoryIdReq.SelDate,
+                custTpBetRecordListbyCategoryIdReq.CategoryId);
             return apiResult;
         }
 
@@ -475,7 +505,8 @@ namespace BackendSite.Controllers.Api
         /// <param name="custTpBetRecordDetailListbyGameTypeReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiListResult<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(CustTpBetRecordDetailListbyGameTypeReq custTpBetRecordDetailListbyGameTypeReq)
+        public ApiListResult<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(
+            CustTpBetRecordDetailListbyGameTypeReq custTpBetRecordDetailListbyGameTypeReq)
         {
             var apiResult = new ApiListResult<TpBetRecordDetailbyGameType>();
             int PageSize = custTpBetRecordDetailListbyGameTypeReq.PageSize;
@@ -484,13 +515,14 @@ namespace BackendSite.Controllers.Api
             int PageNumber = custTpBetRecordDetailListbyGameTypeReq.PageNumber;
 
             apiResult.ErrorCode = 0;
-            apiResult.Data = paymentBLL.GetCustTpBetRecordDetailListbyGameType(custTpBetRecordDetailListbyGameTypeReq.CustId,
-                                                                               custTpBetRecordDetailListbyGameTypeReq.SelDate,
-                                                                               custTpBetRecordDetailListbyGameTypeReq.GameTypeId,
-                                                                               PageSize,
-                                                                               ref PageNumber,
-                                                                               ref TotalPages,
-                                                                               ref RowCount);
+            apiResult.Data = _paymentBLL.GetCustTpBetRecordDetailListbyGameType(
+                custTpBetRecordDetailListbyGameTypeReq.CustId,
+                custTpBetRecordDetailListbyGameTypeReq.SelDate,
+                custTpBetRecordDetailListbyGameTypeReq.GameTypeId,
+                PageSize,
+                ref PageNumber,
+                ref TotalPages,
+                ref RowCount);
             apiResult.PageNumber = PageNumber;
             apiResult.RowCount = RowCount;
             apiResult.TotalPages = TotalPages;
@@ -498,14 +530,15 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public async Task<ApiResult> AdjustmentAndWithdrawalLimitAsync(AdjustmentAndWithdrawalLimitReq adjustmentAndWithdrawalLimitReq)
+        public async Task<ApiResult> AdjustmentAndWithdrawalLimitAsync(
+            AdjustmentAndWithdrawalLimitReq adjustmentAndWithdrawalLimitReq)
         {
             ApiResult apiResult = new ApiResult();
             AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit();
             try
             {
-                var authData = authorizeBLL.GetAuthData();
-                var custInfo = custInfoBLL.GetCustInfoWithCache(adjustmentAndWithdrawalLimitReq.CustId);
+                var authData = _authorizeBLL.GetAuthData();
+                var custInfo = _custInfoBLL.GetCustInfoWithCache(adjustmentAndWithdrawalLimitReq.CustId);
                 if (custInfo != null)
                 {
                     adjustmentAndWithdrawalLimit.CustId = custInfo.CustId;
@@ -516,49 +549,59 @@ namespace BackendSite.Controllers.Api
                     adjustmentAndWithdrawalLimit.AdjustType = adjustmentAndWithdrawalLimitReq.Option;
                     adjustmentAndWithdrawalLimit.SiteName = custInfo.SiteName;
                     adjustmentAndWithdrawalLimit.Operator = authData.UserName;
-                    adjustmentAndWithdrawalLimit.WithdrawalLimitAmount = adjustmentAndWithdrawalLimitReq.WithdrawalLimitAmount;
-                    adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType = adjustmentAndWithdrawalLimitReq.WithdrawalLimitOption;
+                    adjustmentAndWithdrawalLimit.WithdrawalLimitAmount =
+                        adjustmentAndWithdrawalLimitReq.WithdrawalLimitAmount;
+                    adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType =
+                        adjustmentAndWithdrawalLimitReq.WithdrawalLimitOption;
                     adjustmentAndWithdrawalLimit.Memo = adjustmentAndWithdrawalLimitReq.Memo;
 
                     string transId = null;
                     if (adjustmentAndWithdrawalLimit.AdjustType == 2)
                     {
-                        var balance = custInfoBLL.GetBalance(custInfo.CustId);
+                        var balance = _custInfoBLL.GetBalance(custInfo.CustId);
                         if (balance < adjustmentAndWithdrawalLimit.Amount)
                         {
-                            if (mainWalletType == 2)
+                            if (_mainWalletType == 2)
                             {
                                 var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
-                                TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = deAmount, CustId = custInfo.CustId, direction = TpDirection.ToMain };
+                                TpTransfer inTpTransfer = new TpTransfer()
+                                {
+                                    TpId = 1, Amount = deAmount, CustId = custInfo.CustId,
+                                    direction = TpDirection.ToMain
+                                };
 
-                                var acc = await tpBLL.TransferAsync(inTpTransfer);
+                                var acc = await _tpBLL.TransferAsync(inTpTransfer);
                                 if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
                                 {
                                     apiResult.ErrorCode = 1001;
-                                    apiResult.Message = $"{balance.ToString("#,##0.##")}<{adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}";
+                                    apiResult.Message =
+                                        $"{balance.ToString("#,##0.##")}<{adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}";
                                     return apiResult;
                                 }
                             }
                         }
 
-                        balance = custInfoBLL.GetBalance(custInfo.CustId);
+                        balance = _custInfoBLL.GetBalance(custInfo.CustId);
 
                         if (balance < adjustmentAndWithdrawalLimit.Amount)
                         {
                             apiResult.ErrorCode = 1002;
-                            apiResult.Message = $"{balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}";
+                            apiResult.Message =
+                                $"{balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}";
                             return apiResult;
                         }
                     }
 
-                    if (paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, User.Identity.Name, out transId) > 0)
+                    if (_paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, User.Identity.Name,
+                        out transId) > 0)
                     {
-                        if (mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
+                        if (_mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
                         {
-                            var balance = custInfoBLL.GetBalance(custInfo.CustId);
-                            TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = balance, CustId = custInfo.CustId, direction = TpDirection.ToTp };
+                            var balance = _custInfoBLL.GetBalance(custInfo.CustId);
+                            TpTransfer inTpTransfer = new TpTransfer()
+                                {TpId = 1, Amount = balance, CustId = custInfo.CustId, direction = TpDirection.ToTp};
 
-                            var acc = await tpBLL.TransferAsync(inTpTransfer);
+                            var acc = await _tpBLL.TransferAsync(inTpTransfer);
                             if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
                             {
                                 apiResult.ErrorCode = 0;
@@ -570,7 +613,6 @@ namespace BackendSite.Controllers.Api
                             apiResult.ErrorCode = 0;
                             apiResult.Message = $"Success. ID is {transId}";
                         }
-
                     }
                 }
             }
@@ -583,26 +625,32 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BalanceAdjustmentBatch" })]
-        public async Task<List<ApiResult>> BalanceAdjustmentBatch([FromForm] int option, [FromForm] int optSite, [FromForm] int withdrawalLimitOption, [FromForm] IFormFile excelUpload, [FromForm] decimal withdrawal)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Finance/BalanceAdjustmentBatch"})]
+        public async Task<List<ApiResult>> BalanceAdjustmentBatch([FromForm] int option, [FromForm] int optSite,
+            [FromForm] int withdrawalLimitOption, [FromForm] IFormFile excelUpload, [FromForm] decimal withdrawal)
         {
             var apiResult = new List<ApiResult>();
-            var authData = authorizeBLL.GetAuthData();
+            var authData = _authorizeBLL.GetAuthData();
             try
             {
-                if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
+                if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        StringComparison.OrdinalIgnoreCase) ||
+                    excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) ||
+                    excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
                 {
                     ExcelPackage excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
-                    ExcelWorksheet sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
+                    ExcelWorksheet sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
                     bool isLastRow = false;
-                    int RowId = 2;   // 因為有標題列，所以從第2列開始讀起
+                    int RowId = 2; // 因為有標題列，所以從第2列開始讀起
 
-                    do  // 讀取資料，直到讀到空白列為止
+                    do // 讀取資料，直到讀到空白列為止
                     {
-                        string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text;
+                        string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text)
+                            ? null
+                            : sheet.Cells[RowId, 1].Text;
 
                         string sabaId = sheet.Cells[RowId, 2].Text.Trim();
-                        var custId = (string.IsNullOrEmpty(sabaId)) ? null : common.TpIdToCustId(sabaId);
+                        var custId = (string.IsNullOrEmpty(sabaId)) ? null : _common.TpIdToCustId(sabaId);
 
                         decimal.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out decimal amount);
                         string memo = sheet.Cells[RowId, 4].Text.Trim();
@@ -612,112 +660,164 @@ namespace BackendSite.Controllers.Api
                         }
                         else
                         {
-                            var custInfoDetail = custInfoBLL.GetCustInfoDetails(custId, custUsername, optSite);
+                            var custInfoDetail = _custInfoBLL.GetCustInfoDetails(custId, custUsername, optSite);
                             if (custInfoDetail == null)
                             {
-                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Not fund. Username: {custUsername}. SabaId: {sabaId}." });
+                                apiResult.Add(new ApiResult()
+                                {
+                                    ErrorCode = 1002, Message = $"Not fund. Username: {custUsername}. SabaId: {sabaId}."
+                                });
                             }
                             else if (custInfoDetail.Status == 1)
                             {
                                 try
                                 {
-                                    decimal withdrawalLimitAmount = (withdrawalLimitOption == 1) ? amount * withdrawal : 0;
-                                    AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit
-                                    {
-                                        CustId = custInfoDetail.CustId,
-                                        CurrencyId = custInfoDetail.CurrencyId,
-                                        UserName = custInfoDetail.UserName,
-                                        SiteId = custInfoDetail.SiteId,
-                                        Amount = amount,
-                                        AdjustType = option,
-                                        SiteName = custInfoDetail.SiteName,
-                                        Operator = authData.UserName,
-                                        WithdrawalLimitAmount = withdrawalLimitAmount,
-                                        WithdrawalLimitAmountAdjustType = withdrawalLimitOption,
-                                        Memo = memo
-                                    };
+                                    decimal withdrawalLimitAmount =
+                                        (withdrawalLimitOption == 1) ? amount * withdrawal : 0;
+                                    AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit =
+                                        new AdjustmentAndWithdrawalLimit
+                                        {
+                                            CustId = custInfoDetail.CustId,
+                                            CurrencyId = custInfoDetail.CurrencyId,
+                                            UserName = custInfoDetail.UserName,
+                                            SiteId = custInfoDetail.SiteId,
+                                            Amount = amount,
+                                            AdjustType = option,
+                                            SiteName = custInfoDetail.SiteName,
+                                            Operator = authData.UserName,
+                                            WithdrawalLimitAmount = withdrawalLimitAmount,
+                                            WithdrawalLimitAmountAdjustType = withdrawalLimitOption,
+                                            Memo = memo
+                                        };
 
                                     string transId = null;
                                     if (adjustmentAndWithdrawalLimit.AdjustType == 2)
                                     {
-                                        var balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
+                                        var balance = _custInfoBLL.GetBalance(custInfoDetail.CustId);
                                         if (balance < adjustmentAndWithdrawalLimit.Amount)
                                         {
-                                            if (mainWalletType == 2)
+                                            if (_mainWalletType == 2)
                                             {
                                                 var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
-                                                TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = deAmount, CustId = custInfoDetail.CustId, direction = TpDirection.ToMain };
+                                                TpTransfer inTpTransfer = new TpTransfer()
+                                                {
+                                                    TpId = 1, Amount = deAmount, CustId = custInfoDetail.CustId,
+                                                    direction = TpDirection.ToMain
+                                                };
 
-                                                var acc = await tpBLL.TransferAsync(inTpTransfer);
+                                                var acc = await _tpBLL.TransferAsync(inTpTransfer);
                                                 if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
                                                 {
-                                                    apiResult.Add(new ApiResult() { ErrorCode = 1001, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                                    apiResult.Add(new ApiResult()
+                                                    {
+                                                        ErrorCode = 1001,
+                                                        Message =
+                                                            $"Fail. Username: {custUsername}. SabaId: {sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}"
+                                                    });
                                                     RowId += 1;
                                                     continue;
                                                 }
                                             }
                                         }
 
-                                        balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
+                                        balance = _custInfoBLL.GetBalance(custInfoDetail.CustId);
 
                                         if (balance < adjustmentAndWithdrawalLimit.Amount)
                                         {
-                                            apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}" });
+                                            apiResult.Add(new ApiResult()
+                                            {
+                                                ErrorCode = 1002,
+                                                Message =
+                                                    $"Fail. Username: {custUsername}. SabaId: {sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}"
+                                            });
                                             RowId += 1;
                                             continue;
                                         }
                                     }
 
-                                    if (paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, authData.UserName, out transId) > 0)
+                                    if (_paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit,
+                                        authData.UserName, out transId) > 0)
                                     {
-                                        if (mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
+                                        if (_mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
                                         {
-                                            var balance = custInfoBLL.GetBalance(custInfoDetail.CustId);
-                                            TpTransfer inTpTransfer = new TpTransfer() { TpId = 1, Amount = balance, CustId = custInfoDetail.CustId, direction = TpDirection.ToTp };
+                                            var balance = _custInfoBLL.GetBalance(custInfoDetail.CustId);
+                                            TpTransfer inTpTransfer = new TpTransfer()
+                                            {
+                                                TpId = 1, Amount = balance, CustId = custInfoDetail.CustId,
+                                                direction = TpDirection.ToTp
+                                            };
 
-                                            var acc = await tpBLL.TransferAsync(inTpTransfer);
+                                            var acc = await _tpBLL.TransferAsync(inTpTransfer);
                                             if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
                                             {
-                                                apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. ID is {transId}." });
+                                                apiResult.Add(new ApiResult()
+                                                {
+                                                    ErrorCode = 1,
+                                                    Message =
+                                                        $"Success. Username: {custUsername}. SabaId: {sabaId}. ID is {transId}."
+                                                });
                                             }
                                         }
                                         else
                                         {
-                                            apiResult.Add(new ApiResult() { ErrorCode = 1, Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. ID is {transId}." });
+                                            apiResult.Add(new ApiResult()
+                                            {
+                                                ErrorCode = 1,
+                                                Message =
+                                                    $"Success. Username: {custUsername}. SabaId: {sabaId}. ID is {transId}."
+                                            });
                                         }
                                     }
                                 }
                                 catch (Exception ex)
                                 {
-                                    apiResult.Add(new ApiResult() { ErrorCode = 999, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {ex}" });
+                                    apiResult.Add(new ApiResult()
+                                    {
+                                        ErrorCode = 999,
+                                        Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {ex}"
+                                    });
                                 }
                             }
                             else if (custInfoDetail.Status == 2)
                             {
-                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Suspend Status." });
+                                apiResult.Add(new ApiResult()
+                                {
+                                    ErrorCode = 1002,
+                                    Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Suspend Status."
+                                });
                             }
                             else if (custInfoDetail.Status == 4)
                             {
-                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Lock Status." });
+                                apiResult.Add(new ApiResult()
+                                {
+                                    ErrorCode = 1002,
+                                    Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Lock Status."
+                                });
                             }
                             else
                             {
-                                apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Closed Status." });
+                                apiResult.Add(new ApiResult()
+                                {
+                                    ErrorCode = 1002,
+                                    Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Closed Status."
+                                });
                             }
+
                             RowId += 1;
                         }
                     } while (!isLastRow);
+
                     return apiResult;
                 }
                 else
                 {
-                    apiResult.Add(new ApiResult() { ErrorCode = -1, Message = "File Type Error" });
+                    apiResult.Add(new ApiResult() {ErrorCode = -1, Message = "File Type Error"});
                     return apiResult;
                 }
             }
             catch (Exception ex)
             {
-                apiResult.Add(new ApiResult() { ErrorCode = -1, Message = ex.ToString() });
+                apiResult.Add(new ApiResult() {ErrorCode = -1, Message = ex.ToString()});
                 return apiResult;
             }
         }
@@ -734,6 +834,7 @@ namespace BackendSite.Controllers.Api
             public int CategoryId { get; set; }
             public int BaseCurrencyId { get; set; }
         }
+
         [HttpPost]
         public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoList(VipRebateInfoPara para)
         {
@@ -741,7 +842,8 @@ namespace BackendSite.Controllers.Api
             try
             {
                 List<string> CurrencyAmount = new List<string>();
-                var SearchResult = paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, para.StartDate, para.EndDate, para.User, para.PageSize, para.PageNumber,
+                var SearchResult = _paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, para.StartDate,
+                    para.EndDate, para.User, para.PageSize, para.PageNumber,
                     para.CategoryId, para.BaseCurrencyId, ref CurrencyAmount);
                 apiResult.Data = SearchResult.VipRebateInfoList;
                 apiResult.PageNumber = SearchResult.PageNumber;
@@ -771,11 +873,11 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoListByCustId(VipRebateInfoByCustIdPara para)
         {
-            var SearchResult = paymentBLL.GetVipRebateInfoListByCustId(para.CustId,
-                                                                       para.StartDate,
-                                                                       para.EndDate,
-                                                                       10,
-                                                                       para.PageNumber);
+            var SearchResult = _paymentBLL.GetVipRebateInfoListByCustId(para.CustId,
+                para.StartDate,
+                para.EndDate,
+                10,
+                para.PageNumber);
 
             return new ApiListResultCurrencyAmount<VipRebateInfo>
             {
@@ -784,29 +886,48 @@ namespace BackendSite.Controllers.Api
                 PageNumber = SearchResult.PageNumber,
                 RowCount = SearchResult.RowCount,
                 CurrencyAmount = SearchResult.CurrencyAmount,
-                ErrorCode = (int)ErrorCodeEnum.Success
+                ErrorCode = (int) ErrorCodeEnum.Success
             };
-
         }
 
         [HttpPost]
-        public IActionResult GetVipRebateInfoListExport(string SelectSite, int Currency, long StartDate, long EndDate, string User, int CategoryId, int BaseCurrencyId, int RebateCategoriesId)
+        public IActionResult GetVipRebateInfoListExport(string SelectSite, int Currency, long StartDate, long EndDate,
+            string User, int CategoryId, int BaseCurrencyId, int RebateCategoriesId)
         {
-            var SearchResult = paymentBLL.GetVipRebateInfoListExport(SelectSite, Currency, StartDate, EndDate, User, CategoryId, BaseCurrencyId, RebateCategoriesId);
-            var stream = excelBLL.Export(SearchResult.VipRebateInfoList);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"VipRebateReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            var SearchResult = _paymentBLL.GetVipRebateInfoListExport(SelectSite, Currency, StartDate, EndDate, User,
+                CategoryId, BaseCurrencyId, RebateCategoriesId);
+            var stream = _excelBLL.Export(SearchResult.VipRebateInfoList);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"VipRebateReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
         public ApiResult<IEnumerable<VipTPCategory>> GetTPCategoryListByVipRebate()
         {
             var apiResult = new ApiResult<IEnumerable<VipTPCategory>>();
             apiResult.ErrorCode = 0;
-            apiResult.Data = paymentBLL.GetTPCategoryList();
+            apiResult.Data = _paymentBLL.GetTPCategoryList();
             return apiResult;
+        }
+
+        [HttpPost]
+        public async Task<ApiResult> GetTpBetRecordDetailAsync(
+            GetTpBetRecordDetailRequest request)
+        {
+            var result =
+                await _paymentBLL.GetTpBetRecordDetailAsync(
+                    request.GameType,
+                    request.TransId);
+
+            return new ApiResult<TpBetRecordDetailModel>
+            {
+                Data = result,
+                ErrorCode = (int) ErrorCodeEnum.Success
+            };
         }
 
 
         #region Adjustment Limit
+
         public class GetAdjustmentPara
         {
             public int SiteId { get; set; }
@@ -815,10 +936,10 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<AdjustmentLimtData> GetAdjustmentData(GetAdjustmentPara para) 
+        public ApiResult<AdjustmentLimtData> GetAdjustmentData(GetAdjustmentPara para)
         {
             var apiResult = new ApiResult<AdjustmentLimtData>();
-            apiResult.Data = paymentBLL.GetAdjustmentData(para.SiteId, para.CurrencyId);
+            apiResult.Data = _paymentBLL.GetAdjustmentData(para.SiteId, para.CurrencyId);
             apiResult.ErrorCode = 0;
             return apiResult;
         }
@@ -830,33 +951,39 @@ namespace BackendSite.Controllers.Api
             public int CurrencyId { get; set; }
             public double AdjustmentMax { get; set; }
         }
+
         [HttpPost]
         public ApiResult AddAdjustmentLimitInfo(AddAdjustmentLimitPara para)
         {
-            var result = paymentBLL.AddAdjustmentLimitInfo(para.SiteId,para.CurrencyId,para.AdjustmentMax, User.Identity.Name);
+            var result =
+                _paymentBLL.AddAdjustmentLimitInfo(para.SiteId, para.CurrencyId, para.AdjustmentMax,
+                    User.Identity.Name);
             var apiResult = new ApiResult();
-            if (result >0)
+            if (result > 0)
             {
                 apiResult.ErrorCode = 0;
-                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+                apiResult.Message = _selLangBLL.GetMsg("msg_Updatesuccessful");
             }
             else
             {
                 apiResult.ErrorCode = 9;
-                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+                apiResult.Message = _selLangBLL.GetMsg("msg_UpdateFailed");
             }
+
             return apiResult;
         }
+
         public class CheckPassWordPara
         {
             public string PassWord { get; set; }
             public int SiteId { get; set; }
         }
+
         [HttpPost]
         public ApiResult CheckPassWord(CheckPassWordPara para)
         {
             var apiResult = new ApiResult();
-            if (paymentBLL.CheckPassWord(para.PassWord, para.SiteId))
+            if (_paymentBLL.CheckPassWord(para.PassWord, para.SiteId))
             {
                 apiResult.ErrorCode = 0;
             }
@@ -864,8 +991,10 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = 1004;
             }
+
             return apiResult;
         }
+
         #endregion
 
         #endregion

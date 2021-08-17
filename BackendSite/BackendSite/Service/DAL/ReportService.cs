@@ -217,7 +217,7 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public IEnumerable<TpBetRecordDetailModel> GetCustomerDetail(int custId,
+        public IEnumerable<TpBetRecordDataModel> GetCustomerDetail(int custId,
                                                                int gameId,
                                                                string date)
         {
@@ -233,7 +233,7 @@ namespace BackendSite.Service.DAL
                 });
 
                 string SpName = "Admin_TpBetRecord_ByCustIdAndGameIdAndDate_Get";
-                return conn.Query<TpBetRecordDetailModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+                return conn.Query<TpBetRecordDataModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
     }

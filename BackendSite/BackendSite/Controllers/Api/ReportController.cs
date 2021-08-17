@@ -2478,7 +2478,7 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                return new ApiResult<IEnumerable<TpBetRecordDetailModel>>
+                return new ApiResult<IEnumerable<TpBetRecordDataModel>>
                 {
                     Data = data,
                     ErrorCode = (int)ErrorCodeEnum.Success
