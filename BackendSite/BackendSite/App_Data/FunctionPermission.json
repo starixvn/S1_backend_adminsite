@@ -118,7 +118,7 @@
           {
             "DisplayKey": "Set Add/Remove CustTag",
             "FuncKey": "ca_setCustTag"
-          }, 
+          }
         ]
       },
       {
@@ -157,6 +157,26 @@
         "DisplayKey": "Tag Management",
         "FuncKey": "CustManage/TagManagement",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Registration Management",
+        "FuncKey": "CustManage/RegistrationManagement",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Add Note",
+            "FuncKey": "rm_add_note"
+          },
+          {
+            "DisplayKey": "Edit Note",
+            "FuncKey": "rm_edit_note"
+          },
+          {
+            "DisplayKey": "Delete Note",
+            "FuncKey": "rm_delete_note"
+          }
+        ]
       }
     ]
   },

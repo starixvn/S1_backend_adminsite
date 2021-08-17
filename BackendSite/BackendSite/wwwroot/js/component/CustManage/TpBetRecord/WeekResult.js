@@ -1,5 +1,6 @@
 import { number_format } from '../../commJS/common';
 import moment from "moment-timezone";
+import Filter from "./Filter";
 const Result = (props) => {
     let rows = props.Datas.length === 0 ? <tr><td>No Data.</td><td /><td /><td /><td /></tr> : props.Datas.map((d, dIdx) => {
         return (
@@ -14,8 +15,15 @@ const Result = (props) => {
     })
     return (
         <>
+            <Filter
+                FilterData={props.FilterData} 
+                EditfilterData={props.EditfilterData}
+                EditDate={props.EditDate}
+                ClickSubmit={props.ClickSubmit}
+            />
+            <label>※Allow search data up to 12 months</label>
             <div className="table">
-                <label class="col-form-label d-block">Statement By Week</label>
+                <label class="col-form-label d-block">Statement List</label>
                 <table className="table table-striped">
                     <thead>
                         <tr>

@@ -11,10 +11,8 @@ const Panel = () => {
     axios
       .post("/api/CustManage/GetCustTurnOverReport", {
         CustId: parseInt(CustId),
-        // StartTime: moment.utc(new Date(filterDatas.StartTime)).add(-8,'hour').unix(),
-        // EndTime: moment.utc(new Date(filterDatas.EndTime)).add(-8,'hour').unix(),
-        StartTime: moment.utc(filterDatas.StartTime).add(-8,'hour').unix(),
-        EndTime: moment.utc(filterDatas.EndTime).add(-8,'hour').unix(),
+        StartTime: moment(filterDatas.StartTime).unix(),
+        EndTime: moment(filterDatas.EndTime).unix(),
         GameTypes: filterDatas.GameTypes,
       })
       .then((res) => {

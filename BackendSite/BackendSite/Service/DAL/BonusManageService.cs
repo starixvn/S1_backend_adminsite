@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace BackendSite.Service.DAL
 {
@@ -439,7 +440,7 @@ namespace BackendSite.Service.DAL
         /// <returns></returns>
         public bool SetPromotionFlow(bool isAdd, PromotionInfo promotion,
             List<PromotionDisplayConditionModel> promotionDisplayConditionList, int expectedDelSpecificRow,
-            int expectedDelRebateRow, int expectedDelConditionRow)
+            int expectedDelRebateRow, int expectedDelConditionRow,string Operator)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
@@ -459,6 +460,17 @@ namespace BackendSite.Service.DAL
                 trans.Rollback();
                 return false;
             }
+
+            //Setp:inset AdjustmentinfoLog
+            #region
+            var insertcount = InsertAdjustmentInfoLog(promotion, conn, trans, Operator);
+            if (insertcount == 0)
+            {
+                trans.Rollback();
+                return false;
+            }
+            #endregion
+
 
             List<PromotionSpecific> specificList = new List<PromotionSpecific>();
 
@@ -1201,6 +1213,32 @@ namespace BackendSite.Service.DAL
         //    return errorCode;
         //}
 
+        #endregion
+
+        #region
+        private int InsertAdjustmentInfoLog(PromotionInfo promotion, MySqlConnection connection,
+            MySqlTransaction transaction,string Operator)
+        {
+            DynamicParameters propsLog = new DynamicParameters();
+
+            var temppromotion = JsonConvert.SerializeObject(promotion);
+            JObject jobject = JObject.Parse(temppromotion);
+            JArray tokenselect = jobject.SelectToken("Specific") as JArray;
+            if(tokenselect != null)
+            {
+                foreach (JObject item in tokenselect)
+                {
+                    item.Remove("Details");
+                }
+            }
+            string DetailInfo = JsonConvert.SerializeObject(jobject);
+            propsLog.Add("Menu", "BonusManagement");
+            propsLog.Add("ActionType", 1);
+            propsLog.Add("DetailInfo", DetailInfo);
+            propsLog.Add("Operator", Operator);
+            return connection.Execute("Admin_AdjustmentInfoLog_Set", propsLog, transaction: transaction,
+                commandType: CommandType.StoredProcedure);
+        }
         #endregion
     }
 }

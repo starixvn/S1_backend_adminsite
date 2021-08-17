@@ -390,7 +390,7 @@ namespace BackendSite.Controllers.Api
             public string AccountName { set; get; }
             public string AccountNo { set; get; }
             public string IFSCCode { set; get; }
-            public string ReturnUrl { set; get; }
+            //public string ReturnUrl { set; get; }
         }
 
         public class WithdrawalReq3

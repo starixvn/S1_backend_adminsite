@@ -148,9 +148,19 @@ namespace BackendSite.Service.Model.enums
 
     public enum PromotionDisplayConditionType
     {
-        VipLevel=1
+        VipLevel = 1
     }
-    
+
+    public enum BonusStatusType
+    {
+        Initial = 0,
+        Running = 1,
+        Canceled = 2,
+        Expiry = 3,
+        Fulfill = 4,
+        TrasferOut = 5
+    }
+
     #region Bank Financial Account
 
     /// <summary>
@@ -265,4 +275,24 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    public enum VerifyType
+    {
+        No = 0,
+        Verfified = 1
+    }
+    public enum DepositStatusType
+    {
+        Nondeposit = 1,
+        Deposited = 2
+    }
+    public enum RegLiveStatusType
+    {
+        Pending=1,
+        Done = 2,
+        Invalid = 3
+    }
+    public enum ErrorCodeType 
+    { 
+        Success=0
+    }
 }

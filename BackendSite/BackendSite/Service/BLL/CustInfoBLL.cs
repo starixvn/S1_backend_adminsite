@@ -26,7 +26,18 @@ namespace BackendSite.Service.BLL
         private readonly PromotionService promotionService;
         private readonly RollOverService rolloverService;
         private readonly CustTurnoverService custTurnoverService;
-        public CustInfoBLL(IMemoryCache cache, WalletService walletService, CustInfoService custInfoService, ServerInfoBLL serverInfoBLL, TpBLL tpBLL, Tools tools, CodeGenerator codeGenerator, PromotionService promotionService, RollOverService rolloverService, CustTurnoverService custTurnoverService)
+        private readonly BonusInfoService _bonusInfoService;
+        public CustInfoBLL(IMemoryCache cache,
+            WalletService walletService,
+            CustInfoService custInfoService,
+            ServerInfoBLL serverInfoBLL,
+            TpBLL tpBLL,
+            Tools tools,
+            CodeGenerator codeGenerator,
+            PromotionService promotionService,
+            RollOverService rolloverService,
+            CustTurnoverService custTurnoverService,
+            BonusInfoService bonusInfoService)
         {
             this.custInfoService = custInfoService;
             this.serverInfoBLL = serverInfoBLL;
@@ -38,6 +49,7 @@ namespace BackendSite.Service.BLL
             this.promotionService = promotionService;
             this.rolloverService = rolloverService;
             this.custTurnoverService = custTurnoverService;
+            _bonusInfoService = bonusInfoService;
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -74,7 +86,7 @@ namespace BackendSite.Service.BLL
 
             return vipLevelCache;
         }
-        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency,string bankAccountNumber, IEnumerable<int>  selectstatus, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency, string bankAccountNumber, IEnumerable<int> selectstatus, ref int pageNumber, out int totalPages, out int rowCount)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
             List<int> currncyList = new List<int>();
@@ -84,7 +96,7 @@ namespace BackendSite.Service.BLL
             });
 
             var CustInfoList = custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, selectstatus, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList())).ToList();
-            if(CustInfoList.Count() > 0)
+            if (CustInfoList.Count() > 0)
             {
                 CustInfoList.ForEach(x =>
                 {
@@ -139,7 +151,7 @@ namespace BackendSite.Service.BLL
 
                     }
                 }
-                custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>(): JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
+                custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
             }
             return custInfoDetail;
         }
@@ -188,7 +200,13 @@ namespace BackendSite.Service.BLL
         }
         public int CancelBonusByBonusId(int bonusId)
         {
-            return promotionService.CancelBonusByBonusId(bonusId);
+            var statusList = new List<int>
+            {
+                (int) BonusStatusType.Initial,
+                (int) BonusStatusType.Running,
+                (int) BonusStatusType.TrasferOut,
+            };
+            return _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), out int CustId);
         }
 
         public List<CustTurnover> GetCustTurnover(int CustId, string GameTypes, long StartTime, long EndTime)
@@ -428,7 +446,7 @@ namespace BackendSite.Service.BLL
         #endregion
 
         #region TagMamagement
-        public int EditTagMamagement(int id, string tagName,string tagColour, string description, string Operator)
+        public int EditTagMamagement(int id, string tagName, string tagColour, string description, string Operator)
         {
             return custInfoService.EditTagMamagement(id, tagName, tagColour, description, Operator);
         }
@@ -448,7 +466,7 @@ namespace BackendSite.Service.BLL
             return custInfoService.GetAllTag();
         }
 
-        public int SetCustTag(int custid, IEnumerable<int> SelectTag,string Operator)
+        public int SetCustTag(int custid, IEnumerable<int> SelectTag, string Operator)
         {
             return custInfoService.SetCustTag(custid, SelectTag);
         }
@@ -456,11 +474,11 @@ namespace BackendSite.Service.BLL
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
             var custInfoDetail = custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
-            if(custInfoDetail != null)
+            if (custInfoDetail != null)
             {
                 custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
             }
-            
+
             return custInfoDetail;
         }
         #endregion
@@ -471,7 +489,7 @@ namespace BackendSite.Service.BLL
 
             using (TransactionScope scope = new TransactionScope())
             {
-                if(!custInfoService.SetEnableDisablePromotion(custId, enablePromotion))
+                if (!custInfoService.SetEnableDisablePromotion(custId, enablePromotion))
                 {
                     scope.Dispose();
 
@@ -492,6 +510,58 @@ namespace BackendSite.Service.BLL
         public IEnumerable<VipLevelModel> GetAllSiteVipLevelList()
         {
             return custInfoService.GetAllSiteVipLevelList();
+        }
+
+        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency,int depositStatus,int status,string username,int pagenumber,int pagesize,int sort, long StartDate, long EndDate)
+        {
+            return custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pagenumber, pagesize, sort, StartDate, EndDate);
+        }
+
+        public int SetRegLiveStatus(int custid,int status,int siteid,string Operator)
+        {
+            return custInfoService.SetRegLiveStatus(custid, status, siteid, Operator);
+        }
+
+        public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
+        {
+            return custInfoService.GetRegLiveStatusNotes(custId);
+        }
+
+        public int AddRegLiveStatusNote(int custid,string note, string Operator)
+        {
+            return custInfoService.AddRegLiveStatusNote(custid, note, Operator);
+        }
+
+        public int DeleteRegLiveStatusNote(int custid,int id)
+        {
+            return custInfoService.DeleteRegLiveStatusNote(custid, id);
+        }
+
+        public int EditRegLiveStatusNote(int custid,int id, string note, string Operator)
+        {
+            return custInfoService.EditRegLiveStatusNote(custid, id, note, Operator);
+        }
+
+        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate)
+        {
+            List<RegLiveStatusExport> list = new List<RegLiveStatusExport>();
+            var result =  custInfoService.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate);
+            result.ToList().ForEach(x =>
+            {
+                list.Add(new RegLiveStatusExport()
+                {
+                    Site = x.SiteName,
+                    Currency = x.Currency,
+                    UserName= x.UserName,
+                    FullName = x.AccountName,
+                    PhoneNo = x.PhoneNo,
+                    Verify = Enum.GetName(typeof(VerifyType), x.PhoneVerified),
+                    RegTime = x.RegTime.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture),
+                    DepositStatus = Enum.GetName(typeof(DepositStatusType), x.ActStatus),
+                    Status = Enum.GetName(typeof(RegLiveStatusType), x.Status),
+                });
+            });
+            return list;
         }
     }
 }

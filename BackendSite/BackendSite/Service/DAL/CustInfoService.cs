@@ -510,5 +510,86 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<VipLevelModel>("Common_VipLevel_Get");
         }
+
+        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency, int depositStatus, int status, string username, int pagenumber, int pagesize, int sort, long StartDate, long EndDate)
+        {
+            RegLiveStatusResult SearchData = new RegLiveStatusResult();
+            DynamicParameters props = new DynamicParameters();
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+
+            props.Add("SelectSite", JsonConvert.SerializeObject(selectSite));
+            props.Add("Currency", currency);
+            props.Add("UserName", string.IsNullOrWhiteSpace(username) ? null : username);
+            props.Add("DepositStatus", depositStatus);
+            props.Add("Status", status);
+            props.Add("Sort", sort);
+            props.Add("PageSize", pagesize);
+            props.Add("StartDate", StartDate);
+            props.Add("EndDate", EndDate);
+            props.Add("PageNumber", pagenumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = conn.Query<RegLiveStatus>("Admin_CustRegLiveStatusV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
+
+            SearchData.RegLiveStatusDatas = result;
+            SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            SearchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
+
+            return SearchData;
+        }
+
+        public int SetRegLiveStatus(int custid,int status, int siteid, string Operator)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_RegLiveStatus_Set", new { CustId = custid, Status = status, SiteId= siteid, Operator= Operator }, commandType: CommandType.StoredProcedure);
+        }
+
+        public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<RegLiveStatusNotes>("Admin_CustRegLiveStatusNotes_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+        }
+
+        public int AddRegLiveStatusNote(int custid, string note, string Operator)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_CustRegLiveStatusNotes_Ins", new { CustId = custid, Note = string.IsNullOrWhiteSpace(note) ? "" : note, Operator = Operator }, commandType: CommandType.StoredProcedure);
+        }
+
+        public int DeleteRegLiveStatusNote(int custid,int id)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_CustRegLiveStatusNotes_Del", new { CustId = custid, Id = id }, commandType: CommandType.StoredProcedure);
+        }
+
+        public int EditRegLiveStatusNote(int custid, int id, string note, string Operator)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_CustRegLiveStatusNotes_Set", new { CustId = custid, Id = id, Note = note, Operator = Operator }, commandType: CommandType.StoredProcedure);
+        }
+        public IEnumerable<RegLiveStatus> GetExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate)
+        {
+            IEnumerable<RegLiveStatus> result = null;
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                string SpName = "Admin_CustRegLiveStatusExportV2_Get";
+                DynamicParameters props = new DynamicParameters();
+                props.Add("SelectSite", SelectSite);
+                props.Add("Currency", Currency);
+                props.Add("UserName", string.IsNullOrWhiteSpace(User) ? null : User);
+                props.Add("DepositStatus", DepositStatus);
+                props.Add("Status", Status);
+                props.Add("Sort", Sort);
+                props.Add("StartDate", StartDate);
+                props.Add("EndDate", EndDate);
+
+                result = conn.Query<RegLiveStatus>(SpName, props, commandType: CommandType.StoredProcedure);
+            }
+
+            return result;
+        }
     }
 }
