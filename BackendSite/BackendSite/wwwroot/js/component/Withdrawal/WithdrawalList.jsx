@@ -222,7 +222,7 @@ import DateTimePicker from 'react-datetime';
                     Loading.UnLoading();
                     let result = response.data;
                     if (result.errorCode == 0) {
-                        console.log(' onGetData()',result.data);
+                        //console.log(' onGetData()',result.data);
                         if (result.data.status == 3) {
                             await this.onGetPayList(result.data.currencyId, result.data.sysId);
                             await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId, result.data.siteId);
