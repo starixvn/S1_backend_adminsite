@@ -48,10 +48,10 @@ const Panel = (props) => {
 					<CheckBoxElem
 						Title="Site"
 						Options={siteOptions}
-						Selected={props.filterInfo.SelectSite}
+						Selected={props.filterInfo.SiteId}
 						OnChange={props.onChangeCheckBox}
 						OnChangeAll={props.onChangeAllCheckBox}
-						dataColumn="SelectSite"
+						dataColumn="SiteId"
 					/>
 				) : null}
 
@@ -59,7 +59,8 @@ const Panel = (props) => {
 					<DropDownBox
 						columnTitle="Tp"
 						options={TpOptions}
-						dataColumn="SelectTpId"
+						dataColumn="TpId"
+						SetFilter={props.SetFilter}
 					/>
 				) : null}
 
@@ -67,7 +68,8 @@ const Panel = (props) => {
 					<DropDownBox
 						columnTitle="GameType"
 						options={TpGameTypeOptions}
-						dataColumn="SelectGameType"
+						dataColumn="TpGameType"
+						SetFilter={props.SetFilter}
 					/>
 				) : null}
 
@@ -75,7 +77,8 @@ const Panel = (props) => {
 					<DropDownBox
 						columnTitle="Category"
 						options={TpCategoryOptions}
-						dataColumn="SelectCategory"
+						dataColumn="TpCategoryId"
+						SetFilter={props.SetFilter}
 					/>
 				) : null}
 
@@ -86,7 +89,7 @@ const Panel = (props) => {
 						timeFormat: false,
 						onBlur: (e) => {
 							try {
-								props.onChange(moment(e).format(filterdateformat), "StartDate");
+								props.SetFilter(moment(e).format(filterdateformat), "StartDate");
 							} catch (ex) { }
 						},
 					}}
@@ -99,7 +102,7 @@ const Panel = (props) => {
 						timeFormat: false,
 						onBlur: (e) => {
 							try {
-								props.onChange(moment(e).format(filterdateformat), "EndDate");
+								props.SetFilter(moment(e).format(filterdateformat), "EndDate");
 							} catch (ex) { }
 						},
 					}}
@@ -107,7 +110,8 @@ const Panel = (props) => {
 
 				<SwitchBtn
 					columnTitle="IsExpired"
-					dataColumn="SelectExpired"
+					dataColumn="IsExpired"
+					OnChange={props.SetFilter}
 				/>
 
 				<div className="button-group">
@@ -175,7 +179,9 @@ const CheckBoxElem = ({
 
 const CheckBox = (props) => {
 	const OnChange = (e) => {
-		props.onChange(props.Value, props.dataColumn, props.Options);
+		if (props.onChange) {
+			props.onChange(props.Value, props.dataColumn, props.Options);
+		}
 	};
 	return (
 		<label className="checkbox checkbox-checked">
@@ -194,13 +200,13 @@ const CheckBox = (props) => {
 
 const DropDownBox = (props) => {
 	const onChange = (e) => {
-		if (props.onChange) {
-			props.onChange(e.target.value, props.dataColumn);
+		if (props.SetFilter) {
+			props.SetFilter(e.target.value, props.dataColumn);
 		}
 	};
 	let optionRows = props.options.map((item) => {
 		return (
-			<option key={`${props.ColumnTitle}-${item.value}`} value={item.value} selected={props.currentSelect == item.value}>
+			<option key={`${props.columnTitle}-${item.value}`} value={item.value} >
 				{item.displayText}
 			</option>
 		);
@@ -209,7 +215,7 @@ const DropDownBox = (props) => {
 		<div className="input-item">
 			<span className="label">{props.columnTitle}</span>
 			<div className="field">
-				<select onChange={onChange} value={props.value} >
+				<select onChange={onChange} value={props.value} id={props.dataColumn}>
 					<option value="0" >ALL</option>
 					{optionRows}
 				</select>

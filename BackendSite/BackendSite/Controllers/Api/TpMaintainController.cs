@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using BackendSite.Service.Model.TpMaintain;
 using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
 using BackendSite.Service.DAL;
+using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.Api
 {
@@ -152,6 +153,37 @@ namespace BackendSite.Controllers.Api
                 return new ApiResult<IEnumerable<TpMaintain>>
                 {
                     Data = tpMaintainBLL.GetTpMaintainList(),
+                    ErrorCode = 0
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return new ApiResult<IEnumerable<TpMaintain>>
+                {
+                    ErrorCode = 999,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
+        public ApiResult<IEnumerable<TpMaintain>> GetTpMaintainListByFilter([FromForm] FilterInfo filter)
+        {
+            try
+            {
+                var data = tpMaintainBLL.GetTpMaintainList()
+                    .Where(item => item.SiteFilter(filter))
+                    .Where(item => item.TpFilter(filter))
+                    .Where(item => item.TpGameTypeFilter(filter))
+                    .Where(item => item.TpCategoryIdFilter(filter))
+                    .Where(item => item.DateFilter(filter))
+                    .Where(item => item.ExpiredFilter(filter));
+
+                return new ApiResult<IEnumerable<TpMaintain>>
+                {
+                    Data = data,
                     ErrorCode = 0
                 };
             }

@@ -29,9 +29,13 @@ const App = () => {
 
   const dateformat = "YYYY-MM-DD";
   const [stateFilter, setFilter] = useState({
-    SelectSite: [],
+    SiteId: [],
     StartDate: moment().add(-10, "days").format(dateformat),
-    EndDate: moment().format(dateformat),
+    EndDate: moment().add(+10, "days").format(dateformat),
+    TpId:0,
+    TpGameType:0,
+    TpCategoryId:0,
+    IsExpired:false,
   });
 
   useEffect(() => {
@@ -188,15 +192,46 @@ const App = () => {
     });
   };
 
-  const Filter_OnChange = (v, dataColumn) => {
+  const SetFilter = (v, dataColumn) => {
+    console.log(`${dataColumn}=${v}`);
     setFilter({
       ...stateFilter,
       [dataColumn]: v,
     });
+    console.log(stateFilter);
   };
 
   const Filter_Search = () => {
-    alert("search");
+    if (stateFilter.SiteId.length === 0) {
+      alert("Please Choose at least one Site");
+      return false;
+    }
+
+    let filterData = {
+      ...stateFilter,
+      SiteId: stateFilter.SiteId,
+      TpId: stateFilter.TpId,
+      TpGameType: stateFilter.TpGameType, 
+      TpCategoryId: stateFilter.TpCategoryId,
+      StartDate: stateFilter.StartDate,
+      EndDate: stateFilter.EndDate,
+      IsExpired: $('#IsExpired').prop('checked'),
+    };
+    console.log(filterData);
+    let param = {
+      Url: "TpMaintain/GetTpMaintainListByFilter",
+      Data: qs.stringify(filterData),
+    };
+
+    WebAPI.PostData(param).then((res) => {
+      if (res.data.errorCode === 0) {
+        updateDatas({
+          Datas: [...res.data.data],
+        });
+      } else {
+        alert(res.data.message ?? "failed to get data.");
+      }
+    });
   };
 
 
@@ -227,7 +262,7 @@ const App = () => {
             tpList={tpList}
             typeList={typeList}
             tpCategoryList={tpCategoryList}
-            onChange={Filter_OnChange}
+            SetFilter={SetFilter}
             onChangeCheckBox={Filter_CheckBox_OnChange}
             onChangeAllCheckBox={Filter_CheckBox_CheckAll}
             ClickSearch={Filter_Search}
