@@ -848,7 +848,7 @@ const InputBoxLossAmount = (props)=>{
         <div className={props.ClassName ? props.ClassName : "input-item"}>
             {
                 props.HideTitle === true ? null : <label className="label">{props.Title}</label>
-            }.
+            }
             <div className={`field${props.iptSubClass ? (' '+props.iptSubClass) : ''}`}>
                 {
                     props.SubTitle ? <span className="bule-bold">{props.SubTitle}</span> : null

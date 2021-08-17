@@ -169,4 +169,13 @@ namespace BackendSite.Service.Model
         public string GameName { get; set; }
         public int CategoryId { get; set; }
     }
+    public class PromotionCashBackSetting
+    {
+        public int CurrencyId { get; set; }
+        public int CategoryId { get; set; }
+        public int Level { get; set; }
+        public decimal Percentage { get; set; }
+        public decimal LossAmount { get; set; }
+        public int Status { get; set; }
+    }
 }

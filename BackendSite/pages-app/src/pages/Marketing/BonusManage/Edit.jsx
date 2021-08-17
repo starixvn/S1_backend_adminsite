@@ -283,10 +283,13 @@ export default props => {
 	};
 
 	const SelectTpId = (value, dataColumn, mainKey, oIdx) => {
+		let site = props.SiteList.find(s => s.siteId === state.siteId);
+		console.log(site,'site');
 		dispatch({
 			type: defActionType.SET_TPID,
 			idx: oIdx,
-			dataColumn
+			dataColumn,
+			site: site
 		});
 	};
 	return (

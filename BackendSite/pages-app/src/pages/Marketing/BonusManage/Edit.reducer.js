@@ -368,11 +368,15 @@ export function reducer(state, action) {
       let categoryInfo = state.productCategory[action.idx];
       let _tpId = categoryInfo.tpId;
       let _categoryId = categoryInfo.value;
-
+      let _specific = state.specific;
+      action.site.currencyList.forEach((item)=>{
+        _specific[item].tpGames= {};
+      });
       return {
         ...state,
         tpId: _tpId,
         categoryId: _categoryId,
+        specific:_specific
       };
 
     // case defActionType.GET_TPGAME_CATEGORIES:

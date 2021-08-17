@@ -447,7 +447,7 @@ namespace BackendSite.Service.DAL
         /// <returns></returns>
         public bool SetPromotionFlow(bool isAdd, PromotionInfo promotion,
             List<PromotionDisplayConditionModel> promotionDisplayConditionList, int expectedDelSpecificRow,
-            int expectedDelRebateRow, int expectedDelConditionRow,string Operator)
+            int expectedDelRebateRow, int expectedDelConditionRow,string Operator, DisplayConditionAbountVipLevel vipLevelCondition)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
@@ -569,6 +569,29 @@ namespace BackendSite.Service.DAL
                 {
                     DeletePromotionRebate(promotion.BonusCode, promotion.SiteId, rebateList, expectedDelRebateRow,
                         conn, trans);
+                }
+            }
+
+            if(promotion.PeriodType == 7)
+            {
+                List<PromotionCashBackSetting> cashBackList = new List<PromotionCashBackSetting>();
+                foreach (var s in promotion.Specific)
+                {
+                    foreach (var r in s.RebateList)
+                    {
+                        vipLevelCondition.SelectedVipLevel.ToList().ForEach(x =>
+                        {
+                            cashBackList.Add(new PromotionCashBackSetting
+                            {
+                                CurrencyId = s.CurrencyId,
+                                CategoryId = r.GameType,
+                                Level = x,
+                                Percentage = r.Percentage,
+                                LossAmount = r.LossAmount,
+                                Status = r.Status
+                            });
+                        });              
+                    }
                 }
             }
 

@@ -101,7 +101,7 @@ namespace BackendSite.Service.BLL
             }
 
             return _bonusManageService.SetPromotionFlow(isAdd, promotion, promotionDisplayConditionList,
-                0, 0, 0, Operator);
+                0, 0, 0, Operator, vipLevelCondition);
         }
 
         public bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode)
