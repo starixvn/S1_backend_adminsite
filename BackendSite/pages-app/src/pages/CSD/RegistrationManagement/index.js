@@ -8,6 +8,7 @@ import Result from "./Result";
 import Note from "./Note";
 
 const App = () => {
+  moment.tz.setDefault("Asia/Taipei");
   const [siteList, setSiteList] = useState([]);
   const [stateFilter, setFilter] = useState({
     SelectSite: [],
@@ -16,10 +17,6 @@ const App = () => {
     Status: 0,
     User: "",
     RegTimeType: 1,
-    StartDate: moment().add(-10, "days").format("l"),
-    EndDate: moment().format("l"),
-  });
-  const [exportFilter, setexportFilter] = useState({
     StartDate: moment().add(-10, "days").format("l"),
     EndDate: moment().format("l"),
   });
@@ -65,40 +62,6 @@ const App = () => {
       }
     });
   }, []);
-  // const Filter_CheckBox_OnChange = (v, dataColumn) => {
-  //   let isRemove = stateFilter[dataColumn].includes(v);
-  //   let newChecked = isRemove
-  //     ? stateFilter[dataColumn].filter((value) => value !== v)
-  //     : stateFilter[dataColumn].push(v);
-  //   let currentTab = stateFilter[dataColumn];
-  //   if (newChecked.length === 0) {
-  //     currentTab = [];
-  //   } else if (currentTab === null) {
-  //     currentTab = newChecked;
-  //   }
-
-  //   if (isRemove && !newChecked.includes(currentTab)) {
-  //     currentTab = newChecked.length === 0 ? [] : newChecked;
-  //   }
-  //   setFilter({
-  //     ...stateFilter,
-  //     [dataColumn]: currentTab,
-  //   });
-  // };
-
-  // const Filter_CheckBox_CheckAll = (v, dataColumn, options) => {
-  //   if (v !== "All") return false;
-  //   let currentTab =
-  //     stateFilter[dataColumn].length === options.length
-  //       ? []
-  //       : options.map((o) => {
-  //           return o.value;
-  //         });
-  //   setFilter({
-  //     ...stateFilter,
-  //     [dataColumn]: currentTab,
-  //   });
-  // };
 
   const Filter_OnChange = (v, dataColumn) => {
     setFilter({
@@ -107,13 +70,6 @@ const App = () => {
     });
   };
 
-  const Export_OnChange = (v, dataColumn) => {
-    console.log(v, dataColumn);
-    setexportFilter({
-      ...exportFilter,
-      [dataColumn]: v,
-    });
-  };
   const Submit = () => {
     if (stateFilter.SelectSite.length === 0) {
       alert("Please Choose at least one Site");
@@ -135,6 +91,8 @@ const App = () => {
         Sort: Number(stateFilter.RegTimeType),
         PageSize: 30,
         PageNumber: 1,
+        StartDate: moment(stateFilter.StartDate).unix(),
+        EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
       },
     };
     WebAPI.PostData(param)
@@ -185,6 +143,8 @@ const App = () => {
           Sort: Number(stateDatas.FilterInfo.RegTimeType),
           PageSize: 30,
           PageNumber: Number(stateDatas.PageInfo.pageNumber),
+          StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
+          EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
         },
       };
       WebAPI.PostData(param)
@@ -231,8 +191,8 @@ const App = () => {
         Status: Number(stateFilter.Status),
         User: stateFilter.User,
         Sort: Number(stateFilter.RegTimeType),
-        StartDate: moment(exportFilter.StartDate).unix(),
-        EndDate: moment(exportFilter.EndDate).add(1, "days").unix() - 1,
+        StartDate: moment(stateFilter.StartDate).unix(),
+        EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
       },
     };
 
@@ -256,6 +216,8 @@ const App = () => {
         Sort: Number(stateDatas.FilterInfo.RegTimeType),
         PageSize: 30,
         PageNumber: PageNumber,
+        StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
+        EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
       },
     };
     WebAPI.PostData(param)
@@ -321,6 +283,8 @@ const App = () => {
         Sort: Number(stateDatas.FilterInfo.RegTimeType),
         PageSize: 30,
         PageNumber: stateDatas.PageInfo.pageNumber,
+        StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
+        EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
       },
     };
     WebAPI.PostData(param)
@@ -533,13 +497,9 @@ const App = () => {
       <h4 className="page-name">Registration Management</h4>
       <Filter
         SiteList={siteList}
-        // onChangeCheckBox={Filter_CheckBox_OnChange}
-        // onChangeAllCheckBox={Filter_CheckBox_CheckAll}
         filterInfo={stateFilter}
         onChange={Filter_OnChange}
         ClickSubmit={Submit}
-        exportFilter={exportFilter}
-        ExportOnChange={Export_OnChange}
       />
       {stateDatas.Datas === null ? null : (
         <Result
