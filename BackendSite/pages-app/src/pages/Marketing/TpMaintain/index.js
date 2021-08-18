@@ -193,12 +193,10 @@ const App = () => {
   };
 
   const SetFilter = (v, dataColumn) => {
-    console.log(`${dataColumn}=${v}`);
     setFilter({
       ...stateFilter,
       [dataColumn]: v,
     });
-    console.log(stateFilter);
   };
 
   const Filter_Search = () => {
@@ -217,7 +215,6 @@ const App = () => {
       EndDate: stateFilter.EndDate,
       IsExpired: $('#IsExpired').prop('checked'),
     };
-    console.log(filterData);
     let param = {
       Url: "TpMaintain/GetTpMaintainListByFilter",
       Data: qs.stringify(filterData),
