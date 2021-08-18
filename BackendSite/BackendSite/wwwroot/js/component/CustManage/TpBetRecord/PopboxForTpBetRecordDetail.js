@@ -388,9 +388,11 @@ const dataColumnDefs = () => {
 const DateDetailModal = ({ show, tpBetRecordDatas, handleClose }) => {
   let headerRows = [];
   let bodyRows = [];
+  let a = null;
   console.log("TpBetRecordDetail", tpBetRecordDatas);
   if (show) {
-    var a = tpBetRecordDatas.detail.replace(/\"/g, "|");
+    //a = tpBetRecordDatas.detail.replace(/\"/g, "|");
+    a = tpBetRecordDatas.data.detail;
     console.log(a);
     // const columnDefs = dataColumnDefs();
     // //Column Header
@@ -479,12 +481,18 @@ const DateDetailModal = ({ show, tpBetRecordDatas, handleClose }) => {
           </button>
         </div>
         <div style={{ overflow: "scroll", height: "85%" }}>
-          {/* <table className="table table-striped">
+          <table className="table table-striped">
             <thead>
-              <tr>{headerRows}</tr>
+              {/* <tr>{headerRows}</tr> */}
+              <tr>
+                <td>Detail</td>
+              </tr>
             </thead>
-            <tbody>{bodyRows}</tbody>
-          </table> */}
+            {/* <tbody>{bodyRows}</tbody> */}
+            <tr>
+              <td>{a}</td>
+            </tr>
+          </table>
         </div>
       </div>
     </div>
