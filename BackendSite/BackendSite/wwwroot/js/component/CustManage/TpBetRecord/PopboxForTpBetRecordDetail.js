@@ -391,9 +391,20 @@ const DateDetailModal = ({ show, tpBetRecordDatas, handleClose }) => {
   let a = null;
   console.log("TpBetRecordDetail", tpBetRecordDatas);
   if (show) {
+    console.log("show");
     //a = tpBetRecordDatas.detail.replace(/\"/g, "|");
-    a = tpBetRecordDatas.data.detail;
-    console.log(a);
+    //a = tpBetRecordDatas.data.detail;
+    a = JSON.parse(tpBetRecordDatas.data.detail);
+    console.log("a", a);
+    var d = tpBetRecordDatas.data.detail;
+    //用這個判斷是否為object
+    if (typeof a == "object") {
+      console.log("object");
+    }
+    //用這個判斷是否為array
+    if (Array.isArray(a)) {
+      console.log("array");
+    }
     // const columnDefs = dataColumnDefs();
     // //Column Header
     // columnDefs.forEach((element, idx) => {
@@ -482,16 +493,8 @@ const DateDetailModal = ({ show, tpBetRecordDatas, handleClose }) => {
         </div>
         <div style={{ overflow: "scroll", height: "85%" }}>
           <table className="table table-striped">
-            <thead>
-              {/* <tr>{headerRows}</tr> */}
-              <tr>
-                <td>Detail</td>
-              </tr>
-            </thead>
+            <thead>{/* <tr>{headerRows}</tr> */}</thead>
             {/* <tbody>{bodyRows}</tbody> */}
-            <tr>
-              <td>{a}</td>
-            </tr>
           </table>
         </div>
       </div>

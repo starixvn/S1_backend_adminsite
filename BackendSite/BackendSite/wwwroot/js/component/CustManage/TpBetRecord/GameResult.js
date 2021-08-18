@@ -5,7 +5,6 @@ import moment from "moment-timezone";
 import TpBetRecordDetailModal from "./PopboxForTpBetRecordDetail";
 
 const Result = (props) => {
-  console.log(props);
   let rows =
     props.Datas.data.length === 0 ? (
       <tr>
