@@ -16,28 +16,28 @@ export default props => {
 		initialState(props.IsAdd, props.Datas, props.SiteList)
 	);
 
-	// useEffect(() => {
-	// 	let param = {
-	// 		Url: "BonusManage/GetTpGameList"
-	// 	};
-	// 	WebAPI.PostData(param).then(res => {
-	// 		if (isMountedRef.current) {
-	// 			if (res.data.errorCode === 0) {
-	// 				dispatch({
-	// 					type: defActionType.GET_TPGAME_CATEGORIES,
-	// 					tpGameCategory: res.data.data
-	// 				});
-	// 			} else {
-	// 				alert(res.data.message ?? "failed to get data.");
-	// 			}
-	// 		}
-	// 	});
-	// }, []);
+	useEffect(() => {
+		let param = {
+			Url: "BonusManage/GetTpGameList"
+		};
+		WebAPI.PostData(param).then(res => {
+			if (isMountedRef.current) {
+				if (res.data.errorCode === 0) {
+					dispatch({
+						type: defActionType.GET_TPGAME_CATEGORIES,
+						tpGameCategory: res.data.data
+					});
+				} else {
+					alert(res.data.message ?? "failed to get data.");
+				}
+			}
+		});
+	}, []);
 
 	useEffect(() => {
 		if(state.tpId !== null){
 			let param = {
-				Url: "BonusManage/GetTpGameListV2",
+				Url: "BonusManage/GetCashBackGameList",
 				Data: qs.stringify({
 					TpId: Number(state.tpId),
 					CategoryId: Number(state.categoryId)
@@ -47,8 +47,8 @@ export default props => {
 				if (isMountedRef.current) {
 					if (res.data.errorCode === 0) {
 						dispatch({
-							type: defActionType.GET_TPGAME_CATEGORIES,
-							tpGameCategory: res.data.data
+							type: defActionType.GET_CASHBACK_CATEGORIES,
+							cashbackGameCategory: res.data.data
 						});
 					} else {
 						alert(res.data.message ?? "failed to get data.");

@@ -17,6 +17,7 @@ export const defActionType = {
   GET_SITE_VIPLEVEL: "GET_SITE_VIPLEVEL",
   FORVIPLEVEL_SET_VALUE: "FORVIPLEVEL_SET_VALUE",
   VIPLEVEL_SET_VALUE: "VIPLEVEL_SET_VALUE",
+  GET_CASHBACK_CATEGORIES: "GET_CASHBACK_CATEGORIES"
 };
 
 export const initialState = (IsAdd, datas, siteList) => {
@@ -59,6 +60,7 @@ export const initialState = (IsAdd, datas, siteList) => {
       vipLevelList: [], //Initial Vip Level SelectedItem.
       forVipLevel: [], //Use VipLevel Or not
       selectedVipLevel: [], //If User VipLevel,Which Vip if fit.
+      cashbackGameCategory:[]
     };
   } else {
     let site = siteList.find((s) => s.siteId === datas.siteId);
@@ -112,6 +114,7 @@ export const initialState = (IsAdd, datas, siteList) => {
       vipLevelList: [],
       forVipLevel: _forVipLevel,
       selectedVipLevel: _selcectedVipLevel,
+      cashbackGameCategory:[]
     };
   }
 };
@@ -142,6 +145,7 @@ const initSpecific = {
   },
   tpGames: {},
   minPayout: "",
+  cashbackGames:{}
 };
 
 const SetSpecific = (currencyList, langList, data) => {
@@ -379,20 +383,20 @@ export function reducer(state, action) {
         specific:_specific
       };
 
-    // case defActionType.GET_TPGAME_CATEGORIES:
-    //   let tpGameCategory = action.tpGameCategory.map((item) => {
-    //     return {
-    //       value: item.type,
-    //       displayText: item.typeName,
-    //     };
-    //   });
-    //   return {
-    //     ...state,
-    //     tpGameCategory: tpGameCategory,
-    //   };
-
     case defActionType.GET_TPGAME_CATEGORIES:
       let tpGameCategory = action.tpGameCategory.map((item) => {
+        return {
+          value: item.type,
+          displayText: item.typeName,
+        };
+      });
+      return {
+        ...state,
+        tpGameCategory: tpGameCategory,
+      };
+
+    case defActionType.GET_CASHBACK_CATEGORIES:
+      let cashbackGameCategory = action.cashbackGameCategory.map((item) => {
         return {
           value: item.categoryId,
           displayText: item.gameName,
@@ -400,7 +404,7 @@ export function reducer(state, action) {
       });
       return {
         ...state,
-        tpGameCategory: tpGameCategory,
+        cashbackGameCategory: cashbackGameCategory,
       };
 
     case defActionType.CURRENCY_SET_TpGame_VALUE:

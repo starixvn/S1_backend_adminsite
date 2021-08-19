@@ -592,13 +592,13 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         [HttpPost]
-        public ApiResult<IEnumerable<TpGames>> GetTpGameListV2([FromForm] GetTpGameListReq para)
+        public ApiResult<IEnumerable<TpGames>> GetCashBackGameList([FromForm] GetTpGameListReq para)
         {
             var apiResult = new ApiResult<IEnumerable<TpGames>>();
 
             try
             {
-                apiResult.Data = _bonusManageBLL.GetTpGameList(para.TpId,para.CategoryId);
+                apiResult.Data = _bonusManageBLL.GetCashBackGameList(para.TpId,para.CategoryId);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)

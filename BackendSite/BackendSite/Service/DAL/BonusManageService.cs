@@ -64,7 +64,7 @@ namespace BackendSite.Service.DAL
             return conn.Query<TpGameType>("Admin_TpGameType_Get", commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<TpGames> GetTpGameList(int tpId, int categoryId)
+        public IEnumerable<TpGames> GetCashBackGameList(int tpId, int categoryId)
         {
             using MySqlConnection conn =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
