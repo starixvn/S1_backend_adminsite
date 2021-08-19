@@ -1,456 +1,270 @@
 import React from "react";
 
-const dataColumnDefs = () => {
-  return [
-    //TpName
-    {
-      columnTitle: "Tp Name",
-      dataColumn: "tpName",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "1",
-      },
-    },
-    //TransId
-    {
-      columnTitle: "TransId",
-      dataColumn: "transId",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //Category
-    {
-      columnTitle: "Category",
-      dataColumn: "categoryName",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //Game
-    {
-      columnTitle: "Game",
-      dataColumn: "gameName",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //UserName
-    {
-      columnTitle: "UserName",
-      dataColumn: "userName",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //Currency
-    {
-      columnTitle: "Currency",
-      dataColumn: "code",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //Site
-    {
-      columnTitle: "Site",
-      dataColumn: "siteName",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //TpUserName
-    {
-      columnTitle: "TpUserName",
-      dataColumn: "tpUserName",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //TransTime
-    {
-      columnTitle: "TransTime",
-      dataColumn: "transTime",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //SettledTime
-    {
-      columnTitle: "SettledTime",
-      dataColumn: "settledTime",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //Stake
-    {
-      columnTitle: "Stake",
-      dataColumn: "stake",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //ValidBet
-    {
-      columnTitle: "ValidBet",
-      dataColumn: "validBet",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //Revenue
-    {
-      columnTitle: "Revenue",
-      dataColumn: "revenue",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //WinLoss Amount
-    {
-      columnTitle: "WinLoss Amount",
-      dataColumn: "winLostAmount",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //SettlementType
-    {
-      columnTitle: "SettlementType",
-      dataColumn: "settlementType",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //Ticket Status
-    {
-      columnTitle: "Ticket Status",
-      dataColumn: "ticketStatus",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //Original State
-    {
-      columnTitle: "Original State",
-      dataColumn: "originalState",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //Ticket Key
-    {
-      columnTitle: "Original Key",
-      dataColumn: "ticketKey",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //BonusId
-    {
-      columnTitle: "BonusId",
-      dataColumn: "bonusId",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-    //CreateTime
-    {
-      columnTitle: "CreateTime",
-      dataColumn: "createTime",
-      body: {
-        style: {
-          // position: "sticky",
-          // top: "36.8px",
-          // height:"36.8px",
-          // zIndex:"1"
-        },
-      },
-      style: {
-        position: "sticky",
-        top: "0",
-        height: "36.8px",
-        zIndex: "3",
-      },
-    },
-  ];
+const checkDataType = (data) => {
+  //判斷是否為array
+  if (Array.isArray(data)) {
+    return "array";
+  }
+  //判斷是否為object
+  if (typeof data == "object") {
+    return "object";
+  }
+  return "text";
 };
 
 const DateDetailModal = ({ show, tpBetRecordDatas, handleClose }) => {
-  let headerRows = [];
   let bodyRows = [];
-  let a = null;
-  console.log("TpBetRecordDetail", tpBetRecordDatas);
+
   if (show) {
-    console.log("show");
-    //a = tpBetRecordDatas.detail.replace(/\"/g, "|");
-    //a = tpBetRecordDatas.data.detail;
-    a = JSON.parse(tpBetRecordDatas.data.detail);
-    console.log("a", a);
-    var d = tpBetRecordDatas.data.detail;
-    //用這個判斷是否為object
-    if (typeof a == "object") {
-      console.log("object");
+    let detail = JSON.parse(tpBetRecordDatas.data.detail); //將資料轉json
+    let detailDataType = checkDataType(detail); //判斷detail型態
+
+    //第1層資料處理(用detail資料型態判斷)
+    switch (detailDataType) {
+      case "array":
+        //detail=0.array.
+        break;
+      case "object":
+        //detail=0.object.
+        let detailKeys = Object.keys(detail);
+        detailKeys.forEach((firstObjectKey, firstObjectIdx) => {
+          let firstObjectProperty = checkDataType(detail[firstObjectKey]);
+
+          console.log(
+            "detail is object",
+            1,
+            firstObjectKey,
+            firstObjectProperty
+          ); //for debug
+
+          //第2層資料處理(用1層資料型態判斷)
+          switch (firstObjectProperty) {
+            case "array":
+              //detail=0.object >> 1.array.
+              detail[firstObjectKey].forEach(
+                (secondArrayItem, firstArrayIdx) => {
+                  //Array需要Display目前輸出是[firstArrayIdx]筆
+                  bodyRows.push(
+                    <tr key={`result-body-0-object-1-array-${firstArrayIdx}`}>
+                      <td>{`${firstObjectKey}[${firstArrayIdx}] ▼`}</td>
+                    </tr>
+                  );
+                  let secondArrayProperty = checkDataType(secondArrayItem);
+
+                  console.log(
+                    "detail is object",
+                    1,
+                    firstObjectKey,
+                    firstObjectProperty,
+                    2,
+                    " >> array",
+                    firstArrayIdx,
+                    secondArrayProperty
+                  ); //for debug
+
+                  //第3層資料處理(用2層資料型態判斷)
+                  switch (secondArrayProperty) {
+                    case "array":
+                      //detail=0.object >> 1.array >> 2.array
+                      break;
+                    case "object":
+                      //detail=0.object >> 1.array >> 2.object
+                      let secondItemKeys = Object.keys(secondArrayItem); //取出第2層object屬性
+                      secondItemKeys.forEach(
+                        (secondItemKey, secondArrayItemIdx) => {
+                          let thirdObjectProperty = checkDataType(
+                            secondArrayItem[secondItemKey]
+                          );
+                          console.log(
+                            "detail is object",
+                            1,
+                            firstObjectKey,
+                            firstObjectProperty,
+                            2,
+                            " >> array",
+                            firstArrayIdx,
+                            secondArrayProperty,
+                            3,
+                            " >> object",
+                            secondItemKey,
+                            thirdObjectProperty
+                          ); //for debug
+
+                          switch (thirdObjectProperty) {
+                            case "array":
+                              //detail=0.object >> 1.array >> 2.object >> 3.array
+                              secondArrayItem[secondItemKey].forEach(
+                                (thirdArrayItem, secondArrayIdx) => {
+                                  bodyRows.push(
+                                    <tr
+                                      key={`result-body-0-object-1-array-2-object-3-array-${secondArrayIdx}`}
+                                    >
+                                      <td>{`${firstObjectKey}[${firstArrayIdx}] ➤ ${secondItemKey}[${secondArrayIdx}] ▼`}</td>
+                                    </tr>
+                                  );
+                                  let fourthArrayProperty =
+                                    checkDataType(thirdArrayItem);
+                                  console.log(
+                                    "detail is object",
+                                    1,
+                                    firstObjectKey,
+                                    firstObjectProperty,
+                                    2,
+                                    " >> array",
+                                    firstArrayIdx,
+                                    secondArrayProperty,
+                                    3,
+                                    " >> object",
+                                    secondItemKey,
+                                    thirdObjectProperty,
+                                    4,
+                                    ">> array",
+                                    secondArrayIdx,
+                                    fourthArrayProperty
+                                  ); //for debug
+
+                                  switch (fourthArrayProperty) {
+                                    case "array":
+                                      //detail=0.object >> 1.array >> 2.object >> 3.array >> 4.array
+                                      break;
+                                    case "object":
+                                      //detail=0.object >> 1.array >> 2.object >> 3.array >> 4.object
+                                      let fourthObjectKeys =
+                                        Object.keys(thirdArrayItem); //取出第2層object屬性
+                                      fourthObjectKeys.forEach(
+                                        (fourthObjectKey, fourthObjectIdx) => {
+                                          let fifthObjectProperty =
+                                            checkDataType(
+                                              thirdArrayItem[fourthObjectKey]
+                                            );
+                                          console.log(
+                                            "detail is object",
+                                            1,
+                                            firstObjectKey,
+                                            firstObjectProperty,
+                                            2,
+                                            " >> array",
+                                            firstArrayIdx,
+                                            secondArrayProperty,
+                                            3,
+                                            " >> object",
+                                            secondItemKey,
+                                            thirdObjectProperty,
+                                            4,
+                                            ">> array",
+                                            secondArrayIdx,
+                                            fourthArrayProperty,
+                                            5,
+                                            ">> object",
+                                            fourthObjectKey,
+                                            fifthObjectProperty
+                                          ); //for debug
+                                          switch (fifthObjectProperty) {
+                                            case "array":
+                                              break;
+                                            case "object":
+                                              break;
+                                            default:
+                                              //detail=0.object >> 1.array >> 2.object >> 3.array >> 4.object >> 5.text
+                                              bodyRows.push(
+                                                <tr
+                                                  key={`result-body-0-object-1-array-2-object-3-array-4-object-5-text-${fourthObjectIdx}`}
+                                                >
+                                                  <td>{`${firstObjectKey}[${firstArrayIdx}] ➤ ${secondItemKey}[${secondArrayIdx}] ➤ ${fourthObjectKey}`}</td>
+                                                  <td>
+                                                    {
+                                                      thirdArrayItem[
+                                                        fourthObjectKey
+                                                      ]
+                                                    }
+                                                  </td>
+                                                </tr>
+                                              );
+                                              break;
+                                          }
+                                        }
+                                      );
+                                      break;
+                                    default:
+                                      //detail=0.object >> 1.array >> 2.object >> 3.array >> 4.text
+                                      bodyRows.push(
+                                        <tr
+                                          key={`result-body-0-object-1-array-2-object-3-array-4-text-${secondArrayIdx}`}
+                                        >
+                                          <td>{`${firstObjectKey}[${firstArrayIdx}] ➤ ${secondItemKey}[${secondArrayIdx}]`}</td>
+                                          <td>{thirdArrayItem}</td>
+                                        </tr>
+                                      );
+                                      break;
+                                  }
+                                }
+                              );
+                              break;
+                            case "object":
+                              //detail=0.object >> 1.array >> 2.object >> 3.object
+                              break;
+                            default:
+                              //detail=0.object >> 1.array >> 2.object >> 3.text
+                              bodyRows.push(
+                                <tr
+                                  key={`result-body-0-object-1-array-2-object-3-text-${secondArrayItemIdx}`}
+                                >
+                                  <td>{`${firstObjectKey}[${firstArrayIdx}] ➤ ${secondItemKey}`}</td>
+                                  <td>{secondArrayItem[secondItemKey]}</td>
+                                </tr>
+                              );
+                              break;
+                          }
+                        }
+                      );
+                      break;
+                    default:
+                      //detail=0.object >> 1.array >> 2.text
+                      bodyRows.push(
+                        <tr
+                          key={`result-body-0-object-1-array-2-text-${firstArrayIdx}`}
+                        >
+                          <td>{`${firstObjectKey}[${firstArrayIdx}]`}</td>
+                          <td>{secondArrayItem}</td>
+                        </tr>
+                      );
+                      break;
+                  }
+                }
+              );
+              break;
+            case "object":
+              //detail=0.object >> 1.object.
+              break;
+            default:
+              //detail=0.object >> 1.text.
+              console.log("detail >> " + detail[firstObjectKey] + " is text"); //for debug
+              bodyRows.push(
+                <tr key={`result-body-0-object-1-text-${firstObjectIdx}`}>
+                  <td>{firstObjectKey}</td>
+                  <td>{detail[firstObjectKey]}</td>
+                </tr>
+              );
+              break;
+          }
+        });
+        break;
+      default:
+        //detail=0.text.
+        console.log("detail is text"); //for debug
+        bodyRows.push(
+          <tr key={`result-body-0-text`}>
+            <td>Detail</td>
+            <td>{detail}</td>
+          </tr>
+        );
+        break;
     }
-    //用這個判斷是否為array
-    if (Array.isArray(a)) {
-      console.log("array");
-    }
-    // const columnDefs = dataColumnDefs();
-    // //Column Header
-    // columnDefs.forEach((element, idx) => {
-    //   headerRows.push(
-    //     <th
-    //       key={`th-${element.dataColumn}-${idx}`}
-    //       scope="col"
-    //       style={element.style ? element.style : ""}
-    //     >
-    //       {element.columnTitle}
-    //     </th>
-    //   );
-    // });
-    // //body Rows
-    // bodyRows = dateDetailDatas.map((data, idx) => {
-    //   let row = columnDefs.map((element, idx) => {
-    //     let subData = {};
-    //     if (element.body && element.body.subData) {
-    //       element.body.subData.forEach((s) => {
-    //         subData[s] = data[s];
-    //       });
-    //     }
-    //     return (
-    //       <td
-    //         key={`td-${element.dataColumn}-${idx}`}
-    //         style={element.body && element.body.style ? element.body.style : ""}
-    //         bgcolor={
-    //           element.body && element.body.attr && element.body.attr.bgcolor
-    //             ? element.body.attr.bgcolor
-    //             : ""
-    //         }
-    //       >
-    //         {element.body && element.body.format
-    //           ? element.body.format(data[element.dataColumn], subData)
-    //           : data[element.dataColumn]}
-    //       </td>
-    //     );
-    //   });
-    //   return <tr key={`result-body-${idx}`}>{row}</tr>;
-    // });
   }
 
   const showHideStyle = show
     ? { display: "block", background: "rgba(0, 0, 0, 0.6)" }
     : {};
-
   return (
     <div className="modal" style={showHideStyle}>
       <div
@@ -474,14 +288,6 @@ const DateDetailModal = ({ show, tpBetRecordDatas, handleClose }) => {
             height: "49px",
           }}
         >
-          {/* <span style={{ fontWeight: "bold" }}>
-            This is{" "}
-            <span style={{ color: "red" }}>
-              {userdata.userName} {">"} {userdata.categoryName} {">"}{" "}
-              {userdata.gameName} {">"} {userdata.date}
-            </span>{" "}
-            Data.
-          </span> */}
           <button
             type="button"
             className="btn btn-approved"
@@ -493,8 +299,7 @@ const DateDetailModal = ({ show, tpBetRecordDatas, handleClose }) => {
         </div>
         <div style={{ overflow: "scroll", height: "85%" }}>
           <table className="table table-striped">
-            <thead>{/* <tr>{headerRows}</tr> */}</thead>
-            {/* <tbody>{bodyRows}</tbody> */}
+            <tbody>{bodyRows}</tbody>
           </table>
         </div>
       </div>
