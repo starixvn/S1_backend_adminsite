@@ -1249,6 +1249,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                         Loading.UnLoading();
                         let result = response.data;
                         if (result.errorCode == 0) {
+                            alert("Fix Success")
                             this.props.onGetCustInfoDetail();
                         } else {
                             alert(result.message);
