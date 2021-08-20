@@ -972,11 +972,11 @@ namespace BackendSite.Service.BLL
             return Data;
         }
 
-        public IEnumerable<TpBetRecordDetailModel> GetCustomerDetail(int custId,
+        public IEnumerable<TpBetRecordDataModel> GetCustomerDetail(int custId,
                                                                int gameId,
                                                                string date)
         {
-            Dictionary<string, TpBetRecordDetailModel> keyValuePairs = new Dictionary<string, TpBetRecordDetailModel>();
+            Dictionary<string, TpBetRecordDataModel> keyValuePairs = new Dictionary<string, TpBetRecordDataModel>();
             string dateFormat = string.Empty;
             var detailList = reportService.GetCustomerDetail(custId,
                                                              gameId,
