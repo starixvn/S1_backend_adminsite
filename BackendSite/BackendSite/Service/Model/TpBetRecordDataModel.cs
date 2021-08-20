@@ -10,7 +10,7 @@ namespace BackendSite.Service.Model
     /// <summary>
     /// 代表 第三方下注紀錄資料
     /// </summary>
-    public class TpBetRecordDetailModel
+    public class TpBetRecordDataModel
     {
         /// <summary>
         /// 讀寫 第三方ID
