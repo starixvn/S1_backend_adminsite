@@ -177,6 +177,11 @@
             "FuncKey": "rm_delete_note"
           }
         ]
+      },
+      {
+        "DisplayKey": "Disable User For Game",
+        "FuncKey": "CustManage/DisableUserForGame",
+        "Enable": false
       }
     ]
   },
