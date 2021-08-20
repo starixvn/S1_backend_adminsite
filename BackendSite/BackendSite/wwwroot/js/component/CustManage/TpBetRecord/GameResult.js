@@ -50,7 +50,7 @@ const Result = (props) => {
           <thead>
             <tr>
               <th>Trans Id</th>
-              <th>Trans Id(Test)</th>
+              <th>Trans Id(Test:Only show saba test data)</th>
               <th>Turnover</th>
               <th>Valid Bet</th>
               <th>WinLoss</th>
