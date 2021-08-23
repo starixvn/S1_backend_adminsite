@@ -96,6 +96,25 @@ namespace BackendSite.Controllers.Api
             public int FilterType { get; set; }
         }
 
+        public class LeaderboardExtraPointReq
+        {
+            public IEnumerable<int> SelectSite { get; set; }
+            public int CategoryId { get; set; }
+            public int Currency { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+        }
+
+        public class SetLeaderboardExtraPointReq
+        {
+            public long ActiveDate { get; set; }
+            public int CategoryId { get; set; }
+            public string UserName { get; set; }
+            public decimal ExtraPoint { get; set; }
+        }
+        
         #endregion
 
         #region Action
@@ -598,7 +617,61 @@ namespace BackendSite.Controllers.Api
         }
 
         #endregion
+        #region For Leaderboard ExtraPoint 
+        [HttpPost]
+        public ApiListResult<LeaderboardExtraPointList> GetLeaderboardExtraPointList(LeaderboardExtraPointReq leaderboardExtraPointReq)
+        {
+            var apiResult = new ApiListResult<LeaderboardExtraPointList>();
+            int totalPages = 0, rowCount = 0;
 
+            int pageNumber = leaderboardExtraPointReq.PageNumber;
+            int pageSize = 10;
+            if (leaderboardExtraPointReq.PageSize > 0)
+                pageSize = leaderboardExtraPointReq.PageSize;
+            apiResult.Data = _bonusManageBLL.GetLeaderboardExtraPointList(leaderboardExtraPointReq.SelectSite,
+                leaderboardExtraPointReq.CategoryId, leaderboardExtraPointReq.Currency, leaderboardExtraPointReq.StartDate, 
+                leaderboardExtraPointReq.EndDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+            apiResult.TotalPages = totalPages;
+            apiResult.PageNumber = pageNumber;
+            apiResult.RowCount = rowCount;
+            apiResult.ErrorCode = 0;
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult SetLeaderboardExtraPoint(SetLeaderboardExtraPointReq setLeaderboardExtraPointReq)
+        {
+            var apiResult = new ApiResult();
+            apiResult.Message = "Unknown Error";
+            string UserName = _authorizeBLL.GetAuthData().UserName;
+            int rtn = _bonusManageBLL.SetLeaderboardExtraPoint(
+                setLeaderboardExtraPointReq.ActiveDate, setLeaderboardExtraPointReq.CategoryId, setLeaderboardExtraPointReq.UserName,
+                setLeaderboardExtraPointReq.ExtraPoint, UserName
+                );
+            if (rtn == 0)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = "";
+            }
+            else if (rtn == -2)
+            {
+                apiResult.ErrorCode = rtn;
+                apiResult.Message = "User Not Found";
+            }
+            else if (rtn == -3)
+            {
+                apiResult.ErrorCode = rtn;
+                apiResult.Message = "Can only select the ActiveDate today or after today";
+            }
+            else
+            {
+                apiResult.ErrorCode = rtn;
+                apiResult.Message = "Unknown Error";
+            }
+            return apiResult;
+        }
+        #endregion
         #endregion
     }
 }
