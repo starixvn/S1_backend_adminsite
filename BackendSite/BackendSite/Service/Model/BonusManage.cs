@@ -57,6 +57,7 @@ namespace BackendSite.Service.Model
         public string VN_AffIds { get; set; }
         public string VN_AffCodes { get; set; }
         public int TotalUsageLimit { get; set; }
+        public IEnumerable<PromotionCashBack> CashBackList { get; set; }
     }
 
     public class TpGameType
@@ -79,9 +80,23 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
     }
 
+    public class PromotionCashBack
+    {
+        public int GameType { get; set; }
+        public decimal Percentage { get; set; }
+        public int Status { get; set; }
+        public decimal LossAmount { get; set; }
+        public int TpId { get; set; }
+    }
+
     public class PromotionRebate1 : PromotionRebate
     {
         public int CurrencyId { get; set; }
+    }
+    public class PromotionCashBack1 : PromotionCashBack 
+    {
+        public int CurrencyId { get; set; }
+        public int Level { get; set; }      
     }
 
     public class GetPromotionListReq
@@ -162,5 +177,31 @@ namespace BackendSite.Service.Model
         public bool IsForVipLevel  { get; set; }
 
         public IEnumerable<int> SelectedVipLevel { get; set; }
+    }
+    public class TpGames
+    {
+        public string GameName { get; set; }
+        public int CategoryId { get; set; }
+    }
+    public class PromotionCashBackSetting
+    {
+        public int CurrencyId { get; set; }
+        public int CategoryId { get; set; }
+        public int Level { get; set; }
+        public decimal Percentage { get; set; }
+        public decimal LossAmount { get; set; }
+        public int Status { get; set; }
+        public int TpId { get; set; }
+    }
+    public class CashBackGame
+    {
+        public string GameName { get; set; }
+        public int CategoryId { get; set; }
+        public int TpId { get; set; }
+    }
+    public class GetCashBackGamerep
+    {
+        public string GameName { get; set; }
+        public int Key { get; set; }
     }
 }
