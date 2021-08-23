@@ -191,7 +191,7 @@ namespace BackendSite.Service.Model
         public decimal Percentage { get; set; }
         public decimal LossAmount { get; set; }
         public int Status { get; set; }
-        public int TpId { get; set; }
+        public int? TpId { get; set; }
     }
     public class CashBackGame
     {
