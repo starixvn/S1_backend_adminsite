@@ -190,12 +190,20 @@ const App = () => {
 							? Number(info.bonus)
 							: Number(info.maxBonus);
 
-					let tpGame = promotion.promotionType == 6 || promotion.promotionType == 7 ? promotion.tpGameCategory.map(t => {
+					let tpGame = promotion.promotionType == 6 ? promotion.tpGameCategory.map(t => {
 						return {
 							GameType: t.value,
 							Percentage: info.tpGames[t.value]?.percentage ? Number(info.tpGames[t.value].percentage) : 0,
-							Status: info.tpGames[t.value]?.status ? Number(info.tpGames[t.value].status) : 0,
-							LossAmount: info.tpGames[t.value]?.lossAmount ? Number(info.tpGames[t.value].lossAmount) : 0,
+							Status: info.tpGames[t.value]?.status ? Number(info.tpGames[t.value].status) : 0
+						}
+					}) : null;
+
+					let cashbackGame = promotion.promotionType == 7 ? promotion.cashbackGameCategory.map(t => {
+						return {
+							GameType: t.value,
+							Percentage: info.cashbackGames[t.value]?.percentage ? Number(info.cashbackGames[t.value].percentage) : 0,
+							Status: info.cashbackGames[t.value]?.status ? Number(info.cashbackGames[t.value].status) : 0,
+							LossAmount: info.cashbackGames[t.value]?.lossAmount ? Number(info.cashbackGames[t.value].lossAmount) : 0,
 						}
 					}) : null;
 
@@ -214,7 +222,8 @@ const App = () => {
 						RebateList: tpGame,
 						MinPayout: Number(info.minPayout),
 						VN_AffCodes: info.affid,
-						TotalUsageLimit: info.totalUsageLimit
+						TotalUsageLimit: info.totalUsageLimit,
+						CashBackList: cashbackGame
 					};
 				});
 
@@ -310,6 +319,7 @@ const App = () => {
 				})
 			}).then(
 				res => {
+					console.log(res.data.data);
 					return {
 						errorCode: res.data.errorCode,
 						data: res.data.data,

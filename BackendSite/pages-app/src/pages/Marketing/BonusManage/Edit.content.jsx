@@ -473,6 +473,10 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 									this,
 									state.currentTab
 								)}
+								EditCashbackGameCategoryValue={action.EditCashbackGameCategoryValue.bind(
+									this,
+									state.currentTab
+								)}
 								currencyId={state.currentTab}
 								action={action}
 							/>
@@ -531,7 +535,6 @@ const SubPanel = props => {
 			let Data = props.state.specific[props.currencyId].tpGames;
 			let Locked = Boolean(Data[item.value]?.status);
 			let value = Data[item.value]?.percentage;
-			let lossAmountvalue = Data[item.value]?.lossAmount;
 			return (
 				<div key={`tpgame-${item.value}`} className="list__item" style={Locked ? { alignItems: "center", padding: "0.5rem", background: "#dcffee" } : { alignItems: "center", padding: "0.5rem" }}>
 					<label className="">
@@ -551,12 +554,42 @@ const SubPanel = props => {
 						type={'Number'}
 						iptSubClass='ratio'
 					/>
+				</div>
+			);
+		}
+	);
+	let cashbackGameArr = props.state.cashbackGameCategory.map(
+		item => {
+			let switchKey = `tpgame-switch-${item.value}`;
+			let Data = props.state.specific[props.currencyId].cashbackGames;
+			let Locked = Boolean(Data[item.value]?.status);
+			let value = Data[item.value]?.percentage;
+			let lossAmountvalue = Data[item.value]?.lossAmount;
+			return (
+				<div key={`tpgame-${item.value}`} className="list__item" style={Locked ? { alignItems: "center", padding: "0.5rem", background: "#dcffee" } : { alignItems: "center", padding: "0.5rem" }}>
+					<label className="">
+						<span className="text">{item.displayText}</span>
+					</label>
+					<div className="switch__container">
+						<input id={switchKey} className="switch switch--flat" type="checkbox" checked={Locked} onChange={props.EditCashbackGameCategoryValue.bind(this, item.displayText, item.value, !Locked, "status")} />
+						<label htmlFor={switchKey}></label>
+					</div>
+					<InputBox
+						ClassName="input-item"
+						HideTitle={true}
+						value={value}
+						Disabled={!Locked}
+						OnChange={props.EditCashbackGameCategoryValue.bind(this, item.displayText, item.value)}
+						dataColumn="percentage"
+						type={'Number'}
+						iptSubClass='ratio'
+					/>
 					<InputBoxLossAmount
 						ClassName="input-item"
 						HideTitle={false}
 						value={lossAmountvalue}
 						Disabled={!Locked}
-						OnChange={props.EditTpGameCategoryValue.bind(this, item.displayText, item.value)}
+						OnChange={props.EditCashbackGameCategoryValue.bind(this, item.displayText, item.value)}
 						dataColumn="lossAmount"
 						type={'Number'}
 					/>
@@ -621,12 +654,15 @@ const SubPanel = props => {
 							</div>
 							<div className="row-flex ">
 								<div className="input-item">
-									<label className="label">Tp Games</label>
+									{props.state.promotionType == 6 ? <label className="label">Tp Games</label> : <label className="label">CashBack Games</label>}
 								</div>
 							</div>
-							<div className="row-flex ">
+							{props.state.promotionType == 6 ?<div className="row-flex ">
 								{tpGameArr}
-							</div>
+							</div>:<div className="row-flex ">
+								{cashbackGameArr}
+							</div>}
+							
 						</>
 					) :
 					(props.state.promotionType == 8) ?

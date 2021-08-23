@@ -17,7 +17,8 @@ export const defActionType = {
   GET_SITE_VIPLEVEL: "GET_SITE_VIPLEVEL",
   FORVIPLEVEL_SET_VALUE: "FORVIPLEVEL_SET_VALUE",
   VIPLEVEL_SET_VALUE: "VIPLEVEL_SET_VALUE",
-  GET_CASHBACK_CATEGORIES: "GET_CASHBACK_CATEGORIES"
+  GET_CASHBACK_CATEGORIES: "GET_CASHBACK_CATEGORIES",
+  CURRENCY_SET_CashBackGame_VALUE: "CURRENCY_SET_CashBackGame_VALUE"
 };
 
 export const initialState = (IsAdd, datas, siteList) => {
@@ -167,6 +168,7 @@ const SetSpecific = (currencyList, langList, data) => {
       let _newData = {};
       let lang = JSON.parse(d.details ?? "{}");
       let _tpGameData = {};
+      let _cashbackGameData = {};
       d["lang"] = lang;
       d["selectedLang"] = Object.keys(lang);
       langList
@@ -200,6 +202,19 @@ const SetSpecific = (currencyList, langList, data) => {
           };
         });
         _specific[d.currencyId].tpGames = _tpGameData;
+      }
+      if(d.cashBackList != null){
+        _specific[d.currencyId].cashbackGames = d.cashBackList.forEach((r) => {
+          //tpId 1,27 Wallet Type is Transfer else is Seamless
+          //Seamless index is tpid,Transfer index is gameType
+          var index = (r.tpId !== 1 && r.tpId !== 27) ? r.tpId:r.gameType;
+          _cashbackGameData[index] = {
+            percentage: r.percentage,
+            status: r.status,
+            lossAmount: r.lossAmount
+          };
+        });
+        _specific[d.currencyId].cashbackGames = _cashbackGameData;
       }
     });
   }
@@ -374,7 +389,7 @@ export function reducer(state, action) {
       let _categoryId = categoryInfo.value;
       let _specific = state.specific;
       action.site.currencyList.forEach((item)=>{
-        _specific[item].tpGames= {};
+        _specific[item].cashbackGames= {};
       });
       return {
         ...state,
@@ -398,7 +413,7 @@ export function reducer(state, action) {
     case defActionType.GET_CASHBACK_CATEGORIES:
       let cashbackGameCategory = action.cashbackGameCategory.map((item) => {
         return {
-          value: item.categoryId,
+          value: item.key,
           displayText: item.gameName,
         };
       });
@@ -408,7 +423,6 @@ export function reducer(state, action) {
       };
 
     case defActionType.CURRENCY_SET_TpGame_VALUE:
-      console.log(action,'action');
       return {
         ...state,
         specific: {
@@ -426,6 +440,25 @@ export function reducer(state, action) {
           },
         },
       };
+
+      case defActionType.CURRENCY_SET_CashBackGame_VALUE:
+        return {
+          ...state,
+          specific: {
+            ...state.specific,
+            [action.currencyId]: {
+              ...state.specific[action.currencyId],
+              cashbackGames: {
+                ...state.specific[action.currencyId].cashbackGames,
+                [action.gameType]: {
+                  ...state.specific[action.currencyId].cashbackGames[action.gameType],
+                  [action.dataColumn]: action.value,
+                  gameName: action.gameName,
+                },
+              },
+            },
+          },
+        };
 
     case defActionType.SPECIALBONUS_VALUE:
       return {

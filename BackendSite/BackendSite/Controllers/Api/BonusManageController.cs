@@ -227,7 +227,7 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = _bonusManageBLL.DuplicatePromotion(duplicateRequest.BonusCode,
                     duplicateRequest.SiteId,
-                    duplicateRequest.NewBonusCode) ? 0 : 1;
+                    duplicateRequest.NewBonusCode, User.Identity.Name) ? 0 : 1;
                 apiResult.Message = apiResult.ErrorCode == 1
                     ? "Duplicate fail.The bonus setting already exists which with same promotion-type & product-category."
                     : string.Empty;
@@ -592,9 +592,9 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         [HttpPost]
-        public ApiResult<IEnumerable<TpGames>> GetCashBackGameList([FromForm] GetTpGameListReq para)
+        public ApiResult<IEnumerable<GetCashBackGamerep>> GetCashBackGameList([FromForm] GetTpGameListReq para)
         {
-            var apiResult = new ApiResult<IEnumerable<TpGames>>();
+            var apiResult = new ApiResult<IEnumerable<GetCashBackGamerep>>();
 
             try
             {

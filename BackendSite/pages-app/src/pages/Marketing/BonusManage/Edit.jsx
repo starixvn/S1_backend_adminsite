@@ -92,7 +92,7 @@ export default props => {
 						for (let f_key in state[key][c_key]) {
 							if (skipField.includes(f_key)) continue;
 							let column = state[key][c_key][f_key];
-							if (f_key === "tpGames" && (state.promotionType == 6 || state.promotionType == 7)) {
+							if (f_key === "tpGames" && (state.promotionType == 6)) {
 								if (Object.keys(state[key][c_key][f_key]).length === 0) {
 									alert(
 										`${window.i18n[`lbl_Currency${c_key}`]
@@ -111,7 +111,28 @@ export default props => {
 										break;
 									}
 								}
-							} else if (
+							}
+							else if(f_key === "cashbackGames" && state.promotionType == 7){
+								if (Object.keys(state[key][c_key][f_key]).length === 0) {
+									alert(
+										`${window.i18n[`lbl_Currency${c_key}`]
+										} Please open at least one cashbackGames.` );
+									checked = false;
+									break;
+								}
+								for (let t_key in state[key][c_key][f_key]) {
+									let tpcolumn = state[key][c_key][f_key][t_key];
+									if (Boolean(tpcolumn?.status) && !Boolean(tpcolumn?.percentage) && !Boolean(tpcolumn?.lossAmount)) {
+										alert(
+											`${window.i18n[`lbl_Currency${c_key}`]
+											}'s ${f_key} ${tpcolumn.gameName} percentage or lossAmount does not allow null.`
+										);
+										checked = false;
+										break;
+									}
+								}
+							}
+							else if (
 								(column === null ||
 								column === undefined ||
 								column === "") && f_key !== "affid"
@@ -152,6 +173,12 @@ export default props => {
 				state.selectedVipLevel.length === 0
 			) {
 				alert("[For Vip Level] is Open. Please select at least one level.");
+				checked = false;
+				break;
+			}else if(
+				state.promotionType == 7 && state.selectedVipLevel.length === 0
+			){
+				alert("Please select at least one level.")
 				checked = false;
 				break;
 			}
@@ -237,6 +264,17 @@ export default props => {
 		});
 	};
 
+	const EditCashbackGameCategoryValue = (currencyId, gameName, gameType, value, dataColumn) => {
+		dispatch({
+			type: defActionType.CURRENCY_SET_CashBackGame_VALUE,
+			value,
+			dataColumn,
+			currencyId,
+			gameName,
+			gameType
+		});
+	};
+
 	const EditOnlyRegisteredValue = (value, dataColumn) => {
 		dispatch({ type: defActionType.ONLY_REGISTERED_SET_VALUE, value, dataColumn });
 	};
@@ -284,7 +322,6 @@ export default props => {
 
 	const SelectTpId = (value, dataColumn, mainKey, oIdx) => {
 		let site = props.SiteList.find(s => s.siteId === state.siteId);
-		console.log(site,'site');
 		dispatch({
 			type: defActionType.SET_TPID,
 			idx: oIdx,
@@ -322,7 +359,8 @@ export default props => {
 					EditOnlyRegisteredValue,
 					EditAutoExtendValue,
 					EditForVipLevelValue,
-					EditSelectedVipLevel
+					EditSelectedVipLevel,
+					EditCashbackGameCategoryValue
 				}}
 				siteList={props.SiteList}
 				IsAdd={props.IsAdd}
