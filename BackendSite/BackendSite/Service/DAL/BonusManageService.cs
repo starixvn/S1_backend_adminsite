@@ -606,7 +606,7 @@ namespace BackendSite.Service.DAL
                                 Percentage = r.Percentage,
                                 LossAmount = r.LossAmount,
                                 Status = r.Status,
-                                TpId = promotion.TpId == 0 ? r.GameType : 0
+                                TpId = promotion.TpId == 0 ? r.GameType : promotion.TpId
                             }); 
                         });              
                     }
