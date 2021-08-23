@@ -719,6 +719,33 @@ namespace BackendSite.Controllers.Api
         }
 
         #endregion
+        #region CSD > Customer Administration > CustInfo [ResetCustUSDTInfo]
+
+        [HttpPost]
+        public ApiResult ResetCustUSDTInfo(CustInfoReq custInfoReq)
+        {
+            ApiResult apiResult = new ApiResult();
+            if (custInfoBLL.ResetCustUSDTInfo(custInfoReq.CustId))
+            {
+                string Menu = "CustManage/CustInfoList";
+                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("Action", "Reset USDT Info");
+                serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Reset Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
+            }
+        }
+
+        #endregion
 
         #region CustStatus Setting
 
