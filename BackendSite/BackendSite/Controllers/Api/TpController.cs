@@ -11,6 +11,7 @@ using BackendSite.Service.Library;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using Newtonsoft.Json;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Controllers.Api
 {
@@ -87,6 +88,8 @@ namespace BackendSite.Controllers.Api
             };
 
             var apiResult = await tpBLL.FixNegativeAsync(tpInfo);
+            apiResult.Message = string.IsNullOrWhiteSpace(apiResult.Message) ? apiResult.RawMessage : apiResult.Message;
+
             return apiResult;
         }
         [HttpPost]
@@ -149,7 +152,7 @@ namespace BackendSite.Controllers.Api
         }
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/ThirdPartyAdjustment" })]
-        public async Task<ApiResult> SetAdjustmentTpCustInfo([FromForm] int SiteId, [FromForm] int TpId, [FromForm] string UserName, [FromForm] string UserTpId, [FromForm] int Opt, [FromForm] int Amount, [FromForm] string Memo)
+        public async Task<ApiResult> SetAdjustmentTpCustInfo([FromForm] int SiteId, [FromForm] int TpId, [FromForm] string UserName, [FromForm] string UserTpId, [FromForm] int Opt, [FromForm] decimal Amount, [FromForm] string Memo)
         {
             var apiResult = new ApiResult();
             var custId = (string.IsNullOrEmpty(UserTpId)) ? null : common.TpIdToCustId(UserTpId);
@@ -158,7 +161,7 @@ namespace BackendSite.Controllers.Api
             AdminTpTransfer inTpTransfer = new AdminTpTransfer() { TpId = TpId, CustId = custInfosDetail.CustId, Amount = Amount, direction = (TpDirection)Opt, Operator = User.Identity.Name, Remarks = Memo };
 
             var result = await tpBLL.AdminAdjustmentTransferAsync(inTpTransfer);
-            if(result.ErrorCode == 0)
+            if (result.ErrorCode == (int)ErrorCodeType.Success)
             {
                 var param = new
                 {
@@ -171,7 +174,7 @@ namespace BackendSite.Controllers.Api
                 tpBLL.SetAdjustmentTpCustInfoLog("3RDFundsAdjustment", 1, JsonConvert.SerializeObject(param), User.Identity.Name);
             }
             apiResult.ErrorCode = result.ErrorCode;
-            apiResult.Message = result.Data.ThirdId;
+            apiResult.Message = string.IsNullOrWhiteSpace(result.Message) ? result.RawMessage : result.Message;
 
             return apiResult;
         }

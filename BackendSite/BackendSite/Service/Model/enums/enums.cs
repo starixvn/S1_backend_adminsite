@@ -291,4 +291,8 @@ namespace BackendSite.Service.Model.enums
         Done = 2,
         Invalid = 3
     }
+    public enum ErrorCodeType 
+    { 
+        Success=0
+    }
 }

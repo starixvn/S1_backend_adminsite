@@ -13,6 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using BackendSite.Service.Model.TpMaintain;
 using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
+using BackendSite.Service.DAL;
+using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.Api
 {
@@ -23,12 +25,14 @@ namespace BackendSite.Controllers.Api
     {
         private readonly TpMaintainBLL tpMaintainBLL;
         private readonly ServerInfoBLL serverInfoBLL;
+        private readonly AuthorizeBLL authorizeBLL;
         private readonly ILogger<TpMaintainController> logger;
 
         public TpMaintainController(IServiceProvider provider)
         {
             tpMaintainBLL = provider.GetRequiredService<TpMaintainBLL>();
             serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
+            authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             logger = provider.GetRequiredService<ILogger<TpMaintainController>>();
         }
 
@@ -40,6 +44,8 @@ namespace BackendSite.Controllers.Api
             {
                 input.BeginDate = input.BeginDate.ToUniversalTime();
                 input.EndDate = input.EndDate.ToUniversalTime();
+                input.UpdateUser = authorizeBLL.GetAuthData().UserName;
+
                 if (input.SiteId == 0)//處理ALL 
                 {
                     var list = serverInfoBLL.GetSiteListByLoginUser().Select(server => GetNewTpMaintainBySiteId(input, server));
@@ -54,6 +60,32 @@ namespace BackendSite.Controllers.Api
                 return new ApiResult
                 {
                     ErrorCode = await tpMaintainBLL.InsertTpMaintain(input) ? 0 : -1
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return new ApiResult
+                {
+                    ErrorCode = 999,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
+        public ApiResult UpdateTpMaintainAsync([FromForm] TpMaintain input)
+        {
+            try
+            {
+                input.BeginDate = input.BeginDate.ToUniversalTime();
+                input.EndDate = input.EndDate.ToUniversalTime();
+                input.UpdateUser = authorizeBLL.GetAuthData().UserName;
+
+                return new ApiResult
+                {
+                    ErrorCode = tpMaintainBLL.UpdateTpMaintain(input) ? 0 : -1
                 };
             }
             catch (Exception ex)
@@ -137,13 +169,44 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
+        public ApiResult<IEnumerable<TpMaintain>> GetTpMaintainListByFilter([FromForm] FilterInfo filter)
+        {
+            try
+            {
+                var data = tpMaintainBLL.GetTpMaintainList()
+                    .Where(item => item.SiteFilter(filter))
+                    .Where(item => item.TpFilter(filter))
+                    .Where(item => item.TpGameTypeFilter(filter))
+                    .Where(item => item.TpCategoryIdFilter(filter))
+                    .Where(item => item.DateFilter(filter))
+                    .Where(item => item.ExpiredFilter(filter));
+
+                return new ApiResult<IEnumerable<TpMaintain>>
+                {
+                    Data = data,
+                    ErrorCode = 0
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return new ApiResult<IEnumerable<TpMaintain>>
+                {
+                    ErrorCode = 999,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
         public ApiResult<IEnumerable<TpGameType>> GetTpGameTypeList()
         {
             try
             {
                 return new ApiResult<IEnumerable<TpGameType>>
                 {
-                    Data = tpMaintainBLL.GetTpGameTypeList(),
+                    Data = tpMaintainBLL.GetTpGameTypeList().OrderBy(i => i.Type),
                     ErrorCode = 0
                 };
             }
@@ -151,6 +214,29 @@ namespace BackendSite.Controllers.Api
             {
                 logger.LogError(ex, ex.Message);
                 return new ApiResult<IEnumerable<TpGameType>>
+                {
+                    ErrorCode = 999,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
+        public ApiResult<IEnumerable<TpCategory>> GetTPCategoryList()
+        {
+            try
+            {
+                return new ApiResult<IEnumerable<TpCategory>>
+                {
+                    Data = tpMaintainBLL.GetTPCategoryList(),
+                    ErrorCode = 0
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return new ApiResult<IEnumerable<TpCategory>>
                 {
                     ErrorCode = 999,
                     Message = ex.Message,
@@ -172,7 +258,8 @@ namespace BackendSite.Controllers.Api
                 MaintainType = input.MaintainType,
                 TypeValue = input.TypeValue,
                 BeginTime = input.BeginTime,
-                EndTime = input.EndTime
+                EndTime = input.EndTime,
+                UpdateUser = input.UpdateUser             
             };
         }       
     }

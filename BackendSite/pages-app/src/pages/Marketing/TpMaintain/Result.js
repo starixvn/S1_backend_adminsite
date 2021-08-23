@@ -7,9 +7,9 @@ const SpecialItemType = {
 
 export const dataColumnDefs = () => {
 	return [
-		{ 
-			dataColumn: "sn", 
-			columnTitle: "SN" 
+		{
+			dataColumn: "sn",
+			columnTitle: "SN"
 		},
 		{
 			dataColumn: "siteName",
@@ -30,16 +30,20 @@ export const dataColumnDefs = () => {
 		{
 			dataColumn: "beginDate",
 			columnTitle: "BeginDate Time" + " (" + moment().format('Z') + ")",
-			body:{
-				format:dateFormat
+			body: {
+				format: dateFormat
 			}
 		},
 		{
 			dataColumn: "endDate",
 			columnTitle: "EndDate Time" + " (" + moment().format('Z') + ")",
-			body:{
-				format:dateFormat
+			body: {
+				format: dateFormat
 			}
+		},
+		{
+			dataColumn: "updateUser",
+			columnTitle: "LastUpdateUser"
 		},
 		{
 			columnTitle: "Action",
@@ -66,8 +70,8 @@ const Panel = props => {
 				scope="col"
 				className={
 					element.header &&
-					element.header.attr &&
-					element.header.attr.class
+						element.header.attr &&
+						element.header.attr.class
 						? element.header.attr.class
 						: ""
 				}>
@@ -84,6 +88,7 @@ const Panel = props => {
 					body_content = (
 						<ActionButtons
 							ClickDelete={props.ClickDelete.bind(null, d_idx)}
+							ClickEdit={props.ClickEdit.bind(null, d_idx)}
 						/>
 					);
 				}
@@ -106,8 +111,8 @@ const Panel = props => {
 					key={`td-${element.dataColumn}-${c_idx}`}
 					className={
 						element.body &&
-						element.body.attr &&
-						element.body.attr.class
+							element.body.attr &&
+							element.body.attr.class
 							? element.body.attr.class
 							: ""
 					}>
@@ -134,6 +139,9 @@ const Panel = props => {
 const ActionButtons = props => {
 	return (
 		<div className="button-action">
+			<button className="btn btn-edit" title="Only can edit time column." onClick={props.ClickEdit}>
+				<i className="icon-edit"></i>
+			</button>
 			<button className="btn btn-icon-delete" onClick={props.ClickDelete}>
 				<i className="icon-delete"></i>
 			</button>
@@ -141,8 +149,8 @@ const ActionButtons = props => {
 	);
 };
 
-const dateFormat = (time)=>{
+const dateFormat = (time) => {
 	return moment.utc(time).local().format('YYYY-MM-DD HH:mm');
-  }
+}
 
 export default Panel;

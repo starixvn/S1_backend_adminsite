@@ -39,6 +39,8 @@ namespace BackendSite.Service.Model
         public string AccountNo { set; get; }
         public string AccountName { set; get; }
         public string IFSCCode { set; get; }
+        public string NickName { set; get; }
+        public string AccountType { set; get; }
         public string RefId { set; get; }
         public bool HasPhotoId { set; get; }
         public string VipLevelName { set; get; }
@@ -82,6 +84,10 @@ namespace BackendSite.Service.Model
         public int? BankId { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int? CurrencyId { set; get; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string AccountType { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string NickName { get; set; }
     }
     public class WithdrawalInfoForExport
     {

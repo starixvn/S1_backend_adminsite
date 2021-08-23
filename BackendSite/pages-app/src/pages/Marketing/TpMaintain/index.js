@@ -5,6 +5,7 @@ import WebAPI from "../../../module//WebAPI";
 import EditPanel from "./Edit";
 import moment from "moment";
 import qs from "qs";
+import Filter from "./Filter";
 
 const defaultModel = {
   SN: "",
@@ -21,10 +22,22 @@ const App = () => {
     ShowSettingPanel: false,
     IsAdd: false,
   });
-
   const [siteList, setSiteList] = useState([]);
   const [tpList, setTpList] = useState([]);
   const [typeList, setTypeList] = useState([]);
+  const [tpCategoryList, setTpCategoryList] = useState([]);
+
+  const dateformat = "YYYY-MM-DD";
+  const [stateFilter, setFilter] = useState({
+    SiteId: [],
+    StartDate: moment().add(-10, "days").format(dateformat),
+    EndDate: moment().add(+10, "days").format(dateformat),
+    TpId:0,
+    TpGameType:0,
+    TpCategoryId:0,
+    IsExpired:false,
+  });
+
   useEffect(() => {
     GetTpMaintainList();
 
@@ -50,8 +63,16 @@ const App = () => {
     });
 
     WebAPI.PostData({ Url: "TpMaintain/GetTpGameTypeList" }).then((res) => {
-      if (res.data.errorCode === 0) {    
+      if (res.data.errorCode === 0) {
         setTypeList(res.data.data);
+      } else {
+        alert(res.data.message ?? "failed to get data.");
+      }
+    });
+
+    WebAPI.PostData({ Url: "TpMaintain/GetTPCategoryList" }).then((res) => {
+      if (res.data.errorCode === 0) {
+        setTpCategoryList(res.data.data);
       } else {
         alert(res.data.message ?? "failed to get data.");
       }
@@ -60,7 +81,7 @@ const App = () => {
   }, []);
 
   const GetTpMaintainList = () => {
-    
+
     let param = {
       Url: "TpMaintain/GetTpMaintainList"
     };
@@ -76,21 +97,21 @@ const App = () => {
     });
   };
 
-  const InsertTpMaintain = (datas, tpGametype) => {
-    let insertData = {
+  const SetTpMaintain = (datas, tpGameTypeList, isAdd) => {
+    let SetData = {
       siteId: datas.siteId,
-      tpId: datas.id,
+      tpId: datas.tpId,
       beginDate: moment(datas.beginDate).toJSON(),
       endDate: moment(datas.endDate).toJSON(),
       maintainType: "Date",
-      tpGameTypeList: tpGametype
+      tpGameTypeList: tpGameTypeList,
+      sn: datas.sn
     };
-    
+
     let param = {
-      Url: "TpMaintain/InsertTpMaintain",
-      Data: qs.stringify(insertData),
+      Url: isAdd ? "TpMaintain/InsertTpMaintain" : "TpMaintain/UpdateTpMaintain",
+      Data: qs.stringify(SetData),
     };
-    
     WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {
         alert("success.");
@@ -126,9 +147,95 @@ const App = () => {
     }
   };
 
+  const EditTpMaintain = (idx) => {
+    alert("Only can edit time column.");
+    updateDatas({
+      ...stateDatas,
+      ShowSettingPanel: true,
+      SettingDatas: stateDatas.Datas[idx],
+      IsAdd: false,
+    });
+  };
+
+  const Filter_CheckBox_OnChange = (v, dataColumn) => {
+    let isRemove = stateFilter[dataColumn].includes(v);
+    let newChecked = isRemove
+      ? stateFilter[dataColumn].filter((value) => value !== v)
+      : stateFilter[dataColumn].push(v);
+    let currentTab = stateFilter[dataColumn];
+    if (newChecked.length === 0) {
+      currentTab = [];
+    } else if (currentTab === null) {
+      currentTab = newChecked;
+    }
+
+    if (isRemove && !newChecked.includes(currentTab)) {
+      currentTab = newChecked.length === 0 ? [] : newChecked;
+    }
+    setFilter({
+      ...stateFilter,
+      [dataColumn]: currentTab,
+    });
+  };
+
+  const Filter_CheckBox_CheckAll = (v, dataColumn, options) => {
+    if (v !== "ALL") return false;
+    let currentTab =
+      stateFilter[dataColumn].length === options.length
+        ? []
+        : options.map((o) => {
+          return o.value;
+        });
+    setFilter({
+      ...stateFilter,
+      [dataColumn]: currentTab,
+    });
+  };
+
+  const SetFilter = (v, dataColumn) => {
+    setFilter({
+      ...stateFilter,
+      [dataColumn]: v,
+    });
+  };
+
+  const Filter_Search = () => {
+    if (stateFilter.SiteId.length === 0) {
+      alert("Please Choose at least one Site");
+      return false;
+    }
+
+    let filterData = {
+      ...stateFilter,
+      SiteId: stateFilter.SiteId,
+      TpId: stateFilter.TpId,
+      TpGameType: stateFilter.TpGameType, 
+      TpCategoryId: stateFilter.TpCategoryId,
+      StartDate: stateFilter.StartDate,
+      EndDate: stateFilter.EndDate,
+      IsExpired: $('#IsExpired').prop('checked'),
+    };
+    let param = {
+      Url: "TpMaintain/GetTpMaintainListByFilter",
+      Data: qs.stringify(filterData),
+    };
+
+    WebAPI.PostData(param).then((res) => {
+      if (res.data.errorCode === 0) {
+        updateDatas({
+          Datas: [...res.data.data],
+        });
+      } else {
+        alert(res.data.message ?? "failed to get data.");
+      }
+    });
+  };
+
+
   return (
     <div className="container-fluid">
-      <h4 className="page-name">Maintenance</h4>
+      <h4 className="page-name">{`${stateDatas.ShowSettingPanel ? (stateDatas.IsAdd ? "Add " : "Edit ") : ""
+        }Maintenance`} </h4>
       {stateDatas.ShowSettingPanel ? (
         <EditPanel
           siteList={siteList}
@@ -140,10 +247,24 @@ const App = () => {
               ShowSettingPanel: false,
             });
           }}
-          InsertTpMaintain={InsertTpMaintain}
+          Datas={stateDatas.SettingDatas}
+          IsAdd={stateDatas.IsAdd}
+          SetTpMaintain={SetTpMaintain}
         />
       ) : (
         <>
+          <Filter
+            filterInfo={stateFilter}
+            SiteList={siteList}
+            tpList={tpList}
+            typeList={typeList}
+            tpCategoryList={tpCategoryList}
+            SetFilter={SetFilter}
+            onChangeCheckBox={Filter_CheckBox_OnChange}
+            onChangeAllCheckBox={Filter_CheckBox_CheckAll}
+            ClickSearch={Filter_Search}
+          />
+
           <button
             className="btn btn-add"
             style={{ marginBottom: "20px" }}
@@ -162,6 +283,7 @@ const App = () => {
             <Result
               Datas={stateDatas.Datas}
               ClickDelete={DeleteTpMaintain}
+              ClickEdit={EditTpMaintain}
             />
           )}
         </>
