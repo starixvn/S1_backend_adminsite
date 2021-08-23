@@ -28,6 +28,9 @@ const Panel = () => {
     EndTime: moment.utc(new Date()).add(8, "hour").format("l LTS"),
     DateQuickPicker: "0",
   });
+  const [stateDatas, setDatas] = React.useState({
+    FilterInfo: null,
+  });
 
   const EditfilterData = (v, col) => {
     setfilterData({
@@ -101,6 +104,9 @@ const Panel = () => {
         if (result.errorCode == 0) {
           setWeekDatas(result.data);
           setInfoType("week");
+          setDatas({
+            FilterInfo:filterData
+          });
         } else {
           alert(result.message);
         }
@@ -123,6 +129,9 @@ const Panel = () => {
           if (result.errorCode == 0) {
             setWeekDatas(result.data);
             setInfoType("week");
+            setDatas({
+              FilterInfo:filterData
+            });
           } else {
             alert(result.message);
           }
@@ -140,6 +149,8 @@ const Panel = () => {
       .post("/api/Payment/GetCustTpBetRecordListOneDay", {
         CustId: CustId,
         selDate: moment(Date).format("YYYY-MM-DD"),
+        StartDate: moment(stateDatas.FilterInfo.StartTime).unix(),
+        EndDate: moment(stateDatas.FilterInfo.EndTime).unix(),
       })
       .then((res) => {
         let result = res.data;
@@ -161,6 +172,8 @@ const Panel = () => {
         CustId: CustId,
         selDate: moment(Date).format("YYYY-MM-DD"),
         CategoryId: parseInt(CategoryId),
+        StartDate: moment(stateDatas.FilterInfo.StartTime).unix(),
+        EndDate: moment(stateDatas.FilterInfo.EndTime).unix(),
       })
       .then((res) => {
         let result = res.data;
@@ -182,6 +195,8 @@ const Panel = () => {
         CustId: CustId,
         selDate: moment(Date).format("YYYY-MM-DD"),
         gameTypeId: parseInt(GameTypeId),
+        StartDate: moment(stateDatas.FilterInfo.StartTime).unix(),
+        EndDate: moment(stateDatas.FilterInfo.EndTime).unix(),
         PageSize: 15,
         PageNumber: PageNumber,
       })

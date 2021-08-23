@@ -112,6 +112,8 @@ namespace BackendSite.Controllers.Api
         {
             public int CustId { get; set; }
             public string SelDate { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
         }
 
         public class CustTpBetRecordListbyCategoryIdReq
@@ -119,6 +121,8 @@ namespace BackendSite.Controllers.Api
             public int CustId { get; set; }
             public string SelDate { get; set; }
             public int CategoryId { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
         }
 
         public class CustTpBetRecordDetailListbyGameTypeReq
@@ -126,6 +130,8 @@ namespace BackendSite.Controllers.Api
             public int CustId { get; set; }
             public string SelDate { get; set; }
             public int GameTypeId { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
         }
@@ -470,7 +476,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneDay>>();
             apiResult.ErrorCode = 0;
             apiResult.Data = _paymentBLL.GetCustTpBetRecordListOneDay(custTpBetRecordListOneDayReq.CustId,
-                custTpBetRecordListOneDayReq.SelDate);
+                custTpBetRecordListOneDayReq.SelDate, custTpBetRecordListOneDayReq.StartDate, custTpBetRecordListOneDayReq.EndDate);
             return apiResult;
         }
 
@@ -491,7 +497,7 @@ namespace BackendSite.Controllers.Api
             apiResult.ErrorCode = 0;
             apiResult.Data = _paymentBLL.GetCustTpBetRecordListbyCategoryId(custTpBetRecordListbyCategoryIdReq.CustId,
                 custTpBetRecordListbyCategoryIdReq.SelDate,
-                custTpBetRecordListbyCategoryIdReq.CategoryId);
+                custTpBetRecordListbyCategoryIdReq.CategoryId, custTpBetRecordListbyCategoryIdReq.StartDate, custTpBetRecordListbyCategoryIdReq.EndDate);
             return apiResult;
         }
 
@@ -519,6 +525,8 @@ namespace BackendSite.Controllers.Api
                 custTpBetRecordDetailListbyGameTypeReq.CustId,
                 custTpBetRecordDetailListbyGameTypeReq.SelDate,
                 custTpBetRecordDetailListbyGameTypeReq.GameTypeId,
+                custTpBetRecordDetailListbyGameTypeReq.StartDate,
+                custTpBetRecordDetailListbyGameTypeReq.EndDate,
                 PageSize,
                 ref PageNumber,
                 ref TotalPages,

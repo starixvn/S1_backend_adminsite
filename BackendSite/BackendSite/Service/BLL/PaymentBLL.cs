@@ -116,21 +116,21 @@ namespace BackendSite.Service.BLL
             return walletService.GetCustTpBetRecordListOneWeek(custId);
         }
 
-        public IEnumerable<TpBetRecordListOneDay> GetCustTpBetRecordListOneDay(int custId, string selDate)
+        public IEnumerable<TpBetRecordListOneDay> GetCustTpBetRecordListOneDay(int custId, string selDate,long startDate,long endDate)
         {
-            return walletService.GetCustTpBetRecordListOneDay(custId, selDate);
+            return walletService.GetCustTpBetRecordListOneDay(custId, selDate, startDate, endDate);
         }
 
         public IEnumerable<TpBetRecordbyCategoryId> GetCustTpBetRecordListbyCategoryId(int custId, string selDate,
-            int categoryId)
+            int categoryId, long startDate, long endDate)
         {
-            return walletService.GetCustTpBetRecordListbyCategoryId(custId, selDate, categoryId);
+            return walletService.GetCustTpBetRecordListbyCategoryId(custId, selDate, categoryId, startDate, endDate);
         }
 
         public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId,
-            string selDate, int gameTypeId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+            string selDate, int gameTypeId, long startDate, long endDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
-            return walletService.GetCustTpBetRecordDetailListbyGameType(custId, selDate, gameTypeId, PageSize,
+            return walletService.GetCustTpBetRecordDetailListbyGameType(custId, selDate, gameTypeId, startDate, endDate, PageSize,
                 ref PageNumber, ref TotalPages, ref RowCount);
         }
 
