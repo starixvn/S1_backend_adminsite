@@ -237,12 +237,12 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int SetLeaderboardExtraPoint(long activeDate, int categoryId, string userName, decimal extraPoint, string lastUpdateUser)
+        public int SetLeaderboardExtraPoint(long activeDate, int siteId, int categoryId, string userName, decimal extraPoint, string lastUpdateUser)
         {
             
             int Rtn = -1;
 
-            var p = new DynamicParameters(new { _ActiveDate = activeDate, _CategoryId = categoryId, _UserName = userName, _ExtraPoint = extraPoint, _LastUpdateUser = lastUpdateUser });
+            var p = new DynamicParameters(new { _ActiveDate = activeDate, _SiteId = siteId, _CategoryId = categoryId, _UserName = userName, _ExtraPoint = extraPoint, _LastUpdateUser = lastUpdateUser });
             p.Add("RTN", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));

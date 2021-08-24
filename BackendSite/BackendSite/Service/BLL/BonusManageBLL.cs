@@ -209,9 +209,9 @@ namespace BackendSite.Service.BLL
         {
             return _bonusManageService.GetLeaderboardExtraPointList(selectSite, categoryType, currencyId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
-        public int SetLeaderboardExtraPoint(long activeDate, int categoryId, string userName, decimal extraPoint, string lastUpdateUser)
+        public int SetLeaderboardExtraPoint(long activeDate, int siteId, int categoryId, string userName, decimal extraPoint, string lastUpdateUser)
         {
-            return _bonusManageService.SetLeaderboardExtraPoint( activeDate, categoryId, userName, extraPoint, lastUpdateUser);
+            return _bonusManageService.SetLeaderboardExtraPoint( activeDate, siteId, categoryId, userName, extraPoint, lastUpdateUser);
         }
     }
 }

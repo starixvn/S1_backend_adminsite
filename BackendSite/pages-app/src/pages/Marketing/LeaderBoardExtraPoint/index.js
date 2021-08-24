@@ -13,7 +13,7 @@ const App = () => {
   const [stateFilter, setFilter] = useState({
     SelectSite: [],
     StartDate: moment().add(-10, "days").format("l"),
-    EndDate: moment().format("l"),
+    EndDate: moment().add(5, "days").format("l"),
     Currency: "0",
     User: "",
     Category: "0",
@@ -22,6 +22,7 @@ const App = () => {
   });
   const [stateExtraPointitem, setExtraPointitem] = useState({
     ActiveDate:moment().format("l"),
+    SiteId:1,
     CategoryId:1,
     UserName:"",
     ExtraPoint:0
@@ -71,20 +72,16 @@ const App = () => {
             });
           }
           Filter_CheckBox_CheckAll("All", "SelectSite",siteListOptions);
-          //DatePicker_OnChange(3);
-          console.log("stateFilter",stateFilter);
-          //Filter_Submit();
           let Data = {
             SelectSite: SiteIds,
             Currency: 0,
             CategoryId: 0,
-            //StartDate: moment.utc(moment().add(-10, "days").format("l")).unix(),
             StartDate: moment.utc(moment().add(-10, "days").format("l")).unix(),
-            EndDate: moment.utc(moment().format("l")).unix(),
+            EndDate: moment.utc(moment().add(5, "days").format("l")).unix(),
             PageNumber: 1,
             PageSize: 10,
           };
-          console.log('Data',Data);
+          
           api
             .post("/api/BonusManage/GetLeaderboardExtraPointList", Data)
             .then(function (res) {
@@ -116,39 +113,7 @@ const App = () => {
   }, []);
 
 
-  // useEffect(() => {
-  //   //Filter_CheckBox_CheckAll
-  //   console.log(stateDatas.FilterInfo);
-  //   let Data = {
-  //     SelectSite: [1,2,3],
-  //     Currency: 0,
-  //     CategoryId: 0,
-  //     StartDate: moment().startOf("week").unix(),
-  //     EndDate: moment().endOf("week").unix(),
-  //     PageNumber: 1,
-  //     PageSize: 10,
-  //   };
-
-  //   api
-  //     .post("/api/Payment/GetVipRebateInfoList", Data)
-  //     .then(function (res) {
-  //       if (res.data.errorCode === 0) {
-  //         setDatas({
-  //           ...stateDatas,
-  //           PageInfo: {
-  //             ...stateDatas.PageInfo,
-  //             pageNumber: 1,
-  //           },
-  //           Datas: [...res.data.data],
-  //         });
-  //       } else {
-  //         alert(res.data.message ?? "failed to get data.");
-  //       }
-  //     })
-  //     .catch(function (error) {
-  //       alert(error);
-  //     });
-  //   }, []);
+  
 
     const GetInitSelectedSiteName = (props) => {
       let headerRows = [];
@@ -229,7 +194,6 @@ const App = () => {
   };
 
   const addExtraPoint_OnChange = (v, dataColumn) => {
-    console.log("v:",v,"dataColumn",dataColumn,stateExtraPointitem);
     setExtraPointitem({
       ...stateExtraPointitem,
       [dataColumn]: v,
@@ -262,27 +226,21 @@ const App = () => {
       ...stateDatas,
       IsAdd: true,
     });
-    console.log(stateDatas);
   };
   const Filter_CheckBox_CheckAll = (v, dataColumn, options) => {
-    console.log(v,dataColumn,options);
     if (v !== "All") return false;
-    console.log("stateFilter[dataColumn].length",stateFilter[dataColumn].length);
-    console.log("options.length",options.length);
     let currentTab =
       stateFilter[dataColumn].length === options.length
         ? []
         : options.map((o) => {
             return o.value;
           });
-          console.log("options.currentTab",currentTab);
     setFilter({
       ...stateFilter,
       [dataColumn]: currentTab,
     });
   };
   const Filter_Submit = () => {
-    console.log('stateFilter',stateFilter);
     if (stateFilter.SelectSite.length === 0) {
       alert("Please Choose at least one Site");
       return false;
@@ -297,7 +255,6 @@ const App = () => {
       PageNumber: 1,
       PageSize: 10
     };
-    console.log('Data',Data);
     api
       .post("/api/BonusManage/GetLeaderboardExtraPointList", Data)
       .then(function (res) {
@@ -337,7 +294,6 @@ const App = () => {
       PageNumber: PageNumber,
       PageSize: 10
     };
-    console.log('Data',Data);
     api
       .post("/api/BonusManage/GetLeaderboardExtraPointList", Data)
       .then(function (res) {
@@ -365,11 +321,11 @@ const App = () => {
   const Add_ExtraPointItem = () => {
     let Data = {
       ActiveDate :moment(stateExtraPointitem.ActiveDate).unix(),
+      SiteId:parseInt(stateExtraPointitem.SiteId),
       CategoryId:parseInt(stateExtraPointitem.CategoryId),
       UserName:stateExtraPointitem.UserName,
       ExtraPoint:parseFloat(stateExtraPointitem.ExtraPoint)
     };
-    console.log('Add_ExtraPointItem Data',Data,"stateExtraPointitem",stateExtraPointitem);
     api
       .post("/api/BonusManage/SetLeaderboardExtraPoint", Data)
       .then(function (res) {
@@ -391,7 +347,7 @@ const App = () => {
       <h4 className="page-name">LeaderBoard ExtraPoint</h4>
       {stateDatas.IsAdd ? (
         <EditPanel
-          siteList={siteList}
+          SiteList={siteList}
           ClickBack={() => {
             setDatas({
               ...stateDatas,

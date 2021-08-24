@@ -110,6 +110,7 @@ namespace BackendSite.Controllers.Api
         public class SetLeaderboardExtraPointReq
         {
             public long ActiveDate { get; set; }
+            public int SiteId { get; set; }
             public int CategoryId { get; set; }
             public string UserName { get; set; }
             public decimal ExtraPoint { get; set; }
@@ -646,8 +647,8 @@ namespace BackendSite.Controllers.Api
             apiResult.Message = "Unknown Error";
             string UserName = _authorizeBLL.GetAuthData().UserName;
             int rtn = _bonusManageBLL.SetLeaderboardExtraPoint(
-                setLeaderboardExtraPointReq.ActiveDate, setLeaderboardExtraPointReq.CategoryId, setLeaderboardExtraPointReq.UserName,
-                setLeaderboardExtraPointReq.ExtraPoint, UserName
+                setLeaderboardExtraPointReq.ActiveDate, setLeaderboardExtraPointReq.SiteId, setLeaderboardExtraPointReq.CategoryId, 
+                setLeaderboardExtraPointReq.UserName, setLeaderboardExtraPointReq.ExtraPoint, UserName
                 );
             if (rtn == 0)
             {

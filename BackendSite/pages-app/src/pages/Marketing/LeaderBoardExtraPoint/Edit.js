@@ -12,6 +12,15 @@ const elemType = {
 
 
 const EditPanel = props => {
+	let siteListOptions = "";
+  if (props.SiteList) {
+    siteListOptions = props.SiteList.map((i) => {
+      return {
+        value: Number(i.siteId),
+        displayText: i.siteName,
+      };
+    });
+  }
 	const [stateData, updateData] = useState({
 		...props.Datas,
 		subject: props.IsAdd ? {} : JSON.parse(props.Datas.subject),
@@ -107,6 +116,18 @@ const EditPanel = props => {
 					},
 				}}
 				/>
+			{siteListOptions ? (
+			<DropDownBox
+				columnTitle="Site"
+				options={siteListOptions.map((x, index) => {
+				return { value: x.value, displayText: x.displayText };
+				})}
+				hasAll={false}
+				selectedValue={1}
+				dataColumn="SiteId"
+				onChange={props.onChange}
+			/>
+			) : null}
 			{props.CategoryList !== null ? (
 			<DropDownBox
 				columnTitle="Category"
@@ -224,7 +245,6 @@ const SettingContent = props => {
 };
 const InputBox = (props) => {
     const OnChange = (e) => {
-		console.log("e.target",e.target,"props",props);
 	  if (props.onChange) {
 		props.onChange(e.target.value, props.dataColumn);
 	  }
@@ -249,7 +269,6 @@ const InputBox = (props) => {
 }
 const InputField = (props) => {
 	const onChange = (e) => {
-		console.log("e.target",e.target,"props",props);
 	  if (props.onChange) {
 		props.onChange(e.target.value, props.dataColumn);
 	  }
