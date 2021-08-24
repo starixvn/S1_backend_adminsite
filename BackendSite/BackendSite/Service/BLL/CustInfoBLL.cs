@@ -194,6 +194,10 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.ResetCustBankInfo(CustId);
         }
+        public bool ResetCustUSDTInfo(int CustId)
+        {
+            return custInfoService.ResetCustUSDTInfo(CustId);
+        }
         public decimal GetWithdrawalAvailableBalance(int custId)
         {
             return custInfoService.GetWithdrawalAvailableBalance(custId);

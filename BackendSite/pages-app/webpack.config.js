@@ -210,9 +210,13 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Finance/WithdrawalAccounting/index.js",
     // ],
-    "CSD/RegistrationManagement.min": [
-      '@babel/polyfill',
-    "./src/pages/CSD/RegistrationManagement/index.js",
+    // "CSD/RegistrationManagement.min": [
+    //   '@babel/polyfill',
+    // "./src/pages/CSD/RegistrationManagement/index.js",
+    // ],
+    "Marketing/LeaderBoardExtraPoint.min": [
+    	 '@babel/polyfill',
+    	"./src/pages/Marketing/LeaderBoardExtraPoint/index.js"
     ],
   },
   output: {

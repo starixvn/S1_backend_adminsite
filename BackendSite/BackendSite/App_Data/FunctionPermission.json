@@ -460,6 +460,11 @@
         "DisplayKey": "Venders Maintenance",
         "FuncKey": "Marketing/TpMaintain",
         "Enable": false
+      },
+      {
+        "DisplayKey": "LeaderBoard ExtraPoint",
+        "FuncKey": "Marketing/LeaderBoardExtraPoint",
+        "Enable": false
       }
     ]
   },
