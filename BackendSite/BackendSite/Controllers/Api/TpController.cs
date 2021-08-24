@@ -88,6 +88,8 @@ namespace BackendSite.Controllers.Api
             };
 
             var apiResult = await tpBLL.FixNegativeAsync(tpInfo);
+            apiResult.Message = string.IsNullOrWhiteSpace(apiResult.Message) ? apiResult.RawMessage : apiResult.Message;
+
             return apiResult;
         }
         [HttpPost]

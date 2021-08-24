@@ -1,13 +1,9 @@
-﻿using BackendSite.Service.Model;
-using BackendSite.Service.Model.TpMaintain;
+﻿using BackendSite.Service.Model.TpMaintain;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
 
 namespace BackendSite.Service.DAL
@@ -36,7 +32,13 @@ namespace BackendSite.Service.DAL
         public bool InsertTpMaintain(TpMaintain input)
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.QueryFirst<int>("Admin_TpMaintainV1_Ins", new DynamicParameters(input), commandType: CommandType.StoredProcedure) > 0;
+            return conn.QueryFirst<int>("Admin_TpMaintainV2_Ins", new DynamicParameters(input), commandType: CommandType.StoredProcedure) > 0;
+        }
+
+        public bool UpdateTpMaintain(TpMaintain input)
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_TpMaintain_Set", new DynamicParameters(input), commandType: CommandType.StoredProcedure) > 0;
         }
 
         public bool DeleteTpMaintain(int sn)
@@ -49,6 +51,12 @@ namespace BackendSite.Service.DAL
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.Query<TpGameType>("Admin_TpGameType_Get", commandType: CommandType.Text);
+        }
+
+        public IEnumerable<TpCategory> GetTPCategoryList()
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Query<TpCategory>("Admin_TPCategory_Get", commandType: CommandType.Text);
         }
     }
 }

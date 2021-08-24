@@ -101,16 +101,17 @@ namespace BackendSite.Service.BLL
             }
 
             return _bonusManageService.SetPromotionFlow(isAdd, promotion, promotionDisplayConditionList,
-                0, 0, 0, Operator);
+                0, 0, 0, Operator, vipLevelCondition);
         }
 
-        public bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode)
+        public bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode,string Operator)
         {
             //return _bonusManageService.DuplicatePromotion(bonusCode, siteId, newBonusCode);
 
             var expectedSpecificRow = _bonusManageService.GetPromotionSpecific(bonusCode, siteId).Count();
             var expectedRebateRow = _bonusManageService.GetPromotionRebate(bonusCode, siteId).Count();
             var expectedConditionRow = _bonusManageService.GetPromotionDisplayCondition(bonusCode, siteId).Count();
+            var expectedCashBackRow = _bonusManageService.GetPromotionCashBack(bonusCode, siteId).Count();
 
 
             return _bonusManageService.DuplicatePromotionFlow(bonusCode,
@@ -118,7 +119,9 @@ namespace BackendSite.Service.BLL
                  newBonusCode,
                  expectedSpecificRow,
                  expectedRebateRow,
-                 expectedConditionRow);
+                 expectedConditionRow,
+                 expectedCashBackRow,
+                 Operator);
         }
 
         public int SetPromotionStatus(string bonusCode, int siteId, int status)
@@ -135,6 +138,33 @@ namespace BackendSite.Service.BLL
         public IEnumerable<TpGameType> GetTpGameList()
         {
             return _bonusManageService.GetTpGameList();
+        }
+
+        public IEnumerable<GetCashBackGamerep> GetCashBackGameList(int tpId,int categoryId)
+        {
+            List<GetCashBackGamerep> result = new List<GetCashBackGamerep>();
+            var trmpresult = _bonusManageService.GetCashBackGameList(tpId, categoryId);
+
+            //tpId == 0,WalletType is Seamless
+            //tpId != 0,WalletType is Transfer
+            if (tpId == 0)
+            {
+                //WalletType is Seamless key by tpid
+                trmpresult.ToList().ForEach(x =>
+                {
+                    result.Add(new GetCashBackGamerep {GameName= x.GameName,Key = x.TpId});
+                });
+            }
+            else
+            {
+                //WalletType is Seamless key by CategoryId
+                trmpresult.ToList().ForEach(x =>
+                {
+                    result.Add(new GetCashBackGamerep { GameName = x.GameName, Key = x.CategoryId });
+                });
+            }
+            
+            return result;
         }
 
         public async Task<BonusImportResult> BonusImportAsync(BonusImportPara bonusImportPara)

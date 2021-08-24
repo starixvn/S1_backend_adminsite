@@ -96,6 +96,7 @@ namespace BackendSite.Controllers.Api
             public int FilterType { get; set; }
         }
 
+
         public class LeaderboardExtraPointReq
         {
             public IEnumerable<int> SelectSite { get; set; }
@@ -116,6 +117,11 @@ namespace BackendSite.Controllers.Api
             public decimal ExtraPoint { get; set; }
         }
         
+        public class GetTpGameListReq
+        {
+            public int TpId { get; set; }
+            public int CategoryId { get; set; }
+        }
         #endregion
 
         #region Action
@@ -242,7 +248,7 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = _bonusManageBLL.DuplicatePromotion(duplicateRequest.BonusCode,
                     duplicateRequest.SiteId,
-                    duplicateRequest.NewBonusCode) ? 0 : 1;
+                    duplicateRequest.NewBonusCode, User.Identity.Name) ? 0 : 1;
                 apiResult.Message = apiResult.ErrorCode == 1
                     ? "Duplicate fail.The bonus setting already exists which with same promotion-type & product-category."
                     : string.Empty;
@@ -596,6 +602,24 @@ namespace BackendSite.Controllers.Api
             try
             {
                 apiResult.Data = _bonusManageBLL.GetTpGameList();
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+        [HttpPost]
+        public ApiResult<IEnumerable<GetCashBackGamerep>> GetCashBackGameList([FromForm] GetTpGameListReq para)
+        {
+            var apiResult = new ApiResult<IEnumerable<GetCashBackGamerep>>();
+
+            try
+            {
+                apiResult.Data = _bonusManageBLL.GetCashBackGameList(para.TpId,para.CategoryId);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
