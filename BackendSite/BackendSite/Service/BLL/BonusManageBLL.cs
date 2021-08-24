@@ -235,5 +235,13 @@ namespace BackendSite.Service.BLL
                 ScratchCardList = ScratchCardList.Where(x => x.Joiner != "-");
             return ScratchCardList;
         }
+        public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(IEnumerable<int> selectSite, int categoryType, int currencyId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        {
+            return _bonusManageService.GetLeaderboardExtraPointList(selectSite, categoryType, currencyId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+        }
+        public int SetLeaderboardExtraPoint(long activeDate, int siteId, int categoryId, string userName, decimal extraPoint, string lastUpdateUser)
+        {
+            return _bonusManageService.SetLeaderboardExtraPoint( activeDate, siteId, categoryId, userName, extraPoint, lastUpdateUser);
+        }
     }
 }

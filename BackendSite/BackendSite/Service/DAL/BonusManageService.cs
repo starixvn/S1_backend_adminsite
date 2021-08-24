@@ -219,6 +219,44 @@ namespace BackendSite.Service.DAL
                     commandType: CommandType.StoredProcedure);
             }
         }
+        public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(IEnumerable<int> selectSite, int categoryType, int currencyId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        {
+            string SelectSite = null;
+            if (selectSite != null && selectSite.Any())
+            {
+                SelectSite = JsonConvert.SerializeObject(selectSite);
+            }
+            totalPages = 0;
+
+            var p = new DynamicParameters(new { SelectSite, CategoryType = categoryType, CurrencyId = currencyId, PageSize = pageSize });
+            p.Add("StartDate", startDate);
+            p.Add("EndDate", endDate);
+            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            var result = conn.Query<LeaderboardExtraPointList>("Admin_LeaderboardExtraPoint_Get", p, commandType: CommandType.StoredProcedure);
+            pageNumber = p.Get<int?>("PageNumber") ?? 0;
+            totalPages = p.Get<int?>("TotalPages") ?? 0;
+            rowCount = p.Get<int?>("RowCount") ?? 0;
+            return result;
+        }
+
+        public int SetLeaderboardExtraPoint(long activeDate, int siteId, int categoryId, string userName, decimal extraPoint, string lastUpdateUser)
+        {
+            
+            int Rtn = -1;
+
+            var p = new DynamicParameters(new { _ActiveDate = activeDate, _SiteId = siteId, _CategoryId = categoryId, _UserName = userName, _ExtraPoint = extraPoint, _LastUpdateUser = lastUpdateUser });
+            p.Add("RTN", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            int result = conn.Execute("Admin_LeaderboardExtraPoint_Set", p, commandType: CommandType.StoredProcedure);
+            Rtn = p.Get<int?>("RTN") ?? -1;
+            return Rtn;
+        }
 
         #region Public Method
 
