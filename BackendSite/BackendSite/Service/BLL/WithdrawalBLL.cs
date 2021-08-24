@@ -347,7 +347,8 @@ namespace BackendSite.Service.BLL
                 {
                     TimeSpan ts1 = new TimeSpan(x.CreateTime.Ticks);
                     TimeSpan ts2 = new TimeSpan(x.UpdateTime.Ticks);
-                    TimeSpan ts = ts1.Subtract(ts2).Duration();
+                    TimeSpan timeSpanOfFlowEndTime = new TimeSpan(x.FlowEndTime.Ticks);
+                    TimeSpan ts = ts1.Subtract(timeSpanOfFlowEndTime).Duration();
                     x.CompleteTime = GetTimeString(ts);
                     if (x.VerifyTime > DateTime.Now.AddYears(-1000))
                     {
@@ -355,7 +356,7 @@ namespace BackendSite.Service.BLL
                         TimeSpan tsv = ts1.Subtract(ts3).Duration();
                         if (x.Status == 6)
                         {
-                            TimeSpan tsa = ts3.Subtract(ts2).Duration();
+                            TimeSpan tsa = ts3.Subtract(timeSpanOfFlowEndTime).Duration();
                             x.ToApprovedTime = GetTimeString(tsa);
                         }
 
@@ -382,7 +383,8 @@ namespace BackendSite.Service.BLL
                 {
                     TimeSpan ts1 = new TimeSpan(x.CreateTime.Ticks);
                     TimeSpan ts2 = new TimeSpan(x.UpdateTime.Ticks);
-                    TimeSpan ts = ts1.Subtract(ts2).Duration();
+                    TimeSpan timeSpanOfFlowEndTime = new TimeSpan(x.FlowEndTime.Ticks);
+                    TimeSpan ts = ts1.Subtract(timeSpanOfFlowEndTime).Duration();
                     string tempToVerifyTime = "";
                     string tempToApprovedTime = "";
                     if (x.VerifyTime > DateTime.Now.AddYears(-1000))
@@ -391,11 +393,18 @@ namespace BackendSite.Service.BLL
                         TimeSpan tsv = ts1.Subtract(ts3).Duration();
                         if (x.Status == 6)
                         {
-                            TimeSpan tsa = ts3.Subtract(ts2).Duration();
+                            TimeSpan tsa = ts3.Subtract(timeSpanOfFlowEndTime).Duration();
                             tempToApprovedTime = GetTimeString(tsa);
                         }
 
                         tempToVerifyTime = GetTimeString(tsv);
+                    }
+
+                    DateTime? flowEndTime = null;
+                    //Not Flow End.
+                    if(x.Status==5 || x.Status == 6 || x.Status == 7)
+                    {
+                        flowEndTime = x.FlowEndTime;
                     }
 
                     exportDataToExcel.Add(new WithdrawalTimeExportData
@@ -408,6 +417,7 @@ namespace BackendSite.Service.BLL
                         Status = x.StatusName,
                         CreateTime = x.CreateTime,
                         UpdateTime = x.UpdateTime,
+                        FlowEndTime = flowEndTime,
                         ToVerifyTime = tempToVerifyTime,
                         ToApprovedTime = tempToApprovedTime,
                         CompleteTime = GetTimeString(ts)
