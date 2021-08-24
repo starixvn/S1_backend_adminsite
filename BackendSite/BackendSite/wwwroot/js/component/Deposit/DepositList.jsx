@@ -349,7 +349,7 @@ import DateTimePicker from 'react-datetime';
                     btnGroup.push(<button key={1} type="button" className="btn btn-hold" onClick={this.onConfirm.bind(this, 1)}>Pending</button>);
                 if (data.status == dS.Pending && data.depositType == 3)
                     btnGroup.push(<button key={7} type="button" className="btn btn-hold" onClick={this.onConfirm.bind(this, 7)}>On Hold(Risk Check)</button>);
-                if (data.status == dS.Pending && data.depositType == 3)
+                if (data.status == dS.Pending && (data.depositType == 3 || data.depositType == 4))
                     btnGroup.push(<button key={3} type="button" className="btn btn-approved" onClick={this.onConfirm.bind(this, 3)}>Approved</button>);
                 if (data.status == dS.Pending)
                     btnGroup.push(<button key={4} type="button" className="btn btn-rejected" onClick={this.onConfirm.bind(this, 4)}>Rejected</button>);
