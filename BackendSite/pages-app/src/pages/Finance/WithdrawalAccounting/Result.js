@@ -57,7 +57,7 @@ const dataColumnDefs = () => {
       columnTitle: "Operator",
     },
     {
-      dataColumn: "updateTime",
+      dataColumn: "flowEndTime",
       columnTitle: "Approved Time" + " (" + moment().format("Z") + ")",
       body: {
         format: dateFormat,
