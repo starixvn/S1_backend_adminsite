@@ -25,7 +25,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public async Task<ApiResult> TpDisableUserForGame(TpDisableUser tpDisableUser)
+        public async Task<ApiResult> TpDisableUserForGame([FromForm] TpDisableUser tpDisableUser)
         {
             try
             {

@@ -118,7 +118,11 @@ const WithdrawalAccounting = lazy(() =>
   import("./pages/Finance/WithdrawalAccounting/index")
 );
 
-export const defaultPage = "WithdrawalAccounting";
+const DisableUserForGame = lazy(() =>
+  import("./pages/CSD/DisableUserForGame/index")
+);
+
+export const defaultPage = "DisableUserForGame";
 
 export const layoutType = {
   N88: "N88",
@@ -700,4 +704,17 @@ export const pages = {
     ],
     layout: layoutType.N88,
   },
+  DisableUserForGame: {
+    comp: (
+      <Suspense fallback="loading...">
+        <DisableUserForGame />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  }
 };
