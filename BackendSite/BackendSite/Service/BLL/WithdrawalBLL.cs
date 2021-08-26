@@ -73,7 +73,7 @@ namespace BackendSite.Service.BLL
         public int WithdrawalApproved(string transId, string comment, string updater, int userId, bool hasPic)
         {
             var serverInfo = _serverInfoService.GetModel();
-            var forStatus = new List<int> {(int) WithdrawalStatus.Process};
+            var forStatus = new List<int> { (int)WithdrawalStatus.Process };
 
             Match m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out int withdrawalId);
@@ -402,7 +402,9 @@ namespace BackendSite.Service.BLL
 
                     DateTime? flowEndTime = null;
                     //Not Flow End.
-                    if(x.Status==5 || x.Status == 6 || x.Status == 7)
+                    if (x.Status == (int)WithdrawalStatus.Cancelled
+                    || x.Status == (int)WithdrawalStatus.Approved
+                    || x.Status == (int)WithdrawalStatus.Rejected)
                     {
                         flowEndTime = x.FlowEndTime;
                     }
@@ -487,10 +489,10 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                if (withdrawalInfo.WithdrawalType == (int) WithdrawalType.LocalBank
-                    && withdrawalInfo.Status == (int) WithdrawalStatus.Approved)
+                if (withdrawalInfo.WithdrawalType == (int)WithdrawalType.LocalBank
+                    && withdrawalInfo.Status == (int)WithdrawalStatus.Approved)
                 {
-                    var accountingData = GetAccountingList(transId, withdrawalInfo.SiteId,withdrawalInfo.CurrencyId);
+                    var accountingData = GetAccountingList(transId, withdrawalInfo.SiteId, withdrawalInfo.CurrencyId);
                     var isoCode = _reportService.GetCurrencyList().Where(x => x.CurrencyId == withdrawalInfo.CurrencyId)
                         .Select(x => x.IsoCode).FirstOrDefault();
 
@@ -672,9 +674,9 @@ namespace BackendSite.Service.BLL
                 string.IsNullOrEmpty(userName) ? null : userName);
         }
 
-        private IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingList(string transId, int siteId,int currencyId)
+        private IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingList(string transId, int siteId, int currencyId)
         {
-            return _withdrawalBankAccountingService.GetAccountingListByTransId(transId, siteId,currencyId);
+            return _withdrawalBankAccountingService.GetAccountingListByTransId(transId, siteId, currencyId);
         }
 
         private GetWithdrawalBankAccountingModel GetAccountingById(int id)
