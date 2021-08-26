@@ -27,9 +27,9 @@ namespace BackendSite.Service.BLL
             return messageService.SendMessageToPlayer(customer.SiteId, sender, title, content, custId, customer.UserName, customer.UserLang, SenderCustId);
         }
 
-        public IEnumerable<Announcement> GetAnnouncements(int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, long startDate, long endDate, int status, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
-            return messageService.GetAnnouncements(PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            return messageService.GetAnnouncements(selectSite, startDate, endDate, status,PageSize, ref PageNumber, ref TotalPages, ref RowCount);
         }
 
         public Announcement GetAnnouncementById(int Id)
