@@ -32,13 +32,20 @@ namespace BackendSite.Controllers.Api
             this.common = common;
         }
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
-        [HttpPost]
-        public ApiListResult<Announcement> GetAnnouncement([FromForm] int PageNumber)
+        public class GetAnnouncementreq
+        {
+            public IEnumerable<int> SelectSite { get; set; }
+            public int Status { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
+            public int PageNumber { get; set; }
+        }
+        public ApiListResult<Announcement> GetAnnouncement(GetAnnouncementreq para)
         {
             int PageSize = 10;
             int TotalPages = 0;
             int RowCount = 0;
+            int PageNumber = para.PageNumber;
             var apiResult = new ApiListResult<Announcement>();
             try
             {
@@ -48,7 +55,7 @@ namespace BackendSite.Controllers.Api
                     siteList.Add(0, "All");
                 }
 
-                var result = messageBLL.GetAnnouncements(PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                var result = messageBLL.GetAnnouncements(para.SelectSite, para.StartDate, para.EndDate, para.Status, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
                 foreach (var r in result)
                 {
                     siteList.TryGetValue(r.SiteId, out string siteName);

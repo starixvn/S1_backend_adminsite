@@ -5,6 +5,8 @@ import WebAPI from "../../../module//WebAPI";
 import EditPanel from "./Edit";
 import moment from "moment-timezone";
 import qs from "qs";
+import Filter from "./Filter";
+import { api } from "../../../module/WebAPI";
 
 const defaultModel = {
   startTime: "",
@@ -26,28 +28,23 @@ const App = () => {
   });
 
   const [siteList, setSiteList] = useState([]);
+  const [filterList, setFilterSiteList] = useState([]);
+
+  const [stateFilter, setFilter] = useState({
+    SelectSite: [],
+    StartDate: moment().add(-10, "days").format("l"),
+    EndDate: moment().format("l"),
+    Status: 0,
+    DateQuickPicker: 0,
+  });
+  const [sumbitFilter, setsubmitFilter] = useState({
+    SelectSite: [],
+    StartDate: "",
+    EndDate: "",
+    Status: 0,
+  });
 
   useEffect(() => {
-    let param = {
-      Url: "Message/GetAnnouncement",
-      Data: `PageNumber=${1}`,
-    };
-
-    WebAPI.PostData(param).then((res) => {
-      if (res.data.errorCode === 0) {
-        updateDatas({
-          PageInfo: {
-            totalPages: res.data.totalPages,
-            pageNumber: 1,
-            rowCount: res.data.rowCount,
-          },
-          Datas: [...res.data.data],
-        });
-      } else {
-        alert(res.data.message ?? "failed to get data.");
-      }
-    });
-
     WebAPI.PostData({ Url: "Common/AdminUserSiteList" }).then((res) => {
       if (res.data.errorCode === 0) {
         let _siteList = {};
@@ -55,6 +52,7 @@ const App = () => {
           _siteList[s.siteId] = s;
         });
         setSiteList(_siteList);
+        setFilterSiteList(res.data.data);
       } else {
         alert(res.data.message ?? "failed to get data.");
       }
@@ -195,25 +193,135 @@ const App = () => {
   };
 
   const Result_ChangePage = (PageNumber) => {
-    let param = {
-      Url: "Message/GetAnnouncement",
-      Data: `PageNumber=${PageNumber}`,
+    let Data = {
+      SelectSite: sumbitFilter.SelectSite,
+      StartDate: sumbitFilter.StartDate,
+      EndDate: sumbitFilter.EndDate,
+      Status: sumbitFilter.Status,
+      PageNumber: PageNumber,
     };
+    api
+      .post("/api/Message/GetAnnouncement", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          updateDatas({
+            PageInfo: {
+              totalPages: res.data.totalPages,
+              pageNumber: PageNumber,
+              rowCount: res.data.rowCount,
+            },
+            Datas: [...res.data.data],
+          });
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  };
 
-    WebAPI.PostData(param).then((res) => {
-      if (res.data.errorCode === 0) {
-        updateDatas({
-          PageInfo: {
-            totalPages: res.data.totalPages,
-            pageNumber: PageNumber,
-            rowCount: res.data.rowCount,
-          },
-          Datas: [...res.data.data],
-        });
-      } else {
-        alert(res.data.message ?? "failed to get data.");
-      }
+  const Filter_OnChange = (v, dataColumn) => {
+    setFilter({
+      ...stateFilter,
+      [dataColumn]: v,
     });
+  };
+
+  const DatePicker_OnChange = (props) => {
+    let _startDate = "";
+    let _endDate = "";
+
+    switch (props) {
+      case "1":
+        _startDate = moment().startOf("day");
+        _endDate = moment().endOf("day");
+
+        break;
+      case "2":
+        _startDate = moment().subtract(1, "days");
+        _endDate = moment().subtract(1, "days");
+
+        break;
+      case "3":
+        _startDate = moment().startOf("week");
+        _endDate = moment().endOf("week");
+
+        break;
+      case "4":
+        _startDate = moment().subtract(1, "week").startOf("week");
+        _endDate = moment().subtract(1, "week").endOf("week");
+
+        break;
+      case "5":
+        _startDate = moment().startOf("month");
+        _endDate = moment().endOf("month");
+
+        break;
+      case "6":
+        _startDate = moment().subtract(1, "month").startOf("month");
+        _endDate = moment().subtract(1, "month").endOf("month");
+
+        break;
+      default:
+        break;
+    }
+    if (props !== "0") {
+      setFilter({
+        ...stateFilter,
+        ["StartDate"]: _startDate.format("l"),
+        ["EndDate"]: _endDate.format("l"),
+        ["DateQuickPicker"]: props,
+      });
+    } else {
+      setFilter({
+        ...stateFilter,
+        ["DateQuickPicker"]: props,
+      });
+    }
+  };
+
+  const ClickSubmit = () => {
+    if (stateFilter.SelectSite.length === 0) {
+      alert("Please Choose at least one Site");
+      return false;
+    }
+    const siteIds = [];
+    stateFilter.SelectSite.map((o) => {
+      siteIds.push(o.value);
+    });
+    let Data = {
+      SelectSite: siteIds,
+      StartDate: moment(stateFilter.StartDate).unix(),
+      EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
+      Status: parseInt(stateFilter.Status, 10),
+      PageNumber: 1,
+    };
+    api
+      .post("/api/Message/GetAnnouncement", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          updateDatas({
+            PageInfo: {
+              totalPages: res.data.totalPages,
+              pageNumber: 1,
+              rowCount: res.data.rowCount,
+            },
+            Datas: [...res.data.data],
+          });
+          setsubmitFilter({
+            SelectSite: Data.SelectSite,
+            StartDate: Data.StartDate,
+            EndDate: Data.EndDate,
+            Status: Data.Status,
+          });
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
   };
 
   return (
@@ -237,6 +345,13 @@ const App = () => {
         />
       ) : (
         <>
+          <Filter
+            SiteList={filterList}
+            filterInfo={stateFilter}
+            onChange={Filter_OnChange}
+            datePickeronChange={DatePicker_OnChange}
+            ClickSubmit={ClickSubmit}
+          />
           <button
             className="btn btn-add"
             style={{ marginBottom: "20px" }}
