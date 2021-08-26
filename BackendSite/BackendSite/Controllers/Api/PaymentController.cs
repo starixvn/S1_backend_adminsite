@@ -918,7 +918,7 @@ namespace BackendSite.Controllers.Api
                     request.GameType,
                     request.TransId);
 
-            return new ApiResult<TpBetRecordDetailModel>
+            return new ApiResult<object>
             {
                 Data = result,
                 ErrorCode = (int) ErrorCodeEnum.Success
