@@ -21,17 +21,16 @@ const Result = (props) => {
         return (
           <tr key={`result-${dIdx}`}>
             <td>{d.transId}</td>
-            {/*<td>*/}
-            {/*  {" "}*/}
-            {/*  <button*/}
-            {/*    className="btn btn-link"*/}
-            {/*    onClick={() =>*/}
-            {/*      props.ClickTpBetRecordDetail(props.Info.GameTypeId, d.transId)*/}
-            {/*    }*/}
-            {/*  >*/}
-            {/*    {d.transId}*/}
-            {/*  </button>*/}
-            {/*</td>*/}
+            <td>
+              <button
+                className="btn btn-link"
+                onClick={() =>
+                  props.ClickTpBetRecordDetail(props.Info.GameTypeId, d.transId)
+                }
+              >
+                {d.transId}
+              </button>
+            </td>
             <td>{number_format(d.turnOver)}</td>
             <td>{number_format(d.validBet)}</td>
             <td>{number_format(d.winlostAmount)}</td>
@@ -50,7 +49,7 @@ const Result = (props) => {
           <thead>
             <tr>
               <th>Trans Id</th>
-              {/*<th>Trans Id(Test:Only show saba test data)</th>*/}
+              <th>Trans Id(Test:Only show saba test data)</th>
               <th>Turnover</th>
               <th>Valid Bet</th>
               <th>WinLoss</th>
