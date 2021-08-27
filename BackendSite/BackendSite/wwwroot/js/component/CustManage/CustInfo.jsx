@@ -100,6 +100,8 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     <th scope="row">{row.transId}</th>
                     <td>{i18n["lbl_DepositType" + row.depositType]}</td>
                     <td className="text-right">{number_format(row.amount)}</td>
+                    <td className="text-right">{number_format(row.actualDeposit)}</td>
+                    <td>{row.bankName}</td>
                     <td>{row.accountNo}</td>
                     <td>{row.accountName}</td>
                     <td>{DepositStatusOp[row.status]}</td>
@@ -123,6 +125,8 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                 <th scope="col">Trxn.ID</th>
                                 <th scope="col">Deposit Type</th>
                                 <th scope="col" className="text-right">Amount</th>
+                                <th scope="col" className="text-right">Actual Deposit</th>
+                                <th scope="col">Bank Name</th>
                                 <th scope="col">To Acc. NO.</th>
                                 <th scope="col">To Acc. Name</th>
                                 <th scope="col">Status</th>
