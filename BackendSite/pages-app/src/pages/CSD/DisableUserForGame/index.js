@@ -1,53 +1,67 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from 'react-dom';
-import data from "./data.json";
+import Edit from "./Edit"
 import qs from "qs";
 import WebAPI from "../../../module//WebAPI";
 
 const App = () => {
+
   const [stateDatas, updateDatas] = useState({
     Datas: null,
     ShowSettingPanel: false,
     IsAdd: false,
   });
+  
+  const UpdateDisableUserForGame = (custId, siteId, disableTpGame) => {
 
-  const InsertDisableUserForGame = (datas, disableGames) => {
-    let insertData = {
-      CustId: datas.custId,
-      SiteId: datas.siteId,
-      TpGame: disableGames
+    let data = {
+      CustId: custId,
+      SiteId: siteId,
+      DisableTpGame: disableTpGame
     };
-    console.log("Hello")
     let param = {
       Url: "Risk/TpDisableUserForGame",
-      Data: qs.stringify(insertData),
+      Data: qs.stringify(data),
     };
     
     WebAPI.PostData(param).then((res) => {
-      if (res.data.errorCode === 0) {
+      if (res.data.errorCode === 1) {
         alert("success.");
       } else {
         alert(res.data.message ?? "failed to get data.");
       }
     });
   };
+
   return (
     <div className="container-fluid">
       <h4 className="page-name">Disable User For Game</h4>
-      <button 
-        className="btn btn-add"
-        style={{ marginBottom: "20px" }}
-        onClick={()=>{
-
-          let custInfo = {
-            custId : 250140,
-            siteId : 1
-          }
-
-          InsertDisableUserForGame(custInfo, data)
-          }}>
-        Disable User For Game
-      </button>
+      {stateDatas.ShowSettingPanel ? (
+        <Edit 
+        ClickBack={() => {
+          updateDatas({
+            ...stateDatas,
+            ShowSettingPanel: false,
+          });
+        }}
+        InsertOrUpdate={UpdateDisableUserForGame}
+        />
+      ) : (
+        <>
+          <button
+            className="btn btn-add"
+            style={{ marginBottom: "20px" }}
+            onClick={() => {
+              updateDatas({
+              ...stateDatas,
+              ShowSettingPanel: true,
+              IsAdd: true,
+              });
+            }}>
+            Add Maintenance
+          </button>
+        </>
+      )}
     </div>
   );
 }

@@ -712,6 +712,7 @@ export const pages = {
     ),
     css: [
       "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/common/fonts/main-font/style.css",
       "./css/css/main.css",
       "./css/css/vendor/DateTimePicker/DateTimePicker.css",
     ],

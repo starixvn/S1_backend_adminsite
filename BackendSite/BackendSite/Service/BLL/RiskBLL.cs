@@ -13,7 +13,7 @@ namespace BackendSite.Service.BLL
             _riskService = riskService;
         }
 
-        public async Task<int> DisableUserForGame(TpDisableUser tpDisableUser)
+        public async Task<int> DisableUserForGame(DisableUser tpDisableUser)
         {
             return await _riskService.TpDisableUserSet(tpDisableUser);
         }

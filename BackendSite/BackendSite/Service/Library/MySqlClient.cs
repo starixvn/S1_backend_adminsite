@@ -210,6 +210,26 @@ namespace BackendSite.Service.Library
             return result;
         }
 
+        public async Task<IEnumerable<T>> QueryAsync<T>(string name)
+        {
+            IEnumerable<T> result;
+            var sw = Stopwatch.StartNew();
+            try
+            {
+                await using var connection = new MySqlConnection(_connectionString);
+                result = await connection.QueryAsync<T>(name, commandType: CommandType.Text);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, name);
+                throw;
+            }
+
+            LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
+            _logger.LogDebug(name);
+            return result;
+        }
+        
         public async Task<IEnumerable<T>> QueryAsync<T>(string name, SqlMapper.IDynamicParameters parameters)
         {
             IEnumerable<T> result;

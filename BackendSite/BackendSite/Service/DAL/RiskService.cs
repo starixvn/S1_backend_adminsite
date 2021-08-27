@@ -16,13 +16,13 @@ namespace BackendSite.Service.DAL
             _sqlClient = sqlClient;
         }
 
-        public async Task<int> TpDisableUserSet(TpDisableUser tpDisableUser)
+        public async Task<int> TpDisableUserSet(DisableUser tpDisableUser)
         {
             var p = new DynamicParameters();
 
             p.Add("_CustId", tpDisableUser.CustId);
             p.Add("_SiteId", tpDisableUser.SiteId);
-            p.Add("_GameInfo", JsonConvert.SerializeObject(tpDisableUser.TpGame));
+            p.Add("_GameInfo", JsonConvert.SerializeObject(tpDisableUser.DisableTpGame));
             p.Add("_UpdateOperator", tpDisableUser.UpdateOperator);
 
             return await _sqlClient.ExecuteAsync("Admin_TpDisableUser_Set", p);
