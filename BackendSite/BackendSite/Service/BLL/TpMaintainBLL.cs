@@ -58,7 +58,7 @@ namespace BackendSite.Service.BLL
             return tpMaintainService.GetTpGameTypeList();
         }
 
-        public IEnumerable<TpCategory> GetTPCategoryList()
+        public IEnumerable<Model.TpMaintain.TpCategory> GetTPCategoryList()
         {
             return tpMaintainService.GetTPCategoryList();
         }
