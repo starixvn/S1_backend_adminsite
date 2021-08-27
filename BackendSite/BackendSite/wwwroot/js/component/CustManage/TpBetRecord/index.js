@@ -13,6 +13,8 @@ const Panel = () => {
   const [stateTpBetRecordDatas, setTpBetRecordDatas] = React.useState();
   const [stateTpBetRecordDatasShowStatus, setTpBetRecordDatasShowStatus] =
     React.useState(false);
+  const [stateTpBetRecordDatasShowRawDetail, setTpBetRecordDatasShowRawDetail] =
+    React.useState(false);
   const [stateGameInfo, setGameInfo] = React.useState({
     Date: null,
     GameTypeId: null,
@@ -214,6 +216,7 @@ const Panel = () => {
         if (result.errorCode == 0) {
           setTpBetRecordDatas(result);
           setTpBetRecordDatasShowStatus(true);
+          setTpBetRecordDatasShowRawDetail(false);
         } else {
           alert(result.message);
         }
@@ -224,8 +227,12 @@ const Panel = () => {
   };
 
   //Poppout Close
+  const GameResult_SwitchDetailBtnClick = (flag) => {
+    setTpBetRecordDatasShowRawDetail(flag);
+  };
+
+  //Poppout Close
   const GameResult_CloseBtnClick = () => {
-    //Poppout Close
     setTpBetRecordDatasShowStatus(false);
     setTpBetRecordDatas({});
   };
@@ -265,8 +272,10 @@ const Panel = () => {
       //Popout:TpBetRecordDetail
       TpBetRecordDatas={stateTpBetRecordDatas}
       TpBetRecordDatasShowStatus={stateTpBetRecordDatasShowStatus}
+      TpBetRecordDatasShowRawDetail={stateTpBetRecordDatasShowRawDetail}
       ClickTpBetRecordDetail={getTpBetRecordDetail}
       TpBetRecordCloseBtn={GameResult_CloseBtnClick}
+      SwitchDetailBtn={GameResult_SwitchDetailBtnClick}
     />
   ) : null;
 };
