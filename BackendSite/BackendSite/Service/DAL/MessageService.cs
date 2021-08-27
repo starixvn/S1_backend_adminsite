@@ -36,19 +36,25 @@ namespace BackendSite.Service.DAL
             return conn.Execute("Msg_Ins", new { Type = 99, siteId = siteId, LangId = lang, RecipientCustId = custId, Recipient = CustUserName, SenderCustId = SenderCustId, Sender = sender, Title = title, Content = content, MainId = 0 }, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<Announcement> GetAnnouncements(int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, long startDate, long endDate,int status, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
             IEnumerable<Announcement> result = null;
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            //site為ALL類型的都可以查
+            List<int> tempselectSite = selectSite.ToList();
+            tempselectSite.Add(0);
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
-                string SpName = "Admin_Announcement_Get";
+                string SpName = "Admin_AnnouncementV2_Get";
                 DynamicParameters props = new DynamicParameters();
-                props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-                props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-                props.Add("@PageSize", PageSize);
+                props.Add("SelectSite", JsonConvert.SerializeObject(tempselectSite));
+                props.Add("StartDate", startDate);
+                props.Add("EndDate", endDate);
+                props.Add("Status", status);
+                props.Add("PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+                props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                props.Add("PageSize", PageSize);
 
                 result = conn.Query<Announcement>(SpName, props, commandType: CommandType.StoredProcedure);
                 PageNumber = props.Get<int?>("@PageNumber") ?? 0;

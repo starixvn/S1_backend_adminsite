@@ -113,6 +113,7 @@ namespace BackendSite.Service.Model
         public string SabaID { get; set; }
         public string SignupUrl { get; set; }
         public string AffiliateId { get; set; }
+        public string AffiliateCode { get; set; }
     }
 
     public class CustPhotoId

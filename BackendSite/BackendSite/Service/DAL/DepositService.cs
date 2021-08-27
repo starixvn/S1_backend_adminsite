@@ -86,7 +86,7 @@ namespace BackendSite.Service.DAL
             p.Add("TotalAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var depositList = conn.Query<DepositRequest>("Admin_DepositInfoListByCustV3_Get", p, commandType: CommandType.StoredProcedure);
+            var depositList = conn.Query<DepositRequest>("Admin_DepositInfoListByCustV4_Get", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -282,7 +282,7 @@ namespace BackendSite.Service.DAL
             }
             var p = new DynamicParameters(new { SelectSite, DepositType, StartDate = startDate, EndDate = endDate, DepositId = depositId, TransId = DepositId, UserName, CurrencyId, Status, VipStatus = VipStatus });
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var depositList = conn.Query<DepositInfoForExport>("Admin_DepositListForExportV5_Get", p, commandType: CommandType.StoredProcedure);
+            var depositList = conn.Query<DepositInfoForExport>("Admin_DepositListForExportV6_Get", p, commandType: CommandType.StoredProcedure);
             return depositList;
         }
         public IEnumerable<DepositLimitCurrencyInfo> GetDepositLimitCurrencyList(int siteId, int depositType)
