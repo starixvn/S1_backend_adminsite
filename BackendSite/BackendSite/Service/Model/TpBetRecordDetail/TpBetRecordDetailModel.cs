@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace BackendSite.Service.Model.TpBetRecordDetail
+﻿namespace BackendSite.Service.Model.TpBetRecordDetail
 {
     public class TpBetRecordDetailModel
     {
@@ -9,6 +7,8 @@ namespace BackendSite.Service.Model.TpBetRecordDetail
         public int GameType { get; set; }
 
         public string TransId { get; set; }
+
+        public int CurrencyId { get; set; }
 
         public string Detail { get; set; }
 

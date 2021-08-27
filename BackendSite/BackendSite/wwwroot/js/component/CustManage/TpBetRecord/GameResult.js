@@ -84,7 +84,9 @@ const Result = (props) => {
       </button>
       <TpBetRecordDetailModal
         show={props.TpBetRecordDatasShowStatus}
+        showRawDetail={props.TpBetRecordDatasShowRawDetail}
         tpBetRecordDatas={props.TpBetRecordDatas}
+        handleSwitch={props.SwitchDetailBtn}
         handleClose={(e) => props.TpBetRecordCloseBtn()}
       />
     </>

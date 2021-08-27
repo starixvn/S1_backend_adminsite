@@ -295,4 +295,16 @@ namespace BackendSite.Service.Model.enums
     { 
         Success=0
     }
+
+    public enum TpCategory
+    {
+        Sports = 1,
+        Casino = 2,
+        LiveCasino = 3,
+        Fishing = 4,
+        Cockfighting = 5,
+        Lottery = 6,
+        VirtualSports = 7,
+        Poker = 8,
+    }
 }
