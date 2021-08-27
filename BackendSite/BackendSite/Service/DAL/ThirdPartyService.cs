@@ -95,5 +95,10 @@ namespace BackendSite.Service.DAL
 
             _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", props);
         }
+
+        public async Task<TpCurrency> GetTpCurrency(int tpId, int currencyId)
+        {
+            return await _reportDbClient.QueryFirstAsync<TpCurrency>("TpCurrency_Get", new DynamicParameters(new { TpId = tpId, CurrencyId = currencyId }) );
+        }
     }
 }
