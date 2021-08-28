@@ -21,9 +21,14 @@
         if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
-
 }
+<div id="content"></div>
 @section Scripts {
+    <script>
+        window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
+        window.RootUrl = '@Url.Content("~/api")';
+        window.LangCode = 'en'
+    </script>
     <script src="~/lib/Oneworks/jscalendar/calendar.js"></script>
     <script src="~/lib/Oneworks/jscalendar/lang/calendar-en.js"></script>
     <script src="~/lib/Oneworks/jscalendar/calendar-setup.js"></script>
@@ -31,4 +36,5 @@
     <script type="text/javascript">
         $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
     </script>
+    <script src="~/js/component/CSD/DisableUserForGame.min.js" asp-append-version="true"></script>
 }

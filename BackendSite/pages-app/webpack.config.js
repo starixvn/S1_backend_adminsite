@@ -210,9 +210,13 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Finance/WithdrawalAccounting/index.js",
     // ],
-    "CSD/RegistrationManagement.min": [
+    // "CSD/RegistrationManagement.min": [
+    //   '@babel/polyfill',
+    // "./src/pages/CSD/RegistrationManagement/index.js",
+    // ],
+    "CSD/DisableUserForGame.min": [
       '@babel/polyfill',
-    "./src/pages/CSD/RegistrationManagement/index.js",
+    "./src/pages/CSD/DisableUserForGame/index.js",
     ],
   },
   output: {
