@@ -17,23 +17,35 @@ namespace BackendSite.Controllers.Api
     public class RiskController : Controller
     {
         private readonly RiskBLL _riskBll;
-        private readonly GameCasinoBLL _gameCasinoBLL;
+        private readonly GameCasinoBLL _gameCasinoBll;
+        private readonly CustInfoBLL _custInfoBll;
         private readonly ILogger<RiskController> _logger;
 
-        public RiskController(RiskBLL riskBll, GameCasinoBLL gameCasinoBll, ILogger<RiskController> logger)
+        public RiskController(RiskBLL riskBll, GameCasinoBLL gameCasinoBll, CustInfoBLL custInfoBll, ILogger<RiskController> logger)
         {
             _riskBll = riskBll;
-            _gameCasinoBLL = gameCasinoBll;
+            _gameCasinoBll = gameCasinoBll;
+            _custInfoBll = custInfoBll;
             _logger = logger;
         }
 
         [HttpPost]
-        public async Task<ApiResult> TpDisableUserForGame([FromForm] DisableUser tpDisableUser)
+        public async Task<ApiResult> TpDisableUserForGame([FromForm] DisableUser disableGames)
         {
+            var apiResult = new ApiResult();
             try
             {
-                tpDisableUser.UpdateOperator = User.Identity.Name;
-                var result = await _riskBll.DisableUserForGame(tpDisableUser);
+                var updateOperator = User.Identity.Name;
+                var customer = await _custInfoBll.GetCustId(disableGames.UserName, disableGames.SiteId);
+                if (customer == null)
+                {
+                    apiResult.ErrorCode = -2;
+                    apiResult.Message = "User Not Found";
+                    return apiResult;
+                }
+
+                var result = await _riskBll.DisableUserForGame(customer.CustId, customer.SiteId,
+                    disableGames.DisableTpGame, updateOperator);
                 return new ApiResult
                 {
                     ErrorCode = result == 1 ? 0 : result,
@@ -50,7 +62,7 @@ namespace BackendSite.Controllers.Api
             }
         }
 
-        [HttpPost]
+        [HttpGet]
         //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/Risk" })]
         public async Task<ApiResult<IEnumerable<RiskTpListInfo>>> GetTpList()
         {
@@ -58,7 +70,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 {
-                    apiResult.Data = await _gameCasinoBLL.GetTpList();
+                    apiResult.Data = await _gameCasinoBll.GetTpList();
                     apiResult.ErrorCode = 0;
                 };
             }
@@ -80,7 +92,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<RiskGameCasinoData>>();
             try
             {
-                var gameCasinoData = await _gameCasinoBLL.GameCasinoByTPIdV3(tpId);
+                var gameCasinoData = await _gameCasinoBll.GameCasinoByTPIdV3(tpId);
                 apiResult.Data = gameCasinoData;
                 apiResult.ErrorCode = 0;
             }

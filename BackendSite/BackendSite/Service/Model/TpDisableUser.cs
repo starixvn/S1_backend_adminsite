@@ -4,10 +4,9 @@ namespace BackendSite.Service.Model
 {
     public class DisableUser
     {
-        public int CustId { get; set; }
+        public string UserName { get; set; }
         public int SiteId { get; set; }
         public List<DisableTpGame> DisableTpGame { get; set; }
-        public string UpdateOperator { get; set; }
     }
 
     public class DisableTpGame

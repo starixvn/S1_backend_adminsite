@@ -12,10 +12,10 @@ const App = () => {
     IsAdd: false,
   });
   
-  const UpdateDisableUserForGame = (custId, siteId, disableTpGame) => {
+  const UpdateDisableUserForGame = (userName, siteId, disableTpGame) => {
 
     let data = {
-      CustId: custId,
+      UserName: userName,
       SiteId: siteId,
       DisableTpGame: disableTpGame
     };
@@ -25,10 +25,15 @@ const App = () => {
     };
     
     WebAPI.PostData(param).then((res) => {
-      if (res.data.errorCode === 1) {
+
+      if (res.data.errorCode === 0) {
         alert("success.");
+        updateDatas({
+          ...stateDatas,
+          ShowSettingPanel: false,
+        });
       } else {
-        alert(res.data.message ?? "failed to get data.");
+        alert(res.data.message);
       }
     });
   };
@@ -36,32 +41,29 @@ const App = () => {
   return (
     <div className="container-fluid">
       <h4 className="page-name">Disable User For Game</h4>
-      {stateDatas.ShowSettingPanel ? (
+      {stateDatas.ShowSettingPanel ? 
         <Edit 
-        ClickBack={() => {
-          updateDatas({
-            ...stateDatas,
-            ShowSettingPanel: false,
-          });
-        }}
-        InsertOrUpdate={UpdateDisableUserForGame}
-        />
-      ) : (
-        <>
-          <button
-            className="btn btn-add"
-            style={{ marginBottom: "20px" }}
-            onClick={() => {
-              updateDatas({
+          ClickBack={() => {
+            updateDatas({
               ...stateDatas,
-              ShowSettingPanel: true,
-              IsAdd: true,
+              ShowSettingPanel: false,
+            });
+          }}
+          InsertOrUpdate={UpdateDisableUserForGame}/> : 
+      <>
+        <button
+          className="btn btn-add"
+          style={{ marginBottom: "20px" }}
+          onClick={() => {
+              updateDatas({
+                ...stateDatas,
+                ShowSettingPanel: true,
+                IsAdd: true,
               });
-            }}>
-            Add Maintenance
-          </button>
-        </>
-      )}
+          }}>
+          Add Maintenance
+        </button>
+      </>}
     </div>
   );
 }

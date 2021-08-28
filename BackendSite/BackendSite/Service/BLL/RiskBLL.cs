@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 
@@ -13,9 +14,9 @@ namespace BackendSite.Service.BLL
             _riskService = riskService;
         }
 
-        public async Task<int> DisableUserForGame(DisableUser tpDisableUser)
+        public async Task<int> DisableUserForGame(int custId, int siteId, List<DisableTpGame> gameIndo, string updateOperator)
         {
-            return await _riskService.TpDisableUserSet(tpDisableUser);
+            return await _riskService.TpDisableUserSet(custId, siteId, gameIndo, updateOperator);
         }
     }
 }

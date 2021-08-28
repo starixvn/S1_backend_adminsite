@@ -1,4 +1,4 @@
-import React, {useState}  from "react"
+import React from "react"
 import Checkbox from "./Checkbox"
 
 export default function TpCheckList({ tpList, tpChecked = f => f, gameChecked = g => g }) {
@@ -14,22 +14,22 @@ export default function TpCheckList({ tpList, tpChecked = f => f, gameChecked = 
                             value={tp.tpId}
                             checked={tp.checked}
                             toggle = {tpChecked}
-                            />
-                            <div>
-                        {(tp.gameList != null && tp.gameList.length > 0) ? tp.gameList.map((game, j) => (
+                        />
+                        <div>
+                        {(tp.gameList != null && tp.gameList.length > 0) ? 
+                        tp.gameList.map((game, j) => (
                             <Checkbox
-                            key={j}
-                            title={game.name}
-                            value={tp.tpId + "-" + game.gameId}
-                            checked={game.checked}
-                            toggle = {gameChecked}
+                                key={j}
+                                title={game.name}
+                                value={tp.tpId + "_" + game.gameId}
+                                checked={game.checked}
+                                toggle = {gameChecked}
                             />
                         )) : null} 
                         </div>
                     </div>
-                )
-            }
-        )}
-    </>
-            )
+                )}
+            )}
+        </>
+    )
 }

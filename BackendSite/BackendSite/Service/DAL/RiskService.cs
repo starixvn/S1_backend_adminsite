@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -16,14 +17,14 @@ namespace BackendSite.Service.DAL
             _sqlClient = sqlClient;
         }
 
-        public async Task<int> TpDisableUserSet(DisableUser tpDisableUser)
+        public async Task<int> TpDisableUserSet(int custId, int siteId, List<DisableTpGame> gameIndo, string updateOperator)
         {
             var p = new DynamicParameters();
 
-            p.Add("_CustId", tpDisableUser.CustId);
-            p.Add("_SiteId", tpDisableUser.SiteId);
-            p.Add("_GameInfo", JsonConvert.SerializeObject(tpDisableUser.DisableTpGame));
-            p.Add("_UpdateOperator", tpDisableUser.UpdateOperator);
+            p.Add("_CustId", custId);
+            p.Add("_SiteId", siteId);
+            p.Add("_GameInfo", JsonConvert.SerializeObject(gameIndo));
+            p.Add("_UpdateOperator", updateOperator);
 
             return await _sqlClient.ExecuteAsync("Admin_TpDisableUser_Set", p);
         }

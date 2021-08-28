@@ -1,17 +1,29 @@
 import React, { useState, useEffect } from "react";
 import TpCheckList from "./Components/TpCheckList";
 import TabButton from "./Components/TabButton"
+import InputBox from "./Components/InputBox";
+import SiteRadioGroup from "./Components/RadioGroup";
 import WebAPI from "../../../module//WebAPI";
 
-function Edit({ ClickBack = f => f, InsertOrUpdate = g => g }) {
+function Edit({ IsAdd, ClickBack = f => f, InsertOrUpdate = g => g }) {
 
     const [tpList, setTpList] = useState([]);
-
+    const [siteList, setSiteList] = useState([]);
+    const [siteId, setSite] = useState(0);
+    const [userName, setUserName] = useState("");
     useEffect(() => {
   
-      WebAPI.PostData({ Url: "Risk/GetTpList" }).then((res) => {
+      WebAPI.fetchData({ Url: "Risk/GetTpList" }).then((res) => {
         if (res.data.errorCode === 0) {
             setTpList(res.data.data);
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      });
+
+      WebAPI.PostData({ Url: "Common/AdminUserSiteList" }).then((res) => {
+        if (res.data.errorCode === 0) {
+            setSiteList(res.data.data);
         } else {
           alert(res.data.message ?? "failed to get data.");
         }
@@ -20,7 +32,7 @@ function Edit({ ClickBack = f => f, InsertOrUpdate = g => g }) {
     }, []);
     
     const Submit = () => {
-        var temp = [];
+        var selectedTp = [];
         tpList.forEach( (a, i) => {
             if(a.checked) {
                 let games = []
@@ -30,11 +42,11 @@ function Edit({ ClickBack = f => f, InsertOrUpdate = g => g }) {
                         games.push(b.gameId)
                     }
                 })
-                temp.push( { TpId:a.tpId, GameList:games } )
+                selectedTp.push( { TpId:a.tpId, GameList:games } )
             }
         })
 
-        InsertOrUpdate(250140, 1, temp)
+        InsertOrUpdate(userName, siteId, selectedTp)
     };
 
     const GetTpGameList = (tpId, checked) => {
@@ -63,7 +75,8 @@ function Edit({ ClickBack = f => f, InsertOrUpdate = g => g }) {
     }
 
     const GameCheck = (gameId, checked) => {
-        const tpGameId = gameId.split('-')
+        
+        const tpGameId = gameId.split(/_(.+)/)
         var tpIdx = tpList.map( i => {
             return i.tpId;
           }).indexOf(parseInt(tpGameId[0]));
@@ -76,21 +89,23 @@ function Edit({ ClickBack = f => f, InsertOrUpdate = g => g }) {
         setTpList([...tpList]);
     }
 
+    const SelectSite = (siteId) => {
+        setSite(siteId);
+    }
+
+    const InputUserName = (e) => {
+        setUserName(e);
+    }
+
     return (
         <>
+        <div className="filter noBGcolor"><SiteRadioGroup title="Available Sites" siteList={siteList} selectSite={siteId} disabled={false} toggle={SelectSite}/></div>
+        <div className="row-flex"><InputBox title="UserName" value={userName} disabled={false} onChange={setUserName}/></div>
         <div className="filter noBGcolor tag"><TabButton title="Slots"/></div>
         <div className="filter"><TpCheckList tpList={tpList} tpChecked={GetTpGameList} gameChecked={GameCheck}/></div>
         <div className="filter float-btn-group">
-            <button
-                className="btn btn-back"
-                onClick={ClickBack}>
-                Back
-            </button>
-            <button
-                className="btn btn-add"
-                onClick={Submit}>
-                Submit
-            </button>
+            <button className="btn btn-back" onClick={ClickBack}>Back</button>
+            <button className="btn btn-add" onClick={Submit}> Submit</button>
         </div>
         </>
     );
