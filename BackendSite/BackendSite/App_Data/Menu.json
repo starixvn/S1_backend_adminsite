@@ -556,6 +556,16 @@
         "Childs": null
       },
       {
+        "Key": "VipLevelReview",
+        "Title": "Vip Level Review",
+        "FuncKey": "Marketing/VipLevelReview",
+        "Controller": "Marketing",
+        "Action": "VipLevelReview",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
         "Key": "LatestHighlightVideoManagement",
         "Title": "Latest Highlight Video Management",
         "FuncKey": "Marketing/LatestHighlightVideoManagement",

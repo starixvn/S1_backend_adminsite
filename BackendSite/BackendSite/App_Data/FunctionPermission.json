@@ -430,6 +430,22 @@
         ]
       },
       {
+        "DisplayKey": "VipLevelReview",
+        "FuncKey": "Marketing/VipLevelReview",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Export Excel",
+            "FuncKey": "viplevelreview_export_excel"
+          },
+          {
+            "DisplayKey": "Update Status",
+            "FuncKey": "viplevelreview_update"
+          }
+        ]
+      },
+      {
         "DisplayKey": "Latest Highlight Video Management",
         "FuncKey": "Marketing/LatestHighlightVideoManagement",
         "Enable": false
