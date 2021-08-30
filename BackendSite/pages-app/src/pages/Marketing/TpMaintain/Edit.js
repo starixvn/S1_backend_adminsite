@@ -6,7 +6,6 @@ const elemType = {
 	DateTimePicker: "DateTimePicker"
 };
 const dateformat = "YYYY-MM-DD HH:mm";
-
 const commonColDefs = [
 	{
 		datacolumn: "beginDate",
@@ -22,35 +21,54 @@ const commonColDefs = [
 
 const EditPanel = props => {
 	const [stateData, updateData] = useState({
-		siteId: 0,
-		id: 1,
-		beginDate: moment().format(dateformat),
-		endDate: moment().add(1,"day").format(dateformat),
-		maintainType:"Date",
+		siteId: props.IsAdd ? 0 : props.Datas.siteId,
+		tpId: props.IsAdd ? 1 : props.Datas.tpId,
+		beginDate: props.IsAdd ? moment().format(dateformat) : UtcToLocal(props.Datas.beginDate),
+		endDate: props.IsAdd ? moment().add(1, "day").format(dateformat) : UtcToLocal(props.Datas.endDate),
+		maintainType: props.IsAdd ? "Date" : props.Datas.maintainType,
 		typeList: props.typeList,
+		sn: props.IsAdd ? null : props.Datas.sn,
+		tpGameType: props.IsAdd ? null : props.Datas.tpGameType,
+	});
+
+	React.useEffect(() => {
+		if (!props.IsAdd) {
+			$("input[type='checkbox']").each(function () {
+				$(this).prop('disabled', true);
+				if ($(this).prop('id') == stateData.tpGameType) {
+					$(this).prop("checked", true)
+				}
+			});
+
+			if ($("input[type='checkbox'][value='0']").prop("checked")) {
+				$("#CheckItemGroup").hide();
+			} else {
+				$("#CheckItemGroup").show();
+			}
+		}
 	});
 
 	const EditFiled = (v, datacolumn) => {
 		updateData({
 			...stateData,
 			[datacolumn]: v
-		});	
-		if (datacolumn == "id"){
-			$("input[type='checkbox']").each(function() {
+		});
+		if (datacolumn == "tpId") {
+			$("input[type='checkbox']").each(function () {
 				$(this).prop("checked", false);
 			});
 			$("#CheckItemGroup").show();
 			GetTpGameTypeOptions(stateData.typeList, v);
-		}			
+		}
 	};
 
-	const InsertTpMaintain = () => {
-		let tpGametype = "";
-		if($("input[type='checkbox'][value='0']").prop("checked")) {
-			tpGametype="0";
-		} else {	
-			$("input[type='checkbox'][value!='0']:checked").each(function() {
-				tpGametype += `${$(this).val()},`;
+	const SetTpMaintain = () => {
+		let tpGameTypeList = "";
+		if ($("input[type='checkbox'][value='0']").prop("checked")) {
+			tpGameTypeList = "0";
+		} else {
+			$("input[type='checkbox'][value!='0']:checked").each(function () {
+				tpGameTypeList += `${$(this).val()},`;
 			});
 		}
 
@@ -63,25 +81,26 @@ const EditPanel = props => {
 			check = false;
 			msg = "Please select endDate.";
 		}
-		else if (tpGametype == "") {
+		else if (tpGameTypeList == "") {
 			check = false;
 			msg = "Please select tpGametype.";
 		}
 
 		if (check) {
-			props.InsertTpMaintain(stateData, tpGametype);
+			props.SetTpMaintain(stateData, tpGameTypeList, props.IsAdd);
 		} else {
 			alert(msg);
 		}
 	};
+
 	const CheckBox_OnChange = (v, dataColumn) => {
 	};
 
 	const CheckBox_OnChangeAll = (v, dataColumn) => {
-		$("input[type='checkbox'][value!='0']").each(function() {
+		$("input[type='checkbox'][value!='0']").each(function () {
 			$(this).prop("checked", false);
 		});
-		if($("input[type='checkbox'][value='0']").prop("checked")) {
+		if ($("input[type='checkbox'][value='0']").prop("checked")) {
 			$("#CheckItemGroup").hide();
 		} else {
 			$("#CheckItemGroup").show();
@@ -95,10 +114,10 @@ const EditPanel = props => {
 			elem = (
 				<DateTimePickerElem
 					key={key}
-					columnTitle={col.columnTitle}					
+					columnTitle={col.columnTitle}
 					dateTimePickerProps={{
-						dateFormat:"YYYY-MM-DD",
-						timeFormat:"HH:mm",
+						dateFormat: "YYYY-MM-DD",
+						timeFormat: "HH:mm",
 						defaultValue: moment(stateData[col.datacolumn]).format(dateformat),
 						onBlur: e => {
 							try {
@@ -106,12 +125,12 @@ const EditPanel = props => {
 									moment(e).format(dateformat),
 									col.datacolumn
 								);
-							} catch (ex) {}
+							} catch (ex) { }
 						}
 					}}
 				/>
 			);
-		} 
+		}
 		return elem;
 	});
 
@@ -122,35 +141,38 @@ const EditPanel = props => {
 				style={{ marginBottom: "20px" }}
 				onClick={props.ClickBack}>
 				Back
-			</button>	
+			</button>
 
 			<SiteList
 				siteList={props.siteList}
 				currentSelect={stateData.siteId}
 				onChange={EditFiled}
-				datacolumn={"siteId"}
-			/>	
+				datacolumn="siteId"
+				IsAdd={props.IsAdd}
+			/>
 
 			<DropDownBox
 				columnTitle="Tp Name"
 				options={GetTPOptions(props.tpList)}
-				selectedValue={props.id}
-				dataColumn={"id"}
+				currentSelect={stateData.tpId}
+				dataColumn="tpId"
 				onChange={EditFiled}
-			/> 
+				IsAdd={props.IsAdd}
+			/>
 			<br></br>
-			 <div className="row-flex">
+			<div className="row-flex">
 				{stateData.typeList ? (
-				<CheckBoxElem
-					Title="Tp GameType"
-					Options={GetTpGameTypeOptions(stateData.typeList, stateData.id)}
-					OnChange={CheckBox_OnChange}
-					OnChangeAll={CheckBox_OnChangeAll}
-					dataColumn="tpGameType"
-				/>
+					<CheckBoxElem
+						Title="Tp GameType"
+						Options={GetTpGameTypeOptions(stateData.typeList, stateData.tpId)}
+						OnChange={CheckBox_OnChange}
+						OnChangeAll={CheckBox_OnChangeAll}
+						dataColumn="tpGameType"
+						currentSelect={stateData.tpGameType}
+					/>
 				) : null}
-			</div> 
-			
+			</div>
+
 			<br></br>
 			{commonRows}
 			<button
@@ -160,7 +182,7 @@ const EditPanel = props => {
 					marginBottom: "40px",
 					float: "right"
 				}}
-				onClick={InsertTpMaintain}> 
+				onClick={SetTpMaintain}>
 				Submit
 			</button>
 		</>
@@ -172,13 +194,13 @@ const DateTimePickerElem = props => {
 		<div className="form-group">
 			<span className="label">{props.columnTitle}</span>
 			<DateTimePicker
-			 {...props.dateTimePickerProps} 
-			 />
+				{...props.dateTimePickerProps}
+			/>
 		</div>
 	);
 };
 
-const SiteList = ({ siteList, onChange, currentSelect, datacolumn }) => {
+const SiteList = ({ siteList, onChange, currentSelect, datacolumn, IsAdd }) => {
 	let radio =
 		siteList &&
 		Object.keys(siteList).map(siteId => {
@@ -191,6 +213,7 @@ const SiteList = ({ siteList, onChange, currentSelect, datacolumn }) => {
 					id={`rb-site-${siteId}`}
 					onChange={onChange.bind(null, siteId, datacolumn)}
 					checked={currentSelect == siteId}
+					IsAdd={IsAdd}
 				/>
 			);
 		});
@@ -202,10 +225,10 @@ const SiteList = ({ siteList, onChange, currentSelect, datacolumn }) => {
 	);
 };
 
-const RadioItem = ({ value, dispalyText, id, onChange, checked }) => {
+const RadioItem = ({ value, dispalyText, id, onChange, checked, IsAdd }) => {
 	return (
 		<div className="custom-control custom-radio custom-control-inline">
-			<input
+			<input disabled={IsAdd ? false : true}
 				type="radio"
 				id={id}
 				name="SiteList"
@@ -222,107 +245,114 @@ const RadioItem = ({ value, dispalyText, id, onChange, checked }) => {
 };
 
 const GetTPOptions = (tpList) => {
-	let TPOptions = [];	
+	let TPOptions = [];
 	if (tpList != null) {
 		tpList.forEach((x) => {
-		TPOptions.push({ value: x.id, displayText: x.tpName });
-	  });
+			TPOptions.push({ value: x.id, displayText: x.tpName });
+		});
 	}
 	return TPOptions;
 };
 
 const DropDownBox = (props) => {
 	const onChange = (e) => {
-	  if (props.onChange) {
-		props.onChange(e.target.value, props.dataColumn);
-	  }
+		if (props.onChange) {
+			props.onChange(e.target.value, props.dataColumn);
+		}
 	};
 	let optionRows = props.options.map((item) => {
-	  return (
-		<option key={`${props.ColumnTitle}-${item.value}`} value={item.value}>
-		  {item.displayText}
-		</option>
-	  );
+		return (
+			<option key={`${props.ColumnTitle}-${item.value}`} value={item.value} selected={props.currentSelect == item.value}>
+				{item.displayText}
+			</option>
+		);
 	});
 	return (
 		<div>
 			<div className="input-item">
 				<span className="label">{props.columnTitle}</span>
 				<div className="field">
-				<select onChange={onChange} value={props.value}>
-					{optionRows}
-				</select>
+					<select onChange={onChange} value={props.value} disabled={props.IsAdd ? false : true}>
+						{optionRows}
+					</select>
 				</div>
 			</div>
-	  	</div>	
+		</div>
 	);
 };
 
 const GetTpGameTypeOptions = (typeList, tpId) => {
-	let TpGameTypeOptions = [];	
+	let TpGameTypeOptions = [];
 	if (typeList != null) {
 		typeList.forEach((x) => {
-			if	(tpId == x.tpId){
-				TpGameTypeOptions.push({ value: `${x.type}-${x.categoryId}`, displayText: x.typeName });
-			}			
-	  });
+			if (tpId == x.tpId) {
+				TpGameTypeOptions.push({ value: `${x.type}-${x.categoryId}`, displayText: x.typeName, id: x.type });
+			}
+		});
 	}
-	return TpGameTypeOptions;		
-};  
+	return TpGameTypeOptions;
+};
 
 const CheckBoxElem = ({
 	Title,
 	Options,
 	OnChange,
 	OnChangeAll,
-	dataColumn,
-  }) => {
+	dataColumn
+}) => {
 	let opt = Options.map((o) => {
-	  return (
-		<CheckBox
-		  onChange={OnChange}
-		  Options={null}
-		  Title={o.displayText}
-		  Value={o.value}
-		  dataColumn={dataColumn}
-		/>
-	  );
-	});
- 	return (
-	  <div className="input-item" style={{ width: "auto" }}>
-		<span className="label">{Title}</span>
-		<div className="field">		
+		return (
 			<CheckBox
-			onChange={OnChangeAll}
-			Title="All"
-			Options={Options}
-			Value="0"
-			dataColumn={dataColumn}
-			/>		
-			<br />	
-			<div id="CheckItemGroup">	
-			{opt}
+				onChange={OnChange}
+				Options={null}
+				Title={o.displayText}
+				Value={o.value}
+				dataColumn={dataColumn}
+				id={o.id}
+			/>
+		);
+	});
+	return (
+		<div className="input-item" style={{ width: "auto" }} >
+			<span className="label">{Title}</span>
+			<div className="field">
+				<CheckBox
+					onChange={OnChangeAll}
+					Title="All"
+					Options={Options}
+					Value="0"
+					dataColumn={dataColumn}
+					id="0"
+				/>
+				<br />
+				<div id="CheckItemGroup">
+					{opt}
+				</div>
 			</div>
 		</div>
-	  </div>
-	); 
-};
-  
-const CheckBox = (props) => {
-	const OnChange = (e) => {
-	  props.onChange(props.Value, props.dataColumn, props.Options);
-	};
-	return (
-	  <label className="checkbox checkbox-checked">
-		<input
-		  type="checkbox"
-		  style={{ width: "0" }}
-		  value={props.Value}
-		  onChange={OnChange}
-		/>
-		<i className="icon icon-checkbox"></i>
-		<span className="text">{props.Title}</span>
-	  </label>
 	);
 };
+
+const CheckBox = (props) => {
+	const OnChange = (e) => {
+		props.onChange(props.Value, props.dataColumn, props.Options);
+	};
+	return (
+		<label className="checkbox checkbox-checked">
+			<input
+				type="checkbox"
+				style={{ width: "0" }}
+				value={props.Value}
+				onChange={OnChange}
+				id={props.id}
+			/>
+			<i className="icon icon-checkbox"></i>
+			<span className="text">{props.Title}</span>
+		</label>
+	);
+};
+
+const UtcToLocal = (time) => {
+	return moment.utc(time).local().format('YYYY-MM-DD HH:mm');
+}
 export default EditPanel;
