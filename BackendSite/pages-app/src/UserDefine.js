@@ -120,7 +120,11 @@ const WithdrawalAccounting = lazy(() =>
 const LeaderBoardExtraPoint = lazy(() =>
   import("./pages/Marketing/LeaderBoardExtraPoint/index")
 );
-export const defaultPage = "LeaderBoardExtraPoint";
+const VipLevelReview = lazy(() =>
+  import("./pages/Marketing/VipLevelReview/index")
+);
+
+export const defaultPage = "VipLevelReview";
 
 export const layoutType = {
   N88: "N88",
@@ -706,6 +710,19 @@ export const pages = {
     comp: (
       <Suspense fallback="loading...">
         <LeaderBoardExtraPoint />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  VipLevelReview: {
+    comp: (
+      <Suspense fallback="loading...">
+        <VipLevelReview />
       </Suspense>
     ),
     css: [

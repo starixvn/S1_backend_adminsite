@@ -3,6 +3,9 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
+using BackendSite.ExceptionHandling;
+using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Controllers.Api
@@ -10,52 +13,112 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
-
     public class VipLevelController : ControllerBase
     {
-        private readonly VipLevelBLL vipLevelBLL;
-        private readonly CustInfoBLL custInfoBLL;
-        private readonly AuthorizeBLL authorizeBLL;
-        private readonly ExcelBLL excelBLL;
+        #region Fields
 
-        public VipLevelController(VipLevelBLL vipLevelBLL, CustInfoBLL custInfoBLL, AuthorizeBLL authorizeBLL, ExcelBLL excelBLL)
+        private readonly VipLevelBLL _vipLevelBLL;
+        private readonly CustInfoBLL _custInfoBLL;
+        private readonly AuthorizeBLL _authorizeBLL;
+        private readonly ExcelBLL _excelBLL;
+
+        #endregion
+
+        #region Constructors
+
+        public VipLevelController(VipLevelBLL vipLevelBLL,
+            CustInfoBLL custInfoBLL,
+            AuthorizeBLL authorizeBLL,
+            ExcelBLL excelBLL)
         {
-            this.vipLevelBLL = vipLevelBLL;
-            this.custInfoBLL = custInfoBLL;
-            this.authorizeBLL = authorizeBLL;
-            this.excelBLL = excelBLL;
+            _vipLevelBLL = vipLevelBLL;
+            _custInfoBLL = custInfoBLL;
+            _authorizeBLL = authorizeBLL;
+            _excelBLL = excelBLL;
         }
+
+        #endregion
+
+        #region API Model
+
         public class CustIdReq
         {
             public int CustId { get; set; }
             public int VipLevel { get; set; }
             public int Manually { get; set; }
         }
+
+        public class VipUpgradeReviewParameter
+        {
+            public int SiteId { get; set; }
+            public string CalculateYearMonth { get; set; }
+            public VipStatus Status { get; set; }
+            public string UserName { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+
+        }
+
+        public class UpdateVipUpgradeReviewParameter
+        {
+            public IEnumerable<int> CustIdList { get; set; }
+            public string CalculateYearMonth { get; set; }
+            public int SiteId { get; set; }
+            public VipStatus NewStatus { get; set; }
+        }
+
+        public class VipDowngradeReviewParameter
+        {
+            public int SiteId { get; set; }
+            public string CalculateYearMonth { get; set; }
+            public VipStatus Status { get; set; }
+            public string UserName { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+        }
+
+        public class UpdateVipDowngradeReviewParameter
+        {
+            public IEnumerable<int> CustIdList { get; set; }
+            public string CalculateYearMonth { get; set; }
+            public int SiteId { get; set; }
+            public VipStatus NewStatus { get; set; }
+        }
+
+        #endregion
+
+        #region Actions
+
+        #region CustInfo > VipLevel
+
         [HttpPost]
         public ApiListResult<VipLevelSetting> GetVipLevelSetting(CustIdReq custIdReq)
         {
-            var custInfo = custInfoBLL.GetCustInfoWithCache(custIdReq.CustId);
+            var custInfo = _custInfoBLL.GetCustInfoWithCache(custIdReq.CustId);
             var apiListResult = new ApiListResult<VipLevelSetting>();
-            apiListResult.Data = vipLevelBLL.GetVipLevelSetting(custInfo.SiteId);
+            apiListResult.Data = _vipLevelBLL.GetVipLevelSetting(custInfo.SiteId);
             apiListResult.ErrorCode = 0;
             return apiListResult;
         }
+
         [HttpPost]
         public ApiResult<VipLevelInfo> GetVipLevelInfo(CustIdReq custIdReq)
         {
             var apiListResult = new ApiResult<VipLevelInfo>();
-            apiListResult.Data = vipLevelBLL.GetVipLevelInfo(custIdReq.CustId);
+            apiListResult.Data = _vipLevelBLL.GetVipLevelInfo(custIdReq.CustId);
             apiListResult.ErrorCode = 0;
             return apiListResult;
         }
+
         [HttpPost]
         public ApiListResult<VipLevelLog> GetVipLevelLog(CustIdReq custIdReq)
         {
             var apiListResult = new ApiListResult<VipLevelLog>();
-            apiListResult.Data = vipLevelBLL.GetVipLevelLog(custIdReq.CustId);
+            apiListResult.Data = _vipLevelBLL.GetVipLevelLog(custIdReq.CustId);
             apiListResult.ErrorCode = 0;
             return apiListResult;
         }
+
         [HttpPost]
         public ApiResult SetVipLevel(CustIdReq custIdReq)
         {
@@ -63,9 +126,10 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                var custInfo = custInfoBLL.GetCustInfoWithCache(custIdReq.CustId);
-                var authData = authorizeBLL.GetAuthData();
-                var result = vipLevelBLL.SetVipLevel(custInfo.SiteId, custInfo.CustId, custInfo.UserName, custIdReq.VipLevel, authData.UserName);
+                var custInfo = _custInfoBLL.GetCustInfoWithCache(custIdReq.CustId);
+                var authData = _authorizeBLL.GetAuthData();
+                var result = _vipLevelBLL.SetVipLevel(custInfo.SiteId, custInfo.CustId, custInfo.UserName,
+                    custIdReq.VipLevel, authData.UserName);
                 apiResult.Data = result;
                 apiResult.ErrorCode = 0;
             }
@@ -77,6 +141,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
         [HttpPost]
         public ApiResult SetVipLevelManually(CustIdReq custIdReq)
         {
@@ -84,9 +149,10 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                var custInfo = custInfoBLL.GetCustInfoWithCache(custIdReq.CustId);
-                var authData = authorizeBLL.GetAuthData();
-                var result = vipLevelBLL.SetVipLevelManually(custInfo.SiteId, custInfo.CustId, custInfo.UserName, custIdReq.Manually, authData.UserName);
+                var custInfo = _custInfoBLL.GetCustInfoWithCache(custIdReq.CustId);
+                var authData = _authorizeBLL.GetAuthData();
+                var result = _vipLevelBLL.SetVipLevelManually(custInfo.SiteId, custInfo.CustId, custInfo.UserName,
+                    custIdReq.Manually, authData.UserName);
                 apiResult.Data = result;
                 apiResult.ErrorCode = 0;
             }
@@ -99,84 +165,151 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public class VipUpgradeReviewPara
+        #endregion
+
+        #region VIP Review
+
+        [HttpPost]
+        public ApiListResult<VipUpgradeReviewDetailModel> GetVipUpgradeReviewList(VipUpgradeReviewParameter request)
         {
-            public int SiteId { get; set; }
-            public string YearMonth { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
-            public int Status { get; set; }
-            public string UserName { get; set; }
-            public VipUpgradeReviewPara()
+            var result = _vipLevelBLL.GetVipUpgradeReviewList(request.SiteId,
+                request.CalculateYearMonth,
+                request.Status,
+                request.UserName,
+                request.PageNumber,
+                request.PageSize);
+
+            return new ApiListResult<VipUpgradeReviewDetailModel>
             {
-                //PageSize預設20
-                if (PageSize == 0)
-                    PageSize = 20;
+                Data = result.Data,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                PageNumber = result.PageNumber,
+                TotalPages = result.TotalPages,
+                RowCount = result.RowCount
+            };
+        }
+
+        [HttpPost]
+        public IActionResult ExportVipUpgradeReviewList(int SiteId,
+            string YearMonth,
+            int Status,
+            string UserName)
+        {
+            var data = _vipLevelBLL.ExportVipUpgradeReviewList(SiteId,
+                YearMonth,
+                (VipStatus)Status,
+                UserName);
+
+            var stream = _excelBLL.Export(data);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"VipUpgrade_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
+
+        [HttpPost]
+        public ApiResult UpdateVipUpgradeReview(UpdateVipUpgradeReviewParameter request)
+        {
+            if (_vipLevelBLL.UpdateVipUpgradeReview(request.CustIdList,
+                request.CalculateYearMonth,
+                request.SiteId,
+                request.NewStatus,
+                User.Identity.Name))
+            {
+                //success
+                return new ApiResult()
+                {
+                    ErrorCode = 0,
+                    Message = "Update Successful."
+                };
+            }
+            else
+            {
+                //fail
+                return new ApiResult()
+                {
+                    ErrorCode = -1,
+                    Message = "Update Fail."
+                };
             }
         }
 
         [HttpPost]
-        public ApiListResult<VipUpgradeList> GetVipUpgradeReview(VipUpgradeReviewPara para)
+        public ApiListResult<VipDowngradeReviewDetailModel> GetVipDowngradeReviewList(VipDowngradeReviewParameter request)
         {
-            var apiResult = new ApiListResult<VipUpgradeList>();
-            try
-            {
-                var SearchResult = vipLevelBLL.GetVipUpgradeReview(para.YearMonth, para.SiteId, para.PageNumber, para.PageSize, para.Status, para.UserName);
-                apiResult.Data = SearchResult.VipUpgradeList;
-                apiResult.PageNumber = SearchResult.PageNumber;
-                apiResult.TotalPages = SearchResult.TotalPages;
-                apiResult.RowCount = SearchResult.RowCount;
+            var result = _vipLevelBLL.GetVipDowngradeReviewList(request.SiteId,
+                request.CalculateYearMonth,
+                request.Status,
+                request.UserName,
+                request.PageNumber,
+                request.PageSize);
 
-                if (vipLevelBLL.CanUpgradeVip(para.YearMonth))
-                {
-                    apiResult.ErrorCode = (int)GetVipUpgradeReviewErrorCode.CanUpgrade;
-                }
-                else
-                {
-                    apiResult.ErrorCode = (int)GetVipUpgradeReviewErrorCode.JustCanSearch;
-                }
-            }
-            catch (Exception ex)
+            return new ApiListResult<VipDowngradeReviewDetailModel>
             {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = ex.Message;
-            }
-            return apiResult;
-        }
-        public class UpdateVipUpgradeReviewPara
-        {
-            public string CustIds { get; set; }
-            public string YearMonth { get; set; }
-            public int ChangeStatus { get; set; }
-        }
-        [HttpPost]
-        public ApiResult UpdateVipUpgradeReview(UpdateVipUpgradeReviewPara para)
-        {
-            var apiResult = new ApiResult();
-            try
-            {
-                if (vipLevelBLL.CanUpgradeVip(para.YearMonth))
-                {
-                    vipLevelBLL.UpdateVipUpgradeReview(para.CustIds, para.YearMonth, User.Identity.Name, para.ChangeStatus);
-                }
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = ex.Message;
-            }
+                Data = result.Data,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                PageNumber = result.PageNumber,
+                TotalPages = result.TotalPages,
+                RowCount = result.RowCount
+            };
 
-            return apiResult;
+            //不應該用errorcode判斷.........這個條件要再確認
+            // if (_vipLevelBLL.CanUpgradeVip(request.YearMonth))
+            // {
+            //     apiResult.ErrorCode = (int) GetVipUpgradeReviewErrorCode.CanUpgrade;
+            // }
+            // else
+            // {
+            //     apiResult.ErrorCode = (int) GetVipUpgradeReviewErrorCode.JustCanSearch;
+            // }
+            //
+            // return apiResult;
         }
 
         [HttpPost]
-        public IActionResult ExportVipUpgradedata(int SiteId, string YearMonth, int Status, string UserName)
+        public IActionResult ExportVipDowngradeReviewList(int SiteId,
+            string CalculateYearMonth,
+            int Status,
+            string UserName)
         {
-            var ExportData = vipLevelBLL.GetVipUpgradedata(SiteId, YearMonth, Status, UserName);
-            var stream = excelBLL.Export(ExportData);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"VipUpgrade_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            var exportData = _vipLevelBLL.ExportVipDowngradeReviewList(SiteId,
+                CalculateYearMonth,
+                (VipStatus)Status,
+                UserName);
+
+            var stream = _excelBLL.Export(exportData);
+
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"VipDowngrade_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
+        [HttpPost]
+        public ApiResult UpdateVipDowngradeReview(UpdateVipDowngradeReviewParameter request)
+        {
+            if (_vipLevelBLL.UpdateVipDowngradeReview(request.CustIdList,
+                request.CalculateYearMonth,
+                request.SiteId,
+                request.NewStatus,
+                User.Identity.Name))
+            {
+                //success
+                return new ApiResult()
+                {
+                    ErrorCode = 0,
+                    Message = "Update Successful."
+                };
+            }
+            else
+            {
+                //fail
+                return new ApiResult()
+                {
+                    ErrorCode = -1,
+                    Message = "Update Fail."
+                };
+            }
+        }
+
+        #endregion
+
+        #endregion
     }
 }
