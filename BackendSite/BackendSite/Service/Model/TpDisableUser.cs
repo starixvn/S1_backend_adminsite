@@ -18,6 +18,8 @@ namespace BackendSite.Service.Model
 
     public class QueryTpDsiableUser
     {
+        public IEnumerable<int> SiteIds { get; set; }
+        public string UserName { get; set; }
         public long StartDate { get; set; }
         public long EndDate { get; set; }
         public int PageNumber { get; set; }

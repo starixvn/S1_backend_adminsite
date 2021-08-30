@@ -25,6 +25,8 @@ const App = () => {
   const GetDisableUserList = (PageNumber = 1, PageSize = 10) => {
 
     let query = {
+      siteIds: [1,2,3],
+      UserName: null,
       StartDate: moment.utc('2021/08/25 00:00:00').unix(),
       EndDate: moment.utc('2020/08/31 00:00:00').unix(),
       PageNumber: PageNumber,

@@ -37,8 +37,8 @@ namespace BackendSite.Controllers.Api
             var pageNumber = query.PageNumber;
             try
             {
-                apiResult.Data = _riskBll.GetTpDisableUser(query.StartDate, 
-                    query.EndDate, query.PageSize, query.PageNumber, out var totalPages, out var rowCount);
+                apiResult.Data = _riskBll.GetTpDisableUser(query.SiteIds, query.UserName, query.StartDate, query.EndDate, 
+                                                           query.PageSize, query.PageNumber, out var totalPages, out var rowCount);
                 apiResult.TotalPages = totalPages;
                 apiResult.PageNumber = pageNumber;
                 apiResult.RowCount = rowCount;

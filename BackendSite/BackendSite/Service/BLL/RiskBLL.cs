@@ -19,9 +19,9 @@ namespace BackendSite.Service.BLL
             return await _riskService.TpDisableUserSet(custId, siteId, gameIndo, Operator);
         }
         
-        public IEnumerable<TpDisableUser> GetTpDisableUser(long startDate, long endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<TpDisableUser> GetTpDisableUser(IEnumerable<int> siteIds, string userName, long startDate, long endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
         {
-            return _riskService.TpDisableUserGet(startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
+            return _riskService.TpDisableUserGet(siteIds, userName, startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
         }
     }
 }

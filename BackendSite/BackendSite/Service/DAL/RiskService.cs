@@ -29,23 +29,24 @@ namespace BackendSite.Service.DAL
             return await _sqlClient.ExecuteAsync("Admin_TpDisableUser_Set", p);
         }
 
-        public IEnumerable<TpDisableUser> TpDisableUserGet(long startDate, long endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<TpDisableUser> TpDisableUserGet(IEnumerable<int> siteIds, string userName, long startDate, long endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
         {
             totalPages = 0;
             rowCount = 0;
-            
             var p = new DynamicParameters();
-            p.Add("StartDate", startDate);
-            p.Add("EndDate", endDate);
-            p.Add("PageSize", pageSize);
-            p.Add("PageNumber", pageNumber);
-            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_SiteIds", JsonConvert.SerializeObject(siteIds));
+            p.Add("_UserName", userName);
+            p.Add("_StartDate", startDate);
+            p.Add("_EndDate", endDate);
+            p.Add("_PageSize", pageSize);
+            p.Add("_PageNumber", pageNumber);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
             
             var result = _sqlClient.Query<TpDisableUser>("Admin_TpDisableUser_Get", p);
-            totalPages = p.Get<int>("TotalPages");
-            rowCount = p.Get<int>("RowCount");
+            totalPages = p.Get<int>("_TotalPages");
+            rowCount = p.Get<int>("_RowCount");
             return result;
         }
     }
