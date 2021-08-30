@@ -25,7 +25,7 @@ namespace BackendSite.Service.Library
             _logger = logger;
         }
 
-        public async Task<T> QueryFirstAsync<T>(string name, SqlMapper.IDynamicParameters parameters)
+        public async Task<T> QueryFirstAsync<T>(string name, DynamicParameters parameters)
         {
             T result;
             var sw = Stopwatch.StartNew();

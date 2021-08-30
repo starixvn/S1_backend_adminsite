@@ -101,7 +101,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TpUserName = TpUserName, TransId = transId, Email = Email, PhoneNo = PhoneNo, StartDate = startDate, EndDate = endDate, SiteList = siteList, AffId, BankAccountNumber = BankAccountNumber, SelectCurrency = SelectCurrency, CurrncyList = currncyList, SelectStatus = SelectStatus });
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExportV3_Get", p, commandType: CommandType.StoredProcedure);
+            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExportV4_Get", p, commandType: CommandType.StoredProcedure);
             return custInfoDetailList;
         }
 
@@ -114,7 +114,7 @@ namespace BackendSite.Service.DAL
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfoDetailSearchV5_Get", new { CustId = custId, UserName = userName, SiteList = siteList }, commandType: CommandType.StoredProcedure);
+            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfoDetailSearchV6_Get", new { CustId = custId, UserName = userName, SiteList = siteList }, commandType: CommandType.StoredProcedure);
             return result;
         }
 
@@ -204,6 +204,11 @@ namespace BackendSite.Service.DAL
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_ResetCustBankInfo_Set", new { CustId = custId }, commandType: CommandType.StoredProcedure) > 0;
+        }
+        public bool ResetCustUSDTInfo(int custId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_ResetCustUSDTInfo_Set", new { CustId = custId }, commandType: CommandType.StoredProcedure) > 0;
         }
         public bool SetCustStatus(int custId, int status)
         {

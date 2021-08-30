@@ -64,6 +64,13 @@ namespace BackendSite.Service.DAL
             return conn.Query<TpGameType>("Admin_TpGameType_Get", commandType: CommandType.StoredProcedure);
         }
 
+        public IEnumerable<CashBackGame> GetCashBackGameList(int? tpId, int? categoryId)
+        {
+            using MySqlConnection conn =
+                new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<CashBackGame>("Admin_CashBackGameType_Get", new { TpId = tpId , PromoCategoryId = categoryId } ,commandType: CommandType.StoredProcedure);
+        }
+
         public async Task<BonusImportResult> BonusImportAsync(BonusImportPara bonusImportPara)
         {
             BonusImportResult result = new BonusImportResult()
@@ -212,6 +219,44 @@ namespace BackendSite.Service.DAL
                     commandType: CommandType.StoredProcedure);
             }
         }
+        public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(IEnumerable<int> selectSite, int categoryType, int currencyId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        {
+            string SelectSite = null;
+            if (selectSite != null && selectSite.Any())
+            {
+                SelectSite = JsonConvert.SerializeObject(selectSite);
+            }
+            totalPages = 0;
+
+            var p = new DynamicParameters(new { SelectSite, CategoryType = categoryType, CurrencyId = currencyId, PageSize = pageSize });
+            p.Add("StartDate", startDate);
+            p.Add("EndDate", endDate);
+            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            var result = conn.Query<LeaderboardExtraPointList>("Admin_LeaderboardExtraPoint_Get", p, commandType: CommandType.StoredProcedure);
+            pageNumber = p.Get<int?>("PageNumber") ?? 0;
+            totalPages = p.Get<int?>("TotalPages") ?? 0;
+            rowCount = p.Get<int?>("RowCount") ?? 0;
+            return result;
+        }
+
+        public int SetLeaderboardExtraPoint(long activeDate, int siteId, int categoryId, string userName, decimal extraPoint, string lastUpdateUser)
+        {
+            
+            int Rtn = -1;
+
+            var p = new DynamicParameters(new { _ActiveDate = activeDate, _SiteId = siteId, _CategoryId = categoryId, _UserName = userName, _ExtraPoint = extraPoint, _LastUpdateUser = lastUpdateUser });
+            p.Add("RTN", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            int result = conn.Execute("Admin_LeaderboardExtraPoint_Set", p, commandType: CommandType.StoredProcedure);
+            Rtn = p.Get<int?>("RTN") ?? -1;
+            return Rtn;
+        }
 
         #region Public Method
 
@@ -276,6 +321,16 @@ namespace BackendSite.Service.DAL
                 if (promotion.Specific != null)
                 {
                     var rebateList = GetPromotionRebate(bonusCode, siteId, conn, trans);
+                    var cashBackList = GetPromotionCashBack(bonusCode, siteId, conn, trans);
+                    var tempcashBackList = cashBackList.GroupBy(x => new { x.CurrencyId, x.GameType, x.LossAmount, x.Percentage, x.Status,x.TpId }).Select(x=> new PromotionCashBack1 
+                    { 
+                        CurrencyId = x.Key.CurrencyId,
+                        GameType = x.Key.GameType,
+                        LossAmount = x.Key.LossAmount,
+                        Percentage = x.Key.Percentage,
+                        Status = x.Key.Status,
+                        TpId = x.Key.TpId
+                    }).ToList();
 
                     foreach (var s in promotion.Specific)
                     {
@@ -294,7 +349,11 @@ namespace BackendSite.Service.DAL
                         }
 
                         s.RebateList = rebateList.Where(x => x.CurrencyId == s.CurrencyId);
+                        s.CashBackList = tempcashBackList.Where(x => x.CurrencyId == s.CurrencyId);
                     }
+
+                  
+
                 }
             }
 
@@ -440,7 +499,7 @@ namespace BackendSite.Service.DAL
         /// <returns></returns>
         public bool SetPromotionFlow(bool isAdd, PromotionInfo promotion,
             List<PromotionDisplayConditionModel> promotionDisplayConditionList, int expectedDelSpecificRow,
-            int expectedDelRebateRow, int expectedDelConditionRow,string Operator)
+            int expectedDelRebateRow, int expectedDelConditionRow,string Operator, DisplayConditionAbountVipLevel vipLevelCondition)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
@@ -533,7 +592,7 @@ namespace BackendSite.Service.DAL
                     conn, trans);
             }
 
-            if (promotion.PromotionType == 6 || promotion.PromotionType == 7)
+            if (promotion.PromotionType == 6)
             {
                 List<PromotionRebate1> rebateList = new List<PromotionRebate1>();
                 foreach (var s in promotion.Specific)
@@ -565,6 +624,40 @@ namespace BackendSite.Service.DAL
                 }
             }
 
+            if(promotion.PromotionType == 7)
+            {
+                List<PromotionCashBackSetting> cashBackList = new List<PromotionCashBackSetting>();
+                var cashBackGameList = GetCashBackGameList(promotion.TpId, promotion.CategoryId).ToList(); ;
+
+                foreach (var s in promotion.Specific)
+                {
+                    foreach (var r in s.CashBackList)
+                    {
+                        var tempCategoryId = promotion.TpId == 0 ? cashBackGameList.Where(x => x.TpId == r.GameType).FirstOrDefault().CategoryId : r.GameType;
+                        vipLevelCondition.SelectedVipLevel.ToList().ForEach(x =>
+                        {
+                            cashBackList.Add(new PromotionCashBackSetting
+                            {
+                                CurrencyId = s.CurrencyId,
+                                CategoryId = tempCategoryId,
+                                Level = x,
+                                Percentage = r.Percentage,
+                                LossAmount = r.LossAmount,
+                                Status = r.Status,
+                                TpId = promotion.TpId == 0 ? r.GameType : promotion.TpId
+                            }); 
+                        });              
+                    }
+                }
+                if (setAffectCount == 2)
+                {
+                    DeletePromotionCashBack(promotion.BonusCode, promotion.SiteId,
+                        conn, trans);                    
+                }
+                    InsertPromotionCashBack(promotion.BonusCode, promotion.SiteId, Operator, cashBackList,
+                        conn, trans);
+            }
+
             trans.Commit();
             return true;
         }
@@ -580,7 +673,7 @@ namespace BackendSite.Service.DAL
         /// <param name="expectedConditionRow"></param>
         /// <returns></returns>
         public bool DuplicatePromotionFlow(string bonusCode, int siteId, string newBonusCode, int expectedSpecificRow,
-            int expectedRebateRow, int expectedConditionRow)
+            int expectedRebateRow, int expectedConditionRow, int expectedCashBackRow,string Operator)
         {
             using (MySqlConnection connection =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionString")))
@@ -623,6 +716,18 @@ namespace BackendSite.Service.DAL
                         expectedConditionRow, connection, transaction);
 
                     if (!promotionConditionRessult)
+                    {
+                        transaction.Rollback();
+                        return false;
+                    }
+                }
+
+                if(expectedCashBackRow > 0)
+                {
+                    var promotionCashBackRessult = DuplicatePromotionCashBack(bonusCode, siteId, newBonusCode,
+                        expectedCashBackRow, connection, transaction, Operator);
+
+                    if (!promotionCashBackRessult)
                     {
                         transaction.Rollback();
                         return false;
@@ -1238,6 +1343,79 @@ namespace BackendSite.Service.DAL
             propsLog.Add("Operator", Operator);
             return connection.Execute("Admin_AdjustmentInfoLog_Set", propsLog, transaction: transaction,
                 commandType: CommandType.StoredProcedure);
+        }
+        #endregion
+
+        #region
+        private bool DeletePromotionCashBack(string bonusCode, int siteId,
+            MySqlConnection connection,
+            MySqlTransaction transaction)
+        {
+            var p = new DynamicParameters();
+
+            p.Add("_BonusCode", bonusCode);
+            p.Add("_SiteId", siteId);
+
+            return connection.Execute("Admin_PromotionCashBack_Del", p, transaction: transaction,
+                commandType: CommandType.StoredProcedure) > 0;
+        }
+
+        private bool InsertPromotionCashBack(string bonusCode, int siteId, string Operator,List<PromotionCashBackSetting> cashbacklist,
+            MySqlConnection connection,
+            MySqlTransaction transaction)
+        {
+            var p = new DynamicParameters();
+
+            p.Add("_BonusCode", bonusCode);
+            p.Add("_SiteId", siteId);
+            p.Add("_Operator", Operator);
+            p.Add("_CashBackList", JsonConvert.SerializeObject(cashbacklist));
+
+            return connection.Execute("Admin_PromotionCashBack_Set", p, transaction: transaction,
+                commandType: CommandType.StoredProcedure) > 0;
+        }
+
+        public IEnumerable<PromotionCashBack1> GetPromotionCashBack(string bonusCode, int siteId,
+            MySqlConnection connection = null,
+            MySqlTransaction transaction = null)
+        {
+            var p = new DynamicParameters();
+
+            p.Add("_BonusCode", bonusCode);
+            p.Add("_SiteId", siteId);
+
+            if (connection == null)
+            {
+                using MySqlConnection conn =
+                    new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+                return conn.Query<PromotionCashBack1>("Admin_PromotionCashBack_Get", p,
+                    commandType: CommandType.StoredProcedure);
+            }
+            else
+            {
+                return connection.Query<PromotionCashBack1>("Admin_PromotionCashBack_Get", p, transaction: transaction,
+                    commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        private bool DuplicatePromotionCashBack(string bonusCode, int siteId, string newBonusCode,
+            int expectedRow, MySqlConnection connection,
+            MySqlTransaction transaction, string Operator)
+        {
+            var p = new DynamicParameters();
+
+            p.Add("_BonusCode", bonusCode);
+            p.Add("_SiteId", siteId);
+            p.Add("_NewBonusCode", newBonusCode);
+            p.Add("_Operator", Operator);
+            p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            connection.Execute("Admin_PromotionCashBackDuplicate_Set", p, transaction: transaction,
+                commandType: CommandType.StoredProcedure);
+
+            var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
+
+            return affectCount == expectedRow;
         }
         #endregion
     }

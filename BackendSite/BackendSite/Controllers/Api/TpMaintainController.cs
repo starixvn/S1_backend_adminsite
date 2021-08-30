@@ -223,11 +223,11 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/TpMaintain" })]
-        public ApiResult<IEnumerable<TpCategory>> GetTPCategoryList()
+        public ApiResult<IEnumerable<Service.Model.TpMaintain.TpCategory>> GetTPCategoryList()
         {
             try
             {
-                return new ApiResult<IEnumerable<TpCategory>>
+                return new ApiResult<IEnumerable<Service.Model.TpMaintain.TpCategory>>
                 {
                     Data = tpMaintainBLL.GetTPCategoryList(),
                     ErrorCode = 0
@@ -236,7 +236,7 @@ namespace BackendSite.Controllers.Api
             catch (Exception ex)
             {
                 logger.LogError(ex, ex.Message);
-                return new ApiResult<IEnumerable<TpCategory>>
+                return new ApiResult<IEnumerable<Service.Model.TpMaintain.TpCategory>>
                 {
                     ErrorCode = 999,
                     Message = ex.Message,

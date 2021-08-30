@@ -73,7 +73,7 @@ namespace BackendSite.Service.BLL
         public int WithdrawalApproved(string transId, string comment, string updater, int userId, bool hasPic)
         {
             var serverInfo = _serverInfoService.GetModel();
-            var forStatus = new List<int> {(int) WithdrawalStatus.Process};
+            var forStatus = new List<int> { (int)WithdrawalStatus.Process };
 
             Match m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out int withdrawalId);
@@ -347,7 +347,8 @@ namespace BackendSite.Service.BLL
                 {
                     TimeSpan ts1 = new TimeSpan(x.CreateTime.Ticks);
                     TimeSpan ts2 = new TimeSpan(x.UpdateTime.Ticks);
-                    TimeSpan ts = ts1.Subtract(ts2).Duration();
+                    TimeSpan timeSpanOfFlowEndTime = new TimeSpan(x.FlowEndTime.Ticks);
+                    TimeSpan ts = ts1.Subtract(timeSpanOfFlowEndTime).Duration();
                     x.CompleteTime = GetTimeString(ts);
                     if (x.VerifyTime > DateTime.Now.AddYears(-1000))
                     {
@@ -355,7 +356,7 @@ namespace BackendSite.Service.BLL
                         TimeSpan tsv = ts1.Subtract(ts3).Duration();
                         if (x.Status == 6)
                         {
-                            TimeSpan tsa = ts3.Subtract(ts2).Duration();
+                            TimeSpan tsa = ts3.Subtract(timeSpanOfFlowEndTime).Duration();
                             x.ToApprovedTime = GetTimeString(tsa);
                         }
 
@@ -382,7 +383,8 @@ namespace BackendSite.Service.BLL
                 {
                     TimeSpan ts1 = new TimeSpan(x.CreateTime.Ticks);
                     TimeSpan ts2 = new TimeSpan(x.UpdateTime.Ticks);
-                    TimeSpan ts = ts1.Subtract(ts2).Duration();
+                    TimeSpan timeSpanOfFlowEndTime = new TimeSpan(x.FlowEndTime.Ticks);
+                    TimeSpan ts = ts1.Subtract(timeSpanOfFlowEndTime).Duration();
                     string tempToVerifyTime = "";
                     string tempToApprovedTime = "";
                     if (x.VerifyTime > DateTime.Now.AddYears(-1000))
@@ -391,11 +393,20 @@ namespace BackendSite.Service.BLL
                         TimeSpan tsv = ts1.Subtract(ts3).Duration();
                         if (x.Status == 6)
                         {
-                            TimeSpan tsa = ts3.Subtract(ts2).Duration();
+                            TimeSpan tsa = ts3.Subtract(timeSpanOfFlowEndTime).Duration();
                             tempToApprovedTime = GetTimeString(tsa);
                         }
 
                         tempToVerifyTime = GetTimeString(tsv);
+                    }
+
+                    DateTime? flowEndTime = null;
+                    //Not Flow End.
+                    if (x.Status == (int)WithdrawalStatus.Cancelled
+                    || x.Status == (int)WithdrawalStatus.Approved
+                    || x.Status == (int)WithdrawalStatus.Rejected)
+                    {
+                        flowEndTime = x.FlowEndTime;
                     }
 
                     exportDataToExcel.Add(new WithdrawalTimeExportData
@@ -408,6 +419,7 @@ namespace BackendSite.Service.BLL
                         Status = x.StatusName,
                         CreateTime = x.CreateTime,
                         UpdateTime = x.UpdateTime,
+                        FlowEndTime = flowEndTime,
                         ToVerifyTime = tempToVerifyTime,
                         ToApprovedTime = tempToApprovedTime,
                         CompleteTime = GetTimeString(ts)
@@ -477,10 +489,10 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                if (withdrawalInfo.WithdrawalType == (int) WithdrawalType.LocalBank
-                    && withdrawalInfo.Status == (int) WithdrawalStatus.Approved)
+                if (withdrawalInfo.WithdrawalType == (int)WithdrawalType.LocalBank
+                    && withdrawalInfo.Status == (int)WithdrawalStatus.Approved)
                 {
-                    var accountingData = GetAccountingList(transId, withdrawalInfo.SiteId,withdrawalInfo.CurrencyId);
+                    var accountingData = GetAccountingList(transId, withdrawalInfo.SiteId, withdrawalInfo.CurrencyId);
                     var isoCode = _reportService.GetCurrencyList().Where(x => x.CurrencyId == withdrawalInfo.CurrencyId)
                         .Select(x => x.IsoCode).FirstOrDefault();
 
@@ -662,9 +674,9 @@ namespace BackendSite.Service.BLL
                 string.IsNullOrEmpty(userName) ? null : userName);
         }
 
-        private IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingList(string transId, int siteId,int currencyId)
+        private IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingList(string transId, int siteId, int currencyId)
         {
-            return _withdrawalBankAccountingService.GetAccountingListByTransId(transId, siteId,currencyId);
+            return _withdrawalBankAccountingService.GetAccountingListByTransId(transId, siteId, currencyId);
         }
 
         private GetWithdrawalBankAccountingModel GetAccountingById(int id)

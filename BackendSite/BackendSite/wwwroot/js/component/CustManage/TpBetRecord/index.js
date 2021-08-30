@@ -10,6 +10,11 @@ const Panel = () => {
   const [stateDayDatas, setDayDatas] = React.useState();
   const [stateCategoryDatas, setCategoryDatas] = React.useState();
   const [stateGameDatas, setGameDatas] = React.useState();
+  const [stateTpBetRecordDatas, setTpBetRecordDatas] = React.useState();
+  const [stateTpBetRecordDatasShowStatus, setTpBetRecordDatasShowStatus] =
+    React.useState(false);
+  const [stateTpBetRecordDatasShowRawDetail, setTpBetRecordDatasShowRawDetail] =
+    React.useState(false);
   const [stateGameInfo, setGameInfo] = React.useState({
     Date: null,
     GameTypeId: null,
@@ -17,9 +22,16 @@ const Panel = () => {
   const [stateInfoType, setInfoType] = React.useState();
   let CustId = parseInt(getUrlParameter("custId"));
   const [filterData, setfilterData] = React.useState({
-    StartTime: moment.utc(new Date()).add(8, "hour").add(-1, "days").format("l LTS"),
+    StartTime: moment
+      .utc(new Date())
+      .add(8, "hour")
+      .add(-1, "days")
+      .format("l LTS"),
     EndTime: moment.utc(new Date()).add(8, "hour").format("l LTS"),
     DateQuickPicker: "0",
+  });
+  const [stateDatas, setDatas] = React.useState({
+    FilterInfo: null,
   });
 
   const EditfilterData = (v, col) => {
@@ -39,8 +51,8 @@ const Panel = () => {
         _endDate = moment().endOf("day");
         break;
       case "2":
-        _startDate = moment().subtract(1, "days").startOf("days");
-        _endDate = moment().subtract(1, "days").endOf("days");
+        _startDate = moment().subtract(1, "days");
+        _endDate = moment().subtract(1, "days");
 
         break;
       case "3":
@@ -94,6 +106,9 @@ const Panel = () => {
         if (result.errorCode == 0) {
           setWeekDatas(result.data);
           setInfoType("week");
+          setDatas({
+            FilterInfo:filterData
+          });
         } else {
           alert(result.message);
         }
@@ -102,7 +117,7 @@ const Panel = () => {
         alert(error);
       });
   };
-  
+
   React.useEffect(() => {
     axios
       .post("/api/Payment/GetCustTpBetRecordList", {
@@ -116,6 +131,9 @@ const Panel = () => {
           if (result.errorCode == 0) {
             setWeekDatas(result.data);
             setInfoType("week");
+            setDatas({
+              FilterInfo:filterData
+            });
           } else {
             alert(result.message);
           }
@@ -133,6 +151,8 @@ const Panel = () => {
       .post("/api/Payment/GetCustTpBetRecordListOneDay", {
         CustId: CustId,
         selDate: moment(Date).format("YYYY-MM-DD"),
+        StartDate: moment(stateDatas.FilterInfo.StartTime).unix(),
+        EndDate: moment(stateDatas.FilterInfo.EndTime).unix(),
       })
       .then((res) => {
         let result = res.data;
@@ -154,6 +174,8 @@ const Panel = () => {
         CustId: CustId,
         selDate: moment(Date).format("YYYY-MM-DD"),
         CategoryId: parseInt(CategoryId),
+        StartDate: moment(stateDatas.FilterInfo.StartTime).unix(),
+        EndDate: moment(stateDatas.FilterInfo.EndTime).unix(),
       })
       .then((res) => {
         let result = res.data;
@@ -175,6 +197,8 @@ const Panel = () => {
         CustId: CustId,
         selDate: moment(Date).format("YYYY-MM-DD"),
         gameTypeId: parseInt(GameTypeId),
+        StartDate: moment(stateDatas.FilterInfo.StartTime).unix(),
+        EndDate: moment(stateDatas.FilterInfo.EndTime).unix(),
         PageSize: 15,
         PageNumber: PageNumber,
       })
@@ -191,6 +215,41 @@ const Panel = () => {
       .catch((error) => {
         alert(error);
       });
+  };
+
+  const getTpBetRecordDetail = (GameType, TransId) => {
+    axios
+      .post("/api/Payment/GetTpBetRecordDetail", {
+        // GameType: parseInt(GameType),
+        // TransId: TransId,
+        //For Test
+        GameType: parseInt(1),
+        TransId: "Test1234",
+      })
+      .then((res) => {
+        let result = res.data;
+        if (result.errorCode == 0) {
+          setTpBetRecordDatas(result);
+          setTpBetRecordDatasShowStatus(true);
+          setTpBetRecordDatasShowRawDetail(false);
+        } else {
+          alert(result.message);
+        }
+      })
+      .catch((error) => {
+        alert(error);
+      });
+  };
+
+  //Poppout Close
+  const GameResult_SwitchDetailBtnClick = (flag) => {
+    setTpBetRecordDatasShowRawDetail(flag);
+  };
+
+  //Poppout Close
+  const GameResult_CloseBtnClick = () => {
+    setTpBetRecordDatasShowStatus(false);
+    setTpBetRecordDatas({});
   };
 
   const onClickBack = (type) => {
@@ -225,6 +284,13 @@ const Panel = () => {
       Info={stateGameInfo}
       ClickBack={onClickBack}
       ClickDetail={getGameData}
+      //Popout:TpBetRecordDetail
+      TpBetRecordDatas={stateTpBetRecordDatas}
+      TpBetRecordDatasShowStatus={stateTpBetRecordDatasShowStatus}
+      TpBetRecordDatasShowRawDetail={stateTpBetRecordDatasShowRawDetail}
+      ClickTpBetRecordDetail={getTpBetRecordDetail}
+      TpBetRecordCloseBtn={GameResult_CloseBtnClick}
+      SwitchDetailBtn={GameResult_SwitchDetailBtnClick}
     />
   ) : null;
 };

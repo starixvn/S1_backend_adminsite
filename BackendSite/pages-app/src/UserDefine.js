@@ -118,11 +118,16 @@ const WithdrawalAccounting = lazy(() =>
   import("./pages/Finance/WithdrawalAccounting/index")
 );
 
+const LeaderBoardExtraPoint = lazy(() =>
+  import("./pages/Marketing/LeaderBoardExtraPoint/index")
+);
+
 const DisableUserForGame = lazy(() =>
   import("./pages/CSD/DisableUserForGame/index")
 );
 
 export const defaultPage = "DisableUserForGame";
+
 
 export const layoutType = {
   N88: "N88",
@@ -712,7 +717,20 @@ export const pages = {
     ),
     css: [
       "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
       "./css/common/fonts/main-font/style.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  LeaderBoardExtraPoint: {
+    comp: (
+      <Suspense fallback="loading...">
+        <LeaderBoardExtraPoint />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
       "./css/css/main.css",
       "./css/css/vendor/DateTimePicker/DateTimePicker.css",
     ],

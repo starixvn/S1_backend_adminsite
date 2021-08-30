@@ -1,0 +1,50 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Hosting
+@using BackendSite.Service.BLL
+@using BackendSite.Service.Model.enums
+@inject IWebHostEnvironment environment
+@inject SelLangBLL selLangBLL
+@inject ServerInfoBLL serverInfoBLL
+@inject AuthorizeBLL authorizeBLL
+@section Style {
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/lib/bootstrap-multiselect/bootstrap-multiselect-modify.css" rel="stylesheet" />
+    <link href="~/css/vendor/DateTimePicker/DateTimePicker.css" rel="stylesheet" />
+}
+@{
+    Layout = "~/Views/Shared/_LayoutPagesApp.cshtml";
+    ViewData["Title"] = "LeaderBoard ExtraPoint";
+}
+@{
+    var currencyList = serverInfoBLL.GetCurrencyList();
+    var i18n = new Dictionary<string, string>();
+
+    foreach (var currency in currencyList)
+    {
+        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
+            i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+    }
+
+    var typeList = new Dictionary<int, string>();
+    foreach (var value in Enum.GetValues(typeof(PromotionType)))
+    {
+        var _value = (int)value;
+        typeList.Add(_value, selLangBLL.GetResourceValue($"lbl_PromotionType{_value}") ?? _value.ToString());
+    }
+}
+
+<div id="content"></div>
+
+
+@section Scripts {
+    <script>
+        window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
+        window.RootUrl = '@Url.Content("~/api")';
+        window.LangCode = 'en'
+        window.gCurrencyList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(currencyList));
+        window.gTypeList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(typeList));
+    </script>
+    <script src="~/lib/bootstrap-multiselect/bootstrap-multiselect.js"></script>
+    <script src="~/js/component/Marketing/LeaderBoardExtraPoint.min.js" asp-append-version="true"></script>
+}

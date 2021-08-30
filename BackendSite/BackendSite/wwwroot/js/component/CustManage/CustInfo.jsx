@@ -100,6 +100,8 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     <th scope="row">{row.transId}</th>
                     <td>{i18n["lbl_DepositType" + row.depositType]}</td>
                     <td className="text-right">{number_format(row.amount)}</td>
+                    <td className="text-right">{number_format(row.actualDeposit)}</td>
+                    <td>{row.bankName}</td>
                     <td>{row.accountNo}</td>
                     <td>{row.accountName}</td>
                     <td>{DepositStatusOp[row.status]}</td>
@@ -123,6 +125,8 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                 <th scope="col">Trxn.ID</th>
                                 <th scope="col">Deposit Type</th>
                                 <th scope="col" className="text-right">Amount</th>
+                                <th scope="col" className="text-right">Actual Deposit</th>
+                                <th scope="col">Bank Name</th>
                                 <th scope="col">To Acc. NO.</th>
                                 <th scope="col">To Acc. Name</th>
                                 <th scope="col">Status</th>
@@ -1086,6 +1090,24 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     }.bind(this));
             }
         }
+        onResetCustUSDTnfo() {
+            if (confirm('Are you sure reset USDT Info ?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/api/CustManage/ResetCustUSDTInfo', { CustId: data.custId })
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.props.onGetCustInfoDetail();
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
 
         onUnlock() {
             if (!this.state.reason) { return alert("Please enter Reason For Unlock！"); }
@@ -1249,6 +1271,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                         Loading.UnLoading();
                         let result = response.data;
                         if (result.errorCode == 0) {
+                            alert("Fix Success")
                             this.props.onGetCustInfoDetail();
                         } else {
                             alert(result.message);
@@ -1335,6 +1358,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                         <div className="button-block">
                             {data.phoneVerified || data.emailVerified ? null : <button className="btn btn-primary" onClick={this.onResetProfile.bind(this)}>Reset Profile</button>}
                             <button className="btn btn-primary" onClick={this.onResetCustBankInfo.bind(this)}>Reset Customer Bank Info.</button>
+                            <button className="btn btn-primary" onClick={this.onResetCustUSDTnfo.bind(this)}>Reset Customer USDT Info.</button>
                             {data.status == 1 && data.agent != null && subFuncKeys.indexOf("ca_acc_lock") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"lock")}>Lock</button> : null}
                             {(data.status == 1 || data.status == 2 || data.status == 4) && data.agent != null && subFuncKeys.indexOf("ca_acc_close") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"closed")}>Closed</button> : null}
                             {(data.status == 2 || data.status == 4) && data.agent != null && subFuncKeys.indexOf("ca_unlock") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"unlock")}>Unlock</button> : null}

@@ -216,7 +216,11 @@ module.exports = {
     // ],
     "CSD/DisableUserForGame.min": [
       '@babel/polyfill',
-    "./src/pages/CSD/DisableUserForGame/index.js",
+    "./src/pages/CSD/DisableUserForGame/index.js"
+    ],
+    "Marketing/LeaderBoardExtraPoint.min": [
+    	 '@babel/polyfill',
+    	"./src/pages/Marketing/LeaderBoardExtraPoint/index.js"
     ],
   },
   output: {

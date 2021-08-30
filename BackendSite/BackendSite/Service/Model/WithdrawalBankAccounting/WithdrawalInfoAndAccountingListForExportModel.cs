@@ -73,7 +73,7 @@ namespace BackendSite.Service.Model.WithdrawalBankAccounting
             set;
         }
 
-        public string UpdateTime
+        public string FlowEndTime
         {
             get;
             set;
