@@ -14,9 +14,14 @@ namespace BackendSite.Service.BLL
             _riskService = riskService;
         }
 
-        public async Task<int> DisableUserForGame(int custId, int siteId, List<DisableTpGame> gameIndo, string updateOperator)
+        public async Task<int> DisableUserForGame(int custId, int siteId, List<DisableTpGame> gameIndo, string Operator)
         {
-            return await _riskService.TpDisableUserSet(custId, siteId, gameIndo, updateOperator);
+            return await _riskService.TpDisableUserSet(custId, siteId, gameIndo, Operator);
+        }
+        
+        public IEnumerable<TpDisableUser> GetTpDisableUser(long startDate, long endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
+        {
+            return _riskService.TpDisableUserGet(startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
         }
     }
 }

@@ -17,16 +17,36 @@ namespace BackendSite.Service.DAL
             _sqlClient = sqlClient;
         }
 
-        public async Task<int> TpDisableUserSet(int custId, int siteId, List<DisableTpGame> gameIndo, string updateOperator)
+        public async Task<int> TpDisableUserSet(int custId, int siteId, List<DisableTpGame> gameIndo, string Operator)
         {
             var p = new DynamicParameters();
 
             p.Add("_CustId", custId);
             p.Add("_SiteId", siteId);
             p.Add("_GameInfo", JsonConvert.SerializeObject(gameIndo));
-            p.Add("_UpdateOperator", updateOperator);
+            p.Add("_Operator", Operator);
 
             return await _sqlClient.ExecuteAsync("Admin_TpDisableUser_Set", p);
+        }
+
+        public IEnumerable<TpDisableUser> TpDisableUserGet(long startDate, long endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
+        {
+            totalPages = 0;
+            rowCount = 0;
+            
+            var p = new DynamicParameters();
+            p.Add("StartDate", startDate);
+            p.Add("EndDate", endDate);
+            p.Add("PageSize", pageSize);
+            p.Add("PageNumber", pageNumber);
+            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            
+            var result = _sqlClient.Query<TpDisableUser>("Admin_TpDisableUser_Get", p);
+            totalPages = p.Get<int>("TotalPages");
+            rowCount = p.Get<int>("RowCount");
+            return result;
         }
     }
 }
