@@ -23,5 +23,10 @@ namespace BackendSite.Service.BLL
         {
             return _riskService.TpDisableUserGet(siteIds, userName, startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
         }
+
+        public async Task<TpDisableUserDetail> GetTpDisableUserBuCustId(int custId)
+        {
+            return await _riskService.TpDisableUserGetByCustId(custId);
+        }
     }
 }

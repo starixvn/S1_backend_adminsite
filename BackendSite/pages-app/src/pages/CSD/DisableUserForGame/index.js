@@ -10,7 +10,8 @@ const App = () => {
 
   const [eventState, updateEvent] = useState({
     ShowSettingPanel: false,
-    IsAdd: false,
+    IsAdd: true,
+    CustId: 0
   });
   
   const [datas, setDatas] = useState({
@@ -62,6 +63,15 @@ const App = () => {
     GetDisableUserList(PageNumber);
   };
 
+  const EditDisableUser = (custId) => {
+    updateEvent({
+      ...eventState,
+      ShowSettingPanel: true,
+      IsAdd: false,
+      CustId: custId
+    });
+  }
+
   const UpdateDisableUserForGame = (userName, siteId, disableTpGame) => {
 
     let data = {
@@ -99,6 +109,8 @@ const App = () => {
               ShowSettingPanel: false,
             });
           }}
+          IsAdd={eventState.IsAdd}
+          CustId = {eventState.CustId}
           InsertOrUpdate={UpdateDisableUserForGame}/> : 
       <>
         <button
@@ -109,14 +121,16 @@ const App = () => {
                 ...eventState,
                 ShowSettingPanel: true,
                 IsAdd: true,
+                CustId: 0
               });
           }}>
-          Add Maintenance
+          Add Disable User
         </button>
         {datas.Datas === null ? null : (
             <Result
             {...datas}
             ChangePage={Result_ChangePage}
+            ClickEdit={EditDisableUser}
             />
           )}
       </>}

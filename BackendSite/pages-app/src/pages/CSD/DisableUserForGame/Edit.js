@@ -5,29 +5,45 @@ import InputBox from "./Components/InputBox";
 import SiteRadioGroup from "./Components/RadioGroup";
 import WebAPI from "../../../module//WebAPI";
 
-function Edit({ IsAdd, ClickBack = f => f, InsertOrUpdate = g => g }) {
+function Edit({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
 
     const [tpList, setTpList] = useState([]);
     const [siteList, setSiteList] = useState([]);
     const [siteId, setSite] = useState(0);
     const [userName, setUserName] = useState("");
-    useEffect(() => {
-  
-      WebAPI.fetchData({ Url: "Risk/GetTpList" }).then((res) => {
-        if (res.data.errorCode === 0) {
-            setTpList(res.data.data);
-        } else {
-          alert(res.data.message ?? "failed to get data.");
-        }
-      });
 
-      WebAPI.PostData({ Url: "Common/AdminUserSiteList" }).then((res) => {
-        if (res.data.errorCode === 0) {
-            setSiteList(res.data.data);
-        } else {
-          alert(res.data.message ?? "failed to get data.");
+    useEffect(() => {        
+
+        WebAPI.fetchData({ Url: "Risk/GetTpList" }).then((res) => {
+            if (res.data.errorCode === 0) {
+                setTpList(res.data.data);
+            } 
+            else {
+                alert(res.data.message ?? "failed to get data.");
+            }
+        });
+
+        WebAPI.PostData({ Url: "Common/AdminUserSiteList" }).then((res) => {
+            if (res.data.errorCode === 0) {
+                setSiteList(res.data.data);
+            } 
+            else {
+                alert(res.data.message ?? "failed to get data.");
+            }
+        });
+
+        if(CustId != 0) {
+            WebAPI.fetchData({ Url: `Risk/GetTpDisableUserByCustId/${CustId}` }).then((res) => {
+                if (res.data.errorCode === 0) {
+                    console.log(res.data.data);
+                    setSite(res.data.data.siteId);
+                    setUserName(res.data.data.userName);
+                } 
+                else {
+                    alert(res.data.message ?? "failed to get data.");
+                }
+            });
         }
-      });
   
     }, []);
     
@@ -51,6 +67,8 @@ function Edit({ IsAdd, ClickBack = f => f, InsertOrUpdate = g => g }) {
 
     const GetTpGameList = (tpId, checked) => {
 
+        console.log(tpId)
+        console.log(checked)
         var result = tpList.map((item, index) => {
             return item.tpId;
           }).indexOf(tpId);
@@ -99,8 +117,8 @@ function Edit({ IsAdd, ClickBack = f => f, InsertOrUpdate = g => g }) {
 
     return (
         <>
-        <div className="filter noBGcolor"><SiteRadioGroup title="Available Sites" siteList={siteList} selectSite={siteId} disabled={false} toggle={SelectSite}/></div>
-        <div className="row-flex"><InputBox title="UserName" value={userName} disabled={false} onChange={setUserName}/></div>
+        <div className="filter noBGcolor"><SiteRadioGroup title="Available Sites" siteList={siteList} selectSite={siteId} disabled={!IsAdd} toggle={SelectSite}/></div>
+        <div className="row-flex"><InputBox title="UserName" value={userName} disabled={!IsAdd} onChange={setUserName}/></div>
         <div className="filter noBGcolor tag"><TabButton title="Slots"/></div>
         <div className="filter"><TpCheckList tpList={tpList} tpChecked={GetTpGameList} gameChecked={GameCheck}/></div>
         <div className="filter float-btn-group">

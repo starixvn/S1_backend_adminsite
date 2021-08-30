@@ -2,6 +2,10 @@ import React from "react";
 import Pagination from "./Pagination";
 import moment from "moment-timezone";
 
+const SpecialItemType = {
+	actionBtn: "actionBtn"
+};
+
 const dataColumnDefs = () => {
   return [
     { dataColumn: "siteName", columnTitle: "SiteName" },
@@ -29,6 +33,17 @@ const dataColumnDefs = () => {
       },
     },
     { dataColumn: "updateOperator", columnTitle: "LastUpdateUser"},
+    {
+        columnTitle: "Action",
+        header: {
+            attr: {
+                className: "width-85"
+            }
+        },
+        body: {
+            SpecialItem: SpecialItemType.actionBtn
+        }
+    }
   ];
 };
 
@@ -48,32 +63,44 @@ export default function Result (tpDisableUser) {
             {element.columnTitle}
         </th>);
     });
-    let bodyRows = tpDisableUser.Datas.map((data, idx) => {
-        let row = columnDefs.map((element, idx) => {
-        let subData = {};
-        if (element.body && element.body.subData) {
-            element.body.subData.forEach((s) => {
-            subData[s] = data[s];
-            });
-        }
-        return (
-            <td
-            key={`td-${element.dataColumn}-${idx}`}
-            className={
-                element.body && element.body.attr && element.body.attr.class
-                ? element.body.attr.class
-                : ""
+    let bodyRows = tpDisableUser.Datas.map((data, i) => {
+        let row = columnDefs.map((element, j) => {
+            
+            let body_content = null;
+            if (element.body && element.body.format) {
+                let subData = {};
+                if(element.body.subData) {
+                    element.body.subData.forEach((s) => {
+                    subData[s] = data[s];
+                    });
+                }
+                body_content = element.body.format(data[element.dataColumn], subData)
+
             }
-            >
-            {element.body && element.body.format
-                ? element.body.format(data[element.dataColumn], subData)
-                : data[element.dataColumn]}
-            </td>
-        );
+            else if (element.body && element.body.SpecialItem && element.body.SpecialItem === SpecialItemType.actionBtn) {
+                body_content = (
+                    <ActionButtons ClickEdit={tpDisableUser.ClickEdit.bind(null, data["custId"])}/>
+                );
+            }
+            else {
+                body_content = data[element.dataColumn]
+            }
+
+            return (
+                <td
+                key={`td-${element.dataColumn}-${j}`}
+                className={
+                    element.body && element.body.attr && element.body.attr.class
+                    ? element.body.attr.class
+                    : ""
+                }>
+                {body_content}
+                </td>
+            );
         });
 
-    return <tr key={`result-body-${idx}`}>{row}</tr>;
-  });
+        return <tr key={`result-body-${i}`}>{row}</tr>;
+    });
 
   return (
     <div className="table">
@@ -94,6 +121,17 @@ export default function Result (tpDisableUser) {
     </div>
   );
 };
+
+const ActionButtons = props => {
+	return (
+		<div className="button-action">
+			<button className="btn btn-edit" title="Only can edit time column." onClick={props.ClickEdit}>
+				<i className="icon-edit"></i>
+			</button>
+		</div>
+	);
+};
+
 const userNameFormat = (userName, subData) => {
   return (
     <a

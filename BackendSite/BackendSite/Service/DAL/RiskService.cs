@@ -31,8 +31,6 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<TpDisableUser> TpDisableUserGet(IEnumerable<int> siteIds, string userName, long startDate, long endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
         {
-            totalPages = 0;
-            rowCount = 0;
             var p = new DynamicParameters();
             p.Add("_SiteIds", JsonConvert.SerializeObject(siteIds));
             p.Add("_UserName", userName);
@@ -45,9 +43,16 @@ namespace BackendSite.Service.DAL
             p.Add("_StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
             
             var result = _sqlClient.Query<TpDisableUser>("Admin_TpDisableUser_Get", p);
-            totalPages = p.Get<int>("_TotalPages");
-            rowCount = p.Get<int>("_RowCount");
+            totalPages = p.Get<int?>("_TotalPages") ?? 0;
+            rowCount = p.Get<int?>("_RowCount") ?? 0;
             return result;
+        }
+
+        public async Task<TpDisableUserDetail> TpDisableUserGetByCustId(int custId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            return await _sqlClient.QueryFirstAsync<TpDisableUserDetail>("Admin_TpDisableUserByCustId_Get", p);
         }
     }
 }

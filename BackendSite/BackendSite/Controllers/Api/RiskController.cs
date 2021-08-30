@@ -54,6 +54,25 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        [HttpGet]
+        [Route("{custId:int}")]
+        public async Task<ApiResult<TpDisableUserDetail>> GetTpDisableUserByCustId(int custId)
+        {
+            var apiResult = new ApiResult<TpDisableUserDetail>();
+            try
+            {
+                apiResult.Data = await _riskBll.GetTpDisableUserBuCustId(custId);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
+        }
+
         [HttpPost]
         public async Task<ApiResult> TpDisableUserForGame([FromForm] DisableUser disableGames)
         {

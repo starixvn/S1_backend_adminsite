@@ -36,4 +36,11 @@ namespace BackendSite.Service.Model
         public string UpdateOperator { get; set; }
         public DateTime UpdateTime { get; set; }
     }
+
+    public class TpDisableUserDetail
+    {
+        public int SiteId { get; set; }
+        public string UserName { get; set; }
+        public string GameInfo { get; set; }
+    }
 }
