@@ -92,7 +92,8 @@ namespace BackendSite.Controllers.Api
                     disableGames.DisableTpGame, updateOperator);
                 return new ApiResult
                 {
-                    ErrorCode = result == 1 ? 0 : result,
+                    //result: 1 (新增成功),2 (修改成功)
+                    ErrorCode = (result == 1 || result == 2) ? 0 : result,
                 };
             }
             catch (Exception ex)
