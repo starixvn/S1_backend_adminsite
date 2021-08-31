@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
@@ -23,7 +24,7 @@ namespace BackendSite.Service.BLL
         
         public async Task<IEnumerable<RiskGameCasinoData>> GameCasinoByTPIdV3(int tpId)
         {
-            var casinoGames = await _gameCasinoService.GameCasinoByTPIdV3(tpId);
+            var casinoGames = await _gameCasinoService.GetGameCasinoV4ByTpId(tpId);
 
             return (from game in casinoGames
                 let gameName = JsonConvert.DeserializeObject<GameCasinoTranslate>(game.Name)

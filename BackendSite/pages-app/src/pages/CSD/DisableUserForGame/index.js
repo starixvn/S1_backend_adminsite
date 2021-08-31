@@ -149,7 +149,7 @@ const App = () => {
           ...eventState,
           ShowSettingPanel: false,
         });
-        GetDisableUserList();
+        GetDisableUserList(stateFilter);
       } else {
         alert(res.data.message);
       }
@@ -158,13 +158,6 @@ const App = () => {
 
   return (
     <div className="container-fluid">
-      <h4 className="page-name">Disable User For Game</h4>
-      <Filter 
-        siteList={siteList} 
-        filterInfo={stateFilter} 
-        onChange={FilterChange}
-        siteChecked={SiteChange}
-        search={Search} />
       {eventState.ShowSettingPanel ? 
         <Edit 
           ClickBack={() => {
@@ -177,6 +170,13 @@ const App = () => {
           CustId = {eventState.CustId}
           InsertOrUpdate={UpdateDisableUserForGame} /> : 
         <>
+        <h4 className="page-name">Disable User For Game</h4>
+          <Filter 
+            siteList={siteList} 
+            filterInfo={stateFilter} 
+            onChange={FilterChange}
+            siteChecked={SiteChange}
+            search={Search} />
           <button
             className="btn btn-add"
             style={{ marginBottom: "20px" }}

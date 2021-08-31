@@ -183,7 +183,7 @@
       },
       {
         "Key": "",
-        "Title": "Disable User",
+        "Title": "Disable User For Game",
         "FuncKey": "CustManage/DisableUserForGame",
         "Controller": "CustManage",
         "Action": "DisableUserForGame",

@@ -22,12 +22,12 @@ namespace BackendSite.Service.DAL
             return await _sqlClient.QueryAsync<RiskTpListInfo>("Admin_TpList_Get");
         }
         
-        public async Task<IEnumerable<GameCasinoDataV3>> GameCasinoByTPIdV3(int tpId)
+        public async Task<IEnumerable<GameCasinoDataV3>> GetGameCasinoV4ByTpId(int tpId)
         {
             var props = new DynamicParameters();
-            props.Add("TPId", tpId);
+            props.Add("_TpId", tpId);
 
-            var result = await _sqlClient.QueryAsync<GameCasinoDataV3>("Admin_GameCasinoV3_Get", props);
+            var result = await _sqlClient.QueryAsync<GameCasinoDataV3>("Admin_GameCasinoV4_Get", props);
 
             return result;
         }
