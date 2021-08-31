@@ -25,6 +25,7 @@ const dataColumnDefs = () => {
         format: dateTimeFormat,
       },
     },
+    { dataColumn: "updateOperator", columnTitle: "LastUpdateUser"},
     {
       dataColumn: "updateTime",
       columnTitle: "UpdateTime (GMT+8)",
@@ -32,7 +33,6 @@ const dataColumnDefs = () => {
         format: dateTimeFormat,
       },
     },
-    { dataColumn: "updateOperator", columnTitle: "LastUpdateUser"},
     {
         columnTitle: "Action",
         header: {

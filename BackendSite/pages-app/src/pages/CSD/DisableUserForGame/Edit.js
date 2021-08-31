@@ -67,8 +67,6 @@ function Edit({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
 
     const GetTpGameList = (tpId, checked) => {
 
-        console.log(tpId)
-        console.log(checked)
         var result = tpList.map((item, index) => {
             return item.tpId;
           }).indexOf(tpId);
@@ -118,7 +116,7 @@ function Edit({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
     return (
         <>
         <div className="filter noBGcolor"><SiteRadioGroup title="Available Sites" siteList={siteList} selectSite={siteId} disabled={!IsAdd} toggle={SelectSite}/></div>
-        <div className="row-flex"><InputBox title="UserName" value={userName} disabled={!IsAdd} onChange={setUserName}/></div>
+        <div className="row-flex"><InputBox title="UserName" value={userName} disabled={!IsAdd} onChange={setUserName} dataColumn = "UserName"/></div>
         <div className="filter noBGcolor tag"><TabButton title="Slots"/></div>
         <div className="filter"><TpCheckList tpList={tpList} tpChecked={GetTpGameList} gameChecked={GameCheck}/></div>
         <div className="filter float-btn-group">

@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from 'react-dom';
 import Edit from "./Edit"
 import Result from "./Result";
+import Filter from "./Filter";
 import qs from "qs";
 import WebAPI from "../../../module//WebAPI";
-import moment from "moment-timezone";
+import moment from "moment";
 
 const App = () => {
-
+  const dateformat = "YYYY-MM-DD";
   const [eventState, updateEvent] = useState({
     ShowSettingPanel: false,
     IsAdd: true,
@@ -19,18 +20,43 @@ const App = () => {
     Datas: null
   });
 
+  const [stateFilter, setFilter] = useState({
+    SiteId: [1,2,3,4],
+    StartDate: moment().add(-10, "days").format(dateformat),
+    EndDate: moment().format(dateformat),
+    UserName: ""
+  });
+
+  const [siteList, setSiteList] = useState([]);
+
   useEffect(() => {
-    GetDisableUserList();
-  }, [eventState]);
+    WebAPI.PostData({ Url: "Common/AdminUserSiteList" }).then((res) => {
+      if (res.data.errorCode === 0) {
+        
+        let siteTmp = res.data.data.map((item) => {
+          return { siteId: item.siteId, siteName: item.siteName, checked: true }
+        })
+        siteTmp.unshift({ siteId:0, siteName: "All", checked: true })
+        setSiteList(siteTmp);
+      } 
+      else {
+        alert(res.data.message ?? "failed to get data.");
+      }
+    });
+    GetDisableUserList(stateFilter);
+  }, []);
 
-  const GetDisableUserList = (PageNumber = 1, PageSize = 10) => {
-
+  const GetDisableUserList = (filter, pageNumber = 1, PageSize = 10) => {
+    if (filter.SiteId.length === 0) {
+      alert("Please Choose at least one Site");
+      return false;
+    }
     let query = {
-      siteIds: [1,2,3],
-      UserName: null,
-      StartDate: moment.utc('2021/08/25 00:00:00').unix(),
-      EndDate: moment.utc('2020/08/31 00:00:00').unix(),
-      PageNumber: PageNumber,
+      SiteIds: filter.SiteId,
+      UserName: filter.UserName,
+      StartDate: moment.utc(filter.StartDate).unix(),
+      EndDate: moment.utc(filter.EndDate).unix(),
+      pageNumber: pageNumber,
       PageSize: PageSize
     };
     let param = {
@@ -56,11 +82,7 @@ const App = () => {
   }
 
   const Result_ChangePage = (PageNumber) => {
-    // if (stateFilter.SelectSite.length === 0) {
-    //   alert("Please Choose at least one Site");
-    //   return false;
-    // }
-    GetDisableUserList(PageNumber);
+    GetDisableUserList(stateFilter, PageNumber);
   };
 
   const EditDisableUser = (custId) => {
@@ -70,6 +92,41 @@ const App = () => {
       IsAdd: false,
       CustId: custId
     });
+  }
+
+  const FilterChange = (v, dataColumn) => {
+    setFilter({
+      ...stateFilter,
+      [dataColumn]: v,
+    });
+  }
+
+  const SiteChange = (siteId, checked) => {
+    if(siteId == 0) {
+      siteList.forEach( a => { a.checked = !checked })
+    }
+    else {
+      let idx = siteList.map( i => {
+        return i.siteId;
+      }).indexOf(siteId)
+      siteList[idx].checked = !checked
+    }
+
+    let siteIds = []
+    siteList.forEach( a => {
+      if(a.siteId !=0 && a.checked)
+      siteIds.push(a.siteId)
+    })
+                  
+    setFilter({
+      ...stateFilter,
+      ["SiteId"]: siteIds,
+    });
+    setSiteList([...siteList])
+  }
+
+  const Search = () => {
+    GetDisableUserList(stateFilter);
   }
 
   const UpdateDisableUserForGame = (userName, siteId, disableTpGame) => {
@@ -92,6 +149,7 @@ const App = () => {
           ...eventState,
           ShowSettingPanel: false,
         });
+        GetDisableUserList();
       } else {
         alert(res.data.message);
       }
@@ -101,6 +159,12 @@ const App = () => {
   return (
     <div className="container-fluid">
       <h4 className="page-name">Disable User For Game</h4>
+      <Filter 
+        siteList={siteList} 
+        filterInfo={stateFilter} 
+        onChange={FilterChange}
+        siteChecked={SiteChange}
+        search={Search} />
       {eventState.ShowSettingPanel ? 
         <Edit 
           ClickBack={() => {
@@ -111,29 +175,29 @@ const App = () => {
           }}
           IsAdd={eventState.IsAdd}
           CustId = {eventState.CustId}
-          InsertOrUpdate={UpdateDisableUserForGame}/> : 
-      <>
-        <button
-          className="btn btn-add"
-          style={{ marginBottom: "20px" }}
-          onClick={() => {
-              updateEvent({
-                ...eventState,
-                ShowSettingPanel: true,
-                IsAdd: true,
-                CustId: 0
-              });
-          }}>
-          Add Disable User
-        </button>
-        {datas.Datas === null ? null : (
-            <Result
-            {...datas}
-            ChangePage={Result_ChangePage}
-            ClickEdit={EditDisableUser}
-            />
+          InsertOrUpdate={UpdateDisableUserForGame} /> : 
+        <>
+          <button
+            className="btn btn-add"
+            style={{ marginBottom: "20px" }}
+            onClick={() => {
+                updateEvent({
+                  ...eventState,
+                  ShowSettingPanel: true,
+                  IsAdd: true,
+                  CustId: 0
+                });
+            }}>
+            Add Disable User
+          </button>
+          {datas.Datas === null ? null : (
+              <Result
+              {...datas}
+              ChangePage={Result_ChangePage}
+              ClickEdit={EditDisableUser} />
           )}
-      </>}
+        </>
+      }
     </div>
   );
 }
