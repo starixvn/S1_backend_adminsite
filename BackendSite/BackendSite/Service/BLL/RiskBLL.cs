@@ -28,5 +28,10 @@ namespace BackendSite.Service.BLL
         {
             return await _riskService.TpDisableUserGetByCustId(custId);
         }
+
+        public async Task<int> UpdateStatus(int custId, int status, string Operator)
+        {
+            return await _riskService.UpdateStatus(custId, status, Operator);
+        }
     }
 }

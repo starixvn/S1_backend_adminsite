@@ -107,6 +107,30 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        [HttpPost]
+        public async Task<ApiResult> UpdateStatus([FromForm] DisableDisableUser disable)
+        {
+            try
+            {
+                var updateOperator = User.Identity.Name;
+                var result = await _riskBll.UpdateStatus(disable.CustId, disable.Status, updateOperator);
+                return new ApiResult
+                {
+                    //result: 1 (新增成功),2 (修改成功)
+                    ErrorCode = (result == 1 || result == 2) ? 0 : result,
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new ApiResult
+                {
+                    ErrorCode = 999,
+                    Message = ex.Message,
+                };
+            }
+        }
+
         [HttpGet]
         //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/Risk" })]
         public async Task<ApiResult<IEnumerable<RiskTpListInfo>>> GetTpList()

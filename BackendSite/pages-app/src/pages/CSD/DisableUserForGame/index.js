@@ -94,6 +94,34 @@ const App = () => {
     });
   }
 
+  const SwitchStatus = (custId, status) => {
+    datas.Datas.forEach(a => {
+      if(a.custId === custId) {
+        a.status ^= 1
+      }
+    });
+    setDatas({
+      ...datas,
+    });
+
+    let data = {
+      CustId: custId,
+      Status: status ^= 1,
+    };
+    let param = {
+      Url: "Risk/UpdateStatus",
+      Data: qs.stringify(data),
+    };
+    
+    WebAPI.PostData(param).then((res) => {
+      if (res.data.errorCode === 0) {
+        alert("success.");
+      } else {
+        alert(res.data.message);
+      }
+    });
+  }
+
   const FilterChange = (v, dataColumn) => {
     setFilter({
       ...stateFilter,
@@ -194,7 +222,8 @@ const App = () => {
               <Result
               {...datas}
               ChangePage={Result_ChangePage}
-              ClickEdit={EditDisableUser} />
+              ClickEdit={EditDisableUser}
+              UpdateStatus={SwitchStatus} />
           )}
         </>
       }

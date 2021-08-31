@@ -3,7 +3,8 @@ import Pagination from "./Pagination";
 import moment from "moment-timezone";
 
 const SpecialItemType = {
-	actionBtn: "actionBtn"
+	actionBtn: "actionBtn",
+  statusBtn: "statusBtn"
 };
 
 const dataColumnDefs = () => {
@@ -32,6 +33,13 @@ const dataColumnDefs = () => {
       body: {
         format: dateTimeFormat,
       },
+    },
+    {
+        dataColumn: "status",
+        columnTitle: "Status",
+        body: { 
+          SpecialItem: SpecialItemType.statusBtn 
+        }
     },
     {
         columnTitle: "Action",
@@ -78,9 +86,16 @@ export default function Result (tpDisableUser) {
 
             }
             else if (element.body && element.body.SpecialItem && element.body.SpecialItem === SpecialItemType.actionBtn) {
-                body_content = (
-                    <ActionButtons ClickEdit={tpDisableUser.ClickEdit.bind(null, data["custId"])}/>
-                );
+                body_content = <ActionButtons 
+                                  ClickEdit={tpDisableUser.ClickEdit.bind(this, data["custId"])}/>
+
+            }
+            else if(element.body && element.body.SpecialItem && element.body.SpecialItem === SpecialItemType.statusBtn) {
+                body_content =  <StatusButton 
+                                  mainKey={data["custId"]} 
+                                  checked={data["status"] === 1} 
+                                  onChange={tpDisableUser.UpdateStatus.bind(this, data["custId"], data["status"])}
+                                />
             }
             else {
                 body_content = data[element.dataColumn]
@@ -130,6 +145,22 @@ const ActionButtons = props => {
 			</button>
 		</div>
 	);
+};
+
+const StatusButton = ({ checked, onChange, mainKey }) => {
+  let id = `switch-${mainKey}`;
+  return (
+    <div className="switch__container">
+      <input
+        id={id}
+        className="switch switch--flat"
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+      />
+      <label htmlFor={id}></label>
+    </div>
+  );
 };
 
 const userNameFormat = (userName, subData) => {

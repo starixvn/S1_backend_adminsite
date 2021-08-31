@@ -10,6 +10,12 @@ namespace BackendSite.Service.Model
         public List<DisableTpGame> DisableTpGame { get; set; }
     }
 
+    public class DisableDisableUser
+    {
+        public int CustId { get; set; }
+        public int Status { get; set; }
+    }
+
     public class DisableTpGame
     {
         public int TpId { get; set; }
@@ -31,6 +37,7 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
+        public int Status { get; set; }
         public string Creator { get; set; }
         public DateTime CreateTime { get; set; }
         public string UpdateOperator { get; set; }
