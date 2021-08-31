@@ -107,6 +107,13 @@ const dataColumnDefs = () => {
       },
     },
     {
+      dataColumn: "qualifiedTime",
+      columnTitle: "Lastest Qualified Time" + " (" + moment().format("Z") + ")",
+      body: {
+        format: qualifiedTimeFormat,
+      },
+    },
+    {
       dataColumn: "lastUpdateUser",
       columnTitle: "Last Updator",
     },
@@ -314,6 +321,12 @@ const settletimeFormat = (createTime) => {
     return "";
   }
   return moment(createTime).format("l LTS");
+};
+const qualifiedTimeFormat = (dateTime) => {
+  if (dateTime === "") {
+    return "";
+  }
+  return moment(dateTime).format("l LTS");
 };
 const levelBgcolerFormat = (level) => {
   switch (level) {
