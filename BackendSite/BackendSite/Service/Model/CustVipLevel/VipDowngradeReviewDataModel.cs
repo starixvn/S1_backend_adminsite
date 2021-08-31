@@ -39,6 +39,8 @@ namespace BackendSite.Service.Model.CustVipLevel
 
         public string SettleTime { get; set; }
 
+        public string QualifiedTime { get; set; }
+
         public string LastUpdateUser { get; set; }
     }
 }
