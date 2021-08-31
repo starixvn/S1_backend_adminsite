@@ -1,5 +1,7 @@
 import React from "react";
 import Pagination from "./Pagination";
+import StatusButton from "./Components/StatusButton";
+import ActionButtons from "./Components/ActionButton";
 import moment from "moment-timezone";
 
 const SpecialItemType = {
@@ -133,32 +135,6 @@ export default function Result (tpDisableUser) {
         }}
         ChangePage={tpDisableUser.ChangePage}
       />
-    </div>
-  );
-};
-
-const ActionButtons = props => {
-	return (
-		<div className="button-action">
-			<button className="btn btn-edit" title="Only can edit time column." onClick={props.ClickEdit}>
-				<i className="icon-edit"></i>
-			</button>
-		</div>
-	);
-};
-
-const StatusButton = ({ checked, onChange, mainKey }) => {
-  let id = `switch-${mainKey}`;
-  return (
-    <div className="switch__container">
-      <input
-        id={id}
-        className="switch switch--flat"
-        type="checkbox"
-        checked={checked}
-        onChange={onChange}
-      />
-      <label htmlFor={id}></label>
     </div>
   );
 };
