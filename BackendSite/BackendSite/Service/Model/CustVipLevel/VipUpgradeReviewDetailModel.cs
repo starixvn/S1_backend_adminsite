@@ -20,6 +20,7 @@
             Status = data.Status;
             CalculateTime = data.CalculateTime;
             SettleTime = data.SettleTime;
+            QualifiedTime = data.QualifiedTime;
             LastUpdateUser = data.LastUpdateUser;
 
             CanUpdateStatus = false; 
