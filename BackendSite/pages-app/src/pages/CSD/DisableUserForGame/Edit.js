@@ -48,17 +48,20 @@ function Edit({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
     }, []);
     
     const Submit = () => {
-        var selectedTp = [];
-        tpList.forEach( (a, i) => {
+        if (userName === null || userName === '') {
+            alert("Please enter UserName");
+            return false;
+        }
+        let selectedTp = [];
+        tpList.forEach( a => {
             if(a.checked) {
                 let games = []
-                
                 a.gameList.forEach( b => {
                     if(b.checked) {
                         games.push(b.gameId)
                     }
                 })
-                selectedTp.push( { TpId:a.tpId, GameList:games } )
+                selectedTp.push({ TpId:a.tpId, GameList:games })
             }
         })
 
@@ -67,16 +70,16 @@ function Edit({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
 
     const GetTpGameList = (tpId, checked) => {
 
-        var result = tpList.map((item, index) => {
-            return item.tpId;
-          }).indexOf(tpId);
-        tpList[result].checked = !checked
-        
         if(!checked)
         {    
             WebAPI.fetchData({ Url: `Risk/GameCasinoByTpIdV3/${tpId}` }).then((res) => {
                 if (res.data.errorCode === 0) {
-                    tpList[result].gameList=res.data.data
+                    tpList.forEach( a => {
+                        if(a.tpId === tpId) {
+                            a.checked = !checked
+                            a.gameList=res.data.data
+                        }
+                    })
                     setTpList([...tpList]);
                 } else {
                   alert(res.data.message ?? "failed to get data.");
@@ -85,37 +88,36 @@ function Edit({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
         }
         else
         {
-            tpList[result].gameList = []
+            tpList.forEach( a => {
+                if(a.tpId === tpId) {
+                    a.checked = !checked
+                    a.gameList = []
+                }   
+            })
             setTpList([...tpList]);
         }
     }
 
     const GameCheck = (gameId, checked) => {
         
-        const tpGameId = gameId.split(/_(.+)/)
-        var tpIdx = tpList.map( i => {
-            return i.tpId;
-          }).indexOf(parseInt(tpGameId[0]));
+        const [tpId, game] = gameId.split(/_(.+)/)
 
-        var gameIdx = tpList[tpIdx].gameList.map( j => {
-            return j.gameId;
-        }).indexOf(tpGameId[1]);
-        
-        tpList[tpIdx].gameList[gameIdx].checked = !checked
+        tpList.forEach( a => {
+            if(a.tpId === parseInt(tpId)) {
+                a.gameList.forEach( b => {
+                    if(b.gameId === game)
+                        b.checked = !checked
+                })
+             }
+                
+        })
+
         setTpList([...tpList]);
-    }
-
-    const SelectSite = (siteId) => {
-        setSite(siteId);
-    }
-
-    const InputUserName = (e) => {
-        setUserName(e);
     }
 
     return (
         <>
-        <div className="filter noBGcolor"><SiteRadioGroup title="Available Sites" siteList={siteList} selectSite={siteId} disabled={!IsAdd} toggle={SelectSite}/></div>
+        <div className="filter noBGcolor"><SiteRadioGroup title="Available Sites" siteList={siteList} selectSite={siteId} disabled={!IsAdd} toggle={setSite}/></div>
         <div className="row-flex"><InputBox title="UserName" value={userName} disabled={!IsAdd} onChange={setUserName} dataColumn = "UserName"/></div>
         <div className="filter noBGcolor tag"><TabButton title="Slots"/></div>
         <div className="filter"><TpCheckList tpList={tpList} tpChecked={GetTpGameList} gameChecked={GameCheck}/></div>

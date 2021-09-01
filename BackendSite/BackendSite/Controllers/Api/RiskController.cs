@@ -116,8 +116,7 @@ namespace BackendSite.Controllers.Api
                 var result = await _riskBll.UpdateStatus(disable.CustId, disable.Status, updateOperator);
                 return new ApiResult
                 {
-                    //result: 1 (新增成功),2 (修改成功)
-                    ErrorCode = (result == 1 || result == 2) ? 0 : result,
+                    ErrorCode = result == 1 ? 0 : result,
                 };
             }
             catch (Exception ex)
