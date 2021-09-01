@@ -159,26 +159,6 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
-        public ApiResult<IEnumerable<GameCasinoDetailData>> GetGameCasinoDetailV2(GetGameCasinoDetailPara para)
-        {
-
-            var apiResult = new ApiResult<IEnumerable<GameCasinoDetailData>>();
-            try
-            {
-                apiResult.Data = gameCasinoManageBLL.GetGameCasinoDetail(para);
-                apiResult.ErrorCode = 0;
-            }
-            catch(Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = ex.Message;
-            }
-
-            return apiResult;
-        }
-
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
         public ApiResult<IEnumerable<GameCasinoDetailBySite>> GetGameCasinoDetailV3(GetGameCasinoDetailPara para)
         {
 

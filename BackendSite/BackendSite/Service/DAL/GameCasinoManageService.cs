@@ -99,15 +99,6 @@ namespace BackendSite.Service.DAL
             props.Add("GameCasinoId", para.GameCasinoId);
             return conn.Query<CurrencyDataV2>("Admin_Currency_GetByCasinoId", props, commandType: CommandType.StoredProcedure);
         }
-
-        public List<GameCasinoDetail> GetGameCasinoDetailBySiteAndCasinoId(GetGameCasinoDetailPara para)
-        {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            DynamicParameters props = new DynamicParameters();
-            props.Add("GameCasinoId", para.GameCasinoId);
-            props.Add("SiteId", para.SiteId);  
-            return conn.Query<GameCasinoDetail>("Admin_GameCasinoDetail_GetBySiteAndCasinoId", props, commandType: CommandType.StoredProcedure).ToList();
-        }
         public List<GameCasinoDetail> GetGameCasinoDetailBySiteAndCasinoIdV2(GetGameCasinoDetailPara para,int SiteId)
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
