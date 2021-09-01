@@ -91,6 +91,13 @@ const dataColumnDefs = () => {
         format: settletimeFormat,
       },
     },
+    {
+      dataColumn: "qualifiedTime",
+      columnTitle: "Lastest Qualified Time" + " (" + moment().format("Z") + ")",
+      body: {
+        format: qualifiedTimeFormat,
+      },
+    },
     { dataColumn: "lastUpdateUser", columnTitle: "LastUpdateUser" },
     {
       dataColumn: "status",
@@ -296,6 +303,15 @@ const settletimeFormat = (createTime) => {
     return "";
   }
   return moment(createTime).format("l LTS");
+};
+const qualifiedTimeFormat = (dateTime) => {
+  if (dateTime === "First Time Upgrade") {
+    return "First Time Upgrade";
+  }
+  if (dateTime === "") {
+    return "";
+  }
+  return moment(dateTime).format("l LTS");
 };
 const levelBgcolerFormat = (level) => {
   switch (level) {

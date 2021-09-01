@@ -115,6 +115,15 @@ namespace BackendSite.Service.BLL
                 }).ToList();
             }
 
+            details = details.Select(c =>
+            {
+                if (c.Status == VipStatus.Settled)
+                {
+                    c.QualifiedTime = "";
+                }
+                return c;
+            }).ToList();
+
             return new GetVipUpgradeReviewListModel()
             {
                 Data = details,
@@ -181,6 +190,15 @@ namespace BackendSite.Service.BLL
                     return c;
                 }).ToList();
             }
+            
+            details = details.Select(c =>
+            {
+                if (c.Status == VipStatus.Settled)
+                {
+                    c.QualifiedTime = "";
+                }
+                return c;
+            }).ToList();
 
             return new GetVipDowngradeReviewListModel()
             {
