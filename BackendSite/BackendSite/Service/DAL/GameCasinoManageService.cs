@@ -70,6 +70,8 @@ namespace BackendSite.Service.DAL
             props.Add("PageSize", gameCasinoPara.PageSize);
             props.Add("TPId", gameCasinoPara.TPid);
             props.Add("CategoryId", gameCasinoPara.Categories);
+            props.Add("SiteId", gameCasinoPara.Site);
+            props.Add("CurrencyId", gameCasinoPara.Currency);
             props.Add("Names", string.IsNullOrEmpty(gameCasinoPara.Name == null ? null : gameCasinoPara.Name.Replace(" ", "")) ? null : $"%{gameCasinoPara.Name.Trim()}%");
 
             var result = conn.Query<GameCasinoData>("Admin_GameCasinoV3_Get", props, commandType: CommandType.StoredProcedure);

@@ -2,17 +2,8 @@ import React from "react";
 import moment from "moment";
 import DateTimePicker from "react-datetime";
 
-const defCategoryType = {
-  1: "Sports",
-  2: "Slots",
-  3: "Live Casino",
-  4: "Fishing",
-  5: "Cockfighting",
-  6: "Lottery",
-  7: "Virtual Sports",
-  8: "Poker",
-};
 const defCurrencyType = {
+  0: "",
   2: "MYR",
   4: "THB",
   13: "RMB",
@@ -20,7 +11,24 @@ const defCurrencyType = {
   51: "VND",
   61: "INR",
 };
+const defCategoryType = {
+  0: "",
+  1: "Hot",
+  2: "Featured",
+  3: "Status",
+  4: "Jackpot",
+};
 const Panel = (props) => {
+  let siteListOptions = [];
+  if (props.SiteList) {
+    siteListOptions.push({value:0,displayText:""})
+    props.SiteList.forEach((i) => {
+      siteListOptions.push({
+        value: i.value,
+        displayText: i.displayText,
+      });
+    });
+  }
   return (
     <div className="filter">
       <div className="row-flex">
@@ -38,20 +46,31 @@ const Panel = (props) => {
           options={Object.keys(defCategoryType).map((key) => {
             return { value: key, displayText: defCategoryType[key] };
           })}
-          hasAll={true}
+          hasAll={false}
           selectedValue={0}
           dataColumn="Categories"
           onChange={props.FiterOnChange}
+          value={props.StateFilter.Categories}
+        />
+        <DropDownBox
+          columnTitle="Site"
+          options={siteListOptions}
+          hasAll={false}
+          selectedValue={0}
+          dataColumn="Site"
+          onChange={props.FiterOnChange}
+          value={props.StateFilter.Site}
         />
         <DropDownBox
           columnTitle="Currency"
           options={Object.keys(defCurrencyType).map((key) => {
             return { value: key, displayText: defCurrencyType[key] };
           })}
-          hasAll={true}
+          hasAll={false}
           selectedValue={0}
           dataColumn="Currency"
           onChange={props.FiterOnChange}
+          value={props.StateFilter.Currency}
         />
         <InputField
           columnTitle="Name"
