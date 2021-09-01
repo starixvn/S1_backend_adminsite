@@ -14,10 +14,16 @@ const App = () => {
   const [stateFilter, setFilter] = useState({
     TPid: 0,
     Name: "",
+    Categories: 0,
+    Currency: 0,
+    Site:0
   });
   const [backupFilter, setbackupFilter] = useState({
     TPid: null,
     Name: null,
+    Categories: 0,
+    Currency: 0,
+    Site:0
   });
   const [detailData, setdetailData] = useState({});
   const [stateTPList, setTPList] = useState(null);
@@ -26,6 +32,28 @@ const App = () => {
   const [siteList, setsiteList] = useState(null);
   const [DetailFilter, setDetailFilter] = useState(0);
   const [detailSearchData, setdetailSearchData] = useState(null);
+
+  useEffect(() => {
+    if (mainPage == 1) {
+      let Data = {
+        GameCasinoId: parseInt(detailData.gameCasinoId),
+      };
+
+      api
+        .post("/api/GameCasinoManagement/GetGameCasinoDetailV3", Data)
+        .then(function (res) {
+          if (res.data.errorCode === 0) {
+            setdetailSearchData(res.data.data);
+          } else {
+            alert(res.data.message ?? "failed to get data.");
+          }
+        })
+        .catch(function (error) {
+          alert(error);
+        });
+    }
+  }, [mainPage]);
+
   useEffect(() => {
     api
       .post("/api/GameCasinoManagement/GetTpList")
@@ -77,18 +105,14 @@ const App = () => {
   const DetailFilterChange = (v, dataColumn) => {
     setDetailFilter(v);
   };
+
   const DetailSubmit = () => {
-    if (DetailFilter === 0) {
-      alert("Please Choose at Site");
-      return false;
-    }
     let Data = {
       GameCasinoId: parseInt(detailData.gameCasinoId),
-      SiteId: parseInt(DetailFilter),
     };
 
     api
-      .post("/api/GameCasinoManagement/GetGameCasinoDetailV2", Data)
+      .post("/api/GameCasinoManagement/GetGameCasinoDetailV3", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           setdetailSearchData(res.data.data);
@@ -100,6 +124,7 @@ const App = () => {
         alert(error);
       });
   };
+
   const Submit = () => {
     if (stateFilter.TPid === 0) {
       alert("Please Choose at TP");
@@ -108,6 +133,9 @@ const App = () => {
     let Data = {
       TPid: parseInt(stateFilter.TPid),
       Name: stateFilter.Name,
+      Currency: parseInt(stateFilter.Currency),
+      Categories: parseInt(stateFilter.Categories),
+      Site: parseInt(stateFilter.Site),
       PageNumber: 1,
     };
     api
@@ -123,6 +151,7 @@ const App = () => {
           setbackupFilter({
             TPid: parseInt(stateFilter.TPid),
             Currency: stateFilter.Currency,
+            Categories: stateFilter.Categories,
             Site: stateFilter.Site,
             Name: stateFilter.Name,
           });
@@ -138,6 +167,9 @@ const App = () => {
     let Data = {
       TPid: parseInt(backupFilter.TPid),
       Name: backupFilter.Name,
+      Currency: parseInt(backupFilter.Currency),
+      Categories: parseInt(backupFilter.Categories),
+      Site: parseInt(backupFilter.Site),
       PageNumber: PageNumber,
     };
     api
@@ -222,20 +254,18 @@ const App = () => {
       GameCasinoId: parseInt(detailData.gameCasinoId),
       SiteId: parseInt(DetailFilter),
     };
-    if (window.confirm(`Are you sure to delete ${props.currencyName} ?`)) {
-      api
-        .post("/api/GameCasinoManagement/DeleteGameCasinoDetail", Data)
-        .then(function (res) {
-          if (res.data.errorCode === 0) {
-            DetailSubmit();
-          } else {
-            alert(res.data.message ?? "failed to get data.");
-          }
-        })
-        .catch(function (error) {
-          alert(error);
-        });
-    }
+    api
+      .post("/api/GameCasinoManagement/DeleteGameCasinoDetail", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          DetailSubmit();
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
   };
   const Update_Detail_Status = (type, props) => {
     let Data = {
@@ -246,34 +276,33 @@ const App = () => {
       Hot: props.hot,
       Featured: props.featured,
       Status: props.status,
-      Promotion: props.promotion
+      Promotion: props.promotion,
     };
     let Data2 = {
       GameCasinoId: parseInt(detailData.gameCasinoId),
       SiteId: parseInt(DetailFilter),
     };
-    if (
-      window.confirm(`Are you sure to change ${props.currencyName} ${type} ?`)
-    ) {
-      api
-        .post("/api/GameCasinoManagement/SetGameCasinoDetail", Data)
-        .then(function (res) {
-          if (res.data.errorCode === 0) {
-            DetailSubmit();
-          } else {
-            alert(res.data.message ?? "failed to get data.");
-          }
-        })
-        .catch(function (error) {
-          alert(error);
-        });
-    }
+    api
+      .post("/api/GameCasinoManagement/SetGameCasinoDetail", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          DetailSubmit();
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
   };
   const Goback = () => {
     setFilter({
       ...stateFilter,
       TPid: backupFilter.TPid,
       Name: backupFilter.Name,
+      Categories: backupFilter.Categories,
+      Currency: backupFilter.Currency,
+      Site:backupFilter.Site
     });
     setmainPage(0);
     setdetailSearchData(null);
@@ -289,6 +318,7 @@ const App = () => {
             FiterOnChange={FilterOnChange}
             StateTPList={stateTPList}
             Submit={Submit}
+            SiteList={siteList}
           />
         )}
         {datas === null ? null : (

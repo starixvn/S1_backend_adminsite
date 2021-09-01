@@ -18,10 +18,12 @@ namespace BackendSite.Controllers.Api
     public class GameCasinoManagementController : ControllerBase
     {
         private readonly GameCasinoManageBLL gameCasinoManageBLL;
+        private readonly ServerInfoBLL serverInfoBLL;
 
-        public GameCasinoManagementController(GameCasinoManageBLL gameCasinoManageBLL)
+        public GameCasinoManagementController(GameCasinoManageBLL gameCasinoManageBLL, ServerInfoBLL serverInfoBLL)
         {
             this.gameCasinoManageBLL = gameCasinoManageBLL;
+            this.serverInfoBLL = serverInfoBLL;
         }
 
         [HttpPost]
@@ -157,16 +159,17 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
-        public ApiResult<IEnumerable<GameCasinoDetailData>> GetGameCasinoDetailV2(GetGameCasinoDetailPara para)
+        public ApiResult<IEnumerable<GameCasinoDetailBySite>> GetGameCasinoDetailV3(GetGameCasinoDetailPara para)
         {
 
-            var apiResult = new ApiResult<IEnumerable<GameCasinoDetailData>>();
+            var apiResult = new ApiResult<IEnumerable<GameCasinoDetailBySite>>();
             try
             {
-                apiResult.Data = gameCasinoManageBLL.GetGameCasinoDetail(para);
+                var SiteList = serverInfoBLL.GetSiteListByLoginUser().ToList();
+                apiResult.Data = gameCasinoManageBLL.GetGameCasinoDetailV2(para, SiteList);
                 apiResult.ErrorCode = 0;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
