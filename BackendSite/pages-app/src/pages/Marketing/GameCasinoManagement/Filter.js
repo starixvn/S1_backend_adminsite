@@ -2,12 +2,28 @@ import React from "react";
 import moment from "moment";
 import DateTimePicker from "react-datetime";
 
+const defCategoryType = {
+  1: "Sports",
+  2: "Slots",
+  3: "Live Casino",
+  4: "Fishing",
+  5: "Cockfighting",
+  6: "Lottery",
+  7: "Virtual Sports",
+  8: "Poker",
+};
+const defCurrencyType = {
+  2: "MYR",
+  4: "THB",
+  13: "RMB",
+  15: "IDR",
+  51: "VND",
+  61: "INR",
+};
 const Panel = (props) => {
   return (
     <div className="filter">
       <div className="row-flex">
-      </div>
-      <div>
         <DropDownBox
           columnTitle="TP"
           options={GetTPOptions(props.StateTPList)}
@@ -17,21 +33,39 @@ const Panel = (props) => {
           onChange={props.FiterOnChange}
           value={props.StateFilter.TPid}
         />
+        <DropDownBox
+          columnTitle="Categories"
+          options={Object.keys(defCategoryType).map((key) => {
+            return { value: key, displayText: defCategoryType[key] };
+          })}
+          hasAll={true}
+          selectedValue={0}
+          dataColumn="Categories"
+          onChange={props.FiterOnChange}
+        />
+        <DropDownBox
+          columnTitle="Currency"
+          options={Object.keys(defCurrencyType).map((key) => {
+            return { value: key, displayText: defCurrencyType[key] };
+          })}
+          hasAll={true}
+          selectedValue={0}
+          dataColumn="Currency"
+          onChange={props.FiterOnChange}
+        />
+        <InputField
+          columnTitle="Name"
+          Value={props.StateFilter.Name}
+          dataColumn="Name"
+          onChange={props.FiterOnChange}
+          defaultValue=""
+        />
       </div>
-      <div>
-          <InputField
-            columnTitle="Name"
-            Value={props.StateFilter.Name}
-            dataColumn="Name"
-            onChange={props.FiterOnChange}
-            defaultValue=""
-          />
-      </div>
-      <div>
+      <div className="row-flex">
         {props.StateTPList === null ? null : (
           <button
             className="btn btn-add"
-            style={{ marginTop: "20px", marginBottom: "40px" }}
+            style={{ marginTop: "20px"}}
             onClick={props.Submit}
           >
             Submit

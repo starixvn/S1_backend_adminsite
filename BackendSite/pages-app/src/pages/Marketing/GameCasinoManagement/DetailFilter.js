@@ -7,7 +7,7 @@ const Panel = (props) => {
   return (
     <div className="filter">
       <div className="row-flex"></div>
-      <div>
+      {/* <div>
         {props.SiteList === null ? null : (
           <RadioBox
             Title="Site"
@@ -17,9 +17,9 @@ const Panel = (props) => {
             Selected={props.DetailFilter}
           />
         )}
-      </div>
+      </div> */}
       <div>
-        {props.StateTPList === null ? null : (
+        {/* {props.StateTPList === null ? null : (
           <button
             className="btn btn-add"
             onClick={props.Submit}
@@ -31,7 +31,7 @@ const Panel = (props) => {
           >
             Submit
           </button>
-        )}
+        )} */}
         <button
           className="btn btn-search"
           type="back"
