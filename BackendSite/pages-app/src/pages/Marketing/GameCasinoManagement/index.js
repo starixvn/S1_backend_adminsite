@@ -198,6 +198,9 @@ const App = () => {
     let Data = {
       TPid: parseInt(backupFilter.TPid),
       Name: backupFilter.Name,
+      Currency: parseInt(backupFilter.Currency),
+      Categories: parseInt(backupFilter.Categories),
+      Site: parseInt(backupFilter.Site),
       PageNumber: pageInfo.pageNumber,
     };
     api
