@@ -50,4 +50,11 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public string GameInfo { get; set; }
     }
+
+    public class TpDisableUserForGameDetail
+    {
+        public int SiteId { get; set; }
+        public string UserName { get; set; }
+        public List<DisableTpGame> GameInfo { get; set; }
+    }
 }

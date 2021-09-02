@@ -46,7 +46,7 @@ const App = () => {
     GetDisableUserList(stateFilter);
   }, []);
 
-  const GetDisableUserList = (filter, pageNumber = 1, PageSize = 10) => {
+  const GetDisableUserList = (filter, pageNumber = 1, pageSize = 10) => {
     if (filter.SiteId.length === 0) {
       alert("Please Choose at least one Site");
       return false;
@@ -57,7 +57,7 @@ const App = () => {
       StartDate: moment.utc(filter.StartDate).unix(),
       EndDate: moment.utc(filter.EndDate).unix(),
       pageNumber: pageNumber,
-      PageSize: PageSize
+      PageSize: pageSize
     };
     let param = {
       Url: "Risk/GetTpDisableUser",

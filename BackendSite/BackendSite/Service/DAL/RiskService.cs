@@ -28,7 +28,16 @@ namespace BackendSite.Service.DAL
 
             return await _sqlClient.ExecuteAsync("Admin_TpDisableUser_Set", p);
         }
-
+        
+        public async Task<int> UpdateStatus(int custId, int status, string Operator)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            p.Add("_Status", status);
+            p.Add("_Operator", Operator);
+            return await _sqlClient.ExecuteAsync("Admin_TpDisableUserStatus_Set", p);
+        }
+        
         public IEnumerable<TpDisableUser> TpDisableUserGet(IEnumerable<int> siteIds, string userName, long startDate, long endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
         {
             var p = new DynamicParameters();
@@ -53,15 +62,6 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters();
             p.Add("_CustId", custId);
             return await _sqlClient.QueryFirstAsync<TpDisableUserDetail>("Admin_TpDisableUserByCustId_Get", p);
-        }
-
-        public async Task<int> UpdateStatus(int custId, int status, string Operator)
-        {
-            var p = new DynamicParameters();
-            p.Add("_CustId", custId);
-            p.Add("_Status", status);
-            p.Add("_Operator", Operator);
-            return await _sqlClient.ExecuteAsync("Admin_TpDisableUserStatus_Set", p);
         }
     }
 }

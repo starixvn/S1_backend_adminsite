@@ -8,6 +8,7 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.Api
 {
@@ -56,12 +57,19 @@ namespace BackendSite.Controllers.Api
 
         [HttpGet]
         [Route("{custId:int}")]
-        public async Task<ApiResult<TpDisableUserDetail>> GetTpDisableUserByCustId(int custId)
+        public async Task<ApiResult<TpDisableUserForGameDetail>> GetTpDisableUserByCustId(int custId)
         {
-            var apiResult = new ApiResult<TpDisableUserDetail>();
+            var apiResult = new ApiResult<TpDisableUserForGameDetail>();
             try
             {
-                apiResult.Data = await _riskBll.GetTpDisableUserBuCustId(custId);
+                var data = await _riskBll.GetTpDisableUserBuCustId(custId);
+                var detail = new TpDisableUserForGameDetail()
+                {
+                    UserName = data.UserName,
+                    SiteId = data.SiteId,
+                    GameInfo = JsonConvert.DeserializeObject<List<DisableTpGame>>(data.GameInfo)
+                };
+                apiResult.Data = detail;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
