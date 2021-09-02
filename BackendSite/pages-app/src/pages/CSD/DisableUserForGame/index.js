@@ -54,8 +54,8 @@ const App = () => {
     let query = {
       SiteIds: filter.SiteId,
       UserName: filter.UserName,
-      StartDate: moment.utc(filter.StartDate).unix(),
-      EndDate: moment.utc(filter.EndDate).unix(),
+      StartDate: moment(filter.StartDate).utc().unix(),
+      EndDate: moment(filter.EndDate).utc().unix(),
       pageNumber: pageNumber,
       PageSize: pageSize
     };
