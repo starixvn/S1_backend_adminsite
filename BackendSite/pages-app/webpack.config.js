@@ -218,6 +218,10 @@ module.exports = {
     //   '@babel/polyfill',
     // "./src/pages/CSD/RegistrationManagement/index.js",
     // ],
+    "CSD/DisableUserForGame.min": [
+      '@babel/polyfill',
+    "./src/pages/CSD/DisableUserForGame/index.js"
+    ],
     "Marketing/LeaderBoardExtraPoint.min": [
       "@babel/polyfill",
       "./src/pages/Marketing/LeaderBoardExtraPoint/index.js",
@@ -226,6 +230,10 @@ module.exports = {
       "@babel/polyfill",
       "./src/pages/Marketing/VipLevelReview/index.js",
     ],
+    // "Marketing/LeaderBoardExtraPoint.min": [
+    // 	 '@babel/polyfill',
+    // 	"./src/pages/Marketing/LeaderBoardExtraPoint/index.js"
+    // ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

@@ -140,6 +140,7 @@ namespace BackendSite.Service.Model
         public int Before { get; set; }
         public int After { get; set; }
     }
+
     public class GameCasinoDetailBySite
     {
         public int SiteId { get; set; }
