@@ -38,8 +38,6 @@ function Edit({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
     const [siteList, setSiteList] = useState([]);
     const [siteId, setSite] = useState(0);
     const [userName, setUserName] = useState("");
-    const [custData, setCustData] = useState(null);
-
     useEffect(() => {        
 
         WebAPI.fetchData({ Url: "Risk/GetTpList" }).then((res) => {
@@ -63,7 +61,10 @@ function Edit({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
         if(CustId != 0) {
             WebAPI.fetchData({ Url: `Risk/GetTpDisableUserByCustId/${CustId}` }).then((res) => {
                 if (res.data.errorCode === 0) {
-                    setCustData(res.data.data)
+                    let temp = res.data.data;
+                    setUserName(temp.userName)
+                    setSite(temp.siteId)
+                    dispatch({ type: "initial", data: { data: temp.disableGames}  });
                 } 
                 else {
                     alert(res.data.message ?? "failed to get data.");
@@ -71,27 +72,6 @@ function Edit({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
             });
         }
     }, []);
-    
-    useEffect(() => {
-        if (tpList.length > 0 && custData != null) {
-            setSite(custData.siteId);
-            setUserName(custData.userName);
-            custData.gameInfo.forEach( a => {
-                tpList.forEach( tp => {
-                    if (a.tpId === tp.tpId) {
-                        GetTpGameList(a.tpId, false)
-                    }
-                })
-            })
-            custData.gameInfo.forEach( a => {
-                if (a.gameList != null) {
-                    a.gameList.forEach(game => {
-                        console.log(`${a.tpId}_${game}`);
-                    })
-                }
-            })
-        }
-    }, [custData]);
 
     const Submit = () => {
         if (userName === null || userName === '') {

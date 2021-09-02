@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Amazon.S3.Util;
 using BackendSite.Attributes;
@@ -62,14 +63,36 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<TpDisableUserForGameDetail>();
             try
             {
+                var tpList = await _gameCasinoBll.GetTpList();
                 var data = await _riskBll.GetTpDisableUserBuCustId(custId);
-                var detail = new TpDisableUserForGameDetail()
+                var disableGames = JsonConvert.DeserializeObject<List<DisableTpGame>>(data.GameInfo);
+
+                foreach (var dg in disableGames)
                 {
-                    UserName = data.UserName,
+                    foreach (var tp in tpList)
+                    {
+                        if (dg.TpId == tp.TpId)
+                        {
+                            tp.Checked = true;
+                            var games = await _gameCasinoBll.GameCasinoByTPIdV3(tp.TpId);
+                            tp.GameList = games.Select(a=> new TpGameCasino()
+                            {
+                                GameId = a.GameId,
+                                Name = a.Name,
+                                Checked = dg.GameList != null && dg.GameList.Any(c=>c == a.GameId)
+                            }).ToList();
+                        }
+                    }
+                }
+
+                var atempo = tpList.ToList();
+                var cust = new TpDisableUserForGameDetail()
+                {
                     SiteId = data.SiteId,
-                    GameInfo = JsonConvert.DeserializeObject<List<DisableTpGame>>(data.GameInfo)
+                    UserName = data.UserName,
+                    DisableGames = atempo
                 };
-                apiResult.Data = detail;
+                apiResult.Data = cust;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)

@@ -55,6 +55,26 @@ namespace BackendSite.Service.Model
     {
         public int SiteId { get; set; }
         public string UserName { get; set; }
-        public List<DisableTpGame> GameInfo { get; set; }
+        public List<RiskTpListInfo> DisableGames { get; set; }
+    }
+    public class SiteTpListIfo
+    {
+        public int TpId { set; get; }
+        public string TpName { set; get; }
+    }
+    
+    public class RiskTpListInfo
+    {
+        public int TpId { set; get; }
+        public string TpName { set; get; }
+        public List<TpGameCasino> GameList { set; get; }
+        public bool Checked { set; get; }
+    }
+    
+    public class TpGameCasino
+    {
+        public string GameId { get; set; }
+        public string Name { get; set; }
+        public bool Checked { get; set; }
     }
 }
