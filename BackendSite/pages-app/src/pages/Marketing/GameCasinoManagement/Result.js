@@ -2,6 +2,7 @@ import React from "react";
 import Pagination from "./Pagination";
 import WebAPI from "../../../module/WebAPI";
 import { api } from "../../../module/WebAPI";
+import Detail from "./Detail";
 
 const dataColumnDefs = () => {
   return [
@@ -58,10 +59,11 @@ const Panel = (props) => {
       ) : element.dataColumn === "hot" ||
         element.dataColumn === "featured" ||
         element.dataColumn === "status" ||
-        element.dataColumn === "promotion"? (
+        element.dataColumn === "promotion" ? (
         <td key={`td-${element.dataColumn}-${idx}`}>
           {data[element.dataColumn] ? "Yes" : "No"}
-          {window.subFuncKeys && window.subFuncKeys.includes("gcm_edit_main") ? (
+          {window.subFuncKeys &&
+          window.subFuncKeys.includes("gcm_edit_main") ? (
             <div className="switch__container">
               <input
                 id={`switch-${element.dataColumn + dataidx}`}
@@ -96,8 +98,39 @@ const Panel = (props) => {
         </td>
       );
     });
-
-    return <tr key={`result-body-${dataidx}`}>{row}</tr>;
+    if (props.DetailGameCasinoId == data["gameCasinoId"]) {
+      return (
+        <>
+          <tr key={`result-body-${dataidx}`}>{row}</tr>
+          <tr>
+            <td colspan="8">
+              <button
+                className="btn btn-search"
+                type="back"
+                onClick={props.Goback}
+                style={{
+                  marginTop: "10px",
+                  marginBottom: "10px",
+                  marginRight: "10px",
+                }}
+              >
+                Closed
+              </button>
+              {props.DetailSearchData === null ? null : (
+                <Detail
+                  DetailSearchData={props.DetailSearchData}
+                  Create={props.Create}
+                  Delete={props.Delete}
+                  Update={props.Update}
+                />
+              )}
+            </td>
+          </tr>
+        </>
+      );
+    } else {
+      return <tr key={`result-body-${dataidx}`}>{row}</tr>;
+    }
   });
   return (
     <div className="table">

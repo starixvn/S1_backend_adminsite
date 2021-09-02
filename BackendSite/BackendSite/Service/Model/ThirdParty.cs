@@ -76,10 +76,4 @@ namespace BackendSite.Service.Model
         public decimal outstanding { get; set; }
         public byte Currency { get; set; }
     }
-
-    public class SiteTpListIfo
-    {
-        public int TpId { set; get; }
-        public string TpName { set; get; }
-    }
 }

@@ -567,5 +567,10 @@ namespace BackendSite.Service.BLL
             });
             return list;
         }
+
+        public async Task<CustomerForRisk> GetCustId(string userName, int siteId)
+        {
+            return await custInfoService.GetCustId(userName, siteId);
+        }
     }
 }

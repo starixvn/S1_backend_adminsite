@@ -1,14 +1,11 @@
 ﻿using BackendSite.Service.DAL;
-using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.Model.TpBetRecordDetail;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.BLL
 {
@@ -16,27 +13,19 @@ namespace BackendSite.Service.BLL
     {
         private readonly AdjustmentService adjustmentService;
         private readonly WalletService walletService;
-        private readonly AdminUserService adminUserService;
-        private readonly Tools tools;
         private readonly AdminService adminService;
         private readonly TpBetRecordService _tpBetRecordService;
         private readonly TpMaintainService _tpMaintainService;
+        private readonly ThirdPartyService _thirdPartyService;
 
-        public PaymentBLL(AdjustmentService adjustmentService,
-            WalletService walletService,
-            AdminUserService adminUserService,
-            Tools tools,
-            AdminService adminService,
-            TpBetRecordService tpBetRecordService,
-            TpMaintainService tpMaintainService)
+        public PaymentBLL(IServiceProvider provider)
         {
-            this.adjustmentService = adjustmentService;
-            this.walletService = walletService;
-            this.adminUserService = adminUserService;
-            this.tools = tools;
-            this.adminService = adminService;
-            _tpBetRecordService = tpBetRecordService;
-            _tpMaintainService = tpMaintainService;
+            adjustmentService = provider.GetRequiredService<AdjustmentService>();
+            walletService = provider.GetRequiredService<WalletService>();
+            adminService = provider.GetRequiredService<AdminService>();
+            _tpBetRecordService = provider.GetRequiredService<TpBetRecordService>();
+            _tpMaintainService = provider.GetRequiredService<TpMaintainService>();
+            _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
         }
 
         public int PaymentAdjustment(AdjustmentInfo adjustmentInfo, string Operator, out string transId)
@@ -116,21 +105,21 @@ namespace BackendSite.Service.BLL
             return walletService.GetCustTpBetRecordListOneWeek(custId);
         }
 
-        public IEnumerable<TpBetRecordListOneDay> GetCustTpBetRecordListOneDay(int custId, string selDate)
+        public IEnumerable<TpBetRecordListOneDay> GetCustTpBetRecordListOneDay(int custId, string selDate,long startDate,long endDate)
         {
-            return walletService.GetCustTpBetRecordListOneDay(custId, selDate);
+            return walletService.GetCustTpBetRecordListOneDay(custId, selDate, startDate, endDate);
         }
 
         public IEnumerable<TpBetRecordbyCategoryId> GetCustTpBetRecordListbyCategoryId(int custId, string selDate,
-            int categoryId)
+            int categoryId, long startDate, long endDate)
         {
-            return walletService.GetCustTpBetRecordListbyCategoryId(custId, selDate, categoryId);
+            return walletService.GetCustTpBetRecordListbyCategoryId(custId, selDate, categoryId, startDate, endDate);
         }
 
         public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId,
-            string selDate, int gameTypeId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+            string selDate, int gameTypeId, long startDate, long endDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
-            return walletService.GetCustTpBetRecordDetailListbyGameType(custId, selDate, gameTypeId, PageSize,
+            return walletService.GetCustTpBetRecordDetailListbyGameType(custId, selDate, gameTypeId, startDate, endDate, PageSize,
                 ref PageNumber, ref TotalPages, ref RowCount);
         }
 
@@ -188,34 +177,22 @@ namespace BackendSite.Service.BLL
             return walletService.GetCustTpBetRecordList(custId, startDate, endDate);
         }
 
-        public async Task<TpBetRecordDetailModel> GetTpBetRecordDetailAsync(int gameType,string transId)
+        public async Task<BaseDetail> GetTpBetRecordDetailAsync(int gameType, string transId)
         {
-            var gameTypeItem = _tpMaintainService.GetTpGameTypeList().Where(x => x.Type == gameType).FirstOrDefault();
+            var gameTypeItem = _tpMaintainService.GetTpGameTypeList().FirstOrDefault(x => x.Type == gameType);
 
-            var result =  await _tpBetRecordService.GetTpBetRecordDetailAsync(gameTypeItem.TpId, gameType,transId);
+            var result = await _tpBetRecordService.GetTpBetRecordDetailAsync(gameTypeItem.TpId, gameType, transId);
 
-            //var s= @"""";
-            //var v = "\"";
-            //var a=result.Detail.Replace(v,s);
+            var tpCurrency = _thirdPartyService.GetTpCurrency(gameTypeItem.TpId, result.CurrencyId);
 
-            //var a = Regex.Replace(result.FirstOrDefault().Detail, @"\"", """,
-            //                     RegexOptions.None, TimeSpan.FromSeconds(1.5));
-            //if (result.Any())
-            //{
-            var a = result.FirstOrDefault();
-                //a._Detail = JsonConvert.DeserializeObject<dynamic>(a.Detail);
-                //foreach (var item in detailOriginalData)
-                //{
-                //    var cSharpClass = JsonConvert.DeserializeObject<dynamic>(item.ToString());
+            var detail = new DetailMapping().GetDetail(new GetDetailObject
+            {
+                TpCategoryId = gameTypeItem.CategoryId,
+                TpCurrency = await tpCurrency,
+                TpBetRecordDetail = result
+            });
 
-                //    foreach (JProperty item2 in cSharpClass)
-                //    {
-
-                //    }
-                //}
-            //}
-
-            return a;
+            return detail;
         }
     }
 }

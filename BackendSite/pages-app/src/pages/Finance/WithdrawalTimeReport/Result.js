@@ -36,6 +36,13 @@ const dataColumnDefs = () => {
       },
     },
     {
+      dataColumn: "flowEndTime",
+      columnTitle: "Flow End Time" + " (" + moment().format("Z") + ")",
+      body: {
+        format: dateFormat,
+      },
+    },
+    {
       dataColumn: "toVerifyTime",
       columnTitle: "To Verify Time",
       body: {
@@ -84,6 +91,11 @@ const Panel = (props) => {
         element.body.subData.forEach((s) => {
           subData[s] = data[s];
         });
+      }
+      if (element.dataColumn === "flowEndTime") {
+        if (data.status != 5 && data.status != 6 && data.status != 7) {
+          data[element.dataColumn] = null;
+        }
       }
       return (
         <td
@@ -152,7 +164,8 @@ const numberFormat = (number) => {
   return number_format(number_toFixed(number, 0));
 };
 const dateFormat = (createTime) => {
-  return moment(createTime).format("l LTS");
+  if (createTime == null) return "";
+  else return moment(createTime).format("l LTS");
 };
 
 export default Panel;

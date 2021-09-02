@@ -177,6 +177,11 @@
             "FuncKey": "rm_delete_note"
           }
         ]
+      },
+      {
+        "DisplayKey": "Disable User For Game",
+        "FuncKey": "CustManage/DisableUserForGame",
+        "Enable": false
       }
     ]
   },
@@ -430,6 +435,22 @@
         ]
       },
       {
+        "DisplayKey": "VipLevelReview",
+        "FuncKey": "Marketing/VipLevelReview",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Export Excel",
+            "FuncKey": "viplevelreview_export_excel"
+          },
+          {
+            "DisplayKey": "Update Status",
+            "FuncKey": "viplevelreview_update"
+          }
+        ]
+      },
+      {
         "DisplayKey": "Latest Highlight Video Management",
         "FuncKey": "Marketing/LatestHighlightVideoManagement",
         "Enable": false
@@ -459,6 +480,11 @@
       {
         "DisplayKey": "Venders Maintenance",
         "FuncKey": "Marketing/TpMaintain",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "LeaderBoard ExtraPoint",
+        "FuncKey": "Marketing/LeaderBoardExtraPoint",
         "Enable": false
       }
     ]

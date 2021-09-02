@@ -22,7 +22,6 @@ const Result = (props) => {
           <tr key={`result-${dIdx}`}>
             <td>{d.transId}</td>
             <td>
-              {" "}
               <button
                 className="btn btn-link"
                 onClick={() =>
@@ -84,7 +83,9 @@ const Result = (props) => {
       </button>
       <TpBetRecordDetailModal
         show={props.TpBetRecordDatasShowStatus}
+        showRawDetail={props.TpBetRecordDatasShowRawDetail}
         tpBetRecordDatas={props.TpBetRecordDatas}
+        handleSwitch={props.SwitchDetailBtn}
         handleClose={(e) => props.TpBetRecordCloseBtn()}
       />
     </>

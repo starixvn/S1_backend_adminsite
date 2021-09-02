@@ -126,5 +126,17 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/LeaderBoardExtraPoint" })]
+        public IActionResult LeaderBoardExtraPoint()
+        {
+            return View();
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview" })]
+        public IActionResult VipLevelReview()
+        {
+            return View();
+        }
     }
 }

@@ -34,6 +34,7 @@ export const initPromotionType = [
 
 export const initSpecialBonusPromotionType = [
   { value: 1, displayText: defPromotionType[1] },
+  { value: 2, displayText: defPromotionType[2] },
   { value: 3, displayText: defPromotionType[3] },
 ];
 
@@ -112,9 +113,9 @@ export const initDeviceType = [
   { value: 3, displayText: "App" },
 ];
 export const initFilterType = [
-	{ value: 0, displayText: "All" },
-	{ value: 1, displayText: "New" },
-	{ value: 2, displayText: "Used" }
+  { value: 0, displayText: "All" },
+  { value: 1, displayText: "New" },
+  { value: 2, displayText: "Used" },
 ];
 
 export const VipLevelOptions = [{ value: 1, displayText: "For Vip Level" }];

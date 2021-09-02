@@ -61,7 +61,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             var data = _reportDbClient.Query<WithdrawalInfoAndAccountingListModel>(
-                "Admin_WithdrawalInfoAndAccounting_Get", parameter);
+                "Admin_WithdrawalInfoAndAccountingV2_Get", parameter);
 
 
             totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
@@ -88,7 +88,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_UserName", userName);
 
             return _reportDbClient.Query<WithdrawalInfoAndAccountingListForExportModel>(
-                "Admin_WithdrawalInfoAndAccountingForExport_Get", parameter);
+                "Admin_WithdrawalInfoAndAccountingForExportV2_Get", parameter);
         }
 
         public IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingListByTransId(string transId, int siteId,int currencyId)

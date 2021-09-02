@@ -108,6 +108,7 @@ namespace BackendSite.Service.Model
         public int DepositCnt { set; get; }
         public string Operator { set; get; }
         public DateTime? UpdateTime { set; get; }
+        public string AffiliateCode { get; set; }
 
     }
 

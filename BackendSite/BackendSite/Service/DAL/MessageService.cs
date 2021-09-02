@@ -6,6 +6,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
@@ -16,12 +17,16 @@ namespace BackendSite.Service.DAL
         private readonly IConfiguration configuration;
         private readonly string commonServiceUrl;
         private readonly CourierAdapter courierAdapter;
+        private readonly ILogger<MessageService> _logger;
 
-        public MessageService(IConfiguration configuration, CourierAdapter courierAdapter)
+        public MessageService(IConfiguration configuration,
+            CourierAdapter courierAdapter,
+            ILogger<MessageService> logger)
         {
             this.configuration = configuration;
             commonServiceUrl = configuration.GetValue<string>("CommonService");
             this.courierAdapter = courierAdapter;
+            _logger = logger;
         }
 
         public int SendMessageToPlayer(int siteId, string sender, string title, string content, int custId, string CustUserName, string lang)
@@ -36,19 +41,25 @@ namespace BackendSite.Service.DAL
             return conn.Execute("Msg_Ins", new { Type = 99, siteId = siteId, LangId = lang, RecipientCustId = custId, Recipient = CustUserName, SenderCustId = SenderCustId, Sender = sender, Title = title, Content = content, MainId = 0 }, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<Announcement> GetAnnouncements(int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, long startDate, long endDate, int status, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
             IEnumerable<Announcement> result = null;
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            //site為ALL類型的都可以查
+            List<int> tempselectSite = selectSite.ToList();
+            tempselectSite.Add(0);
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
-                string SpName = "Admin_Announcement_Get";
+                string SpName = "Admin_AnnouncementV2_Get";
                 DynamicParameters props = new DynamicParameters();
-                props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-                props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-                props.Add("@PageSize", PageSize);
+                props.Add("SelectSite", JsonConvert.SerializeObject(tempselectSite));
+                props.Add("StartDate", startDate);
+                props.Add("EndDate", endDate);
+                props.Add("Status", status);
+                props.Add("PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+                props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                props.Add("PageSize", PageSize);
 
                 result = conn.Query<Announcement>(SpName, props, commandType: CommandType.StoredProcedure);
                 PageNumber = props.Get<int?>("@PageNumber") ?? 0;
@@ -193,8 +204,65 @@ namespace BackendSite.Service.DAL
         }
         public bool DeleteBatchMessage(int batchId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_BatchMessage_Del", new { BatchId = batchId }, commandType: CommandType.StoredProcedure) > 0;
+            int batchMessageCount = 0;
+            int messageCount = 0;
+
+            _logger.LogInformation($@"MessageService-DeleteBatchMessage Start.");
+
+            using MySqlConnection conn =
+                    new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+
+            using var trans = conn.BeginTransaction();
+
+            var bp = new DynamicParameters();
+            bp.Add("_BatchId", batchId);
+
+            batchMessageCount = conn.QueryFirstOrDefault<int>("Admin_BatchMessageForDelete_Get", bp, transaction: trans, commandType: CommandType.StoredProcedure);
+
+            _logger.LogInformation($@"MessageService-DeleteBatchMessage Expect Delete Message Count={batchMessageCount}.");
+
+            if (batchMessageCount > 0)
+            {
+                int affectCount = conn.QueryFirstOrDefault<int>("Admin_BatchMessageV2_Del", bp, transaction: trans, commandType: CommandType.StoredProcedure);
+
+                if (affectCount != batchMessageCount)
+                {
+                    trans.Rollback();
+
+                    _logger.LogError($@"MessageService-DeleteBatchMessage Expect Delete Batch Message Count={batchMessageCount},Actual Delete Batch Message Count={affectCount}.Transaction rollback.");
+
+                    return false;
+                }
+            }
+
+            var p = new DynamicParameters();
+            p.Add("_BatchId", batchId);
+
+            messageCount = conn.QueryFirstOrDefault<int>("Admin_MessageForDelete_Get", p, transaction: trans, commandType: CommandType.StoredProcedure);
+
+            _logger.LogInformation($@"MessageService-DeleteBatchMessage Expect Delete Message Count={messageCount}.");
+
+            if (messageCount > 0)
+            {
+
+                int affectCount = conn.QueryFirstOrDefault<int>("Admin_MessageByBatchId_Del", bp, transaction: trans, commandType: CommandType.StoredProcedure);
+
+                if (affectCount != messageCount)
+                {
+                    trans.Rollback();
+
+                    _logger.LogError($@"MessageService-DeleteBatchMessage Expect Delete Message Count={messageCount},Actual Delete Message Count={affectCount}.Transaction rollback.");
+
+                    return false;
+                }
+            }
+
+            trans.Commit();
+
+            _logger.LogInformation($@"MessageService-DeleteBatchMessage End.");
+
+            return true;
         }
         public bool UpdateBatchMessage(int batchId, string message)
         {

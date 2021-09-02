@@ -64,6 +64,8 @@ namespace BackendSite.Service.Model
         //public virtual IEnumerable<Comments> Comments { get; set; }
         public bool HasPic { get; set; }
         public int BankSlipPicCount { get; set; }
+
+        public DateTime FlowEndTime { set; get; }
     }
     public class WithdrawalInfo
     {
@@ -130,6 +132,8 @@ namespace BackendSite.Service.Model
         public int WithdrawlCnt { set; get; }
         public string Operator { set; get; }
         public DateTime? UpdateTime { set; get; }
+
+        public DateTime FlowEndTime { set; get; }
     }
 
     public class WithdrawalLimit
@@ -204,6 +208,7 @@ namespace BackendSite.Service.Model
         public DateTime CreateTime { get; set; }
         public DateTime UpdateTime { get; set; }
         public DateTime VerifyTime { get; set; }
+        public DateTime FlowEndTime { get; set; }
         public string TransId { get; set; }
         public int WithdrawalType { get; set; }
         public string UserName { get; set; }
@@ -228,6 +233,7 @@ namespace BackendSite.Service.Model
         public string Status { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdateTime { get; set; }
+        public DateTime? FlowEndTime { get; set; }
         public string ToVerifyTime { get; set; }
         public string ToApprovedTime { get; set; }
         public string CompleteTime { get; set; }

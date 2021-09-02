@@ -118,7 +118,19 @@ const WithdrawalAccounting = lazy(() =>
   import("./pages/Finance/WithdrawalAccounting/index")
 );
 
-export const defaultPage = "WithdrawalAccounting";
+const LeaderBoardExtraPoint = lazy(() =>
+  import("./pages/Marketing/LeaderBoardExtraPoint/index")
+);
+
+const DisableUserForGame = lazy(() =>
+  import("./pages/CSD/DisableUserForGame/index")
+);
+
+const VipLevelReview = lazy(() =>
+  import("./pages/Marketing/VipLevelReview/index")
+);
+
+export const defaultPage = "VipLevelReview";
 
 export const layoutType = {
   N88: "N88",
@@ -691,6 +703,46 @@ export const pages = {
     comp: (
       <Suspense fallback="loading...">
         <WithdrawalAccounting />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  DisableUserForGame: {
+    comp: (
+      <Suspense fallback="loading...">
+        <DisableUserForGame />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/common/fonts/main-font/style.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  LeaderBoardExtraPoint: {
+    comp: (
+      <Suspense fallback="loading...">
+        <LeaderBoardExtraPoint />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  VipLevelReview: {
+    comp: (
+      <Suspense fallback="loading...">
+        <VipLevelReview />
       </Suspense>
     ),
     css: [

@@ -180,6 +180,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Disable User For Game",
+        "FuncKey": "CustManage/DisableUserForGame",
+        "Controller": "CustManage",
+        "Action": "DisableUserForGame",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
@@ -545,12 +555,22 @@
         "Roles": null,
         "Childs": null
       },
+      //{
+      //  "Key": "VipUpgrade",
+      //  "Title": "VipUpgrade",
+      //  "FuncKey": "Marketing/VipUpgrade",
+      //  "Controller": "Marketing",
+      //  "Action": "VipUpgrade",
+      //  "Icon": "",
+      //  "Roles": null,
+      //  "Childs": null
+      //},
       {
-        "Key": "VipUpgrade",
-        "Title": "VipUpgrade",
-        "FuncKey": "Marketing/VipUpgrade",
+        "Key": "VipLevelReview",
+        "Title": "Vip Level Review",
+        "FuncKey": "Marketing/VipLevelReview",
         "Controller": "Marketing",
-        "Action": "VipUpgrade",
+        "Action": "VipLevelReview",
         "Icon": "",
         "Roles": null,
         "Childs": null
@@ -591,6 +611,16 @@
         "FuncKey": "Marketing/TpMaintain",
         "Controller": "Marketing",
         "Action": "TpMaintain",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "LeaderBoardExtraPoint",
+        "Title": "LeaderBoard ExtraPoint",
+        "FuncKey": "Marketing/LeaderBoardExtraPoint",
+        "Controller": "Marketing",
+        "Action": "LeaderBoardExtraPoint",
         "Icon": "",
         "Roles": null,
         "Childs": null

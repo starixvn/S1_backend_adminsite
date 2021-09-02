@@ -178,6 +178,20 @@ namespace BackendSite.Service.Model
 
         public IEnumerable<int> SelectedVipLevel { get; set; }
     }
+    public class LeaderboardExtraPointList
+    {
+        public DateTime ActiveDate { get; set; }
+        public string SiteName { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public string Currency { get; set; }
+        public string CategoryName { get; set; }
+        public decimal ExtraPoint { get; set; }
+        public DateTime CreateTime { set; get; }
+        public DateTime UpdateTime { set; get; }
+        public string LastUpdateUser { get; set; }
+
+    }
     public class TpGames
     {
         public string GameName { get; set; }
@@ -191,7 +205,7 @@ namespace BackendSite.Service.Model
         public decimal Percentage { get; set; }
         public decimal LossAmount { get; set; }
         public int Status { get; set; }
-        public int TpId { get; set; }
+        public int? TpId { get; set; }
     }
     public class CashBackGame
     {

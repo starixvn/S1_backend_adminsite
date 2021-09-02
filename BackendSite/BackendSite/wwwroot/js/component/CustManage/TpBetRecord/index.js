@@ -13,6 +13,8 @@ const Panel = () => {
   const [stateTpBetRecordDatas, setTpBetRecordDatas] = React.useState();
   const [stateTpBetRecordDatasShowStatus, setTpBetRecordDatasShowStatus] =
     React.useState(false);
+  const [stateTpBetRecordDatasShowRawDetail, setTpBetRecordDatasShowRawDetail] =
+    React.useState(false);
   const [stateGameInfo, setGameInfo] = React.useState({
     Date: null,
     GameTypeId: null,
@@ -27,6 +29,9 @@ const Panel = () => {
       .format("l LTS"),
     EndTime: moment.utc(new Date()).add(8, "hour").format("l LTS"),
     DateQuickPicker: "0",
+  });
+  const [stateDatas, setDatas] = React.useState({
+    FilterInfo: null,
   });
 
   const EditfilterData = (v, col) => {
@@ -101,6 +106,9 @@ const Panel = () => {
         if (result.errorCode == 0) {
           setWeekDatas(result.data);
           setInfoType("week");
+          setDatas({
+            FilterInfo:filterData
+          });
         } else {
           alert(result.message);
         }
@@ -123,6 +131,9 @@ const Panel = () => {
           if (result.errorCode == 0) {
             setWeekDatas(result.data);
             setInfoType("week");
+            setDatas({
+              FilterInfo:filterData
+            });
           } else {
             alert(result.message);
           }
@@ -140,6 +151,8 @@ const Panel = () => {
       .post("/api/Payment/GetCustTpBetRecordListOneDay", {
         CustId: CustId,
         selDate: moment(Date).format("YYYY-MM-DD"),
+        StartDate: moment(stateDatas.FilterInfo.StartTime).unix(),
+        EndDate: moment(stateDatas.FilterInfo.EndTime).unix(),
       })
       .then((res) => {
         let result = res.data;
@@ -161,6 +174,8 @@ const Panel = () => {
         CustId: CustId,
         selDate: moment(Date).format("YYYY-MM-DD"),
         CategoryId: parseInt(CategoryId),
+        StartDate: moment(stateDatas.FilterInfo.StartTime).unix(),
+        EndDate: moment(stateDatas.FilterInfo.EndTime).unix(),
       })
       .then((res) => {
         let result = res.data;
@@ -182,6 +197,8 @@ const Panel = () => {
         CustId: CustId,
         selDate: moment(Date).format("YYYY-MM-DD"),
         gameTypeId: parseInt(GameTypeId),
+        StartDate: moment(stateDatas.FilterInfo.StartTime).unix(),
+        EndDate: moment(stateDatas.FilterInfo.EndTime).unix(),
         PageSize: 15,
         PageNumber: PageNumber,
       })
@@ -214,6 +231,7 @@ const Panel = () => {
         if (result.errorCode == 0) {
           setTpBetRecordDatas(result);
           setTpBetRecordDatasShowStatus(true);
+          setTpBetRecordDatasShowRawDetail(false);
         } else {
           alert(result.message);
         }
@@ -224,8 +242,12 @@ const Panel = () => {
   };
 
   //Poppout Close
+  const GameResult_SwitchDetailBtnClick = (flag) => {
+    setTpBetRecordDatasShowRawDetail(flag);
+  };
+
+  //Poppout Close
   const GameResult_CloseBtnClick = () => {
-    //Poppout Close
     setTpBetRecordDatasShowStatus(false);
     setTpBetRecordDatas({});
   };
@@ -265,8 +287,10 @@ const Panel = () => {
       //Popout:TpBetRecordDetail
       TpBetRecordDatas={stateTpBetRecordDatas}
       TpBetRecordDatasShowStatus={stateTpBetRecordDatasShowStatus}
+      TpBetRecordDatasShowRawDetail={stateTpBetRecordDatasShowRawDetail}
       ClickTpBetRecordDetail={getTpBetRecordDetail}
       TpBetRecordCloseBtn={GameResult_CloseBtnClick}
+      SwitchDetailBtn={GameResult_SwitchDetailBtnClick}
     />
   ) : null;
 };

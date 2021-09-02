@@ -95,6 +95,7 @@ import DateTimePicker from 'react-datetime';
                         <td>{row.accountName}</td> */}
                         <td>{moment(row.createTime).format('l LTS')}</td>
                         <td>{row.updateTime ? moment(row.updateTime).format('l LTS') : null}</td>
+                        <td>{row.status ==5 || row.status==6 || row.status==7 ? moment(row.flowEndTime).format('l LTS') : null}</td>
                         {row.vipLevel === 0 ? <td>{row.vipLevelName}</td> : <td bgcolor={vipbg}>{row.vipLevelName}</td>}
                         <td className="text-right">{row.withdrawlCnt}</td>
                         <td>{WithdrawalStatusOp[row.status]}{row.status == 8 && row.hasPhotoId ? <span>(Uploaded PhothId)</span> : null} </td>
@@ -135,6 +136,7 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">To Acc. Name</th> */}
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Update Time (" + moment().format('Z') + ")"}</th>
+                                <th scope="col">{"Flow End Time (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">VIP Level</th>
                                 <th scope="col" className="text-right">Withdrawl Count</th>
                                 <th scope="col">{i18n.lbl_Status}</th>
@@ -262,7 +264,7 @@ import DateTimePicker from 'react-datetime';
                     Loading.UnLoading();
                     let result = response.data;
                     if (result.errorCode == 0) {
-                        this.setState({ Comments: result.data, GetData: true });
+                        this.setState({ Comments: result.data, GetData: true,Comment: "" });
                     } else {
                         alert(result.message);
                     }
@@ -358,7 +360,8 @@ import DateTimePicker from 'react-datetime';
                     //Loading.UnLoading();
                     let result = response.data;
                     if (result.errorCode == 0) {
-                        this.setState({ BankInfoOffList: result.data });
+                        this.setState({...Comment,
+                             BankInfoOffList: result.data });
                     } else {
                         alert(result.message);
                     }
@@ -375,7 +378,7 @@ import DateTimePicker from 'react-datetime';
                     //Loading.UnLoading();
                     let result = response.data;
                     if (result.errorCode == 0) {
-                        this.setState({ PayList: result.data });
+                        this.setState({ ...Comment,PayList: result.data });
                     } else {
                         alert(result.message);
                     }
@@ -688,6 +691,12 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="row">{"Update Time (" + moment().format('Z') + ")"}</th>
                                 <td>{data.updateTime ? moment(data.updateTime).format('l LTS') : null}</td>
                             </tr>
+                            {data.status == 5 || data.status == 6 || data.status == 7 ?
+                            <tr>
+                                <th scope="row">{"Flow End Time (" + moment().format('Z') + ")"}</th>
+                                <td>{data.flowEndTime ? moment(data.flowEndTime).format('l LTS') : null}</td>
+                            </tr>
+                            : null}
                         </tbody>
                     </table>
                     {picrows}
