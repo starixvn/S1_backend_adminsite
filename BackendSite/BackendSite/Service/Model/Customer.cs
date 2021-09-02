@@ -331,4 +331,11 @@ namespace BackendSite.Service.Model
         public string DepositStatus { get; set; }
         public string Status { get; set; }
     }
+
+    public class CustomerForRisk
+    {
+        public int CustId { get; set; }
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+    }
 }

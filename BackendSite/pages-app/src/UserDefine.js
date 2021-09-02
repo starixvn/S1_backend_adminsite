@@ -117,9 +117,15 @@ const BankFinancialReport = lazy(() =>
 const WithdrawalAccounting = lazy(() =>
   import("./pages/Finance/WithdrawalAccounting/index")
 );
+
 const LeaderBoardExtraPoint = lazy(() =>
   import("./pages/Marketing/LeaderBoardExtraPoint/index")
 );
+
+const DisableUserForGame = lazy(() =>
+  import("./pages/CSD/DisableUserForGame/index")
+);
+
 const VipLevelReview = lazy(() =>
   import("./pages/Marketing/VipLevelReview/index")
 );
@@ -702,6 +708,20 @@ export const pages = {
     css: [
       "./lib/bootstrap/dist/css/bootstrap.min.css",
       "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  DisableUserForGame: {
+    comp: (
+      <Suspense fallback="loading...">
+        <DisableUserForGame />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/common/fonts/main-font/style.css",
       "./css/css/vendor/DateTimePicker/DateTimePicker.css",
     ],
     layout: layoutType.N88,

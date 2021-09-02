@@ -110,5 +110,11 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
+        public IActionResult DisableUserForGame()
+        {
+            return View();
+        }
     }
 }

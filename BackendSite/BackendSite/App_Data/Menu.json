@@ -180,6 +180,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Disable User For Game",
+        "FuncKey": "CustManage/DisableUserForGame",
+        "Controller": "CustManage",
+        "Action": "DisableUserForGame",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
