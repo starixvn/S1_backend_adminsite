@@ -41,6 +41,8 @@ namespace BackendSite.Service.Model
         public string IFSCCode { set; get; }
         public string NickName { set; get; }
         public string AccountType { set; get; }
+        public string Network { set; get; }
+        public int WalletCurrencyID { set; get; }
         public string RefId { set; get; }
         public bool HasPhotoId { set; get; }
         public string VipLevelName { set; get; }
@@ -83,6 +85,8 @@ namespace BackendSite.Service.Model
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int? PayId { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public int? ChannelId { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int? BankId { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int? CurrencyId { set; get; }
@@ -90,6 +94,7 @@ namespace BackendSite.Service.Model
         public string AccountType { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string NickName { get; set; }
+        public string Network { set; get; }
     }
     public class WithdrawalInfoForExport
     {
