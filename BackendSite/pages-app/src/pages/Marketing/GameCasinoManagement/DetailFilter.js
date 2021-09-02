@@ -6,32 +6,7 @@ import moment from "moment";
 const Panel = (props) => {
   return (
     <div className="filter">
-      <div className="row-flex"></div>
       <div>
-        {props.SiteList === null ? null : (
-          <RadioBox
-            Title="Site"
-            Options={Object.values(props.SiteList)}
-            OnChange={props.DetailFilterChange}
-            dataColumn="Site"
-            Selected={props.DetailFilter}
-          />
-        )}
-      </div>
-      <div>
-        {props.StateTPList === null ? null : (
-          <button
-            className="btn btn-add"
-            onClick={props.Submit}
-            style={{
-              marginTop: "20px",
-              marginBottom: "40px",
-              marginRight: "10px",
-            }}
-          >
-            Submit
-          </button>
-        )}
         <button
           className="btn btn-search"
           type="back"

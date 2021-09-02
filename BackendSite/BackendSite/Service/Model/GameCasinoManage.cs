@@ -44,11 +44,12 @@ namespace BackendSite.Service.Model
         public int Currency { get; set; }
         public int TPid { get; set; }
         public string Name { get; set; }
+        public int Categories { get; set; }
         public GameCasinoPara()
         {
-            //PageSize預設10
+            //PageSize預設100
             if (PageSize == 0)
-                PageSize = 10;
+                PageSize = 100;
         }
     }
 
@@ -157,10 +158,17 @@ namespace BackendSite.Service.Model
         public string CName { get; set; }
         public bool Checked { get; set; }
     }
-    
+
     public class GameCasinoTranslate
     {
         public string en { get; set; }
         public string cs { get; set; }
+    }
+
+    public class GameCasinoDetailBySite
+    {
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
+        public List<GameCasinoDetailData> GameCasinoDetails { get; set; }
     }
 }

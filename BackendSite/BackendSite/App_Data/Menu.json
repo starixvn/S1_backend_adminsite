@@ -555,12 +555,22 @@
         "Roles": null,
         "Childs": null
       },
+      //{
+      //  "Key": "VipUpgrade",
+      //  "Title": "VipUpgrade",
+      //  "FuncKey": "Marketing/VipUpgrade",
+      //  "Controller": "Marketing",
+      //  "Action": "VipUpgrade",
+      //  "Icon": "",
+      //  "Roles": null,
+      //  "Childs": null
+      //},
       {
-        "Key": "VipUpgrade",
-        "Title": "VipUpgrade",
-        "FuncKey": "Marketing/VipUpgrade",
+        "Key": "VipLevelReview",
+        "Title": "Vip Level Review",
+        "FuncKey": "Marketing/VipLevelReview",
         "Controller": "Marketing",
-        "Action": "VipUpgrade",
+        "Action": "VipLevelReview",
         "Icon": "",
         "Roles": null,
         "Childs": null

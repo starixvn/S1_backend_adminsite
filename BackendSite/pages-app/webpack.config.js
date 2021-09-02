@@ -206,6 +206,10 @@ module.exports = {
     //   // '@babel/polyfill',
     //   "./src/pages/Finance/AdjustmentLogReport/index.js",
     // ],
+    //"Finance/AdjustmentLogReport.min": [
+    //  // '@babel/polyfill',
+    //  "./src/pages/Finance/AdjustmentLogReport/index.js",
+    //],
     // "Finance/WithdrawalAccounting.min": [
     //   "@babel/polyfill",
     //   "./src/pages/Finance/WithdrawalAccounting/index.js",
@@ -217,6 +221,14 @@ module.exports = {
     "CSD/DisableUserForGame.min": [
       '@babel/polyfill',
     "./src/pages/CSD/DisableUserForGame/index.js"
+    ],
+    "Marketing/LeaderBoardExtraPoint.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/LeaderBoardExtraPoint/index.js",
+    ],
+    "Marketing/VipLevelReview.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/VipLevelReview/index.js",
     ],
     // "Marketing/LeaderBoardExtraPoint.min": [
     // 	 '@babel/polyfill',
