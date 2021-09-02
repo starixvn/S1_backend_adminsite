@@ -77,4 +77,28 @@ namespace BackendSite.Service.Model
         public string Name { get; set; }
         public bool Checked { get; set; }
     }
+    
+    public class GameCasinoDataV3
+    {
+        public int GameCasinoId { get; set; }
+        public int TpId { get; set; }
+        public string GameId { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class RiskGameCasinoData
+    {
+        public int GameCasinoId { get; set; }
+        public int TpId { get; set; }
+        public string GameId { get; set; }
+        public string Name { get; set; }
+        public string CName { get; set; }
+        public bool Checked { get; set; }
+    }
+
+    public class GameCasinoTranslate
+    {
+        public string en { get; set; }
+        public string cs { get; set; }
+    }
 }

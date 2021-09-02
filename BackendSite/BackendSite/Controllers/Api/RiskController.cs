@@ -64,14 +64,14 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var tpList = await _gameCasinoBll.GetTpList();
-                var data = await _riskBll.GetTpDisableUserBuCustId(custId);
-                var disableGames = JsonConvert.DeserializeObject<List<DisableTpGame>>(data.GameInfo);
+                var userDisableGames = await _riskBll.GetTpDisableUserBuCustId(custId);
+                var disableGames = JsonConvert.DeserializeObject<List<DisableTpGame>>(userDisableGames.GameInfo);
 
-                foreach (var dg in disableGames)
+                foreach (var disableGame in disableGames)
                 {
                     foreach (var tp in tpList)
                     {
-                        if (dg.TpId == tp.TpId)
+                        if (disableGame.TpId == tp.TpId)
                         {
                             tp.Checked = true;
                             var games = await _gameCasinoBll.GameCasinoByTPIdV3(tp.TpId);
@@ -79,20 +79,19 @@ namespace BackendSite.Controllers.Api
                             {
                                 GameId = a.GameId,
                                 Name = a.Name,
-                                Checked = dg.GameList != null && dg.GameList.Any(c=>c == a.GameId)
+                                Checked = disableGame.GameList != null && disableGame.GameList.Any(c=>c == a.GameId)
                             }).ToList();
                         }
                     }
                 }
 
-                var atempo = tpList.ToList();
-                var cust = new TpDisableUserForGameDetail()
+                var editInfo = new TpDisableUserForGameDetail()
                 {
-                    SiteId = data.SiteId,
-                    UserName = data.UserName,
-                    DisableGames = atempo
+                    SiteId = userDisableGames.SiteId,
+                    UserName = userDisableGames.UserName,
+                    DisableGames = tpList.ToList()
                 };
-                apiResult.Data = cust;
+                apiResult.Data = editInfo;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -162,7 +161,6 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpGet]
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/Risk" })]
         public async Task<ApiResult<IEnumerable<RiskTpListInfo>>> GetTpList()
         {
             var apiResult = new ApiResult<IEnumerable<RiskTpListInfo>>();
@@ -186,7 +184,6 @@ namespace BackendSite.Controllers.Api
 
         [HttpGet]
         [Route("{tpId:int}")]
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
         public async Task<ApiResult<IEnumerable<RiskGameCasinoData>>> GameCasinoByTpIdV3(int tpId)
         {
             var apiResult = new ApiResult<IEnumerable<RiskGameCasinoData>>();
