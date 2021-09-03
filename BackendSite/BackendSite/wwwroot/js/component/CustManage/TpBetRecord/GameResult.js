@@ -15,6 +15,7 @@ const Result = (props) => {
         <td />
         <td />
         <td />
+        <td />
       </tr>
     ) : (
       props.Datas.data.map((d, dIdx) => {
@@ -31,6 +32,7 @@ const Result = (props) => {
                 {d.transId}
               </button>
             </td>
+            <td>{d.settlementTypeName}</td>
             <td>{number_format(d.turnOver)}</td>
             <td>{number_format(d.validBet)}</td>
             <td>{number_format(d.winlostAmount)}</td>
@@ -50,6 +52,7 @@ const Result = (props) => {
             <tr>
               <th>Trans Id</th>
               <th>Trans Id(Test:Only show saba test data)</th>
+              <th>SettlementTypeName</th>
               <th>Turnover</th>
               <th>Valid Bet</th>
               <th>WinLoss</th>

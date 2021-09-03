@@ -1,13 +1,17 @@
 import { number_format } from '../../commJS/common';
 import moment from "moment-timezone";
 const Result = (props) => {
-    let rows = props.Datas.length === 0 ? <tr><td>No Data.</td><td /><td /><td /><td /><td /></tr> : props.Datas.map((d, dIdx) => {
+    let rows = props.Datas.length === 0 ? <tr><td>No Data.</td><td /><td /><td /><td /><td /><td /><td /><td /><td /></tr> : props.Datas.map((d, dIdx) => {
         return (
             <tr key={`result-${dIdx}`}>
                 <td>{moment(d.settledDate).format('l')}</td>
                 <td>{d.gameTypeName}</td>
-                <td>{number_format(d.turnOver)}</td>
-                <td>{number_format(d.validBet)}</td>
+                <td>{number_format(d.settledForValid_TurnOver)}</td>
+                <td>{number_format(d.settledForValidNotRollover_TurnOver)}</td>
+                <td>{number_format(d.other_TurnOver)}</td>
+                <td>{number_format(d.settledForValid_ValidBet)}</td>
+                <td>{number_format(d.settledForValidNotRollover_ValidBet)}</td>
+                <td>{number_format(d.other_ValidBet)}</td>
                 <td>{number_format(d.winlostAmount)}</td>
                 <td><button className="btn btn-add" onClick={props.ClickDetail.bind(null, d.settledDate, d.gameTypeID, 1)}>Details</button></td>
             </tr>
@@ -22,8 +26,12 @@ const Result = (props) => {
                         <tr>
                             <th>Settled Date</th>
                             <th>Game Type Name</th>
-                            <th>Turnover</th>
-                            <th>Valid Bet</th>
+                            <th>Turnover (SettledForValid)</th>
+                            <th>Turnover (SettledForValidNotRollover)</th>
+                            <th>Turnover (UnSettled,SettledForInvalid,Cheating)</th>
+                            <th>Valid Bet (SettledForValid)</th>
+                            <th>Valid Bet (SettledForValidNotRollover)</th>
+                            <th>Valid Bet (UnSettled,SettledForInvalid,Cheating)</th>
                             <th>WinLoss</th>
                             <th>Action</th>
                         </tr>

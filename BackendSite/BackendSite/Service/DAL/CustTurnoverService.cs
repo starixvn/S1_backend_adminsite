@@ -22,7 +22,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<CustTurnover> GetCustTurnover(int CustId, string GameTypes, long StartTime, long EndTime)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<CustTurnover>("Admin_TpBetRecord_GetByCustIdV2", new { 
+            return conn.Query<CustTurnover>("Admin_TpBetRecord_GetByCustIdV3", new { 
                 CustId = CustId, 
                 GameList=GameTypes,
                 StartDate=StartTime,
