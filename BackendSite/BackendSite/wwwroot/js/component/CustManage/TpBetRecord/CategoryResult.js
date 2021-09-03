@@ -26,12 +26,12 @@ const Result = (props) => {
                         <tr>
                             <th>Settled Date</th>
                             <th>Game Type Name</th>
-                            <th>Turnover (SettledForValid)</th>
-                            <th>Turnover (SettledForValidNotRollover)</th>
-                            <th>Turnover (UnSettled,SettledForInvalid,Cheating)</th>
-                            <th>Valid Bet (SettledForValid)</th>
-                            <th>Valid Bet (SettledForValidNotRollover)</th>
-                            <th>Valid Bet (UnSettled,SettledForInvalid,Cheating)</th>
+                            <th>Turnover (Settled)</th>
+                            <th>Turnover (NotRollover)</th>
+                            <th>Turnover (UnSettled)</th>
+                            <th>Valid Bet (Settled)</th>
+                            <th>Valid Bet (NotRollover)</th>
+                            <th>Valid Bet (UnSettled)</th>
                             <th>WinLoss</th>
                             <th>Action</th>
                         </tr>
