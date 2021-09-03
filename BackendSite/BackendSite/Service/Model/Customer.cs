@@ -154,6 +154,7 @@ namespace BackendSite.Service.Model
         public string GameName { get; set; }
         public decimal Stake { get; set; }
         public decimal WinlostAmount { get; set; }
+        public int SettlementType { get; set; }
     }
     public class CustBankInfoLog
     {

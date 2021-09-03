@@ -450,10 +450,10 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<TpBetRecordListOneWeek>> GetCustTpBetRecordList(
+        public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecordList(
             CustTpBetRecordListReq custTpBetRecordListReq)
         {
-            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneWeek>>();
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordByDate>>();
             apiResult.Data = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId,
                 custTpBetRecordListReq.StartDate, custTpBetRecordListReq.EndDate);
             apiResult.ErrorCode = 0;
@@ -470,10 +470,10 @@ namespace BackendSite.Controllers.Api
         /// <param name="custTpBetRecordListOneDayReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<TpBetRecordListOneDay>> GetCustTpBetRecordListOneDay(
+        public ApiResult<IEnumerable<TpBetRecordListOneDayRes>> GetCustTpBetRecordListOneDay(
             CustTpBetRecordListOneDayReq custTpBetRecordListOneDayReq)
         {
-            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneDay>>();
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneDayRes>>();
             apiResult.ErrorCode = 0;
             apiResult.Data = _paymentBLL.GetCustTpBetRecordListOneDay(custTpBetRecordListOneDayReq.CustId,
                 custTpBetRecordListOneDayReq.SelDate, custTpBetRecordListOneDayReq.StartDate, custTpBetRecordListOneDayReq.EndDate);
@@ -490,10 +490,10 @@ namespace BackendSite.Controllers.Api
         /// <param name="custTpBetRecordListbyCategoryIdReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<TpBetRecordbyCategoryId>> GetCustTpBetRecordListbyCategoryId(
+        public ApiResult<IEnumerable<TpBetRecordbyCategoryIdRes>> GetCustTpBetRecordListbyCategoryId(
             CustTpBetRecordListbyCategoryIdReq custTpBetRecordListbyCategoryIdReq)
         {
-            var apiResult = new ApiResult<IEnumerable<TpBetRecordbyCategoryId>>();
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordbyCategoryIdRes>>();
             apiResult.ErrorCode = 0;
             apiResult.Data = _paymentBLL.GetCustTpBetRecordListbyCategoryId(custTpBetRecordListbyCategoryIdReq.CustId,
                 custTpBetRecordListbyCategoryIdReq.SelDate,

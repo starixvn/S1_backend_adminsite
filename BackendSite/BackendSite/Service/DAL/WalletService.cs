@@ -172,13 +172,13 @@ namespace BackendSite.Service.DAL
         public IEnumerable<TpBetRecordListOneDay> GetCustTpBetRecordListOneDay(int custId, string selDate, long startDate, long endDate)
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.Query<TpBetRecordListOneDay>("Admin_TpBetRecord_byOneDayV3_Get", new { CustId = custId, SelDate = selDate, StartDate = startDate, EndDate = endDate }, commandType: CommandType.StoredProcedure);
+            var result = conn.Query<TpBetRecordListOneDay>("Admin_TpBetRecord_byOneDayV4_Get", new { CustId = custId, SelDate = selDate, StartDate = startDate, EndDate = endDate }, commandType: CommandType.StoredProcedure);
             return result;
         }
         public IEnumerable<TpBetRecordbyCategoryId> GetCustTpBetRecordListbyCategoryId(int custId, string selDate, int categoryId, long startDate, long endDate)
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.Query<TpBetRecordbyCategoryId>("Admin_TpBetRecord_byCategoryIdV3_Get", new  { CustId = custId, SelDate = selDate, CategoryId = categoryId, StartDate = startDate, EndDate = endDate }, commandType: CommandType.StoredProcedure);
+            var result = conn.Query<TpBetRecordbyCategoryId>("Admin_TpBetRecord_byCategoryIdV4_Get", new  { CustId = custId, SelDate = selDate, CategoryId = categoryId, StartDate = startDate, EndDate = endDate }, commandType: CommandType.StoredProcedure);
             return result;
         }
         public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, string selDate, int gameTypeId, long startDate, long endDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
@@ -187,7 +187,7 @@ namespace BackendSite.Service.DAL
             IEnumerable<TpBetRecordDetailbyGameType> result = null;
             using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
-                string SpName = "Admin_TpBetRecord_byGameTypeListV3_Get";
+                string SpName = "Admin_TpBetRecord_byGameTypeListV4_Get";
                 DynamicParameters props = new DynamicParameters(new { CustId = custId, SelDate = selDate, TypeId = gameTypeId, StartDate = startDate, EndDate = endDate });
                 props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
                 props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -311,7 +311,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<TpBetRecordListOneWeek> GetCustTpBetRecordList(int custId, long startDate, long endDate)
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.Query<TpBetRecordListOneWeek>("Admin_TpBetRecordListV2_Get", new { CustId = custId, StartDate = startDate, EndDate = endDate }, commandType: CommandType.StoredProcedure);
+            var result = conn.Query<TpBetRecordListOneWeek>("Admin_TpBetRecordListV3_Get", new { CustId = custId, StartDate = startDate, EndDate = endDate }, commandType: CommandType.StoredProcedure);
             return result;
         }
     }
