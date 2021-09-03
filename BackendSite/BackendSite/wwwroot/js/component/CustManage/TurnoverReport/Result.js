@@ -25,8 +25,8 @@ const Result = (props)=>{
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th>Total - Turnover (SettledForValid)</th>
-                            <th>Total - Turnover (SettledForValidNotRollover)</th>
+                            <th>Total - Turnover (Settled)</th>
+                            <th>Total - Turnover (NotRollover)</th>
                             <th>Total - WinLoss</th>
                         </tr>
                     </thead>
