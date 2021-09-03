@@ -239,7 +239,7 @@ import DateTimePicker from 'react-datetime';
                         } else if (result.data.withdrawalType == 4) {
                             SelId = result.data.payId;
                         }
-                        this.setState({ Data: result.data, selectType: result.data.withdrawalType, GetData: true, SelId: SelId, Comment: result.data.comment });
+                        this.setState({ Data: result.data, selectType: result.data.withdrawalType, GetData: true, SelId: SelId, ChannelId: ChannelId, Comment: result.data.comment });
                     } else {
                         alert(result.message);
                     }
@@ -312,9 +312,15 @@ import DateTimePicker from 'react-datetime';
                     data.WithdrawalInfo = this.state.Data.withdrawalInfo;
                     data.SelId = parseInt(this.state.SelId);
                     data.WithdrawalType = this.state.selectType;
-                    data.ChannelId = this.state.ChannelId;
-                    if((data.ChannelId == 0 || data.ChannelId == null) && this.state.CryptoPayList != null)
-                        data.ChannelId = this.state.CryptoPayList.find(x=>x.payId == SelId).channelId;
+                    if (result.data.withdrawalType == 4)
+                    {
+                        data.ChannelId = this.state.ChannelId;
+                        console.log('1',data);
+                        if((data.ChannelId == 0 || data.ChannelId == null) && this.state.CryptoPayList != null &&　data.SelId != 0)
+                            data.ChannelId = this.state.CryptoPayList.find(x=>x.payId == data.SelId).channelId;
+                        console.log('2',data);
+                    }
+
                 }
                 // console.log('WithdrawalConfirm data',data,'state',this.state);
                 axios.post('/api/Withdrawal/WithdrawalConfirm', data)
