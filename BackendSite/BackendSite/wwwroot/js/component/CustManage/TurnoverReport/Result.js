@@ -10,11 +10,14 @@ const Result = (props)=>{
         if(d.settlementType == 3){
             total_settledForValidNotRollover_stake += d.stake;
         }
+        total_settledForValid_stake += d.stakeSettled;
+        total_settledForValidNotRollover_stake += d.stakeNotRollover;
         total_winLost +=d.winlostAmount;
         return(
             <tr key={`result-${dIdx}`}>
                 <td>{d.gameName}</td>
-                <td>{number_format(d.stake)}</td>
+                <td>{number_format(d.stakeSettled)}</td>
+                <td>{number_format(d.stakeNotRollover)}</td>
                 <td>{number_format(d.winlostAmount)}</td>
             </tr>
         )
@@ -42,7 +45,8 @@ const Result = (props)=>{
                     <thead>
                         <tr>
                             <th>GameName</th>
-                            <th>Turnover</th>
+                            <th>Turnover (Settled)</th>
+                            <th>Turnover (NotRollover)</th>
                             <th>WinLoss</th>
                         </tr>
                     </thead>

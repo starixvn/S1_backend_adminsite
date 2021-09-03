@@ -1052,7 +1052,7 @@ namespace BackendSite.Controllers.Api
                                                    request.EndTime);
             return new ApiResult<dynamic>
             {
-                Data = data.Select(x => new { x.GameName, x.Stake, x.UserName, x.WinlostAmount, x.SettlementType }),
+                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover }),
                 ErrorCode = 0
             };
         }

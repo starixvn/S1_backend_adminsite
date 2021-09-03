@@ -2,13 +2,12 @@ import { number_format } from '../../commJS/common';
 import moment from "moment-timezone";
 import Filter from "./Filter";
 const Result = (props) => {
-    let rows = props.Datas.length === 0 ? <tr><td>No Data.</td><td /><td /><td /><td /><td /><td /><td /><td /></tr> : props.Datas.map((d, dIdx) => {
+    let rows = props.Datas.length === 0 ? <tr><td>No Data.</td><td /><td /><td /><td /><td /><td /><td /></tr> : props.Datas.map((d, dIdx) => {
         return (
             <tr key={`result-${dIdx}`}>
                 <td>{moment(d.settledDate).format('l')}</td>
                 <td>{number_format(d.settledForValid_TurnOver)}</td>
                 <td>{number_format(d.settledForValidNotRollover_TurnOver)}</td>
-                <td>{number_format(d.other_TurnOver)}</td>
                 <td>{number_format(d.settledForValid_ValidBet)}</td>
                 <td>{number_format(d.settledForValidNotRollover_ValidBet)}</td>
                 <td>{number_format(d.other_ValidBet)}</td>
@@ -34,7 +33,6 @@ const Result = (props) => {
                             <th>Settled Date</th>
                             <th>Turnover (Settled)</th>
                             <th>Turnover (NotRollover)</th>
-                            <th>Turnover (UnSettled)</th>
                             <th>Valid Bet (Settled)</th>
                             <th>Valid Bet (NotRollover)</th>
                             <th>Valid Bet (UnSettled)</th>
