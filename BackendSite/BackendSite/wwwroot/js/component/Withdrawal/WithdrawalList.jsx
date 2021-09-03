@@ -231,7 +231,7 @@ import DateTimePicker from 'react-datetime';
                         }
                         
                         let SelId = null;
-                        let ChannelId = null;
+                        let ChannelId = 0;
                         if (result.data.withdrawalType == 1) {
                             SelId = result.data.payId;
                         } else if (result.data.withdrawalType == 2) {
@@ -239,7 +239,7 @@ import DateTimePicker from 'react-datetime';
                         } else if (result.data.withdrawalType == 4) {
                             SelId = result.data.payId;
                         }
-                        this.setState({ Data: result.data, selectType: result.data.withdrawalType, GetData: true, SelId: SelId, Comment: result.data.comment });
+                        this.setState({ Data: result.data, selectType: result.data.withdrawalType, GetData: true, SelId: SelId, ChannelId: ChannelId, Comment: result.data.comment });
                     } else {
                         alert(result.message);
                     }
@@ -307,16 +307,18 @@ import DateTimePicker from 'react-datetime';
             if ((action != 0 && confirm(confirmstring)) || action == 0) {
                 Loading.OnLoading();
                 let data = { transId: this.props.transId, Comment: this.state.Comment, Action: action };
-
                 if (action == 4) {
                     data.WithdrawalInfo = this.state.Data.withdrawalInfo;
                     data.SelId = parseInt(this.state.SelId);
                     data.WithdrawalType = this.state.selectType;
-                    data.ChannelId = this.state.ChannelId;
-                    if((data.ChannelId == 0 || data.ChannelId == null) && this.state.CryptoPayList != null)
-                        data.ChannelId = this.state.CryptoPayList.find(x=>x.payId == SelId).channelId;
+                    if (this.state.selectType == 4)
+                    {
+                        data.ChannelId = this.state.ChannelId;
+                        if((data.ChannelId == 0 || data.ChannelId == null) && this.state.CryptoPayList != null &&　data.SelId != 0)
+                            data.ChannelId = this.state.CryptoPayList.find(x=>x.payId == data.SelId).channelId;
+                    }
+
                 }
-                // console.log('WithdrawalConfirm data',data,'state',this.state);
                 axios.post('/api/Withdrawal/WithdrawalConfirm', data)
                     .then(function (response) {
                         Loading.UnLoading();
@@ -341,7 +343,7 @@ import DateTimePicker from 'react-datetime';
 
         onSelectType(event) {
             let SelId = null;
-            let ChannelId = null;
+            let ChannelId = 0;
             if (parseInt(event.target.value) == 1 && this.state.PayList.length > 0) {
                 SelId = this.state.PayList[0].payId;
             } else if (parseInt(event.target.value) == 2 && this.state.BankInfoOffList.length > 0) {
@@ -408,7 +410,7 @@ import DateTimePicker from 'react-datetime';
 
         onSelId(event) {
             
-            let ChannelId = null;
+            let ChannelId = 0;
             if(this.state.selectType == 4)
             {
                 ChannelId = this.state.CryptoPayList.find(x=>x.payId == event.target.value).channelId;
