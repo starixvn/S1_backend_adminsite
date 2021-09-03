@@ -213,22 +213,30 @@ namespace BackendSite.Service.BLL
             return _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), out int CustId);
         }
 
-        public List<CustTurnover> GetCustTurnover(int CustId, string GameTypes, long StartTime, long EndTime)
+        public List<CustTurnoverRes> GetCustTurnover(int CustId, string GameTypes, long StartTime, long EndTime)
         {
             var datas = custTurnoverService.GetCustTurnover(CustId, GameTypes, StartTime, EndTime);
 
-            var result = new List<CustTurnover>();
+            var result = new List<CustTurnoverRes>();
 
             foreach (CustTurnover data in datas)
             {
                 var item = result.FirstOrDefault(x => x.GameType == data.GameType);
                 if (item == null)
                 {
-                    result.Add(data);
+                    result.Add(new CustTurnoverRes {
+                        UserName = data.UserName,
+                        GameType =data.GameType,
+                        GameName = data.GameName,
+                        StakeSettled = data.SettlementType == 1 ? data.Stake : 0,
+                        StakeNotRollover = data.SettlementType == 3 ? data.Stake : 0,
+                        WinlostAmount = data.WinlostAmount
+                    });
                 }
                 else
                 {
-                    item.Stake += data.Stake;
+                    item.StakeSettled += data.SettlementType == 1 ? data.Stake : 0;
+                    item.StakeNotRollover += data.SettlementType == 3 ? data.Stake : 0;
                     item.WinlostAmount += data.WinlostAmount;
                 }
             }
