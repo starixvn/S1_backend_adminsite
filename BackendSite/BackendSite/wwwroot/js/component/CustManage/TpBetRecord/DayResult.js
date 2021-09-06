@@ -9,7 +9,7 @@ const Result = (props) => {
                 <td>{number_format(d.settledForValid_TurnOver + d.settledForValidNotRollover_TurnOver)}</td>
                 <td>{number_format(d.settledForValid_TurnOver)}</td>
                 <td>{number_format(d.settledForValidNotRollover_TurnOver)}</td>
-                <td>{number_format(d.settledForValid_ValidBet + d.settledForValidNotRollover_ValidBet)}</td>
+                <td>{number_format(d.settledForValid_ValidBet + d.settledForValidNotRollover_ValidBet + d.other_ValidBet)}</td>
                 <td>{number_format(d.settledForValid_ValidBet)}</td>
                 <td>{number_format(d.settledForValidNotRollover_ValidBet)}</td>
                 <td>{number_format(d.other_ValidBet)}</td>
@@ -29,10 +29,10 @@ const Result = (props) => {
                             <th>Category Name</th>
                             <th>Turnover</th>
                             <th>Turnover (Settled)</th>
-                            <th>Turnover (NotRollover)</th>
+                            <th>Turnover (below odd)</th>
                             <th>Valid Bet</th>
                             <th>Valid Bet (Settled)</th>
-                            <th>Valid Bet (NotRollover)</th>
+                            <th>Valid Bet (below odd)</th>
                             <th>Valid Bet (UnSettled)</th>
                             <th>WinLoss</th>
                             <th>Action</th>
