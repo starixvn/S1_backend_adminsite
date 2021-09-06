@@ -6,8 +6,10 @@ const Result = (props) => {
             <tr key={`result-${dIdx}`}>
                 <td>{moment(d.settledDate).format('l')}</td>
                 <td>{d.gameTypeName}</td>
+                <td>{number_format(d.settledForValid_TurnOver + d.settledForValidNotRollover_TurnOver)}</td>
                 <td>{number_format(d.settledForValid_TurnOver)}</td>
                 <td>{number_format(d.settledForValidNotRollover_TurnOver)}</td>
+                <td>{number_format(d.settledForValid_ValidBet + d.settledForValidNotRollover_ValidBet)}</td>
                 <td>{number_format(d.settledForValid_ValidBet)}</td>
                 <td>{number_format(d.settledForValidNotRollover_ValidBet)}</td>
                 <td>{number_format(d.other_ValidBet)}</td>
@@ -25,8 +27,10 @@ const Result = (props) => {
                         <tr>
                             <th>Settled Date</th>
                             <th>Game Type Name</th>
+                            <th>Turnover</th>
                             <th>Turnover (Settled)</th>
                             <th>Turnover (NotRollover)</th>
+                            <th>Valid Bet</th>
                             <th>Valid Bet (Settled)</th>
                             <th>Valid Bet (NotRollover)</th>
                             <th>Valid Bet (UnSettled)</th>
