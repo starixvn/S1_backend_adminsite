@@ -22,6 +22,7 @@ const Result = (props) => {
         return (
           <tr key={`result-${dIdx}`}>
             <td>{d.transId}</td>
+            <td>{d.bonusId}</td>
             <td>
               <button
                 className="btn btn-link"
@@ -51,6 +52,7 @@ const Result = (props) => {
           <thead>
             <tr>
               <th>Trans Id</th>
+              <th>Bonus Id</th>
               <th>Trans Id(Test:Only show saba test data)</th>
               <th>SettlementTypeName</th>
               <th>Turnover</th>
