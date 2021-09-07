@@ -22,7 +22,6 @@ const Result = (props) => {
         return (
           <tr key={`result-${dIdx}`}>
             <td>{d.transId}</td>
-            <td>{d.bonusId}</td>
             <td>
               <button
                 className="btn btn-link"
@@ -39,6 +38,7 @@ const Result = (props) => {
             <td>{number_format(d.winlostAmount)}</td>
             <td>{moment(d.transTime).format("l LTS")}</td>
             <td>{moment(d.settledTime).format("l LTS")}</td>
+            <td>{d.bonusId}</td>
             <td>{d.bonusCode}</td>
           </tr>
         );
@@ -52,7 +52,6 @@ const Result = (props) => {
           <thead>
             <tr>
               <th>Trans Id</th>
-              <th>Bonus Id</th>
               <th>Trans Id(Test:Only show saba test data)</th>
               <th>SettlementTypeName</th>
               <th>Turnover</th>
@@ -60,6 +59,7 @@ const Result = (props) => {
               <th>WinLoss</th>
               <th>Trans Time</th>
               <th>Settled Time</th>
+              <th>Bonus Id</th>
               <th>Bonus Code</th>
             </tr>
           </thead>

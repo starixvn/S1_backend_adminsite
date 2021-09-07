@@ -71,13 +71,13 @@ namespace BackendSite.Service.Model
     public class TpBetRecordByDate
     {
         public DateTime SettledDate { get; set; }
-        public decimal SettledForValid_TurnOver { get; set; }
-        public decimal SettledForValidNotRollover_TurnOver { get; set; }
-        public decimal Other_TurnOver { get; set; }
-        public decimal SettledForValid_ValidBet { get; set; }
-        public decimal SettledForValidNotRollover_ValidBet { get; set; }
-        public decimal Other_ValidBet { get; set; }
-        public decimal WinlostAmount { get; set; }
+        public decimal ValidBet { get; set; }
+        public decimal InvalidBet { get; set; }
+        public decimal ValidTo { get; set; }
+        public decimal TurnOver { get; set; }
+        public decimal RunningTickets { get; set; }
+        public decimal WinLoss { get; set; }
+
     }
     public class TpBetRecordListOneDay
     {
@@ -94,13 +94,12 @@ namespace BackendSite.Service.Model
         public DateTime SettledDate { get; set; }
         public string CategoryName { get; set; }
         public int CategoryId { get; set; }
-        public decimal SettledForValid_TurnOver { get; set; }
-        public decimal SettledForValidNotRollover_TurnOver { get; set; }
-        public decimal Other_TurnOver { get; set; }
-        public decimal SettledForValid_ValidBet { get; set; }
-        public decimal SettledForValidNotRollover_ValidBet { get; set; }
-        public decimal Other_ValidBet { get; set; }
-        public decimal WinlostAmount { get; set; }
+        public decimal ValidBet { get; set; }
+        public decimal InvalidBet { get; set; }
+        public decimal ValidTo { get; set; }
+        public decimal TurnOver { get; set; }
+        public decimal RunningTickets { get; set; }
+        public decimal WinLoss { get; set; }
     }
     public class TpBetRecordbyCategoryId
     {
@@ -117,13 +116,12 @@ namespace BackendSite.Service.Model
         public DateTime SettledDate { get; set; }
         public string GameTypeName { get; set; }
         public int GameTypeID { get; set; }
-        public decimal SettledForValid_TurnOver { get; set; }
-        public decimal SettledForValidNotRollover_TurnOver { get; set; }
-        public decimal Other_TurnOver { get; set; }
-        public decimal SettledForValid_ValidBet { get; set; }
-        public decimal SettledForValidNotRollover_ValidBet { get; set; }
-        public decimal Other_ValidBet { get; set; }
-        public decimal WinlostAmount { get; set; }
+        public decimal ValidBet { get; set; }
+        public decimal InvalidBet { get; set; }
+        public decimal ValidTo { get; set; }
+        public decimal TurnOver { get; set; }
+        public decimal RunningTickets { get; set; }
+        public decimal WinLoss { get; set; }
     }
     public class TpBetRecordDetailbyGameType
     {
