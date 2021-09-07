@@ -119,13 +119,12 @@ namespace BackendSite.Service.BLL
                 SettledDate = x.Key.SettledDate,
                 CategoryName = x.Key.CategoryName,
                 CategoryId = x.Key.CategoryId,
-                SettledForValid_TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
-                SettledForValidNotRollover_TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
-                Other_TurnOver = x.Where(y => (y.SettlementType == (int)SettlementType.UnSettled || y.SettlementType == (int)SettlementType.SettledForInvalid || y.SettlementType == (int)SettlementType.Cheating)).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
-                SettledForValid_ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => y.ValidBet),
-                SettledForValidNotRollover_ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet),
-                Other_ValidBet = x.Where(y => (y.SettlementType == (int)SettlementType.UnSettled || y.SettlementType == (int)SettlementType.SettledForInvalid || y.SettlementType == (int)SettlementType.Cheating)).Sum(y => y.ValidBet),
-                WinlostAmount = x.Sum(y => y.WinlostAmount)
+                ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => y.ValidBet),
+                InvalidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForInvalid).Sum(y => y.ValidBet),
+                ValidTo = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
+                TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
+                RunningTickets = x.Where(y => y.SettlementType == (int)SettlementType.UnSettled).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
+                WinLoss = x.Sum(y => y.WinlostAmount)
             }).ToList();
             return result;
         }
@@ -144,13 +143,12 @@ namespace BackendSite.Service.BLL
                 SettledDate = x.Key.SettledDate,
                 GameTypeName = x.Key.GameTypeName,
                 GameTypeID = x.Key.GameTypeID,
-                SettledForValid_TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
-                SettledForValidNotRollover_TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
-                Other_TurnOver = x.Where(y => (y.SettlementType == (int)SettlementType.UnSettled || y.SettlementType == (int)SettlementType.SettledForInvalid || y.SettlementType == (int)SettlementType.Cheating)).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
-                SettledForValid_ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => y.ValidBet),
-                SettledForValidNotRollover_ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet),
-                Other_ValidBet = x.Where(y => (y.SettlementType == (int)SettlementType.UnSettled || y.SettlementType == (int)SettlementType.SettledForInvalid || y.SettlementType == (int)SettlementType.Cheating)).Sum(y => y.ValidBet),
-                WinlostAmount = x.Sum(y => y.WinlostAmount)
+                ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => y.ValidBet),
+                InvalidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForInvalid).Sum(y => y.ValidBet),
+                ValidTo = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
+                TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
+                RunningTickets = x.Where(y => y.SettlementType == (int)SettlementType.UnSettled).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
+                WinLoss = x.Sum(y => y.WinlostAmount)
             }).ToList();
             return result;
         }
@@ -226,13 +224,12 @@ namespace BackendSite.Service.BLL
             }).Select(x => new TpBetRecordByDate
             {
                 SettledDate = x.Key.SettledDate,
-                SettledForValid_TurnOver = x.Where(y=> y.SettlementType ==  (int)SettlementType.SettledForValid).Sum(y=> (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
-                SettledForValidNotRollover_TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
-                Other_TurnOver = x.Where(y => (y.SettlementType == (int)SettlementType.UnSettled || y.SettlementType == (int)SettlementType.SettledForInvalid || y.SettlementType == (int)SettlementType.Cheating)).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
-                SettledForValid_ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => y.ValidBet),
-                SettledForValidNotRollover_ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet),
-                Other_ValidBet = x.Where(y => (y.SettlementType == (int)SettlementType.UnSettled || y.SettlementType == (int)SettlementType.SettledForInvalid || y.SettlementType == (int)SettlementType.Cheating)).Sum(y => y.ValidBet),
-                WinlostAmount = x.Sum(y=> y.WinlostAmount)
+                ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => y.ValidBet),
+                InvalidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForInvalid).Sum(y => y.ValidBet),
+                ValidTo = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
+                TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
+                RunningTickets = x.Where(y => y.SettlementType == (int)SettlementType.UnSettled).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
+                WinLoss = x.Sum(y => y.WinlostAmount)
             }).OrderBy(i=> i.SettledDate).ToList();
 
             return result;
