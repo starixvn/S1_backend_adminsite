@@ -344,7 +344,7 @@ namespace BackendSite.Controllers.Api
                         var custInfosDetail = custInfoBLL.GetCustInfoDetails(custId, custUsername, optSite);
                         if (custInfosDetail == null)
                         {
-                            resultMessage = $"Not found. CustId :{custId}. Username: {custUsername}. SabaId: {sabaId}.";
+                            resultMessage = $"Not found. CustId={custId}. Username={custUsername}. SabaId={sabaId}.";
                             //apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = resultMessage });
                         }
                         else if (custInfosDetail.Status == 1)
@@ -366,12 +366,12 @@ namespace BackendSite.Controllers.Api
                                     break;
 
                                 case (int)CustStatus.Suspend:
-                                    resultMessage = $"Fail.CustId :{custId}. Username: {custUsername}. SabaId: {sabaId}. Customer status is Suspend.";
+                                    resultMessage = $"Fail. CustId={custId}. Username={custUsername}. SabaId={sabaId}. Status={CustStatus.Suspend.GetDescription()}";
                                     //apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = resultMessage });
                                     break;
 
                                 case (int)CustStatus.Closed:
-                                    resultMessage = $"Fail.CustId :{custId}. Username: {custUsername}. SabaId: {sabaId}. Customer status is Closed.";
+                                    resultMessage = $"Fail. CustId={custId}. Username={custUsername}. SabaId={sabaId}. Status={CustStatus.Closed.GetDescription()}";
                                     //apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = resultMessage });
                                     break;
 
@@ -632,12 +632,12 @@ namespace BackendSite.Controllers.Api
             {
                 if (messageBLL.SendMessageBatch(personalMsg, custId, siteId, updator, batchMessageId))
                 {
-                    resultMessage = $"Success. CustId:{custId}. Username: {userName}. SabaId: {sabaId}. Status:{custStatus.GetDescription()}. ";
+                    resultMessage = $"Success. CustId={custId}. Username={userName}. SabaId={sabaId}. Status={custStatus.GetDescription()}. ";
                     errorCode = 1;
                 }
                 else
                 {
-                    resultMessage = $"Fail. CustId:{custId}. Username: {userName}. SabaId: {sabaId}. Status:{custStatus.GetDescription()}. Insert done but affect count != 1 ";
+                    resultMessage = $"Fail. CustId={custId}. Username={userName}. SabaId={sabaId}. Status={custStatus.GetDescription()}. Insert done but affect count != 1 ";
                     errorCode = 999;
                 }
             }
