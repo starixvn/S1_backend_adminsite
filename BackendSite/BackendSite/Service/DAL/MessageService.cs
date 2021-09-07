@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -183,10 +184,29 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Execute("Admin_PersonalMsg_Del", new { Id, CustId }, commandType: CommandType.StoredProcedure);
         }
-        public int SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
+        public bool SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_Msg_BatchV2_Ins", new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg, BatchId = batchId }, commandType: CommandType.StoredProcedure);
+            int result = 0;
+
+            using (MySqlConnection connection = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                connection.Open();
+                using var transaction = connection.BeginTransaction();
+                result = connection.Execute("Admin_Msg_BatchV2_Ins",
+                    new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg, BatchId = batchId },
+                    commandType: CommandType.StoredProcedure);
+
+                if (result == 1)
+                {
+                    transaction.Commit();
+                    return true;
+                }
+                else
+                {
+                    transaction.Rollback();
+                    return false;
+                }
+            }
         }
         public int ChangeVipLevelBatch(int siteId, int custId, string userName, int vipLevel, string memo, string Operator)
         {
@@ -267,7 +287,9 @@ namespace BackendSite.Service.DAL
         public bool UpdateBatchMessage(int batchId, string message)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            _logger.LogInformation($@"MessageService-UpdateBatchMessage Start At {DateTime.UtcNow}.");
             return conn.Execute("Admin_BatchMessageUpdate_Set", new { BatchId = batchId, Message = message }, commandType: CommandType.StoredProcedure) > 0;
+            _logger.LogInformation($@"MessageService-UpdateBatchMessage End At {DateTime.UtcNow}.");
         }
         public BatchMsg GetBatchMessage(int batchId)
         {

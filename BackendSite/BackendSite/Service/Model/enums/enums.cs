@@ -20,6 +20,7 @@ namespace BackendSite.Service.Model.enums
         Running = 1,
         Suspend = 2,
         Closed = 3,
+        Lock = 4,
     }
     public enum DepositType
     {
