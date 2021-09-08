@@ -96,7 +96,7 @@ namespace BackendSite.Service.BLL
             });
 
             var CustInfoList = custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, selectstatus, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList())).ToList();
-            if (CustInfoList.Count() > 0)
+            if (CustInfoList.Count > 0)
             {
                 CustInfoList.ForEach(x =>
                 {

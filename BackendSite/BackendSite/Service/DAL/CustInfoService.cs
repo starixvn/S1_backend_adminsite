@@ -299,12 +299,12 @@ namespace BackendSite.Service.DAL
                     var UpdateAtArray = x.UpdateAt.Split(',');
                     var OperatorArray = x.Operator.Split(',');
                     x.UpdateRemark = new List<string>();
-                    for (var i = 0; i < UpdateAtArray.Count(); i++)
+                    for (var i = 0; i < UpdateAtArray.Length; i++)
                     {
                         x.UpdateRemark.Add($"{UpdateAtArray[i]}-{OperatorArray[i]}");
                     }
-                    x.CallOutStatus = UpdateAtArray.Count();
-                    if (UpdateAtArray.Count() == 3)
+                    x.CallOutStatus = UpdateAtArray.Length;
+                    if (UpdateAtArray.Length == 3)
                     {
                         x.CanUpdate = false;
                     }
@@ -381,7 +381,7 @@ namespace BackendSite.Service.DAL
                 {
                     var UpdateAtArray = x.UpdateAt.Split(',');
                     var OperatorArray = x.Operator.Split(',');
-                    for (var i = 0; i < UpdateAtArray.Count(); i++)
+                    for (var i = 0; i < UpdateAtArray.Length; i++)
                     {
                         switch (i)
                         {

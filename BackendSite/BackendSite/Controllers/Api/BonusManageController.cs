@@ -360,8 +360,8 @@ namespace BackendSite.Controllers.Api
                     /*Spared Task for
                      * Batch*/
 
-                    var rounds = BonusImportListPara.Count() / OneRoundCount;
-                    var remainder = BonusImportListPara.Count() % OneRoundCount;
+                    var rounds = BonusImportListPara.Count / OneRoundCount;
+                    var remainder = BonusImportListPara.Count % OneRoundCount;
                     if (remainder > 0)
                         rounds++;
 

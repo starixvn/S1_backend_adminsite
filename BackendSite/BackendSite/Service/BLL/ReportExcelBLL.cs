@@ -265,7 +265,7 @@ namespace BackendSite.Service.BLL
             foreach (var mergeTitles in mergeTitlesList)
             {
                 var cellCount = 1;
-                for (var i = 0; i < mergeTitles.Count(); i++)
+                for (var i = 0; i < mergeTitles.Count; i++)
                 {
                     var cell = ws.Cells[currentRow, cellCount];
                     cell.Value = mergeTitles.ElementAt(i).Value.Name;
@@ -408,14 +408,14 @@ namespace BackendSite.Service.BLL
                                                             totalTitles);
             }
 
-            if (mergeContentRules.Count() > 0)
+            if (mergeContentRules.Count > 0)
             {
                 ComplexReportSetCustomizeBodyCellMerge(ws,
                                                        mergeContentRules,
                                                        bodyStartRow);
             }
 
-            if (groupTitles.Count() > 0)
+            if (groupTitles.Count > 0)
             {
                 ComplexReportSetBodyGroupContentStyle(ws,
                                                       titles,
@@ -424,7 +424,7 @@ namespace BackendSite.Service.BLL
                                                       currentRow);
             }
 
-            if (isSummary && notSummaryTitles.Count() > 0)
+            if (isSummary && notSummaryTitles.Count > 0)
             {
                 ComplexReportSetBodySummary(ws,
                                             data,
@@ -561,7 +561,7 @@ namespace BackendSite.Service.BLL
 
                         if (value.Contains("TOTAL"))
                         {
-                            for (var j = colIdx; j <= titles.Count(); j++)
+                            for (var j = colIdx; j <= titles.Count; j++)
                             {
                                 ws.Cells[i, j].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                 ws.Cells[i, j].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#BFFFFF"));

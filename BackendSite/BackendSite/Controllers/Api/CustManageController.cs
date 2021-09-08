@@ -1154,7 +1154,7 @@ namespace BackendSite.Controllers.Api
                                                       para.PageNumber,
                                                       para.PageSize);
 
-            if (SearchResult.CustTeleList.Count() == 0)
+            if (SearchResult.CustTeleList.Count == 0)
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
