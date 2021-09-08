@@ -39,7 +39,7 @@ namespace BackendSite.Controllers.Api
             foreach (var currency in siteList.ToList().Find(x => x.SiteId == SiteId).CurrencyList.Replace("[", "").Replace("]", "").Split(","))
             {
                 int currencyId;
-                Int32.TryParse(currency, out currencyId);
+                int.TryParse(currency, out currencyId);
                 var referral = referralList?.Where(x => x.CurrencyId == currencyId).ToList().FirstOrDefault();
                 referralManagementList.Add(new ReferralManagement
                 {

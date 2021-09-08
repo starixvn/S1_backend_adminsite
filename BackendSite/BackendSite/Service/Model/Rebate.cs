@@ -9,17 +9,17 @@ namespace BackendSite.Service.Model
     public class VipLevel
     {
         public int Level { get; set; }
-        public String LevelName { get; set; }
+        public string LevelName { get; set; }
     }
     public class TPCategory
     {
         public int CategoryId { get; set; }
-        public String CategoryName { get; set; }
+        public string CategoryName { get; set; }
     }
     public class RebateCategoryList
     {
         public int CategoryId { get; set; }
-        public String CategoryName { get; set; }
+        public string CategoryName { get; set; }
         public IEnumerable<RebateLevelData> CategoryLevelList { get; set; }
 
     }

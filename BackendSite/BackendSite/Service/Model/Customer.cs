@@ -187,7 +187,7 @@ namespace BackendSite.Service.Model
         public bool CanUpdate { get; set; }
         public string UpdateAt { get; set; }
         public string Operator { get; set; }
-        public List<String> UpdateRemark { get; set; }
+        public List<string> UpdateRemark { get; set; }
         public CustTele() {
             CanUpdate = true;
         }

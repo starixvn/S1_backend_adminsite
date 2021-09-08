@@ -161,7 +161,7 @@ namespace BackendSite.Service.Model
     public class VipTPCategory
     {
         public int CategoryId { get; set; }
-        public String CategoryName { get; set; }
+        public string CategoryName { get; set; }
     }
 
     #region Adjustment

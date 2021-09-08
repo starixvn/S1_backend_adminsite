@@ -280,7 +280,7 @@ namespace BackendSite.Service.BLL
         private bool CheckParameterForSetTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount,
                                                          out string message)
         {
-            message = String.Empty;
+            message = string.Empty;
 
             if (bankFinancialTransferAccount == null)
             {
@@ -802,7 +802,7 @@ namespace BackendSite.Service.BLL
         private bool CheckSharedParameterForSetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail,
                                                             out string message)
         {
-            message = String.Empty;
+            message = string.Empty;
 
             if (bankFinancialTransferInfoDetail == null)
             {
@@ -878,7 +878,7 @@ namespace BackendSite.Service.BLL
         private bool CheckParameterForSetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail,
                                                       out string message)
         {
-            message = String.Empty;
+            message = string.Empty;
 
             #region From Data
 
@@ -1080,7 +1080,7 @@ namespace BackendSite.Service.BLL
         private bool CheckParameterWithTypeOtherForSetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail,
                                                                    out string message)
         {
-            message = String.Empty;
+            message = string.Empty;
 
             if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.OnlyMinus)
             {

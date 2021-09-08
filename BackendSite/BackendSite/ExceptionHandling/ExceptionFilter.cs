@@ -38,7 +38,7 @@ namespace BackendSite.ExceptionHandling
                 var adminException = context.Exception as AdminException;
                 var message = adminException.Message;
 
-                if (String.IsNullOrEmpty(message))
+                if (string.IsNullOrEmpty(message))
                 {
                     message = _selLangBLL.GetMsg(adminException.ErrorCode.GetDescription());
                 }
