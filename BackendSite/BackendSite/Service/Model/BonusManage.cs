@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PromotionDisplayCondition;
 
 namespace BackendSite.Service.Model

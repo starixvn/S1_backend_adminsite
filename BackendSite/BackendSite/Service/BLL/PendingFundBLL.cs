@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using Dapper;
 using Microsoft.Extensions.Configuration;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL

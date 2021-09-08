@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using Dapper;
 using Microsoft.Extensions.Caching.Memory;
-using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.BLL
 {

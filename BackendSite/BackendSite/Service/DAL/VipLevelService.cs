@@ -4,9 +4,7 @@ using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using BackendSite.Service.Model.CustVipLevel;
-using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.DAL
 {

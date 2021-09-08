@@ -3,8 +3,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
