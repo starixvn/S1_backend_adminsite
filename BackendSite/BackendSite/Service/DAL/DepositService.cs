@@ -387,8 +387,7 @@ namespace BackendSite.Service.DAL
             var SearchData = new DepositTimeData();
             var props = new DynamicParameters();
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            int tempDepositId;
-            int.TryParse(para.DepositID, out tempDepositId);
+            int.TryParse(para.DepositID, out var tempDepositId);
             
             props.Add("SelectSite", SelectSite);
             props.Add("DepositId", tempDepositId);
@@ -424,8 +423,7 @@ namespace BackendSite.Service.DAL
                 selectstatus.Add(Status);
             }
             var SelectStatus = JsonConvert.SerializeObject(selectstatus);
-            int tempDepositId;
-            int.TryParse(DepositID, out tempDepositId);
+            int.TryParse(DepositID, out var tempDepositId);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var props = new DynamicParameters();

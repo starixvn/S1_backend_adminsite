@@ -540,7 +540,6 @@ namespace BackendSite.Controllers.Api
                     {
                         var custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text;
 
-                        int custId;
                         var sabaId = sheet.Cells[RowId, 2].Text.Trim();
                         var _sabaId = "";
                         if (sabaId.IndexOf("_") > -1)
@@ -553,7 +552,7 @@ namespace BackendSite.Controllers.Api
                         }
 
                         var m = Regex.Match(_sabaId, @"\d+");
-                        var _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
+                        var _custId = int.TryParse(m.Value, out var custId) ? custId : (int?)null;
                         int.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out var vipLevel);
                         var memo = sheet.Cells[RowId, 4].Text.Trim();
                         if (string.IsNullOrEmpty(custUsername) && _custId == null)

@@ -16,8 +16,7 @@ namespace BackendSite.Service.BLL
         }
         public string GetContentByLang(string Lang, Dictionary<string, string> multiLangContent)
         {
-            string Content;
-            if (!multiLangContent.TryGetValue(Lang, out  Content))
+            if (!multiLangContent.TryGetValue(Lang, out var Content))
             {
                 if (!multiLangContent.TryGetValue("en", out Content))
                 {

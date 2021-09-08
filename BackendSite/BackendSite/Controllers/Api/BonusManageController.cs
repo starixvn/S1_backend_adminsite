@@ -403,8 +403,7 @@ namespace BackendSite.Controllers.Api
             foreach (var currency in siteList.ToList().Find(x => x.SiteId == SiteId).CurrencyList.Replace("[", "")
                 .Replace("]", "").Split(","))
             {
-                int currencyId;
-                int.TryParse(currency, out currencyId);
+                int.TryParse(currency, out var currencyId);
                 var referral = referralList.FirstOrDefault(x => x.CurrencyId == currencyId);
                 referralManagementList.Add(new ReferralManagement
                 {
@@ -471,15 +470,14 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<ReferralCustList> GetReferralCustList(ReferralCustListReq referralCustListReq)
         {
             var apiResult = new ApiListResult<ReferralCustList>();
-            int totalPages = 0, rowCount = 0;
 
             var pageNumber = referralCustListReq.PageNumber;
             var pageSize = 10;
             if (referralCustListReq.PageSize > 0)
                 pageSize = referralCustListReq.PageSize;
             apiResult.Data = _referralManagementBLL.GetReferralCustList(referralCustListReq.SelectSite,
-                referralCustListReq.UserName, referralCustListReq.CurrencyId, pageSize, ref pageNumber, out totalPages,
-                out rowCount);
+                referralCustListReq.UserName, referralCustListReq.CurrencyId, pageSize, ref pageNumber, out var totalPages,
+                out var rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;

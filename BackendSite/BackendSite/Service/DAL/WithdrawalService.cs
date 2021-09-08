@@ -300,8 +300,7 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             using var conn =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            int tempWithdrawalID;
-            int.TryParse(para.WithdrawalID, out tempWithdrawalID);
+            int.TryParse(para.WithdrawalID, out var tempWithdrawalID);
 
             props.Add("SelectSite", SelectSite);
             props.Add("WithdrawalId", tempWithdrawalID);
@@ -343,8 +342,7 @@ namespace BackendSite.Service.DAL
             }
 
             var selectStatusString = JsonConvert.SerializeObject(selectStatus);
-            int tempWithdrawalId;
-            int.TryParse(withdrawalId, out tempWithdrawalId);
+            int.TryParse(withdrawalId, out var tempWithdrawalId);
 
             using var conn =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));

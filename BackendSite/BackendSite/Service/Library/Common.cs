@@ -37,7 +37,6 @@ namespace BackendSite.Service.Library
         }
         public int? TpIdToCustId(string TpId)
         {
-            int custId;
             TpId = TpId.Trim();
 
             if (TpId.IndexOf("_") > -1)
@@ -50,7 +49,7 @@ namespace BackendSite.Service.Library
             }
 
             var m = Regex.Match(TpId, @"\d+");
-            var _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
+            var _custId = int.TryParse(m.Value, out var custId) ? custId : (int?)null;
 
             return _custId;
         }
