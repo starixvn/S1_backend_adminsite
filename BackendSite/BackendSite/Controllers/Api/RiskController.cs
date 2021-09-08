@@ -65,26 +65,30 @@ namespace BackendSite.Controllers.Api
             {
                 var tpList = await _gameCasinoBll.GetTpList();
                 var userDisableGames = await _riskBll.GetTpDisableUserBuCustId(custId);
-                var disableGames = JsonConvert.DeserializeObject<List<DisableTpGame>>(userDisableGames.GameInfo);
 
-                foreach (var disableGame in disableGames)
+                if (userDisableGames.GameInfo != null && userDisableGames.GameInfo != "null")
                 {
-                    foreach (var tp in tpList)
+                    var disableGames = JsonConvert.DeserializeObject<List<DisableTpGame>>(userDisableGames.GameInfo);
+
+                    foreach (var disableGame in disableGames)
                     {
-                        if (disableGame.TpId == tp.TpId)
+                        foreach (var tp in tpList)
                         {
-                            tp.Checked = true;
-                            var games = await _gameCasinoBll.GameCasinoByTPIdV3(tp.TpId);
-                            tp.GameList = games.Select(a=> new TpGameCasino()
+                            if (disableGame.TpId == tp.TpId)
                             {
-                                GameId = a.GameId,
-                                Name = a.Name,
-                                Checked = disableGame.GameList != null && disableGame.GameList.Any(c=>c == a.GameId)
-                            }).ToList();
+                                tp.Checked = true;
+                                var games = await _gameCasinoBll.GameCasinoByTPIdV3(tp.TpId);
+                                tp.GameList = games.Select(a=> new TpGameCasino()
+                                {
+                                    GameId = a.GameId,
+                                    Name = a.Name,
+                                    Checked = disableGame.GameList != null && disableGame.GameList.Any(c=>c == a.GameId)
+                                }).ToList();
+                            }
                         }
                     }
                 }
-
+                
                 var editInfo = new TpDisableUserForGameDetail()
                 {
                     SiteId = userDisableGames.SiteId,
