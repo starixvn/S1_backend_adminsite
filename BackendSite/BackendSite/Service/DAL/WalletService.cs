@@ -90,7 +90,7 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<RebateLog> GetRebateLog(IEnumerable<int> SelectSite, string userName, int rebateType, long startDate, long endDate, int pageSize, int currencyId, int baseCurrencyId, int rebateCategoriesId, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
         {
-            List<string> tempCurrencyTotalAmount = new List<string>();
+            var tempCurrencyTotalAmount = new List<string>();
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var p = new DynamicParameters(new { SelectSite = JsonConvert.SerializeObject(SelectSite), UserName = userName, RebateType = rebateType
                 , StartDate = startDate, EndDate = endDate, PageSize = pageSize, CategoryType= rebateCategoriesId, CurrencyId= currencyId,BaseCurrencyId= baseCurrencyId});
@@ -159,25 +159,25 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PromotionCategory> GetPromotionCategory()
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var result = conn.Query<PromotionCategory>("Common_PromotionCategory_Get", commandType: CommandType.StoredProcedure);
             return result;
         }
         public IEnumerable<TpBetRecordListOneWeek> GetCustTpBetRecordListOneWeek(int custId)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var result = conn.Query<TpBetRecordListOneWeek>("Admin_TpBetRecord_byCustIDOneWeek_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
             return result;
         }
         public IEnumerable<TpBetRecordListOneDay> GetCustTpBetRecordListOneDay(int custId, string selDate, long startDate, long endDate)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var result = conn.Query<TpBetRecordListOneDay>("Admin_TpBetRecord_byOneDayV4_Get", new { CustId = custId, SelDate = selDate, StartDate = startDate, EndDate = endDate }, commandType: CommandType.StoredProcedure);
             return result;
         }
         public IEnumerable<TpBetRecordbyCategoryId> GetCustTpBetRecordListbyCategoryId(int custId, string selDate, int categoryId, long startDate, long endDate)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var result = conn.Query<TpBetRecordbyCategoryId>("Admin_TpBetRecord_byCategoryIdV4_Get", new  { CustId = custId, SelDate = selDate, CategoryId = categoryId, StartDate = startDate, EndDate = endDate }, commandType: CommandType.StoredProcedure);
             return result;
         }
@@ -185,10 +185,10 @@ namespace BackendSite.Service.DAL
         {
 
             IEnumerable<TpBetRecordDetailbyGameType> result = null;
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
-                string SpName = "Admin_TpBetRecord_byGameTypeListV4_Get";
-                DynamicParameters props = new DynamicParameters(new { CustId = custId, SelDate = selDate, TypeId = gameTypeId, StartDate = startDate, EndDate = endDate });
+                var SpName = "Admin_TpBetRecord_byGameTypeListV4_Get";
+                var props = new DynamicParameters(new { CustId = custId, SelDate = selDate, TypeId = gameTypeId, StartDate = startDate, EndDate = endDate });
                 props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
                 props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -206,10 +206,10 @@ namespace BackendSite.Service.DAL
 
         public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int pageSize, int pageNumber,int CategoryId, int BaseCurrencyId,ref List<string> CurrencyAmount)
         {
-            List<string> tempCurrencyTotalAmount = new List<string>();
-            VipRebateInfoData SearchData = new VipRebateInfoData();
-            DynamicParameters props = new DynamicParameters();
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var tempCurrencyTotalAmount = new List<string>();
+            var SearchData = new VipRebateInfoData();
+            var props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             props.Add("SelectSite", JsonConvert.SerializeObject(selectSite));
             props.Add("Currency", currency);
             props.Add("UserName", string.IsNullOrWhiteSpace(User) ? null : User);
@@ -247,10 +247,10 @@ namespace BackendSite.Service.DAL
         }
         public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, long? startDate, long? endDate, int pageSize, int pageNumber)
         {
-            VipRebateInfoData SearchData = new VipRebateInfoData();
-            List<string> tempCurrencyTotalAmount = new List<string>();
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            DynamicParameters props = new DynamicParameters();
+            var SearchData = new VipRebateInfoData();
+            var tempCurrencyTotalAmount = new List<string>();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var props = new DynamicParameters();
             props.Add("CustId", custId);
             props.Add("StartDate", startDate);
             props.Add("EndDate", endDate);
@@ -284,8 +284,8 @@ namespace BackendSite.Service.DAL
         }
         public VipRebateInfoData GetVipRebateInfoListExport(string selectSite, int currency, long startDate, long endDate, string User, int CategoryId, int BaseCurrencyId, int RebateCategoriesId)
         {
-            VipRebateInfoData SearchData = new VipRebateInfoData();
-            DynamicParameters props = new DynamicParameters();
+            var SearchData = new VipRebateInfoData();
+            var props = new DynamicParameters();
             props.Add("SelectSite", selectSite);
             props.Add("Currency", currency);
             props.Add("UserName", string.IsNullOrWhiteSpace(User) ? null : User);
@@ -294,7 +294,7 @@ namespace BackendSite.Service.DAL
             props.Add("CategoryId", CategoryId);
             props.Add("BaseCurrencyId", BaseCurrencyId);
             props.Add("CategoryType", RebateCategoriesId);
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var result = conn.Query<VipRebateInfo>("Admin_VipRebateReportListV4Export_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             SearchData.VipRebateInfoList = result;
@@ -310,7 +310,7 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<TpBetRecordListOneWeek> GetCustTpBetRecordList(int custId, long startDate, long endDate)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var result = conn.Query<TpBetRecordListOneWeek>("Admin_TpBetRecordListV3_Get", new { CustId = custId, StartDate = startDate, EndDate = endDate }, commandType: CommandType.StoredProcedure);
             return result;
         }

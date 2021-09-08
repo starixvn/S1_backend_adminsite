@@ -27,7 +27,7 @@ namespace BackendSite.Service.DAL
         public CashBackBonus GetCashBackBonus(int SiteId)
         {
             CashBackBonus cashBackBonus = null;
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 conn.Open();
                 using (var tran = conn.BeginTransaction())
@@ -49,12 +49,12 @@ namespace BackendSite.Service.DAL
         public int? AddCashBackBonus(CashBackBonusBase _CashBackBonus, IEnumerable<CashBackGames> _CashBackGames,  IEnumerable<CashBackMinMaxAmount> _CashBackMinMaxAmounts, int SiteId)
         {
             int? CashbackId = null;
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 conn.Open();
                 using (var tran = conn.BeginTransaction())
                 {
-                    DynamicParameters _props = new DynamicParameters();
+                    var _props = new DynamicParameters();
                     _props.Add("@Id", dbType: DbType.Int32, direction: ParameterDirection.Output);
                     _props.Add("@SiteId", SiteId);
                     _props.Add("@Period", _CashBackBonus.Period);
@@ -94,12 +94,12 @@ namespace BackendSite.Service.DAL
 
         public void SetCashBackBonus(CashBackBonusBase _CashBackBonus, IEnumerable<CashBackGames> _CashBackGames, IEnumerable<CashBackMinMaxAmount> _CashBackMinMaxAmounts, int SiteId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 conn.Open();
                 using (var tran = conn.BeginTransaction())
                 {
-                    DynamicParameters _props = new DynamicParameters();
+                    var _props = new DynamicParameters();
                     _props.Add("@Id", _CashBackBonus.Id);
                     _props.Add("@SiteId", SiteId);
                     _props.Add("@Period", _CashBackBonus.Period);

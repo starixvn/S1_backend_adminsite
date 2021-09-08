@@ -22,7 +22,7 @@
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
 
-    IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("CustManage/CustInfoList");
+    var subFuncKeys = permissionBLL.GetSubFunckeys("CustManage/CustInfoList");
     subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
 }
 @section Scripts {

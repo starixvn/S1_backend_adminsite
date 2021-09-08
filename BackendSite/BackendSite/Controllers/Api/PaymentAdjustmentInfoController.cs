@@ -34,10 +34,10 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         public ApiListResultCurrencyAmount<PaymentAdjustment> GetAdjustmentInfoByCust(GetAdjustmentInfoReq getAdjustmentInfoReq)
         {
-            int pageNumber = getAdjustmentInfoReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
-            List<string> CurrencyAmount = new List<string>();
+            var pageNumber = getAdjustmentInfoReq.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
+            var CurrencyAmount = new List<string>();
             var apiListResult = new ApiListResultCurrencyAmount<PaymentAdjustment>();
             apiListResult.Data = paymentAdjustmentBLL.GetAdjustmentInfoByCust(getAdjustmentInfoReq.CustId, getAdjustmentInfoReq.StartDate, getAdjustmentInfoReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount,ref CurrencyAmount);
             apiListResult.ErrorCode = 0;

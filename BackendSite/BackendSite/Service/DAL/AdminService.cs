@@ -27,7 +27,7 @@ namespace BackendSite.Service.DAL
 
         public bool AddAccount(int siteId, AdminUser adminUser)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 var p = new DynamicParameters(new { 
                     SiteId = siteId, 
@@ -41,7 +41,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<AdminUser> AccountList(int siteId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.Query<AdminUser>("AdminAccount_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
             }
@@ -49,7 +49,7 @@ namespace BackendSite.Service.DAL
 
         public AdminUser GetAccount(int siteId, int userId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.QueryFirst<AdminUser>("AdminAccountId_Get", new { SiteId = siteId, UserId = userId }, commandType: CommandType.StoredProcedure);
             }
@@ -57,7 +57,7 @@ namespace BackendSite.Service.DAL
 
         public bool EditAccount(int siteId, AdminUser adminUser)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.Execute("AdminAccountId_Set", new { 
                     SiteId = siteId, 
@@ -69,7 +69,7 @@ namespace BackendSite.Service.DAL
         
         public bool ChangePwdAccount(int siteId, AdminUser adminUser)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.Execute("AdminAccountChangePwd_Set", new { SiteId = siteId, UserId = adminUser.UserId, UserPWD = adminUser.Userpwd }, commandType: CommandType.StoredProcedure) > 0;
             }
@@ -78,7 +78,7 @@ namespace BackendSite.Service.DAL
         public bool ChangePwd(int siteId, int userId, ChangePwd changePwd, out string Md5Userpwd)
         {
             Md5Userpwd = null;
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 var p = new DynamicParameters(new { SiteId = siteId, UserId = userId, Md5OldPassword = changePwd.OldPwd, Md5NewPassword = changePwd.NewPwd });
                 p.Add("Md5Userpwd", dbType: DbType.String, direction: ParameterDirection.Output);
@@ -95,7 +95,7 @@ namespace BackendSite.Service.DAL
 
         public int SetSpecialPasswordData(int SiteId, string Password, string Operator)
         {
-            DynamicParameters props = new DynamicParameters();
+            var props = new DynamicParameters();
             props.Add("SiteId", SiteId);
             props.Add("Password", Password);
             props.Add("Operator", Operator);

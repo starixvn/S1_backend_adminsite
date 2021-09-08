@@ -54,7 +54,7 @@ namespace BackendSite.Service.BLL
 
         public Customer GetCustInfoWithCache(int custId)
         {
-            string key = $"CustInfo_{custId}";
+            var key = $"CustInfo_{custId}";
             var customer = cache.Get<Customer>(key);
             if (customer == null)
             {
@@ -71,7 +71,7 @@ namespace BackendSite.Service.BLL
         }
         public int GetVipLevelWithCache(int custId)
         {
-            string key = $"VipLevelCache_{custId}";
+            var key = $"VipLevelCache_{custId}";
             var vipLevelCache = cache.Get<int?>(key) ?? -1;
             if (vipLevelCache != -1)
             {
@@ -89,7 +89,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency, string bankAccountNumber, IEnumerable<int> selectstatus, ref int pageNumber, out int totalPages, out int rowCount)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
-            List<int> currncyList = new List<int>();
+            var currncyList = new List<int>();
             serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x =>
             {
                 currncyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
@@ -110,7 +110,7 @@ namespace BackendSite.Service.BLL
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
 
-            List<int> currncyList = new List<int>();
+            var currncyList = new List<int>();
             serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x =>
             {
                 currncyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
@@ -183,7 +183,7 @@ namespace BackendSite.Service.BLL
             codeGenerator.Minimum = 6;
             codeGenerator.RepeatCharacters = true;
             NewPassword = codeGenerator.Generate();
-            string md5NewPassword = tools.MD5Encrypt(NewPassword);
+            var md5NewPassword = tools.MD5Encrypt(NewPassword);
             return custInfoService.SetResetPwd(CustId, md5NewPassword);
         }
         public bool ResetProfile(int CustId)
@@ -210,7 +210,7 @@ namespace BackendSite.Service.BLL
                 (int) BonusStatusType.Running,
                 (int) BonusStatusType.TrasferOut,
             };
-            return _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), out int CustId);
+            return _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), out var CustId);
         }
 
         public List<CustTurnoverRes> GetCustTurnover(int CustId, string GameTypes, long StartTime, long EndTime)
@@ -219,7 +219,7 @@ namespace BackendSite.Service.BLL
 
             var result = new List<CustTurnoverRes>();
 
-            foreach (CustTurnover data in datas)
+            foreach (var data in datas)
             {
                 var item = result.FirstOrDefault(x => x.GameType == data.GameType);
                 if (item == null)
@@ -333,15 +333,15 @@ namespace BackendSite.Service.BLL
 
         public bool SetCustStatus(string menu, int custId, int status, string reason, string action, string user)
         {
-            bool result = false;
-            Dictionary<string, dynamic> mainInfo = new Dictionary<string, dynamic>();
-            Dictionary<string, dynamic> noteInfo = new Dictionary<string, dynamic>();
+            var result = false;
+            var mainInfo = new Dictionary<string, dynamic>();
+            var noteInfo = new Dictionary<string, dynamic>();
             mainInfo.Add("MenuName", "Customer Info");
             mainInfo.Add("Action", action);
             noteInfo.Add("MenuName", "Customer Info");
             noteInfo.Add("Action", "Add Note");
 
-            using (TransactionScope scope = new TransactionScope())
+            using (var scope = new TransactionScope())
             {
                 #region Update Status
 
@@ -398,15 +398,15 @@ namespace BackendSite.Service.BLL
         /// <returns></returns>
         public int DeleteOnUserData(string menu, int custId, string reason, string user)
         {
-            int result = 0;
-            Dictionary<string, dynamic> mainInfo = new Dictionary<string, dynamic>();
-            Dictionary<string, dynamic> noteInfo = new Dictionary<string, dynamic>();
+            var result = 0;
+            var mainInfo = new Dictionary<string, dynamic>();
+            var noteInfo = new Dictionary<string, dynamic>();
             mainInfo.Add("MenuName", "Customer Info");
             mainInfo.Add("Action", "Kick Out");
             noteInfo.Add("MenuName", "Customer Info");
             noteInfo.Add("Action", "Add Note");
 
-            using (TransactionScope scope = new TransactionScope())
+            using (var scope = new TransactionScope())
             {
                 #region Kick Out User
 
@@ -497,9 +497,9 @@ namespace BackendSite.Service.BLL
 
         public int SetEnableDisablePromotion(int custId, int enablePromotion, string Operator)
         {
-            int result = 1;
+            var result = 1;
 
-            using (TransactionScope scope = new TransactionScope())
+            using (var scope = new TransactionScope())
             {
                 if (!custInfoService.SetEnableDisablePromotion(custId, enablePromotion))
                 {
@@ -556,7 +556,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate)
         {
-            List<RegLiveStatusExport> list = new List<RegLiveStatusExport>();
+            var list = new List<RegLiveStatusExport>();
             var result =  custInfoService.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate);
             result.ToList().ForEach(x =>
             {

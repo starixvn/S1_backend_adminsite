@@ -29,27 +29,27 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PayList> GetPayList()
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                string SpName = "Admin_PayList_Get";
+                var SpName = "Admin_PayList_Get";
                 return conn.Query<PayList>(SpName, commandType: CommandType.StoredProcedure);
             }
         }
 
         public IEnumerable<PayChannel> GetPayChannelList()
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                string SpName = "Admin_PayChannel_Get";
+                var SpName = "Admin_PayChannel_Get";
                 return conn.Query<PayChannel>(SpName, new { PayId = 0 }, commandType: CommandType.StoredProcedure);
             }
         }
 
         public IEnumerable<PayCurrency> GetPayCurrencyList()
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                string SpName = "Admin_PayCurrency_Get";
+                var SpName = "Admin_PayCurrency_Get";
                 return conn.Query<PayCurrency>(SpName, new { ChannelId = 0 }, commandType: CommandType.StoredProcedure);
             }
         }
@@ -59,8 +59,8 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
             using var trans = conn.BeginTransaction();
-            DynamicParameters props = new DynamicParameters();
-            DynamicParameters propsLog = new DynamicParameters();
+            var props = new DynamicParameters();
+            var propsLog = new DynamicParameters();
 
             #region props
             props.Add("PayId", PayId);
@@ -97,8 +97,8 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
             using var trans = conn.BeginTransaction();
-            DynamicParameters props = new DynamicParameters();
-            DynamicParameters propsLog = new DynamicParameters();
+            var props = new DynamicParameters();
+            var propsLog = new DynamicParameters();
 
             #region props
             props.Add("ChannelId", ChannelId);
@@ -134,17 +134,17 @@ namespace BackendSite.Service.DAL
 
         public void UpdatePayCurrency(int ChannelId, int CurrencyId, decimal MinAmount, decimal MaxAmount, int AmountRule, string AmountShow, string Operator)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 conn.Open();
                 using (var tran = conn.BeginTransaction())
                 {
-                    string SpName = "Admin_PayCurrency_Set";
+                    var SpName = "Admin_PayCurrency_Set";
                     conn.Execute(SpName, new { ChannelId, CurrencyId, MinAmount, MaxAmount, AmountRule, AmountShow }, tran, commandType: CommandType.StoredProcedure);
 
                     var list = new Dictionary<string, string>();
 
-                    DynamicParameters props = new DynamicParameters();
+                    var props = new DynamicParameters();
                     props.Add("ChannelId", ChannelId);
                     props.Add("CurrencyId", CurrencyId);
                     props.Add("MinAmount", MinAmount);
@@ -170,8 +170,8 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
             using var trans = conn.BeginTransaction();
-            DynamicParameters props = new DynamicParameters();
-            DynamicParameters propsLog = new DynamicParameters();
+            var props = new DynamicParameters();
+            var propsLog = new DynamicParameters();
 
             #region props
             props.Add("ChannelId", ChannelId);
@@ -207,9 +207,9 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int PayId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                string SpName = "Admin_BankInfoSys_Get";
+                var SpName = "Admin_BankInfoSys_Get";
                 return conn.Query<PayListBankInfoSys>(SpName, new { PayId }, commandType: CommandType.StoredProcedure);
             }
         }
@@ -219,8 +219,8 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
             using var trans = conn.BeginTransaction();
-            DynamicParameters props = new DynamicParameters();
-            DynamicParameters propsLog = new DynamicParameters();
+            var props = new DynamicParameters();
+            var propsLog = new DynamicParameters();
 
             #region props
             props.Add("PayId", PayId);

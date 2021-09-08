@@ -49,8 +49,8 @@ namespace BackendSite.Service.Library
                 TpId = TpId.Substring(TpId.LastIndexOf("x"), TpId.Length - TpId.LastIndexOf("x"));
             }
 
-            Match m = Regex.Match(TpId, @"\d+");
-            int? _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
+            var m = Regex.Match(TpId, @"\d+");
+            var _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
 
             return _custId;
         }

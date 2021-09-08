@@ -18,7 +18,7 @@ namespace BackendSite.Service.DAL
 
         public string GetMenuData()
         {
-            string contentRootPath = env.ContentRootPath;
+            var contentRootPath = env.ContentRootPath;
             var MenuData = File.ReadAllText($"{contentRootPath}/App_Data/Menu.json");
 
             return MenuData;

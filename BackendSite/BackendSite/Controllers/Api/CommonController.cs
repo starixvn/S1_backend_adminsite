@@ -44,7 +44,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult<List<dynamic>> GetEnumType([FromQuery] string enumName)
         {
             var apiResult = new ApiResult<List<dynamic>>();
-            List<dynamic> result = new List<dynamic>();
+            var result = new List<dynamic>();
             try
             {
                 var allTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes());
@@ -75,7 +75,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult AddAdminOperateLog(AdminOperateLog adminOperateLog)
         {
             var apiResult = new ApiResult();
-            bool result = serverInfoBLL.AdminOperateLog(adminOperateLog.SiteId, adminOperateLog.CustId, adminOperateLog.Menu, adminOperateLog.ActionType, adminOperateLog.DetailInfo, User.Identity.Name) > 0;
+            var result = serverInfoBLL.AdminOperateLog(adminOperateLog.SiteId, adminOperateLog.CustId, adminOperateLog.Menu, adminOperateLog.ActionType, adminOperateLog.DetailInfo, User.Identity.Name) > 0;
 
             if (result)
             {
@@ -102,9 +102,9 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<GetAdminOperateLog> GetAdminOperateLog(AdminOperateLogReq adminOperateLogReq)
         {
             var apiListResult = new ApiListResult<GetAdminOperateLog>();
-            int pageNumber = adminOperateLogReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
+            var pageNumber = adminOperateLogReq.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
             var depositRequestList = serverInfoBLL.GetAdminOperateLog(adminOperateLogReq.SiteId, adminOperateLogReq.CustId, adminOperateLogReq.Menu, adminOperateLogReq.Operator, adminOperateLogReq.startDate, adminOperateLogReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
             apiListResult.Data = depositRequestList;
             apiListResult.ErrorCode = 0;

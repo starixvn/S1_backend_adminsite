@@ -115,10 +115,10 @@ namespace BackendSite.Service.DAL
 
         public bool SetFlow(ActionType action, WithdrawalBankAccountingModel model)
         {
-            using MySqlConnection connection =
+            using var connection =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             connection.Open();
-            using MySqlTransaction transaction = connection.BeginTransaction();
+            using var transaction = connection.BeginTransaction();
             switch (action)
             {
                 case ActionType.Create: //Insert

@@ -210,9 +210,9 @@ namespace BackendSite.Controllers.Api
 
             #region Initial Param
 
-            List<Dictionary<string, dynamic>> byDate = new List<Dictionary<string, dynamic>>();
-            Dictionary<string, TitleModel> byDateTitles = new Dictionary<string, TitleModel>();
-            List<Dictionary<string, MergeTitleModel>> titlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
+            var byDate = new List<Dictionary<string, dynamic>>();
+            var byDateTitles = new Dictionary<string, TitleModel>();
+            var titlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
 
             #endregion
 
@@ -220,7 +220,7 @@ namespace BackendSite.Controllers.Api
 
             #region Merge Title
 
-            Dictionary<string, MergeTitleModel> mergeTitles = new Dictionary<string, MergeTitleModel>();
+            var mergeTitles = new Dictionary<string, MergeTitleModel>();
             mergeTitles.Add("FirstMergeTitle", new MergeTitleModel { Name = "", MergeRange = 1 });
 
             mergeTitles.Add("Deposit", new MergeTitleModel { Name = "Deposit", MergeRange = currencyList.Count() + 1 });
@@ -252,7 +252,7 @@ namespace BackendSite.Controllers.Api
 
             foreach (var curr in currencyList)
             {
-                string isoCode = currencyData.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+                var isoCode = currencyData.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
 
                 var DepositPropName = $"Deposit-{isoCode}";
                 var WithdrawalPropName = $"Withdrawal-{isoCode}";
@@ -288,7 +288,7 @@ namespace BackendSite.Controllers.Api
 
             #endregion
 
-            List<string> totalTitle = new List<string>
+            var totalTitle = new List<string>
             {
                 "DepositInMYR", "WithdrawalInMYR",
                 "NettInMYR", "BonusInMYR",
@@ -297,7 +297,7 @@ namespace BackendSite.Controllers.Api
                 "WinLossInMYR"
             };
 
-            List<string> notSummaryTitles = new List<string>
+            var notSummaryTitles = new List<string>
             {
                 "Key", "Date",
                 "CurrencyId", "Currency"
@@ -326,37 +326,37 @@ namespace BackendSite.Controllers.Api
 
                 if (getByDateItem != null)
                 {
-                    getByDateItem.TryGetValue("DepositInMYR", out dynamic deposit);
+                    getByDateItem.TryGetValue("DepositInMYR", out var deposit);
                     getByDateItem["DepositInMYR"] = (decimal)deposit + item.DepositInMYR;
 
-                    getByDateItem.TryGetValue("WithdrawalInMYR", out dynamic withdrawal);
+                    getByDateItem.TryGetValue("WithdrawalInMYR", out var withdrawal);
                     getByDateItem["WithdrawalInMYR"] = (decimal)withdrawal + item.WithdrawalInMYR;
 
-                    getByDateItem.TryGetValue("NettInMYR", out dynamic nett);
+                    getByDateItem.TryGetValue("NettInMYR", out var nett);
                     getByDateItem["NettInMYR"] = (decimal)nett + item.NettInMYR;
 
-                    getByDateItem.TryGetValue("BonusInMYR", out dynamic bonus);
+                    getByDateItem.TryGetValue("BonusInMYR", out var bonus);
                     getByDateItem["BonusInMYR"] = (decimal)bonus + item.BonusInMYR;
 
-                    getByDateItem.TryGetValue("RebateInMYR", out dynamic rebate);
+                    getByDateItem.TryGetValue("RebateInMYR", out var rebate);
                     getByDateItem["RebateInMYR"] = (decimal)rebate + item.RebateInMYR;
 
-                    getByDateItem.TryGetValue("AdjustmentInMYR", out dynamic adjustment);
+                    getByDateItem.TryGetValue("AdjustmentInMYR", out var adjustment);
                     getByDateItem["AdjustmentInMYR"] = (decimal)adjustment + item.AdjustmentInMYR;
 
-                    getByDateItem.TryGetValue("TurnOverStakeInMYR", out dynamic turnOverStake);
+                    getByDateItem.TryGetValue("TurnOverStakeInMYR", out var turnOverStake);
                     getByDateItem["TurnOverStakeInMYR"] = (decimal)turnOverStake + item.TurnOverStakeInMYR;
 
-                    getByDateItem.TryGetValue("TurnOverValidBetInMYR", out dynamic turnOverValidBet);
+                    getByDateItem.TryGetValue("TurnOverValidBetInMYR", out var turnOverValidBet);
                     getByDateItem["TurnOverValidBetInMYR"] = (decimal)turnOverValidBet + item.TurnOverValidBetInMYR;
 
-                    getByDateItem.TryGetValue("WinLossInMYR", out dynamic winLoss);
+                    getByDateItem.TryGetValue("WinLossInMYR", out var winLoss);
                     getByDateItem["WinLossInMYR"] = (decimal)winLoss + item.WinLossInMYR;
 
                     //Deposit
                     if (getByDateItem.ContainsKey(DepositPropName))
                     {
-                        getByDateItem.TryGetValue(DepositPropName, out dynamic depositdata);
+                        getByDateItem.TryGetValue(DepositPropName, out var depositdata);
                         getByDateItem[DepositPropName] = (decimal)depositdata + item.Deposit;
                     }
                     else
@@ -367,7 +367,7 @@ namespace BackendSite.Controllers.Api
                     //Withdrawal
                     if (getByDateItem.ContainsKey(WithdrawalPropName))
                     {
-                        getByDateItem.TryGetValue(WithdrawalPropName, out dynamic withdrawaldata);
+                        getByDateItem.TryGetValue(WithdrawalPropName, out var withdrawaldata);
                         getByDateItem[WithdrawalPropName] = (decimal)withdrawaldata + item.Withdrawal;
                     }
                     else
@@ -378,7 +378,7 @@ namespace BackendSite.Controllers.Api
                     //Nett
                     if (getByDateItem.ContainsKey(NettPropName))
                     {
-                        getByDateItem.TryGetValue(NettPropName, out dynamic nettdata);
+                        getByDateItem.TryGetValue(NettPropName, out var nettdata);
                         getByDateItem[NettPropName] = (decimal)nettdata + item.Nett;
                     }
                     else
@@ -389,7 +389,7 @@ namespace BackendSite.Controllers.Api
                     //Bonus
                     if (getByDateItem.ContainsKey(BonusPropName))
                     {
-                        getByDateItem.TryGetValue(BonusPropName, out dynamic bonusdata);
+                        getByDateItem.TryGetValue(BonusPropName, out var bonusdata);
                         getByDateItem[BonusPropName] = (decimal)bonusdata + item.Bonus;
                     }
                     else
@@ -401,7 +401,7 @@ namespace BackendSite.Controllers.Api
 
                     if (getByDateItem.ContainsKey(RebatePropName))
                     {
-                        getByDateItem.TryGetValue(RebatePropName, out dynamic rebatedata);
+                        getByDateItem.TryGetValue(RebatePropName, out var rebatedata);
                         getByDateItem[RebatePropName] = (decimal)rebatedata + item.Rebate;
                     }
                     else
@@ -412,7 +412,7 @@ namespace BackendSite.Controllers.Api
                     //Adjustment
                     if (getByDateItem.ContainsKey(AdjustmentPropName))
                     {
-                        getByDateItem.TryGetValue(AdjustmentPropName, out dynamic adjustmentdata);
+                        getByDateItem.TryGetValue(AdjustmentPropName, out var adjustmentdata);
                         getByDateItem[AdjustmentPropName] = (decimal)adjustmentdata + item.Adjustment;
                     }
                     else
@@ -423,7 +423,7 @@ namespace BackendSite.Controllers.Api
                     //TurnOver(Stake)
                     if (getByDateItem.ContainsKey(TurnOverStakePropName))
                     {
-                        getByDateItem.TryGetValue(TurnOverStakePropName, out dynamic turnOverStakeData);
+                        getByDateItem.TryGetValue(TurnOverStakePropName, out var turnOverStakeData);
                         getByDateItem[TurnOverStakePropName] = (decimal)turnOverStakeData + item.TurnOverStake;
                     }
                     else
@@ -434,7 +434,7 @@ namespace BackendSite.Controllers.Api
                     //TrunOver(VaildBet)
                     if (getByDateItem.ContainsKey(TurnOverValidBetPropName))
                     {
-                        getByDateItem.TryGetValue(TurnOverValidBetPropName, out dynamic turnOverValidBetData);
+                        getByDateItem.TryGetValue(TurnOverValidBetPropName, out var turnOverValidBetData);
                         getByDateItem[TurnOverValidBetPropName] = (decimal)turnOverValidBetData + item.TurnOverValidBet;
                     }
                     else
@@ -445,7 +445,7 @@ namespace BackendSite.Controllers.Api
                     //Winloss
                     if (getByDateItem.ContainsKey(WinLossPropName))
                     {
-                        getByDateItem.TryGetValue(WinLossPropName, out dynamic winLossData);
+                        getByDateItem.TryGetValue(WinLossPropName, out var winLossData);
                         getByDateItem[WinLossPropName] = (decimal)winLossData + item.WinLoss;
                     }
                     else
@@ -456,7 +456,7 @@ namespace BackendSite.Controllers.Api
                 }
                 else
                 {
-                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    var newItem = new Dictionary<string, dynamic>()
                     {
                         { "Key", getByDateKey },
                         { "Date", item.Date },
@@ -490,7 +490,7 @@ namespace BackendSite.Controllers.Api
 
             #endregion
 
-            List<ComplexReportExportDataToExcel> d = new List<ComplexReportExportDataToExcel>()
+            var d = new List<ComplexReportExportDataToExcel>()
             {
                 new ComplexReportExportDataToExcel()
                 {
@@ -519,8 +519,8 @@ namespace BackendSite.Controllers.Api
         {
             #region Date Caculate
 
-            DateTime endDate = Convert.ToDateTime(request.EndDate);
-            string StartDate = new DateTime(endDate.Year, endDate.Month, 1).AddMonths(-1).ToString("yyyy-MM-dd");
+            var endDate = Convert.ToDateTime(request.EndDate);
+            var StartDate = new DateTime(endDate.Year, endDate.Month, 1).AddMonths(-1).ToString("yyyy-MM-dd");
 
             #endregion
 
@@ -551,8 +551,8 @@ namespace BackendSite.Controllers.Api
 
             #region Date Caculate
 
-            DateTime endDate = Convert.ToDateTime(EndDate);
-            string StartDate = new DateTime(endDate.Year, endDate.Month, 1).AddMonths(-1).ToString("yyyy-MM-dd");
+            var endDate = Convert.ToDateTime(EndDate);
+            var StartDate = new DateTime(endDate.Year, endDate.Month, 1).AddMonths(-1).ToString("yyyy-MM-dd");
 
             #endregion
 
@@ -571,11 +571,11 @@ namespace BackendSite.Controllers.Api
 
             #region Initial Param
 
-            List<Dictionary<string, MergeTitleModel>> titlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
-            Dictionary<string, TitleModel> Titles = new Dictionary<string, TitleModel>();
+            var titlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
+            var Titles = new Dictionary<string, TitleModel>();
 
-            List<Dictionary<string, dynamic>> turnOverContent = new List<Dictionary<string, dynamic>>();
-            List<Dictionary<string, dynamic>> winLossContent = new List<Dictionary<string, dynamic>>();
+            var turnOverContent = new List<Dictionary<string, dynamic>>();
+            var winLossContent = new List<Dictionary<string, dynamic>>();
 
             #endregion
 
@@ -583,7 +583,7 @@ namespace BackendSite.Controllers.Api
 
             #region Titles To Merge
 
-            Dictionary<string, MergeTitleModel> mergeTitles = new Dictionary<string, MergeTitleModel>();
+            var mergeTitles = new Dictionary<string, MergeTitleModel>();
             mergeTitles.Add("FirstMergeTitle", new MergeTitleModel { Name = "", MergeRange = 2 });
 
             mergeTitles.Add("Today", new MergeTitleModel { Name = "Today", MergeRange = currencyList.Count() + 1 });
@@ -608,7 +608,7 @@ namespace BackendSite.Controllers.Api
 
             foreach (var curr in currencyList)
             {
-                string isoCode = currencyData.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+                var isoCode = currencyData.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
 
                 var TodayPropName = $"Today-{isoCode}";
                 var YesterdayPropName = $"Yesterday-{isoCode}";
@@ -633,7 +633,7 @@ namespace BackendSite.Controllers.Api
 
             #region Total Title
 
-            List<string> totalTitle = new List<string>
+            var totalTitle = new List<string>
             {
                 "TodayInMYR", "YesterdayInMYR",
                 "LastTwoDaysInMYR", "ThisMonthInMYR",
@@ -644,7 +644,7 @@ namespace BackendSite.Controllers.Api
 
             #region Group Title
 
-            List<string> groupTitle = new List<string>
+            var groupTitle = new List<string>
             {
                 "GameName"
             };
@@ -653,7 +653,7 @@ namespace BackendSite.Controllers.Api
 
             #region Not Summary Title
 
-            List<string> notSummaryTitles = new List<string>
+            var notSummaryTitles = new List<string>
             {   "Key", "CurrencyId",
                 "Currency", "CategoryId",
                 "CategoryName", "GameId",
@@ -695,26 +695,26 @@ namespace BackendSite.Controllers.Api
 
                 if (getTurnOverItem != null)
                 {
-                    getTurnOverItem.TryGetValue("TodayInMYR", out dynamic today);
+                    getTurnOverItem.TryGetValue("TodayInMYR", out var today);
                     getTurnOverItem["TodayInMYR"] = (decimal)today + item.TurnOverValidBetTodaySummaryInMYR;
 
-                    getTurnOverItem.TryGetValue("YesterdayInMYR", out dynamic withdrawal);
+                    getTurnOverItem.TryGetValue("YesterdayInMYR", out var withdrawal);
                     getTurnOverItem["YesterdayInMYR"] = (decimal)withdrawal + item.TurnOverValidBetYesterdaySummaryInMYR;
 
-                    getTurnOverItem.TryGetValue("LastTwoDaysInMYR", out dynamic nett);
+                    getTurnOverItem.TryGetValue("LastTwoDaysInMYR", out var nett);
                     getTurnOverItem["LastTwoDaysInMYR"] = (decimal)nett + item.TurnOverValidBetLastTwoDaysSummaryInMYR;
 
-                    getTurnOverItem.TryGetValue("ThisMonthInMYR", out dynamic bonus);
+                    getTurnOverItem.TryGetValue("ThisMonthInMYR", out var bonus);
                     getTurnOverItem["ThisMonthInMYR"] = (decimal)bonus + item.TurnOverValidBetThisMonthSummaryInMYR;
 
-                    getTurnOverItem.TryGetValue("LastMonthInMYR", out dynamic rebate);
+                    getTurnOverItem.TryGetValue("LastMonthInMYR", out var rebate);
                     getTurnOverItem["LastMonthInMYR"] = (decimal)rebate + item.TurnOverValidBetLastMonthSummaryInMYR;
 
 
                     //Today
                     if (getTurnOverItem.ContainsKey(TodayPropName))
                     {
-                        getTurnOverItem.TryGetValue(TodayPropName, out dynamic todaydata);
+                        getTurnOverItem.TryGetValue(TodayPropName, out var todaydata);
                         getTurnOverItem[TodayPropName] = (decimal)todaydata + item.TurnOverValidBetTodaySummary;
                     }
                     else
@@ -725,7 +725,7 @@ namespace BackendSite.Controllers.Api
                     //Yesterday
                     if (getTurnOverItem.ContainsKey(YesterdayPropName))
                     {
-                        getTurnOverItem.TryGetValue(YesterdayPropName, out dynamic yesterdaydata);
+                        getTurnOverItem.TryGetValue(YesterdayPropName, out var yesterdaydata);
                         getTurnOverItem[YesterdayPropName] = (decimal)yesterdaydata + item.TurnOverValidBetYesterdaySummary;
                     }
                     else
@@ -736,7 +736,7 @@ namespace BackendSite.Controllers.Api
                     //LastTwoDays
                     if (getTurnOverItem.ContainsKey(LastTwoDaysPropName))
                     {
-                        getTurnOverItem.TryGetValue(LastTwoDaysPropName, out dynamic lasttwodaysdata);
+                        getTurnOverItem.TryGetValue(LastTwoDaysPropName, out var lasttwodaysdata);
                         getTurnOverItem[LastTwoDaysPropName] = (decimal)lasttwodaysdata + item.TurnOverValidBetLastTwoDaysSummary;
                     }
                     else
@@ -747,7 +747,7 @@ namespace BackendSite.Controllers.Api
                     //ThisMonth
                     if (getTurnOverItem.ContainsKey(ThisMonthPropName))
                     {
-                        getTurnOverItem.TryGetValue(ThisMonthPropName, out dynamic thismonthdata);
+                        getTurnOverItem.TryGetValue(ThisMonthPropName, out var thismonthdata);
                         getTurnOverItem[ThisMonthPropName] = (decimal)thismonthdata + item.TurnOverValidBetThisMonthSummary;
                     }
                     else
@@ -758,7 +758,7 @@ namespace BackendSite.Controllers.Api
                     //LastMonth
                     if (getTurnOverItem.ContainsKey(LastMonthPropName))
                     {
-                        getTurnOverItem.TryGetValue(LastMonthPropName, out dynamic lastmonthdata);
+                        getTurnOverItem.TryGetValue(LastMonthPropName, out var lastmonthdata);
                         getTurnOverItem[LastMonthPropName] = (decimal)lastmonthdata + item.TurnOverValidBetLastMonthSummary;
                     }
                     else
@@ -768,7 +768,7 @@ namespace BackendSite.Controllers.Api
                 }
                 else
                 {
-                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    var newItem = new Dictionary<string, dynamic>()
                     {
                         { "Key", getKey },
                         { "CurrencyId", item.CurrencyId },
@@ -796,26 +796,26 @@ namespace BackendSite.Controllers.Api
 
                 if (getTurnOverCategoryItem != null)
                 {
-                    getTurnOverCategoryItem.TryGetValue("TodayInMYR", out dynamic today);
+                    getTurnOverCategoryItem.TryGetValue("TodayInMYR", out var today);
                     getTurnOverCategoryItem["TodayInMYR"] = (decimal)today + item.TurnOverValidBetTodaySummaryInMYR;
 
-                    getTurnOverCategoryItem.TryGetValue("YesterdayInMYR", out dynamic withdrawal);
+                    getTurnOverCategoryItem.TryGetValue("YesterdayInMYR", out var withdrawal);
                     getTurnOverCategoryItem["YesterdayInMYR"] = (decimal)withdrawal + item.TurnOverValidBetYesterdaySummaryInMYR;
 
-                    getTurnOverCategoryItem.TryGetValue("LastTwoDaysInMYR", out dynamic nett);
+                    getTurnOverCategoryItem.TryGetValue("LastTwoDaysInMYR", out var nett);
                     getTurnOverCategoryItem["LastTwoDaysInMYR"] = (decimal)nett + item.TurnOverValidBetLastTwoDaysSummaryInMYR;
 
-                    getTurnOverCategoryItem.TryGetValue("ThisMonthInMYR", out dynamic bonus);
+                    getTurnOverCategoryItem.TryGetValue("ThisMonthInMYR", out var bonus);
                     getTurnOverCategoryItem["ThisMonthInMYR"] = (decimal)bonus + item.TurnOverValidBetThisMonthSummaryInMYR;
 
-                    getTurnOverCategoryItem.TryGetValue("LastMonthInMYR", out dynamic rebate);
+                    getTurnOverCategoryItem.TryGetValue("LastMonthInMYR", out var rebate);
                     getTurnOverCategoryItem["LastMonthInMYR"] = (decimal)rebate + item.TurnOverValidBetLastMonthSummaryInMYR;
 
 
                     //Today
                     if (getTurnOverCategoryItem.ContainsKey(TodayPropName))
                     {
-                        getTurnOverCategoryItem.TryGetValue(TodayPropName, out dynamic todaydata);
+                        getTurnOverCategoryItem.TryGetValue(TodayPropName, out var todaydata);
                         getTurnOverCategoryItem[TodayPropName] = (decimal)todaydata + item.TurnOverValidBetTodaySummary;
                     }
                     else
@@ -826,7 +826,7 @@ namespace BackendSite.Controllers.Api
                     //Yesterday
                     if (getTurnOverCategoryItem.ContainsKey(YesterdayPropName))
                     {
-                        getTurnOverCategoryItem.TryGetValue(YesterdayPropName, out dynamic yesterdaydata);
+                        getTurnOverCategoryItem.TryGetValue(YesterdayPropName, out var yesterdaydata);
                         getTurnOverCategoryItem[YesterdayPropName] = (decimal)yesterdaydata + item.TurnOverValidBetYesterdaySummary;
                     }
                     else
@@ -837,7 +837,7 @@ namespace BackendSite.Controllers.Api
                     //LastTwoDays
                     if (getTurnOverCategoryItem.ContainsKey(LastTwoDaysPropName))
                     {
-                        getTurnOverCategoryItem.TryGetValue(LastTwoDaysPropName, out dynamic lasttwodaysdata);
+                        getTurnOverCategoryItem.TryGetValue(LastTwoDaysPropName, out var lasttwodaysdata);
                         getTurnOverCategoryItem[LastTwoDaysPropName] = (decimal)lasttwodaysdata + item.TurnOverValidBetLastTwoDaysSummary;
                     }
                     else
@@ -848,7 +848,7 @@ namespace BackendSite.Controllers.Api
                     //ThisMonth
                     if (getTurnOverCategoryItem.ContainsKey(ThisMonthPropName))
                     {
-                        getTurnOverCategoryItem.TryGetValue(ThisMonthPropName, out dynamic thismonthdata);
+                        getTurnOverCategoryItem.TryGetValue(ThisMonthPropName, out var thismonthdata);
                         getTurnOverCategoryItem[ThisMonthPropName] = (decimal)thismonthdata + item.TurnOverValidBetThisMonthSummary;
                     }
                     else
@@ -859,7 +859,7 @@ namespace BackendSite.Controllers.Api
                     //LastMonth
                     if (getTurnOverCategoryItem.ContainsKey(LastMonthPropName))
                     {
-                        getTurnOverCategoryItem.TryGetValue(LastMonthPropName, out dynamic lastmonthdata);
+                        getTurnOverCategoryItem.TryGetValue(LastMonthPropName, out var lastmonthdata);
                         getTurnOverCategoryItem[LastMonthPropName] = (decimal)lastmonthdata + item.TurnOverValidBetLastMonthSummary;
                     }
                     else
@@ -869,7 +869,7 @@ namespace BackendSite.Controllers.Api
                 }
                 else
                 {
-                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    var newItem = new Dictionary<string, dynamic>()
                     {
                         { "Key", getCategoryKey },
                         { "CurrencyId", item.CurrencyId },
@@ -897,26 +897,26 @@ namespace BackendSite.Controllers.Api
 
                 if (getWinLossItem != null)
                 {
-                    getWinLossItem.TryGetValue("TodayInMYR", out dynamic today);
+                    getWinLossItem.TryGetValue("TodayInMYR", out var today);
                     getWinLossItem["TodayInMYR"] = (decimal)today + item.WinLossTodaySummaryInMYR;
 
-                    getWinLossItem.TryGetValue("YesterdayInMYR", out dynamic yesterday);
+                    getWinLossItem.TryGetValue("YesterdayInMYR", out var yesterday);
                     getWinLossItem["YesterdayInMYR"] = (decimal)yesterday + item.TurnOverValidBetYesterdaySummaryInMYR;
 
-                    getWinLossItem.TryGetValue("LastTwoDaysInMYR", out dynamic lasttwodays);
+                    getWinLossItem.TryGetValue("LastTwoDaysInMYR", out var lasttwodays);
                     getWinLossItem["LastTwoDaysInMYR"] = (decimal)lasttwodays + item.WinLossLastTwoDaysSummaryInMYR;
 
-                    getWinLossItem.TryGetValue("ThisMonthInMYR", out dynamic thismonth);
+                    getWinLossItem.TryGetValue("ThisMonthInMYR", out var thismonth);
                     getWinLossItem["ThisMonthInMYR"] = (decimal)thismonth + item.WinLossThisMonthSummaryInMYR;
 
-                    getWinLossItem.TryGetValue("LastMonthInMYR", out dynamic lastmonth);
+                    getWinLossItem.TryGetValue("LastMonthInMYR", out var lastmonth);
                     getWinLossItem["LastMonthInMYR"] = (decimal)lastmonth + item.WinLossLastMonthSummaryInMYR;
 
 
                     //Today
                     if (getWinLossItem.ContainsKey(TodayPropName))
                     {
-                        getWinLossItem.TryGetValue(TodayPropName, out dynamic todaydata);
+                        getWinLossItem.TryGetValue(TodayPropName, out var todaydata);
                         getWinLossItem[TodayPropName] = (decimal)todaydata + item.WinLossTodaySummary;
                     }
                     else
@@ -927,7 +927,7 @@ namespace BackendSite.Controllers.Api
                     //Yesterday
                     if (getWinLossItem.ContainsKey(YesterdayPropName))
                     {
-                        getWinLossItem.TryGetValue(YesterdayPropName, out dynamic yesterdaydata);
+                        getWinLossItem.TryGetValue(YesterdayPropName, out var yesterdaydata);
                         getWinLossItem[YesterdayPropName] = (decimal)yesterdaydata + item.WinLossYesterdaySummary;
                     }
                     else
@@ -938,7 +938,7 @@ namespace BackendSite.Controllers.Api
                     //LastTwoDays
                     if (getWinLossItem.ContainsKey(LastTwoDaysPropName))
                     {
-                        getWinLossItem.TryGetValue(LastTwoDaysPropName, out dynamic lasttwodaysdata);
+                        getWinLossItem.TryGetValue(LastTwoDaysPropName, out var lasttwodaysdata);
                         getWinLossItem[LastTwoDaysPropName] = (decimal)lasttwodaysdata + item.WinLossLastTwoDaysSummary;
                     }
                     else
@@ -949,7 +949,7 @@ namespace BackendSite.Controllers.Api
                     //ThisMonth
                     if (getWinLossItem.ContainsKey(ThisMonthPropName))
                     {
-                        getWinLossItem.TryGetValue(ThisMonthPropName, out dynamic thismonthdata);
+                        getWinLossItem.TryGetValue(ThisMonthPropName, out var thismonthdata);
                         getWinLossItem[ThisMonthPropName] = (decimal)thismonthdata + item.WinLossThisMonthSummary;
                     }
                     else
@@ -960,7 +960,7 @@ namespace BackendSite.Controllers.Api
                     //LastMonth
                     if (getWinLossItem.ContainsKey(LastMonthPropName))
                     {
-                        getWinLossItem.TryGetValue(LastMonthPropName, out dynamic lastmonthdata);
+                        getWinLossItem.TryGetValue(LastMonthPropName, out var lastmonthdata);
                         getWinLossItem[LastMonthPropName] = (decimal)lastmonthdata + item.WinLossLastMonthSummary;
                     }
                     else
@@ -971,7 +971,7 @@ namespace BackendSite.Controllers.Api
                 }
                 else
                 {
-                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    var newItem = new Dictionary<string, dynamic>()
                     {
                         { "Key", getKey },
                         { "CurrencyId", item.CurrencyId },
@@ -999,26 +999,26 @@ namespace BackendSite.Controllers.Api
 
                 if (getWinLossCategoryItem != null)
                 {
-                    getWinLossCategoryItem.TryGetValue("TodayInMYR", out dynamic today);
+                    getWinLossCategoryItem.TryGetValue("TodayInMYR", out var today);
                     getWinLossCategoryItem["TodayInMYR"] = (decimal)today + item.WinLossTodaySummaryInMYR;
 
-                    getWinLossCategoryItem.TryGetValue("YesterdayInMYR", out dynamic yesterday);
+                    getWinLossCategoryItem.TryGetValue("YesterdayInMYR", out var yesterday);
                     getWinLossCategoryItem["YesterdayInMYR"] = (decimal)yesterday + item.TurnOverValidBetYesterdaySummaryInMYR;
 
-                    getWinLossCategoryItem.TryGetValue("LastTwoDaysInMYR", out dynamic lasttwodays);
+                    getWinLossCategoryItem.TryGetValue("LastTwoDaysInMYR", out var lasttwodays);
                     getWinLossCategoryItem["LastTwoDaysInMYR"] = (decimal)lasttwodays + item.WinLossLastTwoDaysSummaryInMYR;
 
-                    getWinLossCategoryItem.TryGetValue("ThisMonthInMYR", out dynamic thismonth);
+                    getWinLossCategoryItem.TryGetValue("ThisMonthInMYR", out var thismonth);
                     getWinLossCategoryItem["ThisMonthInMYR"] = (decimal)thismonth + item.WinLossThisMonthSummaryInMYR;
 
-                    getWinLossCategoryItem.TryGetValue("LastMonthInMYR", out dynamic lastmonth);
+                    getWinLossCategoryItem.TryGetValue("LastMonthInMYR", out var lastmonth);
                     getWinLossCategoryItem["LastMonthInMYR"] = (decimal)lastmonth + item.WinLossLastMonthSummaryInMYR;
 
 
                     //Today
                     if (getWinLossCategoryItem.ContainsKey(TodayPropName))
                     {
-                        getWinLossCategoryItem.TryGetValue(TodayPropName, out dynamic todaydata);
+                        getWinLossCategoryItem.TryGetValue(TodayPropName, out var todaydata);
                         getWinLossCategoryItem[TodayPropName] = (decimal)todaydata + item.WinLossTodaySummary;
                     }
                     else
@@ -1029,7 +1029,7 @@ namespace BackendSite.Controllers.Api
                     //Yesterday
                     if (getWinLossCategoryItem.ContainsKey(YesterdayPropName))
                     {
-                        getWinLossCategoryItem.TryGetValue(YesterdayPropName, out dynamic yesterdaydata);
+                        getWinLossCategoryItem.TryGetValue(YesterdayPropName, out var yesterdaydata);
                         getWinLossCategoryItem[YesterdayPropName] = (decimal)yesterdaydata + item.WinLossYesterdaySummary;
                     }
                     else
@@ -1040,7 +1040,7 @@ namespace BackendSite.Controllers.Api
                     //LastTwoDays
                     if (getWinLossCategoryItem.ContainsKey(LastTwoDaysPropName))
                     {
-                        getWinLossCategoryItem.TryGetValue(LastTwoDaysPropName, out dynamic lasttwodaysdata);
+                        getWinLossCategoryItem.TryGetValue(LastTwoDaysPropName, out var lasttwodaysdata);
                         getWinLossCategoryItem[LastTwoDaysPropName] = (decimal)lasttwodaysdata + item.WinLossLastTwoDaysSummary;
                     }
                     else
@@ -1051,7 +1051,7 @@ namespace BackendSite.Controllers.Api
                     //ThisMonth
                     if (getWinLossCategoryItem.ContainsKey(ThisMonthPropName))
                     {
-                        getWinLossCategoryItem.TryGetValue(ThisMonthPropName, out dynamic thismonthdata);
+                        getWinLossCategoryItem.TryGetValue(ThisMonthPropName, out var thismonthdata);
                         getWinLossCategoryItem[ThisMonthPropName] = (decimal)thismonthdata + item.WinLossThisMonthSummary;
                     }
                     else
@@ -1062,7 +1062,7 @@ namespace BackendSite.Controllers.Api
                     //LastMonth
                     if (getWinLossCategoryItem.ContainsKey(LastMonthPropName))
                     {
-                        getWinLossCategoryItem.TryGetValue(LastMonthPropName, out dynamic lastmonthdata);
+                        getWinLossCategoryItem.TryGetValue(LastMonthPropName, out var lastmonthdata);
                         getWinLossCategoryItem[LastMonthPropName] = (decimal)lastmonthdata + item.WinLossLastMonthSummary;
                     }
                     else
@@ -1073,7 +1073,7 @@ namespace BackendSite.Controllers.Api
                 }
                 else
                 {
-                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    var newItem = new Dictionary<string, dynamic>()
                     {
                         { "Key", getCategoryKey },
                         { "CurrencyId", item.CurrencyId },
@@ -1103,7 +1103,7 @@ namespace BackendSite.Controllers.Api
             #region Merge Content Rule
 
             var categoryIdList = ExportData.Select(x => x.CategoryId).Distinct().OrderBy(x => x);
-            List<int> mergeContentRule = new List<int>();
+            var mergeContentRule = new List<int>();
 
             foreach (var categoryId in categoryIdList)
             {
@@ -1112,7 +1112,7 @@ namespace BackendSite.Controllers.Api
 
             #endregion
 
-            List<ComplexReportExportDataToExcel> d = new List<ComplexReportExportDataToExcel>()
+            var d = new List<ComplexReportExportDataToExcel>()
             {
                 new ComplexReportExportDataToExcel()
                 {
@@ -1180,7 +1180,7 @@ namespace BackendSite.Controllers.Api
             var ExportData = _reportBLL.GetUserOnlineReport(SiteIds,
                                                            SelectDate);
 
-            int totalMaxCount = ExportData.GroupBy(x => new
+            var totalMaxCount = ExportData.GroupBy(x => new
             {
                 LocalTime = x.LocalTime
             }).Select(x => x.Sum(y => y.MaxCount)).Max();
@@ -1191,9 +1191,9 @@ namespace BackendSite.Controllers.Api
 
             #region Initial Param
 
-            List<Dictionary<string, dynamic>> Content = new List<Dictionary<string, dynamic>>();
-            Dictionary<string, TitleModel> Titles = new Dictionary<string, TitleModel>();
-            List<Dictionary<string, MergeTitleModel>> titlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
+            var Content = new List<Dictionary<string, dynamic>>();
+            var Titles = new Dictionary<string, TitleModel>();
+            var titlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
 
             #endregion
 
@@ -1201,7 +1201,7 @@ namespace BackendSite.Controllers.Api
 
             #region Merge Title
 
-            Dictionary<string, MergeTitleModel> MergeTitles = new Dictionary<string, MergeTitleModel>();
+            var MergeTitles = new Dictionary<string, MergeTitleModel>();
 
             MergeTitles.Add("Date", new MergeTitleModel { Name = SelectDate, MergeRange = 1 });
             MergeTitles.Add("OnlineCount", new MergeTitleModel { Name = "Online Count", MergeRange = siteList.Count() + 1 });
@@ -1217,7 +1217,7 @@ namespace BackendSite.Controllers.Api
 
             foreach (var site in siteList)
             {
-                string siteName = serverData.Where(x => x.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
+                var siteName = serverData.Where(x => x.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
 
                 var OnlinePropName = $"Online-{siteName}";
 
@@ -1228,12 +1228,12 @@ namespace BackendSite.Controllers.Api
 
             #endregion
 
-            List<string> totalTitle = new List<string>
+            var totalTitle = new List<string>
             {
                 "TotalOnline",
             };
 
-            List<string> notSummaryTitles = new List<string>
+            var notSummaryTitles = new List<string>
             {
                 "Key", "LocalTime",
                 "TotalOnline"
@@ -1252,12 +1252,12 @@ namespace BackendSite.Controllers.Api
 
                 if (getItem != null)
                 {
-                    getItem.TryGetValue("TotalOnline", out dynamic totalCountdata);
+                    getItem.TryGetValue("TotalOnline", out var totalCountdata);
                     getItem["TotalOnline"] = (int)totalCountdata + item.MaxCount;
 
                     if (getItem.ContainsKey(OnlinePropName))
                     {
-                        getItem.TryGetValue(OnlinePropName, out dynamic maxCountData);
+                        getItem.TryGetValue(OnlinePropName, out var maxCountData);
                         getItem[OnlinePropName] = (int)maxCountData + item.MaxCount;
                     }
                     else
@@ -1273,7 +1273,7 @@ namespace BackendSite.Controllers.Api
                 }
                 else
                 {
-                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    var newItem = new Dictionary<string, dynamic>()
                     {
                         { "Key", getKey },
                         { "LocalTime", item.LocalTime },
@@ -1286,7 +1286,7 @@ namespace BackendSite.Controllers.Api
                 }
             }
 
-            List<ComplexReportExportDataToExcel> d = new List<ComplexReportExportDataToExcel>()
+            var d = new List<ComplexReportExportDataToExcel>()
             {
                 new ComplexReportExportDataToExcel()
                 {
@@ -1357,17 +1357,17 @@ namespace BackendSite.Controllers.Api
 
             #region Initial Param
 
-            List<Dictionary<string, MergeTitleModel>> summaryTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
-            Dictionary<string, TitleModel> summaryTitles = new Dictionary<string, TitleModel>();
-            List<string> summaryTotalTitle = new List<string>();
-            List<Dictionary<string, dynamic>> summaryContent = new List<Dictionary<string, dynamic>>();
-            List<Dictionary<string, dynamic>> summaryTotalContent = new List<Dictionary<string, dynamic>>();
+            var summaryTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
+            var summaryTitles = new Dictionary<string, TitleModel>();
+            var summaryTotalTitle = new List<string>();
+            var summaryContent = new List<Dictionary<string, dynamic>>();
+            var summaryTotalContent = new List<Dictionary<string, dynamic>>();
 
-            List<Dictionary<string, MergeTitleModel>> dateTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
-            Dictionary<string, TitleModel> dateTitles = new Dictionary<string, TitleModel>();
-            List<string> dateTotalTitle = new List<string>();
-            List<Dictionary<string, dynamic>> dateContent = new List<Dictionary<string, dynamic>>();
-            List<Dictionary<string, dynamic>> dateTotalContent = new List<Dictionary<string, dynamic>>();
+            var dateTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
+            var dateTitles = new Dictionary<string, TitleModel>();
+            var dateTotalTitle = new List<string>();
+            var dateContent = new List<Dictionary<string, dynamic>>();
+            var dateTotalContent = new List<Dictionary<string, dynamic>>();
 
             #endregion
 
@@ -1375,7 +1375,7 @@ namespace BackendSite.Controllers.Api
 
             #region Summary Merge Title
 
-            Dictionary<string, MergeTitleModel> depositTypeTitles = new Dictionary<string, MergeTitleModel>();
+            var depositTypeTitles = new Dictionary<string, MergeTitleModel>();
             depositTypeTitles.Add("FirstMergeTitle", new MergeTitleModel { Name = "", MergeRange = 1 });
 
             depositTypeTitles.Add("OnlineBanking", new MergeTitleModel { Name = "Online Banking", MergeRange = (currencyList.Count() + 1) * 2 });
@@ -1385,7 +1385,7 @@ namespace BackendSite.Controllers.Api
 
             summaryTitlesToMerge.Add(depositTypeTitles);
 
-            Dictionary<string, MergeTitleModel> mergeTitles = new Dictionary<string, MergeTitleModel>();
+            var mergeTitles = new Dictionary<string, MergeTitleModel>();
             mergeTitles.Add("SecondMergeTitle", new MergeTitleModel { Name = "", MergeRange = 1 });
 
             mergeTitles.Add("OnlineAmount", new MergeTitleModel { Name = "Amount", MergeRange = currencyList.Count() + 1 });
@@ -1425,7 +1425,7 @@ namespace BackendSite.Controllers.Api
 
             foreach (var curr in currencyList)
             {
-                string isoCode = currencyData.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+                var isoCode = currencyData.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
 
                 var OnlineAmountPropName = $"OnlineAmount-{isoCode}";
                 var OnlinePrecentPropName = $"OnlinePrecent-{isoCode}";
@@ -1490,8 +1490,8 @@ namespace BackendSite.Controllers.Api
 
             #region Date Merge Title
 
-            Dictionary<string, MergeTitleModel> accountNameTitles = new Dictionary<string, MergeTitleModel>();
-            Dictionary<string, MergeTitleModel> dateMergeTitles = new Dictionary<string, MergeTitleModel>();
+            var accountNameTitles = new Dictionary<string, MergeTitleModel>();
+            var dateMergeTitles = new Dictionary<string, MergeTitleModel>();
 
             accountNameTitles.Add("Account", new MergeTitleModel { Name = "Account", MergeRange = 1 });
             dateMergeTitles.Add("SecondMergeTitle", new MergeTitleModel { Name = "", MergeRange = 1 });
@@ -1519,7 +1519,7 @@ namespace BackendSite.Controllers.Api
 
             foreach (var data in ExportData)
             {
-                int i = 0;
+                var i = 0;
                 dateTitles.Add($"Date", new TitleModel { Name = "AccountName", SortId = 1 });
 
                 foreach (var account in data.SummaryAccountData)
@@ -1538,7 +1538,7 @@ namespace BackendSite.Controllers.Api
 
                     foreach (var curr in currencyList)
                     {
-                        string isoCode = currencyData.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+                        var isoCode = currencyData.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
 
                         var TotalAmountPropName = $"{account.AccountType}-{account.AccountId}-TotalAmount-{isoCode}";
                         var TotalCountPropName = $"{account.AccountType}-{account.AccountId}-TotalCount-{isoCode}";
@@ -1614,7 +1614,7 @@ namespace BackendSite.Controllers.Api
                         }
                         else
                         {
-                            Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                            var newItem = new Dictionary<string, dynamic>()
                             {
                                 { "Key", $"{accountItem.AccountType}-{accountItem.AccountId}" },
                                 { "AccountId", accountItem.AccountId },
@@ -1699,7 +1699,7 @@ namespace BackendSite.Controllers.Api
                     }
                     else
                     {
-                        Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                        var newItem = new Dictionary<string, dynamic>()
                         {
                             { "Key", "TOTAL" },
                             { "AccountId", "" },
@@ -1767,7 +1767,7 @@ namespace BackendSite.Controllers.Api
                         }
                         else
                         {
-                            Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                            var newItem = new Dictionary<string, dynamic>()
                             {
                                 { "Key", $"{accountDateItem.Date}" },
                                 { "Date", accountDateItem.Date },
@@ -1856,7 +1856,7 @@ namespace BackendSite.Controllers.Api
                         }
                         else
                         {
-                            Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                            var newItem = new Dictionary<string, dynamic>()
                             {
                                 { "Key", "TOTAL" },
                                 { "Date", "TOTAL：" },
@@ -1891,7 +1891,7 @@ namespace BackendSite.Controllers.Api
 
             #endregion
 
-            List<ComplexReportExportDataToExcel> exelParam = new List<ComplexReportExportDataToExcel>()
+            var exelParam = new List<ComplexReportExportDataToExcel>()
             {
                 new ComplexReportExportDataToExcel()
                 {
@@ -1978,13 +1978,13 @@ namespace BackendSite.Controllers.Api
 
             currencyList = ExportData.Select(x => x.CurrencyId).Distinct();
 
-            List<Dictionary<string, MergeTitleModel>> summaryTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
-            List<Dictionary<string, MergeTitleModel>> byDateTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
-            Dictionary<string, TitleModel> SummaryTitles = new Dictionary<string, TitleModel>();
-            Dictionary<string, TitleModel> ByDateTitles = new Dictionary<string, TitleModel>();
+            var summaryTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
+            var byDateTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
+            var SummaryTitles = new Dictionary<string, TitleModel>();
+            var ByDateTitles = new Dictionary<string, TitleModel>();
 
-            List<Dictionary<string, dynamic>> summaryContent = new List<Dictionary<string, dynamic>>();
-            List<Dictionary<string, dynamic>> byDateContent = new List<Dictionary<string, dynamic>>();
+            var summaryContent = new List<Dictionary<string, dynamic>>();
+            var byDateContent = new List<Dictionary<string, dynamic>>();
 
             #endregion
 
@@ -1992,8 +1992,8 @@ namespace BackendSite.Controllers.Api
 
             #region Titles To Merge
 
-            Dictionary<string, MergeTitleModel> summaryMergeTitles = new Dictionary<string, MergeTitleModel>();
-            Dictionary<string, MergeTitleModel> byDateMergeTitles = new Dictionary<string, MergeTitleModel>();
+            var summaryMergeTitles = new Dictionary<string, MergeTitleModel>();
+            var byDateMergeTitles = new Dictionary<string, MergeTitleModel>();
 
             summaryMergeTitles.Add("FirstMergeTitle", new MergeTitleModel { Name = "", MergeRange = 3 });
 
@@ -2028,7 +2028,7 @@ namespace BackendSite.Controllers.Api
 
             foreach (var curr in currencyList)
             {
-                string isoCode = currencyData.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+                var isoCode = currencyData.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
 
                 var TurnOverValidBetPropName = $"TurnOverValidBet-{isoCode}";
                 var WinLossPropName = $"WinLoss-{isoCode}";
@@ -2047,7 +2047,7 @@ namespace BackendSite.Controllers.Api
 
             #region Total Title
 
-            List<string> totalTitle = new List<string>
+            var totalTitle = new List<string>
             {
                 "TurnOverValidBetInMYR", "WinLossInMYR",
             };
@@ -2056,7 +2056,7 @@ namespace BackendSite.Controllers.Api
 
             #region Group Title
 
-            List<string> groupTitle = new List<string>
+            var groupTitle = new List<string>
             {
                 "GameName","CategoryName"
             };
@@ -2065,7 +2065,7 @@ namespace BackendSite.Controllers.Api
 
             #region Not Summary Title
 
-            List<string> notSummaryTitles = new List<string>
+            var notSummaryTitles = new List<string>
             {   "Key", "Date",
                 "CustId", "UserName",
                 "CurrencyId", "Currency",
@@ -2125,16 +2125,16 @@ namespace BackendSite.Controllers.Api
 
                 if (getSummaryItem != null)
                 {
-                    getSummaryItem.TryGetValue("TurnOverValidBetInMYR", out dynamic turnOverValidBet);
+                    getSummaryItem.TryGetValue("TurnOverValidBetInMYR", out var turnOverValidBet);
                     getSummaryItem["TurnOverValidBetInMYR"] = (decimal)turnOverValidBet + item.TurnOverValidBetSummaryInMYR;
 
-                    getSummaryItem.TryGetValue("WinLossInMYR", out dynamic winLoss);
+                    getSummaryItem.TryGetValue("WinLossInMYR", out var winLoss);
                     getSummaryItem["WinLossInMYR"] = (decimal)winLoss + item.WinLossSummaryInMYR;
 
                     //TurnOverValidBet
                     if (getSummaryItem.ContainsKey(TurnOverValidBetPropName))
                     {
-                        getSummaryItem.TryGetValue(TurnOverValidBetPropName, out dynamic turnoverdata);
+                        getSummaryItem.TryGetValue(TurnOverValidBetPropName, out var turnoverdata);
                         getSummaryItem[TurnOverValidBetPropName] = (decimal)turnoverdata + item.TurnOverValidBetSummary;
                     }
                     else
@@ -2145,7 +2145,7 @@ namespace BackendSite.Controllers.Api
                     //WinLoss
                     if (getSummaryItem.ContainsKey(WinLossPropName))
                     {
-                        getSummaryItem.TryGetValue(WinLossPropName, out dynamic winlossdata);
+                        getSummaryItem.TryGetValue(WinLossPropName, out var winlossdata);
                         getSummaryItem[WinLossPropName] = (decimal)winlossdata + item.WinLossSummary;
                     }
                     else
@@ -2155,7 +2155,7 @@ namespace BackendSite.Controllers.Api
                 }
                 else
                 {
-                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    var newItem = new Dictionary<string, dynamic>()
                     {
                         { "Key", getSummaryKey },
                         { "CustId", item.CustId },
@@ -2179,16 +2179,16 @@ namespace BackendSite.Controllers.Api
 
                 if (getSummaryCategoryItem != null)
                 {
-                    getSummaryCategoryItem.TryGetValue("TurnOverValidBetInMYR", out dynamic today);
+                    getSummaryCategoryItem.TryGetValue("TurnOverValidBetInMYR", out var today);
                     getSummaryCategoryItem["TurnOverValidBetInMYR"] = (decimal)today + item.TurnOverValidBetSummaryInMYR;
 
-                    getSummaryCategoryItem.TryGetValue("WinLossInMYR", out dynamic withdrawal);
+                    getSummaryCategoryItem.TryGetValue("WinLossInMYR", out var withdrawal);
                     getSummaryCategoryItem["WinLossInMYR"] = (decimal)withdrawal + item.WinLossSummaryInMYR;
 
                     //TurnOverValidBet
                     if (getSummaryCategoryItem.ContainsKey(TurnOverValidBetPropName))
                     {
-                        getSummaryCategoryItem.TryGetValue(TurnOverValidBetPropName, out dynamic turnOverValidBet);
+                        getSummaryCategoryItem.TryGetValue(TurnOverValidBetPropName, out var turnOverValidBet);
                         getSummaryCategoryItem[TurnOverValidBetPropName] = (decimal)turnOverValidBet + item.TurnOverValidBetSummary;
                     }
                     else
@@ -2199,7 +2199,7 @@ namespace BackendSite.Controllers.Api
                     //WinLoss
                     if (getSummaryCategoryItem.ContainsKey(WinLossPropName))
                     {
-                        getSummaryCategoryItem.TryGetValue(WinLossPropName, out dynamic winLoss);
+                        getSummaryCategoryItem.TryGetValue(WinLossPropName, out var winLoss);
                         getSummaryCategoryItem[WinLossPropName] = (decimal)winLoss + item.WinLossSummary;
                     }
                     else
@@ -2210,7 +2210,7 @@ namespace BackendSite.Controllers.Api
                 }
                 else
                 {
-                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    var newItem = new Dictionary<string, dynamic>()
                     {
                         { "Key", getCategoryKey },
                         { "CustId", item.CustId },
@@ -2234,16 +2234,16 @@ namespace BackendSite.Controllers.Api
 
                 if (getSummaryUserNameItem != null)
                 {
-                    getSummaryUserNameItem.TryGetValue("TurnOverValidBetInMYR", out dynamic turnOverValidBetInMYR);
+                    getSummaryUserNameItem.TryGetValue("TurnOverValidBetInMYR", out var turnOverValidBetInMYR);
                     getSummaryUserNameItem["TurnOverValidBetInMYR"] = (decimal)turnOverValidBetInMYR + item.TurnOverValidBetSummaryInMYR;
 
-                    getSummaryUserNameItem.TryGetValue("WinLossInMYR", out dynamic winLossInMYR);
+                    getSummaryUserNameItem.TryGetValue("WinLossInMYR", out var winLossInMYR);
                     getSummaryUserNameItem["WinLossInMYR"] = (decimal)winLossInMYR + item.WinLossSummaryInMYR;
 
                     //TurnOverValidBet
                     if (getSummaryUserNameItem.ContainsKey(TurnOverValidBetPropName))
                     {
-                        getSummaryUserNameItem.TryGetValue(TurnOverValidBetPropName, out dynamic turnOverValidBet);
+                        getSummaryUserNameItem.TryGetValue(TurnOverValidBetPropName, out var turnOverValidBet);
                         getSummaryUserNameItem[TurnOverValidBetPropName] = (decimal)turnOverValidBet + item.TurnOverValidBetSummary;
                     }
                     else
@@ -2254,7 +2254,7 @@ namespace BackendSite.Controllers.Api
                     //WinLoss
                     if (getSummaryUserNameItem.ContainsKey(WinLossPropName))
                     {
-                        getSummaryUserNameItem.TryGetValue(WinLossPropName, out dynamic winLoss);
+                        getSummaryUserNameItem.TryGetValue(WinLossPropName, out var winLoss);
                         getSummaryUserNameItem[WinLossPropName] = (decimal)winLoss + item.WinLossSummary;
                     }
                     else
@@ -2265,7 +2265,7 @@ namespace BackendSite.Controllers.Api
                 }
                 else
                 {
-                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    var newItem = new Dictionary<string, dynamic>()
                     {
                         { "Key", getUserNameKey },
                         { "CustId", item.CustId },
@@ -2293,16 +2293,16 @@ namespace BackendSite.Controllers.Api
 
                 if (getUserItem != null)
                 {
-                    getUserItem.TryGetValue("TurnOverValidBetInMYR", out dynamic turnOverValidBet);
+                    getUserItem.TryGetValue("TurnOverValidBetInMYR", out var turnOverValidBet);
                     getUserItem["TurnOverValidBetInMYR"] = (decimal)turnOverValidBet + item.TurnOverValidBetSummaryInMYR;
 
-                    getUserItem.TryGetValue("WinLossInMYR", out dynamic winLoss);
+                    getUserItem.TryGetValue("WinLossInMYR", out var winLoss);
                     getUserItem["WinLossInMYR"] = (decimal)winLoss + item.WinLossSummaryInMYR;
 
                     //TurnOver
                     if (getUserItem.ContainsKey(TurnOverValidBetPropName))
                     {
-                        getUserItem.TryGetValue(TurnOverValidBetPropName, out dynamic turnoverdata);
+                        getUserItem.TryGetValue(TurnOverValidBetPropName, out var turnoverdata);
                         getUserItem[TurnOverValidBetPropName] = (decimal)turnoverdata + item.TurnOverValidBetSummaryInMYR;
                     }
                     else
@@ -2313,7 +2313,7 @@ namespace BackendSite.Controllers.Api
                     //WinLoss
                     if (getUserItem.ContainsKey(WinLossPropName))
                     {
-                        getUserItem.TryGetValue(WinLossPropName, out dynamic winlossdata);
+                        getUserItem.TryGetValue(WinLossPropName, out var winlossdata);
                         getUserItem[WinLossPropName] = (decimal)winlossdata + item.WinLossSummaryInMYR;
                     }
                     else
@@ -2323,7 +2323,7 @@ namespace BackendSite.Controllers.Api
                 }
                 else
                 {
-                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    var newItem = new Dictionary<string, dynamic>()
                     {
                         { "Key", getByDateKey },
                         { "Date", item.Date },
@@ -2348,16 +2348,16 @@ namespace BackendSite.Controllers.Api
 
                 if (getByDateUserItem != null)
                 {
-                    getByDateUserItem.TryGetValue("TurnOverValidBetInMYR", out dynamic turnOverValidBetInMYR);
+                    getByDateUserItem.TryGetValue("TurnOverValidBetInMYR", out var turnOverValidBetInMYR);
                     getByDateUserItem["TurnOverValidBetInMYR"] = (decimal)turnOverValidBetInMYR + item.TurnOverValidBetSummaryInMYR;
 
-                    getByDateUserItem.TryGetValue("WinLossInMYR", out dynamic winLossInMYR);
+                    getByDateUserItem.TryGetValue("WinLossInMYR", out var winLossInMYR);
                     getByDateUserItem["WinLossInMYR"] = (decimal)winLossInMYR + item.WinLossSummaryInMYR;
 
                     //TurnOverValidBet
                     if (getByDateUserItem.ContainsKey(TurnOverValidBetPropName))
                     {
-                        getByDateUserItem.TryGetValue(TurnOverValidBetPropName, out dynamic turnOverValidBet);
+                        getByDateUserItem.TryGetValue(TurnOverValidBetPropName, out var turnOverValidBet);
                         getByDateUserItem[TurnOverValidBetPropName] = (decimal)turnOverValidBet + item.TurnOverValidBetSummary;
                     }
                     else
@@ -2368,7 +2368,7 @@ namespace BackendSite.Controllers.Api
                     //WinLoss
                     if (getByDateUserItem.ContainsKey(WinLossPropName))
                     {
-                        getByDateUserItem.TryGetValue(WinLossPropName, out dynamic winLoss);
+                        getByDateUserItem.TryGetValue(WinLossPropName, out var winLoss);
                         getByDateUserItem[WinLossPropName] = (decimal)winLoss + item.WinLossSummary;
                     }
                     else
@@ -2379,7 +2379,7 @@ namespace BackendSite.Controllers.Api
                 }
                 else
                 {
-                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    var newItem = new Dictionary<string, dynamic>()
                     {
                         { "Key", getByDateUserNameKey },
                         { "Date", "USER" },
@@ -2410,7 +2410,7 @@ namespace BackendSite.Controllers.Api
             #region Summary
 
             var custIdList = ExportData.Select(x => x.CustId).Distinct().OrderBy(x => x);
-            List<int> summaryMergeContentRule = new List<int>();
+            var summaryMergeContentRule = new List<int>();
 
             foreach (var custId in custIdList)
             {
@@ -2421,7 +2421,7 @@ namespace BackendSite.Controllers.Api
 
             #region ByDate
 
-            List<int> byDateMergeContentRule = new List<int>();
+            var byDateMergeContentRule = new List<int>();
 
             foreach (var custId in custIdList)
             {
@@ -2432,7 +2432,7 @@ namespace BackendSite.Controllers.Api
 
             #endregion
 
-            List<ComplexReportExportDataToExcel> d = new List<ComplexReportExportDataToExcel>()
+            var d = new List<ComplexReportExportDataToExcel>()
             {
                 new ComplexReportExportDataToExcel()
                 {

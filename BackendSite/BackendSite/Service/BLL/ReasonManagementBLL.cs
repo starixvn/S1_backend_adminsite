@@ -27,12 +27,12 @@ namespace BackendSite.Service.BLL
 
         public int SetReasonManagement(SetReasonManagementPara para,int UserId)
         {
-            DateTime now = DateTime.UtcNow;
+            var now = DateTime.UtcNow;
             return reasonManagementService.SetReasonManagement(para, UserId, now);
         }
         public int InsertReasonManagement(InsertReasonManagementPara para, int UserId)
         {
-            DateTime now = DateTime.UtcNow;
+            var now = DateTime.UtcNow;
             return reasonManagementService.InsertReasonManagement(para, UserId, now);
         }
     }

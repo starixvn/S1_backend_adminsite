@@ -20,7 +20,7 @@ namespace BackendSite.Service.DAL
 
         public int SetBanner(BannerInfo bannerInfo, string user)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var p = new DynamicParameters();
             p.Add("BannerName", bannerInfo.BannerName);
             p.Add("SiteId", bannerInfo.SiteId);
@@ -46,16 +46,16 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<BannerInfoList> GetBannerList(int SiteId,int BannerTypeId,int Status)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
                 return conn.Query<BannerInfoList>("Admin_BannerListV3_Get", new { SiteId, BannerTypeId, Status }, commandType: CommandType.StoredProcedure);
             }
         }
         public BannerInfo GetBanner(int SiteId, string BannerName)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
-                BannerInfo result = new BannerInfo();
+                var result = new BannerInfo();
                 var queryresult = conn.QueryFirstOrDefault("Admin_Banner_Get", new { SiteId, BannerName }, commandType: CommandType.StoredProcedure);
 
                 if (queryresult != null)
@@ -104,10 +104,10 @@ namespace BackendSite.Service.DAL
         }
         public int UpdateBannerStatus(int SiteId, string BannerName, int Status, string User)
         {
-            int errorCode = 0;
+            var errorCode = 0;
             try
             {
-                using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+                using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
                 {
                     conn.Execute("Admin_BannerStatus_Set", new { SiteId, BannerName, Status, AdminUser = User }, commandType: CommandType.StoredProcedure);
                 }

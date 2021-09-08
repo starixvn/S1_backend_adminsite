@@ -20,7 +20,7 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<DomainTable> GetDomainList(IEnumerable<int> selectSite, int currency)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 string SelectSite = null;
                 if (selectSite != null && selectSite.Any())
@@ -32,28 +32,28 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<DomainTable> GetDomainListbySite(int siteId, int currency)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.Query<DomainTable>("Admin_DomainTablebySite_Get", new { SiteId = siteId, Currency = currency }, commandType: CommandType.StoredProcedure);
             }
         }
         public int SetDomain(int siteId, int currencyId, string domain, int status, int sort, string lastUpdateUser)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.Execute("Admin_DomainTable_Set", new { SiteId = siteId, CurrencyId = currencyId, Domain = domain, Status = status, Sort = sort, LastUpdateUser = lastUpdateUser }, commandType: CommandType.StoredProcedure);
             }
         }
         public int DelDomain(int dId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.Execute("Admin_DomainTable_Del", new { DId = dId }, commandType: CommandType.StoredProcedure);
             }
         }
         public int UpdateDomain(int dId, string domain, int status, int sort, string lastUpdateUser)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.Execute("Admin_DomainTableUpdate_Set", new { DId = dId, Domain = domain, Status = status, Sort = sort, LastUpdateUser = lastUpdateUser }, commandType: CommandType.StoredProcedure);
             }

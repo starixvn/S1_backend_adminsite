@@ -82,14 +82,14 @@ namespace BackendSite.Controllers.Api
 
         public ApiListResult<Announcement> GetAnnouncement(GetAnnouncementreq para)
         {
-            int PageSize = 10;
-            int TotalPages = 0;
-            int RowCount = 0;
-            int PageNumber = para.PageNumber;
+            var PageSize = 10;
+            var TotalPages = 0;
+            var RowCount = 0;
+            var PageNumber = para.PageNumber;
             var apiResult = new ApiListResult<Announcement>();
             try
             {
-                Dictionary<int, string> siteList = serverInfoBLL.GetSiteList().ToDictionary(x => x.SiteId, y => y.SiteName);
+                var siteList = serverInfoBLL.GetSiteList().ToDictionary(x => x.SiteId, y => y.SiteName);
                 if (!siteList.ContainsKey(0))
                 {
                     siteList.Add(0, "All");
@@ -98,7 +98,7 @@ namespace BackendSite.Controllers.Api
                 var result = messageBLL.GetAnnouncements(para.SelectSite, para.StartDate, para.EndDate, para.Status, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
                 foreach (var r in result)
                 {
-                    siteList.TryGetValue(r.SiteId, out string siteName);
+                    siteList.TryGetValue(r.SiteId, out var siteName);
                     r.SiteName = siteName;
                 }
                 apiResult.Data = result;
@@ -206,9 +206,9 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<PersonalMsg> GetPersonalMsg([FromForm] int CustId, [FromForm] int PageNumber)
         {
-            int PageSize = 10;
-            int TotalPages = 0;
-            int RowCount = 0;
+            var PageSize = 10;
+            var TotalPages = 0;
+            var RowCount = 0;
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
@@ -252,9 +252,9 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<PersonalMsg> SendPersonalMsg([FromForm] int CustId, [FromForm] string Title, [FromForm] string Content, [FromForm] int PageNumber)
         {
-            int PageSize = 10;
-            int TotalPages = 0;
-            int RowCount = 0;
+            var PageSize = 10;
+            var TotalPages = 0;
+            var RowCount = 0;
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
@@ -281,9 +281,9 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<PersonalMsg> DeletePersonalMsg([FromForm] int Id, [FromForm] int CustId, [FromForm] int PageNumber)
         {
-            int PageSize = 10;
-            int TotalPages = 0;
-            int RowCount = 0;
+            var PageSize = 10;
+            var TotalPages = 0;
+            var RowCount = 0;
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
@@ -318,22 +318,22 @@ namespace BackendSite.Controllers.Api
                 || excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) 
                 || excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
             {
-                ExcelPackage excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
-                ExcelWorksheet sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
-                bool isLastRow = false;
-                int RowId = 2;   // 因為有標題列，所以從第2列開始讀起
-                int BatchId = 0;
+                var excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
+                var sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
+                var isLastRow = false;
+                var RowId = 2;   // 因為有標題列，所以從第2列開始讀起
+                var BatchId = 0;
                 messageBLL.NewBatchMessage(optSite, authData.UserName, personalMsg, ref BatchId);
 
                 _logger.LogInformation($@"MessageService-Read Excel And Send Start At {DateTime.UtcNow}.");
 
                 do  // 讀取資料，直到讀到空白列為止
                 {
-                    string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text.Trim();
-                    string sabaId = sheet.Cells[RowId, 2].Text.Trim();
+                    var custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text.Trim();
+                    var sabaId = sheet.Cells[RowId, 2].Text.Trim();
                     var custId = (string.IsNullOrEmpty(sabaId)) ? null : common.TpIdToCustId(sabaId);
-                    string resultMessage = string.Empty;
-                    int errorCode = 0;
+                    var resultMessage = string.Empty;
+                    var errorCode = 0;
 
                     if (string.IsNullOrEmpty(custUsername) && custId == null)
                     {
@@ -437,9 +437,9 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<BatchMsg> DeleteBatchMessage([FromForm] IEnumerable<int> SelectSite, [FromForm] long? StartDate, [FromForm] long? EndDate, [FromForm] int batchId, [FromForm] int PageNumber)
         {
-            int PageSize = 10;
-            int TotalPages = 0;
-            int RowCount = 0;
+            var PageSize = 10;
+            var TotalPages = 0;
+            var RowCount = 0;
             var apiResult = new ApiListResult<BatchMsg>();
             try
             {
@@ -499,9 +499,9 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<BatchMsg> GetBatchMessageList([FromForm] IEnumerable<int> SelectSite, [FromForm] long? StartDate, [FromForm] long? EndDate, [FromForm] int PageNumber)
         {
-            int PageSize = 10;
-            int TotalPages = 0;
-            int RowCount = 0;
+            var PageSize = 10;
+            var TotalPages = 0;
+            var RowCount = 0;
             var apiResult = new ApiListResult<BatchMsg>();
             try
             {
@@ -531,18 +531,18 @@ namespace BackendSite.Controllers.Api
             {
                 if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
                 {
-                    ExcelPackage excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
-                    ExcelWorksheet sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
-                    bool isLastRow = false;
-                    int RowId = 2;   // 因為有標題列，所以從第2列開始讀起
+                    var excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
+                    var sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
+                    var isLastRow = false;
+                    var RowId = 2;   // 因為有標題列，所以從第2列開始讀起
 
                     do  // 讀取資料，直到讀到空白列為止
                     {
-                        string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text;
+                        var custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text) ? null : sheet.Cells[RowId, 1].Text;
 
                         int custId;
-                        string sabaId = sheet.Cells[RowId, 2].Text.Trim();
-                        string _sabaId = "";
+                        var sabaId = sheet.Cells[RowId, 2].Text.Trim();
+                        var _sabaId = "";
                         if (sabaId.IndexOf("_") > -1)
                         {
                             _sabaId = sabaId.Substring(sabaId.LastIndexOf("_") + 1, sabaId.Length - sabaId.LastIndexOf("_") - 1);
@@ -552,10 +552,10 @@ namespace BackendSite.Controllers.Api
                             _sabaId = sabaId.Substring(sabaId.LastIndexOf("x") + 1, sabaId.Length - sabaId.LastIndexOf("x") - 1);
                         }
 
-                        Match m = Regex.Match(_sabaId, @"\d+");
-                        int? _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
-                        int.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out int vipLevel);
-                        string memo = sheet.Cells[RowId, 4].Text.Trim();
+                        var m = Regex.Match(_sabaId, @"\d+");
+                        var _custId = int.TryParse(m.Value, out custId) ? custId : (int?)null;
+                        int.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out var vipLevel);
+                        var memo = sheet.Cells[RowId, 4].Text.Trim();
                         if (string.IsNullOrEmpty(custUsername) && _custId == null)
                         {
                             isLastRow = true;

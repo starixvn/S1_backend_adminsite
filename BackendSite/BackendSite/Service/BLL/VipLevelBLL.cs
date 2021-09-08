@@ -100,10 +100,10 @@ namespace BackendSite.Service.BLL
                 userName,
                 pageNumber,
                 pageSize,
-                out int totalPages,
-                out int rowCount);
+                out var totalPages,
+                out var rowCount);
 
-            List<VipUpgradeReviewDetailModel> details =
+            var details =
                 data.Select(p => new VipUpgradeReviewDetailModel(p)).ToList();
 
             if (CheckCanUpdateStatus(calculateYearMonth, siteId, VipTypeEnum.Upgrade))
@@ -176,10 +176,10 @@ namespace BackendSite.Service.BLL
                 userName,
                 pageNumber,
                 pageSize,
-                out int totalPages,
-                out int rowCount).ToList();
+                out var totalPages,
+                out var rowCount).ToList();
 
-            List<VipDowngradeReviewDetailModel> details =
+            var details =
                 data.Select(p => new VipDowngradeReviewDetailModel(p)).ToList();
 
             if (CheckCanUpdateStatus(calculateYearMonth, siteId, VipTypeEnum.Downgrade))

@@ -18,7 +18,7 @@
     var authData = authorizeBLL.GetAuthData();
     var loginUser = adminUserService.GetUser(authData.UserId);
 
-    IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("Marketing/VipLevelReview");
+    var subFuncKeys = permissionBLL.GetSubFunckeys("Marketing/VipLevelReview");
     subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
 
     var i18n = new Dictionary<string, string>();
@@ -29,7 +29,7 @@
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
 
-    string[] lbl_Txts = new string[] {"lbl_Save", "lbl_Success", "lbl_Action", "lbl_SelectSite", "lbl_Point", "lbl_DepositLeast", "lbl_BetLeast", "lbl_AddPointLevel", "lbl_AddNewPointLevel", "lbl_Delete", "lbl_AreYouSure", "lbl_OK", "lbl_Cancel", "lbl_Error"};
+    var lbl_Txts = new string[] {"lbl_Save", "lbl_Success", "lbl_Action", "lbl_SelectSite", "lbl_Point", "lbl_DepositLeast", "lbl_BetLeast", "lbl_AddPointLevel", "lbl_AddNewPointLevel", "lbl_Delete", "lbl_AreYouSure", "lbl_OK", "lbl_Cancel", "lbl_Error"};
     foreach (var lbl_Txt in lbl_Txts)
     {
         if (!i18n.ContainsKey(lbl_Txt))

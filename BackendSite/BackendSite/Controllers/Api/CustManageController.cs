@@ -301,7 +301,7 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq custInfoListReq)
         {
             int totalPages = 0, rowCount = 0;
-            int pageNumber = custInfoListReq.PageNumber;
+            var pageNumber = custInfoListReq.PageNumber;
 
             var data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite,
                                                    custInfoListReq.BirDate,
@@ -381,7 +381,7 @@ namespace BackendSite.Controllers.Api
             if (string.IsNullOrEmpty(input))
                 return input;
 
-            string pattern = @"(?<=[\w]{3})[\w-\._\+%]*(?=[\w]{3})";
+            var pattern = @"(?<=[\w]{3})[\w-\._\+%]*(?=[\w]{3})";
             return Regex.Replace(input, pattern, m => new string('*', m.Length));
         }
         public static string MaskEmail(string input)
@@ -389,7 +389,7 @@ namespace BackendSite.Controllers.Api
             if (string.IsNullOrEmpty(input))
                 return input;
 
-            string pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
+            var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
             return Regex.Replace(input, pattern, m => new string('*', m.Length));
         }
 
@@ -464,12 +464,12 @@ namespace BackendSite.Controllers.Api
         public ApiResult SetCustStatusSwitch(CustStatusSwitch custStatusSwitch)
         {
             var apiResult = new ApiResult<bool>();
-            bool data = custInfoBLL.SetCustStatusSwitch(custStatusSwitch.CustId, custStatusSwitch.Op) > 0;
+            var data = custInfoBLL.SetCustStatusSwitch(custStatusSwitch.CustId, custStatusSwitch.Op) > 0;
 
             if (data)
             {
-                string Menu = "CustManage/CustInfoList";
-                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
                 if (custStatusSwitch.Op == 1)
                 {
@@ -502,12 +502,12 @@ namespace BackendSite.Controllers.Api
         public ApiResult SetCustInfo(CustStatus custStatus)
         {
             var apiResult = new ApiResult<bool>();
-            bool data = custInfoBLL.SetCustInfo(custStatus.CustId, custStatus.Level, custStatus.FullName, custStatus.Birthday_Y, custStatus.Birthday_M, custStatus.Birthday_D, custStatus.PhoneNumber, custStatus.EMail, User.Identity.Name) > 0;
+            var data = custInfoBLL.SetCustInfo(custStatus.CustId, custStatus.Level, custStatus.FullName, custStatus.Birthday_Y, custStatus.Birthday_M, custStatus.Birthday_D, custStatus.PhoneNumber, custStatus.EMail, User.Identity.Name) > 0;
 
             if (data)
             {
-                string Menu = "CustManage/CustInfoList";
-                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
                 if (custStatus.Level != null)
                 {
@@ -579,7 +579,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult UploadCustPhotoId([FromForm] int CustId, [FromForm] IFormFile File)
         {
-            decimal xSize = 500m;
+            var xSize = 500m;
             var custInfo = custInfoBLL.GetCustInfoWithCache(CustId);
             decimal xCell = 1;
             if (_contentTypesCheck.ContainsKey(File.ContentType))
@@ -608,11 +608,11 @@ namespace BackendSite.Controllers.Api
                 var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
                 img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 
-                string fileName = File.FileName;
+                var fileName = File.FileName;
                 fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
                 fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
 
-                byte[] fileBytes = ms.ToArray();
+                var fileBytes = ms.ToArray();
                 var result = custInfoBLL.SetCustPhotoId(custInfo.CustId, custInfo.SiteId, fileName, fileBytes);
 
                 if (result > 0)
@@ -641,12 +641,12 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         public ApiResult DelCustPhotoId(CustInfoReq custInfoReq)
         {
-            bool data = custInfoBLL.DelCustPhotoId(custInfoReq.CustId);
+            var data = custInfoBLL.DelCustPhotoId(custInfoReq.CustId);
 
             if (data)
             {
-                string Menu = "CustManage/CustInfoList";
-                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("Action", "Delete Photo");
                 serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
@@ -672,8 +672,8 @@ namespace BackendSite.Controllers.Api
         {
             if (custInfoBLL.ResetProfile(custInfoReq.CustId))
             {
-                string Menu = "CustManage/CustInfoList";
-                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("Action", "Reset Profile");
                 serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
@@ -697,11 +697,11 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult ResetCustBankInfo(CustInfoReq custInfoReq)
         {
-            ApiResult apiResult = new ApiResult();
+            var apiResult = new ApiResult();
             if (custInfoBLL.ResetCustBankInfo(custInfoReq.CustId))
             {
-                string Menu = "CustManage/CustInfoList";
-                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("Action", "Reset Bank Info");
                 serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
@@ -724,11 +724,11 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult ResetCustUSDTInfo(CustInfoReq custInfoReq)
         {
-            ApiResult apiResult = new ApiResult();
+            var apiResult = new ApiResult();
             if (custInfoBLL.ResetCustUSDTInfo(custInfoReq.CustId))
             {
-                string Menu = "CustManage/CustInfoList";
-                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("Action", "Reset USDT Info");
                 serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
@@ -920,9 +920,9 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<LoginLog> GetLoginLogByCust(LoginLogReq loginLogReq)
         {
             var apiListResult = new ApiListResult<LoginLog>();
-            int pageNumber = loginLogReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
+            var pageNumber = loginLogReq.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
             var withdrawalList = custInfoBLL.GetLoginLogByCust(loginLogReq.CustId, loginLogReq.startDate, loginLogReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
             apiListResult.Data = withdrawalList;
             apiListResult.ErrorCode = 0;
@@ -941,7 +941,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_resetpwd" })]
         public ApiResult<string> SetResetPwd(CustInfoReq custInfoReq)
         {
-            string NewPwd = "";
+            var NewPwd = "";
             if (custInfoBLL.SetResetPwd(custInfoReq.CustId, out NewPwd))
             {
                 return new ApiResult<string>
@@ -963,12 +963,12 @@ namespace BackendSite.Controllers.Api
         public ApiResult AddCustNote(AddCustNoteReq addCustNoteReq)
         {
 
-            bool data = custInfoBLL.AddCustNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name);
+            var data = custInfoBLL.AddCustNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name);
 
             if (data)
             {
-                string Menu = "CustManage/CustInfoList";
-                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("Action", "Add Note");
                 serverInfoBLL.AdminOperateLog(null, addCustNoteReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
@@ -1008,12 +1008,12 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                bool data = custInfoBLL.SetCustNotes(setCustNoteReq.CustId, setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
+                var data = custInfoBLL.SetCustNotes(setCustNoteReq.CustId, setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
 
                 if (data)
                 {
-                    string Menu = "CustManage/CustInfoList";
-                    Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                    var Menu = "CustManage/CustInfoList";
+                    var Info = new Dictionary<string, dynamic>();
                     Info.Add("MenuName", "Customer Info");
                     if (setCustNoteReq.Type == 1)
                     {
@@ -1119,11 +1119,11 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult CancelBonusByBonusId(BonusReq bonusReq)
         {
-            ApiResult apiResult = new ApiResult();
+            var apiResult = new ApiResult();
             custInfoBLL.CancelBonusByBonusId(bonusReq.BonusId);
 
-            string Menu = "CustManage/CustInfoList";
-            Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+            var Menu = "CustManage/CustInfoList";
+            var Info = new Dictionary<string, dynamic>();
             Info.Add("MenuName", "Customer Info");
             Info.Add("Action", "Cancel Bonus");
             serverInfoBLL.AdminOperateLog(null, bonusReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
@@ -1214,7 +1214,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<CustInfoDetail>();
 
-            string custUsername = string.IsNullOrEmpty(custInfosReq.UserName) ? null : custInfosReq.UserName;
+            var custUsername = string.IsNullOrEmpty(custInfosReq.UserName) ? null : custInfosReq.UserName;
             var custId = (string.IsNullOrEmpty(custInfosReq.sabaId)) ? null : common.TpIdToCustId(custInfosReq.sabaId);
 
             var custInfosDetail = custInfoBLL.GetCustInfoDetails(custId, custUsername, custInfosReq.SiteId);
@@ -1328,8 +1328,8 @@ namespace BackendSite.Controllers.Api
         {
             if (custInfoBLL.SetCustTag(para.CustId,para.SelectTag, User.Identity.Name) > 0)
             {
-                List<string> temp = new List<string>();
-                string selectTag = JsonConvert.SerializeObject(temp);
+                var temp = new List<string>();
+                var selectTag = JsonConvert.SerializeObject(temp);
                 if (para.SelectTag != null && para.SelectTag.Any())
                 {
                     var alltagDict = custInfoBLL.GetAllTag().ToDictionary(x=> x.Id,x=> x.TagName);
@@ -1400,7 +1400,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult SetRegLiveStatus(SetRegLiveStatusPara para)
         {
-            ApiResult apiResult = new ApiResult();
+            var apiResult = new ApiResult();
             if (custInfoBLL.SetRegLiveStatus(para.CustId, para.Status,para.SiteId,User.Identity.Name) > 0)
             {
                 apiResult.ErrorCode = 0;
@@ -1426,7 +1426,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult AddRegLiveStatusNote(AddRegLiveStatusNotes addCustNoteReq)
         {
-            ApiResult apiResult = new ApiResult();
+            var apiResult = new ApiResult();
             if (custInfoBLL.AddRegLiveStatusNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name) > 0)
             {
                 apiResult.ErrorCode = 0;
@@ -1442,7 +1442,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult DeleteRegLiveStatusNote(DeleteRegLiveStatusNotes deleteCustNoteReq)
         {
-            ApiResult apiResult = new ApiResult();
+            var apiResult = new ApiResult();
             if (custInfoBLL.DeleteRegLiveStatusNote(deleteCustNoteReq.CustId, deleteCustNoteReq.Id) > 0)
             {
                 apiResult.ErrorCode = 0;
@@ -1458,7 +1458,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult EditRegLiveStatusNote(EditRegLiveStatusNotes EditRegLiveStatusNote)
         {
-            ApiResult apiResult = new ApiResult();
+            var apiResult = new ApiResult();
             if (custInfoBLL.EditRegLiveStatusNote(EditRegLiveStatusNote.CustId, EditRegLiveStatusNote.Id, EditRegLiveStatusNote.Note, User.Identity.Name) > 0)
             {
                 apiResult.ErrorCode = 0;

@@ -49,7 +49,7 @@ namespace BackendSite.Service.BLL
                     row.CurrencyName = selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}");
                     row.SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName;
 
-                    gameTypeList.TryGetValue(row.GameType, out string GameName);
+                    gameTypeList.TryGetValue(row.GameType, out var GameName);
                     row.GameName = GameName;
                 }
             }

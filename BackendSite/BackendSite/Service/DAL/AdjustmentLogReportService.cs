@@ -24,13 +24,13 @@ namespace BackendSite.Service.DAL
         }
         public List<AdjustmentInfoLogMenu> GetAdjustmentInfoLogMenu()
         {
-            DynamicParameters props = new DynamicParameters();
+            var props = new DynamicParameters();
             return _reportDbClient.Query<AdjustmentInfoLogMenu>("Admin_AdjustmentInfoLog_Menu_Get", props).ToList();
         }
         public AdjustmentLogReportResult GetAdjustmentInfoLog(GetAdjustmentInfoLogPara para)
         {
-            AdjustmentLogReportResult SearchResult = new AdjustmentLogReportResult();
-            DynamicParameters props = new DynamicParameters();
+            var SearchResult = new AdjustmentLogReportResult();
+            var props = new DynamicParameters();
             props.Add("PageNumber", para.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);

@@ -108,7 +108,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<TpBetRecordListOneDayRes> GetCustTpBetRecordListOneDay(int custId, string selDate,long startDate,long endDate)
         {
-            List<TpBetRecordListOneDayRes> result = new List<TpBetRecordListOneDayRes>();
+            var result = new List<TpBetRecordListOneDayRes>();
             result = walletService.GetCustTpBetRecordListOneDay(custId, selDate, startDate, endDate).ToList().GroupBy(x => new
             {
                 SettledDate = x.SettledDate,
@@ -132,7 +132,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<TpBetRecordbyCategoryIdRes> GetCustTpBetRecordListbyCategoryId(int custId, string selDate,
             int categoryId, long startDate, long endDate)
         {
-            List<TpBetRecordbyCategoryIdRes> result = new List<TpBetRecordbyCategoryIdRes>();
+            var result = new List<TpBetRecordbyCategoryIdRes>();
             result = walletService.GetCustTpBetRecordListbyCategoryId(custId, selDate, categoryId, startDate, endDate).GroupBy(x => new
             {
                 SettledDate = x.SettledDate,
@@ -218,7 +218,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<TpBetRecordByDate> GetCustTpBetRecordList(int custId, long startDate, long endDate)
         {
-            List<TpBetRecordByDate> result = new List<TpBetRecordByDate>();
+            var result = new List<TpBetRecordByDate>();
 
             result = walletService.GetCustTpBetRecordList(custId, startDate, endDate).ToList().GroupBy(x => new
             {

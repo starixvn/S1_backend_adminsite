@@ -20,7 +20,7 @@ namespace BackendSite.Service.DAL
         }
         public AdminUser GetAdminUserByUserName(string userName)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.QueryFirstOrDefault<AdminUser>("LoginAdminUser_Get", new { UserName = userName }, commandType: CommandType.StoredProcedure);
             }
@@ -28,7 +28,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<AdminUser> GetUserList()
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.Query<AdminUser>("Admin_User_GetAll", commandType: CommandType.StoredProcedure);
             }
@@ -36,7 +36,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<AssignSites> GetAssignSiteList(int UserId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.Query<AssignSites>("Admin_AuthorSite_Get", new { UserId = UserId  }, commandType: CommandType.StoredProcedure);
             }
@@ -44,12 +44,12 @@ namespace BackendSite.Service.DAL
 
         public void AssignSiteList(int UserId, IEnumerable<int> SiteIds)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 conn.Open();
                 using (var tran = conn.BeginTransaction())
                 {
-                    string SpName = "Admin_AuthorSite_Del";
+                    var SpName = "Admin_AuthorSite_Del";
                     conn.Execute(SpName, new { UserId }, tran, commandType: CommandType.StoredProcedure);
 
                     if (SiteIds != null && SiteIds.Any())
@@ -68,7 +68,7 @@ namespace BackendSite.Service.DAL
 
         public AssignGroups GetAssignGroup(int UserId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.QueryFirst<AssignGroups>("Admin_AuthorGroup_Get", new { UserId }, commandType: CommandType.StoredProcedure);
             }
@@ -76,19 +76,19 @@ namespace BackendSite.Service.DAL
 
         public void AssignGroup(int UserId, int? GroupSEQ)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 conn.Open();
                 using (var tran = conn.BeginTransaction())
                 {
                     if (GroupSEQ == null)
                     {
-                        string SpName = "Admin_AuthorGroup_Del";
+                        var SpName = "Admin_AuthorGroup_Del";
                         conn.Execute(SpName, new { UserId }, tran, commandType: CommandType.StoredProcedure);
                     }
                     else
                     {
-                        string SpName = "Admin_AuthorGroup_Set";
+                        var SpName = "Admin_AuthorGroup_Set";
                         conn.Execute(SpName, new { UserId, GroupSEQ }, tran, commandType: CommandType.StoredProcedure);
                     }
 
@@ -99,7 +99,7 @@ namespace BackendSite.Service.DAL
 
         public void SetUserPassword(int UserId, string MD5Pwd)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 conn.Execute("Admin_User_SetPwd", new { UserId, UserPwd = MD5Pwd }, commandType: CommandType.StoredProcedure);
             }
@@ -107,7 +107,7 @@ namespace BackendSite.Service.DAL
 
         public void SetUserStatus(int UserId, int Status)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 conn.Execute("Admin_User_SetStatus", new { UserId, UserStatus = Status }, commandType: CommandType.StoredProcedure);
             }
@@ -116,12 +116,12 @@ namespace BackendSite.Service.DAL
         public IEnumerable<AdminUser> AddUser(string UserName, string MD5Pwd, int[] SiteList, int? GroupSEQ)
         {
             IEnumerable<AdminUser> userList = null;
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 conn.Open();
                 using (var tran = conn.BeginTransaction())
                 {
-                    DynamicParameters UserInfo = new DynamicParameters();
+                    var UserInfo = new DynamicParameters();
                     UserInfo.Add("@UserId", dbType: DbType.Int32, direction: ParameterDirection.Output);
                     UserInfo.Add("@UserName", UserName);
                     UserInfo.Add("@Userpwd", MD5Pwd);
@@ -130,13 +130,13 @@ namespace BackendSite.Service.DAL
 
                     conn.Execute("Admin_User_Ins", UserInfo, tran, commandType: CommandType.StoredProcedure);
 
-                    int ? UserId = UserInfo.Get<int?>("@UserId");
+                    var UserId = UserInfo.Get<int?>("@UserId");
 
                     if(UserId != null)
                     {
                         if (GroupSEQ != null)
                         {
-                            string SpName = "Admin_AuthorGroup_Set";
+                            var SpName = "Admin_AuthorGroup_Set";
                             conn.Execute(SpName, new { UserId, GroupSEQ }, tran, commandType: CommandType.StoredProcedure);
                         }
 
@@ -160,7 +160,7 @@ namespace BackendSite.Service.DAL
 
         public AdminUser GetUser(int UserId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.QueryFirst<AdminUser>("Admin_User_Get", new { UserId }, commandType: CommandType.StoredProcedure);
             }

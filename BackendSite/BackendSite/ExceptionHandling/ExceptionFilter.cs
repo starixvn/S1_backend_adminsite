@@ -43,8 +43,8 @@ namespace BackendSite.ExceptionHandling
             {
                 code = HttpStatusCode.OK;
 
-                AdminException adminException = context.Exception as AdminException;
-                string message = adminException.Message;
+                var adminException = context.Exception as AdminException;
+                var message = adminException.Message;
 
                 if (String.IsNullOrEmpty(message))
                 {

@@ -34,9 +34,9 @@ namespace BackendSite.Controllers.Api
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
             var referralList = referralManagementBLL.GetReferralBySiteId(SiteId);
             var currencyList = reportBLL.GetCurrency().ToList();
-            List<ReferralManagement> referralManagementList = new List<ReferralManagement>();
+            var referralManagementList = new List<ReferralManagement>();
 
-            foreach (string currency in siteList.ToList().Find(x => x.SiteId == SiteId).CurrencyList.Replace("[", "").Replace("]", "").Split(","))
+            foreach (var currency in siteList.ToList().Find(x => x.SiteId == SiteId).CurrencyList.Replace("[", "").Replace("]", "").Split(","))
             {
                 int currencyId;
                 Int32.TryParse(currency, out currencyId);
@@ -115,8 +115,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<ReferralCustList>();
             int totalPages = 0, rowCount = 0;
 
-            int pageNumber = referralCustListReq.PageNumber;
-            int pageSize = 10;
+            var pageNumber = referralCustListReq.PageNumber;
+            var pageSize = 10;
             if (referralCustListReq.PageSize > 0)
                 pageSize = referralCustListReq.PageSize;
             apiResult.Data = referralManagementBLL.GetReferralCustList(referralCustListReq.SelectSite, referralCustListReq.UserName, referralCustListReq.CurrencyId, pageSize, ref pageNumber, out totalPages, out rowCount);
@@ -138,24 +138,24 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<ReferralFriend> GetRefFriendList(RefFriendListReq refFriendListReq)
         {
-            Dictionary<int, string> referralStatus = new Dictionary<int, string>()
+            var referralStatus = new Dictionary<int, string>()
             {
                 {0,"Approved" },
                 {1,"Running" },
                 {2,"Expired" }
             };
 
-            int PageSize = 10;
+            var PageSize = 10;
             if (refFriendListReq.PageSize > 0)
                 PageSize = refFriendListReq.PageSize;
-            int pageNumber = refFriendListReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
+            var pageNumber = refFriendListReq.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
             var apiResult = new ApiListResult<ReferralFriend>();
             var data = referralManagementBLL.GetRefFriendList(refFriendListReq.CustId, refFriendListReq.StartDate, refFriendListReq.EndDate, PageSize, ref pageNumber, ref totalPages, ref rowCount);
             foreach (var x in data)
             {
-                referralStatus.TryGetValue(x.Status, out string name);
+                referralStatus.TryGetValue(x.Status, out var name);
                 x.StatusName = name;
             }
             apiResult.Data = data;

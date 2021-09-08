@@ -64,7 +64,7 @@ namespace BackendSite.Controllers
 
         public IActionResult PendingFund()
         {
-            IEnumerable<PendingFund> pendingFund = pendingFundBLL.PendingFundList();
+            var pendingFund = pendingFundBLL.PendingFundList();
             return View(pendingFund.ToList());
         }
         [HttpGet]

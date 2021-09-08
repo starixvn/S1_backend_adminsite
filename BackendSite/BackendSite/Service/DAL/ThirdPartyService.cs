@@ -55,10 +55,10 @@ namespace BackendSite.Service.DAL
         public IEnumerable<AdminTpTransferInfo> GetAdjustmentTpLog(int SiteId, int TpId, int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
             IEnumerable<AdminTpTransferInfo> result = null;
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                string SpName = "Admin_LogAdminAdjustWallet_Get";
-                DynamicParameters props = new DynamicParameters();
+                var SpName = "Admin_LogAdminAdjustWallet_Get";
+                var props = new DynamicParameters();
                 props.Add("@SiteId", SiteId);
                 props.Add("@TpId", TpId);
                 props.Add("@CustId", CustId);
@@ -87,7 +87,7 @@ namespace BackendSite.Service.DAL
 
         public void SetAdjustmentTpCustInfoLog(string Menu, int ActionType, string DetailInfo, string Operator)
         {
-            DynamicParameters props = new DynamicParameters();
+            var props = new DynamicParameters();
             props.Add("Menu", Menu);
             props.Add("ActionType", ActionType);
             props.Add("DetailInfo", DetailInfo);

@@ -29,10 +29,10 @@ namespace BackendSite.Service.BLL
         }
         public IEnumerable<GetSiteLangData> GetSiteLangData(int SiteId)
         {
-            ServerInfo ServerInfo = new ServerInfo();
+            var ServerInfo = new ServerInfo();
             ServerInfo = serverInfoService.GetSiteList().ToList().Find(x=> x.SiteId == SiteId);
-            List<string> langList = JsonConvert.DeserializeObject<List<string>>(ServerInfo.LangList);
-            List<GetSiteLangData> result = new List<GetSiteLangData>();
+            var langList = JsonConvert.DeserializeObject<List<string>>(ServerInfo.LangList);
+            var result = new List<GetSiteLangData>();
             langList.ForEach(x => result.Add(new GetSiteLangData() { LangId = x,Link= string.Empty,Title = string.Empty}));
             return result;
         }

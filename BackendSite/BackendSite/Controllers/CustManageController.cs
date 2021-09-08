@@ -70,9 +70,9 @@ namespace BackendSite.Controllers
         [RequestSizeLimit(40000000)]
         public IActionResult ExportCustInfoList(CustInfoReq custInfoReq)
         {
-            List<int> selectSite = new List<int>();
-            List<int> selectCurrency = new List<int>();
-            List<int> selectStatus = new List<int>();
+            var selectSite = new List<int>();
+            var selectCurrency = new List<int>();
+            var selectStatus = new List<int>();
             if (custInfoReq.SelectSite != null)
             {
                 selectSite = Array.ConvertAll<string, int>(custInfoReq.SelectSite.Split(','), s => int.Parse(s)).ToList();

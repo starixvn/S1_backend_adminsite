@@ -43,7 +43,7 @@ namespace BackendSite.Service.BLL
                     ref CurrencyAmount
                 );
 
-            List<BonusInfoFrontEnd> result = new List<BonusInfoFrontEnd>();
+            var result = new List<BonusInfoFrontEnd>();
             if (datas != null && datas.Any())
             {
                 foreach (var row in datas)
@@ -89,7 +89,7 @@ namespace BackendSite.Service.BLL
                     RebateCategoriesId
                 );
 
-            List<BonusInfoFrontEnd> result = new List<BonusInfoFrontEnd>();
+            var result = new List<BonusInfoFrontEnd>();
             if (datas != null && datas.Any())
             {
                 foreach (var row in datas)

@@ -26,7 +26,7 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<FireBaseMessageInfo> GetFireBaseMessageList(int fireBaseId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
              
                 return conn.Query<FireBaseMessageInfo>("Admin_FirebaseData_Get", new { FirebaseId = fireBaseId }, commandType: CommandType.StoredProcedure);
@@ -34,7 +34,7 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<FireBaseCustInfo> GetFireBaseCustList(int siteId, int custId )
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
 
                 return conn.Query<FireBaseCustInfo>("Admin_FirebaseCustList_Get",new { SiteId = siteId, CustId = custId }, commandType: CommandType.StoredProcedure);
@@ -42,7 +42,7 @@ namespace BackendSite.Service.DAL
         }
         public async Task<ApiResult<IEnumerable<FireBaseReturn>>> SendFireBaseNotificationAsync(IEnumerable<FireBaseMessage> fireBaseMessage)
         {
-            string apiUrl = $"{commonServiceUrl}FireBase/SendFireBaseNotification";
+            var apiUrl = $"{commonServiceUrl}FireBase/SendFireBaseNotification";
             dynamic req = new
             {
                 FireBaseMessages = fireBaseMessage

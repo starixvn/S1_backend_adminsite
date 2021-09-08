@@ -30,11 +30,11 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<SiteLanguage> GetLangIdList(ServerInfo serverInfo)
         {
-            List<SiteLanguage> list = new List<SiteLanguage>();
+            var list = new List<SiteLanguage>();
 
             foreach (var langId in serverInfo.ILangList)
             {
-                SiteLanguage siteLanguage = new SiteLanguage();
+                var siteLanguage = new SiteLanguage();
                 siteLanguage.LangId = langId;
                 siteLanguage.Language = GetLan_Info(langId);
                 list.Add(siteLanguage);
@@ -45,8 +45,8 @@ namespace BackendSite.Service.BLL
         private string GetLan_Info(string key)
         {
             //
-            string labelString = string.Empty;
-            string sKey = $"{Assembly.GetExecutingAssembly().GetName().Name}.App_GlobalResources.Lan_Info";
+            var labelString = string.Empty;
+            var sKey = $"{Assembly.GetExecutingAssembly().GetName().Name}.App_GlobalResources.Lan_Info";
             if (!rm.ContainsKey(sKey))
             {
                 rm.TryAdd(sKey, new ResourceManager(sKey, Assembly.GetExecutingAssembly()));
@@ -59,8 +59,8 @@ namespace BackendSite.Service.BLL
         private string GetResourceValue(string key, string categoryId, string langId)
         {
             //
-            string labelString = string.Empty;
-            string sKey = $"{Assembly.GetExecutingAssembly().GetName().Name}.App_GlobalResources.{categoryId}_{langId}";
+            var labelString = string.Empty;
+            var sKey = $"{Assembly.GetExecutingAssembly().GetName().Name}.App_GlobalResources.{categoryId}_{langId}";
             if (!rm.ContainsKey(sKey))
             {
                 rm.TryAdd(sKey, new ResourceManager(sKey, Assembly.GetExecutingAssembly()));
@@ -84,31 +84,31 @@ namespace BackendSite.Service.BLL
         }
         public string GetResourceValue(string key)
         {
-            string labelString = GetResourceValue(key, "lan", "en");
+            var labelString = GetResourceValue(key, "lan", "en");
 
             return labelString;
         }
         public string GetMsg(string key)
         {
-            string labelString = GetResourceValue(key, "msg", "en");
+            var labelString = GetResourceValue(key, "msg", "en");
 
             return labelString;
         }
         public string GetResourceValue(string key,string lang)
         {
-            string labelString = GetResourceValue(key, "lan", lang);
+            var labelString = GetResourceValue(key, "lan", lang);
 
             return labelString;
         }
         public string GetMsg(string key,string lang)
         {
-            string labelString = GetResourceValue(key, "msg", lang);
+            var labelString = GetResourceValue(key, "msg", lang);
 
             return labelString;
         }
         public string GetErrMsg(int code)
         {
-            string labelString = GetResourceValue($"Code_{code}", "GameMsg_lan", "en");
+            var labelString = GetResourceValue($"Code_{code}", "GameMsg_lan", "en");
 
             return labelString;
         }

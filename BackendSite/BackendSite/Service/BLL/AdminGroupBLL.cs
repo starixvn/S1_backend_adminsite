@@ -33,7 +33,7 @@ namespace BackendSite.Service.BLL
 
         public bool CheckGroupIsExists(string GroupName, int? SEQ)
         {
-            IEnumerable<AdminGroup> all_groups = adminGroupService.GetGroupList();
+            var all_groups = adminGroupService.GetGroupList();
             return all_groups.Any(x => x.GroupSEQ != SEQ && string.Equals(x.GroupName, GroupName, StringComparison.OrdinalIgnoreCase));
         }
 

@@ -39,7 +39,7 @@ namespace BackendSite.Service.BLL
                     ref CurrencyAmount
                 );
 
-            List<PaymentAdjustmentFrontEnd> result = new List<PaymentAdjustmentFrontEnd>();
+            var result = new List<PaymentAdjustmentFrontEnd>();
             if(datas != null && datas.Any())
             {
                 foreach (var row in datas)
@@ -79,7 +79,7 @@ namespace BackendSite.Service.BLL
                     EndDate
                 );
 
-            List<PaymentAdjustmentFrontEnd> result = new List<PaymentAdjustmentFrontEnd>();
+            var result = new List<PaymentAdjustmentFrontEnd>();
             if (datas != null && datas.Any())
             {
                 foreach (var row in datas)

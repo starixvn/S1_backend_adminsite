@@ -74,9 +74,9 @@ namespace BackendSite.Controllers.Api
 
         public ApiListResult<AdjustWithdrawalLimit> GetAdjustWithdrawalLimitsLog([FromForm] int CustId, [FromForm] int PageNumber)
         {
-            int PageSize = 10;
-            int TotalPages = 0;
-            int RowCount = 0;
+            var PageSize = 10;
+            var TotalPages = 0;
+            var RowCount = 0;
 
             var result = new ApiListResult<AdjustWithdrawalLimit>();
             try

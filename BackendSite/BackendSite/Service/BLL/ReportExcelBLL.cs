@@ -140,7 +140,7 @@ namespace BackendSite.Service.BLL
             {
                 foreach (var s in t)
                 {
-                    int currentRow = 1;
+                    var currentRow = 1;
 
                     var ws = p.Workbook.Worksheets.Add(s.SheetName);
 
@@ -266,7 +266,7 @@ namespace BackendSite.Service.BLL
         {
             foreach (var mergeTitles in mergeTitlesList)
             {
-                int cellCount = 1;
+                var cellCount = 1;
                 for (var i = 0; i < mergeTitles.Count(); i++)
                 {
                     var cell = ws.Cells[currentRow, cellCount];
@@ -302,7 +302,7 @@ namespace BackendSite.Service.BLL
                         }
                     }
 
-                    for (int j = cellCount; j < (cellCount + mergeTitles.ElementAt(i).Value.MergeRange); j++)
+                    for (var j = cellCount; j < (cellCount + mergeTitles.ElementAt(i).Value.MergeRange); j++)
                     {
                         ws.Cells[currentRow, j].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
                         ws.Cells[currentRow, j].Style.Border.Top.Style = ExcelBorderStyle.Medium;
@@ -373,13 +373,13 @@ namespace BackendSite.Service.BLL
                                              List<int> mergeContentRules,
                                              List<string> groupTitles)
         {
-            int bodyStartRow = currentRow;
+            var bodyStartRow = currentRow;
             if (IsTotalTitleMax)
             {
                 for (var i = 0; i < data.Count(); i++)
                 {
                     var bt = data.ElementAt(i);
-                    bool maxFlag = bt.ContainsKey("MaxCount");
+                    var maxFlag = bt.ContainsKey("MaxCount");
 
                     if (maxFlag)
                     {
@@ -557,13 +557,13 @@ namespace BackendSite.Service.BLL
                 {
                     var colIdx = titles.IndexOf(title) + 1;
 
-                    for (int i = bodyStartRow; i < bodyEndRow; i++)
+                    for (var i = bodyStartRow; i < bodyEndRow; i++)
                     {
-                        string value = (string)ws.Cells[i, colIdx].Value;
+                        var value = (string)ws.Cells[i, colIdx].Value;
 
                         if (value.Contains("TOTAL"))
                         {
-                            for (int j = colIdx; j <= titles.Count(); j++)
+                            for (var j = colIdx; j <= titles.Count(); j++)
                             {
                                 ws.Cells[i, j].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                 ws.Cells[i, j].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#BFFFFF"));
@@ -578,7 +578,7 @@ namespace BackendSite.Service.BLL
                                                     List<int> mergeContentRules,
                                                     int currentRow)
         {
-            foreach (int row in mergeContentRules)
+            foreach (var row in mergeContentRules)
             {
                 var cell = ws.Cells[currentRow, 1];
 
@@ -589,7 +589,7 @@ namespace BackendSite.Service.BLL
                 cell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 cell.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
-                for (int i = currentRow; i <= currentRow + row - 1; i++)
+                for (var i = currentRow; i <= currentRow + row - 1; i++)
                 {
                     ws.Cells[i, 1, i + 1, 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                     ws.Cells[i, 1, i + 1, 1].Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -614,7 +614,7 @@ namespace BackendSite.Service.BLL
         {
             #region Total Data Caculate
 
-            Dictionary<string, dynamic> totaldata = new Dictionary<string, dynamic>();
+            var totaldata = new Dictionary<string, dynamic>();
 
             for (var i = 0; i < data.Count(); i++)
             {
@@ -629,7 +629,7 @@ namespace BackendSite.Service.BLL
                         var value = item.Value;
                         var colName = item.Key;
 
-                        var getItem = totaldata.TryGetValue(colName, out dynamic total);
+                        var getItem = totaldata.TryGetValue(colName, out var total);
 
                         if (getItem)
                         {

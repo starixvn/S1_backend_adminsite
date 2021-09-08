@@ -49,7 +49,7 @@ namespace BackendSite.Service.DAL
             {
                 if (selectstatus.ToList().Count == 0)
                 {
-                    List<int> templist = new List<int>() { 1, 2, 3 };
+                    var templist = new List<int>() { 1, 2, 3 };
                     SelectStatus = JsonConvert.SerializeObject(templist);
                 }
                 else
@@ -90,7 +90,7 @@ namespace BackendSite.Service.DAL
             {
                 if (selectstatus.ToList().Count == 0)
                 {
-                    List<int> templist = new List<int>() { 1, 2, 3 };
+                    var templist = new List<int>() { 1, 2, 3 };
                     SelectStatus = JsonConvert.SerializeObject(templist);
                 }
                 else
@@ -247,9 +247,9 @@ namespace BackendSite.Service.DAL
 
         public TeleCSDData GetTeleCSD(string SiteIds, string Currency, long StartDate, long EndDate, int Deposit, int DormantUser, int CallOut, int PageNumber, int PageSize)
         {
-            TeleCSDData SearchData = new TeleCSDData();
-            DynamicParameters props = new DynamicParameters();
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var SearchData = new TeleCSDData();
+            var props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             //var SiteIdsObject = JsonConvert.DeserializeObject<MutiSelect[]>(SiteIds);
             //var CurrencyObject = JsonConvert.DeserializeObject<MutiSelect[]>(Currency);
 
@@ -296,10 +296,10 @@ namespace BackendSite.Service.DAL
             {
                 if (x.UpdateAt != null)
                 {
-                    string[] UpdateAtArray = x.UpdateAt.Split(',');
-                    string[] OperatorArray = x.Operator.Split(',');
+                    var UpdateAtArray = x.UpdateAt.Split(',');
+                    var OperatorArray = x.Operator.Split(',');
                     x.UpdateRemark = new List<string>();
-                    for (int i = 0; i < UpdateAtArray.Count(); i++)
+                    for (var i = 0; i < UpdateAtArray.Count(); i++)
                     {
                         x.UpdateRemark.Add($"{UpdateAtArray[i]}-{OperatorArray[i]}");
                     }
@@ -321,8 +321,8 @@ namespace BackendSite.Service.DAL
 
         public int UpdateCustomerTele(int siteId, int custId, string Operator)
         {
-            DynamicParameters props = new DynamicParameters();
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
 
             props.Add("SiteId", siteId);
             props.Add("CustId", custId);
@@ -333,8 +333,8 @@ namespace BackendSite.Service.DAL
 
         public List<CustTeleExport> GetTeleCSDExportData(string SiteIds, string Currency, long StartDate, long EndDate, int Deposit, int DormantUser, int CallOut)
         {
-            List<CustTeleExport> result = new List<CustTeleExport>();
-            DynamicParameters props = new DynamicParameters();
+            var result = new List<CustTeleExport>();
+            var props = new DynamicParameters();
             //var SiteIdsObject = JsonConvert.DeserializeObject<MutiSelect[]>(SiteIds);
             //var CurrencyObject = JsonConvert.DeserializeObject<MutiSelect[]>(Currency);
             //int siteidlength = SiteIdsObject == null ? 0 : SiteIdsObject.Length;
@@ -379,9 +379,9 @@ namespace BackendSite.Service.DAL
                 var thirdcall = string.Empty;
                 if (x.UpdateAt != null && x.Operator != null)
                 {
-                    string[] UpdateAtArray = x.UpdateAt.Split(',');
-                    string[] OperatorArray = x.Operator.Split(',');
-                    for (int i = 0; i < UpdateAtArray.Count(); i++)
+                    var UpdateAtArray = x.UpdateAt.Split(',');
+                    var OperatorArray = x.Operator.Split(',');
+                    for (var i = 0; i < UpdateAtArray.Count(); i++)
                     {
                         switch (i)
                         {
@@ -421,7 +421,7 @@ namespace BackendSite.Service.DAL
         /// <returns></returns>
         public int DeleteOnUserData(int custId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 var parameters = new DynamicParameters(
                 new
@@ -429,7 +429,7 @@ namespace BackendSite.Service.DAL
                     _CustId = custId
                 });
 
-                string SpName = "Admin_OnUser_Del";
+                var SpName = "Admin_OnUser_Del";
                 return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
@@ -437,7 +437,7 @@ namespace BackendSite.Service.DAL
         #region Tag
         public int EditTagMamagement(int id, string tagName, string tagColour, string description, string Operator)
         {
-            DynamicParameters props = new DynamicParameters();
+            var props = new DynamicParameters();
             props.Add("Id", id);
             props.Add("TagName", tagName);
             props.Add("TagColour", tagColour);
@@ -449,8 +449,8 @@ namespace BackendSite.Service.DAL
 
         public GetTagDataResult GetTagData(int status,int pageNumber,int pageSize)
         {
-            GetTagDataResult SearchResult = new GetTagDataResult();
-            DynamicParameters props = new DynamicParameters();
+            var SearchResult = new GetTagDataResult();
+            var props = new DynamicParameters();
             props.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -470,7 +470,7 @@ namespace BackendSite.Service.DAL
 
         public int SetTagStatus(int Id, string Operator)
         {
-            DynamicParameters props = new DynamicParameters();
+            var props = new DynamicParameters();
             props.Add("Id", Id);
             props.Add("Operator", Operator);
 
@@ -479,8 +479,8 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<TagData> GetAllTag()
         {
-            GetTagDataResult SearchResult = new GetTagDataResult();
-            DynamicParameters props = new DynamicParameters();
+            var SearchResult = new GetTagDataResult();
+            var props = new DynamicParameters();
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -492,13 +492,13 @@ namespace BackendSite.Service.DAL
 
         public int SetCustTag(int custid, IEnumerable<int> SelectTag)
         {
-            List<int> temp = new List<int>();
-            string selectTag = JsonConvert.SerializeObject(temp); 
+            var temp = new List<int>();
+            var selectTag = JsonConvert.SerializeObject(temp); 
             if (SelectTag != null && SelectTag.Any())
             {
                 selectTag = JsonConvert.SerializeObject(SelectTag);
             }
-            DynamicParameters props = new DynamicParameters();
+            var props = new DynamicParameters();
             props.Add("CustId", custid);
             props.Add("TagList", selectTag);
 
@@ -519,9 +519,9 @@ namespace BackendSite.Service.DAL
 
         public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency, int depositStatus, int status, string username, int pagenumber, int pagesize, int sort, long StartDate, long EndDate)
         {
-            RegLiveStatusResult SearchData = new RegLiveStatusResult();
-            DynamicParameters props = new DynamicParameters();
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var SearchData = new RegLiveStatusResult();
+            var props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
 
             props.Add("SelectSite", JsonConvert.SerializeObject(selectSite));
             props.Add("Currency", currency);
@@ -579,10 +579,10 @@ namespace BackendSite.Service.DAL
         public IEnumerable<RegLiveStatus> GetExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate)
         {
             IEnumerable<RegLiveStatus> result = null;
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
-                string SpName = "Admin_CustRegLiveStatusExportV2_Get";
-                DynamicParameters props = new DynamicParameters();
+                var SpName = "Admin_CustRegLiveStatusExportV2_Get";
+                var props = new DynamicParameters();
                 props.Add("SelectSite", SelectSite);
                 props.Add("Currency", Currency);
                 props.Add("UserName", string.IsNullOrWhiteSpace(User) ? null : User);

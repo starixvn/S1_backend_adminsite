@@ -22,10 +22,10 @@ namespace BackendSite.Service.DAL
 
         public PrizeSearchResult PrizeSearch(PrizeSelect prizeSelect)
         {
-            PrizeSearchResult SearchResult = new PrizeSearchResult();
-            List<string> tempCurrencyTotalAmount = new List<string>();
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            DynamicParameters props = new DynamicParameters();
+            var SearchResult = new PrizeSearchResult();
+            var tempCurrencyTotalAmount = new List<string>();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var props = new DynamicParameters();
 
             props.Add("PageSize", prizeSelect.PageSize);
             props.Add("StartDate", prizeSelect.StartDate);
@@ -66,9 +66,9 @@ namespace BackendSite.Service.DAL
 
         public PrizeLogResult GetPrizeLog(PrizeLogPara prizeLogPara)
         {
-            PrizeLogResult LogResult = new PrizeLogResult();
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            DynamicParameters props = new DynamicParameters();
+            var LogResult = new PrizeLogResult();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var props = new DynamicParameters();
             props.Add("PageNumber", prizeLogPara.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -90,15 +90,15 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<EventDraw> GetEventName()
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<EventDraw>("Admin_EventDraw_Get", commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<DrawPrizeExcelData> GetExportData(IEnumerable<int> SelectSite, string StartDate, string EndDate, int CurrencyId, string EventName)
         {
-            PrizeSearchResult SearchResult = new PrizeSearchResult();
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            DynamicParameters props = new DynamicParameters();
+            var SearchResult = new PrizeSearchResult();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var props = new DynamicParameters();
             props.Add("StartDate", StartDate);
             props.Add("EndDate", EndDate);
             props.Add("SelectSite", SelectSite != null ? SelectSite.Any() ? JsonConvert.SerializeObject(SelectSite) : null : null);

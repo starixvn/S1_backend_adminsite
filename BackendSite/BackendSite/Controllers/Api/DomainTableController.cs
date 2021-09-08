@@ -69,7 +69,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult SetDomain(SetDomainReq setDomainReq)
         {
-            ApiResult apiResult = new ApiResult();
+            var apiResult = new ApiResult();
             try
             {
                 if (domainTableBLL.SetDomain(setDomainReq.SiteId, setDomainReq.CurrencyId, setDomainReq.Domain, setDomainReq.Status, setDomainReq.Sort, authorizeBLL.GetAuthData().UserName) > 0)
@@ -113,7 +113,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult DelDomain(DelDomainReq delDomainReq)
         {
-            ApiResult apiResult = new ApiResult();
+            var apiResult = new ApiResult();
             if (domainTableBLL.DelDomain(delDomainReq.DId) > 0)
             {
                 apiResult.ErrorCode = 0;
@@ -137,7 +137,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult UpdateDomain(UpdateDomainReq updateDomainReq)
         {
-            ApiResult apiResult = new ApiResult();
+            var apiResult = new ApiResult();
             try
             {
                 if (domainTableBLL.UpdateDomain(updateDomainReq.DId, updateDomainReq.Domain, updateDomainReq.Status, updateDomainReq.Sort, authorizeBLL.GetAuthData().UserName) > 0)

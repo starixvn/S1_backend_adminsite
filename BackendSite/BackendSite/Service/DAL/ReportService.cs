@@ -33,18 +33,18 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<CurrencyModel> GetCurrencyList()
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
-                string SpName = "Common_Currency_Get";
+                var SpName = "Common_Currency_Get";
                 return conn.Query<CurrencyModel>(SpName, commandType: CommandType.StoredProcedure);
             }
         }
 
         public IEnumerable<ServerInfoModel> GetServerInfoList()
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
-                string SpName = "Admin_ServerInfoList_Get";
+                var SpName = "Admin_ServerInfoList_Get";
                 return conn.Query<ServerInfoModel>(SpName, commandType: CommandType.StoredProcedure);
             }
         }
@@ -110,7 +110,7 @@ namespace BackendSite.Service.DAL
                                                                                         string startDate,
                                                                                         string endDate)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
                 var parameters = new DynamicParameters(
                 new
@@ -121,7 +121,7 @@ namespace BackendSite.Service.DAL
                     EndDate = endDate
                 });
 
-                string SpName = "Admin_ReportTurnOverAndWinlost_GroupByDay_Get";
+                var SpName = "Admin_ReportTurnOverAndWinlost_GroupByDay_Get";
                 return conn.Query<TurnoverAndWinlossSummeryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
@@ -132,7 +132,7 @@ namespace BackendSite.Service.DAL
                                                                                  string endDate)
         {
 
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
                 var parameters = new DynamicParameters(
                 new
@@ -143,7 +143,7 @@ namespace BackendSite.Service.DAL
                     _EndDate = endDate
                 });
 
-                string SpName = "Admin_ReportTurnOverValidBet_Statistical_Get";
+                var SpName = "Admin_ReportTurnOverValidBet_Statistical_Get";
                 return conn.Query<StatisticalPartcialSummeryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
@@ -152,7 +152,7 @@ namespace BackendSite.Service.DAL
                                                                                string selectDate)
         {
 
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
                 var parameters = new DynamicParameters(
                 new
@@ -161,7 +161,7 @@ namespace BackendSite.Service.DAL
                     SelDate = selectDate
                 });
 
-                string SpName = "Admin_OnlineReport_Get";
+                var SpName = "Admin_OnlineReport_Get";
                 return conn.Query<UserOnlinePartcialSummaryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
@@ -171,7 +171,7 @@ namespace BackendSite.Service.DAL
                                                                         string startDate,
                                                                         string endDate)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
                 var parameters = new DynamicParameters(
                 new
@@ -181,7 +181,7 @@ namespace BackendSite.Service.DAL
                     StartDate = startDate,
                     EndDate = endDate
                 });
-                string SpName = "Admin_Report_DepositDetailByDay_Get";
+                var SpName = "Admin_Report_DepositDetailByDay_Get";
                 return conn.Query<DepositReportParticalModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
             
@@ -200,7 +200,7 @@ namespace BackendSite.Service.DAL
                                                                                         string userName)
         {
 
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
                 var parameters = new DynamicParameters(
                 new
@@ -212,7 +212,7 @@ namespace BackendSite.Service.DAL
                     CustomerName = userName
                 });
 
-                string SpName = "Admin_ReportTurnOverAndWinlost_CustomerStatistical_Get";
+                var SpName = "Admin_ReportTurnOverAndWinlost_CustomerStatistical_Get";
                 return conn.Query<CustomerStatisticalPartcialSummeryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }
@@ -222,7 +222,7 @@ namespace BackendSite.Service.DAL
                                                                string date)
         {
 
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
             {
                 var parameters = new DynamicParameters(
                 new
@@ -232,7 +232,7 @@ namespace BackendSite.Service.DAL
                     _SelDate = date
                 });
 
-                string SpName = "Admin_TpBetRecord_ByCustIdAndGameIdAndDate_Get";
+                var SpName = "Admin_TpBetRecord_ByCustIdAndGameIdAndDate_Get";
                 return conn.Query<TpBetRecordDataModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
             }
         }

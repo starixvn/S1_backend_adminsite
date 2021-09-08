@@ -198,7 +198,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult GetWithdrawalInfoAndAccountingByTransId(GetWithdrawalInfoAndAccountingByTransIdRequest request)
         {
             var result = _withdrawalBLL.GetAccountingListByTransId(request.TransId,
-                out GetWithdrawalInfoAndAccountingModel data);
+                out var data);
 
             if (!result)
             {
@@ -217,7 +217,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult GetWithdrawalBankAccounting(GetWithdrawalBankAccountingRequest request)
         {
             var result =
-                _withdrawalBLL.GetWithdrawalBankAccountingById(request.Id, out GetWithdrawalBankAccountingModel data);
+                _withdrawalBLL.GetWithdrawalBankAccountingById(request.Id, out var data);
 
             if (!result)
             {
@@ -319,8 +319,8 @@ namespace BackendSite.Controllers.Api
 
         public ApiResult DeleteWithdrawalAccounting(DeleteWithdrawalAccountingRequest request)
         {
-            var result = _withdrawalBLL.DeleteWithdrawalAccounting(request.Id, out string transId, out int seq,
-                out int uploadPicTimes);
+            var result = _withdrawalBLL.DeleteWithdrawalAccounting(request.Id, out var transId, out var seq,
+                out var uploadPicTimes);
 
             if (!result)
             {
@@ -342,12 +342,12 @@ namespace BackendSite.Controllers.Api
         public async Task<ApiResult> UploadAccountingPicture(UploadAccountingPictureRequest request)
         {
             var result =
-                _withdrawalBLL.UpdateWithdrawalAccountingForUploadPicture(request.Id, out int newUploadPictureTimes);
+                _withdrawalBLL.UpdateWithdrawalAccountingForUploadPicture(request.Id, out var newUploadPictureTimes);
             if (result)
             {
-                string pictureBaseOnSixFour = request.Picture.Replace("data:image/png;base64,", "");
-                byte[] bytes = Convert.FromBase64String(pictureBaseOnSixFour);
-                MemoryStream stream = new MemoryStream(bytes);
+                var pictureBaseOnSixFour = request.Picture.Replace("data:image/png;base64,", "");
+                var bytes = Convert.FromBase64String(pictureBaseOnSixFour);
+                var stream = new MemoryStream(bytes);
 
                 if (await UploadAccountPictureAsync(stream, request.TransId, request.Seq, newUploadPictureTimes))
                 {

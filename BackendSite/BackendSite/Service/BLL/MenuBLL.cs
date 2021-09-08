@@ -25,7 +25,7 @@ namespace BackendSite.Service.BLL
 
         public List<MenuItem> GetMenuData()
         {
-            List<MenuItem> result = new List<MenuItem>();
+            var result = new List<MenuItem>();
             var menuDatas = Newtonsoft.Json.JsonConvert.DeserializeObject<List<MenuItem>>(menuService.GetMenuData());
             var authData = authorizeBLL.GetAuthData();
             if (authData != null)

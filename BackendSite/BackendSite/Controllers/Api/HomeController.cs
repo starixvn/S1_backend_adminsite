@@ -190,7 +190,7 @@ namespace BackendSite.Controllers.Api
         {
 
             var result = _adminBLL.ChangePwd(changePwd);
-            string custMsg = string.Empty;
+            var custMsg = string.Empty;
 
             if (result != ErrorCodeEnum.Success)
             {
@@ -252,7 +252,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetDashBoardData(DashBoardPara para)
         {
-            List<int> CanSearchSite = new List<int>();
+            var CanSearchSite = new List<int>();
 
             _serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x => CanSearchSite.Add(x.SiteId));
             var result = _dashBoardBLL.GetDashBoardData(para.SiteId, para.CurrencyId, para.BaseCurrencyId, CanSearchSite);

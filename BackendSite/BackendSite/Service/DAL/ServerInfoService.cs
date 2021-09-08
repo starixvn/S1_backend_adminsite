@@ -17,7 +17,7 @@ namespace BackendSite.Service.DAL
         }
         public ServerInfo GetModel()
         {
-            int siteId = 1;
+            var siteId = 1;
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.QueryFirstOrDefault<ServerInfo>("ServerInfo_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }

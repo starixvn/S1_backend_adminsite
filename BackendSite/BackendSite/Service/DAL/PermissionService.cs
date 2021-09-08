@@ -25,7 +25,7 @@ namespace BackendSite.Service.DAL
 
         public string GetPermissionJSONData()
         {
-            string contentRootPath = env.ContentRootPath;
+            var contentRootPath = env.ContentRootPath;
             var initPermissionData = File.ReadAllText($"{contentRootPath}/App_Data/FunctionPermission.json");
 
             return initPermissionData;

@@ -19,7 +19,7 @@
     var authData = authorizeBLL.GetAuthData();
     var loginUser = adminUserService.GetUser(authData.UserId);
 
-    IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("Finance/PaymentManage");
+    var subFuncKeys = permissionBLL.GetSubFunckeys("Finance/PaymentManage");
     subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
 
     var currencyList = serverInfoBLL.GetCurrencyList();

@@ -66,7 +66,7 @@ namespace BackendSite.Service.BLL
         {
             string Md5Userpwd = null;
             var serverInfo = serverInfoService.GetModel();
-            int userId = 0;
+            var userId = 0;
             int.TryParse(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.NameIdentifier).Value, out userId);
             changePwd.OldPwd = tools.MD5Encrypt(changePwd.OldPwd);
             changePwd.NewPwd = tools.MD5Encrypt(changePwd.NewPwd);

@@ -27,10 +27,10 @@ namespace BackendSite.Service.DAL
         public IEnumerable<BonusInfo> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId, ref int PageNumber, ref int TotalPages, ref int RowCount, ref List<string> CurrencyAmount)
         {
             IEnumerable<BonusInfo> result = null;
-            List<string> tempCurrencyTotalAmount = new List<string>();
+            var tempCurrencyTotalAmount = new List<string>();
 
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            DynamicParameters props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var props = new DynamicParameters();
             props.Add("@SelectSite", JsonConvert.SerializeObject(SelectSite));
             props.Add("@BonusCode", BonusCode);
             props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
@@ -74,10 +74,10 @@ namespace BackendSite.Service.DAL
         public IEnumerable<BonusInfo> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int BaseCurrencyId, int RebateCategoriesId)
         {
             IEnumerable<BonusInfo> result = null;
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                string SpName = "Admin_BonusInfoExportV4_Get";
-                DynamicParameters props = new DynamicParameters();
+                var SpName = "Admin_BonusInfoExportV4_Get";
+                var props = new DynamicParameters();
                 props.Add("@SelectSite", SelectSite);
                 props.Add("@BonusCode", BonusCode);
                 props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
@@ -98,9 +98,9 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PendingBonus> GetPendingBonusList()
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                string SpName = "Admin_PendingBonusList_Get";
+                var SpName = "Admin_PendingBonusList_Get";
                 return conn.Query<PendingBonus>(SpName, commandType: CommandType.StoredProcedure);
             }
         }
@@ -116,14 +116,14 @@ namespace BackendSite.Service.DAL
             p.Add("_LockedAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_BonusAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_Bonus", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-            int result = conn.Execute("Common_CancelBonusByBonusId_SetV3", p, transaction: trans, commandType: CommandType.StoredProcedure);
+            var result = conn.Execute("Common_CancelBonusByBonusId_SetV3", p, transaction: trans, commandType: CommandType.StoredProcedure);
 
-            int siteId = p.Get<int?>("_SiteId") ?? 0;
+            var siteId = p.Get<int?>("_SiteId") ?? 0;
             custId = p.Get<int?>("_CustId") ?? 0;
-            string userName = p.Get<string>("_UserName");
-            decimal lockedAmount = p.Get<decimal?>("_LockedAmount") ?? 0;
-            decimal bonusAmount = p.Get<decimal?>("_BonusAmount") ?? 0;
-            decimal bonus = p.Get<decimal?>("_Bonus") ?? 0;
+            var userName = p.Get<string>("_UserName");
+            var lockedAmount = p.Get<decimal?>("_LockedAmount") ?? 0;
+            var bonusAmount = p.Get<decimal?>("_BonusAmount") ?? 0;
+            var bonus = p.Get<decimal?>("_Bonus") ?? 0;
 
             if (isReturnAmount)
             {
@@ -139,10 +139,10 @@ namespace BackendSite.Service.DAL
 
                 if (backAmount > 0)
                 {
-                    result = walletService.SetBalance(custId, siteId, userName, backAmount, 7, $"Cancel Bonus({bonus.ToString("#,##0.##")}), Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out decimal afterAmount, out byte is1stDepoist, conn, trans);
+                    result = walletService.SetBalance(custId, siteId, userName, backAmount, 7, $"Cancel Bonus({bonus.ToString("#,##0.##")}), Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterAmount, out var is1stDepoist, conn, trans);
 
                     if (result > 0)
-                        result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, $"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out decimal afterWithdrawalLimit, conn, trans);
+                        result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, $"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterWithdrawalLimit, conn, trans);
                 }
             }
 

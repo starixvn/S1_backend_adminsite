@@ -21,15 +21,15 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<ReasonManagementFuncKey> GetFuncKey()
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<ReasonManagementFuncKey>("Admin_BankFinancialReason_FuncKey_Get", commandType: CommandType.StoredProcedure);
         }
 
         public GetReasonManagementDataResult GetReasonManagementData(GetReasonManagementDataPara para)
         {
-            GetReasonManagementDataResult SearchResult = new GetReasonManagementDataResult();
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            DynamicParameters props = new DynamicParameters();
+            var SearchResult = new GetReasonManagementDataResult();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var props = new DynamicParameters();
             props.Add("PageNumber", para.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -49,8 +49,8 @@ namespace BackendSite.Service.DAL
 
         public int SetReasonManagement(SetReasonManagementPara para,int UserId, DateTime now)
         {
-            DynamicParameters props = new DynamicParameters();
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
 
             props.Add("Id", para.Id);
             props.Add("Description", para.Description);
@@ -61,8 +61,8 @@ namespace BackendSite.Service.DAL
         }
         public int InsertReasonManagement(InsertReasonManagementPara para, int UserId, DateTime now)
         {
-            DynamicParameters props = new DynamicParameters();
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
 
             props.Add("FuncKey", para.FuncKey);
             props.Add("Description", para.Description);

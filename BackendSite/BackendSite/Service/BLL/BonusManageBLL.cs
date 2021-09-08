@@ -142,7 +142,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<GetCashBackGamerep> GetCashBackGameList(int tpId,int categoryId)
         {
-            List<GetCashBackGamerep> result = new List<GetCashBackGamerep>();
+            var result = new List<GetCashBackGamerep>();
             var trmpresult = _bonusManageService.GetCashBackGameList(tpId, categoryId);
 
             //tpId == 0,WalletType is Seamless
@@ -179,7 +179,7 @@ namespace BackendSite.Service.BLL
             const string chars1 = "0123456789";
             const string chars2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             const string chars3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            string chars = chars3;
+            var chars = chars3;
             if (type == 1)
             {
                 chars = chars1;
@@ -195,11 +195,11 @@ namespace BackendSite.Service.BLL
 
         public int GenScratchCardCode(string specialCode, int num, string lastUpdateUser)
         {
-            int count = num;
-            int errorcount = 0;
+            var count = num;
+            var errorcount = 0;
             while (count > 0 && errorcount < 30)
             {
-                string scratchCardCode = $"{RandomString(5, 2)}-{RandomString(6, 3)}";
+                var scratchCardCode = $"{RandomString(5, 2)}-{RandomString(6, 3)}";
                 if (_bonusManageService.SetScratchCardCode(specialCode, scratchCardCode, lastUpdateUser) == 0)
                 {
                     count--;

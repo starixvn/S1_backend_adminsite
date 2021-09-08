@@ -46,7 +46,7 @@ namespace BackendSite.Service.DAL
             transId = p.Get<string>("TransId");
             if (result > 0)
             {
-                List<int> forStatus = new List<int>();
+                var forStatus = new List<int>();
                 forStatus.Add((int)AdjustStatus.Pending);
                 if (SetAdjustmentInfo(transId, adjustmentInfo.SiteId, $"Payment Adjustment: {adjustmentInfo.Amount * (adjustmentInfo.AdjustType == 1 ? 1 : -1)}", Operator, forStatus, AdjustStatus.Approved, adjustmentInfo, conn, trans) > 0)
                 {
@@ -64,8 +64,8 @@ namespace BackendSite.Service.DAL
 
         public int SetAdjustmentInfo(string transId, int siteId, string comment, string Operator, IEnumerable<int> forStatus, AdjustStatus status, AdjustmentInfo adjustmentInfo, MySqlConnection conn, MySqlTransaction trans)
         {
-            int adjustId = 0;
-            int type = 1 + adjustmentInfo.AdjustType;
+            var adjustId = 0;
+            var type = 1 + adjustmentInfo.AdjustType;
 
             if (adjustmentInfo.AdjustType == 3)
             {
@@ -76,13 +76,13 @@ namespace BackendSite.Service.DAL
                 type = 7;
             }
 
-            Match m = Regex.Match(transId, @"\d+");
+            var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out adjustId);
 
-            int result = 0;
+            var result = 0;
             try
             {
-                string sForStatus = Newtonsoft.Json.JsonConvert.SerializeObject(forStatus);
+                var sForStatus = Newtonsoft.Json.JsonConvert.SerializeObject(forStatus);
                 var p = new DynamicParameters(new { AdjustId = adjustId, SiteId = siteId, RefId = (string)null, Comment = comment, ForStatus = sForStatus, Status = (int)status, ThirdId = (string)null });
                 p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
@@ -96,15 +96,15 @@ namespace BackendSite.Service.DAL
                     {
                         byte is1stDepoist = 0;
                         decimal afterAmount = 0;
-                        decimal amount = adjustmentInfo.Amount;
+                        var amount = adjustmentInfo.Amount;
 
                         if (adjustmentInfo.AdjustType == 2 || adjustmentInfo.AdjustType == 4)
                         {
                             amount *= -1;
                         }
 
-                        int custId = p.Get<int?>("CustId") ?? 0;
-                        string UserName = p.Get<string>("UserName");
+                        var custId = p.Get<int?>("CustId") ?? 0;
+                        var UserName = p.Get<string>("UserName");
                         result = walletService.SetBalance(custId, siteId, UserName, amount, type, $"Payment Adjustment: {amount}", transId, out afterAmount, out is1stDepoist, conn, trans);
 
                         if (is1stDepoist == 1 && result > 0)
@@ -140,10 +140,10 @@ namespace BackendSite.Service.DAL
         public IEnumerable<AdjustWithdrawalLimit> GetAdjustWithdrawalLimitsLog(int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
             IEnumerable<AdjustWithdrawalLimit> result = null;
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                string SpName = "Admin_AdjustWithdrawalLimitInfo_Get";
-                DynamicParameters props = new DynamicParameters();
+                var SpName = "Admin_AdjustWithdrawalLimitInfo_Get";
+                var props = new DynamicParameters();
                 props.Add("@CustId", CustId);
                 props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
                 props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -170,10 +170,10 @@ namespace BackendSite.Service.DAL
             decimal deduction = 0;
             if (walletInfo != null)
             {
-                decimal Balance = walletInfo.Balance;
-                decimal tmpDeduction = walletInfo.WithdrawalLimit - walletInfo.TurnOver;
+                var Balance = walletInfo.Balance;
+                var tmpDeduction = walletInfo.WithdrawalLimit - walletInfo.TurnOver;
                 deduction = tmpDeduction < 0 ? 0 : tmpDeduction;
-                decimal tmpAvailableBalance = walletInfo.Balance - (deduction);
+                var tmpAvailableBalance = walletInfo.Balance - (deduction);
             }
 
             if (withdrawalLimitInfo.AdjustType == 2 && deduction < withdrawalLimitInfo.Amount)
@@ -198,7 +198,7 @@ namespace BackendSite.Service.DAL
                 p.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
                 conn.Execute("Admin_AdjustWithdrawalLimitInfo_Ins", p, trans, commandType: CommandType.StoredProcedure);
-                string transId = p.Get<string>("TransId");
+                var transId = p.Get<string>("TransId");
 
                 if (string.IsNullOrEmpty(transId))
                 {
@@ -207,11 +207,11 @@ namespace BackendSite.Service.DAL
                 }
                 else
                 {
-                    decimal amount = withdrawalLimitInfo.AdjustType == 2 ? withdrawalLimitInfo.Amount * -1 : withdrawalLimitInfo.Amount;
-                    withdrawalLimitService.SetWithdrawalLimit(withdrawalLimitInfo.CustId, UserName, SiteId, amount, withdrawalLimitInfo.Memo, transId, out decimal AfterAmount, conn, trans);
+                    var amount = withdrawalLimitInfo.AdjustType == 2 ? withdrawalLimitInfo.Amount * -1 : withdrawalLimitInfo.Amount;
+                    withdrawalLimitService.SetWithdrawalLimit(withdrawalLimitInfo.CustId, UserName, SiteId, amount, withdrawalLimitInfo.Memo, transId, out var AfterAmount, conn, trans);
 
                     #region propsLog
-                    DynamicParameters propsLog = new DynamicParameters();
+                    var propsLog = new DynamicParameters();
                     var list = new Dictionary<string, string>();
                     foreach (var paraName in p.ParameterNames)
                     {
@@ -250,7 +250,7 @@ namespace BackendSite.Service.DAL
             Adjustment_transId = Adjustment_p.Get<string>("TransId");
             if (result > 0)
             {
-                List<int> forStatus = new List<int>();
+                var forStatus = new List<int>();
                 forStatus.Add((int)AdjustStatus.Pending);
                 result = SetAdjustmentInfo(Adjustment_transId, adjustmentAndWithdrawalLimit.SiteId, $"Payment Adjustment: {adjustmentAndWithdrawalLimit.Amount * (adjustmentAndWithdrawalLimit.AdjustType % 2 == 1/*1, 3(Add)2, 4(Deduct)*/ ? 1 : -1)}", Operator, forStatus, AdjustStatus.Approved, adjustmentAndWithdrawalLimit, conn, trans);
 
@@ -264,10 +264,10 @@ namespace BackendSite.Service.DAL
                         decimal deduction = 0;
                         if (walletInfo != null)
                         {
-                            decimal Balance = walletInfo.Balance;
-                            decimal tmpDeduction = walletInfo.WithdrawalLimit - walletInfo.TurnOver;
+                            var Balance = walletInfo.Balance;
+                            var tmpDeduction = walletInfo.WithdrawalLimit - walletInfo.TurnOver;
                             deduction = tmpDeduction < 0 ? 0 : tmpDeduction;
-                            decimal tmpAvailableBalance = walletInfo.Balance - (deduction);
+                            var tmpAvailableBalance = walletInfo.Balance - (deduction);
                         }
 
                         if (adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType == 2 && deduction < adjustmentAndWithdrawalLimit.WithdrawalLimitAmount)
@@ -292,7 +292,7 @@ namespace BackendSite.Service.DAL
                             WithdrawalLimit_p.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
                             conn.Execute("Admin_AdjustWithdrawalLimitInfo_Ins", WithdrawalLimit_p, trans, commandType: CommandType.StoredProcedure);
-                            string transId = WithdrawalLimit_p.Get<string>("TransId");
+                            var transId = WithdrawalLimit_p.Get<string>("TransId");
 
                             if (string.IsNullOrEmpty(transId))
                             {
@@ -301,8 +301,8 @@ namespace BackendSite.Service.DAL
                             }
                             else
                             {
-                                decimal amount = adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType == 2 ? adjustmentAndWithdrawalLimit.WithdrawalLimitAmount * -1 : adjustmentAndWithdrawalLimit.WithdrawalLimitAmount;
-                                result = withdrawalLimitService.SetWithdrawalLimit(adjustmentAndWithdrawalLimit.CustId, adjustmentAndWithdrawalLimit.UserName, adjustmentAndWithdrawalLimit.SiteId, amount, adjustmentAndWithdrawalLimit.Memo, transId, out decimal AfterAmount, conn, trans);
+                                var amount = adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType == 2 ? adjustmentAndWithdrawalLimit.WithdrawalLimitAmount * -1 : adjustmentAndWithdrawalLimit.WithdrawalLimitAmount;
+                                result = withdrawalLimitService.SetWithdrawalLimit(adjustmentAndWithdrawalLimit.CustId, adjustmentAndWithdrawalLimit.UserName, adjustmentAndWithdrawalLimit.SiteId, amount, adjustmentAndWithdrawalLimit.Memo, transId, out var AfterAmount, conn, trans);
 
                                 //return 0;
                             }
@@ -333,7 +333,7 @@ namespace BackendSite.Service.DAL
         }
         public int AddAdjustmentLimitInfo(int SiteId, int CurrencyId, double AdjustmentMax, string Operator)
         {
-            DynamicParameters props = new DynamicParameters();
+            var props = new DynamicParameters();
             props.Add("SiteId", SiteId);
             props.Add("CurrencyId", CurrencyId);
             props.Add("AdjustmentMax", AdjustmentMax);

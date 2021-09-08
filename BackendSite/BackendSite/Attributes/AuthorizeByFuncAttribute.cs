@@ -42,7 +42,7 @@ namespace BackendSite.Attributes
         {
             if (!string.IsNullOrEmpty(FuncKey))
             {
-                PageStaus pageStatus = PageStaus.allow;
+                var pageStatus = PageStaus.allow;
                 if (filterContext.HttpContext.User.Identity.IsAuthenticated)
                 {
                     var authInfo = authorizeBLL.GetAuthData();
@@ -94,7 +94,7 @@ namespace BackendSite.Attributes
                         switch (pageStatus)
                         {
                             case PageStaus.deniedReturnResult:
-                                ContentResult result = new ContentResult();
+                                var result = new ContentResult();
                                 result.Content = "Permission denied.";
                                 filterContext.Result = result;
                                 break;

@@ -18,7 +18,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PendingFund> PendingFundList(int siteId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.Query<PendingFund>("TmpPendingFund_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
             }

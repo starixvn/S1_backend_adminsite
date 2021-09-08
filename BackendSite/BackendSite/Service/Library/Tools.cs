@@ -19,10 +19,10 @@ namespace BackendSite.Service.Library
         /// <returns></returns>
         public string MD5Encrypt(string pass)
         {
-            MD5CryptoServiceProvider md5Hasher = new MD5CryptoServiceProvider();
-            byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(pass));
-            StringBuilder sBuilder = new StringBuilder();
-            for (int i = 0; i < data.Length; i++)
+            var md5Hasher = new MD5CryptoServiceProvider();
+            var data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(pass));
+            var sBuilder = new StringBuilder();
+            for (var i = 0; i < data.Length; i++)
             {
                 sBuilder.Append(data[i].ToString("x2"));
             }
@@ -35,8 +35,8 @@ namespace BackendSite.Service.Library
         /// <returns></returns>
         public bool CheckUserName(string userName)
         {
-            Regex regex = new Regex("^(?!^\\d+$)(?!^[a-zA-Z]+$)[0-9a-zA-Z]{6,18}$", RegexOptions.Singleline);
-            Match mPwd = regex.Match(userName);
+            var regex = new Regex("^(?!^\\d+$)(?!^[a-zA-Z]+$)[0-9a-zA-Z]{6,18}$", RegexOptions.Singleline);
+            var mPwd = regex.Match(userName);
             if (userName.Length < 6 || userName.Length > 18)
                 return false;
             return mPwd.Success;
@@ -48,8 +48,8 @@ namespace BackendSite.Service.Library
         /// <returns></returns>
         public bool CheckUserInputPassword(string userPwd)
         {
-            Regex regex = new Regex("^[A-Za-z0-9]+$", RegexOptions.Singleline);
-            Match mPwd = regex.Match(userPwd);
+            var regex = new Regex("^[A-Za-z0-9]+$", RegexOptions.Singleline);
+            var mPwd = regex.Match(userPwd);
             if (userPwd.Length < 6 || userPwd.Length > 18)
                 return false;
             return mPwd.Success;
@@ -57,8 +57,8 @@ namespace BackendSite.Service.Library
 
         public string GetToken()
         {
-            Guid g = Guid.NewGuid();
-            string GuidString = Convert.ToBase64String(g.ToByteArray());
+            var g = Guid.NewGuid();
+            var GuidString = Convert.ToBase64String(g.ToByteArray());
             GuidString = GuidString.Replace("=", "");
             GuidString = GuidString.Replace("+", "");
 
@@ -72,15 +72,15 @@ namespace BackendSite.Service.Library
         /// <returns></returns>
         public string GetClientIP(Microsoft.AspNetCore.Http.HttpContext context)
         {
-            string[] HeaderNames = new string[] { "HTTP_X_FORWARDED_FOR", "HTTP_INCAP_CLIENT_IP", "HTTP_TRUE_CLIENT_IP", "HTTP_X_REAL_IP", "REMOTE_ADDR" };
+            var HeaderNames = new string[] { "HTTP_X_FORWARDED_FOR", "HTTP_INCAP_CLIENT_IP", "HTTP_TRUE_CLIENT_IP", "HTTP_X_REAL_IP", "REMOTE_ADDR" };
 
-            foreach (string Header in HeaderNames)
+            foreach (var Header in HeaderNames)
             {
 
                 if (context.Request.Headers.ContainsKey(Header))
                 {
                     string sServerVariables = context.Request.Headers[Header];
-                    string ip = GetIPAddress(sServerVariables.Split(','));
+                    var ip = GetIPAddress(sServerVariables.Split(','));
                     if (!string.IsNullOrEmpty(ip))
                     {
                         return ip;
@@ -93,9 +93,9 @@ namespace BackendSite.Service.Library
 
         private string GetIPAddress(string[] IPArry)
         {
-            foreach (string ip in IPArry)
+            foreach (var ip in IPArry)
             {
-                string IPAddress = ip.Trim();
+                var IPAddress = ip.Trim();
                 if (IsIPAddress(IPAddress)
                     && !isInnerIP(IPAddress)) return IPAddress.Trim();
             }
@@ -104,8 +104,8 @@ namespace BackendSite.Service.Library
         }
         private bool isInnerIP(string ipAddress)
         {
-            bool isInnerIp = false;
-            long ipNum = getIpNum(ipAddress);
+            var isInnerIp = false;
+            var ipNum = getIpNum(ipAddress);
 
             long aBegin = 167772160;// getIpNum("10.0.0.0");
             long aEnd = 184549375;// getIpNum("10.255.255.255");
@@ -121,13 +121,13 @@ namespace BackendSite.Service.Library
         }
         private long getIpNum(String ipAddress)
         {
-            string[] ip = ipAddress.Split('.');
+            var ip = ipAddress.Split('.');
             long a = Convert.ToInt32(ip[0]);
             long b = Convert.ToInt32(ip[1]);
             long c = Convert.ToInt32(ip[2]);
             long d = Convert.ToInt32(ip[3]);
 
-            long ipNum = a * 256 * 256 * 256 + b * 256 * 256 + c * 256 + d;
+            var ipNum = a * 256 * 256 * 256 + b * 256 * 256 + c * 256 + d;
             return ipNum;
         }
         private bool IsIPAddress(string str1)
@@ -135,7 +135,7 @@ namespace BackendSite.Service.Library
             if (string.IsNullOrEmpty(str1) || str1.Length < 7 || str1.Length > 15) return false;
             const string regformat = @"^\d{1,3}[\.]\d{1,3}[\.]\d{1,3}[\.]\d{1,3}$";
 
-            Regex regex = new Regex(regformat, RegexOptions.IgnoreCase);
+            var regex = new Regex(regformat, RegexOptions.IgnoreCase);
             return regex.IsMatch(str1);
 
         }
@@ -146,7 +146,7 @@ namespace BackendSite.Service.Library
         #endregion
         public string GetFromUrl(Microsoft.AspNetCore.Http.HttpContext context)
         {
-            string fromUrl = "";
+            var fromUrl = "";
             if (context.Request.Headers.ContainsKey("Referer"))
             {
                 fromUrl = context.Request.Headers["Referer"].ToString();
@@ -162,7 +162,7 @@ namespace BackendSite.Service.Library
         /// <returns></returns>
         public decimal Floor(decimal d, int decimals)
         {
-            long value = (long)Math.Pow(10.0, decimals);
+            var value = (long)Math.Pow(10.0, decimals);
             return Convert.ToDecimal(Math.Floor(d * (decimal)value) / (decimal)value);
         }
         /// <summary>
@@ -186,8 +186,8 @@ namespace BackendSite.Service.Library
         /// <returns></returns>
         public static string GetDescription(this Enum value)
         {
-            FieldInfo fi = value.GetType().GetField(value.ToString());
-            DescriptionAttribute[] attributes = (DescriptionAttribute[])fi.GetCustomAttributes(
+            var fi = value.GetType().GetField(value.ToString());
+            var attributes = (DescriptionAttribute[])fi.GetCustomAttributes(
              typeof(DescriptionAttribute), false);
             if (attributes.Length > 0) return attributes[0].Description;
             else return value.ToString();

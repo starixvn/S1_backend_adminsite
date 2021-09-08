@@ -18,7 +18,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PointLevelInfo> GetPointLevelInfos(int siteId, int currencyId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.Query<PointLevelInfo>("PointLevelInfo_Get", new { SiteId = siteId, CurrencyId = currencyId }, commandType: CommandType.StoredProcedure);
             }
@@ -26,7 +26,7 @@ namespace BackendSite.Service.DAL
 
         public bool AddPointLevelInfo(PointLevelInfo pointLevelInfo)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 var param = new
                 {
@@ -43,7 +43,7 @@ namespace BackendSite.Service.DAL
 
         public bool EditPointLevelInfo(PointLevelInfo pointLevelInfo)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 var param = new
                 {
@@ -60,7 +60,7 @@ namespace BackendSite.Service.DAL
 
         public PointLevelInfo GetPointLevelInfo(int siteId, int currencyId, int point)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.QueryFirstOrDefault<PointLevelInfo>("PointLevelInfoDetail_Get", new { SiteId = siteId, CurrencyId = currencyId, PointLevel = point }, commandType: CommandType.StoredProcedure);
             }
@@ -68,7 +68,7 @@ namespace BackendSite.Service.DAL
 
         public int DeletePointLevelInfo(PointLevelInfo pointLevelInfo)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 return conn.Execute("PointLevelInfo_Del",new { SiteId = pointLevelInfo.SiteId, CurrencyId = pointLevelInfo.CurrencyId, PointLevel = pointLevelInfo.PointLevel },commandType: CommandType.StoredProcedure);
             }
