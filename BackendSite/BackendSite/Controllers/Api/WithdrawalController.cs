@@ -268,7 +268,7 @@ namespace BackendSite.Controllers.Api
                 {
                     var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
                     var bankInfoOff = bankDetailBLL.GetBankInfoOff(withdrawalRequest.SiteId)
-                        .Where(x => x.BankId == withdrawalReq.SelId).FirstOrDefault();
+                        .FirstOrDefault(x => x.BankId == withdrawalReq.SelId);
 
                     if (bankInfoOff != null)
                     {

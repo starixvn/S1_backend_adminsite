@@ -1500,7 +1500,7 @@ namespace BackendSite.Service.BLL
 
                 if (data.DepositType == DepositType.LocalBank)
                 {
-                    var account = accountData.Where(x => x.AccountNo == data.AccountNo).FirstOrDefault();
+                    var account = accountData.FirstOrDefault(x => x.AccountNo == data.AccountNo);
 
                     if (account != null)
                     {
@@ -1530,8 +1530,8 @@ namespace BackendSite.Service.BLL
                 }
                 else
                 {
-                    var account = accountData.Where(x => x.PayId.ToString() == data.AccountNo && x.SiteId == data.SiteId && x.CurrencyId == data.CurrencyId).FirstOrDefault();
-                    var pay = payData.Where(x => x.Id.ToString() == data.AccountNo).FirstOrDefault();
+                    var account = accountData.FirstOrDefault(x => x.PayId.ToString() == data.AccountNo && x.SiteId == data.SiteId && x.CurrencyId == data.CurrencyId);
+                    var pay = payData.FirstOrDefault(x => x.Id.ToString() == data.AccountNo);
 
                     if (!keyValuePairs.ContainsKey($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"))
                     {
@@ -1565,7 +1565,7 @@ namespace BackendSite.Service.BLL
 
                 if (data.WithdrawalType == WithdrawalType.LocalBank)
                 {
-                    var account = accountData.Where(x => x.AccountNo == data.AccountNo).FirstOrDefault();
+                    var account = accountData.FirstOrDefault(x => x.AccountNo == data.AccountNo);
 
                     if (account != null)
                     {
@@ -1593,8 +1593,8 @@ namespace BackendSite.Service.BLL
                 }
                 else if (data.WithdrawalType == WithdrawalType.OnlinePayment)
                 {
-                    var account = accountData.Where(x => x.PayId.ToString() == data.AccountNo && x.SiteId == data.SiteId && x.CurrencyId == data.CurrencyId).FirstOrDefault();
-                    var pay = payData.Where(x => x.Id.ToString() == data.AccountNo).FirstOrDefault();
+                    var account = accountData.FirstOrDefault(x => x.PayId.ToString() == data.AccountNo && x.SiteId == data.SiteId && x.CurrencyId == data.CurrencyId);
+                    var pay = payData.FirstOrDefault(x => x.Id.ToString() == data.AccountNo);
 
                     if (!keyValuePairs.ContainsKey($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"))
                     {
@@ -1627,7 +1627,7 @@ namespace BackendSite.Service.BLL
             {
                 BankFinancialDataModel bankFinancialDataModel = null;
 
-                var account = accountData.Where(x => x.AccountNo == data.AccountNo).FirstOrDefault();
+                var account = accountData.FirstOrDefault(x => x.AccountNo == data.AccountNo);
 
                 if (account != null)
                 {

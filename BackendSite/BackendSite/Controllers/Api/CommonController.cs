@@ -48,7 +48,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var allTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes());
-                var getType = allTypes.Where(t => string.Equals(t.Name, enumName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                var getType = allTypes.FirstOrDefault(t => string.Equals(t.Name, enumName, StringComparison.OrdinalIgnoreCase));
                 if (getType != null)
                 {
                     if (getType.Namespace == "BackendSite.Service.Model.enums" && getType.IsEnum)

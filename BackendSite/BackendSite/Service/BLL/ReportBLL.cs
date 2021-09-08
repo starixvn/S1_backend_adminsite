@@ -625,8 +625,8 @@ namespace BackendSite.Service.BLL
                     summaryCurrencyData.Add(summaryCurrencyModel);
                 }
 
-                accountCurrencyModel = depositAccountModel.SummaryData.Where(x => x.CurrencyId == data.CurrencyId).FirstOrDefault();
-                summaryCurrencyModel = summaryCurrencyData.Where(x => x.CurrencyId == data.CurrencyId).FirstOrDefault();
+                accountCurrencyModel = depositAccountModel.SummaryData.FirstOrDefault(x => x.CurrencyId == data.CurrencyId);
+                summaryCurrencyModel = summaryCurrencyData.FirstOrDefault(x => x.CurrencyId == data.CurrencyId);
 
                 accountCurrencyModel.TotalAmount += data.DepositSummary;
                 accountCurrencyModel.TotalAmountInMYR += RoundingNumber(data.DepositSummary * rate, 2);

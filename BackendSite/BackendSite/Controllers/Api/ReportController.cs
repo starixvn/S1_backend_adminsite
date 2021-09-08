@@ -1104,7 +1104,7 @@ namespace BackendSite.Controllers.Api
 
             foreach (var categoryId in categoryIdList)
             {
-                mergeContentRule.Add(turnOverContent.Where(x => x["CategoryId"] == categoryId).Count());
+                mergeContentRule.Add(turnOverContent.Count(x => x["CategoryId"] == categoryId));
             }
 
             #endregion
@@ -2411,7 +2411,7 @@ namespace BackendSite.Controllers.Api
 
             foreach (var custId in custIdList)
             {
-                summaryMergeContentRule.Add(summaryContent.Where(x => x["CustId"] == custId).Count());
+                summaryMergeContentRule.Add(summaryContent.Count(x => x["CustId"] == custId));
             }
 
             #endregion
@@ -2422,7 +2422,7 @@ namespace BackendSite.Controllers.Api
 
             foreach (var custId in custIdList)
             {
-                byDateMergeContentRule.Add(byDateContent.Where(x => x["CustId"] == custId).Count());
+                byDateMergeContentRule.Add(byDateContent.Count(x => x["CustId"] == custId));
             }
 
             #endregion
