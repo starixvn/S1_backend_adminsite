@@ -30,7 +30,7 @@ namespace BackendSite.Attributes
 
         private bool IsJsonResult(string ContentType)
         {
-            return ContentType == null ? false : ContentType.Contains("*/*") || ContentType.Contains("application/json");
+            return ContentType != null && (ContentType.Contains("*/*") || ContentType.Contains("application/json"));
         }
 
         public void OnAuthorization(AuthorizationFilterContext filterContext)
