@@ -89,8 +89,10 @@ namespace BackendSite.Attributes
                         switch (pageStatus)
                         {
                             case PageStatus.DeniedReturnResult:
-                                var result = new ContentResult();
-                                result.Content = "Permission denied.";
+                                var result = new ContentResult
+                                {
+                                    Content = "Permission denied."
+                                };
                                 filterContext.Result = result;
                                 break;
 

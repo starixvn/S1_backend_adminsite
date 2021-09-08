@@ -667,8 +667,10 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult SetLeaderboardExtraPoint(SetLeaderboardExtraPointReq setLeaderboardExtraPointReq)
         {
-            var apiResult = new ApiResult();
-            apiResult.Message = "Unknown Error";
+            var apiResult = new ApiResult
+            {
+                Message = "Unknown Error"
+            };
             var UserName = _authorizeBLL.GetAuthData().UserName;
             var rtn = _bonusManageBLL.SetLeaderboardExtraPoint(
                 setLeaderboardExtraPointReq.ActiveDate, setLeaderboardExtraPointReq.SiteId, setLeaderboardExtraPointReq.CategoryId, 

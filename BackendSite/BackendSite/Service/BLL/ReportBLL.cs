@@ -609,18 +609,22 @@ namespace BackendSite.Service.BLL
 
                 if (!depositAccountModel.SummaryData.Select(x => x.CurrencyId).Contains(data.CurrencyId))
                 {
-                    accountCurrencyModel = new DepositSummaryReportModel();
-                    accountCurrencyModel.CurrencyId = data.CurrencyId;
-                    accountCurrencyModel.IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
+                    accountCurrencyModel = new DepositSummaryReportModel
+                    {
+                        CurrencyId = data.CurrencyId,
+                        IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault()
+                    };
 
                     depositAccountModel.SummaryData.Add(accountCurrencyModel);
                 }
 
                 if (!summaryCurrencyData.Select(x => x.CurrencyId).Contains(data.CurrencyId))
                 {
-                    summaryCurrencyModel = new DepositSummaryReportModel();
-                    summaryCurrencyModel.CurrencyId = data.CurrencyId;
-                    summaryCurrencyModel.IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
+                    summaryCurrencyModel = new DepositSummaryReportModel
+                    {
+                        CurrencyId = data.CurrencyId,
+                        IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault()
+                    };
 
                     summaryCurrencyData.Add(summaryCurrencyModel);
                 }
@@ -674,9 +678,11 @@ namespace BackendSite.Service.BLL
                 {
                     if (!accountItem.Value.SummaryData.Select(x => x.CurrencyId).Contains(curr))
                     {
-                        accountCurrencyModel = new DepositSummaryReportModel();
-                        accountCurrencyModel.CurrencyId = curr;
-                        accountCurrencyModel.IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+                        accountCurrencyModel = new DepositSummaryReportModel
+                        {
+                            CurrencyId = curr,
+                            IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault()
+                        };
 
                         accountItem.Value.SummaryData.Add(accountCurrencyModel);
                     }
@@ -702,9 +708,11 @@ namespace BackendSite.Service.BLL
 
                 if (!summaryCurrencyData.Select(x => x.CurrencyId).Contains(curr))
                 {
-                    summaryCurrencyModel = new DepositSummaryReportModel();
-                    summaryCurrencyModel.CurrencyId = curr;
-                    summaryCurrencyModel.IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+                    summaryCurrencyModel = new DepositSummaryReportModel
+                    {
+                        CurrencyId = curr,
+                        IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault()
+                    };
 
                     summaryCurrencyData.Add(summaryCurrencyModel);
                 }
@@ -753,10 +761,12 @@ namespace BackendSite.Service.BLL
 
                 if (!accountDateKeyValuePairs.ContainsKey($"{AccountType}-{data.AccountId}-{dateFormat}-{data.CurrencyId}"))
                 {
-                    depositByDateReportModel = new DepositByDateReportModel();
-                    depositByDateReportModel.Date = dateFormat;
-                    depositByDateReportModel.CurrencyId = data.CurrencyId;
-                    depositByDateReportModel.IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
+                    depositByDateReportModel = new DepositByDateReportModel
+                    {
+                        Date = dateFormat,
+                        CurrencyId = data.CurrencyId,
+                        IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault()
+                    };
 
                     accountDateKeyValuePairs.Add($"{AccountType}-{data.AccountId}-{dateFormat}-{data.CurrencyId}", depositByDateReportModel);
                 }
@@ -772,8 +782,10 @@ namespace BackendSite.Service.BLL
 
                 if (!accountDateTotalKeyValuePairs.ContainsKey($"{AccountType}-{data.AccountId}-{dateFormat}"))
                 {
-                    depositByDateReportTotalModel = new DepositByDateReportModel();
-                    depositByDateReportTotalModel.Date = dateFormat;
+                    depositByDateReportTotalModel = new DepositByDateReportModel
+                    {
+                        Date = dateFormat
+                    };
 
                     accountDateTotalKeyValuePairs.Add($"{AccountType}-{data.AccountId}-{dateFormat}", depositByDateReportTotalModel);
                 }
@@ -801,10 +813,12 @@ namespace BackendSite.Service.BLL
                     {
                         if (!accountDateKeyValuePairs.ContainsKey($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-{date}-{curr}"))
                         {
-                            depositByDateReportModel = new DepositByDateReportModel();
-                            depositByDateReportModel.Date = date;
-                            depositByDateReportModel.CurrencyId = curr;
-                            depositByDateReportModel.IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
+                            depositByDateReportModel = new DepositByDateReportModel
+                            {
+                                Date = date,
+                                CurrencyId = curr,
+                                IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault()
+                            };
 
                             accountDateKeyValuePairs.Add($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-{date}-{curr}", depositByDateReportModel);
                         }
@@ -818,8 +832,10 @@ namespace BackendSite.Service.BLL
 
                     if (!accountDateTotalKeyValuePairs.ContainsKey($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-{date}"))
                     {
-                        depositByDateReportTotalModel = new DepositByDateReportModel();
-                        depositByDateReportTotalModel.Date = date;
+                        depositByDateReportTotalModel = new DepositByDateReportModel
+                        {
+                            Date = date
+                        };
 
                         accountDateTotalKeyValuePairs.Add($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-{date}", depositByDateReportTotalModel);
                     }

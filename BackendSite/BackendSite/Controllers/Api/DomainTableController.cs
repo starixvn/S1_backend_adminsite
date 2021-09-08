@@ -33,9 +33,11 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<IEnumerable<DomainTable>> GetDomainList(DomainListReq domainListReq)
         {
-            var apiResult = new ApiResult<IEnumerable<DomainTable>>();
-            apiResult.Data = domainTableBLL.GetDomainList(domainListReq.SelectSite, domainListReq.CurrencyId);
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<IEnumerable<DomainTable>>
+            {
+                Data = domainTableBLL.GetDomainList(domainListReq.SelectSite, domainListReq.CurrencyId),
+                ErrorCode = 0
+            };
 
             return apiResult;
         }
@@ -49,9 +51,11 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<IEnumerable<DomainTable>> GetDomainListbySite(DomainListbySiteReq domainListbySiteReq)
         {
-            var apiResult = new ApiResult<IEnumerable<DomainTable>>();
-            apiResult.Data = domainTableBLL.GetDomainListbySite(domainListbySiteReq.SiteId, domainListbySiteReq.CurrencyId);
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<IEnumerable<DomainTable>>
+            {
+                Data = domainTableBLL.GetDomainListbySite(domainListbySiteReq.SiteId, domainListbySiteReq.CurrencyId),
+                ErrorCode = 0
+            };
 
             return apiResult;
         }

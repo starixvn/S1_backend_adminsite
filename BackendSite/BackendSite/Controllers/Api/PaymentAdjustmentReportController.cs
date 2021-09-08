@@ -70,13 +70,15 @@ namespace BackendSite.Controllers.Api
             var totalPages = 0;
             var rowCount = 0;
             var CurrencyAmount = new List<string>();
-            var apiListResult = new ApiListResultCurrencyAmount<PaymentAdjustment>();
-            apiListResult.Data = paymentAdjustmentBLL.GetAdjustmentInfoByCust(getAdjustmentInfoReq.CustId, getAdjustmentInfoReq.StartDate, getAdjustmentInfoReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount,ref CurrencyAmount);
-            apiListResult.ErrorCode = 0;
-            apiListResult.PageNumber = pageNumber;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.RowCount = rowCount;
-            apiListResult.CurrencyAmount = CurrencyAmount;
+            var apiListResult = new ApiListResultCurrencyAmount<PaymentAdjustment>
+            {
+                Data = paymentAdjustmentBLL.GetAdjustmentInfoByCust(getAdjustmentInfoReq.CustId, getAdjustmentInfoReq.StartDate, getAdjustmentInfoReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount,ref CurrencyAmount),
+                ErrorCode = 0,
+                PageNumber = pageNumber,
+                TotalPages = totalPages,
+                RowCount = rowCount,
+                CurrencyAmount = CurrencyAmount
+            };
 
             return apiListResult;
         }

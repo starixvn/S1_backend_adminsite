@@ -29,9 +29,11 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<int>> GetCurrencyList()
         {
             var serverInfo = serverInfoBLL.GetServerInfo();
-            var apiResult = new ApiResult<IEnumerable<int>>();
-            apiResult.Data = serverInfo.ICurrencyList;
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<IEnumerable<int>>
+            {
+                Data = serverInfo.ICurrencyList,
+                ErrorCode = 0
+            };
             return apiResult;
         }
 

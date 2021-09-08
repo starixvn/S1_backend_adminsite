@@ -118,9 +118,11 @@ namespace BackendSite.Service.BLL
                     }
                 }
 
-                var graphicOptions = new GraphicOptions();
-                graphicOptions.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-                graphicOptions.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+                var graphicOptions = new GraphicOptions
+                {
+                    CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed,
+                    SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed
+                };
                 var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
                 img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 

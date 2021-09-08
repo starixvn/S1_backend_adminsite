@@ -59,9 +59,11 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<IEnumerable<PendingBonus>> GetPendingBonusList()
         {
-            var apiResult = new ApiResult<IEnumerable<PendingBonus>>();
-            apiResult.Data = bonusInfoBLL.GetPendingBonusList();
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<IEnumerable<PendingBonus>>
+            {
+                Data = bonusInfoBLL.GetPendingBonusList(),
+                ErrorCode = 0
+            };
             return apiResult;
         }
     }

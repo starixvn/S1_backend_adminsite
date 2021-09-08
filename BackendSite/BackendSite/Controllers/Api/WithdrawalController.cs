@@ -598,10 +598,12 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<WithdrawalKYC>> WithdrawalKYCList(WithdrawalKYC withdrawalKYC)
         {
             var result = withdrawalBLL.GetWithdrawalKYCList(withdrawalKYC.SiteId);
-            var apiResult = new ApiResult<IEnumerable<WithdrawalKYC>>();
+            var apiResult = new ApiResult<IEnumerable<WithdrawalKYC>>
+            {
+                Data = result,
+                ErrorCode = 0
+            };
 
-            apiResult.Data = result;
-            apiResult.ErrorCode = 0;
             return apiResult;
         }
 
