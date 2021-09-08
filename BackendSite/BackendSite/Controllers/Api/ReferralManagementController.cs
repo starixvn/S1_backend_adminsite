@@ -32,7 +32,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<List<ReferralManagement>>();
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
-            var referralList = referralManagementBLL.GetReferralBySiteId(SiteId);
+            var referralList = referralManagementBLL.GetReferralBySiteId(SiteId).ToList();
             var currencyList = reportBLL.GetCurrency().ToList();
             var referralManagementList = new List<ReferralManagement>();
 
@@ -40,7 +40,7 @@ namespace BackendSite.Controllers.Api
             {
                 int currencyId;
                 int.TryParse(currency, out currencyId);
-                var referral = referralList?.Where(x => x.CurrencyId == currencyId).ToList().FirstOrDefault();
+                var referral = referralList.FirstOrDefault(x => x.CurrencyId == currencyId);
                 referralManagementList.Add(new ReferralManagement
                 {
                     SiteId = SiteId,
@@ -82,8 +82,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<dynamic>();
             try
             {
-                var referralList = referralManagementBLL.GetReferralBySiteId(SiteId);
-                var referral = referralList?.Where(x => x.CurrencyId == CurrencyId).ToList().FirstOrDefault();
+                var referralList = referralManagementBLL.GetReferralBySiteId(SiteId).ToList();
+                var referral = referralList.FirstOrDefault(x => x.CurrencyId == CurrencyId);
                 if (referral == null)
                 {
                     apiResult.ErrorCode = 7;
