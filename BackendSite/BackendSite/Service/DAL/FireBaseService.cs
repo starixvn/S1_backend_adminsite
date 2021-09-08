@@ -23,19 +23,13 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<FireBaseMessageInfo> GetFireBaseMessageList(int fireBaseId)
         {
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
-            {
-             
-                return conn.Query<FireBaseMessageInfo>("Admin_FirebaseData_Get", new { FirebaseId = fireBaseId }, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<FireBaseMessageInfo>("Admin_FirebaseData_Get", new { FirebaseId = fireBaseId }, commandType: CommandType.StoredProcedure);
         }
         public IEnumerable<FireBaseCustInfo> GetFireBaseCustList(int siteId, int custId )
         {
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
-            {
-
-                return conn.Query<FireBaseCustInfo>("Admin_FirebaseCustList_Get",new { SiteId = siteId, CustId = custId }, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<FireBaseCustInfo>("Admin_FirebaseCustList_Get",new { SiteId = siteId, CustId = custId }, commandType: CommandType.StoredProcedure);
         }
         public async Task<ApiResult<IEnumerable<FireBaseReturn>>> SendFireBaseNotificationAsync(IEnumerable<FireBaseMessage> fireBaseMessage)
         {

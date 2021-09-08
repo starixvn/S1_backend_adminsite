@@ -421,17 +421,15 @@ namespace BackendSite.Service.DAL
         /// <returns></returns>
         public int DeleteOnUserData(int custId)
         {
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                var parameters = new DynamicParameters(
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var parameters = new DynamicParameters(
                 new
                 {
                     _CustId = custId
                 });
 
-                var SpName = "Admin_OnUser_Del";
-                return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
-            }
+            var SpName = "Admin_OnUser_Del";
+            return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
         }
 
         #region Tag
@@ -579,21 +577,19 @@ namespace BackendSite.Service.DAL
         public IEnumerable<RegLiveStatus> GetExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate)
         {
             IEnumerable<RegLiveStatus> result = null;
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
-            {
-                var SpName = "Admin_CustRegLiveStatusExportV2_Get";
-                var props = new DynamicParameters();
-                props.Add("SelectSite", SelectSite);
-                props.Add("Currency", Currency);
-                props.Add("UserName", string.IsNullOrWhiteSpace(User) ? null : User);
-                props.Add("DepositStatus", DepositStatus);
-                props.Add("Status", Status);
-                props.Add("Sort", Sort);
-                props.Add("StartDate", StartDate);
-                props.Add("EndDate", EndDate);
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var SpName = "Admin_CustRegLiveStatusExportV2_Get";
+            var props = new DynamicParameters();
+            props.Add("SelectSite", SelectSite);
+            props.Add("Currency", Currency);
+            props.Add("UserName", string.IsNullOrWhiteSpace(User) ? null : User);
+            props.Add("DepositStatus", DepositStatus);
+            props.Add("Status", Status);
+            props.Add("Sort", Sort);
+            props.Add("StartDate", StartDate);
+            props.Add("EndDate", EndDate);
 
-                result = conn.Query<RegLiveStatus>(SpName, props, commandType: CommandType.StoredProcedure);
-            }
+            result = conn.Query<RegLiveStatus>(SpName, props, commandType: CommandType.StoredProcedure);
 
             return result;
         }

@@ -184,21 +184,19 @@ namespace BackendSite.Service.DAL
         {
 
             IEnumerable<TpBetRecordDetailbyGameType> result = null;
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
-            {
-                var SpName = "Admin_TpBetRecord_byGameTypeListV4_Get";
-                var props = new DynamicParameters(new { CustId = custId, SelDate = selDate, TypeId = gameTypeId, StartDate = startDate, EndDate = endDate });
-                props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-                props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@PageSize", PageSize);
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var SpName = "Admin_TpBetRecord_byGameTypeListV4_Get";
+            var props = new DynamicParameters(new { CustId = custId, SelDate = selDate, TypeId = gameTypeId, StartDate = startDate, EndDate = endDate });
+            props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("@PageSize", PageSize);
 
-                result = conn.Query<TpBetRecordDetailbyGameType>(SpName, props, commandType: CommandType.StoredProcedure);
-                PageNumber = props.Get<int?>("@PageNumber") ?? 0;
-                TotalPages = props.Get<int?>("@TotalPages") ?? 0;
-                RowCount = props.Get<int?>("@RowCount") ?? 0;
-            }
+            result = conn.Query<TpBetRecordDetailbyGameType>(SpName, props, commandType: CommandType.StoredProcedure);
+            PageNumber = props.Get<int?>("@PageNumber") ?? 0;
+            TotalPages = props.Get<int?>("@TotalPages") ?? 0;
+            RowCount = props.Get<int?>("@RowCount") ?? 0;
 
             return result;
         }

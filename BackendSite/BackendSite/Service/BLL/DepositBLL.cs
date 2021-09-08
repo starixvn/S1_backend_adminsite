@@ -379,23 +379,21 @@ namespace BackendSite.Service.BLL
         {
             var result = 1;
 
-            using (var scope = new TransactionScope())
+            using var scope = new TransactionScope();
+            if(!depositService.SetDepositRequestAmount(transId, amount, Operator))
             {
-                if(!depositService.SetDepositRequestAmount(transId, amount, Operator))
-                {
-                    scope.Dispose();
+                scope.Dispose();
 
-                    return 0;
-                }
-                if (!custInfoService.AddCustNote(CustId, $"SetDepositRequestAmount:{amount}", Operator))
-                {
-                    scope.Dispose();
-
-                    return 0;
-                }
-
-                scope.Complete();
+                return 0;
             }
+            if (!custInfoService.AddCustNote(CustId, $"SetDepositRequestAmount:{amount}", Operator))
+            {
+                scope.Dispose();
+
+                return 0;
+            }
+
+            scope.Complete();
             return result;
         }
     }

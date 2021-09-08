@@ -73,35 +73,31 @@ namespace BackendSite.Service.DAL
         public IEnumerable<BonusInfo> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int BaseCurrencyId, int RebateCategoriesId)
         {
             IEnumerable<BonusInfo> result = null;
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                var SpName = "Admin_BonusInfoExportV4_Get";
-                var props = new DynamicParameters();
-                props.Add("@SelectSite", SelectSite);
-                props.Add("@BonusCode", BonusCode);
-                props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
-                props.Add("@PromotionType", PromotionType);
-                props.Add("@Currency", CurrencyId);
-                props.Add("@UserName", UserName);
-                props.Add("@TransID", TransId);
-                props.Add("@StartDate", StartDate);
-                props.Add("@EndDate", EndDate);
-                props.Add("@BaseCurrencyId", BaseCurrencyId);
-                props.Add("@CategoryType", RebateCategoriesId);
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var SpName = "Admin_BonusInfoExportV4_Get";
+            var props = new DynamicParameters();
+            props.Add("@SelectSite", SelectSite);
+            props.Add("@BonusCode", BonusCode);
+            props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
+            props.Add("@PromotionType", PromotionType);
+            props.Add("@Currency", CurrencyId);
+            props.Add("@UserName", UserName);
+            props.Add("@TransID", TransId);
+            props.Add("@StartDate", StartDate);
+            props.Add("@EndDate", EndDate);
+            props.Add("@BaseCurrencyId", BaseCurrencyId);
+            props.Add("@CategoryType", RebateCategoriesId);
 
-                result = conn.Query<BonusInfo>(SpName, props, commandType: CommandType.StoredProcedure);
-            }
+            result = conn.Query<BonusInfo>(SpName, props, commandType: CommandType.StoredProcedure);
 
             return result;
         }
 
         public IEnumerable<PendingBonus> GetPendingBonusList()
         {
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                var SpName = "Admin_PendingBonusList_Get";
-                return conn.Query<PendingBonus>(SpName, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var SpName = "Admin_PendingBonusList_Get";
+            return conn.Query<PendingBonus>(SpName, commandType: CommandType.StoredProcedure);
         }
         public int CancelBonusByBonusId(bool isReturnAmount, int bonusId, string statusList, out int custId)
         {

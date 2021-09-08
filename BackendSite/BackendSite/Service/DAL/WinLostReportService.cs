@@ -20,18 +20,14 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<WinLostReport> GetWinLostReport(DateTime StartDate, DateTime EndDate, IEnumerable<int> SiteList, int Currency)
         {
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                return conn.Query<WinLostReport>("Report_WinLostV2_Get", new { StartDate, EndDate, SiteIds=JsonConvert.SerializeObject(SiteList), Currency}, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Query<WinLostReport>("Report_WinLostV2_Get", new { StartDate, EndDate, SiteIds=JsonConvert.SerializeObject(SiteList), Currency}, commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<GameType> GetAllGameType()
         {
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                return conn.Query<GameType>("Admin_TpGameType_Get", commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Query<GameType>("Admin_TpGameType_Get", commandType: CommandType.StoredProcedure);
         }
     }
 }

@@ -50,10 +50,8 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<SiteTpListIfo> GetTpList()
         {
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
-            {
-                return conn.Query<SiteTpListIfo>("Admin_TpList_Get", new {}, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<SiteTpListIfo>("Admin_TpList_Get", new {}, commandType: CommandType.StoredProcedure);
         }
 
         public GameCasinoResult GameCasinoByTPIdV2(GameCasinoPara gameCasinoPara)

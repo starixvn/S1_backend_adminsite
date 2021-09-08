@@ -58,21 +58,19 @@ namespace BackendSite.Service.DAL
         public void InsertLatestHighlightVideo(int SiteId,string Date, List<GetSiteLangData> SiteLangDatas, string User)
         {
             var result = new LatestHighlightVideoDataResult();
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                conn.Open();
-                using (var tran = conn.BeginTransaction())
-                {
-                    var props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var tran = conn.BeginTransaction();
+            var props = new DynamicParameters();
 
-                    foreach (var data in SiteLangDatas)
-                    {
-                        conn.Execute("Admin_LatestHighlightVideo_Int",
-                            new { SiteId = SiteId, Date = Date, Operator = User, Title = data.Title, Link = data.Link, LangId = data.LangId }, tran,commandType: CommandType.StoredProcedure);
-                    }
-                    tran.Commit();
-                }
-            };
+            foreach (var data in SiteLangDatas)
+            {
+                conn.Execute("Admin_LatestHighlightVideo_Int",
+                    new { SiteId = SiteId, Date = Date, Operator = User, Title = data.Title, Link = data.Link, LangId = data.LangId }, tran,commandType: CommandType.StoredProcedure);
+            }
+            tran.Commit();
+
+            ;
             
         }
     }
