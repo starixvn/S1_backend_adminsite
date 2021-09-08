@@ -154,6 +154,16 @@ namespace BackendSite.Service.Model
         public string GameName { get; set; }
         public decimal Stake { get; set; }
         public decimal WinlostAmount { get; set; }
+        public int SettlementType { get; set; }
+    }
+    public class CustTurnoverRes
+    {
+        public string UserName { get; set; }
+        public int GameType { get; set; }
+        public string GameName { get; set; }
+        public decimal StakeSettled { get; set; }
+        public decimal StakeNotRollover { get; set; }
+        public decimal WinlostAmount { get; set; }
     }
     public class CustBankInfoLog
     {

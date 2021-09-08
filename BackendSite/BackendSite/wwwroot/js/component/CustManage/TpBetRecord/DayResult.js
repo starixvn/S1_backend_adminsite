@@ -1,14 +1,17 @@
 import { number_format } from '../../commJS/common';
 import moment from "moment-timezone";
 const Result = (props) => {
-    let rows = props.Datas.length === 0 ? <tr><td>No Data.</td><td /><td /><td /><td /><td /></tr> : props.Datas.map((d, dIdx) => {
+    let rows = props.Datas.length === 0 ? <tr><td>No Data.</td><td /><td /><td /><td /><td /><td /><td /><td /></tr> : props.Datas.map((d, dIdx) => {
         return (
             <tr key={`result-${dIdx}`}>
                 <td>{moment(d.settledDate).format('l')}</td>
                 <td>{number_format(d.categoryName)}</td>
-                <td>{number_format(d.turnOver)}</td>
+                <td>{number_format(d.totalTO)}</td>
                 <td>{number_format(d.validBet)}</td>
-                <td>{number_format(d.winlostAmount)}</td>
+                <td>{number_format(d.invalidBet)}</td>
+                <td>{number_format(d.turnOver)}</td>
+                <td>{number_format(d.runningTickets)}</td>
+                <td>{number_format(d.winLoss)}</td>
                 <td><button className="btn btn-add" onClick={props.ClickDetail.bind(null, d.settledDate, d.categoryId)}>Details</button></td>
             </tr>
         )
@@ -22,8 +25,11 @@ const Result = (props) => {
                         <tr>
                             <th>Settled Date</th>
                             <th>Category Name</th>
-                            <th>Turnover</th>
+                            <th>Total TO</th>
                             <th>Valid Bet</th>
+                            <th>Invalid Bet</th>
+                            <th>Turnover (ExcludeValidTO)</th>
+                            <th>Running Tickets</th>
                             <th>WinLoss</th>
                             <th>Action</th>
                         </tr>

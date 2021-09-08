@@ -192,6 +192,7 @@ namespace BackendSite.Controllers.Api
             public string WithdrawalInfo { set; get; }
             public int? WithdrawalType { set; get; }
             public int? SelId { set; get; }
+            public int? ChannelId { set; get; }
         }
 
         [HttpPost]
@@ -281,6 +282,7 @@ namespace BackendSite.Controllers.Api
                 else if (withdrawalReq.WithdrawalType == (int) WithdrawalType.CryptoPay)
                 {
                     withdrawalInfo.PayId = withdrawalReq.SelId;
+                    withdrawalInfo.ChannelId = withdrawalReq.ChannelId;
                 }
 
                 if (withdrawalReq.WithdrawalType == null ||
@@ -310,6 +312,7 @@ namespace BackendSite.Controllers.Api
                             CustId = custId,
                             Amount = amount,
                             PayId = withdrawalInfo.PayId ?? 0,
+                            ChannelId = withdrawalInfo.ChannelId ?? 0,
                             AccountName = withdrawalInfo.AccountName,
                             AccountNo = withdrawalInfo.AccountNo,
                             IFSCCode = withdrawalInfo.IFSCCode
@@ -382,8 +385,8 @@ namespace BackendSite.Controllers.Api
             public int SysId { get; set; }
             public string TransId { get; set; }
             public int PayId { get; set; }
+            public int ChannelId { get; set; }
             public int CustId { get; set; }
-
             public decimal Amount { get; set; }
 
             //public string ClientIP { set; get; }
@@ -398,6 +401,7 @@ namespace BackendSite.Controllers.Api
             public int CurrencyId { get; set; }
             public int SysId { get; set; }
             public int SiteId { get; set; }
+            public string ChannelName { get; set; }
         }
 
         [HttpPost]
@@ -416,6 +420,7 @@ namespace BackendSite.Controllers.Api
         {
             public int PayId { get; set; }
             public string PayName { get; set; }
+            public int ChannelId { get; set; }
         }
 
         [HttpPost]
@@ -441,11 +446,14 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<Pay>>();
             var cryptoPay = bankDetailBLL.GetCryptoPay();
             var _payInfo = (from x in cryptoPay
-                select new Pay
-                {
-                    PayId = x.PayId,
-                    PayName = x.PayName
-                }).Distinct(bankInfoPayComparer);
+                            where x.CurrencyId == withdrawalReq.CurrencyId && x.ChannelName == withdrawalReq.ChannelName
+                             select new Pay
+                            {
+                                PayId = x.PayId,
+                                PayName = x.PayName,
+                                ChannelId = x.ChannelId
+                            }).Distinct(bankInfoPayComparer);
+            
             apiResult.Data = _payInfo;
             apiResult.ErrorCode = 0;
             return apiResult;

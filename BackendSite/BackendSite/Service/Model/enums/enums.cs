@@ -20,6 +20,7 @@ namespace BackendSite.Service.Model.enums
         Running = 1,
         Suspend = 2,
         Closed = 3,
+        Lock = 4,
     }
     public enum DepositType
     {
@@ -320,5 +321,14 @@ namespace BackendSite.Service.Model.enums
         Lottery = 6,
         VirtualSports = 7,
         Poker = 8,
+    }
+
+    public enum SettlementType
+    {
+        UnSettled = 0,
+        SettledForValid = 1,
+        SettledForInvalid = 2,
+        SettledForValidNotRollover = 3,
+        Cheating = 4
     }
 }

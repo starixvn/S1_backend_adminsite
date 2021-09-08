@@ -16,6 +16,7 @@ const Result = (props) => {
       : props.Datas.map((d, dIdx) => {
           return (
             <tr key={`result-${dIdx}`}>
+              <td>{d.bonusId}</td>
               <td>{d.bonusCode}</td>
               <td>{d.description}</td>
               <td>{number_format(d.bonusAmount)}</td>
@@ -44,6 +45,7 @@ const Result = (props) => {
         <table className="table table-striped">
           <thead>
             <tr>
+              <th scope="col">Bonus Id</th>
               <th scope="col">BonusCode</th>
               <th scope="col">Description</th>
               <th scope="col">Bonus Amount</th>
