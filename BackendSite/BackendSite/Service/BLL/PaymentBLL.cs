@@ -212,7 +212,7 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                return result.Password != password ? false : true;
+                return result.Password == password;
             }
         }
 
