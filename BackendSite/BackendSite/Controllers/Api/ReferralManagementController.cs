@@ -50,7 +50,7 @@ namespace BackendSite.Controllers.Api
                     VaildBet = referral == null ? string.Empty : referral.VaildBet.ToString(),
                     Deposit = referral == null ? string.Empty : referral.Deposit.ToString(),
                     IsoCode = currencyList.Find(x => x.CurrencyId == currencyId).IsoCode,
-                    Status = referral == null ? false : referral.Status
+                    Status = referral?.Status ?? false
                 });
             }
 

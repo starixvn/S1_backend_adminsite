@@ -48,7 +48,7 @@
     }
 
     var subFuncKeys = permissionBLL.GetSubFunckeys("Finance/DepositList");
-    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
+    subFuncKeys = subFuncKeys ?? new List<string>();
 }
 <h4 class="page-name">@selLangBLL.GetResourceValue("lbl_DepositRequest")</h4>
 

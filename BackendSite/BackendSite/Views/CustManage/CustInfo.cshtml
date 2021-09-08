@@ -52,7 +52,7 @@
     }
 
     var subFuncKeys = permissionBLL.GetSubFunckeys("CustManage/CustInfoList");
-    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
+    subFuncKeys = subFuncKeys ?? new List<string>();
 }
 @section Scripts {
     <script src="~/lib/clipboard.min.js"></script>

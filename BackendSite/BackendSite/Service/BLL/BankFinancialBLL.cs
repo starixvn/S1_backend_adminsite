@@ -1546,12 +1546,12 @@ namespace BackendSite.Service.BLL
                         bankFinancialDataModel.CurrencyId = data.CurrencyId;
                         bankFinancialDataModel.IsoCode = currencyData.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
                         bankFinancialDataModel.Channel = TransferChannelEnum.PSP;
-                        bankFinancialDataModel.PayId = account == null ? pay.Id : account.PayId;
+                        bankFinancialDataModel.PayId = account?.PayId ?? pay.Id;
                         bankFinancialDataModel.PayName = account == null ? pay.PayName : account.PayName;
                         bankFinancialDataModel.AccountNo = account == null ? pay.PayName + " " + bankFinancialDataModel.IsoCode : account.AccountNo;
                         bankFinancialDataModel.AccountName = account == null ? pay.PayName + " " + bankFinancialDataModel.IsoCode : account.DisplayName;
                         bankFinancialDataModel.Purpose = account == null ? "1,2,3" : account.Purpose;
-                        bankFinancialDataModel.AccountStatus = account == null ? status : account.Status;
+                        bankFinancialDataModel.AccountStatus = account?.Status ?? status;
                     }
                     bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
@@ -1609,12 +1609,12 @@ namespace BackendSite.Service.BLL
                         bankFinancialDataModel.CurrencyId = data.CurrencyId;
                         bankFinancialDataModel.IsoCode = currencyData.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
                         bankFinancialDataModel.Channel = TransferChannelEnum.PSP;
-                        bankFinancialDataModel.PayId = account == null ? pay.Id : account.PayId;
+                        bankFinancialDataModel.PayId = account?.PayId ?? pay.Id;
                         bankFinancialDataModel.PayName = account == null ? pay.PayName : account.PayName;
                         bankFinancialDataModel.AccountNo = account == null ? pay.PayName+" "+bankFinancialDataModel.IsoCode : account.AccountNo;
                         bankFinancialDataModel.AccountName = account == null ? pay.PayName + " " + bankFinancialDataModel.IsoCode : account.DisplayName;
                         bankFinancialDataModel.Purpose = account == null ? "1,2,3" : account.Purpose;
-                        bankFinancialDataModel.AccountStatus = account == null ? status : account.Status;
+                        bankFinancialDataModel.AccountStatus = account?.Status ?? status;
                     }
 
                     bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
