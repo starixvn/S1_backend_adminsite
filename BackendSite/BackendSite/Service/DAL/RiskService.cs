@@ -63,5 +63,12 @@ namespace BackendSite.Service.DAL
             p.Add("_CustId", custId);
             return await _sqlClient.QueryFirstAsync<TpDisableUserDetail>("Admin_TpDisableUserByCustId_Get", p);
         }
+
+        public async Task<int> DeleteTpDisableUser(int custId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            return await _sqlClient.ExecuteAsync("Admin_TpDisableUser_Del", p);
+        }
     }
 }

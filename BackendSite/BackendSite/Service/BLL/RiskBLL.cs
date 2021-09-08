@@ -33,5 +33,10 @@ namespace BackendSite.Service.BLL
         {
             return await _riskService.UpdateStatus(custId, status, Operator);
         }
+
+        public async Task<int> DeleteTpDisableUser(int custId)
+        {
+            return await _riskService.DeleteTpDisableUser(custId);
+        }
     }
 }
