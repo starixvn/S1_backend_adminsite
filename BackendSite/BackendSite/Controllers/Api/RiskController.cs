@@ -65,26 +65,30 @@ namespace BackendSite.Controllers.Api
             {
                 var tpList = await _gameCasinoBll.GetTpList();
                 var userDisableGames = await _riskBll.GetTpDisableUserBuCustId(custId);
-                var disableGames = JsonConvert.DeserializeObject<List<DisableTpGame>>(userDisableGames.GameInfo);
 
-                foreach (var disableGame in disableGames)
+                if (userDisableGames.GameInfo != null && userDisableGames.GameInfo != "null")
                 {
-                    foreach (var tp in tpList)
+                    var disableGames = JsonConvert.DeserializeObject<List<DisableTpGame>>(userDisableGames.GameInfo);
+
+                    foreach (var disableGame in disableGames)
                     {
-                        if (disableGame.TpId == tp.TpId)
+                        foreach (var tp in tpList)
                         {
-                            tp.Checked = true;
-                            var games = await _gameCasinoBll.GameCasinoByTPIdV3(tp.TpId);
-                            tp.GameList = games.Select(a=> new TpGameCasino()
+                            if (disableGame.TpId == tp.TpId)
                             {
-                                GameId = a.GameId,
-                                Name = a.Name,
-                                Checked = disableGame.GameList != null && disableGame.GameList.Any(c=>c == a.GameId)
-                            }).ToList();
+                                tp.Checked = true;
+                                var games = await _gameCasinoBll.GameCasinoByTPIdV3(tp.TpId);
+                                tp.GameList = games.Select(a=> new TpGameCasino()
+                                {
+                                    GameId = a.GameId,
+                                    Name = a.Name,
+                                    Checked = disableGame.GameList != null && disableGame.GameList.Any(c=>c == a.GameId)
+                                }).ToList();
+                            }
                         }
                     }
                 }
-
+                
                 var editInfo = new TpDisableUserForGameDetail()
                 {
                     SiteId = userDisableGames.SiteId,
@@ -144,6 +148,28 @@ namespace BackendSite.Controllers.Api
             {
                 var updateOperator = User.Identity.Name;
                 var result = await _riskBll.UpdateStatus(disable.CustId, disable.Status, updateOperator);
+                return new ApiResult
+                {
+                    ErrorCode = result == 1 ? 0 : result,
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new ApiResult
+                {
+                    ErrorCode = 999,
+                    Message = ex.Message,
+                };
+            }
+        }
+        
+        [HttpPost]
+        public async Task<ApiResult> Delete([FromForm] int custId)
+        {
+            try
+            {
+                var result = await _riskBll.DeleteTpDisableUser(custId);
                 return new ApiResult
                 {
                     ErrorCode = result == 1 ? 0 : result,
