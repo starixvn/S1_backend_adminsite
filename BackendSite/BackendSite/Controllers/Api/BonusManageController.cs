@@ -351,7 +351,6 @@ namespace BackendSite.Controllers.Api
 
                             BonusImportListPara.Add(para);
                             RowId++;
-                            continue;
                         }
                         else
                         {
