@@ -97,9 +97,11 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
         public ApiResult<IEnumerable<SiteTpListIfo>> GetTpList()
         {
-            var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>();
-            apiResult.Data = gameCasinoManageBLL.GetTpList();
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>
+            {
+                Data = gameCasinoManageBLL.GetTpList(),
+                ErrorCode = 0
+            };
 
             return apiResult;
         }

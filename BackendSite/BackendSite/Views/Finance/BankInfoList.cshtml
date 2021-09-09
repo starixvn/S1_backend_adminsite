@@ -29,7 +29,7 @@
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
     var subFuncKeys = permissionBLL.GetSubFunckeys("Finance/BankInfoList");
-    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
+    subFuncKeys = subFuncKeys ?? new List<string>();
 }
 <h4 class="page-name">@selLangBLL.GetResourceValue("lbl_BankCardList")</h4>
 <div id="BankCardInfoPanel"></div>

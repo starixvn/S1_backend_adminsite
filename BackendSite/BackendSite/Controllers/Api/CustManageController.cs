@@ -643,9 +643,11 @@ namespace BackendSite.Controllers.Api
 
                 }
 
-                var graphicOptions = new GraphicOptions();
-                graphicOptions.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-                graphicOptions.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+                var graphicOptions = new GraphicOptions
+                {
+                    CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed,
+                    SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed
+                };
                 var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
                 img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 
@@ -1070,9 +1072,11 @@ namespace BackendSite.Controllers.Api
 
         public ApiResult<IEnumerable<CustNote>> GetCustNotes(AddCustNoteReq addCustNoteReq)
         {
-            var apiResult = new ApiResult<IEnumerable<CustNote>>();
-            apiResult.Data = custInfoBLL.GetCustNotes(addCustNoteReq.CustId);
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<IEnumerable<CustNote>>
+            {
+                Data = custInfoBLL.GetCustNotes(addCustNoteReq.CustId),
+                ErrorCode = 0
+            };
 
             return apiResult;
         }
@@ -1233,7 +1237,7 @@ namespace BackendSite.Controllers.Api
                                                       para.PageNumber,
                                                       para.PageSize);
 
-            if (SearchResult.CustTeleList.Count() == 0)
+            if (SearchResult.CustTeleList.Count == 0)
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
@@ -1498,9 +1502,11 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(AddRegLiveStatusNotes addCustNoteReq)
         {
-            var apiResult = new ApiResult<IEnumerable<RegLiveStatusNotes>>();
-            apiResult.Data = custInfoBLL.GetRegLiveStatusNotes(addCustNoteReq.CustId);
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<IEnumerable<RegLiveStatusNotes>>
+            {
+                Data = custInfoBLL.GetRegLiveStatusNotes(addCustNoteReq.CustId),
+                ErrorCode = 0
+            };
 
             return apiResult;
         }

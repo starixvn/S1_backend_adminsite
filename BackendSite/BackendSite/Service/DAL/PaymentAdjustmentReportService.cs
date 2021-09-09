@@ -61,20 +61,18 @@ namespace BackendSite.Service.DAL
         public IEnumerable<PaymentAdjustment> GetPaymentAdjustmentExportReport(string TransId, int CurrencyId, string UserName, int AdjustType, IEnumerable<int> SiteList, long StartDate, long EndDate)
         {
             IEnumerable<PaymentAdjustment> result = null;
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                var SpName = "Admin_AdjustmentInfoExportV3_Get";
-                var props = new DynamicParameters();
-                props.Add("@TransID", TransId);
-                props.Add("@Currency", CurrencyId);
-                props.Add("@UserName", UserName);
-                props.Add("@AdjustType", AdjustType);
-                props.Add("@StartDate", StartDate);
-                props.Add("@EndDate", EndDate);
-                props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var SpName = "Admin_AdjustmentInfoExportV3_Get";
+            var props = new DynamicParameters();
+            props.Add("@TransID", TransId);
+            props.Add("@Currency", CurrencyId);
+            props.Add("@UserName", UserName);
+            props.Add("@AdjustType", AdjustType);
+            props.Add("@StartDate", StartDate);
+            props.Add("@EndDate", EndDate);
+            props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
 
-                result = conn.Query<PaymentAdjustment>(SpName, props, commandType: CommandType.StoredProcedure);
-            }
+            result = conn.Query<PaymentAdjustment>(SpName, props, commandType: CommandType.StoredProcedure);
 
             return result;
         }

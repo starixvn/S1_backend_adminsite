@@ -271,7 +271,7 @@ namespace BackendSite.Controllers.Api
 
             var data = _menuBLL.GetMenuData();
 
-            if (data.Count() == 0)
+            if (data.Count == 0)
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }

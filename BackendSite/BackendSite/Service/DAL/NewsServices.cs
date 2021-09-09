@@ -44,10 +44,8 @@ namespace BackendSite.Service.DAL
 
         public News GetNewsById(int NewsId)
         {
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                return conn.QueryFirstOrDefault<News>("Admin_News_GetById", new { NewsId }, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.QueryFirstOrDefault<News>("Admin_News_GetById", new { NewsId }, commandType: CommandType.StoredProcedure);
         }
 
         public int? SetNews(bool IsAdd, News newsDatas)
@@ -73,10 +71,8 @@ namespace BackendSite.Service.DAL
 
         public void SetStatus(int NewsId, int Status, string LastUpdateUser)
         {
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                conn.Execute("Admin_News_SetStatus", new { NewsId, Status, LastUpdateUser }, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Execute("Admin_News_SetStatus", new { NewsId, Status, LastUpdateUser }, commandType: CommandType.StoredProcedure);
         }
     }
 }

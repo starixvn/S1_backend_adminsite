@@ -33,7 +33,7 @@
     }
 
     var subFuncKeys = permissionBLL.GetSubFunckeys("Marketing/VipRebateMangetment");
-    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
+    subFuncKeys = subFuncKeys ?? new List<string>();
 }
 
 <div id="content"></div>

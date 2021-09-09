@@ -48,25 +48,23 @@ namespace BackendSite.Service.DAL
             //site為ALL類型的都可以查
             var tempselectSite = selectSite.ToList();
             tempselectSite.Add(0);
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
-            {
-                var SpName = "Admin_AnnouncementV2_Get";
-                var props = new DynamicParameters();
-                props.Add("SelectSite", JsonConvert.SerializeObject(tempselectSite));
-                props.Add("StartDate", startDate);
-                props.Add("EndDate", endDate);
-                props.Add("Status", status);
-                props.Add("PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-                props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("PageSize", PageSize);
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var SpName = "Admin_AnnouncementV2_Get";
+            var props = new DynamicParameters();
+            props.Add("SelectSite", JsonConvert.SerializeObject(tempselectSite));
+            props.Add("StartDate", startDate);
+            props.Add("EndDate", endDate);
+            props.Add("Status", status);
+            props.Add("PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("PageSize", PageSize);
 
-                result = conn.Query<Announcement>(SpName, props, commandType: CommandType.StoredProcedure);
-                PageNumber = props.Get<int?>("@PageNumber") ?? 0;
-                TotalPages = props.Get<int?>("@TotalPages") ?? 0;
-                RowCount = props.Get<int?>("@RowCount") ?? 0;
-            }
+            result = conn.Query<Announcement>(SpName, props, commandType: CommandType.StoredProcedure);
+            PageNumber = props.Get<int?>("@PageNumber") ?? 0;
+            TotalPages = props.Get<int?>("@TotalPages") ?? 0;
+            RowCount = props.Get<int?>("@RowCount") ?? 0;
 
             return result;
         }
@@ -80,35 +78,31 @@ namespace BackendSite.Service.DAL
         public Announcement AddAnnouncement(Announcement Datas, string Creator, int CreatorId, long _StartTime, long _EndTime)
         {
             var result = new Announcement();
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var tran = conn.BeginTransaction();
+            var SpName = "Admin_Announcement_Ins";
+            var param = new DynamicParameters();
+            param.Add("@Id", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            param.Add("@SiteId", Datas.SiteId);
+            param.Add("@StartTime", _StartTime);
+            param.Add("@EndTime", _EndTime);
+            param.Add("@Subject", Datas.Subject);
+            param.Add("@Content", Datas.Content);
+            param.Add("@Status", Datas.Status);
+            param.Add("@Creator", Creator);
+            param.Add("@CreatorId", CreatorId);
+            param.Add("@IsTest", Datas.IsTest);
+
+            conn.Execute(SpName, param, tran, commandType: CommandType.StoredProcedure);
+
+            var Id = param.Get<int?>("@Id");
+            if (Id != null)
             {
-                conn.Open();
-                using (var tran = conn.BeginTransaction())
-                {
-                    var SpName = "Admin_Announcement_Ins";
-                    var param = new DynamicParameters();
-                    param.Add("@Id", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                    param.Add("@SiteId", Datas.SiteId);
-                    param.Add("@StartTime", _StartTime);
-                    param.Add("@EndTime", _EndTime);
-                    param.Add("@Subject", Datas.Subject);
-                    param.Add("@Content", Datas.Content);
-                    param.Add("@Status", Datas.Status);
-                    param.Add("@Creator", Creator);
-                    param.Add("@CreatorId", CreatorId);
-                    param.Add("@IsTest", Datas.IsTest);
-
-                    conn.Execute(SpName, param, tran, commandType: CommandType.StoredProcedure);
-
-                    var Id = param.Get<int?>("@Id");
-                    if (Id != null)
-                    {
-                        result = conn.Query<Announcement>("Admin_Announcement_GetById", new { Id }, tran, commandType: CommandType.StoredProcedure).FirstOrDefault();
-                    }
-
-                    tran.Commit();
-                }
+                result = conn.Query<Announcement>("Admin_Announcement_GetById", new { Id }, tran, commandType: CommandType.StoredProcedure).FirstOrDefault();
             }
+
+            tran.Commit();
 
             return result;
         }
@@ -116,29 +110,25 @@ namespace BackendSite.Service.DAL
         public Announcement UpdateAnnouncement(Announcement Datas, string LastUpdater, int LastUpdaterId, long _StartTime, long _EndTime)
         {
             var result = new Announcement();
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                conn.Open();
-                using (var tran = conn.BeginTransaction())
-                {
-                    var SpName = "Admin_Announcement_Upd";
-                    var param = new DynamicParameters();
-                    param.Add("@Id", Datas.Id);
-                    param.Add("@SiteId", Datas.SiteId);
-                    param.Add("@StartTime", _StartTime);
-                    param.Add("@EndTime", _EndTime);
-                    param.Add("@Subject", Datas.Subject);
-                    param.Add("@Content", Datas.Content);
-                    param.Add("@Status", Datas.Status);
-                    param.Add("@LastUpdater", LastUpdater);
-                    param.Add("@LastUpdaterId", LastUpdaterId);
-                    param.Add("@IsTest", Datas.IsTest);
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var tran = conn.BeginTransaction();
+            var SpName = "Admin_Announcement_Upd";
+            var param = new DynamicParameters();
+            param.Add("@Id", Datas.Id);
+            param.Add("@SiteId", Datas.SiteId);
+            param.Add("@StartTime", _StartTime);
+            param.Add("@EndTime", _EndTime);
+            param.Add("@Subject", Datas.Subject);
+            param.Add("@Content", Datas.Content);
+            param.Add("@Status", Datas.Status);
+            param.Add("@LastUpdater", LastUpdater);
+            param.Add("@LastUpdaterId", LastUpdaterId);
+            param.Add("@IsTest", Datas.IsTest);
 
-                    conn.Execute(SpName, param, tran, commandType: CommandType.StoredProcedure);
-                    result = conn.Query<Announcement>("Admin_Announcement_GetById", new { Datas.Id }, tran, commandType: CommandType.StoredProcedure).FirstOrDefault();
-                    tran.Commit();
-                }
-            }
+            conn.Execute(SpName, param, tran, commandType: CommandType.StoredProcedure);
+            result = conn.Query<Announcement>("Admin_Announcement_GetById", new { Datas.Id }, tran, commandType: CommandType.StoredProcedure).FirstOrDefault();
+            tran.Commit();
 
             return result;
         }
@@ -152,23 +142,21 @@ namespace BackendSite.Service.DAL
         public IEnumerable<PersonalMsg> GetPersonalMsg(int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
             IEnumerable<PersonalMsg> result = null;
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                conn.Open();
-                var SpName = "Admin_PersonalMessage_Get";
-                var props = new DynamicParameters();
-                props.Add("@CustId", CustId, dbType: DbType.Int32);
-                props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-                props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@PageSize", PageSize);
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            var SpName = "Admin_PersonalMessage_Get";
+            var props = new DynamicParameters();
+            props.Add("@CustId", CustId, dbType: DbType.Int32);
+            props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("@PageSize", PageSize);
 
-                result = conn.Query<PersonalMsg>(SpName, props, commandType: CommandType.StoredProcedure);
-                PageNumber = props.Get<int?>("@PageNumber") ?? 0;
-                TotalPages = props.Get<int?>("@TotalPages") ?? 0;
-                RowCount = props.Get<int?>("@RowCount") ?? 0;
-            }
+            result = conn.Query<PersonalMsg>(SpName, props, commandType: CommandType.StoredProcedure);
+            PageNumber = props.Get<int?>("@PageNumber") ?? 0;
+            TotalPages = props.Get<int?>("@TotalPages") ?? 0;
+            RowCount = props.Get<int?>("@RowCount") ?? 0;
 
             return result;
         }
@@ -188,24 +176,22 @@ namespace BackendSite.Service.DAL
         {
             var result = 0;
 
-            using (var connection = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                connection.Open();
-                using var transaction = connection.BeginTransaction();
-                result = connection.Execute("Admin_Msg_BatchV2_Ins",
-                    new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg, BatchId = batchId },
-                    commandType: CommandType.StoredProcedure);
+            using var connection = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
+            result = connection.Execute("Admin_Msg_BatchV2_Ins",
+                new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg, BatchId = batchId },
+                commandType: CommandType.StoredProcedure);
 
-                if (result == 1)
-                {
-                    transaction.Commit();
-                    return true;
-                }
-                else
-                {
-                    transaction.Rollback();
-                    return false;
-                }
+            if (result == 1)
+            {
+                transaction.Commit();
+                return true;
+            }
+            else
+            {
+                transaction.Rollback();
+                return false;
             }
         }
         public int ChangeVipLevelBatch(int siteId, int custId, string userName, int vipLevel, string memo, string Operator)
@@ -301,26 +287,24 @@ namespace BackendSite.Service.DAL
         public IEnumerable<BatchMsg> GetBatchMessageList(IEnumerable<int> SelectSite, long? StartDate, long? EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
             IEnumerable<BatchMsg> result = null;
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                conn.Open();
-                var SpName = "Admin_BatchMessageList_Get";
-                var props = new DynamicParameters();
-                var _SelectSite = JsonConvert.SerializeObject(SelectSite);
-                props.Add("@SelectSite", _SelectSite);
-                props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-                props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@PageSize", PageSize);
-                props.Add("@StartDate", StartDate);
-                props.Add("@EndDate", EndDate);
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            var SpName = "Admin_BatchMessageList_Get";
+            var props = new DynamicParameters();
+            var _SelectSite = JsonConvert.SerializeObject(SelectSite);
+            props.Add("@SelectSite", _SelectSite);
+            props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("@PageSize", PageSize);
+            props.Add("@StartDate", StartDate);
+            props.Add("@EndDate", EndDate);
 
-                result = conn.Query<BatchMsg>(SpName, props, commandType: CommandType.StoredProcedure);
-                PageNumber = props.Get<int?>("@PageNumber") ?? 0;
-                TotalPages = props.Get<int?>("@TotalPages") ?? 0;
-                RowCount = props.Get<int?>("@RowCount") ?? 0;
-            }
+            result = conn.Query<BatchMsg>(SpName, props, commandType: CommandType.StoredProcedure);
+            PageNumber = props.Get<int?>("@PageNumber") ?? 0;
+            TotalPages = props.Get<int?>("@TotalPages") ?? 0;
+            RowCount = props.Get<int?>("@RowCount") ?? 0;
 
             return result;
         }

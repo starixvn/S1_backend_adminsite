@@ -1391,9 +1391,11 @@ namespace BackendSite.Service.BLL
                     }
                 }
 
-                var graphicOptions = new GraphicOptions();
-                graphicOptions.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-                graphicOptions.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+                var graphicOptions = new GraphicOptions
+                {
+                    CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed,
+                    SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed
+                };
                 var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
                 img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 
@@ -1544,12 +1546,12 @@ namespace BackendSite.Service.BLL
                         bankFinancialDataModel.CurrencyId = data.CurrencyId;
                         bankFinancialDataModel.IsoCode = currencyData.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
                         bankFinancialDataModel.Channel = TransferChannelEnum.PSP;
-                        bankFinancialDataModel.PayId = account == null ? pay.Id : account.PayId;
+                        bankFinancialDataModel.PayId = account?.PayId ?? pay.Id;
                         bankFinancialDataModel.PayName = account == null ? pay.PayName : account.PayName;
                         bankFinancialDataModel.AccountNo = account == null ? pay.PayName + " " + bankFinancialDataModel.IsoCode : account.AccountNo;
                         bankFinancialDataModel.AccountName = account == null ? pay.PayName + " " + bankFinancialDataModel.IsoCode : account.DisplayName;
                         bankFinancialDataModel.Purpose = account == null ? "1,2,3" : account.Purpose;
-                        bankFinancialDataModel.AccountStatus = account == null ? status : account.Status;
+                        bankFinancialDataModel.AccountStatus = account?.Status ?? status;
                     }
                     bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
@@ -1607,12 +1609,12 @@ namespace BackendSite.Service.BLL
                         bankFinancialDataModel.CurrencyId = data.CurrencyId;
                         bankFinancialDataModel.IsoCode = currencyData.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
                         bankFinancialDataModel.Channel = TransferChannelEnum.PSP;
-                        bankFinancialDataModel.PayId = account == null ? pay.Id : account.PayId;
+                        bankFinancialDataModel.PayId = account?.PayId ?? pay.Id;
                         bankFinancialDataModel.PayName = account == null ? pay.PayName : account.PayName;
                         bankFinancialDataModel.AccountNo = account == null ? pay.PayName+" "+bankFinancialDataModel.IsoCode : account.AccountNo;
                         bankFinancialDataModel.AccountName = account == null ? pay.PayName + " " + bankFinancialDataModel.IsoCode : account.DisplayName;
                         bankFinancialDataModel.Purpose = account == null ? "1,2,3" : account.Purpose;
-                        bankFinancialDataModel.AccountStatus = account == null ? status : account.Status;
+                        bankFinancialDataModel.AccountStatus = account?.Status ?? status;
                     }
 
                     bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];

@@ -139,22 +139,20 @@ namespace BackendSite.Service.DAL
         public IEnumerable<AdjustWithdrawalLimit> GetAdjustWithdrawalLimitsLog(int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
             IEnumerable<AdjustWithdrawalLimit> result = null;
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                var SpName = "Admin_AdjustWithdrawalLimitInfo_Get";
-                var props = new DynamicParameters();
-                props.Add("@CustId", CustId);
-                props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-                props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                props.Add("@PageSize", PageSize);
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var SpName = "Admin_AdjustWithdrawalLimitInfo_Get";
+            var props = new DynamicParameters();
+            props.Add("@CustId", CustId);
+            props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("@PageSize", PageSize);
 
-                result = conn.Query<AdjustWithdrawalLimit>(SpName, props, commandType: CommandType.StoredProcedure);
-                PageNumber = props.Get<int?>("@PageNumber") ?? 0;
-                TotalPages = props.Get<int?>("@TotalPages") ?? 0;
-                RowCount = props.Get<int?>("@RowCount") ?? 0;
-            }
+            result = conn.Query<AdjustWithdrawalLimit>(SpName, props, commandType: CommandType.StoredProcedure);
+            PageNumber = props.Get<int?>("@PageNumber") ?? 0;
+            TotalPages = props.Get<int?>("@TotalPages") ?? 0;
+            RowCount = props.Get<int?>("@RowCount") ?? 0;
 
             return result;
         }

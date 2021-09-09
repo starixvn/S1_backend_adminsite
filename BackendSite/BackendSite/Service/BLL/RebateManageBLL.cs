@@ -58,9 +58,11 @@ namespace BackendSite.Service.BLL
         }
         public RebateCurrencyData GeRebateInfo(int siteId, int currencyId)
         {
-            var reault = new RebateCurrencyData();
-            reault.CurrencyId = currencyId;
-            reault.PayoutLimitList = GetRebatePayoutLimit(siteId, currencyId, null);
+            var reault = new RebateCurrencyData
+            {
+                CurrencyId = currencyId,
+                PayoutLimitList = GetRebatePayoutLimit(siteId, currencyId, null)
+            };
             var rList= new List<RebateCategoryList>();
             foreach (var x in GetTPCategoryList())
             {
@@ -75,8 +77,10 @@ namespace BackendSite.Service.BLL
         }
         public RebateCategoryDetail GeRebateCategoryDetail(int siteId, int currencyId, int categoryId)
         {
-            var reault = new RebateCategoryDetail();
-            reault.CategoryId = categoryId;
+            var reault = new RebateCategoryDetail
+            {
+                CategoryId = categoryId
+            };
 
             var rList = new List<RebateGameTypeList>();
             foreach (var x in GetTpGameTypeListbyCategory(categoryId))

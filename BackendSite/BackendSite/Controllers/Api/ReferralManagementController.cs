@@ -32,15 +32,14 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<List<ReferralManagement>>();
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
-            var referralList = referralManagementBLL.GetReferralBySiteId(SiteId);
+            var referralList = referralManagementBLL.GetReferralBySiteId(SiteId).ToList();
             var currencyList = reportBLL.GetCurrency().ToList();
             var referralManagementList = new List<ReferralManagement>();
 
             foreach (var currency in siteList.ToList().Find(x => x.SiteId == SiteId).CurrencyList.Replace("[", "").Replace("]", "").Split(","))
             {
-                int currencyId;
-                int.TryParse(currency, out currencyId);
-                var referral = referralList?.Where(x => x.CurrencyId == currencyId).ToList().FirstOrDefault();
+                int.TryParse(currency, out var currencyId);
+                var referral = referralList.FirstOrDefault(x => x.CurrencyId == currencyId);
                 referralManagementList.Add(new ReferralManagement
                 {
                     SiteId = SiteId,
@@ -50,7 +49,7 @@ namespace BackendSite.Controllers.Api
                     VaildBet = referral == null ? string.Empty : referral.VaildBet.ToString(),
                     Deposit = referral == null ? string.Empty : referral.Deposit.ToString(),
                     IsoCode = currencyList.Find(x => x.CurrencyId == currencyId).IsoCode,
-                    Status = referral == null ? false : referral.Status
+                    Status = referral?.Status ?? false
                 });
             }
 
@@ -82,8 +81,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<dynamic>();
             try
             {
-                var referralList = referralManagementBLL.GetReferralBySiteId(SiteId);
-                var referral = referralList?.Where(x => x.CurrencyId == CurrencyId).ToList().FirstOrDefault();
+                var referralList = referralManagementBLL.GetReferralBySiteId(SiteId).ToList();
+                var referral = referralList.FirstOrDefault(x => x.CurrencyId == CurrencyId);
                 if (referral == null)
                 {
                     apiResult.ErrorCode = 7;

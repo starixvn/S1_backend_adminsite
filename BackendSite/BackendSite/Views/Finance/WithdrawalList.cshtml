@@ -48,7 +48,7 @@
     }
 
     var subFuncKeys = permissionBLL.GetSubFunckeys("Finance/WithdrawalList");
-    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
+    subFuncKeys = subFuncKeys ?? new List<string>();
 }
 <h4 class="page-name">@selLangBLL.GetResourceValue("lbl_WithdrawalRequest")</h4>
 <div id="searchForm"></div>

@@ -178,8 +178,10 @@ namespace BackendSite.Controllers.Api
                     var tmp = new ApiResult<TransferResult>();
                     if (mainWalletType == 2)
                     {
-                        var pendingFund = new PendingFund();
-                        pendingFund.CustId = depositConfirmReuslt;
+                        var pendingFund = new PendingFund
+                        {
+                            CustId = depositConfirmReuslt
+                        };
                         tmp = await Process(pendingFund);
                     }
                     else

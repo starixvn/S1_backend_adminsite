@@ -25,9 +25,11 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<IEnumerable<SportLeagues>> GetSportLeaguesList(SportLeaguesReq sportLeaguesReq)
         {
-            var apiResult = new ApiResult<IEnumerable<SportLeagues>>();
-            apiResult.Data = sportsBLL.GetSportLeaguesList(sportLeaguesReq.SportCategoryId);
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<IEnumerable<SportLeagues>>
+            {
+                Data = sportsBLL.GetSportLeaguesList(sportLeaguesReq.SportCategoryId),
+                ErrorCode = 0
+            };
 
             return apiResult;
         }
@@ -38,9 +40,11 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<IEnumerable<SportTeams>> GetSportTeamsList(SportTeamsReq sportTeamsReq)
         {
-            var apiResult = new ApiResult<IEnumerable<SportTeams>>();
-            apiResult.Data = sportsBLL.GetSportTeamsList(sportTeamsReq.SportLeaguesId);
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<IEnumerable<SportTeams>>
+            {
+                Data = sportsBLL.GetSportTeamsList(sportTeamsReq.SportLeaguesId),
+                ErrorCode = 0
+            };
 
             return apiResult;
         }

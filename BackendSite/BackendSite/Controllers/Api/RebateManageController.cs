@@ -25,17 +25,21 @@ namespace BackendSite.Controllers.Api
         }
         public ApiResult<IEnumerable<VipLevelSetting>> GetVipLevel(VipLevelReq vipLevelReq)
         {
-            var apiResult = new ApiResult<IEnumerable<VipLevelSetting>>();
-            apiResult.ErrorCode = 0;
-            //apiResult.Data = rebateManageBLL.GetVipLevel(vipLevelReq.SiteId);
-            apiResult.Data = vipLevelBLL.GetVipLevelSetting(vipLevelReq.SiteId);
+            var apiResult = new ApiResult<IEnumerable<VipLevelSetting>>
+            {
+                ErrorCode = 0,
+                //apiResult.Data = rebateManageBLL.GetVipLevel(vipLevelReq.SiteId);
+                Data = vipLevelBLL.GetVipLevelSetting(vipLevelReq.SiteId)
+            };
             return apiResult;
         }
         public ApiResult<IEnumerable<TPCategory>> GetTPCategoryList()
         {
-            var apiResult = new ApiResult<IEnumerable<TPCategory>>();
-            apiResult.ErrorCode = 0;
-            apiResult.Data = rebateManageBLL.GetTPCategoryList();
+            var apiResult = new ApiResult<IEnumerable<TPCategory>>
+            {
+                ErrorCode = 0,
+                Data = rebateManageBLL.GetTPCategoryList()
+            };
             return apiResult;
         }
         public class GameTypeListReq
@@ -44,9 +48,11 @@ namespace BackendSite.Controllers.Api
         }
         public ApiResult<IEnumerable<TpGameType>> GetTpGameTypeListbyCategory(GameTypeListReq gameTypeListReq)
         {
-            var apiResult = new ApiResult<IEnumerable<TpGameType>>();
-            apiResult.ErrorCode = 0;
-            apiResult.Data = rebateManageBLL.GetTpGameTypeListbyCategory(gameTypeListReq.CategoryId);
+            var apiResult = new ApiResult<IEnumerable<TpGameType>>
+            {
+                ErrorCode = 0,
+                Data = rebateManageBLL.GetTpGameTypeListbyCategory(gameTypeListReq.CategoryId)
+            };
             return apiResult;
         }
 
@@ -56,8 +62,10 @@ namespace BackendSite.Controllers.Api
         }
         public ApiResult<RebatePeriod> GetRebatePeriod(RebatePeriodReq rebatePeriodReq)
         {
-            var apiResult = new ApiResult<RebatePeriod>();
-            apiResult.Data = new RebatePeriod();
+            var apiResult = new ApiResult<RebatePeriod>
+            {
+                Data = new RebatePeriod()
+            };
             var periodType = 0;
             var periodDay = 0;
             var redeemHours = 0;
@@ -101,8 +109,10 @@ namespace BackendSite.Controllers.Api
         }
         public ApiResult DelRebatePeriod(DelRebatePeriodReq delRebatePeriodReq)
         {
-            var apiResult = new ApiResult();
-            apiResult.ErrorCode = 99;
+            var apiResult = new ApiResult
+            {
+                ErrorCode = 99
+            };
             var result = rebateManageBLL.DelRebatePeriod(delRebatePeriodReq.SiteId);
             if (result)
             {
@@ -122,9 +132,11 @@ namespace BackendSite.Controllers.Api
         }
         public ApiResult<RebateCurrencyData> GetRebateInfo(RebateInfoReq rebateInfoReq)
         {
-            var apiResult = new ApiResult<RebateCurrencyData>();
-            apiResult.ErrorCode = 0;
-            apiResult.Data = rebateManageBLL.GeRebateInfo(rebateInfoReq.SiteId, rebateInfoReq.CurrencyId);
+            var apiResult = new ApiResult<RebateCurrencyData>
+            {
+                ErrorCode = 0,
+                Data = rebateManageBLL.GeRebateInfo(rebateInfoReq.SiteId, rebateInfoReq.CurrencyId)
+            };
             return apiResult;
         }
         public class RebateInfoByGameTypeReq
@@ -135,9 +147,11 @@ namespace BackendSite.Controllers.Api
         }
         public ApiResult<IEnumerable<RebateLevelData>> GetRebateInfoByGameType(RebateInfoByGameTypeReq rebateInfoByGameTypeReq)
         {
-            var apiResult = new ApiResult<IEnumerable<RebateLevelData>>();
-            apiResult.ErrorCode = 0;
-            apiResult.Data = rebateManageBLL.GetRebateDataByGameType(rebateInfoByGameTypeReq.SiteId, rebateInfoByGameTypeReq.GameType, rebateInfoByGameTypeReq.CurrencyId);
+            var apiResult = new ApiResult<IEnumerable<RebateLevelData>>
+            {
+                ErrorCode = 0,
+                Data = rebateManageBLL.GetRebateDataByGameType(rebateInfoByGameTypeReq.SiteId, rebateInfoByGameTypeReq.GameType, rebateInfoByGameTypeReq.CurrencyId)
+            };
             return apiResult;
         }
         public class RebateCategoryDetailReq
@@ -148,9 +162,11 @@ namespace BackendSite.Controllers.Api
         }
         public ApiResult<RebateCategoryDetail> GeRebateCategoryDetail(RebateCategoryDetailReq rebateCategoryDetailReq)
         {
-            var apiResult = new ApiResult<RebateCategoryDetail>();
-            apiResult.ErrorCode = 0;
-            apiResult.Data = rebateManageBLL.GeRebateCategoryDetail(rebateCategoryDetailReq.SiteId, rebateCategoryDetailReq.CurrencyId, rebateCategoryDetailReq.CategoryId);
+            var apiResult = new ApiResult<RebateCategoryDetail>
+            {
+                ErrorCode = 0,
+                Data = rebateManageBLL.GeRebateCategoryDetail(rebateCategoryDetailReq.SiteId, rebateCategoryDetailReq.CurrencyId, rebateCategoryDetailReq.CategoryId)
+            };
             return apiResult;
         }
 
@@ -165,8 +181,10 @@ namespace BackendSite.Controllers.Api
         }
         public ApiResult SetRebateCategory(SetRebateCategoryReq setRebateCategoryReq)
         {
-            var apiResult = new ApiResult();
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult
+            {
+                ErrorCode = 0
+            };
             var UserName = authorizeBLL.GetAuthData().UserName;
             apiResult.ErrorCode = 99;
             var result = rebateManageBLL.SetRebateCategory(setRebateCategoryReq.SiteId, setRebateCategoryReq.CurrencyId, setRebateCategoryReq.CategoryId, setRebateCategoryReq.level, setRebateCategoryReq.percentage, UserName);
@@ -191,8 +209,10 @@ namespace BackendSite.Controllers.Api
         }
         public ApiResult SetRebateCategoryBatch(SetRebateCategoryBatchReq setRebateCategoryBatchReq)
         {
-            var apiResult = new ApiResult();
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult
+            {
+                ErrorCode = 0
+            };
             var UserName = authorizeBLL.GetAuthData().UserName;
             apiResult.ErrorCode = 99;
             var result = rebateManageBLL.SetRebateCategoryBatch(setRebateCategoryBatchReq.SiteId, setRebateCategoryBatchReq.CurrencyId, setRebateCategoryBatchReq.CategoryId, setRebateCategoryBatchReq.levelPercentage, UserName);
@@ -218,8 +238,10 @@ namespace BackendSite.Controllers.Api
         }
         public ApiResult DelRebateCategory(DelRebateCategoryReq delRebateCategoryReq)
         {
-            var apiResult = new ApiResult();
-            apiResult.ErrorCode = 99;
+            var apiResult = new ApiResult
+            {
+                ErrorCode = 99
+            };
             var result = rebateManageBLL.DelRebateCategory(delRebateCategoryReq.SiteId, delRebateCategoryReq.CurrencyId, delRebateCategoryReq.CategoryId, delRebateCategoryReq.level);
             if (result)
             {
@@ -291,8 +313,10 @@ namespace BackendSite.Controllers.Api
         }
         public ApiResult DelRebateGameType(DelRebateGameTypeReq delRebateGameTypeReq)
         {
-            var apiResult = new ApiResult();
-            apiResult.ErrorCode = 99;
+            var apiResult = new ApiResult
+            {
+                ErrorCode = 99
+            };
             var result = rebateManageBLL.DelRebateGameType(delRebateGameTypeReq.SiteId, delRebateGameTypeReq.CurrencyId, delRebateGameTypeReq.GameType, delRebateGameTypeReq.level);
             if (result)
             {
@@ -361,8 +385,10 @@ namespace BackendSite.Controllers.Api
         }
         public ApiResult DelRebatePayoutLimit(DelRebatePayoutLimitReq delRebatePayoutLimitReq)
         {
-            var apiResult = new ApiResult();
-            apiResult.ErrorCode = 99;
+            var apiResult = new ApiResult
+            {
+                ErrorCode = 99
+            };
             var result = rebateManageBLL.DelRebatePayoutLimit(delRebatePayoutLimitReq.SiteId, delRebatePayoutLimitReq.CurrencyId, delRebatePayoutLimitReq.CategoryId);
             if (result)
             {

@@ -329,14 +329,16 @@ namespace BackendSite.Controllers.Api
             var pageNumber = getRebateLogByCustReq.PageNumber;
             var totalPages = 0;
             var rowCount = 0;
-            var apiListResult = new ApiListResult<RebateLog>();
-            apiListResult.Data = _paymentBLL.GetRebateLogByCust(getRebateLogByCustReq.CustId,
-                getRebateLogByCustReq.StartDate, getRebateLogByCustReq.EndDate, 10, ref pageNumber, out totalPages,
-                out rowCount);
-            apiListResult.ErrorCode = 0;
-            apiListResult.PageNumber = pageNumber;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.RowCount = rowCount;
+            var apiListResult = new ApiListResult<RebateLog>
+            {
+                Data = _paymentBLL.GetRebateLogByCust(getRebateLogByCustReq.CustId,
+                    getRebateLogByCustReq.StartDate, getRebateLogByCustReq.EndDate, 10, ref pageNumber, out totalPages,
+                    out rowCount),
+                ErrorCode = 0,
+                PageNumber = pageNumber,
+                TotalPages = totalPages,
+                RowCount = rowCount
+            };
 
             return apiListResult;
         }
@@ -441,9 +443,11 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<TpBetRecordListOneWeek>> GetCustTpBetRecordListOneWeek(
             CustTpBetRecordListOneWeekReq custTpBetRecordListOneWeekReq)
         {
-            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneWeek>>();
-            apiResult.ErrorCode = 0;
-            apiResult.Data = _paymentBLL.GetCustTpBetRecordListOneWeek(custTpBetRecordListOneWeekReq.CustId);
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneWeek>>
+            {
+                ErrorCode = 0,
+                Data = _paymentBLL.GetCustTpBetRecordListOneWeek(custTpBetRecordListOneWeekReq.CustId)
+            };
             return apiResult;
         }
 
@@ -451,10 +455,12 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecordList(
             CustTpBetRecordListReq custTpBetRecordListReq)
         {
-            var apiResult = new ApiResult<IEnumerable<TpBetRecordByDate>>();
-            apiResult.Data = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId,
-                custTpBetRecordListReq.StartDate, custTpBetRecordListReq.EndDate);
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordByDate>>
+            {
+                Data = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId,
+                    custTpBetRecordListReq.StartDate, custTpBetRecordListReq.EndDate),
+                ErrorCode = 0
+            };
             return apiResult;
         }
 
@@ -471,10 +477,12 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<TpBetRecordListOneDayRes>> GetCustTpBetRecordListOneDay(
             CustTpBetRecordListOneDayReq custTpBetRecordListOneDayReq)
         {
-            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneDayRes>>();
-            apiResult.ErrorCode = 0;
-            apiResult.Data = _paymentBLL.GetCustTpBetRecordListOneDay(custTpBetRecordListOneDayReq.CustId,
-                custTpBetRecordListOneDayReq.SelDate, custTpBetRecordListOneDayReq.StartDate, custTpBetRecordListOneDayReq.EndDate);
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneDayRes>>
+            {
+                ErrorCode = 0,
+                Data = _paymentBLL.GetCustTpBetRecordListOneDay(custTpBetRecordListOneDayReq.CustId,
+                    custTpBetRecordListOneDayReq.SelDate, custTpBetRecordListOneDayReq.StartDate, custTpBetRecordListOneDayReq.EndDate)
+            };
             return apiResult;
         }
 
@@ -491,11 +499,13 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<TpBetRecordbyCategoryIdRes>> GetCustTpBetRecordListbyCategoryId(
             CustTpBetRecordListbyCategoryIdReq custTpBetRecordListbyCategoryIdReq)
         {
-            var apiResult = new ApiResult<IEnumerable<TpBetRecordbyCategoryIdRes>>();
-            apiResult.ErrorCode = 0;
-            apiResult.Data = _paymentBLL.GetCustTpBetRecordListbyCategoryId(custTpBetRecordListbyCategoryIdReq.CustId,
-                custTpBetRecordListbyCategoryIdReq.SelDate,
-                custTpBetRecordListbyCategoryIdReq.CategoryId, custTpBetRecordListbyCategoryIdReq.StartDate, custTpBetRecordListbyCategoryIdReq.EndDate);
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordbyCategoryIdRes>>
+            {
+                ErrorCode = 0,
+                Data = _paymentBLL.GetCustTpBetRecordListbyCategoryId(custTpBetRecordListbyCategoryIdReq.CustId,
+                    custTpBetRecordListbyCategoryIdReq.SelDate,
+                    custTpBetRecordListbyCategoryIdReq.CategoryId, custTpBetRecordListbyCategoryIdReq.StartDate, custTpBetRecordListbyCategoryIdReq.EndDate)
+            };
             return apiResult;
         }
 
@@ -909,9 +919,11 @@ namespace BackendSite.Controllers.Api
 
         public ApiResult<IEnumerable<VipTPCategory>> GetTPCategoryListByVipRebate()
         {
-            var apiResult = new ApiResult<IEnumerable<VipTPCategory>>();
-            apiResult.ErrorCode = 0;
-            apiResult.Data = _paymentBLL.GetTPCategoryList();
+            var apiResult = new ApiResult<IEnumerable<VipTPCategory>>
+            {
+                ErrorCode = 0,
+                Data = _paymentBLL.GetTPCategoryList()
+            };
             return apiResult;
         }
 
@@ -944,9 +956,11 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<AdjustmentLimtData> GetAdjustmentData(GetAdjustmentPara para)
         {
-            var apiResult = new ApiResult<AdjustmentLimtData>();
-            apiResult.Data = _paymentBLL.GetAdjustmentData(para.SiteId, para.CurrencyId);
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<AdjustmentLimtData>
+            {
+                Data = _paymentBLL.GetAdjustmentData(para.SiteId, para.CurrencyId),
+                ErrorCode = 0
+            };
             return apiResult;
         }
 

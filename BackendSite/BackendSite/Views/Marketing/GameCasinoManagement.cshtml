@@ -21,7 +21,7 @@
     var loginUser = adminUserService.GetUser(authData.UserId);
 
     var subFuncKeys = permissionBLL.GetSubFunckeys("Marketing/GameCasinoManagement");
-    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
+    subFuncKeys = subFuncKeys ?? new List<string>();
 
     var i18n = new Dictionary<string, string>();
 

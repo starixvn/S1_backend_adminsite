@@ -27,29 +27,23 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PayList> GetPayList()
         {
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                var SpName = "Admin_PayList_Get";
-                return conn.Query<PayList>(SpName, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var SpName = "Admin_PayList_Get";
+            return conn.Query<PayList>(SpName, commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<PayChannel> GetPayChannelList()
         {
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                var SpName = "Admin_PayChannel_Get";
-                return conn.Query<PayChannel>(SpName, new { PayId = 0 }, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var SpName = "Admin_PayChannel_Get";
+            return conn.Query<PayChannel>(SpName, new { PayId = 0 }, commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<PayCurrency> GetPayCurrencyList()
         {
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                var SpName = "Admin_PayCurrency_Get";
-                return conn.Query<PayCurrency>(SpName, new { ChannelId = 0 }, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var SpName = "Admin_PayCurrency_Get";
+            return conn.Query<PayCurrency>(SpName, new { ChannelId = 0 }, commandType: CommandType.StoredProcedure);
         }
 
         public void UpdatePayList(int PayId, int Status,string Operator)
@@ -132,35 +126,30 @@ namespace BackendSite.Service.DAL
 
         public void UpdatePayCurrency(int ChannelId, int CurrencyId, decimal MinAmount, decimal MaxAmount, int AmountRule, string AmountShow, string Operator)
         {
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var tran = conn.BeginTransaction();
+            var SpName = "Admin_PayCurrency_Set";
+            conn.Execute(SpName, new { ChannelId, CurrencyId, MinAmount, MaxAmount, AmountRule, AmountShow }, tran, commandType: CommandType.StoredProcedure);
+
+            var list = new Dictionary<string, string>();
+
+            var props = new DynamicParameters();
+            props.Add("ChannelId", ChannelId);
+            props.Add("CurrencyId", CurrencyId);
+            props.Add("MinAmount", MinAmount);
+            props.Add("MaxAmount", MaxAmount);
+            props.Add("AmountRule", AmountRule);
+            props.Add("AmountShow", AmountShow);
+            foreach (var paraName in props.ParameterNames)
             {
-                conn.Open();
-                using (var tran = conn.BeginTransaction())
-                {
-                    var SpName = "Admin_PayCurrency_Set";
-                    conn.Execute(SpName, new { ChannelId, CurrencyId, MinAmount, MaxAmount, AmountRule, AmountShow }, tran, commandType: CommandType.StoredProcedure);
-
-                    var list = new Dictionary<string, string>();
-
-                    var props = new DynamicParameters();
-                    props.Add("ChannelId", ChannelId);
-                    props.Add("CurrencyId", CurrencyId);
-                    props.Add("MinAmount", MinAmount);
-                    props.Add("MaxAmount", MaxAmount);
-                    props.Add("AmountRule", AmountRule);
-                    props.Add("AmountShow", AmountShow);
-                    foreach (var paraName in props.ParameterNames)
-                    {
-                        var value = Convert.ToString(props.Get<dynamic>(paraName));
-                        list.Add(paraName, value);
-                    }
-
-                    conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu= "PaymentManagement", ActionType = 1, DetailInfo= JsonConvert.SerializeObject(list), Operator }, tran, commandType: CommandType.StoredProcedure);
-
-                    tran.Commit();
-                }
-                    
+                var value = Convert.ToString(props.Get<dynamic>(paraName));
+                list.Add(paraName, value);
             }
+
+            conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu= "PaymentManagement", ActionType = 1, DetailInfo= JsonConvert.SerializeObject(list), Operator }, tran, commandType: CommandType.StoredProcedure);
+
+            tran.Commit();
         }
 
         public void UpdatePayCurrencyAmount(int ChannelId, int CurrencyId, decimal MinAmount, decimal MaxAmount, string Operator)
@@ -205,11 +194,9 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int PayId)
         {
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                var SpName = "Admin_BankInfoSys_Get";
-                return conn.Query<PayListBankInfoSys>(SpName, new { PayId }, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var SpName = "Admin_BankInfoSys_Get";
+            return conn.Query<PayListBankInfoSys>(SpName, new { PayId }, commandType: CommandType.StoredProcedure);
         }
 
         public void UpdateBankInfo(int PayId, int SysId, int Status, string Operator)

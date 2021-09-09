@@ -50,10 +50,8 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<SiteTpListIfo> GetTpList()
         {
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
-            {
-                return conn.Query<SiteTpListIfo>("Admin_TpList_Get", new {}, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<SiteTpListIfo>("Admin_TpList_Get", new {}, commandType: CommandType.StoredProcedure);
         }
 
         public GameCasinoResult GameCasinoByTPIdV2(GameCasinoPara gameCasinoPara)
@@ -70,7 +68,7 @@ namespace BackendSite.Service.DAL
             props.Add("CategoryId", gameCasinoPara.Categories);
             props.Add("SiteId", gameCasinoPara.Site);
             props.Add("CurrencyId", gameCasinoPara.Currency);
-            props.Add("Names", string.IsNullOrEmpty(gameCasinoPara.Name == null ? null : gameCasinoPara.Name.Replace(" ", "")) ? null : $"%{gameCasinoPara.Name.Trim()}%");
+            props.Add("Names", string.IsNullOrEmpty(gameCasinoPara.Name?.Replace(" ", "")) ? null : $"%{gameCasinoPara.Name.Trim()}%");
 
             var result = conn.Query<GameCasinoData>("Admin_GameCasinoV3_Get", props, commandType: CommandType.StoredProcedure);
             LogResult.GameCasinoData = result.ToList();

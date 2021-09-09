@@ -30,9 +30,11 @@ namespace BackendSite.Service.BLL
 
             foreach (var langId in serverInfo.ILangList)
             {
-                var siteLanguage = new SiteLanguage();
-                siteLanguage.LangId = langId;
-                siteLanguage.Language = GetLan_Info(langId);
+                var siteLanguage = new SiteLanguage
+                {
+                    LangId = langId,
+                    Language = GetLan_Info(langId)
+                };
                 list.Add(siteLanguage);
             }
 

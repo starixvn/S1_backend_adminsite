@@ -351,7 +351,6 @@ namespace BackendSite.Controllers.Api
 
                             BonusImportListPara.Add(para);
                             RowId++;
-                            continue;
                         }
                         else
                         {
@@ -361,8 +360,8 @@ namespace BackendSite.Controllers.Api
                     /*Spared Task for
                      * Batch*/
 
-                    var rounds = BonusImportListPara.Count() / OneRoundCount;
-                    var remainder = BonusImportListPara.Count() % OneRoundCount;
+                    var rounds = BonusImportListPara.Count / OneRoundCount;
+                    var remainder = BonusImportListPara.Count % OneRoundCount;
                     if (remainder > 0)
                         rounds++;
 
@@ -397,16 +396,15 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<List<ReferralManagement>>();
             var siteList = _serverInfoBLL.GetSiteListByLoginUser();
-            var referralList = _referralManagementBLL.GetReferralBySiteId(SiteId);
+            var referralList = _referralManagementBLL.GetReferralBySiteId(SiteId).ToList();
             var currencyList = _reportBLL.GetCurrency().ToList();
             var referralManagementList = new List<ReferralManagement>();
 
             foreach (var currency in siteList.ToList().Find(x => x.SiteId == SiteId).CurrencyList.Replace("[", "")
                 .Replace("]", "").Split(","))
             {
-                int currencyId;
-                int.TryParse(currency, out currencyId);
-                var referral = referralList?.Where(x => x.CurrencyId == currencyId).ToList().FirstOrDefault();
+                int.TryParse(currency, out var currencyId);
+                var referral = referralList.FirstOrDefault(x => x.CurrencyId == currencyId);
                 referralManagementList.Add(new ReferralManagement
                 {
                     SiteId = SiteId,
@@ -416,7 +414,7 @@ namespace BackendSite.Controllers.Api
                     VaildBet = referral == null ? string.Empty : referral.VaildBet.ToString(),
                     Deposit = referral == null ? string.Empty : referral.Deposit.ToString(),
                     IsoCode = currencyList.Find(x => x.CurrencyId == currencyId).IsoCode,
-                    Status = referral == null ? false : referral.Status
+                    Status = referral?.Status ?? false
                 });
             }
 
@@ -448,8 +446,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<dynamic>();
             try
             {
-                var referralList = _referralManagementBLL.GetReferralBySiteId(SiteId);
-                var referral = referralList?.Where(x => x.CurrencyId == CurrencyId).ToList().FirstOrDefault();
+                var referralList = _referralManagementBLL.GetReferralBySiteId(SiteId).ToList();
+                var referral = referralList.FirstOrDefault(x => x.CurrencyId == CurrencyId);
                 if (referral == null)
                 {
                     apiResult.ErrorCode = 7;
@@ -472,15 +470,14 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<ReferralCustList> GetReferralCustList(ReferralCustListReq referralCustListReq)
         {
             var apiResult = new ApiListResult<ReferralCustList>();
-            int totalPages = 0, rowCount = 0;
 
             var pageNumber = referralCustListReq.PageNumber;
             var pageSize = 10;
             if (referralCustListReq.PageSize > 0)
                 pageSize = referralCustListReq.PageSize;
             apiResult.Data = _referralManagementBLL.GetReferralCustList(referralCustListReq.SelectSite,
-                referralCustListReq.UserName, referralCustListReq.CurrencyId, pageSize, ref pageNumber, out totalPages,
-                out rowCount);
+                referralCustListReq.UserName, referralCustListReq.CurrencyId, pageSize, ref pageNumber, out var totalPages,
+                out var rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;
@@ -667,8 +664,10 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult SetLeaderboardExtraPoint(SetLeaderboardExtraPointReq setLeaderboardExtraPointReq)
         {
-            var apiResult = new ApiResult();
-            apiResult.Message = "Unknown Error";
+            var apiResult = new ApiResult
+            {
+                Message = "Unknown Error"
+            };
             var UserName = _authorizeBLL.GetAuthData().UserName;
             var rtn = _bonusManageBLL.SetLeaderboardExtraPoint(
                 setLeaderboardExtraPointReq.ActiveDate, setLeaderboardExtraPointReq.SiteId, setLeaderboardExtraPointReq.CategoryId, 

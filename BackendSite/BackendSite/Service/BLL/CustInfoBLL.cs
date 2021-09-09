@@ -96,7 +96,7 @@ namespace BackendSite.Service.BLL
             });
 
             var CustInfoList = custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, selectstatus, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList())).ToList();
-            if (CustInfoList.Count() > 0)
+            if (CustInfoList.Count > 0)
             {
                 CustInfoList.ForEach(x =>
                 {
@@ -341,20 +341,40 @@ namespace BackendSite.Service.BLL
             noteInfo.Add("MenuName", "Customer Info");
             noteInfo.Add("Action", "Add Note");
 
-            using (var scope = new TransactionScope())
+            using var scope = new TransactionScope();
+
+            #region Update Status
+
+            result = custInfoService.SetCustStatus(custId, status);
+
+            if (!result)
             {
-                #region Update Status
+                scope.Dispose();
 
-                result = custInfoService.SetCustStatus(custId, status);
+                return false;
+            };
 
-                if (!result)
+            if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Update, mainInfo, user) <= 0)
+            {
+                scope.Dispose();
+
+                return false;
+            }
+
+            #endregion
+
+            if (result)
+            {
+                #region Insert Reason For Update Status
+
+                if (!custInfoService.AddCustNote(custId, action + " Reason : " + reason, user))
                 {
                     scope.Dispose();
 
                     return false;
-                };
+                }
 
-                if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Update, mainInfo, user) <= 0)
+                if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Create, noteInfo, user) <= 0)
                 {
                     scope.Dispose();
 
@@ -362,30 +382,9 @@ namespace BackendSite.Service.BLL
                 }
 
                 #endregion
-
-                if (result)
-                {
-                    #region Insert Reason For Update Status
-
-                    if (!custInfoService.AddCustNote(custId, action + " Reason : " + reason, user))
-                    {
-                        scope.Dispose();
-
-                        return false;
-                    }
-
-                    if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Create, noteInfo, user) <= 0)
-                    {
-                        scope.Dispose();
-
-                        return false;
-                    }
-
-                    #endregion
-                }
-
-                scope.Complete();
             }
+
+            scope.Complete();
 
             return result;
 
@@ -406,20 +405,40 @@ namespace BackendSite.Service.BLL
             noteInfo.Add("MenuName", "Customer Info");
             noteInfo.Add("Action", "Add Note");
 
-            using (var scope = new TransactionScope())
+            using var scope = new TransactionScope();
+
+            #region Kick Out User
+
+            result = custInfoService.DeleteOnUserData(custId);
+
+            if (result <= 0)
             {
-                #region Kick Out User
+                scope.Dispose();
 
-                result = custInfoService.DeleteOnUserData(custId);
+                return 0;
+            };
 
-                if (result <= 0)
+            if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Delete, mainInfo, user) <= 0)
+            {
+                scope.Dispose();
+
+                return 0;
+            }
+
+            #endregion
+
+            if (result > 0)
+            {
+                #region Insert Reason For Kick Out
+
+                if (!custInfoService.AddCustNote(custId, "Kick Out Reason : " + reason, user))
                 {
                     scope.Dispose();
 
                     return 0;
-                };
+                }
 
-                if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Delete, mainInfo, user) <= 0)
+                if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Create, noteInfo, user) <= 0)
                 {
                     scope.Dispose();
 
@@ -427,30 +446,9 @@ namespace BackendSite.Service.BLL
                 }
 
                 #endregion
-
-                if (result > 0)
-                {
-                    #region Insert Reason For Kick Out
-
-                    if (!custInfoService.AddCustNote(custId, "Kick Out Reason : " + reason, user))
-                    {
-                        scope.Dispose();
-
-                        return 0;
-                    }
-
-                    if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Create, noteInfo, user) <= 0)
-                    {
-                        scope.Dispose();
-
-                        return 0;
-                    }
-
-                    #endregion
-                }
-
-                scope.Complete();
             }
+
+            scope.Complete();
 
             return result;
         }
@@ -499,23 +497,21 @@ namespace BackendSite.Service.BLL
         {
             var result = 1;
 
-            using (var scope = new TransactionScope())
+            using var scope = new TransactionScope();
+            if (!custInfoService.SetEnableDisablePromotion(custId, enablePromotion))
             {
-                if (!custInfoService.SetEnableDisablePromotion(custId, enablePromotion))
-                {
-                    scope.Dispose();
+                scope.Dispose();
 
-                    return 0;
-                }
-                if (!custInfoService.AddCustNote(custId, enablePromotion == 0 ? "Disable Promotion" : "Enable Promotion", Operator))
-                {
-                    scope.Dispose();
-
-                    return 0;
-                }
-
-                scope.Complete();
+                return 0;
             }
+            if (!custInfoService.AddCustNote(custId, enablePromotion == 0 ? "Disable Promotion" : "Enable Promotion", Operator))
+            {
+                scope.Dispose();
+
+                return 0;
+            }
+
+            scope.Complete();
             return result;
         }
 

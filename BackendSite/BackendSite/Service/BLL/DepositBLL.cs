@@ -118,9 +118,11 @@ namespace BackendSite.Service.BLL
                     }
                 }
 
-                var graphicOptions = new GraphicOptions();
-                graphicOptions.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-                graphicOptions.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+                var graphicOptions = new GraphicOptions
+                {
+                    CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed,
+                    SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed
+                };
                 var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
                 img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 
@@ -379,23 +381,21 @@ namespace BackendSite.Service.BLL
         {
             var result = 1;
 
-            using (var scope = new TransactionScope())
+            using var scope = new TransactionScope();
+            if(!depositService.SetDepositRequestAmount(transId, amount, Operator))
             {
-                if(!depositService.SetDepositRequestAmount(transId, amount, Operator))
-                {
-                    scope.Dispose();
+                scope.Dispose();
 
-                    return 0;
-                }
-                if (!custInfoService.AddCustNote(CustId, $"SetDepositRequestAmount:{amount}", Operator))
-                {
-                    scope.Dispose();
-
-                    return 0;
-                }
-
-                scope.Complete();
+                return 0;
             }
+            if (!custInfoService.AddCustNote(CustId, $"SetDepositRequestAmount:{amount}", Operator))
+            {
+                scope.Dispose();
+
+                return 0;
+            }
+
+            scope.Complete();
             return result;
         }
     }
