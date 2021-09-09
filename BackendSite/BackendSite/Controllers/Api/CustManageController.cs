@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace BackendSite.Controllers.Api
 {
@@ -463,6 +464,25 @@ namespace BackendSite.Controllers.Api
         public ApiResult SetCustStatusSwitch(CustStatusSwitch custStatusSwitch)
         {
             var apiResult = new ApiResult<bool>();
+            int OldStatus = 0;
+            int NewStatus = 0;
+            var custSwitchInfo = custInfoBLL.GetCustSwitchStatus(custStatusSwitch.CustId);
+            switch (custStatusSwitch.Op) 
+            {
+                case 1:
+                    OldStatus = custSwitchInfo.IsKyc;
+                    break;
+                case 2:
+                    OldStatus = custSwitchInfo.IsRisk;
+                    break;
+                case 3:
+                    OldStatus = custSwitchInfo.PhoneVerified;
+                    break;
+                default:
+                    OldStatus = custSwitchInfo.EmailVerified;
+                    break;
+            }
+            NewStatus = OldStatus == 0 ? 1 : 0;
             var data = custInfoBLL.SetCustStatusSwitch(custStatusSwitch.CustId, custStatusSwitch.Op) > 0;
 
             if (data)
@@ -473,10 +493,26 @@ namespace BackendSite.Controllers.Api
                 if (custStatusSwitch.Op == 1)
                 {
                     Info.Add("Action", "Change IsKyc Status");
+                    Info.Add("OldStatus", OldStatus == 0 ? "NO" : "YES");
+                    Info.Add("NewStatus", NewStatus == 0 ? "NO" : "YES");
                 }
                 else if (custStatusSwitch.Op == 2)
                 {
                     Info.Add("Action", "Change IsRisk Status");
+                    Info.Add("OldStatus", OldStatus == 0 ? "NO" : "YES");
+                    Info.Add("NewStatus", NewStatus == 0 ? "NO" : "YES");
+                }
+                else if (custStatusSwitch.Op == 3)
+                {
+                    Info.Add("Action", "Change PhoneVerified Status");
+                    Info.Add("OldStatus", OldStatus == 0 ? "NO" : "YES");
+                    Info.Add("NewStatus", NewStatus == 0 ? "NO" : "YES");
+                }
+                else if (custStatusSwitch.Op == 4)
+                {
+                    Info.Add("Action", "Change EmailVerified Status");
+                    Info.Add("OldStatus", OldStatus == 0 ? "NO" : "YES");
+                    Info.Add("NewStatus", NewStatus == 0 ? "NO" : "YES");
                 }
                 serverInfoBLL.AdminOperateLog(null, custStatusSwitch.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
@@ -501,6 +537,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult SetCustInfo(CustStatus custStatus)
         {
             var apiResult = new ApiResult<bool>();
+            var custProfile = custInfoBLL.GetCustProfile(custStatus.CustId);
             var data = custInfoBLL.SetCustInfo(custStatus.CustId, custStatus.Level, custStatus.FullName, custStatus.Birthday_Y, custStatus.Birthday_M, custStatus.Birthday_D, custStatus.PhoneNumber, custStatus.EMail, User.Identity.Name) > 0;
 
             if (data)
@@ -511,22 +548,27 @@ namespace BackendSite.Controllers.Api
                 if (custStatus.Level != null)
                 {
                     Info.Add("Action", $"Change Level To {custStatus.Level}");
+                    Info.Add("Before Change Level", custProfile.UserLevel);
                 }
                 else if (custStatus.FullName != null)
                 {
                     Info.Add("Action", $"Change Full Name To {custStatus.FullName}");
+                    Info.Add("Before Change Full Name", custProfile.AccountName);
                 }
                 else if (custStatus.Birthday_Y != null || custStatus.Birthday_M != null || custStatus.Birthday_D != null)
                 {
                     Info.Add("Action", $"Change Birthday To {custStatus.Birthday_Y}/{custStatus.Birthday_M}/{custStatus.Birthday_D}");
+                    Info.Add("Before Change Birthday", $"{custProfile.Birth_y}/{custProfile.Birth_m}/{custProfile.Birth_d}");
                 }
                 else if (custStatus.PhoneNumber != null)
                 {
                     Info.Add("Action", $"Change Phone Number To {custStatus.PhoneNumber}");
+                    Info.Add("Before Change Phone Number", custProfile.PhoneNo);
                 }
                 else if (custStatus.EMail != null)
                 {
                     Info.Add("Action", $"Change EMail To {custStatus.EMail}");
+                    Info.Add("Before Change EMail", custProfile.Email);
                 }
 
                 serverInfoBLL.AdminOperateLog(null, custStatus.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
@@ -671,12 +713,24 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult ResetProfile(CustInfoReq custInfoReq)
         {
+            var custProfile = custInfoBLL.GetCustProfile(custInfoReq.CustId);
             if (custInfoBLL.ResetProfile(custInfoReq.CustId))
             {
                 var Menu = "CustManage/CustInfoList";
                 var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("Action", "Reset Profile");
+
+                if (!string.IsNullOrWhiteSpace(custProfile.Profile))
+                {
+                    var jsonObject = JObject.Parse(custProfile.Profile);
+                    var jTokens = jsonObject.Descendants().Where(p => !p.Any());
+                    jTokens.ToList().ForEach(jToken =>
+                    {
+                        Info.Add(jToken.Path, jToken.ToString());
+                    });
+                }
+
                 serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
                 return new ApiResult
@@ -699,12 +753,24 @@ namespace BackendSite.Controllers.Api
         public ApiResult ResetCustBankInfo(CustInfoReq custInfoReq)
         {
             var apiResult = new ApiResult();
+            var custProfile = custInfoBLL.GetCustProfile(custInfoReq.CustId);
             if (custInfoBLL.ResetCustBankInfo(custInfoReq.CustId))
             {
                 var Menu = "CustManage/CustInfoList";
                 var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("Action", "Reset Bank Info");
+                if (!string.IsNullOrWhiteSpace(custProfile.BankInfo))
+                {
+                    var bankInfoDetailList = JsonConvert.DeserializeObject<IEnumerable<BankInfoDetail>>(custProfile.BankInfo);
+
+                    bankInfoDetailList.ToList().ForEach(x =>
+                    {
+                        Info.Add("SysId", x.SysId);
+                        Info.Add("AccountNo", x.AccountNo);
+                        Info.Add("IFSCCode", x.IFSCCode);
+                    });
+                }
                 serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
                 return new ApiResult
@@ -726,12 +792,24 @@ namespace BackendSite.Controllers.Api
         public ApiResult ResetCustUSDTInfo(CustInfoReq custInfoReq)
         {
             var apiResult = new ApiResult();
+            var custProfile = custInfoBLL.GetCustProfile(custInfoReq.CustId);
             if (custInfoBLL.ResetCustUSDTInfo(custInfoReq.CustId))
             {
                 var Menu = "CustManage/CustInfoList";
                 var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("Action", "Reset USDT Info");
+                if (!string.IsNullOrWhiteSpace(custProfile.USDTInfo))
+                {
+                    var USDTDetailList = JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo);
+
+                    USDTDetailList.ToList().ForEach(x =>
+                    {
+                        Info.Add("NickName", x.NickName);
+                        Info.Add("USDTAddress", x.USDTAddress);
+                    });
+
+                }
                 serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
                 return new ApiResult
@@ -945,6 +1023,11 @@ namespace BackendSite.Controllers.Api
             var NewPwd = "";
             if (custInfoBLL.SetResetPwd(custInfoReq.CustId, out NewPwd))
             {
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("NewPwd", NewPwd);
+                serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
                 return new ApiResult<string>
                 {
                     Data = NewPwd,
