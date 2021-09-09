@@ -605,5 +605,16 @@ namespace BackendSite.Service.DAL
             props.Add("_siteId", siteId);
             return await _reportDbClient.QueryFirstAsync<CustomerForRisk>("Admin_CustId_Get", props);
         }
+
+        public CustomerSwitchStatus GetCustSwitchStatus(int custId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.QueryFirstOrDefault<CustomerSwitchStatus>("Admin_CustSwitchStatus_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+        }
+        public CustProfileReq  GetCustProfile(int custId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.QueryFirstOrDefault<CustProfileReq>("Admin_CustProfile_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+        }
     }
 }

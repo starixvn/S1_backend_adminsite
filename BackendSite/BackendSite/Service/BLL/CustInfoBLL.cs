@@ -580,5 +580,15 @@ namespace BackendSite.Service.BLL
         {
             return await custInfoService.GetCustId(userName, siteId);
         }
+
+        public CustomerSwitchStatus GetCustSwitchStatus(int custId)
+        {
+           return custInfoService.GetCustSwitchStatus(custId);
+        }
+
+        public CustProfileReq GetCustProfile(int custId)
+        {
+            return custInfoService.GetCustProfile(custId);
+        }
     }
 }
