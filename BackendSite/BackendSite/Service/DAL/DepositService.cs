@@ -127,13 +127,14 @@ namespace BackendSite.Service.DAL
                 Prefix = $"D{common.GetEnv()}"
             });
 
+            var DepositInfo = JsonConvert.DeserializeObject(deposit.DepositInfo);
             var para = new
             {
                 deposit.CustId,
                 deposit.UserName,
                 deposit.CurrencyId,
                 deposit.SiteId,
-                deposit.DepositInfo,
+                DepositInfo,
                 deposit.Amount,
                 deposit.Comment,
                 deposit.RefId,
