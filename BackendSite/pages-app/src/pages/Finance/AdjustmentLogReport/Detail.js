@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useReducer, useState } from "react";
 import moment from "moment";
 import ReactJsonView from "react-json-view";
+import { JsonToTable } from "react-json-to-table";
 
 const Panel = (props) => {
   const josnobject = JSON.parse(props.DetailData.DetailInfo);
@@ -53,23 +54,11 @@ const Panel = (props) => {
           Disabled={true}
         />
       </div>
-      {/* <div>
-        <TextInputBox
-          Title="DetailInfo"
-          ClassName="form-group"
-          inputClass="form-control"
-          dataColumn="DetailInfo"
-          value={props.DetailData.DetailInfo}
-        />
-      </div> */}
       <div className="row-flex">
         <div className="input-item">
           <span className="label">DetailInfo</span>
-          <ReactJsonView
-            src={josnobject}
-            theme="rjv-default"
-            iconStyle="square"
-            displayDataTypes={false}
+          <JsonToTable
+            json={josnobject}
           />
         </div>
       </div>
