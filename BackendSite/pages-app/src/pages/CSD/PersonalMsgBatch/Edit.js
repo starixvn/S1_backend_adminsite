@@ -144,14 +144,14 @@ const EditPanel = (props) => {
           .then(function (response) {
             if (isMountedRef.current) {
               if (response.data) {
-                let param = {
-                  Url: "Message/ExportSendMessageBatchResultReport",
-                  Data: {
-                    Result: JSON.stringify(response.data),
-                  },
-                };
+                // let param = {
+                //   Url: "Message/ExportSendMessageBatchResultReport",
+                //   Data: {
+                //     Result: JSON.stringify(response.data),
+                //   },
+                // };
 
-                WebAPI.DownloadData(param);
+                // WebAPI.DownloadData(param);
 
                 updateData({
                   optSite: "",
