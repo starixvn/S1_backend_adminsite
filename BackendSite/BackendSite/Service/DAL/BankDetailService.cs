@@ -37,8 +37,8 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
             using var trans = conn.BeginTransaction();
-            DynamicParameters props = new DynamicParameters();
-            DynamicParameters propsLog = new DynamicParameters();
+            var props = new DynamicParameters();
+            var propsLog = new DynamicParameters();
 
             #region props
             props.Add("SiteId", siteId);
@@ -85,8 +85,8 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
             using var trans = conn.BeginTransaction();
-            DynamicParameters props = new DynamicParameters();
-            DynamicParameters propsLog = new DynamicParameters();
+            var props = new DynamicParameters();
+            var propsLog = new DynamicParameters();
 
             #region props
             props.Add("SiteId", siteId);
@@ -133,8 +133,8 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
             using var trans = conn.BeginTransaction();
-            DynamicParameters props = new DynamicParameters();
-            DynamicParameters propsLog = new DynamicParameters();
+            var props = new DynamicParameters();
+            var propsLog = new DynamicParameters();
 
             #region props
             props.Add("SiteId", siteId);
@@ -174,10 +174,8 @@ namespace BackendSite.Service.DAL
 
         public bool EditBankDetail(int siteId, BankDetail bankDetail)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                return conn.Execute("BankDetail_Set", new { SiteId = siteId, SysId = bankDetail.BankId, BankAccountName = bankDetail.AccountName, BankAccountNo = bankDetail.AccountNo, MinAmount = bankDetail.MinAmount, MaxAmount = bankDetail.MaxAmount, PointLevel = bankDetail.PointLevel }, commandType: CommandType.StoredProcedure) > 0;
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("BankDetail_Set", new { SiteId = siteId, SysId = bankDetail.BankId, BankAccountName = bankDetail.AccountName, BankAccountNo = bankDetail.AccountNo, MinAmount = bankDetail.MinAmount, MaxAmount = bankDetail.MaxAmount, PointLevel = bankDetail.PointLevel }, commandType: CommandType.StoredProcedure) > 0;
         }
 
         public IEnumerable<BankInfoSys> GetSysBankList()

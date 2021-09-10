@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BackendSite.Service.Model.enums;
+﻿using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model.BankFinancial
 {

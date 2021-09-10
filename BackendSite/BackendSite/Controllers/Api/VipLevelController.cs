@@ -95,27 +95,33 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<VipLevelSetting> GetVipLevelSetting(CustIdReq custIdReq)
         {
             var custInfo = _custInfoBLL.GetCustInfoWithCache(custIdReq.CustId);
-            var apiListResult = new ApiListResult<VipLevelSetting>();
-            apiListResult.Data = _vipLevelBLL.GetVipLevelSetting(custInfo.SiteId);
-            apiListResult.ErrorCode = 0;
+            var apiListResult = new ApiListResult<VipLevelSetting>
+            {
+                Data = _vipLevelBLL.GetVipLevelSetting(custInfo.SiteId),
+                ErrorCode = 0
+            };
             return apiListResult;
         }
 
         [HttpPost]
         public ApiResult<VipLevelInfo> GetVipLevelInfo(CustIdReq custIdReq)
         {
-            var apiListResult = new ApiResult<VipLevelInfo>();
-            apiListResult.Data = _vipLevelBLL.GetVipLevelInfo(custIdReq.CustId);
-            apiListResult.ErrorCode = 0;
+            var apiListResult = new ApiResult<VipLevelInfo>
+            {
+                Data = _vipLevelBLL.GetVipLevelInfo(custIdReq.CustId),
+                ErrorCode = 0
+            };
             return apiListResult;
         }
 
         [HttpPost]
         public ApiListResult<VipLevelLog> GetVipLevelLog(CustIdReq custIdReq)
         {
-            var apiListResult = new ApiListResult<VipLevelLog>();
-            apiListResult.Data = _vipLevelBLL.GetVipLevelLog(custIdReq.CustId);
-            apiListResult.ErrorCode = 0;
+            var apiListResult = new ApiListResult<VipLevelLog>
+            {
+                Data = _vipLevelBLL.GetVipLevelLog(custIdReq.CustId),
+                ErrorCode = 0
+            };
             return apiListResult;
         }
 

@@ -1,14 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
-using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Newtonsoft.Json;
@@ -35,14 +30,14 @@ namespace BackendSite.Attributes
 
         private bool IsJsonResult(string ContentType)
         {
-            return ContentType == null ? false : ContentType.Contains("*/*") || ContentType.Contains("application/json");
+            return ContentType != null && (ContentType.Contains("*/*") || ContentType.Contains("application/json"));
         }
 
         public void OnAuthorization(AuthorizationFilterContext filterContext)
         {
             if (!string.IsNullOrEmpty(FuncKey))
             {
-                PageStaus pageStatus = PageStaus.allow;
+                var pageStatus = PageStatus.Allow;
                 if (filterContext.HttpContext.User.Identity.IsAuthenticated)
                 {
                     var authInfo = authorizeBLL.GetAuthData();
@@ -52,18 +47,18 @@ namespace BackendSite.Attributes
                         if (loginUser.Status == 0)
                         {
                             filterContext.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                            pageStatus = PageStaus.deniedGoLoginPage;
+                            pageStatus = PageStatus.DeniedGoLoginPage;
                         }
                         else if (loginUser.GroupSEQ == null)
                         {
-                            pageStatus = PageStaus.deniedReturnResult;
+                            pageStatus = PageStatus.DeniedReturnResult;
                         }
                         else
                         {
                             var permissions = permissionBLL.GetUserPermission((int)loginUser.GroupSEQ);
                             if (string.IsNullOrEmpty(SubFuncKey))
                             {
-                                pageStatus = !permissions.Any(x => string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase)) ? PageStaus.deniedReturnResult : PageStaus.allow;
+                                pageStatus = !permissions.Any(x => string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase)) ? PageStatus.DeniedReturnResult : PageStatus.Allow;
                             }
                             else
                             {
@@ -71,17 +66,17 @@ namespace BackendSite.Attributes
                                     string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase) 
                                     && !string.IsNullOrEmpty(x.SubFuncKeys) 
                                     && JsonConvert.DeserializeObject<string[]>(x.SubFuncKeys).Any(s=> string.Equals(s, SubFuncKey, StringComparison.OrdinalIgnoreCase))
-                                    ) ? PageStaus.deniedReturnResult : PageStaus.allow;
+                                    ) ? PageStatus.DeniedReturnResult : PageStatus.Allow;
                             }
                         }
                     }
                 }
                 else
                 {
-                    pageStatus = PageStaus.deniedGoLoginPage;
+                    pageStatus = PageStatus.DeniedGoLoginPage;
                 }
 
-                if (pageStatus != PageStaus.allow)
+                if (pageStatus != PageStatus.Allow)
                 {
                     if (IsJsonResult(filterContext.HttpContext.Request.ContentType))
                     {
@@ -93,13 +88,15 @@ namespace BackendSite.Attributes
                     {
                         switch (pageStatus)
                         {
-                            case PageStaus.deniedReturnResult:
-                                ContentResult result = new ContentResult();
-                                result.Content = "Permission denied.";
+                            case PageStatus.DeniedReturnResult:
+                                var result = new ContentResult
+                                {
+                                    Content = "Permission denied."
+                                };
                                 filterContext.Result = result;
                                 break;
 
-                            case PageStaus.deniedGoLoginPage:
+                            case PageStatus.DeniedGoLoginPage:
                                 filterContext.Result = new RedirectResult("~/AccessDenied/RefreshPage");
                                 break;
 
@@ -111,11 +108,11 @@ namespace BackendSite.Attributes
             }
         }
 
-        enum PageStaus
+        enum PageStatus
         {
-            allow = 0,
-            deniedReturnResult = 1,
-            deniedGoLoginPage = 2
+            Allow = 0,
+            DeniedReturnResult = 1,
+            DeniedGoLoginPage = 2
         }
     }
 }

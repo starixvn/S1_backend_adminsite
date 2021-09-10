@@ -32,6 +32,7 @@ class AdjustmentInfoList extends React.Component {
         let rows = this.props.searchData.data.map(row =>
             <tr key={row.transId}>
                 <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
+                <th scope="row">{row.memo}</th>
                 <th scope="row">{row.transId}</th>
                 <td>{i18n["lbl_Currency" + row.currencyId]}</td>
                 <td className="text-right">{Direction[row.adjustType] + number_format(row.amount)}</td>
@@ -50,6 +51,7 @@ class AdjustmentInfoList extends React.Component {
                     <thead>
                         <tr>
                             <th scope="col">CreateTime (Adjusted to GMT+8)</th>
+                            <th scope="col">Adjustment Remark</th>
                             <th scope="col">TransId</th>
                             <th scope="col">Currency</th>
                             <th scope="col" className="text-right">Amount</th>

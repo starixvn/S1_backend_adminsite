@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using BackendSite.Service.Model;
 using MySql.Data.MySqlClient;
 using Dapper;
@@ -21,18 +20,14 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<WinLostReport> GetWinLostReport(DateTime StartDate, DateTime EndDate, IEnumerable<int> SiteList, int Currency)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                return conn.Query<WinLostReport>("Report_WinLostV2_Get", new { StartDate, EndDate, SiteIds=JsonConvert.SerializeObject(SiteList), Currency}, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Query<WinLostReport>("Report_WinLostV2_Get", new { StartDate, EndDate, SiteIds=JsonConvert.SerializeObject(SiteList), Currency}, commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<GameType> GetAllGameType()
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                return conn.Query<GameType>("Admin_TpGameType_Get", commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Query<GameType>("Admin_TpGameType_Get", commandType: CommandType.StoredProcedure);
         }
     }
 }

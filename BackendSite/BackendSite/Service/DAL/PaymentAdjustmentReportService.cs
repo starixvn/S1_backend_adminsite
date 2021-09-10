@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Service.Model;
 using MySql.Data.MySqlClient;
 using Dapper;
@@ -22,9 +21,9 @@ namespace BackendSite.Service.DAL
         public IEnumerable<PaymentAdjustment> GetPaymentAdjustmentReport(string TransId, int CurrencyId, string UserName, int AdjustType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount, ref List<string> CurrencyAmount)
         {
             IEnumerable<PaymentAdjustment> result = null;
-            List<string> tempCurrencyTotalAmount = new List<string>();
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            DynamicParameters props = new DynamicParameters();
+            var tempCurrencyTotalAmount = new List<string>();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var props = new DynamicParameters();
             props.Add("@PageSize", PageSize);
             props.Add("@TransID", TransId);
             props.Add("@Currency", CurrencyId);
@@ -62,20 +61,18 @@ namespace BackendSite.Service.DAL
         public IEnumerable<PaymentAdjustment> GetPaymentAdjustmentExportReport(string TransId, int CurrencyId, string UserName, int AdjustType, IEnumerable<int> SiteList, long StartDate, long EndDate)
         {
             IEnumerable<PaymentAdjustment> result = null;
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                string SpName = "Admin_AdjustmentInfoExportV3_Get";
-                DynamicParameters props = new DynamicParameters();
-                props.Add("@TransID", TransId);
-                props.Add("@Currency", CurrencyId);
-                props.Add("@UserName", UserName);
-                props.Add("@AdjustType", AdjustType);
-                props.Add("@StartDate", StartDate);
-                props.Add("@EndDate", EndDate);
-                props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var SpName = "Admin_AdjustmentInfoExportV3_Get";
+            var props = new DynamicParameters();
+            props.Add("@TransID", TransId);
+            props.Add("@Currency", CurrencyId);
+            props.Add("@UserName", UserName);
+            props.Add("@AdjustType", AdjustType);
+            props.Add("@StartDate", StartDate);
+            props.Add("@EndDate", EndDate);
+            props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
 
-                result = conn.Query<PaymentAdjustment>(SpName, props, commandType: CommandType.StoredProcedure);
-            }
+            result = conn.Query<PaymentAdjustment>(SpName, props, commandType: CommandType.StoredProcedure);
 
             return result;
         }
@@ -83,7 +80,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<PaymentAdjustment> GetAdjustmentInfoByCust(int CustId, long? startDate, long? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            List<string> tempCurrencyTotalAmount = new List<string>();
+            var tempCurrencyTotalAmount = new List<string>();
             var p = new DynamicParameters(new { CustId = CustId, StartDate = startDate, EndDate = endDate, PageSize = pageSize });
 
             #region GetCurrencyTotalAmount

@@ -2,10 +2,8 @@
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Data;
 using Newtonsoft.Json;
 
@@ -21,10 +19,10 @@ namespace BackendSite.Service.DAL
         }
         public DashBoardData GetDashBoardData(int SiteId, int CurrencyId, int BaseCurrencyId, List<int> CanSearchSite)
         {
-            List<int> SiteList = new List<int>();
+            var SiteList = new List<int>();
             SiteList.Add(SiteId);
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            DynamicParameters props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var props = new DynamicParameters();
             props.Add("CurrencyId", CurrencyId);
             props.Add("BaseCurrencyId", BaseCurrencyId);
             props.Add("SelectSite", SiteId != 0 ? JsonConvert.SerializeObject(SiteList) : JsonConvert.SerializeObject(CanSearchSite));
@@ -34,10 +32,10 @@ namespace BackendSite.Service.DAL
 
         public DashBoardDetailData GetDashBoardTodayData(int SiteId, int CurrencyId, int BaseCurrencyId, List<int> CanSearchSite)
         {
-            List<int> SiteList = new List<int>();
+            var SiteList = new List<int>();
             SiteList.Add(SiteId);
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            DynamicParameters props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var props = new DynamicParameters();
             props.Add("CurrencyId", CurrencyId);
             props.Add("BaseCurrencyId", BaseCurrencyId);
             props.Add("SelectSite", SiteId != 0 ? JsonConvert.SerializeObject(SiteList) : JsonConvert.SerializeObject(CanSearchSite));
@@ -46,10 +44,10 @@ namespace BackendSite.Service.DAL
         }
         public DashBoardDetailData GetDashBoardTodayExtraData(int SiteId, int CurrencyId, int BaseCurrencyId, List<int> CanSearchSite,int TempTableType)
         {
-            List<int> SiteList = new List<int>();
+            var SiteList = new List<int>();
             SiteList.Add(SiteId);
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            DynamicParameters props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var props = new DynamicParameters();
             props.Add("CurrencyId", CurrencyId);
             props.Add("BaseCurrencyId", BaseCurrencyId);
             props.Add("SelectSite", SiteId != 0 ? JsonConvert.SerializeObject(SiteList) : JsonConvert.SerializeObject(CanSearchSite));

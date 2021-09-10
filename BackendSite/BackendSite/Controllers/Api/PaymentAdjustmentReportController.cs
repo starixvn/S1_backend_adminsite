@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL;
@@ -28,10 +26,10 @@ namespace BackendSite.Controllers.Api
             var result = new ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd>();
             try
             {
-                int PageSize = 10;
-                int TotalPages = 0;
-                int RowCount = 0;
-                List<string> CurrencyAmount = new List<string>();
+                var PageSize = 10;
+                var TotalPages = 0;
+                var RowCount = 0;
+                var CurrencyAmount = new List<string>();
                 result.Data = paymentAdjustmentBLL.GetPaymentAdjustmentReport(TransId, CurrencyId, UserName, AdjustType, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount, ref CurrencyAmount);
                 result.PageNumber = PageNumber;
                 result.RowCount = RowCount;
@@ -68,17 +66,19 @@ namespace BackendSite.Controllers.Api
         }
         public ApiListResultCurrencyAmount<PaymentAdjustment> GetAdjustmentInfoByCust(GetAdjustmentInfoReq getAdjustmentInfoReq)
         {
-            int pageNumber = getAdjustmentInfoReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
-            List<string> CurrencyAmount = new List<string>();
-            var apiListResult = new ApiListResultCurrencyAmount<PaymentAdjustment>();
-            apiListResult.Data = paymentAdjustmentBLL.GetAdjustmentInfoByCust(getAdjustmentInfoReq.CustId, getAdjustmentInfoReq.StartDate, getAdjustmentInfoReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount,ref CurrencyAmount);
-            apiListResult.ErrorCode = 0;
-            apiListResult.PageNumber = pageNumber;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.RowCount = rowCount;
-            apiListResult.CurrencyAmount = CurrencyAmount;
+            var pageNumber = getAdjustmentInfoReq.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
+            var CurrencyAmount = new List<string>();
+            var apiListResult = new ApiListResultCurrencyAmount<PaymentAdjustment>
+            {
+                Data = paymentAdjustmentBLL.GetAdjustmentInfoByCust(getAdjustmentInfoReq.CustId, getAdjustmentInfoReq.StartDate, getAdjustmentInfoReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount,ref CurrencyAmount),
+                ErrorCode = 0,
+                PageNumber = pageNumber,
+                TotalPages = totalPages,
+                RowCount = rowCount,
+                CurrencyAmount = CurrencyAmount
+            };
 
             return apiListResult;
         }

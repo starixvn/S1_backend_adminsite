@@ -1,10 +1,8 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
@@ -58,7 +56,7 @@ namespace BackendSite.Service.BLL
 
         private List<FuncPermissionSettings> SetPermissions(IEnumerable<FuncPermissionSettings> Settings, IEnumerable<GroupPermisison> GroupPermissions, IEnumerable<UserPermission> UserPermissions)
         {
-            List<FuncPermissionSettings> result = new List<FuncPermissionSettings>();
+            var result = new List<FuncPermissionSettings>();
             foreach (var setting in Settings)
             {
                 result.Add(SetPermissions(setting, GroupPermissions, UserPermissions));
@@ -71,7 +69,7 @@ namespace BackendSite.Service.BLL
         {
             if (Setting.FuncKeys != null && Setting.FuncKeys.Any())
             {
-                List<FuncPermissionSettings> functionkeys = new List<FuncPermissionSettings>();
+                var functionkeys = new List<FuncPermissionSettings>();
                 foreach (var funckeys in Setting.FuncKeys)
                 {
                     functionkeys.Add(SetPermissions(funckeys, GroupPermissions, UserPermissions));
@@ -114,7 +112,7 @@ namespace BackendSite.Service.BLL
                         var checkedIndexItemList = new List<int>();
                         foreach (var subFuncKey in userSubPermission)
                         {
-                            int idx = Setting.SubFuncKeys.FindIndex(i => i.FuncKey.ToUpper() == subFuncKey.ToUpper());
+                            var idx = Setting.SubFuncKeys.FindIndex(i => i.FuncKey.ToUpper() == subFuncKey.ToUpper());
                             if (idx >= 0) checkedIndexItemList.Add(idx);
                         }
 
@@ -139,7 +137,7 @@ namespace BackendSite.Service.BLL
                         var checkedIndexItemList = new List<int>();
                         foreach (var subFuncKey in userSubPermission)
                         {
-                            int idx = Setting.SubFuncKeys.FindIndex(i => i.FuncKey.ToUpper() == subFuncKey.ToUpper());
+                            var idx = Setting.SubFuncKeys.FindIndex(i => i.FuncKey.ToUpper() == subFuncKey.ToUpper());
                             if (idx >= 0) checkedIndexItemList.Add(idx);
                         }
 
@@ -156,7 +154,7 @@ namespace BackendSite.Service.BLL
             var authData = authorizeBLL.GetAuthData();
             var loginUser = adminUserService.GetUser(authData.UserId);
 
-            bool result = false;
+            var result = false;
             if (loginUser.IsSuper)
             {
                 result = true;
@@ -198,7 +196,7 @@ namespace BackendSite.Service.BLL
             var authData = authorizeBLL.GetAuthData();
             var loginUser = adminUserService.GetUser(authData.UserId);
 
-            bool result = false;
+            var result = false;
             var permissions = GetUserPermission(GroupSEQ);
             if (permissions != null && permissions.Any())
             {
@@ -272,7 +270,7 @@ namespace BackendSite.Service.BLL
 
         public bool DashBoardAuthorize()
         {
-            bool result = false;
+            var result = false;
 
             var authData = authorizeBLL.GetAuthData();
             var loginUser = adminUserService.GetUser(authData.UserId);

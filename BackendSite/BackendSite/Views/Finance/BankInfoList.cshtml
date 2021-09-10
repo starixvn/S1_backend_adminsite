@@ -1,7 +1,6 @@
 ﻿@model IEnumerable<BackendSite.Service.Model.BankDetail>
 @using Microsoft.AspNetCore.Hosting
 @using BackendSite.Service.BLL
-@using BackendSite.Service.Model
 @inject IWebHostEnvironment environment
 @inject SelLangBLL selLangBLL
 @inject AuthorizeBLL authorizeBLL
@@ -17,7 +16,7 @@
 }
 @{
     var i18n = new Dictionary<string, string>();
-    string[] lbl_Txts = new string[] { "lbl_Enable", "lbl_Disable" };
+    var lbl_Txts = new string[] { "lbl_Enable", "lbl_Disable" };
     foreach (var lbl_Txt in lbl_Txts)
     {
         if (!i18n.ContainsKey(lbl_Txt))
@@ -29,8 +28,8 @@
         if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
-    IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("Finance/BankInfoList");
-    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
+    var subFuncKeys = permissionBLL.GetSubFunckeys("Finance/BankInfoList");
+    subFuncKeys = subFuncKeys ?? new List<string>();
 }
 <h4 class="page-name">@selLangBLL.GetResourceValue("lbl_BankCardList")</h4>
 <div id="BankCardInfoPanel"></div>

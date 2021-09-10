@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
-using BackendSite.Service.Model;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers
@@ -64,7 +60,7 @@ namespace BackendSite.Controllers
 
         public IActionResult PendingFund()
         {
-            IEnumerable<PendingFund> pendingFund = pendingFundBLL.PendingFundList();
+            var pendingFund = pendingFundBLL.PendingFundList();
             return View(pendingFund.ToList());
         }
         [HttpGet]

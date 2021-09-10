@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using Dapper;
 using Microsoft.Extensions.Configuration;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -120,13 +114,13 @@ namespace BackendSite.Service.BLL
                 (int) BonusStatusType.Running,
             };
 
-            var result = bonusInfoService.CancelBonusByBonusId(true, bonusId, JsonConvert.SerializeObject(statusList), out int custId);
+            var result = bonusInfoService.CancelBonusByBonusId(true, bonusId, JsonConvert.SerializeObject(statusList), out var custId);
 
             if (result > 0)
             {
                 var userData = _authorizeBLL.GetAuthData();
-                string Menu = "Pending Bonus/Cancel";
-                Dictionary<string, dynamic> Info = new Dictionary<string, dynamic>();
+                var Menu = "Pending Bonus/Cancel";
+                var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("Action", "Cancel Bonus");
                 _serverInfoBLL.AdminOperateLog(null, custId, Menu, ActionType.Update, Info, userData.UserName);
@@ -139,7 +133,7 @@ namespace BackendSite.Service.BLL
         public async Task<ApiResult> BonusTransferAllAsync()
         {
             var apiResult = new ApiResult();
-            List<string> errorMsg = new List<string>();
+            var errorMsg = new List<string>();
             foreach (var pendingBonus in bonusInfoService.GetPendingBonusList())
             {
                 var tpBonusTransfer = new TpBonusTransfer

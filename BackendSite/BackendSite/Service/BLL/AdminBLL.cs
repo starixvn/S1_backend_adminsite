@@ -2,13 +2,10 @@
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Http;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
@@ -66,7 +63,7 @@ namespace BackendSite.Service.BLL
         {
             string Md5Userpwd = null;
             var serverInfo = serverInfoService.GetModel();
-            int userId = 0;
+            var userId = 0;
             int.TryParse(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.NameIdentifier).Value, out userId);
             changePwd.OldPwd = tools.MD5Encrypt(changePwd.OldPwd);
             changePwd.NewPwd = tools.MD5Encrypt(changePwd.NewPwd);

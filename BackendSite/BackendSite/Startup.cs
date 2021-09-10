@@ -1,11 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using BackendSite.Service.BLL;
-using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -83,7 +78,7 @@ namespace BackendSite
             //services.AddSingleton<ReferralManagementService>();
             //services.AddSingleton<SportsService>();
             //services.AddSingleton<PrizeService>();
-            //services.AddSingleton<RebateManageService>(); //­«½Æ¤F...
+            //services.AddSingleton<RebateManageService>(); //ï¿½ï¿½ï¿½Æ¤F...
 
             //services.AddSingleton<VipLevelService>();
             //services.AddSingleton<GameCasinoManageService>();
@@ -153,7 +148,7 @@ namespace BackendSite
             //services.AddSingleton<ReferralManagementBLL>();
             //services.AddSingleton<SportsBLL>();
             //services.AddSingleton<PrizeBLL>();
-            ////services.AddSingleton<RebateManageBLL>(); //­«½Æ¤F...
+            ////services.AddSingleton<RebateManageBLL>(); //ï¿½ï¿½ï¿½Æ¤F...
             //services.AddSingleton<VipLevelBLL>();
             //services.AddSingleton<GameCasinoManageBLL>();
             //services.AddSingleton<BankFinancialBLL>();

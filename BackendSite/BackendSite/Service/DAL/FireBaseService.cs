@@ -3,11 +3,8 @@ using BackendSite.Service.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
-using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace BackendSite.Service.DAL
@@ -26,23 +23,17 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<FireBaseMessageInfo> GetFireBaseMessageList(int fireBaseId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
-            {
-             
-                return conn.Query<FireBaseMessageInfo>("Admin_FirebaseData_Get", new { FirebaseId = fireBaseId }, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<FireBaseMessageInfo>("Admin_FirebaseData_Get", new { FirebaseId = fireBaseId }, commandType: CommandType.StoredProcedure);
         }
         public IEnumerable<FireBaseCustInfo> GetFireBaseCustList(int siteId, int custId )
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
-            {
-
-                return conn.Query<FireBaseCustInfo>("Admin_FirebaseCustList_Get",new { SiteId = siteId, CustId = custId }, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<FireBaseCustInfo>("Admin_FirebaseCustList_Get",new { SiteId = siteId, CustId = custId }, commandType: CommandType.StoredProcedure);
         }
         public async Task<ApiResult<IEnumerable<FireBaseReturn>>> SendFireBaseNotificationAsync(IEnumerable<FireBaseMessage> fireBaseMessage)
         {
-            string apiUrl = $"{commonServiceUrl}FireBase/SendFireBaseNotification";
+            var apiUrl = $"{commonServiceUrl}FireBase/SendFireBaseNotification";
             dynamic req = new
             {
                 FireBaseMessages = fireBaseMessage

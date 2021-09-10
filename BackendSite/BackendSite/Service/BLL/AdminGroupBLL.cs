@@ -1,11 +1,9 @@
 ﻿using BackendSite.Service.DAL;
-using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
@@ -33,7 +31,7 @@ namespace BackendSite.Service.BLL
 
         public bool CheckGroupIsExists(string GroupName, int? SEQ)
         {
-            IEnumerable<AdminGroup> all_groups = adminGroupService.GetGroupList();
+            var all_groups = adminGroupService.GetGroupList();
             return all_groups.Any(x => x.GroupSEQ != SEQ && string.Equals(x.GroupName, GroupName, StringComparison.OrdinalIgnoreCase));
         }
 

@@ -74,7 +74,11 @@ function Edit({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
     }, []);
 
     const Submit = () => {
-        if (userName === null || userName === '') {
+        if (siteId === 0) {
+            alert("Please select a site");
+            return false;
+        }
+        if (userName === '') {
             alert("Please enter UserName");
             return false;
         }

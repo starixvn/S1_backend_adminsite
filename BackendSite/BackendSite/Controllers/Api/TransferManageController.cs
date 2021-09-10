@@ -11,7 +11,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
@@ -118,7 +117,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var authData = _authorizeBLL.GetAuthData();
-                string dateTime = GetTimeZoneDateTime(1);
+                var dateTime = GetTimeZoneDateTime(1);
                 apiResult.Data = new BankFinancialTransferInfoTransDetailModel()
                 {
                     TransDate = DateTime.Now.ToString("yyyy-MM-dd"),
@@ -173,7 +172,7 @@ namespace BackendSite.Controllers.Api
                     var receipt = _bankFinancialBLL.GetTransferIngoReceipt(data.TransferId);
 
                     var authData = _authorizeBLL.GetAuthData();
-                    string dateTime = GetTimeZoneDateTime(1);
+                    var dateTime = GetTimeZoneDateTime(1);
 
                     if(receipt!=null)
                     {
@@ -305,7 +304,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<ProcessedImage> ReviewTransferReceiptPic([FromForm] IFormFile UploadReceipt)
         {
-            ProcessedImage processedImage = new ProcessedImage();
+            var processedImage = new ProcessedImage();
             var apiResult = new ApiResult<ProcessedImage>();
 
             var transferReceipt = _bankFinancialBLL.ProcessImage(UploadReceipt);
@@ -412,7 +411,7 @@ namespace BackendSite.Controllers.Api
 
         private string GetTimeZoneDateTime(int siteId)
         {
-            int timeZone = siteId == 1 ? 8 : 7;
+            var timeZone = siteId == 1 ? 8 : 7;
             return new DateTimeOffset(DateTime.Now).ToOffset(new TimeSpan(timeZone, 0, 0)).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
         }
 

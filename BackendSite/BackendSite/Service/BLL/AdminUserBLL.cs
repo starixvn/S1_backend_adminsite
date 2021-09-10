@@ -1,10 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
@@ -46,7 +43,7 @@ namespace BackendSite.Service.BLL
 
         public void SetUserPassword(int UserId, string Password)
         {
-            string MD5Pwd = tools.MD5Encrypt(Password);
+            var MD5Pwd = tools.MD5Encrypt(Password);
             adminUserService.SetUserPassword(UserId, MD5Pwd);
         }
 
@@ -57,7 +54,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<AdminUser> AddUser(string UserName, string Userpwd, int[] SiteList, int? GroupSEQ)
         {
-            string MD5Pwd = tools.MD5Encrypt(Userpwd);
+            var MD5Pwd = tools.MD5Encrypt(Userpwd);
             return adminUserService.AddUser(UserName, MD5Pwd, SiteList, GroupSEQ);
         }
     }
