@@ -601,9 +601,10 @@ namespace BackendSite.Service.DAL
         public async Task<CustomerForRisk> GetCustId(string userName, int siteId)
         {
             var props = new DynamicParameters();
-            props.Add("_userName", userName);
-            props.Add("_siteId", siteId);
-            return await _reportDbClient.QueryFirstAsync<CustomerForRisk>("Admin_CustId_Get", props);
+            props.Add("CustId", null);
+            props.Add("UserName", userName);
+            props.Add("SiteId", siteId);
+            return await _reportDbClient.QueryFirstAsync<CustomerForRisk>("Admin_CustInfo_Get", props);
         }
     }
 }
