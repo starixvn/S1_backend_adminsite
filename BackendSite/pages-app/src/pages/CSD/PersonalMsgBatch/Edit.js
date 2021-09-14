@@ -147,7 +147,7 @@ const EditPanel = (props) => {
                 let param = {
                   Url: "Message/ExportSendMessageBatchResultReport",
                   Data: {
-                    Result: JSON.stringify(response.data),
+                    BatchId: response.data.data,
                   },
                 };
 
