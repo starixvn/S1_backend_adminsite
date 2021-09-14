@@ -218,22 +218,26 @@ module.exports = {
     //   '@babel/polyfill',
     // "./src/pages/CSD/RegistrationManagement/index.js",
     // ],
-    "CSD/DisableUserForGame.min": [
-      '@babel/polyfill',
-    "./src/pages/CSD/DisableUserForGame/index.js"
-    ],
-    "Marketing/LeaderBoardExtraPoint.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/LeaderBoardExtraPoint/index.js",
-    ],
-    "Marketing/VipLevelReview.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/VipLevelReview/index.js",
-    ],
+    // "CSD/DisableUserForGame.min": [
+    //   '@babel/polyfill',
+    // "./src/pages/CSD/DisableUserForGame/index.js"
+    // ],
+    // "Marketing/LeaderBoardExtraPoint.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/LeaderBoardExtraPoint/index.js",
+    // ],
+    // "Marketing/VipLevelReview.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/VipLevelReview/index.js",
+    // ],
     // "Marketing/LeaderBoardExtraPoint.min": [
     // 	 '@babel/polyfill',
     // 	"./src/pages/Marketing/LeaderBoardExtraPoint/index.js"
     // ],
+    "Marketing/AppLinkManagement.min": [
+    	 '@babel/polyfill',
+    	"./src/pages/Marketing/AppLinkManagement/index.js"
+    ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

@@ -137,5 +137,11 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/AppLinkManagement" })]
+        public IActionResult AppLinkManagement()
+        {
+            return View();
+        }
     }
 }

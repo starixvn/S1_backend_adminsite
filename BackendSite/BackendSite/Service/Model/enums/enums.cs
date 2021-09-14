@@ -326,4 +326,14 @@
         SettledForValidNotRollover = 3,
         Cheating = 4
     }
+    public enum AppLinkAppType
+    {
+        Andriod = 1,
+        IOS = 2
+    }
+    public enum AppLinkProtocolType
+    {
+        HTTP = 1,
+        HTTPS = 2
+    }
 }
