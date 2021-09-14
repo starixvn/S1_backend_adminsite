@@ -64,18 +64,6 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
         }
 
-        public class SendBatchMessageResultModel
-        {
-            public string UserName { get; set; }
-            public string SabaId { get; set; }
-            public string Result { get; set; }
-        }
-
-
-        public class SendBatchMessageResult
-        {
-          public List<SendBatchMessageResultModel> Data { get; set; }
-        }
         #endregion
 
         #region Action
@@ -306,23 +294,23 @@ namespace BackendSite.Controllers.Api
         }
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiResult<List<SendBatchMessageResultModel>> SendMessageBatch([FromForm] int optSite,
+        public ApiResult<int> SendMessageBatch([FromForm] int optSite,
             [FromForm] IFormFile excelUpload,
             [FromForm] string personalMsg)
         {
-            //var apiResult = new List<ApiResult>();
-            var sendResult = new List<SendBatchMessageResultModel>();
             var authData = authorizeBLL.GetAuthData();
+            int BatchId = 0;
 
-            if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", StringComparison.OrdinalIgnoreCase) 
-                || excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) 
+            if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", StringComparison.OrdinalIgnoreCase)
+                || excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase)
                 || excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
             {
-                var excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
-                var sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
-                var isLastRow = false;
-                var RowId = 2;   // 因為有標題列，所以從第2列開始讀起
-                var BatchId = 0;
+
+                ExcelPackage excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
+                ExcelWorksheet sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
+                bool isLastRow = false;
+                int RowId = 2;   // 因為有標題列，所以從第2列開始讀起
+
                 messageBLL.NewBatchMessage(optSite, authData.UserName, personalMsg, ref BatchId);
 
                 _logger.LogInformation($@"MessageService-Read Excel And Send Start At {DateTime.UtcNow}.");
@@ -391,12 +379,15 @@ namespace BackendSite.Controllers.Api
                             }
                         }
 
-                        sendResult.Add(new SendBatchMessageResultModel
-                        {
-                            UserName = custUsername,
-                            SabaId = sabaId,
-                            Result = resultMessage
-                        });
+                        int status = (errorCode == 1) ? 3 : 4;
+
+                        InsertBatchMessageSendLog(BatchId,
+                            custInfosDetail.CustId,
+                           custUsername,
+                           sabaId,
+                           resultMessage,
+                           authData.UserName,
+                            status);
 
                         RowId += 1;
                     }
@@ -407,30 +398,31 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                sendResult.Add(new SendBatchMessageResultModel
-                {
-                    UserName = "File Type Error",
-                    SabaId = "File Type Error",
-                    Result = "File Type Error"
-                });
                 //apiResult.Add(new ApiResult() { ErrorCode = -1, Message = "File Type Error" });
+                return new ApiResult<int>()
+                {
+                    ErrorCode = -1,
+                    Message = "File Type Error"
+                };
             }
 
-            return new ApiResult<List<SendBatchMessageResultModel>>
+            return new ApiResult<int>()
             {
-                Data = sendResult
+                Data = BatchId,
+                ErrorCode = 0,
+                Message = "Send Process Finish."
             };
         }
 
         [HttpPost]
-        public IActionResult ExportSendMessageBatchResultReport(string Result)
+        public IActionResult ExportSendMessageBatchResultReport(int BatchId)
         {
-            var data = JsonConvert.DeserializeObject<ApiResult<List<SendBatchMessageResultModel>>>(Result);
-            var stream = _excelBLL.Export(data.Data);
+            var data = messageBLL.GetBatchMessageSendLog(BatchId);
+            var stream = _excelBLL.Export(data);
 
             return File(stream,
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        $"SendMessageBatchResult_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+                        $"SendMessageBatchResult_{BatchId}_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
@@ -631,12 +623,14 @@ namespace BackendSite.Controllers.Api
             {
                 if (messageBLL.SendMessageBatch(personalMsg, custId, siteId, updator, batchMessageId))
                 {
-                    resultMessage = $"Success. CustId={custId}. Username={userName}. SabaId={sabaId}. Status={custStatus.GetDescription()}. ";
+                    resultMessage = $"Success. CustId:{custId}. Username: {userName}. SabaId: {sabaId}. Status: {custStatus.GetDescription()}. ";
+
                     errorCode = 1;
                 }
                 else
                 {
-                    resultMessage = $"Fail. CustId={custId}. Username={userName}. SabaId={sabaId}. Status={custStatus.GetDescription()}. Insert done but affect count != 1 ";
+                    resultMessage = $"Fail. CustId:{custId}. Username: {userName}. SabaId: {sabaId}. Status: {custStatus.GetDescription()}. Insert done but affect count != 1 ";
+
                     errorCode = 999;
                 }
             }
@@ -644,6 +638,29 @@ namespace BackendSite.Controllers.Api
             {
                 resultMessage = ex.ToString();
                 errorCode = -1;
+            }
+        }
+
+        private void InsertBatchMessageSendLog(int batchMessageId,
+            int custId,
+            string userName,
+            string sabaId,
+            string resultMessage,
+            string updator,
+            int status)
+        {
+
+            if (!messageBLL.InsertBatchMessageSendLog(batchMessageId,
+                custId,
+                userName,
+                sabaId,
+                resultMessage,
+                updator,
+                status))
+            {
+                _logger.LogError($@"MessageService-InsertBatchMessageSendLog Fail. " +
+                    $@"BatchId: {batchMessageId}. CustId: {custId}. Username: {userName}." +
+                    $@" SabaId: {sabaId}. Result: {resultMessage}. Status:{status}");
             }
         }
 

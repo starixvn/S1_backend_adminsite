@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.BatchMessageSendLog;
+
 namespace BackendSite.Service.BLL
 {
     public class MessageBLL
@@ -29,7 +31,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, long startDate, long endDate, int status, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
-            return messageService.GetAnnouncements(selectSite, startDate, endDate, status,PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            return messageService.GetAnnouncements(selectSite, startDate, endDate, status, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
         }
 
         public Announcement GetAnnouncementById(int Id)
@@ -98,6 +100,28 @@ namespace BackendSite.Service.BLL
         public async Task<ApiResult> SendSMSMessageToPlayer(int CustId)
         {
             return await messageService.SendSMSMessageToPlayerAsync(CustId);
+        }
+
+        public bool InsertBatchMessageSendLog(int batchId,
+            int custId,
+            string userName,
+            string sabaId,
+            string resultMessage,
+            string updator,
+            int status)
+        {
+            return messageService.InsertBatchMessageSendLog(batchId,
+                custId,
+                userName,
+                sabaId,
+                resultMessage,
+                updator,
+                status);
+        }
+
+        public IEnumerable<BatchMessageSendLogListModel> GetBatchMessageSendLog(int batchId)
+        {
+            return messageService.GetBatchMessageSendLogResult(batchId);
         }
     }
 }

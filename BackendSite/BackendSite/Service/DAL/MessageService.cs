@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.BatchMessageSendLog;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -19,15 +20,20 @@ namespace BackendSite.Service.DAL
         private readonly string commonServiceUrl;
         private readonly CourierAdapter courierAdapter;
         private readonly ILogger<MessageService> _logger;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
         public MessageService(IConfiguration configuration,
             CourierAdapter courierAdapter,
-            ILogger<MessageService> logger)
+            ILogger<MySqlClient> logger,
+            ILogger<MessageService> messageServiceLogger)
         {
             this.configuration = configuration;
             commonServiceUrl = configuration.GetValue<string>("CommonService");
             this.courierAdapter = courierAdapter;
-            _logger = logger;
+            _logger = messageServiceLogger;
+            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
+            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
         }
 
         public int SendMessageToPlayer(int siteId, string sender, string title, string content, int custId, string CustUserName, string lang)
@@ -272,10 +278,10 @@ namespace BackendSite.Service.DAL
         }
         public bool UpdateBatchMessage(int batchId, string message)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            _logger.LogInformation($@"MessageService-UpdateBatchMessage Start At {DateTime.UtcNow}.");
-            return conn.Execute("Admin_BatchMessageUpdate_Set", new { BatchId = batchId, Message = message }, commandType: CommandType.StoredProcedure) > 0;
-            _logger.LogInformation($@"MessageService-UpdateBatchMessage End At {DateTime.UtcNow}.");
+            DynamicParameters props = new DynamicParameters();
+            props.Add("BatchId", batchId);
+            props.Add("Message", message);
+            return _mainDbClient.Execute("Admin_BatchMessageUpdate_Set", props) > 0;
         }
         public BatchMsg GetBatchMessage(int batchId)
         {
@@ -313,6 +319,42 @@ namespace BackendSite.Service.DAL
             var apiUrl = $"{commonServiceUrl}OTPSMS/SendSMS";
             ApiResult apiResult = await courierAdapter.MyPostAsync<IEnumerable<FireBaseReturn>, dynamic>(apiUrl, new { CustId });
             return apiResult;
+        }
+
+        public bool InsertBatchMessageSendLog(int batchId,
+            int custId,
+            string userName,
+            string sabaId,
+            string resultMessage,
+            string updator,
+            int status)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            {
+                DynamicParameters props = new DynamicParameters();
+
+                props.Add("_BatchId", batchId);
+                props.Add("_CustId", custId);
+                props.Add("_UserName", userName);
+                props.Add("_SabaId", sabaId);
+                props.Add("_Result", resultMessage);
+                props.Add("_Creator", updator);
+                props.Add("_Status", status);
+
+                return conn.Execute("Admin_BatchMessageSendLog_Ins", props, commandType: CommandType.StoredProcedure) == 1;
+
+            }
+        }
+
+        public IEnumerable<BatchMessageSendLogListModel> GetBatchMessageSendLogResult(int batchId)
+        {
+            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
+            {
+                DynamicParameters props = new DynamicParameters();
+                props.Add("_BatchId", batchId);
+
+                return conn.Query<BatchMessageSendLogListModel>("Admin_BatchMessageSendLog_Get", props, commandType: CommandType.StoredProcedure);
+            }
         }
     }
 }
