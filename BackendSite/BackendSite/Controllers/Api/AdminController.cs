@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.Api
@@ -28,7 +25,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult AddAccount([FromBody]AdminUser adminUser)
         {
-            bool result = adminBLL.AddAccount(adminUser);
+            var result = adminBLL.AddAccount(adminUser);
             var apiResult = new ApiResult();
             if (result)
             {
@@ -46,7 +43,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult EditAccount([FromBody]AdminUser adminUser)
         {
-            bool result = adminBLL.EditAccount(adminUser);
+            var result = adminBLL.EditAccount(adminUser);
             var apiResult = new ApiResult();
             if (result)
             {
@@ -64,7 +61,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult ChangePwdAccount([FromBody]AdminUser adminUser)
         {
-            bool result = adminBLL.ChangePwdAccount(adminUser);
+            var result = adminBLL.ChangePwdAccount(adminUser);
             var apiResult = new ApiResult();
             if (result)
             {

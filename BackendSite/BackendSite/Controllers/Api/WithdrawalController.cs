@@ -92,10 +92,10 @@ namespace BackendSite.Controllers.Api
             WithdrawalListReq withdrawalListReq)
         {
             var apiListResult = new ApiListResultCurrencyAmount<WithdrawalRequest>();
-            int pageNumber = withdrawalListReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
-            List<string> CurrencyAmount = new List<string>();
+            var pageNumber = withdrawalListReq.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
+            var CurrencyAmount = new List<string>();
             var withdrawalRequestList = withdrawalBLL.GetWithdrawalRequestList(withdrawalListReq.SelectSite,
                 withdrawalListReq.withdrawalType, withdrawalListReq.startDate, withdrawalListReq.endDate,
                 withdrawalListReq.WithdrawalId, withdrawalListReq.UserName, withdrawalListReq.CurrencyId,
@@ -153,11 +153,11 @@ namespace BackendSite.Controllers.Api
                     IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
 
                     var getRequest = new GetObjectRequest();
-                    string key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, withdrawalReq.TransId,
+                    var key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, withdrawalReq.TransId,
                         withdrawalRequest.BankSlipPicCount);
                     getRequest.BucketName = awsWithdrawalBucketName;
                     getRequest.Key = key;
-                    GetObjectResponse getResponse = await client.GetObjectAsync(getRequest);
+                    var getResponse = await client.GetObjectAsync(getRequest);
                     withdrawalRequest.HasPic = true;
                 }
                 else
@@ -205,7 +205,7 @@ namespace BackendSite.Controllers.Api
             if (withdrawalReq.Action == (int) WithdrawalStatus.Approved)
             {
                 //Check has pic or not
-                bool hasPic = await CheckWithdrawalPictureAsync(withdrawalReq.TransId);
+                var hasPic = await CheckWithdrawalPictureAsync(withdrawalReq.TransId);
 
                 withdrawConfirmReuslt = withdrawalBLL.WithdrawalApproved(withdrawalReq.TransId, withdrawalReq.Comment,
                     User.Identity.Name, authData.UserId,hasPic);
@@ -215,10 +215,10 @@ namespace BackendSite.Controllers.Api
                     var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
                     var userLang = custInfoBLL.GetCustInfoWithCache(withdrawalRequest.CustId).UserLang;
                     // Send message to player
-                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
-                    string title = selLangBLL.GetResourceValue("lbl_WithdrawalApprovedTitle", userLang);
+                    var sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
+                    var title = selLangBLL.GetResourceValue("lbl_WithdrawalApprovedTitle", userLang);
                     title = string.Format(title, withdrawalReq.TransId);
-                    string content = selLangBLL.GetResourceValue("lbl_WithdrawalApprovedContent", userLang);
+                    var content = selLangBLL.GetResourceValue("lbl_WithdrawalApprovedContent", userLang);
                     content = string.Format(content, withdrawalReq.TransId);
                     messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
 
@@ -243,10 +243,10 @@ namespace BackendSite.Controllers.Api
                     var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
                     var userLang = custInfoBLL.GetCustInfoWithCache(withdrawalRequest.CustId).UserLang;
                     // Send message to player
-                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
-                    string title = selLangBLL.GetResourceValue("lbl_WithdrawalRejectTitle", userLang);
+                    var sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
+                    var title = selLangBLL.GetResourceValue("lbl_WithdrawalRejectTitle", userLang);
                     title = string.Format(title, withdrawalReq.TransId);
-                    string content = selLangBLL.GetResourceValue("lbl_WithdrawalRejectContent", userLang);
+                    var content = selLangBLL.GetResourceValue("lbl_WithdrawalRejectContent", userLang);
                     content = string.Format(content, withdrawalReq.TransId);
                     messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
                 }
@@ -268,7 +268,7 @@ namespace BackendSite.Controllers.Api
                 {
                     var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
                     var bankInfoOff = bankDetailBLL.GetBankInfoOff(withdrawalRequest.SiteId)
-                        .Where(x => x.BankId == withdrawalReq.SelId).FirstOrDefault();
+                        .FirstOrDefault(x => x.BankId == withdrawalReq.SelId);
 
                     if (bankInfoOff != null)
                     {
@@ -294,8 +294,8 @@ namespace BackendSite.Controllers.Api
                 }
                 else
                 {
-                    int custId = 0;
-                    decimal amount = 0m;
+                    var custId = 0;
+                    var amount = 0m;
                     withdrawConfirmReuslt = withdrawalBLL.WithdrawalProcess(withdrawalReq.TransId,
                         withdrawalReq.Comment, User.Identity.Name,
                         Newtonsoft.Json.JsonConvert.SerializeObject(withdrawalInfo), withdrawalReq.WithdrawalType,
@@ -494,10 +494,10 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetWithdrawalListByCust(WithdrawalReq4 withdrawalReq)
         {
-            int pageNumber = withdrawalReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
-            List<string> CurrencyAmount = new List<string>();
+            var pageNumber = withdrawalReq.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
+            var CurrencyAmount = new List<string>();
             var data = withdrawalBLL.GetWithdrawalListByCust(withdrawalReq.CustId,
                 withdrawalReq.TransId,
                 withdrawalReq.Status,
@@ -598,10 +598,12 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<WithdrawalKYC>> WithdrawalKYCList(WithdrawalKYC withdrawalKYC)
         {
             var result = withdrawalBLL.GetWithdrawalKYCList(withdrawalKYC.SiteId);
-            var apiResult = new ApiResult<IEnumerable<WithdrawalKYC>>();
+            var apiResult = new ApiResult<IEnumerable<WithdrawalKYC>>
+            {
+                Data = result,
+                ErrorCode = 0
+            };
 
-            apiResult.Data = result;
-            apiResult.ErrorCode = 0;
             return apiResult;
         }
 
@@ -743,9 +745,9 @@ namespace BackendSite.Controllers.Api
                 if (result)
                 {
                     var WithdrawalPic = withdrawalBLL.GetWithdrawalPicCount(para.TransId);
-                    string x = para.Pic.Replace("data:image/png;base64,", "");
-                    byte[] bytes = Convert.FromBase64String(x);
-                    MemoryStream stream = new MemoryStream(bytes);
+                    var x = para.Pic.Replace("data:image/png;base64,", "");
+                    var bytes = Convert.FromBase64String(x);
+                    var stream = new MemoryStream(bytes);
                     var config = new AmazonS3Config
                     {
                         RegionEndpoint = RegionEndpoint.APSoutheast1
@@ -759,7 +761,7 @@ namespace BackendSite.Controllers.Api
 
                     IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
                     var putRequest = new PutObjectRequest();
-                    string key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, para.TransId,
+                    var key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, para.TransId,
                         WithdrawalPic.BankSlipPicCount);
                     putRequest.BucketName = awsWithdrawalBucketName; // Your bucket name
                     putRequest.ContentType = "image/png";
@@ -767,7 +769,7 @@ namespace BackendSite.Controllers.Api
                     putRequest.Key = key;
 
 
-                    PutObjectResponse putResponse = await client.PutObjectAsync(putRequest);
+                    var putResponse = await client.PutObjectAsync(putRequest);
                     apiResult.ErrorCode = 0;
                 }
                 else
@@ -822,11 +824,11 @@ namespace BackendSite.Controllers.Api
 
                 IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
                 var request = new DeleteObjectRequest();
-                string key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, para.TransId,
+                var key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, para.TransId,
                     WithdrawalPic.BankSlipPicCount);
                 request.BucketName = awsWithdrawalBucketName;
                 request.Key = key;
-                DeleteObjectResponse Response = await client.DeleteObjectAsync(request);
+                var Response = await client.DeleteObjectAsync(request);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -902,7 +904,7 @@ namespace BackendSite.Controllers.Api
                     BucketName = awsWithdrawalBucketName,
                     Key = $"{awsWithdrawalFolder}/{transId}_{withdrawalPicCount.BankSlipPicCount}.png"
                 };
-                GetObjectResponse response = await client.GetObjectAsync(request);
+                var response = await client.GetObjectAsync(request);
 
                 return response.HttpStatusCode == HttpStatusCode.OK;
             }
@@ -936,14 +938,14 @@ namespace BackendSite.Controllers.Api
 
                 IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
                 var request = new CopyObjectRequest();
-                string withdrawalKey = $"{awsWithdrawalFolder}/{transId}_{withdrawalPicCount.BankSlipPicCount}.png";
+                var withdrawalKey = $"{awsWithdrawalFolder}/{transId}_{withdrawalPicCount.BankSlipPicCount}.png";
                 //NameingRule:{TransId}_{Seq}_{UploadTimes}
-                string accountingKey = $"{awsWithdrawalAccountingFolder}/{transId}_1_1.png";
+                var accountingKey = $"{awsWithdrawalAccountingFolder}/{transId}_1_1.png";
                 request.SourceBucket = awsWithdrawalBucketName;
                 request.SourceKey = withdrawalKey;
                 request.DestinationBucket = awsWithdrawalBucketName;
                 request.DestinationKey = accountingKey;
-                CopyObjectResponse response = await client.CopyObjectAsync(request);
+                var response = await client.CopyObjectAsync(request);
 
                 return response.HttpStatusCode == HttpStatusCode.OK;
             }

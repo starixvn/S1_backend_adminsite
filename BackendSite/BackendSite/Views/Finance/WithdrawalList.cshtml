@@ -1,6 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Hosting
 @using BackendSite.Service.BLL
-@using BackendSite.Service.Model
 @inject IWebHostEnvironment environment
 @inject SelLangBLL selLangBLL
 @inject ServerInfoBLL serverInfoBLL
@@ -28,28 +27,28 @@
     i18n.Add("lbl_Pending", selLangBLL.GetResourceValue("lbl_Pending"));
     i18n.Add("lbl_Approved", selLangBLL.GetResourceValue("lbl_Approved"));
 
-    string[] lbl_Txts = new string[] { "lbl_Action", "lbl_Comment", "lbl_ActualDeposit", "lbl_No", "lbl_WithdrawalId", "lbl_WithdrawalType", "lbl_UserName", "lbl_Amount", "lbl_ChargeFee", "lbl_Memo", "lbl_CreateTime", "lbl_Status" };
+    var lbl_Txts = new string[] { "lbl_Action", "lbl_Comment", "lbl_ActualDeposit", "lbl_No", "lbl_WithdrawalId", "lbl_WithdrawalType", "lbl_UserName", "lbl_Amount", "lbl_ChargeFee", "lbl_Memo", "lbl_CreateTime", "lbl_Status" };
     foreach (var lbl_Txt in lbl_Txts)
     {
         if (!i18n.ContainsKey(lbl_Txt))
             i18n.Add(lbl_Txt, selLangBLL.GetResourceValue(lbl_Txt));
     }
 
-    for (int i = 0; i <= 8; i++)
+    for (var i = 0; i <= 8; i++)
     {
         if (!i18n.ContainsKey($"lbl_WithdrawalStatus{i}"))
             i18n.Add($"lbl_WithdrawalStatus{i}", selLangBLL.GetResourceValue($"lbl_WithdrawalStatus{i}"));
     }
     i18n.Add($"lbl_WithdrawalStatus{99}", selLangBLL.GetResourceValue($"lbl_WithdrawalStatus{99}"));
 
-    for (int i = 0; i <= 4; i++)
+    for (var i = 0; i <= 4; i++)
     {
         if (!i18n.ContainsKey($"lbl_WithdrawalType{i}"))
             i18n.Add($"lbl_WithdrawalType{i}", selLangBLL.GetResourceValue($"lbl_WithdrawalType{i}"));
     }
 
-    IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("Finance/WithdrawalList");
-    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
+    var subFuncKeys = permissionBLL.GetSubFunckeys("Finance/WithdrawalList");
+    subFuncKeys = subFuncKeys ?? new List<string>();
 }
 <h4 class="page-name">@selLangBLL.GetResourceValue("lbl_WithdrawalRequest")</h4>
 <div id="searchForm"></div>

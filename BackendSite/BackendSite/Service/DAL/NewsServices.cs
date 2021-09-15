@@ -3,11 +3,9 @@ using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.DAL
 {
@@ -21,8 +19,8 @@ namespace BackendSite.Service.DAL
 
         public NewsData GetNewsList(IEnumerable<int> SelectSite, long StartDate, long EndDate, int PageSize, int PageNumber, int Status)
         {
-            NewsData SearchData = new NewsData();
-            DynamicParameters props = new DynamicParameters();
+            var SearchData = new NewsData();
+            var props = new DynamicParameters();
             props.Add("SelectSite", JsonConvert.SerializeObject(SelectSite));
             props.Add("StartDate", StartDate);
             props.Add("EndDate", EndDate);
@@ -32,7 +30,7 @@ namespace BackendSite.Service.DAL
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
 
             var result = conn.Query<News>("Admin_NewsV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
@@ -46,10 +44,8 @@ namespace BackendSite.Service.DAL
 
         public News GetNewsById(int NewsId)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                return conn.QueryFirstOrDefault<News>("Admin_News_GetById", new { NewsId }, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.QueryFirstOrDefault<News>("Admin_News_GetById", new { NewsId }, commandType: CommandType.StoredProcedure);
         }
 
         public int? SetNews(bool IsAdd, News newsDatas)
@@ -75,10 +71,8 @@ namespace BackendSite.Service.DAL
 
         public void SetStatus(int NewsId, int Status, string LastUpdateUser)
         {
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                conn.Execute("Admin_News_SetStatus", new { NewsId, Status, LastUpdateUser }, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Execute("Admin_News_SetStatus", new { NewsId, Status, LastUpdateUser }, commandType: CommandType.StoredProcedure);
         }
     }
 }

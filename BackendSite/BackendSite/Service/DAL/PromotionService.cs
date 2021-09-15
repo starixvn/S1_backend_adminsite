@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.DAL
 {
@@ -37,10 +36,10 @@ namespace BackendSite.Service.DAL
 
         public PromotionListData GetPromotionListByCustIdAndDate(int CustId, long StartDate, long EndDate, int PageNumber, int PageSize)
         {
-            PromotionListData PromotionListData = new PromotionListData();
+            var PromotionListData = new PromotionListData();
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            DynamicParameters props = new DynamicParameters();
-            List<string> tempCurrencyTotalAmount = new List<string>();
+            var props = new DynamicParameters();
+            var tempCurrencyTotalAmount = new List<string>();
             props.Add("CustId", CustId);
             props.Add("StartDate", StartDate);
             props.Add("EndDate", EndDate);

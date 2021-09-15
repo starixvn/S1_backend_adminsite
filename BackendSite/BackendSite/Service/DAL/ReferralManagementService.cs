@@ -3,11 +3,9 @@ using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.DAL
 {
@@ -29,7 +27,7 @@ namespace BackendSite.Service.DAL
         public void SetReferral(List<ReferralManagement> referralList)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            List<ReferralList> para = new List<ReferralList>();
+            var para = new List<ReferralList>();
             referralList.ForEach(x =>
             {
                 if (!string.IsNullOrWhiteSpace(x.PeriodDays) && !string.IsNullOrWhiteSpace(x.BonusAmount) && !string.IsNullOrWhiteSpace(x.VaildBet) && !string.IsNullOrWhiteSpace(x.Deposit))
@@ -76,9 +74,9 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<ReferralFriend> GetRefFriendList(int custId, long? StartDate, long? EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            string SpName = "Admin_ReferralFriendList_Get";
-            DynamicParameters props = new DynamicParameters(new { CustId = custId });
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var SpName = "Admin_ReferralFriendList_Get";
+            var props = new DynamicParameters(new { CustId = custId });
             props.Add("PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);

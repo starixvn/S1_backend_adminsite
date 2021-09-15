@@ -486,6 +486,11 @@
         "DisplayKey": "LeaderBoard ExtraPoint",
         "FuncKey": "Marketing/LeaderBoardExtraPoint",
         "Enable": false
+      },
+      {
+        "DisplayKey": "App Link Management",
+        "FuncKey": "Marketing/AppLinkManagement",
+        "Enable": false
       }
     ]
   },

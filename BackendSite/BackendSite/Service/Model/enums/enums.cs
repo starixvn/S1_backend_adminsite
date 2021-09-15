@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace BackendSite.Service.Model.enums
+﻿namespace BackendSite.Service.Model.enums
 {
     public enum Direction
     {
@@ -330,5 +325,15 @@ namespace BackendSite.Service.Model.enums
         SettledForInvalid = 2,
         SettledForValidNotRollover = 3,
         Cheating = 4
+    }
+    public enum AppLinkAppType
+    {
+        Andriod = 1,
+        IOS = 2
+    }
+    public enum AppLinkProtocolType
+    {
+        HTTP = 1,
+        HTTPS = 2
     }
 }

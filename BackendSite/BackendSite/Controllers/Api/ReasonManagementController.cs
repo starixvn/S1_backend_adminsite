@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
@@ -26,9 +24,11 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<ReasonManagementFuncKey>> GetFuncKey()
         {
 
-            var apiResult = new ApiResult<IEnumerable<ReasonManagementFuncKey>>();
-            apiResult.Data = reasonManagementBLL.GetFuncKey();
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<IEnumerable<ReasonManagementFuncKey>>
+            {
+                Data = reasonManagementBLL.GetFuncKey(),
+                ErrorCode = 0
+            };
 
             return apiResult;
 

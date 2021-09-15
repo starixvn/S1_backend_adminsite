@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Library;
 using BackendSite.Attributes;
@@ -51,9 +49,9 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         public ApiListResult<TpTransferInfo> GetTpTransferInfoByCust(TransferInfoReq transferInfoReq)
         {
-            int pageNumber = transferInfoReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
+            var pageNumber = transferInfoReq.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
             var data = tpBLL.GetTpTransferInfoByCust(transferInfoReq.CustId,
                                                      transferInfoReq.TransId,
                                                      transferInfoReq.startDate,
@@ -81,7 +79,7 @@ namespace BackendSite.Controllers.Api
 
         public async Task<ApiResult> FixNegativeAsync(FixNegativeReq fixNegativeReq)
         {
-            TpInfo tpInfo = new TpInfo
+            var tpInfo = new TpInfo
             {
                 CustId = fixNegativeReq.CustId,
                 TpId = 1
@@ -158,7 +156,7 @@ namespace BackendSite.Controllers.Api
             var custId = (string.IsNullOrEmpty(UserTpId)) ? null : common.TpIdToCustId(UserTpId);
             var custInfosDetail = custInfoBLL.GetCustInfoDetails(custId, UserName, SiteId);
             
-            AdminTpTransfer inTpTransfer = new AdminTpTransfer() { TpId = TpId, CustId = custInfosDetail.CustId, Amount = Amount, direction = (TpDirection)Opt, Operator = User.Identity.Name, Remarks = Memo };
+            var inTpTransfer = new AdminTpTransfer() { TpId = TpId, CustId = custInfosDetail.CustId, Amount = Amount, direction = (TpDirection)Opt, Operator = User.Identity.Name, Remarks = Memo };
 
             var result = await tpBLL.AdminAdjustmentTransferAsync(inTpTransfer);
             if (result.ErrorCode == (int)ErrorCodeType.Success)
@@ -182,9 +180,9 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/ThirdPartyAdjustment" })]
         public ApiListResult<AdminTpTransferInfo> GetAdjustmentTpLog([FromForm] int SiteId, [FromForm] int TpId, [FromForm] int CustId, [FromForm] int PageNumber)
         {
-            int PageSize = 10;
-            int TotalPages = 0;
-            int RowCount = 0;
+            var PageSize = 10;
+            var TotalPages = 0;
+            var RowCount = 0;
 
             var result = new ApiListResult<AdminTpTransferInfo>();
             try

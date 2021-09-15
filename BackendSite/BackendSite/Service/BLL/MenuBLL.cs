@@ -1,10 +1,8 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
@@ -25,7 +23,7 @@ namespace BackendSite.Service.BLL
 
         public List<MenuItem> GetMenuData()
         {
-            List<MenuItem> result = new List<MenuItem>();
+            var result = new List<MenuItem>();
             var menuDatas = Newtonsoft.Json.JsonConvert.DeserializeObject<List<MenuItem>>(menuService.GetMenuData());
             var authData = authorizeBLL.GetAuthData();
             if (authData != null)

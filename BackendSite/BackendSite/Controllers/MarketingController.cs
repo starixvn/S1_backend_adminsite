@@ -1,6 +1,5 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
-using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers
@@ -135,6 +134,12 @@ namespace BackendSite.Controllers
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview" })]
         public IActionResult VipLevelReview()
+        {
+            return View();
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/AppLinkManagement" })]
+        public IActionResult AppLinkManagement()
         {
             return View();
         }

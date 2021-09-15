@@ -33,8 +33,8 @@ const Result = (props) => {
               </button>
             </td>
             <td>{d.settlementTypeName}</td>
-            <td>{number_format(d.turnOver)}</td>
-            <td>{number_format(d.validBet)}</td>
+            <td>{number_format(d.turnOver_ExcludeValidTO)}</td>
+            <td>{number_format(d.validBet_Valid)}</td>
             <td>{number_format(d.winlostAmount)}</td>
             <td>{moment(d.transTime).format("l LTS")}</td>
             <td>{moment(d.settledTime).format("l LTS")}</td>
@@ -53,7 +53,7 @@ const Result = (props) => {
             <tr>
               <th>Trans Id</th>
               <th>SettlementTypeName</th>
-              <th>Turnover</th>
+              <th>Turnover(ExcludeValidTO)</th>
               <th>Valid Bet</th>
               <th>WinLoss</th>
               <th>Trans Time</th>

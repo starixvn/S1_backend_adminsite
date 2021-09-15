@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -43,7 +40,7 @@ namespace BackendSite.Service.BLL
                     ref CurrencyAmount
                 );
 
-            List<BonusInfoFrontEnd> result = new List<BonusInfoFrontEnd>();
+            var result = new List<BonusInfoFrontEnd>();
             if (datas != null && datas.Any())
             {
                 foreach (var row in datas)
@@ -89,7 +86,7 @@ namespace BackendSite.Service.BLL
                     RebateCategoriesId
                 );
 
-            List<BonusInfoFrontEnd> result = new List<BonusInfoFrontEnd>();
+            var result = new List<BonusInfoFrontEnd>();
             if (datas != null && datas.Any())
             {
                 foreach (var row in datas)

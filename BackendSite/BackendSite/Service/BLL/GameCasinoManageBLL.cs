@@ -2,10 +2,8 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
@@ -69,10 +67,10 @@ namespace BackendSite.Service.BLL
         {
             IEnumerable<CurrencyDataV2> CurrencyData = null;
             IEnumerable<ServerInfo> SiteList = null;
-            List<GameCasinoDetail> GameCasinoDetailList = new List<GameCasinoDetail>();
+            var GameCasinoDetailList = new List<GameCasinoDetail>();
             //List<int> siteData = new List<int>();
             //List<GameCasinoDetailData> gameCasinoDetailData = new List<GameCasinoDetailData>();
-            List<GameCasinoDetailBySite> result = new List<GameCasinoDetailBySite>();
+            var result = new List<GameCasinoDetailBySite>();
             //這個GameCasinoId是屬於哪個TP,哪個Currency有這個TP
             CurrencyData = gameCasinoManageService.GetCurrency(para);
             

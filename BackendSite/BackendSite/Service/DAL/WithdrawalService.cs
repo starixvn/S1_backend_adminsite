@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.DAL
 {
@@ -53,15 +52,15 @@ namespace BackendSite.Service.DAL
             var CurrencyId = JsonConvert.SerializeObject(currencyId);
             var Status = JsonConvert.SerializeObject(status);
             var VipStatus = JsonConvert.SerializeObject(levelstatus);
-            int withdrawalId = 0;
-            List<string> tempCurrencyTotalAmount = new List<string>();
+            var withdrawalId = 0;
+            var tempCurrencyTotalAmount = new List<string>();
             if (!string.IsNullOrWhiteSpace(WithdrawalId))
             {
-                Match m = Regex.Match(WithdrawalId, @"\d+");
+                var m = Regex.Match(WithdrawalId, @"\d+");
                 int.TryParse(m.Value, out withdrawalId);
             }
 
-            using MySqlConnection conn =
+            using var conn =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var p = new DynamicParameters(new
             {
@@ -111,14 +110,14 @@ namespace BackendSite.Service.DAL
 
         public WithdrawalRequest GetWithdrawalRequest(int withdrawalId, int siteId)
         {
-            using MySqlConnection conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.QueryFirstOrDefault<WithdrawalRequest>("Admin_WithdrawalRequestTransIDV3_Get",
                 new { WithdrawalId = withdrawalId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<Comments> GetWithdrawalRequestComment(int withdrawalId, int siteId)
         {
-            using MySqlConnection conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.Query<Comments>("WithdrawalRequestComment_Get",
                 new { WithdrawalId = withdrawalId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
@@ -134,7 +133,7 @@ namespace BackendSite.Service.DAL
             }
             else
             {
-                using MySqlConnection connection =
+                using var connection =
                     new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
                 return connection.Execute("WithdrawalLog_Ins",
                     new { WithdrawalId = withdrawalId, SiteId = siteId, Comment = comment, Action = status, Operator },
@@ -146,7 +145,7 @@ namespace BackendSite.Service.DAL
             long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount,
             ref List<string> CurrencyAmount)
         {
-            List<string> tempCurrencyTotalAmount = new List<string>();
+            var tempCurrencyTotalAmount = new List<string>();
             var p = new DynamicParameters(new
             { CustId, TransId = transId, Status, StartDate = startDate, EndDate = endDate, PageSize = pageSize });
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
@@ -191,10 +190,10 @@ namespace BackendSite.Service.DAL
             var CurrencyId = "[" + currencyId + "]";
             var Status = "[" + status + "]";
             var VipStatus = $"[{LevelStatus}]";
-            int withdrawalId = 0;
+            var withdrawalId = 0;
             if (!string.IsNullOrWhiteSpace(WithdrawalId))
             {
-                Match m = Regex.Match(WithdrawalId, @"\d+");
+                var m = Regex.Match(WithdrawalId, @"\d+");
                 int.TryParse(m.Value, out withdrawalId);
             }
 
@@ -281,7 +280,7 @@ namespace BackendSite.Service.DAL
         public WithdrawalTimeData WithdrawalTimeReportGet(WithdrawalTimeReportPara para)
         {
             var SelectSite = JsonConvert.SerializeObject(para.SelectSite);
-            List<int> selectstatus = new List<int>();
+            var selectstatus = new List<int>();
             if (para.Status == 0)
             {
                 selectstatus.Add(3);
@@ -297,12 +296,11 @@ namespace BackendSite.Service.DAL
 
             var SelectStatus = JsonConvert.SerializeObject(selectstatus);
 
-            WithdrawalTimeData SearchData = new WithdrawalTimeData();
-            DynamicParameters props = new DynamicParameters();
-            using MySqlConnection conn =
+            var SearchData = new WithdrawalTimeData();
+            var props = new DynamicParameters();
+            using var conn =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            int tempWithdrawalID;
-            Int32.TryParse(para.WithdrawalID, out tempWithdrawalID);
+            int.TryParse(para.WithdrawalID, out var tempWithdrawalID);
 
             props.Add("SelectSite", SelectSite);
             props.Add("WithdrawalId", tempWithdrawalID);
@@ -344,12 +342,11 @@ namespace BackendSite.Service.DAL
             }
 
             var selectStatusString = JsonConvert.SerializeObject(selectStatus);
-            int tempWithdrawalId;
-            Int32.TryParse(withdrawalId, out tempWithdrawalId);
+            int.TryParse(withdrawalId, out var tempWithdrawalId);
 
-            using MySqlConnection conn =
+            using var conn =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            DynamicParameters props = new DynamicParameters();
+            var props = new DynamicParameters();
             props.Add("StartDate", startDate);
             props.Add("EndDate", endDate);
             props.Add("SelectSite", selectSiteString);
@@ -373,16 +370,16 @@ namespace BackendSite.Service.DAL
             int userId = 0,
             bool hasPic = false)
         {
-            Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out int withdrawalId);
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var withdrawalId);
 
             custId = 0;
             amount = 0m;
-            int result = 0;
-            Dictionary<string, string> paraLog = new Dictionary<string, string>();
+            var result = 0;
+            var paraLog = new Dictionary<string, string>();
             try
             {
-                using MySqlConnection conn =
+                using var conn =
                     new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
                 conn.Open();
                 using var trans = conn.BeginTransaction();
@@ -393,24 +390,24 @@ namespace BackendSite.Service.DAL
                     /*Approved don't to Set WithdrawalInfo*/
                     (status == WithdrawalStatus.Approved ? null : withdrawalInfo),
                     withdrawalType,
-                    out custId, out string userName, out amount, out paraLog,
+                    out custId, out var userName, out amount, out paraLog,
                     conn, trans);
 
                 if (result > 0)
                 {
                     //step2: Set WithdrawalLog
-                    int logResult = SetWithdrawalLog(withdrawalId, siteId, comment, (int)status, updater, conn, trans);
-                    int specialResult = 0;
+                    var logResult = SetWithdrawalLog(withdrawalId, siteId, comment, (int)status, updater, conn, trans);
+                    var specialResult = 0;
 
                     if (logResult > 0)
                     {
-                        int updateFlowEndResult = 0; //For Reject AAnd Approved Use.
+                        var updateFlowEndResult = 0; //For Reject AAnd Approved Use.
                         //step3: special Flow by Status.
                         switch (status)
                         {
                             case WithdrawalStatus.Rejected:
-                                int balanceResult = 0;
-                                int type = 2 + _typePosition; /*Rejected  Withdrawal 1002*/
+                                var balanceResult = 0;
+                                var type = 2 + _typePosition; /*Rejected  Withdrawal 1002*/
 
                                 updateFlowEndResult = SetWithdrawalInfoFlowEndTime(withdrawalId, conn, trans);
 
@@ -423,8 +420,8 @@ namespace BackendSite.Service.DAL
 
                                 break;
                             case WithdrawalStatus.Approved:
-                                int dummyResult = 0;
-                                int accountingResult = 0;
+                                var dummyResult = 0;
+                                var accountingResult = 0;
                                 var withdrawalInfoData = JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalInfo);
 
                                 updateFlowEndResult = SetWithdrawalInfoFlowEndTime(withdrawalId,conn, trans);
@@ -525,7 +522,7 @@ namespace BackendSite.Service.DAL
             userName = string.Empty;
             amount = 0m;
             paraLog = new Dictionary<string, string>();
-            int result = 0;
+            var result = 0;
 
             var p = new DynamicParameters(new
             {
@@ -577,7 +574,7 @@ namespace BackendSite.Service.DAL
         public WithdrawalRequest GetWithdrawalInfo(int withdrawalId,
             string transId)
         {
-            using MySqlConnection conn =
+            using var conn =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             return conn.QueryFirstOrDefault<WithdrawalRequest>("Admin_WithdrawalInfo_Get",
                 new { _WithdrawalId = withdrawalId, _TransId = transId }, commandType: CommandType.StoredProcedure);

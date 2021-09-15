@@ -1,14 +1,6 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.DAL
 {
@@ -25,7 +17,7 @@ namespace BackendSite.Service.DAL
 
         public string GetPermissionJSONData()
         {
-            string contentRootPath = env.ContentRootPath;
+            var contentRootPath = env.ContentRootPath;
             var initPermissionData = File.ReadAllText($"{contentRootPath}/App_Data/FunctionPermission.json");
 
             return initPermissionData;

@@ -73,12 +73,12 @@ namespace BackendSite.Service.BLL
 
         public (bool Status, int Count, string Message) SetTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
         {
-            bool status = false;
-            int count = 0;
-            string message = string.Empty;
-            bool updateTransferDataFlag = false;
-            int affectTransferData = 0;
-            BankFinancialTransferAccountDetailModel oldData = new BankFinancialTransferAccountDetailModel();
+            var status = false;
+            var count = 0;
+            var message = string.Empty;
+            var updateTransferDataFlag = false;
+            var affectTransferData = 0;
+            var oldData = new BankFinancialTransferAccountDetailModel();
 
             if (!CheckParameterForSetTransferAccount(bankFinancialTransferAccount, out message))
             {
@@ -98,7 +98,7 @@ namespace BackendSite.Service.BLL
                 }
             }
 
-            BankFinancialTransferAccountModel transferAccountModel = new BankFinancialTransferAccountModel
+            var transferAccountModel = new BankFinancialTransferAccountModel
             {
                 Id = bankFinancialTransferAccount.Id,
                 SiteId = bankFinancialTransferAccount.SiteId,
@@ -125,7 +125,7 @@ namespace BackendSite.Service.BLL
 
             if (transferAccountModel.Id == 0)
             {
-                using (TransactionScope scope = new TransactionScope())
+                using (var scope = new TransactionScope())
                 {
 
                     if (_bankFinancialService.InsertTransferAccount(transferAccountModel) != 1)
@@ -150,7 +150,7 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                using (TransactionScope scope = new TransactionScope())
+                using (var scope = new TransactionScope())
                 {
 
                     if (_bankFinancialService.UpdateTransferAccount(transferAccountModel) != 1)
@@ -221,17 +221,17 @@ namespace BackendSite.Service.BLL
 
         private string GetTimeZoneDateTimeByDateString(int siteId, string datetime)
         {
-            int timeZone = (siteId == 2 || siteId == 3) ? 7 : 8;
+            var timeZone = (siteId == 2 || siteId == 3) ? 7 : 8;
             return Convert.ToDateTime(datetime).AddHours(timeZone).ToString("yyyy-MM-dd HH:mm:ss");
         }
 
         private string GetPurpose(string purpose)
         {
-            string result = string.Empty;
+            var result = string.Empty;
 
             IEnumerable<int> purposeList = purpose.Split(',').Select(int.Parse).ToList();
 
-            foreach (int i in purposeList)
+            foreach (var i in purposeList)
             {
                 switch (i)
                 {
@@ -247,9 +247,9 @@ namespace BackendSite.Service.BLL
 
         private string GetTransferId(TransferTypeEnum transferType)
         {
-            string prefix = string.Empty;
-            string nowDate = string.Empty;
-            string nowMaxNo = string.Empty;
+            var prefix = string.Empty;
+            var nowDate = string.Empty;
+            var nowMaxNo = string.Empty;
 
             switch (transferType)
             {
@@ -280,7 +280,7 @@ namespace BackendSite.Service.BLL
         private bool CheckParameterForSetTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount,
                                                          out string message)
         {
-            message = String.Empty;
+            message = string.Empty;
 
             if (bankFinancialTransferAccount == null)
             {
@@ -535,9 +535,9 @@ namespace BackendSite.Service.BLL
 
         public (bool Status, int Count, string Message) SetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail, IFormFile transferReceipt)
         {
-            bool status = false;
-            int count = 0;
-            string message = string.Empty;
+            var status = false;
+            var count = 0;
+            var message = string.Empty;
 
             #region Checnk Parameter
 
@@ -571,9 +571,9 @@ namespace BackendSite.Service.BLL
 
             if (bankFinancialTransferInfoDetail.TransferId == null)
             {
-                using (TransactionScope scope = new TransactionScope())
+                using (var scope = new TransactionScope())
                 {
-                    string TransferId = GetTransferId(bankFinancialTransferInfoDetail.TransferType);
+                    var TransferId = GetTransferId(bankFinancialTransferInfoDetail.TransferType);
                     result.TransferInfoFromModel.TransferId = TransferId;
                     result.TransferInfoToModel.TransferId = TransferId;
 
@@ -632,7 +632,7 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                using (TransactionScope scope = new TransactionScope())
+                using (var scope = new TransactionScope())
                 {
                     if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.PlusAndMinus ||
                        bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.OnlyMinus)
@@ -695,14 +695,14 @@ namespace BackendSite.Service.BLL
 
         public (bool Status, int Count, string Message) DeleteTransferInfo(string transferId)
         {
-            bool status = false;
-            int count = 0;
-            string message = string.Empty;
+            var status = false;
+            var count = 0;
+            var message = string.Empty;
 
             if (transferId != null)
             {
                 //Step1:Get Data
-                IEnumerable<BankFinancialTransferInfoTransDetailModel> getdata = _bankFinancialService.GetTransferInfoList(true,
+                var getdata = _bankFinancialService.GetTransferInfoList(true,
                                                              null,
                                                              null,
                                                              null,
@@ -715,7 +715,7 @@ namespace BackendSite.Service.BLL
 
                 var transferInfoReceiptModel = _bankFinancialService.GetTransferInfoReceipt(transferId);
 
-                BankFinancialTransferInfoTransDetailModel data = new BankFinancialTransferInfoTransDetailModel();
+                var data = new BankFinancialTransferInfoTransDetailModel();
 
                 if (getdata.Count() == 1)
                 {
@@ -729,9 +729,9 @@ namespace BackendSite.Service.BLL
                 //Step2: Set Data for Insert Log
                 var result = SetParameterModelForSetTransferInfo(data);
 
-                using (TransactionScope scope = new TransactionScope())
+                using (var scope = new TransactionScope())
                 {
-                    int affectCount = 0;
+                    var affectCount = 0;
 
                     //Step3:Insert Log
                     if (data.TransactionType == TransactionTypeEnum.PlusAndMinus
@@ -802,7 +802,7 @@ namespace BackendSite.Service.BLL
         private bool CheckSharedParameterForSetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail,
                                                             out string message)
         {
-            message = String.Empty;
+            message = string.Empty;
 
             if (bankFinancialTransferInfoDetail == null)
             {
@@ -878,7 +878,7 @@ namespace BackendSite.Service.BLL
         private bool CheckParameterForSetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail,
                                                       out string message)
         {
-            message = String.Empty;
+            message = string.Empty;
 
             #region From Data
 
@@ -1080,7 +1080,7 @@ namespace BackendSite.Service.BLL
         private bool CheckParameterWithTypeOtherForSetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail,
                                                                    out string message)
         {
-            message = String.Empty;
+            message = string.Empty;
 
             if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.OnlyMinus)
             {
@@ -1371,7 +1371,7 @@ namespace BackendSite.Service.BLL
 
             if (_contentTypesCheck.ContainsKey(image.ContentType))
             {
-                decimal xSize = 500m;
+                var xSize = 500m;
                 var apiResult = new ApiResult();
                 decimal xCell = 1;
 
@@ -1391,17 +1391,19 @@ namespace BackendSite.Service.BLL
                     }
                 }
 
-                var graphicOptions = new GraphicOptions();
-                graphicOptions.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-                graphicOptions.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+                var graphicOptions = new GraphicOptions
+                {
+                    CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed,
+                    SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed
+                };
                 var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
                 img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 
-                string fileName = image.FileName;
+                var fileName = image.FileName;
                 fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
                 fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
 
-                byte[] fileBytes = ms.ToArray();
+                var fileBytes = ms.ToArray();
 
                 processedImage.FileName = fileName;
                 processedImage.FileBytes = fileBytes;
@@ -1469,7 +1471,7 @@ namespace BackendSite.Service.BLL
                                                                                string endDate)
         {
 
-            Dictionary<string, BankFinancialDataModel> keyValuePairs = new Dictionary<string, BankFinancialDataModel>();
+            var keyValuePairs = new Dictionary<string, BankFinancialDataModel>();
 
             var accountData = _bankFinancialService.GetTransferAccountList();
             var payData = _paymentManageService.GetPayList();
@@ -1500,7 +1502,7 @@ namespace BackendSite.Service.BLL
 
                 if (data.DepositType == DepositType.LocalBank)
                 {
-                    var account = accountData.Where(x => x.AccountNo == data.AccountNo).FirstOrDefault();
+                    var account = accountData.FirstOrDefault(x => x.AccountNo == data.AccountNo);
 
                     if (account != null)
                     {
@@ -1530,12 +1532,12 @@ namespace BackendSite.Service.BLL
                 }
                 else
                 {
-                    var account = accountData.Where(x => x.PayId.ToString() == data.AccountNo && x.SiteId == data.SiteId && x.CurrencyId == data.CurrencyId).FirstOrDefault();
-                    var pay = payData.Where(x => x.Id.ToString() == data.AccountNo).FirstOrDefault();
+                    var account = accountData.FirstOrDefault(x => x.PayId.ToString() == data.AccountNo && x.SiteId == data.SiteId && x.CurrencyId == data.CurrencyId);
+                    var pay = payData.FirstOrDefault(x => x.Id.ToString() == data.AccountNo);
 
                     if (!keyValuePairs.ContainsKey($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"))
                     {
-                        TransferAccountStatusEnum status = pay.Status == 1 ? TransferAccountStatusEnum.Open : TransferAccountStatusEnum.Close;
+                        var status = pay.Status == 1 ? TransferAccountStatusEnum.Open : TransferAccountStatusEnum.Close;
 
                         bankFinancialDataModel = new BankFinancialDataModel();
                         keyValuePairs.Add($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}", bankFinancialDataModel);
@@ -1544,12 +1546,12 @@ namespace BackendSite.Service.BLL
                         bankFinancialDataModel.CurrencyId = data.CurrencyId;
                         bankFinancialDataModel.IsoCode = currencyData.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
                         bankFinancialDataModel.Channel = TransferChannelEnum.PSP;
-                        bankFinancialDataModel.PayId = account == null ? pay.Id : account.PayId;
+                        bankFinancialDataModel.PayId = account?.PayId ?? pay.Id;
                         bankFinancialDataModel.PayName = account == null ? pay.PayName : account.PayName;
                         bankFinancialDataModel.AccountNo = account == null ? pay.PayName + " " + bankFinancialDataModel.IsoCode : account.AccountNo;
                         bankFinancialDataModel.AccountName = account == null ? pay.PayName + " " + bankFinancialDataModel.IsoCode : account.DisplayName;
                         bankFinancialDataModel.Purpose = account == null ? "1,2,3" : account.Purpose;
-                        bankFinancialDataModel.AccountStatus = account == null ? status : account.Status;
+                        bankFinancialDataModel.AccountStatus = account?.Status ?? status;
                     }
                     bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
@@ -1565,7 +1567,7 @@ namespace BackendSite.Service.BLL
 
                 if (data.WithdrawalType == WithdrawalType.LocalBank)
                 {
-                    var account = accountData.Where(x => x.AccountNo == data.AccountNo).FirstOrDefault();
+                    var account = accountData.FirstOrDefault(x => x.AccountNo == data.AccountNo);
 
                     if (account != null)
                     {
@@ -1593,12 +1595,12 @@ namespace BackendSite.Service.BLL
                 }
                 else if (data.WithdrawalType == WithdrawalType.OnlinePayment)
                 {
-                    var account = accountData.Where(x => x.PayId.ToString() == data.AccountNo && x.SiteId == data.SiteId && x.CurrencyId == data.CurrencyId).FirstOrDefault();
-                    var pay = payData.Where(x => x.Id.ToString() == data.AccountNo).FirstOrDefault();
+                    var account = accountData.FirstOrDefault(x => x.PayId.ToString() == data.AccountNo && x.SiteId == data.SiteId && x.CurrencyId == data.CurrencyId);
+                    var pay = payData.FirstOrDefault(x => x.Id.ToString() == data.AccountNo);
 
                     if (!keyValuePairs.ContainsKey($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"))
                     {
-                        TransferAccountStatusEnum status = pay.Status == 1 ? TransferAccountStatusEnum.Open : TransferAccountStatusEnum.Close;
+                        var status = pay.Status == 1 ? TransferAccountStatusEnum.Open : TransferAccountStatusEnum.Close;
 
                         bankFinancialDataModel = new BankFinancialDataModel();
                         keyValuePairs.Add($"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}", bankFinancialDataModel);
@@ -1607,12 +1609,12 @@ namespace BackendSite.Service.BLL
                         bankFinancialDataModel.CurrencyId = data.CurrencyId;
                         bankFinancialDataModel.IsoCode = currencyData.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
                         bankFinancialDataModel.Channel = TransferChannelEnum.PSP;
-                        bankFinancialDataModel.PayId = account == null ? pay.Id : account.PayId;
+                        bankFinancialDataModel.PayId = account?.PayId ?? pay.Id;
                         bankFinancialDataModel.PayName = account == null ? pay.PayName : account.PayName;
                         bankFinancialDataModel.AccountNo = account == null ? pay.PayName+" "+bankFinancialDataModel.IsoCode : account.AccountNo;
                         bankFinancialDataModel.AccountName = account == null ? pay.PayName + " " + bankFinancialDataModel.IsoCode : account.DisplayName;
                         bankFinancialDataModel.Purpose = account == null ? "1,2,3" : account.Purpose;
-                        bankFinancialDataModel.AccountStatus = account == null ? status : account.Status;
+                        bankFinancialDataModel.AccountStatus = account?.Status ?? status;
                     }
 
                     bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
@@ -1627,7 +1629,7 @@ namespace BackendSite.Service.BLL
             {
                 BankFinancialDataModel bankFinancialDataModel = null;
 
-                var account = accountData.Where(x => x.AccountNo == data.AccountNo).FirstOrDefault();
+                var account = accountData.FirstOrDefault(x => x.AccountNo == data.AccountNo);
 
                 if (account != null)
                 {

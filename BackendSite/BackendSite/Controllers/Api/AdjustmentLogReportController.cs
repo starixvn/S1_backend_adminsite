@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
@@ -24,9 +22,11 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<AdjustmentInfoLogMenu>> GetAdjustmentInfoLogMenu()
         {
 
-            var apiResult = new ApiResult<IEnumerable<AdjustmentInfoLogMenu>>();
-            apiResult.Data = adjustmentLogReportBLL.GetAdjustmentInfoLogMenu();
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<IEnumerable<AdjustmentInfoLogMenu>>
+            {
+                Data = adjustmentLogReportBLL.GetAdjustmentInfoLogMenu(),
+                ErrorCode = 0
+            };
 
             return apiResult;
 

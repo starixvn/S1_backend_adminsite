@@ -624,6 +624,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "AppLinkManagement",
+        "Title": "App Link Management",
+        "FuncKey": "Marketing/AppLinkManagement",
+        "Controller": "Marketing",
+        "Action": "AppLinkManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

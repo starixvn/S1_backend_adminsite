@@ -304,10 +304,10 @@ namespace BackendSite.Controllers.Api
             [FromForm] int CategoryId, [FromForm] IFormFile excelUpload)
         {
             var apiResult = new ApiResult<List<BonusImportResult>>();
-            List<BonusImportResult> BonusImportResultList = new List<BonusImportResult>();
+            var BonusImportResultList = new List<BonusImportResult>();
             //var apiResult = new List<ApiResult>();
             const int OneRoundCount = 2; //每次N筆資料寫入DB
-            List<BonusImportPara> BonusImportListPara = new List<BonusImportPara>();
+            var BonusImportListPara = new List<BonusImportPara>();
             try
             {
                 if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -315,29 +315,29 @@ namespace BackendSite.Controllers.Api
                     excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) ||
                     excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
                 {
-                    ExcelPackage excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
-                    ExcelWorksheet sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
-                    bool isLastRow = false;
-                    int RowId = 2; // 因為有標題列，所以從第2列開始讀起
+                    var excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
+                    var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
+                    var isLastRow = false;
+                    var RowId = 2; // 因為有標題列，所以從第2列開始讀起
 
                     do
                     {
-                        string siteId = sheet.Cells[RowId, 1].Text.Trim();
-                        string bonusAmount = sheet.Cells[RowId, 3].Text.Trim();
-                        string rollover = sheet.Cells[RowId, 4].Text.Trim();
-                        string expiryDay = sheet.Cells[RowId, 5].Text.Trim();
-                        string memo = sheet.Cells[RowId, 6].Text.Trim();
-                        string userName = sheet.Cells[RowId, 2].Text.Trim();
+                        var siteId = sheet.Cells[RowId, 1].Text.Trim();
+                        var bonusAmount = sheet.Cells[RowId, 3].Text.Trim();
+                        var rollover = sheet.Cells[RowId, 4].Text.Trim();
+                        var expiryDay = sheet.Cells[RowId, 5].Text.Trim();
+                        var memo = sheet.Cells[RowId, 6].Text.Trim();
+                        var userName = sheet.Cells[RowId, 2].Text.Trim();
 
                         if (!string.IsNullOrWhiteSpace(siteId) && !string.IsNullOrWhiteSpace(bonusAmount) &&
                             !string.IsNullOrWhiteSpace(userName))
                         {
-                            int.TryParse(siteId, out int SiteId);
-                            int.TryParse(rollover, out int Rollover);
-                            int.TryParse(expiryDay, out int ExpiryDay);
-                            decimal.TryParse(bonusAmount, out decimal BonusAmount);
+                            int.TryParse(siteId, out var SiteId);
+                            int.TryParse(rollover, out var Rollover);
+                            int.TryParse(expiryDay, out var ExpiryDay);
+                            decimal.TryParse(bonusAmount, out var BonusAmount);
 
-                            BonusImportPara para = new BonusImportPara()
+                            var para = new BonusImportPara()
                             {
                                 SiteId = SiteId,
                                 UserName = userName,
@@ -351,7 +351,6 @@ namespace BackendSite.Controllers.Api
 
                             BonusImportListPara.Add(para);
                             RowId++;
-                            continue;
                         }
                         else
                         {
@@ -361,14 +360,14 @@ namespace BackendSite.Controllers.Api
                     /*Spared Task for
                      * Batch*/
 
-                    var rounds = BonusImportListPara.Count() / OneRoundCount;
-                    var remainder = BonusImportListPara.Count() % OneRoundCount;
+                    var rounds = BonusImportListPara.Count / OneRoundCount;
+                    var remainder = BonusImportListPara.Count % OneRoundCount;
                     if (remainder > 0)
                         rounds++;
 
-                    for (int i = 1; i <= rounds; i++)
+                    for (var i = 1; i <= rounds; i++)
                     {
-                        List<BonusImportPara> query = BonusImportListPara.Skip((i - 1) * OneRoundCount)
+                        var query = BonusImportListPara.Skip((i - 1) * OneRoundCount)
                             .Take(OneRoundCount).ToList();
                         var insertTasks = query.Select(x => _bonusManageBLL.BonusImportAsync(x));
                         var result = await Task.WhenAll(insertTasks);
@@ -397,16 +396,15 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<List<ReferralManagement>>();
             var siteList = _serverInfoBLL.GetSiteListByLoginUser();
-            var referralList = _referralManagementBLL.GetReferralBySiteId(SiteId);
+            var referralList = _referralManagementBLL.GetReferralBySiteId(SiteId).ToList();
             var currencyList = _reportBLL.GetCurrency().ToList();
-            List<ReferralManagement> referralManagementList = new List<ReferralManagement>();
+            var referralManagementList = new List<ReferralManagement>();
 
-            foreach (string currency in siteList.ToList().Find(x => x.SiteId == SiteId).CurrencyList.Replace("[", "")
+            foreach (var currency in siteList.ToList().Find(x => x.SiteId == SiteId).CurrencyList.Replace("[", "")
                 .Replace("]", "").Split(","))
             {
-                int currencyId;
-                Int32.TryParse(currency, out currencyId);
-                var referral = referralList?.Where(x => x.CurrencyId == currencyId).ToList().FirstOrDefault();
+                int.TryParse(currency, out var currencyId);
+                var referral = referralList.FirstOrDefault(x => x.CurrencyId == currencyId);
                 referralManagementList.Add(new ReferralManagement
                 {
                     SiteId = SiteId,
@@ -416,7 +414,7 @@ namespace BackendSite.Controllers.Api
                     VaildBet = referral == null ? string.Empty : referral.VaildBet.ToString(),
                     Deposit = referral == null ? string.Empty : referral.Deposit.ToString(),
                     IsoCode = currencyList.Find(x => x.CurrencyId == currencyId).IsoCode,
-                    Status = referral == null ? false : referral.Status
+                    Status = referral?.Status ?? false
                 });
             }
 
@@ -448,8 +446,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<dynamic>();
             try
             {
-                var referralList = _referralManagementBLL.GetReferralBySiteId(SiteId);
-                var referral = referralList?.Where(x => x.CurrencyId == CurrencyId).ToList().FirstOrDefault();
+                var referralList = _referralManagementBLL.GetReferralBySiteId(SiteId).ToList();
+                var referral = referralList.FirstOrDefault(x => x.CurrencyId == CurrencyId);
                 if (referral == null)
                 {
                     apiResult.ErrorCode = 7;
@@ -472,15 +470,14 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<ReferralCustList> GetReferralCustList(ReferralCustListReq referralCustListReq)
         {
             var apiResult = new ApiListResult<ReferralCustList>();
-            int totalPages = 0, rowCount = 0;
 
-            int pageNumber = referralCustListReq.PageNumber;
-            int pageSize = 10;
+            var pageNumber = referralCustListReq.PageNumber;
+            var pageSize = 10;
             if (referralCustListReq.PageSize > 0)
                 pageSize = referralCustListReq.PageSize;
             apiResult.Data = _referralManagementBLL.GetReferralCustList(referralCustListReq.SelectSite,
-                referralCustListReq.UserName, referralCustListReq.CurrencyId, pageSize, ref pageNumber, out totalPages,
-                out rowCount);
+                referralCustListReq.UserName, referralCustListReq.CurrencyId, pageSize, ref pageNumber, out var totalPages,
+                out var rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;
@@ -492,25 +489,25 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<ReferralFriend> GetRefFriendList(RefFriendListReq refFriendListReq)
         {
-            Dictionary<int, string> referralStatus = new Dictionary<int, string>()
+            var referralStatus = new Dictionary<int, string>()
             {
                 {0, "Approved"},
                 {1, "Running"},
                 {2, "Expired"}
             };
 
-            int PageSize = 10;
+            var PageSize = 10;
             if (refFriendListReq.PageSize > 0)
                 PageSize = refFriendListReq.PageSize;
-            int pageNumber = refFriendListReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
+            var pageNumber = refFriendListReq.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
             var apiResult = new ApiListResult<ReferralFriend>();
             var data = _referralManagementBLL.GetRefFriendList(refFriendListReq.CustId, refFriendListReq.StartDate,
                 refFriendListReq.EndDate, PageSize, ref pageNumber, ref totalPages, ref rowCount);
             foreach (var x in data)
             {
-                referralStatus.TryGetValue(x.Status, out string name);
+                referralStatus.TryGetValue(x.Status, out var name);
                 x.StatusName = name;
             }
 
@@ -649,8 +646,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<LeaderboardExtraPointList>();
             int totalPages = 0, rowCount = 0;
 
-            int pageNumber = leaderboardExtraPointReq.PageNumber;
-            int pageSize = 10;
+            var pageNumber = leaderboardExtraPointReq.PageNumber;
+            var pageSize = 10;
             if (leaderboardExtraPointReq.PageSize > 0)
                 pageSize = leaderboardExtraPointReq.PageSize;
             apiResult.Data = _bonusManageBLL.GetLeaderboardExtraPointList(leaderboardExtraPointReq.SelectSite,
@@ -667,10 +664,12 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult SetLeaderboardExtraPoint(SetLeaderboardExtraPointReq setLeaderboardExtraPointReq)
         {
-            var apiResult = new ApiResult();
-            apiResult.Message = "Unknown Error";
-            string UserName = _authorizeBLL.GetAuthData().UserName;
-            int rtn = _bonusManageBLL.SetLeaderboardExtraPoint(
+            var apiResult = new ApiResult
+            {
+                Message = "Unknown Error"
+            };
+            var UserName = _authorizeBLL.GetAuthData().UserName;
+            var rtn = _bonusManageBLL.SetLeaderboardExtraPoint(
                 setLeaderboardExtraPointReq.ActiveDate, setLeaderboardExtraPointReq.SiteId, setLeaderboardExtraPointReq.CategoryId, 
                 setLeaderboardExtraPointReq.UserName, setLeaderboardExtraPointReq.ExtraPoint, UserName
                 );

@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using Dapper;
 using Microsoft.Extensions.Caching.Memory;
-using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.BLL
 {
@@ -61,7 +56,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BankInfoSys> GetSysBankList()
         {
-            string sBankInfoSysListKey = $"SysBankList";
+            var sBankInfoSysListKey = $"SysBankList";
 
             var sysBankList = cache.Get<IEnumerable<BankInfoSys>>(sBankInfoSysListKey);
             if (sysBankList == null)
@@ -79,7 +74,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BankInfoOff> GetAllBankInfoOff()
         {
-            string sBankInfoOffListKey = $"BankInfoOffList_All";
+            var sBankInfoOffListKey = $"BankInfoOffList_All";
             var bankInfoOffList = cache.Get<IEnumerable<BankInfoOff>>(sBankInfoOffListKey);
 
             if (bankInfoOffList == null)
@@ -96,7 +91,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BankInfoOff> GetBankInfoOff(int siteId)
         {
-            string sBankInfoOffListKey = $"BankInfoOffList_{siteId}";
+            var sBankInfoOffListKey = $"BankInfoOffList_{siteId}";
             var BankInfoOffList = cache.Get<IEnumerable<BankInfoOff>>(sBankInfoOffListKey);
             if (BankInfoOffList == null)
             {
@@ -112,7 +107,7 @@ namespace BackendSite.Service.BLL
         }
         public IEnumerable<BankInfoPay> GetBankInfoPay()
         {
-            string sBankInfoPayListKey = "BankInfoPayForPayout";
+            var sBankInfoPayListKey = "BankInfoPayForPayout";
             var BankInfoPayList = cache.Get<IEnumerable<BankInfoPay>>(sBankInfoPayListKey);
             if (BankInfoPayList == null)
             {
@@ -128,7 +123,7 @@ namespace BackendSite.Service.BLL
         }
         public IEnumerable<BankInfoPay> GetCryptoPay()
         {
-            string sCryptoPayListKey = "CryptoPayForPayout";
+            var sCryptoPayListKey = "CryptoPayForPayout";
             var CryptoPayList = cache.Get<IEnumerable<BankInfoPay>>(sCryptoPayListKey);
             if (CryptoPayList == null)
             {

@@ -93,7 +93,22 @@ const App = () => {
       CustId: custId
     });
   }
+  const DeleteDisableUser = (custId) => {
 
+    let param = {
+      Url: "Risk/Delete",
+      Data: `custId=${custId}`,
+    };
+    
+    WebAPI.PostData(param).then((res) => {
+      if (res.data.errorCode === 0) {
+        alert("success.");
+      } else {
+        alert(res.data.message);
+      }
+    });
+    GetDisableUserList(stateFilter);
+  }
   const SwitchStatus = (custId, status) => {
     datas.Datas.forEach(a => {
       if(a.custId === custId) {
@@ -223,6 +238,7 @@ const App = () => {
               {...datas}
               ChangePage={Result_ChangePage}
               ClickEdit={EditDisableUser}
+              ClickDelete={DeleteDisableUser}
               UpdateStatus={SwitchStatus} />
           )}
         </>

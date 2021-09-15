@@ -1,11 +1,8 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Attributes;
 
 namespace BackendSite.Controllers.Api
@@ -27,9 +24,11 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<IEnumerable<AdminGroup>> GetGroupList()
         {
-            var apiResult = new ApiResult<IEnumerable<AdminGroup>>();
-            apiResult.Data = adminGroupBLL.GetGroupList();
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<IEnumerable<AdminGroup>>
+            {
+                Data = adminGroupBLL.GetGroupList(),
+                ErrorCode = 0
+            };
             return apiResult;
         }
 

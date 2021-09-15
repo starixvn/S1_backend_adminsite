@@ -89,7 +89,8 @@ export default function Result (tpDisableUser) {
             }
             else if (element.body && element.body.SpecialItem && element.body.SpecialItem === SpecialItemType.actionBtn) {
                 body_content = <ActionButtons 
-                                  ClickEdit={tpDisableUser.ClickEdit.bind(this, data["custId"])}/>
+                                  ClickEdit={tpDisableUser.ClickEdit.bind(this, data["custId"])}
+                                  ClickDelete={tpDisableUser.ClickDelete.bind(this, data["custId"])}/>
 
             }
             else if(element.body && element.body.SpecialItem && element.body.SpecialItem === SpecialItemType.statusBtn) {

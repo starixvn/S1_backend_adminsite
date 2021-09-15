@@ -1,10 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {
@@ -192,7 +187,7 @@ namespace BackendSite.Service.Model
         public bool CanUpdate { get; set; }
         public string UpdateAt { get; set; }
         public string Operator { get; set; }
-        public List<String> UpdateRemark { get; set; }
+        public List<string> UpdateRemark { get; set; }
         public CustTele() {
             CanUpdate = true;
         }
@@ -347,5 +342,37 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+    }
+    public class CustomerSwitchStatus
+    {
+        public int IsKyc { get; set; }
+        public int IsRisk { get; set; }
+        public int PhoneVerified { get; set; }
+        public int EmailVerified { get; set; }
+    }
+    public class CustProfileReq 
+    { 
+        public int UserLevel { get; set; }
+        public string Birth_d { get; set; }
+        public string Birth_m { get; set; }
+        public string Birth_y { get; set; }
+        public string PhoneNo { get; set; }
+        public string Email { get; set; }
+        public string AccountName { get; set; }
+        public string AreaCode { get; set; }
+        public string Profile { get; set; }
+        public string BankInfo { get; set; }
+        public string USDTInfo { get; set; }
+    }
+    public class BankInfoDetail
+    {
+        public int SysId { set; get; }
+        public string AccountNo { set; get; }
+        public string IFSCCode { set; get; }
+    }
+    public class USDTDetail
+    {
+        public string NickName { set; get; }
+        public string USDTAddress { set; get; }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL;
@@ -79,10 +78,10 @@ namespace BackendSite.Controllers.Api
                                                            Currency,
                                                            true);
 
-            List<Dictionary<string, dynamic>> byDate = new List<Dictionary<string, dynamic>>();
-            List<Dictionary<string, dynamic>> Total = new List<Dictionary<string, dynamic>>();
-            Dictionary<string, int> byDateTitles = new Dictionary<string, int>();
-            Dictionary<string, int> TotalTitles = new Dictionary<string, int>();
+            var byDate = new List<Dictionary<string, dynamic>>();
+            var Total = new List<Dictionary<string, dynamic>>();
+            var byDateTitles = new Dictionary<string, int>();
+            var TotalTitles = new Dictionary<string, int>();
 
             foreach (var item in Datas)
             {
@@ -98,12 +97,12 @@ namespace BackendSite.Controllers.Api
                     x.Any(y => y.Key == "Key" && (string)y.Value == getByDateKey)
                 );
 
-                if (getByDateItem != null && getByDateItem.TryGetValue("CurrencyId", out dynamic currencyId) && (int)currencyId == item.CurrencyId)
+                if (getByDateItem != null && getByDateItem.TryGetValue("CurrencyId", out var currencyId) && (int)currencyId == item.CurrencyId)
                 {
-                    getByDateItem.TryGetValue("TurnoverAmount", out dynamic stakeSummary);
+                    getByDateItem.TryGetValue("TurnoverAmount", out var stakeSummary);
                     getByDateItem["TurnoverAmount"] = (decimal)stakeSummary + item.StakeSummary;
 
-                    getByDateItem.TryGetValue("WinlostAmount", out dynamic WinlostAmount);
+                    getByDateItem.TryGetValue("WinlostAmount", out var WinlostAmount);
                     getByDateItem["WinlostAmount"] = (decimal)WinlostAmount + item.WinlostAmount;
 
                     if (!byDateTitles.ContainsKey(gameStakePropName))
@@ -112,7 +111,7 @@ namespace BackendSite.Controllers.Api
                     }
                     if (getByDateItem.ContainsKey(gameStakePropName))
                     {
-                        getByDateItem.TryGetValue(gameStakePropName, out dynamic gameStake);
+                        getByDateItem.TryGetValue(gameStakePropName, out var gameStake);
                         getByDateItem[gameStakePropName] = (decimal)gameStake + item.StakeSummary;
                     }
                     else
@@ -126,7 +125,7 @@ namespace BackendSite.Controllers.Api
                     }
                     if (getByDateItem.ContainsKey(gameWinlostPropName))
                     {
-                        getByDateItem.TryGetValue(gameWinlostPropName, out dynamic gameWinlost);
+                        getByDateItem.TryGetValue(gameWinlostPropName, out var gameWinlost);
                         getByDateItem[gameWinlostPropName] = (decimal)gameWinlost + item.WinlostAmount;
                     }
                     else
@@ -136,7 +135,7 @@ namespace BackendSite.Controllers.Api
                 }
                 else
                 {
-                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    var newItem = new Dictionary<string, dynamic>()
                     {
                         { "Key", getByDateKey },
                         { "Date", date },
@@ -173,10 +172,10 @@ namespace BackendSite.Controllers.Api
                 var getByTotal = Total.FirstOrDefault(x => x.Any(y => y.Key == "CurrencyId" && (int)y.Value == item.CurrencyId));
                 if (getByTotal != null)
                 {
-                    getByTotal.TryGetValue("TurnoverAmount", out dynamic stakeSummary);
+                    getByTotal.TryGetValue("TurnoverAmount", out var stakeSummary);
                     getByTotal["TurnoverAmount"] = (decimal)stakeSummary + item.StakeSummary;
 
-                    getByTotal.TryGetValue("WinlostAmount", out dynamic WinlostAmount);
+                    getByTotal.TryGetValue("WinlostAmount", out var WinlostAmount);
                     getByTotal["WinlostAmount"] = (decimal)WinlostAmount + item.WinlostAmount;
 
                     if (!TotalTitles.ContainsKey(gameStakePropName))
@@ -186,7 +185,7 @@ namespace BackendSite.Controllers.Api
 
                     if (getByTotal.ContainsKey(gameStakePropName))
                     {
-                        getByTotal.TryGetValue(gameStakePropName, out dynamic gameStake);
+                        getByTotal.TryGetValue(gameStakePropName, out var gameStake);
                         getByTotal[gameStakePropName] = (decimal)gameStake + item.StakeSummary;
                     }
                     else
@@ -200,7 +199,7 @@ namespace BackendSite.Controllers.Api
                     }
                     if (getByTotal.ContainsKey(gameWinlostPropName))
                     {
-                        getByTotal.TryGetValue(gameWinlostPropName, out dynamic gameWinlost);
+                        getByTotal.TryGetValue(gameWinlostPropName, out var gameWinlost);
                         getByTotal[gameWinlostPropName] = (decimal)gameWinlost + item.WinlostAmount;
                     }
                     else
@@ -210,7 +209,7 @@ namespace BackendSite.Controllers.Api
                 }
                 else
                 {
-                    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
+                    var newItem = new Dictionary<string, dynamic>()
                     {
                         { "Date", date },
                         { "CurrencyId", item.CurrencyId },
@@ -244,7 +243,7 @@ namespace BackendSite.Controllers.Api
                 }
             }
 
-            List<ExportDataToExcel> d = new List<ExportDataToExcel>()
+            var d = new List<ExportDataToExcel>()
             {
                 new ExportDataToExcel(){SheetName="ByDate", Content = byDate, Titles=byDateTitles.OrderBy(x=> x.Value).Select(x=> x.Key).ToList()},
                 new ExportDataToExcel(){SheetName="Total", Content = Total, Titles=TotalTitles.OrderBy(x=> x.Value).Select(x=> x.Key).ToList()},

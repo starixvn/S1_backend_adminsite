@@ -35,7 +35,7 @@ namespace BackendSite.Service.BLL
         }
         public async Task<IEnumerable<TpWallet>> GetTpWalletAsync(int custId)
         {
-            string sKey = $"TpWallet_{custId}";
+            var sKey = $"TpWallet_{custId}";
             var tpWalletList = cache.Get<IEnumerable<TpWallet>>(sKey);
             if (tpWalletList == null)
             {
@@ -73,7 +73,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult<TransferResult>> TransferAsync(TpTransfer inTpTransfer)
         {
-            decimal amount = inTpTransfer.Amount;
+            var amount = inTpTransfer.Amount;
             if (amount.ToString().IndexOf(".") > -1)
             {
                 decimal.TryParse(amount.ToString("#.##"), out amount);
@@ -94,7 +94,7 @@ namespace BackendSite.Service.BLL
         }
         public async Task<ApiResult<UserBalance>> GetBalanceAsync(TpInfo inInfo)
         {
-            Dictionary<string, string> input = new Dictionary<string, string>();
+            var input = new Dictionary<string, string>();
             var myUrl = $"{apiUrl}GetBalance";
             var oTpInfo = new TpInfo
             {
@@ -103,7 +103,7 @@ namespace BackendSite.Service.BLL
                 inputs = input
             };
 
-            ApiResult<UserBalance> data = new ApiResult<UserBalance>();
+            var data = new ApiResult<UserBalance>();
 
             try
             {
@@ -115,13 +115,13 @@ namespace BackendSite.Service.BLL
                 data.Message = ex.ToString();
             }
 
-            ApiResult<UserBalance> result = data;
+            var result = data;
 
             return result;
         }
         public async Task<ApiResult<TransferResult>> FixNegativeAsync(TpInfo inInfo)
         {
-            Dictionary<string, string> input = new Dictionary<string, string>();
+            var input = new Dictionary<string, string>();
             var myUrl = $"{apiUrl}FixNegative";
             var oTpInfo = new TpInfo
             {
@@ -140,7 +140,7 @@ namespace BackendSite.Service.BLL
         }
         public async Task<ApiResult<TransferResult>> AdminAdjustmentTransferAsync(AdminTpTransfer inadminTpTransfer)
         {
-            decimal amount = inadminTpTransfer.Amount;
+            var amount = inadminTpTransfer.Amount;
             if (amount.ToString().IndexOf(".") > -1)
             {
                 decimal.TryParse(amount.ToString("#.##"), out amount);
