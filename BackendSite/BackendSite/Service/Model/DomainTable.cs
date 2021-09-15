@@ -12,4 +12,15 @@
         public int Status { get; set; }
         public string LastUpdateUser { get; set; }
     }
+    public class GetAppLinkTableReq 
+    {
+        public int SiteId { get; set; }
+    }
+    public class SetAppLinkReq
+    {
+        public int SiteId { get; set; }
+        public string Domain { get; set; }
+        public int AppType { get; set; }
+        public int ProtocolType { get; set; }
+    }
 }
