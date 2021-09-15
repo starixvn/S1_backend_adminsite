@@ -107,7 +107,7 @@ const Panel = () => {
           setWeekDatas(result.data);
           setInfoType("week");
           setDatas({
-            FilterInfo:filterData
+            FilterInfo: filterData,
           });
         } else {
           alert(result.message);
@@ -132,7 +132,7 @@ const Panel = () => {
             setWeekDatas(result.data);
             setInfoType("week");
             setDatas({
-              FilterInfo:filterData
+              FilterInfo: filterData,
             });
           } else {
             alert(result.message);
@@ -220,11 +220,11 @@ const Panel = () => {
   const getTpBetRecordDetail = (GameType, TransId) => {
     axios
       .post("/api/Payment/GetTpBetRecordDetail", {
-        // GameType: parseInt(GameType),
-        // TransId: TransId,
+        GameType: parseInt(GameType),
+        TransId: TransId,
         //For Test
-        GameType: parseInt(1),
-        TransId: "Test1234",
+        //GameType: parseInt(1),
+        //TransId: "Test1234",
       })
       .then((res) => {
         let result = res.data;

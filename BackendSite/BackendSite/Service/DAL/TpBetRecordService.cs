@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 using BackendSite.Service.Model.TpBetRecordDetail;
 using Dapper;
@@ -16,7 +17,7 @@ namespace BackendSite.Service.DAL
             _configuration = configuration;
         }
 
-        public async Task<TpBetRecordDetailModel> GetTpBetRecordDetailAsync(int tpId,int gameType,string transId)
+        public async Task<IEnumerable<TpBetRecordDetailModel>> GetTpBetRecordDetailAsync(int tpId,int gameType,string transId)
         {
             var p = new DynamicParameters(new
             {
@@ -26,8 +27,9 @@ namespace BackendSite.Service.DAL
             });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return await conn.QueryFirstAsync<TpBetRecordDetailModel>("Service_TpBetRecordDetail_Get", p,
+            var data =  await conn.QueryAsync<TpBetRecordDetailModel>("Service_TpBetRecordDetail_Get", p,
                 commandType: CommandType.StoredProcedure);
+            return data;
         }
     }
 }

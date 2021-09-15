@@ -16,12 +16,12 @@ const Result = (props) => {
         <td />
         <td />
         <td />
+        <td />
       </tr>
     ) : (
       props.Datas.data.map((d, dIdx) => {
         return (
           <tr key={`result-${dIdx}`}>
-            <td>{d.transId}</td>
             <td>
               <button
                 className="btn btn-link"
@@ -52,7 +52,6 @@ const Result = (props) => {
           <thead>
             <tr>
               <th>Trans Id</th>
-              <th>Trans Id(Test:Only show saba test data)</th>
               <th>SettlementTypeName</th>
               <th>Turnover</th>
               <th>Valid Bet</th>
