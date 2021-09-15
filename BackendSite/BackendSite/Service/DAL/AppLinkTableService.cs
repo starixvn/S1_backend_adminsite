@@ -22,5 +22,11 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.Query<AppLinkTable>("Admin_AppLinkTable_Get", new { SiteId = siteId}, commandType: CommandType.StoredProcedure);
         }
+
+        public int SetAppLink(int SiteId, int AppType, string Domain, int ProtocolType,string LastUpdateUser)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_AppLinkTable_Set", new { SiteId = SiteId, ProtocolType = ProtocolType, Domain = Domain, AppType = AppType, LastUpdateUser = LastUpdateUser }, commandType: CommandType.StoredProcedure);
+        }
     }
 }

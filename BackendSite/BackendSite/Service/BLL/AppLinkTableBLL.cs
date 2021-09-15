@@ -48,5 +48,10 @@ namespace BackendSite.Service.BLL
 
             return AppLinkTable;
         }
+
+        public int SetAppLink(int SiteId, int AppType, string Domain, int ProtocolType,string LastUpdateUser)
+        {
+            return appLinkTableService.SetAppLink(SiteId, AppType, Domain, ProtocolType, LastUpdateUser);
+        }
     }
 }

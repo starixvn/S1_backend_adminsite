@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-
+import { api } from "../../../module/WebAPI";
 const Panel = (props) => {
   let result = props.Data.map((item) => {
     return (
@@ -31,7 +31,7 @@ const Detail = (props) => {
   const [isEdit, setEdit] = useState(false);
   const [editValue, setEditValue] = useState({
     Domain: "",
-    ProtocolType: 0,
+    ProtocolType: 1,
   });
   let row = "";
 
@@ -55,17 +55,22 @@ const Detail = (props) => {
   };
 
   const EditSubmit = () => {
-    let Data={
-        SiteId:DetailData.SiteId,
-        AppType:DetailData.AppType,
-        Domain:editValue.Domain,
-        ProtocolType:editValue.ProtocolType
-    }
+    let Data = {
+      SiteId: parseInt(DetailData.SiteId),
+      AppType: parseInt(DetailData.AppType),
+      Domain: editValue.Domain,
+      ProtocolType: parseInt(editValue.ProtocolType),
+    };
     api
       .post("/api/AppLinkTable/SetAppLink", Data)
       .then(function (response) {
         if (response.data.errorCode === 0) {
-        //   props.ClickSave(newDomainList);
+          setDetailData({
+            ...DetailData,
+            Domain:Data.Domain,
+            ProtocolType:Data.ProtocolType
+          });
+          setEdit(false);
           alert(response.data.message);
         } else {
           alert(response.data.message);
@@ -81,6 +86,10 @@ const Detail = (props) => {
   };
   const EditClick = () => {
     setEdit(true);
+    setEditValue({
+      Domain: DetailData.Domain,
+      ProtocolType: DetailData.ProtocolType,
+    });
   };
   let List =
     DetailData !== null ? (
@@ -105,6 +114,7 @@ const Detail = (props) => {
             onChange={DetailDataOnchange}
             dataColumn="Domain"
           />
+          {isEdit ? null : <DetailDomain Domain={DetailData.Domain} />}
         </td>
         <td>
           {isEdit ? (
@@ -145,20 +155,18 @@ const Detail = (props) => {
         id={`collapseExample-${props.Data.appType}`}
       >
         <div className="table">{row}</div>
-        {/* {isOpen ? (
-          <PopBoxContentAdd
-            ClickCancel={CreateCancel}
-            SiteId={props.siteId}
-            CurrencyId={props.currId}
-            ClickSave={handleAdd}
-            ReGetData={ReGetData}
-          />
-        ) : null} */}
       </div>
     </div>
   );
 };
+const DetailDomain = (props) => {
+  const [Domain, setDomain] = useState("");
+  useEffect(() => {
+    setDomain(props.Domain)
+  }, [props]);
 
+  return(<div>{Domain}</div>)
+};
 const InputBox = (props) => {
   const onChange = (e) => {
     if (props.onChange) {
@@ -167,9 +175,7 @@ const InputBox = (props) => {
   };
   return props.isEdit ? (
     <input type="text" defaultValue={props.defaultValue} onChange={onChange} />
-  ) : (
-    props.defaultValue
-  );
+  ) : null;
 };
 const DropDownBox = (props) => {
   const onChange = (e) => {

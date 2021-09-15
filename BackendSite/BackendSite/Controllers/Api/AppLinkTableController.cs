@@ -15,9 +15,13 @@ namespace BackendSite.Controllers.Api
     public class AppLinkTableController
     {
         private readonly AppLinkTableBLL appLinkTableBLL;
-        public AppLinkTableController(AppLinkTableBLL appLinkTableBLL)
+        private readonly AuthorizeBLL authorizeBLL;
+        private readonly SelLangBLL selLangBLL;
+        public AppLinkTableController(AppLinkTableBLL appLinkTableBLL, AuthorizeBLL authorizeBLL, SelLangBLL selLangBLL)
         {
             this.appLinkTableBLL = appLinkTableBLL;
+            this.authorizeBLL = authorizeBLL;
+            this.selLangBLL = selLangBLL;
         }
 
         [HttpPost]
@@ -36,6 +40,25 @@ namespace BackendSite.Controllers.Api
         public ApiResult SetAppLink(SetAppLinkReq setAppLinkReq)
         {
             var apiResult = new ApiResult();
+            try
+            {
+                if (appLinkTableBLL.SetAppLink(setAppLinkReq.SiteId, setAppLinkReq.AppType, setAppLinkReq.Domain, setAppLinkReq.ProtocolType, authorizeBLL.GetAuthData().UserName) > 0)
+                {
+                    apiResult.ErrorCode = 0;
+                    apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+                }
+                else
+                {
+                    apiResult.ErrorCode = 9;
+                    apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 91;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+            
             return apiResult;
         }
     }
