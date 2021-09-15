@@ -20,7 +20,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<AppLinkTable> GetAppLinkTable(int siteId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<AppLinkTable>("Admin_AppLinkTable_Get", new { SiteId = siteId}, commandType: CommandType.StoredProcedure);
+            return conn.Query<AppLinkTable>("Service_AppLinkTable_Get", new { SiteId = siteId}, commandType: CommandType.StoredProcedure);
         }
 
         public int SetAppLink(int SiteId, int AppType, string Domain, int ProtocolType,string LastUpdateUser)
