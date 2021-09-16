@@ -22,7 +22,7 @@ const Result = (props) => {
       props.Datas.data.map((d, dIdx) => {
         return (
           <tr key={`result-${dIdx}`}>
-            <td>
+            {/* <td>
               <button
                 className="btn btn-link"
                 onClick={() =>
@@ -31,7 +31,8 @@ const Result = (props) => {
               >
                 {d.transId}
               </button>
-            </td>
+            </td> */}
+            <td>{d.transId}</td>
             <td>{d.settlementTypeName}</td>
             <td>{number_format(d.turnOver_ExcludeValidTO)}</td>
             <td>{number_format(d.validBet_Valid)}</td>
