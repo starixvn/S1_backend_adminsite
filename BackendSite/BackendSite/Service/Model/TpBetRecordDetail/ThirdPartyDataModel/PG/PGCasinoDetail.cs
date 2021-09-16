@@ -13,7 +13,7 @@ namespace BackendSite.Service.Model.TpBetRecordDetail.ThirdPartyDataModel
         public PGCasinoDetail(GetDetailObject detailObject) : base(detailObject)
         {
             _betDetail = JsonConvert.DeserializeObject<PGDetailResult>(detailObject.TpBetRecordDetail.Detail);
-            _tpCurrency = detailObject.TpCurrency;    
+            _tpCurrency = detailObject.TpCurrency;
         }
 
         public string RefTransId => _betDetail?.parentBetId.ToString();
@@ -24,8 +24,8 @@ namespace BackendSite.Service.Model.TpBetRecordDetail.ThirdPartyDataModel
 
         public DateTime UTCSettledTime => DateTimeOffset.FromUnixTimeMilliseconds(_betDetail?.betEndTime ?? 0).DateTime;
 
-        public decimal Stake => _betDetail.betAmount * _tpCurrency.ExchangeRate;
+        public decimal Stake => (_betDetail?.betAmount ?? 0) * _tpCurrency.ExchangeRate;
 
-        public decimal WinlostAmount => (_betDetail.winAmount - _betDetail.betAmount) * _tpCurrency.ExchangeRate;      
-    }  
+        public decimal WinlostAmount => (_betDetail == null ? 0 : (_betDetail.winAmount - _betDetail.betAmount)) * _tpCurrency.ExchangeRate;
+    }
 }

@@ -22,12 +22,12 @@ namespace BackendSite.Service.Model.TpBetRecordDetail.ThirdPartyDataModel
 
         public string TpUserName => _betDetail?.vendor_member_id;
 
-        public DateTime UTCBetTime => new DateTimeOffset(_betDetail.transaction_time, new TimeSpan(TimeZone, 0, 0)).DateTime;
+        public DateTime UTCBetTime => _betDetail == null ? DateTime.Now : new DateTimeOffset(_betDetail.transaction_time, new TimeSpan(TimeZone, 0, 0)).DateTime;
 
-        public DateTime UTCSettledTime => new DateTimeOffset(_betDetail.match_datetime, new TimeSpan(TimeZone, 0, 0)).DateTime;
+        public DateTime UTCSettledTime => _betDetail == null ? DateTime.Now : new DateTimeOffset(_betDetail.match_datetime, new TimeSpan(TimeZone, 0, 0)).DateTime;
 
-        public decimal Stake => _betDetail.stake * _tpCurrency.ExchangeRate;
+        public decimal Stake => (_betDetail?.stake ?? 0) * _tpCurrency.ExchangeRate;
 
-        public decimal WinlostAmount => _betDetail.winlost_amount * _tpCurrency.ExchangeRate;
+        public decimal WinlostAmount => (_betDetail?.winlost_amount ?? 0) * _tpCurrency.ExchangeRate;
     }
 }

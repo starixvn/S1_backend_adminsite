@@ -34,8 +34,8 @@ namespace BackendSite.Service.Model.TpBetRecordDetail.ThirdPartyDataModel
             new DateTimeOffset(_betNumberDetail.transaction_time, new TimeSpan(TimeZone, 0, 0)).DateTime :
             new DateTimeOffset(_betDetail.settlement_time, new TimeSpan(TimeZone, 0, 0)).DateTime;
 
-        public decimal Stake => GameType == 2 ? _betNumberDetail.stake * _tpCurrency.ExchangeRate : _betDetail.stake * _tpCurrency.ExchangeRate;
+        public decimal Stake => GameType == 2 ? (_betNumberDetail?.stake ?? 0) * _tpCurrency.ExchangeRate : (_betDetail?.stake ?? 0) * _tpCurrency.ExchangeRate;
 
-        public decimal WinlostAmount => GameType == 2 ? _betNumberDetail.winlost_amount * _tpCurrency.ExchangeRate : _betDetail.winlost_amount * _tpCurrency.ExchangeRate;
+        public decimal WinlostAmount => GameType == 2 ? (_betNumberDetail?.winlost_amount ?? 0) * _tpCurrency.ExchangeRate : (_betDetail?.winlost_amount ?? 0) * _tpCurrency.ExchangeRate;
     }
 }

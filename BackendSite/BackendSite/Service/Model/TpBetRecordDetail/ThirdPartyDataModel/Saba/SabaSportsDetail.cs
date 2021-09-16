@@ -16,20 +16,20 @@ namespace BackendSite.Service.Model.TpBetRecordDetail.ThirdPartyDataModel
         public SabaSportsDetail(GetDetailObject detailObject) : base(detailObject)
         {
             _betDetail = JsonConvert.DeserializeObject<GetBetDetailResult>(detailObject.TpBetRecordDetail.Detail)?.BetDetails?.First();
-            _tpCurrency = detailObject.TpCurrency;       
+            _tpCurrency = detailObject.TpCurrency;
         }
 
         public string TpUserName => _betDetail?.vendor_member_id;
 
-        public DateTime UTCBetTime =>  new DateTimeOffset(_betDetail.transaction_time, new TimeSpan(TimeZone, 0, 0)).DateTime;
+        public DateTime UTCBetTime => _betDetail == null ? DateTime.Now : new DateTimeOffset(_betDetail.transaction_time, new TimeSpan(TimeZone, 0, 0)).DateTime;
 
-        public DateTime UTCSettledTime => new DateTimeOffset(_betDetail.settlement_time, new TimeSpan(TimeZone, 0, 0)).DateTime;
+        public DateTime UTCSettledTime => _betDetail == null ? DateTime.Now :  new DateTimeOffset(_betDetail.settlement_time, new TimeSpan(TimeZone, 0, 0)).DateTime;
 
         public string Odds => _betDetail?.odds;
 
-        public decimal Stake => _betDetail.stake * _tpCurrency.ExchangeRate;
+        public decimal Stake => (_betDetail?.stake ?? 0) * _tpCurrency.ExchangeRate;
 
-        public decimal WinlostAmount => _betDetail.winlost_amount * _tpCurrency.ExchangeRate;
+        public decimal WinlostAmount => (_betDetail?.winlost_amount ?? 0) * _tpCurrency.ExchangeRate;
 
         public string LeagueName => _betDetail?.leaguename?.First()?.name;
 
@@ -43,7 +43,7 @@ namespace BackendSite.Service.Model.TpBetRecordDetail.ThirdPartyDataModel
 
         public string Handicap => _betDetail?.hdp;
 
-        public string TicketStatus => _betDetail?.ticket_status;    
+        public string TicketStatus => _betDetail?.ticket_status;
 
         public string AwayScore => _betDetail?.away_score;
 
