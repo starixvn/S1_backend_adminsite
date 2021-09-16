@@ -21,9 +21,9 @@ namespace BackendSite.Service.Model.TpBetRecordDetail.ThirdPartyDataModel
 
         public string TpUserName => _betDetail?.vendor_member_id;
 
-        public DateTime UTCBetTime => _betDetail == null ? DateTime.Now : new DateTimeOffset(_betDetail.transaction_time, new TimeSpan(TimeZone, 0, 0)).DateTime;
+        public DateTime UTCBetTime => _betDetail == null ? DateTime.MinValue : new DateTimeOffset(_betDetail.transaction_time, new TimeSpan(TimeZone, 0, 0)).DateTime;
 
-        public DateTime UTCSettledTime => _betDetail == null ? DateTime.Now :  new DateTimeOffset(_betDetail.settlement_time, new TimeSpan(TimeZone, 0, 0)).DateTime;
+        public DateTime UTCSettledTime => _betDetail == null ? DateTime.MinValue :  new DateTimeOffset(_betDetail.settlement_time, new TimeSpan(TimeZone, 0, 0)).DateTime;
 
         public string Odds => _betDetail?.odds;
 
