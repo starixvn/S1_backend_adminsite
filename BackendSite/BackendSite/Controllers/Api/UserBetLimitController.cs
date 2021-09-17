@@ -23,12 +23,12 @@ namespace BackendSite.Controllers.Api
         }
         
         [HttpGet]
-        public async Task<ApiResult<IEnumerable<BetLimitTpCategory>>> GetTpCategoryList()
+        public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategoryList()
         {
-            var tpCategorys = await _userBetLimitBll.GetTpCategoryList();
-            var apiResult = new ApiResult<IEnumerable<BetLimitTpCategory>>
+            var tpCategories = await _userBetLimitBll.GetTpCategoryList();
+            var apiResult = new ApiResult<IEnumerable<TpCategoryBetLimit>>
             {
-                Data = tpCategorys, 
+                Data = tpCategories, 
                 ErrorCode = 0
             };
 

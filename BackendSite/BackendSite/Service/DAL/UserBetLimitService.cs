@@ -14,9 +14,9 @@ namespace BackendSite.Service.DAL
             _sqlClient = sqlClient;
         }
 
-        public async Task<IEnumerable<BetLimitTpCategory>> GetTpCategoryList()
+        public async Task<IEnumerable<TpCategoryData>> GetTpCategoryList()
         {
-            return await _sqlClient.QueryAsync<BetLimitTpCategory>("Admin_TPCategory_Get", null);
+            return await _sqlClient.QueryAsync<TpCategoryData>("Admin_TPCategory_Get", null);
         }
     }
 }
