@@ -69,10 +69,10 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
             alert("Please select a site");
             return false;
         }
-        // if (userName === '') {
-        //     alert("Please enter UserName");
-        //     return false;
-        // }
+        if (userName === '') {
+            alert("Please enter UserName");
+            return false;
+        }
         let betSetting = [];
         tpCategories.forEach(a => {
             if(a.checked) {    
@@ -80,7 +80,7 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
             }
         })
         console.log(betSetting)
-        //InsertOrUpdate(userName, siteId, betSetting)
+        InsertOrUpdate(userName, siteId, betSetting)
     };
 
     return (

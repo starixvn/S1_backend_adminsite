@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from 'react-dom';
 import Edit from "./Edit"
-
+import qs from "qs";
+import WebAPI from "../../../module//WebAPI";
 const App = () => {
   const [eventState, updateEvent] = useState({
     ShowSettingPanel: false,
@@ -10,8 +11,30 @@ const App = () => {
   });
 
 
-  const InsertOrUpdate = () => {
-    console.log('InsertOrUpdate')
+  const InsertOrUpdate = (userName, siteId, betSetting) => {
+
+    let data = {
+      UserName: userName,
+      SiteId: siteId,
+      BetSetting: betSetting
+    };
+    let param = {
+      Url: "UserBetLimit/InsertOrUpdate",
+      Data: qs.stringify(data),
+    };
+    
+    WebAPI.PostData(param).then((res) => {
+
+      if (res.data.errorCode === 0) {
+        alert("success.");
+        updateEvent({
+          ...eventState,
+          ShowSettingPanel: false,
+        });
+      } else {
+        alert(res.data.message);
+      }
+    });
   };
 
   return (

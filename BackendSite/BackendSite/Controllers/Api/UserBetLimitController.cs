@@ -15,11 +15,13 @@ namespace BackendSite.Controllers.Api
     public class UserBetLimitController : Controller
     {
         private readonly UserBetLimitBLL _userBetLimitBll;
+        private readonly CustInfoBLL _custInfoBll;
         private readonly ILogger<UserBetLimitController> _logger;
-        public UserBetLimitController(ILogger<UserBetLimitController> logger, UserBetLimitBLL userBetLimitBll)
+        public UserBetLimitController(ILogger<UserBetLimitController> logger, UserBetLimitBLL userBetLimitBll, CustInfoBLL custInfoBll)
         {
             _logger = logger;
             _userBetLimitBll = userBetLimitBll;
+            _custInfoBll = custInfoBll;
         }
         
         [HttpGet]
@@ -33,6 +35,40 @@ namespace BackendSite.Controllers.Api
             };
 
             return apiResult;
-        } 
+        }
+        
+        [HttpPost]
+        public async Task<ApiResult> InsertOrUpdate([FromForm] CustBetLimit custBetLimit)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                var updateOperator = User.Identity.Name;
+                var customer = await _custInfoBll.GetCustId(custBetLimit.UserName, custBetLimit.SiteId);
+                if (customer == null)
+                {
+                    apiResult.ErrorCode = -2;
+                    apiResult.Message = "User Not Found";
+                    return apiResult;
+                }
+
+                var result = await _userBetLimitBll.InsertOrUpdate(customer.CustId, customer.SiteId,
+                    custBetLimit.BetSetting, updateOperator);
+                return new ApiResult
+                {
+                    //result: 1 (新增成功),2 (修改成功)
+                    ErrorCode = (result == 1 || result == 2) ? 0 : result,
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new ApiResult
+                {
+                    ErrorCode = 999,
+                    Message = ex.Message,
+                };
+            }
+        }
     }
 }

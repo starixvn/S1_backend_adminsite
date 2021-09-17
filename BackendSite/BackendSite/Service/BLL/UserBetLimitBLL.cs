@@ -20,6 +20,11 @@ namespace BackendSite.Service.BLL
             var tpCategories = await _userBetLimitService.GetTpCategoryList();
 
             return tpCategories.Select(category => new TpCategoryBetLimit() {CategoryId = category.CategoryId, CategoryName = category.CategoryName}).ToList();
-        } 
+        }
+
+        public async Task<int> InsertOrUpdate(int custId, int siteId, List<BetSetting> betSetting, string updateOperator)
+        {
+            return await _userBetLimitService.InsertOrUpdate(custId, siteId, betSetting, updateOperator);
+        }
     }
 }
