@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { api } from "../../../module/WebAPI";
 import WebAPI from "../../../module/WebAPI";
+import { Editor } from "react-draft-wysiwyg";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import draftToHtml from "draftjs-to-html";
+import htmlToDraft from "html-to-draftjs";
+import { EditorState, convertToRaw, ContentState } from "draft-js";
 
 const EditPanel = (props) => {
   let defaultData = {
@@ -47,6 +52,7 @@ const EditPanel = (props) => {
 
   const EditFiled = (v, datacolumn, subDatas) => {
     if (subDatas && subDatas.lang) {
+      // let aa = { ...stateData[datacolumn], [subDatas.lang]: v };
       updateData({
         ...stateData,
         [datacolumn]: {
@@ -459,6 +465,20 @@ const OuterPanel = (props) => {
 };
 
 const SettingContent = (props) => {
+  const onEditorStateChange = (editorState) => {
+    let editorStatehtml = draftToHtml(
+      convertToRaw(editorState.getCurrentContent())
+    );
+    props.EditFiled(editorStatehtml, "content", { lang: props.lang });
+  };
+  let content = EditorState.createEmpty();
+  let contentBlock = htmlToDraft(props.content);
+  if (contentBlock) {
+    let contentstate = ContentState.createFromBlockArray(
+      contentBlock.contentBlocks
+    );
+    content = EditorState.createWithContent(contentstate);
+  }
   return (
     <div className="panel-body">
       <div className="form-group">
@@ -474,14 +494,21 @@ const SettingContent = (props) => {
       </div>
       <div className="form-group">
         <label>Content</label>
-        <textarea
+        {/* <textarea
           className="form-control"
           rows="8"
           value={props.content}
           onChange={(e) => {
             props.EditFiled(e.target.value, "content", { lang: props.lang });
           }}
-        ></textarea>
+        ></textarea> */}
+        <Editor
+          defaultEditorState={content}
+          toolbarClassName="toolbar-class"
+          wrapperClassName="wrapper-class"
+          editorClassName="editor-class"
+          onEditorStateChange={onEditorStateChange}
+        />
       </div>
     </div>
   );

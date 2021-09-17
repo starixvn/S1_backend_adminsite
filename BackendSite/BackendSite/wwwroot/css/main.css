@@ -1460,3 +1460,9 @@ table.revert-style > tbody tr:first-child td{
         min-width: 100%;
     }
 }
+
+.editor-class {
+    background-color:white;
+    padding: 1rem;
+    border: 1px solid #ccc;
+}
