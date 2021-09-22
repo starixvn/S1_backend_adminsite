@@ -31,5 +31,10 @@ namespace BackendSite.Service.BLL
         {
             return _userBetLimitService.GetUserBetLimit(siteIds, userName, startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
         }
+
+        public async Task<int> Delete(int custId)
+        {
+            return await _userBetLimitService.Delete(custId);
+        }
     }
 }

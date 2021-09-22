@@ -48,20 +48,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        
-        [HttpGet]
-        public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategoryList()
-        {
-            var tpCategories = await _userBetLimitBll.GetTpCategoryList();
-            var apiResult = new ApiResult<IEnumerable<TpCategoryBetLimit>>
-            {
-                Data = tpCategories, 
-                ErrorCode = 0
-            };
 
-            return apiResult;
-        }
-        
         [HttpPost]
         public async Task<ApiResult> InsertOrUpdate([FromForm] CustBetLimit custBetLimit)
         {
@@ -94,6 +81,41 @@ namespace BackendSite.Controllers.Api
                     Message = ex.Message,
                 };
             }
+        }
+        
+        [HttpPost]
+        public async Task<ApiResult> Delete([FromForm] int custId)
+        {
+            try
+            {
+                var result = await _userBetLimitBll.Delete(custId);
+                return new ApiResult
+                {
+                    ErrorCode = result == 1 ? 0 : result,
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new ApiResult
+                {
+                    ErrorCode = 999,
+                    Message = ex.Message,
+                };
+            }
+        }
+        
+        [HttpGet]
+        public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategoryList()
+        {
+            var tpCategories = await _userBetLimitBll.GetTpCategoryList();
+            var apiResult = new ApiResult<IEnumerable<TpCategoryBetLimit>>
+            {
+                Data = tpCategories, 
+                ErrorCode = 0
+            };
+
+            return apiResult;
         }
     }
 }

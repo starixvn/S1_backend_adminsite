@@ -52,5 +52,12 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             return result;
         }
+
+        public async Task<int> Delete(int custId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            return await _sqlClient.ExecuteAsync("Admin_CustBetLimit_Del", p);
+        }
     }
 }

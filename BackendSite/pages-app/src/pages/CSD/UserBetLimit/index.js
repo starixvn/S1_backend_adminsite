@@ -116,8 +116,20 @@ const App = () => {
 
   }
 
-  const DeleteDisableUser = () => {
-
+  const DeleteDisableUser = (custId) => {
+    let param = {
+      Url: "UserBetLimit/Delete",
+      Data: `custId=${custId}`,
+    };
+    
+    WebAPI.PostData(param).then((res) => {
+      if (res.data.errorCode === 0) {
+        alert("success.");
+      } else {
+        alert(res.data.message);
+      }
+    });
+    GetUserBetLimitData(stateFilter);
   }
 
   const SwitchStatus = () => {
