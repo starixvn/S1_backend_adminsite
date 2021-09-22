@@ -24,6 +24,31 @@ namespace BackendSite.Controllers.Api
             _custInfoBll = custInfoBll;
         }
         
+        [HttpPost]
+        public ApiListResult<UserBetLimit> GetUserBetLimit([FromForm] QueryUserBetLimit query)
+        {
+            var apiResult = new ApiListResult<UserBetLimit>();
+
+            var pageNumber = query.PageNumber;
+            try
+            {
+                apiResult.Data = _userBetLimitBll.GetUserBetLimit(query.SiteIds, query.UserName, query.StartDate, query.EndDate, 
+                    query.PageSize, query.PageNumber, out var totalPages, out var rowCount);
+                apiResult.TotalPages = totalPages;
+                apiResult.PageNumber = pageNumber;
+                apiResult.RowCount = rowCount;
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        
         [HttpGet]
         public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategoryList()
         {

@@ -1,12 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
 {
-    public class UserBetLimit
-    {
-        
-    }
-
     public class TpCategoryData
     {
         public int CategoryId { set; get; }
@@ -41,5 +37,27 @@ namespace BackendSite.Service.Model
         public int TpId { get; set; }
         public int MinBet { set; get; }
         public int MaxBet { set; get; }
+    }
+    
+    public class QueryUserBetLimit
+    {
+        public IEnumerable<int> SiteIds { get; set; }
+        public string UserName { get; set; }
+        public long StartDate { get; set; }
+        public long EndDate { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+    }
+    
+    public class UserBetLimit
+    {
+        public string SiteName { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int Status { get; set; }
+        public string Creator { get; set; }
+        public DateTime CreateTime { get; set; }
+        public string UpdateOperator { get; set; }
+        public DateTime UpdateTime { get; set; }
     }
 }
