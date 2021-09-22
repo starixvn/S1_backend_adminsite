@@ -57,7 +57,7 @@ const dataColumnDefs = () => {
   ];
 };
 
-export default function Result (tpDisableUser) {
+export default function Result (userBetLimit) {
     const columnDefs = dataColumnDefs();
     let headerRows = [];
 
@@ -73,7 +73,7 @@ export default function Result (tpDisableUser) {
             {element.columnTitle}
         </th>);
     });
-    let bodyRows = tpDisableUser.Datas.map((data, i) => {
+    let bodyRows = userBetLimit.Datas.map((data, i) => {
         let row = columnDefs.map((element, j) => {
             
             let body_content = null;
@@ -89,15 +89,15 @@ export default function Result (tpDisableUser) {
             }
             else if (element.body && element.body.SpecialItem && element.body.SpecialItem === SpecialItemType.actionBtn) {
                 body_content = <ActionButtons 
-                                  ClickEdit={tpDisableUser.ClickEdit.bind(this, data["custId"])}
-                                  ClickDelete={tpDisableUser.ClickDelete.bind(this, data["custId"])}/>
+                                  ClickEdit={userBetLimit.ClickEdit.bind(this, data["custId"])}
+                                  ClickDelete={userBetLimit.ClickDelete.bind(this, data["custId"])}/>
 
             }
             else if(element.body && element.body.SpecialItem && element.body.SpecialItem === SpecialItemType.statusBtn) {
                 body_content =  <StatusButton 
                                   mainKey={data["custId"]} 
                                   checked={data["status"] === 1} 
-                                  onChange={tpDisableUser.UpdateStatus.bind(this, data["custId"], data["status"])}
+                                  onChange={userBetLimit.UpdateStatus.bind(this, data["custId"], data["status"])}
                                 />
             }
             else {
@@ -130,11 +130,11 @@ export default function Result (tpDisableUser) {
       </table>
       <Pagination
         Data={{
-          totalPages: tpDisableUser.PageInfo.totalPages,
-          pageNumber: tpDisableUser.PageInfo.pageNumber,
-          rowCount: tpDisableUser.PageInfo.rowCount,
+          totalPages: userBetLimit.PageInfo.totalPages,
+          pageNumber: userBetLimit.PageInfo.pageNumber,
+          rowCount: userBetLimit.PageInfo.rowCount,
         }}
-        ChangePage={tpDisableUser.ChangePage}
+        ChangePage={userBetLimit.ChangePage}
       />
     </div>
   );

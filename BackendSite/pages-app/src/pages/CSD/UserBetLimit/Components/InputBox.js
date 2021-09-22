@@ -5,11 +5,11 @@ export default function InputBox ({ id ,title, value, type, disabled, onChange, 
     return (
         <div className="input-item">
             <label className="label">{title}</label>
-            <input id={inputKey} 
+            <input id={id} 
                    type={type ? type : 'text'} 
                    value={value} 
                    disabled={disabled} 
-                   onChange={e => onChange(e.target.value, inputKey)}/>
+                   onChange={e => onChange(e.target.value, dataColumn)}/>
         </div>
     )
 }

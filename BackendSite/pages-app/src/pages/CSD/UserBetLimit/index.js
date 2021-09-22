@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from 'react-dom';
 import Edit from "./Edit"
 import Result from "./Result";
+import Filter from "./Filter";
 import qs from "qs";
 import WebAPI from "../../../module//WebAPI";
 import moment from "moment";
 
 const App = () => {
+  const dateformat = "YYYY-MM-DD";
+
   const [eventState, updateEvent] = useState({
     ShowSettingPanel: false,
     IsAdd: true,
@@ -18,17 +21,41 @@ const App = () => {
     Datas: null
   });
 
+  const [stateFilter, setFilter] = useState({
+    SiteId: [1,2,3,4],
+    StartDate: moment().add(-10, "days").format(dateformat),
+    EndDate: moment().format(dateformat),
+    UserName: ""
+  });
+
+  const [siteList, setSiteList] = useState([]);
+
   useEffect(() => {
-    GetUserBetLimitData();
+
+    WebAPI.PostData({ Url: "Common/AdminUserSiteList" }).then((res) => {
+      if (res.data.errorCode === 0) {
+        
+        let siteTmp = res.data.data.map((item) => {
+          return { siteId: item.siteId, siteName: item.siteName, checked: true }
+        })
+        siteTmp.unshift({ siteId:0, siteName: "All", checked: true })
+        setSiteList(siteTmp);
+      } 
+      else {
+        alert(res.data.message ?? "failed to get data.");
+      }
+    });
+
+    GetUserBetLimitData(stateFilter);
   }, []);
 
-  const GetUserBetLimitData = (pageNumber = 1, pageSize = 10) => {
-
+  const GetUserBetLimitData = (filter, pageNumber = 1, pageSize = 10) => {
+    console.log(filter)
     let query = {
-      SiteIds: [1,2,3],
-      UserName: null,
-      StartDate: moment('2021-09-15').utc().unix(),
-      EndDate: moment('2021-09-22').utc().unix(),
+      SiteIds: filter.SiteId,
+      UserName: filter.UserName,
+      StartDate: moment(filter.StartDate).utc().unix(),
+      EndDate: moment(filter.EndDate).utc().unix(),
       pageNumber: pageNumber,
       PageSize: pageSize
     };
@@ -81,9 +108,9 @@ const App = () => {
     });
   };
 
-  const Result_ChangePage = () => {
-
-  }
+  const Result_ChangePage = (PageNumber) => {
+    GetUserBetLimitData(stateFilter, PageNumber);
+  };
 
   const EditDisableUser = () => {
 
@@ -95,6 +122,42 @@ const App = () => {
 
   const SwitchStatus = () => {
 
+  }
+
+  const FilterChange = (v, dataColumn) => {
+    console.log(v)
+    setFilter({
+      ...stateFilter,
+      [dataColumn]: v,
+    });
+  }
+
+  const SiteChange = (siteId, checked) => {
+    if(siteId == 0) {
+      siteList.forEach( a => { a.checked = !checked })
+    }
+    else {
+      let idx = siteList.map( i => {
+        return i.siteId;
+      }).indexOf(siteId)
+      siteList[idx].checked = !checked
+    }
+
+    let siteIds = []
+    siteList.forEach( a => {
+      if(a.siteId !=0 && a.checked)
+      siteIds.push(a.siteId)
+    })
+                  
+    setFilter({
+      ...stateFilter,
+      ["SiteId"]: siteIds,
+    });
+    setSiteList([...siteList])
+  }
+
+  const Search = () => {
+    GetUserBetLimitData(stateFilter);
   }
 
   return (
@@ -112,16 +175,22 @@ const App = () => {
           InsertOrUpdate={InsertOrUpdate} /> : 
         <>
         <h4 className="page-name">User Bet Limit</h4>
+          <Filter 
+            siteList={siteList} 
+            filterInfo={stateFilter} 
+            onChange={FilterChange}
+            siteChecked={SiteChange}
+            search={Search} />
           <button
             className="btn btn-add"
             style={{ marginBottom: "20px" }}
             onClick={() => {
-                updateEvent({
-                  ...eventState,
-                  ShowSettingPanel: true,
-                  IsAdd: true,
-                  CustId: 0
-                });
+              updateEvent({
+                ...eventState,
+                ShowSettingPanel: true,
+                IsAdd: true,
+                CustId: 0
+              });
             }}>
             Create
           </button>
