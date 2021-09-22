@@ -61,7 +61,7 @@ const App = () => {
     };
 
     let param = {
-      Url: "UserBetLimit/GetUserBetLimit",
+      Url: "UserBetLimit/Get",
       Data: qs.stringify(query),
     };
 

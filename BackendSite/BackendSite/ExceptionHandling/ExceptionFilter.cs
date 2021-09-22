@@ -5,16 +5,20 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Net;
 using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace BackendSite.ExceptionHandling
 {
     public class ExceptionFilter : IExceptionFilter
     {
         private readonly SelLangBLL _selLangBLL;
+        private readonly ILogger<ExceptionFilter> _logger;
 
-        public ExceptionFilter()
+        public ExceptionFilter(IServiceProvider serviceProvider)
         {
-            _selLangBLL = new SelLangBLL();
+            _logger = serviceProvider.GetRequiredService<ILogger<ExceptionFilter>>();
+            _selLangBLL = serviceProvider.GetRequiredService<SelLangBLL>();
         }
 
         public void OnException(ExceptionContext context)
@@ -30,7 +34,7 @@ namespace BackendSite.ExceptionHandling
                 rawMessage = exception.Message,
                 stackTrace = exception.StackTrace
             });
-
+            
             if (context.Exception.GetType() == typeof(AdminException))
             {
                 code = HttpStatusCode.OK;
@@ -48,6 +52,11 @@ namespace BackendSite.ExceptionHandling
                     errorCode = adminException.ErrorCode,
                     message = message
                 });
+                _logger.LogError(message);
+            }
+            else
+            {
+                _logger.LogError(context.Exception, $"Ex massage: {exception.Message}, StackTrace: {context.Exception.StackTrace}");
             }
 
             var httpContext = context.HttpContext;
