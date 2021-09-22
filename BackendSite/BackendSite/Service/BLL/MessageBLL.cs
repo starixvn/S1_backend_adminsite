@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
@@ -56,7 +60,12 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<PersonalMsg> GetPersonalMsg(int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
-            return messageService.GetPersonalMsg(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            var personMsg =  messageService.GetPersonalMsg(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            personMsg.ToList().ForEach(x =>
+            {
+                x.ContentRemoveTag = StripHTML(x.Content);
+            });
+            return personMsg;
         }
 
         public CustLang GetCustLang(int CustId)
@@ -122,6 +131,11 @@ namespace BackendSite.Service.BLL
         public IEnumerable<BatchMessageSendLogListModel> GetBatchMessageSendLog(int batchId)
         {
             return messageService.GetBatchMessageSendLogResult(batchId);
+        }
+
+        private string StripHTML(string input)
+        {
+            return Regex.Replace(input, "<.*?>", String.Empty);
         }
     }
 }

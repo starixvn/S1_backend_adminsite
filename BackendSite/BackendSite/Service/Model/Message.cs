@@ -36,6 +36,7 @@ namespace BackendSite.Service.Model
         public DateTime CreateTime { get; set; }
         public int Status { get; set; }
         public bool Flag { get; set; }
+        public string ContentRemoveTag { get; set; }
 
     }
     public class PersonalMsgBase
