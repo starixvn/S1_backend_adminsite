@@ -27,15 +27,15 @@ namespace BackendSite.Service.Model.TpBetRecordDetail.ThirdPartyDataModel
         public string TpUserName => GameType == 2 ? _betNumberDetail?.vendor_member_id : _betDetail?.vendor_member_id;
 
         public DateTime UTCBetTime => GameType == 2 ?
-            new DateTimeOffset(_betNumberDetail.transaction_time, new TimeSpan(TimeZone, 0, 0)).DateTime :
-            new DateTimeOffset(_betDetail.transaction_time, new TimeSpan(TimeZone, 0, 0)).DateTime;
+            (_betNumberDetail == null ? DateTime.MinValue : new DateTimeOffset(_betNumberDetail.transaction_time, new TimeSpan(TimeZone, 0, 0)).DateTime) :
+            (_betDetail == null ? DateTime.MinValue : new DateTimeOffset(_betDetail.transaction_time, new TimeSpan(TimeZone, 0, 0)).DateTime);
 
         public DateTime UTCSettledTime => GameType == 2 ?
-            new DateTimeOffset(_betNumberDetail.transaction_time, new TimeSpan(TimeZone, 0, 0)).DateTime :
-            new DateTimeOffset(_betDetail.settlement_time, new TimeSpan(TimeZone, 0, 0)).DateTime;
+            (_betNumberDetail == null ? DateTime.MinValue : new DateTimeOffset(_betNumberDetail.transaction_time, new TimeSpan(TimeZone, 0, 0)).DateTime) :
+            (_betDetail == null ? DateTime.MinValue : new DateTimeOffset(_betDetail.settlement_time, new TimeSpan(TimeZone, 0, 0)).DateTime);
 
-        public decimal Stake => GameType == 2 ? _betNumberDetail.stake * _tpCurrency.ExchangeRate : _betDetail.stake * _tpCurrency.ExchangeRate;
+        public decimal Stake => GameType == 2 ? (_betNumberDetail?.stake ?? 0) * _tpCurrency.ExchangeRate : (_betDetail?.stake ?? 0) * _tpCurrency.ExchangeRate;
 
-        public decimal WinlostAmount => GameType == 2 ? _betNumberDetail.winlost_amount * _tpCurrency.ExchangeRate : _betDetail.winlost_amount * _tpCurrency.ExchangeRate;
+        public decimal WinlostAmount => GameType == 2 ? (_betNumberDetail?.winlost_amount ?? 0) * _tpCurrency.ExchangeRate : (_betDetail?.winlost_amount ?? 0) * _tpCurrency.ExchangeRate;
     }
 }
