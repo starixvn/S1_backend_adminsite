@@ -104,7 +104,12 @@ namespace BackendSite.Service.BLL
         }
         public IEnumerable<BatchMsg> GetBatchMessageList(IEnumerable<int> SelectSite, long? StartDate, long? EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
-            return messageService.GetBatchMessageList(SelectSite, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            var batchMessageList = messageService.GetBatchMessageList(SelectSite, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            batchMessageList.ToList().ForEach(x =>
+            {
+                x.Content = StripHTML(x.Content);
+            });
+            return batchMessageList;
         }
         public async Task<ApiResult> SendSMSMessageToPlayer(int CustId)
         {
