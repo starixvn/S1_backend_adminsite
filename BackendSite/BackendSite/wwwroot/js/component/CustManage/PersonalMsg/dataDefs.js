@@ -22,6 +22,6 @@ export const columnDefs = [
         }
     },
     { dataColumn:'title',  columnTitle:'Subject' },
-    { dataColumn:'content',  columnTitle:'Content' },
+    { dataColumn:'contentRemoveTag',  columnTitle:'Content' },
     { dataColumn:'sender',  columnTitle:'Sender' }
 ];
