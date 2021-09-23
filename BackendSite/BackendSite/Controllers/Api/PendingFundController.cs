@@ -43,9 +43,9 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         [HttpPost]
-        public async Task<ApiResult> BonusTransferAsync([FromForm]int CustId)
+        public async Task<ApiResult> BonusTransferAsync([FromForm]int CustId, [FromForm] int TpId)
         {
-            var apiResult = await pendingFundBLL.BonusTransferAsync(CustId);
+            var apiResult = await pendingFundBLL.BonusTransferAsync(CustId, TpId);
 
             if (apiResult.ErrorCode == 0)
             {
@@ -53,7 +53,7 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                apiResult.Message = apiResult.RawMessage;
+                apiResult.Message = string.IsNullOrWhiteSpace(apiResult.RawMessage) ? apiResult.Message : apiResult.RawMessage;
             }
 
             return apiResult;
