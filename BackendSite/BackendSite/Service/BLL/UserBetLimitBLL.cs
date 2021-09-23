@@ -36,5 +36,10 @@ namespace BackendSite.Service.BLL
         {
             return await _userBetLimitService.Delete(custId);
         }
+
+        public async Task<int> UpdateStatus(int custId, int status, string updateOperator)
+        {
+            return await _userBetLimitService.UpdateStatus(custId, status, updateOperator);
+        }
     }
 }

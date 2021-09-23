@@ -63,6 +63,17 @@ namespace BackendSite.Controllers.Api
         }
         
         [HttpPost]
+        public async Task<ApiResult> UpdateStatus([FromForm] BetLimitStatus betLimitStatus)
+        {
+            var updateOperator = User.Identity.Name;
+            var result = await _userBetLimitBll.UpdateStatus(betLimitStatus.CustId, betLimitStatus.Status, updateOperator);
+            return new ApiResult
+            {
+                ErrorCode = result == 1 ? 0 : result,
+            };
+        }
+        
+        [HttpPost]
         public async Task<ApiResult> Delete([FromForm] int custId)
         {
             var result = await _userBetLimitBll.Delete(custId);

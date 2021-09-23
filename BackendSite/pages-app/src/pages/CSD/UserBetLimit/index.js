@@ -132,8 +132,32 @@ const App = () => {
     GetUserBetLimitData(stateFilter);
   }
 
-  const SwitchStatus = () => {
+  const SwitchStatus = (custId, status) => {
+    datas.Datas.forEach(a => {
+      if(a.custId === custId) {
+        a.status ^= 1
+      }
+    });
+    setDatas({
+      ...datas,
+    });
 
+    let data = {
+      CustId: custId,
+      Status: status ^= 1,
+    };
+    let param = {
+      Url: "UserBetLimit/UpdateStatus",
+      Data: qs.stringify(data),
+    };
+    
+    WebAPI.PostData(param).then((res) => {
+      if (res.data.errorCode === 0) {
+        alert("success.");
+      } else {
+        alert(res.data.message);
+      }
+    });
   }
 
   const FilterChange = (v, dataColumn) => {

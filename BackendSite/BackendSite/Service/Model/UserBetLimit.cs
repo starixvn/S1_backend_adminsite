@@ -60,4 +60,10 @@ namespace BackendSite.Service.Model
         public string UpdateOperator { get; set; }
         public DateTime UpdateTime { get; set; }
     }
+    
+    public class BetLimitStatus
+    {
+        public int CustId { get; set; }
+        public int Status { get; set; }
+    }
 }

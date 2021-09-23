@@ -37,13 +37,6 @@ const dataColumnDefs = () => {
       },
     },
     {
-        dataColumn: "status",
-        columnTitle: "Status",
-        body: { 
-          SpecialItem: SpecialItemType.statusBtn 
-        }
-    },
-    {
         columnTitle: "Action",
         header: {
             attr: {

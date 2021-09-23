@@ -59,5 +59,14 @@ namespace BackendSite.Service.DAL
             p.Add("_CustId", custId);
             return await _sqlClient.ExecuteAsync("Admin_CustBetLimit_Del", p);
         }
+
+        public async Task<int> UpdateStatus(int custId, int status, string updateOperator)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            p.Add("_Status", status);
+            p.Add("_Operator", updateOperator);
+            return await _sqlClient.ExecuteAsync("Admin_CustBetLimitStatus_Set", p);
+        }
     }
 }
