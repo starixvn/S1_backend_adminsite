@@ -45,7 +45,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite,
             IEnumerable<int> withdrawalType, long startDate, long endDate, int siteId, string WithdrawalId,
             string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,
-            int pageSize, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
+            int pageSize, int amounttype, string amount, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
         {
             var SelectSite = JsonConvert.SerializeObject(selectSite);
             var WithdrawalType = JsonConvert.SerializeObject(withdrawalType);
@@ -59,7 +59,11 @@ namespace BackendSite.Service.DAL
                 var m = Regex.Match(WithdrawalId, @"\d+");
                 int.TryParse(m.Value, out withdrawalId);
             }
-
+            decimal tempAmount = 0;
+            if (!string.IsNullOrWhiteSpace(amount))
+            {
+                tempAmount = Convert.ToDecimal(amount);
+            }
             using var conn =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var p = new DynamicParameters(new
@@ -75,13 +79,15 @@ namespace BackendSite.Service.DAL
                 CurrencyId,
                 Status,
                 VipStatus = VipStatus,
-                PageSize = pageSize
+                PageSize = pageSize,
+                AmountType = amounttype,
+                Amount = tempAmount
             });
 
             #region GetCurrencyTotalAmount
 
             var CurrencyTotalAmount =
-                conn.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get", p, commandType: CommandType.StoredProcedure)
+                conn.Query<TotalAmount>("Admin_WithdrawalTotalAmountV2_Get", p, commandType: CommandType.StoredProcedure)
                     .ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
@@ -100,7 +106,7 @@ namespace BackendSite.Service.DAL
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<WithdrawalRequest>("Admin_WithdrawalListV4_Get", p,
+            var result = conn.Query<WithdrawalRequest>("Admin_WithdrawalListV5_Get", p,
                 commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
@@ -183,7 +189,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(string selectSite, string withdrawalType,
             long startDate, long endDate, string WithdrawalId, string UserName, string currencyId, string status,
-            string LevelStatus)
+            string LevelStatus, int AmountType, string Amount)
         {
             var SelectSite = "[" + selectSite + "]";
             var WithdrawalType = "[" + withdrawalType + "]";
@@ -196,7 +202,11 @@ namespace BackendSite.Service.DAL
                 var m = Regex.Match(WithdrawalId, @"\d+");
                 int.TryParse(m.Value, out withdrawalId);
             }
-
+            decimal tempAmount = 0;
+            if (!string.IsNullOrWhiteSpace(Amount))
+            {
+                tempAmount = Convert.ToDecimal(Amount);
+            }
             var p = new DynamicParameters(new
             {
                 SelectSite,
@@ -208,11 +218,13 @@ namespace BackendSite.Service.DAL
                 UserName,
                 CurrencyId,
                 Status,
-                VipStatus = VipStatus
+                VipStatus = VipStatus,
+                AmountType = AmountType,
+                Amount = tempAmount
             });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var depositList = conn.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExportV5_Get", p,
+            var depositList = conn.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExportV6_Get", p,
                 commandType: CommandType.StoredProcedure);
             return depositList;
         }
