@@ -8,6 +8,8 @@ export default function TpCategoryBetLimitList({ categories, toggle, input }) {
         <>
             {categories.map((cate, i) => {
                 let switchKey = `tpgame-switch-${cate.categoryId}`;
+                let minKey = `MinBet-${cate.categoryId}`;
+                let maxKey = `MaxBet-${cate.categoryId}`;
                 return (
                     <div key={i} className="filter">
                         <div className="row-flex">
@@ -19,8 +21,8 @@ export default function TpCategoryBetLimitList({ categories, toggle, input }) {
                                     <input id={switchKey} className="switch switch--flat" type="checkbox" checked={cate.checked} onChange={(e) => toggle(e.target.id, cate.checked)}/>
                                     <label htmlFor={switchKey}></label>
                                 </div>
-                                <InputBox id={cate.categoryId} type="Number" title="MinBet" onChange={input} dataColumn="MinBet" disabled={!cate.checked} />
-                                <InputBox id={cate.categoryId} type="Number" title="MaxBet" onChange={input} dataColumn="MaxBet" disabled={!cate.checked} />
+                                <InputBox id={cate.categoryId} type="Number" title="MinBet" onChange={input} dataColumn={minKey} disabled={!cate.checked} />
+                                <InputBox id={cate.categoryId} type="Number" title="MaxBet" onChange={input} dataColumn={maxKey} disabled={!cate.checked} />
                             </div>
                         </div>
                     </div>

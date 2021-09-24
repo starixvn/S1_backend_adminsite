@@ -74,4 +74,15 @@ namespace BackendSite.Service.Model
         public decimal outstanding { get; set; }
         public byte Currency { get; set; }
     }
+    public class SetBetLimit
+    {
+        public int TpId { set; get; }
+        public int CustId { set; get; }
+        public string BetSetting { get; set; }
+    }
+    public class GetBetLimitReq
+    {
+        public int TpId { set; get; }
+        public int CustId { set; get; }
+    }
 }

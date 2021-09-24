@@ -44,7 +44,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public async Task<ApiResult> InsertOrUpdate([FromForm] CustBetLimit custBetLimit)
+        public async Task<ApiResult> Set([FromForm] CustBetLimit custBetLimit)
         {
             var updateOperator = User.Identity.Name;
             var customer = await _custInfoBll.GetCustId(custBetLimit.UserName, custBetLimit.SiteId);
@@ -53,7 +53,7 @@ namespace BackendSite.Controllers.Api
                 throw new AdminException(ErrorCodeEnum.NoData, "User Not Found");
             }
 
-            var result = await _userBetLimitBll.InsertOrUpdate(customer.CustId, customer.SiteId,
+            var result = await _userBetLimitBll.SetUserBetLimit(customer.CustId, customer.SiteId,
                 custBetLimit.BetSetting, updateOperator);
             return new ApiResult
             {

@@ -90,7 +90,7 @@ const App = () => {
       BetSetting: betSetting
     };
     let param = {
-      Url: "UserBetLimit/InsertOrUpdate",
+      Url: "UserBetLimit/Set",
       Data: qs.stringify(data),
     };
     

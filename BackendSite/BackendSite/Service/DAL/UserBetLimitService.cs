@@ -16,12 +16,7 @@ namespace BackendSite.Service.DAL
         {
             _sqlClient = sqlClient;
         }
-
-        public async Task<IEnumerable<TpCategoryData>> GetTpCategoryList()
-        {
-            return await _sqlClient.QueryAsync<TpCategoryData>("Admin_TPCategory_Get", null);
-        }
-
+        
         public async Task<int> InsertOrUpdate(int custId, int siteId, List<BetSetting> betSetting, string updateOperator)
         {
             var p = new DynamicParameters();
@@ -68,5 +63,25 @@ namespace BackendSite.Service.DAL
             p.Add("_Operator", updateOperator);
             return await _sqlClient.ExecuteAsync("Admin_CustBetLimitStatus_Set", p);
         }
+        
+        public async Task<UserBetLimitDetail> UserBetLimitGetByCustId(int custId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            return await _sqlClient.QueryFirstAsync<UserBetLimitDetail>("Admin_CustBetLimitByCustId_Get", p);
+        }
+        
+        public async Task<IEnumerable<TpGameType>> GetTpGameTypeListbyCategory(int categoryId)
+        {
+            var p = new DynamicParameters();
+            p.Add("CategoryId", categoryId);
+            return await _sqlClient.QueryAsync<TpGameType>("Admin_TpGameTypebyCategory_Get", p);
+        }
+        
+        public async Task<IEnumerable<TpCategoryData>> GetTpCategoryList()
+        {
+            return await _sqlClient.QueryAsync<TpCategoryData>("Admin_TPCategory_Get", null);
+        }
+
     }
 }
