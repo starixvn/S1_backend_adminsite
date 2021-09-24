@@ -180,5 +180,12 @@ namespace BackendSite.Service.BLL
         {
             thirdPartyService.SetAdjustmentTpCustInfoLog(Menu, ActionType, DetailInfo, Operator);
         }
+
+        public async Task<ApiResult<object>> GetBetDetail(GetTpBetRecordDetailRequest request)
+        {
+            var myUrl = $"{apiUrl}GetBetDetail";
+            var result = await courierAdapter.MyPostAsync<object, GetTpBetRecordDetailRequest>(myUrl, request);
+            return result;
+        }
     }
 }

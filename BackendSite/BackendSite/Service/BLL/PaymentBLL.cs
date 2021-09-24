@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BackendSite.Service.Model.TpBetRecordDetail;
 using Microsoft.Extensions.DependencyInjection;
 using BackendSite.Service.Model.enums;
 
@@ -15,7 +14,6 @@ namespace BackendSite.Service.BLL
         private readonly AdjustmentService adjustmentService;
         private readonly WalletService walletService;
         private readonly AdminService adminService;
-        private readonly TpBetRecordService _tpBetRecordService;
         private readonly TpMaintainService _tpMaintainService;
         private readonly ThirdPartyService _thirdPartyService;
 
@@ -24,7 +22,6 @@ namespace BackendSite.Service.BLL
             adjustmentService = provider.GetRequiredService<AdjustmentService>();
             walletService = provider.GetRequiredService<WalletService>();
             adminService = provider.GetRequiredService<AdminService>();
-            _tpBetRecordService = provider.GetRequiredService<TpBetRecordService>();
             _tpMaintainService = provider.GetRequiredService<TpMaintainService>();
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
         }
@@ -235,44 +232,6 @@ namespace BackendSite.Service.BLL
             }).OrderBy(i => i.SettledDate).ToList();
 
             return result;
-        }
-
-        public async Task<BaseDetail> GetTpBetRecordDetailAsync(int gameType, string transId)
-        {
-            var gameTypeItem = _tpMaintainService.GetTpGameTypeList().FirstOrDefault(x => x.Type == gameType);
-
-            var result = await _tpBetRecordService.GetTpBetRecordDetailAsync(gameTypeItem.TpId, gameType, transId);
-
-            if (result.Any())
-            {
-                var data = result.FirstOrDefault();
-
-                var tpCurrency = _thirdPartyService.GetTpCurrency(gameTypeItem.TpId, data.CurrencyId);
-
-                return new DetailMapping().GetDetail(new GetDetailObject
-                {
-                    OriginalTpId = gameTypeItem.TpId,
-                    OriginalGameType = gameType,
-                    OriginalGameTypeName = gameTypeItem.TypeName,
-                    OriginalTransId = transId,
-                    TpCategoryId = gameTypeItem.CategoryId,
-                    TpCurrency = await tpCurrency,
-                    TpBetRecordDetail = data
-                });
-            }
-            else
-            {
-                return new DetailMapping().GetDetail(new GetDetailObject
-                {
-                    OriginalTpId = gameTypeItem.TpId,
-                    OriginalGameType = gameType,
-                    OriginalGameTypeName = gameTypeItem.TypeName,
-                    OriginalTransId = transId,
-                    TpCategoryId = gameTypeItem.CategoryId,
-                    TpCurrency = null,
-                    TpBetRecordDetail = new TpBetRecordDetailModel()
-                });
-            }
         }
     }
 }
