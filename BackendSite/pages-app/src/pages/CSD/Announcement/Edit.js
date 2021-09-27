@@ -38,7 +38,15 @@ const EditPanel = props => {
 		subject: props.IsAdd ? {} : JSON.parse(props.Datas.subject),
 		content: props.IsAdd ? {} : JSON.parse(props.Datas.content)
 	});
-	const [langDatas, setlangDatas] = useState(props.IsAdd ? null : props.siteList[props.Datas.siteId == 0?1:props.Datas.siteId].iLangList);
+	const tempiLangList = [];
+	Object.keys(props.siteList).forEach(key=>{
+		props.siteList[key].iLangList.forEach(y=>{
+			if(!tempiLangList.includes(y)){
+				tempiLangList.push(y);
+			}
+		})
+	})
+	const [langDatas, setlangDatas] = useState(props.IsAdd ? null : props.Datas.siteId == 0 ? tempiLangList : props.siteList[props.Datas.siteId].iLangList);
     let allLang = ["en", "cs", "ch", "th", "id", "vn"];
 	const EditFiled = (v, datacolumn, subDatas) => {
 		if (subDatas && subDatas.lang) {
@@ -55,7 +63,21 @@ const EditPanel = props => {
 				[datacolumn]: v,
 				siteName: v == 0 ? allSiteDisplayText : props.siteList[v].siteName
 			});
-			setlangDatas( props.siteList[v == 0?1:v].iLangList);
+			const tempAllLang = [];
+
+			Object.keys(props.siteList).forEach(key=>{
+				props.siteList[key].iLangList.forEach(y=>{
+					if(!tempAllLang.includes(y)){
+						tempAllLang.push(y);
+					}
+				})
+			})
+			if(v == 0){
+				setlangDatas(tempAllLang)
+			}
+			else{
+				setlangDatas(props.siteList[v].iLangList);
+			}
 		} else {
 			updateData({
 				...stateData,
