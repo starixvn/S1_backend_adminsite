@@ -181,10 +181,10 @@ namespace BackendSite.Service.BLL
             thirdPartyService.SetAdjustmentTpCustInfoLog(Menu, ActionType, DetailInfo, Operator);
         }
 
-        public async Task<ApiResult<object>> GetBetDetail(GetTpBetRecordDetailRequest request)
+        public async Task<ApiResult<dynamic>> GetBetDetail(GetTpBetRecordDetailRequest request)
         {
             var myUrl = $"{apiUrl}GetBetDetail";
-            var result = await courierAdapter.MyPostAsync<object, GetTpBetRecordDetailRequest>(myUrl, request);
+            var result = await courierAdapter.MyPostAsync<dynamic, GetTpBetRecordDetailRequest>(myUrl, request);
             return result;
         }
     }

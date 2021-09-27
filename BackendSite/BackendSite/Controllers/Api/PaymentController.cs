@@ -921,13 +921,6 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        [HttpPost]
-        public async Task<ApiResult<object>> GetTpBetRecordDetailAsync(GetTpBetRecordDetailRequest request)
-        {
-            return await _tpBLL.GetBetDetail(request);       
-        }
-
-
         #region Adjustment Limit
 
         public class GetAdjustmentPara

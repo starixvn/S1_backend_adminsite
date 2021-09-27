@@ -185,7 +185,7 @@ namespace BackendSite
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
-            });
+            }).AddNewtonsoftJson();
             services.AddRazorPages(options =>
             {
                 options.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
