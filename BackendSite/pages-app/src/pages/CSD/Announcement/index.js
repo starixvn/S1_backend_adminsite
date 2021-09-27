@@ -161,6 +161,7 @@ const App = () => {
           SettingDatas: null,
           ShowSettingPanel: false,
         });
+        alert(isAdd ? "Add Success!" : "Update Success!")
       } else {
         alert(res.data.message ?? "failed to get data.");
       }
