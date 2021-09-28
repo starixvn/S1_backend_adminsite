@@ -84,7 +84,7 @@ const Panel = () => {
 				setProcessing(true);
 			let param = {
 				Url: "PendingFund/BonusTransfer",
-				Data: qs.stringify({ CustId: stateData[idx].custId })
+				Data: qs.stringify({ CustId: stateData[idx].custId ,TpId: stateData[idx].tpId})
 			};
 			WebAPI.PostData(param).then(
 				res => {

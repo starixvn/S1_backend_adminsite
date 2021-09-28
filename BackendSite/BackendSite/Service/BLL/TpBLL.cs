@@ -269,7 +269,8 @@ namespace BackendSite.Service.BLL
 
             try
             {
-                var apiResult = await courierAdapter.MyPostAsync<List<SabaBetSettingResponse>, GetBetLimitReq>(myUrl, setBetLimit);
+                var apiResult =
+                    await courierAdapter.MyPostAsync<List<SabaBetSettingResponse>, GetBetLimitReq>(myUrl, setBetLimit);
                 return apiResult;
             }
             catch (Exception ex)
@@ -280,6 +281,13 @@ namespace BackendSite.Service.BLL
                     Message = ex.Message
                 };
             }
+        }
+
+        public async Task<ApiResult<dynamic>> GetBetDetail(GetTpBetRecordDetailRequest request)
+        {
+            var myUrl = $"{apiUrl}GetBetDetail";
+            var result = await courierAdapter.MyPostAsync<dynamic, GetTpBetRecordDetailRequest>(myUrl, request);
+            return result;
         }
     }
 }

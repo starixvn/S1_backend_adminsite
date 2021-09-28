@@ -88,13 +88,13 @@ namespace BackendSite.Service.BLL
             public Dictionary<string, string> inputs { set; get; }
         }
 
-        public async Task<ApiResult<TransferResult>> BonusTransferAsync(int custId)
+        public async Task<ApiResult<TransferResult>> BonusTransferAsync(int custId,int tpId)
         {
             var apiResult = new ApiResult<TransferResult>();
 
             var tpBonusTransfer = new TpBonusTransfer
             {
-                TpId = 1,
+                TpId = tpId,
                 CustId = custId,
                 inputs = new Dictionary<string, string>()
             };
@@ -138,7 +138,7 @@ namespace BackendSite.Service.BLL
             {
                 var tpBonusTransfer = new TpBonusTransfer
                 {
-                    TpId = 1,
+                    TpId = pendingBonus.TpId,
                     CustId = pendingBonus.CustId,
                     inputs = new Dictionary<string, string>()
                 };
@@ -147,7 +147,7 @@ namespace BackendSite.Service.BLL
                 apiResult = await courierAdapter.MyPostAsync<TransferResult, TpBonusTransfer>(myUrl, tpBonusTransfer);
 
                 if (apiResult.ErrorCode != 0)
-                    errorMsg.Add($"{pendingBonus.UserName}: {apiResult.RawMessage}");
+                    errorMsg.Add($"{pendingBonus.UserName}: {(string.IsNullOrWhiteSpace(apiResult.RawMessage) ? apiResult.Message : apiResult.RawMessage)}");
             }
 
             apiResult.Message = string.Join("\n\r", errorMsg);
