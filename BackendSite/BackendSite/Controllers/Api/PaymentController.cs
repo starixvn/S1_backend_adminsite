@@ -416,7 +416,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<PromotionCategory>> GetPromotionCategory()
         {
             var data = _paymentBLL.GetPromotionCategory();
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
