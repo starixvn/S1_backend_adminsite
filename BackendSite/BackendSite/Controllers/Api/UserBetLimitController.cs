@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
@@ -44,7 +45,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public async Task<ApiResult> Set([FromForm] CustBetLimit custBetLimit)
+        public async Task<ApiResult> PostUserBetLimit([FromForm] CustBetLimit custBetLimit)
         {
             var updateOperator = User.Identity.Name;
             var customer = await _custInfoBll.GetCustId(custBetLimit.UserName, custBetLimit.SiteId);
@@ -93,6 +94,25 @@ namespace BackendSite.Controllers.Api
                 ErrorCode = 0
             };
 
+            return apiResult;
+        }
+        
+        [HttpGet]
+        [Route("{categoryId:int}")]
+        public async Task<ApiResult<IEnumerable<GameTypeBetLimit>>> GetTpGameTypeListbyCategory(int categoryId)
+        {
+            var tpGameType = await _userBetLimitBll.GetTpGameTypeListbyCategoryAsync(categoryId);
+            var gameTypeWithBetLimit = tpGameType.Select(a => new GameTypeBetLimit()
+            {
+                TypeId = a.Type,
+                TypeName = a.TypeName
+            });
+            
+            var apiResult = new ApiResult<IEnumerable<GameTypeBetLimit>>
+            {
+                ErrorCode = 0,
+                Data = gameTypeWithBetLimit
+            };
             return apiResult;
         }
     }

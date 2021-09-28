@@ -71,7 +71,7 @@ namespace BackendSite.Service.DAL
             return await _sqlClient.QueryFirstAsync<UserBetLimitDetail>("Admin_CustBetLimitByCustId_Get", p);
         }
         
-        public async Task<IEnumerable<TpGameType>> GetTpGameTypeListbyCategory(int categoryId)
+        public async Task<IEnumerable<TpGameType>> GetTpGameTypeListbyCategoryAsync(int categoryId)
         {
             var p = new DynamicParameters();
             p.Add("CategoryId", categoryId);
@@ -82,6 +82,5 @@ namespace BackendSite.Service.DAL
         {
             return await _sqlClient.QueryAsync<TpCategoryData>("Admin_TPCategory_Get", null);
         }
-
     }
 }

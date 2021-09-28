@@ -16,8 +16,18 @@ namespace BackendSite.Service.Model
         public bool Checked { get; set; }
         public int MinBet { set; get; }
         public int MaxBet { set; get; }
+        public List<GameTypeBetLimit> GameTypeBetLimit { get; set; }
     }
-    
+
+    public class GameTypeBetLimit
+    {
+        public int TypeId { set; get; }
+        public string TypeName { get; set; }
+        public bool Checked { get; set; }
+        public int MinBet { set; get; }
+        public int MaxBet { set; get; }
+    }
+
     public class CustBetLimit
     {
         public string UserName { get; set; }
@@ -35,7 +45,7 @@ namespace BackendSite.Service.Model
     
     public class TpBetSetting
     {
-        public int TpId { get; set; }
+        public int GameTypeId { get; set; }
         public int MinBet { set; get; }
         public int MaxBet { set; get; }
     }

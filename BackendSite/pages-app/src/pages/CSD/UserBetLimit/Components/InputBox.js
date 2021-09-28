@@ -1,7 +1,6 @@
 import React from 'react';
 
-export default function InputBox ({ id ,title, value, type, disabled, onChange, dataColumn }) {
-    let inputKey = `${dataColumn}-${id}`;
+export default function InputBox ({ id ,title, value, type, disabled, dataColumn, onChange = f => f  }) {
     return (
         <div className="input-item">
             <label className="label">{title}</label>

@@ -28,10 +28,19 @@ namespace BackendSite.Service.BLL
 
         public async Task<int> SetUserBetLimit(int custId, int siteId, List<BetSetting> betSetting, string updateOperator)
         {
-            var sabaBetLimit = betSetting.SingleOrDefault(a => a.TpCategory == 1);
-            if (sabaBetLimit != null)
+            var sportBetSetting = betSetting.SingleOrDefault(a => a.TpCategory == 1);
+            if (sportBetSetting != null)
             {
-                var apiResult = await _tpBll.SetBetLimitAsync(1, custId, sabaBetLimit.MinBet, sabaBetLimit.MaxBet);
+                var minBet = sportBetSetting.MinBet;
+                var maxBet = sportBetSetting.MaxBet;
+                var sabaBetSetting = sportBetSetting.TpBetSetting.SingleOrDefault(a => a.GameTypeId == 1);
+                if (sabaBetSetting != null)
+                {
+                    minBet = sabaBetSetting.MinBet;
+                    maxBet = sabaBetSetting.MaxBet;
+                }
+
+                var apiResult = await _tpBll.SetBetLimitAsync(1, custId, minBet, maxBet);
             }
 
             return await _userBetLimitService.InsertOrUpdate(custId, siteId, betSetting, updateOperator);
@@ -62,6 +71,11 @@ namespace BackendSite.Service.BLL
         public async Task<int> UpdateStatus(int custId, int status, string updateOperator)
         {
             return await _userBetLimitService.UpdateStatus(custId, status, updateOperator);
+        }
+
+        public async Task<IEnumerable<TpGameType>> GetTpGameTypeListbyCategoryAsync(int categoryId)
+        {
+            return await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(categoryId);
         }
     }
 }

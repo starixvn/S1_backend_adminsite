@@ -2,7 +2,8 @@ import React from "react";
 import InputBox from "./Components/InputBox";
 import DateTimePickerElem from "./Components/DateTimePickerElem"
 import SiteCheckList from "./Components/SiteCheckList"
-export default function Filter ({ siteList, filterInfo, onChange = f => f, siteChecked = g => g, search = h => h }) {
+
+function Filter ({ siteList, filterInfo, onChange = f => f, siteChecked = g => g, search = h => h }) {
     return (
         <div className="filter">
             <div className="row-flex">
@@ -28,3 +29,6 @@ export default function Filter ({ siteList, filterInfo, onChange = f => f, siteC
         </div>
     )
 }
+
+
+export default Filter

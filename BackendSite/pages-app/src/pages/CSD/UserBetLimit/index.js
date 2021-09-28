@@ -50,7 +50,6 @@ const App = () => {
   }, []);
 
   const GetUserBetLimitData = (filter, pageNumber = 1, pageSize = 10) => {
-    console.log(filter)
     let query = {
       SiteIds: filter.SiteId,
       UserName: filter.UserName,
@@ -90,7 +89,7 @@ const App = () => {
       BetSetting: betSetting
     };
     let param = {
-      Url: "UserBetLimit/Set",
+      Url: "UserBetLimit/PostUserBetLimit",
       Data: qs.stringify(data),
     };
     
@@ -161,7 +160,6 @@ const App = () => {
   }
 
   const FilterChange = (v, dataColumn) => {
-    console.log(v)
     setFilter({
       ...stateFilter,
       [dataColumn]: v,
