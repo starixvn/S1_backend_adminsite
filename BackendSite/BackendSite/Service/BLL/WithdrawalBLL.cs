@@ -43,12 +43,12 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite,
             IEnumerable<int> withdrawalType, long startDate, long endDate, string withdrawalId, string userName,
-            IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus, int pageSize,
+            IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus, int pageSize, int amounttype, string amount,
             ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
         {
             var serverInfo = _serverInfoService.GetModel();
             return _withdrawalService.GetWithdrawalRequestList(selectSite, withdrawalType, startDate, endDate,
-                serverInfo.SiteId /*Not require*/, withdrawalId, userName, currencyId, status, levelStatus, pageSize,
+                serverInfo.SiteId /*Not require*/, withdrawalId, userName, currencyId, status, levelStatus, pageSize, amounttype, amount,
                 ref pageNumber, out totalPages, out rowCount, ref currencyAmount);
         }
 
@@ -230,10 +230,10 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(string selectSite, string withdrawalType,
             long startDate, long endDate, string withdrawalId, string userName, string currencyId, string status,
-            string levelStatus)
+            string levelStatus, int AmountType, string Amount)
         {
             return _withdrawalService.GetWithdrawalExportList(selectSite, withdrawalType, startDate, endDate,
-                withdrawalId, userName, currencyId, status, levelStatus);
+                withdrawalId, userName, currencyId, status, levelStatus, AmountType, Amount);
         }
 
         public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(int siteId, int currencyId) =>
