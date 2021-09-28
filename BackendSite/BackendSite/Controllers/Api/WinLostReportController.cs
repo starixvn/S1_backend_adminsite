@@ -54,7 +54,7 @@ namespace BackendSite.Controllers.Api
                                                           request.Currency,
                                                   false);
 
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }

@@ -325,7 +325,7 @@ namespace BackendSite.Controllers.Api
                                                    out totalPages,
                                                    out rowCount);
 
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
@@ -1148,7 +1148,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult GetAllGameTypeList()
         {
             var data = winLostReportService.GetAllGameType();
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
