@@ -85,6 +85,8 @@ namespace BackendSite.Controllers.Api
             public long endDate { get; set; }
             public IEnumerable<int> status { get; set; }
             public IEnumerable<int> LevelStatus { get; set; }
+            public int AmountType { get; set; }
+            public string Amount { get; set; }
         }
 
         [HttpPost]
@@ -99,7 +101,7 @@ namespace BackendSite.Controllers.Api
             var withdrawalRequestList = withdrawalBLL.GetWithdrawalRequestList(withdrawalListReq.SelectSite,
                 withdrawalListReq.withdrawalType, withdrawalListReq.startDate, withdrawalListReq.endDate,
                 withdrawalListReq.WithdrawalId, withdrawalListReq.UserName, withdrawalListReq.CurrencyId,
-                withdrawalListReq.status, withdrawalListReq.LevelStatus, 10, ref pageNumber, out totalPages,
+                withdrawalListReq.status, withdrawalListReq.LevelStatus, 10, withdrawalListReq.AmountType, withdrawalListReq.Amount, ref pageNumber, out totalPages,
                 out rowCount, ref CurrencyAmount);
             apiListResult.Data = withdrawalRequestList;
             apiListResult.ErrorCode = 0;
@@ -446,7 +448,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<Pay>>();
             var cryptoPay = bankDetailBLL.GetCryptoPay();
             var _payInfo = (from x in cryptoPay
-                            where x.CurrencyId == withdrawalReq.CurrencyId && x.ChannelName == withdrawalReq.ChannelName
+                            where x.CurrencyId == withdrawalReq.CurrencyId && x.ChannelName.Equals(withdrawalReq.ChannelName, StringComparison.OrdinalIgnoreCase)
                              select new Pay
                             {
                                 PayId = x.PayId,

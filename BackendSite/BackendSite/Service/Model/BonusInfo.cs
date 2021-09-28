@@ -56,5 +56,6 @@ namespace BackendSite.Service.Model
         public DateTime ExpiryTime { get; set; }
         public DateTime CreateTime { get; set; }
         public int CustId { get; set; }
+        public int TpId { get; set; }
     }
 }
