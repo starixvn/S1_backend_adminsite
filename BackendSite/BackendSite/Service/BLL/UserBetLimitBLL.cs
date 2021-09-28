@@ -77,5 +77,57 @@ namespace BackendSite.Service.BLL
         {
             return await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(categoryId);
         }
+
+        public async Task<CustBetLimitByCustId> GetByCustId(int custId)
+        {
+            var custBetSetting = await _userBetLimitService.UserBetLimitGetByCustId(custId);
+            var betSettings = JsonConvert.DeserializeObject<List<BetSetting>>(custBetSetting.BetSetting);
+            var tpCategories = await _userBetLimitService.GetTpCategoryList();
+            var listCategoryBetLimit = new List<TpCategoryBetLimit>();
+            foreach (var category in tpCategories)
+            {
+                var categoryBetLimit = new TpCategoryBetLimit()
+                {
+                    CategoryId = category.CategoryId,
+                    CategoryName = category.CategoryName
+                };
+                var categorySetting = betSettings.SingleOrDefault(a => a.TpCategory == category.CategoryId);
+                if (categorySetting != null)
+                {
+                    categoryBetLimit.MinBet = categorySetting.MinBet;
+                    categoryBetLimit.MaxBet = categorySetting.MaxBet;
+                    categoryBetLimit.Checked = true;
+                    var typeBetLimit = await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(category.CategoryId);
+
+                    var listTpGametype = new List<GameTypeBetLimit>();
+                    foreach (var gameType in typeBetLimit)
+                    {
+                        var gameTypeBet = new GameTypeBetLimit()
+                        {
+                            TypeId = gameType.Type,
+                            TypeName = gameType.TypeName
+                        };
+                        
+                        var custTpBet = categorySetting.TpBetSetting?.SingleOrDefault(a => a.GameTypeId == gameType.Type);
+                        if (custTpBet != null)
+                        {
+                            gameTypeBet.Checked = true;
+                            gameTypeBet.MinBet = custTpBet.MinBet;
+                            gameTypeBet.MaxBet = custTpBet.MaxBet;
+                        }
+                        listTpGametype.Add(gameTypeBet);
+                    }
+                    categoryBetLimit.GameTypeBetLimit = listTpGametype;
+                }
+                listCategoryBetLimit.Add(categoryBetLimit);
+            }
+            var resp = new CustBetLimitByCustId()
+            {
+                UserName = custBetSetting.UserName,
+                SiteId = custBetSetting.SiteId,
+                BetSetting = listCategoryBetLimit
+            };
+            return resp;
+        }
     }
 }

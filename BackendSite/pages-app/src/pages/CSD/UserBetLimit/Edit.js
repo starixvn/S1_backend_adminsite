@@ -67,15 +67,7 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
     const [currentTab, setTab] = useState({ id:0, name:"" });
 
     useEffect(() => {
-        WebAPI.fetchData({ Url: "UserBetLimit/GetTpCategoryList" }).then((res) => {
-            if (res.data.errorCode === 0) {
-                dispatch({ type: "initial", data: { data: res.data.data}  });
-            } 
-            else {
-                alert(res.data.message ?? "failed to get data.");
-            }
-        });
-
+        
         WebAPI.PostData({ Url: "Common/AdminUserSiteList" }).then((res) => {
             if (res.data.errorCode === 0) {
                 setSiteList(res.data.data);
@@ -84,6 +76,31 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
                 alert(res.data.message ?? "failed to get data.");
             }
         });
+
+        if(!IsAdd && CustId != 0) {
+            WebAPI.fetchData({ Url: `UserBetLimit/GetByCustId/${CustId}` }).then((res) => {
+                if (res.data.errorCode === 0) {
+                    let temp = res.data.data;
+                    setUserName(temp.userName)
+                    setSite(temp.siteId)
+                    dispatch({ type: "initial", data: { data: temp.betSetting}  });
+                    let first = temp.betSetting.filter(a=>a.checked === true);
+                    setTab({ id: first[0].categoryId, name: first[0].categoryName })
+                } 
+                else {
+                    alert(res.data.message ?? "failed to get data.");
+                }
+            });
+        } else {
+            WebAPI.fetchData({ Url: "UserBetLimit/GetTpCategoryList" }).then((res) => {
+                if (res.data.errorCode === 0) {
+                    dispatch({ type: "initial", data: { data: res.data.data}  });
+                } 
+                else {
+                    alert(res.data.message ?? "failed to get data.");
+                }
+            });
+        }
 
     }, []);
 
@@ -103,6 +120,10 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
         }
         else
         {
+            if(categoryId == currentTab.id) {
+                let first = tpCategories.filter(a=>a.checked === true && a.categoryId !== categoryId);
+                setTab({ id: first[0].categoryId, name: first[0].categoryName })
+            }
             dispatch({ type: "categoryCheck", data: { id: categoryId, checked: checked, gameTypeBetLimit: []} });
         }
     }

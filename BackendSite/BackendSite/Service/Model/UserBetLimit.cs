@@ -94,10 +94,17 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
     }
     
-    public class UserBetLimitDetail
+    public class CustBetLimitData
     {
         public int SiteId { get; set; }
         public string UserName { get; set; }
         public string BetSetting { get; set; }
+    }
+    
+    public class CustBetLimitByCustId
+    {
+        public int SiteId { get; set; }
+        public string UserName { get; set; }
+        public List<TpCategoryBetLimit> BetSetting { get; set; }
     }
 }

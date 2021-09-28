@@ -43,6 +43,18 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+        
+        [HttpGet]
+        [Route("{custId:int}")]
+        public async Task<ApiResult<CustBetLimitByCustId>> GetByCustId(int custId)
+        {
+            var result = await _userBetLimitBll.GetByCustId(custId);
+            return new ApiResult<CustBetLimitByCustId>()
+            {
+                Data = result,
+                ErrorCode = 0
+            };
+        }
 
         [HttpPost]
         public async Task<ApiResult> PostUserBetLimit([FromForm] CustBetLimit custBetLimit)

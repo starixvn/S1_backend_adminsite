@@ -111,11 +111,16 @@ const App = () => {
     GetUserBetLimitData(stateFilter, PageNumber);
   };
 
-  const EditDisableUser = () => {
-
+  const EditUser = (custId) => {
+    updateEvent({
+      ...eventState,
+      ShowSettingPanel: true,
+      IsAdd: false,
+      CustId: custId
+    });
   }
 
-  const DeleteDisableUser = (custId) => {
+  const DeleteUser = (custId) => {
     let param = {
       Url: "UserBetLimit/Delete",
       Data: `custId=${custId}`,
@@ -232,8 +237,8 @@ const App = () => {
               <Result
               {...datas}
               ChangePage={Result_ChangePage}
-              ClickEdit={EditDisableUser}
-              ClickDelete={DeleteDisableUser}
+              ClickEdit={EditUser}
+              ClickDelete={DeleteUser}
               UpdateStatus={SwitchStatus} />
           )}
         </>
