@@ -263,6 +263,8 @@ namespace BackendSite.Controllers.Api
             public int PageSize { get; set; }
             public long StartDate { get; set; }
             public long EndDate { get; set; }
+            public string AffiliatesCode { get; set; }
+            public int AgentCodeType { get; set; }
         }
 
         public class SetRegLiveStatusPara 
@@ -1466,7 +1468,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var SearchResult = custInfoBLL.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status
-                , custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort,custInfoReq.StartDate,custInfoReq.EndDate);
+                , custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort,custInfoReq.StartDate,custInfoReq.EndDate, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
 
                 apiResult.Data = SearchResult.RegLiveStatusDatas;
                 apiResult.PageNumber = SearchResult.PageNumber;
@@ -1560,11 +1562,11 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public IActionResult ExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate)
+        public IActionResult ExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate, string AffiliatesCode, int AgentCodeType)
         {
-            var ExportData = custInfoBLL.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate);
+            var ExportData = custInfoBLL.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate, AffiliatesCode, AgentCodeType);
             var stream = excelBLL.Export(ExportData);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Registration_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
         #endregion
     }
