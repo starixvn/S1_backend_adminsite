@@ -515,12 +515,13 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<VipLevelModel>("Common_VipLevel_Get");
         }
 
-        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency, int depositStatus, int status, string username, int pagenumber, int pagesize, int sort, long StartDate, long EndDate)
+        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency, int depositStatus, int status, string username, int pagenumber, int pagesize, int sort, long StartDate, long EndDate, string AffiliatesCode, int AgentCodeType)
         {
+            //CreditSite
             var SearchData = new RegLiveStatusResult();
             var props = new DynamicParameters();
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-
+            List<string> CreditSite = new List<string>() { "Nova88Ref01", "Nova88Ref02", "Nova88Ref03", "Nova88Ref04", "Nova88Ref05", "Nova88Ref06", "Nova88Ref07", "Nova88Ref08", "Goal123Ref01", "BwingRef01" };
             props.Add("SelectSite", JsonConvert.SerializeObject(selectSite));
             props.Add("Currency", currency);
             props.Add("UserName", string.IsNullOrWhiteSpace(username) ? null : username);
@@ -530,12 +531,15 @@ namespace BackendSite.Service.DAL
             props.Add("PageSize", pagesize);
             props.Add("StartDate", StartDate);
             props.Add("EndDate", EndDate);
+            props.Add("AffCode", string.IsNullOrWhiteSpace(AffiliatesCode) ? null : AffiliatesCode);
+            props.Add("CreditSite", JsonConvert.SerializeObject(CreditSite));
+            props.Add("AgentCodeType", AgentCodeType);
             props.Add("PageNumber", pagenumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<RegLiveStatus>("Admin_CustRegLiveStatusV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var result = conn.Query<RegLiveStatus>("Admin_CustRegLiveStatusV3_Get", props, commandType: CommandType.StoredProcedure).ToList();
 
             SearchData.RegLiveStatusDatas = result;
             SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;

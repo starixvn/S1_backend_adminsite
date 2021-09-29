@@ -306,6 +306,8 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public string Currency { get; set; }
         public string SiteName { get; set; }
+        public string AffCode { get; set; }
+        public string Agent { get; set; }
     }
     public class RegLiveStatusResult
     {

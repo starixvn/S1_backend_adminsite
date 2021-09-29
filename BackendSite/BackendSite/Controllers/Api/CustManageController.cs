@@ -263,6 +263,8 @@ namespace BackendSite.Controllers.Api
             public int PageSize { get; set; }
             public long StartDate { get; set; }
             public long EndDate { get; set; }
+            public string AffiliatesCode { get; set; }
+            public int AgentCodeType { get; set; }
         }
 
         public class SetRegLiveStatusPara 
@@ -1466,7 +1468,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var SearchResult = custInfoBLL.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status
-                , custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort,custInfoReq.StartDate,custInfoReq.EndDate);
+                , custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort,custInfoReq.StartDate,custInfoReq.EndDate, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
 
                 apiResult.Data = SearchResult.RegLiveStatusDatas;
                 apiResult.PageNumber = SearchResult.PageNumber;

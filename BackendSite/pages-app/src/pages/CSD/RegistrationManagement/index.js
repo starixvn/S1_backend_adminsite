@@ -19,6 +19,8 @@ const App = () => {
     RegTimeType: 1,
     StartDate: moment().add(-10, "days").format("l"),
     EndDate: moment().format("l"),
+    AffiliatesCode:"",
+    Agentcode:1
   });
   const [stateDatas, setDatas] = useState({
     PageInfo: null,
@@ -64,6 +66,7 @@ const App = () => {
   }, []);
 
   const Filter_OnChange = (v, dataColumn) => {
+    console.log(v, dataColumn);
     setFilter({
       ...stateFilter,
       [dataColumn]: v,
@@ -93,6 +96,8 @@ const App = () => {
         PageNumber: 1,
         StartDate: moment(stateFilter.StartDate).unix(),
         EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
+        AffiliatesCode:stateFilter.AffiliatesCode,
+        AgentCodeType:Number(stateFilter.Agentcode)
       },
     };
     WebAPI.PostData(param)
@@ -218,6 +223,8 @@ const App = () => {
         PageNumber: PageNumber,
         StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
         EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
+        AffiliatesCode:stateFilter.AffiliatesCode,
+        AgentCodeType:Number(stateFilter.Agentcode)
       },
     };
     WebAPI.PostData(param)
