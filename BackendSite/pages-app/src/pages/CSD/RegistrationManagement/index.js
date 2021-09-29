@@ -150,6 +150,8 @@ const App = () => {
           PageNumber: Number(stateDatas.PageInfo.pageNumber),
           StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
           EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
+          AffiliatesCode:stateDatas.FilterInfo.AffiliatesCode,
+          AgentCodeType:Number(stateDatas.FilterInfo.AgentCodeType)
         },
       };
       WebAPI.PostData(param)
@@ -225,8 +227,8 @@ const App = () => {
         PageNumber: PageNumber,
         StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
         EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
-        AffiliatesCode:stateDatas.AffiliatesCode,
-        AgentCodeType:Number(stateDatas.AgentCodeType)
+        AffiliatesCode:stateDatas.FilterInfo.AffiliatesCode,
+        AgentCodeType:Number(stateDatas.FilterInfo.AgentCodeType)
       },
     };
     WebAPI.PostData(param)
