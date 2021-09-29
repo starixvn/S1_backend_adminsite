@@ -182,6 +182,11 @@
         "DisplayKey": "Disable User For Game",
         "FuncKey": "CustManage/DisableUserForGame",
         "Enable": false
+      },
+      {
+        "DisplayKey": "User Bet Limit",
+        "FuncKey": "CustManage/UserBetLimit",
+        "Enable": false
       }
     ]
   },
