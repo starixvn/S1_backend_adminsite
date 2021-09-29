@@ -217,5 +217,11 @@ namespace BackendSite.Controllers.Api
             apiListResult.ErrorCode = 0;
             return apiListResult;
         }
+
+        [HttpPost]
+        public async Task<ApiResult<dynamic>> GetTpBetRecordDetailAsync(GetTpBetRecordDetailRequest request)
+        {
+            return await tpBLL.GetBetDetail(request);
+        }
     }
 }

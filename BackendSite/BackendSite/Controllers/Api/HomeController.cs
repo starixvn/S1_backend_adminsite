@@ -168,7 +168,7 @@ namespace BackendSite.Controllers.Api
         {
             var data = _serverInfoBLL.GetSiteList();
 
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }

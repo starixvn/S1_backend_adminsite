@@ -168,12 +168,6 @@ namespace BackendSite.Controllers.Api
             public long EndDate { get; set; }
         }
 
-        public class GetTpBetRecordDetailRequest
-        {
-            public int GameType { get; set; }
-            public string TransId { get; set; }
-        }
-
         #endregion
 
         #region Actions
@@ -416,7 +410,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<PromotionCategory>> GetPromotionCategory()
         {
             var data = _paymentBLL.GetPromotionCategory();
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
@@ -926,23 +920,6 @@ namespace BackendSite.Controllers.Api
             };
             return apiResult;
         }
-
-        [HttpPost]
-        public async Task<ApiResult> GetTpBetRecordDetailAsync(
-            GetTpBetRecordDetailRequest request)
-        {
-            var result =
-                await _paymentBLL.GetTpBetRecordDetailAsync(
-                    request.GameType,
-                    request.TransId);
-
-            return new ApiResult<object>
-            {
-                Data = result,
-                ErrorCode = (int) ErrorCodeEnum.Success
-            };
-        }
-
 
         #region Adjustment Limit
 

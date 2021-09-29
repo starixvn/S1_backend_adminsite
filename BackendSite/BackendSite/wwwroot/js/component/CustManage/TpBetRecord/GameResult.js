@@ -26,7 +26,7 @@ const Result = (props) => {
               <button
                 className="btn btn-link"
                 onClick={() =>
-                  props.ClickTpBetRecordDetail(props.Info.GameTypeId, d.transId)
+                  props.ClickTpBetRecordDetail(props.Info.GameTypeId, d.transId, d.settledTime)
                 }
               >
                 {d.transId}
