@@ -101,6 +101,7 @@ const App = () => {
           ...eventState,
           ShowSettingPanel: false,
         });
+        GetUserBetLimitData(stateFilter);
       } else {
         alert(res.data.message);
       }
@@ -129,11 +130,11 @@ const App = () => {
     WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {
         alert("success.");
+        GetUserBetLimitData(stateFilter);
       } else {
         alert(res.data.message);
       }
     });
-    GetUserBetLimitData(stateFilter);
   }
 
   const SwitchStatus = (custId, status) => {

@@ -15,12 +15,12 @@ function reducer (state, action) {
             state[idx].gameTypeBetLimit = action.data.gameTypeBetLimit
             return [...state];
         case "inputBetLimit":
-            const [limit, categoryId] = action.data.id.split(/[\s-]+/);
-            let idxx = state.findIndex(x => x.categoryId === parseInt(categoryId));
+            const [limit, categoryId] = action.data.id.split(/-(.+)/)
+            let i = state.findIndex(x => x.categoryId === parseInt(categoryId));
             if(limit == "MinBet") {
-                state[idxx].minBet = action.data.value;
+                state[i].minBet = action.data.value;
             } else if(limit == "MaxBet") {
-                state[idxx].maxBet = action.data.value;
+                state[i].maxBet = action.data.value;
             }
             return [...state];
         case "gameTypeCheck":
@@ -122,7 +122,10 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
         {
             if(categoryId == currentTab.id) {
                 let first = tpCategories.filter(a=>a.checked === true && a.categoryId !== categoryId);
-                setTab({ id: first[0].categoryId, name: first[0].categoryName })
+                if(first.length === 0)
+                    setTab({ id: 0, name: "" })
+                else
+                    setTab({ id: first[0].categoryId, name: first[0].categoryName })
             }
             dispatch({ type: "categoryCheck", data: { id: categoryId, checked: checked, gameTypeBetLimit: []} });
         }
@@ -153,12 +156,35 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
             alert("Please enter UserName");
             return false;
         }
+        if (tpCategories.filter(a => a.checked === true).length === 0) {
+            alert("Please select at least one category.")
+            return false;
+        }
+        let checked = true;
         let betSetting = [];
         tpCategories.forEach(a => {
             if(a.checked) {    
                 let tpBetSetting = []
+                if(a.minBet === 0) {
+                    alert(`${a.categoryName} MinBet can't be 0`);
+                    checked = false;
+                    return;
+                } else if (a.maxBet === 0) {
+                    alert(`${a.categoryName} MaxBet can't be 0`);
+                    checked = false;
+                    return;
+                }
                 a.gameTypeBetLimit.forEach( b => {
                     if(b.checked) {
+                        if(b.minBet === 0) {
+                            alert(`${b.typeName} MinBet can't be 0`);
+                            checked = false;
+                            return;
+                        } else if (b.maxBet === 0) {
+                            alert(`${b.typeName} MaxBet can't be 0`);
+                            checked = false;
+                            return;
+                        }
                         tpBetSetting.push({ GameTypeId: b.typeId, MinBet: b.minBet, MaxBet: b.maxBet })
                     }
                 })
@@ -166,7 +192,9 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
                 betSetting.push({ TpCategory:a.categoryId, MinBet:a.minBet, MaxBet:a.maxBet, TpBetSetting: tpBetSetting})
             }
         })
-        InsertOrUpdate(userName, siteId, betSetting)
+        if(checked) {
+            InsertOrUpdate(userName, siteId, betSetting)
+        }
     };
 
     return (
