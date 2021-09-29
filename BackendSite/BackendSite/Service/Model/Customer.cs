@@ -337,6 +337,8 @@ namespace BackendSite.Service.Model
         public string RegTime { get; set; }
         public string DepositStatus { get; set; }
         public string Status { get; set; }
+        public string AffCode { get; set; }
+        public string Agent { get; set; }
     }
 
     public class CustomerForRisk

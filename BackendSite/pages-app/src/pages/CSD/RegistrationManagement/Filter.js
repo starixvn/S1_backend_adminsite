@@ -119,7 +119,7 @@ const Panel = (props) => {
           })}
           hasAll={false}
           selectedValue={1}
-          dataColumn="Agentcode"
+          dataColumn="AgentCodeType"
           onChange={props.onChange}
         />
         <div className="button-group">

@@ -20,7 +20,7 @@ const App = () => {
     StartDate: moment().add(-10, "days").format("l"),
     EndDate: moment().format("l"),
     AffiliatesCode:"",
-    Agentcode:1
+    AgentCodeType:1
   });
   const [stateDatas, setDatas] = useState({
     PageInfo: null,
@@ -97,7 +97,7 @@ const App = () => {
         StartDate: moment(stateFilter.StartDate).unix(),
         EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
         AffiliatesCode:stateFilter.AffiliatesCode,
-        AgentCodeType:Number(stateFilter.Agentcode)
+        AgentCodeType:Number(stateFilter.AgentCodeType)
       },
     };
     WebAPI.PostData(param)
@@ -198,6 +198,8 @@ const App = () => {
         Sort: Number(stateFilter.RegTimeType),
         StartDate: moment(stateFilter.StartDate).unix(),
         EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
+        AffiliatesCode:stateFilter.AffiliatesCode,
+        AgentCodeType:Number(stateFilter.AgentCodeType)
       },
     };
 
@@ -223,8 +225,8 @@ const App = () => {
         PageNumber: PageNumber,
         StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
         EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
-        AffiliatesCode:stateFilter.AffiliatesCode,
-        AgentCodeType:Number(stateFilter.Agentcode)
+        AffiliatesCode:stateDatas.AffiliatesCode,
+        AgentCodeType:Number(stateDatas.AgentCodeType)
       },
     };
     WebAPI.PostData(param)

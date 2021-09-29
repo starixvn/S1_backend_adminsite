@@ -1562,11 +1562,11 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public IActionResult ExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate)
+        public IActionResult ExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate, string AffiliatesCode, int AgentCodeType)
         {
-            var ExportData = custInfoBLL.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate);
+            var ExportData = custInfoBLL.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate, AffiliatesCode, AgentCodeType);
             var stream = excelBLL.Export(ExportData);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Registration_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
         #endregion
     }
