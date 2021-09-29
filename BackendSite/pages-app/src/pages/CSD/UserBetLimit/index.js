@@ -172,7 +172,7 @@ const App = () => {
     });
   }
 
-  const SiteChange = (siteId, checked) => {
+  const SiteChange = (siteId, siteName, checked) => {
     if(siteId == 0) {
       siteList.forEach( a => { a.checked = !checked })
     }

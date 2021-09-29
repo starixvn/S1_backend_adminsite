@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useReducer } from "react";
 import InputBox from "./Components/InputBox";
-import SiteRadioGroup from "./Components/RadioGroup";
+import SiteRadioGroup from "./Components/SiteRadioGroup";
 import TpCategoryCheckList from "./Components/TpCategoryCheckList"
 import SubPanel from "./SubPanel";
 import WebAPI from "../../../module//WebAPI";
