@@ -33,7 +33,7 @@ namespace BackendSite.Service.BLL
             {
                 var minBet = sportBetSetting.MinBet;
                 var maxBet = sportBetSetting.MaxBet;
-                var sabaBetSetting = sportBetSetting.TpBetSetting.SingleOrDefault(a => a.GameTypeId == 1);
+                var sabaBetSetting = sportBetSetting.TpBetSetting?.SingleOrDefault(a => a.GameTypeId == 1);
                 if (sabaBetSetting != null)
                 {
                     minBet = sabaBetSetting.MinBet;
@@ -41,6 +41,8 @@ namespace BackendSite.Service.BLL
                 }
 
                 var apiResult = await _tpBll.SetBetLimitAsync(1, custId, minBet, maxBet);
+                if (apiResult.ErrorCode != 0)
+                    throw new AdminException(ErrorCodeEnum.SystemException, "Set third party bet limit failed");
             }
 
             return await _userBetLimitService.InsertOrUpdate(custId, siteId, betSetting, updateOperator);
@@ -61,7 +63,7 @@ namespace BackendSite.Service.BLL
                 var apiResult = await _tpBll.SetBetLimitAsync(1, custId, sabaBetLimit.Data);
                 if (apiResult.ErrorCode != 0)
                 {
-                    throw new AdminException(ErrorCodeEnum.Fail, "update third party bet limit failed");
+                    throw new AdminException(ErrorCodeEnum.Fail, "reset third party bet limit failed");
                 }
             }
             
@@ -73,15 +75,22 @@ namespace BackendSite.Service.BLL
             return await _userBetLimitService.UpdateStatus(custId, status, updateOperator);
         }
 
-        public async Task<IEnumerable<TpGameType>> GetTpGameTypeListbyCategoryAsync(int categoryId)
+        public async Task<IEnumerable<GameTypeBetLimit>> GetTpGameTypeListbyCategoryAsync(int categoryId)
         {
-            return await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(categoryId);
+            var tpGameType = await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(categoryId);
+            var gameTypeWithBetLimit = tpGameType.Select(a => new GameTypeBetLimit()
+            {
+                TypeId = a.Type,
+                TypeName = a.TypeName
+            });
+            return gameTypeWithBetLimit;
         }
 
         public async Task<CustBetLimitByCustId> GetByCustId(int custId)
         {
             var custBetSetting = await _userBetLimitService.UserBetLimitGetByCustId(custId);
-            var betSettings = JsonConvert.DeserializeObject<List<BetSetting>>(custBetSetting.BetSetting);
+            
+            
             var tpCategories = await _userBetLimitService.GetTpCategoryList();
             var listCategoryBetLimit = new List<TpCategoryBetLimit>();
             foreach (var category in tpCategories)
@@ -91,33 +100,38 @@ namespace BackendSite.Service.BLL
                     CategoryId = category.CategoryId,
                     CategoryName = category.CategoryName
                 };
-                var categorySetting = betSettings.SingleOrDefault(a => a.TpCategory == category.CategoryId);
-                if (categorySetting != null)
+                if (!string.IsNullOrEmpty(custBetSetting.BetSetting) && custBetSetting.BetSetting != "null")
                 {
-                    categoryBetLimit.MinBet = categorySetting.MinBet;
-                    categoryBetLimit.MaxBet = categorySetting.MaxBet;
-                    categoryBetLimit.Checked = true;
-                    var typeBetLimit = await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(category.CategoryId);
-
-                    var listTpGametype = new List<GameTypeBetLimit>();
-                    foreach (var gameType in typeBetLimit)
+                    var betSettings = JsonConvert.DeserializeObject<List<BetSetting>>(custBetSetting.BetSetting);
+                    
+                    var categorySetting = betSettings.SingleOrDefault(a => a.TpCategory == category.CategoryId);
+                    if (categorySetting != null)
                     {
-                        var gameTypeBet = new GameTypeBetLimit()
+                        categoryBetLimit.MinBet = categorySetting.MinBet;
+                        categoryBetLimit.MaxBet = categorySetting.MaxBet;
+                        categoryBetLimit.Checked = true;
+                        var typeBetLimit = await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(category.CategoryId);
+
+                        var listTpGametype = new List<GameTypeBetLimit>();
+                        foreach (var gameType in typeBetLimit)
                         {
-                            TypeId = gameType.Type,
-                            TypeName = gameType.TypeName
-                        };
+                            var gameTypeBet = new GameTypeBetLimit()
+                            {
+                                TypeId = gameType.Type,
+                                TypeName = gameType.TypeName
+                            };
                         
-                        var custTpBet = categorySetting.TpBetSetting?.SingleOrDefault(a => a.GameTypeId == gameType.Type);
-                        if (custTpBet != null)
-                        {
-                            gameTypeBet.Checked = true;
-                            gameTypeBet.MinBet = custTpBet.MinBet;
-                            gameTypeBet.MaxBet = custTpBet.MaxBet;
+                            var custTpBet = categorySetting.TpBetSetting?.SingleOrDefault(a => a.GameTypeId == gameType.Type);
+                            if (custTpBet != null)
+                            {
+                                gameTypeBet.Checked = true;
+                                gameTypeBet.MinBet = custTpBet.MinBet;
+                                gameTypeBet.MaxBet = custTpBet.MaxBet;
+                            }
+                            listTpGametype.Add(gameTypeBet);
                         }
-                        listTpGametype.Add(gameTypeBet);
+                        categoryBetLimit.GameTypeBetLimit = listTpGametype;
                     }
-                    categoryBetLimit.GameTypeBetLimit = listTpGametype;
                 }
                 listCategoryBetLimit.Add(categoryBetLimit);
             }

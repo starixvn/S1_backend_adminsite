@@ -18,10 +18,8 @@ namespace BackendSite.Controllers.Api
     {
         private readonly UserBetLimitBLL _userBetLimitBll;
         private readonly CustInfoBLL _custInfoBll;
-        private readonly ILogger<UserBetLimitController> _logger;
-        public UserBetLimitController(ILogger<UserBetLimitController> logger, UserBetLimitBLL userBetLimitBll, CustInfoBLL custInfoBll)
+        public UserBetLimitController(UserBetLimitBLL userBetLimitBll, CustInfoBLL custInfoBll)
         {
-            _logger = logger;
             _userBetLimitBll = userBetLimitBll;
             _custInfoBll = custInfoBll;
         }
@@ -48,10 +46,10 @@ namespace BackendSite.Controllers.Api
         [Route("{custId:int}")]
         public async Task<ApiResult<CustBetLimitByCustId>> GetByCustId(int custId)
         {
-            var result = await _userBetLimitBll.GetByCustId(custId);
+            var data = await _userBetLimitBll.GetByCustId(custId);
             return new ApiResult<CustBetLimitByCustId>()
             {
-                Data = result,
+                Data = data,
                 ErrorCode = 0
             };
         }
@@ -99,10 +97,10 @@ namespace BackendSite.Controllers.Api
         [HttpGet]
         public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategoryList()
         {
-            var tpCategories = await _userBetLimitBll.GetTpCategoryList();
+            var data = await _userBetLimitBll.GetTpCategoryList();
             var apiResult = new ApiResult<IEnumerable<TpCategoryBetLimit>>
             {
-                Data = tpCategories, 
+                Data = data, 
                 ErrorCode = 0
             };
 
@@ -113,17 +111,11 @@ namespace BackendSite.Controllers.Api
         [Route("{categoryId:int}")]
         public async Task<ApiResult<IEnumerable<GameTypeBetLimit>>> GetTpGameTypeListbyCategory(int categoryId)
         {
-            var tpGameType = await _userBetLimitBll.GetTpGameTypeListbyCategoryAsync(categoryId);
-            var gameTypeWithBetLimit = tpGameType.Select(a => new GameTypeBetLimit()
-            {
-                TypeId = a.Type,
-                TypeName = a.TypeName
-            });
-            
+            var data = await _userBetLimitBll.GetTpGameTypeListbyCategoryAsync(categoryId);
             var apiResult = new ApiResult<IEnumerable<GameTypeBetLimit>>
             {
+                Data = data,
                 ErrorCode = 0,
-                Data = gameTypeWithBetLimit
             };
             return apiResult;
         }
