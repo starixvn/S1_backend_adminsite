@@ -17,7 +17,7 @@ namespace BackendSite.Service.DAL
         }
         public ServerInfo GetModel()
         {
-            int siteId = 1;
+            var siteId = 1;
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.QueryFirstOrDefault<ServerInfo>("ServerInfo_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
@@ -46,14 +46,12 @@ namespace BackendSite.Service.DAL
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                var adminOperateLogList = conn.Query<GetAdminOperateLog>("Log_LogAdminOperateInfoV2_Get", p, commandType: CommandType.StoredProcedure);
-                pageNumber = p.Get<int?>("PageNumber") ?? 0;
-                totalPages = p.Get<int?>("TotalPages") ?? 0;
-                rowCount = p.Get<int?>("RowCount") ?? 0;
-                return adminOperateLogList;
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var adminOperateLogList = conn.Query<GetAdminOperateLog>("Log_LogAdminOperateInfoV2_Get", p, commandType: CommandType.StoredProcedure);
+            pageNumber = p.Get<int?>("PageNumber") ?? 0;
+            totalPages = p.Get<int?>("TotalPages") ?? 0;
+            rowCount = p.Get<int?>("RowCount") ?? 0;
+            return adminOperateLogList;
         }
     }
 }

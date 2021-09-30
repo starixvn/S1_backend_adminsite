@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace BackendSite.Service.Model
+﻿namespace BackendSite.Service.Model
 {
     public class DomainTable
     {
@@ -16,5 +11,16 @@ namespace BackendSite.Service.Model
         public int Sort { get; set; }
         public int Status { get; set; }
         public string LastUpdateUser { get; set; }
+    }
+    public class GetAppLinkTableReq 
+    {
+        public int SiteId { get; set; }
+    }
+    public class SetAppLinkReq
+    {
+        public int SiteId { get; set; }
+        public string Domain { get; set; }
+        public int AppType { get; set; }
+        public int ProtocolType { get; set; }
     }
 }

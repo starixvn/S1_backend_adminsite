@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
-using BackendSite.Service.Model.TpBetRecordDetail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -170,12 +168,6 @@ namespace BackendSite.Controllers.Api
             public long EndDate { get; set; }
         }
 
-        public class GetTpBetRecordDetailRequest
-        {
-            public int GameType { get; set; }
-            public string TransId { get; set; }
-        }
-
         #endregion
 
         #region Actions
@@ -183,8 +175,8 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public async Task<ApiResult> PaymentAdjustmentAsync(PaymentAdjustmentReq paymentAdjustmentReq)
         {
-            ApiResult apiResult = new ApiResult();
-            AdjustmentInfo adjustmentInfo = new AdjustmentInfo();
+            var apiResult = new ApiResult();
+            var adjustmentInfo = new AdjustmentInfo();
             var custInfo = _custInfoBLL.GetCustInfoWithCache(paymentAdjustmentReq.CustId);
             if (custInfo != null)
             {
@@ -204,7 +196,7 @@ namespace BackendSite.Controllers.Api
                         if (_mainWalletType == 2)
                         {
                             var deAmount = adjustmentInfo.Amount - balance;
-                            TpTransfer inTpTransfer = new TpTransfer()
+                            var inTpTransfer = new TpTransfer()
                                 {TpId = 1, Amount = deAmount, CustId = custInfo.CustId, direction = TpDirection.ToMain};
 
                             var acc = await _tpBLL.TransferAsync(inTpTransfer);
@@ -242,7 +234,7 @@ namespace BackendSite.Controllers.Api
                     if (_mainWalletType == 2 && adjustmentInfo.AdjustType == 1)
                     {
                         var balance = _custInfoBLL.GetBalance(custInfo.CustId);
-                        TpTransfer inTpTransfer = new TpTransfer()
+                        var inTpTransfer = new TpTransfer()
                             {TpId = 1, Amount = balance, CustId = custInfo.CustId, direction = TpDirection.ToTp};
 
                         var acc = await _tpBLL.TransferAsync(inTpTransfer);
@@ -274,9 +266,9 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         public ApiListResult<FinancialLog> GetFinancialLog(GetFinancialLogReq getFinancialLogReq)
         {
-            int pageNumber = getFinancialLogReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
+            var pageNumber = getFinancialLogReq.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
             var data = _paymentBLL.GetFinancialLog(getFinancialLogReq.CustId, getFinancialLogReq.StartDate,
                 getFinancialLogReq.EndDate, getFinancialLogReq.RefTransId, 10, ref pageNumber, out totalPages,
                 out rowCount);
@@ -303,9 +295,9 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         public ApiResult GetBonusLog(GetBonusLogReq getBonusLogReq)
         {
-            int pageNumber = getBonusLogReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
+            var pageNumber = getBonusLogReq.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
             var data = _paymentBLL.GetBonusLog(getBonusLogReq.CustId,
                 getBonusLogReq.PromoCategoryId,
                 getBonusLogReq.StartDate,
@@ -328,17 +320,19 @@ namespace BackendSite.Controllers.Api
 
         public ApiListResult<RebateLog> GetRebateLogByCust(GetRebateLogByCustReq getRebateLogByCustReq)
         {
-            int pageNumber = getRebateLogByCustReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
-            var apiListResult = new ApiListResult<RebateLog>();
-            apiListResult.Data = _paymentBLL.GetRebateLogByCust(getRebateLogByCustReq.CustId,
-                getRebateLogByCustReq.StartDate, getRebateLogByCustReq.EndDate, 10, ref pageNumber, out totalPages,
-                out rowCount);
-            apiListResult.ErrorCode = 0;
-            apiListResult.PageNumber = pageNumber;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.RowCount = rowCount;
+            var pageNumber = getRebateLogByCustReq.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
+            var apiListResult = new ApiListResult<RebateLog>
+            {
+                Data = _paymentBLL.GetRebateLogByCust(getRebateLogByCustReq.CustId,
+                    getRebateLogByCustReq.StartDate, getRebateLogByCustReq.EndDate, 10, ref pageNumber, out totalPages,
+                    out rowCount),
+                ErrorCode = 0,
+                PageNumber = pageNumber,
+                TotalPages = totalPages,
+                RowCount = rowCount
+            };
 
             return apiListResult;
         }
@@ -349,10 +343,10 @@ namespace BackendSite.Controllers.Api
             [FromForm] int RebateCategoriesId)
         {
             var apiListResult = new ApiListResultCurrencyAmount<RebateLog>();
-            int PageSize = 10;
-            int TotalPages = 0;
-            int RowCount = 0;
-            List<string> CurrencyAmount = new List<string>();
+            var PageSize = 10;
+            var TotalPages = 0;
+            var RowCount = 0;
+            var CurrencyAmount = new List<string>();
             apiListResult.Data = _paymentBLL.GetRebateLog(SelectSite, UserName, RebateType, StartDate, EndDate,
                 PageSize,
                 CurrencyId, BaseCurrencyId, RebateCategoriesId, ref PageNumber, out TotalPages, out RowCount,
@@ -382,9 +376,9 @@ namespace BackendSite.Controllers.Api
             [FromForm] int PageNumber)
         {
             var apiListResult = new ApiListResult<RebateInfo>();
-            int PageSize = 10;
-            int TotalPages = 0;
-            int RowCount = 0;
+            var PageSize = 10;
+            var TotalPages = 0;
+            var RowCount = 0;
             apiListResult.Data = _paymentBLL.GetRebateInfoList(SelectSite, UserName, RebateType, StartDate, EndDate,
                 PageSize, ref PageNumber, out TotalPages, out RowCount);
             apiListResult.PageNumber = PageNumber;
@@ -416,7 +410,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<PromotionCategory>> GetPromotionCategory()
         {
             var data = _paymentBLL.GetPromotionCategory();
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
@@ -443,20 +437,24 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<TpBetRecordListOneWeek>> GetCustTpBetRecordListOneWeek(
             CustTpBetRecordListOneWeekReq custTpBetRecordListOneWeekReq)
         {
-            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneWeek>>();
-            apiResult.ErrorCode = 0;
-            apiResult.Data = _paymentBLL.GetCustTpBetRecordListOneWeek(custTpBetRecordListOneWeekReq.CustId);
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneWeek>>
+            {
+                ErrorCode = 0,
+                Data = _paymentBLL.GetCustTpBetRecordListOneWeek(custTpBetRecordListOneWeekReq.CustId)
+            };
             return apiResult;
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<TpBetRecordListOneWeek>> GetCustTpBetRecordList(
+        public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecordList(
             CustTpBetRecordListReq custTpBetRecordListReq)
         {
-            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneWeek>>();
-            apiResult.Data = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId,
-                custTpBetRecordListReq.StartDate, custTpBetRecordListReq.EndDate);
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordByDate>>
+            {
+                Data = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId,
+                    custTpBetRecordListReq.StartDate, custTpBetRecordListReq.EndDate),
+                ErrorCode = 0
+            };
             return apiResult;
         }
 
@@ -470,13 +468,15 @@ namespace BackendSite.Controllers.Api
         /// <param name="custTpBetRecordListOneDayReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<TpBetRecordListOneDay>> GetCustTpBetRecordListOneDay(
+        public ApiResult<IEnumerable<TpBetRecordListOneDayRes>> GetCustTpBetRecordListOneDay(
             CustTpBetRecordListOneDayReq custTpBetRecordListOneDayReq)
         {
-            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneDay>>();
-            apiResult.ErrorCode = 0;
-            apiResult.Data = _paymentBLL.GetCustTpBetRecordListOneDay(custTpBetRecordListOneDayReq.CustId,
-                custTpBetRecordListOneDayReq.SelDate, custTpBetRecordListOneDayReq.StartDate, custTpBetRecordListOneDayReq.EndDate);
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneDayRes>>
+            {
+                ErrorCode = 0,
+                Data = _paymentBLL.GetCustTpBetRecordListOneDay(custTpBetRecordListOneDayReq.CustId,
+                    custTpBetRecordListOneDayReq.SelDate, custTpBetRecordListOneDayReq.StartDate, custTpBetRecordListOneDayReq.EndDate)
+            };
             return apiResult;
         }
 
@@ -490,14 +490,16 @@ namespace BackendSite.Controllers.Api
         /// <param name="custTpBetRecordListbyCategoryIdReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<TpBetRecordbyCategoryId>> GetCustTpBetRecordListbyCategoryId(
+        public ApiResult<IEnumerable<TpBetRecordbyCategoryIdRes>> GetCustTpBetRecordListbyCategoryId(
             CustTpBetRecordListbyCategoryIdReq custTpBetRecordListbyCategoryIdReq)
         {
-            var apiResult = new ApiResult<IEnumerable<TpBetRecordbyCategoryId>>();
-            apiResult.ErrorCode = 0;
-            apiResult.Data = _paymentBLL.GetCustTpBetRecordListbyCategoryId(custTpBetRecordListbyCategoryIdReq.CustId,
-                custTpBetRecordListbyCategoryIdReq.SelDate,
-                custTpBetRecordListbyCategoryIdReq.CategoryId, custTpBetRecordListbyCategoryIdReq.StartDate, custTpBetRecordListbyCategoryIdReq.EndDate);
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordbyCategoryIdRes>>
+            {
+                ErrorCode = 0,
+                Data = _paymentBLL.GetCustTpBetRecordListbyCategoryId(custTpBetRecordListbyCategoryIdReq.CustId,
+                    custTpBetRecordListbyCategoryIdReq.SelDate,
+                    custTpBetRecordListbyCategoryIdReq.CategoryId, custTpBetRecordListbyCategoryIdReq.StartDate, custTpBetRecordListbyCategoryIdReq.EndDate)
+            };
             return apiResult;
         }
 
@@ -515,10 +517,10 @@ namespace BackendSite.Controllers.Api
             CustTpBetRecordDetailListbyGameTypeReq custTpBetRecordDetailListbyGameTypeReq)
         {
             var apiResult = new ApiListResult<TpBetRecordDetailbyGameType>();
-            int PageSize = custTpBetRecordDetailListbyGameTypeReq.PageSize;
-            int TotalPages = 0;
-            int RowCount = 0;
-            int PageNumber = custTpBetRecordDetailListbyGameTypeReq.PageNumber;
+            var PageSize = custTpBetRecordDetailListbyGameTypeReq.PageSize;
+            var TotalPages = 0;
+            var RowCount = 0;
+            var PageNumber = custTpBetRecordDetailListbyGameTypeReq.PageNumber;
 
             apiResult.ErrorCode = 0;
             apiResult.Data = _paymentBLL.GetCustTpBetRecordDetailListbyGameType(
@@ -541,8 +543,8 @@ namespace BackendSite.Controllers.Api
         public async Task<ApiResult> AdjustmentAndWithdrawalLimitAsync(
             AdjustmentAndWithdrawalLimitReq adjustmentAndWithdrawalLimitReq)
         {
-            ApiResult apiResult = new ApiResult();
-            AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit();
+            var apiResult = new ApiResult();
+            var adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit();
             try
             {
                 var authData = _authorizeBLL.GetAuthData();
@@ -572,7 +574,7 @@ namespace BackendSite.Controllers.Api
                             if (_mainWalletType == 2)
                             {
                                 var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
-                                TpTransfer inTpTransfer = new TpTransfer()
+                                var inTpTransfer = new TpTransfer()
                                 {
                                     TpId = 1, Amount = deAmount, CustId = custInfo.CustId,
                                     direction = TpDirection.ToMain
@@ -606,7 +608,7 @@ namespace BackendSite.Controllers.Api
                         if (_mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
                         {
                             var balance = _custInfoBLL.GetBalance(custInfo.CustId);
-                            TpTransfer inTpTransfer = new TpTransfer()
+                            var inTpTransfer = new TpTransfer()
                                 {TpId = 1, Amount = balance, CustId = custInfo.CustId, direction = TpDirection.ToTp};
 
                             var acc = await _tpBLL.TransferAsync(inTpTransfer);
@@ -646,22 +648,22 @@ namespace BackendSite.Controllers.Api
                     excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) ||
                     excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
                 {
-                    ExcelPackage excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
-                    ExcelWorksheet sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
-                    bool isLastRow = false;
-                    int RowId = 2; // 因為有標題列，所以從第2列開始讀起
+                    var excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
+                    var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
+                    var isLastRow = false;
+                    var RowId = 2; // 因為有標題列，所以從第2列開始讀起
 
                     do // 讀取資料，直到讀到空白列為止
                     {
-                        string custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text)
+                        var custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text)
                             ? null
                             : sheet.Cells[RowId, 1].Text;
 
-                        string sabaId = sheet.Cells[RowId, 2].Text.Trim();
+                        var sabaId = sheet.Cells[RowId, 2].Text.Trim();
                         var custId = (string.IsNullOrEmpty(sabaId)) ? null : _common.TpIdToCustId(sabaId);
 
-                        decimal.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out decimal amount);
-                        string memo = sheet.Cells[RowId, 4].Text.Trim();
+                        decimal.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out var amount);
+                        var memo = sheet.Cells[RowId, 4].Text.Trim();
                         if (string.IsNullOrEmpty(custUsername) && custId == null)
                         {
                             isLastRow = true;
@@ -680,9 +682,9 @@ namespace BackendSite.Controllers.Api
                             {
                                 try
                                 {
-                                    decimal withdrawalLimitAmount =
+                                    var withdrawalLimitAmount =
                                         (withdrawalLimitOption == 1) ? amount * withdrawal : 0;
-                                    AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit =
+                                    var adjustmentAndWithdrawalLimit =
                                         new AdjustmentAndWithdrawalLimit
                                         {
                                             CustId = custInfoDetail.CustId,
@@ -707,7 +709,7 @@ namespace BackendSite.Controllers.Api
                                             if (_mainWalletType == 2)
                                             {
                                                 var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
-                                                TpTransfer inTpTransfer = new TpTransfer()
+                                                var inTpTransfer = new TpTransfer()
                                                 {
                                                     TpId = 1, Amount = deAmount, CustId = custInfoDetail.CustId,
                                                     direction = TpDirection.ToMain
@@ -749,7 +751,7 @@ namespace BackendSite.Controllers.Api
                                         if (_mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
                                         {
                                             var balance = _custInfoBLL.GetBalance(custInfoDetail.CustId);
-                                            TpTransfer inTpTransfer = new TpTransfer()
+                                            var inTpTransfer = new TpTransfer()
                                             {
                                                 TpId = 1, Amount = balance, CustId = custInfoDetail.CustId,
                                                 direction = TpDirection.ToTp
@@ -849,7 +851,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResultCurrencyAmount<VipRebateInfo>();
             try
             {
-                List<string> CurrencyAmount = new List<string>();
+                var CurrencyAmount = new List<string>();
                 var SearchResult = _paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, para.StartDate,
                     para.EndDate, para.User, para.PageSize, para.PageNumber,
                     para.CategoryId, para.BaseCurrencyId, ref CurrencyAmount);
@@ -911,28 +913,13 @@ namespace BackendSite.Controllers.Api
 
         public ApiResult<IEnumerable<VipTPCategory>> GetTPCategoryListByVipRebate()
         {
-            var apiResult = new ApiResult<IEnumerable<VipTPCategory>>();
-            apiResult.ErrorCode = 0;
-            apiResult.Data = _paymentBLL.GetTPCategoryList();
+            var apiResult = new ApiResult<IEnumerable<VipTPCategory>>
+            {
+                ErrorCode = 0,
+                Data = _paymentBLL.GetTPCategoryList()
+            };
             return apiResult;
         }
-
-        [HttpPost]
-        public async Task<ApiResult> GetTpBetRecordDetailAsync(
-            GetTpBetRecordDetailRequest request)
-        {
-            var result =
-                await _paymentBLL.GetTpBetRecordDetailAsync(
-                    request.GameType,
-                    request.TransId);
-
-            return new ApiResult<object>
-            {
-                Data = result,
-                ErrorCode = (int) ErrorCodeEnum.Success
-            };
-        }
-
 
         #region Adjustment Limit
 
@@ -946,9 +933,11 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<AdjustmentLimtData> GetAdjustmentData(GetAdjustmentPara para)
         {
-            var apiResult = new ApiResult<AdjustmentLimtData>();
-            apiResult.Data = _paymentBLL.GetAdjustmentData(para.SiteId, para.CurrencyId);
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<AdjustmentLimtData>
+            {
+                Data = _paymentBLL.GetAdjustmentData(para.SiteId, para.CurrencyId),
+                ErrorCode = 0
+            };
             return apiResult;
         }
 

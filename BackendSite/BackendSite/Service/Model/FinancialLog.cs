@@ -1,8 +1,6 @@
 ﻿using BackendSite.Service.Model.enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.Model
 {
@@ -63,9 +61,21 @@ namespace BackendSite.Service.Model
     public class TpBetRecordListOneWeek
     {
         public DateTime SettledDate { get; set; }
-        public decimal TurnOver { get; set; }
+        public decimal Stake { get; set; }
         public decimal ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }
+        public int SettlementType { get; set; }
+    }
+    public class TpBetRecordByDate
+    {
+        public DateTime SettledDate { get; set; }
+        public decimal TotalTO { get; set; }
+        public decimal ValidBet { get; set; }
+        public decimal InvalidBet { get; set; }
+        public decimal TurnOver { get; set; }
+        public decimal RunningTickets { get; set; }
+        public decimal WinLoss { get; set; }
+
     }
     public class TpBetRecordListOneDay
     {
@@ -75,6 +85,19 @@ namespace BackendSite.Service.Model
         public decimal TurnOver { get; set; }
         public decimal ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }
+        public int SettlementType { get; set; }
+    }
+    public class TpBetRecordListOneDayRes
+    {
+        public DateTime SettledDate { get; set; }
+        public string CategoryName { get; set; }
+        public int CategoryId { get; set; }
+        public decimal TotalTO { get; set; }
+        public decimal ValidBet { get; set; }
+        public decimal InvalidBet { get; set; }
+        public decimal TurnOver { get; set; }
+        public decimal RunningTickets { get; set; }
+        public decimal WinLoss { get; set; }
     }
     public class TpBetRecordbyCategoryId
     {
@@ -84,6 +107,19 @@ namespace BackendSite.Service.Model
         public decimal TurnOver { get; set; }
         public decimal ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }
+        public int SettlementType { get; set; }
+    }
+    public class TpBetRecordbyCategoryIdRes
+    {
+        public DateTime SettledDate { get; set; }
+        public string GameTypeName { get; set; }
+        public int GameTypeID { get; set; }
+        public decimal TotalTO { get; set; }
+        public decimal ValidBet { get; set; }
+        public decimal InvalidBet { get; set; }
+        public decimal TurnOver { get; set; }
+        public decimal RunningTickets { get; set; }
+        public decimal WinLoss { get; set; }
     }
     public class TpBetRecordDetailbyGameType
     {
@@ -95,6 +131,10 @@ namespace BackendSite.Service.Model
         public decimal WinlostAmount { get; set; }
         public DateTime TransTime { get; set; }
         public DateTime SettledTime { get; set; }
+        public int SettlementType { get; set; }
+        public string SettlementTypeName { get; set; }
+        public decimal TurnOver_ExcludeValidTO { get; set; }
+        public decimal ValidBet_Valid { get; set; }
     }
     public class VipRebateInfo
     {
@@ -121,7 +161,7 @@ namespace BackendSite.Service.Model
     public class VipTPCategory
     {
         public int CategoryId { get; set; }
-        public String CategoryName { get; set; }
+        public string CategoryName { get; set; }
     }
 
     #region Adjustment

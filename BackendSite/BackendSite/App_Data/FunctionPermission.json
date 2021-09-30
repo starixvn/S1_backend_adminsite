@@ -182,6 +182,11 @@
         "DisplayKey": "Disable User For Game",
         "FuncKey": "CustManage/DisableUserForGame",
         "Enable": false
+      },
+      {
+        "DisplayKey": "User Bet Limit",
+        "FuncKey": "CustManage/UserBetLimit",
+        "Enable": false
       }
     ]
   },
@@ -485,6 +490,11 @@
       {
         "DisplayKey": "LeaderBoard ExtraPoint",
         "FuncKey": "Marketing/LeaderBoardExtraPoint",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "App Link Management",
+        "FuncKey": "Marketing/AppLinkManagement",
         "Enable": false
       }
     ]

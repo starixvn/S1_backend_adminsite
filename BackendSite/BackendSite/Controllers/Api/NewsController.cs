@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
@@ -110,7 +108,7 @@ namespace BackendSite.Controllers.Api
                     newsDatas.LastUpdateUser = authorizeBLL.GetAuthData().UserName;
                 }
 
-                int? newsId = newsBLL.SetNews(IsAdd, newsDatas);
+                var newsId = newsBLL.SetNews(IsAdd, newsDatas);
                 if (IsAdd)
                 {
                     result.ErrorCode = newsId != null && newsId != 0 ? 0 : -1;

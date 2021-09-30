@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using static BackendSite.Controllers.Api.TpController;
 
 namespace BackendSite.Service.BLL
@@ -35,7 +36,7 @@ namespace BackendSite.Service.BLL
         }
         public async Task<IEnumerable<TpWallet>> GetTpWalletAsync(int custId)
         {
-            string sKey = $"TpWallet_{custId}";
+            var sKey = $"TpWallet_{custId}";
             var tpWalletList = cache.Get<IEnumerable<TpWallet>>(sKey);
             if (tpWalletList == null)
             {
@@ -73,7 +74,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult<TransferResult>> TransferAsync(TpTransfer inTpTransfer)
         {
-            decimal amount = inTpTransfer.Amount;
+            var amount = inTpTransfer.Amount;
             if (amount.ToString().IndexOf(".") > -1)
             {
                 decimal.TryParse(amount.ToString("#.##"), out amount);
@@ -94,7 +95,7 @@ namespace BackendSite.Service.BLL
         }
         public async Task<ApiResult<UserBalance>> GetBalanceAsync(TpInfo inInfo)
         {
-            Dictionary<string, string> input = new Dictionary<string, string>();
+            var input = new Dictionary<string, string>();
             var myUrl = $"{apiUrl}GetBalance";
             var oTpInfo = new TpInfo
             {
@@ -103,7 +104,7 @@ namespace BackendSite.Service.BLL
                 inputs = input
             };
 
-            ApiResult<UserBalance> data = new ApiResult<UserBalance>();
+            var data = new ApiResult<UserBalance>();
 
             try
             {
@@ -115,13 +116,13 @@ namespace BackendSite.Service.BLL
                 data.Message = ex.ToString();
             }
 
-            ApiResult<UserBalance> result = data;
+            var result = data;
 
             return result;
         }
         public async Task<ApiResult<TransferResult>> FixNegativeAsync(TpInfo inInfo)
         {
-            Dictionary<string, string> input = new Dictionary<string, string>();
+            var input = new Dictionary<string, string>();
             var myUrl = $"{apiUrl}FixNegative";
             var oTpInfo = new TpInfo
             {
@@ -140,7 +141,7 @@ namespace BackendSite.Service.BLL
         }
         public async Task<ApiResult<TransferResult>> AdminAdjustmentTransferAsync(AdminTpTransfer inadminTpTransfer)
         {
-            decimal amount = inadminTpTransfer.Amount;
+            var amount = inadminTpTransfer.Amount;
             if (amount.ToString().IndexOf(".") > -1)
             {
                 decimal.TryParse(amount.ToString("#.##"), out amount);
@@ -179,6 +180,114 @@ namespace BackendSite.Service.BLL
         public void SetAdjustmentTpCustInfoLog(string Menu,int ActionType,string DetailInfo,string Operator)
         {
             thirdPartyService.SetAdjustmentTpCustInfoLog(Menu, ActionType, DetailInfo, Operator);
+        }
+
+        public async Task<ApiResult> SetBetLimitAsync(int tpId, int custId, int minBet, int maxBet)
+        {
+            var sportType = new List<string>()
+            {
+                "1", "2", "3", "5", "8", "10", "11", "43", "99", "99MP", "1MP"
+            };
+            var betSetting = sportType.Select(type => new SabaBetSetting()
+            {
+                sport_type = type,
+                min_bet = minBet,
+                max_bet = maxBet,
+                max_bet_per_match = maxBet
+            }).ToList();
+            var myUrl = $"{apiUrl}SetBetLimit";
+            var setBetLimit = new SetBetLimit()
+            {
+                TpId = tpId,
+                CustId = custId,
+                BetSetting = JsonConvert.SerializeObject(betSetting)
+            };
+
+            try
+            {
+                var apiResult = await courierAdapter.MyPostAsync<ApiResult, SetBetLimit>(myUrl, setBetLimit);
+                return apiResult;
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult()
+                {
+                    ErrorCode = 9000,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<ApiResult> SetBetLimitAsync(int tpId, int custId, List<SabaBetSettingResponse> betSettings)
+        {
+            var sportType = new List<string>()
+            {
+                "1", "2", "3", "5", "8", "10", "11", "43", "99", "99MP", "1MP"
+            };
+
+            var tempSetting = betSettings
+                .Where(a => sportType.Contains(a.sport_type))
+                .Select(b=> new SabaBetSetting()
+                {
+                    sport_type = b.sport_type,
+                    min_bet = decimal.ToInt32(b.min_bet),
+                    max_bet = decimal.ToInt32(b.max_bet),
+                    max_bet_per_match = decimal.ToInt32(b.max_bet_per_match)
+                });
+
+            var myUrl = $"{apiUrl}SetBetLimit";
+            var setBetLimit = new SetBetLimit()
+            {
+                TpId = tpId,
+                CustId = custId,
+                BetSetting = JsonConvert.SerializeObject(tempSetting)
+            };
+
+            try
+            {
+                var apiResult = await courierAdapter.MyPostAsync<ApiResult, SetBetLimit>(myUrl, setBetLimit);
+                return apiResult;
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult()
+                {
+                    ErrorCode = 9000,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<ApiResult<List<SabaBetSettingResponse>>> GetBetLimitAsync(int tpId, int custId)
+        {
+            var myUrl = $"{apiUrl}GetBetLimit";
+            var setBetLimit = new GetBetLimitReq()
+            {
+                TpId = tpId,
+                CustId = custId
+            };
+
+            try
+            {
+                var apiResult =
+                    await courierAdapter.MyPostAsync<List<SabaBetSettingResponse>, GetBetLimitReq>(myUrl, setBetLimit);
+                return apiResult;
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult<List<SabaBetSettingResponse>>()
+                {
+                    ErrorCode = 9000,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<ApiResult<dynamic>> GetBetDetail(GetTpBetRecordDetailRequest request)
+        {
+            var myUrl = $"{apiUrl}GetBetDetail";
+            var result = await courierAdapter.MyPostAsync<dynamic, GetTpBetRecordDetailRequest>(myUrl, request);
+            return result;
         }
     }
 }

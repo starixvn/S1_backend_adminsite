@@ -4,9 +4,7 @@ using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using BackendSite.Service.Model.CustVipLevel;
-using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.DAL
 {
@@ -63,7 +61,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<VipSettingModel> GetVipSetting(int vipType)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            DynamicParameters props = new DynamicParameters();
+            var props = new DynamicParameters();
             props.Add("_Status", vipType);
             return conn.Query<VipSettingModel>("Admin_VipSetting_Get", props,
                 commandType: CommandType.StoredProcedure);
@@ -78,8 +76,8 @@ namespace BackendSite.Service.DAL
             out int totalPages,
             out int rowCount)
         {
-            DynamicParameters props = new DynamicParameters();
-            using MySqlConnection conn =
+            var props = new DynamicParameters();
+            using var conn =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             props.Add("_SiteId", siteId);
             props.Add("_CalculateMonth", calculateMonth);
@@ -104,8 +102,8 @@ namespace BackendSite.Service.DAL
             int newStatus,
             string updater)
         {
-            DynamicParameters props = new DynamicParameters();
-            using MySqlConnection conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            var props = new DynamicParameters();
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
 
             props.Add("_CustIds", custIds);
             props.Add("_CalculateMonth", yearMonth);
@@ -126,7 +124,7 @@ namespace BackendSite.Service.DAL
             out int totalPages,
             out int rowCount)
         {
-            DynamicParameters props = new DynamicParameters();
+            var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
             props.Add("_CalculateYearMonth", calculateYearMonth);
             props.Add("_Status", status);
@@ -150,9 +148,9 @@ namespace BackendSite.Service.DAL
             int newStatus,
             string updater)
         {
-            using MySqlConnection conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
 
-            DynamicParameters props = new DynamicParameters();
+            var props = new DynamicParameters();
             props.Add("_CustIdList", custIdList);
             props.Add("_CalculateYearMonth", calculateYearMonth);
             props.Add("_Status", newStatus);
@@ -171,7 +169,7 @@ namespace BackendSite.Service.DAL
             MySqlConnection conn,
             MySqlTransaction trans)
         {
-            DynamicParameters props = new DynamicParameters();
+            var props = new DynamicParameters();
             props.Add("_CustIdList", custIdList);
             props.Add("_CalculateYearMonth", calculateYearMonth);
             props.Add("_Status", newStatus);
@@ -188,7 +186,7 @@ namespace BackendSite.Service.DAL
             MySqlConnection conn,
             MySqlTransaction trans)
         {
-            DynamicParameters props = new DynamicParameters();
+            var props = new DynamicParameters();
             props.Add("_CustIdList", custIdList);
             props.Add("_CalculateYearMonth", calculateYearMonth);
             props.Add("_Status", newStatus);

@@ -1,10 +1,6 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using Microsoft.AspNetCore.Identity;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
@@ -28,9 +24,9 @@ namespace BackendSite.Service.BLL
             if (walletInfo != null)
             {
                 Balance = walletInfo.Balance;
-                decimal tmpDeduction = walletInfo.WithdrawalLimit - walletInfo.TurnOver;
+                var tmpDeduction = walletInfo.WithdrawalLimit - walletInfo.TurnOver;
                 DifferenceAmount = tmpDeduction < 0 ? 0 : tmpDeduction;
-                decimal tmpAvailableBalance = walletInfo.Balance - (DifferenceAmount);
+                var tmpAvailableBalance = walletInfo.Balance - (DifferenceAmount);
                 AvailableBalance = tmpAvailableBalance < 0 ? 0 : walletInfo.Balance - (DifferenceAmount);
             }
 

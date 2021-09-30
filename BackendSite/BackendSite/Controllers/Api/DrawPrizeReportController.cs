@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
@@ -75,9 +73,11 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<EventDraw>> GetEventName()
         {
 
-            var apiResult = new ApiResult<IEnumerable<EventDraw>>();
-            apiResult.Data = prizeBLL.GetEventName();
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<IEnumerable<EventDraw>>
+            {
+                Data = prizeBLL.GetEventName(),
+                ErrorCode = 0
+            };
 
             return apiResult;
 

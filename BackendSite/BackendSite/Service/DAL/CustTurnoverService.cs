@@ -2,12 +2,8 @@
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.DAL
 {
@@ -22,7 +18,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<CustTurnover> GetCustTurnover(int CustId, string GameTypes, long StartTime, long EndTime)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<CustTurnover>("Admin_TpBetRecord_GetByCustIdV2", new { 
+            return conn.Query<CustTurnover>("Admin_TpBetRecord_GetByCustIdV3", new { 
                 CustId = CustId, 
                 GameList=GameTypes,
                 StartDate=StartTime,

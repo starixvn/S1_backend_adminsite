@@ -16,6 +16,8 @@ const dataColumnDefs = () => {
   return [
     { dataColumn: "siteName", columnTitle: "Site" },
     { dataColumn: "currency", columnTitle: "Currency" },
+    { dataColumn: "affCode", columnTitle: "Affiliates Code" },
+    { dataColumn: "agent", columnTitle: "Agent" },
     {
       dataColumn: "userName",
       columnTitle: "UserName",

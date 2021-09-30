@@ -1,14 +1,11 @@
-﻿using BackendSite.Attributes;
-using BackendSite.ExceptionHandling;
+﻿using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -171,7 +168,7 @@ namespace BackendSite.Controllers.Api
         {
             var data = _serverInfoBLL.GetSiteList();
 
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
@@ -190,7 +187,7 @@ namespace BackendSite.Controllers.Api
         {
 
             var result = _adminBLL.ChangePwd(changePwd);
-            string custMsg = string.Empty;
+            var custMsg = string.Empty;
 
             if (result != ErrorCodeEnum.Success)
             {
@@ -252,7 +249,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetDashBoardData(DashBoardPara para)
         {
-            List<int> CanSearchSite = new List<int>();
+            var CanSearchSite = new List<int>();
 
             _serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x => CanSearchSite.Add(x.SiteId));
             var result = _dashBoardBLL.GetDashBoardData(para.SiteId, para.CurrencyId, para.BaseCurrencyId, CanSearchSite);
@@ -274,7 +271,7 @@ namespace BackendSite.Controllers.Api
 
             var data = _menuBLL.GetMenuData();
 
-            if (data.Count() == 0)
+            if (data.Count == 0)
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }

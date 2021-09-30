@@ -1,7 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.BatchMessageSendLog;
+
 namespace BackendSite.Service.BLL
 {
     public class MessageBLL
@@ -29,7 +35,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, long startDate, long endDate, int status, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
-            return messageService.GetAnnouncements(selectSite, startDate, endDate, status,PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            return messageService.GetAnnouncements(selectSite, startDate, endDate, status, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
         }
 
         public Announcement GetAnnouncementById(int Id)
@@ -54,7 +60,12 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<PersonalMsg> GetPersonalMsg(int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
-            return messageService.GetPersonalMsg(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            var personMsg =  messageService.GetPersonalMsg(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            personMsg.ToList().ForEach(x =>
+            {
+                x.ContentRemoveTag = StripHTML(x.Content);
+            });
+            return personMsg;
         }
 
         public CustLang GetCustLang(int CustId)
@@ -67,7 +78,7 @@ namespace BackendSite.Service.BLL
             messageService.DeletePersonalMsg(Id, CustId);
         }
 
-        public int SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
+        public bool SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
         {
             return messageService.SendMessageBatch(personalMsg, custId, siteId, sender, batchId);
         }
@@ -93,11 +104,43 @@ namespace BackendSite.Service.BLL
         }
         public IEnumerable<BatchMsg> GetBatchMessageList(IEnumerable<int> SelectSite, long? StartDate, long? EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
-            return messageService.GetBatchMessageList(SelectSite, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            var batchMessageList = messageService.GetBatchMessageList(SelectSite, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            batchMessageList.ToList().ForEach(x =>
+            {
+                x.Content = StripHTML(x.Content);
+            });
+            return batchMessageList;
         }
         public async Task<ApiResult> SendSMSMessageToPlayer(int CustId)
         {
             return await messageService.SendSMSMessageToPlayerAsync(CustId);
+        }
+
+        public bool InsertBatchMessageSendLog(int batchId,
+            int custId,
+            string userName,
+            string sabaId,
+            string resultMessage,
+            string updator,
+            int status)
+        {
+            return messageService.InsertBatchMessageSendLog(batchId,
+                custId,
+                userName,
+                sabaId,
+                resultMessage,
+                updator,
+                status);
+        }
+
+        public IEnumerable<BatchMessageSendLogListModel> GetBatchMessageSendLog(int batchId)
+        {
+            return messageService.GetBatchMessageSendLogResult(batchId);
+        }
+
+        private string StripHTML(string input)
+        {
+            return Regex.Replace(input, "<.*?>", String.Empty);
         }
     }
 }

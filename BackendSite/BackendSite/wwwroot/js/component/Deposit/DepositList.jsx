@@ -47,6 +47,11 @@ import DateTimePicker from 'react-datetime';
         5: 5,
         6: 6
     }
+    const AmountStatus = {
+        0: "",
+        1: "Amount Greater Than",
+        2: "Amount Smaller Than"
+    }
 
     class DepositList extends React.Component {
         constructor(props) {
@@ -530,7 +535,9 @@ import DateTimePicker from 'react-datetime';
                 IsRefresh: false,
                 MutiSelRefresh: false,
                 rejectChecks: {},
-                levelStatus: []
+                levelStatus: [],
+                amountType:0,
+                amount: ""
             };
             this.searchFilter = {};
         }
@@ -552,7 +559,9 @@ import DateTimePicker from 'react-datetime';
                 clearTimeout(this._myTimer);
             }
             //Loading.OnLoading();
-            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, PageNumber: pageNumber, SelectSite: this.searchFilter.selectSite};
+            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, PageNumber: pageNumber, SelectSite: this.searchFilter.selectSite,
+                        AmountType: parseInt(this.searchFilter.amountType), Amount:this.searchFilter.amount
+                        };
 
             if (this.searchFilter.SelectDepositID != "") {
                 data.DepositId = this.searchFilter.SelectDepositID;
@@ -611,7 +620,7 @@ import DateTimePicker from 'react-datetime';
         }
 
         onExport() {
-            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, SelectSite: this.searchFilter.selectSite };
+            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, SelectSite: this.searchFilter.selectSite, AmountType: parseInt(this.searchFilter.amountType), Amount:this.searchFilter.amount };
             if (this.searchFilter.SelectDepositID != "") {
                 data.DepositId = this.searchFilter.SelectDepositID;
             }
@@ -728,6 +737,11 @@ import DateTimePicker from 'react-datetime';
 
             if (this.selectdate_end.current.state.inputValue == "") {
                 alert("Please Choose To Date")
+                return;
+            }
+
+            if(parseInt(this.state.amountType) != 0 && this.state.amount == ""){
+                alert("Please Set Amount")
                 return;
             }
             //this._Search = true;
@@ -994,6 +1008,11 @@ import DateTimePicker from 'react-datetime';
                 return <option key={`status-list-${obj}`} value={obj}>{LevelStatus[obj]}</option>;
             }.bind(this));
             levelList = <select id="levelStatus" name="levelStatus[]" multiple="multiple">{levelList}</select>;
+
+            let AmountList = Object.keys(AmountStatus).map(function (obj) {
+                return <option key={`status-list-${obj}`} value={obj}>{AmountStatus[obj]}</option>;
+            }.bind(this));
+            AmountList = <select onChange={this.onChange.bind(this)} name="amountType" value={this.state.amountType}>{AmountList}</select>
             
 
             let searchData = this.state.searchData;
@@ -1064,7 +1083,18 @@ import DateTimePicker from 'react-datetime';
                                         <input type="text" name="SelectDepositID" value={this.state.SelectDepositID} onChange={this.onChange.bind(this)} />
                                     </div>
                                 </div>
-
+                                <div className="input-item">
+                                    <span className="label">Amount Type</span>
+                                    <div className="field">
+                                        {AmountList}
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Amount</span>
+                                    <div className="field">
+                                        <input type="text" name="amount" value={this.state.amount} type="number" onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>
                                 <div className="button-group">
                                     <button className="btn btn-search" type="submit"><span>Search</span></button>
                                 </div>

@@ -4,11 +4,9 @@ using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.DAL
 {
@@ -23,9 +21,9 @@ namespace BackendSite.Service.DAL
 
         public LatestHighlightVideoDataResult GetLatestHighlightVideoData(GetLatestHighlightVideoDataPara para)
         {
-            LatestHighlightVideoDataResult result = new LatestHighlightVideoDataResult();
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            DynamicParameters props = new DynamicParameters();
+            var result = new LatestHighlightVideoDataResult();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var props = new DynamicParameters();
 
             props.Add("PageNumber", para.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -48,8 +46,8 @@ namespace BackendSite.Service.DAL
         }
         public int SetLatestHighlightVideo(SetLatestHighlightVideoPara para,string User)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            DynamicParameters props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var props = new DynamicParameters();
             props.Add("Date", para.Date);
             props.Add("VideoId", para.VideoId);
             props.Add("Title", para.Title);
@@ -59,22 +57,20 @@ namespace BackendSite.Service.DAL
         }
         public void InsertLatestHighlightVideo(int SiteId,string Date, List<GetSiteLangData> SiteLangDatas, string User)
         {
-            LatestHighlightVideoDataResult result = new LatestHighlightVideoDataResult();
-            using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                conn.Open();
-                using (var tran = conn.BeginTransaction())
-                {
-                    DynamicParameters props = new DynamicParameters();
+            var result = new LatestHighlightVideoDataResult();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var tran = conn.BeginTransaction();
+            var props = new DynamicParameters();
 
-                    foreach (var data in SiteLangDatas)
-                    {
-                        conn.Execute("Admin_LatestHighlightVideo_Int",
-                            new { SiteId = SiteId, Date = Date, Operator = User, Title = data.Title, Link = data.Link, LangId = data.LangId }, tran,commandType: CommandType.StoredProcedure);
-                    }
-                    tran.Commit();
-                }
-            };
+            foreach (var data in SiteLangDatas)
+            {
+                conn.Execute("Admin_LatestHighlightVideo_Int",
+                    new { SiteId = SiteId, Date = Date, Operator = User, Title = data.Title, Link = data.Link, LangId = data.LangId }, tran,commandType: CommandType.StoredProcedure);
+            }
+            tran.Commit();
+
+            ;
             
         }
     }

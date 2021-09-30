@@ -22,8 +22,8 @@
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
 
-    IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("CustManage/CustInfoList");
-    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
+    var subFuncKeys = permissionBLL.GetSubFunckeys("CustManage/CustInfoList");
+    subFuncKeys = subFuncKeys ?? new List<string>();
 }
 @section Scripts {
     <script src="~/lib/Oneworks/jscalendar/calendar.js"></script>

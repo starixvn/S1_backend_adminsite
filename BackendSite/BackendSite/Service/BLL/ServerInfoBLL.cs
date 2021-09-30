@@ -45,7 +45,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<ServerInfo> GetSiteList()
         {
-            string sServerInfoListKey = $"ServerInfoList";
+            var sServerInfoListKey = $"ServerInfoList";
             var SiteList = cache.Get<IEnumerable<ServerInfo>>(sServerInfoListKey);
             if (SiteList == null)
             {
@@ -64,7 +64,7 @@ namespace BackendSite.Service.BLL
             var authData = authorizeBLL.GetAuthData();
             if (authData != null)
             {
-                string sServerInfoListKey = $"ServerInfoList_UserId_{authData.UserId}";
+                var sServerInfoListKey = $"ServerInfoList_UserId_{authData.UserId}";
                 var UserSiteList = cache.Get<IEnumerable<ServerInfo>>(sServerInfoListKey);
                 if (UserSiteList == null)
                 {
@@ -95,7 +95,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<int> GetCurrencyList()
         {
-            List<int> result = new List<int>();
+            var result = new List<int>();
             var siteList = GetSiteListByLoginUser();
             if (siteList != null)
             {
@@ -144,7 +144,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<GetAdminOperateLog> GetAdminOperateLog(int? SiteId, int? CustId, string Menu, string Operator, long StartDate, long EndDate, int PageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             var permissionJson = permissionBLL.GetPermissionJSONData();
-            Dictionary<string, string> dictKeys = new Dictionary<string, string>();
+            var dictKeys = new Dictionary<string, string>();
 
             foreach (var permission in permissionJson)
             {
@@ -155,7 +155,7 @@ namespace BackendSite.Service.BLL
             var returndata = serverInfoService.GetAdminOperateLog(SiteId, CustId, Menu, Operator, StartDate, EndDate, PageSize, ref pageNumber, out totalPages, out rowCount);
 
             foreach (var data in returndata) {
-                dictKeys.TryGetValue(data.Menu, out string displayKey);
+                dictKeys.TryGetValue(data.Menu, out var displayKey);
                 data.Menu = displayKey;
             }
 

@@ -54,7 +54,7 @@ namespace BackendSite.Service.BLL
 
         public Customer GetCustInfoWithCache(int custId)
         {
-            string key = $"CustInfo_{custId}";
+            var key = $"CustInfo_{custId}";
             var customer = cache.Get<Customer>(key);
             if (customer == null)
             {
@@ -71,7 +71,7 @@ namespace BackendSite.Service.BLL
         }
         public int GetVipLevelWithCache(int custId)
         {
-            string key = $"VipLevelCache_{custId}";
+            var key = $"VipLevelCache_{custId}";
             var vipLevelCache = cache.Get<int?>(key) ?? -1;
             if (vipLevelCache != -1)
             {
@@ -89,14 +89,14 @@ namespace BackendSite.Service.BLL
         public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency, string bankAccountNumber, IEnumerable<int> selectstatus, ref int pageNumber, out int totalPages, out int rowCount)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
-            List<int> currncyList = new List<int>();
+            var currncyList = new List<int>();
             serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x =>
             {
                 currncyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
 
             var CustInfoList = custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, selectstatus, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList())).ToList();
-            if (CustInfoList.Count() > 0)
+            if (CustInfoList.Count > 0)
             {
                 CustInfoList.ForEach(x =>
                 {
@@ -110,7 +110,7 @@ namespace BackendSite.Service.BLL
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
 
-            List<int> currncyList = new List<int>();
+            var currncyList = new List<int>();
             serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x =>
             {
                 currncyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
@@ -125,10 +125,10 @@ namespace BackendSite.Service.BLL
             var custInfoDetail = custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
             if (custInfoDetail != null)
             {
-                custInfoDetail.LastDepositTime = custInfoDetail.LastDepositTimeRecord == null ? "N/A" : custInfoDetail.LastDepositTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.LastWithdrawlTime = custInfoDetail.LastWithdrawalTimeRecord == null ? "N/A" : custInfoDetail.LastWithdrawalTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.LastBettingTime = custInfoDetail.LastTpBetRecordTimeRecord == null ? "N/A" : custInfoDetail.LastTpBetRecordTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.FirstDepositTime = custInfoDetail.FirstDepositTimeRecord == null ? "N/A" : custInfoDetail.FirstDepositTimeRecord?.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.LastDepositTime = custInfoDetail.LastDepositTimeRecord == null ? "N/A" : custInfoDetail.LastDepositTimeRecord?.ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.LastWithdrawlTime = custInfoDetail.LastWithdrawalTimeRecord == null ? "N/A" : custInfoDetail.LastWithdrawalTimeRecord?.ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.LastBettingTime = custInfoDetail.LastTpBetRecordTimeRecord == null ? "N/A" : custInfoDetail.LastTpBetRecordTimeRecord?.ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.FirstDepositTime = custInfoDetail.FirstDepositTimeRecord == null ? "N/A" : custInfoDetail.FirstDepositTimeRecord?.ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
 
                 custInfoDetail.tpWallet = await tpBLL.GetTpWalletAsync(custInfoDetail.CustId);
                 custInfoDetail.promotions = promotionService.GetPromotionListByCustId(custInfoDetail.CustId);
@@ -183,7 +183,7 @@ namespace BackendSite.Service.BLL
             codeGenerator.Minimum = 6;
             codeGenerator.RepeatCharacters = true;
             NewPassword = codeGenerator.Generate();
-            string md5NewPassword = tools.MD5Encrypt(NewPassword);
+            var md5NewPassword = tools.MD5Encrypt(NewPassword);
             return custInfoService.SetResetPwd(CustId, md5NewPassword);
         }
         public bool ResetProfile(int CustId)
@@ -210,25 +210,33 @@ namespace BackendSite.Service.BLL
                 (int) BonusStatusType.Running,
                 (int) BonusStatusType.TrasferOut,
             };
-            return _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), out int CustId);
+            return _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), out var CustId);
         }
 
-        public List<CustTurnover> GetCustTurnover(int CustId, string GameTypes, long StartTime, long EndTime)
+        public List<CustTurnoverRes> GetCustTurnover(int CustId, string GameTypes, long StartTime, long EndTime)
         {
             var datas = custTurnoverService.GetCustTurnover(CustId, GameTypes, StartTime, EndTime);
 
-            var result = new List<CustTurnover>();
+            var result = new List<CustTurnoverRes>();
 
-            foreach (CustTurnover data in datas)
+            foreach (var data in datas)
             {
                 var item = result.FirstOrDefault(x => x.GameType == data.GameType);
                 if (item == null)
                 {
-                    result.Add(data);
+                    result.Add(new CustTurnoverRes {
+                        UserName = data.UserName,
+                        GameType =data.GameType,
+                        GameName = data.GameName,
+                        StakeSettled = data.SettlementType == 1 ? data.Stake : 0,
+                        StakeNotRollover = data.SettlementType == 3 ? data.Stake : 0,
+                        WinlostAmount = data.WinlostAmount
+                    });
                 }
                 else
                 {
-                    item.Stake += data.Stake;
+                    item.StakeSettled += data.SettlementType == 1 ? data.Stake : 0;
+                    item.StakeNotRollover += data.SettlementType == 3 ? data.Stake : 0;
                     item.WinlostAmount += data.WinlostAmount;
                 }
             }
@@ -325,28 +333,48 @@ namespace BackendSite.Service.BLL
 
         public bool SetCustStatus(string menu, int custId, int status, string reason, string action, string user)
         {
-            bool result = false;
-            Dictionary<string, dynamic> mainInfo = new Dictionary<string, dynamic>();
-            Dictionary<string, dynamic> noteInfo = new Dictionary<string, dynamic>();
+            var result = false;
+            var mainInfo = new Dictionary<string, dynamic>();
+            var noteInfo = new Dictionary<string, dynamic>();
             mainInfo.Add("MenuName", "Customer Info");
             mainInfo.Add("Action", action);
             noteInfo.Add("MenuName", "Customer Info");
             noteInfo.Add("Action", "Add Note");
 
-            using (TransactionScope scope = new TransactionScope())
+            using var scope = new TransactionScope();
+
+            #region Update Status
+
+            result = custInfoService.SetCustStatus(custId, status);
+
+            if (!result)
             {
-                #region Update Status
+                scope.Dispose();
 
-                result = custInfoService.SetCustStatus(custId, status);
+                return false;
+            };
 
-                if (!result)
+            if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Update, mainInfo, user) <= 0)
+            {
+                scope.Dispose();
+
+                return false;
+            }
+
+            #endregion
+
+            if (result)
+            {
+                #region Insert Reason For Update Status
+
+                if (!custInfoService.AddCustNote(custId, action + " Reason : " + reason, user))
                 {
                     scope.Dispose();
 
                     return false;
-                };
+                }
 
-                if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Update, mainInfo, user) <= 0)
+                if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Create, noteInfo, user) <= 0)
                 {
                     scope.Dispose();
 
@@ -354,30 +382,9 @@ namespace BackendSite.Service.BLL
                 }
 
                 #endregion
-
-                if (result)
-                {
-                    #region Insert Reason For Update Status
-
-                    if (!custInfoService.AddCustNote(custId, action + " Reason : " + reason, user))
-                    {
-                        scope.Dispose();
-
-                        return false;
-                    }
-
-                    if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Create, noteInfo, user) <= 0)
-                    {
-                        scope.Dispose();
-
-                        return false;
-                    }
-
-                    #endregion
-                }
-
-                scope.Complete();
             }
+
+            scope.Complete();
 
             return result;
 
@@ -390,28 +397,48 @@ namespace BackendSite.Service.BLL
         /// <returns></returns>
         public int DeleteOnUserData(string menu, int custId, string reason, string user)
         {
-            int result = 0;
-            Dictionary<string, dynamic> mainInfo = new Dictionary<string, dynamic>();
-            Dictionary<string, dynamic> noteInfo = new Dictionary<string, dynamic>();
+            var result = 0;
+            var mainInfo = new Dictionary<string, dynamic>();
+            var noteInfo = new Dictionary<string, dynamic>();
             mainInfo.Add("MenuName", "Customer Info");
             mainInfo.Add("Action", "Kick Out");
             noteInfo.Add("MenuName", "Customer Info");
             noteInfo.Add("Action", "Add Note");
 
-            using (TransactionScope scope = new TransactionScope())
+            using var scope = new TransactionScope();
+
+            #region Kick Out User
+
+            result = custInfoService.DeleteOnUserData(custId);
+
+            if (result <= 0)
             {
-                #region Kick Out User
+                scope.Dispose();
 
-                result = custInfoService.DeleteOnUserData(custId);
+                return 0;
+            };
 
-                if (result <= 0)
+            if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Delete, mainInfo, user) <= 0)
+            {
+                scope.Dispose();
+
+                return 0;
+            }
+
+            #endregion
+
+            if (result > 0)
+            {
+                #region Insert Reason For Kick Out
+
+                if (!custInfoService.AddCustNote(custId, "Kick Out Reason : " + reason, user))
                 {
                     scope.Dispose();
 
                     return 0;
-                };
+                }
 
-                if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Delete, mainInfo, user) <= 0)
+                if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Create, noteInfo, user) <= 0)
                 {
                     scope.Dispose();
 
@@ -419,30 +446,9 @@ namespace BackendSite.Service.BLL
                 }
 
                 #endregion
-
-                if (result > 0)
-                {
-                    #region Insert Reason For Kick Out
-
-                    if (!custInfoService.AddCustNote(custId, "Kick Out Reason : " + reason, user))
-                    {
-                        scope.Dispose();
-
-                        return 0;
-                    }
-
-                    if (serverInfoBLL.AdminOperateLog(null, custId, menu, ActionType.Create, noteInfo, user) <= 0)
-                    {
-                        scope.Dispose();
-
-                        return 0;
-                    }
-
-                    #endregion
-                }
-
-                scope.Complete();
             }
+
+            scope.Complete();
 
             return result;
         }
@@ -489,25 +495,23 @@ namespace BackendSite.Service.BLL
 
         public int SetEnableDisablePromotion(int custId, int enablePromotion, string Operator)
         {
-            int result = 1;
+            var result = 1;
 
-            using (TransactionScope scope = new TransactionScope())
+            using var scope = new TransactionScope();
+            if (!custInfoService.SetEnableDisablePromotion(custId, enablePromotion))
             {
-                if (!custInfoService.SetEnableDisablePromotion(custId, enablePromotion))
-                {
-                    scope.Dispose();
+                scope.Dispose();
 
-                    return 0;
-                }
-                if (!custInfoService.AddCustNote(custId, enablePromotion == 0 ? "Disable Promotion" : "Enable Promotion", Operator))
-                {
-                    scope.Dispose();
-
-                    return 0;
-                }
-
-                scope.Complete();
+                return 0;
             }
+            if (!custInfoService.AddCustNote(custId, enablePromotion == 0 ? "Disable Promotion" : "Enable Promotion", Operator))
+            {
+                scope.Dispose();
+
+                return 0;
+            }
+
+            scope.Complete();
             return result;
         }
 
@@ -516,9 +520,9 @@ namespace BackendSite.Service.BLL
             return custInfoService.GetAllSiteVipLevelList();
         }
 
-        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency,int depositStatus,int status,string username,int pagenumber,int pagesize,int sort, long StartDate, long EndDate)
+        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency,int depositStatus,int status,string username,int pagenumber,int pagesize,int sort, long StartDate, long EndDate,string AffiliatesCode,int AgentCodeType)
         {
-            return custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pagenumber, pagesize, sort, StartDate, EndDate);
+            return custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pagenumber, pagesize, sort, StartDate, EndDate, AffiliatesCode, AgentCodeType);
         }
 
         public int SetRegLiveStatus(int custid,int status,int siteid,string Operator)
@@ -546,10 +550,10 @@ namespace BackendSite.Service.BLL
             return custInfoService.EditRegLiveStatusNote(custid, id, note, Operator);
         }
 
-        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate)
+        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate, string AffiliatesCode, int AgentCodeType)
         {
-            List<RegLiveStatusExport> list = new List<RegLiveStatusExport>();
-            var result =  custInfoService.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate);
+            var list = new List<RegLiveStatusExport>();
+            var result =  custInfoService.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate, AffiliatesCode, AgentCodeType);
             result.ToList().ForEach(x =>
             {
                 list.Add(new RegLiveStatusExport()
@@ -563,6 +567,8 @@ namespace BackendSite.Service.BLL
                     RegTime = x.RegTime.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture),
                     DepositStatus = Enum.GetName(typeof(DepositStatusType), x.ActStatus),
                     Status = Enum.GetName(typeof(RegLiveStatusType), x.Status),
+                    AffCode = x.AffCode,
+                    Agent = x.Agent
                 });
             });
             return list;
@@ -571,6 +577,16 @@ namespace BackendSite.Service.BLL
         public async Task<CustomerForRisk> GetCustId(string userName, int siteId)
         {
             return await custInfoService.GetCustId(userName, siteId);
+        }
+
+        public CustomerSwitchStatus GetCustSwitchStatus(int custId)
+        {
+           return custInfoService.GetCustSwitchStatus(custId);
+        }
+
+        public CustProfileReq GetCustProfile(int custId)
+        {
+            return custInfoService.GetCustProfile(custId);
         }
     }
 }

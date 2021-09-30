@@ -1,28 +1,24 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Reflection;
-using System.Resources;
 using System.Text.Json;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace BackendSite.ExceptionHandling
 {
     public class ExceptionFilter : IExceptionFilter
     {
         private readonly SelLangBLL _selLangBLL;
+        private readonly ILogger<ExceptionFilter> _logger;
 
-        public ExceptionFilter()
+        public ExceptionFilter(IServiceProvider serviceProvider)
         {
-            _selLangBLL = new SelLangBLL();
+            _logger = serviceProvider.GetRequiredService<ILogger<ExceptionFilter>>();
+            _selLangBLL = serviceProvider.GetRequiredService<SelLangBLL>();
         }
 
         public void OnException(ExceptionContext context)
@@ -38,15 +34,15 @@ namespace BackendSite.ExceptionHandling
                 rawMessage = exception.Message,
                 stackTrace = exception.StackTrace
             });
-
+            
             if (context.Exception.GetType() == typeof(AdminException))
             {
                 code = HttpStatusCode.OK;
 
-                AdminException adminException = context.Exception as AdminException;
-                string message = adminException.Message;
+                var adminException = context.Exception as AdminException;
+                var message = adminException.Message;
 
-                if (String.IsNullOrEmpty(message))
+                if (string.IsNullOrEmpty(message))
                 {
                     message = _selLangBLL.GetMsg(adminException.ErrorCode.GetDescription());
                 }
@@ -56,6 +52,11 @@ namespace BackendSite.ExceptionHandling
                     errorCode = adminException.ErrorCode,
                     message = message
                 });
+                _logger.LogError(message);
+            }
+            else
+            {
+                _logger.LogError(context.Exception, $"Ex massage: {exception.Message}, StackTrace: {context.Exception.StackTrace}");
             }
 
             var httpContext = context.HttpContext;

@@ -2,6 +2,9 @@ import React from "react";
 import ReactJsonView from "react-json-view";
 import ReactJsonViewer, { propTypes } from "react-json-viewer";
 
+//已經完成串接的TpId
+const TpIdFinishList = [1, 14];
+
 const DateDetailModal = ({
   show,
   showRawDetail,
@@ -12,11 +15,25 @@ const DateDetailModal = ({
   let bodyRows = [];
   let mainDetail = null;
   let rawDetail = null;
+
   if (show) {
-    rawDetail = JSON.parse(tpBetRecordDatas.data.detail);
-    mainDetail = Object.assign({}, tpBetRecordDatas.data);
-    console.log(mainDetail);
-    delete mainDetail.detail;
+    let dataKeys = Object.keys(tpBetRecordDatas.data);
+    if (dataKeys.find((element) => element == "detail")) {
+      rawDetail = JSON.parse(tpBetRecordDatas.data.detail);
+      mainDetail = Object.assign({}, tpBetRecordDatas.data);
+      //console.log(mainDetail);
+      delete mainDetail.detail;
+    } else {
+      let strMessage = null;
+      if (TpIdFinishList.find((tpId) => tpId == tpBetRecordDatas.data.tpId)) {
+        strMessage = tpBetRecordDatas.data.gameTypeName + " Data not find.";
+      } else {
+        strMessage =
+          tpBetRecordDatas.data.gameTypeName + " Data not connected yet.";
+      }
+      rawDetail = { message: strMessage };
+      mainDetail = { message: strMessage };
+    }
   }
 
   const showHideStyle = show

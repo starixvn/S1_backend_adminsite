@@ -51,17 +51,19 @@ namespace BackendSite.Controllers.Api
             public long endDate { get; set; }
             public IEnumerable<int> status { get; set; }
             public IEnumerable<int> LevelStatus { get; set; }
+            public int AmountType { get; set; }
+            public string Amount { get; set; }
         }
 
         [HttpPost]
         public ApiListResultCurrencyAmount<DepositRequest> GetDepositRequestList(DepositListReq depositListReq)
         {
             var apiListResult = new ApiListResultCurrencyAmount<DepositRequest>();
-            int pageNumber = depositListReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
-            List<string> CurrencyAmount = new List<string>();
-            var depositRequestList = depositBLL.GetDepositRequestList(depositListReq.SelectSite, depositListReq.DepositType, depositListReq.startDate, depositListReq.endDate, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, depositListReq.LevelStatus, 10, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
+            var pageNumber = depositListReq.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
+            var CurrencyAmount = new List<string>();
+            var depositRequestList = depositBLL.GetDepositRequestList(depositListReq.SelectSite, depositListReq.DepositType, depositListReq.startDate, depositListReq.endDate, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, depositListReq.LevelStatus, 10, depositListReq.AmountType, depositListReq.Amount, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
             apiListResult.Data = depositRequestList;
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;
@@ -94,9 +96,9 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetDepositListByCust(DepositListReq1 depositListReq)
         {
-            int pageNumber = depositListReq.PageNumber;
-            int totalPages = 0;
-            int rowCount = 0;
+            var pageNumber = depositListReq.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
             decimal totalAmount = 0;
             var data = depositBLL.GetDepositListByCust(depositListReq.CustId,
                                                        depositListReq.TransId,
@@ -175,11 +177,13 @@ namespace BackendSite.Controllers.Api
 
                 if (depositConfirmReuslt > 0)
                 {
-                    ApiResult<TransferResult> tmp = new ApiResult<TransferResult>();
+                    var tmp = new ApiResult<TransferResult>();
                     if (mainWalletType == 2)
                     {
-                        PendingFund pendingFund = new PendingFund();
-                        pendingFund.CustId = depositConfirmReuslt;
+                        var pendingFund = new PendingFund
+                        {
+                            CustId = depositConfirmReuslt
+                        };
                         tmp = await Process(pendingFund);
                     }
                     else
@@ -196,10 +200,10 @@ namespace BackendSite.Controllers.Api
                         var depositRequest = depositBLL.GetDepositRequest(depositReq.TransId);
                         var userLang = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId).UserLang;
                         // Send message to player
-                        string sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
-                        string title = selLangBLL.GetResourceValue("lbl_DepositApprovedTitle", userLang);
+                        var sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
+                        var title = selLangBLL.GetResourceValue("lbl_DepositApprovedTitle", userLang);
                         title = string.Format(title, depositReq.TransId);
-                        string content = selLangBLL.GetResourceValue("lbl_DepositApprovedContent", userLang);
+                        var content = selLangBLL.GetResourceValue("lbl_DepositApprovedContent", userLang);
                         content = string.Format(content, depositReq.TransId);
                         messageBLL.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
                     }
@@ -215,10 +219,10 @@ namespace BackendSite.Controllers.Api
                     var custInfo = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId);
                     var userLang = custInfo.UserLang;
                     // Send message to player
-                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
-                    string title = selLangBLL.GetResourceValue("lbl_DepositRejectTitle", userLang);
+                    var sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
+                    var title = selLangBLL.GetResourceValue("lbl_DepositRejectTitle", userLang);
                     title = string.Format(title, depositReq.TransId);
-                    string content = selLangBLL.GetResourceValue("lbl_DepositRejectContent", userLang);
+                    var content = selLangBLL.GetResourceValue("lbl_DepositRejectContent", userLang);
                     content = string.Format(content, depositReq.TransId);
                     messageBLL.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
                     if (custInfo.SiteId == 1)
@@ -380,7 +384,7 @@ namespace BackendSite.Controllers.Api
             var depositConfirmReuslt = -1;
             var Comment = $"{ User.Identity.Name} Rejected Deposit Multiple";
 
-            foreach (string _transId in batchRejectedDepositList.TransId)
+            foreach (var _transId in batchRejectedDepositList.TransId)
             {
                 var aaa = _transId;
                 depositConfirmReuslt = depositBLL.DepositRejectd(_transId, 0, Comment, User.Identity.Name);
@@ -390,10 +394,10 @@ namespace BackendSite.Controllers.Api
                     var depositRequest = depositBLL.GetDepositRequest(_transId);
                     var userLang = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId).UserLang;
                     // Send message to player
-                    string sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
-                    string title = selLangBLL.GetResourceValue("lbl_DepositRejectTitle", userLang);
+                    var sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
+                    var title = selLangBLL.GetResourceValue("lbl_DepositRejectTitle", userLang);
                     title = string.Format(title, _transId);
-                    string content = selLangBLL.GetResourceValue("lbl_DepositRejectContent", userLang);
+                    var content = selLangBLL.GetResourceValue("lbl_DepositRejectContent", userLang);
                     content = string.Format(content, _transId);
                     messageBLL.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
                 }

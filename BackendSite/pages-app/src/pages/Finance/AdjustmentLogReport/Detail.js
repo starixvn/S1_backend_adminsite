@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useReducer, useState } from "react";
 import moment from "moment";
+import ReactJsonView from "react-json-view";
+import { JsonToTable } from "react-json-to-table";
 
 const Panel = (props) => {
+  const josnobject = JSON.parse(props.DetailData.DetailInfo);
   return (
     <div className="filter">
       <div className="row-flex">
@@ -51,15 +54,15 @@ const Panel = (props) => {
           Disabled={true}
         />
       </div>
-      <div>
-        <TextInputBox
-          Title="DetailInfo"
-          ClassName="form-group"
-          inputClass="form-control"
-          dataColumn="DetailInfo"
-          value={props.DetailData.DetailInfo}
-        />
+      <div className="row-flex">
+        <div className="input-item">
+          <span className="label">DetailInfo</span>
+          <JsonToTable
+            json={josnobject}
+          />
+        </div>
       </div>
+
       <button
         className="btn btn-search"
         type="submit"
@@ -97,27 +100,27 @@ const InputField = (props) => {
   );
 };
 const InputField2 = (props) => {
-    const EditField = (e) => {
-      if (props.onChange) {
-        props.onChange(e.target.value, props.dataColumn);
-      } else if (props.onBlur) {
-        props.onBlur(e.target.value, props.dataColumn);
-      }
-    };
-    return (
-      <div className="input-item">
-        <span className="label">{props.columnTitle}</span>
-        <input
-          className="form-control"
-          value={props.Value}
-          onChange={EditField}
-          onBlur={EditField}
-          disabled={props.Disabled}
-          style={{ width: `${props.Size}px` }}
-        />
-      </div>
-    );
+  const EditField = (e) => {
+    if (props.onChange) {
+      props.onChange(e.target.value, props.dataColumn);
+    } else if (props.onBlur) {
+      props.onBlur(e.target.value, props.dataColumn);
+    }
   };
+  return (
+    <div className="input-item">
+      <span className="label">{props.columnTitle}</span>
+      <input
+        className="form-control"
+        value={props.Value}
+        onChange={EditField}
+        onBlur={EditField}
+        disabled={props.Disabled}
+        style={{ width: `${props.Size}px` }}
+      />
+    </div>
+  );
+};
 const TextInputBox = (props) => {
   const OnChange = (e) => {
     let value = e.target.value;

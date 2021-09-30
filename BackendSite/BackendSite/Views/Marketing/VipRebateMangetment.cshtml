@@ -1,7 +1,6 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using Microsoft.AspNetCore.Hosting
 @using BackendSite.Service.BLL
-@using BackendSite.Service.Model.enums
 @inject IWebHostEnvironment environment
 @inject SelLangBLL selLangBLL
 @inject ServerInfoBLL serverInfoBLL
@@ -19,7 +18,7 @@
 }
 @{
     var i18n = new Dictionary<string, string>();
-    string[] lbl_Txts = new string[] { "lbl_Save", "lbl_Success", "lbl_Action", "lbl_SelectSite", "lbl_Point", "lbl_DepositLeast", "lbl_BetLeast", "lbl_AddPointLevel", "lbl_AddNewPointLevel", "lbl_Delete", "lbl_AreYouSure", "lbl_OK", "lbl_Cancel", "lbl_Error" };
+    var lbl_Txts = new string[] { "lbl_Save", "lbl_Success", "lbl_Action", "lbl_SelectSite", "lbl_Point", "lbl_DepositLeast", "lbl_BetLeast", "lbl_AddPointLevel", "lbl_AddNewPointLevel", "lbl_Delete", "lbl_AreYouSure", "lbl_OK", "lbl_Cancel", "lbl_Error" };
     foreach (var lbl_Txt in lbl_Txts)
     {
         if (!i18n.ContainsKey(lbl_Txt))
@@ -33,8 +32,8 @@
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
 
-    IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("Marketing/VipRebateMangetment");
-    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
+    var subFuncKeys = permissionBLL.GetSubFunckeys("Marketing/VipRebateMangetment");
+    subFuncKeys = subFuncKeys ?? new List<string>();
 }
 
 <div id="content"></div>

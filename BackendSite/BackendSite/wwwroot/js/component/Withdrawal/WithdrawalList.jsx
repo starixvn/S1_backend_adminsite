@@ -53,6 +53,11 @@ import DateTimePicker from 'react-datetime';
         5: 5,
         6: 6
     }
+    const AmountStatus = {
+        0: "",
+        1: "Amount Greater Than",
+        2: "Amount Smaller Than"
+    }
 
     class WithdrawalList extends React.Component {
         constructor(props) {
@@ -73,8 +78,7 @@ import DateTimePicker from 'react-datetime';
         }
         
         render() {
-   //         console.log('render',this.props.searchData.data);
-            let rows = this.props.searchData.data.map(row => {
+             let rows = this.props.searchData.data.map(row => {
                 let styleblod = (row.flag === 0) ? { fontWeight: 'bold' } : {};
                 //銅=>銀=>金=>白金=>水鑽藍=>紅寶石
                 let vipbg = (row.vipLevel === 1 ) ? "c6842c": (row.vipLevel === 2 ) ? "c0c0c0" : (row.vipLevel === 3 ) ? "ffd700" : (row.vipLevel === 4 ) ? "66CDAA" :　(row.vipLevel === 5) ? "4169E1" : (row.vipLevel === 6) ? "B22222" : null;
@@ -228,10 +232,11 @@ import DateTimePicker from 'react-datetime';
                         if (result.data.status == 3) {
                             await this.onGetPayList(result.data.currencyId, result.data.sysId);
                             await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId, result.data.siteId);
-                            await this.onGetCryptoPayList(result.data.currencyId, result.data.sysId);
+                            await this.onGetCryptoPayList(result.data.currencyId, result.data.sysId, result.data.network);
                         }
                         
                         let SelId = null;
+                        let ChannelId = 0;
                         if (result.data.withdrawalType == 1) {
                             SelId = result.data.payId;
                         } else if (result.data.withdrawalType == 2) {
@@ -239,8 +244,7 @@ import DateTimePicker from 'react-datetime';
                         } else if (result.data.withdrawalType == 4) {
                             SelId = result.data.payId;
                         }
-
-                        this.setState({ Data: result.data, selectType: result.data.withdrawalType, GetData: true, SelId: SelId, Comment: result.data.comment });
+                        this.setState({ Data: result.data, selectType: result.data.withdrawalType, GetData: true, SelId: SelId, ChannelId: ChannelId, Comment: result.data.comment });
                     } else {
                         alert(result.message);
                     }
@@ -308,13 +312,18 @@ import DateTimePicker from 'react-datetime';
             if ((action != 0 && confirm(confirmstring)) || action == 0) {
                 Loading.OnLoading();
                 let data = { transId: this.props.transId, Comment: this.state.Comment, Action: action };
-
                 if (action == 4) {
                     data.WithdrawalInfo = this.state.Data.withdrawalInfo;
                     data.SelId = parseInt(this.state.SelId);
                     data.WithdrawalType = this.state.selectType;
+                    if (this.state.selectType == 4)
+                    {
+                        data.ChannelId = this.state.ChannelId;
+                        if((data.ChannelId == 0 || data.ChannelId == null) && this.state.CryptoPayList != null &&　data.SelId != 0)
+                            data.ChannelId = this.state.CryptoPayList.find(x=>x.payId == data.SelId).channelId;
+                    }
+
                 }
-                 
                 axios.post('/api/Withdrawal/WithdrawalConfirm', data)
                     .then(function (response) {
                         Loading.UnLoading();
@@ -339,16 +348,17 @@ import DateTimePicker from 'react-datetime';
 
         onSelectType(event) {
             let SelId = null;
-
+            let ChannelId = 0;
             if (parseInt(event.target.value) == 1 && this.state.PayList.length > 0) {
                 SelId = this.state.PayList[0].payId;
             } else if (parseInt(event.target.value) == 2 && this.state.BankInfoOffList.length > 0) {
                 SelId = this.state.BankInfoOffList[0].bankId;
             } else if (parseInt(event.target.value) == 4 && this.state.CryptoPayList.length > 0) {
+            //   console.log(this.state.CryptoPayList);
                 SelId = this.state.CryptoPayList[0].payId;
+                ChannelId = this.state.CryptoPayList[0].channelId;
             }
-
-            this.setState({ selectType: parseInt(event.target.value), SelId: SelId });
+            this.setState({ selectType: parseInt(event.target.value), SelId: SelId, ChannelId: ChannelId });
         }
 
         async onGetBankInfoOffList(currencyId, sysId, siteId) {
@@ -386,9 +396,9 @@ import DateTimePicker from 'react-datetime';
                 }.bind(this));
         }
 
-        async onGetCryptoPayList(currencyId, sysId) {
+        async onGetCryptoPayList(currencyId, sysId, channelName ) {
             let data = this.state.Data;
-            await axios.post('/api/Withdrawal/GetCryptoPayList', { CurrencyId: currencyId, SysId: sysId })
+            await axios.post('/api/Withdrawal/GetCryptoPayList', { CurrencyId: currencyId, SysId: sysId, ChannelName: channelName})
                 .then(function (response) {
                     //Loading.UnLoading();
                     let result = response.data;
@@ -404,7 +414,14 @@ import DateTimePicker from 'react-datetime';
         }
 
         onSelId(event) {
-            this.setState({ SelId: event.target.value });
+            
+            let ChannelId = 0;
+            if(this.state.selectType == 4)
+            {
+                ChannelId = this.state.CryptoPayList.find(x=>x.payId == event.target.value).channelId;
+            }
+            //console.log('event',event,'ChannelId',ChannelId);
+            this.setState({ SelId: event.target.value, ChannelId: ChannelId });
         }
 
         handlePaste = (event) => {
@@ -453,6 +470,7 @@ import DateTimePicker from 'react-datetime';
         }
 
          render() {
+            // console.log("CryptoPayList",this.state.CryptoPayList);
             let data = this.state.Data;
             let btnGroup = [];
             let selectType = null
@@ -629,6 +647,12 @@ import DateTimePicker from 'react-datetime';
                                 <td>{data.accountType}</td>
                             </tr>
                             : null}
+                            {data.accountType != null ?
+                            <tr>
+                                <th scope="row">Network</th>
+                                <td>{data.network}</td>
+                            </tr>
+                            : null}
                             <tr>
                                 <th scope="row">Account No</th>
                                 <td>
@@ -708,7 +732,8 @@ import DateTimePicker from 'react-datetime';
             this.selectdate_start = React.createRef();
             this.selectdate_end = React.createRef();
             this.ExportForm = React.createRef();
-            this.state = { SiteList: [], selectSite: [], selectType: [], selectCurrency: [], selectStatus: [], SelectUser: "", SelectWithdrawalID: "", ShowDetial: false, timeInterval: this._timeInterval, IsRefresh: false, MutiSelRefresh: false ,levelStatus: []};
+            this.state = { SiteList: [], selectSite: [], selectType: [], selectCurrency: [], selectStatus: [], SelectUser: "", SelectWithdrawalID: "", ShowDetial: false, timeInterval: this._timeInterval, IsRefresh: false, MutiSelRefresh: false ,levelStatus: [],amountType:0,
+            amount: ""};
             this.searchFilter = {};
         }
 
@@ -729,7 +754,8 @@ import DateTimePicker from 'react-datetime';
                 clearTimeout(this._myTimer);
             }
             //Loading.OnLoading();
-            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, PageNumber: pageNumber, SelectSite: this.searchFilter.selectSite };
+            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, PageNumber: pageNumber, SelectSite: this.searchFilter.selectSite, 
+                        AmountType: parseInt(this.searchFilter.amountType), Amount:this.searchFilter.amount};
 
             if (this.searchFilter.SelectWithdrawalID != "") {
                 data.WithdrawalId = this.searchFilter.SelectWithdrawalID;
@@ -776,7 +802,7 @@ import DateTimePicker from 'react-datetime';
         }
 
         onExport() {
-            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, SelectSite: this.searchFilter.selectSite };
+            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, SelectSite: this.searchFilter.selectSite, AmountType: parseInt(this.searchFilter.amountType), Amount:this.searchFilter.amount };
             if (this.searchFilter.SelectWithdrawalID != "") {
                 data.WithdrawalId = this.searchFilter.SelectWithdrawalID;
             }
@@ -842,6 +868,11 @@ import DateTimePicker from 'react-datetime';
 
             if (this.selectdate_end.current.state.inputValue == "") {
                 alert("Please Choose To Date")
+                return;
+            }
+
+            if(parseInt(this.state.amountType) != 0 && this.state.amount == ""){
+                alert("Please Set Amount")
                 return;
             }
 
@@ -1112,6 +1143,11 @@ import DateTimePicker from 'react-datetime';
             }.bind(this));
             levelList = <select id="levelStatus" name="levelStatus[]" multiple="multiple">{levelList}</select>;
 
+            let AmountList = Object.keys(AmountStatus).map(function (obj) {
+                return <option key={`status-list-${obj}`} value={obj}>{AmountStatus[obj]}</option>;
+            }.bind(this));
+            AmountList = <select onChange={this.onChange.bind(this)} name="amountType" value={this.state.amountType}>{AmountList}</select>
+
             let searchData = this.state.searchData;
             let StartDate = this.state.StartDate;
             let EndDate = this.state.EndDate;
@@ -1175,6 +1211,18 @@ import DateTimePicker from 'react-datetime';
                                     <span className="label">Withdrawal ID</span>
                                     <div className="field">
                                         <input type="text" name="SelectWithdrawalID" value={this.state.SelectWithdrawalID} onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Amount Type</span>
+                                    <div className="field">
+                                        {AmountList}
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Amount</span>
+                                    <div className="field">
+                                        <input type="text" name="amount" value={this.state.amount} type="number" onChange={this.onChange.bind(this)} />
                                     </div>
                                 </div>
                                 <div className="button-group">

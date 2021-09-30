@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.Model
 {
@@ -75,5 +73,16 @@ namespace BackendSite.Service.Model
         public decimal balance { get; set; }
         public decimal outstanding { get; set; }
         public byte Currency { get; set; }
+    }
+    public class SetBetLimit
+    {
+        public int TpId { set; get; }
+        public int CustId { set; get; }
+        public string BetSetting { get; set; }
+    }
+    public class GetBetLimitReq
+    {
+        public int TpId { set; get; }
+        public int CustId { set; get; }
     }
 }

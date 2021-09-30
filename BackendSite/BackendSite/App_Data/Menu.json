@@ -190,6 +190,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "User Bet Limit",
+        "FuncKey": "CustManage/UserBetLimit",
+        "Controller": "CustManage",
+        "Action": "UserBetLimit",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
@@ -621,6 +631,16 @@
         "FuncKey": "Marketing/LeaderBoardExtraPoint",
         "Controller": "Marketing",
         "Action": "LeaderBoardExtraPoint",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "AppLinkManagement",
+        "Title": "App Link Management",
+        "FuncKey": "Marketing/AppLinkManagement",
+        "Controller": "Marketing",
+        "Action": "AppLinkManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null

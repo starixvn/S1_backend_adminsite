@@ -2,11 +2,9 @@
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.DAL
 {
@@ -21,8 +19,8 @@ namespace BackendSite.Service.DAL
 
         public int SetGameCasinoDetail(SetGameCasionPara para)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            DynamicParameters props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var props = new DynamicParameters();
             props.Add("SiteId", para.SiteId);
             props.Add("CurrencyId", para.CurrencyId);
             props.Add("GameCasinoId", para.GameCasinoId);
@@ -32,8 +30,8 @@ namespace BackendSite.Service.DAL
 
         public int InsertGameCasinoDetail (InsertGameCasionPara para) 
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            DynamicParameters props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var props = new DynamicParameters();
             props.Add("SiteId", para.SiteId);
             props.Add("CurrencyId", para.CurrencyId);
             props.Add("GameCasinoId", para.GameCasinoId);
@@ -42,8 +40,8 @@ namespace BackendSite.Service.DAL
 
         public int DeleteGameCasinoDetail(DeleteGameCasionPara para)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            DynamicParameters props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var props = new DynamicParameters();
             props.Add("SiteId", para.SiteId);
             props.Add("CurrencyId", para.CurrencyId);
             props.Add("GameCasinoId", para.GameCasinoId);
@@ -52,17 +50,15 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<SiteTpListIfo> GetTpList()
         {
-            using (var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
-            {
-                return conn.Query<SiteTpListIfo>("Admin_TpList_Get", new {}, commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<SiteTpListIfo>("Admin_TpList_Get", new {}, commandType: CommandType.StoredProcedure);
         }
 
         public GameCasinoResult GameCasinoByTPIdV2(GameCasinoPara gameCasinoPara)
         {
-            GameCasinoResult LogResult = new GameCasinoResult();
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            DynamicParameters props = new DynamicParameters();
+            var LogResult = new GameCasinoResult();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var props = new DynamicParameters();
             props.Add("PageNumber", gameCasinoPara.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -72,7 +68,7 @@ namespace BackendSite.Service.DAL
             props.Add("CategoryId", gameCasinoPara.Categories);
             props.Add("SiteId", gameCasinoPara.Site);
             props.Add("CurrencyId", gameCasinoPara.Currency);
-            props.Add("Names", string.IsNullOrEmpty(gameCasinoPara.Name == null ? null : gameCasinoPara.Name.Replace(" ", "")) ? null : $"%{gameCasinoPara.Name.Trim()}%");
+            props.Add("Names", string.IsNullOrEmpty(gameCasinoPara.Name?.Replace(" ", "")) ? null : $"%{gameCasinoPara.Name.Trim()}%");
 
             var result = conn.Query<GameCasinoData>("Admin_GameCasinoV3_Get", props, commandType: CommandType.StoredProcedure);
             LogResult.GameCasinoData = result.ToList();
@@ -85,8 +81,8 @@ namespace BackendSite.Service.DAL
 
         public int SetGameCasino(SetGameCasionV2Para para)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            DynamicParameters props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var props = new DynamicParameters();
             props.Add("GameCasinoId", para.GameCasinoId);
             props.Add("Type", para.Type == "hot"? 0: para.Type == "featured"? 1: para.Type == "status"? 2: 3);
             return conn.Execute("Admin_GameCasino_Set", props, commandType: CommandType.StoredProcedure);
@@ -94,15 +90,15 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<CurrencyDataV2> GetCurrency(GetGameCasinoDetailPara para)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            DynamicParameters props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var props = new DynamicParameters();
             props.Add("GameCasinoId", para.GameCasinoId);
             return conn.Query<CurrencyDataV2>("Admin_Currency_GetByCasinoId", props, commandType: CommandType.StoredProcedure);
         }
         public List<GameCasinoDetail> GetGameCasinoDetailBySiteAndCasinoIdV2(GetGameCasinoDetailPara para,int SiteId)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            DynamicParameters props = new DynamicParameters();
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var props = new DynamicParameters();
             props.Add("GameCasinoId", para.GameCasinoId);
             props.Add("SiteId", SiteId);
             return conn.Query<GameCasinoDetail>("Admin_GameCasinoDetail_GetBySiteAndCasinoId", props, commandType: CommandType.StoredProcedure).ToList();

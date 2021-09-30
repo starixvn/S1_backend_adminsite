@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.Api
@@ -33,9 +29,11 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<int>> GetCurrencyList()
         {
             var serverInfo = serverInfoBLL.GetServerInfo();
-            var apiResult = new ApiResult<IEnumerable<int>>();
-            apiResult.Data = serverInfo.ICurrencyList;
-            apiResult.ErrorCode = 0;
+            var apiResult = new ApiResult<IEnumerable<int>>
+            {
+                Data = serverInfo.ICurrencyList,
+                ErrorCode = 0
+            };
             return apiResult;
         }
 
@@ -101,7 +99,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult SetBankCard(bankCardReq bankCardReq)
         {
-            int result = bankDetailBLL.SetBankCard(bankCardReq.siteId, bankCardReq.SysId, bankCardReq.BankAccountName, bankCardReq.BankAccountNo, bankCardReq.MinAmount, bankCardReq.MaxAmount, bankCardReq.DailyLimitAmount, bankCardReq.PointLevel, bankCardReq.Purpose, bankCardReq.Status, bankCardReq.Sort, User.Identity.Name);
+            var result = bankDetailBLL.SetBankCard(bankCardReq.siteId, bankCardReq.SysId, bankCardReq.BankAccountName, bankCardReq.BankAccountNo, bankCardReq.MinAmount, bankCardReq.MaxAmount, bankCardReq.DailyLimitAmount, bankCardReq.PointLevel, bankCardReq.Purpose, bankCardReq.Status, bankCardReq.Sort, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result > 0)
             {
@@ -118,7 +116,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult SetBankCardwithIFSC(bankCardReq bankCardReq)
         {
-            int result = bankDetailBLL.SetBankCardwithIFSC(bankCardReq.siteId, bankCardReq.SysId, bankCardReq.BankAccountName, bankCardReq.BankAccountNo, bankCardReq.IFSCCode, bankCardReq.MinAmount, bankCardReq.MaxAmount, bankCardReq.DailyLimitAmount, bankCardReq.PointLevel, bankCardReq.Purpose, bankCardReq.Status, bankCardReq.Sort, User.Identity.Name);
+            var result = bankDetailBLL.SetBankCardwithIFSC(bankCardReq.siteId, bankCardReq.SysId, bankCardReq.BankAccountName, bankCardReq.BankAccountNo, bankCardReq.IFSCCode, bankCardReq.MinAmount, bankCardReq.MaxAmount, bankCardReq.DailyLimitAmount, bankCardReq.PointLevel, bankCardReq.Purpose, bankCardReq.Status, bankCardReq.Sort, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result > 0)
             {
@@ -142,7 +140,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult DelBankCard(DelbankCardReq bankCardReq)
         {
-            int result = bankDetailBLL.DelBankCard(bankCardReq.siteId, bankCardReq.bankId, User.Identity.Name);
+            var result = bankDetailBLL.DelBankCard(bankCardReq.siteId, bankCardReq.bankId, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result > 0)
             {
@@ -160,7 +158,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult AddBank(BankDetail bankDetail)
         {
-            bool result = bankDetailBLL.AddBankInfo(bankDetail);
+            var result = bankDetailBLL.AddBankInfo(bankDetail);
             var apiResult = new ApiResult();
             if (result)
             {
@@ -180,7 +178,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult EditBank([FromBody]BankDetail bankDetail)
         {
-            bool result = bankDetailBLL.EditBankInfo(bankDetail);
+            var result = bankDetailBLL.EditBankInfo(bankDetail);
             var apiResult = new ApiResult();
             if (result)
             {

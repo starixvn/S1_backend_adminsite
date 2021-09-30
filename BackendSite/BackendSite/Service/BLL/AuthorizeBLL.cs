@@ -4,12 +4,8 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
@@ -73,7 +69,7 @@ namespace BackendSite.Service.BLL
             if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
             {
                 authData = new AuthData();
-                int userId = 0;
+                var userId = 0;
                 int.TryParse(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.NameIdentifier).Value, out userId);
                 authData.UserId = userId;
                 authData.UserName = httpContextAccessor.HttpContext.User.Identity.Name;

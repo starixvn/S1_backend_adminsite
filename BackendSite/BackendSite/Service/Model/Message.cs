@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.Model
 {
@@ -39,6 +36,7 @@ namespace BackendSite.Service.Model
         public DateTime CreateTime { get; set; }
         public int Status { get; set; }
         public bool Flag { get; set; }
+        public string ContentRemoveTag { get; set; }
 
     }
     public class PersonalMsgBase

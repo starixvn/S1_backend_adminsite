@@ -123,44 +123,53 @@ const App = () => {
 
     WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {
-        let tmpDatas = [...stateDatas.Datas];
-        let appendDatas = isAdd
-          ? {
-              creator: res.data.data.creator,
-              createTime: res.data.data.createTime,
-              id: res.data.data.id,
-            }
-          : {
-              lastUpdater: res.data.data.lastUpdater,
-              lastUpdateTime: res.data.data.lastUpdateTime,
+        if(stateDatas.Datas != null){
+          let tmpDatas = [...stateDatas.Datas];
+          let appendDatas = isAdd
+            ? {
+                creator: res.data.data.creator,
+                createTime: res.data.data.createTime,
+                id: res.data.data.id,
+              }
+            : {
+                lastUpdater: res.data.data.lastUpdater,
+                lastUpdateTime: res.data.data.lastUpdateTime,
+              };
+
+          if (isAdd) {
+            tmpDatas.push({
+              ...datas,
+              subject: datas.subject.en,
+              content: datas.content.en,
+              ...appendDatas,
+            });
+
+            tmpDatas = tmpDatas.sort((a, b) => {
+              return b.id - a.id;
+            });
+          } else {
+            tmpDatas[stateDatas.CurrentIdx] = {
+              ...datas,
+              subject: datas.subject.en,
+              content: datas.content.en,
+              ...appendDatas,
             };
+          }
 
-        if (isAdd) {
-          tmpDatas.push({
-            ...datas,
-            subject: datas.subject.en,
-            content: datas.content.en,
-            ...appendDatas,
+          updateDatas({
+            ...stateDatas,
+            Datas: tmpDatas,
+            SettingDatas: null,
+            ShowSettingPanel: false,
           });
-
-          tmpDatas = tmpDatas.sort((a, b) => {
-            return b.id - a.id;
-          });
-        } else {
-          tmpDatas[stateDatas.CurrentIdx] = {
-            ...datas,
-            subject: datas.subject.en,
-            content: datas.content.en,
-            ...appendDatas,
-          };
         }
-
-        updateDatas({
-          ...stateDatas,
-          Datas: tmpDatas,
-          SettingDatas: null,
-          ShowSettingPanel: false,
-        });
+        else{
+          updateDatas({
+            ...stateDatas,
+            ShowSettingPanel: false,
+          });
+        }   
+        alert(isAdd ? "Add Success!" : "Update Success!")
       } else {
         alert(res.data.message ?? "failed to get data.");
       }

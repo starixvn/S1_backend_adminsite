@@ -43,12 +43,12 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite,
             IEnumerable<int> withdrawalType, long startDate, long endDate, string withdrawalId, string userName,
-            IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus, int pageSize,
+            IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus, int pageSize, int amounttype, string amount,
             ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
         {
             var serverInfo = _serverInfoService.GetModel();
             return _withdrawalService.GetWithdrawalRequestList(selectSite, withdrawalType, startDate, endDate,
-                serverInfo.SiteId /*Not require*/, withdrawalId, userName, currencyId, status, levelStatus, pageSize,
+                serverInfo.SiteId /*Not require*/, withdrawalId, userName, currencyId, status, levelStatus, pageSize, amounttype, amount,
                 ref pageNumber, out totalPages, out rowCount, ref currencyAmount);
         }
 
@@ -56,8 +56,8 @@ namespace BackendSite.Service.BLL
         {
             var serverInfo = _serverInfoService.GetModel();
 
-            Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out int withdrawalId);
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var withdrawalId);
             return _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId /*Not require*/);
         }
 
@@ -75,8 +75,8 @@ namespace BackendSite.Service.BLL
             var serverInfo = _serverInfoService.GetModel();
             var forStatus = new List<int> { (int)WithdrawalStatus.Process };
 
-            Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out int withdrawalId);
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
             var withdrawalInfo =
                 JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalRequest.WithdrawalInfo);
@@ -98,8 +98,8 @@ namespace BackendSite.Service.BLL
                 (int) WithdrawalStatus.Pending
             };
 
-            Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out int withdrawalId);
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus), updater,
@@ -117,8 +117,8 @@ namespace BackendSite.Service.BLL
                 //(int)WithdrawalStatus.ToKyc
             };
 
-            Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out int withdrawalId);
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus), updater,
@@ -134,8 +134,8 @@ namespace BackendSite.Service.BLL
                 (int) WithdrawalStatus.Verify
             };
 
-            Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out int withdrawalId);
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus), updater,
@@ -152,8 +152,8 @@ namespace BackendSite.Service.BLL
                 //(int)WithdrawalStatus.ToKyc
             };
 
-            Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out int withdrawalId);
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus), updater,
@@ -175,8 +175,8 @@ namespace BackendSite.Service.BLL
                 (int) WithdrawalStatus.Approved
             };
 
-            Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out int withdrawalId);
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus),
@@ -194,8 +194,8 @@ namespace BackendSite.Service.BLL
                 //(int)WithdrawalStatus.OnHold
             };
 
-            Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out int withdrawalId);
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus),
@@ -211,8 +211,8 @@ namespace BackendSite.Service.BLL
                 (int) WithdrawalStatus.Pending
             };
 
-            Match m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out int withdrawalId);
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus),
@@ -230,10 +230,10 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(string selectSite, string withdrawalType,
             long startDate, long endDate, string withdrawalId, string userName, string currencyId, string status,
-            string levelStatus)
+            string levelStatus, int AmountType, string Amount)
         {
             return _withdrawalService.GetWithdrawalExportList(selectSite, withdrawalType, startDate, endDate,
-                withdrawalId, userName, currencyId, status, levelStatus);
+                withdrawalId, userName, currencyId, status, levelStatus, AmountType, Amount);
         }
 
         public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(int siteId, int currencyId) =>
@@ -284,11 +284,11 @@ namespace BackendSite.Service.BLL
         {
             //IEnumerable<CurrencyDataV2> CurrencyData = null;
             IEnumerable<ServerInfo> siteDataList = null;
-            List<WithdrawalData> result = new List<WithdrawalData>();
+            var result = new List<WithdrawalData>();
             siteDataList = _serverInfoService.GetSiteList();
-            List<int> currencyData =
+            var currencyData =
                 siteDataList.Where(x => x.SiteId == siteId)?.FirstOrDefault()?.ICurrencyList.ToList();
-            Dictionary<int, string> currencyList =
+            var currencyList =
                 _reportService.GetCurrencyList().ToDictionary(x => x.CurrencyId, x => x.IsoCode);
             var withdrawalMinInfo = _withdrawalService.GetWithdrawalLimitData(siteId).ToList();
             currencyData.ForEach(x =>
@@ -345,18 +345,18 @@ namespace BackendSite.Service.BLL
             {
                 result.WithdrawalTimeList.ForEach(x =>
                 {
-                    TimeSpan ts1 = new TimeSpan(x.CreateTime.Ticks);
-                    TimeSpan ts2 = new TimeSpan(x.UpdateTime.Ticks);
-                    TimeSpan timeSpanOfFlowEndTime = new TimeSpan(x.FlowEndTime.Ticks);
-                    TimeSpan ts = ts1.Subtract(timeSpanOfFlowEndTime).Duration();
+                    var ts1 = new TimeSpan(x.CreateTime.Ticks);
+                    var ts2 = new TimeSpan(x.UpdateTime.Ticks);
+                    var timeSpanOfFlowEndTime = new TimeSpan(x.FlowEndTime.Ticks);
+                    var ts = ts1.Subtract(timeSpanOfFlowEndTime).Duration();
                     x.CompleteTime = GetTimeString(ts);
                     if (x.VerifyTime > DateTime.Now.AddYears(-1000))
                     {
-                        TimeSpan ts3 = new TimeSpan(x.VerifyTime.Ticks);
-                        TimeSpan tsv = ts1.Subtract(ts3).Duration();
+                        var ts3 = new TimeSpan(x.VerifyTime.Ticks);
+                        var tsv = ts1.Subtract(ts3).Duration();
                         if (x.Status == 6)
                         {
-                            TimeSpan tsa = ts3.Subtract(timeSpanOfFlowEndTime).Duration();
+                            var tsa = ts3.Subtract(timeSpanOfFlowEndTime).Duration();
                             x.ToApprovedTime = GetTimeString(tsa);
                         }
 
@@ -381,19 +381,19 @@ namespace BackendSite.Service.BLL
             {
                 result.ForEach(x =>
                 {
-                    TimeSpan ts1 = new TimeSpan(x.CreateTime.Ticks);
-                    TimeSpan ts2 = new TimeSpan(x.UpdateTime.Ticks);
-                    TimeSpan timeSpanOfFlowEndTime = new TimeSpan(x.FlowEndTime.Ticks);
-                    TimeSpan ts = ts1.Subtract(timeSpanOfFlowEndTime).Duration();
-                    string tempToVerifyTime = "";
-                    string tempToApprovedTime = "";
+                    var ts1 = new TimeSpan(x.CreateTime.Ticks);
+                    var ts2 = new TimeSpan(x.UpdateTime.Ticks);
+                    var timeSpanOfFlowEndTime = new TimeSpan(x.FlowEndTime.Ticks);
+                    var ts = ts1.Subtract(timeSpanOfFlowEndTime).Duration();
+                    var tempToVerifyTime = "";
+                    var tempToApprovedTime = "";
                     if (x.VerifyTime > DateTime.Now.AddYears(-1000))
                     {
-                        TimeSpan ts3 = new TimeSpan(x.VerifyTime.Ticks);
-                        TimeSpan tsv = ts1.Subtract(ts3).Duration();
+                        var ts3 = new TimeSpan(x.VerifyTime.Ticks);
+                        var tsv = ts1.Subtract(ts3).Duration();
                         if (x.Status == 6)
                         {
-                            TimeSpan tsa = ts3.Subtract(timeSpanOfFlowEndTime).Duration();
+                            var tsa = ts3.Subtract(timeSpanOfFlowEndTime).Duration();
                             tempToApprovedTime = GetTimeString(tsa);
                         }
 
@@ -591,11 +591,11 @@ namespace BackendSite.Service.BLL
 
         private string GetTimeString(TimeSpan ts)
         {
-            string tempDays = "";
-            string tempHours = "";
-            string tempMinutes = "";
-            string tempSeconds = "";
-            string result = "";
+            var tempDays = "";
+            var tempHours = "";
+            var tempMinutes = "";
+            var tempSeconds = "";
+            var result = "";
             if (ts.Days != 0)
             {
                 tempDays = string.Format("{0}Days", ts.Days.ToString());

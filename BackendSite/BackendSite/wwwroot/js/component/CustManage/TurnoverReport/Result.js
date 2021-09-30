@@ -1,14 +1,27 @@
 import {number_format} from '../../commJS/common';
 const Result = (props)=>{
-    let total_stake = 0;
+    let total_totalto = 0;
+    let total_settledForValid_stake = 0;
+    let total_settledForValidNotRollover_stake = 0;
     let total_winLost = 0;
-    let rows = props.Datas.length === 0 ? <tr><td>No Data.</td><td/><td/></tr> : props.Datas.map((d, dIdx)=>{
-        total_stake += d.stake;
+    let rows = props.Datas.length === 0 ? <tr><td>No Data.</td><td/><td/><td/><td/></tr> : props.Datas.map((d, dIdx)=>{
+        if(d.settlementType == 1){
+            total_settledForValid_stake += d.stake;
+        }
+        if(d.settlementType == 3){
+            total_settledForValidNotRollover_stake += d.stake;
+        }
+        total_totalto += d.stakeSettled;
+        total_totalto += d.stakeNotRollover;
+        total_settledForValid_stake += d.stakeSettled;
+        total_settledForValidNotRollover_stake += d.stakeNotRollover;
         total_winLost +=d.winlostAmount;
         return(
             <tr key={`result-${dIdx}`}>
                 <td>{d.gameName}</td>
-                <td>{number_format(d.stake)}</td>
+                <td>{number_format(d.stakeSettled + d.stakeNotRollover)}</td>
+                <td>{number_format(d.stakeSettled)}</td>
+                <td>{number_format(d.stakeNotRollover)}</td>
                 <td>{number_format(d.winlostAmount)}</td>
             </tr>
         )
@@ -19,13 +32,17 @@ const Result = (props)=>{
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th>Total - Turnover</th>
+                            <th>Total - Total TO </th>
+                            <th>Total - Valid Bet</th>
+                            <th>Total - Turnover (ExcludeValidTO) </th>
                             <th>Total - WinLoss</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{number_format(total_stake)}</td>
+                            <td>{number_format(total_totalto)}</td>
+                            <td>{number_format(total_settledForValid_stake)}</td>
+                            <td>{number_format(total_settledForValidNotRollover_stake)}</td>
                             <td>{number_format(total_winLost)}</td>
                         </tr>
                     </tbody>
@@ -34,7 +51,9 @@ const Result = (props)=>{
                     <thead>
                         <tr>
                             <th>GameName</th>
-                            <th>Turnover</th>
+                            <th>Total TO</th>
+                            <th>Valid Bet</th>
+                            <th>Turnover (ExcludeValidTO)</th>
                             <th>WinLoss</th>
                         </tr>
                     </thead>

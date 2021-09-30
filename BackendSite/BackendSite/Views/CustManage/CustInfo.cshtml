@@ -25,34 +25,34 @@
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
 
-    for (int i = 0; i <= 7; i++)
+    for (var i = 0; i <= 7; i++)
     {
         if (!i18n.ContainsKey($"lbl_DepositStatus{i}"))
             i18n.Add($"lbl_DepositStatus{i}", selLangBLL.GetResourceValue($"lbl_DepositStatus{i}"));
     }
     i18n.Add($"lbl_DepositStatus{99}", selLangBLL.GetResourceValue($"lbl_DepositStatus{99}"));
 
-    for (int i = 1; i <= 3; i++)
+    for (var i = 1; i <= 3; i++)
     {
         if (!i18n.ContainsKey($"lbl_DepositType{i}"))
             i18n.Add($"lbl_DepositType{i}", selLangBLL.GetResourceValue($"lbl_DepositType{i}"));
     }
 
-    for (int i = 0; i <= 7; i++)
+    for (var i = 0; i <= 7; i++)
     {
         if (!i18n.ContainsKey($"lbl_WithdrawalStatus{i}"))
             i18n.Add($"lbl_WithdrawalStatus{i}", selLangBLL.GetResourceValue($"lbl_WithdrawalStatus{i}"));
     }
     i18n.Add($"lbl_WithdrawalStatus{99}", selLangBLL.GetResourceValue($"lbl_WithdrawalStatus{99}"));
 
-    for (int i = 0; i <= 2; i++)
+    for (var i = 0; i <= 2; i++)
     {
         if (!i18n.ContainsKey($"lbl_WithdrawalType{i}"))
             i18n.Add($"lbl_WithdrawalType{i}", selLangBLL.GetResourceValue($"lbl_WithdrawalType{i}"));
     }
 
-    IEnumerable<string> subFuncKeys = permissionBLL.GetSubFunckeys("CustManage/CustInfoList");
-    subFuncKeys = subFuncKeys == null ? new List<string>() : subFuncKeys;
+    var subFuncKeys = permissionBLL.GetSubFunckeys("CustManage/CustInfoList");
+    subFuncKeys = subFuncKeys ?? new List<string>();
 }
 @section Scripts {
     <script src="~/lib/clipboard.min.js"></script>

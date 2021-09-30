@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace BackendSite.Service.Model
+﻿namespace BackendSite.Service.Model
 {
     public class BankInfoPay
     {
@@ -17,6 +12,7 @@ namespace BackendSite.Service.Model
         public string BankCode { get; set; }
         public string BankName { get; set; }
         public int ChannelId { get; set; }
+        public string ChannelName { get; set; }
         public int Mode { get; set; }
         public int PointLevel { get; set; }
         public string PayCode { get; set; }

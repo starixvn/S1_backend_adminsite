@@ -4,14 +4,11 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
@@ -105,7 +102,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var authData = _authorizeBLL.GetAuthData();
-                string dateTime = GetTimeZoneDateTimeBySiteId(req.SiteId);
+                var dateTime = GetTimeZoneDateTimeBySiteId(req.SiteId);
                 apiResult.Data = new BankFinancialTransferAccountDetailModel()
                 {
                     SiteId = req.SiteId,
@@ -150,7 +147,7 @@ namespace BackendSite.Controllers.Api
                     var data = result.FirstOrDefault();
 
                     var authData = _authorizeBLL.GetAuthData();
-                    string dateTime = GetTimeZoneDateTimeBySiteId(req.SiteId);
+                    var dateTime = GetTimeZoneDateTimeBySiteId(req.SiteId);
 
                     data.Updator = authData.UserId;
                     data.UpdatorName = authData.UserName;
@@ -291,7 +288,7 @@ namespace BackendSite.Controllers.Api
 
         private string GetTimeZoneDateTimeBySiteId(int siteId)
         {
-            int timeZone = (siteId == 2 || siteId == 3) ? 7 : 8;
+            var timeZone = (siteId == 2 || siteId == 3) ? 7 : 8;
             return new DateTimeOffset(DateTime.Now).ToOffset(new TimeSpan(timeZone, 0, 0)).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
         }
 

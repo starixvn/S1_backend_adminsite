@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 
@@ -49,7 +48,7 @@ namespace BackendSite.Service.BLL
                     row.CurrencyName = selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}");
                     row.SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName;
 
-                    gameTypeList.TryGetValue(row.GameType, out string GameName);
+                    gameTypeList.TryGetValue(row.GameType, out var GameName);
                     row.GameName = GameName;
                 }
             }

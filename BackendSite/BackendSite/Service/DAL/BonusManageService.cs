@@ -28,16 +28,14 @@ namespace BackendSite.Service.DAL
 
         public int SetPromotionStatus(string bonusCode, int siteId, int status, string lastUpdateUser)
         {
-            int errorCode = 0;
+            var errorCode = 0;
             try
             {
-                using (MySqlConnection conn =
-                    new MySqlConnection(_configuration.GetConnectionString("ConnectionString")))
-                {
-                    string SpName = "Admin_Promotion_SetStatus";
-                    conn.Execute(SpName, new {bonusCode, siteId, status, lastUpdateUser},
-                        commandType: CommandType.StoredProcedure);
-                }
+                using var conn =
+                    new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+                var SpName = "Admin_Promotion_SetStatus";
+                conn.Execute(SpName, new {bonusCode, siteId, status, lastUpdateUser},
+                    commandType: CommandType.StoredProcedure);
             }
             catch (Exception)
             {
@@ -49,31 +47,29 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
         {
-            using (MySqlConnection conn =
-                new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport")))
-            {
-                string SpName = "Admin_PromotionCategory_Get";
-                return conn.Query<PromoCategory>(SpName, new {walletType}, commandType: CommandType.StoredProcedure);
-            }
+            using var conn =
+                new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            var SpName = "Admin_PromotionCategory_Get";
+            return conn.Query<PromoCategory>(SpName, new {walletType}, commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<TpGameType> GetTpGameList()
         {
-            using MySqlConnection conn =
+            using var conn =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<TpGameType>("Admin_TpGameType_Get", commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<CashBackGame> GetCashBackGameList(int? tpId, int? categoryId)
         {
-            using MySqlConnection conn =
+            using var conn =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<CashBackGame>("Admin_CashBackGameType_Get", new { TpId = tpId , PromoCategoryId = categoryId } ,commandType: CommandType.StoredProcedure);
         }
 
         public async Task<BonusImportResult> BonusImportAsync(BonusImportPara bonusImportPara)
         {
-            BonusImportResult result = new BonusImportResult()
+            var result = new BonusImportResult()
             {
                 SiteId = bonusImportPara.SiteId,
                 UserName = bonusImportPara.UserName,
@@ -87,13 +83,13 @@ namespace BackendSite.Service.DAL
 
             try
             {
-                using MySqlConnection conn =
+                using var conn =
                     new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
                 conn.Open();
 
                 using var trans = conn.BeginTransaction();
 
-                DynamicParameters p = new DynamicParameters();
+                var p = new DynamicParameters();
                 p.Add("@SiteId", bonusImportPara.SiteId);
                 p.Add("@UserName", bonusImportPara.UserName);
                 var customer = conn.Query<Customer>("Admin_CustInfoByUserName_Get", p, trans,
@@ -108,7 +104,7 @@ namespace BackendSite.Service.DAL
                 }
                 else
                 {
-                    DynamicParameters custBonusPara = new DynamicParameters();
+                    var custBonusPara = new DynamicParameters();
                     custBonusPara.Add("@CustId", customer.FirstOrDefault().CustId);
                     var bonusInfo = conn.Query<CustBonus>("Admin_CustBonus_Get", custBonusPara, trans,
                         commandType: CommandType.StoredProcedure).ToList();
@@ -123,7 +119,7 @@ namespace BackendSite.Service.DAL
                     }
                     else
                     {
-                        DynamicParameters para = new DynamicParameters();
+                        var para = new DynamicParameters();
                         para.Add("@PromotionType", 3);
                         para.Add("@BonusCode", "X");
                         para.Add("@CustId", customer.FirstOrDefault().CustId);
@@ -140,11 +136,11 @@ namespace BackendSite.Service.DAL
                         conn.Execute("Member_BonusInfo_Ins", para, transaction: trans,
                             commandType: CommandType.StoredProcedure);
 
-                        string transId = para.Get<string>("TransId");
-                        int.TryParse(transId.Replace("BD", ""), out int bonusId);
-                        long expiryTime = DateTimeOffset.Now.AddDays(bonusImportPara.ExpiryDay).ToUnixTimeSeconds();
+                        var transId = para.Get<string>("TransId");
+                        int.TryParse(transId.Replace("BD", ""), out var bonusId);
+                        var expiryTime = DateTimeOffset.Now.AddDays(bonusImportPara.ExpiryDay).ToUnixTimeSeconds();
 
-                        DynamicParameters para2 = new DynamicParameters();
+                        var para2 = new DynamicParameters();
                         para2.Add("@BonusId", bonusId);
                         para2.Add("@PromoCategoryId", bonusImportPara.CategoryId);
                         para2.Add("@TpId", bonusImportPara.TpId);
@@ -178,17 +174,15 @@ namespace BackendSite.Service.DAL
 
         public int SetScratchCardCode(string specialCode, string scratchCardCode, string lastUpdateUser)
         {
-            int errorCode = 0;
+            var errorCode = 0;
             try
             {
-                using (MySqlConnection conn =
-                    new MySqlConnection(_configuration.GetConnectionString("ConnectionString")))
-                {
-                    string SpName = "Admin_ScratchCardCode_set";
-                    conn.Execute(SpName, new {specialCode, scratchCardCode, lastUpdateUser},
-                        commandType: CommandType.StoredProcedure);
-                    // logger.LogInformation($"success - SpecialCode:{SpecialCode} ScratchCardCode:{ScratchCardCode}");
-                }
+                using var conn =
+                    new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+                var SpName = "Admin_ScratchCardCode_set";
+                conn.Execute(SpName, new {specialCode, scratchCardCode, lastUpdateUser},
+                    commandType: CommandType.StoredProcedure);
+                // logger.LogInformation($"success - SpecialCode:{SpecialCode} ScratchCardCode:{ScratchCardCode}");
             }
             catch (Exception e)
             {
@@ -201,23 +195,19 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<ScratchCard> GetScratchCardList(string specialCode)
         {
-            using (MySqlConnection conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString")))
-            {
-                string SpName = "Admin_ScratchCardCodeList_Get";
-                return conn.Query<ScratchCard>(SpName, new {SpecialCode = specialCode, CustId = -1},
-                    commandType: CommandType.StoredProcedure);
-            }
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            var SpName = "Admin_ScratchCardCodeList_Get";
+            return conn.Query<ScratchCard>(SpName, new {SpecialCode = specialCode, CustId = -1},
+                commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<ScratchCardExport> GetScratchCardListExport(string specialCode)
         {
-            using (MySqlConnection conn =
-                new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport")))
-            {
-                string SpName = "Admin_ScratchCardCodeListExport_Get";
-                return conn.Query<ScratchCardExport>(SpName, new {SpecialCode = specialCode},
-                    commandType: CommandType.StoredProcedure);
-            }
+            using var conn =
+                new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            var SpName = "Admin_ScratchCardCodeListExport_Get";
+            return conn.Query<ScratchCardExport>(SpName, new {SpecialCode = specialCode},
+                commandType: CommandType.StoredProcedure);
         }
         public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(IEnumerable<int> selectSite, int categoryType, int currencyId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
@@ -247,13 +237,13 @@ namespace BackendSite.Service.DAL
         public int SetLeaderboardExtraPoint(long activeDate, int siteId, int categoryId, string userName, decimal extraPoint, string lastUpdateUser)
         {
             
-            int Rtn = -1;
+            var Rtn = -1;
 
             var p = new DynamicParameters(new { _ActiveDate = activeDate, _SiteId = siteId, _CategoryId = categoryId, _UserName = userName, _ExtraPoint = extraPoint, _LastUpdateUser = lastUpdateUser });
             p.Add("RTN", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            int result = conn.Execute("Admin_LeaderboardExtraPoint_Set", p, commandType: CommandType.StoredProcedure);
+            var result = conn.Execute("Admin_LeaderboardExtraPoint_Set", p, commandType: CommandType.StoredProcedure);
             Rtn = p.Get<int?>("RTN") ?? -1;
             return Rtn;
         }
@@ -291,12 +281,10 @@ namespace BackendSite.Service.DAL
             p.Add("_BonusCode", bonusCode);
             p.Add("_PermissionSiteIds", permissionSiteIds);
 
-            using (MySqlConnection conn =
-                new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport")))
-            {
-                return conn.Query<PromotionInfo>("Admin_PromotionListV3_Get", p,
-                    commandType: CommandType.StoredProcedure);
-            }
+            using var conn =
+                new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<PromotionInfo>("Admin_PromotionListV3_Get", p,
+                commandType: CommandType.StoredProcedure);
         }
 
         /// <summary>
@@ -380,7 +368,7 @@ namespace BackendSite.Service.DAL
 
             if (connection == null)
             {
-                using MySqlConnection conn =
+                using var conn =
                     new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
                 return conn.QueryFirst<PromotionInfo>("Admin_PromotionV2_Get", p,
                     commandType: CommandType.StoredProcedure);
@@ -412,7 +400,7 @@ namespace BackendSite.Service.DAL
 
             if (connection == null)
             {
-                using MySqlConnection conn =
+                using var conn =
                     new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
                 return conn.Query<PromotionSpecific>("Admin_PromotionSpecificV3_Get", p,
                     commandType: CommandType.StoredProcedure);
@@ -443,7 +431,7 @@ namespace BackendSite.Service.DAL
 
             if (connection == null)
             {
-                using MySqlConnection conn =
+                using var conn =
                     new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
                 return conn.Query<PromotionRebate1>("Admin_PromotionRebateV2_Get", p,
                     commandType: CommandType.StoredProcedure);
@@ -474,7 +462,7 @@ namespace BackendSite.Service.DAL
 
             if (connection == null)
             {
-                using MySqlConnection conn =
+                using var conn =
                     new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
                 return conn.Query<PromotionDisplayConditionModel>("Admin_PromotionDisplayCondition_Get", p,
                     commandType: CommandType.StoredProcedure);
@@ -531,7 +519,7 @@ namespace BackendSite.Service.DAL
             #endregion
 
 
-            List<PromotionSpecific> specificList = new List<PromotionSpecific>();
+            var specificList = new List<PromotionSpecific>();
 
             foreach (var specific in promotion.Specific)
             {
@@ -594,7 +582,7 @@ namespace BackendSite.Service.DAL
 
             if (promotion.PromotionType == 6)
             {
-                List<PromotionRebate1> rebateList = new List<PromotionRebate1>();
+                var rebateList = new List<PromotionRebate1>();
                 foreach (var s in promotion.Specific)
                 {
                     foreach (var r in s.RebateList)
@@ -626,7 +614,7 @@ namespace BackendSite.Service.DAL
 
             if(promotion.PromotionType == 7)
             {
-                List<PromotionCashBackSetting> cashBackList = new List<PromotionCashBackSetting>();
+                var cashBackList = new List<PromotionCashBackSetting>();
                 var cashBackGameList = GetCashBackGameList(promotion.TpId, promotion.CategoryId).ToList(); ;
 
                 foreach (var s in promotion.Specific)
@@ -675,68 +663,66 @@ namespace BackendSite.Service.DAL
         public bool DuplicatePromotionFlow(string bonusCode, int siteId, string newBonusCode, int expectedSpecificRow,
             int expectedRebateRow, int expectedConditionRow, int expectedCashBackRow,string Operator)
         {
-            using (MySqlConnection connection =
-                new MySqlConnection(_configuration.GetConnectionString("ConnectionString")))
+            using var connection =
+                new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
+
+            var promotionRessult = DuplicatePromotion(bonusCode, siteId, newBonusCode, connection, transaction);
+
+            if (!promotionRessult)
             {
-                connection.Open();
-                using var transaction = connection.BeginTransaction();
-
-                var promotionRessult = DuplicatePromotion(bonusCode, siteId, newBonusCode, connection, transaction);
-
-                if (!promotionRessult)
-                {
-                    transaction.Rollback();
-                    return false;
-                }
-
-                var promotionSpecificRessult = DuplicatePromotionSpecific(bonusCode, siteId, newBonusCode,
-                    expectedSpecificRow, connection, transaction);
-
-                if (!promotionSpecificRessult)
-                {
-                    transaction.Rollback();
-                    return false;
-                }
-
-                if (expectedRebateRow > 0)
-                {
-                    var promotionRebateRessult = DuplicatePromotionRebate(bonusCode, siteId, newBonusCode,
-                        expectedRebateRow, connection, transaction);
-
-                    if (!promotionRebateRessult)
-                    {
-                        transaction.Rollback();
-                        return false;
-                    }
-                }
-
-                if (expectedConditionRow > 0)
-                {
-                    var promotionConditionRessult = DuplicatePromotionDisplayCondition(bonusCode, siteId, newBonusCode,
-                        expectedConditionRow, connection, transaction);
-
-                    if (!promotionConditionRessult)
-                    {
-                        transaction.Rollback();
-                        return false;
-                    }
-                }
-
-                if(expectedCashBackRow > 0)
-                {
-                    var promotionCashBackRessult = DuplicatePromotionCashBack(bonusCode, siteId, newBonusCode,
-                        expectedCashBackRow, connection, transaction, Operator);
-
-                    if (!promotionCashBackRessult)
-                    {
-                        transaction.Rollback();
-                        return false;
-                    }
-                }
-
-                transaction.Commit();
-                return true;
+                transaction.Rollback();
+                return false;
             }
+
+            var promotionSpecificRessult = DuplicatePromotionSpecific(bonusCode, siteId, newBonusCode,
+                expectedSpecificRow, connection, transaction);
+
+            if (!promotionSpecificRessult)
+            {
+                transaction.Rollback();
+                return false;
+            }
+
+            if (expectedRebateRow > 0)
+            {
+                var promotionRebateRessult = DuplicatePromotionRebate(bonusCode, siteId, newBonusCode,
+                    expectedRebateRow, connection, transaction);
+
+                if (!promotionRebateRessult)
+                {
+                    transaction.Rollback();
+                    return false;
+                }
+            }
+
+            if (expectedConditionRow > 0)
+            {
+                var promotionConditionRessult = DuplicatePromotionDisplayCondition(bonusCode, siteId, newBonusCode,
+                    expectedConditionRow, connection, transaction);
+
+                if (!promotionConditionRessult)
+                {
+                    transaction.Rollback();
+                    return false;
+                }
+            }
+
+            if(expectedCashBackRow > 0)
+            {
+                var promotionCashBackRessult = DuplicatePromotionCashBack(bonusCode, siteId, newBonusCode,
+                    expectedCashBackRow, connection, transaction, Operator);
+
+                if (!promotionCashBackRessult)
+                {
+                    transaction.Rollback();
+                    return false;
+                }
+            }
+
+            transaction.Commit();
+            return true;
         }
 
         #endregion
@@ -1324,11 +1310,11 @@ namespace BackendSite.Service.DAL
         private int InsertAdjustmentInfoLog(PromotionInfo promotion, MySqlConnection connection,
             MySqlTransaction transaction,string Operator)
         {
-            DynamicParameters propsLog = new DynamicParameters();
+            var propsLog = new DynamicParameters();
 
             var temppromotion = JsonConvert.SerializeObject(promotion);
-            JObject jobject = JObject.Parse(temppromotion);
-            JArray tokenselect = jobject.SelectToken("Specific") as JArray;
+            var jobject = JObject.Parse(temppromotion);
+            var tokenselect = jobject.SelectToken("Specific") as JArray;
             if(tokenselect != null)
             {
                 foreach (JObject item in tokenselect)
@@ -1336,7 +1322,7 @@ namespace BackendSite.Service.DAL
                     item.Remove("Details");
                 }
             }
-            string DetailInfo = JsonConvert.SerializeObject(jobject);
+            var DetailInfo = JsonConvert.SerializeObject(jobject);
             propsLog.Add("Menu", "BonusManagement");
             propsLog.Add("ActionType", 1);
             propsLog.Add("DetailInfo", DetailInfo);
@@ -1386,7 +1372,7 @@ namespace BackendSite.Service.DAL
 
             if (connection == null)
             {
-                using MySqlConnection conn =
+                using var conn =
                     new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
                 return conn.Query<PromotionCashBack1>("Admin_PromotionCashBack_Get", p,
                     commandType: CommandType.StoredProcedure);

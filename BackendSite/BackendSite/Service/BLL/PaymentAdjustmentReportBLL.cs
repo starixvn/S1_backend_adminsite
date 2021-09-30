@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -39,7 +37,7 @@ namespace BackendSite.Service.BLL
                     ref CurrencyAmount
                 );
 
-            List<PaymentAdjustmentFrontEnd> result = new List<PaymentAdjustmentFrontEnd>();
+            var result = new List<PaymentAdjustmentFrontEnd>();
             if(datas != null && datas.Any())
             {
                 foreach (var row in datas)
@@ -79,7 +77,7 @@ namespace BackendSite.Service.BLL
                     EndDate
                 );
 
-            List<PaymentAdjustmentFrontEnd> result = new List<PaymentAdjustmentFrontEnd>();
+            var result = new List<PaymentAdjustmentFrontEnd>();
             if (datas != null && datas.Any())
             {
                 foreach (var row in datas)
