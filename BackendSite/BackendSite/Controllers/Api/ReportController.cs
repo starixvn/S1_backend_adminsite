@@ -172,7 +172,7 @@ namespace BackendSite.Controllers.Api
                                                               request.StartDate,
                                                               request.EndDate);
 
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
@@ -526,7 +526,7 @@ namespace BackendSite.Controllers.Api
                                                              StartDate,
                                                              request.EndDate);
 
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
@@ -1152,7 +1152,7 @@ namespace BackendSite.Controllers.Api
             var data = _reportBLL.GetUserOnlineReport(JsonConvert.SerializeObject(request.SiteIds),
                                                            request.SelectDate);
 
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
@@ -1318,7 +1318,7 @@ namespace BackendSite.Controllers.Api
                                                    request.StartDate,
                                                    request.EndDate);
 
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
@@ -1934,7 +1934,7 @@ namespace BackendSite.Controllers.Api
                                                                      request.EndDate,
                                                                      request.UserName);
 
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
@@ -2469,7 +2469,7 @@ namespace BackendSite.Controllers.Api
                                                           request.Date);
 
 
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }

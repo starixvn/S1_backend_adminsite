@@ -207,7 +207,7 @@ namespace BackendSite
 
             services.AddMvc(config =>
             {
-                config.Filters.Add(new ExceptionFilter());
+                config.Filters.Add<ExceptionFilter>();
             });
 
             #endregion

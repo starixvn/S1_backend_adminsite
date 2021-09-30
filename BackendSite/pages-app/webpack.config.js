@@ -234,9 +234,13 @@ module.exports = {
     // 	 '@babel/polyfill',
     // 	"./src/pages/Marketing/LeaderBoardExtraPoint/index.js"
     // ],
-    "Marketing/AppLinkManagement.min": [
-    	 '@babel/polyfill',
-    	"./src/pages/Marketing/AppLinkManagement/index.js"
+    // "Marketing/AppLinkManagement.min": [
+    // 	 '@babel/polyfill',
+    // 	"./src/pages/Marketing/AppLinkManagement/index.js"
+    // ],
+    "CSD/UserBetLimit.min": [
+      "@babel/polyfill",
+      "./src/pages/CSD/UserBetLimit/index.js"
     ],
   },
   output: {

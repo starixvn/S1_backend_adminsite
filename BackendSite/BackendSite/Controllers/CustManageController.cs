@@ -115,5 +115,11 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/UserBetLimit" })]
+        public IActionResult UserBetLimit()
+        {
+            return View();
+        }
     }
 }

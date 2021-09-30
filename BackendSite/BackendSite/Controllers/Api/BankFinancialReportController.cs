@@ -115,7 +115,7 @@ namespace BackendSite.Controllers.Api
                                                               request.StartDate,
                                                               request.EndDate);
 
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
@@ -159,7 +159,7 @@ namespace BackendSite.Controllers.Api
                                                               request.StartDate,
                                                               request.EndDate);
 
-            if (data.Count() == 0)
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }

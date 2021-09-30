@@ -130,7 +130,11 @@ const VipLevelReview = lazy(() =>
   import("./pages/Marketing/VipLevelReview/index")
 );
 
-export const defaultPage = "VipLevelReview";
+const UserBetLimit = lazy(() =>
+  import("./pages/CSD/UserBetLimit/index")
+);
+
+export const defaultPage = "UserBetLimit";
 
 export const layoutType = {
   N88: "N88",
@@ -748,6 +752,20 @@ export const pages = {
     css: [
       "./lib/bootstrap/dist/css/bootstrap.min.css",
       "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  UserBetLimit: {
+    comp: (
+      <Suspense fallback="loading...">
+        <UserBetLimit />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/common/fonts/main-font/style.css",
       "./css/css/vendor/DateTimePicker/DateTimePicker.css",
     ],
     layout: layoutType.N88,
