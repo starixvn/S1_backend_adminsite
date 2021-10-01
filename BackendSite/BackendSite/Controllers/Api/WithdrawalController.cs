@@ -877,6 +877,19 @@ namespace BackendSite.Controllers.Api
                 $"WithdrawalTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
+        public ApiResult<IEnumerable<WithdrawalLimitInfoManage>> GetUSDTWithdrawalLimitInfos(
+            USDTWithdrawalLimit USDTwithdrawalLimit)
+        {
+            //var apiResult = new ApiResult<IEnumerable<WithdrawalLimitInfoManage>>();
+            //var withdrawalLimitInfoManages =
+            //    withdrawalBLL.GetWithdrawalLimitInfos(withdrawalLimit.SiteId, withdrawalLimit.CurrencyId);
+            //apiResult.Data = withdrawalLimitInfoManages;
+            //apiResult.ErrorCode = 0;
+            //return apiResult;
+        }
+
         #region Private Methods
 
         /// <summary>

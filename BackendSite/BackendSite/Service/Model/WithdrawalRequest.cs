@@ -235,4 +235,11 @@ namespace BackendSite.Service.Model
         public string ToApprovedTime { get; set; }
         public string CompleteTime { get; set; }
     }
+    public class USDTWithdrawalLimit
+    {
+        public int SiteId { get; set; }
+
+        public int CurrencyId { get; set; }
+        public int NetworkType { get; set; }
+    }
 }

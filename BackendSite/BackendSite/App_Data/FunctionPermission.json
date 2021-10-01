@@ -321,6 +321,11 @@
         "DisplayKey": "Adjustment Log Report",
         "FuncKey": "Finance/AdjustmentLogReport",
         "Enable": false
+      },
+      {
+        "DisplayKey": "USDT WithdrawalLimit Management",
+        "FuncKey": "Finance/USDTWithdrawalLimitManagement",
+        "Enable": false
       }
     ]
   },

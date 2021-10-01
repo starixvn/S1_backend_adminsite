@@ -378,6 +378,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "USDTWithdrawalLimitManagement",
+        "Title": "USDT WithdrawalLimit Management",
+        "FuncKey": "Finance/USDTWithdrawalLimitManagement",
+        "Controller": "Finance",
+        "Action": "USDTWithdrawalLimitManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
