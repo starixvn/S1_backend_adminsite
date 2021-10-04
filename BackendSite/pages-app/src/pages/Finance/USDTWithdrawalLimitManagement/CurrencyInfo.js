@@ -103,10 +103,11 @@ const Result = (props) => {
   const handleDelete = (idx) => {
     if (window.confirm("您真的確定要刪除嗎？\n\n請確認！") === true) {
       api
-        .post("/api/Withdrawal/DeleteWithdrawalLimitInfo", {
+        .post("/api/Withdrawal/DeleteUSDTWithdrawalLimitInfo", {
           siteId: levelList[idx].siteId,
           currencyId: levelList[idx].currencyId,
           vipLevel: levelList[idx].vipLevel,
+          networkType: levelList[idx].NetworkType
         })
         .then(function (response) {
           if (response.data.errorCode === 0) {

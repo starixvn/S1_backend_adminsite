@@ -432,7 +432,12 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<USDTWithdrawalLimitInfoManage> GetUSDTWithdrawalLimitInfos(int siteId, int currencyId,string Network) 
         { 
-            return _withdrawalLimitService.GetUSDTWithdrawalLimitInfos(siteId, currencyId, Network);
+            var USDTWithdrawalLimitInfos =  _withdrawalLimitService.GetUSDTWithdrawalLimitInfos(siteId, currencyId, Network);
+            USDTWithdrawalLimitInfos.ToList().ForEach(x =>
+            {
+                x.NetworkType = (int)(NetworkType)Enum.Parse(typeof(NetworkType), x.Network);
+            });
+            return USDTWithdrawalLimitInfos;
         }
 
         public bool AddUSDTWithdrawalLimit(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage, string updater)
