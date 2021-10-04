@@ -504,7 +504,44 @@ const SettingContent = (props) => {
         ></textarea> */}
         <Editor
           defaultEditorState={content}
-          toolbarClassName="toolbar-class"
+          // toolbarClassName="toolbar-class"
+          toolbar={
+            {
+              options: ['inline', 'blockType', 'fontSize', 'fontFamily','list','textAlign'
+              , 'colorPicker','link', 'emoji', 'image', 'remove', 'history'],
+              blockType: {
+                inDropdown: true,
+                options: ['Normal', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'],
+                className: undefined,
+                component: undefined,
+                dropdownClassName: undefined,
+              },
+              inline: {
+                options: ['bold','italic','underline','strikethrough'],
+                bold: { className: 'demo-option-custom' },
+                italic: { className: 'demo-option-custom' },
+                underline: { className: 'demo-option-custom' },
+                strikethrough: {className: 'demo-option-custom' },
+                monospace: { className: 'demo-option-custom' },
+                superscript: {className: 'demo-option-custom'},
+                subscript: { className: 'demo-option-custom' }
+              },
+              textAlign: {
+                inDropdown: false,
+                className: undefined,
+                component: undefined,
+                dropdownClassName: undefined,
+                options: ['left', 'center', 'right'],
+              },
+              list: {
+                inDropdown: false,
+                className: undefined,
+                component: undefined,
+                dropdownClassName: undefined,
+                options: ['unordered', 'ordered'],
+              }
+            }
+          }
           wrapperClassName="wrapper-class"
           editorClassName="editor-class"
           onEditorStateChange={onEditorStateChange}
