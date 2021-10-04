@@ -12,7 +12,8 @@ import { defActionType } from "./Edit.reducer";
 const initBonusAmountType = promoType => {
 	return Number(promoType) === 3
 		? [{ value: 2, displayText: "Amount" }]
-		: [
+		: Number(promoType) === 7 ? [{ value: 1, displayText: "Percentage" }]
+		:[
 			{ value: 1, displayText: "Percentage" },
 			{ value: 2, displayText: "Amount" }
 		];
@@ -628,6 +629,16 @@ const SubPanel = props => {
 				{(props.state.promotionType == 6 || props.state.promotionType == 7) ?
 					(
 						<>
+							{props.state.promotionType == 7 ? <RadioBox
+									Title="Bonus Amount Type"
+									Options={initBonusAmountType(props.state.promotionType)}
+									OnChange={props.EditCurrencyAmountValue}
+									dataColumn="bonusAmountType"
+									Selected={
+										props.state.specific[props.currencyId].bonusAmountType
+									}
+									mainKey={props.currencyId}
+								/> : null}
 							<div className="row-flex">
 								<InputBox
 									Title="Roll Over"
@@ -635,6 +646,19 @@ const SubPanel = props => {
 									dataColumn="rollOver"
 									value={props.state.specific[props.currencyId].rollOver}
 								/>
+								{props.state.promotionType == 7 ? <InputBox
+										Type="Number"
+										Title="Bonus"
+										OnChange={props.EditMainValue}
+										dataColumn="bonus"
+										value={props.state.specific[props.currencyId].bonus}
+										iptSubClass={
+											props.state.specific[props.currencyId]
+												.bonusAmountType === 1
+												? "ratio"
+												: null
+										}
+									/> : null}
 								<InputBox
 									Type="Number"
 									Title="Max Bonus"
