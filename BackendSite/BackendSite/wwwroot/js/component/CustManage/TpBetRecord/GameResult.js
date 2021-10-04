@@ -26,7 +26,11 @@ const Result = (props) => {
               <button
                 className="btn btn-link"
                 onClick={() =>
-                  props.ClickTpBetRecordDetail(props.Info.GameTypeId, d.transId, d.settledTime)
+                  props.ClickTpBetRecordDetail(
+                    props.Info.GameTypeId,
+                    d.transId,
+                    d.settledTime
+                  )
                 }
               >
                 {d.transId}
@@ -88,6 +92,7 @@ const Result = (props) => {
       <TpBetRecordDetailModal
         show={props.TpBetRecordDatasShowStatus}
         showRawDetail={props.TpBetRecordDatasShowRawDetail}
+        GameTypeInfo={props.Info}
         tpBetRecordDatas={props.TpBetRecordDatas}
         handleSwitch={props.SwitchDetailBtn}
         handleClose={(e) => props.TpBetRecordCloseBtn()}
