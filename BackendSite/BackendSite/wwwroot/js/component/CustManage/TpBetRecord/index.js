@@ -217,11 +217,13 @@ const Panel = () => {
       });
   };
 
-  const getTpBetRecordDetail = (GameType, TransId) => {
+  const getTpBetRecordDetail = (GameType, TransId, SettledTime) => {
     axios
-      .post("/api/Payment/GetTpBetRecordDetail", {
+      .post("/api/tp/GetTpBetRecordDetail", {
+        CustId: CustId,
         GameType: parseInt(GameType),
         TransId: TransId,
+        SettledTime:SettledTime
         //For Test
         //GameType: parseInt(1),
         //TransId: "Test1234",

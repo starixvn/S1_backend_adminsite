@@ -185,7 +185,7 @@ namespace BackendSite
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
-            });
+            }).AddNewtonsoftJson();
             services.AddRazorPages(options =>
             {
                 options.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
@@ -207,7 +207,7 @@ namespace BackendSite
 
             services.AddMvc(config =>
             {
-                config.Filters.Add(new ExceptionFilter());
+                config.Filters.Add<ExceptionFilter>();
             });
 
             #endregion

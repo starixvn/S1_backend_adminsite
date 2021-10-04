@@ -190,6 +190,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "User Bet Limit",
+        "FuncKey": "CustManage/UserBetLimit",
+        "Controller": "CustManage",
+        "Action": "UserBetLimit",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

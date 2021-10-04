@@ -520,9 +520,9 @@ namespace BackendSite.Service.BLL
             return custInfoService.GetAllSiteVipLevelList();
         }
 
-        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency,int depositStatus,int status,string username,int pagenumber,int pagesize,int sort, long StartDate, long EndDate)
+        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency,int depositStatus,int status,string username,int pagenumber,int pagesize,int sort, long StartDate, long EndDate,string AffiliatesCode,int AgentCodeType)
         {
-            return custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pagenumber, pagesize, sort, StartDate, EndDate);
+            return custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pagenumber, pagesize, sort, StartDate, EndDate, AffiliatesCode, AgentCodeType);
         }
 
         public int SetRegLiveStatus(int custid,int status,int siteid,string Operator)
@@ -550,10 +550,10 @@ namespace BackendSite.Service.BLL
             return custInfoService.EditRegLiveStatusNote(custid, id, note, Operator);
         }
 
-        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate)
+        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate, string AffiliatesCode, int AgentCodeType)
         {
             var list = new List<RegLiveStatusExport>();
-            var result =  custInfoService.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate);
+            var result =  custInfoService.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate, AffiliatesCode, AgentCodeType);
             result.ToList().ForEach(x =>
             {
                 list.Add(new RegLiveStatusExport()
@@ -567,6 +567,8 @@ namespace BackendSite.Service.BLL
                     RegTime = x.RegTime.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture),
                     DepositStatus = Enum.GetName(typeof(DepositStatusType), x.ActStatus),
                     Status = Enum.GetName(typeof(RegLiveStatusType), x.Status),
+                    AffCode = x.AffCode,
+                    Agent = x.Agent
                 });
             });
             return list;

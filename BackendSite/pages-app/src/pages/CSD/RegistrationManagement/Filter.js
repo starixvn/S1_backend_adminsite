@@ -24,6 +24,10 @@ const defRegTimeType = {
   1: "Eariler ",
   2: "Later ",
 };
+const defAgentCodeType = {
+  1: "Credit site ",
+  2: "Others ",
+};
 
 const Panel = (props) => {
 
@@ -100,6 +104,22 @@ const Panel = (props) => {
           hasAll={false}
           selectedValue={1}
           dataColumn="RegTimeType"
+          onChange={props.onChange}
+        />
+        <InputField
+          columnTitle="Affiliates Code"
+          defaultValue=""
+          dataColumn="AffiliatesCode"
+          onChange={props.onChange}
+        />
+        <DropDownBox
+          columnTitle="Agent code"
+          options={Object.keys(defAgentCodeType).map((key) => {
+            return { value: key, displayText: defAgentCodeType[key] };
+          })}
+          hasAll={false}
+          selectedValue={1}
+          dataColumn="AgentCodeType"
           onChange={props.onChange}
         />
         <div className="button-group">
