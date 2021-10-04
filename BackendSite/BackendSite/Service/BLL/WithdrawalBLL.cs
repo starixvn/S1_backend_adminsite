@@ -430,6 +430,32 @@ namespace BackendSite.Service.BLL
             return exportDataToExcel;
         }
 
+        public IEnumerable<USDTWithdrawalLimitInfoManage> GetUSDTWithdrawalLimitInfos(int siteId, int currencyId,string Network) 
+        { 
+            return _withdrawalLimitService.GetUSDTWithdrawalLimitInfos(siteId, currencyId, Network);
+        }
+
+        public bool AddUSDTWithdrawalLimit(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage, string updater)
+        {
+            if (USDTwithdrawalLimitInfoManage.WithdrawalMax < 0 || USDTwithdrawalLimitInfoManage.WithdrawalMin < 0)
+            {
+                return false;
+            }
+
+            return _withdrawalLimitService.AddUSDTWithdrawalLimitInfo(USDTwithdrawalLimitInfoManage, updater);
+        }
+
+        public int DeleteUSDTWithdrawalLimit(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage, string Operator)
+        {
+            var currentUpperPoint = _withdrawalLimitService.GetWithdrawalLimitInfo(USDTwithdrawalLimitInfoManage.SiteId,
+                USDTwithdrawalLimitInfoManage.CurrencyId, USDTwithdrawalLimitInfoManage.VipLevel + 1);
+
+            if (currentUpperPoint != null)
+                return 0;
+
+            return _withdrawalLimitService.DeleteUSDTWithdrawalLimitInfo(USDTwithdrawalLimitInfoManage, Operator);
+        }
+
         #region WithdrawalBankAccounting
 
         public GetWithdrawalInfoAndAccountingListModel GetWithdrawalInfoAndAccountingList(

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { api } from '../../../module/WebAPI';
 export const PopBoxContentAddLevel = (props) => {
     let lastList = props.LevelList.length === 0 ? [] : props.LevelList[props.LevelList.length - 1];
-    let siteId = props.SiteId, currencyId = props.CurrencyId, vipLevel = 1, withdrawalMin = 1, withdrawalMax = 1;
+    let siteId = props.SiteId, currencyId = props.CurrencyId, vipLevel = 1, withdrawalMin = 1, withdrawalMax = 1,NetworkType = props.NetworkType;
 
     if (lastList.length !== 0) {
         vipLevel = parseInt(lastList.vipLevel) + 1;
@@ -13,14 +13,14 @@ export const PopBoxContentAddLevel = (props) => {
     const [Level, setLevel] = useState(vipLevel);
     const [WithdrawalMin, setWithdrawalMin] = useState(withdrawalMin);
     const [WithdrawalMax, setWithdrawalMax] = useState(withdrawalMax);
-    let newLevelList = { siteId: siteId, currencyId: currencyId, vipLevel: Level, withdrawalMin: WithdrawalMin, withdrawalMax: WithdrawalMax }
+    let newLevelList = { siteId: siteId, currencyId: currencyId, vipLevel: Level, withdrawalMin: WithdrawalMin, withdrawalMax: WithdrawalMax ,NetworkType:NetworkType}
     const handleSave = (e) => {
         e.preventDefault();
 
         if (lastList.vipLevel >= Level) { return (alert("err1")) };
         //if (lastList.withdrawalMin >= WithdrawalMin) { return (alert("Withdrawal Min too small")) };
         //if (lastList.withdrawalMax >= WithdrawalMax) { return (alert("Withdrawal Max too small")) };
-        api.post('/api/Withdrawal/AddWithdrawalLimitInfo', { siteId: siteId, currencyId: currencyId, vipLevel: Level, withdrawalMin: WithdrawalMin, withdrawalMax: WithdrawalMax })
+        api.post('/api/Withdrawal/AddUSDTWithdrawalLimitInfo', { siteId: siteId, currencyId: currencyId, vipLevel: Level, withdrawalMin: WithdrawalMin, withdrawalMax: WithdrawalMax,NetworkType:NetworkType })
             .then(function (response) {
                 if (response.data.errorCode === 0) {
                     props.ClickSave(newLevelList);

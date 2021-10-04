@@ -879,15 +879,53 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
-        public ApiResult<IEnumerable<WithdrawalLimitInfoManage>> GetUSDTWithdrawalLimitInfos(
+        public ApiResult<IEnumerable<USDTWithdrawalLimitInfoManage>> GetUSDTWithdrawalLimitInfos(
             USDTWithdrawalLimit USDTwithdrawalLimit)
         {
-            //var apiResult = new ApiResult<IEnumerable<WithdrawalLimitInfoManage>>();
-            //var withdrawalLimitInfoManages =
-            //    withdrawalBLL.GetWithdrawalLimitInfos(withdrawalLimit.SiteId, withdrawalLimit.CurrencyId);
-            //apiResult.Data = withdrawalLimitInfoManages;
-            //apiResult.ErrorCode = 0;
-            //return apiResult;
+            var apiResult = new ApiResult<IEnumerable<USDTWithdrawalLimitInfoManage>>();
+            var USDTwithdrawalLimitInfoManages =
+                withdrawalBLL.GetUSDTWithdrawalLimitInfos(USDTwithdrawalLimit.SiteId, USDTwithdrawalLimit.CurrencyId, Enum.GetName(typeof(NetworkType), USDTwithdrawalLimit.NetworkType));
+            apiResult.Data = USDTwithdrawalLimitInfoManages;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult AddUSDTWithdrawalLimitInfo(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage)
+        {
+            var result = withdrawalBLL.AddUSDTWithdrawalLimit(USDTwithdrawalLimitInfoManage, User.Identity.Name);
+            var apiResult = new ApiResult();
+            if (result)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult DeleteUSDTWithdrawalLimitInfo(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage)
+        {
+            var result = withdrawalBLL.DeleteUSDTWithdrawalLimit(USDTwithdrawalLimitInfoManage, User.Identity.Name);
+            var apiResult = new ApiResult();
+            if (result > 0)
+            {
+                apiResult.ErrorCode = 0;
+                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = 9;
+                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+            }
+
+            return apiResult;
         }
 
         #region Private Methods

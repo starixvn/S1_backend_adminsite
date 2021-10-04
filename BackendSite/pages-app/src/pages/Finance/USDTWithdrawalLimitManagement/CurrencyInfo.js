@@ -40,11 +40,11 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 export const CurrencyInfo = (props) => {
-    console.log('CurrencyInfo');
+    console.log(props,'CurrencyInfo');
   let CurrencyList = props.optSite.siteCurrencyList.map((value) => {
     return (
       <div
-        key={`Site-${props.optSite.siteId}-CurrencyInfo-${value}`}
+        key={`Site-${props.optSite.siteId}-CurrencyInfo-${value}-Network-${props.optSite.Network}`}
         className="panel mt-20"
       >
         <a
@@ -164,7 +164,6 @@ const Result = (props) => {
   };
 
   useEffect(() => {
-      console.log(props);
     let mounted = true;
     api
       .post("/api/Withdrawal/GetUSDTWithdrawalLimitInfos", {
@@ -218,6 +217,7 @@ const Result = (props) => {
               SiteId={props.siteId}
               CurrencyId={props.currId}
               ClickSave={handleAddLevelList}
+              NetworkType={props.networkType}
             />
           ) : null}
         </div>

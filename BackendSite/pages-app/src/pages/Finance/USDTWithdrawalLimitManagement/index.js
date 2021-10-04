@@ -53,10 +53,6 @@ const USDTWithdrawalLimitInfo = () => {
   }, []);
 
   Networkradio = Object.keys(NetworkType).map((key) => {
-    // return {
-    //   displayText: StatusType[key],
-    //   value: key,
-    // };
     return (
         <div
           key={`NetworkOpt-${key}`}
