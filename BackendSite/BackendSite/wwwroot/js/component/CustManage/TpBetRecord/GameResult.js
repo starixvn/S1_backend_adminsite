@@ -101,7 +101,8 @@ const Result = (props) => {
         ChangePage={props.ClickDetail.bind(
           null,
           props.Info.Date,
-          props.Info.GameTypeId
+          props.Info.GameTypeId,
+          props.Info.GameTypeName
         )}
       />
       <button
