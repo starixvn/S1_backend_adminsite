@@ -2,9 +2,6 @@ import React from "react";
 import ReactJsonView from "react-json-view";
 import ReactJsonViewer, { propTypes } from "react-json-viewer";
 
-//已經完成串接的TpId
-const TpIdFinishList = [1, 14];
-
 const DateDetailModal = ({
   show,
   showRawDetail,
