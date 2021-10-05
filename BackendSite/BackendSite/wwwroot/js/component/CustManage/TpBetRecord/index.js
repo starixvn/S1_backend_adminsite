@@ -257,6 +257,9 @@ const Panel = () => {
       })
       .catch((error) => {
         alert(error);
+        setTpBetRecordDatas(result);
+        setTpBetRecordDatasShowStatus(true);
+        setTpBetRecordDatasShowRawDetail(false);
       });
   };
 
