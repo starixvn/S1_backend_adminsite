@@ -11,7 +11,7 @@ const NetworkType = {
 const App = () => {
   return (
     <div className="container-fluid">
-      <h4 className="page-name">Withdrawal Limit Management</h4>
+      <h4 className="page-name">USDT Withdrawal Limit Management</h4>
       <div>
         <USDTWithdrawalLimitInfo />
       </div>

@@ -107,7 +107,7 @@ const Result = (props) => {
           siteId: levelList[idx].siteId,
           currencyId: levelList[idx].currencyId,
           vipLevel: levelList[idx].vipLevel,
-          networkType: levelList[idx].NetworkType
+          networkType: levelList[idx].networkType
         })
         .then(function (response) {
           if (response.data.errorCode === 0) {
@@ -134,10 +134,11 @@ const Result = (props) => {
           ? levelList[idx].withdrawalMax
           : editValue.withdrawalMax;
       api
-        .post("/api/Withdrawal/EditWithdrawalLimitInfo", {
+        .post("/api/Withdrawal/EditUSDTWithdrawalLimitInfo", {
           siteId: levelList[idx].siteId,
           currencyId: levelList[idx].currencyId,
           vipLevel: levelList[idx].vipLevel,
+          networkType: levelList[idx].networkType,
           withdrawalMin: parseInt(withdrawalMin),
           withdrawalMax: parseInt(withdrawalMax),
         })

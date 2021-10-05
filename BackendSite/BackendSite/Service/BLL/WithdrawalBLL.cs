@@ -452,13 +452,23 @@ namespace BackendSite.Service.BLL
 
         public int DeleteUSDTWithdrawalLimit(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage, string Operator)
         {
-            var currentUpperPoint = _withdrawalLimitService.GetWithdrawalLimitInfo(USDTwithdrawalLimitInfoManage.SiteId,
-                USDTwithdrawalLimitInfoManage.CurrencyId, USDTwithdrawalLimitInfoManage.VipLevel + 1);
+            var currentUpperPoint = _withdrawalLimitService.GetUSDTWithdrawalLimitInfo(USDTwithdrawalLimitInfoManage.SiteId,
+                USDTwithdrawalLimitInfoManage.CurrencyId, USDTwithdrawalLimitInfoManage.VipLevel + 1, USDTwithdrawalLimitInfoManage.Network);
 
             if (currentUpperPoint != null)
                 return 0;
 
             return _withdrawalLimitService.DeleteUSDTWithdrawalLimitInfo(USDTwithdrawalLimitInfoManage, Operator);
+        }
+
+        public bool EditUSDTWithdrawalLimit(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage, string updater)
+        {
+            if (USDTwithdrawalLimitInfoManage.WithdrawalMax < 0 || USDTwithdrawalLimitInfoManage.WithdrawalMin < 0)
+            {
+                return false;
+            }
+
+            return _withdrawalLimitService.EditUSDTWithdrawalLimitInfo(USDTwithdrawalLimitInfoManage, updater);
         }
 
         #region WithdrawalBankAccounting
