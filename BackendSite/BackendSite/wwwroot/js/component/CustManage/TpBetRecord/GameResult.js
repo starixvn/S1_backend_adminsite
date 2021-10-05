@@ -4,6 +4,14 @@ import { NewPagination } from "../../commJS/NewPagination.jsx";
 import moment from "moment-timezone";
 import TpBetRecordDetailModal from "./PopboxForTpBetRecordDetail";
 
+const style = {
+  ":hover": {
+    backgroundColor: "red",
+    font: "inherit",
+    color: "green",
+  },
+};
+
 const Result = (props) => {
   let rows =
     props.Datas.data.length === 0 ? (
@@ -22,7 +30,7 @@ const Result = (props) => {
       props.Datas.data.map((d, dIdx) => {
         return (
           <tr key={`result-${dIdx}`}>
-            <td>
+            {/* <td>
               <button
                 className="btn btn-link"
                 onClick={() =>
@@ -35,8 +43,22 @@ const Result = (props) => {
               >
                 {d.transId}
               </button>
+            </td> */}
+            <td>
+              <button
+                style={{ outline: "none" }}
+                className="btn btn-outline-primary"
+                onClick={() =>
+                  props.ClickTpBetRecordDetail(
+                    props.Info.GameTypeId,
+                    d.transId,
+                    d.settledTime
+                  )
+                }
+              >
+                {d.transId}
+              </button>
             </td>
-            {/* <td>{d.transId}</td> */}
             <td>{d.settlementTypeName}</td>
             <td>{number_format(d.turnOver_ExcludeValidTO)}</td>
             <td>{number_format(d.validBet_Valid)}</td>
