@@ -221,8 +221,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public async Task<ApiResult<dynamic>> GetTpBetRecordDetailAsync(GetTpBetRecordDetailRequest request)
         {
-            var a =  await tpBLL.GetBetDetail(request);
-            return a;
+            return await tpBLL.GetBetDetail(request);
         }
     }
 }
