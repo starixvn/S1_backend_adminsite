@@ -22,16 +22,21 @@ const Result = (props) => {
       props.Datas.data.map((d, dIdx) => {
         return (
           <tr key={`result-${dIdx}`}>
-            <td>
+            {/* <td>
               <button
                 className="btn btn-link"
                 onClick={() =>
-                  props.ClickTpBetRecordDetail(props.Info.GameTypeId, d.transId, d.settledTime)
+                  props.ClickTpBetRecordDetail(
+                    props.Info.GameTypeId,
+                    d.transId,
+                    d.settledTime
+                  )
                 }
               >
                 {d.transId}
               </button>
-            </td>
+            </td> */}
+            <td>{d.transId}</td>
             <td>{d.settlementTypeName}</td>
             <td>{number_format(d.turnOver_ExcludeValidTO)}</td>
             <td>{number_format(d.validBet_Valid)}</td>
@@ -88,6 +93,7 @@ const Result = (props) => {
       <TpBetRecordDetailModal
         show={props.TpBetRecordDatasShowStatus}
         showRawDetail={props.TpBetRecordDatasShowRawDetail}
+        GameTypeInfo={props.Info}
         tpBetRecordDatas={props.TpBetRecordDatas}
         handleSwitch={props.SwitchDetailBtn}
         handleClose={(e) => props.TpBetRecordCloseBtn()}
