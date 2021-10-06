@@ -18,6 +18,7 @@ const Panel = () => {
   const [stateGameInfo, setGameInfo] = React.useState({
     Date: null,
     GameTypeId: null,
+    GameTypeName: "",
   });
   const [stateInfoType, setInfoType] = React.useState();
   let CustId = parseInt(getUrlParameter("custId"));
@@ -191,7 +192,7 @@ const Panel = () => {
       });
   };
 
-  const getGameData = (Date, GameTypeId, PageNumber) => {
+  const getGameData = (Date, GameTypeId, GameTypeName, PageNumber) => {
     axios
       .post("/api/Payment/GetCustTpBetRecordDetailListbyGameType", {
         CustId: CustId,
@@ -206,7 +207,11 @@ const Panel = () => {
         let result = res.data;
         if (result.errorCode == 0) {
           setGameDatas(result);
-          setGameInfo({ Date: Date, GameTypeId: GameTypeId });
+          setGameInfo({
+            Date: Date,
+            GameTypeId: GameTypeId,
+            GameTypeName: GameTypeName,
+          });
           setInfoType("game");
         } else {
           alert(result.message);
@@ -223,23 +228,38 @@ const Panel = () => {
         CustId: CustId,
         GameType: parseInt(GameType),
         TransId: TransId,
-        SettledTime:SettledTime
+        SettledTime: SettledTime,
         //For Test
         //GameType: parseInt(1),
         //TransId: "Test1234",
       })
       .then((res) => {
         let result = res.data;
-        if (result.errorCode == 0) {
-          setTpBetRecordDatas(result);
-          setTpBetRecordDatasShowStatus(true);
-          setTpBetRecordDatasShowRawDetail(false);
-        } else {
-          alert(result.message);
+        switch (result.errorCode) {
+          case 0: //已經接廠商，取得資料成功
+            break;
+          case 3000: //已經接廠商，取得資料找不到
+            break;
+          case 3001: //尚未接廠商，取得資料找不到
+            break;
+          default:
+            //已經接廠商，取得資料exception & 未知錯誤
+            if (result.message == "") {
+              alert(result.rawMessage);
+            } else {
+              alert(result.message);
+            }
+            break;
         }
+        setTpBetRecordDatas(result);
+        setTpBetRecordDatasShowStatus(true);
+        setTpBetRecordDatasShowRawDetail(false);
       })
       .catch((error) => {
         alert(error);
+        setTpBetRecordDatas(result);
+        setTpBetRecordDatasShowStatus(true);
+        setTpBetRecordDatasShowRawDetail(false);
       });
   };
 

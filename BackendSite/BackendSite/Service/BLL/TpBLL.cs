@@ -286,8 +286,19 @@ namespace BackendSite.Service.BLL
         public async Task<ApiResult<dynamic>> GetBetDetail(GetTpBetRecordDetailRequest request)
         {
             var myUrl = $"{apiUrl}GetBetDetail";
-            var result = await courierAdapter.MyPostAsync<dynamic, GetTpBetRecordDetailRequest>(myUrl, request);
-            return result;
+
+            try
+            {
+                return await courierAdapter.MyPostAsync<dynamic, GetTpBetRecordDetailRequest>(myUrl, request);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult<dynamic>()
+                {
+                    ErrorCode = 9000,
+                    Message = "AdminSite Error: " + ex.Message
+                };
+            }
         }
     }
 }

@@ -2,12 +2,10 @@ import React from "react";
 import ReactJsonView from "react-json-view";
 import ReactJsonViewer, { propTypes } from "react-json-viewer";
 
-//已經完成串接的TpId
-const TpIdFinishList = [1, 14];
-
 const DateDetailModal = ({
   show,
   showRawDetail,
+  GameTypeInfo,
   tpBetRecordDatas,
   handleSwitch,
   handleClose,
@@ -17,22 +15,56 @@ const DateDetailModal = ({
   let rawDetail = null;
 
   if (show) {
-    let dataKeys = Object.keys(tpBetRecordDatas.data);
-    if (dataKeys.find((element) => element == "detail")) {
-      rawDetail = JSON.parse(tpBetRecordDatas.data.detail);
-      mainDetail = Object.assign({}, tpBetRecordDatas.data);
-      //console.log(mainDetail);
-      delete mainDetail.detail;
-    } else {
-      let strMessage = null;
-      if (TpIdFinishList.find((tpId) => tpId == tpBetRecordDatas.data.tpId)) {
-        strMessage = tpBetRecordDatas.data.gameTypeName + " Data not find.";
-      } else {
-        strMessage =
-          tpBetRecordDatas.data.gameTypeName + " Data not connected yet.";
-      }
-      rawDetail = { message: strMessage };
-      mainDetail = { message: strMessage };
+    let strMessage = null;
+    console.log(tpBetRecordDatas);
+    switch (tpBetRecordDatas.errorCode) {
+      case 0: //已經接廠商，取得資料成功
+        {
+          if (tpBetRecordDatas.data != null) {
+            let dataKeys = Object.keys(tpBetRecordDatas.data);
+            if (dataKeys.find((element) => element == "detail")) {
+              rawDetail = JSON.parse(tpBetRecordDatas.data.detail);
+              mainDetail = Object.assign({}, tpBetRecordDatas.data);
+
+              delete mainDetail.detail;
+            } else {
+              strMessage =
+                GameTypeInfo.GameTypeName + " Data(detail of result) not find.";
+              rawDetail = { message: strMessage };
+              mainDetail = { message: strMessage };
+            }
+          } else {
+            strMessage =
+              GameTypeInfo.GameTypeName + " Data not find. Data is null.";
+            rawDetail = { message: strMessage };
+            mainDetail = { message: strMessage };
+          }
+        }
+        break;
+      case 3000: //已經接廠商，取得資料找不到
+        {
+          strMessage = GameTypeInfo.GameTypeName + " Data not find.";
+          rawDetail = { message: strMessage };
+          mainDetail = { message: strMessage };
+        }
+        break;
+      case 3001: //尚未接廠商，取得資料找不到
+        {
+          strMessage = GameTypeInfo.GameTypeName + " Data not connected yet.";
+          rawDetail = { message: strMessage };
+          mainDetail = { message: strMessage };
+        }
+        break;
+      default:
+        //已經接廠商，取得資料exception & 未知錯誤
+        {
+          strMessage =
+            GameTypeInfo.GameTypeName +
+            " Data error happened. Please contant admin.";
+          rawDetail = { message: strMessage };
+          mainDetail = { message: strMessage };
+        }
+        break;
     }
   }
 

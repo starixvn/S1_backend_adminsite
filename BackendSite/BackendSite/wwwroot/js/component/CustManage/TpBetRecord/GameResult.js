@@ -4,6 +4,14 @@ import { NewPagination } from "../../commJS/NewPagination.jsx";
 import moment from "moment-timezone";
 import TpBetRecordDetailModal from "./PopboxForTpBetRecordDetail";
 
+const style = {
+  ":hover": {
+    backgroundColor: "red",
+    font: "inherit",
+    color: "green",
+  },
+};
+
 const Result = (props) => {
   let rows =
     props.Datas.data.length === 0 ? (
@@ -22,11 +30,30 @@ const Result = (props) => {
       props.Datas.data.map((d, dIdx) => {
         return (
           <tr key={`result-${dIdx}`}>
-            <td>
+            {/* <td>
               <button
                 className="btn btn-link"
                 onClick={() =>
-                  props.ClickTpBetRecordDetail(props.Info.GameTypeId, d.transId, d.settledTime)
+                  props.ClickTpBetRecordDetail(
+                    props.Info.GameTypeId,
+                    d.transId,
+                    d.settledTime
+                  )
+                }
+              >
+                {d.transId}
+              </button>
+            </td> */}
+            <td>
+              <button
+                style={{ outline: "none" }}
+                className="btn btn-outline-primary"
+                onClick={() =>
+                  props.ClickTpBetRecordDetail(
+                    props.Info.GameTypeId,
+                    d.transId,
+                    d.settledTime
+                  )
                 }
               >
                 {d.transId}
@@ -74,7 +101,8 @@ const Result = (props) => {
         ChangePage={props.ClickDetail.bind(
           null,
           props.Info.Date,
-          props.Info.GameTypeId
+          props.Info.GameTypeId,
+          props.Info.GameTypeName
         )}
       />
       <button
@@ -88,6 +116,7 @@ const Result = (props) => {
       <TpBetRecordDetailModal
         show={props.TpBetRecordDatasShowStatus}
         showRawDetail={props.TpBetRecordDatasShowRawDetail}
+        GameTypeInfo={props.Info}
         tpBetRecordDatas={props.TpBetRecordDatas}
         handleSwitch={props.SwitchDetailBtn}
         handleClose={(e) => props.TpBetRecordCloseBtn()}
