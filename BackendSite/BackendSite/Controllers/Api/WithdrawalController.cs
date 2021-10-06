@@ -878,7 +878,6 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         public ApiResult<IEnumerable<USDTWithdrawalLimitInfoManage>> GetUSDTWithdrawalLimitInfos(
             USDTWithdrawalLimit USDTwithdrawalLimit)
         {
