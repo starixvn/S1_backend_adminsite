@@ -178,5 +178,10 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
+        public IActionResult USDTWithdrawalLimitManagement()
+        {
+            return View();
+        }
     }
 }
