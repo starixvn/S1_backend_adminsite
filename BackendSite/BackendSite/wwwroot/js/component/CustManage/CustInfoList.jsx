@@ -152,6 +152,7 @@ import * as Loading from '../commJS/Loading.jsx';
 
         onSearch(pageNumber) {
             Loading.OnLoading();
+            this.setState({ Loading: true });
             let data = {
                 SelectSite: !this.state.selectSite ? null : this.state.selectSite,
                 StartDate: !this.state.StartDate ? null : this.state.StartDate,
@@ -428,6 +429,7 @@ import * as Loading from '../commJS/Loading.jsx';
             }
             let StartDate = this.state.StartDate;
             let EndDate = this.state.EndDate;
+            let Loading = this.state.Loading;
             let siteList = this.state.SiteList.map(function (obj) {
                 return <option key={obj.siteId} value={obj.siteId} selected="selected">{obj.siteName}</option>;
                 //return <option key={obj.siteId} value={obj.siteId}>{obj.siteName}</option>;
@@ -542,9 +544,13 @@ import * as Loading from '../commJS/Loading.jsx';
                                         {statusList}
                                     </div>
                                 </div>
+                                {Loading ? 
+                                <div className="button-group">
+                                    <button className="btn btn-search" type="submit" disabled={true}><span>Loading</span></button>
+                                </div>:
                                 <div className="button-group">
                                     <button type="submit" className="btn btn-primary">Search</button>
-                                </div>
+                                </div>}                       
                             </div>
                         </div>
                     </form>
