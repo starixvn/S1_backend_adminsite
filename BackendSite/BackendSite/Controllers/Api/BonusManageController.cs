@@ -139,7 +139,8 @@ namespace BackendSite.Controllers.Api
                     request.StartDate,
                     request.EndDate,
                     request.Device,
-                    request.BonusCode);
+                    request.BonusCode,
+                    request.IsSpecial);
 
                 apiResult.ErrorCode = 0;
             }
@@ -215,7 +216,8 @@ namespace BackendSite.Controllers.Api
                     request.StartDate,
                     request.EndDate,
                     request.Device,
-                    request.BonusCode);
+                    request.BonusCode,
+                    request.IsSpecial);
 
                 apiResult.ErrorCode = errorCode;
                 apiResult.Message = errorCode == 1
@@ -272,7 +274,8 @@ namespace BackendSite.Controllers.Api
                     request.StartDate,
                     request.EndDate,
                     request.Device,
-                    request.BonusCode);
+                    request.BonusCode,
+                    request.IsSpecial);
 
             return apiResult;
         }

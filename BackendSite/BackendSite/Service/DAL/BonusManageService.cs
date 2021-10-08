@@ -269,7 +269,8 @@ namespace BackendSite.Service.DAL
             long endDate,
             int device,
             string bonusCode,
-            string permissionSiteIds)
+            string permissionSiteIds,
+            bool IsSpecial)
         {
             var p = new DynamicParameters();
             p.Add("_SiteIds", siteIds);
@@ -280,10 +281,11 @@ namespace BackendSite.Service.DAL
             p.Add("_Device", device);
             p.Add("_BonusCode", bonusCode);
             p.Add("_PermissionSiteIds", permissionSiteIds);
+            p.Add("_IsSpecial", IsSpecial ? 1 : 0);
 
             using var conn =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<PromotionInfo>("Admin_PromotionListV3_Get", p,
+            return conn.Query<PromotionInfo>("Admin_PromotionListV4_Get", p,
                 commandType: CommandType.StoredProcedure);
         }
 

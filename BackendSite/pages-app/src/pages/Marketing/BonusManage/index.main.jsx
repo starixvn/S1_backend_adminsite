@@ -114,6 +114,9 @@ const titleData = [
 		body: { SpecialItem: SpecialItemType.actionBtn2 }
 	}
 ];
+
+const specialBonusOptions = [{ value: 1, displayText: "IsSpecial" }];
+
 const DateTimePickerElem = (props) => {
 	return (
 	  <div className="input-item">
@@ -213,6 +216,25 @@ export default ({
 		return <tr key={`body-${d_idx}`}>{arr}</tr>;
 	});
 
+	// const SpecialBonusCheckBox = (value, dataColumn) => {
+	// 	console.log(value, dataColumn);
+	// 	if (state.specialBonusCheck.length > 0) {
+	// 		dispatch({
+	// 			type: defActionType.SPECIALBONUS_VALUE,
+	// 			specialBonusCheck: [],
+	// 			isSpecial: false
+	// 		});
+	// 	}
+	// 	else {
+	// 		dispatch({
+	// 			type: defActionType.SPECIALBONUS_VALUE,
+	// 			specialBonusCheck: [value],
+	// 			isSpecial: true
+	// 		});
+
+	// 	}
+	// };
+
 	return (
 		<div className="container-fluid">
 			<h4 className="page-name">Bonus Management</h4>
@@ -284,6 +306,7 @@ export default ({
                         dataColumn="BonusCode"
                         onChange={FilterOnchange}
                     />
+					{CheckboxSingal("", specialBonusOptions, StateFilter.IsSpecial, FilterOnchange, "IsSpecial", null, false)}
 					<button
 						className="btn btn-search"
 						style={{ marginBottom: "10px" }}
@@ -320,6 +343,7 @@ export default ({
 		</div>
 	);
 };
+
 
 const ActionButtons = props => {
 	return (
@@ -391,7 +415,7 @@ const OptionElem = ({ columnTitle, options, onChange, values }) => {
 	);
   };
 
-  const itemRenderer = ({ checked, option, onClick }) => {
+const itemRenderer = ({ checked, option, onClick }) => {
 	return (
 	  <div>
 		<input
@@ -405,3 +429,33 @@ const OptionElem = ({ columnTitle, options, onChange, values }) => {
 	  </div>
 	);
   };
+
+const CheckboxSingal = (Title, Options, Selected, OnChange, dataColumn, mainKey, Disabled = false) => {
+	let opt = Options.map(o => {
+		return <CheckboxSingalCheckBox key={`${Title}-${o.value}${mainKey === null ? '' : `-${mainKey}`}`} onChange={OnChange} Title={o.displayText} checked={Selected.includes(o.value)} Value={o.value} dataColumn={dataColumn} Disabled={Disabled} />
+	});
+	return (
+		<>
+			{Title !== "" ? <div className="row-flex">
+				<div className="input-item">
+					<label className="label">{Title}</label>
+				</div>
+			</div> : null}
+			<div className="row-flex">
+				{opt}
+			</div>
+		</>
+	)
+}
+const CheckboxSingalCheckBox = (props) => {
+	const SpecialBonusCheckBoxOnChange = (e) => {
+		props.onChange(props.Value, props.dataColumn);
+	}
+	return (
+		<label className="checkbox checkbox-checked" >
+			<input type="checkbox" value={props.Value} checked={props.checked} onChange={SpecialBonusCheckBoxOnChange} disabled={props.Disabled} />
+			<i className="icon icon-checkbox"></i>
+			<span className="text">{props.Title}</span>
+		</label>
+	)
+}
