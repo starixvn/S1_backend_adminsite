@@ -107,6 +107,7 @@ namespace BackendSite.Service.Model
         public long EndDate { get; set; }
         public int Device { get; set; }
         public string BonusCode { get; set; }
+        public bool IsSpecial { get; set; }
     }
 
     public class Filter
