@@ -84,7 +84,23 @@ namespace BackendSite.Controllers
             {
                 selectStatus = Array.ConvertAll<string, int>(custInfoReq.SelectStatus.Split(','), s => int.Parse(s)).ToList();
             }
-            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(selectSite, custInfoReq.BirDate, custInfoReq.BirMonth, custInfoReq.BirYear, custInfoReq.UserName, custInfoReq.AccountName, custInfoReq.LoginIp, custInfoReq.TransId, custInfoReq.TpUserName, custInfoReq.Email, custInfoReq.PhoneNo, custInfoReq.StartDate, custInfoReq.EndDate, custInfoReq.AffId, selectCurrency, custInfoReq.BankAccountNumber, selectStatus);
+            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(selectSite, 
+                                                                    custInfoReq.BirDate, 
+                                                                    custInfoReq.BirMonth, 
+                                                                    custInfoReq.BirYear, 
+                                                                    custInfoReq.UserName?.Trim(), 
+                                                                    custInfoReq.AccountName?.Trim(), 
+                                                                    custInfoReq.LoginIp?.Trim(), 
+                                                                    custInfoReq.TransId?.Trim(), 
+                                                                    custInfoReq.TpUserName?.Trim(), 
+                                                                    custInfoReq.Email?.Trim(), 
+                                                                    custInfoReq.PhoneNo?.Trim(), 
+                                                                    custInfoReq.StartDate, 
+                                                                    custInfoReq.EndDate, 
+                                                                    custInfoReq.AffId, 
+                                                                    selectCurrency, 
+                                                                    custInfoReq.BankAccountNumber?.Trim(), 
+                                                                    selectStatus);
 
             var stream = excelBLL.Export(ExportCustInfo);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportCustInfo)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
