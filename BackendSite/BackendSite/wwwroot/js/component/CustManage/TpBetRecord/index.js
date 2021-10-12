@@ -236,14 +236,17 @@ const Panel = () => {
       .then((res) => {
         let result = res.data;
         switch (result.errorCode) {
-          case 0: //已經接廠商，取得資料成功
+          case 0: //已經接廠商，取得資料成功(Object呈現)
             break;
           case 3000: //已經接廠商，取得資料找不到
             break;
           case 3001: //尚未接廠商，取得資料找不到
             break;
+          case 3002: //已經接廠商，取得資料成功(Url呈現)
+            break;
           default:
-            //已經接廠商，取得資料exception & 未知錯誤
+            //9000：已經接廠商，取得資料exception
+            //其他：未知錯誤
             if (result.message == "") {
               alert(result.rawMessage);
             } else {

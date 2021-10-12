@@ -322,6 +322,7 @@ namespace BackendSite.Service.DAL
         }
 
         public bool InsertBatchMessageSendLog(int batchId,
+            int rowId,
             int custId,
             string userName,
             string sabaId,
@@ -334,6 +335,7 @@ namespace BackendSite.Service.DAL
                 DynamicParameters props = new DynamicParameters();
 
                 props.Add("_BatchId", batchId);
+                props.Add("_Seq", rowId);
                 props.Add("_CustId", custId);
                 props.Add("_UserName", userName);
                 props.Add("_SabaId", sabaId);
