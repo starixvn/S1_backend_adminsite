@@ -144,6 +144,14 @@ export default props => {
 								checked = false;
 								break;
 							}
+							else if((f_key === "bonusAmountType" && (state.promotionType == 7) && state[key][c_key][f_key] == 0)){
+								alert(
+									`${window.i18n[`lbl_Currency${c_key}`]
+									}'s ${f_key} does not allow null.`
+								);
+								checked = false;
+								break;
+							}
 						}
 					}
 
