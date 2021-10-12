@@ -42,6 +42,7 @@ const dataColumnDefs = () => {
         format: dateFormat,
       },
     },
+    { dataColumn: "settledDate", columnTitle: "SettledDate" },
   ];
 };
 const Panel = (props) => {
