@@ -309,19 +309,19 @@ namespace BackendSite.Controllers.Api
                                                    custInfoListReq.BirDate,
                                                    custInfoListReq.BirMonth,
                                                    custInfoListReq.BirYear,
-                                                   custInfoListReq.UserName,
-                                                   custInfoListReq.AccountName,
-                                                   custInfoListReq.LoginIp,
-                                                   custInfoListReq.TransId,
-                                                   custInfoListReq.TpUserName,
-                                                   custInfoListReq.Email,
-                                                   custInfoListReq.PhoneNo,
+                                                   custInfoListReq.UserName?.Trim(),
+                                                   custInfoListReq.AccountName?.Trim(),
+                                                   custInfoListReq.LoginIp?.Trim(),
+                                                   custInfoListReq.TransId?.Trim(),
+                                                   custInfoListReq.TpUserName?.Trim(),
+                                                   custInfoListReq.Email?.Trim(),
+                                                   custInfoListReq.PhoneNo?.Trim(),
                                                    custInfoListReq.StartDate,
                                                    custInfoListReq.EndDate,
                                                    custInfoListReq.PageSize,
                                                    custInfoListReq.AffId,
                                                    custInfoListReq.SelectCurrency,
-                                                   custInfoListReq.BankAccountNumber,
+                                                   custInfoListReq.BankAccountNumber?.Trim(),
                                                    custInfoListReq.SelectStatus,
                                                    ref pageNumber,
                                                    out totalPages,
@@ -368,7 +368,23 @@ namespace BackendSite.Controllers.Api
             //{
             //    selectStatus = Array.ConvertAll<string, int>(custInfoReq.SelectStatus.Split(','), s => int.Parse(s)).ToList();
             //}
-            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(custInfoReq.SelectSite, custInfoReq.BirDate, custInfoReq.BirMonth, custInfoReq.BirYear, custInfoReq.UserName, custInfoReq.AccountName, custInfoReq.LoginIp, custInfoReq.TransId, custInfoReq.TpUserName, custInfoReq.Email, custInfoReq.PhoneNo, custInfoReq.StartDate, custInfoReq.EndDate, custInfoReq.AffId, custInfoReq.SelectCurrency, custInfoReq.BankAccountNumber, custInfoReq.SelectStatus);
+            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(custInfoReq.SelectSite, 
+                                                                    custInfoReq.BirDate, 
+                                                                    custInfoReq.BirMonth, 
+                                                                    custInfoReq.BirYear, 
+                                                                    custInfoReq.UserName, 
+                                                                    custInfoReq.AccountName, 
+                                                                    custInfoReq.LoginIp, 
+                                                                    custInfoReq.TransId, 
+                                                                    custInfoReq.TpUserName, 
+                                                                    custInfoReq.Email, 
+                                                                    custInfoReq.PhoneNo, 
+                                                                    custInfoReq.StartDate, 
+                                                                    custInfoReq.EndDate, 
+                                                                    custInfoReq.AffId, 
+                                                                    custInfoReq.SelectCurrency, 
+                                                                    custInfoReq.BankAccountNumber, 
+                                                                    custInfoReq.SelectStatus);
 
             var stream = excelBLL.Export(ExportCustInfo);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportCustInfo)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
