@@ -31,7 +31,8 @@ namespace BackendSite.Service.BLL
             long startDate,
             long endDate,
             int device,
-            string bonusCode)
+            string bonusCode,
+            bool IsSpecial)
         {
 
             var siteList = _serverInfoBLL.GetSiteListByLoginUser().Select(x => x.SiteId);
@@ -43,7 +44,8 @@ namespace BackendSite.Service.BLL
                         endDate,
                         device,
                         bonusCode,
-                        JsonConvert.SerializeObject(siteList));
+                        JsonConvert.SerializeObject(siteList),
+                        IsSpecial);
         }
 
         public PromotionInfo GetPromotion(string bonusCode, int siteId)

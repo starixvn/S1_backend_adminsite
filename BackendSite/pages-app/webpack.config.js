@@ -238,9 +238,12 @@ module.exports = {
     // 	 '@babel/polyfill',
     // 	"./src/pages/Marketing/AppLinkManagement/index.js"
     // ],
-    "CSD/UserBetLimit.min": [
-      "@babel/polyfill",
-      "./src/pages/CSD/UserBetLimit/index.js"
+    // "CSD/UserBetLimit.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/CSD/UserBetLimit/index.js"
+    // ],
+    "Finance/USDTWithdrawalLimitManagement.min": [
+    	"./src/pages/Finance/USDTWithdrawalLimitManagement/index.js"
     ],
   },
   output: {

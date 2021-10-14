@@ -1020,7 +1020,7 @@ import DateTimePicker from 'react-datetime';
             let StartDate = this.state.StartDate;
             let EndDate = this.state.EndDate;
             let rejectChecks = this.state.rejectChecks;
-
+            let IsRefresh = this.state.IsRefresh;
             return (
                 <div>
                     {!this.state.ShowDetial ? <form method="post" onSubmit={this.handleSubmit.bind(this)}>
@@ -1095,9 +1095,13 @@ import DateTimePicker from 'react-datetime';
                                         <input type="text" name="amount" value={this.state.amount} type="number" onChange={this.onChange.bind(this)} />
                                     </div>
                                 </div>
+                                {IsRefresh ? 
+                                <div className="button-group">
+                                    <button className="btn btn-search" type="submit" disabled={true}><span>Loading</span></button>
+                                </div>:
                                 <div className="button-group">
                                     <button className="btn btn-search" type="submit"><span>Search</span></button>
-                                </div>
+                                </div>}
                             </div>
                         </div>
                     </form> : null}

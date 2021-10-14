@@ -117,6 +117,7 @@ namespace BackendSite.Service.BLL
         }
 
         public bool InsertBatchMessageSendLog(int batchId,
+            int rowId,
             int custId,
             string userName,
             string sabaId,
@@ -125,6 +126,7 @@ namespace BackendSite.Service.BLL
             int status)
         {
             return messageService.InsertBatchMessageSendLog(batchId,
+                rowId,
                 custId,
                 userName,
                 sabaId,

@@ -430,6 +430,47 @@ namespace BackendSite.Service.BLL
             return exportDataToExcel;
         }
 
+        public IEnumerable<USDTWithdrawalLimitInfoManage> GetUSDTWithdrawalLimitInfos(int siteId, int currencyId,string Network) 
+        { 
+            var USDTWithdrawalLimitInfos =  _withdrawalLimitService.GetUSDTWithdrawalLimitInfos(siteId, currencyId, Network);
+            USDTWithdrawalLimitInfos.ToList().ForEach(x =>
+            {
+                x.NetworkType = (int)(NetworkType)Enum.Parse(typeof(NetworkType), x.Network);
+            });
+            return USDTWithdrawalLimitInfos;
+        }
+
+        public bool AddUSDTWithdrawalLimit(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage, string updater)
+        {
+            if (USDTwithdrawalLimitInfoManage.WithdrawalMax < 0 || USDTwithdrawalLimitInfoManage.WithdrawalMin < 0)
+            {
+                return false;
+            }
+
+            return _withdrawalLimitService.AddUSDTWithdrawalLimitInfo(USDTwithdrawalLimitInfoManage, updater);
+        }
+
+        public int DeleteUSDTWithdrawalLimit(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage, string Operator)
+        {
+            var currentUpperPoint = _withdrawalLimitService.GetUSDTWithdrawalLimitInfo(USDTwithdrawalLimitInfoManage.SiteId,
+                USDTwithdrawalLimitInfoManage.CurrencyId, USDTwithdrawalLimitInfoManage.VipLevel + 1, USDTwithdrawalLimitInfoManage.Network);
+
+            if (currentUpperPoint != null)
+                return 0;
+
+            return _withdrawalLimitService.DeleteUSDTWithdrawalLimitInfo(USDTwithdrawalLimitInfoManage, Operator);
+        }
+
+        public bool EditUSDTWithdrawalLimit(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage, string updater)
+        {
+            if (USDTwithdrawalLimitInfoManage.WithdrawalMax < 0 || USDTwithdrawalLimitInfoManage.WithdrawalMin < 0)
+            {
+                return false;
+            }
+
+            return _withdrawalLimitService.EditUSDTWithdrawalLimitInfo(USDTwithdrawalLimitInfoManage, updater);
+        }
+
         #region WithdrawalBankAccounting
 
         public GetWithdrawalInfoAndAccountingListModel GetWithdrawalInfoAndAccountingList(

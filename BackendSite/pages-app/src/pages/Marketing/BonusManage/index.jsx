@@ -28,7 +28,8 @@ const App = () => {
 		StartDate: moment().add(-10, "days").format("l"),
 		EndDate: moment().format("l"),
 		Device: 0,
-		BonusCode:null
+		BonusCode:null,
+		IsSpecial:[]
 	  });
 
 
@@ -39,10 +40,26 @@ const App = () => {
 	});
 
 	const FilterOnchange = (value, dataColumn)=>{
-		setFilter({
-			...stateFilter,
-			[dataColumn]:value
-		});
+		if(dataColumn == "IsSpecial"){
+			if (stateFilter.IsSpecial.length > 0) {
+				setFilter({
+					...stateFilter,
+					[dataColumn]:[]
+				});
+			}
+			else {
+				setFilter({
+					...stateFilter,
+					[dataColumn]:[value]
+				});
+			}
+		}
+		else{
+			setFilter({
+				...stateFilter,
+				[dataColumn]:value
+			});
+		}
 	}
 
 	const GetInitSelectedSiteName = (props) => {
@@ -95,7 +112,8 @@ const App = () => {
 							StartDate: moment(stateFilter.StartDate).unix(),
         					EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
 							Device: 0,
-							BonusCode:stateFilter.BonusCode
+							BonusCode:stateFilter.BonusCode,
+							IsSpecial:stateFilter.IsSpecial.length > 0
 						})
 					};
 					WebAPI.PostData(param).then(res => {
@@ -266,7 +284,8 @@ const App = () => {
 				Status: parseInt(stateFilter.Status,10),
 				StartDate: moment(stateFilter.StartDate).unix(),
         		EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
-				BonusCode:stateFilter.BonusCode
+				BonusCode:stateFilter.BonusCode,
+				IsSpecial:stateFilter.IsSpecial.length > 0
 			};
 			let _vipLevelCondition={
 				IsForVipLevel:promotion.forVipLevel.includes(1) ? true : false,
@@ -514,7 +533,8 @@ const App = () => {
 				Status: parseInt(stateFilter.Status,10),
 				StartDate: moment(stateFilter.StartDate).unix(),
         		EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
-				BonusCode:stateFilter.BonusCode
+				BonusCode:stateFilter.BonusCode,
+				IsSpecial:stateFilter.IsSpecial.length > 0
 			};
 			let param = {
 				Url: "BonusManage/DuplicatePromotion",
@@ -651,7 +671,8 @@ const App = () => {
 				StartDate: moment(stateFilter.StartDate).unix(),
 				EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
 				Device: parseInt(stateFilter.Device,10),
-				BonusCode:stateFilter.BonusCode
+				BonusCode:stateFilter.BonusCode,
+				IsSpecial:stateFilter.IsSpecial.length > 0
 			})
 		};
 

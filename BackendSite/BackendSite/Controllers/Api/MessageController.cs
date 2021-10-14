@@ -382,6 +382,7 @@ namespace BackendSite.Controllers.Api
                         int status = (errorCode == 1) ? 3 : 4;
 
                         InsertBatchMessageSendLog(BatchId,
+                            RowId,
                             custInfosDetail.CustId,
                            custUsername,
                            sabaId,
@@ -642,6 +643,7 @@ namespace BackendSite.Controllers.Api
         }
 
         private void InsertBatchMessageSendLog(int batchMessageId,
+            int rowId,
             int custId,
             string userName,
             string sabaId,
@@ -651,6 +653,7 @@ namespace BackendSite.Controllers.Api
         {
 
             if (!messageBLL.InsertBatchMessageSendLog(batchMessageId,
+                rowId,
                 custId,
                 userName,
                 sabaId,
