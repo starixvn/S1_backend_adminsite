@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -62,7 +63,14 @@ namespace BackendSite.Controllers.Api
 
         public class LoginModel
         {
+            /// <summary>
+            /// 使用者帳號
+            /// </summary>
             public string txtID { set; get; }
+
+            /// <summary>
+            /// 使用者密碼
+            /// </summary>
             public string txtPW { set; get; }
         }
 
@@ -78,10 +86,19 @@ namespace BackendSite.Controllers.Api
         #region Actions
 
         /// <summary>
-        /// 登入
+        /// 後台登入
         /// </summary>
-        /// <param name="loginModel"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     {
+        ///        "txtID": "admin",
+        ///        "txtPW": "1q2w3e4r"
+        ///     }
+        ///
+        /// </remarks>
+        /// <param name="loginModel">登入參數</param>
+        /// <returns>結果</returns>
         [HttpPost]
         [AllowAnonymous]
         public async Task<ApiResult> Signin([FromBody] LoginModel loginModel)
@@ -146,6 +163,7 @@ namespace BackendSite.Controllers.Api
         /// 登出
         /// </summary>
         /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public async Task<ApiResult> Signout()
         {

@@ -9,6 +9,11 @@
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\Users\ettah\Desktop\Project\BackendWeb\BackendSite\BackendSite\BackendSite.xml</DocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="Controllers\Api\PendingFund.cs" />
     <Compile Remove="Service\Model\Payment.cs" />
@@ -75,6 +80,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.3" />
     <PackageReference Include="MySql.Data" Version="8.0.19" />
+    <PackageReference Include="NSwag.AspNetCore" Version="12.3.0" />
+    <PackageReference Include="NSwag.SwaggerGeneration.AspNetCore" Version="12.3.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
     <PackageReference Include="Serilog.Exceptions" Version="6.1.0" />
   </ItemGroup>
@@ -97,6 +104,6 @@
     </Content>
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties app_3data_4menu_1json__JsonSchema="http://json-schema.org/draft-04/schema" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties app_3data_4menu_1json__JsonSchema="http://json-schema.org/draft-04/schema" package_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>

@@ -14,6 +14,8 @@ using BackendSite.Attributes;
 using BackendSite.Extensions;
 using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
+using NSwag.AspNetCore;
+//using BackendSite.SwaggerDoc;
 
 namespace BackendSite
 {
@@ -211,6 +213,14 @@ namespace BackendSite
             });
 
             #endregion
+
+            #region Swagger Setting
+
+            services.AddOpenApiDocument();
+
+            #endregion
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -227,6 +237,17 @@ namespace BackendSite
 
             if (!env.IsProduction())
             {
+                #region Swagger & Redoc Setting
+
+                app.UseOpenApi();
+                app.UseSwaggerUi3();
+                app.UseReDoc(config =>
+                {
+                    config.Path = "/redoc";
+                });
+
+                #endregion
+
                 app.UseDeveloperExceptionPage();
             }
             else
