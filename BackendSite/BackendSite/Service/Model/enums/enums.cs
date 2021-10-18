@@ -1,4 +1,7 @@
-﻿namespace BackendSite.Service.Model.enums
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
+
+namespace BackendSite.Service.Model.enums
 {
     public enum Direction
     {
@@ -223,21 +226,25 @@
     /// <summary>
     /// 交易型態 列舉
     /// </summary>
+    [Description("交易型態 列舉")]
     public enum TransactionTypeEnum
     {
         /// <summary>
         /// 只有加項
         /// </summary>
+        [Description("只有加項")]
         OnlyPlus = 1,
 
         /// <summary>
         /// 只有減項
         /// </summary>
+        [Description("只有減項")]
         OnlyMinus = 2,
 
         /// <summary>
         /// 一加一減
         /// </summary>
+        [Description("一加一減")]
         PlusAndMinus = 3
     }
 
