@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -66,11 +67,13 @@ namespace BackendSite.Controllers.Api
             /// <summary>
             /// 使用者帳號
             /// </summary>
+            [Required]
             public string txtID { set; get; }
 
             /// <summary>
             /// 使用者密碼
             /// </summary>
+            [Required]
             public string txtPW { set; get; }
         }
 
