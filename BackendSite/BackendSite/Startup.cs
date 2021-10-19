@@ -32,6 +32,24 @@ namespace BackendSite
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            #region 註冊 Policy
+
+            services.AddCors(options =>
+            {
+                // CorsPolicy 是自訂的 Policy 名稱
+                options.AddPolicy("CorsPolicy", policy =>
+                {
+                    policy.WithOrigins("http://localhost:3000",
+                        "http://admin.n88dev.com/",
+                        "https://admin.n88dev.com/")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+            });
+
+            #endregion
+
             services.AddMemoryCache();
 
             /*Attributes*/
@@ -229,7 +247,10 @@ namespace BackendSite
 
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseCors(AllowSpecificOrigins);
+            //app.UseCors(AllowSpecificOrigins);
+            #region 
+            app.UseCors("CorsPolicy");
+            #endregion
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseRequestLogMiddleware();
@@ -254,7 +275,7 @@ namespace BackendSite
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-
+            //app.UseCors(AllowSpecificOrigins);
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
