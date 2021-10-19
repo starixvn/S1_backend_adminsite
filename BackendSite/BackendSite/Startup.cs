@@ -218,16 +218,6 @@ namespace BackendSite
 
             services.AddOpenApiDocument();
 
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy(name: AllowSpecificOrigins,
-                                  builder =>
-                                  {
-                                      builder.WithOrigins("http://localhost:9158", "http://admin.n88dev.com/");
-                                  });
-            });
-            services.AddControllers();
             #endregion
 
 
@@ -236,13 +226,6 @@ namespace BackendSite
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
-            //允许跨域
-            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("Content-Disposition"));
-            #region 启用Swagger中间件
-
-            #endregion
-
 
             app.UseStaticFiles();
             app.UseRouting();
