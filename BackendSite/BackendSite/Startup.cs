@@ -250,6 +250,7 @@ namespace BackendSite
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseForwardedHeaders();
 
             app.UseStaticFiles();
             app.UseRouting();
@@ -261,7 +262,7 @@ namespace BackendSite
             app.UseAuthorization();
             app.UseRequestLogMiddleware();
             app.UseResponseLogMiddleware();
-            app.UseForwardedHeaders();
+          
 
             if (!env.IsProduction())
             {
@@ -290,6 +291,7 @@ namespace BackendSite
                     pattern: "{controller=Home}/{action=Index}");
             });
 
+            app.UseHttpsRedirection();
         }
     }
 }
