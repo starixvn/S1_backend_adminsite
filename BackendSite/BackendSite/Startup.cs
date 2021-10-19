@@ -218,16 +218,7 @@ namespace BackendSite
 
             #region Swagger Setting
 
-            services.AddOpenApiDocument(config => 
-            {
-                config.PostProcess = document =>
-                {
-                    document.Schemes = new List<OpenApiSchema>()
-                    {
-                        OpenApiSchema.Https
-                    };
-                };
-            });
+            services.AddOpenApiDocument();
 
             #endregion
 
@@ -247,7 +238,18 @@ namespace BackendSite
             {
                 #region Swagger & Redoc Setting
 
-                app.UseOpenApi();
+                app.UseOpenApi(config =>
+                {
+                    config.PostProcess = (document, http) =>
+                    {        
+                        document.Schemes = new List<OpenApiSchema>()
+                        {
+                            OpenApiSchema.Http,
+                            OpenApiSchema.Https
+                        };
+                        document.Info.Title = "AdminSite API Document";
+                    };
+                });
                 app.UseSwaggerUi3();
                 app.UseReDoc(config =>
                 {
