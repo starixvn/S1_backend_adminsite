@@ -15,6 +15,7 @@ using BackendSite.Extensions;
 using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
 using NSwag.AspNetCore;
+using Microsoft.AspNetCore.HttpOverrides;
 //using BackendSite.SwaggerDoc;
 
 namespace BackendSite
@@ -238,6 +239,11 @@ namespace BackendSite
 
             #endregion
 
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.All;
+            });
+
 
         }
 
@@ -255,6 +261,7 @@ namespace BackendSite
             app.UseAuthorization();
             app.UseRequestLogMiddleware();
             app.UseResponseLogMiddleware();
+            app.UseForwardedHeaders();
 
             if (!env.IsProduction())
             {
