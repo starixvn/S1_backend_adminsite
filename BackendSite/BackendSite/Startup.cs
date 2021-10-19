@@ -14,9 +14,10 @@ using BackendSite.Attributes;
 using BackendSite.Extensions;
 using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
-using NSwag.AspNetCore;
 using Microsoft.AspNetCore.HttpOverrides;
-//using BackendSite.SwaggerDoc;
+using NSwag;
+using System.Collections.Generic;
+
 
 namespace BackendSite
 {
@@ -235,7 +236,16 @@ namespace BackendSite
 
             #region Swagger Setting
 
-            services.AddOpenApiDocument();
+            services.AddOpenApiDocument(config => 
+            {
+                config.PostProcess = document =>
+                {
+                    document.Schemes = new List<OpenApiSchema>()
+                    {
+                        OpenApiSchema.Https
+                    };
+                };
+            });
 
             #endregion
 
