@@ -177,4 +177,18 @@ namespace BackendSite.Service.Model
         public string UpdateOperator { get; set; }
     }
     #endregion
+
+    public class BalanceAdjustBonusCodeRep
+    {
+        public bool HasBonusCode { get; set; }
+        public string BonusCode { get; set; }
+        public decimal Bonus { get; set; }
+        public int RollOver { get; set; }
+    }
+    public class CheckBalanceAdjustData 
+    { 
+        public string BonusCode { get; set; }
+        public decimal Bonus { get; set; }
+        public int RollOver { get; set; }
+    }
 }

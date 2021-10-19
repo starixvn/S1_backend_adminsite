@@ -608,7 +608,7 @@ namespace BackendSite.Controllers.Api
                         if (_mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
                         {
                             var balance = _custInfoBLL.GetBalance(custInfo.CustId);
-                            var inTpTransfer = new TpTransfer()
+                            var inTpTransfer = new TpTransfer()                                      
                                 {TpId = 1, Amount = balance, CustId = custInfo.CustId, direction = TpDirection.ToTp};
 
                             var acc = await _tpBLL.TransferAsync(inTpTransfer);
@@ -992,6 +992,44 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        public class CheckBalanceAdjustBonusCodePara
+        {
+            public string BonusCode { get; set; }
+            public int PromotionType { get; set; }
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+        }
+        [HttpPost]
+        public ApiResult<BalanceAdjustBonusCodeRep> CheckBalanceAdjustBonusCode(CheckBalanceAdjustBonusCodePara para)
+        {
+            var apiResult = new ApiResult<BalanceAdjustBonusCodeRep>();
+            var data = _paymentBLL.CheckBalanceAdjustBonusCode(para.BonusCode,para.PromotionType, para.SiteId,para.CurrencyId);
+            apiResult.Data = data;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        //public class AdjustmentAndWithdrawalLimitNewReq
+        //{
+        //    public int CustId { get; set; }
+        //    public int Option { get; set; }
+        //    public decimal Amount { get; set; }
+        //    public decimal WithdrawalLimitAmount { get; set; }
+        //    public int WithdrawalLimitOption { get; set; }
+        //    public string Memo { set; get; }
+        //    public string BonusCode { get; set; }
+        //    public int BonusType { get; set; }
+        //    public int Id { get; set; }
+        //    public int TpId { get; set; }
+        //    public decimal RollOver { get; set; }
+        //    public int WalletType { get; set; }
+        //}
+        //public async Task<ApiResult> AdjustmentAndWithdrawalLimitNewAsync(AdjustmentAndWithdrawalLimitNewReq adjustmentAndWithdrawalLimitNewReq)
+        //{
+        //    var apiResult = new ApiResult();
+        //    var aa = await _paymentBLL.AdjustmentAndWithdrawalLimitNewAsync();
+        //    return apiResult;
+        //}
         #endregion
 
         #endregion

@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.Configuration;
+using BackendSite.Service.Library;
 
 namespace BackendSite.Service.BLL
 {
@@ -16,14 +18,18 @@ namespace BackendSite.Service.BLL
         private readonly AdminService adminService;
         private readonly TpMaintainService _tpMaintainService;
         private readonly ThirdPartyService _thirdPartyService;
+        private readonly string membersiteUrl;
+        private readonly CourierAdapter courierAdapter;
 
-        public PaymentBLL(IServiceProvider provider)
+        public PaymentBLL(IServiceProvider provider, IConfiguration configuration, CourierAdapter courierAdapter)
         {
             adjustmentService = provider.GetRequiredService<AdjustmentService>();
             walletService = provider.GetRequiredService<WalletService>();
             adminService = provider.GetRequiredService<AdminService>();
             _tpMaintainService = provider.GetRequiredService<TpMaintainService>();
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
+            membersiteUrl = configuration.GetValue<string>("MembersiteService");
+            this.courierAdapter = courierAdapter;
         }
 
         public int PaymentAdjustment(AdjustmentInfo adjustmentInfo, string Operator, out string transId)
@@ -233,5 +239,43 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+        public BalanceAdjustBonusCodeRep CheckBalanceAdjustBonusCode(string BonusCode,int PromotionType, int SiteId,int CurrencyId)
+        {
+            BalanceAdjustBonusCodeRep result = new BalanceAdjustBonusCodeRep();
+            var BalanceAdjustBonusCodeData = adjustmentService.CheckBalanceAdjustBonusCode(BonusCode, PromotionType, SiteId, CurrencyId);
+
+            if(BalanceAdjustBonusCodeData != null)
+            {
+                result.HasBonusCode = true;
+                result.BonusCode = BalanceAdjustBonusCodeData.BonusCode;
+                result.RollOver = BalanceAdjustBonusCodeData.RollOver;
+                result.Bonus = BalanceAdjustBonusCodeData.Bonus;
+            }
+            else
+            {
+                result.HasBonusCode = false;
+            }
+
+
+            //測試用資料
+            if(BonusCode == "XXX")
+            {
+                result.HasBonusCode = true;
+                result.BonusCode = "XXX";
+                result.RollOver = 100;
+                result.Bonus = 200;
+            }
+            return result;
+        }
+
+        //public async Task<ApiResult<IEnumerable<BannerV3>>> AdjustmentAndWithdrawalLimitNewAsync()
+        //{
+        //    Payload payload = new Payload() { BannerType = 4};
+        //     var myUrl = $"{membersiteUrl}Site/GetBannerV3/en";
+        //    var apiResult = new ApiResult<IEnumerable<BannerV3>>();
+        //    apiResult = await courierAdapter.MyPostAsync
+        //        <IEnumerable<BannerV3>, Payload>(myUrl, payload);
+        //    return apiResult;
+        //}
     }
 }
