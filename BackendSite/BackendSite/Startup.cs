@@ -34,24 +34,6 @@ namespace BackendSite
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            #region 註冊 Policy
-
-            services.AddCors(options =>
-            {
-                // CorsPolicy 是自訂的 Policy 名稱
-                options.AddPolicy("CorsPolicy", policy =>
-                {
-                    policy.WithOrigins("http://localhost:3000",
-                        "http://admin.n88dev.com/",
-                        "https://admin.n88dev.com/")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials();
-                });
-            });
-
-            #endregion
-
             services.AddMemoryCache();
 
             /*Attributes*/
@@ -249,30 +231,17 @@ namespace BackendSite
 
             #endregion
 
-            services.Configure<ForwardedHeadersOptions>(options =>
-            {
-                options.ForwardedHeaders = ForwardedHeaders.All;
-            });
-
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseForwardedHeaders();
-
             app.UseStaticFiles();
             app.UseRouting();
-            //app.UseCors(AllowSpecificOrigins);
-            #region 
-            app.UseCors("CorsPolicy");
-            #endregion
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseRequestLogMiddleware();
             app.UseResponseLogMiddleware();
-          
 
             if (!env.IsProduction())
             {
@@ -293,7 +262,7 @@ namespace BackendSite
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-            //app.UseCors(AllowSpecificOrigins);
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -301,7 +270,6 @@ namespace BackendSite
                     pattern: "{controller=Home}/{action=Index}");
             });
 
-            app.UseHttpsRedirection();
         }
     }
 }
