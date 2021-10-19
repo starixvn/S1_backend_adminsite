@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
-    [EnableCors("CorsPolicy")]
+
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
