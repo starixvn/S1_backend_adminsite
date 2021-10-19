@@ -167,6 +167,11 @@ namespace BackendSite.Controllers.Api
             public int CustId { get; set; }
         }
 
+        public class CryptoWalletLogListReq
+        {
+            public int CustId { get; set; }
+        }
+        
         public class CustBonusReq
         {
             public int CustId { get; set; }
@@ -1197,6 +1202,20 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        #region CSD > Customer Administration > CustInfo > Crypto Wallet Log
+        
+        [HttpPost]
+        public ApiListResult<CustCryptoWalletLog> GetCryptoWalletLog(CryptoWalletLogListReq cryptoWalletLogListReq)
+        {
+            var apiListResult = new ApiListResult<CustCryptoWalletLog>();
+            var custInfo = custInfoBLL.GetCustInfoWithCache(cryptoWalletLogListReq.CustId);
+            apiListResult.ErrorCode = 0;
+            var cryptoWalletInfo = custInfoBLL.GetCustCryptoWalletLogList(cryptoWalletLogListReq.CustId, custInfo.SiteId);
+            apiListResult.Data = cryptoWalletInfo;
+            return apiListResult;
+        }
+        
+        #endregion
         #region CSD > Customer Administration > CustInfo > Promotion Report
 
         public ApiListResultCurrencyAmount<Promotion> GetPromotionListByCustIdAndDate([FromForm] int CustId, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int PageSize)

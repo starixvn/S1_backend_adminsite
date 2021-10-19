@@ -11,6 +11,7 @@ import TurnoverReport from './TurnoverReport/index';
 import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
 import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
 import { BankLog } from './CustInfo_BankLog.jsx';
+import { CryptoWalletLog } from './CustInfo_CryptoWalletLog.jsx';
 import DateTimePicker from 'react-datetime';
 import TpBetRecord from './TpBetRecord/index';
 import VipLevel from './VipLevel/index';
@@ -1792,12 +1793,12 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Referral History", "VIP Level", "Promotion Report","Tag"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Crypto Wallet Log", "Referral History", "VIP Level", "Promotion Report","Tag"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false, Tag: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null ,Tag:null};
         constructor(props) {
             super(props);
-            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {},TagList:{} };
+            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], CryptoWalletLogData :[], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {},TagList:{} };
         }
 
         onTab(idx, tabName) {
@@ -2283,6 +2284,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
         }
 
         GetBankLog() {
+            console.log(123);
             let CustId = getUrlParameter("custId");
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
@@ -2300,6 +2302,28 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                         Loading.UnLoading();
                         alert(error);
                     }.bind(this));
+            }
+        }
+
+        GetCryptoWalletLog() {
+            console.log(222);
+            let CustId = getUrlParameter("custId");
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                Loading.OnLoading();
+                axios.post('/api/CustManage/GetCryptoWalletLog', { CustId: iCustId })
+                    .then(function (response) {
+                        Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({ CryptoWalletLogData: result.data });
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                    Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
             }
         }
 
@@ -2381,7 +2405,6 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                         alert(error);
                     }.bind(this));
         }
-
         render() {
             let dataContainer = null;
             let TabIdx = this.state.TabIdx;
@@ -2419,12 +2442,14 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
             } else if (TabName == this._Tabs[15]) {
                 dataContainer = <BankLog GetBankLog={this.GetBankLog.bind(this)} searchData={this.state.BankLogData} CurrencyId={this.state.CustInfoData.currencyId}/>
             } else if (TabName == this._Tabs[16]) {
-                dataContainer = <ReferralHistory GetReferralHistory={this.GetReferralHistory.bind(this)} searchData={this.state.ReferralHistoryData} ReferralHistory={this.state.ReferralHistory} onChangeValue={this.onChangeValue.bind(this)} />
+                dataContainer = <CryptoWalletLog GetCryptoWalletLog={this.GetCryptoWalletLog.bind(this)} searchData={this.state.CryptoWalletLogData}/>
             } else if (TabName == this._Tabs[17]) {
-                dataContainer = <VipLevel />
+                dataContainer = <ReferralHistory GetReferralHistory={this.GetReferralHistory.bind(this)} searchData={this.state.ReferralHistoryData} ReferralHistory={this.state.ReferralHistory} onChangeValue={this.onChangeValue.bind(this)} />
             } else if (TabName == this._Tabs[18]) {
-                dataContainer = <PromotionReport />
+                dataContainer = <VipLevel />
             } else if (TabName == this._Tabs[19]) {
+                dataContainer = <PromotionReport />
+            } else if (TabName == this._Tabs[20]) {
                 dataContainer = <Tag onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)}/>
             }
 

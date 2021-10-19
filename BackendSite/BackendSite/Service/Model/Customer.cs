@@ -168,6 +168,13 @@ namespace BackendSite.Service.Model
         public string IFSCCode { set; get; }
         public string CreateTime { set; get; }
     }
+    public class CustCryptoWalletLog
+    {
+        public string Type { set; get; }
+        public string NetWork { set; get; }
+        public string UsdtAddress { set; get; }
+        public string CreateTime { set; get; }
+    }
     public class CustBonus
     {
         public string PromotionCategory { set; get; }
