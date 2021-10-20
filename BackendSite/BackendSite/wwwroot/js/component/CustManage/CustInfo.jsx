@@ -2284,7 +2284,6 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
         }
 
         GetBankLog() {
-            console.log(123);
             let CustId = getUrlParameter("custId");
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
@@ -2306,7 +2305,6 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
         }
 
         GetCryptoWalletLog() {
-            console.log(222);
             let CustId = getUrlParameter("custId");
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
