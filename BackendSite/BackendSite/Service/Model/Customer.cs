@@ -173,7 +173,6 @@ namespace BackendSite.Service.Model
         public string NetWork { set; get; }
         public string UsdtAddress { set; get; }
         public string CreateTime { set; get; }
-        public byte Type { set; get; }
     }
     public class CustBonus
     {
