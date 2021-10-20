@@ -233,6 +233,11 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<CustBankInfoLog>("Admin_BankInfoLogList_Get", new { CustId = custId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
+        public IEnumerable<CustCryptoWalletLog> GetCustCryptoWalletLogList(int custId, int siteId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<CustCryptoWalletLog>("Admin_CryptoWalletLogList_Get", new { CustId = custId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
+        }
         public IEnumerable<CustBonus> GetCustBonus(int custId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
