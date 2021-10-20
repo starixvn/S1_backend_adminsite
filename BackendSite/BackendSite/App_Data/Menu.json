@@ -340,6 +340,16 @@
         "Childs": null
       },
       {
+        "Key": "USDTWithdrawalLimitManagement",
+        "Title": "USDT WithdrawalLimit Management",
+        "FuncKey": "Finance/USDTWithdrawalLimitManagement",
+        "Controller": "Finance",
+        "Action": "USDTWithdrawalLimitManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
         "Key": "DepositTimeReport",
         "Title": "Deposit Time Report",
         "FuncKey": "Finance/DepositTimeReport",
@@ -375,16 +385,6 @@
         "FuncKey": "Finance/AdjustmentLogReport",
         "Controller": "Finance",
         "Action": "AdjustmentLogReport",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "USDTWithdrawalLimitManagement",
-        "Title": "USDT WithdrawalLimit Management",
-        "FuncKey": "Finance/USDTWithdrawalLimitManagement",
-        "Controller": "Finance",
-        "Action": "USDTWithdrawalLimitManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null
