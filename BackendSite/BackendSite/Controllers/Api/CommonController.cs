@@ -21,6 +21,18 @@ namespace BackendSite.Controllers.Api
             this.serverInfoBLL = serverInfoBLL;
         }
 
+        /// <summary>
+        /// Common/AdminUserSiteList 取得可使用的品牌清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Global Func.
+        /// 每個程式在需要選取品牌條件時，都需要確認有哪些品牌可以選擇。
+        /// 
+        /// </remarks>
+        /// <returns>結果</returns>
         [HttpPost]
         public ApiResult<IEnumerable<ServerInfo>> AdminUserSiteList()
         {
@@ -40,6 +52,18 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// Common/GetEnumType 取得列舉清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Global Func.
+        /// 
+        /// </remarks>
+        /// <param name="enumName">參數</param>
+        /// <returns>結果</returns>
         [HttpPost]
         public ApiResult<List<dynamic>> GetEnumType([FromQuery] string enumName)
         {
@@ -71,6 +95,18 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// Common/AddAdminOperateLog 新增後台操作紀錄
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：暫時沒有找到呼叫這隻API的程式...待確認是否有使用
+        /// 
+        /// </remarks>
+        /// <param name="adminOperateLog">參數</param>
+        /// <returns>結果</returns>
         [HttpPost]
         public ApiResult AddAdminOperateLog(AdminOperateLog adminOperateLog)
         {
@@ -91,13 +127,17 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// 
+        /// Common/GetAdminOperateLog 取得後台操作紀錄
         /// </summary>
         /// <remarks>
-        /// CSD > Customer Administration > CustInfo > Admin User Log
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > CustInfo > Admin User Log > [Submit]
+        /// 
         /// </remarks>
-        /// <param name="adminOperateLogReq"></param>
-        /// <returns></returns>
+        /// <param name="adminOperateLogReq">參數</param>
+        /// <returns>結果</returns>
         [HttpPost]
         public ApiListResult<GetAdminOperateLog> GetAdminOperateLog(AdminOperateLogReq adminOperateLogReq)
         {

@@ -21,7 +21,10 @@ namespace BackendSite.Controllers.Api
         private readonly CustInfoService custInfoService;
         private readonly Common common;
 
-        public AdjustWithdrawalLimitController(CustInfoBLL custInfoBLL, AdjustWithdrawalLimitBLL adjustWithdrawalLimitBLL, AuthorizeBLL authorizeBLL, CustInfoService custInfoService, Common common)
+        public AdjustWithdrawalLimitController(CustInfoBLL custInfoBLL,
+            AdjustWithdrawalLimitBLL adjustWithdrawalLimitBLL,
+            AuthorizeBLL authorizeBLL,
+            CustInfoService custInfoService, Common common)
         {
             this.custInfoBLL = custInfoBLL;
             this.adjustWithdrawalLimitBLL = adjustWithdrawalLimitBLL;
@@ -30,6 +33,21 @@ namespace BackendSite.Controllers.Api
             this.common = common;
         }
 
+        /// <summary>
+        /// AdjustWithdrawalLimit/GetCustAndWalletInfoAsync 取得會員錢包資訊
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Limit Adjustment > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="SiteId"></param>
+        /// <param name="UserName"></param>
+        /// <param name="SabaId"></param>
+        /// <returns>結果</returns>
+        [HttpPost]
         public ApiResult<dynamic> GetCustAndWalletInfoAsync([FromForm] int SiteId, [FromForm] string UserName, [FromForm] string SabaId)
         {
             var result = new ApiResult<dynamic>();
@@ -69,6 +87,20 @@ namespace BackendSite.Controllers.Api
             return result;
         }
 
+        /// <summary>
+        /// AdjustWithdrawalLimit/GetAdjustWithdrawalLimitsLog 取得調整提款限額紀錄
+        /// </summary>
+        /// <remarks>
+        ///
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Limit Adjustment > ShowLog
+        /// 
+        /// </remarks>
+        /// <param name="CustId"></param>
+        /// <param name="PageNumber"></param>
+        /// <returns>結果</returns>
+        [HttpPost]
         public ApiListResult<AdjustWithdrawalLimit> GetAdjustWithdrawalLimitsLog([FromForm] int CustId, [FromForm] int PageNumber)
         {
             var PageSize = 10;
@@ -94,6 +126,20 @@ namespace BackendSite.Controllers.Api
             return result;
         }
 
+        /// <summary>
+        /// AdjustWithdrawalLimit/SetAdjustWithdrawalLimit 設定提款限額
+        /// </summary>
+        /// <remarks>
+        ///
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Limit Adjustment > Setting > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="CustId"></param>
+        /// <param name="adjustWithdrawalLimit"></param>
+        /// <returns>結果</returns>
+        [HttpPost]
         public ApiResult SetAdjustWithdrawalLimit([FromForm] int CustId, [FromForm] AdjustWithdrawalLimit adjustWithdrawalLimit)
         {
             var result = new ApiResult();
@@ -124,6 +170,19 @@ namespace BackendSite.Controllers.Api
             return result;
         }
 
+        /// <summary>
+        /// AdjustWithdrawalLimit/GetWalletInfo 取得錢包資訊
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Limit Adjustment > ShowWalletInfo
+        /// 
+        /// </remarks>
+        /// <param name="CustId"></param>
+        /// <returns>結果</returns>
+        [HttpPost]
         public ApiResult<WalletInfo> GetWalletInfo([FromForm] int CustId)
         {
             var result = new ApiResult<WalletInfo>();

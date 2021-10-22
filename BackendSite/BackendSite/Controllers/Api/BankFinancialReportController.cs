@@ -106,6 +106,19 @@ namespace BackendSite.Controllers.Api
 
         #region TransferInfo Report
 
+        /// <summary>
+        /// BankFinancialReport/GetTransferInfoReport 取得轉帳報表資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：BankFinancial > Transfer Info Report > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="request">參數</param>
+        /// <returns>結果</returns>
+        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/TransferInfoReport" })]
         public ApiResult GetTransferInfoReport(GetTransferInfoReportReq request)
         {
@@ -129,6 +142,21 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        /// <summary>
+        /// BankFinancialReport/ExportTransferInfoReport 匯出轉帳報表資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：BankFinancial > Transfer Info Report > [Export]
+        /// 
+        /// </remarks>
+        /// <param name="SiteId"></param>
+        /// <param name="AccountNo"></param>
+        /// <param name="StartDate"></param>
+        /// <param name="EndDate"></param>
+        /// <returns>檔案</returns>
         [HttpPost]
         public IActionResult ExportTransferInfoReport(int SiteId,
                                                     string AccountNo,
@@ -150,6 +178,19 @@ namespace BackendSite.Controllers.Api
 
         #region BankFinancial Report
 
+        /// <summary>
+        /// BankFinancialReport/GetBankFinancialReport 取得金融報表資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：BankFinancial > Bank Financial Report > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="request">參數</param>
+        /// <returns>結果</returns>
+        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/BankFinancialReport" })]
         public ApiResult GetBankFinancialReport(GetBankFinancialReportReq request)
         {
@@ -173,6 +214,21 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        /// <summary>
+        /// BankFinancialReport/ExportBankFinancialReport 匯出金融報表資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：BankFinancial > Bank Financial Report > [Export]
+        /// 
+        /// </remarks>
+        /// <param name="SiteIds"></param>
+        /// <param name="CurrencyIds"></param>
+        /// <param name="StartDate"></param>
+        /// <param name="EndDate"></param>
+        /// <returns>檔案</returns>
         [HttpPost]
         public IActionResult ExportBankFinancialReport(string SiteIds,
                                                        string CurrencyIds,

@@ -65,6 +65,7 @@ namespace BackendSite.Controllers.Api
         #region API Model
 
         public class LoginModel
+        { 
             /// <summary>
             /// 使用者帳號
             /// </summary>
@@ -90,9 +91,14 @@ namespace BackendSite.Controllers.Api
         #region Actions
 
         /// <summary>
-        /// 後台登入
+        /// Home/Signin 後台登入
         /// </summary>
         /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Home > Signin > [Login]
+        /// 
         /// Sample request:
         ///
         ///     {
@@ -101,7 +107,7 @@ namespace BackendSite.Controllers.Api
         ///     }
         ///
         /// </remarks>
-        /// <param name="loginModel">登入參數</param>
+        /// <param name="loginModel">參數</param>
         /// <returns>結果</returns>
         [HttpPost]
         [AllowAnonymous]
@@ -147,9 +153,16 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// 登入檢查
+        /// Home/CheckSignIn 登入檢查
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Global Func.每次Load首頁時確認是否為已登入狀態。
+        /// 
+        /// </remarks>
+        /// <returns>結果</returns>
         [HttpPost]
         public ApiResult CheckSignIn()
         {
@@ -164,9 +177,16 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// 登出
+        /// Home/Signout 登出
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Home > User > [Logout]
+        /// 
+        /// </remarks>
+        /// <returns>結果</returns>
         [HttpPost]
         public async Task<ApiResult> Signout()
         {
@@ -181,9 +201,16 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// 取得網站清單
+        /// Home/GetSiteList 取得品牌清單
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Global Func.
+        /// 
+        /// </remarks>
+        /// <returns>結果</returns>
         [HttpPost]
         public ApiResult GetSiteList()
         {
@@ -203,6 +230,18 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        /// <summary>
+        /// Home/ChangePwd 使用者密碼變更
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Home > User > Change Password > [Confirm]
+        /// 
+        /// </remarks>
+        /// <param name="changePwd">參數</param>
+        /// <returns>結果</returns>
         [HttpPost]
         public ApiResult ChangePwd([FromBody] ChangePwd changePwd)
         {
@@ -225,8 +264,9 @@ namespace BackendSite.Controllers.Api
             };
         }
 
-        #region Temp,沒再使用
+        #region Temp，沒再使用
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public ApiResult<int> RegisteredCustomers([FromForm] int SiteId, [FromForm] long StartDate, [FromForm] long EndDate)
         {
@@ -246,6 +286,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public ApiResult<int> DepositCustomers([FromForm] int SiteId, [FromForm] long StartDate, [FromForm] long EndDate)
         {
@@ -267,6 +308,18 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        /// <summary>
+        /// Home/GetDashBoardData 取得首頁儀錶板資訊資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Home > Dash Board > [Refresh]
+        /// 
+        /// </remarks>
+        /// <param name="para">參數</param>
+        /// <returns>結果</returns>
         [HttpPost]
         public ApiResult GetDashBoardData(DashBoardPara para)
         {
@@ -283,9 +336,17 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// 取得主選單
+        /// Home/GetMenu 取得主選單
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Home > Signin > [Login] > [GetMenu].
+        /// 確認登入成功後，打此API取得選單資料。
+        /// 
+        /// </remarks>
+        /// <returns>結果</returns>
         [HttpPost]
         public ApiResult GetMenu()
         {

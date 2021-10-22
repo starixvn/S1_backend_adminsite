@@ -21,6 +21,7 @@ namespace BackendSite.Controllers.Api
             public int FireBaseId { get; set; }
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public async Task<ApiResult> SendFireBaseMessageAsync(SendFireBaseMessageReq sendFireBaseMessageReq)
         {
