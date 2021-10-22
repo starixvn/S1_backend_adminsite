@@ -65,7 +65,6 @@ namespace BackendSite.Controllers.Api
         #region API Model
 
         public class LoginModel
-        {
             /// <summary>
             /// 使用者帳號
             /// </summary>
@@ -168,7 +167,6 @@ namespace BackendSite.Controllers.Api
         /// 登出
         /// </summary>
         /// <returns></returns>
-        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public async Task<ApiResult> Signout()
         {

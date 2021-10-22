@@ -23,7 +23,6 @@ namespace BackendSite
 {
     public class Startup
     {
-        private readonly string AllowSpecificOrigins = "AllowAllOriginsPolicy";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -207,20 +206,13 @@ namespace BackendSite
             services.AddDataProtection().DisableAutomaticKeyGeneration();
             services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("CookieKeys")).SetApplicationName("SharedCookieApp");
 
-            #region Global Filter
-
+            //Global Filter
             services.AddMvc(config =>
             {
                 config.Filters.Add<ExceptionFilter>();
             });
 
-            #endregion
-
-            #region Swagger Setting
-
-            services.AddOpenApiDocument();
-
-            #endregion
+            services.AddOpenApiDocument(); //Swagger Setting
 
         }
 
