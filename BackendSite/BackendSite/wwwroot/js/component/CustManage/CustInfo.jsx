@@ -180,8 +180,11 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
 
         handleSubmit(event) {
             event.preventDefault();
-            this.props.onChangeValue("DepositList", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, Status: parseInt(this.state.DepositStatus) === 0 ? null : parseInt(this.state.DepositStatus),
-                                    UTCStartDate:moment.utc(this.startDate.current.value).unix(),UTCEndDate:moment.utc(this.endDate.current.value).add(1, 'days').unix()-1 });
+            this.props.onChangeValue("DepositList", { StartDate: moment(this.startDate.current.value).unix(),
+                 EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1,
+                 Status: parseInt(this.state.DepositStatus),
+                 UTCStartDate:moment.utc(this.startDate.current.value).unix(),
+                 UTCEndDate:moment.utc(this.endDate.current.value).add(1, 'days').unix()-1 });
             this.props.GetDepositListByCust(1);
         }
 
@@ -1961,7 +1964,8 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                                                 EndDate: UTCEndDate,
                                                                 Status: Status,
                                                                 CustId: iCustId, 
-                                                                PageNumber: pageNumber })
+                                                                PageNumber: pageNumber,
+                                                                PageSize: 10 })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1980,14 +1984,17 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
         GetWithdrawalListByCust(PageNumber) {
             let pageNumber = PageNumber || this.state.WithdrawalListData.pageNumber;
             let CustId = getUrlParameter("custId");
+
             const {UTCStartDate,UTCEndDate,Status} = this.state.WithdrawalInfo;
             if (!isNaN(CustId)) {
                 let iCustId = parseInt(CustId);
+                
                 axios.post('/api/Withdrawal/GetWithdrawalListByCust', { StartDate: UTCStartDate,
                                                                     EndDate: UTCEndDate,
                                                                     Status: Status,
                                                                     CustId: iCustId, 
-                                                                    PageNumber: pageNumber })
+                                                                    PageNumber: pageNumber,
+                                                                    PageSize:10 })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;

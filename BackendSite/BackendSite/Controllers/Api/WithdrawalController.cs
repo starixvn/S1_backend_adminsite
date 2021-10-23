@@ -16,6 +16,7 @@ using System.IO;
 using System.Net;
 using Amazon;
 using BackendSite.ExceptionHandling;
+using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Controllers.Api
 {
@@ -474,12 +475,11 @@ namespace BackendSite.Controllers.Api
             }
         }
 
-        public class WithdrawalReq4
+        public class WithdrawalReq4: ApiRequestPageModel
         {
-            public int PageNumber { get; set; }
             public int CustId { get; set; }
             public string TransId { get; set; }
-            public int? Status { get; set; }
+            public int Status { get; set; }
             public long startDate { get; set; }
             public long endDate { get; set; }
         }
@@ -502,10 +502,10 @@ namespace BackendSite.Controllers.Api
             var CurrencyAmount = new List<string>();
             var data = withdrawalBLL.GetWithdrawalListByCust(withdrawalReq.CustId,
                 withdrawalReq.TransId,
-                withdrawalReq.Status,
+                withdrawalReq.Status == 0 ? (int?) null : withdrawalReq.Status,
                 withdrawalReq.startDate,
                 withdrawalReq.endDate,
-                10,
+                withdrawalReq.PageSize,
                 ref pageNumber,
                 out totalPages,
                 out rowCount,
@@ -595,6 +595,20 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        #region CSD > Withdrawal KYC Control
+
+        /// <summary>
+        /// Withdrawal/WithdrawalKYCList 取得提款KYC控制資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Withdrawal KYC Control > Change [Site]
+        /// 
+        /// </remarks>
+        /// <param name="withdrawalKYC"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/WithdrawalKYCControl"})]
         [HttpPost]
         public ApiResult<IEnumerable<WithdrawalKYC>> WithdrawalKYCList(WithdrawalKYC withdrawalKYC)
@@ -609,6 +623,18 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// Withdrawal/EditWithdrawalKYCList 更新提款KYC資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Withdrawal KYC Control > Edit > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="withdrawalKYC"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/WithdrawalKYCControl"})]
         [HttpPost]
         public ApiResult EditWithdrawalKYCList(WithdrawalKYC withdrawalKYC)
@@ -628,6 +654,8 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
+        #endregion
 
         public class WithdrawalLimitPara
         {
