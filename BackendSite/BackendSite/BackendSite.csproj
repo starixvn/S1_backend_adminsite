@@ -108,6 +108,22 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\ApiV2\Admin\SpecialFunc\" />
+    <Folder Include="Controllers\ApiV2\Admin\Permission\" />
+    <Folder Include="Controllers\ApiV2\Admin\Setting\" />
+    <Folder Include="Controllers\ApiV2\Finance\Deposit\" />
+    <Folder Include="Controllers\ApiV2\Finance\DepositSetting\" />
+    <Folder Include="Controllers\ApiV2\Finance\WithdrawalSetting\" />
+    <Folder Include="Controllers\ApiV2\Finance\Withdrawal\" />
+    <Folder Include="Controllers\ApiV2\Marketing\BonusSetting\" />
+    <Folder Include="Controllers\ApiV2\Member\Setting\" />
+    <Folder Include="Controllers\ApiV2\Report\OtherReport\" />
+    <Folder Include="Controllers\ApiV2\System\DropDownList\" />
+    <Folder Include="Controllers\ApiV2\System\Home\" />
+    <Folder Include="Controllers\ApiV2\System\SettingLog\" />
+  </ItemGroup>
+
   <ProjectExtensions><VisualStudio><UserProperties app_3data_4menu_1json__JsonSchema="http://json-schema.org/draft-04/schema" package_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>
