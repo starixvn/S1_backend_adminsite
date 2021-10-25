@@ -88,8 +88,20 @@ namespace BackendSite.Controllers.Api
 
         public class CustStatusSwitch
         {
+            /// <summary>
+            /// 客戶ID
+            /// </summary>
             public int CustId { get; set; }
+
+            /// <summary>
+            /// 異動資訊(1=IsKyc, 2=IsRisk, 3=PhoneVerified, 4=EmailVerified)
+            /// </summary>
             public int Op { get; set; }
+
+            /// <summary>
+            /// 狀態(0=為驗證, 1=已驗證)
+            /// </summary>
+            public int Flag { get; set; }
         }
 
         public class CustStatus
@@ -171,7 +183,7 @@ namespace BackendSite.Controllers.Api
         {
             public int CustId { get; set; }
         }
-        
+
         public class CustBonusReq
         {
             public int CustId { get; set; }
@@ -216,8 +228,8 @@ namespace BackendSite.Controllers.Api
         #endregion
 
         #region TagManagement
-        public class EditTagManagementpara 
-        { 
+        public class EditTagManagementpara
+        {
             public int Id { get; set; }
             public string TagName { get; set; }
             public string TagColour { get; set; }
@@ -249,14 +261,14 @@ namespace BackendSite.Controllers.Api
             public int PageSize { get; set; }
         }
 
-        public class SetEnableDisableBonusPara 
+        public class SetEnableDisableBonusPara
         {
             public int CustId { get; set; }
             public int EnablePromotion { get; set; }
         }
 
         #region RegLiveStatus
-        public class RegLiveStatusPara 
+        public class RegLiveStatusPara
         {
             public IEnumerable<int> SiteIds { get; set; }
             public int Currency { get; set; }
@@ -272,7 +284,7 @@ namespace BackendSite.Controllers.Api
             public int AgentCodeType { get; set; }
         }
 
-        public class SetRegLiveStatusPara 
+        public class SetRegLiveStatusPara
         {
             public int CustId { get; set; }
             public int Status { get; set; }
@@ -289,7 +301,7 @@ namespace BackendSite.Controllers.Api
             public int CustId { get; set; }
             public int Id { get; set; }
         }
-        public class EditRegLiveStatusNotes 
+        public class EditRegLiveStatusNotes
         {
             public int CustId { get; set; }
             public int Id { get; set; }
@@ -304,6 +316,19 @@ namespace BackendSite.Controllers.Api
 
         #region CSD > Customer Administration
 
+        /// <summary>
+        /// CustManage/GetCustInfoList 取得客戶資料清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="custInfoListReq"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq custInfoListReq)
         {
@@ -350,10 +375,18 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// New Code For Frontend
+        /// CustManage/ExportCustInfoList 會出客戶資料清單
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > [Export Excel]
+        /// 
+        /// ***New Code For Frontend Team.
+        /// </remarks>
         /// <param name="custInfoReq"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         [RequestSizeLimit(40000000)]
         public IActionResult ExportCustInfoList(CustInfoListReq custInfoReq)
@@ -373,22 +406,22 @@ namespace BackendSite.Controllers.Api
             //{
             //    selectStatus = Array.ConvertAll<string, int>(custInfoReq.SelectStatus.Split(','), s => int.Parse(s)).ToList();
             //}
-            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(custInfoReq.SelectSite, 
-                                                                    custInfoReq.BirDate, 
-                                                                    custInfoReq.BirMonth, 
-                                                                    custInfoReq.BirYear, 
-                                                                    custInfoReq.UserName, 
-                                                                    custInfoReq.AccountName, 
-                                                                    custInfoReq.LoginIp, 
-                                                                    custInfoReq.TransId, 
-                                                                    custInfoReq.TpUserName, 
-                                                                    custInfoReq.Email, 
-                                                                    custInfoReq.PhoneNo, 
-                                                                    custInfoReq.StartDate, 
-                                                                    custInfoReq.EndDate, 
-                                                                    custInfoReq.AffId, 
-                                                                    custInfoReq.SelectCurrency, 
-                                                                    custInfoReq.BankAccountNumber, 
+            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(custInfoReq.SelectSite,
+                                                                    custInfoReq.BirDate,
+                                                                    custInfoReq.BirMonth,
+                                                                    custInfoReq.BirYear,
+                                                                    custInfoReq.UserName,
+                                                                    custInfoReq.AccountName,
+                                                                    custInfoReq.LoginIp,
+                                                                    custInfoReq.TransId,
+                                                                    custInfoReq.TpUserName,
+                                                                    custInfoReq.Email,
+                                                                    custInfoReq.PhoneNo,
+                                                                    custInfoReq.StartDate,
+                                                                    custInfoReq.EndDate,
+                                                                    custInfoReq.AffId,
+                                                                    custInfoReq.SelectCurrency,
+                                                                    custInfoReq.BankAccountNumber,
                                                                     custInfoReq.SelectStatus);
 
             var stream = excelBLL.Export(ExportCustInfo);
@@ -399,28 +432,17 @@ namespace BackendSite.Controllers.Api
 
         #region CSD > Customer Administration > CustInfo
 
-        public static string MaskPhone(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return input;
-
-            var pattern = @"(?<=[\w]{3})[\w-\._\+%]*(?=[\w]{3})";
-            return Regex.Replace(input, pattern, m => new string('*', m.Length));
-        }
-        public static string MaskEmail(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return input;
-
-            var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
-            return Regex.Replace(input, pattern, m => new string('*', m.Length));
-        }
-
         /// <summary>
-        /// CustInfo
+        /// CustManage/GetCustInfoDetail 取得客戶資料明細
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
         /// <param name="custInfoReq"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public async Task<ApiResult<CustInfoDetail>> GetCustInfoDetailAsync(CustInfoReq custInfoReq)
         {
@@ -448,10 +470,17 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// CustInfo > Bonus Wallet
+        /// CustManage/GetCustBonus 取得客戶獎金
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Bonus Wallet
+        /// 
+        /// </remarks>
         /// <param name="custBonusReq"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult GetCustBonus(CustBonusReq custBonusReq)
         {
@@ -464,10 +493,17 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// CustInfo > Rebate Info
+        /// CustManage/GetRebateInfo 取得客戶返水資料
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Rebate Info
+        /// 
+        /// </remarks>
         /// <param name="custBonusReq"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult GetRebateInfoByCust(CustBonusReq custBonusReq)
         {
@@ -483,6 +519,11 @@ namespace BackendSite.Controllers.Api
 
         #region CustInfo > Switch On IsKyc、IsRisk、PhoneVerified、EmailVerified
 
+        /// <summary>
+        /// CustManage/SetCustStatusSwitch 設定客戶狀態開關
+        /// </summary>
+        /// <param name="custStatusSwitch"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiResult SetCustStatusSwitch(CustStatusSwitch custStatusSwitch)
         {
@@ -490,7 +531,7 @@ namespace BackendSite.Controllers.Api
             int OldStatus = 0;
             int NewStatus = 0;
             var custSwitchInfo = custInfoBLL.GetCustSwitchStatus(custStatusSwitch.CustId);
-            switch (custStatusSwitch.Op) 
+            switch (custStatusSwitch.Op)
             {
                 case 1:
                     OldStatus = custSwitchInfo.IsKyc;
@@ -555,8 +596,8 @@ namespace BackendSite.Controllers.Api
 
         #region CustInfo > Edit User Level、Full Name、Birthday (M/D/Y)、Phone Number、E-Mail
 
-        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_userEdit" })]
+        [HttpPost]
         public ApiResult SetCustInfo(CustStatus custStatus)
         {
             var apiResult = new ApiResult<bool>();
@@ -939,8 +980,8 @@ namespace BackendSite.Controllers.Api
         /// </summary>
         /// <param name="setCustStatusReq"></param>
         /// <returns></returns>
-        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_close" })]
+        [HttpPost]
         public ApiResult SetClose(CustInfoReq setCustStatusReq)
         {
             if (custInfoBLL.SetCustStatus("CustManage/CustInfoList",
@@ -967,8 +1008,9 @@ namespace BackendSite.Controllers.Api
         #endregion
 
         #region CSD > Customer Administration > CustInfo [Enable/Disable Bonus]
-        [HttpPost]
+
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_promotion" })]
+        [HttpPost]
         public ApiResult SetEnableDisablePromotion(SetEnableDisableBonusPara para)
         {
             if (custInfoBLL.SetEnableDisablePromotion(para.CustId, para.EnablePromotion, User.Identity.Name) > 0)
@@ -989,8 +1031,10 @@ namespace BackendSite.Controllers.Api
         #region CSD > Customer Administration > CustInfo [Kick Out]
 
         /// <summary>
-        /// 強制讓客戶登出
+        /// CustManage/KickOut 強制讓客戶登出
         /// </summary>
+        /// <remarks>
+        /// </remarks>
         /// <param name="setCustStatusReq"></param>
         /// <returns></returns>
         [HttpPost]
@@ -1203,7 +1247,7 @@ namespace BackendSite.Controllers.Api
         #endregion
 
         #region CSD > Customer Administration > CustInfo > Crypto Wallet Log
-        
+
         [HttpPost]
         public ApiListResult<CustCryptoWalletLog> GetCryptoWalletLog(CryptoWalletLogListReq cryptoWalletLogListReq)
         {
@@ -1214,8 +1258,9 @@ namespace BackendSite.Controllers.Api
             apiListResult.Data = cryptoWalletInfo;
             return apiListResult;
         }
-        
+
         #endregion
+
         #region CSD > Customer Administration > CustInfo > Promotion Report
 
         public ApiListResultCurrencyAmount<Promotion> GetPromotionListByCustIdAndDate([FromForm] int CustId, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int PageSize)
@@ -1260,8 +1305,20 @@ namespace BackendSite.Controllers.Api
 
         #region CSD > TeleCSD
 
-        [HttpPost]
+        /// <summary>
+        /// CustManage/GetTeleCSD 取得客服致電資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > TeleCSD > [Submit](Query)
+        /// 
+        /// </remarks>
+        /// <param name="para"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
+        [HttpPost]
         public ApiListResult<CustTele> GetTeleCSD(TeleCSDpara para)
         {
             var SearchResult = custInfoBLL.GetTeleCSD(JsonConvert.SerializeObject(para.SiteIds),
@@ -1291,6 +1348,19 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        /// <summary>
+        /// CustManage/UpdateCustomerTele 更新客服致電資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > TeleCSD > Submit(Query) > [Complete once]
+        /// 
+        /// </remarks>
+        /// <param name="para"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
         [HttpPost]
         public ApiResult UpdateCustomerTele(TeleCSDUpdatepara para)
         {
@@ -1308,6 +1378,25 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        /// <summary>
+        /// CustManage/ExportTeleCSDData 匯出客服致電資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > TeleCSD > Submit(Query) > [Export Excel]
+        /// 
+        /// </remarks>
+        /// <param name="SiteIds"></param>
+        /// <param name="Currency"></param>
+        /// <param name="Deposit"></param>
+        /// <param name="CallOut"></param>
+        /// <param name="DormantUser"></param>
+        /// <param name="StartDate"></param>
+        /// <param name="EndDate"></param>
+        /// <returns>檔案</returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
         [HttpPost]
         public IActionResult ExportTeleCSDData(string SiteIds,
                                                string Currency,
@@ -1371,10 +1460,11 @@ namespace BackendSite.Controllers.Api
         #endregion
 
         #region CSD > TagMamagement
+        
         [HttpPost]
         public ApiResult EditTagMamagement(EditTagManagementpara para)
         {
-            if (custInfoBLL.EditTagMamagement(para.Id, para.TagName,para.TagColour, para.Description, User.Identity.Name) > 0)
+            if (custInfoBLL.EditTagMamagement(para.Id, para.TagName, para.TagColour, para.Description, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -1436,7 +1526,7 @@ namespace BackendSite.Controllers.Api
                 apiResult.Data = custInfoBLL.GetAllTag();
                 apiResult.ErrorCode = 0;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong.";
@@ -1444,18 +1534,18 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
-         
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_setCustTag" })]
         public ApiResult SetCustTag(SetCustTagPara para)
         {
-            if (custInfoBLL.SetCustTag(para.CustId,para.SelectTag, User.Identity.Name) > 0)
+            if (custInfoBLL.SetCustTag(para.CustId, para.SelectTag, User.Identity.Name) > 0)
             {
                 var temp = new List<string>();
                 var selectTag = JsonConvert.SerializeObject(temp);
                 if (para.SelectTag != null && para.SelectTag.Any())
                 {
-                    var alltagDict = custInfoBLL.GetAllTag().ToDictionary(x=> x.Id,x=> x.TagName);
+                    var alltagDict = custInfoBLL.GetAllTag().ToDictionary(x => x.Id, x => x.TagName);
                     para.SelectTag.ToList().ForEach(x =>
                     {
                         temp.Add(alltagDict[x]);
@@ -1494,6 +1584,7 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
+        
         #endregion
 
         [HttpPost]
@@ -1503,7 +1594,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var SearchResult = custInfoBLL.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status
-                , custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort,custInfoReq.StartDate,custInfoReq.EndDate, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
+                , custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort, custInfoReq.StartDate, custInfoReq.EndDate, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
 
                 apiResult.Data = SearchResult.RegLiveStatusDatas;
                 apiResult.PageNumber = SearchResult.PageNumber;
@@ -1511,12 +1602,12 @@ namespace BackendSite.Controllers.Api
                 apiResult.RowCount = SearchResult.RowCount;
                 apiResult.ErrorCode = 0;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
             }
-            
+
             return apiResult;
         }
 
@@ -1524,7 +1615,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult SetRegLiveStatus(SetRegLiveStatusPara para)
         {
             var apiResult = new ApiResult();
-            if (custInfoBLL.SetRegLiveStatus(para.CustId, para.Status,para.SiteId,User.Identity.Name) > 0)
+            if (custInfoBLL.SetRegLiveStatus(para.CustId, para.Status, para.SiteId, User.Identity.Name) > 0)
             {
                 apiResult.ErrorCode = 0;
             }
@@ -1603,6 +1694,39 @@ namespace BackendSite.Controllers.Api
             var stream = excelBLL.Export(ExportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Registration_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// 電話遮罩
+        /// </summary>
+        /// <param name="phone">電話</param>
+        /// <returns>遮罩處理結果</returns>
+        private static string MaskPhone(string phone)
+        {
+            if (string.IsNullOrEmpty(phone))
+                return phone;
+
+            var pattern = @"(?<=[\w]{3})[\w-\._\+%]*(?=[\w]{3})";
+            return Regex.Replace(phone, pattern, m => new string('*', m.Length));
+        }
+
+        /// <summary>
+        /// EMail遮罩
+        /// </summary>
+        /// <param name="email">Email</param>
+        /// <returns>遮罩處理結果</returns>
+        private static string MaskEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return email;
+
+            var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
+            return Regex.Replace(email, pattern, m => new string('*', m.Length));
+        }
+
         #endregion
     }
 }

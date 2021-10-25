@@ -14,7 +14,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class RiskController : Controller
+    public class RiskController : ControllerBase
     {
         private readonly RiskBLL _riskBll;
         private readonly GameCasinoBLL _gameCasinoBll;
