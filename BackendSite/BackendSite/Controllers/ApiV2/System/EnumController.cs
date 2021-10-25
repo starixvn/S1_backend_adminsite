@@ -25,11 +25,9 @@ namespace BackendSite.Controllers.ApiV2.System
         /// Enum/GetEnumType 取得列舉清單
         /// </summary>
         /// <remarks>
-        /// 
         /// Http Method：POST
         /// 
         /// Func Path：Global Func.
-        /// 
         /// </remarks>
         /// <param name="reqest">參數</param>
         /// <returns>結果</returns>

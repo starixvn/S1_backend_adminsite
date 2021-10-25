@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BackendSite.Controllers.ApiV2.Member.Operate
+namespace BackendSite.Controllers.ApiV2.Member.Process
 {
     [Authorize]
     [Route("api/[controller]/[action]")]
