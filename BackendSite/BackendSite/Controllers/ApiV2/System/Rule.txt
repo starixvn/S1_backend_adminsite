@@ -1,0 +1,5 @@
+﻿
+BaseDataController:存放前端所需的顯示資料。
+(ex.DropDownList、Radio Btn......)
+
+EnumController：取得系統設定Enum的資料。
