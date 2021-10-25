@@ -607,8 +607,8 @@ namespace BackendSite.Controllers.Api
         /// Func Path：CSD > Withdrawal KYC Control > Change [Site]
         /// 
         /// </remarks>
-        /// <param name="withdrawalKYC"></param>
-        /// <returns></returns>
+        /// <param name="withdrawalKYC">參數</param>
+        /// <returns>結果</returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/WithdrawalKYCControl"})]
         [HttpPost]
         public ApiResult<IEnumerable<WithdrawalKYC>> WithdrawalKYCList(WithdrawalKYC withdrawalKYC)
@@ -633,8 +633,8 @@ namespace BackendSite.Controllers.Api
         /// Func Path：CSD > Withdrawal KYC Control > Edit > [Submit]
         /// 
         /// </remarks>
-        /// <param name="withdrawalKYC"></param>
-        /// <returns></returns>
+        /// <param name="withdrawalKYC">參數</param>
+        /// <returns>是否成功</returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/WithdrawalKYCControl"})]
         [HttpPost]
         public ApiResult EditWithdrawalKYCList(WithdrawalKYC withdrawalKYC)

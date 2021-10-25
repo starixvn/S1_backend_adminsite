@@ -3,6 +3,43 @@ using System.Text.Json.Serialization;
 
 namespace BackendSite.Service.Model.enums
 {
+
+    //Enum規範：(待討論)
+    //1.請按照table欄位放置區塊(region)
+    //2.命名請以 [Table欄位名稱] + Enum，ex.Customer.IsKyc => IsKycEnum
+
+    #region Customer
+
+    public enum IsKycEnum
+    {
+        Unverified = 0,
+        Verified = 1
+    }
+
+    public enum IsRiskEnum
+    {
+        Unverified = 0,
+        Verified = 1
+    }
+
+    #endregion
+
+    #region CustProfile
+
+    public enum PhoneVerifiedEnum
+    {
+        Unverified = 0,
+        Verified = 1
+    }
+
+    public enum EmailVerifiedEnum
+    {
+        Unverified = 0,
+        Verified = 1
+    }
+
+    #endregion
+
     public enum Direction
     {
         Add = 1,
@@ -34,9 +71,7 @@ namespace BackendSite.Service.Model.enums
         LocalBank = 2,
         CryptoPay = 4
     }
-    /// <summary>
-    /// 
-    /// </summary>
+
     public enum DepositStatus
     {
         Draft = 0,
@@ -304,13 +339,13 @@ namespace BackendSite.Service.Model.enums
     }
     public enum RegLiveStatusType
     {
-        Pending=1,
+        Pending = 1,
         Done = 2,
         Invalid = 3
     }
-    public enum ErrorCodeType 
-    { 
-        Success=0
+    public enum ErrorCodeType
+    {
+        Success = 0
     }
 
     public enum TpCategory

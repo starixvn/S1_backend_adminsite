@@ -88,8 +88,20 @@ namespace BackendSite.Controllers.Api
 
         public class CustStatusSwitch
         {
+            /// <summary>
+            /// 客戶ID
+            /// </summary>
             public int CustId { get; set; }
+
+            /// <summary>
+            /// 異動資訊(1=IsKyc, 2=IsRisk, 3=PhoneVerified, 4=EmailVerified)
+            /// </summary>
             public int Op { get; set; }
+
+            /// <summary>
+            /// 狀態(0=為驗證, 1=已驗證)
+            /// </summary>
+            public int Flag { get; set; }
         }
 
         public class CustStatus
@@ -305,7 +317,7 @@ namespace BackendSite.Controllers.Api
         #region CSD > Customer Administration
 
         /// <summary>
-        /// CustManage/GetCustInfoList
+        /// CustManage/GetCustInfoList 取得客戶資料清單
         /// </summary>
         /// <remarks>
         /// 
@@ -363,7 +375,7 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// CustManage/ExportCustInfoList
+        /// CustManage/ExportCustInfoList 會出客戶資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -421,10 +433,16 @@ namespace BackendSite.Controllers.Api
         #region CSD > Customer Administration > CustInfo
 
         /// <summary>
-        /// CustInfo
+        /// CustManage/GetCustInfoDetail 取得客戶資料明細
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
         /// <param name="custInfoReq"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public async Task<ApiResult<CustInfoDetail>> GetCustInfoDetailAsync(CustInfoReq custInfoReq)
         {
@@ -452,10 +470,17 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// CustInfo > Bonus Wallet
+        /// CustManage/GetCustBonus 取得客戶獎金
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Bonus Wallet
+        /// 
+        /// </remarks>
         /// <param name="custBonusReq"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult GetCustBonus(CustBonusReq custBonusReq)
         {
@@ -468,10 +493,17 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// CustInfo > Rebate Info
+        /// CustManage/GetRebateInfo 取得客戶返水資料
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Rebate Info
+        /// 
+        /// </remarks>
         /// <param name="custBonusReq"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult GetRebateInfoByCust(CustBonusReq custBonusReq)
         {
@@ -487,6 +519,11 @@ namespace BackendSite.Controllers.Api
 
         #region CustInfo > Switch On IsKyc、IsRisk、PhoneVerified、EmailVerified
 
+        /// <summary>
+        /// CustManage/SetCustStatusSwitch 設定客戶狀態開關
+        /// </summary>
+        /// <param name="custStatusSwitch"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiResult SetCustStatusSwitch(CustStatusSwitch custStatusSwitch)
         {
@@ -943,8 +980,8 @@ namespace BackendSite.Controllers.Api
         /// </summary>
         /// <param name="setCustStatusReq"></param>
         /// <returns></returns>
-        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_close" })]
+        [HttpPost]
         public ApiResult SetClose(CustInfoReq setCustStatusReq)
         {
             if (custInfoBLL.SetCustStatus("CustManage/CustInfoList",
@@ -971,8 +1008,9 @@ namespace BackendSite.Controllers.Api
         #endregion
 
         #region CSD > Customer Administration > CustInfo [Enable/Disable Bonus]
-        [HttpPost]
+
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_promotion" })]
+        [HttpPost]
         public ApiResult SetEnableDisablePromotion(SetEnableDisableBonusPara para)
         {
             if (custInfoBLL.SetEnableDisablePromotion(para.CustId, para.EnablePromotion, User.Identity.Name) > 0)
@@ -993,8 +1031,10 @@ namespace BackendSite.Controllers.Api
         #region CSD > Customer Administration > CustInfo [Kick Out]
 
         /// <summary>
-        /// 強制讓客戶登出
+        /// CustManage/KickOut 強制讓客戶登出
         /// </summary>
+        /// <remarks>
+        /// </remarks>
         /// <param name="setCustStatusReq"></param>
         /// <returns></returns>
         [HttpPost]
@@ -1220,6 +1260,7 @@ namespace BackendSite.Controllers.Api
         }
 
         #endregion
+
         #region CSD > Customer Administration > CustInfo > Promotion Report
 
         public ApiListResultCurrencyAmount<Promotion> GetPromotionListByCustIdAndDate([FromForm] int CustId, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int PageSize)
