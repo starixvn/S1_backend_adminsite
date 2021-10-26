@@ -36,9 +36,9 @@ namespace BackendSite.Service.BLL
         {
             return rebateManageService.SetRebatePayoutLimitBatch(siteId, currencyId, levelPayout, lastUpdateUser);
         }
-        public bool DelRebatePayoutLimit(int siteId, int currencyId, int categoryId)
+        public bool DelRebatePayoutLimit(int siteId, int currencyId, int categoryId, string lastUpdateUser)
         {
-            return rebateManageService.DelRebatePayoutLimit( siteId, currencyId, categoryId);
+            return rebateManageService.DelRebatePayoutLimit( siteId, currencyId, categoryId, lastUpdateUser);
         }
         public int GetRebatePeriod(int siteId, out int periodType, out int periodDay, out int redeemHours)
         {
@@ -48,9 +48,9 @@ namespace BackendSite.Service.BLL
         {
             return rebateManageService.SetRebatePeriod(siteId, periodType, periodDay, redeemHours, lastUpdateUser);
         }
-        public bool DelRebatePeriod(int siteId)
+        public bool DelRebatePeriod(int siteId, string lastUpdateUser)
         {
-            return rebateManageService.DelRebatePeriod(siteId);
+            return rebateManageService.DelRebatePeriod(siteId, lastUpdateUser);
         }
         public IEnumerable<RebateLevelData> GetRebateDataByCategory(int siteId, int categoryId, int currencyId)
         {
@@ -98,9 +98,9 @@ namespace BackendSite.Service.BLL
         {
             return rebateManageService.SetRebateCategoryBatch( siteId, CurrencyId, categoryId, levelPercentage, lastUpdateUser);
         }
-        public bool DelRebateCategory(int siteId, int currencyId, int categoryId, int level)
+        public bool DelRebateCategory(int siteId, int currencyId, int categoryId, int level, string lastUpdateUser)
         {
-            return rebateManageService.DelRebateCategory( siteId, currencyId, categoryId, level);
+            return rebateManageService.DelRebateCategory( siteId, currencyId, categoryId, level, lastUpdateUser);
         }
         public bool SetRebateGameType(int siteId, int currencyId, int gameType, int level, decimal percentage, string lastUpdateUser)
         {
@@ -110,9 +110,9 @@ namespace BackendSite.Service.BLL
         {
             return rebateManageService.SetRebateGameTypeBatch(siteId, currencyId, gameType, levelPercentage, lastUpdateUser);
         }
-        public bool DelRebateGameType(int siteId, int currencyId, int gameType, int level)
+        public bool DelRebateGameType(int siteId, int currencyId, int gameType, int level, string lastUpdateUser)
         {
-            return rebateManageService.DelRebateGameType(siteId, currencyId, gameType, level);
+            return rebateManageService.DelRebateGameType(siteId, currencyId, gameType, level, lastUpdateUser);
         }
     }
 }

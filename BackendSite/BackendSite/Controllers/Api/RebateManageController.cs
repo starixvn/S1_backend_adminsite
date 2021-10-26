@@ -113,7 +113,8 @@ namespace BackendSite.Controllers.Api
             {
                 ErrorCode = 99
             };
-            var result = rebateManageBLL.DelRebatePeriod(delRebatePeriodReq.SiteId);
+            var UserName = authorizeBLL.GetAuthData().UserName;
+            var result = rebateManageBLL.DelRebatePeriod(delRebatePeriodReq.SiteId, UserName);
             if (result)
             {
                 apiResult.ErrorCode = 0;
@@ -242,7 +243,8 @@ namespace BackendSite.Controllers.Api
             {
                 ErrorCode = 99
             };
-            var result = rebateManageBLL.DelRebateCategory(delRebateCategoryReq.SiteId, delRebateCategoryReq.CurrencyId, delRebateCategoryReq.CategoryId, delRebateCategoryReq.level);
+            var UserName = authorizeBLL.GetAuthData().UserName;
+            var result = rebateManageBLL.DelRebateCategory(delRebateCategoryReq.SiteId, delRebateCategoryReq.CurrencyId, delRebateCategoryReq.CategoryId, delRebateCategoryReq.level, UserName);
             if (result)
             {
                 apiResult.ErrorCode = 0;
@@ -317,7 +319,8 @@ namespace BackendSite.Controllers.Api
             {
                 ErrorCode = 99
             };
-            var result = rebateManageBLL.DelRebateGameType(delRebateGameTypeReq.SiteId, delRebateGameTypeReq.CurrencyId, delRebateGameTypeReq.GameType, delRebateGameTypeReq.level);
+            var UserName = authorizeBLL.GetAuthData().UserName;
+            var result = rebateManageBLL.DelRebateGameType(delRebateGameTypeReq.SiteId, delRebateGameTypeReq.CurrencyId, delRebateGameTypeReq.GameType, delRebateGameTypeReq.level, UserName);
             if (result)
             {
                 apiResult.ErrorCode = 0;
@@ -389,7 +392,8 @@ namespace BackendSite.Controllers.Api
             {
                 ErrorCode = 99
             };
-            var result = rebateManageBLL.DelRebatePayoutLimit(delRebatePayoutLimitReq.SiteId, delRebatePayoutLimitReq.CurrencyId, delRebatePayoutLimitReq.CategoryId);
+            var UserName = authorizeBLL.GetAuthData().UserName;
+            var result = rebateManageBLL.DelRebatePayoutLimit(delRebatePayoutLimitReq.SiteId, delRebatePayoutLimitReq.CurrencyId, delRebatePayoutLimitReq.CategoryId, UserName);
             if (result)
             {
                 apiResult.ErrorCode = 0;
