@@ -18,6 +18,13 @@
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Remove="Controllers\ApiV2\Report\OtherReport\**" />
+    <Content Remove="Controllers\ApiV2\Report\OtherReport\**" />
+    <EmbeddedResource Remove="Controllers\ApiV2\Report\OtherReport\**" />
+    <None Remove="Controllers\ApiV2\Report\OtherReport\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Controllers\Api\PendingFund.cs" />
@@ -106,6 +113,20 @@
     <Content Update="wwwroot\js\component\Payment\BankInfoList.min.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\ApiV2\Admin\SpecialFunc\" />
+    <Folder Include="Controllers\ApiV2\Admin\Permission\" />
+    <Folder Include="Controllers\ApiV2\Admin\Setting\" />
+    <Folder Include="Controllers\ApiV2\Finance\Deposit\" />
+    <Folder Include="Controllers\ApiV2\Finance\DepositSetting\" />
+    <Folder Include="Controllers\ApiV2\Finance\WithdrawalSetting\" />
+    <Folder Include="Controllers\ApiV2\Finance\Withdrawal\" />
+    <Folder Include="Controllers\ApiV2\Marketing\Bonus\" />
+    <Folder Include="Controllers\ApiV2\Marketing\Setting\" />
+    <Folder Include="Controllers\ApiV2\Report\" />
+    <Folder Include="Controllers\ApiV2\Admin\Home\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties app_3data_4menu_1json__JsonSchema="http://json-schema.org/draft-04/schema" package_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>

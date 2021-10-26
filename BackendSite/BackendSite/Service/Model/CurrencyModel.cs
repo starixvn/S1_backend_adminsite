@@ -3,7 +3,7 @@
 namespace BackendSite.Service.Model
 {
     /// <summary>
-    /// Currency Schema
+    /// 幣別資料表模型
     /// </summary>
     [Table("Currency")]
     public class CurrencyModel

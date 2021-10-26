@@ -22,6 +22,12 @@ namespace BackendSite.Controllers.Api
             this.permissionBLL = permissionBLL;
         }
 
+        /// <summary>
+        /// 目前後台無使用此API
+        /// </summary>
+        /// <param name="adminUser"></param>
+        /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public ApiResult AddAccount([FromBody]AdminUser adminUser)
         {
@@ -40,6 +46,12 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// 目前後台無使用此API
+        /// </summary>
+        /// <param name="adminUser"></param>
+        /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public ApiResult EditAccount([FromBody]AdminUser adminUser)
         {
@@ -58,6 +70,12 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// 目前後台無使用此API
+        /// </summary>
+        /// <param name="adminUser"></param>
+        /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public ApiResult ChangePwdAccount([FromBody]AdminUser adminUser)
         {
