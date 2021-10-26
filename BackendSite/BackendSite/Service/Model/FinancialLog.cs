@@ -184,11 +184,18 @@ namespace BackendSite.Service.Model
         public string BonusCode { get; set; }
         public decimal Bonus { get; set; }
         public int RollOver { get; set; }
+        public int WalletType { get; set; }
+        public int TpId { get; set; }
+        public int CategoryId { get; set; }
+        public string Name { get; set; }
     }
     public class CheckBalanceAdjustData 
     { 
         public string BonusCode { get; set; }
         public decimal Bonus { get; set; }
         public int RollOver { get; set; }
+        public int WalletType { get; set; }
+        public int TpId { get; set; }
+        public int CategoryId { get; set; }
     }
 }

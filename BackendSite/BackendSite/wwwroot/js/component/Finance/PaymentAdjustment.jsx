@@ -14,22 +14,19 @@ import qs from 'qs';
             SabaId: "", 
             AdjustMentLimitMax:0, 
             CheckPassword:false,
-            BonusType:0,
             BonusCode:"",
             CheckedBonusCode:"",
-            WalletType:99,
-            TransferCategoryList:null,
-            SeamlessCategoryList:null,
-            TransferCategory:"",
-            SeamlessCategory:"",
+            WalletType:0,
             RollOver:0,
-            Amount:1};
+            Amount:1,
+            HasBonusCode:false,
+            TpId:0,
+            CategoryId:0,
+            Name:""};
         }
 
         componentDidMount = () => {
             this.getSiteList();
-            this.GetTransferCategoryList();
-            this.GetSeamlessCategoryList();
         }
 
         handleSubmit(event) {
@@ -52,44 +49,6 @@ import qs from 'qs';
                     //Loading.UnLoading();
                     alert(error);
                 }.bind(this));
-        }
-
-        GetTransferCategoryList(){
-            var data = {
-                WalletType:0
-            }
-            axios.post('/api/BonusManage/GetPromoCategories',qs.stringify(data))
-                .then(function (response) {
-                    //Loading.UnLoading();
-                    let result = response.data;
-                    if (result.errorCode == 0) {
-                        this.setState({ TransferCategoryList: result.data });
-                    } else {
-                        alert(result.message);
-                    }
-                }.bind(this)).catch(function (error) {
-                    //Loading.UnLoading();
-                    alert(error);
-                }.bind(this));
-        }
-
-        GetSeamlessCategoryList(){
-            var data = {
-                WalletType:1
-            }
-            axios.post('/api/BonusManage/GetPromoCategories',qs.stringify(data))
-            .then(function (response) {
-                //Loading.UnLoading();
-                let result = response.data;
-                if (result.errorCode == 0) {
-                    this.setState({ SeamlessCategoryList: result.data });
-                } else {
-                    alert(result.message);
-                }
-            }.bind(this)).catch(function (error) {
-                //Loading.UnLoading();
-                alert(error);
-            }.bind(this));
         }
 
         onSiteChanged(e) {
@@ -173,7 +132,8 @@ import qs from 'qs';
             let withdrawal = parseFloat(this.state.Withdrawal);
             let withdrawalamount = isNaN(parseFloat(amount) * withdrawal) ? 0 : parseFloat(amount) * withdrawal;
             let memo = this.state.Memo;
-
+            let bonusCode = this.state.CheckedBonusCode
+            
             if (option == null) {
                 alert('Please select one Option.');
                 return;
@@ -189,8 +149,13 @@ import qs from 'qs';
                 return;
             }
 
-            if(amount > adjustMentLimitMax && adjustMentLimitMax !== 0 && (parseInt(option) === 1 || parseInt(option) === 3)){
+            if(amount > adjustMentLimitMax && adjustMentLimitMax !== 0 && (parseInt(option) === 1 || parseInt(option) === 3 || parseInt(option) === 5)){
                 this.setState({ CheckPassword: true });
+                return;
+            }
+
+            if(parseInt(option) === 5 && bonusCode == ""){
+                alert('Please Check BonusCode');
                 return;
             }
 
@@ -207,99 +172,6 @@ import qs from 'qs';
                 }.bind(this)).catch(function (error) {
                     //Loading.UnLoading();
                     alert(error);
-                }.bind(this));
-        }
-
-        onSumbitPaymentAdjustmentNew(event) {
-            event.preventDefault();
-            let custData = this.state.CustData;
-            let option = this.state.Option;
-            let amount = this.state.Amount;
-            let adjustMentLimitMax = this.state.AdjustMentLimitMax;
-            let checkwd = (this.state.Checkwd) ? 1 : 0;
-            let withdrawal = parseFloat(this.state.Withdrawal);
-            let withdrawalamount = isNaN(parseFloat(amount) * withdrawal) ? 0 : parseFloat(amount) * withdrawal;
-            let memo = this.state.Memo;
-            let walletType = this.state.WalletType;
-            let bonusType = this.state.BonusType;
-            let bonusCode = this.state.BonusCode.trim();
-            let checkedBonusCode = this.state.CheckedBonusCode.trim();
-            let rollOver = this.state.RollOver;
-            let transferCategory = this.state.TransferCategory;
-            let seamlessCategory = this.state.SeamlessCategory;
-            if (option == null) {
-                alert('Please select one Option.');
-                return;
-            }
-
-            if (isNaN(amount)) {
-                alert('Please select one Bank Care Account.');
-                return;
-            }
-
-            if (parseInt(option) === 1 && checkwd === 1 && withdrawalamount === 0) {
-                alert('Please Enter Withdrawal Limit');
-                return;
-            }
-
-            if(amount > adjustMentLimitMax && adjustMentLimitMax !== 0 && (parseInt(option) === 1 || parseInt(option) === 3)){
-                this.setState({ CheckPassword: true });
-                return;
-            }
-
-            if(option == 3 || option == 4){
-                if(bonusType == 0){
-                    alert('Please select BonusType');
-                    return;
-                }
-                if(bonusCode == ""){
-                    alert('Please Enter BonusCode');
-                    return;
-                }
-                if(checkedBonusCode != bonusCode){
-                    alert('Please Check BonusCode');
-                    return;
-                }
-                if(walletType == 99){
-                    alert('Please select WalletType');
-                    return;
-                }
-                if((walletType == 0 && this.state.TransferCategory == "") || (walletType == 1 && this.state.SeamlessCategory == "")){
-                    alert('Please select ProductCategory');
-                    return;
-                }
-                if(isNaN(rollOver)){
-                    alert('Please Enter RollOver');
-                    return;
-                }
-            }
-
-            let data = {
-                CustId: custData.custId,
-                Option: parseInt(option),
-                Amount: parseFloat(amount),
-                WithdrawalLimitOption:checkwd,
-                WithdrawalLimitAmount:withdrawalamount,
-                Memo: memo,
-                BonusCode: bonusCode,
-                BonusType: bonusType,
-                RollOver: parseFloat(rollOver),
-                Id: walletType == 0 ? parseInt(transferCategory) : parseInt(seamlessCategory),
-                WalletType: walletType
-            }
-            axios.post('/api/Payment/AdjustmentAndWithdrawalLimitNew', data)
-                .then(function (response) {
-                    //Loading.UnLoading();
-                    // let result = response.data;
-                    // if (result.errorCode == 0) {
-                    //     this.onGetCustInfoForPayAdjust();
-                    //     alert(result.message);
-                    // } else {
-                    //     alert(result.message);
-                    // }
-                }.bind(this)).catch(function (error) {
-                    //Loading.UnLoading();
-                    // alert(error);
                 }.bind(this));
         }
 
@@ -334,18 +206,17 @@ import qs from 'qs';
             obj[event.target.name] = event.target.value;
             this.setState(obj);
 
-            //option切為Balance,某些欄位恢復為預設值
-            if(event.target.name == "Option" && (event.target.value == 1 || event.target.value == 2)){
-                this.setState({WalletType: 99,
-                            TransferCategory: "",
-                            SeamlessCategory: "",
-                            BonusType:0,
+            //option切換,某些欄位恢復為預設值
+            if(event.target.name == "Option"){
+                this.setState({WalletType: 0,
                             BonusCode:"",
-                            CheckedBonusCode:""
-                });
-            }
-            if(event.target.name == "BonusType"){
-                this.setState({CheckedBonusCode: ""
+                            CheckedBonusCode:"",
+                            HasBonusCode:false,
+                            Name:"",
+                            TpId:0,
+                            CategoryId:0,
+                            Amount:1,
+                            RollOver:0
                 });
             }
         }
@@ -361,12 +232,8 @@ import qs from 'qs';
         onCheckBonusCode(event){
             event.preventDefault();
             let bonusCode = this.state.BonusCode;
-            let bonusType = parseInt(this.state.BonusType);
             let custData = this.state.CustData;
-            if(bonusType == 0){
-                alert('Please select one BonusType');
-                return;
-            }
+            let bonusType = 9;
 
             if(bonusCode == null || bonusCode.replace(/\s/g,"") == ""){
                 alert('Please Enter BonusCode');
@@ -379,16 +246,39 @@ import qs from 'qs';
                 if (result.errorCode == 0) {
                     if(!result.data.hasBonusCode){
                         alert("BonusCode Error! Please Check Again")
+                        this.setState({ RollOver: 0,
+                            Amount: 0,
+                            HasBonusCode: false,
+                            CheckedBonusCode: "",
+                            Name: "",
+                            TpId: 0,
+                            CategoryId: 0,
+                            WalletType: 0
+                        });
                     }
                     else{
-                        this.setState({ CheckedBonusCode: bonusCode });
-                        if(bonusType == 9){
-                            this.setState({ RollOver: result.data.rollOver,Amount: result.data.bonus});
-                        }
+                        this.setState({ RollOver: result.data.rollOver,
+                                        Amount: result.data.bonus,
+                                        HasBonusCode: true,
+                                        CheckedBonusCode: result.data.bonusCode,
+                                        Name: result.data.name,
+                                        TpId: result.data.tpId,
+                                        CategoryId: result.data.categoryId,
+                                        WalletType: result.data.walletType
+                                    });
                         alert("BonusCode " + bonusCode + " exist")       
                     }
                 } else {
                     alert(result.message);
+                    this.setState({ RollOver: 0,
+                        Amount: 0,
+                        HasBonusCode: false,
+                        CheckedBonusCode: "",
+                        Name: "",
+                        TpId: 0,
+                        CategoryId: 0,
+                        WalletType: 0
+                    });
                 }
             }.bind(this)).catch(function (error) {
                 //Loading.UnLoading();
@@ -414,28 +304,7 @@ import qs from 'qs';
                     <label className="custom-control-label" htmlFor={"SiteId_" + obj.siteId}>{obj.siteName}</label>
                 </div>;
             }.bind(this));
-            let transferCategoryList = null;
-            let seamlessCategoryList = null;
-            if((this.state.Option == 3 || this.state.Option == 4)){
-                if(this.state.WalletType == 0){
-                    transferCategoryList = this.state.TransferCategoryList.map(function (obj) {
-                        return  <div className="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id={"TransferCategory" + obj.id} name="TransferCategory" className="custom-control-input" value={obj.id} onChange={this.onChange.bind(this)} />
-                            <label className="custom-control-label" htmlFor={"TransferCategory" + obj.id}>{obj.name}</label>
-                        </div>
-                    }.bind(this))
-                    seamlessCategoryList = null;
-                }
-                if(this.state.WalletType == 1){
-                    seamlessCategoryList = this.state.SeamlessCategoryList.map(function (obj) {
-                        return  <div className="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id={"SeamlessCategory" + obj.id} name="SeamlessCategory" className="custom-control-input" value={obj.id} onChange={this.onChange.bind(this)} />
-                            <label className="custom-control-label" htmlFor={"SeamlessCategory" + obj.id}>{obj.name}</label>
-                        </div>
-                    }.bind(this))
-                    transferCategoryList = null;
-                }
-            }
+
             return (
                 <div>
                     <div className="filter">
@@ -462,7 +331,6 @@ import qs from 'qs';
                     {custData != null ?
                         <div>
                             <h4 className="page-name">Cust Info</h4>
-                            {/* <form method="post" onSubmit={this.onSumbitPaymentAdjustment.bind(this)}> */}
                                 <table className="table table-detail">
                                     <tbody>
                                         <tr>
@@ -502,21 +370,12 @@ import qs from 'qs';
                                         <input type="radio" id="Option_4" name="Option" className="custom-control-input" value={4} onChange={this.onChange.bind(this)} />
                                         <label className="custom-control-label" htmlFor="Option_4">Bonus(-)</label>
                                     </div>
-                                </div>
-                                {this.state.Option == 3 || this.state.Option == 4 ? 
-                                <div className="form-group">
-                                    <label className="col-form-label d-block">BonusType</label>
                                     <div className="custom-control custom-radio custom-control-inline">
-                                        <input type="radio" id="BonusType_1" name="BonusType" className="custom-control-input" value={8} onChange={this.onChange.bind(this)} />
-                                        <label className="custom-control-label" htmlFor="BonusType_1">Static Bonus</label>
-                                    </div>
-                                    <div className="custom-control custom-radio custom-control-inline">
-                                        <input type="radio" id="BonusType_2" name="BonusType" className="custom-control-input" value={9} onChange={this.onChange.bind(this)} />
-                                        <label className="custom-control-label" htmlFor="BonusType_2">Retention Bonus</label>
+                                        <input type="radio" id="Option_5" name="Option" className="custom-control-input" value={5} onChange={this.onChange.bind(this)} />
+                                        <label className="custom-control-label" htmlFor="Option_5">Retention Bonus</label>
                                     </div>
                                 </div>
-                                :null}
-                                {this.state.Option == 3 || this.state.Option == 4 ? 
+                                {this.state.Option == 5 ? 
                                 <div className="form-group width-200">
                                     <div>
                                         <label className="col-form-label">BonusCode</label>
@@ -527,26 +386,28 @@ import qs from 'qs';
                                     </div>
                                 </div>
                                 :null}
-                                {this.state.Option == 3 || this.state.Option == 4 ? 
-                                <div className="form-group">
-                                    <label className="col-form-label d-block">WalletType</label>
-                                    <div className="custom-control custom-radio custom-control-inline">
-                                        <input type="radio" id="WalletType_0" name="WalletType" className="custom-control-input" value={0} onChange={this.onChange.bind(this)} />
-                                        <label className="custom-control-label" htmlFor="WalletType_0">Transfer</label>
-                                    </div>
-                                    <div className="custom-control custom-radio custom-control-inline">
-                                        <input type="radio" id="WalletType_1" name="WalletType" className="custom-control-input" value={1} onChange={this.onChange.bind(this)} />
-                                        <label className="custom-control-label" htmlFor="WalletType_1">Seamless</label>
-                                    </div>
-                                </div>
-                                :null}
-                                {this.state.Option == 3 || this.state.Option == 4 ? 
-                                <div className="form-group">
-                                    {transferCategoryList != null || seamlessCategoryList != null ? <label className="col-form-label d-block">ProductCategory</label>:null}
-                                    {transferCategoryList}
-                                    {seamlessCategoryList}
-                                </div>
-                                :null}
+                                {
+                                    this.state.HasBonusCode ? 
+                                    <>
+                                    <h4 className="page-name">Retention Bonus Info</h4>
+                                    <table className="table table-detail">
+                                        <tr>
+                                            <th scope="row">BonusCode</th>
+                                            <td>{this.state.CheckedBonusCode}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">WalletType</th>
+                                            <td>{this.state.WalletType == 0 ? "Transfer" : "Seamless" }</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">ProductCategory</th>
+                                            <td>{this.state.Name}</td>
+                                        </tr>
+                                    </table>
+                                    </>
+                                    :null
+                                }
+                                {this.state.Option != 5 ? 
                                 <div className="form-group">
                                     <div className="custom-control custom-checkbox custom-control-inline">
                                         <input className="custom-control-input" id="checkwd" type="checkbox" name="Checkwd" checked={this.state.Checkwd} onChange={this.onCheck.bind(this, this.state.Checkwd)} />
@@ -554,14 +415,15 @@ import qs from 'qs';
                                     </div>
                                     <input className="form-control width-200" type="number" name="Withdrawal" pattern="[0-9]*" value={this.state.Withdrawal} onChange={this.onChange.bind(this)}/>
                                 </div>
+                                :null}
                                 <div className="form-group width-200">
                                     <label className="col-form-label">Amount</label>
-                                    <input className="form-control" type="number" name="Amount" onChange={this.onChange.bind(this)} step="1" min="1" disabled={this.state.BonusType == 9 ? true:false} value={this.state.Amount} />
+                                    <input className="form-control" type="number" name="Amount" onChange={this.onChange.bind(this)} step="1" min="1" disabled={this.state.Option == 5 ? true:false} value={this.state.Amount} />
                                 </div>
-                                {this.state.Option == 3 || this.state.Option == 4 ? 
+                                {this.state.Option == 5 ? 
                                 <div className="form-group width-200">
                                     <label className="col-form-label">RollOver</label>
-                                    <input className="form-control" type="number" name="RollOver" onChange={this.onChange.bind(this)} disabled={this.state.BonusType == 9 ? true:false} value={this.state.RollOver}/>
+                                    <input className="form-control" type="number" name="RollOver" onChange={this.onChange.bind(this)} disabled={this.state.Option == 5 ? true:false} value={this.state.RollOver}/>
                                 </div>
                                 :null}
                                 <div className="form-group width-200">
@@ -569,10 +431,8 @@ import qs from 'qs';
                                     <textarea className="form-control" name="Memo" onChange={this.onChange.bind(this)} />
                                 </div>
                                 <div className="button-group mt-10">
-                                    {/* <button type="submit" className="btn btn-primary" onClick={this.onSumbitPaymentAdjustment.bind(this)}>Submit</button> */}
-                                    <button type="submit" className="btn btn-primary" onClick={this.onSumbitPaymentAdjustmentNew.bind(this)}>Submit</button>                                 
+                                    <button type="submit" className="btn btn-primary" onClick={this.onSumbitPaymentAdjustment.bind(this)}>Submit</button>
                                 </div>
-                            {/* </form> */}
                         {this.state.CheckPassword ? <PopBoxContent 
                                                     currency={i18n["lbl_Currency" + this.state.CustData.currencyId]} 
                                                     amount={this.state.Amount}

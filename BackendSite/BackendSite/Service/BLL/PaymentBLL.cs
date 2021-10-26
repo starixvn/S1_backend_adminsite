@@ -18,18 +18,16 @@ namespace BackendSite.Service.BLL
         private readonly AdminService adminService;
         private readonly TpMaintainService _tpMaintainService;
         private readonly ThirdPartyService _thirdPartyService;
-        private readonly string membersiteUrl;
-        private readonly CourierAdapter courierAdapter;
+        private readonly BonusManageService _bonusManageService;
 
-        public PaymentBLL(IServiceProvider provider, IConfiguration configuration, CourierAdapter courierAdapter)
+        public PaymentBLL(IServiceProvider provider, IConfiguration configuration)
         {
             adjustmentService = provider.GetRequiredService<AdjustmentService>();
             walletService = provider.GetRequiredService<WalletService>();
             adminService = provider.GetRequiredService<AdminService>();
             _tpMaintainService = provider.GetRequiredService<TpMaintainService>();
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
-            membersiteUrl = configuration.GetValue<string>("MembersiteService");
-            this.courierAdapter = courierAdapter;
+            _bonusManageService = provider.GetRequiredService<BonusManageService>();
         }
 
         public int PaymentAdjustment(AdjustmentInfo adjustmentInfo, string Operator, out string transId)
@@ -246,36 +244,23 @@ namespace BackendSite.Service.BLL
 
             if(BalanceAdjustBonusCodeData != null)
             {
+                var promoCategories = _bonusManageService.GetPromoCategories(BalanceAdjustBonusCodeData.WalletType).Where(x => x.Id == BalanceAdjustBonusCodeData.CategoryId && x.TpId == BalanceAdjustBonusCodeData.TpId)?.FirstOrDefault();
                 result.HasBonusCode = true;
                 result.BonusCode = BalanceAdjustBonusCodeData.BonusCode;
                 result.RollOver = BalanceAdjustBonusCodeData.RollOver;
                 result.Bonus = BalanceAdjustBonusCodeData.Bonus;
+                result.TpId = BalanceAdjustBonusCodeData.TpId;
+                result.CategoryId = BalanceAdjustBonusCodeData.CategoryId;
+                result.Name = promoCategories == null ? string.Empty : promoCategories.Name;
+                result.WalletType = BalanceAdjustBonusCodeData.WalletType;
             }
             else
             {
                 result.HasBonusCode = false;
             }
 
-
-            //測試用資料
-            if(BonusCode == "XXX")
-            {
-                result.HasBonusCode = true;
-                result.BonusCode = "XXX";
-                result.RollOver = 100;
-                result.Bonus = 200;
-            }
             return result;
         }
 
-        //public async Task<ApiResult<IEnumerable<BannerV3>>> AdjustmentAndWithdrawalLimitNewAsync()
-        //{
-        //    Payload payload = new Payload() { BannerType = 4};
-        //     var myUrl = $"{membersiteUrl}Site/GetBannerV3/en";
-        //    var apiResult = new ApiResult<IEnumerable<BannerV3>>();
-        //    apiResult = await courierAdapter.MyPostAsync
-        //        <IEnumerable<BannerV3>, Payload>(myUrl, payload);
-        //    return apiResult;
-        //}
     }
 }
