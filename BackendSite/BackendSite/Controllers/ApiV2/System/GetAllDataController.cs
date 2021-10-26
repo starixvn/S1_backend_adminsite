@@ -34,7 +34,7 @@ namespace BackendSite.Controllers.ApiV2.System
         #region Actions
 
         /// <summary>
-        /// GetAllData/GetCurrency 取得幣別資料表全部資料
+        /// GetAllData/GetCurrency 取得幣別資料
         /// </summary>
         /// <remarks>
         /// 
@@ -45,7 +45,7 @@ namespace BackendSite.Controllers.ApiV2.System
         /// </remarks>
         /// <returns>結果</returns>
         [HttpPost]
-        public ApiResult<IEnumerable<CurrencyModel>> GetMainFinancialReport()
+        public ApiResult<IEnumerable<CurrencyModel>> GetCurrency()
         {
             var data = _reportBLL.GetCurrency();
 
