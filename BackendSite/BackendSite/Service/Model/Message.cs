@@ -4,22 +4,41 @@ namespace BackendSite.Service.Model
 {
     public class Announcement
     {
+        private DateTimeOffset _startDate { get;set;}
+        private DateTimeOffset _endDate { get;set;}
+        private DateTimeOffset _createTime { get;set;}
+        private DateTimeOffset _lastUpdateTime { get;set;}
         public int Id { get; set; }
         public int SiteId { get; set; }
         public string SiteName { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
+        public DateTimeOffset StartTime
+        {
+            get => _startDate;
+            set => _startDate = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        
+        public DateTimeOffset EndTime
+        {
+            get => _endDate;
+            set => _endDate = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public string Subject { get; set; }
         public string Content { get; set; }
         public int Status { get; set; }
         public string Creator { get; set; }
-        public DateTime CreateTime { get; set; }
-        public DateTime LastUpdateTime { get; set; }
+        public DateTimeOffset CreateTime { 
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset LastUpdateTime
+        {
+            get => _lastUpdateTime;
+            set => _lastUpdateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public string LastUpdater { get; set; }
 
         public int IsTest { get; set; }
     }
-
     public class CustLang
     {
         public string UserLang { get; set; }

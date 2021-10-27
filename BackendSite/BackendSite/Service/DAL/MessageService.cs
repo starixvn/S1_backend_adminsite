@@ -48,26 +48,24 @@ namespace BackendSite.Service.DAL
             return conn.Execute("Msg_Ins", new { Type = 99, siteId = siteId, LangId = lang, RecipientCustId = custId, Recipient = CustUserName, SenderCustId = SenderCustId, Sender = sender, Title = title, Content = content, MainId = 0 }, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, long startDate, long endDate, int status, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, DateTimeOffset startDate, DateTimeOffset endDate, int status, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
-            IEnumerable<Announcement> result = null;
-            //site為ALL類型的都可以查
-            var tempselectSite = selectSite.ToList();
-            tempselectSite.Add(0);
+            var tempSelectSite = selectSite.ToList();
+            tempSelectSite.Add(0);
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var SpName = "Admin_AnnouncementV2_Get";
+            const string spName = "Admin_AnnouncementV2_Get";
             var props = new DynamicParameters();
-            props.Add("SelectSite", JsonConvert.SerializeObject(tempselectSite));
-            props.Add("StartDate", startDate);
-            props.Add("EndDate", endDate);
+            props.Add("SelectSite", JsonConvert.SerializeObject(tempSelectSite));
+            props.Add("StartDate", startDate.DateTime,DbType.DateTime);
+            props.Add("EndDate", endDate.DateTime,DbType.DateTime);
             props.Add("Status", status);
-            props.Add("PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("PageNumber", Math.Abs(PageNumber),DbType.Int32,ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("PageSize", PageSize);
+            props.Add("StartIndex", (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize),DbType.Int32);
+            props.Add("PageSize", Math.Abs(PageSize));
 
-            result = conn.Query<Announcement>(SpName, props, commandType: CommandType.StoredProcedure);
+            var result = conn.Query<Announcement>(spName, props, commandType: CommandType.StoredProcedure);
             PageNumber = props.Get<int?>("@PageNumber") ?? 0;
             TotalPages = props.Get<int?>("@TotalPages") ?? 0;
             RowCount = props.Get<int?>("@RowCount") ?? 0;
@@ -81,7 +79,7 @@ namespace BackendSite.Service.DAL
             return conn.Query<Announcement>("Admin_Announcement_GetById", new { Id }, commandType: CommandType.StoredProcedure).FirstOrDefault();
         }
 
-        public Announcement AddAnnouncement(Announcement Datas, string Creator, int CreatorId, long _StartTime, long _EndTime)
+        public Announcement AddAnnouncement(Announcement Datas, string Creator, int CreatorId, DateTimeOffset _StartTime, DateTimeOffset _EndTime)
         {
             var result = new Announcement();
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
@@ -91,8 +89,8 @@ namespace BackendSite.Service.DAL
             var param = new DynamicParameters();
             param.Add("@Id", dbType: DbType.Int32, direction: ParameterDirection.Output);
             param.Add("@SiteId", Datas.SiteId);
-            param.Add("@StartTime", _StartTime);
-            param.Add("@EndTime", _EndTime);
+            param.Add("@StartTime", _StartTime.DateTime);
+            param.Add("@EndTime", _EndTime.DateTime);
             param.Add("@Subject", Datas.Subject);
             param.Add("@Content", Datas.Content);
             param.Add("@Status", Datas.Status);
@@ -113,7 +111,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public Announcement UpdateAnnouncement(Announcement Datas, string LastUpdater, int LastUpdaterId, long _StartTime, long _EndTime)
+        public Announcement UpdateAnnouncement(Announcement Datas, string LastUpdater, int LastUpdaterId, DateTimeOffset _StartTime, DateTimeOffset _EndTime)
         {
             var result = new Announcement();
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
@@ -123,8 +121,8 @@ namespace BackendSite.Service.DAL
             var param = new DynamicParameters();
             param.Add("@Id", Datas.Id);
             param.Add("@SiteId", Datas.SiteId);
-            param.Add("@StartTime", _StartTime);
-            param.Add("@EndTime", _EndTime);
+            param.Add("@StartTime", _StartTime.DateTime);
+            param.Add("@EndTime", _EndTime.DateTime);
             param.Add("@Subject", Datas.Subject);
             param.Add("@Content", Datas.Content);
             param.Add("@Status", Datas.Status);
