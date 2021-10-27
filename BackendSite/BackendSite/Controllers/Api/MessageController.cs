@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 namespace BackendSite.Controllers.Api
 {
     [Authorize]
-    [Route("api/[controller]/[action]")]
+    [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class MessageController : ControllerBase
     {
@@ -101,7 +101,9 @@ namespace BackendSite.Controllers.Api
                     siteList.Add(0, "All");
                 }
 
-                var result = messageBLL.GetAnnouncements(para.SelectSite, para.StartDate, para.EndDate, para.Status, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                var startTime = new DateTime(1970,1,1,0,0,0,0).AddSeconds( para.StartDate );
+                var endTime = new DateTime(1970,1,1,0,0,0,0).AddSeconds( para.EndDate );
+                var result = messageBLL.GetAnnouncements(para.SelectSite, startTime, endTime, para.Status, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
                 foreach (var r in result)
                 {
                     siteList.TryGetValue(r.SiteId, out var siteName);
@@ -109,11 +111,9 @@ namespace BackendSite.Controllers.Api
                 }
                 apiResult.Data = result;
                 apiResult.ErrorCode = 0;
-
                 apiResult.PageNumber = PageNumber;
                 apiResult.RowCount = RowCount;
                 apiResult.TotalPages = TotalPages;
-                apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
             {
@@ -179,7 +179,9 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var authData = authorizeBLL.GetAuthData();
-                var result = messageBLL.AddAnnouncement(Datas, authData.UserName, authData.UserId, _StartTime, _EndTime);
+                var startTime = new DateTime(1970,1,1,0,0,0,0).AddSeconds( _StartTime );
+                var endTime = new DateTime(1970,1,1,0,0,0,0).AddSeconds( _EndTime );
+                var result = messageBLL.AddAnnouncement(Datas, authData.UserName, authData.UserId, startTime, endTime);
                 apiResult.Data = new { result.CreateTime, result.Creator, result.Id };
                 apiResult.ErrorCode = 0;
             }
@@ -215,7 +217,9 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var authData = authorizeBLL.GetAuthData();
-                var result = messageBLL.UpdateAnnouncement(Datas, authData.UserName, authData.UserId, _StartTime, _EndTime);
+                var startTime = new DateTime(1970,1,1,0,0,0,0).AddSeconds( _StartTime );
+                var endTime = new DateTime(1970,1,1,0,0,0,0).AddSeconds( _EndTime );
+                var result = messageBLL.UpdateAnnouncement(Datas, authData.UserName, authData.UserId, startTime, endTime);
                 apiResult.Data = new { result.LastUpdater, result.LastUpdateTime };
                 apiResult.ErrorCode = 0;
             }

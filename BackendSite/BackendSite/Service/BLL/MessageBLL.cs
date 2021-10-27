@@ -33,7 +33,7 @@ namespace BackendSite.Service.BLL
             return messageService.SendMessageToPlayer(customer.SiteId, sender, title, content, custId, customer.UserName, customer.UserLang, SenderCustId);
         }
 
-        public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, long startDate, long endDate, int status, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, DateTimeOffset startDate, DateTimeOffset endDate, int status, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
         {
             return messageService.GetAnnouncements(selectSite, startDate, endDate, status, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
         }
@@ -43,12 +43,12 @@ namespace BackendSite.Service.BLL
             return messageService.GetAnnouncementById(Id);
         }
 
-        public Announcement AddAnnouncement(Announcement Datas, string Creator, int CreatorId, long _StartTime, long _EndTime)
+        public Announcement AddAnnouncement(Announcement Datas, string Creator, int CreatorId, DateTimeOffset _StartTime, DateTimeOffset _EndTime)
         {
             return messageService.AddAnnouncement(Datas, Creator, CreatorId, _StartTime, _EndTime);
         }
 
-        public Announcement UpdateAnnouncement(Announcement Datas, string LastUpdater, int LastUpdaterId, long _StartTime, long _EndTime)
+        public Announcement UpdateAnnouncement(Announcement Datas, string LastUpdater, int LastUpdaterId, DateTimeOffset _StartTime, DateTimeOffset _EndTime)
         {
             return messageService.UpdateAnnouncement(Datas, LastUpdater, LastUpdaterId, _StartTime, _EndTime);
         }
