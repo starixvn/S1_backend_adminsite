@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 namespace BackendSite.Controllers.Api
 {
     [Authorize]
-    [Route("apiV2/[controller]/[action]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class MessageController : ControllerBase
     {
