@@ -210,4 +210,7 @@
   <data name="msg_UserNotFound" xml:space="preserve">
     <value>The user could not be found! Please check the username and site are valid.</value>
   </data>
+  <data name="msg_WithdrawalLimitAdjustmentNotBalance" xml:space="preserve">
+    <value>Debit amount can not more then difference amount. Please Check.</value>
+  </data>
 </root>
