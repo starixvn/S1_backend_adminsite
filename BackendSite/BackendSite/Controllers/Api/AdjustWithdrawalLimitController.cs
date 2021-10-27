@@ -47,6 +47,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="UserName"></param>
         /// <param name="SabaId"></param>
         /// <returns>結果</returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public ApiResult<dynamic> GetCustAndWalletInfoAsync([FromForm] int SiteId, [FromForm] string UserName, [FromForm] string SabaId)
         {
@@ -100,17 +101,16 @@ namespace BackendSite.Controllers.Api
         /// <param name="CustId"></param>
         /// <param name="PageNumber"></param>
         /// <returns>結果</returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public ApiListResult<AdjustWithdrawalLimit> GetAdjustWithdrawalLimitsLog([FromForm] int CustId, [FromForm] int PageNumber)
         {
             var PageSize = 10;
-            var TotalPages = 0;
-            var RowCount = 0;
 
             var result = new ApiListResult<AdjustWithdrawalLimit>();
             try
             {
-                result.Data = adjustWithdrawalLimitBLL.GetAdjustWithdrawalLimitsLog(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                result.Data = adjustWithdrawalLimitBLL.GetAdjustWithdrawalLimitsLog(CustId, PageNumber, PageSize, out int TotalPages, out int RowCount);
 
                 result.PageNumber = PageNumber;
                 result.RowCount = RowCount;
@@ -139,6 +139,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="CustId"></param>
         /// <param name="adjustWithdrawalLimit"></param>
         /// <returns>結果</returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public ApiResult SetAdjustWithdrawalLimit([FromForm] int CustId, [FromForm] AdjustWithdrawalLimit adjustWithdrawalLimit)
         {
@@ -150,7 +151,7 @@ namespace BackendSite.Controllers.Api
                 adjustWithdrawalLimit.SiteName = custInfo.SiteName;
                 adjustWithdrawalLimit.Operator = authData.UserName;
                 adjustWithdrawalLimit.CustId = CustId;
-                var resultCode = adjustWithdrawalLimitBLL.SetAdjustWithdrawalLimit(adjustWithdrawalLimit, custInfo.UserName, custInfo.CurrencyId, custInfo.SiteId,User.Identity.Name);
+                var resultCode = adjustWithdrawalLimitBLL.SetAdjustWithdrawalLimit(adjustWithdrawalLimit, custInfo.UserName, custInfo.CurrencyId, custInfo.SiteId, User.Identity.Name);
                 if (resultCode == 21)
                 {
                     result.ErrorCode = 21;
@@ -182,6 +183,7 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="CustId"></param>
         /// <returns>結果</returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public ApiResult<WalletInfo> GetWalletInfo([FromForm] int CustId)
         {

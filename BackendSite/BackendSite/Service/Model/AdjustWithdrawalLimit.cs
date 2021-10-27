@@ -4,16 +4,15 @@ namespace BackendSite.Service.Model
 {
     public class AdjustWithdrawalLimit
     {
+        public int CustId { get; set; }
         public int AdjustType { get; set; }
         public string SiteName { get; set; }
         public string TransId { get; set; }
         public decimal Amount { get; set; }
         public string Operator { get; set; }
         public int Status { get; set; }
-        
-        public DateTime CreateTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
         public string Memo { get; set; }
-        public int CustId { get; set; }
     }
 
     public class WithdrawalLimitInfo
