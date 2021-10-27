@@ -10,7 +10,7 @@ import { initWalletType, initPromotionType, initWeekOptions, initPeriodType, wee
 import { defActionType } from "./Edit.reducer";
 
 const initBonusAmountType = promoType => {
-	return Number(promoType) === 3 || Number(promoType) === 9
+	return Number(promoType) === 3
 		? [{ value: 2, displayText: "Amount" }]
 		: Number(promoType) === 7 ? [{ value: 1, displayText: "Percentage" }]
 		:[
@@ -115,7 +115,7 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 			</div>
 			<div id="searchForm">
 				{
-					(state.promotionType == 8 || state.promotionType == 9) ?
+					(state.promotionType == 8) ?
 						null : (
 							<div className="filter">
 								<div className="row-flex">
@@ -236,7 +236,6 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 						/>
 						: null}
 				</div>
-				{state.promotionType == 9 ? null :
 				<div className="filter">
 					<h5>Display Condition</h5>	
 					<div className="row-flex" style={{ marginLeft: "auto" }}>
@@ -260,8 +259,9 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 						/>	
 					:
 					null}	
-				</div>}
-				
+				</div>
+						
+
 				{/* <div className="filter">
 						<RadioBox
 							Title="Period Type"
@@ -689,42 +689,13 @@ const SubPanel = props => {
 							
 						</>
 					) :
-					(props.state.promotionType == 8 || props.state.promotionType == 9) ?
-						(<>
-							<InputBox
-								Title="Rollover"
-								OnChange={props.EditMainValue}
-								dataColumn="rollOver"
-								value={props.state.specific[props.currencyId].rollOver}
-							/>
-							{props.state.promotionType == 9 ? 
-								<>
-									<RadioBox
-										Title="Bonus Amount Type"
-										Options={initBonusAmountType(props.state.promotionType)}
-										OnChange={props.EditCurrencyAmountValue}
-										dataColumn="bonusAmountType"
-										Selected={
-											props.state.specific[props.currencyId].bonusAmountType
-										}
-										mainKey={props.currencyId}
-									/>
-									<InputBox
-											Type="Number"
-											Title="Bonus"
-											OnChange={props.EditMainValue}
-											dataColumn="bonus"
-											value={props.state.specific[props.currencyId].bonus}
-											iptSubClass={
-												props.state.specific[props.currencyId]
-													.bonusAmountType === 1
-													? "ratio"
-													: null
-											}
-									/>
-								</>
-							: null}
-						</>)
+					(props.state.promotionType == 8) ?
+						<InputBox
+							Title="Rollover"
+							OnChange={props.EditMainValue}
+							dataColumn="rollOver"
+							value={props.state.specific[props.currencyId].rollOver}
+						/>
 						: (
 							<>
 								<InputBox
@@ -808,43 +779,7 @@ const SubPanel = props => {
 								</div>
 							</>
 						)}
-				{props.state.promotionType == 9 ?
-					null:
-					<>
-						<div className="filter noBGcolor">
-							<CheckBox
-								Options={langOptions}
-								Title="Available Languages"
-								OnChange={props.action.EditCurrencyLangCheckBox}
-								dataColumn="selectedLang"
-								Selected={
-									props.state.specific[props.currencyId].selectedLang
-								}
-								mainKey={props.state.currencyId}
-							/>
-						</div>
-						<div className="filter noBGcolor tag">{tabArr}</div>
-						{props.state.specific[props.currencyId].selectedLang.length >
-							0 &&
-							langId !== null &&
-							langId !== "" ? (
-							<div className="filter">
-								<div className="panel level-1 mt-20">
-									<LangPanel
-										state={props.state}
-										currencyId={props.currencyId}
-										EditMainValue={
-											props.action.EditCurrencyLangPanelValue
-										}
-										action={props.action}
-										langId={langId}
-									/>
-								</div>
-							</div>
-						) : null}
-					</>
-				}
-				{/* <div className="filter noBGcolor">
+				<div className="filter noBGcolor">
 					<CheckBox
 						Options={langOptions}
 						Title="Available Languages"
@@ -856,8 +791,8 @@ const SubPanel = props => {
 						mainKey={props.state.currencyId}
 					/>
 				</div>
-				<div className="filter noBGcolor tag">{tabArr}</div> */}
-				{/* {props.state.specific[props.currencyId].selectedLang.length >
+				<div className="filter noBGcolor tag">{tabArr}</div>
+				{props.state.specific[props.currencyId].selectedLang.length >
 					0 &&
 					langId !== null &&
 					langId !== "" ? (
@@ -874,7 +809,7 @@ const SubPanel = props => {
 							/>
 						</div>
 					</div>
-				) : null} */}
+				) : null}
 			</div>
 		</>
 	);
