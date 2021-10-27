@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace BackendSite.Controllers.ApiV2.System
 {
     [Authorize]
-    [Route("api/[controller]/[action]")]
+    [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class EnumController : ControllerBase
     {
@@ -31,6 +31,7 @@ namespace BackendSite.Controllers.ApiV2.System
         /// </remarks>
         /// <param name="reqest">參數</param>
         /// <returns>結果</returns>
+        //有新舊API，這支是新API，另一支新的API=api/Common/GetEnumType
         [HttpPost]
         public ApiResult<List<dynamic>> GetEnumType(GetEnumTypeReqest reqest)
         {
