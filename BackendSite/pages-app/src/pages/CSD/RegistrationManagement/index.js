@@ -19,8 +19,8 @@ const App = () => {
     RegTimeType: 1,
     StartDate: moment().add(-10, "days").format("l"),
     EndDate: moment().format("l"),
-    AffiliatesCode:"",
-    AgentCodeType:1
+    AffiliatesCode: "",
+    AgentCodeType: 1,
   });
   const [stateDatas, setDatas] = useState({
     PageInfo: null,
@@ -84,7 +84,7 @@ const App = () => {
     });
     setisloading(true);
     let param = {
-      Url: "CustManage/GetRegLiveStatusData",
+      Url: "CustManage/GetRegLiveStatusList",
       Data: {
         SiteIds: siteIds,
         Currency: Number(stateFilter.Currency),
@@ -96,8 +96,8 @@ const App = () => {
         PageNumber: 1,
         StartDate: moment(stateFilter.StartDate).unix(),
         EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
-        AffiliatesCode:stateFilter.AffiliatesCode,
-        AgentCodeType:Number(stateFilter.AgentCodeType)
+        AffiliatesCode: stateFilter.AffiliatesCode,
+        AgentCodeType: Number(stateFilter.AgentCodeType),
       },
     };
     WebAPI.PostData(param)
@@ -138,7 +138,7 @@ const App = () => {
         siteIds.push(o.value);
       });
       let param = {
-        Url: "CustManage/GetRegLiveStatusData",
+        Url: "CustManage/GetRegLiveStatusList",
         Data: {
           SiteIds: siteIds,
           Currency: Number(stateDatas.FilterInfo.Currency),
@@ -149,9 +149,10 @@ const App = () => {
           PageSize: 30,
           PageNumber: Number(stateDatas.PageInfo.pageNumber),
           StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
-          EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
-          AffiliatesCode:stateDatas.FilterInfo.AffiliatesCode,
-          AgentCodeType:Number(stateDatas.FilterInfo.AgentCodeType)
+          EndDate:
+            moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
+          AffiliatesCode: stateDatas.FilterInfo.AffiliatesCode,
+          AgentCodeType: Number(stateDatas.FilterInfo.AgentCodeType),
         },
       };
       WebAPI.PostData(param)
@@ -190,7 +191,7 @@ const App = () => {
       siteIds.push(o.value);
     });
     let param = {
-      Url: "CustManage/ExportRegLiveStatus",
+      Url: "CustManage/ExportRegLiveStatusList",
       Data: {
         SelectSite: JSON.stringify(siteIds),
         Currency: Number(stateFilter.Currency),
@@ -200,8 +201,8 @@ const App = () => {
         Sort: Number(stateFilter.RegTimeType),
         StartDate: moment(stateFilter.StartDate).unix(),
         EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
-        AffiliatesCode:stateFilter.AffiliatesCode,
-        AgentCodeType:Number(stateFilter.AgentCodeType)
+        AffiliatesCode: stateFilter.AffiliatesCode,
+        AgentCodeType: Number(stateFilter.AgentCodeType),
       },
     };
 
@@ -215,7 +216,7 @@ const App = () => {
       siteIds.push(o.value);
     });
     let param = {
-      Url: "CustManage/GetRegLiveStatusData",
+      Url: "CustManage/GetRegLiveStatusList",
       Data: {
         SiteIds: siteIds,
         Currency: Number(stateDatas.FilterInfo.Currency),
@@ -226,9 +227,10 @@ const App = () => {
         PageSize: 30,
         PageNumber: PageNumber,
         StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
-        EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
-        AffiliatesCode:stateDatas.FilterInfo.AffiliatesCode,
-        AgentCodeType:Number(stateDatas.FilterInfo.AgentCodeType)
+        EndDate:
+          moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
+        AffiliatesCode: stateDatas.FilterInfo.AffiliatesCode,
+        AgentCodeType: Number(stateDatas.FilterInfo.AgentCodeType),
       },
     };
     WebAPI.PostData(param)
@@ -284,7 +286,7 @@ const App = () => {
       siteIds.push(o.value);
     });
     let param = {
-      Url: "CustManage/GetRegLiveStatusData",
+      Url: "CustManage/GetRegLiveStatusList",
       Data: {
         SiteIds: siteIds,
         Currency: Number(stateDatas.FilterInfo.Currency),
@@ -295,7 +297,8 @@ const App = () => {
         PageSize: 30,
         PageNumber: stateDatas.PageInfo.pageNumber,
         StartDate: moment(stateDatas.FilterInfo.StartDate).unix(),
-        EndDate: moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
+        EndDate:
+          moment(stateDatas.FilterInfo.EndDate).add(1, "days").unix() - 1,
       },
     };
     WebAPI.PostData(param)

@@ -94,7 +94,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         #endregion
 
         /// <summary>
-        /// AdjustWithdrawalLimit/GetCustAndWalletInfoAsync 取得會員錢包資訊
+        /// WithdrawalLimitAdjustment/GetCustAndWalletInfoAsync 取得會員錢包資訊
         /// </summary>
         /// <remarks>
         /// 
@@ -149,7 +149,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         }
 
         /// <summary>
-        /// AdjustWithdrawalLimit/GetAdjustWithdrawalLimitsLog 取得調整提款限額紀錄
+        /// WithdrawalLimitAdjustment/GetAdjustWithdrawalLimitsLog 取得調整提款限額紀錄
         /// </summary>
         /// <remarks>
         ///
@@ -189,7 +189,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         }
 
         /// <summary>
-        /// AdjustWithdrawalLimit/SetAdjustWithdrawalLimit 設定提款限額
+        /// WithdrawalLimitAdjustment/SetAdjustWithdrawalLimit 設定提款限額
         /// </summary>
         /// <remarks>
         ///

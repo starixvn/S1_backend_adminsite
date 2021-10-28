@@ -14,7 +14,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class UserBetLimitController : Controller
+    public class UserBetLimitController : ControllerBase
     {
         private readonly UserBetLimitBLL _userBetLimitBll;
         private readonly CustInfoBLL _custInfoBll;

@@ -6,7 +6,8 @@ namespace BackendSite.Service.Model.enums
 
     //Enum規範：(待討論)
     //1.請按照table欄位放置區塊(region)
-    //2.命名請以 [Table欄位名稱] + Enum，ex.Customer.IsKyc => IsKycEnum
+    //2.命名大部分請以 [Table欄位名稱] + Enum，ex.Customer.IsKyc => IsKycEnum
+    //3.如欄位名稱重複率很高，命名請以 [Table名稱] + [Table欄位名稱] + Enum，ex.Customer.Status => CustomerStatusEnum
 
     #region Customer
 
@@ -36,6 +37,16 @@ namespace BackendSite.Service.Model.enums
     {
         Unverified = 0,
         Verified = 1
+    }
+
+    #endregion
+
+    #region Tag
+
+    public enum TagStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
     }
 
     #endregion

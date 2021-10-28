@@ -95,11 +95,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             }
         }
         #endregion
-        
+
         #region CSD > Announcement
-        
+
         /// <summary>
-        /// Message/GetAnnouncement 取得公告清單
+        /// Announcement/GetAnnouncement 取得公告清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -135,7 +135,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         }
 
         /// <summary>
-        /// Message/GetAnnouncementById 取得公告
+        /// Announcement/GetAnnouncementById 取得公告
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -164,7 +164,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         }
 
         /// <summary>
-        /// Message/AddAnnouncement 新增公告
+        /// Announcement/AddAnnouncement 新增公告
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -194,7 +194,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         }
 
         /// <summary>
-        /// Message/UpdateAnnouncement 更新公告
+        /// Announcement/UpdateAnnouncement 更新公告
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -225,7 +225,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         }
 
         /// <summary>
-        /// Message/DeleteAnnouncement 刪除公告
+        /// Announcement/DeleteAnnouncement 刪除公告
         /// </summary>
         /// <remarks>
         /// Http Method：POST
