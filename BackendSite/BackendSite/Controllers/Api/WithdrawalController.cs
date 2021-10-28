@@ -407,6 +407,8 @@ namespace BackendSite.Controllers.Api
             public string ChannelName { get; set; }
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
+        //有新舊API，這支是新API，另一支新的API=api/BaseData/GetBankInfoOffList
         [HttpPost]
         public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffList(WithdrawalReq3 withdrawalReq)
         {
@@ -426,6 +428,8 @@ namespace BackendSite.Controllers.Api
             public int ChannelId { get; set; }
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
+        //有新舊API，這支是新API，另一支新的API=api/BaseData/GetBankInfoOffList
         [HttpPost]
         public ApiResult<IEnumerable<Pay>> GetPayList(WithdrawalReq3 withdrawalReq)
         {
@@ -443,6 +447,8 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
+        //有新舊API，這支是新API，另一支新的API=api/BaseData/GetBankInfoOffList
         [HttpPost]
         public ApiResult<IEnumerable<Pay>> GetCryptoPayList(WithdrawalReq3 withdrawalReq)
         {

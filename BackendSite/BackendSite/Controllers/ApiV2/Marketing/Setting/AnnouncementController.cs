@@ -4,6 +4,7 @@ using System.Linq;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -39,11 +40,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         #endregion
         
         #region API Model
-        public class GetAnnouncementReq
+        public class GetAnnouncementReq : ApiRequestPageModel
         {
             private DateTimeOffset _startDate { get;set;}
             private DateTimeOffset _endDate { get;set;}
-            public IEnumerable<int> SelectSite { get; set; }
+            public IEnumerable<int> SiteId { get; set; }
             public int Status { get; set; }
             public DateTimeOffset StartDate
             {
@@ -55,7 +56,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
-            public int PageNumber { get; set; }
+            
         }
         public class AnnouncementReq
         {
@@ -110,28 +111,16 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         [HttpPost]
         public ApiListResult<Announcement> GetAnnouncement(GetAnnouncementReq para)
         {
-            var pageSize = 10;
             var totalPages = 0;
             var rowCount = 0;
-            var pageNumber = para.PageNumber;
             var apiResult = new ApiListResult<Announcement>();
             try
             {
-                var siteList = serverInfoBLL.GetSiteList().ToDictionary(x => x.SiteId, y => y.SiteName);
-                if (!siteList.ContainsKey(0))
-                {
-                    siteList.Add(0, "All");
-                }
 
-                var result = messageBLL.GetAnnouncements(para.SelectSite, para.StartDate, para.EndDate, para.Status, pageSize, ref pageNumber, ref totalPages, ref rowCount);
-                var apiResultData = result as Announcement[] ?? result.ToArray();
-                foreach (var r in apiResultData)
-                {
-                    siteList.TryGetValue(r.SiteId, out var siteName);
-                    r.SiteName = siteName;
-                }
-                apiResult.Data = apiResultData;
-                apiResult.PageNumber = pageNumber;
+                var result = messageBLL.GetAnnouncements(para.SiteId, para.StartDate, para.EndDate, para.Status, para.PageNumber, para.PageSize, ref totalPages, ref rowCount);
+
+                apiResult.Data = result;
+                apiResult.PageNumber = para.PageNumber;
                 apiResult.RowCount = rowCount;
                 apiResult.TotalPages = totalPages;
                 apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
@@ -187,13 +176,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         [HttpPost]
         public ApiResult AddAnnouncement(AddAnnouncementReq para)
         {
-            var apiResult = new ApiResult<dynamic>();
+            var apiResult = new ApiResult();
 
             try
             {
                 var authData = authorizeBLL.GetAuthData();
                 var result = messageBLL.AddAnnouncement(para.Announcement, authData.UserName, authData.UserId, para._StartTime, para._EndTime);
-                apiResult.Data = new { result.CreateTime, result.Creator, result.Id };
                 apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
             }
             catch (Exception ex)
@@ -219,13 +207,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         [HttpPost]
         public ApiResult UpdateAnnouncement(UpdateAnnouncementReq para)
         {
-            var apiResult = new ApiResult<dynamic>();
+            var apiResult = new ApiResult();
 
             try
             {
                 var authData = authorizeBLL.GetAuthData();
                 var result = messageBLL.UpdateAnnouncement(para.Announcement, authData.UserName, authData.UserId, para._StartTime, para._EndTime);
-                apiResult.Data = new { result.LastUpdater, result.LastUpdateTime };
                 apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
             }
             catch (Exception ex)
@@ -250,7 +237,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         [HttpPost]
         public ApiResult DeleteAnnouncement(AnnouncementReq para)
         {
-            var apiResult = new ApiResult<Announcement>();
+            var apiResult = new ApiResult();
 
             try
             {

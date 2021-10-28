@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.System
 {
-    [Route("api/[controller]/[action]")]
+    [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class GetAllDataController : ControllerBase
     {

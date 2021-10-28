@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using System;
 using System.Collections.Generic;
 
 namespace BackendSite.Service.BLL
@@ -38,14 +39,30 @@ namespace BackendSite.Service.BLL
             };
         }
 
-        public IEnumerable<AdjustWithdrawalLimit> GetAdjustWithdrawalLimitsLog(int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<AdjustWithdrawalLimit> GetAdjustWithdrawalLimitsLog(int CustId,
+            int pageNumber,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
         {
-            return adjustmentService.GetAdjustWithdrawalLimitsLog(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            return adjustmentService.GetAdjustWithdrawalLimitsLog(CustId,
+                Math.Abs(pageSize),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                out totalPages,
+                out rowCount);
         }
 
-        public int SetAdjustWithdrawalLimit(AdjustWithdrawalLimit withdrawalLimitInfo, string UserName, int CurrencyId, int SiteId, string Operator)
+        public int SetAdjustWithdrawalLimit(AdjustWithdrawalLimit withdrawalLimitInfo,
+            string UserName,
+            int CurrencyId,
+            int SiteId,
+            string Operator)
         {
-            return adjustmentService.SetAdjustWithdrawalLimit(withdrawalLimitInfo, UserName, CurrencyId, SiteId, Operator);
+            return adjustmentService.SetAdjustWithdrawalLimit(withdrawalLimitInfo,
+                UserName,
+                CurrencyId,
+                SiteId,
+                Operator);
         }
     }
 }
