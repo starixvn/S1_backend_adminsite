@@ -197,5 +197,20 @@ namespace BackendSite.Service.Model
         public int WalletType { get; set; }
         public int TpId { get; set; }
         public int CategoryId { get; set; }
+        public string Currency { get; set; }
+    }
+    public class BalanceAdjustBonusCodeBatchRep
+    {
+        public bool HasBonusCode { get; set; }
+        public string BonusCode { get; set; }
+        public int WalletType { get; set; }
+        public string Name { get; set; }
+        public List<BalanceAdjustBonusCodeBatchDetail> Detail { get; set; }
+    }
+    public class BalanceAdjustBonusCodeBatchDetail 
+    {
+        public decimal Bonus { get; set; }
+        public int RollOver { get; set; }
+        public string Currency { get; set; }
     }
 }

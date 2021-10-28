@@ -246,7 +246,7 @@ namespace BackendSite.Service.BLL
             {
                 var promoCategories = _bonusManageService.GetPromoCategories(BalanceAdjustBonusCodeData.WalletType).Where(x => x.Id == BalanceAdjustBonusCodeData.CategoryId && x.TpId == BalanceAdjustBonusCodeData.TpId)?.FirstOrDefault();
                 result.HasBonusCode = true;
-                result.BonusCode = BalanceAdjustBonusCodeData.BonusCode;
+                result.BonusCode = BonusCode;
                 result.RollOver = BalanceAdjustBonusCodeData.RollOver;
                 result.Bonus = BalanceAdjustBonusCodeData.Bonus;
                 result.TpId = BalanceAdjustBonusCodeData.TpId;
@@ -261,6 +261,38 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+        public BalanceAdjustBonusCodeBatchRep CheckBalanceAdjustBonusCodeBatch(string BonusCode, int PromotionType, int SiteId)
+        {
+            BalanceAdjustBonusCodeBatchRep result = new BalanceAdjustBonusCodeBatchRep();
+            List<BalanceAdjustBonusCodeBatchDetail> detail = new List<BalanceAdjustBonusCodeBatchDetail>();
+            var BalanceAdjustBonusCodeBatchData = adjustmentService.CheckBalanceAdjustBonusCodeBatch(BonusCode, PromotionType, SiteId).ToList();
 
+            if (BalanceAdjustBonusCodeBatchData.Count != 0)
+            {
+                var promoCategories = _bonusManageService.GetPromoCategories(BalanceAdjustBonusCodeBatchData.FirstOrDefault().WalletType)
+                    .Where(x => x.Id == BalanceAdjustBonusCodeBatchData.FirstOrDefault().CategoryId && x.TpId == BalanceAdjustBonusCodeBatchData.FirstOrDefault().TpId)?.FirstOrDefault();
+
+                BalanceAdjustBonusCodeBatchData.ForEach(x =>
+                {
+                    detail.Add(new BalanceAdjustBonusCodeBatchDetail()
+                    {
+                        Bonus = x.Bonus,
+                        RollOver = x.RollOver,
+                        Currency = x.Currency
+                    });
+                });
+                result.HasBonusCode = true;
+                result.BonusCode = BonusCode;
+                result.WalletType = BalanceAdjustBonusCodeBatchData.FirstOrDefault().WalletType;
+                result.Detail = detail;
+                result.Name = promoCategories == null ? string.Empty : promoCategories.Name;
+            }
+            else
+            {
+                result.HasBonusCode = false;
+            }
+
+            return result;
+        }
     }
 }

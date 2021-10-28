@@ -2,13 +2,22 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from 'react-dom';
 import { api } from '../../../module/WebAPI';
 import qs from 'qs';
+import { PopBoxContent } from "./PopBoxContent";
 
 const initData = {
     optSite: null,
     option: null,
     checkwd: false,
     withdrawal: 1,
-    file: ''
+    file: '',
+    bonusCode:'',
+    HasBonusCode:false,
+    Name:'',
+    CheckedBonusCode:'',
+    BonusCodeDetail:null,
+    WalletType:0,
+    NeedCheckPassword:false,
+    HasCheckPassword:false,
 }
 
 const App = () => {
@@ -21,9 +30,11 @@ const App = () => {
     const SetMsg = () => {
         let msg = "";
         let check = true;
+        let hasCheckPassword = stateData.HasCheckPassword;
         if (!stateData.file) { check = false; msg = "Please choose excel file."; }
         if (!stateData.option) { check = false; msg = "Please check Option."; }
         if (!stateData.optSite) { check = false; msg = "Please check Site."; }
+        if (stateData.option == 5 && stateData.CheckedBonusCode == '') { check = false; msg = "Please check BonusCode."; }
         if(stateData.checkwd && (isNaN(parseInt(stateData.withdrawal))? 0:parseInt(stateData.withdrawal)) === 0) { check = false; msg = "Please Enter Withdrawal Limit."; }
         if (check && window.confirm("Are you sure to import data to " + _site[stateData.optSite] + "?")) {
             let settings = { headers: { 'content-type': 'multipart/form-data' } }
@@ -34,27 +45,144 @@ const App = () => {
             formData.append('optSite', parseInt(stateData.optSite));
             formData.append('withdrawalLimitOption', (stateData.checkwd) ? 1 : 0);
             formData.append('withdrawal',parseFloat(stateData.withdrawal))
-            console.log(stateData.withdrawal);
+            formData.append('bonuscode',stateData.CheckedBonusCode)
             if (!stateSend) {
-                updateSend(true);
-                api.post('/api/Payment/BalanceAdjustmentBatch', formData, settings)
+                if(!hasCheckPassword){
+                    api.post('/api/Payment/CheckAdjustmentLimit', formData, settings)
                     .then(function (response) {
-                        updateSend(false);
-                        if (response.data) {
-                            updateSendData(response.data);
-                            alert('sent successfully');
-                        } else {
-                            alert("sent error");
+                        if(response.data.errorCode == 0){
+                            updateSend(true);
+                            api.post('/api/Payment/BalanceAdjustmentBatch', formData, settings)
+                                .then(function (response) {
+                                    updateSend(false);
+                                    if (response.data) {
+                                        updateSendData(response.data);
+                                        alert('sent successfully');
+                                    } else {
+                                        alert("sent error");
+                                    }
+                                }).catch(function (error) {
+                                    updateSend(false);
+                                    alert(error);
+                                })
+                            updateData({ ...initData });
+                        }
+                        else if(response.data.errorCode == 1000){
+                            updateData({
+                                ...stateData,
+                                NeedCheckPassword: true
+                            })
+                        }
+                        else{
+                            alert(response.data.message);
                         }
                     }).catch(function (error) {
                         updateSend(false);
                         alert(error);
                     })
-                updateData({ ...initData });
+                }
+                else{
+                    updateSend(true);
+                    api.post('/api/Payment/BalanceAdjustmentBatch', formData, settings)
+                        .then(function (response) {
+                            updateSend(false);
+                            if (response.data) {
+                                updateSendData(response.data);
+                                alert('sent successfully');
+                            } else {
+                                alert("sent error");
+                            }
+                        }).catch(function (error) {
+                            updateSend(false);
+                            alert(error);
+                        })
+                    updateData({ ...initData });
+                }
             }
         } else {
             alert(msg);
         }
+    }
+    const CheckPassWordSuccess = () =>{
+        updateData({
+            ...stateData,
+            NeedCheckPassword: false,
+            HasCheckPassword:true
+        })
+        CheckSetMsg();
+    }
+    const CheckSetMsg = ()=>{
+        let settings = { headers: { 'content-type': 'multipart/form-data' } }
+        let file = document.getElementById("uploadfile").files[0];
+        let formData = new FormData();
+        formData.append("excelUpload", file, file.name);
+        formData.append('option', parseInt(stateData.option));
+        formData.append('optSite', parseInt(stateData.optSite));
+        formData.append('withdrawalLimitOption', (stateData.checkwd) ? 1 : 0);
+        formData.append('withdrawal',parseFloat(stateData.withdrawal))
+        formData.append('bonuscode',stateData.CheckedBonusCode)
+        updateSend(true);
+        api.post('/api/Payment/BalanceAdjustmentBatch', formData, settings)
+            .then(function (response) {
+                updateSend(false);
+                if (response.data) {
+                    updateSendData(response.data);
+                    alert('sent successfully');
+                } else {
+                    alert("sent error");
+                }
+            }).catch(function (error) {
+                updateSend(false);
+                alert(error);
+            })
+        updateData({ ...initData });
+    }
+    const CheckBonusCode = () =>{
+        if (!stateData.optSite) { 
+            alert("Please check Site.") 
+            return;
+        }
+        let Data = {
+            BonusCode: stateData.bonusCode,
+            PromotionType: 9,
+            SiteId: parseInt(stateData.optSite)
+          };
+        api.post('/api/Payment/CheckBalanceAdjustBonusCodeBatch',Data)
+            .then(function (response) {
+                if (response.data.errorCode === 0) {
+                    if(response.data.data.hasBonusCode){
+                        alert("BonusCode " + response.data.data.bonusCode + " exist")       
+                        updateData({ ...stateData, 
+                            HasBonusCode: true,
+                            CheckedBonusCode:response.data.data.bonusCode,
+                            Name:response.data.data.name,
+                            BonusCodeDetail:response.data.data.detail,
+                            WalletType:response.data.data.walletType
+                        })
+                    }
+                    else{
+                        alert("BonusCode Error! Please Check Again")
+                        updateData({ ...stateData, 
+                            HasBonusCode: false,
+                            CheckedBonusCode:'',
+                            Name:'',
+                            BonusCodeDetail:null,
+                            WalletType:0
+                        })
+                    }
+                } else {
+                    alert(response.message);
+                    updateData({ ...stateData, 
+                        HasBonusCode: false,
+                        CheckedBonusCode:'',
+                        Name:'',
+                        BonusCodeDetail:null,
+                        WalletType:0
+                    })
+                }
+            }).catch(function (error) {
+                alert(error);
+            })
     }
 
     let radio = "";
@@ -85,6 +213,28 @@ const App = () => {
         });
     }
     let result = sendData.map((value, key) => { return <p key={`result-${key}`}>{value.message}</p> })
+    let bnousCodeDetail = null
+    if(stateData.BonusCodeDetail !== null){
+        bnousCodeDetail = stateData.BonusCodeDetail.map((value) => { 
+            return <tr>
+                <td>
+                    {value.currency}
+                </td>
+                <td>
+                    {value.bonus}
+                </td>
+                <td>
+                    {value.rollOver}
+                </td>
+            </tr>
+        })
+    }
+    const Cancel =()=>{
+        updateData({ ...stateData, 
+            NeedCheckPassword: false
+        })
+    }
+
     return (
         <>
             <div className="container-fluid">
@@ -115,14 +265,68 @@ const App = () => {
                         <input type="radio" id="Option_4" name="Option" className="custom-control-input" onChange={(e) => { EditFiled(4, 'option') }} disabled={stateSend} checked={stateData.option === 4} />
                         <label className="custom-control-label" htmlFor="Option_4">Bonus(-)</label>
                     </div>
-                </div>
-                <div className="form-group">
-                    <div className="custom-control custom-checkbox custom-control-inline">
-                        <input className="custom-control-input" id="checkwd" type="checkbox" onChange={(e) => { EditFiled(e.target.checked, 'checkwd') }} disabled={stateSend} checked={stateData.checkwd === true} />
-                        <label className="custom-control-label" htmlFor="checkwd">Withdraw Condition(Balance Amount X Times):</label>
+                    <div className="custom-control custom-radio custom-control-inline">
+                        <input type="radio" id="Option_5" name="Option" className="custom-control-input" onChange={(e) => { EditFiled(5, 'option') }} disabled={stateSend} checked={stateData.option === 5} />
+                        <label className="custom-control-label" htmlFor="Option_5">Retention Bonus</label>
                     </div>
-                    <input className="form-control width-200" type="number" defaultValue={stateData.withdrawal} onChange={(e) => { EditFiled(e.target.value, 'withdrawal') }} />
                 </div>
+                {
+                    stateData.option == 5 ? 
+                    <>
+                        <div className="form-group">
+                            <label className="col-form-label d-block">BonusCode</label>
+                            <input className="form-control width-200" defaultValue={stateData.bonusCode} onChange={(e) => { EditFiled(e.target.value, 'bonusCode') }} />
+                        </div>
+                        <button className="btn btn-add" style={{marginBottom: '5px' }} onClick={CheckBonusCode}>CheckBonusCode</button>
+                    </>:null
+                }
+                {
+                    stateData.BonusCodeDetail !== null && stateData.option == 5 ?
+                    <>
+                        <h4 className="page-name">Retention Bonus Info</h4>
+                        <table className="table table-detail">
+                            <tr>
+                                <th scope="row">BonusCode</th>
+                                <td>{stateData.CheckedBonusCode}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">WalletType</th>
+                                <td>{stateData.WalletType == 0 ? "Transfer" : "Seamless" }</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">ProductCategory</th>
+                                <td>{stateData.Name}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Detail</th>
+                                <td>
+                                    <tr>
+                                        <th>
+                                            Currency
+                                        </th>
+                                        <th>
+                                            Amount
+                                        </th>
+                                        <th>
+                                            RollOver
+                                        </th>
+                                    </tr>
+                                    {bnousCodeDetail}
+                                </td>
+                            </tr>
+                        </table>
+                    </>:null
+                }
+                {
+                    stateData.option != 5 ?
+                    <div className="form-group">
+                        <div className="custom-control custom-checkbox custom-control-inline">
+                            <input className="custom-control-input" id="checkwd" type="checkbox" onChange={(e) => { EditFiled(e.target.checked, 'checkwd') }} disabled={stateSend} checked={stateData.checkwd === true} />
+                            <label className="custom-control-label" htmlFor="checkwd">Withdraw Condition(Balance Amount X Times):</label>
+                        </div>
+                        <input className="form-control width-200" type="number" defaultValue={stateData.withdrawal} onChange={(e) => { EditFiled(e.target.value, 'withdrawal') }} />
+                    </div>:null                    
+                }           
                 <div className="form-group width-200">
                     <label className="col-form-label">Upload File</label>
                     <input id="uploadfile" className="form-control" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" onChange={(e) => { EditFiled(e.target.value, 'file') }} disabled={stateSend} value={stateData.file} />
@@ -130,6 +334,13 @@ const App = () => {
                 <button className="btn btn-add" style={{ marginTop: '20px', marginBottom: '40px' }} onClick={SetMsg}>Submit</button>
                 <div className="form-group">{result}</div>
             </div>
+            {stateData.NeedCheckPassword ? (
+                <PopBoxContent
+                ClickCancel={Cancel}
+                SiteId={stateData.optSite}
+                CheckPassWordSuccess={CheckPassWordSuccess}
+                />
+            ) : null}
         </>
     )
 }

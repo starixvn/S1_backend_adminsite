@@ -26,7 +26,12 @@ namespace BackendSite.Service.Model
         public decimal WithdrawalLimitAmount { set; get; }
         public int WithdrawalLimitAmountAdjustType { set; get; }
     }
-   
+    public class RetionBonus 
+    { 
+        public int CustId { get; set; }
+        public string BonusCode { get; set; }
+    }
+
 }
 
 
