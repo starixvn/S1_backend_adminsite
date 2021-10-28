@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using OfficeOpenXml;
+
 
 namespace BackendSite.Controllers.Api
 {
@@ -31,7 +35,7 @@ namespace BackendSite.Controllers.Api
         private readonly AuthorizeBLL _authorizeBLL;
         private readonly ExcelBLL _excelBLL;
         private readonly CustInfoBLL _custInfoBLL;
-
+        private readonly ILogger<BonusManageController> _logger;
         #endregion
 
         #region Constructors
@@ -43,7 +47,8 @@ namespace BackendSite.Controllers.Api
             PrizeBLL prizeBLL,
             AuthorizeBLL authorizeBLL,
             ExcelBLL excelBLL,
-            CustInfoBLL custInfoBLL)
+            CustInfoBLL custInfoBLL, 
+            IServiceProvider provider)
         {
             _bonusManageBLL = bonusManageBLL;
             _serverInfoBLL = serverInfoBLL;
@@ -53,6 +58,7 @@ namespace BackendSite.Controllers.Api
             _authorizeBLL = authorizeBLL;
             _excelBLL = excelBLL;
             _custInfoBLL = custInfoBLL;
+            _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
         }
 
         #endregion
@@ -146,6 +152,7 @@ namespace BackendSite.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
                 apiResult.RawMessage = ex.ToString();
@@ -165,6 +172,7 @@ namespace BackendSite.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
                 apiResult.RawMessage = ex.ToString();
@@ -190,6 +198,7 @@ namespace BackendSite.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = 999;
                 apiResult.Message = "something went wrong.";
                 apiResult.RawMessage = ex.Message;
@@ -226,12 +235,14 @@ namespace BackendSite.Controllers.Api
             }
             catch (MySqlException sqlException)
             {
+                _logger.LogError(sqlException, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = sqlException.Number;
                 apiResult.Message = sqlException.Message;
                 apiResult.RawMessage = sqlException.ToString();
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
                 apiResult.RawMessage = ex.ToString();
@@ -257,12 +268,14 @@ namespace BackendSite.Controllers.Api
             }
             catch (MySqlException sqlException)
             {
+                _logger.LogError(sqlException, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = sqlException.Number;
                 apiResult.Message = sqlException.Message;
                 apiResult.RawMessage = sqlException.ToString();
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
                 apiResult.RawMessage = ex.ToString();
@@ -293,6 +306,7 @@ namespace BackendSite.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
                 apiResult.RawMessage = ex.ToString();
@@ -387,6 +401,7 @@ namespace BackendSite.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.ToString();
             }
@@ -436,6 +451,7 @@ namespace BackendSite.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
             }
@@ -462,6 +478,7 @@ namespace BackendSite.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
             }
@@ -536,6 +553,7 @@ namespace BackendSite.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
                 apiResult.RawMessage = ex.ToString();
@@ -557,6 +575,7 @@ namespace BackendSite.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = 999;
                 apiResult.RawMessage = ex.ToString();
             }
@@ -587,6 +606,7 @@ namespace BackendSite.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = 999;
                 apiResult.RawMessage = ex.ToString();
             }
@@ -606,6 +626,7 @@ namespace BackendSite.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = 999;
                 apiResult.RawMessage = ex.ToString();
             }
@@ -624,6 +645,7 @@ namespace BackendSite.Controllers.Api
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = 999;
                 apiResult.RawMessage = ex.ToString();
             }
