@@ -401,7 +401,7 @@ namespace BackendSite.Controllers.Api
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                _logger.LogError(ex, MethodExtension.GetCurrentAsyncMethod());
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.ToString();
             }
