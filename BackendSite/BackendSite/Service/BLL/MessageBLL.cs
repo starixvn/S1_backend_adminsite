@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BatchMessageSendLog;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -35,7 +36,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, DateTimeOffset startDate, DateTimeOffset endDate, int status,int PageNumber, int PageSize, ref int TotalPages, ref int RowCount)
         {
-            return messageService.GetAnnouncements(selectSite,
+            return messageService.GetAnnouncements(JsonConvert.SerializeObject(selectSite),
                 startDate,
                 endDate,
                 status,

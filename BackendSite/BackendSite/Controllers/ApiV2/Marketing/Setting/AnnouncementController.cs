@@ -116,19 +116,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             var apiResult = new ApiListResult<Announcement>();
             try
             {
-                //var siteList = serverInfoBLL.GetSiteList().ToDictionary(x => x.SiteId, y => y.SiteName);
-                //if (!siteList.ContainsKey(0))
-                //{
-                //    siteList.Add(0, "All");
-                //}
 
                 var result = messageBLL.GetAnnouncements(para.SiteId, para.StartDate, para.EndDate, para.Status, para.PageNumber, para.PageSize, ref totalPages, ref rowCount);
-                //var apiResultData = result as Announcement[] ?? result.ToArray();
-                //foreach (var r in apiResultData)
-                //{
-                //    siteList.TryGetValue(r.SiteId, out var siteName);
-                //    r.SiteName = siteName;
-                //}
+
                 apiResult.Data = result;
                 apiResult.PageNumber = para.PageNumber;
                 apiResult.RowCount = rowCount;
@@ -192,7 +182,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             {
                 var authData = authorizeBLL.GetAuthData();
                 var result = messageBLL.AddAnnouncement(para.Announcement, authData.UserName, authData.UserId, para._StartTime, para._EndTime);
-                //apiResult.Data = new { result.CreateTime, result.Creator, result.Id };
                 apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
             }
             catch (Exception ex)
@@ -224,7 +213,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             {
                 var authData = authorizeBLL.GetAuthData();
                 var result = messageBLL.UpdateAnnouncement(para.Announcement, authData.UserName, authData.UserId, para._StartTime, para._EndTime);
-                //apiResult.Data = new { result.LastUpdater, result.LastUpdateTime };
                 apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
             }
             catch (Exception ex)
