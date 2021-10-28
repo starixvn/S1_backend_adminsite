@@ -4,6 +4,7 @@ namespace BackendSite.Service.Model
 {
     public class AdjustWithdrawalLimit
     {
+        private DateTimeOffset _createTime { get; set; }
         public int CustId { get; set; }
         public int AdjustType { get; set; }
         public string SiteName { get; set; }
@@ -11,7 +12,11 @@ namespace BackendSite.Service.Model
         public decimal Amount { get; set; }
         public string Operator { get; set; }
         public int Status { get; set; }
-        public DateTimeOffset CreateTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public string Memo { get; set; }
     }
 

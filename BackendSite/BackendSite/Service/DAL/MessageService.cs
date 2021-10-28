@@ -48,27 +48,32 @@ namespace BackendSite.Service.DAL
             return conn.Execute("Msg_Ins", new { Type = 99, siteId = siteId, LangId = lang, RecipientCustId = custId, Recipient = CustUserName, SenderCustId = SenderCustId, Sender = sender, Title = title, Content = content, MainId = 0 }, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, DateTimeOffset startDate, DateTimeOffset endDate, int status, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<Announcement> GetAnnouncements(string selectSite,
+            DateTimeOffset startDate,
+            DateTimeOffset endDate,
+            int status,
+            int StartIndex,
+            int PageSize,
+            ref int TotalPages,
+            ref int RowCount)
         {
-            var tempSelectSite = selectSite.ToList();
-            tempSelectSite.Add(0);
+            //var tempSelectSite = selectSite.ToList();
+            //tempSelectSite.Add(0);
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             const string spName = "Admin_AnnouncementV2_Get";
             var props = new DynamicParameters();
-            props.Add("SelectSite", JsonConvert.SerializeObject(tempSelectSite));
+            props.Add("SelectSite", selectSite);
             props.Add("StartDate", startDate.DateTime,DbType.DateTime);
             props.Add("EndDate", endDate.DateTime,DbType.DateTime);
-            props.Add("Status", status);
-            props.Add("PageNumber", Math.Abs(PageNumber),DbType.Int32,ParameterDirection.InputOutput);
+            props.Add("Status", status, DbType.Int32);
+            props.Add("StartIndex", StartIndex, DbType.Int32);
+            props.Add("PageSize", PageSize);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize),DbType.Int32);
-            props.Add("PageSize", Math.Abs(PageSize));
 
             var result = conn.Query<Announcement>(spName, props, commandType: CommandType.StoredProcedure);
-            PageNumber = props.Get<int?>("@PageNumber") ?? 0;
-            TotalPages = props.Get<int?>("@TotalPages") ?? 0;
-            RowCount = props.Get<int?>("@RowCount") ?? 0;
+            TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            RowCount = props.Get<int?>("RowCount") ?? 0;
 
             return result;
         }
