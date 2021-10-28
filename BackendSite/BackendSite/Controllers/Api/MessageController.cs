@@ -101,9 +101,19 @@ namespace BackendSite.Controllers.Api
                     siteList.Add(0, "All");
                 }
 
-                var startTime = new DateTime(1970,1,1,0,0,0,0).AddSeconds( para.StartDate );
-                var endTime = new DateTime(1970,1,1,0,0,0,0).AddSeconds( para.EndDate );
-                var result = messageBLL.GetAnnouncements(para.SelectSite, startTime, endTime, para.Status, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                if (para.StartDate > 2147483647)
+                {
+                    para.StartDate = 2147483647;
+                }
+
+                if(para.EndDate > 2147483647)
+                {
+                    para.EndDate = 2147483647;
+                }
+
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate);
+                var result = messageBLL.GetAnnouncements(para.SelectSite, startTime, endTime, para.Status, PageNumber, PageSize, ref TotalPages, ref RowCount);
                 foreach (var r in result)
                 {
                     siteList.TryGetValue(r.SiteId, out var siteName);
@@ -179,8 +189,17 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var authData = authorizeBLL.GetAuthData();
-                var startTime = new DateTime(1970,1,1,0,0,0,0).AddSeconds( _StartTime );
-                var endTime = new DateTime(1970,1,1,0,0,0,0).AddSeconds( _EndTime );
+                if (_StartTime > 2147483647)
+                {
+                    _StartTime = 2147483647;
+                }
+
+                if (_EndTime > 2147483647)
+                {
+                    _EndTime = 2147483647;
+                }
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(_StartTime);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(_EndTime);
                 var result = messageBLL.AddAnnouncement(Datas, authData.UserName, authData.UserId, startTime, endTime);
                 apiResult.Data = new { result.CreateTime, result.Creator, result.Id };
                 apiResult.ErrorCode = 0;
@@ -217,8 +236,17 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var authData = authorizeBLL.GetAuthData();
-                var startTime = new DateTime(1970,1,1,0,0,0,0).AddSeconds( _StartTime );
-                var endTime = new DateTime(1970,1,1,0,0,0,0).AddSeconds( _EndTime );
+                if (_StartTime > 2147483647)
+                {
+                    _StartTime = 2147483647;
+                }
+
+                if (_EndTime > 2147483647)
+                {
+                    _EndTime = 2147483647;
+                }
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(_StartTime);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(_EndTime);
                 var result = messageBLL.UpdateAnnouncement(Datas, authData.UserName, authData.UserId, startTime, endTime);
                 apiResult.Data = new { result.LastUpdater, result.LastUpdateTime };
                 apiResult.ErrorCode = 0;

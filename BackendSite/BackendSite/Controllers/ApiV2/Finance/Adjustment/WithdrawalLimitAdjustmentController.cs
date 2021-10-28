@@ -3,6 +3,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -59,20 +60,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public string SabaId { get; set; }
         }
 
-        public class GetAdjustWithdrawalLimitsLogRequest
+        public class GetAdjustWithdrawalLimitsLogRequest : ApiRequestPageModel
         {
             /// <summary>
             /// 會員ID
             /// </summary>
             public int CustId { get; set; }
-            /// <summary>
-            /// 頁碼
-            /// </summary>
-            public int PageNumber { get; set; }
-            /// <summary>
-            /// 每頁筆數
-            /// </summary>
-            public int PageSize { get; set; }
         }
 
         public class SetAdjustWithdrawalLimitRequest
