@@ -1,6 +1,7 @@
 ﻿using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.System
 {
+    [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class GetAllDataController : ControllerBase
