@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Setting
 {
@@ -18,23 +21,21 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
     {
         #region Fields
 
-        private readonly MessageBLL messageBLL;
-        private readonly AuthorizeBLL authorizeBLL;
-        private readonly ServerInfoBLL serverInfoBLL;
-
+        private readonly MessageBLL _messageBll;
+        private readonly AuthorizeBLL _authorizeBll;
+        private readonly ServerInfoBLL _serverInfoBll;
+        private readonly ILogger<AnnouncementController> _logger;
+        
         #endregion
         
         #region Constructor
 
-        public AnnouncementController(
-            MessageBLL messageBLL,
-            AuthorizeBLL authorizeBLL,
-            ServerInfoBLL serverInfoBLL
-         )
+        public AnnouncementController(IServiceProvider provider)
         {
-            this.messageBLL = messageBLL;
-            this.authorizeBLL = authorizeBLL;
-            this.serverInfoBLL = serverInfoBLL;
+            _messageBll = provider.GetRequiredService<MessageBLL>();
+            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+            _logger = provider.GetRequiredService<ILogger<AnnouncementController>>();
         }
 
         #endregion
@@ -44,7 +45,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         {
             private DateTimeOffset _startDate { get;set;}
             private DateTimeOffset _endDate { get;set;}
-            public IEnumerable<int> SiteId { get; set; }
+            public IEnumerable<int> SelectSite { get; set; }
             public int Status { get; set; }
             public DateTimeOffset StartDate
             {
@@ -56,7 +57,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
-            
         }
         public class AnnouncementReq
         {
@@ -116,9 +116,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             var apiResult = new ApiListResult<Announcement>();
             try
             {
-
-                var result = messageBLL.GetAnnouncements(para.SiteId, para.StartDate, para.EndDate, para.Status, para.PageNumber, para.PageSize, ref totalPages, ref rowCount);
-
+                var result = _messageBll.GetAnnouncements(para.SelectSite, para.StartDate, para.EndDate, para.Status, para.PageNumber, para.PageSize, ref totalPages, ref rowCount);
                 apiResult.Data = result;
                 apiResult.PageNumber = para.PageNumber;
                 apiResult.RowCount = rowCount;
@@ -127,6 +125,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.RawMessage = ex.ToString();
                 apiResult.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
             }
@@ -151,11 +150,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
 
             try
             {
-                apiResult.Data = messageBLL.GetAnnouncementById(para.Id);
+                apiResult.Data = _messageBll.GetAnnouncementById(para.Id);
                 apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.RawMessage = ex.ToString();
                 apiResult.ErrorCode = (int) ErrorMessageCodeEnum.SystemException;
             }
@@ -177,15 +177,22 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         public ApiResult AddAnnouncement(AddAnnouncementReq para)
         {
             var apiResult = new ApiResult();
-
             try
             {
-                var authData = authorizeBLL.GetAuthData();
-                var result = messageBLL.AddAnnouncement(para.Announcement, authData.UserName, authData.UserId, para._StartTime, para._EndTime);
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
+                var authData = _authorizeBll.GetAuthData();
+                var result = _messageBll.AddAnnouncement(para.Announcement, authData.UserName, authData.UserId, para._StartTime, para._EndTime);
+                if (result != null)
+                {
+                    apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Fail;
+                }
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.RawMessage = ex.ToString();
                 apiResult.ErrorCode =(int) ErrorMessageCodeEnum.SystemException;
             }
@@ -211,12 +218,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
 
             try
             {
-                var authData = authorizeBLL.GetAuthData();
-                var result = messageBLL.UpdateAnnouncement(para.Announcement, authData.UserName, authData.UserId, para._StartTime, para._EndTime);
+                var authData = _authorizeBll.GetAuthData();
+                var result = _messageBll.UpdateAnnouncement(para.Announcement, authData.UserName, authData.UserId, para._StartTime, para._EndTime);
                 apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.RawMessage = ex.ToString();
                 apiResult.ErrorCode = (int) ErrorMessageCodeEnum.SystemException;
             }
@@ -241,11 +249,19 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
 
             try
             {
-                messageBLL.DeleteAnnouncement(para.Id);
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
+                var result = _messageBll.DeleteAnnouncement(para.Id);
+                if (result > 0)
+                {
+                    apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Fail;
+                }
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.RawMessage = ex.ToString();
                 apiResult.ErrorCode = (int) ErrorMessageCodeEnum.SystemException;
             }

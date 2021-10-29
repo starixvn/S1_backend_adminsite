@@ -41,6 +41,14 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    public enum DataBase
+    {
+        Main, //ConnectionString
+        Report,//ConnectionStringReport
+        Wager,//ConnectionStringWager
+        Log,//ConnectionStringLog
+    }
+    
     #region Tag
 
     public enum TagStatusEnum
@@ -393,5 +401,14 @@ namespace BackendSite.Service.Model.enums
     {
         ERC20 = 1,
         TRC20 = 2
+    }
+    
+    public enum SendMessageStatus
+    {
+        Pending = 0, 
+        Approved = 1,
+        Processing = 2,
+        Success = 3,
+        Failed = 4
     }
 }

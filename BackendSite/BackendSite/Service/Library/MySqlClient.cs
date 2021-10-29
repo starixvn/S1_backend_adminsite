@@ -7,13 +7,14 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Library
 {
     public sealed class MySqlClient
     {
-        public string Name { get; set; }
-        
+        public DataBase DataBase { get; set; }
+
         private readonly string _connectionString;
 
         private readonly ILogger<MySqlClient> _logger;
