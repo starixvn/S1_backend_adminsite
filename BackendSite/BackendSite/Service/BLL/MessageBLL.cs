@@ -46,24 +46,24 @@ namespace BackendSite.Service.BLL
                 ref RowCount);
         }
 
-        public Announcement GetAnnouncementById(int Id)
+        public Announcement GetAnnouncementById(int id)
         {
-            return messageService.GetAnnouncementById(Id);
+            return messageService.GetAnnouncementById(id);
         }
 
-        public Announcement AddAnnouncement(Announcement Datas, string Creator, int CreatorId, DateTimeOffset _StartTime, DateTimeOffset _EndTime)
+        public Announcement AddAnnouncement(Announcement data, string creator, int creatorId, DateTimeOffset startTime, DateTimeOffset endTime)
         {
-            return messageService.AddAnnouncement(Datas, Creator, CreatorId, _StartTime, _EndTime);
+            return messageService.AddAnnouncement(data, creator, creatorId, startTime, endTime);
         }
 
-        public Announcement UpdateAnnouncement(Announcement Datas, string LastUpdater, int LastUpdaterId, DateTimeOffset _StartTime, DateTimeOffset _EndTime)
+        public Announcement UpdateAnnouncement(Announcement data, string lastUpdater, int lastUpdaterId, DateTimeOffset startTime, DateTimeOffset endTime)
         {
-            return messageService.UpdateAnnouncement(Datas, LastUpdater, LastUpdaterId, _StartTime, _EndTime);
+            return messageService.UpdateAnnouncement(data, lastUpdater, lastUpdaterId, startTime, endTime);
         }
 
-        public void DeleteAnnouncement(int Id)
+        public int DeleteAnnouncement(int id)
         {
-            messageService.DeleteAnnouncement(Id);
+           return messageService.DeleteAnnouncement(id);
         }
 
         public IEnumerable<PersonalMsg> GetPersonalMsg(int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)

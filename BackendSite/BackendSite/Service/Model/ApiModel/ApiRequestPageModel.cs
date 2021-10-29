@@ -21,9 +21,7 @@ namespace BackendSite.Service.Model.ApiModel
         /// <summary>
         /// 每頁資料筆數
         /// </summary>
-        [Required]
-        [Range(10, 100)]
-        public int PageSize { get; set; }
+        public int PageSize { get; set; } = 10;
     }
 
 }
