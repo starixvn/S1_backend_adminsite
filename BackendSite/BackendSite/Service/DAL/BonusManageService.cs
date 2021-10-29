@@ -617,7 +617,7 @@ namespace BackendSite.Service.DAL
                 {
                     foreach (var r in s.CashBackList)
                     {
-                        var tempCategoryId = promotion.TpId == 0 ? cashBackGameList.Where(x => x.TpId == r.GameType).FirstOrDefault().CategoryId : r.GameType;
+                        var tempCategoryId = promotion.TpId == 0 ? cashBackGameList.FirstOrDefault(x => x.TpId == r.GameType).CategoryId : r.GameType;
                         vipLevelCondition.SelectedVipLevel.ToList().ForEach(x =>
                         {
                             cashBackList.Add(new PromotionCashBackSetting
