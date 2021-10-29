@@ -34,7 +34,7 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// Risk/GetTpDisableUser 取得會員錢包資訊
+        /// Risk/GetTpDisableUser 取得第三方被禁止的用戶資料清單
         /// </summary>
         /// <remarks>
         /// 
@@ -78,13 +78,13 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// Risk/GetTpDisableUserByCustId 取得會員錢包資訊
+        /// Risk/GetTpDisableUserByCustId 取得指定第三方被禁止的會員資料
         /// </summary>
         /// <remarks>
         /// 
         /// Http Method：POST
         /// 
-        /// Func Path：CSD > Disable User For Game > [Submit]
+        /// Func Path：CSD > Disable User For Game > [Submit] > Click[Edit]
         /// 
         /// </remarks>
         /// <param name="custId"></param>
@@ -142,13 +142,13 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// Risk/TpDisableUserForGame 取得會員錢包資訊
+        /// Risk/TpDisableUserForGame 更新會員第三方被禁止的資料
         /// </summary>
         /// <remarks>
         /// 
         /// Http Method：POST
         /// 
-        /// Func Path：CSD > Disable User For Game > [Submit]
+        /// Func Path：CSD > Disable User For Game > [Submit] > Click[Edit] > [Submit]
         /// 
         /// </remarks>
         /// <param name="disableGames"></param>
@@ -189,13 +189,13 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// Risk/UpdateStatus 取得會員錢包資訊
+        /// Risk/UpdateStatus 更新會員第三方被禁止的資料狀態
         /// </summary>
         /// <remarks>
         /// 
         /// Http Method：POST
         /// 
-        /// Func Path：CSD > Disable User For Game > [Submit]
+        /// Func Path：CSD > Disable User For Game > [Submit] >Change[Status]
         /// 
         /// </remarks>
         /// <param name="disable"></param>
@@ -225,13 +225,13 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// Risk/Delete 取得會員錢包資訊
+        /// Risk/Delete 刪除會員第三方被禁止的資料
         /// </summary>
         /// <remarks>
         /// 
         /// Http Method：POST
         /// 
-        /// Func Path：CSD > Disable User For Game > [Submit]
+        /// Func Path：CSD > Disable User For Game > [Submit] >Click [Delete]
         /// 
         /// </remarks>
         /// <param name="custId"></param>
@@ -260,13 +260,13 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// Risk/GetTpList 取得會員錢包資訊
+        /// Risk/GetTpList 取得Slot第三方品牌
         /// </summary>
         /// <remarks>
         /// 
         /// Http Method：POST
         /// 
-        /// Func Path：CSD > Disable User For Game > [Submit]
+        /// Func Path：CSD > Disable User For Game > [Submit] > Click[Edit] > Show Slot Tp List
         /// 
         /// </remarks>
         /// <returns></returns>
@@ -294,13 +294,13 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// Risk/GameCasinoByTpIdV3 取得會員錢包資訊
+        /// Risk/GameCasinoByTpIdV3 取得Slot第三方品牌的遊戲
         /// </summary>
         /// <remarks>
         /// 
         /// Http Method：POST
         /// 
-        /// Func Path：CSD > Disable User For Game > [Submit]
+        /// Func Path：CSD > Disable User For Game > [Submit] > Click[Edit] > Slot Tp List > Check [Tp]
         /// 
         /// </remarks>
         /// <param name="tpId"></param>
