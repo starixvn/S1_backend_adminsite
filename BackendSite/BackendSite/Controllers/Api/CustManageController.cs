@@ -850,6 +850,7 @@ namespace BackendSite.Controllers.Api
         }
 
         #endregion
+        
         #region CSD > Customer Administration > CustInfo [ResetCustUSDTInfo]
 
         [HttpPost]
@@ -1460,9 +1461,22 @@ namespace BackendSite.Controllers.Api
         #endregion
 
         #region CSD > TagMamagement
-        
+
+        /// <summary>
+        /// CustManage/EditTagMamagement 更新標籤資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Tag Management > [Submit](Query) > Click[Edit] > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="para"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
-        public ApiResult EditTagMamagement(EditTagManagementpara para)
+        public ApiResult EditTagManagement(EditTagManagementpara para)
         {
             if (custInfoBLL.EditTagMamagement(para.Id, para.TagName, para.TagColour, para.Description, User.Identity.Name) > 0)
             {
@@ -1478,6 +1492,19 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        /// <summary>
+        /// CustManage/GetTagData 取得標籤資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Tag Management > [Submit](Query)
+        /// 
+        /// </remarks>
+        /// <param name="para"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
         public ApiListResult<TagData> GetTagData(GetTagDatapara para)
         {
@@ -1500,6 +1527,19 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// CustManage/SetTagStatus 更新標籤狀態
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Tag Management > [Submit](Query) > Change[Status]
+        /// 
+        /// </remarks>
+        /// <param name="para"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
         public ApiResult SetTagStatus(SetTagStatuspara para)
         {
@@ -1516,6 +1556,8 @@ namespace BackendSite.Controllers.Api
                 throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
             }
         }
+
+        #endregion
 
         [HttpPost]
         public ApiResult<IEnumerable<TagData>> GetAllTag()
@@ -1584,11 +1626,24 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
-        
-        #endregion
 
+        #region CSD > Registration Management
+
+        /// <summary>
+        /// CustManage/GetRegLiveStatusData 取得會員註冊資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Registration Management > [Submit](Query)
+        /// 
+        /// </remarks>
+        /// <param name="custInfoReq"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
         [HttpPost]
-        public ApiListResult<RegLiveStatus> GetRegLiveStatusData(RegLiveStatusPara custInfoReq)
+        public ApiListResult<RegLiveStatus> GetRegLiveStatusList(RegLiveStatusPara custInfoReq)
         {
             var apiResult = new ApiListResult<RegLiveStatus>();
             try
@@ -1611,6 +1666,19 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// CustManage/SetRegLiveStatus 更新會員註冊資料狀態
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Registration Management > [Submit](Query) > Edit [Status]
+        /// 
+        /// </remarks>
+        /// <param name="para"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
         [HttpPost]
         public ApiResult SetRegLiveStatus(SetRegLiveStatusPara para)
         {
@@ -1627,6 +1695,19 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// CustManage/GetRegLiveStatusNotes 取得會員註冊資料註記
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit]
+        /// 
+        /// </remarks>
+        /// <param name="addCustNoteReq"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
         [HttpPost]
         public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(AddRegLiveStatusNotes addCustNoteReq)
         {
@@ -1639,6 +1720,19 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// CustManage/AddRegLiveStatusNote 新增會員註冊資料註記
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Registration Management > [Submit](Query)  > Note[Edit] > [Add]
+        /// 
+        /// </remarks>
+        /// <param name="addCustNoteReq"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_add_note" })]
         [HttpPost]
         public ApiResult AddRegLiveStatusNote(AddRegLiveStatusNotes addCustNoteReq)
         {
@@ -1655,6 +1749,19 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// CustManage/DeleteRegLiveStatusNote 刪除會員註冊資料註記
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit] > Note List > [Delete]
+        /// 
+        /// </remarks>
+        /// <param name="deleteCustNoteReq"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_delete_note" })]
         [HttpPost]
         public ApiResult DeleteRegLiveStatusNote(DeleteRegLiveStatusNotes deleteCustNoteReq)
         {
@@ -1671,6 +1778,19 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// CustManage/EditRegLiveStatusNote 更新會員註冊資料註記
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit] > Note List > [Edit] > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="EditRegLiveStatusNote"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_edit_note" })]
         [HttpPost]
         public ApiResult EditRegLiveStatusNote(EditRegLiveStatusNotes EditRegLiveStatusNote)
         {
@@ -1687,13 +1807,46 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// CustManage/ExportRegLiveStatus 匯出會員註冊資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Registration Management > [Submit](Query) > [Export Excel]
+        /// 
+        /// </remarks>
+        /// <param name="SelectSite"></param>
+        /// <param name="Currency"></param>
+        /// <param name="DepositStatus"></param>
+        /// <param name="Status"></param>
+        /// <param name="User"></param>
+        /// <param name="Sort"></param>
+        /// <param name="StartDate"></param>
+        /// <param name="EndDate"></param>
+        /// <param name="AffiliatesCode"></param>
+        /// <param name="AgentCodeType"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
         [HttpPost]
-        public IActionResult ExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate, string AffiliatesCode, int AgentCodeType)
+        public IActionResult ExportRegLiveStatusList(string SelectSite, 
+            int Currency, 
+            int DepositStatus,
+            int Status, 
+            string User, 
+            int Sort, 
+            long StartDate, 
+            long EndDate, 
+            string AffiliatesCode, 
+            int AgentCodeType)
         {
             var ExportData = custInfoBLL.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate, AffiliatesCode, AgentCodeType);
             var stream = excelBLL.Export(ExportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Registration_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
+
+        #endregion
 
         #endregion
 
