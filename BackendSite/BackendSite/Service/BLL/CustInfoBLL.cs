@@ -86,24 +86,24 @@ namespace BackendSite.Service.BLL
 
             return vipLevelCache;
         }
-        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency, string bankAccountNumber, IEnumerable<int> selectstatus, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string accountName, string loginIp, string transId, string tpUserName, string email, string phoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency, string bankAccountNumber, IEnumerable<int> selectStatus, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
-            var currncyList = new List<int>();
+            var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new[] { x.SiteId });
+            var currencyList = new List<int>();
             serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x =>
             {
-                currncyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
+                currencyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
 
-            var CustInfoList = custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, selectstatus, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList())).ToList();
-            if (CustInfoList.Count > 0)
+            var custInfoList = custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, transId, tpUserName, email, phoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, selectStatus, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList())).ToList();
+            if (custInfoList.Count > 0)
             {
-                CustInfoList.ForEach(x =>
+                custInfoList.ForEach(x =>
                 {
                     x.ITagList = string.IsNullOrWhiteSpace(x.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(x.TagList);
                 });
             }
-            return CustInfoList;
+            return custInfoList;
         }
 
         public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int? AffId, IEnumerable<int> selectCurrency, string BankAccountNumber, IEnumerable<int> selectStatus)

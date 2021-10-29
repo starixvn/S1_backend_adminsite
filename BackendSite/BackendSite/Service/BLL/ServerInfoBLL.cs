@@ -65,27 +65,26 @@ namespace BackendSite.Service.BLL
             if (authData != null)
             {
                 var sServerInfoListKey = $"ServerInfoList_UserId_{authData.UserId}";
-                var UserSiteList = cache.Get<IEnumerable<ServerInfo>>(sServerInfoListKey);
-                if (UserSiteList == null)
+                var userSiteList = cache.Get<IEnumerable<ServerInfo>>(sServerInfoListKey);
+                if (userSiteList == null)
                 {
                     var loginUser = adminUserService.GetUser(authData.UserId);
                     if (loginUser.IsSuper)
                     {
-                        UserSiteList = serverInfoService.GetSiteList();
+                        userSiteList = serverInfoService.GetSiteList();
                     }
                     else
                     {
                         var assignSites = adminUserService.GetAssignSiteList(authData.UserId);
-                        UserSiteList = assignSites != null && assignSites.Any() ? serverInfoService.GetSiteList().Where(x => assignSites.Any(y => y.SiteId == x.SiteId)) : null;
+                        userSiteList = assignSites != null && assignSites.Any() ? serverInfoService.GetSiteList().Where(x => assignSites.Any(y => y.SiteId == x.SiteId)) : null;
                     }
 
-                    if (UserSiteList != null)
+                    if (userSiteList != null)
                     {
-                        cache.Set(sServerInfoListKey, UserSiteList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
+                        cache.Set(sServerInfoListKey, userSiteList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
                     }
                 }
-
-                return UserSiteList;
+                return userSiteList;
             }
             else
             {
