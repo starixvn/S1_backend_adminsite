@@ -52,7 +52,7 @@ namespace BackendSite.ExceptionHandling
                     errorCode = adminException.ErrorCode,
                     message = message
                 });
-                _logger.LogError(message);
+                _logger.LogError(exception, message);
             }
             else
             {
