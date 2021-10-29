@@ -35,41 +35,41 @@ namespace BackendSite.Service.DAL
             return conn.QueryFirstOrDefault<Customer>("Customer_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? AffId, IEnumerable<int> selectCurrency, string bankAccountNumber, IEnumerable<int> selectstatus, ref int pageNumber, out int totalPages, out int rowCount, string siteList, string currncyList)
+        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string accountName, string loginIp, string transId, string tpUserName, string email, string phoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency, string bankAccountNumber, IEnumerable<int> selectStatus, ref int pageNumber, out int totalPages, out int rowCount, string siteList, string currencyList)
         {
-            string SelectSite = null;
-            string SelectCurrency = null;
-            string SelectStatus = null;
+            var jsonSelectSite = string.Empty;
+            var jsonSelectCurrency = string.Empty;
+            var jsonSelectStatus = string.Empty;
             if (selectSite != null && selectSite.Any())
             {
-                SelectSite = JsonConvert.SerializeObject(selectSite);
+                jsonSelectSite = JsonConvert.SerializeObject(selectSite);
             }
             if (selectCurrency != null && selectCurrency.Any())
             {
-                SelectCurrency = JsonConvert.SerializeObject(selectCurrency);
+                jsonSelectCurrency = JsonConvert.SerializeObject(selectCurrency);
             }
-            if (selectstatus != null)
+            if (selectStatus != null)
             {
-                if (selectstatus.ToList().Count == 0)
+                if (selectStatus.ToList().Count == 0)
                 {
-                    var templist = new List<int>() { 1, 2, 3 };
-                    SelectStatus = JsonConvert.SerializeObject(templist);
+                    var tempList = new List<int>() { 1, 2, 3 };
+                    jsonSelectStatus = JsonConvert.SerializeObject(tempList);
                 }
                 else
                 {
-                    SelectStatus = JsonConvert.SerializeObject(selectstatus);
+                    jsonSelectStatus = JsonConvert.SerializeObject(selectStatus);
                 }
             }
             totalPages = 0;
 
-            var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TransId = transId, TpUserName = TpUserName, Email = Email, PhoneNo = PhoneNo, StartDate = startDate, EndDate = endDate, PageSize = pageSize, SelectCurrency = SelectCurrency, SiteList = siteList, AffId, CurrncyList = currncyList, BankAccountNumber = bankAccountNumber, SelectStatus = SelectStatus });
-            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            var p = new DynamicParameters(new {
+                SelectSite = jsonSelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = accountName, LoginIp = loginIp, TransId = transId, TpUserName = tpUserName, Email = email, PhoneNo = phoneNo, StartDate = startDate, EndDate = endDate, PageSize = pageSize, SelectCurrency = jsonSelectCurrency, SiteList = siteList,
+                AffId = affId, CurrncyList = currencyList, BankAccountNumber = bankAccountNumber, SelectStatus = jsonSelectStatus });
+            p.Add("PageNumber", pageNumber, DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.Query<CustInfoDetail>("Admin_CustInfoSearchV5_Get", p, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearchV5_Get", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
