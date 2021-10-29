@@ -38,14 +38,14 @@ import { number_format } from '../commJS/common';
         }
 
         render() {
-            let row = this.state.row;
-           // console.log("render1",row);
+            let row = this.state.row; 
+           //console.log("render1",row);
             return (
                 <tr>
                     <th scope="row">{row.bankCode}</th>
                     <td>{row.bankName}</td>
                     <td>{row.accountNo}</td>
-                    <td>{row.ifscCode}</td>
+                    {row.currencyId==61 ? <td>{row.ifscCode}</td> : null}
                     <td>{row.accountName}</td>
                     <td>
                         <select className="custom-select width-50" name="pointLevel" onChange={this.onChange.bind(this)} value={row.pointLevel}>
