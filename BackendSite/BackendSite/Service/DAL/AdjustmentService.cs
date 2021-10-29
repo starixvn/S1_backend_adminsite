@@ -143,7 +143,7 @@ namespace BackendSite.Service.DAL
             out int RowCount)
         {
 
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
 
             var props = new DynamicParameters();
             props.Add("CustId", CustId);
