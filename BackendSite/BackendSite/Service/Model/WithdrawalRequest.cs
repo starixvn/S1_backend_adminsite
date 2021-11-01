@@ -218,6 +218,8 @@ namespace BackendSite.Service.Model
         public int WithdrawalId { get; set; }
         public string ToVerifyTime { get; set; }
         public string ToApprovedTime { get; set; }
+        public string Operator { get; set; }
+        
     }
 
     public class WithdrawalTimeExportData
