@@ -21,6 +21,7 @@ const dataColumnDefs = () => {
     },
     { dataColumn: "isoCode", columnTitle: "Currency" },
     { dataColumn: "statusName", columnTitle: "Status" },
+    { dataColumn: "operator", columnTitle: "Operate By" },
     {
       dataColumn: "createTime",
       columnTitle: "Create Time" + " (" + moment().format("Z") + ")",
