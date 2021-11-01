@@ -346,7 +346,6 @@ namespace BackendSite.Service.BLL
                 result.WithdrawalTimeList.ForEach(x =>
                 {
                     var ts1 = new TimeSpan(x.CreateTime.Ticks);
-                    var ts2 = new TimeSpan(x.UpdateTime.Ticks);
                     var timeSpanOfFlowEndTime = new TimeSpan(x.FlowEndTime.Ticks);
                     var ts = ts1.Subtract(timeSpanOfFlowEndTime).Duration();
                     x.CompleteTime = GetTimeString(ts);
