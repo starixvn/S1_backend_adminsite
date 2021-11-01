@@ -252,7 +252,7 @@ const numberFormat = (number) => {
   return number_format(number_toFixed(number, 2));
 };
 const dateFormat = (createTime) => {
-  return moment(createTime).add(8, "hour").format("l LTS");
+  return moment(createTime).format("l LTS");
 };
 
 const DropDownBox = (props) => {
