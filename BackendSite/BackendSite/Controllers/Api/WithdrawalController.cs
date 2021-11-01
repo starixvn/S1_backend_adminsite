@@ -901,12 +901,12 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Finance/WithdrawalTimeReport"})]
-        public IActionResult ExportWithdrawalTime(string SelectSite, string WithdrawalID, long StartDate, long EndDate,
-            int Status, int CurrencyId)
+        public IActionResult ExportWithdrawalTime(string selectSite, string withdrawalId, long startDate, long endDate,
+            int status, int currencyId)
         {
-            var ExportData =
-                withdrawalBLL.WithdrawalTimeExportGet(SelectSite, WithdrawalID, StartDate, EndDate, Status, CurrencyId);
-            var stream = excelBLL.Export(ExportData);
+            var exportData =
+                withdrawalBLL.WithdrawalTimeExportGet(selectSite, withdrawalId, startDate, endDate, status, currencyId);
+            var stream = excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"WithdrawalTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

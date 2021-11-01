@@ -230,6 +230,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public string Currency { get; set; }
         public string Status { get; set; }
+        public string OperateBy { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdateTime { get; set; }
         public DateTime? FlowEndTime { get; set; }
