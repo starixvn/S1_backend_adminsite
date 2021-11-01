@@ -381,7 +381,6 @@ namespace BackendSite.Service.BLL
                 result.ForEach(x =>
                 {
                     var ts1 = new TimeSpan(x.CreateTime.Ticks);
-                    var ts2 = new TimeSpan(x.UpdateTime.Ticks);
                     var timeSpanOfFlowEndTime = new TimeSpan(x.FlowEndTime.Ticks);
                     var ts = ts1.Subtract(timeSpanOfFlowEndTime).Duration();
                     var tempToVerifyTime = "";
@@ -416,6 +415,7 @@ namespace BackendSite.Service.BLL
                         UserName = x.UserName,
                         Currency = x.IsoCode,
                         Status = x.StatusName,
+                        OperateBy = x.Operator,
                         CreateTime = x.CreateTime,
                         UpdateTime = x.UpdateTime,
                         FlowEndTime = flowEndTime,
