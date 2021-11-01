@@ -212,6 +212,6 @@ const EditInputField = (props) => {
   );
 };
 const dateFormat = (createTime) => {
-  return moment(createTime).add(8, "hour").format("l LTS");
+  return moment(createTime).format("l LTS");
 };
 export default Panel;
