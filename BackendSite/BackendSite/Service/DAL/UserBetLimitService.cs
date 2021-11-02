@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -21,11 +25,10 @@ namespace BackendSite.Service.DAL
 
         #region Constructor
 
-        public UserBetLimitService(IConfiguration configuration,
-            ILogger<MySqlClient> logger)
+        public UserBetLimitService(IServiceProvider provider)
         {
-            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
-            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
         #endregion

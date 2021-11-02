@@ -27,72 +27,72 @@ namespace BackendSite.Controllers.Api
         /// </summary>
         /// <param name="adminUser"></param>
         /// <returns></returns>
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpPost]
-        public ApiResult AddAccount([FromBody]AdminUser adminUser)
-        {
-            var result = adminBLL.AddAccount(adminUser);
-            var apiResult = new ApiResult();
-            if (result)
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Message = selLangBLL.GetMsg("msg_InsertSuccessful");
-            }
-            else
-            {
-                apiResult.ErrorCode = 9;
-                apiResult.Message = selLangBLL.GetMsg("msg_InsertFailed");
-            }
-            return apiResult;
-        }
+        //[ApiExplorerSettings(IgnoreApi = true)]
+        //[HttpPost]
+        //public ApiResult AddAccount([FromBody]AdminUser adminUser)
+        //{
+        //    var result = adminBLL.AddAccount(adminUser);
+        //    var apiResult = new ApiResult();
+        //    if (result)
+        //    {
+        //        apiResult.ErrorCode = 0;
+        //        apiResult.Message = selLangBLL.GetMsg("msg_InsertSuccessful");
+        //    }
+        //    else
+        //    {
+        //        apiResult.ErrorCode = 9;
+        //        apiResult.Message = selLangBLL.GetMsg("msg_InsertFailed");
+        //    }
+        //    return apiResult;
+        //}
 
         /// <summary>
         /// 目前後台無使用此API
         /// </summary>
         /// <param name="adminUser"></param>
         /// <returns></returns>
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpPost]
-        public ApiResult EditAccount([FromBody]AdminUser adminUser)
-        {
-            var result = adminBLL.EditAccount(adminUser);
-            var apiResult = new ApiResult();
-            if (result)
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
-            }
-            else
-            {
-                apiResult.ErrorCode = 9;
-                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
-            }
-            return apiResult;
-        }
+        //[ApiExplorerSettings(IgnoreApi = true)]
+        //[HttpPost]
+        //public ApiResult EditAccount([FromBody]AdminUser adminUser)
+        //{
+        //    var result = adminBLL.EditAccount(adminUser);
+        //    var apiResult = new ApiResult();
+        //    if (result)
+        //    {
+        //        apiResult.ErrorCode = 0;
+        //        apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
+        //    }
+        //    else
+        //    {
+        //        apiResult.ErrorCode = 9;
+        //        apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+        //    }
+        //    return apiResult;
+        //}
 
         /// <summary>
         /// 目前後台無使用此API
         /// </summary>
         /// <param name="adminUser"></param>
         /// <returns></returns>
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpPost]
-        public ApiResult ChangePwdAccount([FromBody]AdminUser adminUser)
-        {
-            var result = adminBLL.ChangePwdAccount(adminUser);
-            var apiResult = new ApiResult();
-            if (result)
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Message = selLangBLL.GetMsg("msg_UpdatesuccessfulNewpwd");
-            }
-            else
-            {
-                apiResult.ErrorCode = 9;
-                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
-            }
-            return apiResult;
-        }
+        //[ApiExplorerSettings(IgnoreApi = true)]
+        //[HttpPost]
+        //public ApiResult ChangePwdAccount([FromBody]AdminUser adminUser)
+        //{
+        //    var result = adminBLL.ChangePwdAccount(adminUser);
+        //    var apiResult = new ApiResult();
+        //    if (result)
+        //    {
+        //        apiResult.ErrorCode = 0;
+        //        apiResult.Message = selLangBLL.GetMsg("msg_UpdatesuccessfulNewpwd");
+        //    }
+        //    else
+        //    {
+        //        apiResult.ErrorCode = 9;
+        //        apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+        //    }
+        //    return apiResult;
+        //}
 
         public ApiResult<IEnumerable<FuncPermissionModel>> GetPermissionDatas()
         {

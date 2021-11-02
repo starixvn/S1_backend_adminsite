@@ -134,6 +134,19 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
         }
+
+        /// <summary>
+        /// ReferralManagement/GetRefFriendList 取得推薦朋友清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Referral History
+        /// 
+        /// </remarks>
+        /// <param name="refFriendListReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiListResult<ReferralFriend> GetRefFriendList(RefFriendListReq refFriendListReq)
         {
