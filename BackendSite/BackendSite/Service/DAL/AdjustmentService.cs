@@ -3,6 +3,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
@@ -22,15 +23,21 @@ namespace BackendSite.Service.DAL
         private readonly WithdrawalLimitService withdrawalLimitService;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
+        private readonly string _connectionString;
 
-        public AdjustmentService(IConfiguration configuration, Common common, WalletService walletService, WithdrawalLimitService withdrawalLimitService, ILogger<MySqlClient> logger)
+        public AdjustmentService(IConfiguration configuration,
+            IServiceProvider provider,
+            Common common,
+            WalletService walletService,
+            WithdrawalLimitService withdrawalLimitService,
+            ILogger<MySqlClient> logger)
         {
             this.configuration = configuration;
             this.common = common;
             this.walletService = walletService;
             this.withdrawalLimitService = withdrawalLimitService;
-            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
-            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
         public int PaymentAdjustment(AdjustmentInfo adjustmentInfo, string Operator, out string transId)
         {

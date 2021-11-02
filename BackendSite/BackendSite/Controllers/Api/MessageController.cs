@@ -106,7 +106,7 @@ namespace BackendSite.Controllers.Api
                     para.StartDate = 2147483647;
                 }
 
-                if(para.EndDate > 2147483647)
+                if (para.EndDate > 2147483647)
                 {
                     para.EndDate = 2147483647;
                 }
@@ -294,6 +294,21 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        #region CustInfo > Personal Message
+
+        /// <summary>
+        /// Message/GetPersonalMsg 取得指定客戶個人訊息資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Personal Message > Get Personal Message
+        /// 
+        /// </remarks>
+        /// <param name="CustId"></param>
+        /// <param name="PageNumber"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
         [HttpPost]
         public ApiListResult<PersonalMsg> GetPersonalMsg([FromForm] int CustId, [FromForm] int PageNumber)
@@ -321,6 +336,18 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// Message/GetCustLang 取得指定客戶語系
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo  > Personal Message > Get Customer Lang
+        /// 
+        /// </remarks>
+        /// <param name="CustId"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
         [HttpPost]
         public ApiResult<CustLang> GetCustLang([FromForm] int CustId)
@@ -340,6 +367,21 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// Message/SendPersonalMsg 送出指定客戶個人訊息
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo  > Personal Message >  Click [Add] > Click [Send]
+        /// 
+        /// </remarks>
+        /// <param name="CustId"></param>
+        /// <param name="Title"></param>
+        /// <param name="Content"></param>
+        /// <param name="PageNumber"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
         [HttpPost]
         public ApiListResult<PersonalMsg> SendPersonalMsg([FromForm] int CustId, [FromForm] string Title, [FromForm] string Content, [FromForm] int PageNumber)
@@ -369,6 +411,20 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// Message/DeletePersonalMsg 刪除指定客戶個人訊息
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo  > Personal Message > Click [Delete]
+        /// 
+        /// </remarks>
+        /// <param name="Id"></param>
+        /// <param name="CustId"></param>
+        /// <param name="PageNumber"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
         [HttpPost]
         public ApiListResult<PersonalMsg> DeletePersonalMsg([FromForm] int Id, [FromForm] int CustId, [FromForm] int PageNumber)
@@ -396,6 +452,8 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
+        #endregion
 
         #region CSD > Personal Message Batch
 
