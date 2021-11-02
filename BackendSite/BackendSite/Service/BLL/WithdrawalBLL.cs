@@ -384,14 +384,22 @@ namespace BackendSite.Service.BLL
                     var timeSpanOfFlowEndTime = new TimeSpan(x.FlowEndTime.Ticks);
                     var ts = ts1.Subtract(timeSpanOfFlowEndTime).Duration();
                     var tempToVerifyTime = "";
+                    var tempToProcessTime = "";
                     var tempToApprovedTime = "";
                     if (x.VerifyTime > DateTime.Now.AddYears(-1000))
                     {
-                        var ts3 = new TimeSpan(x.VerifyTime.Ticks);
-                        var tsv = ts1.Subtract(ts3).Duration();
+                        var ts2 = new TimeSpan(x.VerifyTime.Ticks);
+                        if (x.ProcessTime>DateTime.Now.AddYears(-1000))
+                        {
+                            var ts3 = new TimeSpan(x.ProcessTime.Ticks);
+                            var tsp = ts2.Subtract(ts3).Duration();
+                            tempToProcessTime = GetTimeString(tsp);
+                        }
+                       
+                        var tsv = ts1.Subtract(ts2).Duration();
                         if (x.Status == 6)
                         {
-                            var tsa = ts3.Subtract(timeSpanOfFlowEndTime).Duration();
+                            var tsa = ts2.Subtract(timeSpanOfFlowEndTime).Duration();
                             tempToApprovedTime = GetTimeString(tsa);
                         }
 
@@ -421,7 +429,11 @@ namespace BackendSite.Service.BLL
                         FlowEndTime = flowEndTime,
                         ToVerifyTime = tempToVerifyTime,
                         ToApprovedTime = tempToApprovedTime,
-                        CompleteTime = GetTimeString(ts)
+                        ToProcessTime = tempToProcessTime,
+                        CompleteTime = GetTimeString(ts),
+                        VerifiedBy = x.VerifiedBy,
+                        ApprovedBy = x.ApprovedBy,
+                        ProcessedBy = x.ProcessedBy
                     });
                 });
             }
