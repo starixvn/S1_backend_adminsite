@@ -429,7 +429,6 @@ namespace BackendSite.Service.BLL
                         FlowEndTime = flowEndTime,
                         ToVerifyTime = tempToVerifyTime,
                         ToApprovedTime = tempToApprovedTime,
-                        ProcessTime = x.ProcessTime,
                         ToProcessTime = tempToProcessTime,
                         CompleteTime = GetTimeString(ts),
                         VerifiedBy = x.VerifiedBy,

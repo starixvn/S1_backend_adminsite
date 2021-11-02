@@ -239,7 +239,6 @@ namespace BackendSite.Service.Model
         public DateTime? FlowEndTime { get; set; }
         public string ToVerifyTime { get; set; }
         public string VerifiedBy { get; set; }
-        public DateTime? ProcessTime { get; set; }
         public string ToProcessTime { get; set; }
         public string ProcessedBy { get; set; }
         public string ToApprovedTime { get; set; }
