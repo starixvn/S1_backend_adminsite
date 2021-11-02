@@ -408,7 +408,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        //有新舊API，這支是新API，另一支新的API=api/BaseData/GetBankInfoOffList
+        //有新舊API，這支是舊API，另一支新的API=api/BaseData/GetBankInfoOffList
         [HttpPost]
         public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffList(WithdrawalReq3 withdrawalReq)
         {
