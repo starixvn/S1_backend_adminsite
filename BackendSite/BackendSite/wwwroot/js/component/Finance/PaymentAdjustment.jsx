@@ -17,11 +17,9 @@ import qs from 'qs';
             BonusCode:"",
             CheckedBonusCode:"",
             WalletType:0,
-            RollOver:0,
+            RollOver:1,
             Amount:1,
             HasBonusCode:false,
-            TpId:0,
-            CategoryId:0,
             Name:""};
         }
 
@@ -132,8 +130,9 @@ import qs from 'qs';
             let withdrawal = parseFloat(this.state.Withdrawal);
             let withdrawalamount = isNaN(parseFloat(amount) * withdrawal) ? 0 : parseFloat(amount) * withdrawal;
             let memo = this.state.Memo;
-            let bonusCode = this.state.CheckedBonusCode
-            
+            let bonusCode = this.state.CheckedBonusCode;
+            let rollOver = this.state.RollOver;
+
             if (option == null) {
                 alert('Please select one Option.');
                 return;
@@ -159,7 +158,8 @@ import qs from 'qs';
                 return;
             }
 
-            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount, Memo: memo })
+            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount, Memo: memo,
+                BounsCode:  bonusCode, RollOver: rollOver})
                 .then(function (response) {
                     //Loading.UnLoading();
                     let result = response.data;
@@ -202,7 +202,6 @@ import qs from 'qs';
 
         onChange(event) {
             let obj = this.state;
-            console.log(event.target.name,'name');
             obj[event.target.name] = event.target.value;
             this.setState(obj);
 
@@ -213,10 +212,8 @@ import qs from 'qs';
                             CheckedBonusCode:"",
                             HasBonusCode:false,
                             Name:"",
-                            TpId:0,
-                            CategoryId:0,
-                            Amount:1,
-                            RollOver:0
+                            // Amount:1,
+                            // RollOver:1
                 });
             }
         }
@@ -246,13 +243,11 @@ import qs from 'qs';
                 if (result.errorCode == 0) {
                     if(!result.data.hasBonusCode){
                         alert("BonusCode Error! Please Check Again")
-                        this.setState({ RollOver: 0,
-                            Amount: 0,
+                        this.setState({ RollOver: 1,
+                            Amount: 1,
                             HasBonusCode: false,
                             CheckedBonusCode: "",
                             Name: "",
-                            TpId: 0,
-                            CategoryId: 0,
                             WalletType: 0
                         });
                     }
@@ -262,21 +257,17 @@ import qs from 'qs';
                                         HasBonusCode: true,
                                         CheckedBonusCode: result.data.bonusCode,
                                         Name: result.data.name,
-                                        TpId: result.data.tpId,
-                                        CategoryId: result.data.categoryId,
                                         WalletType: result.data.walletType
                                     });
                         alert("BonusCode " + bonusCode + " exist")       
                     }
                 } else {
                     alert(result.message);
-                    this.setState({ RollOver: 0,
-                        Amount: 0,
+                    this.setState({ RollOver: 1,
+                        Amount: 1,
                         HasBonusCode: false,
                         CheckedBonusCode: "",
                         Name: "",
-                        TpId: 0,
-                        CategoryId: 0,
                         WalletType: 0
                     });
                 }

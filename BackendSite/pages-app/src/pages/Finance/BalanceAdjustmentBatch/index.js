@@ -44,8 +44,10 @@ const App = () => {
             formData.append('option', parseInt(stateData.option));
             formData.append('optSite', parseInt(stateData.optSite));
             formData.append('withdrawalLimitOption', (stateData.checkwd) ? 1 : 0);
-            formData.append('withdrawal',parseFloat(stateData.withdrawal))
-            formData.append('bonuscode',stateData.CheckedBonusCode)
+            formData.append('withdrawal',isNaN(parseFloat(stateData.withdrawal)) ? 0 : parseFloat(stateData.withdrawal));
+            formData.append('bonuscode',stateData.CheckedBonusCode);
+            console.log(parseFloat(stateData.withdrawal),'withdrawal');
+            console.log(isNaN(parseFloat(stateData.withdrawal)) ? 0: parseFloat(stateData.withdrawal),'withdrawal2');
             if (!stateSend) {
                 if(!hasCheckPassword){
                     api.post('/api/Payment/CheckAdjustmentLimit', formData, settings)

@@ -551,7 +551,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult();
             var adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit();
-            string bonusUrl = $"{_bonusApiUrl}Withdrawal";
+            string bonusUrl = $"{_bonusApiUrl}SetAdjustBonus";
             try
             {
                 var authData = _authorizeBLL.GetAuthData();
@@ -645,7 +645,17 @@ namespace BackendSite.Controllers.Api
                             BonusCode = adjustmentAndWithdrawalLimitReq.BounsCode
                         };
                         var apiOnlineResult =
-                            await courierAdapter.MyPostAsync<bool, RetionBonus>(bonusUrl, retionbonus);
+                            await courierAdapter.MyPostAsync<RetionBonusRep, RetionBonus>(bonusUrl, retionbonus);
+                        if (apiOnlineResult.ErrorCode == 0)
+                        {
+                            apiResult.ErrorCode = apiOnlineResult.ErrorCode;
+                            apiResult.Message = $"Success. ID is {apiOnlineResult.Data.TransId}";
+                        }
+                        else
+                        {
+                            apiResult.ErrorCode = apiOnlineResult.ErrorCode;
+                            apiResult.Message = apiOnlineResult.Message;
+                        }
                     }
                 }
             }
@@ -664,7 +674,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new List<ApiResult>();
             var authData = _authorizeBLL.GetAuthData();
-            string bonusUrl = $"{_bonusApiUrl}Withdrawal";
+            string bonusUrl = $"{_bonusApiUrl}SetAdjustBonus";
             try
             {
                 if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -818,7 +828,23 @@ namespace BackendSite.Controllers.Api
                                             BonusCode = bonuscode
                                         };
                                         var apiOnlineResult =
-                                            await courierAdapter.MyPostAsync<bool, RetionBonus>(bonusUrl, retionbonus);
+                                             await courierAdapter.MyPostAsync<RetionBonusRep, RetionBonus>(bonusUrl, retionbonus);
+                                        if(apiOnlineResult.ErrorCode == 0)
+                                        {
+                                            apiResult.Add(new ApiResult()
+                                            {
+                                                ErrorCode = 1,
+                                                Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. ID is {apiOnlineResult.Data.TransId}."
+                                            });
+                                        }
+                                        else
+                                        {
+                                            apiResult.Add(new ApiResult()
+                                            {
+                                                ErrorCode = apiOnlineResult.ErrorCode,
+                                                Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {apiOnlineResult.Message}"
+                                            });
+                                        }
                                     }
                                     
                                 }
