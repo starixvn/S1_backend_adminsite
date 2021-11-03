@@ -114,7 +114,7 @@ const Panel = (props) => {
           totalPages: props.PageInfo.totalPages,
           pageNumber: props.PageInfo.pageNumber,
           rowCount: props.PageInfo.rowCount,
-          currencyAmount: props.PageInfo.currencyAmount
+          currencyAmount: props.PageInfo.currencyAmount,
         }}
         ChangePage={props.ChangePage}
       />
@@ -141,7 +141,7 @@ const numberFormat = (number) => {
   return number_format(number_toFixed(number, 2));
 };
 const dateFormat = (createTime) => {
-  return moment(createTime).add(8,'hour').format("l LTS");
+  return moment(createTime).add(8, "hour").format("l LTS");
 };
 
 export default Panel;
