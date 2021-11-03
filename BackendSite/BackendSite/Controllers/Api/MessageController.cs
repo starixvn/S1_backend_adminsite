@@ -578,7 +578,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiListResult<BatchMsg> DeleteBatchMessage([FromForm] IEnumerable<int> SelectSite, [FromForm] long? StartDate, [FromForm] long? EndDate, [FromForm] int batchId, [FromForm] int PageNumber)
+        public ApiListResult<BatchMsg> DeleteBatchMessage([FromForm] IEnumerable<int> SelectSite, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int batchId, [FromForm] int PageNumber)
         {
             var PageSize = 10;
             var TotalPages = 0;
@@ -587,7 +587,9 @@ namespace BackendSite.Controllers.Api
             try
             {
                 messageBLL.DeleteBatchMessage(batchId);
-                apiResult.Data = messageBLL.GetBatchMessageList(SelectSite, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+                apiResult.Data = messageBLL.GetBatchMessageList(SelectSite, startTime, endTime, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
 
                 apiResult.PageNumber = PageNumber;
@@ -683,7 +685,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiListResult<BatchMsg> GetBatchMessageList([FromForm] IEnumerable<int> SelectSite, [FromForm] long? StartDate, [FromForm] long? EndDate, [FromForm] int PageNumber)
+        public ApiListResult<BatchMsg> GetBatchMessageList([FromForm] IEnumerable<int> SelectSite, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)
         {
             var PageSize = 10;
             var TotalPages = 0;
@@ -691,7 +693,9 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<BatchMsg>();
             try
             {
-                apiResult.Data = messageBLL.GetBatchMessageList(SelectSite, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+                apiResult.Data = messageBLL.GetBatchMessageList(SelectSite, startTime, endTime, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
 
                 apiResult.PageNumber = PageNumber;

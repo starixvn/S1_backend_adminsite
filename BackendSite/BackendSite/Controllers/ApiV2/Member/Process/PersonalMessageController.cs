@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
@@ -44,6 +45,59 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
+        #endregion
+        
+        #region Model
+        
+        public class ExportMessageBatchReq
+        {
+            public int BatchId { get; set; }
+        }
+        public class DeleteBatchMessageReq
+        {
+            private DateTimeOffset _startDate { get;set;}
+            private DateTimeOffset _endDate { get;set;}
+            public IEnumerable<int> SelectSite { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public int BatchId { get; set; }
+            public int PageNumber { get; set; }
+        }
+        public class UpdateBatchMessageReq
+        {
+            public int BatchId { get; set; }
+            public string PersonalMsg { get; set; }
+        }
+        public class GetBatchMessageReq
+        {
+            public int BatchId { get; set; }
+        }
+        public class GetBatchMessageListReq
+        {
+            private DateTimeOffset _startDate { get;set;}
+            private DateTimeOffset _endDate { get;set;}
+            public IEnumerable<int> SelectSite { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public int PageNumber { get; set; }
+        }
+        
         #endregion
         
         #region CSD > Personal Message Batch
@@ -185,58 +239,51 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// 
         /// Func Path：CSD > Personal Message Batch > Submit(Query) > [Export Excel]
         /// </remarks>
-        /// <param name="BatchId"></param>
+        /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public IActionResult ExportSendMessageBatchResultReport(int BatchId)
+        public IActionResult ExportSendMessageBatchResultReport(ExportMessageBatchReq req)
         {
-            var data = _messageBll.GetBatchMessageSendLog(BatchId);
+            var data = _messageBll.GetBatchMessageSendLog(req.BatchId);
             var stream = _excelBll.Export(data);
 
             return File(stream,
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        $"SendMessageBatchResult_{BatchId}_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+                        $"SendMessageBatchResult_{req.BatchId}_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
         /// <summary>
         /// Message/DeleteBatchMessage 刪除指定批次訊息
         /// </summary>
         /// <remarks>
-        /// 
         /// Http Method：POST
         /// 
         /// Func Path：CSD > Personal Message Batch > Submit(Query) > [Delete]
-        /// 
         /// </remarks>
-        /// <param name="SelectSite"></param>
-        /// <param name="StartDate"></param>
-        /// <param name="EndDate"></param>
-        /// <param name="batchId"></param>
-        /// <param name="PageNumber"></param>
+        /// <param name="req"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiListResult<BatchMsg> DeleteBatchMessage([FromForm] IEnumerable<int> SelectSite, [FromForm] long? StartDate, [FromForm] long? EndDate, [FromForm] int batchId, [FromForm] int PageNumber)
+        public ApiListResult<BatchMsg> DeleteBatchMessage(DeleteBatchMessageReq req)
         {
-            var PageSize = 10;
-            var TotalPages = 0;
-            var RowCount = 0;
+            const int pageSize = 10;
+            var totalPages = 0;
+            var rowCount = 0;
             var apiResult = new ApiListResult<BatchMsg>();
             try
             {
-                _messageBll.DeleteBatchMessage(batchId);
-                apiResult.Data = _messageBll.GetBatchMessageList(SelectSite, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
-                apiResult.ErrorCode = 0;
-
-                apiResult.PageNumber = PageNumber;
-                apiResult.RowCount = RowCount;
-                apiResult.TotalPages = TotalPages;
-                apiResult.ErrorCode = 0;
+                var pageNumber = req.PageNumber;
+                _messageBll.DeleteBatchMessage(req.BatchId);
+                apiResult.Data = _messageBll.GetBatchMessageList(req.SelectSite, req.StartDate, req.EndDate, pageSize, ref pageNumber, ref totalPages, ref rowCount);
+                apiResult.PageNumber = pageNumber;
+                apiResult.RowCount = rowCount;
+                apiResult.TotalPages = totalPages;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
                 apiResult.RawMessage = ex.ToString();
-                apiResult.ErrorCode = 999;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
             }
 
             return apiResult;
@@ -246,29 +293,25 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Message/UpdateBatchMessage 更新指定批次訊息
         /// </summary>
         /// <remarks>
-        /// 
         /// Http Method：POST
         /// 
         /// Func Path：CSD > Personal Message Batch > Submit(Query) > Edit > [Update]
-        /// 
         /// </remarks>
-        /// <param name="batchId"></param>
-        /// <param name="personalMsg"></param>
-        /// <returns></returns>
+        /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiResult UpdateBatchMessage([FromForm] int batchId, [FromForm] string personalMsg)
+        public ApiResult UpdateBatchMessage(UpdateBatchMessageReq req)
         {
             var result = new ApiResult();
             try
             {
-                if (_messageBll.UpdateBatchMessage(batchId, personalMsg))
-                    result.ErrorCode = 0;
+                if (_messageBll.UpdateBatchMessage(req.BatchId, req.PersonalMsg))
+                    result.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
                 result.RawMessage = ex.ToString();
-                result.ErrorCode = 999;
+                result.ErrorCode = (int)ErrorCodeEnum.SystemException;
             }
 
             return result;
@@ -278,28 +321,25 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Message/GetBatchMessage 取得指定批次訊息
         /// </summary>
         /// <remarks>
-        /// 
         /// Http Method：POST
         /// 
         /// Func Path：CSD > Personal Message Batch > Submit(Query) > [Edit]
-        /// 
         /// </remarks>
-        /// <param name="batchId"></param>
-        /// <returns></returns>
+        /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiResult<BatchMsg> GetBatchMessage([FromForm] int batchId)
+        public ApiResult<BatchMsg> GetBatchMessage(GetBatchMessageReq req)
         {
             var result = new ApiResult<BatchMsg>();
             try
             {
-                result.Data = _messageBll.GetBatchMessage(batchId);
-                result.ErrorCode = 0;
+                result.Data = _messageBll.GetBatchMessage(req.BatchId);
+                result.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
                 result.RawMessage = ex.ToString();
-                result.ErrorCode = 999;
+                result.ErrorCode = (int)ErrorCodeEnum.SystemException;
             }
             return result;
         }
@@ -308,41 +348,34 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Message/GetBatchMessageList 取得批次訊息資料清單
         /// </summary>
         /// <remarks>
-        /// 
         /// Http Method：POST
         /// 
         /// Func Path：CSD > Personal Message Batch > [Submit](Query)
-        /// 
         /// </remarks>
-        /// <param name="SelectSite"></param>
-        /// <param name="StartDate"></param>
-        /// <param name="EndDate"></param>
-        /// <param name="PageNumber"></param>
-        /// <returns></returns>
+        /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiListResult<BatchMsg> GetBatchMessageList([FromForm] IEnumerable<int> SelectSite, [FromForm] long? StartDate, [FromForm] long? EndDate, [FromForm] int PageNumber)
+        public ApiListResult<BatchMsg> GetBatchMessageList(GetBatchMessageListReq req)
         {
-            var PageSize = 10;
-            var TotalPages = 0;
-            var RowCount = 0;
+            const int pageSize = 10;
+            var totalPages = 0;
+            var rowCount = 0;
             var apiResult = new ApiListResult<BatchMsg>();
             try
             {
-                apiResult.Data = _messageBll.GetBatchMessageList(SelectSite, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
-                apiResult.ErrorCode = 0;
-
-                apiResult.PageNumber = PageNumber;
-                apiResult.RowCount = RowCount;
-                apiResult.TotalPages = TotalPages;
-                apiResult.ErrorCode = 0;
+                var pageNumber = req.PageNumber;
+                apiResult.Data = _messageBll.GetBatchMessageList(req.SelectSite, req.StartDate, req.EndDate, pageSize, ref pageNumber, ref totalPages, ref rowCount);
+                apiResult.PageNumber = pageNumber;
+                apiResult.RowCount = rowCount;
+                apiResult.TotalPages = totalPages;
+                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
             }
             catch (Exception ex)
             {
                 apiResult.RawMessage = ex.ToString();
-                apiResult.ErrorCode = 999;
+                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.SystemException;
             }
-
+        
             return apiResult;
         }
 
