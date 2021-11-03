@@ -77,7 +77,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         //[ApiExplorerSettings(IgnoreApi = true)]
         //[HttpPost]
-        //public ApiResult ChangePwdAccount([FromBody]AdminUser adminUser)
+        //public ApiResult ChangePwdAccount([FromBody] AdminUser adminUser)
         //{
         //    var result = adminBLL.ChangePwdAccount(adminUser);
         //    var apiResult = new ApiResult();
@@ -94,6 +94,10 @@ namespace BackendSite.Controllers.Api
         //    return apiResult;
         //}
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public ApiResult<IEnumerable<FuncPermissionModel>> GetPermissionDatas()
         {
             var apiResult = new ApiResult<IEnumerable<FuncPermissionModel>>()
