@@ -110,9 +110,9 @@ namespace BackendSite.Service.BLL
         {
             return messageService.GetBatchMessage(batchId);
         }
-        public IEnumerable<BatchMsg> GetBatchMessageList(IEnumerable<int> SelectSite, long? StartDate, long? EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<BatchMsg> GetBatchMessageList(IEnumerable<int> selectSite, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount)
         {
-            var batchMessageList = messageService.GetBatchMessageList(SelectSite, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            var batchMessageList = messageService.GetBatchMessageList(selectSite, startDate, endDate, pageSize, ref pageNumber, ref totalPages, ref rowCount);
             batchMessageList.ToList().ForEach(x =>
             {
                 x.Content = StripHTML(x.Content);
