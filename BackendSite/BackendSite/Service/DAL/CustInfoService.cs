@@ -253,154 +253,94 @@ namespace BackendSite.Service.DAL
             public int value { get; set; }
         }
 
-        public TeleCSDData GetTeleCSD(string SiteIds, string Currency, long StartDate, long EndDate, int Deposit, int DormantUser, int CallOut, int PageNumber, int PageSize)
+        public TeleCSDData GetTeleCSD(string siteIds, string currency, DateTimeOffset startDate, DateTimeOffset endDate, int deposit, int dormantUser, int callOut, int pageNumber, int pageSize)
         {
-            var SearchData = new TeleCSDData();
+            var searchData = new TeleCSDData();
             var props = new DynamicParameters();
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            //var SiteIdsObject = JsonConvert.DeserializeObject<MutiSelect[]>(SiteIds);
-            //var CurrencyObject = JsonConvert.DeserializeObject<MutiSelect[]>(Currency);
-
-            //int siteidlength = SiteIdsObject == null ? 0 : SiteIdsObject.Length;
-            //int Currencylength = CurrencyObject == null ? 0 : CurrencyObject.Length;
-            //int[] SiteIdFilterArray = new int[siteidlength];
-            //int[] CurrencyFilterArray = new int[Currencylength];
-            //if (siteidlength > 0)
-            //{
-            //    for (var i = 0; i < SiteIdsObject.Length; i++)
-            //    {
-            //        SiteIdFilterArray[i] = SiteIdsObject[i].value;
-            //    }
-            //}
-            //if (Currencylength > 0)
-            //{
-            //    for (var i = 0; i < CurrencyObject.Length; i++)
-            //    {
-            //        CurrencyFilterArray[i] = CurrencyObject[i].value;
-            //    }
-            //}
-            //string SiteIdFilter = JsonConvert.SerializeObject(SiteIdFilterArray);
-            //string CurrencyFilter = JsonConvert.SerializeObject(CurrencyFilterArray);
-            //int ActStatus = int.Parse(Deposit);
-            //int DayInactive = int.Parse(DormantUser);
-            //int CallOutStatus = int.Parse(CallOut);
-
-            props.Add("PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("PageSize", PageSize);
-
-            props.Add("SelectSite", SiteIds);
-            props.Add("CurrencyList", Currency);
-            props.Add("StartDate", StartDate);
-            props.Add("EndDate", EndDate);
-            props.Add("ActStatus", Deposit);
-            props.Add("DayInactive", DormantUser);
-            props.Add("CallOutStatus", CallOut);
-            var result = conn.Query<CustTele>("Admin_CustTeleSearchV3_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            props.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),DbType.Int32);
+            props.Add("PageSize", Math.Abs(pageSize));
+            props.Add("SelectSite", siteIds);
+            props.Add("CurrencyList", currency);
+            props.Add("StartDate", startDate.DateTime);
+            props.Add("EndDate", endDate.DateTime);
+            props.Add("ActStatus", deposit);
+            props.Add("DayInactive", dormantUser);
+            props.Add("CallOutStatus", callOut);
+            var result = _reportDbClient.Query<CustTele>("Admin_CustTeleSearchV4_Get", props).ToList();
 
             result.ForEach(x =>
             {
                 if (x.UpdateAt != null)
                 {
-                    var UpdateAtArray = x.UpdateAt.Split(',');
-                    var OperatorArray = x.Operator.Split(',');
+                    var updateAtArray = x.UpdateAt.Split(',');
+                    var operatorArray = x.Operator.Split(',');
                     x.UpdateRemark = new List<string>();
-                    for (var i = 0; i < UpdateAtArray.Length; i++)
+                    for (var i = 0; i < updateAtArray.Length; i++)
                     {
-                        x.UpdateRemark.Add($"{UpdateAtArray[i]}-{OperatorArray[i]}");
+                        x.UpdateRemark.Add($"{updateAtArray[i]}-{operatorArray[i]}");
                     }
-                    x.CallOutStatus = UpdateAtArray.Length;
-                    if (UpdateAtArray.Length == 3)
+                    x.CallOutStatus = updateAtArray.Length;
+                    if (updateAtArray.Length == 3)
                     {
                         x.CanUpdate = false;
                     }
                 }
             });
 
-            SearchData.CustTeleList = result;
-            SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            SearchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
+            searchData.CustTeleList = result;
+            searchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            searchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            searchData.RowCount = props.Get<int?>("RowCount") ?? 0;
 
-            return SearchData;
+            return searchData;
         }
 
-        public int UpdateCustomerTele(int siteId, int custId, string Operator)
+        public int UpdateCustomerTele(int siteId, int custId, string @operator)
         {
             var props = new DynamicParameters();
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-
             props.Add("SiteId", siteId);
             props.Add("CustId", custId);
-            props.Add("Operator", Operator);
-
-            return conn.Execute("Admin_CustTele_Ins", props, commandType: CommandType.StoredProcedure);
+            props.Add("Operator", @operator);
+            return _mainDbClient.Execute("Admin_CustTele_Ins", props);
         }
 
-        public List<CustTeleExport> GetTeleCSDExportData(string SiteIds, string Currency, long StartDate, long EndDate, int Deposit, int DormantUser, int CallOut)
+        public List<CustTeleExport> GetTeleCSDExportData(string siteIds, string currency, DateTimeOffset startDate, DateTimeOffset endDate, int deposit, int dormantUser, int callOut)
         {
             var result = new List<CustTeleExport>();
             var props = new DynamicParameters();
-            //var SiteIdsObject = JsonConvert.DeserializeObject<MutiSelect[]>(SiteIds);
-            //var CurrencyObject = JsonConvert.DeserializeObject<MutiSelect[]>(Currency);
-            //int siteidlength = SiteIdsObject == null ? 0 : SiteIdsObject.Length;
-            //int Currencylength = CurrencyObject == null ? 0 : CurrencyObject.Length;
-            //int[] SiteIdFilterArray = new int[siteidlength];
-            //int[] CurrencyFilterArray = new int[Currencylength];
-            //if (siteidlength > 0)
-            //{
-            //    for (var i = 0; i < SiteIdsObject.Length; i++)
-            //    {
-            //        SiteIdFilterArray[i] = SiteIdsObject[i].value;
-            //    }
-            //}
-            //if (Currencylength > 0)
-            //{
-            //    for (var i = 0; i < CurrencyObject.Length; i++)
-            //    {
-            //        CurrencyFilterArray[i] = CurrencyObject[i].value;
-            //    }
-            //}
-            //string SiteIdFilter = JsonConvert.SerializeObject(SiteIdFilterArray);
-            //string CurrencyFilter = JsonConvert.SerializeObject(CurrencyFilterArray);
-            //int ActStatus = int.Parse(Deposit);
-            //int DayInactive = int.Parse(DormantUser);
-            //int CallOutStatus = int.Parse(CallOut);
+            props.Add("SelectSite", siteIds);
+            props.Add("CurrencyList", currency);
+            props.Add("StartDate", startDate.DateTime);
+            props.Add("EndDate", endDate.DateTime);
+            props.Add("ActStatus", deposit);
+            props.Add("DayInactive", dormantUser);
+            props.Add("CallOutStatus", callOut);
+            var tempResult = _reportDbClient.Query<CustTeleExportTemp>("Admin_CustTeleExportV4_Get", props).ToList();
 
-            props.Add("SelectSite", SiteIds);
-            props.Add("CurrencyList", Currency);
-            props.Add("StartDate", StartDate);
-            props.Add("EndDate", EndDate);
-            props.Add("ActStatus", Deposit);
-            props.Add("DayInactive", DormantUser);
-            props.Add("CallOutStatus", CallOut);
-
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var tempresult = conn.Query<CustTeleExportTemp>("Admin_CustTeleExportV3_Get", props, commandType: CommandType.StoredProcedure).ToList();
-
-            tempresult.ForEach(x =>
+            tempResult.ForEach(x =>
             {
-                var firstcall = string.Empty;
-                var secondcall = string.Empty;
-                var thirdcall = string.Empty;
+                var firstCall = string.Empty;
+                var secondCall = string.Empty;
+                var thirdCall = string.Empty;
                 if (x.UpdateAt != null && x.Operator != null)
                 {
-                    var UpdateAtArray = x.UpdateAt.Split(',');
-                    var OperatorArray = x.Operator.Split(',');
-                    for (var i = 0; i < UpdateAtArray.Length; i++)
+                    var updateAtArray = x.UpdateAt.Split(',');
+                    var operatorArray = x.Operator.Split(',');
+                    for (var i = 0; i < updateAtArray.Length; i++)
                     {
                         switch (i)
                         {
                             case 0:
-                                firstcall = $"{UpdateAtArray[i]}-{OperatorArray[i]}";
+                                firstCall = $"{updateAtArray[i]}-{operatorArray[i]}";
                                 break;
                             case 1:
-                                secondcall = $"{UpdateAtArray[i]}-{OperatorArray[i]}";
+                                secondCall = $"{updateAtArray[i]}-{operatorArray[i]}";
                                 break;
                             case 2:
-                                thirdcall = $"{UpdateAtArray[i]}-{OperatorArray[i]}";
+                                thirdCall = $"{updateAtArray[i]}-{operatorArray[i]}";
                                 break;
                         }
                     }
@@ -413,9 +353,9 @@ namespace BackendSite.Service.DAL
                     DepositStatus = x.DepositStatus,
                     RegDate = x.RegDate,
                     PhoneNumber = x.PhoneNumber,
-                    FirstTimeCall = firstcall,
-                    SecondTimeCall = secondcall,
-                    ThirdTimeCall = thirdcall
+                    FirstTimeCall = firstCall,
+                    SecondTimeCall = secondCall,
+                    ThirdTimeCall = thirdCall
                 });
             });
 

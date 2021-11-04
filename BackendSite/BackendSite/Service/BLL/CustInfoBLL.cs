@@ -255,19 +255,19 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.GetCustBonus(custId);
         }
-        public TeleCSDData GetTeleCSD(string SiteIds, string Currency, long StartDate, long EndDate, int Deposit, int DormantUser, int CallOut, int PageNumber, int PageSize)
+        public TeleCSDData GetTeleCSD(string siteIds, string currency, DateTimeOffset startDate, DateTimeOffset endDate, int deposit, int dormantUser, int callOut, int pageNumber, int pageSize)
         {
-            return custInfoService.GetTeleCSD(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut, PageNumber, PageSize);
+            return custInfoService.GetTeleCSD(siteIds, currency, startDate, endDate, deposit, dormantUser, callOut, pageNumber, pageSize);
         }
 
-        public int UpdateCustomerTele(int siteId, int custId, string Operator)
+        public int UpdateCustomerTele(int siteId, int custId, string @operator)
         {
-            return custInfoService.UpdateCustomerTele(siteId, custId, Operator);
+            return custInfoService.UpdateCustomerTele(siteId, custId, @operator);
         }
 
-        public IEnumerable<CustTeleExport> GetTeleCSDExportData(string SiteIds, string Currency, long StartDate, long EndDate, int Deposit, int DormantUser, int CallOut)
+        public IEnumerable<CustTeleExport> GetTeleCSDExportData(string siteIds, string currency, DateTimeOffset startDate, DateTimeOffset endDate, int deposit, int dormantUser, int callOut)
         {
-            return custInfoService.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);
+            return custInfoService.GetTeleCSDExportData(siteIds, currency, startDate, endDate, deposit, dormantUser, callOut);
         }
 
         public PromotionListData GetPromotionListByCustIdAndDate(int custId, long StartDate, long EndDate, int PageNumber, int PageSize)
