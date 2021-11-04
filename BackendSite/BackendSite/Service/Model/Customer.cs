@@ -184,7 +184,7 @@ namespace BackendSite.Service.Model
     {
         public string UserName { get; set; }
         public int ActStatus { get; set; }
-        public string RegTime { get; set; }
+        public DateTimeOffset RegTime { get; set; }
         public int CallOutStatus { get; set; }
         public string AccountName { get; set; }
         public string PhoneNo { get; set; }
@@ -212,7 +212,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public string FullName { get; set; }
         public string DepositStatus { get; set; }
-        public string RegDate { get; set; }    
+        public DateTimeOffset RegDate { get; set; }    
         public string PhoneNumber { get; set; }
         public string FirstTimeCall { get; set; }
         public string SecondTimeCall { get; set; }
@@ -223,7 +223,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public string FullName { get; set; }
         public string DepositStatus { get; set; }
-        public string RegDate { get; set; }
+        public DateTimeOffset RegDate { get; set; }
         public string PhoneNumber { get; set; }
         public int Remark { get; set; }
         public string UpdateAt { get; set; }

@@ -1322,22 +1322,29 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<CustTele> GetTeleCSD(TeleCSDpara para)
         {
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate);
             var SearchResult = custInfoBLL.GetTeleCSD(JsonConvert.SerializeObject(para.SiteIds),
                                                      JsonConvert.SerializeObject(para.Currency),
-                                                      para.StartDate,
-                                                      para.EndDate,
+                                                      startTime,
+                                                      endTime,
                                                       para.Deposit,
                                                       para.DormantUser,
                                                       para.CallOut,
                                                       para.PageNumber,
                                                       para.PageSize);
-
+            
             if (SearchResult.CustTeleList.Count == 0)
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
             else
             {
+                foreach (var list in SearchResult.CustTeleList)
+                {
+                    list.RegTime = list.RegTime.ToOffset(new TimeSpan(8, 0, 0)).AddHours(8);
+                }
+                
                 return new ApiListResult<CustTele>
                 {
                     Data = SearchResult.CustTeleList,
@@ -1407,14 +1414,21 @@ namespace BackendSite.Controllers.Api
                                                long StartDate,
                                                long EndDate)
         {
-            var ExportData = custInfoBLL.GetTeleCSDExportData(SiteIds,
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+            var exportData = custInfoBLL.GetTeleCSDExportData(SiteIds,
                                                               Currency,
-                                                              StartDate,
-                                                              EndDate,
+                                                              startTime,
+                                                              endTime,
                                                               Deposit,
                                                               DormantUser,
                                                               CallOut);
-            var stream = excelBLL.Export(ExportData);
+
+            foreach (var data in exportData)
+            {
+                data.RegDate = data.RegDate.ToOffset(new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+            var stream = excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"TeleCSD_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
