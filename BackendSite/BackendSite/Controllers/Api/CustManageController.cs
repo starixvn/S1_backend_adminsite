@@ -1481,6 +1481,26 @@ namespace BackendSite.Controllers.Api
                 foreach (var list in SearchResult.CustTeleList)
                 {
                     list.RegTime = list.RegTime.ToOffset(new TimeSpan(8, 0, 0)).AddHours(8);
+
+                    if (list.UpdateAt != null)
+                    {
+                        var updateAtArray = list.UpdateAt.Split(',');
+                        list.UpdateAt = string.Empty;
+                        for (var i = 0; i < updateAtArray.Length; i++)
+                        {
+                            updateAtArray[i] = DateTime.Parse(updateAtArray[i]).AddHours(8).ToString("yyyy-MM-dd HH:mm:ss");
+                            list.UpdateAt += $"{updateAtArray[i]},";
+                        }
+                        list.UpdateAt = list.UpdateAt.Remove(list.UpdateAt.LastIndexOf(","), 1); 
+                    
+                        var operatorArray = list.Operator.Split(',');
+                    
+                        list.UpdateRemark = new List<string>();
+                        for (var i = 0; i < updateAtArray.Length; i++)
+                        {
+                            list.UpdateRemark.Add($"{updateAtArray[i]}-{operatorArray[i]}");
+                        }
+                    }
                 }
                 
                 return new ApiListResult<CustTele>
@@ -1565,6 +1585,12 @@ namespace BackendSite.Controllers.Api
             foreach (var data in exportData)
             {
                 data.RegDate = data.RegDate.ToOffset(new TimeSpan(8, 0, 0)).AddHours(8);
+                if(data.FirstTimeCall != string.Empty)
+                    data.FirstTimeCall = $"{DateTime.Parse(data.FirstTimeCall.Substring(0,19)).AddHours(8):yyyy-MM-dd HH:mm:ss}-{data.FirstTimeCall.Substring(20,data.FirstTimeCall.Length-20)}";
+                if(data.SecondTimeCall != string.Empty)
+                    data.SecondTimeCall = $"{DateTime.Parse(data.SecondTimeCall.Substring(0,19)).AddHours(8):yyyy-MM-dd HH:mm:ss}-{data.SecondTimeCall.Substring(20,data.SecondTimeCall.Length-20)}";
+                if(data.ThirdTimeCall != string.Empty)
+                    data.ThirdTimeCall = $"{DateTime.Parse(data.ThirdTimeCall.Substring(0,19)).AddHours(8):yyyy-MM-dd HH:mm:ss}-{data.ThirdTimeCall.Substring(20,data.ThirdTimeCall.Length-20)}";
             }
             var stream = excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"TeleCSD_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
