@@ -1518,7 +1518,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult EditTagManagement(EditTagManagementpara para)
         {
-            if (custInfoBLL.EditTagMamagement(para.Id, para.TagName, para.TagColour, para.Description, User.Identity.Name) > 0)
+            if (custInfoBLL.EditTagManagement(para.Id, para.TagName, para.TagColour, para.Description, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -1551,11 +1551,15 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<TagData>();
             try
             {
-                var SearchResult = custInfoBLL.GetTagData(para.Status, para.PageNumber, para.PageSize);
-                apiResult.Data = SearchResult.TagDatas;
-                apiResult.PageNumber = SearchResult.PageNumber;
-                apiResult.TotalPages = SearchResult.TotalPages;
-                apiResult.RowCount = SearchResult.RowCount;
+                var searchResult = custInfoBLL.GetTagData(para.Status, para.PageNumber, para.PageSize);
+                foreach (var tagData in searchResult.TagDatas)
+                {
+                    tagData.UpdateTime = tagData.UpdateTime.ToOffset(new TimeSpan(8, 0, 0)).AddHours(8);
+                }
+                apiResult.Data = searchResult.TagDatas;
+                apiResult.PageNumber = searchResult.PageNumber;
+                apiResult.TotalPages = searchResult.TotalPages;
+                apiResult.RowCount = searchResult.RowCount;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)

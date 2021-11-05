@@ -287,9 +287,9 @@ namespace BackendSite.Service.Model
         public string TagColour { get; set; }
         public int Status { get; set; }
         public string Description { get; set; }
-        public string CreateTime { get; set; }
+        // public DateTimeOffset CreateTime { get; set; }
         public string Creator { get; set; }
-        public string UpdateTime { get; set; }
+        public DateTimeOffset UpdateTime { get; set; }
         public string Updator { get; set; }
     }
     public class GetTagDataResult

@@ -381,7 +381,7 @@ namespace BackendSite.Service.DAL
         }
 
         #region Tag
-        public int EditTagMamagement(int id, string tagName, string tagColour, string description, string Operator)
+        public int EditTagManagement(int id, string tagName, string tagColour, string description, string Operator)
         {
             var props = new DynamicParameters();
             props.Add("Id", id);
@@ -395,30 +395,30 @@ namespace BackendSite.Service.DAL
 
         public GetTagDataResult GetTagData(int status,int pageNumber,int pageSize)
         {
-            var SearchResult = new GetTagDataResult();
+            var searchResult = new GetTagDataResult();
             var props = new DynamicParameters();
-            props.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("PageSize", pageSize);
+            props.Add("PageSize", Math.Abs(pageSize));
+            props.Add("StartIndex", (Math.Abs(pageNumber)-1) * Math.Abs(pageSize));
             props.Add("Status", status);
+           
+            var result = _reportDbClient.Query<TagData>("Admin_TagV3_Get", props);
+            searchResult.TagDatas = result.ToList();
+            searchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            searchResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            searchResult.RowCount = props.Get<int?>("RowCount") ?? 0;
 
-            var result = _reportDbClient.Query<TagData>("Admin_TagV2_Get", props);
-
-            SearchResult.TagDatas = result.ToList();
-            SearchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            SearchResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            SearchResult.RowCount = props.Get<int?>("RowCount") ?? 0;
-
-            return SearchResult;
+            return searchResult;
         }
 
-        public int SetTagStatus(int Id, string Operator)
+        public int SetTagStatus(int id, string @operator)
         {
             var props = new DynamicParameters();
-            props.Add("Id", Id);
-            props.Add("Operator", Operator);
+            props.Add("Id", id);
+            props.Add("Operator", @operator);
 
             return _mainDbClient.Execute("Admin_TagStatus_Set", props);
         }
