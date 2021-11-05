@@ -135,6 +135,8 @@ namespace BackendSite.Controllers.Api
             public int PageSize { get; set; }
         }
 
+        #region CSD > Customer Administration > CustInfo > Referral History
+
         /// <summary>
         /// ReferralManagement/GetRefFriendList 取得推薦朋友清單
         /// </summary>
@@ -179,5 +181,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
+        #endregion
     }
 }
