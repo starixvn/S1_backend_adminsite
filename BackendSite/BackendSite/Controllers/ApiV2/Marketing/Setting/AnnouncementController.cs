@@ -23,7 +23,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
 
         private readonly MessageBLL _messageBll;
         private readonly AuthorizeBLL _authorizeBll;
-        private readonly ServerInfoBLL _serverInfoBll;
         private readonly ILogger<AnnouncementController> _logger;
         
         #endregion
@@ -34,7 +33,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         {
             _messageBll = provider.GetRequiredService<MessageBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
-            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _logger = provider.GetRequiredService<ILogger<AnnouncementController>>();
         }
 
@@ -45,7 +43,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         {
             private DateTimeOffset _startDate { get;set;}
             private DateTimeOffset _endDate { get;set;}
-            public IEnumerable<int> SelectSite { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
             public int Status { get; set; }
             public DateTimeOffset StartDate
             {
@@ -116,7 +114,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             var apiResult = new ApiListResult<Announcement>();
             try
             {
-                var result = _messageBll.GetAnnouncements(para.SelectSite, para.StartDate, para.EndDate, para.Status, para.PageNumber, para.PageSize, ref totalPages, ref rowCount);
+                var result = _messageBll.GetAnnouncements(para.SiteIds, para.StartDate, para.EndDate, para.Status, para.PageNumber, para.PageSize, ref totalPages, ref rowCount);
                 apiResult.Data = result;
                 apiResult.PageNumber = para.PageNumber;
                 apiResult.RowCount = rowCount;
