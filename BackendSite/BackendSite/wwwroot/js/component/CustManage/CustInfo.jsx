@@ -668,7 +668,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     <td className="text-right">{Direction[row.direction] + number_format(row.changeAmount)}</td>
                     <td className="text-right">{number_format(row.beforeAmount)}</td>
                     <td className="text-right">{number_format(row.afterAmount)}</td>
-                    <td>{row.memo}</td>
+                    <td title={row.memo}>{row.memo}</td>
                     <td>{row.refTransId}</td>
                 </tr>
             );

@@ -5,6 +5,7 @@ using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +19,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     public class TeleCSDController : ControllerBase
     {
         #region Fields
-        
+
         private readonly CustInfoBLL _custInfoBll;
         private readonly ExcelBLL _excelBll;
 
@@ -33,13 +34,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         #endregion
-        
+
         #region API Model
-        
-        public class TeleCsdReq
+
+        public class TeleCsdReq : ApiRequestPageModel
         {
-            private DateTimeOffset _startDate { get;set;}
-            private DateTimeOffset _endDate { get;set;}
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> Currency { get; set; }
             public int Deposit { get; set; }
@@ -55,24 +56,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
-            public TeleCsdReq()
-            {
-                //PageSize預設10
-                if (PageSize == 0)
-                    PageSize = 10;
-            }
+
         }
         public class TeleCsdUpdateReq
         {
             public int CustId { get; set; }
             public int SiteId { get; set; }
         }
+
         public class ExportTeleCsdDataReq
         {
-            private DateTimeOffset _startDate { get;set;}
-            private DateTimeOffset _endDate { get;set;}
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> Currency { get; set; }
             public int Deposit { get; set; }
@@ -88,14 +83,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
+
         }
-        
+
         #endregion
-        
-        #region CSD > TeleCSD
+
+        #region Action
 
         /// <summary>
-        /// CustManage/GetTeleCSD 取得客服致電資料
+        /// TeleCSD/GetTeleCSD 取得客服致電資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -140,7 +136,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// CustManage/UpdateCustomerTele 更新客服致電資料
+        /// TeleCSD/UpdateCustomerTele 更新客服致電資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -168,7 +164,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// CustManage/ExportTeleCSDData 匯出客服致電資料
+        /// TeleCSD/ExportTeleCSDData 匯出客服致電資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -193,9 +189,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 list.RegDate = new DateTimeOffset(list.RegDate.DateTime, TimeSpan.Zero);
             }
-            
+
             var stream = _excelBll.Export(custTeleExports);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"TeleCSD_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBll.ExcelFile(stream, "TeleCSD");
         }
 
         #endregion

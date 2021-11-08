@@ -375,7 +375,7 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// CustManage/ExportCustInfoList 會出客戶資料清單
+        /// CustManage/ExportCustInfoList 匯出客戶資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -1063,6 +1063,18 @@ namespace BackendSite.Controllers.Api
 
         #region CSD > Customer Administration > CustInfo > Login Log
 
+        /// <summary>
+        /// CustManage/GetLoginLogByCust 取得指定客戶登入紀錄
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Login Log > [Search]
+        /// 
+        /// </remarks>
+        /// <param name="loginLogReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiListResult<LoginLog> GetLoginLogByCust(LoginLogReq loginLogReq)
         {
@@ -1084,6 +1096,18 @@ namespace BackendSite.Controllers.Api
 
         #region CSD > Customer Administration > CustInfo > Reset Password
 
+        /// <summary>
+        /// CustManage/SetResetPwd 重新設定密碼
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Reset Password > [Reset Password]
+        /// 
+        /// </remarks>
+        /// <param name="custInfoReq"></param>
+        /// <returns></returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_resetpwd" })]
         public ApiResult<string> SetResetPwd(CustInfoReq custInfoReq)
@@ -1112,6 +1136,19 @@ namespace BackendSite.Controllers.Api
 
         #region CSD > Customer Administration > CustInfo > Notes
 
+        /// <summary>
+        /// CustManage/AddCustNote 新增客戶備註
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Notes > [Add]
+        /// 
+        /// </remarks>
+        /// <param name="addCustNoteReq"></param>
+        /// <returns></returns>
+        [HttpPost]
         public ApiResult AddCustNote(AddCustNoteReq addCustNoteReq)
         {
 
@@ -1138,6 +1175,19 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        /// <summary>
+        /// CustManage/GetCustNotes 取得客戶備註
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Notes
+        /// 
+        /// </remarks>
+        /// <param name="addCustNoteReq"></param>
+        /// <returns></returns>
+        [HttpPost]
         public ApiResult<IEnumerable<CustNote>> GetCustNotes(AddCustNoteReq addCustNoteReq)
         {
             var apiResult = new ApiResult<IEnumerable<CustNote>>
@@ -1149,6 +1199,18 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// CustManage/SetCustNotes 設定客戶備註
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Notes > [Edit] / [Delete]
+        /// 
+        /// </remarks>
+        /// <param name="setCustNoteReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiResult SetCustNotes(SetCustNoteReq setCustNoteReq)
         {
@@ -1196,8 +1258,20 @@ namespace BackendSite.Controllers.Api
 
         #region CSD > Customer Administration > CustInfo  > Turover
 
-        [HttpPost]
+        /// <summary>
+        /// CustManage/GetCustTurnOverReport 取得客戶累積總額資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Turover > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_turnoverReport" })]
+        [HttpPost]
         public ApiResult GetCustTurnOverReport(GetCustTurnOverReportReq request)
         {
             var data = custInfoBLL.GetCustTurnover(request.CustId,
@@ -1211,8 +1285,19 @@ namespace BackendSite.Controllers.Api
             };
         }
 
-        [HttpPost]
+        /// <summary>
+        /// CustManage/GetAllGameTypeList 取得所有遊戲類型清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Turover > Game List
+        /// 
+        /// </remarks>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_turnoverReport" })]
+        [HttpPost]
         public ApiResult GetAllGameTypeList()
         {
             var data = winLostReportService.GetAllGameType();
@@ -1234,6 +1319,18 @@ namespace BackendSite.Controllers.Api
 
         #region CSD > Customer Administration > CustInfo > Bank Info Log
 
+        /// <summary>
+        /// CustManage/GetBankInfoLogList 取得銀行資訊紀錄
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Bank Info Log
+        /// 
+        /// </remarks>
+        /// <param name="bankInfoLogListReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiListResult<CustBankInfoLog> GetBankInfoLogList(BankInfoLogListReq bankInfoLogListReq)
         {
@@ -1249,6 +1346,18 @@ namespace BackendSite.Controllers.Api
 
         #region CSD > Customer Administration > CustInfo > Crypto Wallet Log
 
+        /// <summary>
+        /// CustManage/GetCryptoWalletLog 取得加密錢包紀錄
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Crypto Wallet Log > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="cryptoWalletLogListReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiListResult<CustCryptoWalletLog> GetCryptoWalletLog(CryptoWalletLogListReq cryptoWalletLogListReq)
         {
@@ -1264,6 +1373,23 @@ namespace BackendSite.Controllers.Api
 
         #region CSD > Customer Administration > CustInfo > Promotion Report
 
+        /// <summary>
+        /// CustManage/GetPromotionListByCustIdAndDate 取得指定客戶和日期的促銷清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Promotion Report > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="CustId"></param>
+        /// <param name="StartDate"></param>
+        /// <param name="EndDate"></param>
+        /// <param name="PageNumber"></param>
+        /// <param name="PageSize"></param>
+        /// <returns></returns>
+        [HttpPost]
         public ApiListResultCurrencyAmount<Promotion> GetPromotionListByCustIdAndDate([FromForm] int CustId, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int PageSize)
         {
             var apiResult = new ApiListResultCurrencyAmount<Promotion>();
@@ -1285,6 +1411,18 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// CustManage/CancelBonusByBonusId 取消指定促銷獎金
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Promotion Report > [Cancel Bonus]
+        /// 
+        /// </remarks>
+        /// <param name="bonusReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiResult CancelBonusByBonusId(BonusReq bonusReq)
         {
@@ -1320,6 +1458,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiListResult<CustTele> GetTeleCSD(TeleCSDpara para)
         {
             var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate);
@@ -1390,6 +1529,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult UpdateCustomerTele(TeleCSDUpdatepara para)
         {
             if (custInfoBLL.UpdateCustomerTele(para.SiteId, para.CustId, User.Identity.Name) > 0)
@@ -1426,6 +1566,7 @@ namespace BackendSite.Controllers.Api
         /// <returns>檔案</returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult ExportTeleCSDData(string SiteIds,
                                                string Currency,
                                                int Deposit,
@@ -1460,7 +1601,7 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
-        #region Financial > Balance Adjustment
+        #region Finance > Balance Adjustment
 
         [HttpPost]
         public ApiResult<CustInfoDetail> GetCustInfoDetails(CustInfosReq custInfosReq)
@@ -1516,6 +1657,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult EditTagManagement(EditTagManagementpara para)
         {
             if (custInfoBLL.EditTagManagement(para.Id, para.TagName, para.TagColour, para.Description, User.Identity.Name) > 0)
@@ -1546,6 +1688,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiListResult<TagData> GetTagData(GetTagDatapara para)
         {
             var apiResult = new ApiListResult<TagData>();
@@ -1585,6 +1728,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult SetTagStatus(SetTagStatuspara para)
         {
             if (custInfoBLL.SetTagStatus(para.Id, User.Identity.Name) > 0)
@@ -1603,6 +1747,19 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        #region  CSD > Customer Administration > CustInfo > Tag
+
+        /// <summary>
+        /// CustManage/GetAllTag 取得所有標籤資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Tag > Tag List
+        /// 
+        /// </remarks>
+        /// <returns></returns>
         [HttpPost]
         public ApiResult<IEnumerable<TagData>> GetAllTag()
         {
@@ -1621,8 +1778,18 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        [HttpPost]
+        /// <summary>
+        /// CustManage/SetCustTag 設定客戶標籤
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Tag > [Add] / [Remove]
+        /// </remarks>
+        /// <param name="para"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_setCustTag" })]
+        [HttpPost]
         public ApiResult SetCustTag(SetCustTagPara para)
         {
             if (custInfoBLL.SetCustTag(para.CustId, para.SelectTag, User.Identity.Name) > 0)
@@ -1653,6 +1820,16 @@ namespace BackendSite.Controllers.Api
             throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
         }
 
+        /// <summary>
+        /// CustManage/GetAllTag 取得指定客戶標籤資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Tag > Added Tag List
+        /// </remarks>
+        /// <param name="custInfoReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiResult<CustInfoDetail> GetCustData(CustInfoReq custInfoReq)
         {
@@ -1671,6 +1848,8 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        #endregion
+
         #region CSD > Registration Management
 
         /// <summary>
@@ -1687,6 +1866,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiListResult<RegLiveStatus> GetRegLiveStatusList(RegLiveStatusPara custInfoReq)
         {
             var apiResult = new ApiListResult<RegLiveStatus>();
@@ -1730,6 +1910,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult SetRegLiveStatus(SetRegLiveStatusPara para)
         {
             var apiResult = new ApiResult();
@@ -1759,6 +1940,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(AddRegLiveStatusNotes addCustNoteReq)
         {
             var apiResult = new ApiResult<IEnumerable<RegLiveStatusNotes>>
@@ -1790,6 +1972,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_add_note" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult AddRegLiveStatusNote(AddRegLiveStatusNotes addCustNoteReq)
         {
             var apiResult = new ApiResult();
@@ -1819,6 +2002,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_delete_note" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult DeleteRegLiveStatusNote(DeleteRegLiveStatusNotes deleteCustNoteReq)
         {
             var apiResult = new ApiResult();
@@ -1848,6 +2032,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_edit_note" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult EditRegLiveStatusNote(EditRegLiveStatusNotes EditRegLiveStatusNote)
         {
             var apiResult = new ApiResult();
@@ -1886,6 +2071,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult ExportRegLiveStatusList(string SelectSite, 
             int Currency, 
             int DepositStatus,

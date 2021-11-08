@@ -21,6 +21,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class HomeController : ControllerBase
     {
         #region Fields
@@ -351,7 +352,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult GetMenu()
         {
 
-            var data = _menuBLL.GetMenuData();
+            var data = _menuBLL.GetMenuData(false,out var errorCodeEnum);
 
             if (data.Count == 0)
             {

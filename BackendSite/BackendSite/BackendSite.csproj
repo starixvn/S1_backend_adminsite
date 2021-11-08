@@ -127,7 +127,6 @@
     <Folder Include="Controllers\ApiV2\Marketing\Bonus\" />
     <Folder Include="Controllers\ApiV2\Marketing\Setting\" />
     <Folder Include="Controllers\ApiV2\Report\" />
-    <Folder Include="Controllers\ApiV2\Admin\Home\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties app_3data_4menu_1json__JsonSchema="http://json-schema.org/draft-04/schema" package_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>

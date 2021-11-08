@@ -306,11 +306,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #endregion
 
         #endregion
-        
+
         #region CSD > Customer Administration
 
         /// <summary>
-        /// CustManage/GetCustInfoList 取得客戶資料清單
+        /// CustomerManage/GetCustInfoList 取得客戶資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -377,7 +377,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// CustManage/ExportCustInfoList 匯出客戶資料清單
+        /// CustomerManage/ExportCustInfoList 匯出客戶資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -410,7 +410,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                                     custInfoReq.SelectStatus);
 
             var stream = _excelBll.Export(ExportCustInfo);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportCustInfo)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            //return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportCustInfo)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBll.ExcelFile(stream, "CustInfoList");
         }
 
         #endregion
