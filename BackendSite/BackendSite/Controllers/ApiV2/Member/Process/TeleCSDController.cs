@@ -92,7 +92,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #region Action
 
         /// <summary>
-        /// CustManage/GetTeleCSD 取得客服致電資料
+        /// TeleCSD/GetTeleCSD 取得客服致電資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -137,7 +137,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// CustManage/UpdateCustomerTele 更新客服致電資料
+        /// TeleCSD/UpdateCustomerTele 更新客服致電資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -165,7 +165,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// CustManage/ExportTeleCSDData 匯出客服致電資料
+        /// TeleCSD/ExportTeleCSDData 匯出客服致電資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST

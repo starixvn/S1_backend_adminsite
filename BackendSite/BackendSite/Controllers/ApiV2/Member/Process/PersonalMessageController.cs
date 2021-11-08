@@ -104,7 +104,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #region Action
 
         /// <summary>
-        /// Message/SendMessageBatch 發送批次訊息
+        /// PersonalMessage/SendMessageBatch 發送批次訊息
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -235,7 +235,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        ///  Message/ExportSendMessageBatchResultReport 匯出指定批次訊息發送結果
+        ///  PersonalMessage/ExportSendMessageBatchResultReport 匯出指定批次訊息發送結果
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -254,7 +254,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// Message/DeleteBatchMessage 刪除指定批次訊息
+        /// PersonalMessage/DeleteBatchMessage 刪除指定批次訊息
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -283,7 +283,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// Message/UpdateBatchMessage 更新指定批次訊息
+        /// PersonalMessage/UpdateBatchMessage 更新指定批次訊息
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -327,7 +327,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// Message/GetBatchMessage 取得指定批次訊息
+        /// PersonalMessage/GetBatchMessage 取得指定批次訊息
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -354,7 +354,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// Message/GetBatchMessageList 取得批次訊息資料清單
+        /// PersonalMessage/GetBatchMessageList 取得批次訊息資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST

@@ -18,7 +18,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     public class RegistrationManagementController : ControllerBase
     {
         #region Fields
-        
+
         private readonly CustInfoBLL _custInfoBll;
         private readonly ExcelBLL _excelBll;
 
@@ -33,13 +33,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         #endregion
-        
+
         #region Model
-        
+
         public class RegLiveStatusReq
         {
-            private DateTimeOffset _startDate { get;set;}
-            private DateTimeOffset _endDate { get;set;}
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
             public int Currency { get; set; }
             public int DepositStatus { get; set; }
@@ -96,13 +96,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string AffiliatesCode { get; set; }
             public int AgentCodeType { get; set; }
         }
-        
+
         #endregion
-        
-        #region CSD > Registration Management
+
+        #region Action
 
         /// <summary>
-        /// CustManage/GetRegLiveStatusData 取得會員註冊資料
+        /// RegistrationManagement/GetRegLiveStatusList 取得會員註冊資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -127,11 +127,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 apiResult.PageNumber = searchResult.PageNumber;
                 apiResult.TotalPages = searchResult.TotalPages;
                 apiResult.RowCount = searchResult.RowCount;
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
 
@@ -139,7 +139,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// CustManage/SetRegLiveStatus 更新會員註冊資料狀態
+        /// RegistrationManagement/SetRegLiveStatus 更新會員註冊資料狀態
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -154,18 +154,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult();
             if (_custInfoBll.SetRegLiveStatus(para.CustId, para.Status, para.SiteId, User.Identity.Name) > 0)
             {
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Fail;
                 apiResult.Message = "update fail";
             }
             return apiResult;
         }
 
         /// <summary>
-        /// CustManage/GetRegLiveStatusNotes 取得會員註冊資料註記
+        /// RegistrationManagement/GetRegLiveStatusNotes 取得會員註冊資料註記
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -183,18 +183,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
             }
-            
+
             var apiResult = new ApiResult<IEnumerable<RegLiveStatusNotes>>
             {
                 Data = result,
-                ErrorCode = (int) ErrorMessageCodeEnum.Success
+                ErrorCode = (int)ErrorMessageCodeEnum.Success
             };
 
             return apiResult;
         }
 
         /// <summary>
-        /// CustManage/AddRegLiveStatusNote 新增會員註冊資料註記
+        /// RegistrationManagement/AddRegLiveStatusNote 新增會員註冊資料註記
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -209,18 +209,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult();
             if (_custInfoBll.AddRegLiveStatusNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name) > 0)
             {
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.SystemException;
-                apiResult.Message = "update fail";
+                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Fail;
+                apiResult.Message = "Create fail.";
             }
             return apiResult;
         }
 
         /// <summary>
-        /// CustManage/DeleteRegLiveStatusNote 刪除會員註冊資料註記
+        /// RegistrationManagement/DeleteRegLiveStatusNote 刪除會員註冊資料註記
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -235,18 +235,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult();
             if (_custInfoBll.DeleteRegLiveStatusNote(deleteCustNoteReq.CustId, deleteCustNoteReq.Id) > 0)
             {
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.SystemException;
-                apiResult.Message = "update fail";
+                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Fail;
+                apiResult.Message = "Delete fail.";
             }
             return apiResult;
         }
 
         /// <summary>
-        /// CustManage/EditRegLiveStatusNote 更新會員註冊資料註記
+        /// RegistrationManagement/EditRegLiveStatusNote 更新會員註冊資料註記
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -261,18 +261,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult();
             if (_custInfoBll.EditRegLiveStatusNote(editRegLiveStatusNote.CustId, editRegLiveStatusNote.Id, editRegLiveStatusNote.Note, User.Identity.Name) > 0)
             {
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.SystemException;
-                apiResult.Message = "update fail";
+                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
+                apiResult.Message = "Update fail.";
             }
             return apiResult;
         }
 
         /// <summary>
-        /// CustManage/ExportRegLiveStatus 匯出會員註冊資料
+        /// RegistrationManagement/ExportRegLiveStatus 匯出會員註冊資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -286,7 +286,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var exportData = _custInfoBll.GetExportRegLiveStatus(JsonConvert.SerializeObject(req.SiteIds), req.Currency, req.DepositStatus, req.Status, req.User, req.Sort, req.StartDate, req.EndDate, req.AffiliatesCode, req.AgentCodeType);
             var stream = _excelBll.Export(exportData);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Registration_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBll.ExcelFile(stream, "Registration");
         }
 
         #endregion
