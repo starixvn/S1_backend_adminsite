@@ -49,13 +49,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         {
             public int Id { get; set; }
         }
-        
+
         #endregion
 
         #region CSD > TagMamagement
 
         /// <summary>
-        /// CustManage/GetTagData 取得標籤資料
+        /// TagManagement/GetTagData 取得標籤資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -91,7 +91,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// CustManage/EditTagMamagement 更新標籤資料
+        /// TagManagement/EditTagMamagement 更新標籤資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -114,9 +114,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
 
             throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
         }
-        
+
         /// <summary>
-        /// CustManage/SetTagStatus 更新標籤狀態
+        /// TagManagement/SetTagStatus 更新標籤狀態
         /// </summary>
         /// <remarks>
         /// Http Method：POST
