@@ -3,6 +3,7 @@ using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,11 +33,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
 
         #region Model
         
-        public class GetTagDataReq
+        public class GetTagDataReq : ApiRequestPageModel
         {
             public int Status { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
         }
         public class EditTagManagementReq
         {

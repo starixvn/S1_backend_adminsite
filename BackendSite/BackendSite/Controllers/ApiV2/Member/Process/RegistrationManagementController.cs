@@ -36,7 +36,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         #region Model
 
-        public class RegLiveStatusReq
+        public class RegLiveStatusReq : ApiRequestPageModel
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
@@ -46,8 +46,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int Status { get; set; }
             public string User { get; set; }
             public int Sort { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
             public DateTimeOffset StartDate
             {
                 get => _startDate;
