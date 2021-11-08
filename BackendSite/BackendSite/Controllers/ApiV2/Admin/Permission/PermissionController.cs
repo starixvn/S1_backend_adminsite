@@ -17,7 +17,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
     public class PermissionController : ControllerBase
     {
         #region Fields
-        
+
         private readonly AuthorizeBLL _authorizeBll;
         private readonly AdminUserService _adminUserService;
         private readonly PermissionBLL _permissionBll;
@@ -34,11 +34,89 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _menuBll = provider.GetRequiredService<MenuBLL>();
         }
-        
+
         #endregion
-        
+
         /// <summary>
-        /// 取得使用者的權限
+        /// Permission/GetAllPermission 取得所有的權限
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        [HttpPost]
+        public ApiResult GetAllPermission()
+        {
+            var authInfo = _authorizeBll.GetAuthData();
+
+            if (authInfo == null)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies"
+                };
+            }
+
+            var loginUser = _adminUserService.GetUser(authInfo.UserId);
+
+            if (loginUser == null)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies.LoginUser is null."
+                };
+            }
+
+            var permissionData = _permissionBll.GetPermissionJSONData();
+
+            if (!permissionData.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+
+            return new ApiResult<IEnumerable<FuncPermissionModel>>
+            {
+                Data = permissionData,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+        }
+
+        /// <summary>
+        /// Permission/GetAllMenu 取得主選單所有資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        [HttpPost]
+        public ApiResult GetAllMenu()
+        {
+            var data = _menuBll.GetMenuData(true, out var errorCodeEnum);
+
+            if (errorCodeEnum == ErrorCodeEnum.Fail)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)errorCodeEnum,
+                    Message = "Missing cookies"
+                };
+            }
+
+            if (data.Count == 0)
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+
+            return new ApiResult<IEnumerable<MenuItem>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// Permission/GetUserPermission 取得使用者的權限
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -47,46 +125,70 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         public ApiResult GetUserPermission()
         {
             var authInfo = _authorizeBll.GetAuthData();
-            if (authInfo != null)
+
+            if (authInfo == null)
             {
-                var loginUser = _adminUserService.GetUser(authInfo.UserId);
-                if (loginUser.GroupSEQ != null)
-                { 
-                    var permissions = _permissionBll.GetUserPermission((int) loginUser.GroupSEQ).ToList();
-                
-                    return new ApiResult<IEnumerable<GroupPermisison>>
-                    {
-                        Data = permissions,
-                        ErrorCode = (int)ErrorCodeEnum.Success
-                    };
-                }
-                throw new AdminException(ErrorCodeEnum.NoData);
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies"
+                };
             }
-            
+
+            var loginUser = _adminUserService.GetUser(authInfo.UserId);
+
+            if (loginUser == null)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies.LoginUser is null."
+                };
+            }
+
+            if (loginUser.GroupSEQ == null)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies.LoginUser's Group is null."
+                };
+            }
+
+            var permissions = _permissionBll.GetUserPermission((int)loginUser.GroupSEQ);
+
             return new ApiResult<IEnumerable<GroupPermisison>>
             {
-                Message = "Missing cookies",
-                ErrorCode = (int)ErrorCodeEnum.Fail
+                Data = permissions,
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         /// <summary>
-        /// Home/GetMenu 取得主選單
+        /// Permission/GetUserMenu 取得使用者主選單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
-        /// 
-        /// 確認登入成功後，打此API取得選單資料。
         /// </remarks>
         [HttpPost]
-        public ApiResult GetMenu()
+        public ApiResult GetUserMenu()
         {
-            var data = _menuBll.GetMenuData();
+            var data = _menuBll.GetMenuData(false, out var errorCodeEnum);
 
-            if (data.Count == 0)
+            if (errorCodeEnum == ErrorCodeEnum.Fail)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)errorCodeEnum,
+                    Message = "Missing Cookie."
+                };
+            }
+
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
+
             return new ApiResult<IEnumerable<MenuItem>>
             {
                 Data = data,

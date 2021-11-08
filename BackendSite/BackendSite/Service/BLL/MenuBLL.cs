@@ -3,6 +3,8 @@ using BackendSite.Service.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BackendSite.ExceptionHandling;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -13,7 +15,8 @@ namespace BackendSite.Service.BLL
         private readonly AdminUserService adminUserService;
         private readonly AuthorizeBLL authorizeBLL;
 
-        public MenuBLL(AdminGroupService adminGroupService, MenuService menuService, AuthorizeBLL authorizeBLL, AdminUserService adminUserService)
+        public MenuBLL(AdminGroupService adminGroupService, MenuService menuService, AuthorizeBLL authorizeBLL,
+            AdminUserService adminUserService)
         {
             this.adminGroupService = adminGroupService;
             this.menuService = menuService;
@@ -21,29 +24,55 @@ namespace BackendSite.Service.BLL
             this.adminUserService = adminUserService;
         }
 
-        public List<MenuItem> GetMenuData()
+        public List<MenuItem> GetMenuData(bool allFlag, out ErrorCodeEnum errorCodeEnum)
         {
-            var result = new List<MenuItem>();
-            var menuDatas = Newtonsoft.Json.JsonConvert.DeserializeObject<List<MenuItem>>(menuService.GetMenuData());
+            //default success
+            errorCodeEnum = ErrorCodeEnum.Success;
+
+            var menuData = JsonConvert.DeserializeObject<List<MenuItem>>(menuService.GetMenuData());
+
             var authData = authorizeBLL.GetAuthData();
-            if (authData != null)
+
+            if (authData == null)
             {
-                var loginUser = adminUserService.GetUser(authData.UserId);
-                if (loginUser.IsSuper)
-                {
-                    result = menuDatas;
-                }
-                else if (loginUser != null && loginUser.GroupSEQ != null)
-                {
-                    var permissions = adminGroupService.GetGroupPermissions((int)loginUser.GroupSEQ);
-                    return CheckMenuPermission(menuDatas, permissions);
-                }
+                //get auth fail
+                errorCodeEnum = ErrorCodeEnum.Fail;
+                return null;
             }
 
-            return result;
+            var loginUser = adminUserService.GetUser(authData.UserId);
+
+            if (loginUser == null)
+            {
+                //get user fail
+                errorCodeEnum = ErrorCodeEnum.Fail;
+                return null;
+            }
+
+            if (allFlag)
+            {
+                return menuData;
+            }
+
+            if (loginUser.IsSuper)
+            {
+                return menuData;
+            }
+
+            if (loginUser.GroupSEQ == null)
+            {
+                //get user's group fail
+                errorCodeEnum = ErrorCodeEnum.Fail;
+                return null;
+            }
+
+            var permissions = adminGroupService.GetGroupPermissions((int) loginUser.GroupSEQ);
+
+            return CheckMenuPermission(menuData, permissions);
         }
 
-        private List<MenuItem> CheckMenuPermission(IEnumerable<MenuItem> Menu, IEnumerable<GroupPermisison> groupPermisisons)
+        private List<MenuItem> CheckMenuPermission(IEnumerable<MenuItem> Menu,
+            IEnumerable<GroupPermisison> groupPermisisons)
         {
             var result = new List<MenuItem>();
             foreach (var item in Menu)
@@ -64,7 +93,8 @@ namespace BackendSite.Service.BLL
                         }
                     }
 
-                    if (item.Childs == null && !string.IsNullOrEmpty(item.FuncKey) && groupPermisisons.Any(x => string.Equals(x.FuncKey, item.FuncKey, StringComparison.OrdinalIgnoreCase)))
+                    if (item.Childs == null && !string.IsNullOrEmpty(item.FuncKey) && groupPermisisons.Any(x =>
+                        string.Equals(x.FuncKey, item.FuncKey, StringComparison.OrdinalIgnoreCase)))
                     {
                         result.Add(item);
                     }

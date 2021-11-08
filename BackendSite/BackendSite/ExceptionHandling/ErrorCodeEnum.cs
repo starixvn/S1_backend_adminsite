@@ -21,6 +21,9 @@ namespace BackendSite.ExceptionHandling
         [Description("msg_PermissionDenied")]
         PermissionDenied = -4,
 
+        [Description("msg_DuplicateData")]
+        DuplicateData = -5,
+
         [Description("msg_SystemException")]
         SystemException = 9999,
 
