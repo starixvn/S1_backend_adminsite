@@ -68,7 +68,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
-            private DateTimeOffset _timeSpan { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> Currency { get; set; }
             public int Deposit { get; set; }
