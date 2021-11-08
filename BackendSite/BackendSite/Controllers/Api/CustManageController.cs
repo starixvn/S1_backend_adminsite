@@ -1876,7 +1876,11 @@ namespace BackendSite.Controllers.Api
                 var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(custInfoReq.EndDate);
                 var SearchResult = custInfoBLL.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status
                 , custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort, startTime, endTime, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
-                
+
+                foreach (var data in SearchResult.RegLiveStatusDatas)
+                {
+                    data.RegTime = new DateTimeOffset(data.RegTime.DateTime, new TimeSpan(8, 0, 0));
+                }
                 apiResult.Data = SearchResult.RegLiveStatusDatas;
                 apiResult.PageNumber = SearchResult.PageNumber;
                 apiResult.TotalPages = SearchResult.TotalPages;
@@ -1944,6 +1948,12 @@ namespace BackendSite.Controllers.Api
                 Data = custInfoBLL.GetRegLiveStatusNotes(addCustNoteReq.CustId),
                 ErrorCode = 0
             };
+
+            foreach (var data in apiResult.Data)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0));
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0));
+            }
 
             return apiResult;
         }
@@ -2078,7 +2088,7 @@ namespace BackendSite.Controllers.Api
             var exportData = custInfoBLL.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, startTime, endTime, AffiliatesCode, AgentCodeType);
             foreach (var data in exportData)
             {
-                data.RegTime = new DateTimeOffset(data.RegTime.DateTime, new TimeSpan(8, 0, 0));
+                data.RegTime = new DateTimeOffset(data.RegTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
             var stream = excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Registration_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
