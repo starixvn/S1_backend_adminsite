@@ -72,7 +72,7 @@ namespace BackendSite.Service.Model
         public string Title { get; set; }
         public string Content { get; set; }
         public string Message { get; set; }
-        public DateTime UpdateTime { get; set; }
-        public DateTime CreateTime { get; set; }
+        public DateTimeOffset UpdateTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
     }
 }

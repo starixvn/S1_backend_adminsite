@@ -696,8 +696,12 @@ namespace BackendSite.Controllers.Api
                 var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
                 var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
                 apiResult.Data = messageBLL.GetBatchMessageList(SelectSite, startTime, endTime, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
-                apiResult.ErrorCode = 0;
 
+                foreach (var data in apiResult.Data)
+                {
+                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                }
                 apiResult.PageNumber = PageNumber;
                 apiResult.RowCount = RowCount;
                 apiResult.TotalPages = TotalPages;
