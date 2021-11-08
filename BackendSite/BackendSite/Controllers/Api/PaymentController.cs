@@ -642,14 +642,16 @@ namespace BackendSite.Controllers.Api
                         var retionbonus = new RetionBonus()
                         {
                             CustId = custInfo.CustId,
-                            BonusCode = adjustmentAndWithdrawalLimitReq.BounsCode
+                            BonusCode = adjustmentAndWithdrawalLimitReq.BounsCode,
+                            Memo = adjustmentAndWithdrawalLimitReq.Memo,
+                            Operator = authData.UserName
                         };
                         var apiOnlineResult =
-                            await courierAdapter.MyPostAsync<RetionBonusRep, RetionBonus>(bonusUrl, retionbonus);
+                            await courierAdapter.MyPostAsync<string, RetionBonus>(bonusUrl, retionbonus);
                         if (apiOnlineResult.ErrorCode == 0)
                         {
                             apiResult.ErrorCode = apiOnlineResult.ErrorCode;
-                            apiResult.Message = $"Success. ID is {apiOnlineResult.Data.TransId}";
+                            apiResult.Message = $"Success. ID is {apiOnlineResult.Data}";
                         }
                         else
                         {
@@ -825,16 +827,18 @@ namespace BackendSite.Controllers.Api
                                         var retionbonus = new RetionBonus()
                                         {
                                             CustId = custInfoDetail.CustId,
-                                            BonusCode = bonuscode
+                                            BonusCode = bonuscode,
+                                            Memo = memo,
+                                            Operator = authData.UserName
                                         };
                                         var apiOnlineResult =
-                                             await courierAdapter.MyPostAsync<RetionBonusRep, RetionBonus>(bonusUrl, retionbonus);
+                                             await courierAdapter.MyPostAsync<string, RetionBonus>(bonusUrl, retionbonus);
                                         if(apiOnlineResult.ErrorCode == 0)
                                         {
                                             apiResult.Add(new ApiResult()
                                             {
                                                 ErrorCode = 1,
-                                                Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. ID is {apiOnlineResult.Data.TransId}."
+                                                Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. ID is {apiOnlineResult.Data}."
                                             });
                                         }
                                         else
@@ -1094,95 +1098,40 @@ namespace BackendSite.Controllers.Api
             apiResult.ErrorCode = 0;
             return apiResult;
         }
-
-        public class AdjustmentLimit
+        public class CheckAdjustmentLimitPara
         {
-            public int CurrencyId { get; set; }
-            public decimal Max { get; set; }
+            public string BonusCode { get; set; }
+            public int SiteId { get; set; }
         }
-        [HttpPost]
-        public ApiResult CheckAdjustmentLimit([FromForm] int optSite, [FromForm] IFormFile excelUpload)
+        public ApiResult CheckRententionBonusAdjustmentLimit(CheckAdjustmentLimitPara para)
         {
             var apiResult = new ApiResult();
+            List<CheckBalanceAdjustData> BonusCodeData = new List<CheckBalanceAdjustData>();
+            apiResult.ErrorCode = 0;
             try
             {
-                if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        StringComparison.OrdinalIgnoreCase) ||
-                    excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) ||
-                    excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
-                {
-                    var excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
-                    var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
-                    var isLastRow = false;
-                    var RowId = 2; // 因為有標題列，所以從第2列開始讀起
+                BonusCodeData = _paymentBLL.CheckRententionBonusAdjustmentLimit(para.BonusCode, para.SiteId).ToList();
 
-                    List<AdjustmentLimit> adjustmentLimitList = new List<AdjustmentLimit>();
-                    do // 讀取資料，直到讀到空白列為止
+                BonusCodeData.ForEach(x =>
+                {
+                    var adjustmentLimit = _paymentBLL.GetAdjustmentData(para.SiteId, x.CurrencyId);
+
+                    if (adjustmentLimit != null)
                     {
-                        var custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text)
-                            ? null
-                            : sheet.Cells[RowId, 1].Text;
-
-                        var sabaId = sheet.Cells[RowId, 2].Text.Trim();
-                        var custId = (string.IsNullOrEmpty(sabaId)) ? null : _common.TpIdToCustId(sabaId);
-
-                        decimal.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out var amount);
-                        var memo = sheet.Cells[RowId, 4].Text.Trim();
-                        if (string.IsNullOrEmpty(custUsername) && custId == null)
+                        decimal Max = Convert.ToDecimal(adjustmentLimit.AdjustmentMax);
+                        if (Max != 0 && Max < x.Bonus)
                         {
-                            isLastRow = true;
+                            apiResult.ErrorCode = 1000;
                         }
-                        else
-                        {
-                            var custInfoDetail = _custInfoBLL.GetCustInfoDetails(custId, custUsername, optSite);
-                            if (custInfoDetail != null)
-                            {
-                                var adjustmentLimit = adjustmentLimitList.Find(x => x.CurrencyId == custInfoDetail.CurrencyId);
-
-                                if(adjustmentLimit != null)
-                                {
-                                    if(adjustmentLimit.Max != 0 && adjustmentLimit.Max > amount)
-                                    {
-                                        apiResult.ErrorCode = 1000;
-                                        return apiResult;
-                                    }
-                                }
-                                else
-                                {
-                                    var adjustmentData = _paymentBLL.GetAdjustmentData(custInfoDetail.SiteId, custInfoDetail.CurrencyId);
-                                    if(adjustmentData.AdjustmentMax != 0 && Convert.ToDecimal(adjustmentData.AdjustmentMax) < amount)
-                                    {
-                                        apiResult.ErrorCode = 1000;
-                                        return apiResult;
-                                    }
-                                    else
-                                    {
-                                        adjustmentLimitList.Add(new AdjustmentLimit
-                                        {
-                                            Max = Convert.ToDecimal(adjustmentData.AdjustmentMax),
-                                            CurrencyId = adjustmentData.CurrencyId
-                                        });
-                                    }
-                                }
-                            }
-                            RowId += 1;
-                        }
-                    } while (!isLastRow);
-                }
-                else
-                {
-                    apiResult.ErrorCode = -1;
-                    apiResult.Message = "File Type Error";
-                    return apiResult;
-                }
+                    }
+                });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 apiResult.ErrorCode = -1;
                 apiResult.Message = ex.ToString();
                 return apiResult;
             }
-            apiResult.ErrorCode = 0;
             return apiResult;
         }
         #endregion

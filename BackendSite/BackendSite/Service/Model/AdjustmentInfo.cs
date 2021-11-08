@@ -30,6 +30,8 @@ namespace BackendSite.Service.Model
     { 
         public int CustId { get; set; }
         public string BonusCode { get; set; }
+        public string Operator { get; set; }
+        public string Memo { get; set; }
     }
     public class RetionBonusRep
     {

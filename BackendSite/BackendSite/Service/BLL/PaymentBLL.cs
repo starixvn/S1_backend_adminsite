@@ -294,5 +294,10 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+
+        public IEnumerable<CheckBalanceAdjustData> CheckRententionBonusAdjustmentLimit(string BonusCode, int SiteId)
+        {
+            return  adjustmentService.CheckBalanceAdjustBonusCodeBatch(BonusCode, 9, SiteId);
+        }
     }
 }

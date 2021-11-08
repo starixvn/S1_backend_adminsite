@@ -198,6 +198,7 @@ namespace BackendSite.Service.Model
         public int TpId { get; set; }
         public int CategoryId { get; set; }
         public string Currency { get; set; }
+        public int CurrencyId { get; set; }
     }
     public class BalanceAdjustBonusCodeBatchRep
     {

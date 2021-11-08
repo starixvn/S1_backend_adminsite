@@ -26,7 +26,7 @@ const App = () => {
     const [stateSend, updateSend] = useState(false);
     const [stateData, updateData] = useState({ ...initData });
     const [sendData, updateSendData] = useState([]);
-    const EditFiled = (v, datacolumn) => { console.log(v, datacolumn);updateData({ ...stateData, [datacolumn]: v }); };
+    const EditFiled = (v, datacolumn) => {updateData({ ...stateData, [datacolumn]: v }); };
     const SetMsg = () => {
         let msg = "";
         let check = true;
@@ -46,11 +46,13 @@ const App = () => {
             formData.append('withdrawalLimitOption', (stateData.checkwd) ? 1 : 0);
             formData.append('withdrawal',isNaN(parseFloat(stateData.withdrawal)) ? 0 : parseFloat(stateData.withdrawal));
             formData.append('bonuscode',stateData.CheckedBonusCode);
-            console.log(parseFloat(stateData.withdrawal),'withdrawal');
-            console.log(isNaN(parseFloat(stateData.withdrawal)) ? 0: parseFloat(stateData.withdrawal),'withdrawal2');
+            let Data = {
+                BonusCode: stateData.bonusCode,
+                SiteId: parseInt(stateData.optSite)
+            };
             if (!stateSend) {
                 if(!hasCheckPassword){
-                    api.post('/api/Payment/CheckAdjustmentLimit', formData, settings)
+                    api.post('/api/Payment/CheckRententionBonusAdjustmentLimit', Data)
                     .then(function (response) {
                         if(response.data.errorCode == 0){
                             updateSend(true);
