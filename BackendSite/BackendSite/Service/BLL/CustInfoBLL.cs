@@ -524,14 +524,14 @@ namespace BackendSite.Service.BLL
             return custInfoService.GetAllSiteVipLevelList();
         }
 
-        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency,int depositStatus,int status,string username,int pagenumber,int pagesize,int sort, long StartDate, long EndDate,string AffiliatesCode,int AgentCodeType)
+        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency,int depositStatus,int status,string username,int pageNumber,int pageSize,int sort, DateTimeOffset startDate, DateTimeOffset endDate,string affiliatesCode,int agentCodeType)
         {
-            return custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pagenumber, pagesize, sort, StartDate, EndDate, AffiliatesCode, AgentCodeType);
+            return custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pageNumber, pageSize, sort, startDate, endDate, affiliatesCode, agentCodeType);
         }
 
-        public int SetRegLiveStatus(int custid,int status,int siteid,string Operator)
+        public int SetRegLiveStatus(int custId,int status,int siteId,string @operator)
         {
-            return custInfoService.SetRegLiveStatus(custid, status, siteid, Operator);
+            return custInfoService.SetRegLiveStatus(custId, status, siteId, @operator);
         }
 
         public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
@@ -539,25 +539,25 @@ namespace BackendSite.Service.BLL
             return custInfoService.GetRegLiveStatusNotes(custId);
         }
 
-        public int AddRegLiveStatusNote(int custid,string note, string Operator)
+        public int AddRegLiveStatusNote(int custId,string note, string @operator)
         {
-            return custInfoService.AddRegLiveStatusNote(custid, note, Operator);
+            return custInfoService.AddRegLiveStatusNote(custId, note, @operator);
         }
 
-        public int DeleteRegLiveStatusNote(int custid,int id)
+        public int DeleteRegLiveStatusNote(int custId,int id)
         {
-            return custInfoService.DeleteRegLiveStatusNote(custid, id);
+            return custInfoService.DeleteRegLiveStatusNote(custId, id);
         }
 
-        public int EditRegLiveStatusNote(int custid,int id, string note, string Operator)
+        public int EditRegLiveStatusNote(int custId,int id, string note, string @operator)
         {
-            return custInfoService.EditRegLiveStatusNote(custid, id, note, Operator);
+            return custInfoService.EditRegLiveStatusNote(custId, id, note, @operator);
         }
 
-        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate, string AffiliatesCode, int AgentCodeType)
+        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
         {
             var list = new List<RegLiveStatusExport>();
-            var result =  custInfoService.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate, AffiliatesCode, AgentCodeType);
+            var result =  custInfoService.GetExportRegLiveStatus(siteIds, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType);
             result.ToList().ForEach(x =>
             {
                 list.Add(new RegLiveStatusExport()
@@ -568,7 +568,7 @@ namespace BackendSite.Service.BLL
                     FullName = x.AccountName,
                     PhoneNo = x.PhoneNo,
                     Verify = Enum.GetName(typeof(VerifyType), x.PhoneVerified),
-                    RegTime = x.RegTime.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture),
+                    RegTime = new DateTimeOffset(x.RegTime.DateTime,TimeSpan.Zero),
                     DepositStatus = Enum.GetName(typeof(DepositStatusType), x.ActStatus),
                     Status = Enum.GetName(typeof(RegLiveStatusType), x.Status),
                     AffCode = x.AffCode,

@@ -463,89 +463,79 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<VipLevelModel>("Common_VipLevel_Get");
         }
 
-        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency, int depositStatus, int status, string username, int pagenumber, int pagesize, int sort, long StartDate, long EndDate, string AffiliatesCode, int AgentCodeType)
+        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
         {
-            //CreditSite
-            var SearchData = new RegLiveStatusResult();
+            var searchData = new RegLiveStatusResult();
             var props = new DynamicParameters();
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            List<string> CreditSite = new List<string>() { "Nova88Ref01", "Nova88Ref02", "Nova88Ref03", "Nova88Ref04", "Nova88Ref05", "Nova88Ref06", "Nova88Ref07", "Nova88Ref08", "Goal123Ref01", "BwingRef01" };
+            var creditSite = new List<string>{ "Nova88Ref01", "Nova88Ref02", "Nova88Ref03", "Nova88Ref04", "Nova88Ref05", "Nova88Ref06", "Nova88Ref07", "Nova88Ref08", "Goal123Ref01", "BwingRef01" };
             props.Add("SelectSite", JsonConvert.SerializeObject(selectSite));
             props.Add("Currency", currency);
             props.Add("UserName", string.IsNullOrWhiteSpace(username) ? null : username);
             props.Add("DepositStatus", depositStatus);
             props.Add("Status", status);
             props.Add("Sort", sort);
-            props.Add("PageSize", pagesize);
-            props.Add("StartDate", StartDate);
-            props.Add("EndDate", EndDate);
-            props.Add("AffCode", string.IsNullOrWhiteSpace(AffiliatesCode) ? null : AffiliatesCode);
-            props.Add("CreditSite", JsonConvert.SerializeObject(CreditSite));
-            props.Add("AgentCodeType", AgentCodeType);
-            props.Add("PageNumber", pagenumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("PageSize", Math.Abs(pageSize));
+            props.Add("StartDate", startDate.DateTime);
+            props.Add("EndDate", endDate.DateTime);
+            props.Add("AffCode", string.IsNullOrWhiteSpace(affiliatesCode) ? null : affiliatesCode);
+            props.Add("CreditSite", JsonConvert.SerializeObject(creditSite));
+            props.Add("AgentCodeType", agentCodeType);
+            props.Add("StartIndex",(Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32,  ParameterDirection.Input);
+            props.Add("PageNumber", Math.Abs(pageNumber),DbType.Int32,ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            
+            var result = _reportDbClient.Query<RegLiveStatus>("Admin_CustRegLiveStatusV4_Get", props).ToList();
+            searchData.RegLiveStatusDatas = result;
+            searchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            searchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            searchData.RowCount = props.Get<int?>("RowCount") ?? 0;
 
-            var result = conn.Query<RegLiveStatus>("Admin_CustRegLiveStatusV3_Get", props, commandType: CommandType.StoredProcedure).ToList();
-
-            SearchData.RegLiveStatusDatas = result;
-            SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            SearchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
-
-            return SearchData;
+            return searchData;
         }
 
-        public int SetRegLiveStatus(int custid,int status, int siteid, string Operator)
+        public int SetRegLiveStatus(int custId,int status, int siteId, string @operator)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_RegLiveStatus_Set", new { CustId = custid, Status = status, SiteId= siteid, Operator= Operator }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute("Admin_RegLiveStatus_Set", new DynamicParameters(new { CustId = custId, Status = status, SiteId= siteId, Operator= @operator }));
         }
 
         public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
         {
+            return _reportDbClient.Query<RegLiveStatusNotes>("Admin_CustRegLiveStatusNotesV2_Get", new DynamicParameters(new { CustId = custId }));
+        }
+
+        public int AddRegLiveStatusNote(int custId, string note, string @operator)
+        {
+            return _mainDbClient.Execute("Admin_CustRegLiveStatusNotes_Ins", new DynamicParameters(new { CustId = custId, Note = string.IsNullOrWhiteSpace(note) ? "" : note, Operator = @operator }));
+        }
+
+        public int DeleteRegLiveStatusNote(int custId,int id)
+        {
+            return _mainDbClient.Execute("Admin_CustRegLiveStatusNotes_Del", new DynamicParameters(new { CustId = custId, Id = id }));
+        }
+
+        public int EditRegLiveStatusNote(int custid, int id, string note, string @operator)
+        {
+            return _mainDbClient.Execute("Admin_CustRegLiveStatusNotes_Set", new DynamicParameters(new { CustId = custid, Id = id, Note = note, Operator = @operator }));
+        }
+        public IEnumerable<RegLiveStatus> GetExportRegLiveStatus(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
+        {
+            var creditSite = new List<string>() { "Nova88Ref01", "Nova88Ref02", "Nova88Ref03", "Nova88Ref04", "Nova88Ref05", "Nova88Ref06", "Nova88Ref07", "Nova88Ref08", "Goal123Ref01", "BwingRef01" };
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<RegLiveStatusNotes>("Admin_CustRegLiveStatusNotes_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
-        }
-
-        public int AddRegLiveStatusNote(int custid, string note, string Operator)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_CustRegLiveStatusNotes_Ins", new { CustId = custid, Note = string.IsNullOrWhiteSpace(note) ? "" : note, Operator = Operator }, commandType: CommandType.StoredProcedure);
-        }
-
-        public int DeleteRegLiveStatusNote(int custid,int id)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_CustRegLiveStatusNotes_Del", new { CustId = custid, Id = id }, commandType: CommandType.StoredProcedure);
-        }
-
-        public int EditRegLiveStatusNote(int custid, int id, string note, string Operator)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_CustRegLiveStatusNotes_Set", new { CustId = custid, Id = id, Note = note, Operator = Operator }, commandType: CommandType.StoredProcedure);
-        }
-        public IEnumerable<RegLiveStatus> GetExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate, string AffiliatesCode, int AgentCodeType)
-        {
-            IEnumerable<RegLiveStatus> result = null;
-            List<string> CreditSite = new List<string>() { "Nova88Ref01", "Nova88Ref02", "Nova88Ref03", "Nova88Ref04", "Nova88Ref05", "Nova88Ref06", "Nova88Ref07", "Nova88Ref08", "Goal123Ref01", "BwingRef01" };
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var SpName = "Admin_CustRegLiveStatusExportV3_Get";
             var props = new DynamicParameters();
-            props.Add("SelectSite", SelectSite);
-            props.Add("Currency", Currency);
-            props.Add("UserName", string.IsNullOrWhiteSpace(User) ? null : User);
-            props.Add("DepositStatus", DepositStatus);
-            props.Add("Status", Status);
-            props.Add("Sort", Sort);
-            props.Add("StartDate", StartDate);
-            props.Add("EndDate", EndDate);
-            props.Add("AffCode", string.IsNullOrWhiteSpace(AffiliatesCode) ? null : AffiliatesCode);
-            props.Add("CreditSite", JsonConvert.SerializeObject(CreditSite));
-            props.Add("AgentCodeType", AgentCodeType);
+            props.Add("SelectSite", siteIds);
+            props.Add("Currency", currency);
+            props.Add("UserName", string.IsNullOrWhiteSpace(user) ? null : user);
+            props.Add("DepositStatus", depositStatus);
+            props.Add("Status", status);
+            props.Add("Sort", sort);
+            props.Add("StartDate", startDate.DateTime);
+            props.Add("EndDate", endDate.DateTime);
+            props.Add("AffCode", string.IsNullOrWhiteSpace(affiliatesCode) ? null : affiliatesCode);
+            props.Add("CreditSite", JsonConvert.SerializeObject(creditSite));
+            props.Add("AgentCodeType", agentCodeType);
 
-            result = conn.Query<RegLiveStatus>(SpName, props, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.Query<RegLiveStatus>("Admin_CustRegLiveStatusExportV4_Get", props);
 
             return result;
         }
