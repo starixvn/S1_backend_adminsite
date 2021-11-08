@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.ExceptionHandling;
@@ -41,14 +42,14 @@ namespace BackendSite.Service.BLL
                 }
 
                 var apiResult = await _tpBll.SetBetLimitAsync(1, custId, minBet, maxBet);
-                if (apiResult.ErrorCode != 0)
+                if (apiResult.ErrorCode != (int)ErrorCodeEnum.Success)
                     throw new AdminException(ErrorCodeEnum.SystemException, "Set third party bet limit failed");
             }
 
             return await _userBetLimitService.InsertOrUpdate(custId, siteId, betSetting, updateOperator);
         }
 
-        public IEnumerable<UserBetLimit> GetUserBetLimit(IEnumerable<int> siteIds, string userName, long startDate, long endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<UserBetLimit> GetUserBetLimit(IEnumerable<int> siteIds, string userName, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
         {
             return _userBetLimitService.GetUserBetLimit(siteIds, userName, startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
         }

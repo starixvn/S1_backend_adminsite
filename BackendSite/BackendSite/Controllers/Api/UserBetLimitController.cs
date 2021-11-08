@@ -28,11 +28,18 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<UserBetLimit> Get([FromForm] QueryUserBetLimit query)
         {
             var pageNumber = query.PageNumber;
-            var data = _userBetLimitBll.GetUserBetLimit(query.SiteIds, query.UserName, query.StartDate, query.EndDate,
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(query.StartDate);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(query.EndDate);
+            var datas = _userBetLimitBll.GetUserBetLimit(query.SiteIds, query.UserName, startTime, endTime,
                 query.PageSize, query.PageNumber, out var totalPages, out var rowCount);
+            foreach (var data in datas)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
             var apiResult = new ApiListResult<UserBetLimit>
             {
-                Data = data,
+                Data = datas,
                 TotalPages = totalPages,
                 PageNumber = pageNumber,
                 RowCount = rowCount,

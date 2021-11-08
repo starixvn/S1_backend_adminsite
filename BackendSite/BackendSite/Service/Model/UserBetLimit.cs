@@ -83,9 +83,9 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public int Status { get; set; }
         public string Creator { get; set; }
-        public DateTime CreateTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
         public string UpdateOperator { get; set; }
-        public DateTime UpdateTime { get; set; }
+        public DateTimeOffset UpdateTime { get; set; }
     }
     
     public class BetLimitStatus
