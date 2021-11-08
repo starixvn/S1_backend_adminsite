@@ -1,0 +1,1802 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BackendSite</name>
+    </assembly>
+    <members>
+        <member name="M:BackendSite.Controllers.Api.CommonController.GetAdminOperateLog(BackendSite.Service.Model.AdminOperateLogReq)">
+            <summary>
+            
+            </summary>
+            <remarks>
+            CSD > Customer Administration > CustInfo > Admin User Log
+            </remarks>
+            <param name="adminOperateLogReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.CustManageController.ExportCustInfoList(BackendSite.Controllers.Api.CustManageController.CustInfoListReq)">
+            <summary>
+            New Code For Frontend
+            </summary>
+            <param name="custInfoReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.CustManageController.GetCustInfoDetailAsync(BackendSite.Controllers.Api.CustManageController.CustInfoReq)">
+            <summary>
+            CustInfo
+            </summary>
+            <param name="custInfoReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.CustManageController.GetCustBonus(BackendSite.Controllers.Api.CustManageController.CustBonusReq)">
+            <summary>
+            CustInfo > Bonus Wallet
+            </summary>
+            <param name="custBonusReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.CustManageController.GetRebateInfoByCust(BackendSite.Controllers.Api.CustManageController.CustBonusReq)">
+            <summary>
+            CustInfo > Rebate Info
+            </summary>
+            <param name="custBonusReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.CustManageController.UploadCustPhotoId(System.Int32,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Upload
+            </summary>
+            <param name="CustId"></param>
+            <param name="File"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.CustManageController.DelCustPhotoId(BackendSite.Controllers.Api.CustManageController.CustInfoReq)">
+            <summary>
+            Ask Re-Upload
+            </summary>
+            <param name="custInfoReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.CustManageController.SetUnlock(BackendSite.Controllers.Api.CustManageController.CustInfoReq)">
+            <summary>
+            將客戶狀態解鎖
+            </summary>
+            <param name="setCustStatusReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.CustManageController.SetLock(BackendSite.Controllers.Api.CustManageController.CustInfoReq)">
+            <summary>
+            將客戶狀態鎖定
+            </summary>
+            <param name="setCustStatusReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.CustManageController.SetClose(BackendSite.Controllers.Api.CustManageController.CustInfoReq)">
+            <summary>
+            將客戶狀態關閉
+            </summary>
+            <param name="setCustStatusReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.CustManageController.KickOut(BackendSite.Controllers.Api.CustManageController.CustInfoReq)">
+            <summary>
+            強制讓客戶登出
+            </summary>
+            <param name="setCustStatusReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.DepositController.GetDepositListByCust(BackendSite.Controllers.Api.DepositController.DepositListReq1)">
+            <summary>
+            
+            </summary>
+            <remarks>
+            Use：
+            CSD > Customer Administration > CustInfo > Deposit Info
+            </remarks>
+            <param name="depositListReq"></param>
+            <returns></returns>
+        </member>
+        <member name="P:BackendSite.Controllers.Api.HomeController.LoginModel.txtID">
+            <summary>
+            使用者帳號
+            </summary>
+        </member>
+        <member name="P:BackendSite.Controllers.Api.HomeController.LoginModel.txtPW">
+            <summary>
+            使用者密碼
+            </summary>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.HomeController.Signin(BackendSite.Controllers.Api.HomeController.LoginModel)">
+             <summary>
+             後台登入
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 {
+                    "txtID": "admin",
+                    "txtPW": "1q2w3e4r"
+                 }
+            
+             </remarks>
+             <param name="loginModel">登入參數</param>
+             <returns>結果</returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.HomeController.CheckSignIn">
+            <summary>
+            登入檢查
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.HomeController.Signout">
+            <summary>
+            登出
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.HomeController.GetSiteList">
+            <summary>
+            取得網站清單
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.HomeController.GetMenu">
+            <summary>
+            取得主選單
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.PaymentAdjustmentInfoController.GetAdjustmentInfoByCust(BackendSite.Controllers.Api.PaymentAdjustmentInfoController.GetAdjustmentInfoReq)">
+            <summary>
+            
+            </summary>
+            <remarks>
+            Use：
+            CSD > Customer Administration > CustInfo > Adjustment Info
+            </remarks>
+            <param name="getAdjustmentInfoReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.PaymentController.GetFinancialLog(BackendSite.Controllers.Api.PaymentController.GetFinancialLogReq)">
+            <summary>
+            
+            </summary>
+            <remarks>
+            Use：
+            CSD > Customer Administration > CustInfo > Financial Log
+            </remarks>
+            <param name="getFinancialLogReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.PaymentController.GetBonusLog(BackendSite.Controllers.Api.PaymentController.GetBonusLogReq)">
+            <summary>
+            
+            </summary>
+            <remarks>
+            Use：
+            CSD > Customer Administration > CustInfo > Bonus Log
+            </remarks>
+            <param name="getBonusLogReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.PaymentController.GetPromotionCategory">
+            <summary>
+            
+            </summary>
+            <remarks>
+            Use：
+            CSD > Customer Administration > CustInfo > Bonus Log [Promotion Category]
+            </remarks>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.PaymentController.GetCustTpBetRecordListOneWeek(BackendSite.Controllers.Api.PaymentController.CustTpBetRecordListOneWeekReq)">
+            <summary>
+            
+            </summary>
+            <remarks>
+            Use：
+            CSD > Customer Administration > CustInfo > Statement
+            </remarks>
+            <param name="custTpBetRecordListOneWeekReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.PaymentController.GetCustTpBetRecordListOneDay(BackendSite.Controllers.Api.PaymentController.CustTpBetRecordListOneDayReq)">
+            <summary>
+            
+            </summary>
+            <remarks>
+            Use：
+            CSD > Customer Administration > CustInfo > Statement
+            </remarks>
+            <param name="custTpBetRecordListOneDayReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.PaymentController.GetCustTpBetRecordListbyCategoryId(BackendSite.Controllers.Api.PaymentController.CustTpBetRecordListbyCategoryIdReq)">
+            <summary>
+            
+            </summary>
+            <remarks>
+            Use：
+            CSD > Customer Administration > CustInfo > Statement
+            </remarks>
+            <param name="custTpBetRecordListbyCategoryIdReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.PaymentController.GetCustTpBetRecordDetailListbyGameType(BackendSite.Controllers.Api.PaymentController.CustTpBetRecordDetailListbyGameTypeReq)">
+            <summary>
+            
+            </summary>
+            <remarks>
+            Use：
+            CSD > Customer Administration > CustInfo > Statement
+            </remarks>
+            <param name="custTpBetRecordDetailListbyGameTypeReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.PaymentController.GetVipRebateInfoListByCustId(BackendSite.Controllers.Api.PaymentController.VipRebateInfoByCustIdPara)">
+            <summary>
+            
+            </summary>
+            <remarks>
+            Use：
+            CSD > Customer Administration > CustInfo > Vip Rebate Log
+            </remarks>
+            <param name="para"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.TpController.GetTpTransferInfoByCust(BackendSite.Controllers.Api.TpController.TransferInfoReq)">
+            <summary>
+            
+            </summary>
+            <remarks>
+            Use：
+            CSD > Customer Administration > CustInfo > Transfer Info
+            </remarks>
+            <param name="transferInfoReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.WithdrawalController.GetWithdrawalListByCust(BackendSite.Controllers.Api.WithdrawalController.WithdrawalReq4)">
+            <summary>
+            
+            </summary>
+            <remarks>
+            Use：
+            CSD > Customer Administration > CustInfo > Withdrawal Info
+            </remarks>
+            <param name="withdrawalReq"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.WithdrawalController.CheckWithdrawalPictureAsync(System.String)">
+            <summary>
+            確認是否存在提款單圖檔
+            </summary>
+            <param name="transId">提款單單號</param>
+            <returns>是否存在</returns>
+        </member>
+        <member name="M:BackendSite.Controllers.Api.WithdrawalController.CopyWithdrawalPictureAsync(System.String)">
+            <summary>
+            複製提款單圖片檔
+            </summary>
+            <param name="transId">提款單單號</param>
+            <returns>是否成功</returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.BankFinancialBLL.CheckSharedParameterForSetTransferInfo(BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel,System.String@)">
+            <summary>
+            檢核 共有 資料
+            </summary>
+            <param name="bankFinancialTransferInfoDetail"></param>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.BankFinancialBLL.CheckParameterForSetTransferInfo(BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel,System.String@)">
+            <summary>
+            檢核 加項 和 減項 的資料
+            </summary>
+            <param name="bankFinancialTransferInfoDetail"></param>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.BankFinancialBLL.CheckParameterWithTypeOtherForSetTransferInfo(BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel,System.String@)">
+            <summary>
+            檢核 和 判斷 單加項 或 單減項 的資料
+            </summary>
+            <param name="bankFinancialTransferInfoDetail"></param>
+            <param name="transactionType"></param>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.BankFinancialBLL.SetParameterModelForSetTransferInfo(BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel)">
+            <summary>
+            裝載 加項設定資料 和 減項設定資料
+            </summary>
+            <param name="bankFinancialTransferInfoDetail"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.BankFinancialBLL.ConvertForDisplay(System.Collections.Generic.IEnumerable{BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel})">
+            <summary>
+            時區轉換
+            </summary>
+            <param name="datas"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.CustInfoBLL.DeleteOnUserData(System.String,System.Int32,System.String,System.String)">
+            <summary>
+            刪除在線使用者資料
+            </summary>
+            <param name="custId">客戶ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.ReportBLL.RoundingNumber(System.Decimal,System.Int32)">
+            <summary>
+            亞洲四捨五入
+            </summary>
+            <param name="number">判斷數字</param>
+            <param name="point">小數點取位</param>
+            <returns>四捨五入過後的數字</returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.ReportBLL.TransformToPercentage(System.Decimal,System.Int32)">
+            <summary>
+            數字轉換為百分比
+            </summary>
+            <param name="number">數字</param>
+            <returns>百分比文字</returns>
+        </member>
+        <member name="T:BackendSite.Service.BLL.GeneralReportExportDataToExcel">
+            <summary>
+            一般報表轉excel單頁參數
+            </summary>
+        </member>
+        <member name="T:BackendSite.Service.BLL.ComplexReportExportDataToExcel">
+            <summary>
+            複雜報表轉excel的參數
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.BLL.ComplexReportExportDataToExcel.SheetName">
+            <summary>
+            Sheet 名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.BLL.ComplexReportExportDataToExcel.Content">
+            <summary>
+            內容
+            </summary>
+        </member>
+        <member name="T:BackendSite.Service.BLL.MergeTitleModel">
+            <summary>
+            合併標題模型
+            </summary>
+        </member>
+        <member name="M:BackendSite.Service.BLL.ReportExcelBLL.GeneralReportExportToMultiSheet(System.Collections.Generic.List{BackendSite.Service.BLL.GeneralReportExportDataToExcel})">
+            <summary>
+            一般報表匯出多頁Excel
+            </summary>
+            <param name="t">匯出各頁資料清單</param>
+            <returns>Excel</returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.ReportExcelBLL.ComplexReportExportToMultiSheet(System.Collections.Generic.List{BackendSite.Service.BLL.ComplexReportExportDataToExcel})">
+            <summary>
+            複雜報表匯出Excel
+            </summary>
+            <param name="t"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.ResponseSettingBLL.SetResponse(BackendSite.Service.Model.enums.ErrorMessageCodeEnum,System.Exception,System.String,System.String)">
+            <summary>
+            裝載回傳結果
+            </summary>
+            <param name="status"></param>
+            <param name="ex"></param>
+            <param name="lang"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.ResponseSettingBLL.SetResponse``1(BackendSite.Service.Model.enums.ErrorMessageCodeEnum,``0,System.Exception,System.String,System.String)">
+            <summary>
+            裝載回傳結果(含資料)
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="status"></param>
+            <param name="data"></param>
+            <param name="ex"></param>
+            <param name="lang"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.ResponseSettingBLL.SetResponse``1(BackendSite.Service.Model.enums.ErrorMessageCodeEnum,System.Collections.Generic.IEnumerable{``0},System.Int32,System.Int32,System.Int32,System.Exception,System.String,System.String)">
+            <summary>
+            裝載回傳結果(含資料+分頁)
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="status"></param>
+            <param name="data"></param>
+            <param name="totalPages"></param>
+            <param name="pageNum"></param>
+            <param name="rowCount"></param>
+            <param name="ex"></param>
+            <param name="lang"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.ResponseSettingBLL.SetResponse(System.Exception,System.String,System.String)">
+            <summary>
+            裝載回傳例外結果
+            </summary>
+            <param name="status"></param>
+            <param name="ex"></param>
+            <param name="lang"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.VipLevelBLL.CheckCanUpdateStatus(System.String,System.Int32,BackendSite.Service.Model.enums.VipTypeEnum)">
+            <summary>
+            判斷是否可以異動資料狀態
+            </summary>
+            <param name="calculateYearMonth"></param>
+            <param name="siteId"></param>
+            <param name="vipType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.VipLevelBLL.GetVipSettings(BackendSite.Service.Model.enums.VipTypeEnum)">
+            <summary>
+            取得VIP排程設定資料
+            </summary>
+            <param name="vipType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.VipLevelBLL.GetVipUpgradeReview(System.Int32,System.String,BackendSite.Service.Model.enums.VipStatus,System.String,System.Int32,System.Int32,System.Int32@,System.Int32@)">
+            <summary>
+            取得VIP升級檢視清單
+            </summary>
+            <param name="siteId"></param>
+            <param name="calculateYearMonth"></param>
+            <param name="status"></param>
+            <param name="userName"></param>
+            <param name="pageNumber"></param>
+            <param name="pageSize"></param>
+            <param name="totalPages"></param>
+            <param name="rowCount"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.VipLevelBLL.UpdateVipUpgradeReview(System.Collections.Generic.IEnumerable{System.Int32},System.String,BackendSite.Service.Model.enums.VipStatus,System.String)">
+            <summary>
+            更新VIP升級檢視資料
+            </summary>
+            <param name="custIdList"></param>
+            <param name="calculateYearMonth"></param>
+            <param name="newStatus"></param>
+            <param name="updater"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.VipLevelBLL.GetVipDowngradeReview(System.Int32,System.String,BackendSite.Service.Model.enums.VipStatus,System.String,System.Int32,System.Int32,System.Int32@,System.Int32@)">
+            <summary>
+            取得VIP降級檢視清單
+            </summary>
+            <param name="siteId"></param>
+            <param name="calculateYearMonth"></param>
+            <param name="status"></param>
+            <param name="userName"></param>
+            <param name="pageNumber"></param>
+            <param name="pageSize"></param>
+            <param name="totalPages"></param>
+            <param name="rowCount"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.BLL.VipLevelBLL.UpdateVipDowngradeReview(System.Collections.Generic.IEnumerable{System.Int32},System.String,BackendSite.Service.Model.enums.VipStatus,System.String)">
+            <summary>
+            更新VIP降級檢視資料
+            </summary>
+            <param name="custIdList"></param>
+            <param name="calculateYearMonth"></param>
+            <param name="newStatus"></param>
+            <param name="updater"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.GetPromotionList(System.String,System.String,System.Int32,System.Int64,System.Int64,System.Int32,System.String,System.String,System.Boolean)">
+            <summary>
+            取得促銷資料清單
+            </summary>
+            <param name="siteIds"></param>
+            <param name="promotionTypes"></param>
+            <param name="status"></param>
+            <param name="startDate"></param>
+            <param name="endDate"></param>
+            <param name="device"></param>
+            <param name="bonusCode"></param>
+            <param name="permissionSiteIds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.GetPromotionFlow(System.String,System.Int32)">
+            <summary>
+            取得指定促銷流程
+            </summary>
+            <param name="bonusCode"></param>
+            <param name="siteId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.GetPromotion(System.String,System.Int32,MySql.Data.MySqlClient.MySqlConnection,MySql.Data.MySqlClient.MySqlTransaction)">
+            <summary>
+            取得促銷基本資料
+            </summary>
+            <param name="bonusCode"></param>
+            <param name="siteId"></param>
+            <param name="connection"></param>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.GetPromotionSpecific(System.String,System.Int32,MySql.Data.MySqlClient.MySqlConnection,MySql.Data.MySqlClient.MySqlTransaction)">
+            <summary>
+            取得指定促銷規則??
+            </summary>
+            <param name="bonusCode"></param>
+            <param name="siteId"></param>
+            <param name="connection"></param>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.GetPromotionRebate(System.String,System.Int32,MySql.Data.MySqlClient.MySqlConnection,MySql.Data.MySqlClient.MySqlTransaction)">
+            <summary>
+            取得指定促銷回饋
+            </summary>
+            <param name="bonusCode"></param>
+            <param name="siteId"></param>
+            <param name="connection"></param>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.GetPromotionDisplayCondition(System.String,System.Int32,MySql.Data.MySqlClient.MySqlConnection,MySql.Data.MySqlClient.MySqlTransaction)">
+            <summary>
+            取得促銷顯示條件
+            </summary>
+            <param name="bonusCode"></param>
+            <param name="siteId"></param>
+            <param name="connection"></param>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.SetPromotionFlow(System.Boolean,BackendSite.Service.Model.PromotionInfo,System.Collections.Generic.List{BackendSite.Service.Model.PromotionDisplayCondition.PromotionDisplayConditionModel},System.Int32,System.Int32,System.Int32,System.String,BackendSite.Service.Model.DisplayConditionAbountVipLevel)">
+            <summary>
+            設定促銷流程
+            </summary>
+            <param name="isAdd"></param>
+            <param name="promotion"></param>
+            <param name="promotionDisplayConditionList"></param>
+            <param name="expectedDelSpecificRow"></param>
+            <param name="expectedDelRebateRow"></param>
+            <param name="expectedDelConditionRow"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.DuplicatePromotionFlow(System.String,System.Int32,System.String,System.Int32,System.Int32,System.Int32,System.Int32,System.String)">
+            <summary>
+            複製促銷流程
+            </summary>
+            <param name="bonusCode"></param>
+            <param name="siteId"></param>
+            <param name="newBonusCode"></param>
+            <param name="expectedSpecificRow"></param>
+            <param name="expectedRebateRow"></param>
+            <param name="expectedConditionRow"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.SetPromotion(BackendSite.Service.Model.PromotionInfo,MySql.Data.MySqlClient.MySqlConnection,MySql.Data.MySqlClient.MySqlTransaction)">
+            <summary>
+            設定促銷基本資料
+            </summary>
+            <param name="promotion"></param>
+            <param name="connection"></param>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.SetPromotionSpecific(System.String,System.Int32,System.Collections.Generic.List{BackendSite.Service.Model.PromotionSpecific},MySql.Data.MySqlClient.MySqlConnection,MySql.Data.MySqlClient.MySqlTransaction)">
+            <summary>
+            設定促銷規則??
+            </summary>
+            <param name="bonusCode"></param>
+            <param name="siteId"></param>
+            <param name="specificList"></param>
+            <param name="connection"></param>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.DeletePromotionSpecific(System.String,System.Int32,System.Collections.Generic.List{BackendSite.Service.Model.PromotionSpecific},System.Int32,MySql.Data.MySqlClient.MySqlConnection,MySql.Data.MySqlClient.MySqlTransaction)">
+            <summary>
+            刪除促銷規則??
+            </summary>
+            <param name="bonusCode"></param>
+            <param name="siteId"></param>
+            <param name="specificList"></param>
+            <param name="expectedRow"></param>
+            <param name="connection"></param>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.SetPromotionRebate(System.String,System.Int32,System.Collections.Generic.List{BackendSite.Service.Model.PromotionRebate1},MySql.Data.MySqlClient.MySqlConnection,MySql.Data.MySqlClient.MySqlTransaction)">
+            <summary>
+            設定促銷回饋
+            </summary>
+            <param name="bonusCode"></param>
+            <param name="siteId"></param>
+            <param name="rebateList"></param>
+            <param name="connection"></param>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.DeletePromotionRebate(System.String,System.Int32,System.Collections.Generic.List{BackendSite.Service.Model.PromotionRebate1},System.Int32,MySql.Data.MySqlClient.MySqlConnection,MySql.Data.MySqlClient.MySqlTransaction)">
+            <summary>
+            刪除促銷回饋
+            </summary>
+            <param name="bonusCode"></param>
+            <param name="siteId"></param>
+            <param name="rebateList"></param>
+            <param name="expectedRow"></param>
+            <param name="connection"></param>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.SetPromotionDisplayCondition(System.String,System.Int32,System.Collections.Generic.List{BackendSite.Service.Model.PromotionDisplayCondition.PromotionDisplayConditionModel},MySql.Data.MySqlClient.MySqlConnection,MySql.Data.MySqlClient.MySqlTransaction)">
+            <summary>
+            設定促銷顯示條件
+            </summary>
+            <param name="bonusCode"></param>
+            <param name="siteId"></param>
+            <param name="conditionData"></param>
+            <param name="connection"></param>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.DeletePromotionDisplayCondition(System.String,System.Int32,System.Collections.Generic.List{BackendSite.Service.Model.PromotionDisplayCondition.PromotionDisplayConditionModel},System.Int32,MySql.Data.MySqlClient.MySqlConnection,MySql.Data.MySqlClient.MySqlTransaction)">
+            <summary>
+            刪除促銷顯示條件
+            </summary>
+            <param name="bonusCode"></param>
+            <param name="siteId"></param>
+            <param name="conditionData"></param>
+            <param name="expectedRow"></param>
+            <param name="connection"></param>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.DuplicatePromotion(System.String,System.Int32,System.String,MySql.Data.MySqlClient.MySqlConnection,MySql.Data.MySqlClient.MySqlTransaction)">
+            <summary>
+            複製促銷基本資料
+            </summary>
+            <param name="bonusCode"></param>
+            <param name="siteId"></param>
+            <param name="newBonusCode"></param>
+            <param name="connection"></param>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.DuplicatePromotionSpecific(System.String,System.Int32,System.String,System.Int32,MySql.Data.MySqlClient.MySqlConnection,MySql.Data.MySqlClient.MySqlTransaction)">
+            <summary>
+            複製促銷規則??
+            </summary>
+            <param name="bonusCode"></param>
+            <param name="siteId"></param>
+            <param name="newBonusCode"></param>
+            <param name="expectedRow"></param>
+            <param name="connection"></param>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.DuplicatePromotionRebate(System.String,System.Int32,System.String,System.Int32,MySql.Data.MySqlClient.MySqlConnection,MySql.Data.MySqlClient.MySqlTransaction)">
+            <summary>
+            複製促銷回饋
+            </summary>
+            <param name="bonusCode"></param>
+            <param name="siteId"></param>
+            <param name="newBonusCode"></param>
+            <param name="expectedRow"></param>
+            <param name="connection"></param>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.DuplicatePromotionDisplayCondition(System.String,System.Int32,System.String,System.Int32,MySql.Data.MySqlClient.MySqlConnection,MySql.Data.MySqlClient.MySqlTransaction)">
+            <summary>
+            複製促銷顯示條件
+            </summary>
+            <param name="bonusCode"></param>
+            <param name="siteId"></param>
+            <param name="newBonusCode"></param>
+            <param name="expectedRow"></param>
+            <param name="connection"></param>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.BonusManageService.InsertAdjustmentInfoLog(BackendSite.Service.Model.PromotionInfo,MySql.Data.MySqlClient.MySqlConnection,MySql.Data.MySqlClient.MySqlTransaction,System.String)">
+            <summary>
+            Duplicate Promotion old flow.not use in temp.
+            </summary>
+            <param name="promotion"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.CustInfoService.DeleteOnUserData(System.Int32)">
+            <summary>
+            刪除線上使用者資料
+            </summary>
+            <param name="custId">客戶ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.DAL.WithdrawalService.GetWithdrawalInfo(System.Int32,System.String)">
+            <summary>
+            取得單筆提款單資訊
+            </summary>
+            <param name="withdrawalId">提款單ID</param>
+            <param name="transId">提款單編號</param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.Library.Tools.MD5Encrypt(System.String)">
+            <summary>
+            MD5加密
+            </summary>
+            <param name="pass"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.Library.Tools.CheckUserName(System.String)">
+            <summary>
+            验证用户名 必须是字母和数字的组合
+            </summary>
+            <param name="userName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.Library.Tools.CheckUserInputPassword(System.String)">
+            <summary>
+            验证用户密码："^[a-zA-Z]\w{5,17}$"正确格式为：以字母开头，长度在6~18之间，只能包含字符、数字和下划线。
+            </summary>
+            <param name="userPwd"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.Library.Tools.GetClientIP(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            获取客户端IP
+            </summary>
+            <param name="context"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.Library.Tools.Floor(System.Decimal,System.Int32)">
+            <summary>
+            保留两位小数的金额
+            </summary>
+            <param name="d"></param>
+            <param name="decimals"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.Library.Tools.FmtBalance(System.Decimal)">
+            <summary>
+            余额
+            </summary>
+            <param name="dBalance"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BackendSite.Service.Library.GetEnumDescription.GetDescription(System.Enum)">
+            <summary>
+            取得列舉說明文字
+            </summary>
+            <param name="value">列舉值</param>
+            <returns></returns>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancialReasonModel.ReasonId">
+            <summary>
+            讀寫 原因ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancialReasonModel.Description">
+            <summary>
+            讀寫 原因說明
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialDataModel.Purpose">
+            <summary>
+            讀寫 目的
+            1=Deposit,2=Withdrawal,3=Transfer
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.Id">
+            <summary>
+            讀寫 識別值ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.SiteId">
+            <summary>
+            讀寫 網站ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.SiteName">
+            <summary>
+            讀寫 網站名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.CurrencyId">
+            <summary>
+            讀寫 幣別Id
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.IsoCode">
+            <summary>
+            讀寫 幣別代號
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.SysId">
+            <summary>
+            讀寫 銀行ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.BankCode">
+            <summary>
+            讀寫 銀行代號
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.Purpose">
+            <summary>
+            讀寫 目的
+            1=Deposit,2=Withdrawal,3=Transfer
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.Channel">
+            <summary>
+            讀寫 付款方式
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.Agent">
+            <summary>
+            讀寫 代理人
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.PayId">
+            <summary>
+            讀寫 第三方支付ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.PayName">
+            <summary>
+            讀寫 第三方支付名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.AccountNo">
+            <summary>
+            讀寫 帳戶帳號
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.AccountName">
+            <summary>
+            讀寫 帳戶名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.DisplayName">
+            <summary>
+            讀寫 帳戶顯示名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.InitialAmount">
+            <summary>
+            讀寫 初始金額
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.MaxBalanceAlertAmount">
+            <summary>
+            讀寫 超過餘額警示
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.Reason">
+            <summary>
+            讀寫 原因
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.Remark">
+            <summary>
+            讀寫 備註
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.Status">
+            <summary>
+            讀寫 資料狀態
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.CreateTime">
+            <summary>
+            讀寫 資料建立時間
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.Creator">
+            <summary>
+            讀寫 資料建立者
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.CreatorName">
+            <summary>
+            讀寫 資料建立者名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.UpdateTime">
+            <summary>
+            讀寫 資料最近更新時間
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.Updator">
+            <summary>
+            讀寫 資料更新者
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountDetailModel.UpdatorName">
+            <summary>
+            讀寫 資料更新者名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.Id">
+            <summary>
+            讀寫 識別值ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.SiteId">
+            <summary>
+            讀寫 網站ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.SiteName">
+            <summary>
+            讀寫 網站名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.CurrencyId">
+            <summary>
+            讀寫 幣別Id
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.SysId">
+            <summary>
+            讀寫 銀行ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.Purpose">
+            <summary>
+            讀寫 目的
+            1=Deposit,2=Withdrawal,3=Transfer
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.Channel">
+            <summary>
+            讀寫 付款方式
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.Agent">
+            <summary>
+            讀寫 代理人
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.PayId">
+            <summary>
+            讀寫 第三方支付ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.AccountNo">
+            <summary>
+            讀寫 帳戶帳號
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.AccountName">
+            <summary>
+            讀寫 帳戶名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.DisplayName">
+            <summary>
+            讀寫 帳戶顯示名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.InitialAmount">
+            <summary>
+            讀寫 初始金額
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.MaxBalanceAlertAmount">
+            <summary>
+            讀寫 超過餘額警示
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.Reason">
+            <summary>
+            讀寫 原因
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.Remark">
+            <summary>
+            讀寫 備註
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.Status">
+            <summary>
+            讀寫 資料狀態
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.CreateTime">
+            <summary>
+            讀寫 資料建立時間
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.Creator">
+            <summary>
+            讀寫 資料建立者
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.UpdateTime">
+            <summary>
+            讀寫 資料最近更新時間
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferAccountModel.Updator">
+            <summary>
+            讀寫 資料更新者
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.Id">
+            <summary>
+            讀寫 識別值ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.TransferId">
+            <summary>
+            讀寫 交易ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.TransactionType">
+            <summary>
+            讀寫 交易型態
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.TransferType">
+            <summary>
+            讀寫 交易類型
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.PlusOrMinus">
+            <summary>
+            讀寫 加項或減項
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.TransDate">
+            <summary>
+            讀寫 交易日期
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.Channel">
+            <summary>
+            讀寫 付款方式
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.Agent">
+            <summary>
+            讀寫 代理人
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.PayId">
+            <summary>
+            讀寫 第三方支付ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.PayName">
+            <summary>
+            讀寫 第三方支付名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.SiteId">
+            <summary>
+            讀寫 網站ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.SiteName">
+            <summary>
+            讀寫 網站名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.CustId">
+            <summary>
+            讀寫 客戶ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.CurrencyId">
+            <summary>
+            讀寫 幣別ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.IsoCode">
+            <summary>
+            讀寫 幣別名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.SysId">
+            <summary>
+            讀寫 銀行ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.BankCode">
+            <summary>
+            讀寫 銀行代號
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.AccountNo">
+            <summary>
+            讀寫 帳戶帳號
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.AccountDisplayName">
+            <summary>
+            讀寫 帳戶顯示名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.Amount">
+            <summary>
+            讀寫 交易金額
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.Fee">
+            <summary>
+            讀寫 手續費(皆為減項)
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.Reason">
+            <summary>
+            讀寫 原因ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.Description">
+            <summary>
+            讀寫 原因說明
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.CreateTime">
+            <summary>
+            讀寫 資料建立時間
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.Creator">
+            <summary>
+            讀寫 資料建立者ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.CreatorName">
+            <summary>
+            讀寫 資料建立者名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.UpdateTime">
+            <summary>
+            讀寫 資料最近更新時間
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.Updator">
+            <summary>
+            讀寫 資料更新者ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoDetailModel.UpdatorName">
+            <summary>
+            讀寫 資料更新者名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.Id">
+            <summary>
+            讀寫 識別值ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.TransferId">
+            <summary>
+            讀寫 交易ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.TransactionType">
+            <summary>
+            讀寫 交易型態
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.TransferType">
+            <summary>
+            讀寫 交易類型
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.PlusOrMinus">
+            <summary>
+            讀寫 加項或減項
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.TransDate">
+            <summary>
+            讀寫 交易日期
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.Channel">
+            <summary>
+            讀寫 付款方式
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.Agent">
+            <summary>
+            讀寫 代理人
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.PayId">
+            <summary>
+            讀寫 第三方支付ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.SiteId">
+            <summary>
+            讀寫 網站ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.SiteName">
+            <summary>
+            讀寫 網站名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.CustId">
+            <summary>
+            讀寫 客戶ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.CurrencyId">
+            <summary>
+            讀寫 幣別
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.SysId">
+            <summary>
+            讀寫 銀行ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.AccountNo">
+            <summary>
+            讀寫 帳戶帳號
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.AccountDisplayName">
+            <summary>
+            讀寫 帳戶顯示名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.Amount">
+            <summary>
+            讀寫 交易金額
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.Fee">
+            <summary>
+            讀寫 手續費(皆為減項)
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.Reason">
+            <summary>
+            讀寫 原因
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.Remark">
+            <summary>
+            讀寫 備註
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.CreateTime">
+            <summary>
+            讀寫 資料建立時間
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.Creator">
+            <summary>
+            讀寫 資料建立者
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.UpdateTime">
+            <summary>
+            讀寫 資料最近更新時間
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoModel.Updator">
+            <summary>
+            讀寫 資料更新者
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.TransferId">
+            <summary>
+            讀寫 交易ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.TransactionType">
+            <summary>
+            讀寫 交易型態
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.TransferType">
+            <summary>
+            讀寫 交易類型
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.TransDate">
+            <summary>
+            讀寫 交易日期
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.FromChannel">
+            <summary>
+            讀寫 付款方式
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.FromAgent">
+            <summary>
+            讀寫 代理人
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.FromPayId">
+            <summary>
+            讀寫 第三方支付ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.FromPayName">
+            <summary>
+            讀寫 第三方支付名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.FromSiteId">
+            <summary>
+            讀寫 網站ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.FromSiteName">
+            <summary>
+            讀寫 網站名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.FromCustId">
+            <summary>
+            讀寫 客戶ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.FromUserName">
+            <summary>
+            讀寫 客戶名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.FromCurrencyId">
+            <summary>
+            讀寫 幣別
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.FromIsoCode">
+            <summary>
+            讀寫 幣別代號
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.FromSysId">
+            <summary>
+            讀寫 銀行ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.FromBankCode">
+            <summary>
+            讀寫 銀行代號
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.FromAccountNo">
+            <summary>
+            讀寫 帳戶帳號
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.FromAccountDisplayName">
+            <summary>
+            讀寫 帳戶顯示名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.FromAmount">
+            <summary>
+            讀寫 交易金額
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.FromFee">
+            <summary>
+            讀寫 手續費(皆為減項)
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.ToChannel">
+            <summary>
+            讀寫 付款方式
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.ToAgent">
+            <summary>
+            讀寫 代理人
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.ToPayId">
+            <summary>
+            讀寫 第三方支付ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.ToPayName">
+            <summary>
+            讀寫 第三方支付名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.ToSiteId">
+            <summary>
+            讀寫 網站ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.ToSiteName">
+            <summary>
+            讀寫 網站名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.ToCustId">
+            <summary>
+            讀寫 客戶ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.ToUserName">
+            <summary>
+            讀寫 客戶名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.ToCurrencyId">
+            <summary>
+            讀寫 幣別
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.ToIsoCode">
+            <summary>
+            讀寫 幣別代號
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.ToSysId">
+            <summary>
+            讀寫 銀行ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.ToBankCode">
+            <summary>
+            讀寫 銀行代號
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.ToAccountNo">
+            <summary>
+            讀寫 帳戶帳號
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.ToAccountDisplayName">
+            <summary>
+            讀寫 帳戶顯示名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.ToAmount">
+            <summary>
+            讀寫 交易金額
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.ToFee">
+            <summary>
+            讀寫 手續費(皆為減項)
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.Reason">
+            <summary>
+            讀寫 原因
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.Remark">
+            <summary>
+            讀寫 備註
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.CreateTime">
+            <summary>
+            讀寫 資料建立時間
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.Creator">
+            <summary>
+            讀寫 資料建立者
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.CreatorName">
+            <summary>
+            讀寫 資料建立者名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.UpdateTime">
+            <summary>
+            讀寫 資料最近更新時間
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.Updator">
+            <summary>
+            讀寫 資料更新者
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.UpdatorName">
+            <summary>
+            讀寫 資料更新者名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.UploadReceiptName">
+            <summary>
+            圖檔名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.TransferPic">
+            <summary>
+            圖檔Binary
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.BankFinancial.BankFinancialTransferInfoTransDetailModel.UploadReceipt">
+            <summary>
+            讀寫 上傳收據
+            </summary>
+        </member>
+        <member name="T:BackendSite.Service.Model.CurrencyModel">
+            <summary>
+            Currency Schema
+            </summary>
+        </member>
+        <member name="T:BackendSite.Service.Model.DepositReportModel">
+            <summary>
+            資料回傳結構
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.DepositReportModel.SummaryAccountData">
+            <summary>
+            總表帳戶資料
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.DepositReportModel.SummaryCurrencyData">
+            <summary>
+            總表各幣別資料
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.DepositReportModel.SummaryTotalData">
+            <summary>
+            總表全部資料
+            </summary>
+        </member>
+        <member name="T:BackendSite.Service.Model.DepositAccountModel">
+            <summary>
+            帳戶資料
+            </summary>
+        </member>
+        <member name="T:BackendSite.Service.Model.enums.DepositStatus">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:BackendSite.Service.Model.enums.TransferChannelEnum">
+            <summary>
+            轉帳方式 列舉
+            </summary>
+        </member>
+        <member name="F:BackendSite.Service.Model.enums.TransferChannelEnum.LocalBank">
+            <summary>
+            當地銀行
+            </summary>
+        </member>
+        <member name="F:BackendSite.Service.Model.enums.TransferChannelEnum.HeadOffice">
+            <summary>
+            高層帳戶
+            </summary>
+        </member>
+        <member name="F:BackendSite.Service.Model.enums.TransferChannelEnum.PSP">
+            <summary>
+            第三方支付
+            </summary>
+        </member>
+        <member name="T:BackendSite.Service.Model.enums.TransferAccountStatusEnum">
+            <summary>
+            轉帳帳戶資料狀態 列舉
+            </summary>
+        </member>
+        <member name="F:BackendSite.Service.Model.enums.TransferAccountStatusEnum.Initial">
+            <summary>
+            初始設定(Front-End Hidden)
+            </summary>
+        </member>
+        <member name="F:BackendSite.Service.Model.enums.TransferAccountStatusEnum.Open">
+            <summary>
+            開放使用(Front-End Show)
+            </summary>
+        </member>
+        <member name="F:BackendSite.Service.Model.enums.TransferAccountStatusEnum.Suspend">
+            <summary>
+            帳戶暫停
+            </summary>
+        </member>
+        <member name="F:BackendSite.Service.Model.enums.TransferAccountStatusEnum.Close">
+            <summary>
+            帳戶關閉(Never Open)
+            </summary>
+        </member>
+        <member name="T:BackendSite.Service.Model.enums.TransactionTypeEnum">
+            <summary>
+            交易型態 列舉
+            </summary>
+        </member>
+        <member name="F:BackendSite.Service.Model.enums.TransactionTypeEnum.OnlyPlus">
+            <summary>
+            只有加項
+            </summary>
+        </member>
+        <member name="F:BackendSite.Service.Model.enums.TransactionTypeEnum.OnlyMinus">
+            <summary>
+            只有減項
+            </summary>
+        </member>
+        <member name="F:BackendSite.Service.Model.enums.TransactionTypeEnum.PlusAndMinus">
+            <summary>
+            一加一減
+            </summary>
+        </member>
+        <member name="T:BackendSite.Service.Model.enums.TransferTypeEnum">
+            <summary>
+            交易類型 列舉
+            </summary>
+        </member>
+        <member name="F:BackendSite.Service.Model.enums.TransferTypeEnum.Deposit">
+            <summary>
+            存款(客戶戶頭=>公司戶頭)
+            </summary>
+        </member>
+        <member name="F:BackendSite.Service.Model.enums.TransferTypeEnum.Withdrawal">
+            <summary>
+            提款(公司戶頭=>客戶戶頭)
+            </summary>
+        </member>
+        <member name="F:BackendSite.Service.Model.enums.TransferTypeEnum.Transfer">
+            <summary>
+            轉帳(公司戶頭=>公司戶頭)
+            </summary>
+        </member>
+        <member name="F:BackendSite.Service.Model.enums.TransferTypeEnum.Other">
+            <summary>
+            其他(手續費、利息...)
+            </summary>
+        </member>
+        <member name="T:BackendSite.Service.Model.enums.PlusOrMinusEnum">
+            <summary>
+            加項或減項 列舉
+            </summary>
+        </member>
+        <member name="F:BackendSite.Service.Model.enums.PlusOrMinusEnum.Plus">
+            <summary>
+            加項
+            </summary>
+        </member>
+        <member name="F:BackendSite.Service.Model.enums.PlusOrMinusEnum.Minus">
+            <summary>
+            減項
+            </summary>
+        </member>
+        <member name="T:BackendSite.Service.Model.TpBetRecordDataModel">
+            <summary>
+            代表 第三方下注紀錄資料
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.TpId">
+            <summary>
+            讀寫 第三方ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.TpName">
+            <summary>
+            讀寫 第三方名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.TransId">
+            <summary>
+            讀寫 交易ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.CategoryId">
+            <summary>
+            讀寫 類別ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.CategoryName">
+            <summary>
+            讀寫 類別名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.GameId">
+            <summary>
+            讀寫 遊戲ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.GameName">
+            <summary>
+            讀寫 遊戲名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.CustId">
+            <summary>
+            讀寫 客戶ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.UserName">
+            <summary>
+            讀寫 客戶名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.CurrencyId">
+            <summary>
+            讀寫 幣別
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.Code">
+            <summary>
+            讀寫 幣別代號
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.SiteId">
+            <summary>
+            讀寫 網站ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.SiteName">
+            <summary>
+            讀寫 網站名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.TpUserName">
+            <summary>
+            讀寫 第三方使用者名稱
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.TransTime">
+            <summary>
+            讀寫 交易時間(UTC+8)
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.SettledTime">
+            <summary>
+            讀寫 開獎時間(UTC+8)
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.Stake">
+            <summary>
+            讀寫 投注金額
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.ValidBet">
+            <summary>
+            讀寫 有效投注金額
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.Revenue">
+            <summary>
+            讀寫 傭金金額
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.WinLostAmount">
+            <summary>
+            讀寫 輸贏金額
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.SettlementType">
+            <summary>
+            讀寫 開獎類型
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.TicketStatus">
+            <summary>
+            讀寫 票券狀態
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.OriginalState">
+            <summary>
+            讀寫 票券狀態(文字)
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.TicketKey">
+            <summary>
+            讀寫 票券驗證碼
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.BonusId">
+            <summary>
+            讀寫 獎金ID
+            </summary>
+        </member>
+        <member name="P:BackendSite.Service.Model.TpBetRecordDataModel.CreateTime">
+            <summary>
+            讀寫 資料建立時間(UTC+8)
+            </summary>
+        </member>
+    </members>
+</doc>

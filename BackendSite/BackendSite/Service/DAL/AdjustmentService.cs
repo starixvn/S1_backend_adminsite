@@ -3,6 +3,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
@@ -22,15 +23,21 @@ namespace BackendSite.Service.DAL
         private readonly WithdrawalLimitService withdrawalLimitService;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
+        private readonly string _connectionString;
 
-        public AdjustmentService(IConfiguration configuration, Common common, WalletService walletService, WithdrawalLimitService withdrawalLimitService, ILogger<MySqlClient> logger)
+        public AdjustmentService(IConfiguration configuration,
+            IServiceProvider provider,
+            Common common,
+            WalletService walletService,
+            WithdrawalLimitService withdrawalLimitService,
+            ILogger<MySqlClient> logger)
         {
             this.configuration = configuration;
             this.common = common;
             this.walletService = walletService;
             this.withdrawalLimitService = withdrawalLimitService;
-            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
-            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
         public int PaymentAdjustment(AdjustmentInfo adjustmentInfo, string Operator, out string transId)
         {
@@ -136,28 +143,34 @@ namespace BackendSite.Service.DAL
             return conn.Execute("AdjustmentLog_Ins", new { AdjustId = adjustId, SiteId = siteId, Comment = comment, Action = status, Operator = Operator }, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<AdjustWithdrawalLimit> GetAdjustWithdrawalLimitsLog(int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<AdjustWithdrawalLimit> GetAdjustWithdrawalLimitsLog(int CustId,
+            int PageSize,
+            int StartIndex,
+            out int TotalPages,
+            out int RowCount)
         {
-            IEnumerable<AdjustWithdrawalLimit> result = null;
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var SpName = "Admin_AdjustWithdrawalLimitInfo_Get";
-            var props = new DynamicParameters();
-            props.Add("@CustId", CustId);
-            props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-            props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("@PageSize", PageSize);
 
-            result = conn.Query<AdjustWithdrawalLimit>(SpName, props, commandType: CommandType.StoredProcedure);
-            PageNumber = props.Get<int?>("@PageNumber") ?? 0;
-            TotalPages = props.Get<int?>("@TotalPages") ?? 0;
-            RowCount = props.Get<int?>("@RowCount") ?? 0;
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+
+            var props = new DynamicParameters();
+            props.Add("CustId", CustId);
+            props.Add("PageSize", PageSize);
+            props.Add("StartIndex", StartIndex);
+            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = conn.Query<AdjustWithdrawalLimit>("Admin_AdjustWithdrawalLimitInfo_Get", props, commandType: CommandType.StoredProcedure);
+            TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            RowCount = props.Get<int?>("RowCount") ?? 0;
 
             return result;
         }
 
-        public int SetAdjustWithdrawalLimit(AdjustWithdrawalLimit withdrawalLimitInfo, string UserName, int CurrencyId, int SiteId, string Operator)
+        public int SetAdjustWithdrawalLimit(AdjustWithdrawalLimit withdrawalLimitInfo,
+            string UserName,
+            int CurrencyId,
+            int SiteId,
+            string Operator)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();

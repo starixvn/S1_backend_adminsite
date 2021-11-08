@@ -14,12 +14,15 @@ using BackendSite.Attributes;
 using BackendSite.Extensions;
 using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
+using Microsoft.AspNetCore.HttpOverrides;
+using NSwag;
+using System.Collections.Generic;
+
 
 namespace BackendSite
 {
     public class Startup
     {
-        private readonly string AllowSpecificOrigins = "AllowAllOriginsPolicy";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -203,23 +206,21 @@ namespace BackendSite
             services.AddDataProtection().DisableAutomaticKeyGeneration();
             services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("CookieKeys")).SetApplicationName("SharedCookieApp");
 
-            #region Global Filter
-
+            //Global Filter
             services.AddMvc(config =>
             {
                 config.Filters.Add<ExceptionFilter>();
             });
 
-            #endregion
+            services.AddOpenApiDocument(); //Swagger Setting
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseCors(AllowSpecificOrigins);
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseRequestLogMiddleware();
@@ -227,6 +228,28 @@ namespace BackendSite
 
             if (!env.IsProduction())
             {
+                #region Swagger & Redoc Setting
+
+                app.UseOpenApi(config =>
+                {
+                    config.PostProcess = (document, http) =>
+                    {        
+                        document.Schemes = new List<OpenApiSchema>()
+                        {
+                            OpenApiSchema.Http,
+                            OpenApiSchema.Https
+                        };
+                        document.Info.Title = "AdminSite API Document";
+                    };
+                });
+                app.UseSwaggerUi3();
+                app.UseReDoc(config =>
+                {
+                    config.Path = "/redoc";
+                });
+
+                #endregion
+
                 app.UseDeveloperExceptionPage();
             }
             else

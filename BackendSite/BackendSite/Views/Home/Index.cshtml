@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Hosting
 @using BackendSite.Service.BLL
 @using BackendSite.Service.Model
+@using BackendSite.ExceptionHandling
 @inject IWebHostEnvironment environment
 @inject SelLangBLL selLangBLL
 @inject ServerInfoBLL serverInfoBLL
@@ -72,7 +73,7 @@
             <div class="main-menu">
                 <nav>
                     <ul class="metismenu" id="menu">
-                        @foreach (var menuItem in menuBLL.GetMenuData())
+                        @foreach (var menuItem in menuBLL.GetMenuData(false,out ErrorCodeEnum errorCodeEnum))
                         {
                             MenuComponent(menuItem);
                         }

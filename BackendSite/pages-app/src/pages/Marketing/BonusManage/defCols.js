@@ -20,6 +20,7 @@ export const defPromotionType = {
   6: "Rebate",
   7: "CashBack",
   8: "Static page",
+  9: "Retention free bet"
 };
 
 export const initPromotionType = [
@@ -30,6 +31,7 @@ export const initPromotionType = [
   { value: 6, displayText: defPromotionType[6] },
   { value: 7, displayText: defPromotionType[7] },
   { value: 8, displayText: defPromotionType[8] },
+  { value: 9, displayText: defPromotionType[9] },
 ];
 
 export const initSpecialBonusPromotionType = [

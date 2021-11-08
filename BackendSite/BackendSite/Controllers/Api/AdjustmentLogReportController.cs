@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitAdjust" })]
     public class AdjustmentLogReportController : Controller
     {
         private readonly AdjustmentLogReportBLL adjustmentLogReportBLL;
@@ -18,6 +20,17 @@ namespace BackendSite.Controllers.Api
             this.adjustmentLogReportBLL = adjustmentLogReportBLL;
         }
 
+        /// <summary>
+        /// AdjustmentLogReport/GetAdjustmentInfoLogMenu 取得調整資料記錄程式清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Adjustment Log Report > DropDownList[Menu]
+        /// 
+        /// </remarks>
+        /// <returns>結果</returns>
         [HttpPost]
         public ApiResult<IEnumerable<AdjustmentInfoLogMenu>> GetAdjustmentInfoLogMenu()
         {
@@ -31,6 +44,19 @@ namespace BackendSite.Controllers.Api
             return apiResult;
 
         }
+
+        /// <summary>
+        /// AdjustmentLogReport/GetAdjustmentInfoLog 取得調整資料紀錄
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Adjustment Log Report > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="para">參數</param>
+        /// <returns>結果</returns>
         [HttpPost]
         public ApiListResult<AdjustmentLogReport> GetAdjustmentInfoLog(GetAdjustmentInfoLogPara para)
         {

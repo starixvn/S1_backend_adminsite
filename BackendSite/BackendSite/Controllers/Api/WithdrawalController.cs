@@ -16,6 +16,7 @@ using System.IO;
 using System.Net;
 using Amazon;
 using BackendSite.ExceptionHandling;
+using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Controllers.Api
 {
@@ -406,6 +407,8 @@ namespace BackendSite.Controllers.Api
             public string ChannelName { get; set; }
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
+        //有新舊API，這支是舊API，另一支新的API=api/BaseData/GetBankInfoOffList
         [HttpPost]
         public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffList(WithdrawalReq3 withdrawalReq)
         {
@@ -425,6 +428,8 @@ namespace BackendSite.Controllers.Api
             public int ChannelId { get; set; }
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
+        //有新舊API，這支是新API，另一支新的API=api/BaseData/GetBankInfoOffList
         [HttpPost]
         public ApiResult<IEnumerable<Pay>> GetPayList(WithdrawalReq3 withdrawalReq)
         {
@@ -442,6 +447,8 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
+        //有新舊API，這支是新API，另一支新的API=api/BaseData/GetBankInfoOffList
         [HttpPost]
         public ApiResult<IEnumerable<Pay>> GetCryptoPayList(WithdrawalReq3 withdrawalReq)
         {
@@ -474,12 +481,11 @@ namespace BackendSite.Controllers.Api
             }
         }
 
-        public class WithdrawalReq4
+        public class WithdrawalReq4: ApiRequestPageModel
         {
-            public int PageNumber { get; set; }
             public int CustId { get; set; }
             public string TransId { get; set; }
-            public int? Status { get; set; }
+            public int Status { get; set; }
             public long startDate { get; set; }
             public long endDate { get; set; }
         }
@@ -502,10 +508,10 @@ namespace BackendSite.Controllers.Api
             var CurrencyAmount = new List<string>();
             var data = withdrawalBLL.GetWithdrawalListByCust(withdrawalReq.CustId,
                 withdrawalReq.TransId,
-                withdrawalReq.Status,
+                withdrawalReq.Status == 0 ? (int?) null : withdrawalReq.Status,
                 withdrawalReq.startDate,
                 withdrawalReq.endDate,
-                10,
+                withdrawalReq.PageSize,
                 ref pageNumber,
                 out totalPages,
                 out rowCount,
@@ -595,6 +601,20 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        #region CSD > Withdrawal KYC Control
+
+        /// <summary>
+        /// Withdrawal/WithdrawalKYCList 取得提款KYC控制資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Withdrawal KYC Control > Change [Site]
+        /// 
+        /// </remarks>
+        /// <param name="withdrawalKYC">參數</param>
+        /// <returns>結果</returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/WithdrawalKYCControl"})]
         [HttpPost]
         public ApiResult<IEnumerable<WithdrawalKYC>> WithdrawalKYCList(WithdrawalKYC withdrawalKYC)
@@ -609,6 +629,18 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// Withdrawal/EditWithdrawalKYCList 更新提款KYC資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Withdrawal KYC Control > Edit > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="withdrawalKYC">參數</param>
+        /// <returns>是否成功</returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/WithdrawalKYCControl"})]
         [HttpPost]
         public ApiResult EditWithdrawalKYCList(WithdrawalKYC withdrawalKYC)
@@ -628,6 +660,8 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
+        #endregion
 
         public class WithdrawalLimitPara
         {
@@ -867,12 +901,12 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Finance/WithdrawalTimeReport"})]
-        public IActionResult ExportWithdrawalTime(string SelectSite, string WithdrawalID, long StartDate, long EndDate,
-            int Status, int CurrencyId)
+        public IActionResult ExportWithdrawalTime(string selectSite, string withdrawalId, long startDate, long endDate,
+            int status, int currencyId)
         {
-            var ExportData =
-                withdrawalBLL.WithdrawalTimeExportGet(SelectSite, WithdrawalID, StartDate, EndDate, Status, CurrencyId);
-            var stream = excelBLL.Export(ExportData);
+            var exportData =
+                withdrawalBLL.WithdrawalTimeExportGet(selectSite, withdrawalId, startDate, endDate, status, currencyId);
+            var stream = excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"WithdrawalTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

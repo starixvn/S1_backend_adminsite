@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml;
+﻿using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,13 @@ namespace BackendSite.Service.BLL
         public IEnumerable<Dictionary<string, dynamic>> Content { get; set; }
         public List<string> Titles { get; set; }
 
+    }
+
+    public class File
+    {
+        public byte[] FileContents { get; set; }
+        public string ContentType { get; set; }
+        public string FileName { get; set; }
     }
 
     public class ExcelBLL
@@ -154,5 +162,12 @@ namespace BackendSite.Service.BLL
             }
         }
 
+        public FileContentResult ExcelFile (byte[] data, string fileName)
+        {
+            return new FileContentResult(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            {
+                FileDownloadName = $"{fileName}_{DateTime.Now.ToString("yyyyMMdd")}.xlsx"
+            };
+        }
     }
 }

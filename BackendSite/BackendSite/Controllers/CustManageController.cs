@@ -30,8 +30,10 @@ namespace BackendSite.Controllers
         }
 
         #region Old Code
-        //待前端改接API，此Action則不會用到，需刪除
 
+        // 這隻For現行後台使用，有另一支API For Frontend Team，
+        // 如有調整邏輯，請兩邊同步調整+測試。(api/CustManage/GetCustPhotoId)
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         public IActionResult GetCustPhotoId(int CustId)
         {
@@ -65,6 +67,9 @@ namespace BackendSite.Controllers
             public string SelectStatus { get; set; }
         }
 
+        // 這隻For現行後台使用，有另一支API For Frontend Team，
+        // 如有調整邏輯，請兩邊同步調整+測試。(api/CustManage/ExportCustInfoList)
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         [RequestSizeLimit(40000000)]
         public IActionResult ExportCustInfoList(CustInfoReq custInfoReq)

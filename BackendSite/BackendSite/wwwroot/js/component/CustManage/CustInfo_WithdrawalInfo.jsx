@@ -114,7 +114,7 @@ export class WithdrawalInfo extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        this.props.onChangeValue("WithdrawalInfo", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, Status: parseInt(this.state.WithdrawalStatus) === 0 ? null : parseInt(this.state.WithdrawalStatus), 
+        this.props.onChangeValue("WithdrawalInfo", { StartDate: moment(this.startDate.current.value).unix(), EndDate: moment(this.endDate.current.value).add(1, 'days').unix() - 1, Status: parseInt(this.state.WithdrawalStatus), 
                                 UTCStartDate:moment.utc(this.startDate.current.value).unix(),UTCEndDate:moment.utc(this.endDate.current.value).add(1, 'days').unix()-1});
         this.props.GetWithdrawalListByCust(1);
     }

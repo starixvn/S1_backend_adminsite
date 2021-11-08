@@ -86,24 +86,24 @@ namespace BackendSite.Service.BLL
 
             return vipLevelCache;
         }
-        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency, string bankAccountNumber, IEnumerable<int> selectstatus, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string accountName, string loginIp, string transId, string tpUserName, string email, string phoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency, string bankAccountNumber, IEnumerable<int> selectStatus, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
-            var currncyList = new List<int>();
+            var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new[] { x.SiteId });
+            var currencyList = new List<int>();
             serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x =>
             {
-                currncyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
+                currencyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
 
-            var CustInfoList = custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, selectstatus, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList())).ToList();
-            if (CustInfoList.Count > 0)
+            var custInfoList = custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, transId, tpUserName, email, phoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, selectStatus, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList())).ToList();
+            if (custInfoList.Count > 0)
             {
-                CustInfoList.ForEach(x =>
+                custInfoList.ForEach(x =>
                 {
                     x.ITagList = string.IsNullOrWhiteSpace(x.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(x.TagList);
                 });
             }
-            return CustInfoList;
+            return custInfoList;
         }
 
         public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int? AffId, IEnumerable<int> selectCurrency, string BankAccountNumber, IEnumerable<int> selectStatus)
@@ -247,23 +247,27 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.GetCustBankInfoLogList(custId, siteId);
         }
+        public IEnumerable<CustCryptoWalletLog> GetCustCryptoWalletLogList(int custId, int siteId)
+        {
+            return custInfoService.GetCustCryptoWalletLogList(custId, siteId);
+        }
         public IEnumerable<CustBonus> GetCustBonus(int custId)
         {
             return custInfoService.GetCustBonus(custId);
         }
-        public TeleCSDData GetTeleCSD(string SiteIds, string Currency, long StartDate, long EndDate, int Deposit, int DormantUser, int CallOut, int PageNumber, int PageSize)
+        public TeleCSDData GetTeleCSD(string siteIds, string currency, DateTimeOffset startDate, DateTimeOffset endDate, int deposit, int dormantUser, int callOut, int pageNumber, int pageSize)
         {
-            return custInfoService.GetTeleCSD(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut, PageNumber, PageSize);
+            return custInfoService.GetTeleCSD(siteIds, currency, startDate, endDate, deposit, dormantUser, callOut, pageNumber, pageSize);
         }
 
-        public int UpdateCustomerTele(int siteId, int custId, string Operator)
+        public int UpdateCustomerTele(int siteId, int custId, string @operator)
         {
-            return custInfoService.UpdateCustomerTele(siteId, custId, Operator);
+            return custInfoService.UpdateCustomerTele(siteId, custId, @operator);
         }
 
-        public IEnumerable<CustTeleExport> GetTeleCSDExportData(string SiteIds, string Currency, long StartDate, long EndDate, int Deposit, int DormantUser, int CallOut)
+        public IEnumerable<CustTeleExport> GetTeleCSDExportData(string siteIds, string currency, DateTimeOffset startDate, DateTimeOffset endDate, int deposit, int dormantUser, int callOut)
         {
-            return custInfoService.GetTeleCSDExportData(SiteIds, Currency, StartDate, EndDate, Deposit, DormantUser, CallOut);
+            return custInfoService.GetTeleCSDExportData(siteIds, currency, startDate, endDate, deposit, dormantUser, callOut);
         }
 
         public PromotionListData GetPromotionListByCustIdAndDate(int custId, long StartDate, long EndDate, int PageNumber, int PageSize)
@@ -456,9 +460,9 @@ namespace BackendSite.Service.BLL
         #endregion
 
         #region TagMamagement
-        public int EditTagMamagement(int id, string tagName, string tagColour, string description, string Operator)
+        public int EditTagManagement(int id, string tagName, string tagColour, string description, string @operator)
         {
-            return custInfoService.EditTagMamagement(id, tagName, tagColour, description, Operator);
+            return custInfoService.EditTagManagement(id, tagName, tagColour, description, @operator);
         }
 
         public GetTagDataResult GetTagData(int status, int pageNumber, int pageSize)
@@ -466,9 +470,9 @@ namespace BackendSite.Service.BLL
             return custInfoService.GetTagData(status, pageNumber, pageSize);
         }
 
-        public int SetTagStatus(int Id, string Operator)
+        public int SetTagStatus(int id, string @operator)
         {
-            return custInfoService.SetTagStatus(Id, Operator);
+            return custInfoService.SetTagStatus(id, @operator);
         }
 
         public IEnumerable<TagData> GetAllTag()
@@ -520,14 +524,14 @@ namespace BackendSite.Service.BLL
             return custInfoService.GetAllSiteVipLevelList();
         }
 
-        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency,int depositStatus,int status,string username,int pagenumber,int pagesize,int sort, long StartDate, long EndDate,string AffiliatesCode,int AgentCodeType)
+        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency,int depositStatus,int status,string username,int pageNumber,int pageSize,int sort, DateTimeOffset startDate, DateTimeOffset endDate,string affiliatesCode,int agentCodeType)
         {
-            return custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pagenumber, pagesize, sort, StartDate, EndDate, AffiliatesCode, AgentCodeType);
+            return custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pageNumber, pageSize, sort, startDate, endDate, affiliatesCode, agentCodeType);
         }
 
-        public int SetRegLiveStatus(int custid,int status,int siteid,string Operator)
+        public int SetRegLiveStatus(int custId,int status,int siteId,string @operator)
         {
-            return custInfoService.SetRegLiveStatus(custid, status, siteid, Operator);
+            return custInfoService.SetRegLiveStatus(custId, status, siteId, @operator);
         }
 
         public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
@@ -535,25 +539,25 @@ namespace BackendSite.Service.BLL
             return custInfoService.GetRegLiveStatusNotes(custId);
         }
 
-        public int AddRegLiveStatusNote(int custid,string note, string Operator)
+        public int AddRegLiveStatusNote(int custId,string note, string @operator)
         {
-            return custInfoService.AddRegLiveStatusNote(custid, note, Operator);
+            return custInfoService.AddRegLiveStatusNote(custId, note, @operator);
         }
 
-        public int DeleteRegLiveStatusNote(int custid,int id)
+        public int DeleteRegLiveStatusNote(int custId,int id)
         {
-            return custInfoService.DeleteRegLiveStatusNote(custid, id);
+            return custInfoService.DeleteRegLiveStatusNote(custId, id);
         }
 
-        public int EditRegLiveStatusNote(int custid,int id, string note, string Operator)
+        public int EditRegLiveStatusNote(int custId,int id, string note, string @operator)
         {
-            return custInfoService.EditRegLiveStatusNote(custid, id, note, Operator);
+            return custInfoService.EditRegLiveStatusNote(custId, id, note, @operator);
         }
 
-        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string SelectSite, int Currency, int DepositStatus, int Status, string User, int Sort, long StartDate, long EndDate, string AffiliatesCode, int AgentCodeType)
+        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
         {
             var list = new List<RegLiveStatusExport>();
-            var result =  custInfoService.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate, AffiliatesCode, AgentCodeType);
+            var result =  custInfoService.GetExportRegLiveStatus(siteIds, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType);
             result.ToList().ForEach(x =>
             {
                 list.Add(new RegLiveStatusExport()
@@ -564,7 +568,7 @@ namespace BackendSite.Service.BLL
                     FullName = x.AccountName,
                     PhoneNo = x.PhoneNo,
                     Verify = Enum.GetName(typeof(VerifyType), x.PhoneVerified),
-                    RegTime = x.RegTime.AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture),
+                    RegTime = new DateTimeOffset(x.RegTime.DateTime,TimeSpan.Zero),
                     DepositStatus = Enum.GetName(typeof(DepositStatusType), x.ActStatus),
                     Status = Enum.GetName(typeof(RegLiveStatusType), x.Status),
                     AffCode = x.AffCode,

@@ -2,15 +2,18 @@
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace BackendSite.Controllers.Api
 {
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class ReportController : ControllerBase
@@ -164,6 +167,19 @@ namespace BackendSite.Controllers.Api
 
         #region MainFinancial Report
 
+        /// <summary>
+        /// Report/GetMainFinancialReport 取得金融報表資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Reports >  Main Financial Report > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="request">參數</param>
+        /// <returns>結果</returns>
+        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/MainFinancialReport" })]
         public ApiResult GetMainFinancialReport(GetMainFinancialReportReq request)
         {
@@ -186,6 +202,21 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        /// <summary>
+        /// Report/ExportMainFinancialReport 匯出金融報表資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Reports > Main Financial Report > [Export Excel]
+        /// 
+        /// </remarks>
+        /// <param name="SiteIds"></param>
+        /// <param name="CurrencyIds"></param>
+        /// <param name="StartDate"></param>
+        /// <param name="EndDate"></param>
+        /// <returns>檔案</returns>
         [HttpPost]
         public IActionResult ExportMainFinancialReport(string SiteIds,
                                                        string CurrencyIds,
@@ -511,6 +542,19 @@ namespace BackendSite.Controllers.Api
 
         #region StatisticalReport By Products
 
+        /// <summary>
+        /// Report/GetStatisticalReport 取得統計報表資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Reports > Statistical Report > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="request">參數</param>
+        /// <returns>結果</returns>
+        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/StatisticalReport" })]
         public ApiResult GetStatisticalReport(GetStatisticalReportReq request)
         {
@@ -540,6 +584,20 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        /// <summary>
+        /// Report/ExportStatisticalReport 匯出統計報表資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Reports > Statistical Report > [Export Excel]
+        /// 
+        /// </remarks>
+        /// <param name="SiteIds"></param>
+        /// <param name="TimeZone"></param>
+        /// <param name="EndDate"></param>
+        /// <returns>檔案</returns>
         [HttpPost]
         public IActionResult ExportStatisticalReport(string SiteIds,
                                                      string TimeZone,
@@ -1146,6 +1204,19 @@ namespace BackendSite.Controllers.Api
 
         #region UserOnlineReport
 
+        /// <summary>
+        /// Report/GetUserOnlineReport 取得使用者線上報表資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Reports > User Online Report > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="request">參數</param>
+        /// <returns>結果</returns>
+        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/UserOnlineReport" })]
         public ApiResult GetUserOnlineReport(GetUserOnlineReportReq request)
         {
@@ -1166,6 +1237,19 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        /// <summary>
+        /// Report/ExportUserOnlineReport 匯出使用者線上報表資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Reports > User Online Report > [Export Excel]
+        /// 
+        /// </remarks>
+        /// <param name="SiteIds"></param>
+        /// <param name="SelectDate"></param>
+        /// <returns>檔案</returns>
         [HttpPost]
         public IActionResult ExportUserOnlineReport(string SiteIds,
                                                     string SelectDate)
@@ -1309,6 +1393,19 @@ namespace BackendSite.Controllers.Api
 
         #region Deposit Report
 
+        /// <summary>
+        /// Report/GetDepositReport 取得存款報表資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Reports > Deposit Report > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="request">參數</param>
+        /// <returns>結果</returns>
+        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/DepositReport" })]
         public ApiResult GetDepositReport(GetDepositReportReq request)
         {
@@ -1332,6 +1429,21 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        /// <summary>
+        /// Report/ExportDepositReport 匯出存款報表資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Reports > Deposit Report > [Export Excel]
+        /// 
+        /// </remarks>
+        /// <param name="SiteIds"></param>
+        /// <param name="CurrencyIds"></param>
+        /// <param name="StartDate"></param>
+        /// <param name="EndDate"></param>
+        /// <returns>檔案</returns>
         [HttpPost]
         public IActionResult ExportDepositReport(string SiteIds,
                                                string CurrencyIds,
@@ -1923,6 +2035,19 @@ namespace BackendSite.Controllers.Api
 
         #region StatisticalReport By Customers
 
+        /// <summary>
+        /// Report/GetCustomerStatisticalReport 取得客戶下注紀錄明細
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Reports > Customer Statistical Report > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="request">參數</param>
+        /// <returns>結果</returns>
+        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/CustomerStatisticalReport" })]
         public ApiResult GetCustomerStatisticalReport(GetCustomerStatisticalReportReq request)
         {
@@ -1948,6 +2073,22 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        /// <summary>
+        /// Report/ExportCustomerStatisticalReport 匯出客戶統計報表
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Reports > Customer Statistical Report > [Export Excel]
+        /// 
+        /// </remarks>
+        /// <param name="SiteIds"></param>
+        /// <param name="CurrencyIds"></param>
+        /// <param name="StartDate"></param>
+        /// <param name="EndDate"></param>
+        /// <param name="UserName"></param>
+        /// <returns>檔案</returns>
         [HttpPost]
         public IActionResult ExportCustomerStatisticalReport(string SiteIds,
                                                string CurrencyIds,
@@ -2462,6 +2603,19 @@ namespace BackendSite.Controllers.Api
                         $"CustomerStatisticalReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
+        /// <summary>
+        /// Report/GetCustomerDetail 取得客戶下注紀錄明細
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Reports > Customer Statistical Report > Click [YYYY/MM/DD]
+        /// 
+        /// </remarks>
+        /// <param name="request">參數</param>
+        /// <returns>結果</returns>
+        [HttpPost]
         public ApiResult GetCustomerDetail(GetCustomerDetailReq request)
         {
             var data = _reportBLL.GetCustomerDetail(request.CustId,

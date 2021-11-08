@@ -5,6 +5,7 @@ using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -74,12 +75,11 @@ namespace BackendSite.Controllers.Api
             return apiListResult;
         }
 
-        public class DepositListReq1
+        public class DepositListReq1 : ApiRequestPageModel
         {
-            public int PageNumber { get; set; }
             public int CustId { get; set; }
             public string TransId { get; set; }
-            public int? Status { get; set; }
+            public int Status { get; set; }
             public long startDate { get; set; }
             public long endDate { get; set; }
         }
@@ -102,10 +102,10 @@ namespace BackendSite.Controllers.Api
             decimal totalAmount = 0;
             var data = depositBLL.GetDepositListByCust(depositListReq.CustId,
                                                        depositListReq.TransId,
-                                                       depositListReq.Status,
+                                                       depositListReq.Status == 0 ? (int?)null : depositListReq.Status,
                                                        depositListReq.startDate,
                                                        depositListReq.endDate,
-                                                       10,
+                                                       depositListReq.PageSize,
                                                        ref pageNumber,
                                                        out totalPages,
                                                        out rowCount,

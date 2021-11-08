@@ -168,6 +168,12 @@ namespace BackendSite.Service.Model
         public string IFSCCode { set; get; }
         public string CreateTime { set; get; }
     }
+    public class CustCryptoWalletLog
+    {
+        public string NetWork { set; get; }
+        public string UsdtAddress { set; get; }
+        public string CreateTime { set; get; }
+    }
     public class CustBonus
     {
         public string PromotionCategory { set; get; }
@@ -178,7 +184,7 @@ namespace BackendSite.Service.Model
     {
         public string UserName { get; set; }
         public int ActStatus { get; set; }
-        public string RegTime { get; set; }
+        public DateTimeOffset RegTime { get; set; }
         public int CallOutStatus { get; set; }
         public string AccountName { get; set; }
         public string PhoneNo { get; set; }
@@ -206,7 +212,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public string FullName { get; set; }
         public string DepositStatus { get; set; }
-        public string RegDate { get; set; }    
+        public DateTimeOffset RegDate { get; set; }    
         public string PhoneNumber { get; set; }
         public string FirstTimeCall { get; set; }
         public string SecondTimeCall { get; set; }
@@ -217,7 +223,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public string FullName { get; set; }
         public string DepositStatus { get; set; }
-        public string RegDate { get; set; }
+        public DateTimeOffset RegDate { get; set; }
         public string PhoneNumber { get; set; }
         public int Remark { get; set; }
         public string UpdateAt { get; set; }
@@ -281,9 +287,9 @@ namespace BackendSite.Service.Model
         public string TagColour { get; set; }
         public int Status { get; set; }
         public string Description { get; set; }
-        public string CreateTime { get; set; }
+        // public DateTimeOffset CreateTime { get; set; }
         public string Creator { get; set; }
-        public string UpdateTime { get; set; }
+        public DateTimeOffset UpdateTime { get; set; }
         public string Updator { get; set; }
     }
     public class GetTagDataResult
@@ -294,10 +300,10 @@ namespace BackendSite.Service.Model
         public int RowCount { get; set; }
     }
     public class RegLiveStatus 
-    { 
+    {
         public string UserName { get; set; }
         public int ActStatus { get; set; }
-        public DateTime RegTime { get; set; }
+        public DateTimeOffset RegTime { get; set; }
         public string AccountName { get; set; }
         public int CustId { get; set; }
         public int SiteId { get; set; }
@@ -322,8 +328,8 @@ namespace BackendSite.Service.Model
         public int Id { get; set; }
         public int CustId { get; set; }
         public string Note { get; set; }
-        public DateTime CreateTime { get; set; }
-        public DateTime? UpdateTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
+        public DateTimeOffset UpdateTime { get; set; }
         public string Operator { get; set; }
     }
     public class RegLiveStatusExport
@@ -334,7 +340,7 @@ namespace BackendSite.Service.Model
         public string FullName { get; set; }
         public string PhoneNo { get; set; }
         public string Verify { get; set; }
-        public string RegTime { get; set; }
+        public DateTimeOffset RegTime { get; set; }
         public string DepositStatus { get; set; }
         public string Status { get; set; }
         public string AffCode { get; set; }

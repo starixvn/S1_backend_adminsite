@@ -57,7 +57,7 @@ const App = () => {
       TagColour: editData.TagColour,
     };
     api
-      .post("/api/CustManage/EditTagMamagement", Data)
+      .post("/api/CustManage/EditTagManagement", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           //EditBack();

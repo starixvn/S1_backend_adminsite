@@ -5,8 +5,11 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -14,6 +17,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
+
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
@@ -61,8 +65,17 @@ namespace BackendSite.Controllers.Api
         #region API Model
 
         public class LoginModel
-        {
+        { 
+            /// <summary>
+            /// 使用者帳號
+            /// </summary>
+            [Required]
             public string txtID { set; get; }
+
+            /// <summary>
+            /// 使用者密碼
+            /// </summary>
+            [Required]
             public string txtPW { set; get; }
         }
 
@@ -78,10 +91,24 @@ namespace BackendSite.Controllers.Api
         #region Actions
 
         /// <summary>
-        /// 登入
+        /// Home/Signin 後台登入
         /// </summary>
-        /// <param name="loginModel"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Home > Signin > [Login]
+        /// 
+        /// Sample request:
+        ///
+        ///     {
+        ///        "txtID": "admin",
+        ///        "txtPW": "1q2w3e4r"
+        ///     }
+        ///
+        /// </remarks>
+        /// <param name="loginModel">參數</param>
+        /// <returns>結果</returns>
         [HttpPost]
         [AllowAnonymous]
         public async Task<ApiResult> Signin([FromBody] LoginModel loginModel)
@@ -126,9 +153,16 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// 登入檢查
+        /// Home/CheckSignIn 登入檢查
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Global Func.每次Load首頁時確認是否為已登入狀態。
+        /// 
+        /// </remarks>
+        /// <returns>結果</returns>
         [HttpPost]
         public ApiResult CheckSignIn()
         {
@@ -143,9 +177,16 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// 登出
+        /// Home/Signout 登出
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Home > User > [Logout]
+        /// 
+        /// </remarks>
+        /// <returns>結果</returns>
         [HttpPost]
         public async Task<ApiResult> Signout()
         {
@@ -160,9 +201,16 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// 取得網站清單
+        /// Home/GetSiteList 取得品牌清單
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Global Func.
+        /// 
+        /// </remarks>
+        /// <returns>結果</returns>
         [HttpPost]
         public ApiResult GetSiteList()
         {
@@ -182,6 +230,18 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        /// <summary>
+        /// Home/ChangePwd 使用者密碼變更
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Home > User > Change Password > [Confirm]
+        /// 
+        /// </remarks>
+        /// <param name="changePwd">參數</param>
+        /// <returns>結果</returns>
         [HttpPost]
         public ApiResult ChangePwd([FromBody] ChangePwd changePwd)
         {
@@ -204,8 +264,9 @@ namespace BackendSite.Controllers.Api
             };
         }
 
-        #region Temp,沒再使用
+        #region Temp，沒再使用
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public ApiResult<int> RegisteredCustomers([FromForm] int SiteId, [FromForm] long StartDate, [FromForm] long EndDate)
         {
@@ -225,6 +286,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public ApiResult<int> DepositCustomers([FromForm] int SiteId, [FromForm] long StartDate, [FromForm] long EndDate)
         {
@@ -246,6 +308,18 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        /// <summary>
+        /// Home/GetDashBoardData 取得首頁儀錶板資訊資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Home > Dash Board > [Refresh]
+        /// 
+        /// </remarks>
+        /// <param name="para">參數</param>
+        /// <returns>結果</returns>
         [HttpPost]
         public ApiResult GetDashBoardData(DashBoardPara para)
         {
@@ -262,14 +336,22 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// 取得主選單
+        /// Home/GetMenu 取得主選單
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Home > Signin > [Login] > [GetMenu].
+        /// 確認登入成功後，打此API取得選單資料。
+        /// 
+        /// </remarks>
+        /// <returns>結果</returns>
         [HttpPost]
         public ApiResult GetMenu()
         {
 
-            var data = _menuBLL.GetMenuData();
+            var data = _menuBLL.GetMenuData(false,out var errorCodeEnum);
 
             if (data.Count == 0)
             {

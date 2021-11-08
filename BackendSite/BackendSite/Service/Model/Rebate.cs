@@ -62,4 +62,12 @@ namespace BackendSite.Service.Model
 
     }
 
+    public class AdjustmentInfoLogParam
+    {
+        public string Menu { get; set; }
+        public int ActionType { get; set; }// ActionType 1. insert/update 2. delete
+        public string DetailInfo { get; set; }
+        public string Operator { get; set; }
+    }
+
 }

@@ -1,5 +1,64 @@
-﻿namespace BackendSite.Service.Model.enums
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
+
+namespace BackendSite.Service.Model.enums
 {
+
+    //Enum規範：(待討論)
+    //1.請按照table欄位放置區塊(region)
+    //2.命名大部分請以 [Table欄位名稱] + Enum，ex.Customer.IsKyc => IsKycEnum
+    //3.如欄位名稱重複率很高，命名請以 [Table名稱] + [Table欄位名稱] + Enum，ex.Customer.Status => CustomerStatusEnum
+
+    #region Customer
+
+    public enum IsKycEnum
+    {
+        Unverified = 0,
+        Verified = 1
+    }
+
+    public enum IsRiskEnum
+    {
+        Unverified = 0,
+        Verified = 1
+    }
+
+    #endregion
+
+    #region CustProfile
+
+    public enum PhoneVerifiedEnum
+    {
+        Unverified = 0,
+        Verified = 1
+    }
+
+    public enum EmailVerifiedEnum
+    {
+        Unverified = 0,
+        Verified = 1
+    }
+
+    #endregion
+
+    public enum DataBase
+    {
+        Main, //ConnectionString
+        Report,//ConnectionStringReport
+        Wager,//ConnectionStringWager
+        Log,//ConnectionStringLog
+    }
+    
+    #region Tag
+
+    public enum TagStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    #endregion
+
     public enum Direction
     {
         Add = 1,
@@ -31,9 +90,7 @@
         LocalBank = 2,
         CryptoPay = 4
     }
-    /// <summary>
-    /// 
-    /// </summary>
+
     public enum DepositStatus
     {
         Draft = 0,
@@ -223,21 +280,25 @@
     /// <summary>
     /// 交易型態 列舉
     /// </summary>
+    [Description("交易型態 列舉")]
     public enum TransactionTypeEnum
     {
         /// <summary>
         /// 只有加項
         /// </summary>
+        [Description("只有加項")]
         OnlyPlus = 1,
 
         /// <summary>
         /// 只有減項
         /// </summary>
+        [Description("只有減項")]
         OnlyMinus = 2,
 
         /// <summary>
         /// 一加一減
         /// </summary>
+        [Description("一加一減")]
         PlusAndMinus = 3
     }
 
@@ -297,13 +358,13 @@
     }
     public enum RegLiveStatusType
     {
-        Pending=1,
+        Pending = 1,
         Done = 2,
         Invalid = 3
     }
-    public enum ErrorCodeType 
-    { 
-        Success=0
+    public enum ErrorCodeType
+    {
+        Success = 0
     }
 
     public enum TpCategory
@@ -340,5 +401,14 @@
     {
         ERC20 = 1,
         TRC20 = 2
+    }
+    
+    public enum SendMessageStatus
+    {
+        Pending = 0, 
+        Approved = 1,
+        Processing = 2,
+        Success = 3,
+        Failed = 4
     }
 }

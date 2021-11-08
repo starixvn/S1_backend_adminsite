@@ -297,21 +297,18 @@ namespace BackendSite.Service.DAL
         /// <returns></returns>
         public PromotionInfo GetPromotionFlow(string bonusCode, int siteId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            conn.Open();
-            using var trans = conn.BeginTransaction();
-
-            var promotion = GetPromotion(bonusCode, siteId, conn, trans);
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            var promotion = GetPromotion(bonusCode, siteId, conn);
 
             if (promotion != null)
             {
-                promotion.PromotionDisplayCondition = GetPromotionDisplayCondition(bonusCode, siteId, conn, trans);
-                promotion.Specific = GetPromotionSpecific(bonusCode, siteId, conn, trans);
+                promotion.PromotionDisplayCondition = GetPromotionDisplayCondition(bonusCode, siteId, conn);
+                promotion.Specific = GetPromotionSpecific(bonusCode, siteId, conn);
 
                 if (promotion.Specific != null)
                 {
-                    var rebateList = GetPromotionRebate(bonusCode, siteId, conn, trans);
-                    var cashBackList = GetPromotionCashBack(bonusCode, siteId, conn, trans);
+                    var rebateList = GetPromotionRebate(bonusCode, siteId, conn);
+                    var cashBackList = GetPromotionCashBack(bonusCode, siteId, conn);
                     var tempcashBackList = cashBackList.GroupBy(x => new { x.CurrencyId, x.GameType, x.LossAmount, x.Percentage, x.Status,x.TpId }).Select(x=> new PromotionCashBack1 
                     { 
                         CurrencyId = x.Key.CurrencyId,
@@ -346,9 +343,6 @@ namespace BackendSite.Service.DAL
 
                 }
             }
-
-            trans.Commit();
-
             return promotion;
         }
 
@@ -623,7 +617,7 @@ namespace BackendSite.Service.DAL
                 {
                     foreach (var r in s.CashBackList)
                     {
-                        var tempCategoryId = promotion.TpId == 0 ? cashBackGameList.Where(x => x.TpId == r.GameType).FirstOrDefault().CategoryId : r.GameType;
+                        var tempCategoryId = promotion.TpId == 0 ? cashBackGameList.FirstOrDefault(x => x.TpId == r.GameType).CategoryId : r.GameType;
                         vipLevelCondition.SelectedVipLevel.ToList().ForEach(x =>
                         {
                             cashBackList.Add(new PromotionCashBackSetting

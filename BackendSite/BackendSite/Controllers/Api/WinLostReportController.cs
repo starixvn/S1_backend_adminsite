@@ -46,6 +46,7 @@ namespace BackendSite.Controllers.Api
 
         #region Action
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "LicWinLost/Report" })]
         public ApiResult GetWinLostReport(GetWinLostReportReq request)
         {
@@ -68,6 +69,7 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public IActionResult ExportReport(string StartDate,
                                           string EndDate,

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -14,14 +15,17 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class RiskController : Controller
+    public class RiskController : ControllerBase
     {
         private readonly RiskBLL _riskBll;
         private readonly GameCasinoBLL _gameCasinoBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ILogger<RiskController> _logger;
 
-        public RiskController(RiskBLL riskBll, GameCasinoBLL gameCasinoBll, CustInfoBLL custInfoBll, ILogger<RiskController> logger)
+        public RiskController(RiskBLL riskBll, 
+            GameCasinoBLL gameCasinoBll, 
+            CustInfoBLL custInfoBll, 
+            ILogger<RiskController> logger)
         {
             _riskBll = riskBll;
             _gameCasinoBll = gameCasinoBll;
@@ -29,6 +33,19 @@ namespace BackendSite.Controllers.Api
             _logger = logger;
         }
 
+        /// <summary>
+        /// Risk/GetTpDisableUser 取得第三方被禁止的用戶資料清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Disable User For Game > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
         public ApiListResult<TpDisableUser> GetTpDisableUser([FromForm] QueryTpDsiableUser query)
         {
@@ -37,8 +54,14 @@ namespace BackendSite.Controllers.Api
             var pageNumber = query.PageNumber;
             try
             {
-                apiResult.Data = _riskBll.GetTpDisableUser(query.SiteIds, query.UserName, query.StartDate, query.EndDate, 
-                                                           query.PageSize, query.PageNumber, out var totalPages, out var rowCount);
+                apiResult.Data = _riskBll.GetTpDisableUser(query.SiteIds,
+                    query.UserName,
+                    query.StartDate,
+                    query.EndDate, 
+                    query.PageSize,
+                    query.PageNumber,
+                    out var totalPages,
+                    out var rowCount);
                 apiResult.TotalPages = totalPages;
                 apiResult.PageNumber = pageNumber;
                 apiResult.RowCount = rowCount;
@@ -54,6 +77,19 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// Risk/GetTpDisableUserByCustId 取得指定第三方被禁止的會員資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Disable User For Game > [Submit] > Click[Edit]
+        /// 
+        /// </remarks>
+        /// <param name="custId"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpGet]
         [Route("{custId:int}")]
         public async Task<ApiResult<TpDisableUserForGameDetail>> GetTpDisableUserByCustId(int custId)
@@ -105,6 +141,19 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// Risk/TpDisableUserForGame 更新會員第三方被禁止的資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Disable User For Game > [Submit] > Click[Edit] > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="disableGames"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
         public async Task<ApiResult> TpDisableUserForGame([FromForm] DisableUser disableGames)
         {
@@ -139,6 +188,19 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        /// <summary>
+        /// Risk/UpdateStatus 更新會員第三方被禁止的資料狀態
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Disable User For Game > [Submit] >Change[Status]
+        /// 
+        /// </remarks>
+        /// <param name="disable"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
         public async Task<ApiResult> UpdateStatus([FromForm] DisableDisableUser disable)
         {
@@ -161,7 +223,20 @@ namespace BackendSite.Controllers.Api
                 };
             }
         }
-        
+
+        /// <summary>
+        /// Risk/Delete 刪除會員第三方被禁止的資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Disable User For Game > [Submit] >Click [Delete]
+        /// 
+        /// </remarks>
+        /// <param name="custId"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
         public async Task<ApiResult> Delete([FromForm] int custId)
         {
@@ -184,6 +259,18 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        /// <summary>
+        /// Risk/GetTpList 取得Slot第三方品牌
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Disable User For Game > [Submit] > Click[Edit] > Show Slot Tp List
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpGet]
         public async Task<ApiResult<IEnumerable<RiskTpListInfo>>> GetTpList()
         {
@@ -206,6 +293,19 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// Risk/GameCasinoByTpIdV3 取得Slot第三方品牌的遊戲
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Disable User For Game > [Submit] > Click[Edit] > Slot Tp List > Check [Tp]
+        /// 
+        /// </remarks>
+        /// <param name="tpId"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpGet]
         [Route("{tpId:int}")]
         public async Task<ApiResult<IEnumerable<RiskGameCasinoData>>> GameCasinoByTpIdV3(int tpId)
