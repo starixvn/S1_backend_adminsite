@@ -1342,7 +1342,7 @@ namespace BackendSite.Controllers.Api
             {
                 foreach (var list in SearchResult.CustTeleList)
                 {
-                    list.RegTime = list.RegTime.ToOffset(new TimeSpan(8, 0, 0)).AddHours(8);
+                    list.RegTime = new DateTimeOffset(list.RegTime.DateTime,new TimeSpan(8,0,0)).AddHours(8);
 
                     if (list.UpdateAt != null)
                     {
@@ -1446,7 +1446,7 @@ namespace BackendSite.Controllers.Api
 
             foreach (var data in exportData)
             {
-                data.RegDate = data.RegDate.ToOffset(new TimeSpan(8, 0, 0)).AddHours(8);
+                data.RegDate = new DateTimeOffset(data.RegDate.DateTime,new TimeSpan(8,0,0)).AddHours(8);
                 if(data.FirstTimeCall != string.Empty)
                     data.FirstTimeCall = $"{DateTime.Parse(data.FirstTimeCall.Substring(0,19)).AddHours(8):yyyy-MM-dd HH:mm:ss}-{data.FirstTimeCall.Substring(20,data.FirstTimeCall.Length-20)}";
                 if(data.SecondTimeCall != string.Empty)
@@ -1554,7 +1554,7 @@ namespace BackendSite.Controllers.Api
                 var searchResult = custInfoBLL.GetTagData(para.Status, para.PageNumber, para.PageSize);
                 foreach (var tagData in searchResult.TagDatas)
                 {
-                    tagData.UpdateTime = tagData.UpdateTime.ToOffset(new TimeSpan(8, 0, 0)).AddHours(8);
+                    tagData.UpdateTime = new DateTimeOffset(tagData.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 }
                 apiResult.Data = searchResult.TagDatas;
                 apiResult.PageNumber = searchResult.PageNumber;
@@ -1892,7 +1892,7 @@ namespace BackendSite.Controllers.Api
             var exportData = custInfoBLL.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, startTime, endTime, AffiliatesCode, AgentCodeType);
             foreach (var data in exportData)
             {
-                data.RegTime = data.RegTime.ToOffset(new TimeSpan(8, 0, 0));
+                data.RegTime = new DateTimeOffset(data.RegTime.DateTime, new TimeSpan(8, 0, 0));
             }
             var stream = excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Registration_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
