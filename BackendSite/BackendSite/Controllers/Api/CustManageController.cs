@@ -1656,7 +1656,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult EditTagManagement(EditTagManagementpara para)
         {
-            if (custInfoBLL.EditTagMamagement(para.Id, para.TagName, para.TagColour, para.Description, User.Identity.Name) > 0)
+            if (custInfoBLL.EditTagManagement(para.Id, para.TagName, para.TagColour, para.Description, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -1689,11 +1689,15 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<TagData>();
             try
             {
-                var SearchResult = custInfoBLL.GetTagData(para.Status, para.PageNumber, para.PageSize);
-                apiResult.Data = SearchResult.TagDatas;
-                apiResult.PageNumber = SearchResult.PageNumber;
-                apiResult.TotalPages = SearchResult.TotalPages;
-                apiResult.RowCount = SearchResult.RowCount;
+                var searchResult = custInfoBLL.GetTagData(para.Status, para.PageNumber, para.PageSize);
+                foreach (var tagData in searchResult.TagDatas)
+                {
+                    tagData.UpdateTime = tagData.UpdateTime.ToOffset(new TimeSpan(8, 0, 0)).AddHours(8);
+                }
+                apiResult.Data = searchResult.TagDatas;
+                apiResult.PageNumber = searchResult.PageNumber;
+                apiResult.TotalPages = searchResult.TotalPages;
+                apiResult.RowCount = searchResult.RowCount;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -1861,9 +1865,11 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<RegLiveStatus>();
             try
             {
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(custInfoReq.StartDate);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(custInfoReq.EndDate);
                 var SearchResult = custInfoBLL.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status
-                , custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort, custInfoReq.StartDate, custInfoReq.EndDate, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
-
+                , custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort, startTime, endTime, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
+                
                 apiResult.Data = SearchResult.RegLiveStatusDatas;
                 apiResult.PageNumber = SearchResult.PageNumber;
                 apiResult.TotalPages = SearchResult.TotalPages;
@@ -2054,8 +2060,14 @@ namespace BackendSite.Controllers.Api
             string AffiliatesCode, 
             int AgentCodeType)
         {
-            var ExportData = custInfoBLL.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, StartDate, EndDate, AffiliatesCode, AgentCodeType);
-            var stream = excelBLL.Export(ExportData);
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+            var exportData = custInfoBLL.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, startTime, endTime, AffiliatesCode, AgentCodeType);
+            foreach (var data in exportData)
+            {
+                data.RegTime = data.RegTime.ToOffset(new TimeSpan(8, 0, 0));
+            }
+            var stream = excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Registration_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
