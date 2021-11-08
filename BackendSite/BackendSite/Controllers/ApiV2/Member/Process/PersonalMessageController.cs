@@ -7,12 +7,14 @@ using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using OfficeOpenXml;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
@@ -46,44 +48,44 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         #endregion
-        
+
         #region Model
-        
+
         public class ExportMessageBatchReq
         {
             public int BatchId { get; set; }
         }
         public class DeleteBatchMessageReq
         {
-            private DateTimeOffset _startDate { get;set;}
-            private DateTimeOffset _endDate { get;set;}
-            public IEnumerable<int> SelectSite { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
             public int BatchId { get; set; }
-            public int PageNumber { get; set; }
         }
         public class UpdateBatchMessageReq
         {
             public int BatchId { get; set; }
-            public string PersonalMsg { get; set; }
+            public List<LanguageDataModel> LanguageDatas { get; set; }
         }
+
+        public class LanguageDataModel
+        {
+            public string Lang { get; set; }
+            public MessageModel Message { get; set; }
+        }
+
+        public class MessageModel
+        {
+            public string Title { get; set; }
+            public string Content { get; set; }
+        }
+
         public class GetBatchMessageReq
         {
             public int BatchId { get; set; }
         }
-        public class GetBatchMessageListReq
+
+        public class GetBatchMessageListReq : ApiRequestPageModel
         {
-            private DateTimeOffset _startDate { get;set;}
-            private DateTimeOffset _endDate { get;set;}
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SelectSite { get; set; }
             public DateTimeOffset StartDate
             {
@@ -95,18 +97,19 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
-            public int PageNumber { get; set; }
         }
-        
+
         #endregion
-        
-        #region CSD > Personal Message Batch
+
+        #region Action
 
         /// <summary>
         /// Message/SendMessageBatch 發送批次訊息
         /// </summary>
         /// <remarks>
         /// Http Method：POST
+        /// 
+        /// Content-Type：Form-Data
         /// 
         /// Func Path：CSD > Personal Message Batch > Add New > [Submit]
         /// </remarks>
@@ -146,7 +149,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                         var sabaId = sheet.Cells[rowId, 2].Text.Trim();
                         var custId = (string.IsNullOrEmpty(sabaId)) ? null : _common.TpIdToCustId(sabaId);
                         var resultMessage = string.Empty;
-                        var errorCode = (int) SendMessageStatus.Failed;
+                        var errorCode = (int)SendMessageStatus.Failed;
 
                         if (string.IsNullOrEmpty(custUsername) && custId == null)
                         {
@@ -164,8 +167,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                             {
                                 switch (custInfosDetail.Status)
                                 {
-                                    case (int) CustStatus.Running:
-                                    case (int) CustStatus.Lock:
+                                    case (int)CustStatus.Running:
+                                    case (int)CustStatus.Lock:
                                         SendBatchMessage(personalMsg,
                                             custInfosDetail.CustId,
                                             optSite,
@@ -173,17 +176,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                             batchId,
                                             custUsername,
                                             sabaId,
-                                            (CustStatus) custInfosDetail.Status,
+                                            (CustStatus)custInfosDetail.Status,
                                             out errorCode,
                                             out resultMessage);
                                         break;
 
-                                    case (int) CustStatus.Suspend:
+                                    case (int)CustStatus.Suspend:
                                         resultMessage =
                                             $"Fail. CustId={custId}. Username={custUsername}. SabaId={sabaId}. Status={CustStatus.Suspend.GetDescription()}";
                                         break;
 
-                                    case (int) CustStatus.Closed:
+                                    case (int)CustStatus.Closed:
                                         resultMessage =
                                             $"Fail. CustId={custId}. Username={custUsername}. SabaId={sabaId}. Status={CustStatus.Closed.GetDescription()}";
                                         break;
@@ -213,16 +216,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     };
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 return new ApiResult<int>()
                 {
-                    ErrorCode = (int) ErrorMessageCodeEnum.SystemException,
+                    ErrorCode = (int)ErrorMessageCodeEnum.SystemException,
                     Message = "Unknown Error"
                 };
             }
-            
+
             return new ApiResult<int>()
             {
                 Data = batchId,
@@ -247,9 +250,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var data = _messageBll.GetBatchMessageSendLog(req.BatchId);
             var stream = _excelBll.Export(data);
 
-            return File(stream,
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        $"SendMessageBatchResult_{req.BatchId}_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBll.ExcelFile(stream, "SendMessageBatchResult");
         }
 
         /// <summary>
@@ -264,29 +265,21 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiListResult<BatchMsg> DeleteBatchMessage(DeleteBatchMessageReq req)
+        public ApiResult DeleteBatchMessage(DeleteBatchMessageReq req)
         {
-            const int pageSize = 10;
-            var totalPages = 0;
-            var rowCount = 0;
-            var apiResult = new ApiListResult<BatchMsg>();
-            try
+            if (!_messageBll.DeleteBatchMessage(req.BatchId))
             {
-                var pageNumber = req.PageNumber;
-                _messageBll.DeleteBatchMessage(req.BatchId);
-                apiResult.Data = _messageBll.GetBatchMessageList(req.SelectSite, req.StartDate, req.EndDate, pageSize, ref pageNumber, ref totalPages, ref rowCount);
-                apiResult.PageNumber = pageNumber;
-                apiResult.RowCount = rowCount;
-                apiResult.TotalPages = totalPages;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.RawMessage = ex.ToString();
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Delete fail."
+                };
             }
 
-            return apiResult;
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
@@ -302,19 +295,35 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiResult UpdateBatchMessage(UpdateBatchMessageReq req)
         {
-            var result = new ApiResult();
-            try
+            var message = new Dictionary<string, MessageModel>();
+
+            foreach (var item in req.LanguageDatas)
             {
-                if (_messageBll.UpdateBatchMessage(req.BatchId, req.PersonalMsg))
-                    result.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                result.RawMessage = ex.ToString();
-                result.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                if (!message.ContainsKey(item.Lang))
+                {
+                    message.Add(item.Lang, item.Message);
+                }
+                else
+                {
+                    throw new AdminException(ErrorCodeEnum.DuplicateData);
+                }
             }
 
-            return result;
+            var messageString = JsonConvert.SerializeObject(message);
+
+            if (!_messageBll.UpdateBatchMessage(req.BatchId, messageString))
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Update Fail."
+                };
+            }
+
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
@@ -330,18 +339,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiResult<BatchMsg> GetBatchMessage(GetBatchMessageReq req)
         {
-            var result = new ApiResult<BatchMsg>();
-            try
+            var data = _messageBll.GetBatchMessage(req.BatchId);
+
+            if (data == null)
             {
-                result.Data = _messageBll.GetBatchMessage(req.BatchId);
-                result.ErrorCode = (int)ErrorCodeEnum.Success;
+                throw new AdminException(ErrorCodeEnum.NoData);
             }
-            catch (Exception ex)
+
+            return new ApiResult<BatchMsg>
             {
-                result.RawMessage = ex.ToString();
-                result.ErrorCode = (int)ErrorCodeEnum.SystemException;
-            }
-            return result;
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
@@ -357,30 +366,29 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiListResult<BatchMsg> GetBatchMessageList(GetBatchMessageListReq req)
         {
-            const int pageSize = 10;
             var totalPages = 0;
             var rowCount = 0;
             var apiResult = new ApiListResult<BatchMsg>();
             try
             {
                 var pageNumber = req.PageNumber;
-                apiResult.Data = _messageBll.GetBatchMessageList(req.SelectSite, req.StartDate, req.EndDate, pageSize, ref pageNumber, ref totalPages, ref rowCount);
+                apiResult.Data = _messageBll.GetBatchMessageList(req.SelectSite, req.StartDate, req.EndDate, req.PageSize, ref pageNumber, ref totalPages, ref rowCount);
                 apiResult.PageNumber = pageNumber;
                 apiResult.RowCount = rowCount;
                 apiResult.TotalPages = totalPages;
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
             }
             catch (Exception ex)
             {
                 apiResult.RawMessage = ex.ToString();
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
             }
-        
+
             return apiResult;
         }
 
         #endregion
-        
+
         #region Private Methods
 
         private void SendBatchMessage(string personalMsg,
@@ -410,7 +418,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,MethodExtension.GetCurrentMethod());
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 resultMessage = ex.ToString();
                 errorCode = (int)SendMessageStatus.Failed;
             }

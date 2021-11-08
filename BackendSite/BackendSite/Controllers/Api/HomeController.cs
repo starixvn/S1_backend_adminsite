@@ -351,7 +351,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult GetMenu()
         {
 
-            var data = _menuBLL.GetMenuData();
+            var data = _menuBLL.GetMenuData(false,out var errorCodeEnum);
 
             if (data.Count == 0)
             {
