@@ -86,6 +86,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiListResult<Announcement> GetAnnouncement(GetAnnouncementreq para)
         {
             var PageSize = 10;
@@ -148,6 +149,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult<Announcement> GetAnnouncementById([FromForm] int Id)
         {
             var apiResult = new ApiResult<Announcement>();
@@ -182,6 +184,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult AddAnnouncement([FromForm] Announcement Datas, [FromForm] long _StartTime, [FromForm] long _EndTime)
         {
             var apiResult = new ApiResult<dynamic>();
@@ -229,6 +232,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult UpdateAnnouncement([FromForm] Announcement Datas, [FromForm] long _StartTime, [FromForm] long _EndTime)
         {
             var apiResult = new ApiResult<dynamic>();
@@ -274,6 +278,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult DeleteAnnouncement([FromForm] int Id)
         {
             var apiResult = new ApiResult<Announcement>();
@@ -473,6 +478,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult<int> SendMessageBatch([FromForm] int optSite,
             [FromForm] IFormFile excelUpload,
             [FromForm] string personalMsg)
@@ -608,6 +614,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult ExportSendMessageBatchResultReport(int BatchId)
         {
             var data = messageBLL.GetBatchMessageSendLog(BatchId);
@@ -636,6 +643,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiListResult<BatchMsg> DeleteBatchMessage([FromForm] IEnumerable<int> SelectSite, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int batchId, [FromForm] int PageNumber)
         {
             var PageSize = 10;
@@ -679,6 +687,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult UpdateBatchMessage([FromForm] int batchId, [FromForm] string personalMsg)
         {
             var result = new ApiResult();
@@ -710,6 +719,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult<BatchMsg> GetBatchMessage([FromForm] int batchId)
         {
             var result = new ApiResult<BatchMsg>();
@@ -743,6 +753,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiListResult<BatchMsg> GetBatchMessageList([FromForm] IEnumerable<int> SelectSite, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)
         {
             var PageSize = 10;

@@ -3,6 +3,7 @@ using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,11 +33,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
 
         #region Model
         
-        public class GetTagDataReq
+        public class GetTagDataReq : ApiRequestPageModel
         {
             public int Status { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
         }
         public class EditTagManagementReq
         {
@@ -49,13 +48,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         {
             public int Id { get; set; }
         }
-        
+
         #endregion
 
         #region CSD > TagMamagement
 
         /// <summary>
-        /// CustManage/GetTagData 取得標籤資料
+        /// TagManagement/GetTagData 取得標籤資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -91,7 +90,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// CustManage/EditTagMamagement 更新標籤資料
+        /// TagManagement/EditTagMamagement 更新標籤資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -114,9 +113,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
 
             throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
         }
-        
+
         /// <summary>
-        /// CustManage/SetTagStatus 更新標籤狀態
+        /// TagManagement/SetTagStatus 更新標籤狀態
         /// </summary>
         /// <remarks>
         /// Http Method：POST
