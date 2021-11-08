@@ -351,5 +351,23 @@ namespace BackendSite.Service.DAL
 
             return _mainDbClient.Execute("Admin_AdjustmentLimitInfo_Set", props);
         }
+        public CheckBalanceAdjustData CheckBalanceAdjustBonusCode(string BonusCode, int PromotionType, int SiteId,int CurrencyId)
+        {
+            var props = new DynamicParameters();
+            props.Add("BonusCode", BonusCode);
+            props.Add("SiteId", SiteId);
+            props.Add("PromotionType", PromotionType);
+            props.Add("CurrencyId", CurrencyId);
+            return _reportDbClient.Query<CheckBalanceAdjustData>("Admin_CheckBalanceAdjust_Get", props).FirstOrDefault();
+        }
+        public IEnumerable<CheckBalanceAdjustData> CheckBalanceAdjustBonusCodeBatch(string BonusCode, int PromotionType, int SiteId)
+        {
+            var props = new DynamicParameters();
+            props.Add("BonusCode", BonusCode);
+            props.Add("SiteId", SiteId);
+            props.Add("PromotionType", PromotionType);
+            props.Add("CurrencyId", 0);
+            return _reportDbClient.Query<CheckBalanceAdjustData>("Admin_CheckBalanceAdjust_Get", props);
+        }
     }
 }
