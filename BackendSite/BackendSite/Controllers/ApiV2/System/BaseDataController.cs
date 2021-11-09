@@ -22,12 +22,14 @@ namespace BackendSite.Controllers.ApiV2.System
 
         private readonly BankDetailBLL _bankDetailBll;
         private readonly UserBetLimitBLL _userBetLimitBll;
+        private readonly GameCasinoBLL _gameCasinoBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
         public BaseDataController(IServiceProvider provider)
         {
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _userBetLimitBll = provider.GetRequiredService<UserBetLimitBLL>();
+            _gameCasinoBll = provider.GetRequiredService<GameCasinoBLL>();
         }
 
         #region Model
@@ -90,6 +92,12 @@ namespace BackendSite.Controllers.ApiV2.System
         {
             public int CategoryId { get; set; }
         }
+        
+        public class GameCasinoByTpIdV3Req
+        {
+            public int TpId { get; set; }
+        }
+        
 
         #endregion
 
@@ -202,6 +210,35 @@ namespace BackendSite.Controllers.ApiV2.System
                 Data = data,
                 ErrorCode = (int)ErrorCodeEnum.Success,
             };
+            return apiResult;
+        }
+
+        /// <summary>
+        /// BaseData/GameCasinoByTpIdV3 取得Slot第三方品牌的遊戲
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path： Slot Tp List 
+        /// </remarks>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<RiskGameCasinoData>>> GameCasinoByTpIdV3(GameCasinoByTpIdV3Req req)
+        {
+            var apiResult = new ApiResult<IEnumerable<RiskGameCasinoData>>();
+            try
+            {
+                var gameCasinoData = await _gameCasinoBll.GameCasinoByTPIdV3(req.TpId);
+                apiResult.Data = gameCasinoData;
+                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
             return apiResult;
         }
         
