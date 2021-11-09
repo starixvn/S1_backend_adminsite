@@ -18,7 +18,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class RiskV2Controller : ControllerBase
+    public class TpDisableController : ControllerBase
     {
         #region Fields
         
@@ -31,7 +31,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         
         #region Constructor
         
-        public RiskV2Controller(IServiceProvider provider)
+        public TpDisableController(IServiceProvider provider)
         {
             _riskBll = provider.GetRequiredService<RiskBLL>();
             _gameCasinoBll = provider.GetRequiredService<GameCasinoBLL>();
@@ -74,7 +74,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         #endregion
         
         /// <summary>
-        /// RiskV2/GetTpDisableUser 取得第三方被禁止的用戶資料清單
+        /// TpDisable/GetTpDisableUser 取得第三方被禁止的用戶資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -116,7 +116,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// RiskV2/GetTpDisableUserByCustId 取得指定第三方被禁止的會員資料
+        /// TpDisable/GetTpDisableUserByCustId 取得指定第三方被禁止的會員資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -176,7 +176,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// RiskV2/TpDisableUserForGame 更新會員第三方被禁止的資料
+        /// TpDisable/TpDisableUserForGame 更新會員第三方被禁止的資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -220,7 +220,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// RiskV2/UpdateStatus 更新會員第三方被禁止的資料狀態
+        /// TpDisable/UpdateStatus 更新會員第三方被禁止的資料狀態
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -253,7 +253,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// RiskV2/Delete 刪除會員第三方被禁止的資料
+        /// TpDisable/Delete 刪除會員第三方被禁止的資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST

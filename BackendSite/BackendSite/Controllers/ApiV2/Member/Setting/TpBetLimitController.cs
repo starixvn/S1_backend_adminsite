@@ -13,7 +13,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class UserBetLimitV2Controller : ControllerBase
+    public class TpBetLimitController : ControllerBase
     {
         #region Fields
         
@@ -24,7 +24,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
 
         #region Constructor
         
-        public UserBetLimitV2Controller(IServiceProvider provider)
+        public TpBetLimitController(IServiceProvider provider)
         {
             _userBetLimitBll = provider.GetRequiredService<UserBetLimitBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
@@ -61,7 +61,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         #endregion
         
         /// <summary>
-        /// UserBetLimit/Get 取得會員下注限額資料清單
+        /// TpBetLimit/Get 取得會員下注限額資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -93,7 +93,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// UserBetLimit/GetByCustId 取得指定會員下注限額資料
+        /// TpBetLimit/GetByCustId 取得指定會員下注限額資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -113,7 +113,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// UserBetLimit/PostUserBetLimit 更新指定會員下注限額資料
+        /// TpBetLimit/PostUserBetLimit 更新指定會員下注限額資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -141,7 +141,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// UserBetLimit/UpdateStatus 更新指定會員下注限額資料狀態
+        /// TpBetLimit/UpdateStatus 更新指定會員下注限額資料狀態
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -161,7 +161,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// UserBetLimit/Delete 刪除指定會員下注限額資料
+        /// TpBetLimit/Delete 刪除指定會員下注限額資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
