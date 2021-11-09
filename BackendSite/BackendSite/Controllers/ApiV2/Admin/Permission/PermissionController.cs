@@ -211,7 +211,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// </remarks>
         /// <returns>結果</returns>
         [HttpPost]
-        public ApiResult<IEnumerable<ServerInfo>> AdminUserSiteList()
+        public ApiResult<IEnumerable<ServerInfo>> GetUserSiteList()
         {
             var apiResult = new ApiResult<IEnumerable<ServerInfo>>();
             try
