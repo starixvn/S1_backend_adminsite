@@ -145,10 +145,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/TransferAccountManage/index.jsx",
     // ],
-    // "Marketing/VipRebateInfoReport.min": [
-    // 	 '@babel/polyfill',
-    // 	"./src/pages/Marketing/VipRebateInfoReport/index.js"
-    // ],
+    "Marketing/VipRebateInfoReport.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/VipRebateInfoReport/index.js",
+    ],
     // "Marketing/VipRebateMangetment.min": [
     //   '@babel/polyfill',
     //   "./src/pages/Marketing/VipRebateMangetment/index.jsx"
@@ -243,7 +243,7 @@ module.exports = {
     //   "./src/pages/CSD/UserBetLimit/index.js"
     // ],
     "Finance/USDTWithdrawalLimitManagement.min": [
-    	"./src/pages/Finance/USDTWithdrawalLimitManagement/index.js"
+      "./src/pages/Finance/USDTWithdrawalLimitManagement/index.js",
     ],
   },
   output: {
