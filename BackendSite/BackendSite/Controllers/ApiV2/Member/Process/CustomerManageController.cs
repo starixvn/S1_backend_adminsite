@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -709,65 +707,65 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="CustId"></param>
         /// <param name="File"></param>
         /// <returns></returns>
-        [HttpPost]
-        public ApiResult UploadCustPhotoId([FromForm] int CustId, [FromForm] IFormFile File)
-        {
-            var xSize = 500m;
-            var custInfo = _custInfoBll.GetCustInfoWithCache(CustId);
-            decimal xCell = 1;
-            if (_contentTypesCheck.ContainsKey(File.ContentType))
-            {
-                using var fileStream = File.OpenReadStream();
-                using var uploadedImage = Image.FromStream(fileStream);
-                using var ms = new MemoryStream();
+        //[HttpPost]
+        //public ApiResult UploadCustPhotoId([FromForm] int CustId, [FromForm] IFormFile File)
+        //{
+        //    var xSize = 500m;
+        //    var custInfo = _custInfoBll.GetCustInfoWithCache(CustId);
+        //    decimal xCell = 1;
+        //    if (_contentTypesCheck.ContainsKey(File.ContentType))
+        //    {
+        //        using var fileStream = File.OpenReadStream();
+        //        using var uploadedImage = Image.FromStream(fileStream);
+        //        using var ms = new MemoryStream();
 
-                if (uploadedImage.Width > xSize || uploadedImage.Height > xSize)
-                {
+        //        if (uploadedImage.Width > xSize || uploadedImage.Height > xSize)
+        //        {
 
-                    if (uploadedImage.Width > uploadedImage.Height)
-                    {
-                        xCell = xSize / uploadedImage.Width;
-                    }
-                    else
-                    {
-                        xCell = xSize / uploadedImage.Height;
-                    }
+        //            if (uploadedImage.Width > uploadedImage.Height)
+        //            {
+        //                xCell = xSize / uploadedImage.Width;
+        //            }
+        //            else
+        //            {
+        //                xCell = xSize / uploadedImage.Height;
+        //            }
 
-                }
+        //        }
 
-                var graphicOptions = new GraphicOptions
-                {
-                    CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed,
-                    SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed
-                };
-                var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
-                img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+        //        var graphicOptions = new GraphicOptions
+        //        {
+        //            CompositingQuality = Drawing2D.CompositingQuality.HighSpeed,
+        //            SmoothingMode = Drawing2D.SmoothingMode.HighSpeed
+        //        };
+        //        var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
+        //        img.Save(ms, Imaging.ImageFormat.Jpeg);
 
-                var fileName = File.FileName;
-                fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
-                fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
+        //        var fileName = File.FileName;
+        //        fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
+        //        fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
 
-                var fileBytes = ms.ToArray();
-                var result = _custInfoBll.SetCustPhotoId(custInfo.CustId, custInfo.SiteId, fileName, fileBytes);
+        //        var fileBytes = ms.ToArray();
+        //        var result = _custInfoBll.SetCustPhotoId(custInfo.CustId, custInfo.SiteId, fileName, fileBytes);
 
-                if (result > 0)
-                {
-                    return new ApiResult
-                    {
-                        ErrorCode = (int)ErrorCodeEnum.Success,
-                        Message = "Upload Success."
-                    };
-                }
-                else
-                {
-                    throw new AdminException(ErrorCodeEnum.Fail, "Upload Fail.");
-                }
-            }
-            else
-            {
-                throw new AdminException(ErrorCodeEnum.FileTypeNotMatch);
-            }
-        }
+        //        if (result > 0)
+        //        {
+        //            return new ApiResult
+        //            {
+        //                ErrorCode = (int)ErrorCodeEnum.Success,
+        //                Message = "Upload Success."
+        //            };
+        //        }
+        //        else
+        //        {
+        //            throw new AdminException(ErrorCodeEnum.Fail, "Upload Fail.");
+        //        }
+        //    }
+        //    else
+        //    {
+        //        throw new AdminException(ErrorCodeEnum.FileTypeNotMatch);
+        //    }
+        //}
 
         /// <summary>
         /// Ask Re-Upload
@@ -834,13 +832,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <summary>
         /// 確認圖檔檔案類型
         /// </summary>
-        private readonly Dictionary<string, ImageFormat> _contentTypesCheck =
-            new Dictionary<string, ImageFormat>(comparer: StringComparer.OrdinalIgnoreCase)
-        {
-            {"image/png",ImageFormat.Png},
-            {"image/jpeg",ImageFormat.Jpeg},
-            { "image/gif",ImageFormat.Gif}
-        };
+        //private readonly Dictionary<string, ImageFormat> _contentTypesCheck =
+        //    new Dictionary<string, ImageFormat>(comparer: StringComparer.OrdinalIgnoreCase)
+        //{
+        //    {"image/png",ImageFormat.Png},
+        //    {"image/jpeg",ImageFormat.Jpeg},
+        //    { "image/gif",ImageFormat.Gif}
+        //};
 
         #endregion
 
