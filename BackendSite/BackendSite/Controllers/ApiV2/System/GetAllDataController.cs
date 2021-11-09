@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.System
 {
@@ -21,6 +22,7 @@ namespace BackendSite.Controllers.ApiV2.System
         #region Fields
 
         private readonly ReportBLL _reportBll;
+        private readonly GameCasinoBLL _gameCasinoBll;
         private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
@@ -30,6 +32,7 @@ namespace BackendSite.Controllers.ApiV2.System
         public GetAllDataController(IServiceProvider provider)
         {
             _reportBll = provider.GetRequiredService<ReportBLL>();
+            _gameCasinoBll = provider.GetRequiredService<GameCasinoBLL>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
@@ -67,6 +70,55 @@ namespace BackendSite.Controllers.ApiV2.System
             }
         }
 
+        /// <summary>
+        /// GetAllData/GetTpCategoryList 取得第三方遊戲大分類清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path： [Available Category]
+        /// </remarks>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategoryList()
+        {
+            var data = await _reportBll.GetTpCategoryList();
+            var apiResult = new ApiResult<IEnumerable<TpCategoryBetLimit>>
+            {
+                Data = data, 
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// GetAllData/GetTpList 取得Slot第三方品牌
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path： Show Slot Tp List
+        /// </remarks>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<IEnumerable<RiskTpListInfo>>> GetTpList()
+        {
+            var apiResult = new ApiResult<IEnumerable<RiskTpListInfo>>();
+            try
+            {
+                {
+                    apiResult.Data = await _gameCasinoBll.GetTpList();
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                };
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+            
+            return apiResult;
+        }
         #endregion
 
     }

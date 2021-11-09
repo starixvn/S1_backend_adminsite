@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
@@ -65,6 +66,14 @@ namespace BackendSite.Service.BLL
         {
             return reportService.GetCurrencyList();
         }
+        
+        public async Task<IEnumerable<TpCategoryBetLimit>> GetTpCategoryList()
+        {
+            var tpCategories = await reportService.GetTpCategoryList();
+
+            return tpCategories.Select(category => new TpCategoryBetLimit() {CategoryId = category.CategoryId, CategoryName = category.CategoryName}).ToList();
+        }
+        
 
         #endregion
 

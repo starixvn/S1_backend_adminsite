@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace BackendSite.Service.DAL
 {
@@ -39,6 +40,12 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var SpName = "Admin_ServerInfoList_Get";
             return conn.Query<ServerInfoModel>(SpName, commandType: CommandType.StoredProcedure);
+        }
+        
+        public async Task<IEnumerable<TpCategoryData>> GetTpCategoryList()
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return await conn.QueryAsync<TpCategoryData>("Admin_TPCategory_Get", commandType: CommandType.StoredProcedure);
         }
 
         #endregion
