@@ -33,6 +33,7 @@ namespace BackendSite.Controllers.Api
         /// 
         /// </remarks>
         /// <returns>結果</returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public ApiResult<IEnumerable<ServerInfo>> AdminUserSiteList()
         {

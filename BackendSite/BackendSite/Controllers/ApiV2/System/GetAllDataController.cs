@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace BackendSite.Controllers.ApiV2.System
 
         private readonly ReportBLL _reportBll;
         private readonly GameCasinoBLL _gameCasinoBll;
-
+        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
@@ -32,6 +33,7 @@ namespace BackendSite.Controllers.ApiV2.System
         {
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _gameCasinoBll = provider.GetRequiredService<GameCasinoBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
