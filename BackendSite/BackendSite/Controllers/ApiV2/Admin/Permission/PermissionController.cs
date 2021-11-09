@@ -118,6 +118,36 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         }
 
         /// <summary>
+        /// Permission/GetSiteList 取得所有品牌清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Global Func.Save in cache.
+        /// 
+        /// </remarks>
+        /// <returns>結果</returns>
+        [HttpPost]
+        public ApiResult GetSiteList()
+        {
+            var data = _serverInfoBll.GetSiteList();
+
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<ServerInfo>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+        }
+
+        /// <summary>
         /// Permission/GetUserPermission 取得使用者的權限
         /// </summary>
         /// <remarks>
