@@ -54,14 +54,24 @@ namespace BackendSite.Controllers.Api
             var pageNumber = query.PageNumber;
             try
             {
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(query.StartDate);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds( query.EndDate);
+                
                 apiResult.Data = _riskBll.GetTpDisableUser(query.SiteIds,
                     query.UserName,
-                    query.StartDate,
-                    query.EndDate, 
+                    startTime,
+                    endTime, 
                     query.PageSize,
                     query.PageNumber,
                     out var totalPages,
                     out var rowCount);
+
+                foreach (var data in apiResult.Data)
+                {
+                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                }
+                
                 apiResult.TotalPages = totalPages;
                 apiResult.PageNumber = pageNumber;
                 apiResult.RowCount = rowCount;
