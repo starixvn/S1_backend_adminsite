@@ -19,9 +19,10 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         #region Fields
 
         private readonly AuthorizeBLL _authorizeBll;
-        private readonly AdminUserService _adminUserService;
+        private readonly AdminBLL _adminBll;
         private readonly PermissionBLL _permissionBll;
         private readonly MenuBLL _menuBll;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
@@ -30,9 +31,10 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         public PermissionController(IServiceProvider provider)
         {
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
-            _adminUserService = provider.GetRequiredService<AdminUserService>();
+            _adminBll = provider.GetRequiredService<AdminBLL>();
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _menuBll = provider.GetRequiredService<MenuBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
@@ -57,7 +59,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
 
-            var loginUser = _adminUserService.GetUser(authInfo.UserId);
+            var loginUser = _adminBll.GetUser(authInfo.UserId);
 
             if (loginUser == null)
             {
@@ -135,7 +137,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
 
-            var loginUser = _adminUserService.GetUser(authInfo.UserId);
+            var loginUser = _adminBll.GetUser(authInfo.UserId);
 
             if (loginUser == null)
             {
@@ -194,6 +196,37 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 Data = data,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
+        }
+
+        /// <summary>
+        /// Permission/AdminUserSiteList 取得使用者可使用的品牌清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Global Func.
+        /// 每個程式在需要選取品牌條件時，都需要確認有哪些品牌可以選擇。
+        /// 
+        /// </remarks>
+        /// <returns>結果</returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<ServerInfo>> AdminUserSiteList()
+        {
+            var apiResult = new ApiResult<IEnumerable<ServerInfo>>();
+            try
+            {
+                apiResult.Data = _serverInfoBll.GetSiteListByLoginUser();
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
+            }
+
+            return apiResult;
         }
     }
 }

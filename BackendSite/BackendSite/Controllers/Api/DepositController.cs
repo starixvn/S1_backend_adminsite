@@ -262,7 +262,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        public async Task<ApiResult<TransferResult>> Process(PendingFund pendingFund)
+        private async Task<ApiResult<TransferResult>> Process(PendingFund pendingFund)
         {
             return await pendingFundBLL.ProcessAsync(pendingFund);
         }

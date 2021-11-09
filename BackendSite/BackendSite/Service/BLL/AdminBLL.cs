@@ -13,14 +13,20 @@ namespace BackendSite.Service.BLL
     {
         private readonly Tools tools;
         private readonly AdminService adminService;
+        private readonly AdminUserService adminUserService;
         private readonly ServerInfoService serverInfoService;
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public AdminBLL(Tools tools, AdminService adminService, ServerInfoService serverInfoService, IHttpContextAccessor httpContextAccessor)
+        public AdminBLL(Tools tools, 
+            AdminService adminService, 
+            ServerInfoService serverInfoService, 
+            AdminUserService adminUserService,
+            IHttpContextAccessor httpContextAccessor)
         {
             this.tools = tools;
             this.adminService = adminService;
             this.serverInfoService = serverInfoService;
+            this.adminUserService = adminUserService;
             this.httpContextAccessor = httpContextAccessor;
         }
 
@@ -63,6 +69,11 @@ namespace BackendSite.Service.BLL
         //        adminUser.Userpwd = tools.MD5Encrypt(adminUser.Userpwd);
         //    return adminService.ChangePwdAccount(serverInfo.SiteId, adminUser);
         //}
+
+        public AdminUser GetUser(int userId)
+        {
+            return adminUserService.GetUser(userId);
+        }
 
         public ErrorCodeEnum ChangePwd(ChangePwd changePwd)
         {
