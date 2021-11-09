@@ -38,36 +38,6 @@ namespace BackendSite.Controllers.ApiV2.System
         #region Actions
 
         /// <summary>
-        /// GetAllData/GetSiteList 取得品牌清單
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// Http Method：POST
-        /// 
-        /// Func Path：Global Func.Save in cache.
-        /// 
-        /// </remarks>
-        /// <returns>結果</returns>
-        [HttpPost]
-        public ApiResult GetSiteList()
-        {
-            var data = _serverInfoBll.GetSiteList();
-
-            if (!data.Any())
-            {
-                throw new AdminException(ErrorCodeEnum.NoData);
-            }
-            else
-            {
-                return new ApiResult<IEnumerable<ServerInfo>>
-                {
-                    Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-            }
-        }
-
-        /// <summary>
         /// GetAllData/GetCurrency 取得幣別資料
         /// </summary>
         /// <remarks>
