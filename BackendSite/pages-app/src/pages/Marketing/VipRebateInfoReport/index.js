@@ -17,7 +17,7 @@ const App = () => {
     User: "",
     Category: "0",
     BaseCurrency: 0,
-    DateQuickPicker:"0"
+    DateQuickPicker: "0",
   });
 
   const [stateDatas, setDatas] = useState({
@@ -95,12 +95,12 @@ const App = () => {
         ...stateFilter,
         ["StartDate"]: _startDate,
         ["EndDate"]: _endDate,
-        ["DateQuickPicker"]:props
+        ["DateQuickPicker"]: props,
       });
-    }else{
+    } else {
       setFilter({
         ...stateFilter,
-        ["DateQuickPicker"]:props
+        ["DateQuickPicker"]: props,
       });
     }
   };
@@ -110,7 +110,7 @@ const App = () => {
       setFilter({
         ...stateFilter,
         [dataColumn]: v,
-        ["DateQuickPicker"]:"0"
+        ["DateQuickPicker"]: "0",
       });
     } else {
       setFilter({
@@ -163,8 +163,8 @@ const App = () => {
       SelectSite: stateFilter.SelectSite,
       Currency: parseInt(stateFilter.Currency),
       CategoryId: parseInt(stateFilter.Category),
-      StartDate: moment.utc(stateFilter.StartDate).unix(),
-      EndDate: moment.utc(stateFilter.EndDate).unix(),
+      StartDate: moment(stateFilter.StartDate).unix(),
+      EndDate: moment(stateFilter.EndDate).unix(),
       User: stateFilter.User,
       PageNumber: 1,
       PageSize: 10,
@@ -179,7 +179,7 @@ const App = () => {
               totalPages: res.data.totalPages,
               pageNumber: 1,
               rowCount: res.data.rowCount,
-              currencyAmount: res.data.currencyAmount
+              currencyAmount: res.data.currencyAmount,
             },
             Datas: [...res.data.data],
             FilterInfo: {
