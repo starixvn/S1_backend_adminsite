@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,21 +20,52 @@ namespace BackendSite.Controllers.ApiV2.System
     {
         #region Fields
 
-        private readonly ReportBLL _reportBLL;
+        private readonly ReportBLL _reportBll;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
         #region Constructors
 
-        public GetAllDataController(IConfiguration configuration,
-                                    ReportBLL reportBLL)
+        public GetAllDataController(IServiceProvider provider)
         {
-            _reportBLL = reportBLL;
+            _reportBll = provider.GetRequiredService<ReportBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
 
         #region Actions
+
+        /// <summary>
+        /// Home/GetSiteList 取得品牌清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Global Func.Save in cache.
+        /// 
+        /// </remarks>
+        /// <returns>結果</returns>
+        [HttpPost]
+        public ApiResult GetSiteList()
+        {
+            var data = _serverInfoBll.GetSiteList();
+
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<ServerInfo>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+        }
 
         /// <summary>
         /// GetAllData/GetCurrency 取得幣別資料
@@ -49,7 +81,7 @@ namespace BackendSite.Controllers.ApiV2.System
         [HttpPost]
         public ApiResult<IEnumerable<CurrencyModel>> GetCurrency()
         {
-            var data = _reportBLL.GetCurrency();
+            var data = _reportBll.GetCurrency();
 
             if (!data.Any())
             {
