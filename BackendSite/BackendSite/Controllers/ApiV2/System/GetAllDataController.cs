@@ -38,7 +38,7 @@ namespace BackendSite.Controllers.ApiV2.System
         #region Actions
 
         /// <summary>
-        /// Home/GetSiteList 取得品牌清單
+        /// GetAllData/GetSiteList 取得品牌清單
         /// </summary>
         /// <remarks>
         /// 
