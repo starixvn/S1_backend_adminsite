@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.ExceptionHandling;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.System
 {
@@ -18,13 +20,14 @@ namespace BackendSite.Controllers.ApiV2.System
     public class BaseDataController : ControllerBase
     {
 
-        private readonly BankDetailBLL _bankDetailBLL;
-        private readonly static BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
+        private readonly BankDetailBLL _bankDetailBll;
+        private readonly UserBetLimitBLL _userBetLimitBll;
+        private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
-        public BaseDataController(IConfiguration configuration,
-            BankDetailBLL bankDetailBLL)
+        public BaseDataController(IServiceProvider provider)
         {
-            _bankDetailBLL = bankDetailBLL;
+            _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
+            _userBetLimitBll = provider.GetRequiredService<UserBetLimitBLL>();
         }
 
         #region Model
@@ -82,6 +85,11 @@ namespace BackendSite.Controllers.ApiV2.System
             /// </summary>
             public int ChannelId { get; set; }
         }
+        
+        public class GetTpGameTypeListByCategoryReq
+        {
+            public int CategoryId { get; set; }
+        }
 
         #endregion
 
@@ -104,7 +112,7 @@ namespace BackendSite.Controllers.ApiV2.System
         public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffList(GetBankInfoOffListRequest withdrawalReq)
         {
             var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
-            var bankInfoOff = _bankDetailBLL.GetBankInfoOff(withdrawalReq.SiteId);
+            var bankInfoOff = _bankDetailBll.GetBankInfoOff(withdrawalReq.SiteId);
             bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == withdrawalReq.CurrencyId && (x.Purpose & 2) > 0)
                 .OrderBy(x => x.BSort);
             apiResult.Data = bankInfoOff;
@@ -129,7 +137,7 @@ namespace BackendSite.Controllers.ApiV2.System
         public ApiResult<IEnumerable<Pay>> GetPayList(GetPayListRequest withdrawalReq)
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var bankInfoPay = _bankDetailBLL.GetBankInfoPay();
+            var bankInfoPay = _bankDetailBll.GetBankInfoPay();
             var _payInfo = (from x in bankInfoPay
                             where x.CurrencyId == withdrawalReq.CurrencyId && x.SysId == withdrawalReq.PayId
                             select new Pay
@@ -161,7 +169,7 @@ namespace BackendSite.Controllers.ApiV2.System
         public ApiResult<IEnumerable<Pay>> GetCryptoPayList(GetCryptoPayListRequest withdrawalReq)
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var cryptoPay = _bankDetailBLL.GetCryptoPay();
+            var cryptoPay = _bankDetailBll.GetCryptoPay();
             var _payInfo = (from x in cryptoPay
                             where x.CurrencyId == withdrawalReq.CurrencyId && x.ChannelName.Equals(withdrawalReq.ChannelName, StringComparison.OrdinalIgnoreCase)
                             select new Pay
@@ -176,7 +184,27 @@ namespace BackendSite.Controllers.ApiV2.System
             return apiResult;
         }
 
-
+        /// <summary>
+        /// BaseData/GetTpGameTypeListbyCategory 取得指定第三方遊戲類型清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > User Bet Limit > [Submit] > Click[Edit] > Check[Available Category] > [Game]
+        /// </remarks>
+        /// <param name="req"></param>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<GameTypeBetLimit>>> GetTpGameTypeListByCategory(GetTpGameTypeListByCategoryReq req)
+        {
+            var data = await _userBetLimitBll.GetTpGameTypeListbyCategoryAsync(req.CategoryId);
+            var apiResult = new ApiResult<IEnumerable<GameTypeBetLimit>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+            };
+            return apiResult;
+        }
+        
         #region Private Methods
 
         private class BankInfoPayComparer : IEqualityComparer<Pay>

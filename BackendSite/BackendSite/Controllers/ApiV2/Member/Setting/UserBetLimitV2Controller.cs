@@ -57,11 +57,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         {
             public int CustId { get; set; }
         }
-        public class GetTpGameTypeListByCategoryReq
-        {
-            public int CategoryId { get; set; }
-        }
-        
+
         #endregion
         
         /// <summary>
@@ -181,48 +177,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             {
                 ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
             };
-        }
-
-        /// <summary>
-        /// UserBetLimit/GetTpCategoryList 取得第三方遊戲大分類清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD > User Bet Limit > [Submit] > Click[Edit] > [Available Category]
-        /// </remarks>
-        [HttpPost]
-        public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategoryList()
-        {
-            var data = await _userBetLimitBll.GetTpCategoryList();
-            var apiResult = new ApiResult<IEnumerable<TpCategoryBetLimit>>
-            {
-                Data = data, 
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-
-            return apiResult;
-        }
-
-        /// <summary>
-        /// UserBetLimit/GetTpGameTypeListbyCategory 取得指定第三方遊戲類型清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD > User Bet Limit > [Submit] > Click[Edit] > Check[Available Category] > [Game]
-        /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
-        public async Task<ApiResult<IEnumerable<GameTypeBetLimit>>> GetTpGameTypeListByCategory(GetTpGameTypeListByCategoryReq req)
-        {
-            var data = await _userBetLimitBll.GetTpGameTypeListbyCategoryAsync(req.CategoryId);
-            var apiResult = new ApiResult<IEnumerable<GameTypeBetLimit>>
-            {
-                Data = data,
-                ErrorCode = (int)ErrorCodeEnum.Success,
-            };
-            return apiResult;
         }
     }
 }

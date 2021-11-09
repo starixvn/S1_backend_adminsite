@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.System
 {
@@ -19,16 +20,15 @@ namespace BackendSite.Controllers.ApiV2.System
     {
         #region Fields
 
-        private readonly ReportBLL _reportBLL;
+        private readonly ReportBLL _reportBll;
 
         #endregion
 
         #region Constructors
 
-        public GetAllDataController(IConfiguration configuration,
-                                    ReportBLL reportBLL)
+        public GetAllDataController(IServiceProvider provider)
         {
-            _reportBLL = reportBLL;
+            _reportBll = provider.GetRequiredService<ReportBLL>();
         }
 
         #endregion
@@ -49,7 +49,7 @@ namespace BackendSite.Controllers.ApiV2.System
         [HttpPost]
         public ApiResult<IEnumerable<CurrencyModel>> GetCurrency()
         {
-            var data = _reportBLL.GetCurrency();
+            var data = _reportBll.GetCurrency();
 
             if (!data.Any())
             {
@@ -65,6 +65,27 @@ namespace BackendSite.Controllers.ApiV2.System
             }
         }
 
+        /// <summary>
+        /// 取得第三方遊戲大分類清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path： [Available Category]
+        /// </remarks>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategoryList()
+        {
+            var data = await _reportBll.GetTpCategoryList();
+            var apiResult = new ApiResult<IEnumerable<TpCategoryBetLimit>>
+            {
+                Data = data, 
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
         #endregion
 
     }
