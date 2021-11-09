@@ -199,7 +199,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         }
 
         /// <summary>
-        /// Permission/AdminUserSiteList 取得使用者可使用的品牌清單
+        /// Permission/GetUserSiteList 取得使用者可使用的品牌清單
         /// </summary>
         /// <remarks>
         /// 
