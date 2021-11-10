@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +28,45 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
+        public IEnumerable<GroupPermisison> GetAllPermission()
+        {
+            var result = new List<GroupPermisison>();
+
+            var permissionDatas = GetPermissionJSONData();
+            foreach (var func in permissionDatas)
+            {
+                foreach (var funcKeyItem in func.Settings)
+                {
+                    var item = GetFuncItem(func.Settings, funcKeyItem.FuncKey);
+                    if (item != null)
+                    {
+                        if (item.SubFuncKeys == null)
+                        {
+                            result.Add(new GroupPermisison
+                            {
+                                GroupSEQ = 0,
+                                FuncKey = funcKeyItem.FuncKey,
+                                SubFuncKeys = null
+                            });
+                            continue;
+                        }
+                        var subFuncKeyDatas = item.SubFuncKeys.Select(x => x.FuncKey);
+                        foreach (var subFuncKeyItem in subFuncKeyDatas)
+                        {
+                            result.Add(new GroupPermisison
+                            {
+                                GroupSEQ = 0,
+                                FuncKey = funcKeyItem.FuncKey,
+                                SubFuncKeys = subFuncKeyItem
+                            });
+                        }
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
+
         public IEnumerable<GroupPermisison> GetUserPermission(int GroupSEQ)
         {
             var permission = adminGroupService.GetGroupPermissions(GroupSEQ);
@@ -35,7 +75,7 @@ namespace BackendSite.Service.BLL
 
         public GroupPermisison GetUserPermission(int GroupSEQ, string FuncKey)
         {
-            var permission = adminGroupService.GetGroupPermissions(GroupSEQ)?.FirstOrDefault(x=> string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase));
+            var permission = adminGroupService.GetGroupPermissions(GroupSEQ)?.FirstOrDefault(x => string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase));
             return permission;
         }
 
@@ -161,7 +201,7 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                if(loginUser.GroupSEQ == null)
+                if (loginUser.GroupSEQ == null)
                 {
                     result = false;
                 }
@@ -187,7 +227,7 @@ namespace BackendSite.Service.BLL
                     }
                 }
             }
-            
+
             return result;
         }
 
@@ -227,7 +267,7 @@ namespace BackendSite.Service.BLL
             if (loginUser.IsSuper)
             {
                 var initDatas = GetPermissionJSONData();
-                foreach(var func in initDatas)
+                foreach (var func in initDatas)
                 {
                     var item = GetFuncItem(func.Settings, FuncKey);
                     if (item != null)
@@ -237,12 +277,12 @@ namespace BackendSite.Service.BLL
                     }
                 }
             }
-            else if(loginUser.GroupSEQ != null)
+            else if (loginUser.GroupSEQ != null)
             {
                 var permissions = GetUserPermission((int)loginUser.GroupSEQ, FuncKey);
-                if(permissions != null && permissions.SubFuncKeys != null)
+                if (permissions != null && permissions.SubFuncKeys != null)
                 {
-                    result = Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<string>>(permissions.SubFuncKeys);
+                    result = JsonConvert.DeserializeObject<IEnumerable<string>>(permissions.SubFuncKeys);
                 }
             }
 

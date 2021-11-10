@@ -86,7 +86,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SelectSite { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
             public DateTimeOffset StartDate
             {
                 get => _startDate;
@@ -372,7 +372,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             try
             {
                 var pageNumber = req.PageNumber;
-                apiResult.Data = _messageBll.GetBatchMessageList(req.SelectSite, req.StartDate, req.EndDate, req.PageSize, ref pageNumber, ref totalPages, ref rowCount);
+                apiResult.Data = _messageBll.GetBatchMessageList(req.SiteIds, req.StartDate, req.EndDate, req.PageSize, ref pageNumber, ref totalPages, ref rowCount);
                 apiResult.PageNumber = pageNumber;
                 apiResult.RowCount = rowCount;
                 apiResult.TotalPages = totalPages;
