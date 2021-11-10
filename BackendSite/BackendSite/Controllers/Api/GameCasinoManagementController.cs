@@ -26,7 +26,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
         public ApiResult SetGameCasinoDetail(SetGameCasionPara para) 
         {
             var apiResult = new ApiResult();
@@ -54,7 +54,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
         public ApiResult InsertGameCasinoDetail(InsertGameCasionPara para)
         {
             var apiResult = new ApiResult();
@@ -74,7 +74,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
         public ApiResult DeleteGameCasinoDetail(DeleteGameCasionPara para)
         {
             var apiResult = new ApiResult();
@@ -94,7 +94,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
         public ApiResult<IEnumerable<SiteTpListIfo>> GetTpList()
         {
             var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>
@@ -107,7 +107,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
         public ApiListResult<GameCasinoData> GameCasinoByTPIdV2(GameCasinoPara gameCasinoPara)
         {
             var apiResult = new ApiListResult<GameCasinoData>();
@@ -130,7 +130,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
         public ApiResult SetGameCasino(SetGameCasionV2Para para)
         {
             var apiResult = new ApiResult();
@@ -159,7 +159,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/GameCasinoManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
         public ApiResult<IEnumerable<GameCasinoDetailBySite>> GetGameCasinoDetailV3(GetGameCasinoDetailPara para)
         {
 
