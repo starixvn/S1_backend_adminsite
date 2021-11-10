@@ -403,30 +403,9 @@
         "Enable": false
       },
       {
-        "DisplayKey": "Banner Management",
-        "FuncKey": "Marketing/BannerManage",
-        "Enable": false
-      },
-      {
         "DisplayKey": "Draw Prize Report",
         "FuncKey": "Marketing/DrawPrizeReport",
         "Enable": false
-      },
-      {
-        "DisplayKey": "Game Casino Management",
-        "FuncKey": "Marketing/GameCasinoManagement",
-        "Enable": false,
-        "InputBoxType": "checkbox",
-        "SubFuncKeys": [
-          {
-            "DisplayKey": "Edit Main",
-            "FuncKey": "gcm_edit_main"
-          },
-          {
-            "DisplayKey": "Edit Detail",
-            "FuncKey": "gcm_edit_detail"
-          }
-        ]
       },
       {
         "DisplayKey": "VipUpgrade",
@@ -461,11 +440,6 @@
         ]
       },
       {
-        "DisplayKey": "Latest Highlight Video Management",
-        "FuncKey": "Marketing/LatestHighlightVideoManagement",
-        "Enable": false
-      },
-      {
         "DisplayKey": "Vip Rebate Mangetment",
         "FuncKey": "Marketing/VipRebateMangetment",
         "Enable": false,
@@ -480,26 +454,6 @@
       {
         "DisplayKey": "Vip Rebate Info",
         "FuncKey": "Marketing/VipRebateInfoReport",
-        "Enable": false
-      },
-      {
-        "DisplayKey": "Domain Management",
-        "FuncKey": "Marketing/DomainManage",
-        "Enable": false
-      },
-      {
-        "DisplayKey": "Venders Maintenance",
-        "FuncKey": "Marketing/TpMaintain",
-        "Enable": false
-      },
-      {
-        "DisplayKey": "LeaderBoard ExtraPoint",
-        "FuncKey": "Marketing/LeaderBoardExtraPoint",
-        "Enable": false
-      },
-      {
-        "DisplayKey": "App Link Management",
-        "FuncKey": "Marketing/AppLinkManagement",
         "Enable": false
       }
     ]
@@ -534,6 +488,57 @@
       }
     ]
   },
+  {
+  "DisplayKey": "CMS",
+  "Settings": [
+    {
+      "DisplayKey": "Banner Management",
+      "FuncKey": "CMS/BannerManage",
+      "Enable": false
+    },
+    {
+      "DisplayKey": "Game Casino Management",
+      "FuncKey": "CMS/GameCasinoManagement",
+      "Enable": false,
+      "InputBoxType": "checkbox",
+      "SubFuncKeys": [
+        {
+          "DisplayKey": "Edit Main",
+          "FuncKey": "gcm_edit_main"
+        },
+        {
+          "DisplayKey": "Edit Detail",
+          "FuncKey": "gcm_edit_detail"
+        }
+      ]
+    },
+    {
+      "DisplayKey": "Latest Highlight Video Management",
+      "FuncKey": "CMS/LatestHighlightVideoManagement",
+      "Enable": false
+    },
+    {
+      "DisplayKey": "Domain Management",
+      "FuncKey": "CMS/DomainManage",
+      "Enable": false
+    },
+    {
+      "DisplayKey": "Venders Maintenance",
+      "FuncKey": "CMS/TpMaintain",
+      "Enable": false
+    },
+    {
+      "DisplayKey": "LeaderBoard ExtraPoint",
+      "FuncKey": "CMS/LeaderBoardExtraPoint",
+      "Enable": false
+    },
+    {
+      "DisplayKey": "App Link Management",
+      "FuncKey": "CMS/AppLinkManagement",
+      "Enable": false
+    }
+  ]
+},
   {
     "DisplayKey": "Home",
     "Settings": [

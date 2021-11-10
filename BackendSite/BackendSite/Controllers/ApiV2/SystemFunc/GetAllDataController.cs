@@ -12,7 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BackendSite.Controllers.ApiV2.System
+namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
