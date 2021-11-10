@@ -20,7 +20,7 @@
     var authData = authorizeBLL.GetAuthData();
     var loginUser = adminUserService.GetUser(authData.UserId);
 
-    var subFuncKeys = permissionBLL.GetSubFunckeys("Marketing/GameCasinoManagement");
+    var subFuncKeys = permissionBLL.GetSubFunckeys("CMS/GameCasinoManagement");
     subFuncKeys = subFuncKeys ?? new List<string>();
 
     var i18n = new Dictionary<string, string>();
