@@ -183,7 +183,10 @@ import qs from 'qs';
             let checkwd = (this.state.Checkwd) ? 1 : 0;
             let withdrawalamount = isNaN(parseFloat(amount) * withdrawal) ? 0 : parseFloat(amount) * withdrawal;
             let memo = this.state.Memo;
-            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount, Memo: memo })
+            let bonusCode = this.state.CheckedBonusCode;
+            let rollOver = this.state.RollOver;
+            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount, Memo: memo,
+                BounsCode:  bonusCode, RollOver: rollOver})
             .then(function (response) {
                 //Loading.UnLoading();
                 let result = response.data;
