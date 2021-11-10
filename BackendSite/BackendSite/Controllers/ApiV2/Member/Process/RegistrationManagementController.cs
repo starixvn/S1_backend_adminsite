@@ -62,9 +62,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         public class SetRegLiveStatusReq
         {
+            public int SiteId { get; set; }
             public int CustId { get; set; }
             public int Status { get; set; }
-            public int SiteId { get; set; }
         }
         public class AddRegLiveStatusNotesReq
         {

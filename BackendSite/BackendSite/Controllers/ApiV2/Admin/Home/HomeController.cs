@@ -86,8 +86,8 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
         /// Sample request:
         ///
         ///     {
-        ///        "txtID": "admin",
-        ///        "txtPW": "1q2w3e4r"
+        ///        "userName": "admin",
+        ///        "userPwd": "1q2w3e4r"
         ///     }
         ///
         /// </remarks>

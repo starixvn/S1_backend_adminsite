@@ -156,6 +156,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         [HttpPost]
         public ApiResult GetUserPermission()
         {
+            IEnumerable<GroupPermisison> result = null;
             var authInfo = _authorizeBll.GetAuthData();
 
             if (authInfo == null)
@@ -187,11 +188,23 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
 
-            var permissions = _permissionBll.GetUserPermission((int)loginUser.GroupSEQ);
+            if (loginUser.IsSuper)
+            {
+                result = _permissionBll.GetAllPermission();
+            }
+            else
+            {
+                result = _permissionBll.GetUserPermission((int)loginUser.GroupSEQ);
+            }
+
+            if (!result.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
 
             return new ApiResult<IEnumerable<GroupPermisison>>
             {
-                Data = permissions,
+                Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }

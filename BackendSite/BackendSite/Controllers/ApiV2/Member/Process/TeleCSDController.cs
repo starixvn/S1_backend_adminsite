@@ -42,7 +42,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<int> Currency { get; set; }
+            public IEnumerable<int> CurrencIds { get; set; }
             public int Deposit { get; set; }
             public int CallOut { get; set; }
             public int DormantUser { get; set; }
@@ -69,7 +69,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<int> Currency { get; set; }
+            public IEnumerable<int> CurrencIds { get; set; }
             public int Deposit { get; set; }
             public int CallOut { get; set; }
             public int DormantUser { get; set; }
@@ -105,7 +105,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public ApiListResult<CustTele> GetTeleCSD(TeleCsdReq req)
         {
             var searchResult = _custInfoBll.GetTeleCSD(JsonConvert.SerializeObject(req.SiteIds),
-                                                     JsonConvert.SerializeObject(req.Currency),
+                                                     JsonConvert.SerializeObject(req.CurrencIds),
                                                      req.StartDate,
                                                      req.EndDate,
                                                      req.Deposit,
@@ -178,7 +178,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public IActionResult ExportTeleCSDData(ExportTeleCsdDataReq req)
         {
             var exportData = _custInfoBll.GetTeleCSDExportData(JsonConvert.SerializeObject(req.SiteIds),
-                                                              JsonConvert.SerializeObject(req.Currency),
+                                                              JsonConvert.SerializeObject(req.CurrencIds),
                                                               req.StartDate,
                                                               req.EndDate,
                                                               req.Deposit,
