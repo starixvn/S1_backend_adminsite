@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,25 +17,25 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
     public class TpBetLimitController : ControllerBase
     {
         #region Fields
-        
+
         private readonly UserBetLimitBLL _userBetLimitBll;
         private readonly CustInfoBLL _custInfoBll;
-        
+
         #endregion
 
         #region Constructor
-        
+
         public TpBetLimitController(IServiceProvider provider)
         {
             _userBetLimitBll = provider.GetRequiredService<UserBetLimitBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
         }
-        
+
         #endregion
 
         #region Model
-        
-        public class QueryUserBetLimitReq
+
+        public class QueryUserBetLimitReq : ApiRequestPageModel
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
@@ -50,8 +51,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
         }
         public class CustBetLimitByCustIdReq
         {
@@ -59,7 +58,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         #endregion
-        
+
         /// <summary>
         /// TpBetLimit/Get 取得會員下注限額資料清單
         /// </summary>
@@ -86,7 +85,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 TotalPages = totalPages,
                 PageNumber = pageNumber,
                 RowCount = rowCount,
-                ErrorCode = 0
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
 
             return apiResult;
@@ -108,7 +107,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             return new ApiResult<CustBetLimitByCustId>()
             {
                 Data = data,
-                ErrorCode = 0
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
 
@@ -170,7 +169,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        public async Task<ApiResult> Delete( CustBetLimitByCustIdReq req)
+        public async Task<ApiResult> Delete(CustBetLimitByCustIdReq req)
         {
             var result = await _userBetLimitBll.Delete(req.CustId);
             return new ApiResult

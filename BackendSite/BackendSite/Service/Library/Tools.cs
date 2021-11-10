@@ -171,6 +171,33 @@ namespace BackendSite.Service.Library
             return Floor(dBalance, 2).ToString("#,##0.#0");
         }
 
+        /// <summary>
+        /// 字串轉日期格式&取時區
+        /// </summary>
+        /// <param name="dateTimeString"></param>
+        /// <param name="dateTimeOffset"></param>
+        /// <param name="timeSpan"></param>
+        /// <returns></returns>
+        public bool StringConvertDateTimeOffset(string dateTimeString,
+            out DateTimeOffset dateTimeOffset,
+            out TimeSpan timeSpan)
+        {
+            dateTimeOffset = DateTimeOffset.MinValue;
+            timeSpan = TimeSpan.Zero;
+
+            if (string.IsNullOrEmpty(dateTimeString))
+            {
+                return false;
+            }
+
+            dateTimeOffset = DateTimeOffset.Parse(dateTimeString);
+
+            timeSpan = dateTimeOffset.Offset;
+
+            return true;
+
+        }
+
     }
 
     public static class GetEnumDescription

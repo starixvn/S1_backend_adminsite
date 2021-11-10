@@ -42,7 +42,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
-            public int Currency { get; set; }
+            public int CurrencyId { get; set; }
             public int DepositStatus { get; set; }
             public int Status { get; set; }
             public string User { get; set; }
@@ -85,7 +85,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public class ExportRegLiveStatusListReq
         {
             public IEnumerable<int> SiteIds { get; set; }
-            public int Currency { get; set; }
+            public int CurrencyId { get; set; }
             public int DepositStatus { get; set; }
             public int Status { get; set; }
             public string User { get; set; }
@@ -116,7 +116,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiListResult<RegLiveStatus>();
             try
             {
-                var searchResult = _custInfoBll.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status
+                var searchResult = _custInfoBll.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.CurrencyId, custInfoReq.DepositStatus, custInfoReq.Status
                 , custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort, custInfoReq.StartDate, custInfoReq.EndDate, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
                 foreach (var data in searchResult.RegLiveStatusDatas)
                 {
@@ -283,7 +283,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public IActionResult ExportRegLiveStatusList(ExportRegLiveStatusListReq req)
         {
-            var exportData = _custInfoBll.GetExportRegLiveStatus(JsonConvert.SerializeObject(req.SiteIds), req.Currency, req.DepositStatus, req.Status, req.User, req.Sort, req.StartDate, req.EndDate, req.AffiliatesCode, req.AgentCodeType);
+            var exportData = _custInfoBll.GetExportRegLiveStatus(JsonConvert.SerializeObject(req.SiteIds), req.CurrencyId, req.DepositStatus, req.Status, req.User, req.Sort, req.StartDate, req.EndDate, req.AffiliatesCode, req.AgentCodeType);
             var stream = _excelBll.Export(exportData);
             return _excelBll.ExcelFile(stream, "Registration");
         }
