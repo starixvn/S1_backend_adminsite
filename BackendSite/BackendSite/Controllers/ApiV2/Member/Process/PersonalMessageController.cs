@@ -113,13 +113,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// 
         /// Func Path：CSD > Personal Message Batch > Add New > [Submit]
         /// </remarks>
-        /// <param name="optSite"></param>
+        /// <param name="siteId"></param>
         /// <param name="excelUpload"></param>
         /// <param name="personalMsg"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiResult<int> SendMessageBatch([FromForm] int optSite,
+        public ApiResult<int> SendMessageBatch([FromForm] int siteId,
             [FromForm] IFormFile excelUpload,
             [FromForm] string personalMsg)
         {
@@ -139,7 +139,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
                     var isLastRow = false;
                     var rowId = 2; // 因為有標題列，所以從第2列開始讀起
-                    _messageBll.NewBatchMessage(optSite, authData.UserName, personalMsg, ref batchId);
+                    _messageBll.NewBatchMessage(siteId, authData.UserName, personalMsg, ref batchId);
 
                     do // 讀取資料，直到讀到空白列為止
                     {
@@ -157,7 +157,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                         }
                         else
                         {
-                            var custInfosDetail = _custInfoBll.GetCustInfoDetails(custId, custUsername, optSite);
+                            var custInfosDetail = _custInfoBll.GetCustInfoDetails(custId, custUsername, siteId);
                             if (custInfosDetail == null)
                             {
                                 resultMessage =
@@ -171,7 +171,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                     case (int)CustStatus.Lock:
                                         SendBatchMessage(personalMsg,
                                             custInfosDetail.CustId,
-                                            optSite,
+                                            siteId,
                                             authData.UserName,
                                             batchId,
                                             custUsername,

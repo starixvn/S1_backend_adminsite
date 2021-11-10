@@ -6,6 +6,7 @@ using BackendSite.Attributes;
 using BackendSite.Controllers.Api;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,16 +22,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
     public class TpDisableController : ControllerBase
     {
         #region Fields
-        
+
         private readonly RiskBLL _riskBll;
         private readonly GameCasinoBLL _gameCasinoBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ILogger<RiskController> _logger;
-        
+
         #endregion
-        
+
         #region Constructor
-        
+
         public TpDisableController(IServiceProvider provider)
         {
             _riskBll = provider.GetRequiredService<RiskBLL>();
@@ -38,12 +39,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _logger = provider.GetRequiredService<ILogger<RiskController>>();
         }
-        
+
         #endregion
 
         #region Model
-        
-        public class QueryTpDisableUserReq
+
+        public class QueryTpDisableUserReq : ApiRequestPageModel
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
@@ -59,8 +60,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
         }
         public class TpDisableUserForGameDetailReq
         {
@@ -72,7 +71,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         #endregion
-        
+
         /// <summary>
         /// TpDisable/GetTpDisableUser 取得第三方被禁止的用戶資料清單
         /// </summary>
@@ -84,7 +83,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
-        public ApiListResult<TpDisableUser> GetTpDisableUser(QueryTpDisableUserReq req)
+        public ApiListResult<TpDisableUser> GetTpDisableUserList(QueryTpDisableUserReq req)
         {
             var apiResult = new ApiListResult<TpDisableUser>();
 
@@ -95,7 +94,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                     req.SiteIds,
                     req.UserName,
                     req.StartDate,
-                    req.EndDate, 
+                    req.EndDate,
                     req.PageSize,
                     req.PageNumber,
                     out var totalPages,
@@ -103,12 +102,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 apiResult.TotalPages = totalPages;
                 apiResult.PageNumber = pageNumber;
                 apiResult.RowCount = rowCount;
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
 
@@ -146,17 +145,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                             {
                                 tp.Checked = true;
                                 var games = await _gameCasinoBll.GameCasinoByTPIdV3(tp.TpId);
-                                tp.GameList = games.Select(a=> new TpGameCasino()
+                                tp.GameList = games.Select(a => new TpGameCasino()
                                 {
                                     GameId = a.GameId,
                                     Name = a.Name,
-                                    Checked = disableGame.GameList != null && disableGame.GameList.Any(c=>c == a.GameId)
+                                    Checked = disableGame.GameList != null && disableGame.GameList.Any(c => c == a.GameId)
                                 }).ToList();
                             }
                         }
                     }
                 }
-                
+
                 var editInfo = new TpDisableUserForGameDetail()
                 {
                     SiteId = userDisableGames.SiteId,
@@ -164,12 +163,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                     DisableGames = tpList.ToList()
                 };
                 apiResult.Data = editInfo;
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
             return apiResult;
@@ -195,7 +194,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 var customer = await _custInfoBll.GetCustId(disableGames.UserName, disableGames.SiteId);
                 if (customer == null)
                 {
-                    apiResult.ErrorCode = (int) ErrorMessageCodeEnum.NoData;;
+                    apiResult.ErrorCode = (int)ErrorMessageCodeEnum.NoData; ;
                     apiResult.Message = "User Not Found";
                     return apiResult;
                 }
@@ -205,7 +204,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 return new ApiResult
                 {
                     //result: 1 (新增成功),2 (修改成功)
-                    ErrorCode = (result == 1 || result == 2) ? (int) ErrorMessageCodeEnum.Success : result,
+                    ErrorCode = (result == 1 || result == 2) ? (int)ErrorMessageCodeEnum.Success : result,
                 };
             }
             catch (Exception ex)
@@ -213,7 +212,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 _logger.LogError(ex, ex.Message);
                 return new ApiResult
                 {
-                    ErrorCode = (int) ErrorMessageCodeEnum.SystemException,
+                    ErrorCode = (int)ErrorMessageCodeEnum.SystemException,
                     Message = ex.Message,
                 };
             }
@@ -238,7 +237,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 var result = await _riskBll.UpdateStatus(disable.CustId, disable.Status, updateOperator);
                 return new ApiResult
                 {
-                    ErrorCode = result == 1 ? (int) ErrorMessageCodeEnum.Success : result,
+                    ErrorCode = result == 1 ? (int)ErrorMessageCodeEnum.Success : result,
                 };
             }
             catch (Exception ex)
@@ -246,7 +245,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 _logger.LogError(ex, ex.Message);
                 return new ApiResult
                 {
-                    ErrorCode = (int) ErrorMessageCodeEnum.SystemException,
+                    ErrorCode = (int)ErrorMessageCodeEnum.SystemException,
                     Message = ex.Message,
                 };
             }
@@ -270,7 +269,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 var result = await _riskBll.DeleteTpDisableUser(req.CustId);
                 return new ApiResult
                 {
-                    ErrorCode = result == 1 ? (int) ErrorMessageCodeEnum.Success : result,
+                    ErrorCode = result == 1 ? (int)ErrorMessageCodeEnum.Success : result,
                 };
             }
             catch (Exception ex)
@@ -278,11 +277,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 _logger.LogError(ex, ex.Message);
                 return new ApiResult
                 {
-                    ErrorCode = (int) ErrorMessageCodeEnum.SystemException,
+                    ErrorCode = (int)ErrorMessageCodeEnum.SystemException,
                     Message = ex.Message,
                 };
             }
         }
-        
+
     }
 }

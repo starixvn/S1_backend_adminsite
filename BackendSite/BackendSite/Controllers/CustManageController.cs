@@ -89,6 +89,8 @@ namespace BackendSite.Controllers
             {
                 selectStatus = Array.ConvertAll<string, int>(custInfoReq.SelectStatus.Split(','), s => int.Parse(s)).ToList();
             }
+
+
             var ExportCustInfo = custInfoBLL.GetCustInfoExportList(selectSite, 
                                                                     custInfoReq.BirDate, 
                                                                     custInfoReq.BirMonth, 

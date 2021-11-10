@@ -107,7 +107,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         /// <param name="para"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
         [HttpPost]
-        public ApiListResult<Announcement> GetAnnouncement(GetAnnouncementReq para)
+        public ApiListResult<Announcement> GetAnnouncementList(GetAnnouncementReq para)
         {
             var totalPages = 0;
             var rowCount = 0;

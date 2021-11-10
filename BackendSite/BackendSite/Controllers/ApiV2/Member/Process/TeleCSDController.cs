@@ -42,7 +42,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<int> CurrencIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
             public int Deposit { get; set; }
             public int CallOut { get; set; }
             public int DormantUser { get; set; }
@@ -69,7 +69,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<int> CurrencIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
             public int Deposit { get; set; }
             public int CallOut { get; set; }
             public int DormantUser { get; set; }
@@ -102,10 +102,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
         [HttpPost]
-        public ApiListResult<CustTele> GetTeleCSD(TeleCsdReq req)
+        public ApiListResult<CustTele> GetTeleCSDList(TeleCsdReq req)
         {
             var searchResult = _custInfoBll.GetTeleCSD(JsonConvert.SerializeObject(req.SiteIds),
-                                                     JsonConvert.SerializeObject(req.CurrencIds),
+                                                     JsonConvert.SerializeObject(req.CurrencyIds),
                                                      req.StartDate,
                                                      req.EndDate,
                                                      req.Deposit,
@@ -147,7 +147,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
         [HttpPost]
-        public ApiResult UpdateCustomerTele(TeleCsdUpdateReq req)
+        public ApiResult Update(TeleCsdUpdateReq req)
         {
             if (_custInfoBll.UpdateCustomerTele(req.SiteId, req.CustId, User.Identity.Name) > 0)
             {
@@ -175,10 +175,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns>檔案</returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
         [HttpPost]
-        public IActionResult ExportTeleCSDData(ExportTeleCsdDataReq req)
+        public IActionResult ExportTeleCSDList(ExportTeleCsdDataReq req)
         {
             var exportData = _custInfoBll.GetTeleCSDExportData(JsonConvert.SerializeObject(req.SiteIds),
-                                                              JsonConvert.SerializeObject(req.CurrencIds),
+                                                              JsonConvert.SerializeObject(req.CurrencyIds),
                                                               req.StartDate,
                                                               req.EndDate,
                                                               req.Deposit,
