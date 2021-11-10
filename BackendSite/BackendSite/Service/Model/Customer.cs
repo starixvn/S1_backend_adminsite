@@ -41,8 +41,8 @@ namespace BackendSite.Service.Model
         public bool EmailVerified { get; set; }
         public string Iovation { get; set; }
         public int Status { get; set; }
-        public DateTimeOffset LastLoginTime { get; set; }
-        public DateTimeOffset RegTime { get; set; }
+        public DateTime LastLoginTime { get; set; }
+        public DateTime RegTime { get; set; }
         public string Email { get; set; }
         public string Profile { get; set; }
         public decimal Balance { get; set; }
@@ -66,7 +66,7 @@ namespace BackendSite.Service.Model
         public IEnumerable<TpWallet> tpWallet { get; set; }
         public IEnumerable<Promotion> promotions { get; set; }
         public string AffiliateId { get; set; }
-        public DateTimeOffset? ReloadTime { get; set; }
+        public DateTime? ReloadTime { get; set; }
         public string IP { get; set; }
         public string LevelName { get; set; }
         public string AffiliateCode { get; set; }
@@ -75,10 +75,10 @@ namespace BackendSite.Service.Model
         public string LastBettingTime { get; set; }
         public decimal TotalAdjustment { get; set; }
         public decimal TotalBonusClaimed { get; set; }
-        public DateTimeOffset? LastWithdrawalTimeRecord { get; set; }
-        public DateTimeOffset? LastDepositTimeRecord { get; set; }
-        public DateTimeOffset? LastTpBetRecordTimeRecord { get; set; }
-        public DateTimeOffset? FirstDepositTimeRecord { get; set; }
+        public DateTime? LastWithdrawalTimeRecord { get; set; }
+        public DateTime? LastDepositTimeRecord { get; set; }
+        public DateTime? LastTpBetRecordTimeRecord { get; set; }
+        public DateTime? FirstDepositTimeRecord { get; set; }
         public string TagList { get; set; }
         public List<int> ITagList { get; set; }
         public int EnablePromotion { get; set; }
