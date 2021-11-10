@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
+using BackendSite.Service.Library;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.DAL
@@ -24,6 +25,8 @@ namespace BackendSite.Service.DAL
         private readonly WithdrawalBankAccountingService _withdrawalBankAccountingService;
         private readonly ILogger<WithdrawalService> _logger;
         private const int TypePosition = 1000;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
         #endregion
 
@@ -35,6 +38,8 @@ namespace BackendSite.Service.DAL
             _walletService = provider.GetRequiredService<WalletService>();
             _withdrawalBankAccountingService = provider.GetRequiredService<WithdrawalBankAccountingService>();
             _logger = provider.GetRequiredService<ILogger<WithdrawalService>>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
         #endregion
@@ -226,20 +231,14 @@ namespace BackendSite.Service.DAL
             return depositList;
         }
 
-        public IEnumerable<WithdrawalKYC> GetWithdrawalKYC(int SiteId)
+        public IEnumerable<WithdrawalKYC> GetWithdrawalKYC(int siteId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var withdrawalKYCList = conn.Query<WithdrawalKYC>("Admin_WithdrawalKyc_Get", new { SiteId },
-                commandType: CommandType.StoredProcedure);
-            return withdrawalKYCList;
+            return _mainDbClient.Query<WithdrawalKYC>("Admin_WithdrawalKyc_Get", new DynamicParameters(new {SiteId = siteId }));
         }
 
         public bool EditWithdrawalKYC(WithdrawalKYC withdrawalKYC)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_WithdrawalKyc_Set",
-                new { withdrawalKYC.SiteId, withdrawalKYC.CurrencyId, withdrawalKYC.Amount },
-                commandType: CommandType.StoredProcedure) > 0;
+            return _mainDbClient.Execute("Admin_WithdrawalKyc_Set",new DynamicParameters(new { withdrawalKYC.SiteId, withdrawalKYC.CurrencyId, withdrawalKYC.Amount })) > 0;
         }
 
         public IEnumerable<WithdrawalMinInfo> GetWithdrawalLimitData(int SiteId)

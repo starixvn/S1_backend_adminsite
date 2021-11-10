@@ -546,31 +546,11 @@
         "Childs": null
       },
       {
-        "Key": "BannerManagement",
-        "Title": "Banner Management",
-        "FuncKey": "Marketing/BannerManage",
-        "Controller": "Marketing",
-        "Action": "BannerManage",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
         "Key": "DrawPrizeReport",
         "Title": "Draw Prize Report",
         "FuncKey": "Marketing/DrawPrizeReport",
         "Controller": "Marketing",
         "Action": "DrawPrizeReport",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "GameCasinoManagement",
-        "Title": "Game Casino Management",
-        "FuncKey": "Marketing/GameCasinoManagement",
-        "Controller": "Marketing",
-        "Action": "GameCasinoManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null
@@ -596,61 +576,11 @@
         "Childs": null
       },
       {
-        "Key": "LatestHighlightVideoManagement",
-        "Title": "Latest Highlight Video Management",
-        "FuncKey": "Marketing/LatestHighlightVideoManagement",
-        "Controller": "Marketing",
-        "Action": "LatestHighlightVideoManagement",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
         "Key": "VipRebateMangetment",
         "Title": "Vip Rebate Mangetment",
         "FuncKey": "Marketing/VipRebateMangetment",
         "Controller": "Marketing",
         "Action": "VipRebateMangetment",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "DomainManagement",
-        "Title": "Domain Management",
-        "FuncKey": "Marketing/DomainManage",
-        "Controller": "Marketing",
-        "Action": "DomainManage",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "VendersMaintenance",
-        "Title": "Venders Maintenance",
-        "FuncKey": "Marketing/TpMaintain",
-        "Controller": "Marketing",
-        "Action": "TpMaintain",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "LeaderBoardExtraPoint",
-        "Title": "LeaderBoard ExtraPoint",
-        "FuncKey": "Marketing/LeaderBoardExtraPoint",
-        "Controller": "Marketing",
-        "Action": "LeaderBoardExtraPoint",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "AppLinkManagement",
-        "Title": "App Link Management",
-        "FuncKey": "Marketing/AppLinkManagement",
-        "Controller": "Marketing",
-        "Action": "AppLinkManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null
@@ -709,6 +639,84 @@
         "FuncKey": "BankFinancial/ReasonManagement",
         "Controller": "BankFinancial",
         "Action": "ReasonManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      }
+    ]
+  },
+  {
+    "Key": "",
+    "Title": "CMS",
+    "Icon": "icon-csd",
+    "Roles": null,
+    "Childs": [
+      {
+        "Key": "BannerManagement",
+        "Title": "Banner Management",
+        "FuncKey": "CMS/BannerManage",
+        "Controller": "Marketing",
+        "Action": "BannerManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "GameCasinoManagement",
+        "Title": "Game Casino Management",
+        "FuncKey": "CMS/GameCasinoManagement",
+        "Controller": "Marketing",
+        "Action": "GameCasinoManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "LatestHighlightVideoManagement",
+        "Title": "Latest Highlight Video Management",
+        "FuncKey": "CMS/LatestHighlightVideoManagement",
+        "Controller": "Marketing",
+        "Action": "LatestHighlightVideoManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "DomainManagement",
+        "Title": "Domain Management",
+        "FuncKey": "CMS/DomainManage",
+        "Controller": "Marketing",
+        "Action": "DomainManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "VendersMaintenance",
+        "Title": "Venders Maintenance",
+        "FuncKey": "CMS/TpMaintain",
+        "Controller": "Marketing",
+        "Action": "TpMaintain",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "LeaderBoardExtraPoint",
+        "Title": "LeaderBoard ExtraPoint",
+        "FuncKey": "CMS/LeaderBoardExtraPoint",
+        "Controller": "Marketing",
+        "Action": "LeaderBoardExtraPoint",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "AppLinkManagement",
+        "Title": "App Link Management",
+        "FuncKey": "CMS/AppLinkManagement",
+        "Controller": "Marketing",
+        "Action": "AppLinkManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null

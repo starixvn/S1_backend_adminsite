@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using LazZiya.ImageResize;
 using Microsoft.AspNetCore.Authorization;
@@ -18,8 +13,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
@@ -41,6 +40,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ExcelBLL _excelBll;
         private readonly ILogger<CustomerManageController> _logger;
         private readonly SelLangBLL _selLangBll;
+
+        /// <summary>
+        /// 確認圖檔檔案類型
+        /// </summary>
+        private readonly Dictionary<string, System.Drawing.Imaging.ImageFormat> _contentTypesCheck =
+            new Dictionary<string, System.Drawing.Imaging.ImageFormat>(comparer: StringComparer.OrdinalIgnoreCase)
+        {
+            {"image/png",System.Drawing.Imaging.ImageFormat.Png},
+            {"image/jpeg",System.Drawing.Imaging.ImageFormat.Jpeg},
+            { "image/gif",System.Drawing.Imaging.ImageFormat.Gif}
+        };
 
         #endregion
 
@@ -64,9 +74,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         #region API Model
 
-        public class CustInfoListReq
+        public class CustInfoListReq : ApiRequestPageModel
         {
-            public IEnumerable<int> SelectSite { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
             public long? StartDate { get; set; }
             public long? EndDate { get; set; }
             public int? BirDate { get; set; }
@@ -80,11 +91,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string Email { get; set; }
             public string PhoneNo { get; set; }
             public int? AffId { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
-            public IEnumerable<int> SelectCurrency { get; set; }
             public string BankAccountNumber { get; set; }
-            public IEnumerable<int> SelectStatus { get; set; }
+            public IEnumerable<int> Statuses { get; set; }
         }
 
         public class CustStatusSwitchRequest
@@ -350,7 +358,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             try
             {
                 var pageNumber = custInfoListReq.PageNumber;
-                var data = _custInfoBll.GetCustInfoList(custInfoListReq.SelectSite,
+                var data = _custInfoBll.GetCustInfoList(custInfoListReq.SiteIds,
                     custInfoListReq.BirDate,
                     custInfoListReq.BirMonth,
                     custInfoListReq.BirYear,
@@ -365,9 +373,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     custInfoListReq.EndDate,
                     custInfoListReq.PageSize,
                     custInfoListReq.AffId,
-                    custInfoListReq.SelectCurrency,
+                    custInfoListReq.CurrencyIds,
                     custInfoListReq.BankAccountNumber?.Trim(),
-                    custInfoListReq.SelectStatus,
+                    custInfoListReq.Statuses,
                     ref pageNumber,
                     out var totalPages,
                     out var rowCount);
@@ -415,7 +423,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [RequestSizeLimit(40000000)]
         public IActionResult ExportCustInfoList(CustInfoListReq custInfoReq)
         {
-            var ExportCustInfo = _custInfoBll.GetCustInfoExportList(custInfoReq.SelectSite,
+            var ExportCustInfo = _custInfoBll.GetCustInfoExportList(custInfoReq.SiteIds,
                                                                     custInfoReq.BirDate,
                                                                     custInfoReq.BirMonth,
                                                                     custInfoReq.BirYear,
@@ -429,9 +437,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                                     custInfoReq.StartDate,
                                                                     custInfoReq.EndDate,
                                                                     custInfoReq.AffId,
-                                                                    custInfoReq.SelectCurrency,
+                                                                    custInfoReq.CurrencyIds,
                                                                     custInfoReq.BankAccountNumber,
-                                                                    custInfoReq.SelectStatus);
+                                                                    custInfoReq.Statuses);
 
             var stream = _excelBll.Export(ExportCustInfo);
             return _excelBll.ExcelFile(stream, "CustInfoList");
@@ -682,17 +690,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         #region CSD > Customer Administration > CustInfo Photo
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="CustId"></param>
-        /// <returns></returns>
         [HttpGet]
         public IActionResult GetCustPhotoId(int CustId)
         {
             var custPhotoId = _custInfoBll.GetCustPhotoId(CustId);
             if (custPhotoId == null)
             {
+                //return StatusCode(404);
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
             else
@@ -707,65 +711,66 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="CustId"></param>
         /// <param name="File"></param>
         /// <returns></returns>
-        //[HttpPost]
-        //public ApiResult UploadCustPhotoId([FromForm] int CustId, [FromForm] IFormFile File)
-        //{
-        //    var xSize = 500m;
-        //    var custInfo = _custInfoBll.GetCustInfoWithCache(CustId);
-        //    decimal xCell = 1;
-        //    if (_contentTypesCheck.ContainsKey(File.ContentType))
-        //    {
-        //        using var fileStream = File.OpenReadStream();
-        //        using var uploadedImage = Image.FromStream(fileStream);
-        //        using var ms = new MemoryStream();
+        [HttpPost]
+        public ApiResult UploadCustPhotoId([FromForm] int CustId, [FromForm] IFormFile File)
+        {
+            var xSize = 500m;
+            var custInfo = _custInfoBll.GetCustInfoWithCache(CustId);
+            decimal xCell = 1;
+            if (_contentTypesCheck.ContainsKey(File.ContentType))
+            {
+                using var fileStream = File.OpenReadStream();
+                using var uploadedImage = Image.FromStream(fileStream);
+                using var ms = new System.IO.MemoryStream();
 
-        //        if (uploadedImage.Width > xSize || uploadedImage.Height > xSize)
-        //        {
+                if (uploadedImage.Width > xSize || uploadedImage.Height > xSize)
+                {
 
-        //            if (uploadedImage.Width > uploadedImage.Height)
-        //            {
-        //                xCell = xSize / uploadedImage.Width;
-        //            }
-        //            else
-        //            {
-        //                xCell = xSize / uploadedImage.Height;
-        //            }
+                    if (uploadedImage.Width > uploadedImage.Height)
+                    {
+                        xCell = xSize / uploadedImage.Width;
+                    }
+                    else
+                    {
+                        xCell = xSize / uploadedImage.Height;
+                    }
 
-        //        }
+                }
 
-        //        var graphicOptions = new GraphicOptions
-        //        {
-        //            CompositingQuality = Drawing2D.CompositingQuality.HighSpeed,
-        //            SmoothingMode = Drawing2D.SmoothingMode.HighSpeed
-        //        };
-        //        var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
-        //        img.Save(ms, Imaging.ImageFormat.Jpeg);
+                var graphicOptions = new GraphicOptions
+                {
+                    CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed,
+                    SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed
+                };
+                var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
+                img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 
-        //        var fileName = File.FileName;
-        //        fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
-        //        fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
+                var fileName = File.FileName;
+                fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
+                fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
 
-        //        var fileBytes = ms.ToArray();
-        //        var result = _custInfoBll.SetCustPhotoId(custInfo.CustId, custInfo.SiteId, fileName, fileBytes);
+                var fileBytes = ms.ToArray();
+                var result = _custInfoBll.SetCustPhotoId(custInfo.CustId, custInfo.SiteId, fileName, fileBytes);
 
-        //        if (result > 0)
-        //        {
-        //            return new ApiResult
-        //            {
-        //                ErrorCode = (int)ErrorCodeEnum.Success,
-        //                Message = "Upload Success."
-        //            };
-        //        }
-        //        else
-        //        {
-        //            throw new AdminException(ErrorCodeEnum.Fail, "Upload Fail.");
-        //        }
-        //    }
-        //    else
-        //    {
-        //        throw new AdminException(ErrorCodeEnum.FileTypeNotMatch);
-        //    }
-        //}
+                if (result > 0)
+                {
+                    return new ApiResult
+                    {
+                        ErrorCode = (int)ErrorCodeEnum.Success,
+                        Message = "Upload Success."
+                    };
+                }
+                else
+                {
+                    throw new AdminException(ErrorCodeEnum.Fail, "Upload Fail.");
+                }
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.FileTypeNotMatch);
+            }
+        }
+
 
         /// <summary>
         /// Ask Re-Upload
@@ -828,17 +833,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
             return Regex.Replace(email, pattern, m => new string('*', m.Length));
         }
-
-        /// <summary>
-        /// 確認圖檔檔案類型
-        /// </summary>
-        //private readonly Dictionary<string, ImageFormat> _contentTypesCheck =
-        //    new Dictionary<string, ImageFormat>(comparer: StringComparer.OrdinalIgnoreCase)
-        //{
-        //    {"image/png",ImageFormat.Png},
-        //    {"image/jpeg",ImageFormat.Jpeg},
-        //    { "image/gif",ImageFormat.Gif}
-        //};
 
         #endregion
 
