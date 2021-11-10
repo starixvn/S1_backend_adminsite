@@ -24,43 +24,33 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<FuncPermissionModel> GetPermissionJSONData()
         {
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<FuncPermissionModel>>(permissionService.GetPermissionJSONData());
+            var result = JsonConvert.DeserializeObject<IEnumerable<FuncPermissionModel>>(permissionService.GetPermissionJSONData());
             return result;
         }
 
         public IEnumerable<GroupPermisison> GetAllPermission()
         {
             var result = new List<GroupPermisison>();
-
+            
             var permissionDatas = GetPermissionJSONData();
             foreach (var func in permissionDatas)
             {
-                foreach (var funcKeyItem in func.Settings)
+                foreach (var funcKeyItem in func.Settings.Where(funcKeyItem => funcKeyItem != null))
                 {
-                    var item = GetFuncItem(func.Settings, funcKeyItem.FuncKey);
-                    if (item != null)
+                    if (funcKeyItem.SubFuncKeys != null)
                     {
-                        if (item.SubFuncKeys == null)
+                        var subFuncKeyDatas = funcKeyItem.SubFuncKeys.Select(x => x.FuncKey);
+                        result.AddRange(subFuncKeyDatas.Select(
+                            subFuncKeyItem => new GroupPermisison {GroupSEQ = 0, FuncKey = funcKeyItem.FuncKey, SubFuncKeys = subFuncKeyItem}));
+                    }
+                    else
+                    {
+                        result.Add(new GroupPermisison
                         {
-                            result.Add(new GroupPermisison
-                            {
-                                GroupSEQ = 0,
-                                FuncKey = funcKeyItem.FuncKey,
-                                SubFuncKeys = null
-                            });
-                            continue;
-                        }
-                        var subFuncKeyDatas = item.SubFuncKeys.Select(x => x.FuncKey);
-                        foreach (var subFuncKeyItem in subFuncKeyDatas)
-                        {
-                            result.Add(new GroupPermisison
-                            {
-                                GroupSEQ = 0,
-                                FuncKey = funcKeyItem.FuncKey,
-                                SubFuncKeys = subFuncKeyItem
-                            });
-                        }
-                        break;
+                            GroupSEQ = 0,
+                            FuncKey = funcKeyItem.FuncKey,
+                            SubFuncKeys = null
+                        });
                     }
                 }
             }
