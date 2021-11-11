@@ -655,9 +655,13 @@ namespace BackendSite.Service.DAL
         /// <param name="expectedSpecificRow"></param>
         /// <param name="expectedRebateRow"></param>
         /// <param name="expectedConditionRow"></param>
+        /// <param name="expectedCashBackRow"></param>
+        /// <param name="Operator"></param>
+        /// <param name="newSpecialCode"></param>
+        /// <param name="isSpecial"></param>
         /// <returns></returns>
         public bool DuplicatePromotionFlow(string bonusCode, int siteId, string newBonusCode, int expectedSpecificRow,
-            int expectedRebateRow, int expectedConditionRow, int expectedCashBackRow,string Operator)
+            int expectedRebateRow, int expectedConditionRow, int expectedCashBackRow,string Operator,string newSpecialCode, bool isSpecial)
         {
             using var connection =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));

@@ -70,6 +70,8 @@ namespace BackendSite.Controllers.Api
             public string BonusCode { get; set; }
             public int SiteId { get; set; }
             public string NewBonusCode { get; set; }
+            public string NewSpecialCode { get; set; }
+            public bool IsSpecial { get; set; }
         }
 
         public class ReferralCustListReq
@@ -273,7 +275,7 @@ namespace BackendSite.Controllers.Api
             {
                 apiResult.ErrorCode = _bonusManageBLL.DuplicatePromotion(duplicateRequest.BonusCode,
                     duplicateRequest.SiteId,
-                    duplicateRequest.NewBonusCode, User.Identity.Name) ? 0 : 1;
+                    duplicateRequest.NewBonusCode, User.Identity.Name, duplicateRequest.NewSpecialCode, duplicateRequest.IsSpecial) ? 0 : 1;
                 apiResult.Message = apiResult.ErrorCode == 1
                     ? "Duplicate fail.The bonus setting already exists which with same promotion-type & product-category."
                     : string.Empty;

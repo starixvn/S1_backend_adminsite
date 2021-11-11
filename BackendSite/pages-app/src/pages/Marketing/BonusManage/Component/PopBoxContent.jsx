@@ -8,7 +8,6 @@ export default ({
     DefWalletType,
     Action
 }) => {
-
     return (
         <div className="newwrapper">
             <div className="popup-wrap is-show">
@@ -43,6 +42,22 @@ export default ({
                                                         inputClass="textfield__input"
                                                     />
                                                 </div>
+                                                {Datas.isSpecial ? 
+                                                <>
+                                                    <div className="form__title">
+                                                        <span className="text">Special Code</span>
+                                                    </div>
+                                                    <div className="textfield">
+                                                        <InputBox
+                                                            Title="SpecialCode"
+                                                            HideTitle={true}
+                                                            OnChange={Action.SetCloneValue}
+                                                            dataColumn="cloneSpecialCode"
+                                                            value={NewDatas.cloneSpecialCode}
+                                                            inputClass="textfield__input"
+                                                        />
+                                                    </div>
+                                                </>:null}                                             
                                             </div>
                                             <div className="table" style={{ marginTop: "1.25rem" }}>
                                                 <table className="table table-striped">

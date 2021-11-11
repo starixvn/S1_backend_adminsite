@@ -106,7 +106,7 @@ namespace BackendSite.Service.BLL
                 0, 0, 0, Operator, vipLevelCondition);
         }
 
-        public bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode,string Operator)
+        public bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode,string Operator, string newSpecialCode, bool isSpecial)
         {
             //return _bonusManageService.DuplicatePromotion(bonusCode, siteId, newBonusCode);
 
@@ -123,7 +123,9 @@ namespace BackendSite.Service.BLL
                  expectedRebateRow,
                  expectedConditionRow,
                  expectedCashBackRow,
-                 Operator);
+                 Operator,
+                 newSpecialCode,
+                 isSpecial);
         }
 
         public int SetPromotionStatus(string bonusCode, int siteId, int status)
