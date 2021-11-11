@@ -23,9 +23,6 @@ namespace BackendSite.Service.Model
     }
     public class CustInfoDetail
     {
-        private DateTimeOffset _lastLoginTime { get; set; }
-        private DateTimeOffset _regTime { get; set; }
-
         public string SiteName { get; set; }
         public int SiteId { get; set; }
         public int CustId { get; set; }
@@ -44,16 +41,8 @@ namespace BackendSite.Service.Model
         public bool EmailVerified { get; set; }
         public string Iovation { get; set; }
         public int Status { get; set; }
-        public DateTimeOffset LastLoginTime
-        {
-            get => _lastLoginTime;
-            set => _lastLoginTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
-        }
-        public DateTimeOffset RegTime
-        {
-            get => _regTime;
-            set => _regTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
-        }
+        public DateTime LastLoginTime { get; set; }
+        public DateTime RegTime { get; set; }
         public string Email { get; set; }
         public string Profile { get; set; }
         public decimal Balance { get; set; }
@@ -114,7 +103,7 @@ namespace BackendSite.Service.Model
         //public int VipLevel { get; set; }
         public string LevelName { get; set; }
         public string Agent { get; set; }
-        public DateTimeOffset RegTime { get; set; }
+        public DateTime RegTime { get; set; }
         public int Status { get; set; }
         public string SabaID { get; set; }
         public string SignupUrl { get; set; }

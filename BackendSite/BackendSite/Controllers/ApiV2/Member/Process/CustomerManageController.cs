@@ -261,7 +261,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// 
         /// Func Path：CSD >  Customer Administration > [Submit]
         /// </remarks>
-        /// <param name="custInfoListReq"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
@@ -330,7 +330,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// 
         /// Func Path：CSD >  Customer Administration > [Export Excel]
         /// </remarks>
-        /// <param name="custInfoReq"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
@@ -395,7 +395,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiResult<CustInfoDetail>> GetCustInfoDetailAsync(CustInfoReq custInfoReq)
         {
 
-            var custInfoDetail = await _custInfoBll.GetCustInfoDetailAsync(custInfoReq.CustId, custInfoReq.UserName);
+            var custInfoDetail = await _custInfoBll.GetCustInfoDetailAsync(custInfoReq.CustId,
+                custInfoReq.UserName);
+
             if (custInfoDetail != null)
             {
                 if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_readDetail"))
@@ -621,6 +623,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         #region CSD > Customer Administration > CustInfo Photo
 
+        /// <summary>
+        /// CustomerManage/GetCustPhotoId 取得客戶圖片
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > [Edit] User Level、Full Name、Birthday (M/D/Y)、Phone Number、E-Mail
+        /// 
+        /// </remarks>
+        /// <param name="CustId"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
         [HttpGet]
         public IActionResult GetCustPhotoId(int CustId)
         {
