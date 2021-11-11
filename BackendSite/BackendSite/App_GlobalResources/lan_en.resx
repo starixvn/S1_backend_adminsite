@@ -630,6 +630,9 @@
   <data name="lbl_PromotionType8" xml:space="preserve">
     <value>Advertising</value>
   </data>
+  <data name="lbl_PromotionType9" xml:space="preserve">
+    <value>Retention free bet</value>
+  </data>
   <data name="lbl_DepositSubmission" xml:space="preserve">
     <value>Deposit Submission</value>
   </data>
