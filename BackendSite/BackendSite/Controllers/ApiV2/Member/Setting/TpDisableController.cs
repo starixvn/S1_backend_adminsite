@@ -175,7 +175,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// TpDisable/Update 更新會員第三方被禁止的資料
+        /// TpDisable/Set 新增or更新會員第三方被禁止的資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -185,7 +185,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="disableGames"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
-        public async Task<ApiResult> Update(DisableUser disableGames)
+        public async Task<ApiResult> Set(DisableUser disableGames)
         {
             var apiResult = new ApiResult();
             try
