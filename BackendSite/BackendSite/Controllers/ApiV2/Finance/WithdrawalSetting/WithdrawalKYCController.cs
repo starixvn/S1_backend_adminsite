@@ -40,11 +40,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         }
 
         #endregion
-        
+
         #region CSD > Withdrawal KYC Control
 
         /// <summary>
-        /// Withdrawal/WithdrawalKYCList 取得提款KYC控制資料
+        /// Withdrawal/GetList 取得提款KYC控制資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -67,7 +67,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         }
 
         /// <summary>
-        /// Withdrawal/EditWithdrawalKYCList 更新提款KYC資料
+        /// Withdrawal/Update 更新提款KYC資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST

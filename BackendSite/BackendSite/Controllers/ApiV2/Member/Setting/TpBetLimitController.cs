@@ -60,7 +60,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         #endregion
 
         /// <summary>
-        /// TpBetLimit/Get 取得會員下注限額資料清單
+        /// TpBetLimit/GetList 取得會員下注限額資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -112,7 +112,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// TpBetLimit/PostUserBetLimit 更新指定會員下注限額資料
+        /// TpBetLimit/Update 更新指定會員下注限額資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
