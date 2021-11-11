@@ -721,6 +721,17 @@ namespace BackendSite.Service.DAL
             return true;
         }
 
+        public IEnumerable<CheckSpecialCodeDuplicate> CheckSpecialCodeDuplicate(PromotionInfo promotion)
+        {
+            var p = new DynamicParameters();
+
+            p.Add("_SpecialCode", promotion.SpecialCode);
+
+            using var conn =
+                    new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<CheckSpecialCodeDuplicate>("Admin_PromotionSpecialCode_Get", p,
+                commandType: CommandType.StoredProcedure);
+        }
         #endregion
 
         #region Private Methods

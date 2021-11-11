@@ -245,5 +245,14 @@ namespace BackendSite.Service.BLL
         {
             return _bonusManageService.SetLeaderboardExtraPoint( activeDate, siteId, categoryId, userName, extraPoint, lastUpdateUser);
         }
+
+        public bool CheckSpecialCodeDuplicate(PromotionInfo promotion)
+        {
+            if(_bonusManageService.CheckSpecialCodeDuplicate(promotion).ToList().Count > 0)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

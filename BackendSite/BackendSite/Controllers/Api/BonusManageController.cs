@@ -217,6 +217,18 @@ namespace BackendSite.Controllers.Api
             try
             {
                 //var errorCode = _bonusManageBLL.SetPromotion(IsAdd, Promotion);
+
+                //如果是新增時有填SpecialCode 檢查SpecialCode是否有重複
+                if (isAdd && promotion.IsSpecial)
+                {
+                    if (_bonusManageBLL.CheckSpecialCodeDuplicate(promotion))
+                    {
+                        apiResult.ErrorCode = 999;
+                        apiResult.Message = "Duplicate Special Code.";
+                        return apiResult;
+                    }
+                }
+                
                 var errorCode = _bonusManageBLL.SetPromotion(isAdd, promotion, vipLevelCondition, User.Identity.Name) ? 0 : 1;
 
                 apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,

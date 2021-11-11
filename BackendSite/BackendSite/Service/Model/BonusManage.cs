@@ -218,4 +218,9 @@ namespace BackendSite.Service.Model
         public string GameName { get; set; }
         public int Key { get; set; }
     }
+    public class CheckSpecialCodeDuplicate
+    {
+        public string BonusCode { get; set; }
+        public int SiteId { get; set; }
+    }
 }
