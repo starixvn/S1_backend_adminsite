@@ -77,7 +77,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// Func Path： [Available Category]
         /// </remarks>
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategoryList()
+        public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategory()
         {
             var data = await _reportBll.GetTpCategoryList();
             var apiResult = new ApiResult<IEnumerable<TpCategoryBetLimit>>

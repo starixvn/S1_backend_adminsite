@@ -69,7 +69,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        public ApiListResult<UserBetLimit> Get(QueryUserBetLimitReq req)
+        public ApiListResult<UserBetLimit> GetList(QueryUserBetLimitReq req)
         {
             var pageNumber = req.PageNumber;
             var datas = _userBetLimitBll.GetUserBetLimit(req.SiteIds, req.UserName, req.StartDate, req.EndDate,
@@ -121,7 +121,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        public async Task<ApiResult> PostUserBetLimit(CustBetLimit req)
+        public async Task<ApiResult> Update(CustBetLimit req)
         {
             var updateOperator = User.Identity.Name;
             var customer = await _custInfoBll.GetCustId(req.UserName, req.SiteId);
