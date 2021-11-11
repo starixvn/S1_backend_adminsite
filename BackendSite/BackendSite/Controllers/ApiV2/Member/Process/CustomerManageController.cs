@@ -40,6 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ExcelBLL _excelBll;
         private readonly ILogger<CustomerManageController> _logger;
         private readonly SelLangBLL _selLangBll;
+        private readonly Tools _tools;
 
         /// <summary>
         /// 確認圖檔檔案類型
@@ -68,18 +69,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _logger = provider.GetRequiredService<ILogger<CustomerManageController>>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
+            _tools = provider.GetRequiredService<Tools>();
         }
 
         #endregion
 
         #region API Model
 
-        public class CustInfoListReq : ApiRequestPageModel
+        public class CustInfoListRequest : ApiRequestPageModel
         {
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
-            public long? StartDate { get; set; }
-            public long? EndDate { get; set; }
+            public string StartDate { get; set; }
+            public string EndDate { get; set; }
             public int? BirDate { get; set; }
             public int? BirMonth { get; set; }
             public int? BirYear { get; set; }
@@ -225,59 +228,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public IEnumerable<int> GameTypes { get; set; }
         }
 
-        #region TeleCSD
-
-        public class TeleCSDpara
-        {
-            public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<int> Currency { get; set; }
-            public int Deposit { get; set; }
-            public int CallOut { get; set; }
-            public int DormantUser { get; set; }
-            public long StartDate { get; set; }
-            public long EndDate { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
-            public TeleCSDpara()
-            {
-                //PageSize預設10
-                if (PageSize == 0)
-                    PageSize = 10;
-            }
-        }
-
-        public class TeleCSDUpdatepara
-        {
-            public int CustId { get; set; }
-            public int SiteId { get; set; }
-        }
-
-        #endregion
-
-        #region TagManagement
-        public class EditTagManagementpara
-        {
-            public int Id { get; set; }
-            public string TagName { get; set; }
-            public string TagColour { get; set; }
-            public string Description { get; set; }
-        }
-        public class GetTagDatapara
-        {
-            public int Status { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
-        }
-        public class SetTagStatuspara
-        {
-            public int Id { get; set; }
-        }
         public class SetCustTagPara
         {
             public int CustId { get; set; }
             public IEnumerable<int> SelectTag { get; set; }
         }
-        #endregion
 
         public class CustPromotionpara
         {
@@ -293,49 +248,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int CustId { get; set; }
             public int EnablePromotion { get; set; }
         }
-
-        #region RegLiveStatus
-        public class RegLiveStatusPara
-        {
-            public IEnumerable<int> SiteIds { get; set; }
-            public int Currency { get; set; }
-            public int DepositStatus { get; set; }
-            public int Status { get; set; }
-            public string User { get; set; }
-            public int Sort { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
-            public long StartDate { get; set; }
-            public long EndDate { get; set; }
-            public string AffiliatesCode { get; set; }
-            public int AgentCodeType { get; set; }
-        }
-
-        public class SetRegLiveStatusPara
-        {
-            public int CustId { get; set; }
-            public int Status { get; set; }
-            public int SiteId { get; set; }
-        }
-
-        public class AddRegLiveStatusNotes
-        {
-            public int CustId { get; set; }
-            public string Note { get; set; }
-        }
-        public class DeleteRegLiveStatusNotes
-        {
-            public int CustId { get; set; }
-            public int Id { get; set; }
-        }
-        public class EditRegLiveStatusNotes
-        {
-            public int CustId { get; set; }
-            public int Id { get; set; }
-            public string Note { get; set; }
-        }
-
-        #endregion
 
         #endregion
 
@@ -353,59 +265,61 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq custInfoListReq)
+        public ApiResult GetCustInfoList(CustInfoListRequest request)
         {
-            try
-            {
-                var pageNumber = custInfoListReq.PageNumber;
-                var data = _custInfoBll.GetCustInfoList(custInfoListReq.SiteIds,
-                    custInfoListReq.BirDate,
-                    custInfoListReq.BirMonth,
-                    custInfoListReq.BirYear,
-                    custInfoListReq.UserName?.Trim(),
-                    custInfoListReq.AccountName?.Trim(),
-                    custInfoListReq.LoginIp?.Trim(),
-                    custInfoListReq.TransId?.Trim(),
-                    custInfoListReq.TpUserName?.Trim(),
-                    custInfoListReq.Email?.Trim(),
-                    custInfoListReq.PhoneNo?.Trim(),
-                    custInfoListReq.StartDate,
-                    custInfoListReq.EndDate,
-                    custInfoListReq.PageSize,
-                    custInfoListReq.AffId,
-                    custInfoListReq.CurrencyIds,
-                    custInfoListReq.BankAccountNumber?.Trim(),
-                    custInfoListReq.Statuses,
-                    ref pageNumber,
-                    out var totalPages,
-                    out var rowCount);
 
-                var custInfoDetails = data.ToList();
-                if (!custInfoDetails.Any())
-                {
-                    return new ApiListResult<CustInfoDetail>
-                    {
-                        ErrorCode = (int)ErrorCodeEnum.NoData,
-                        Message = _selLangBll.GetMsg(ErrorCodeEnum.NoData.GetDescription())
-                    };
-                }
-                return new ApiListResult<CustInfoDetail>
-                {
-                    Data = custInfoDetails,
-                    TotalPages = totalPages,
-                    PageNumber = pageNumber,
-                    RowCount = rowCount,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-            }
-            catch (Exception ex)
+            DateTimeOffset? startDate = null;
+            DateTimeOffset? endDate = null;
+
+            if (_tools.StringConvertDateTimeOffset(request.StartDate, TimeSpan.Zero,
+                out DateTimeOffset startDateResult,
+                out TimeSpan startDateTimeZone))
             {
-                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
-                return new ApiListResult<CustInfoDetail>
-                {
-                    ErrorCode = (int)ErrorCodeEnum.SystemException
-                };
+                startDate = startDateResult;
             }
+            if (_tools.StringConvertDateTimeOffset(request.EndDate, TimeSpan.Zero,
+                out DateTimeOffset endDateResult,
+                out TimeSpan endDateTimeZone))
+            {
+                endDate = endDateResult;
+            }
+
+            var pageNumber = request.PageNumber;
+            var data = _custInfoBll.GetCustInfoList(request.SiteIds,
+                request.BirDate,
+                request.BirMonth,
+                request.BirYear,
+                request.UserName?.Trim(),
+                request.AccountName?.Trim(),
+                request.LoginIp?.Trim(),
+                request.TransId?.Trim(),
+                request.TpUserName?.Trim(),
+                request.Email?.Trim(),
+                request.PhoneNo?.Trim(),
+                startDate,
+                endDate,
+                request.PageSize,
+                request.AffId,
+                request.CurrencyIds,
+                request.BankAccountNumber?.Trim(),
+                request.Statuses,
+                ref pageNumber,
+                out var totalPages,
+                out var rowCount);
+
+            var custInfoDetails = data.ToList();
+            if (!custInfoDetails.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            return new ApiListResult<CustInfoDetail>
+            {
+                Data = custInfoDetails,
+                TotalPages = totalPages,
+                PageNumber = pageNumber,
+                RowCount = rowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
@@ -421,25 +335,42 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         [RequestSizeLimit(40000000)]
-        public IActionResult ExportCustInfoList(CustInfoListReq custInfoReq)
+        public IActionResult ExportCustInfoList(CustInfoListRequest request)
         {
-            var ExportCustInfo = _custInfoBll.GetCustInfoExportList(custInfoReq.SiteIds,
-                                                                    custInfoReq.BirDate,
-                                                                    custInfoReq.BirMonth,
-                                                                    custInfoReq.BirYear,
-                                                                    custInfoReq.UserName,
-                                                                    custInfoReq.AccountName,
-                                                                    custInfoReq.LoginIp,
-                                                                    custInfoReq.TransId,
-                                                                    custInfoReq.TpUserName,
-                                                                    custInfoReq.Email,
-                                                                    custInfoReq.PhoneNo,
-                                                                    custInfoReq.StartDate,
-                                                                    custInfoReq.EndDate,
-                                                                    custInfoReq.AffId,
-                                                                    custInfoReq.CurrencyIds,
-                                                                    custInfoReq.BankAccountNumber,
-                                                                    custInfoReq.Statuses);
+
+            DateTimeOffset? startDate = null;
+            DateTimeOffset? endDate = null;
+
+            if (_tools.StringConvertDateTimeOffset(request.StartDate,TimeSpan.Zero,
+                out DateTimeOffset startDateResult,
+                out TimeSpan startDateTimeZone))
+            {
+                startDate = startDateResult.DateTime;
+            }
+            if (!_tools.StringConvertDateTimeOffset(request.EndDate, TimeSpan.Zero,
+                out DateTimeOffset endDateResult,
+                out TimeSpan endDateTimeZone))
+            {
+                endDate = endDateResult.DateTime;
+            }
+
+            var ExportCustInfo = _custInfoBll.GetCustInfoExportList(request.SiteIds,
+                                                                    request.BirDate,
+                                                                    request.BirMonth,
+                                                                    request.BirYear,
+                                                                    request.UserName,
+                                                                    request.AccountName,
+                                                                    request.LoginIp,
+                                                                    request.TransId,
+                                                                    request.TpUserName,
+                                                                    request.Email,
+                                                                    request.PhoneNo,
+                                                                    startDate,
+                                                                    endDate,
+                                                                    request.AffId,
+                                                                    request.CurrencyIds,
+                                                                    request.BankAccountNumber,
+                                                                    request.Statuses);
 
             var stream = _excelBll.Export(ExportCustInfo);
             return _excelBll.ExcelFile(stream, "CustInfoList");

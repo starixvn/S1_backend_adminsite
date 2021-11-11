@@ -86,7 +86,27 @@ namespace BackendSite.Service.BLL
 
             return vipLevelCache;
         }
-        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string accountName, string loginIp, string transId, string tpUserName, string email, string phoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency, string bankAccountNumber, IEnumerable<int> selectStatus, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite,
+            int? birDate,
+            int? birMonth,
+            int? birYear,
+            string userName,
+            string accountName,
+            string loginIp,
+            string transId,
+            string tpUserName,
+            string email,
+            string phoneNo,
+            DateTimeOffset? startDate,
+            DateTimeOffset? endDate,
+            int pageSize,
+            int? affId,
+            IEnumerable<int> selectCurrency,
+            string bankAccountNumber,
+            IEnumerable<int> selectStatus,
+            ref int pageNumber,
+            out int totalPages,
+            out int rowCount)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new[] { x.SiteId });
             var currencyList = new List<int>();
@@ -106,7 +126,23 @@ namespace BackendSite.Service.BLL
             return custInfoList;
         }
 
-        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, int? AffId, IEnumerable<int> selectCurrency, string BankAccountNumber, IEnumerable<int> selectStatus)
+        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(IEnumerable<int> selectSite,
+            int? birDate,
+            int? birMonth,
+            int? birYear,
+            string userName,
+            string AccountName,
+            string LoginIp,
+            string transId,
+            string TpUserName,
+            string Email,
+            string PhoneNo,
+            DateTimeOffset? startDate,
+            DateTimeOffset? endDate,
+            int? AffId,
+            IEnumerable<int> selectCurrency,
+            string BankAccountNumber,
+            IEnumerable<int> selectStatus)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
 
@@ -125,10 +161,10 @@ namespace BackendSite.Service.BLL
             var custInfoDetail = custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
             if (custInfoDetail != null)
             {
-                custInfoDetail.LastDepositTime = custInfoDetail.LastDepositTimeRecord == null ? "N/A" : custInfoDetail.LastDepositTimeRecord?.ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.LastWithdrawlTime = custInfoDetail.LastWithdrawalTimeRecord == null ? "N/A" : custInfoDetail.LastWithdrawalTimeRecord?.ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.LastBettingTime = custInfoDetail.LastTpBetRecordTimeRecord == null ? "N/A" : custInfoDetail.LastTpBetRecordTimeRecord?.ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.FirstDepositTime = custInfoDetail.FirstDepositTimeRecord == null ? "N/A" : custInfoDetail.FirstDepositTimeRecord?.ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.LastDepositTime = custInfoDetail.LastDepositTimeRecord == null ? "N/A" : Convert.ToDateTime(custInfoDetail.LastDepositTimeRecord).ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.LastWithdrawlTime = custInfoDetail.LastWithdrawalTimeRecord == null ? "N/A" : Convert.ToDateTime(custInfoDetail.LastWithdrawalTimeRecord).ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.LastBettingTime = custInfoDetail.LastTpBetRecordTimeRecord == null ? "N/A" : Convert.ToDateTime(custInfoDetail.LastTpBetRecordTimeRecord).ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                custInfoDetail.FirstDepositTime = custInfoDetail.FirstDepositTimeRecord == null ? "N/A" : Convert.ToDateTime(custInfoDetail.FirstDepositTimeRecord).ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
 
                 custInfoDetail.tpWallet = await tpBLL.GetTpWalletAsync(custInfoDetail.CustId);
                 custInfoDetail.promotions = promotionService.GetPromotionListByCustId(custInfoDetail.CustId);
@@ -224,9 +260,10 @@ namespace BackendSite.Service.BLL
                 var item = result.FirstOrDefault(x => x.GameType == data.GameType);
                 if (item == null)
                 {
-                    result.Add(new CustTurnoverRes {
+                    result.Add(new CustTurnoverRes
+                    {
                         UserName = data.UserName,
-                        GameType =data.GameType,
+                        GameType = data.GameType,
                         GameName = data.GameName,
                         StakeSettled = data.SettlementType == 1 ? data.Stake : 0,
                         StakeNotRollover = data.SettlementType == 3 ? data.Stake : 0,
@@ -524,12 +561,12 @@ namespace BackendSite.Service.BLL
             return custInfoService.GetAllSiteVipLevelList();
         }
 
-        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency,int depositStatus,int status,string username,int pageNumber,int pageSize,int sort, DateTimeOffset startDate, DateTimeOffset endDate,string affiliatesCode,int agentCodeType)
+        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
         {
             return custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pageNumber, pageSize, sort, startDate, endDate, affiliatesCode, agentCodeType);
         }
 
-        public int SetRegLiveStatus(int custId,int status,int siteId,string @operator)
+        public int SetRegLiveStatus(int custId, int status, int siteId, string @operator)
         {
             return custInfoService.SetRegLiveStatus(custId, status, siteId, @operator);
         }
@@ -539,17 +576,17 @@ namespace BackendSite.Service.BLL
             return custInfoService.GetRegLiveStatusNotes(custId);
         }
 
-        public int AddRegLiveStatusNote(int custId,string note, string @operator)
+        public int AddRegLiveStatusNote(int custId, string note, string @operator)
         {
             return custInfoService.AddRegLiveStatusNote(custId, note, @operator);
         }
 
-        public int DeleteRegLiveStatusNote(int custId,int id)
+        public int DeleteRegLiveStatusNote(int custId, int id)
         {
             return custInfoService.DeleteRegLiveStatusNote(custId, id);
         }
 
-        public int EditRegLiveStatusNote(int custId,int id, string note, string @operator)
+        public int EditRegLiveStatusNote(int custId, int id, string note, string @operator)
         {
             return custInfoService.EditRegLiveStatusNote(custId, id, note, @operator);
         }
@@ -557,18 +594,18 @@ namespace BackendSite.Service.BLL
         public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
         {
             var list = new List<RegLiveStatusExport>();
-            var result =  custInfoService.GetExportRegLiveStatus(siteIds, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType);
+            var result = custInfoService.GetExportRegLiveStatus(siteIds, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType);
             result.ToList().ForEach(x =>
             {
                 list.Add(new RegLiveStatusExport()
                 {
                     Site = x.SiteName,
                     Currency = x.Currency,
-                    UserName= x.UserName,
+                    UserName = x.UserName,
                     FullName = x.AccountName,
                     PhoneNo = x.PhoneNo,
                     Verify = Enum.GetName(typeof(VerifyType), x.PhoneVerified),
-                    RegTime = new DateTimeOffset(x.RegTime.DateTime,TimeSpan.Zero),
+                    RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
                     DepositStatus = Enum.GetName(typeof(DepositStatusType), x.ActStatus),
                     Status = Enum.GetName(typeof(RegLiveStatusType), x.Status),
                     AffCode = x.AffCode,
@@ -585,7 +622,7 @@ namespace BackendSite.Service.BLL
 
         public CustomerSwitchStatus GetCustSwitchStatus(int custId)
         {
-           return custInfoService.GetCustSwitchStatus(custId);
+            return custInfoService.GetCustSwitchStatus(custId);
         }
 
         public CustProfileReq GetCustProfile(int custId)

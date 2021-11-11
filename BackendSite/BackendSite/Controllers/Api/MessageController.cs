@@ -185,7 +185,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
         [HttpPost]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public ApiResult AddAnnouncement([FromForm] Announcement Datas, [FromForm] long _StartTime, [FromForm] long _EndTime)
+        public ApiResult AddAnnouncement([FromForm] AddAnnouncementModel Datas, [FromForm] long _StartTime, [FromForm] long _EndTime)
         {
             var apiResult = new ApiResult<dynamic>();
 
@@ -233,7 +233,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
         [HttpPost]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public ApiResult UpdateAnnouncement([FromForm] Announcement Datas, [FromForm] long _StartTime, [FromForm] long _EndTime)
+        public ApiResult UpdateAnnouncement([FromForm] UpdateAnnouncementModel Datas, [FromForm] long _StartTime, [FromForm] long _EndTime)
         {
             var apiResult = new ApiResult<dynamic>();
 

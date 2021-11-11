@@ -157,8 +157,8 @@ namespace BackendSite.Service.Model
 
     public class WithdrawalKYC
     {
-        public int CurrencyId { get; set; }
         public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
         public double Amount { get; set; }
 
     }

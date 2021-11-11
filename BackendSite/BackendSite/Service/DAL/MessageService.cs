@@ -78,7 +78,7 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.QueryFirst<Announcement>("Admin_Announcement_GetById", new DynamicParameters(new {Id = id}));
         }
         
-        public Announcement AddAnnouncement(Announcement data, string creator, int creatorId, DateTimeOffset startTime, DateTimeOffset endTime)
+        public Announcement AddAnnouncement(AddAnnouncementModel data, string creator, int creatorId, DateTimeOffset startTime, DateTimeOffset endTime)
         {
             var result = new Announcement();
             var param = new DynamicParameters();
@@ -103,7 +103,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public Announcement UpdateAnnouncement(Announcement data, string lastUpdater, int lastUpdaterId, DateTimeOffset startTime, DateTimeOffset endTime)
+        public Announcement UpdateAnnouncement(UpdateAnnouncementModel data, string lastUpdater, int lastUpdaterId, DateTimeOffset startTime, DateTimeOffset endTime)
         {
             var param = new DynamicParameters();
             param.Add("@Id", data.Id);

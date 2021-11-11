@@ -23,7 +23,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
         private readonly ReportBLL _reportBll;
         private readonly GameCasinoBLL _gameCasinoBll;
-        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
@@ -33,7 +32,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _gameCasinoBll = provider.GetRequiredService<GameCasinoBLL>();
-            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
@@ -71,7 +69,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
-        /// GetAllData/GetTpCategoryList 取得第三方遊戲大分類清單
+        /// GetAllData/GetTpCategory 取得第三方遊戲大分類清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -79,18 +77,18 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// Func Path： [Available Category]
         /// </remarks>
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategoryList()
+        public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategory()
         {
             var data = await _reportBll.GetTpCategoryList();
             var apiResult = new ApiResult<IEnumerable<TpCategoryBetLimit>>
             {
-                Data = data, 
+                Data = data,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// GetAllData/GetTpList 取得Slot第三方品牌
         /// </summary>
@@ -100,7 +98,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// Func Path： Show Slot Tp List
         /// </remarks>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         public async Task<ApiResult<IEnumerable<RiskTpListInfo>>> GetTpList()
         {
             var apiResult = new ApiResult<IEnumerable<RiskTpListInfo>>();
@@ -116,9 +114,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
-            
+
             return apiResult;
         }
+
         #endregion
 
     }

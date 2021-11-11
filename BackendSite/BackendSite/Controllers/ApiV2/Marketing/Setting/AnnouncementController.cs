@@ -64,29 +64,30 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
-            public Announcement Announcement { get; set; }
-            public DateTimeOffset _StartTime
+            public AddAnnouncementModel Announcement { get; set; }
+            public DateTimeOffset StartTime
             {
                 get => _startDate;
                 set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
-            public DateTimeOffset _EndTime
+            public DateTimeOffset EndTime
             {
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
         }
+        
         public class UpdateAnnouncementReq
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
-            public Announcement Announcement { get; set; }
-            public DateTimeOffset _StartTime
+            public UpdateAnnouncementModel Announcement { get; set; }
+            public DateTimeOffset StartTime
             {
                 get => _startDate;
                 set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
-            public DateTimeOffset _EndTime
+            public DateTimeOffset EndTime
             {
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
@@ -107,7 +108,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         /// <param name="para"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
         [HttpPost]
-        public ApiListResult<Announcement> GetAnnouncement(GetAnnouncementReq para)
+        public ApiListResult<Announcement> GetAnnouncementList(GetAnnouncementReq para)
         {
             var totalPages = 0;
             var rowCount = 0;
@@ -178,7 +179,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             try
             {
                 var authData = _authorizeBll.GetAuthData();
-                var result = _messageBll.AddAnnouncement(para.Announcement, authData.UserName, authData.UserId, para._StartTime, para._EndTime);
+                var result = _messageBll.AddAnnouncement(para.Announcement, authData.UserName, authData.UserId, para.StartTime, para.EndTime);
                 if (result != null)
                 {
                     apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
@@ -218,7 +219,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             try
             {
                 var authData = _authorizeBll.GetAuthData();
-                var result = _messageBll.UpdateAnnouncement(para.Announcement, authData.UserName, authData.UserId, para._StartTime, para._EndTime);
+                var result = _messageBll.UpdateAnnouncement(para.Announcement, authData.UserName, authData.UserId, para.StartTime, para.EndTime);
                 apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
             }
             catch (Exception ex)

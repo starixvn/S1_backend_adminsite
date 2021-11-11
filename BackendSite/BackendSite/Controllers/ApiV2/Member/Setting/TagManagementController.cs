@@ -64,7 +64,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
-        public ApiListResult<TagData> GetTagData(GetTagDataReq req)
+        public ApiListResult<TagData> GetTagList(GetTagDataReq req)
         {
             var apiResult = new ApiListResult<TagData>();
             try
