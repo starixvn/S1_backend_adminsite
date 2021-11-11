@@ -83,7 +83,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
-        public ApiListResult<TpDisableUser> GetTpDisableUserList(QueryTpDisableUserReq req)
+        public ApiListResult<TpDisableUser> GetList(QueryTpDisableUserReq req)
         {
             var apiResult = new ApiListResult<TpDisableUser>();
 
@@ -125,7 +125,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
-        public async Task<ApiResult<TpDisableUserForGameDetail>> GetTpDisableUserByCustId(TpDisableUserForGameDetailReq req)
+        public async Task<ApiResult<TpDisableUserForGameDetail>> GetByCustId(TpDisableUserForGameDetailReq req)
         {
             var apiResult = new ApiResult<TpDisableUserForGameDetail>();
             try
@@ -185,7 +185,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="disableGames"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
-        public async Task<ApiResult> TpDisableUserForGame(DisableUser disableGames)
+        public async Task<ApiResult> Update(DisableUser disableGames)
         {
             var apiResult = new ApiResult();
             try

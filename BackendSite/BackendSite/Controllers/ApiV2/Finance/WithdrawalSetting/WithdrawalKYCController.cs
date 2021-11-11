@@ -54,7 +54,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <param name="req">參數</param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/WithdrawalKYCControl"})]
         [HttpPost]
-        public ApiResult<IEnumerable<WithdrawalKYC>> WithdrawalKYCList(WithdrawalKYCListReq req)
+        public ApiResult<IEnumerable<WithdrawalKYC>> GetList(WithdrawalKYCListReq req)
         {
             var result = _withdrawalBll.GetWithdrawalKYCList(req.SiteId);
             var apiResult = new ApiResult<IEnumerable<WithdrawalKYC>>
@@ -77,7 +77,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/WithdrawalKYCControl"})]
         [HttpPost]
-        public ApiResult EditWithdrawalKYCList(WithdrawalKYC req)
+        public ApiResult Update(WithdrawalKYC req)
         {
             var result = _withdrawalBll.EditWithdrawalKYCList(req);
             var apiResult = new ApiResult();
