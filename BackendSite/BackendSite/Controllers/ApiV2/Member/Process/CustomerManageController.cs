@@ -79,9 +79,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         public class CustInfoListRequest : ApiRequestPageModel
         {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
-
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public string StartDate { get; set; }
@@ -231,59 +228,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public IEnumerable<int> GameTypes { get; set; }
         }
 
-        #region TeleCSD
-
-        public class TeleCSDpara
-        {
-            public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<int> Currency { get; set; }
-            public int Deposit { get; set; }
-            public int CallOut { get; set; }
-            public int DormantUser { get; set; }
-            public long StartDate { get; set; }
-            public long EndDate { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
-            public TeleCSDpara()
-            {
-                //PageSize預設10
-                if (PageSize == 0)
-                    PageSize = 10;
-            }
-        }
-
-        public class TeleCSDUpdatepara
-        {
-            public int CustId { get; set; }
-            public int SiteId { get; set; }
-        }
-
-        #endregion
-
-        #region TagManagement
-        public class EditTagManagementpara
-        {
-            public int Id { get; set; }
-            public string TagName { get; set; }
-            public string TagColour { get; set; }
-            public string Description { get; set; }
-        }
-        public class GetTagDatapara
-        {
-            public int Status { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
-        }
-        public class SetTagStatuspara
-        {
-            public int Id { get; set; }
-        }
         public class SetCustTagPara
         {
             public int CustId { get; set; }
             public IEnumerable<int> SelectTag { get; set; }
         }
-        #endregion
 
         public class CustPromotionpara
         {
@@ -299,49 +248,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int CustId { get; set; }
             public int EnablePromotion { get; set; }
         }
-
-        #region RegLiveStatus
-        public class RegLiveStatusPara
-        {
-            public IEnumerable<int> SiteIds { get; set; }
-            public int Currency { get; set; }
-            public int DepositStatus { get; set; }
-            public int Status { get; set; }
-            public string User { get; set; }
-            public int Sort { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
-            public long StartDate { get; set; }
-            public long EndDate { get; set; }
-            public string AffiliatesCode { get; set; }
-            public int AgentCodeType { get; set; }
-        }
-
-        public class SetRegLiveStatusPara
-        {
-            public int CustId { get; set; }
-            public int Status { get; set; }
-            public int SiteId { get; set; }
-        }
-
-        public class AddRegLiveStatusNotes
-        {
-            public int CustId { get; set; }
-            public string Note { get; set; }
-        }
-        public class DeleteRegLiveStatusNotes
-        {
-            public int CustId { get; set; }
-            public int Id { get; set; }
-        }
-        public class EditRegLiveStatusNotes
-        {
-            public int CustId { get; set; }
-            public int Id { get; set; }
-            public string Note { get; set; }
-        }
-
-        #endregion
 
         #endregion
 
@@ -362,17 +268,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public ApiResult GetCustInfoList(CustInfoListRequest request)
         {
 
-            if (_tools.StringConvertDateTimeOffset(request.StartDate,
-                out DateTimeOffset startDate,
+            DateTimeOffset? startDate = null;
+            DateTimeOffset? endDate = null;
+
+            if (_tools.StringConvertDateTimeOffset(request.StartDate, TimeSpan.Zero,
+                out DateTimeOffset startDateResult,
                 out TimeSpan startDateTimeZone))
             {
-                throw new AdminException(ErrorCodeEnum.Fail);
+                startDate = startDateResult;
             }
-            if (_tools.StringConvertDateTimeOffset(request.EndDate,
-                out DateTimeOffset endDate,
+            if (_tools.StringConvertDateTimeOffset(request.EndDate, TimeSpan.Zero,
+                out DateTimeOffset endDateResult,
                 out TimeSpan endDateTimeZone))
             {
-                throw new AdminException(ErrorCodeEnum.Fail);
+                endDate = endDateResult;
             }
 
             var pageNumber = request.PageNumber;
@@ -387,8 +296,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.TpUserName?.Trim(),
                 request.Email?.Trim(),
                 request.PhoneNo?.Trim(),
-                12345678,
-                12345678,
+                startDate,
+                endDate,
                 request.PageSize,
                 request.AffId,
                 request.CurrencyIds,
@@ -428,17 +337,21 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [RequestSizeLimit(40000000)]
         public IActionResult ExportCustInfoList(CustInfoListRequest request)
         {
-            if (_tools.StringConvertDateTimeOffset(request.StartDate,
-                out DateTimeOffset startDate,
+
+            DateTimeOffset? startDate = null;
+            DateTimeOffset? endDate = null;
+
+            if (_tools.StringConvertDateTimeOffset(request.StartDate,TimeSpan.Zero,
+                out DateTimeOffset startDateResult,
                 out TimeSpan startDateTimeZone))
             {
-                throw new AdminException(ErrorCodeEnum.Fail);
+                startDate = startDateResult.DateTime;
             }
-            if (_tools.StringConvertDateTimeOffset(request.EndDate,
-                out DateTimeOffset endDate,
+            if (!_tools.StringConvertDateTimeOffset(request.EndDate, TimeSpan.Zero,
+                out DateTimeOffset endDateResult,
                 out TimeSpan endDateTimeZone))
             {
-                throw new AdminException(ErrorCodeEnum.Fail);
+                endDate = endDateResult.DateTime;
             }
 
             var ExportCustInfo = _custInfoBll.GetCustInfoExportList(request.SiteIds,
@@ -452,8 +365,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                                     request.TpUserName,
                                                                     request.Email,
                                                                     request.PhoneNo,
-                                                                    12345678,
-                                                                    12345678,
+                                                                    startDate,
+                                                                    endDate,
                                                                     request.AffId,
                                                                     request.CurrencyIds,
                                                                     request.BankAccountNumber,
