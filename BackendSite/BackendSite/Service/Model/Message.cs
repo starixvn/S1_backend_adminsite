@@ -39,6 +39,25 @@ namespace BackendSite.Service.Model
 
         public int IsTest { get; set; }
     }
+    public class AddAnnouncementModel
+    {
+        public int SiteId { get; set; }
+        public string Subject { get; set; }
+        public string Content { get; set; }
+        public int Status { get; set; }
+        public int IsTest { get; set; }
+    }
+    
+    public class UpdateAnnouncementModel
+    {
+        public int Id { get; set; }
+        public int SiteId { get; set; }
+        public string Subject { get; set; }
+        public string Content { get; set; }
+        public int Status { get; set; }
+        public int IsTest { get; set; }
+    }
+    
     public class CustLang
     {
         public string UserLang { get; set; }
