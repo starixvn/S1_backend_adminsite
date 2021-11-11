@@ -51,12 +51,12 @@ namespace BackendSite.Service.BLL
             return messageService.GetAnnouncementById(id);
         }
 
-        public Announcement AddAnnouncement(Announcement data, string creator, int creatorId, DateTimeOffset startTime, DateTimeOffset endTime)
+        public Announcement AddAnnouncement(AddAnnouncementModel data, string creator, int creatorId, DateTimeOffset startTime, DateTimeOffset endTime)
         {
             return messageService.AddAnnouncement(data, creator, creatorId, startTime, endTime);
         }
 
-        public Announcement UpdateAnnouncement(Announcement data, string lastUpdater, int lastUpdaterId, DateTimeOffset startTime, DateTimeOffset endTime)
+        public Announcement UpdateAnnouncement(UpdateAnnouncementModel data, string lastUpdater, int lastUpdaterId, DateTimeOffset startTime, DateTimeOffset endTime)
         {
             return messageService.UpdateAnnouncement(data, lastUpdater, lastUpdaterId, startTime, endTime);
         }
