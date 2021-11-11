@@ -73,7 +73,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         #endregion
 
         /// <summary>
-        /// TpDisable/GetTpDisableUser 取得第三方被禁止的用戶資料清單
+        /// TpDisable/GetList 取得第三方被禁止的用戶資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -115,7 +115,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// TpDisable/GetTpDisableUserByCustId 取得指定第三方被禁止的會員資料
+        /// TpDisable/GetByCustId 取得指定第三方被禁止的會員資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -175,7 +175,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// TpDisable/TpDisableUserForGame 更新會員第三方被禁止的資料
+        /// TpDisable/Update 更新會員第三方被禁止的資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST

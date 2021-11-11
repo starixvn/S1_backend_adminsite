@@ -214,7 +214,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
-        /// BaseData/GameCasinoByTpIdV3 取得Slot第三方品牌的遊戲
+        /// BaseData/GetGameCasinoByTpId 取得Slot第三方品牌的遊戲
         /// </summary>
         /// <remarks>
         /// Http Method：POST
