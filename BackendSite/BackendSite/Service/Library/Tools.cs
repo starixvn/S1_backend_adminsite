@@ -174,28 +174,38 @@ namespace BackendSite.Service.Library
         /// <summary>
         /// 字串轉日期格式&取時區
         /// </summary>
-        /// <param name="dateTimeString"></param>
-        /// <param name="dateTimeOffset"></param>
-        /// <param name="timeSpan"></param>
+        /// <param name="paramDateTime">參數日期(格式=yyyy-mm-ddThh:MM:ss+TT:TT)</param>
+        /// <param name="newTimeZone">希望轉換的時區(TimeSpan)</param>
+        /// <param name="newDateTimeOffset">轉換後的日期(DateTimeOffset)</param>
+        /// <param name="paramTimeZone">參數的時區(TimeSpan)</param>
         /// <returns></returns>
-        public bool StringConvertDateTimeOffset(string dateTimeString,
-            out DateTimeOffset dateTimeOffset,
-            out TimeSpan timeSpan)
+        public bool StringConvertDateTimeOffset(string paramDateTime,
+            TimeSpan newTimeZone,
+            out DateTimeOffset newDateTimeOffset,
+            out TimeSpan paramTimeZone)
         {
-            dateTimeOffset = DateTimeOffset.MinValue;
-            timeSpan = TimeSpan.Zero;
+            newDateTimeOffset = DateTimeOffset.MinValue;
+            paramTimeZone = TimeSpan.Zero;
+            newTimeZone = newTimeZone == null ? TimeSpan.Zero : newTimeZone;
+            try
+            {
+                if (string.IsNullOrEmpty(paramDateTime))
+                {
+                    return false;
+                }
 
-            if (string.IsNullOrEmpty(dateTimeString))
+                newDateTimeOffset = DateTimeOffset.Parse(paramDateTime);
+
+                paramTimeZone = newDateTimeOffset.Offset;
+
+                newDateTimeOffset = new DateTimeOffset(newDateTimeOffset.ToUniversalTime().DateTime, TimeSpan.Zero);
+
+                return true;
+            }
+            catch (FormatException ex)
             {
                 return false;
             }
-
-            dateTimeOffset = DateTimeOffset.Parse(dateTimeString);
-
-            timeSpan = dateTimeOffset.Offset;
-
-            return true;
-
         }
 
     }

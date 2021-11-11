@@ -240,7 +240,7 @@ namespace BackendSite
                             OpenApiSchema.Https
                         };
                         document.Info.Title = "AdminSite API Document";
-                        document.Info.Version = "2.0.7984.33309";
+                        document.Info.Version = "2.0.7985.29061";
                     };
                 });
 
