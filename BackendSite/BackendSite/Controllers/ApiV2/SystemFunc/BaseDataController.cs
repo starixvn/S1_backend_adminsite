@@ -224,7 +224,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// <param name="req"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<RiskGameCasinoData>>> GameCasinoByTpId(GameCasinoByTpIdReq req)
+        public async Task<ApiResult<IEnumerable<RiskGameCasinoData>>> GetGameCasinoByTpId(GameCasinoByTpIdReq req)
         {
             var apiResult = new ApiResult<IEnumerable<RiskGameCasinoData>>();
             try
