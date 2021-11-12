@@ -11,7 +11,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
-
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class CommonController : ControllerBase
     {
         private readonly ServerInfoBLL serverInfoBLL;
@@ -33,7 +33,6 @@ namespace BackendSite.Controllers.Api
         /// 
         /// </remarks>
         /// <returns>結果</returns>
-        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public ApiResult<IEnumerable<ServerInfo>> AdminUserSiteList()
         {
@@ -67,7 +66,6 @@ namespace BackendSite.Controllers.Api
         /// <param name="enumName">參數</param>
         /// <returns>結果</returns>
         //有新舊API，這支是舊API，另一支新的API=apiV2/Enum/GetEnumType
-        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public ApiResult<List<dynamic>> GetEnumType([FromQuery] string enumName)
         {

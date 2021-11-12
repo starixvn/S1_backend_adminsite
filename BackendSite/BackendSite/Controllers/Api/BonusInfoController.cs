@@ -4,11 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Model;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackendSite.Controllers.Api
 {
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class BonusInfoController : Controller
     {
         private readonly BonusInfoBLL bonusInfoBLL;
@@ -21,7 +24,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusInfoReport" })]
-        public ApiListResultCurrencyAmount<BonusInfoFrontEnd> GetBonusInfoReport([FromForm] IEnumerable<int> SelectSite, [FromForm] string BonusCode, [FromForm] string TransId, [FromForm] int CurrencyId, [FromForm] string UserName, [FromForm] int PromotionType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int BaseCurrencyId,[FromForm] int RebateCategoriesId)
+        public ApiListResultCurrencyAmount<BonusInfoFrontEnd> GetBonusInfoReport([FromForm] IEnumerable<int> SelectSite, [FromForm] string BonusCode, [FromForm] string TransId, [FromForm] int CurrencyId, [FromForm] string UserName, [FromForm] int PromotionType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber, [FromForm] int BaseCurrencyId, [FromForm] int RebateCategoriesId)
         {
             var result = new ApiListResultCurrencyAmount<BonusInfoFrontEnd>();
             try
@@ -49,7 +52,7 @@ namespace BackendSite.Controllers.Api
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusInfoReport" })]
         [HttpPost]
-        public IActionResult ExportBonusInfoReport(string SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, long StartDate, long EndDate, int BaseCurrencyId,int RebateCategoriesId)
+        public IActionResult ExportBonusInfoReport(string SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, long StartDate, long EndDate, int BaseCurrencyId, int RebateCategoriesId)
         {
             var ExportData = bonusInfoBLL.GetBonusInfoExportReport(SelectSite, BonusCode, TransId, CurrencyId, UserName, PromotionType, StartDate, EndDate, BaseCurrencyId, RebateCategoriesId);
             var stream = excelBLL.Export(ExportData);

@@ -41,8 +41,9 @@ namespace BackendSite.Service.Model
         public bool EmailVerified { get; set; }
         public string Iovation { get; set; }
         public int Status { get; set; }
-        public DateTime LastLoginTime { get; set; }
-        public DateTime RegTime { get; set; }
+        public DateTimeOffset LastLoginTime { get; set; }
+        public DateTimeOffset RegTime { get; set; }
+
         public string Email { get; set; }
         public string Profile { get; set; }
         public decimal Balance { get; set; }

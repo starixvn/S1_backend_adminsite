@@ -15,6 +15,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class RiskController : ControllerBase
     {
         private readonly RiskBLL _riskBll;
