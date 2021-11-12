@@ -69,7 +69,7 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<TpDisableUser>("Admin_TpDisableUserV2_Get", p);
+            var result = _reportDbClient.Query<TpDisableUser>("Admin_TpDisableUser_Get_V2", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             return result;
