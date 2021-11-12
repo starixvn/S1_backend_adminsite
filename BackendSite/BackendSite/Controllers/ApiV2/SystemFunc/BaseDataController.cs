@@ -93,7 +93,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int CategoryId { get; set; }
         }
         
-        public class GameCasinoByTpIdV3Req
+        public class GameCasinoByTpIdReq
         {
             public int TpId { get; set; }
         }
@@ -214,7 +214,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
-        /// BaseData/GameCasinoByTpIdV3 取得Slot第三方品牌的遊戲
+        /// BaseData/GetGameCasinoByTpId 取得Slot第三方品牌的遊戲
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -224,7 +224,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// <param name="req"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<RiskGameCasinoData>>> GameCasinoByTpIdV3(GameCasinoByTpIdV3Req req)
+        public async Task<ApiResult<IEnumerable<RiskGameCasinoData>>> GetGameCasinoByTpId(GameCasinoByTpIdReq req)
         {
             var apiResult = new ApiResult<IEnumerable<RiskGameCasinoData>>();
             try

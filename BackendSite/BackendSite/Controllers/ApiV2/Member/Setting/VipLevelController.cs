@@ -36,22 +36,25 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _messageBll = provider.GetRequiredService<MessageBLL>();
         }
-        
+
         #endregion
-        
+
         /// <summary>
         /// VipLevel/ChangeVipLevelBatch 批次更新會員VIP等級
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
+        /// Content-Type：Form-Data
+        /// 
         /// Func Path：CSD > Change Vip Level Batch > [Submit]
         /// </remarks>
-        /// <param name="optSite"></param>
+        /// <param name="siteId"></param>
         /// <param name="excelUpload"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/ChangeVipLevelBatch" })]
         [HttpPost]
-        public async Task<List<ApiResult>> ChangeVipLevelBatch([FromForm] int optSite, [FromForm] IFormFile excelUpload)
+        public async Task<List<ApiResult>> ChangeVipLevelBatch([FromForm] int siteId, 
+            [FromForm] IFormFile excelUpload)
         {
             var apiResult = new List<ApiResult>();
             var authData = _authorizeBll.GetAuthData();
@@ -89,7 +92,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                         }
                         else
                         {
-                            var custInfoDetail = _custInfoBll.GetCustInfoDetails(_custId, custUsername, optSite);
+                            var custInfoDetail = _custInfoBll.GetCustInfoDetails(_custId, custUsername, siteId);
 
                             if (custInfoDetail == null)
                             {

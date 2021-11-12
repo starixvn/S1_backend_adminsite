@@ -35,11 +35,36 @@ namespace BackendSite.Service.DAL
             return conn.QueryFirstOrDefault<Customer>("Customer_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string accountName, string loginIp, string transId, string tpUserName, string email, string phoneNo, long? startDate, long? endDate, int pageSize, int? affId, IEnumerable<int> selectCurrency, string bankAccountNumber, IEnumerable<int> selectStatus, ref int pageNumber, out int totalPages, out int rowCount, string siteList, string currencyList)
+        public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite,
+            int? birDate,
+            int? birMonth,
+            int? birYear,
+            string userName,
+            string accountName,
+            string loginIp,
+            string transId,
+            string tpUserName,
+            string email,
+            string phoneNo,
+            DateTimeOffset? startDate,
+            DateTimeOffset? endDate,
+            int pageSize,
+            int? affId,
+            IEnumerable<int> selectCurrency,
+            string bankAccountNumber,
+            IEnumerable<int> selectStatus,
+            ref int pageNumber,
+            out int totalPages,
+            out int rowCount,
+            string siteList,
+            string currencyList)
         {
             var jsonSelectSite = string.Empty;
             var jsonSelectCurrency = string.Empty;
             var jsonSelectStatus = string.Empty;
+            DateTime? startDateParam = null;
+            DateTime? endDateParam = null;
+
             if (selectSite != null && selectSite.Any())
             {
                 jsonSelectSite = JsonConvert.SerializeObject(selectSite);
@@ -62,21 +87,69 @@ namespace BackendSite.Service.DAL
             }
             totalPages = 0;
 
-            var p = new DynamicParameters(new {
-                SelectSite = jsonSelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = accountName, LoginIp = loginIp, TransId = transId, TpUserName = tpUserName, Email = email, PhoneNo = phoneNo, StartDate = startDate, EndDate = endDate, PageSize = pageSize, SelectCurrency = jsonSelectCurrency, SiteList = siteList,
-                AffId = affId, CurrncyList = currencyList, BankAccountNumber = bankAccountNumber, SelectStatus = jsonSelectStatus });
+            if (startDate != null)
+            {
+                startDateParam = DateTimeOffset.Parse(startDate.ToString()).DateTime;
+            }
+
+            if (endDate != null)
+            {
+                endDateParam = DateTimeOffset.Parse(endDate.ToString()).DateTime;
+            }
+
+            var p = new DynamicParameters(new
+            {
+                SelectSite = jsonSelectSite,
+                BirDate = birDate,
+                BirMonth = birMonth,
+                BirYear = birYear,
+                UserName = userName,
+                AccountName = accountName,
+                LoginIp = loginIp,
+                TransId = transId,
+                TpUserName = tpUserName,
+                Email = email,
+                PhoneNo = phoneNo,
+                StartDate = startDateParam,
+                EndDate = endDateParam,
+                PageSize = pageSize,
+                SelectCurrency = jsonSelectCurrency,
+                SiteList = siteList,
+                AffId = affId,
+                CurrncyList = currencyList,
+                BankAccountNumber = bankAccountNumber,
+                SelectStatus = jsonSelectStatus
+            });
             p.Add("PageNumber", pageNumber, DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearchV5_Get", p);
+            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearchV7_Get", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return result;
         }
 
-        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(IEnumerable<int> selectSite, int? birDate, int? birMonth, int? birYear, string userName, string AccountName, string LoginIp, string transId, string TpUserName, string Email, string PhoneNo, long? startDate, long? endDate, string siteList, int? AffId, IEnumerable<int> selectCurrency, string BankAccountNumber, string currncyList, IEnumerable<int> selectstatus)
+        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(IEnumerable<int> selectSite,
+            int? birDate,
+            int? birMonth,
+            int? birYear,
+            string userName,
+            string AccountName,
+            string LoginIp,
+            string transId,
+            string TpUserName,
+            string Email,
+            string PhoneNo,
+            DateTimeOffset? startDate,
+            DateTimeOffset? endDate,
+            string siteList,
+            int? AffId,
+            IEnumerable<int> selectCurrency,
+            string BankAccountNumber,
+            string currncyList,
+            IEnumerable<int> selectstatus)
         {
             string SelectSite = null;
             string SelectCurrency = null;
@@ -104,7 +177,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TpUserName = TpUserName, TransId = transId, Email = Email, PhoneNo = PhoneNo, StartDate = startDate, EndDate = endDate, SiteList = siteList, AffId, BankAccountNumber = BankAccountNumber, SelectCurrency = SelectCurrency, CurrncyList = currncyList, SelectStatus = SelectStatus });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExportV4_Get", p, commandType: CommandType.StoredProcedure);
+            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExportV5_Get", p, commandType: CommandType.StoredProcedure);
             return custInfoDetailList;
         }
 
@@ -117,7 +190,7 @@ namespace BackendSite.Service.DAL
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfoDetailSearchV6_Get", new { CustId = custId, UserName = userName, SiteList = siteList }, commandType: CommandType.StoredProcedure);
+            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfoDetailSearchV7_Get", new { CustId = custId, UserName = userName, SiteList = siteList }, commandType: CommandType.StoredProcedure);
             return result;
         }
 
@@ -260,7 +333,7 @@ namespace BackendSite.Service.DAL
             props.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),DbType.Int32);
+            props.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32);
             props.Add("PageSize", Math.Abs(pageSize));
             props.Add("SelectSite", siteIds);
             props.Add("CurrencyList", currency);
@@ -393,7 +466,7 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_Tag_Set", props);
         }
 
-        public GetTagDataResult GetTagData(int status,int pageNumber,int pageSize)
+        public GetTagDataResult GetTagData(int status, int pageNumber, int pageSize)
         {
             var searchResult = new GetTagDataResult();
             var props = new DynamicParameters();
@@ -402,7 +475,7 @@ namespace BackendSite.Service.DAL
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("PageSize", Math.Abs(pageSize));
-            props.Add("StartIndex", (Math.Abs(pageNumber)-1) * Math.Abs(pageSize));
+            props.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
             props.Add("Status", status);
            
             var result = _reportDbClient.Query<TagData>("Admin_Tag_Get_V3", props);
@@ -439,7 +512,7 @@ namespace BackendSite.Service.DAL
         public int SetCustTag(int custid, IEnumerable<int> SelectTag)
         {
             var temp = new List<int>();
-            var selectTag = JsonConvert.SerializeObject(temp); 
+            var selectTag = JsonConvert.SerializeObject(temp);
             if (SelectTag != null && SelectTag.Any())
             {
                 selectTag = JsonConvert.SerializeObject(SelectTag);
@@ -467,7 +540,7 @@ namespace BackendSite.Service.DAL
         {
             var searchData = new RegLiveStatusResult();
             var props = new DynamicParameters();
-            var creditSite = new List<string>{ "Nova88Ref01", "Nova88Ref02", "Nova88Ref03", "Nova88Ref04", "Nova88Ref05", "Nova88Ref06", "Nova88Ref07", "Nova88Ref08", "Goal123Ref01", "BwingRef01" };
+            var creditSite = new List<string> { "Nova88Ref01", "Nova88Ref02", "Nova88Ref03", "Nova88Ref04", "Nova88Ref05", "Nova88Ref06", "Nova88Ref07", "Nova88Ref08", "Goal123Ref01", "BwingRef01" };
             props.Add("SelectSite", JsonConvert.SerializeObject(selectSite));
             props.Add("Currency", currency);
             props.Add("UserName", string.IsNullOrWhiteSpace(username) ? null : username);
@@ -480,8 +553,8 @@ namespace BackendSite.Service.DAL
             props.Add("AffCode", string.IsNullOrWhiteSpace(affiliatesCode) ? null : affiliatesCode);
             props.Add("CreditSite", JsonConvert.SerializeObject(creditSite));
             props.Add("AgentCodeType", agentCodeType);
-            props.Add("StartIndex",(Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32,  ParameterDirection.Input);
-            props.Add("PageNumber", Math.Abs(pageNumber),DbType.Int32,ParameterDirection.InputOutput);
+            props.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
+            props.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             
@@ -494,9 +567,9 @@ namespace BackendSite.Service.DAL
             return searchData;
         }
 
-        public int SetRegLiveStatus(int custId,int status, int siteId, string @operator)
+        public int SetRegLiveStatus(int custId, int status, int siteId, string @operator)
         {
-            return _mainDbClient.Execute("Admin_RegLiveStatus_Set", new DynamicParameters(new { CustId = custId, Status = status, SiteId= siteId, Operator= @operator }));
+            return _mainDbClient.Execute("Admin_RegLiveStatus_Set", new DynamicParameters(new { CustId = custId, Status = status, SiteId = siteId, Operator = @operator }));
         }
 
         public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
@@ -509,7 +582,7 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_CustRegLiveStatusNotes_Ins", new DynamicParameters(new { CustId = custId, Note = string.IsNullOrWhiteSpace(note) ? "" : note, Operator = @operator }));
         }
 
-        public int DeleteRegLiveStatusNote(int custId,int id)
+        public int DeleteRegLiveStatusNote(int custId, int id)
         {
             return _mainDbClient.Execute("Admin_CustRegLiveStatusNotes_Del", new DynamicParameters(new { CustId = custId, Id = id }));
         }
@@ -554,7 +627,7 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             return conn.QueryFirstOrDefault<CustomerSwitchStatus>("Admin_CustSwitchStatus_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
         }
-        public CustProfileReq  GetCustProfile(int custId)
+        public CustProfileReq GetCustProfile(int custId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             return conn.QueryFirstOrDefault<CustProfileReq>("Admin_CustProfile_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);

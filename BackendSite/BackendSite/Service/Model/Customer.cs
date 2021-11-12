@@ -66,7 +66,7 @@ namespace BackendSite.Service.Model
         public IEnumerable<TpWallet> tpWallet { get; set; }
         public IEnumerable<Promotion> promotions { get; set; }
         public string AffiliateId { get; set; }
-        public DateTime? ReloadTime { get; set; }
+        public string ReloadTime { get; set; }
         public string IP { get; set; }
         public string LevelName { get; set; }
         public string AffiliateCode { get; set; }
@@ -75,10 +75,10 @@ namespace BackendSite.Service.Model
         public string LastBettingTime { get; set; }
         public decimal TotalAdjustment { get; set; }
         public decimal TotalBonusClaimed { get; set; }
-        public DateTime? LastWithdrawalTimeRecord { get; set; }
-        public DateTime? LastDepositTimeRecord { get; set; }
-        public DateTime? LastTpBetRecordTimeRecord { get; set; }
-        public DateTime? FirstDepositTimeRecord { get; set; }
+        public string LastWithdrawalTimeRecord { get; set; }
+        public string LastDepositTimeRecord { get; set; }
+        public string LastTpBetRecordTimeRecord { get; set; }
+        public string FirstDepositTimeRecord { get; set; }
         public string TagList { get; set; }
         public List<int> ITagList { get; set; }
         public int EnablePromotion { get; set; }
@@ -194,7 +194,8 @@ namespace BackendSite.Service.Model
         public string UpdateAt { get; set; }
         public string Operator { get; set; }
         public List<string> UpdateRemark { get; set; }
-        public CustTele() {
+        public CustTele()
+        {
             CanUpdate = true;
         }
 
@@ -212,7 +213,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public string FullName { get; set; }
         public string DepositStatus { get; set; }
-        public DateTimeOffset RegDate { get; set; }    
+        public DateTimeOffset RegDate { get; set; }
         public string PhoneNumber { get; set; }
         public string FirstTimeCall { get; set; }
         public string SecondTimeCall { get; set; }
@@ -299,7 +300,7 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
     }
-    public class RegLiveStatus 
+    public class RegLiveStatus
     {
         public string UserName { get; set; }
         public int ActStatus { get; set; }
@@ -360,8 +361,8 @@ namespace BackendSite.Service.Model
         public int PhoneVerified { get; set; }
         public int EmailVerified { get; set; }
     }
-    public class CustProfileReq 
-    { 
+    public class CustProfileReq
+    {
         public int UserLevel { get; set; }
         public string Birth_d { get; set; }
         public string Birth_m { get; set; }

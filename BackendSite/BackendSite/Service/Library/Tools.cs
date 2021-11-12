@@ -171,6 +171,43 @@ namespace BackendSite.Service.Library
             return Floor(dBalance, 2).ToString("#,##0.#0");
         }
 
+        /// <summary>
+        /// 字串轉日期格式&取時區
+        /// </summary>
+        /// <param name="paramDateTime">參數日期(格式=yyyy-mm-ddThh:MM:ss+TT:TT)</param>
+        /// <param name="newTimeZone">希望轉換的時區(TimeSpan)</param>
+        /// <param name="newDateTimeOffset">轉換後的日期(DateTimeOffset)</param>
+        /// <param name="paramTimeZone">參數的時區(TimeSpan)</param>
+        /// <returns></returns>
+        public bool StringConvertDateTimeOffset(string paramDateTime,
+            TimeSpan newTimeZone,
+            out DateTimeOffset newDateTimeOffset,
+            out TimeSpan paramTimeZone)
+        {
+            newDateTimeOffset = DateTimeOffset.MinValue;
+            paramTimeZone = TimeSpan.Zero;
+            newTimeZone = newTimeZone == null ? TimeSpan.Zero : newTimeZone;
+            try
+            {
+                if (string.IsNullOrEmpty(paramDateTime))
+                {
+                    return false;
+                }
+
+                newDateTimeOffset = DateTimeOffset.Parse(paramDateTime);
+
+                paramTimeZone = newDateTimeOffset.Offset;
+
+                newDateTimeOffset = new DateTimeOffset(newDateTimeOffset.ToUniversalTime().DateTime, TimeSpan.Zero);
+
+                return true;
+            }
+            catch (FormatException ex)
+            {
+                return false;
+            }
+        }
+
     }
 
     public static class GetEnumDescription
