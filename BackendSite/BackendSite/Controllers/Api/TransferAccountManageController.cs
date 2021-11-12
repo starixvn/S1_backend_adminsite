@@ -16,6 +16,7 @@ namespace BackendSite.Controllers.Api
     [Route("api/[controller]/[Action]")]
     [ApiController]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferAccountManage" })]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class TransferAccountManageController : Controller
     {
         #region Fields

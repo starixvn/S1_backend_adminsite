@@ -14,6 +14,7 @@ namespace BackendSite.Controllers.Api
     [Route("api/[controller]/[action]")]
     [ApiController]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/LatestHighlightVideoManagement" })]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class LatestHighlightVideoManagementController : Controller
     {
         private readonly LatestHighlightVideoManagementBLL highlightVideoManagementBLL;

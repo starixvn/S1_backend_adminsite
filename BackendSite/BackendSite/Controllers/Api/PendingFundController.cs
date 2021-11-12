@@ -2,12 +2,15 @@
 using System.Threading.Tasks;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.Api
 {
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class PendingFundController : Controller
     {
 
@@ -28,7 +31,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public async Task<ApiResult> ProcessAsync([FromBody]PendingFund pendingFund)
+        public async Task<ApiResult> ProcessAsync([FromBody] PendingFund pendingFund)
         {
             var apiResult = await pendingFundBLL.ProcessAsync(pendingFund);
 
@@ -42,9 +45,9 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
-        
+
         [HttpPost]
-        public async Task<ApiResult> BonusTransferAsync([FromForm]int CustId, [FromForm] int TpId)
+        public async Task<ApiResult> BonusTransferAsync([FromForm] int CustId, [FromForm] int TpId)
         {
             var apiResult = await pendingFundBLL.BonusTransferAsync(CustId, TpId);
 
@@ -60,7 +63,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         [HttpPost]
-        public ApiResult BonusCancel([FromForm]int bonusId)
+        public ApiResult BonusCancel([FromForm] int bonusId)
         {
             var apiResult = new ApiResult();
             try

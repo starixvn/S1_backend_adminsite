@@ -2,6 +2,7 @@
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.Api
@@ -18,8 +19,10 @@ namespace BackendSite.Controllers.Api
         public int CurrencyId { get; set; }
     }
 
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class MarketingController : ControllerBase
     {
         private readonly SelLangBLL selLangBLL;

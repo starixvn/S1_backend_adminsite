@@ -11,6 +11,7 @@ namespace BackendSite.Controllers.Api
     [Route("api/[controller]/[action]")]
     [ApiController]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusCashBack" })]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class BonusCashBackController : Controller
     {
         private readonly ServerInfoBLL serverInfoBLL;

@@ -18,6 +18,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class PaymentController : ControllerBase
     {
         #region Fields
@@ -77,7 +78,7 @@ namespace BackendSite.Controllers.Api
             public int WithdrawalLimitOption { get; set; }
             public string Memo { set; get; }
             public string BounsCode { get; set; }
-            public int RollOver{ get; set;}
+            public int RollOver { get; set; }
         }
 
         public class GetFinancialLogReq
@@ -773,22 +774,22 @@ namespace BackendSite.Controllers.Api
                                                 Memo = memo
                                             };
 
-                                    string transId = null;
-                                    if (adjustmentAndWithdrawalLimit.AdjustType == 2)
-                                    {
-                                        var balance = _custInfoBLL.GetBalance(custInfoDetail.CustId);
-                                        if (balance < adjustmentAndWithdrawalLimit.Amount)
+                                        string transId = null;
+                                        if (adjustmentAndWithdrawalLimit.AdjustType == 2)
                                         {
-                                            if (_mainWalletType == 2)
+                                            var balance = _custInfoBLL.GetBalance(custInfoDetail.CustId);
+                                            if (balance < adjustmentAndWithdrawalLimit.Amount)
                                             {
-                                                var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
-                                                var inTpTransfer = new TpTransfer()
+                                                if (_mainWalletType == 2)
                                                 {
-                                                    TpId = 1,
-                                                    Amount = deAmount,
-                                                    CustId = custInfoDetail.CustId,
-                                                    direction = TpDirection.ToMain
-                                                };
+                                                    var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
+                                                    var inTpTransfer = new TpTransfer()
+                                                    {
+                                                        TpId = 1,
+                                                        Amount = deAmount,
+                                                        CustId = custInfoDetail.CustId,
+                                                        direction = TpDirection.ToMain
+                                                    };
 
                                                     var acc = await _tpBLL.TransferAsync(inTpTransfer);
                                                     if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
@@ -820,19 +821,19 @@ namespace BackendSite.Controllers.Api
                                             }
                                         }
 
-                                    if (_paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit,
-                                        authData.UserName, out transId) > 0)
-                                    {
-                                        if (_mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
+                                        if (_paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit,
+                                            authData.UserName, out transId) > 0)
                                         {
-                                            var balance = _custInfoBLL.GetBalance(custInfoDetail.CustId);
-                                            var inTpTransfer = new TpTransfer()
+                                            if (_mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == 1)
                                             {
-                                                TpId = 1,
-                                                Amount = balance,
-                                                CustId = custInfoDetail.CustId,
-                                                direction = TpDirection.ToTp
-                                            };
+                                                var balance = _custInfoBLL.GetBalance(custInfoDetail.CustId);
+                                                var inTpTransfer = new TpTransfer()
+                                                {
+                                                    TpId = 1,
+                                                    Amount = balance,
+                                                    CustId = custInfoDetail.CustId,
+                                                    direction = TpDirection.ToTp
+                                                };
 
                                                 var acc = await _tpBLL.TransferAsync(inTpTransfer);
                                                 if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
@@ -867,7 +868,7 @@ namespace BackendSite.Controllers.Api
                                         };
                                         var apiOnlineResult =
                                              await courierAdapter.MyPostAsync<string, RetionBonus>(bonusUrl, retionbonus);
-                                        if(apiOnlineResult.ErrorCode == 0)
+                                        if (apiOnlineResult.ErrorCode == 0)
                                         {
                                             apiResult.Add(new ApiResult()
                                             {
@@ -884,7 +885,7 @@ namespace BackendSite.Controllers.Api
                                             });
                                         }
                                     }
-                                    
+
                                 }
                                 catch (Exception ex)
                                 {
@@ -1110,7 +1111,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult<BalanceAdjustBonusCodeRep> CheckBalanceAdjustBonusCode(CheckBalanceAdjustBonusCodePara para)
         {
             var apiResult = new ApiResult<BalanceAdjustBonusCodeRep>();
-            var data = _paymentBLL.CheckBalanceAdjustBonusCode(para.BonusCode,para.PromotionType, para.SiteId,para.CurrencyId);
+            var data = _paymentBLL.CheckBalanceAdjustBonusCode(para.BonusCode, para.PromotionType, para.SiteId, para.CurrencyId);
             apiResult.Data = data;
             apiResult.ErrorCode = 0;
             return apiResult;

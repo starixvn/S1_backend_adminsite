@@ -17,6 +17,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class TpMaintainController : ControllerBase
     {
         private readonly TpMaintainBLL tpMaintainBLL;

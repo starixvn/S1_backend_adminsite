@@ -13,7 +13,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
-    
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class ReferralManagementController : Controller
     {
         private readonly ServerInfoBLL serverInfoBLL;

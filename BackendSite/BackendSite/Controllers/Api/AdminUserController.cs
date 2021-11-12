@@ -5,12 +5,15 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Attributes;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackendSite.Controllers.Api
 {
+    [Authorize]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Admin/UserAuthoritySetting" })]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class AdminUserController : Controller
     {
         private readonly AdminUserBLL adminUserBLL;

@@ -1,12 +1,15 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
 namespace BackendSite.Controllers.Api
 {
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class PaymentAdjustmentInfoController : Controller
     {
         private readonly PaymentAdjustmentReportBLL paymentAdjustmentBLL;
@@ -40,7 +43,7 @@ namespace BackendSite.Controllers.Api
             var CurrencyAmount = new List<string>();
             var apiListResult = new ApiListResultCurrencyAmount<PaymentAdjustment>
             {
-                Data = paymentAdjustmentBLL.GetAdjustmentInfoByCust(getAdjustmentInfoReq.CustId, getAdjustmentInfoReq.StartDate, getAdjustmentInfoReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount,ref CurrencyAmount),
+                Data = paymentAdjustmentBLL.GetAdjustmentInfoByCust(getAdjustmentInfoReq.CustId, getAdjustmentInfoReq.StartDate, getAdjustmentInfoReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount),
                 ErrorCode = 0,
                 PageNumber = pageNumber,
                 TotalPages = totalPages,

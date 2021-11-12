@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.Api
 {
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class AdminController : Controller
     {
         private readonly SelLangBLL selLangBLL;
@@ -27,7 +30,6 @@ namespace BackendSite.Controllers.Api
         /// </summary>
         /// <param name="adminUser"></param>
         /// <returns></returns>
-        //[ApiExplorerSettings(IgnoreApi = true)]
         //[HttpPost]
         //public ApiResult AddAccount([FromBody]AdminUser adminUser)
         //{
@@ -51,7 +53,6 @@ namespace BackendSite.Controllers.Api
         /// </summary>
         /// <param name="adminUser"></param>
         /// <returns></returns>
-        //[ApiExplorerSettings(IgnoreApi = true)]
         //[HttpPost]
         //public ApiResult EditAccount([FromBody]AdminUser adminUser)
         //{
@@ -75,7 +76,6 @@ namespace BackendSite.Controllers.Api
         /// </summary>
         /// <param name="adminUser"></param>
         /// <returns></returns>
-        //[ApiExplorerSettings(IgnoreApi = true)]
         //[HttpPost]
         //public ApiResult ChangePwdAccount([FromBody] AdminUser adminUser)
         //{
