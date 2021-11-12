@@ -668,7 +668,7 @@ namespace BackendSite.Service.DAL
             connection.Open();
             using var transaction = connection.BeginTransaction();
 
-            var promotionRessult = DuplicatePromotion(bonusCode, siteId, newBonusCode, connection, transaction);
+            var promotionRessult = DuplicatePromotion(bonusCode, siteId, newBonusCode, newSpecialCode, isSpecial, connection, transaction);
 
             if (!promotionRessult)
             {
@@ -969,7 +969,7 @@ namespace BackendSite.Service.DAL
         /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        private bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode, MySqlConnection connection,
+        private bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode, string newSpecialCode, bool isSpecial, MySqlConnection connection,
             MySqlTransaction transaction)
         {
             var p = new DynamicParameters();
@@ -977,9 +977,11 @@ namespace BackendSite.Service.DAL
             p.Add("_BonusCode", bonusCode);
             p.Add("_SiteId", siteId);
             p.Add("_NewBonusCode", newBonusCode);
+            p.Add("_NewSpecialCode", newSpecialCode);
+            p.Add("_IsSpecial", isSpecial ? 1:0);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            connection.Execute("Admin_PromotionDuplicateV2_Set", p, transaction: transaction,
+            connection.Execute("Admin_PromotionDuplicate_Set_V3", p, transaction: transaction,
                 commandType: CommandType.StoredProcedure);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
