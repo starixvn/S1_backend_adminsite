@@ -180,25 +180,21 @@ namespace BackendSite.Service.Library
         /// <param name="paramTimeZone">參數的時區(TimeSpan)</param>
         /// <returns></returns>
         public bool StringConvertDateTimeOffset(string paramDateTime,
-            TimeSpan newTimeZone,
             out DateTimeOffset newDateTimeOffset,
-            out TimeSpan paramTimeZone)
+            out TimeSpan paramTimeZone,
+            TimeSpan? newTimeZone = null)
         {
             newDateTimeOffset = DateTimeOffset.MinValue;
             paramTimeZone = TimeSpan.Zero;
-            newTimeZone = newTimeZone == null ? TimeSpan.Zero : newTimeZone;
             try
             {
                 if (string.IsNullOrEmpty(paramDateTime))
                 {
                     return false;
                 }
-
                 newDateTimeOffset = DateTimeOffset.Parse(paramDateTime);
-
                 paramTimeZone = newDateTimeOffset.Offset;
-
-                newDateTimeOffset = new DateTimeOffset(newDateTimeOffset.ToUniversalTime().DateTime, TimeSpan.Zero);
+                newDateTimeOffset = new DateTimeOffset(newDateTimeOffset.ToUniversalTime().DateTime, newTimeZone ?? TimeSpan.Zero);
 
                 return true;
             }

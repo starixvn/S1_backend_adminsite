@@ -342,7 +342,7 @@ namespace BackendSite.Service.DAL
             props.Add("ActStatus", deposit);
             props.Add("DayInactive", dormantUser);
             props.Add("CallOutStatus", callOut);
-            var result = _reportDbClient.Query<CustTele>("Admin_CustTeleSearchV4_Get", props).ToList();
+            var result = _reportDbClient.Query<CustTele>("Admin_CustTeleSearch_Get_V4", props).ToList();
 
             result.ForEach(x =>
             {
@@ -391,7 +391,7 @@ namespace BackendSite.Service.DAL
             props.Add("ActStatus", deposit);
             props.Add("DayInactive", dormantUser);
             props.Add("CallOutStatus", callOut);
-            var tempResult = _reportDbClient.Query<CustTeleExportTemp>("Admin_CustTeleExportV4_Get", props).ToList();
+            var tempResult = _reportDbClient.Query<CustTeleExportTemp>("Admin_CustTeleExport_Get_V4", props).ToList();
 
             tempResult.ForEach(x =>
             {
@@ -477,8 +477,8 @@ namespace BackendSite.Service.DAL
             props.Add("PageSize", Math.Abs(pageSize));
             props.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
             props.Add("Status", status);
-
-            var result = _reportDbClient.Query<TagData>("Admin_TagV3_Get", props);
+           
+            var result = _reportDbClient.Query<TagData>("Admin_Tag_Get_V3", props);
             searchResult.TagDatas = result.ToList();
             searchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
             searchResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
@@ -557,8 +557,8 @@ namespace BackendSite.Service.DAL
             props.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            var result = _reportDbClient.Query<RegLiveStatus>("Admin_CustRegLiveStatusV4_Get", props).ToList();
+            
+            var result = _reportDbClient.Query<RegLiveStatus>("Admin_CustRegLiveStatus_Get_V4", props).ToList();
             searchData.RegLiveStatusDatas = result;
             searchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
             searchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
@@ -574,7 +574,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
         {
-            return _reportDbClient.Query<RegLiveStatusNotes>("Admin_CustRegLiveStatusNotesV2_Get", new DynamicParameters(new { CustId = custId }));
+            return _reportDbClient.Query<RegLiveStatusNotes>("Admin_CustRegLiveStatusNotes_Get_V2", new DynamicParameters(new { CustId = custId }));
         }
 
         public int AddRegLiveStatusNote(int custId, string note, string @operator)
@@ -608,7 +608,7 @@ namespace BackendSite.Service.DAL
             props.Add("CreditSite", JsonConvert.SerializeObject(creditSite));
             props.Add("AgentCodeType", agentCodeType);
 
-            var result = _reportDbClient.Query<RegLiveStatus>("Admin_CustRegLiveStatusExportV4_Get", props);
+            var result = _reportDbClient.Query<RegLiveStatus>("Admin_CustRegLiveStatusExport_Get_V4", props);
 
             return result;
         }

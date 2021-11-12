@@ -271,15 +271,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             DateTimeOffset? startDate = null;
             DateTimeOffset? endDate = null;
 
-            if (_tools.StringConvertDateTimeOffset(request.StartDate, TimeSpan.Zero,
-                out DateTimeOffset startDateResult,
-                out TimeSpan startDateTimeZone))
+            if (_tools.StringConvertDateTimeOffset(request.StartDate, out var startDateResult, out _))
             {
                 startDate = startDateResult;
             }
-            if (_tools.StringConvertDateTimeOffset(request.EndDate, TimeSpan.Zero,
-                out DateTimeOffset endDateResult,
-                out TimeSpan endDateTimeZone))
+            if (_tools.StringConvertDateTimeOffset(request.EndDate, out var endDateResult, out _))
             {
                 endDate = endDateResult;
             }
@@ -341,20 +337,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             DateTimeOffset? startDate = null;
             DateTimeOffset? endDate = null;
 
-            if (_tools.StringConvertDateTimeOffset(request.StartDate,TimeSpan.Zero,
-                out DateTimeOffset startDateResult,
-                out TimeSpan startDateTimeZone))
+            if (_tools.StringConvertDateTimeOffset(request.StartDate, out var startDateResult, out _))
             {
                 startDate = startDateResult.DateTime;
             }
-            if (!_tools.StringConvertDateTimeOffset(request.EndDate, TimeSpan.Zero,
-                out DateTimeOffset endDateResult,
-                out TimeSpan endDateTimeZone))
+            if (!_tools.StringConvertDateTimeOffset(request.EndDate, out var endDateResult, out _))
             {
                 endDate = endDateResult.DateTime;
             }
 
-            var ExportCustInfo = _custInfoBll.GetCustInfoExportList(request.SiteIds,
+            var exportCustInfo = _custInfoBll.GetCustInfoExportList(request.SiteIds,
                                                                     request.BirDate,
                                                                     request.BirMonth,
                                                                     request.BirYear,
@@ -372,7 +364,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                                     request.BankAccountNumber,
                                                                     request.Statuses);
 
-            var stream = _excelBll.Export(ExportCustInfo);
+            var stream = _excelBll.Export(exportCustInfo);
             return _excelBll.ExcelFile(stream, "CustInfoList");
         }
 
