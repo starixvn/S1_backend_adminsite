@@ -228,7 +228,7 @@ namespace BackendSite.Service.DAL
         public int SetCustPhotoId(int custId, int siteId, string picFileName, byte[] photoIdPic)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Member_CustPhotoId_Int", new { CustId = custId, SiteId = siteId, PicFileName = picFileName, PhotoIdPic = photoIdPic }, commandType: CommandType.StoredProcedure);
+            return conn.Execute("Admin_CustPhotoId_Ins", new { CustId = custId, SiteId = siteId, PicFileName = picFileName, PhotoIdPic = photoIdPic }, commandType: CommandType.StoredProcedure);
         }
         public bool DelCustPhotoId(int custId)
         {
