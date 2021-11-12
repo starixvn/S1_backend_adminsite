@@ -6,11 +6,14 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackendSite.Controllers.Api
 {
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class WinLostReportController : ControllerBase
     {
         #region Fields

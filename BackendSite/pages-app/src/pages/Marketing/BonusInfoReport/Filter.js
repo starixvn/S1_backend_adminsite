@@ -23,6 +23,7 @@ const defPromotionType = {
   6: "Rebate",
   7: "CashBack",
   8: "Advertising",
+  9: "Retention free bet"
 };
 const defDateType = {
   0: "",

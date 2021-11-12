@@ -1,8 +1,11 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -11,14 +14,10 @@ namespace BackendSite.Service.DAL
 {
     public class AdjustmentLogReportService
     {
-        private readonly IConfiguration configuration;
-        private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-        public AdjustmentLogReportService(IConfiguration configuration, ILogger<MySqlClient> logger)
+        public AdjustmentLogReportService(IServiceProvider provider)
         {
-            this.configuration = configuration;
-            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
-            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
         public List<AdjustmentInfoLogMenu> GetAdjustmentInfoLogMenu()
         {

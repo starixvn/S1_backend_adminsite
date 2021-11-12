@@ -12,6 +12,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitAdjust" })]
     public class AdjustWithdrawalLimitController : Controller
     {
@@ -104,13 +105,11 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<AdjustWithdrawalLimit> GetAdjustWithdrawalLimitsLog([FromForm] int CustId, [FromForm] int PageNumber)
         {
             var PageSize = 10;
-            var TotalPages = 0;
-            var RowCount = 0;
 
             var result = new ApiListResult<AdjustWithdrawalLimit>();
             try
             {
-                result.Data = adjustWithdrawalLimitBLL.GetAdjustWithdrawalLimitsLog(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                result.Data = adjustWithdrawalLimitBLL.GetAdjustWithdrawalLimitsLog(CustId, PageNumber, PageSize, out int TotalPages, out int RowCount);
 
                 result.PageNumber = PageNumber;
                 result.RowCount = RowCount;
@@ -150,7 +149,7 @@ namespace BackendSite.Controllers.Api
                 adjustWithdrawalLimit.SiteName = custInfo.SiteName;
                 adjustWithdrawalLimit.Operator = authData.UserName;
                 adjustWithdrawalLimit.CustId = CustId;
-                var resultCode = adjustWithdrawalLimitBLL.SetAdjustWithdrawalLimit(adjustWithdrawalLimit, custInfo.UserName, custInfo.CurrencyId, custInfo.SiteId,User.Identity.Name);
+                var resultCode = adjustWithdrawalLimitBLL.SetAdjustWithdrawalLimit(adjustWithdrawalLimit, custInfo.UserName, custInfo.CurrencyId, custInfo.SiteId, User.Identity.Name);
                 if (resultCode == 21)
                 {
                     result.ErrorCode = 21;

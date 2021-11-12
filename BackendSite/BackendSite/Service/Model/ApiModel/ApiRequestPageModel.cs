@@ -15,15 +15,13 @@ namespace BackendSite.Service.Model.ApiModel
         /// 頁數
         /// </summary>
         [Required]
-        [Range(1,999)]
+        [Range(1,9999)]
         public int PageNumber { get; set; }
 
         /// <summary>
         /// 每頁資料筆數
         /// </summary>
-        [Required]
-        [Range(10, 100)]
-        public int PageSize { get; set; }
+        public int PageSize { get; set; } = 10;
     }
 
 }

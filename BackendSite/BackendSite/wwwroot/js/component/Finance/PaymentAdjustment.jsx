@@ -5,7 +5,22 @@ import qs from 'qs';
     class PaymentAdjustment extends React.Component {
         constructor(props) {
             super(props);
-            this.state = { UserName: "", CustData: null, Checkwd: false, Withdrawal: 1, SiteList: [], SiteId: null, SabaId: "", AdjustMentLimitMax:0, CheckPassword:false};
+            this.state = { UserName: "", 
+            CustData: null, 
+            Checkwd: false, 
+            Withdrawal: 1, 
+            SiteList: [], 
+            SiteId: null, 
+            SabaId: "", 
+            AdjustMentLimitMax:0, 
+            CheckPassword:false,
+            BonusCode:"",
+            CheckedBonusCode:"",
+            WalletType:0,
+            RollOver:1,
+            Amount:1,
+            HasBonusCode:false,
+            Name:""};
         }
 
         componentDidMount = () => {
@@ -115,6 +130,8 @@ import qs from 'qs';
             let withdrawal = parseFloat(this.state.Withdrawal);
             let withdrawalamount = isNaN(parseFloat(amount) * withdrawal) ? 0 : parseFloat(amount) * withdrawal;
             let memo = this.state.Memo;
+            let bonusCode = this.state.CheckedBonusCode;
+            let rollOver = this.state.RollOver;
 
             if (option == null) {
                 alert('Please select one Option.');
@@ -131,12 +148,18 @@ import qs from 'qs';
                 return;
             }
 
-            if(amount > adjustMentLimitMax && adjustMentLimitMax !== 0 && (parseInt(option) === 1 || parseInt(option) === 3)){
+            if(amount > adjustMentLimitMax && adjustMentLimitMax !== 0 && (parseInt(option) === 1 || parseInt(option) === 3 || parseInt(option) === 5)){
                 this.setState({ CheckPassword: true });
                 return;
             }
 
-            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount, Memo: memo })
+            if(parseInt(option) === 5 && bonusCode == ""){
+                alert('Please Check BonusCode');
+                return;
+            }
+
+            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount, Memo: memo,
+                BounsCode:  bonusCode, RollOver: rollOver})
                 .then(function (response) {
                     //Loading.UnLoading();
                     let result = response.data;
@@ -160,7 +183,10 @@ import qs from 'qs';
             let checkwd = (this.state.Checkwd) ? 1 : 0;
             let withdrawalamount = isNaN(parseFloat(amount) * withdrawal) ? 0 : parseFloat(amount) * withdrawal;
             let memo = this.state.Memo;
-            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount, Memo: memo })
+            let bonusCode = this.state.CheckedBonusCode;
+            let rollOver = this.state.RollOver;
+            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount, Memo: memo,
+                BounsCode:  bonusCode, RollOver: rollOver})
             .then(function (response) {
                 //Loading.UnLoading();
                 let result = response.data;
@@ -181,6 +207,18 @@ import qs from 'qs';
             let obj = this.state;
             obj[event.target.name] = event.target.value;
             this.setState(obj);
+
+            //option切換,某些欄位恢復為預設值
+            if(event.target.name == "Option"){
+                this.setState({WalletType: 0,
+                            BonusCode:"",
+                            CheckedBonusCode:"",
+                            HasBonusCode:false,
+                            Name:"",
+                            // Amount:1,
+                            // RollOver:1
+                });
+            }
         }
 
         onCheck(Checkwd) {
@@ -191,6 +229,56 @@ import qs from 'qs';
             this.setState({ CheckPassword: false });
         }
 
+        onCheckBonusCode(event){
+            event.preventDefault();
+            let bonusCode = this.state.BonusCode;
+            let custData = this.state.CustData;
+            let bonusType = 9;
+
+            if(bonusCode == null || bonusCode.replace(/\s/g,"") == ""){
+                alert('Please Enter BonusCode');
+                return;
+            }
+            axios.post('/api/Payment/CheckBalanceAdjustBonusCode', { BonusCode: bonusCode, PromotionType: bonusType, SiteId: custData.siteId, CurrencyId: custData.currencyId})
+            .then(function (response) {
+                //Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    if(!result.data.hasBonusCode){
+                        alert("BonusCode Error! Please Check Again")
+                        this.setState({ RollOver: 1,
+                            Amount: 1,
+                            HasBonusCode: false,
+                            CheckedBonusCode: "",
+                            Name: "",
+                            WalletType: 0
+                        });
+                    }
+                    else{
+                        this.setState({ RollOver: result.data.rollOver,
+                                        Amount: result.data.bonus,
+                                        HasBonusCode: true,
+                                        CheckedBonusCode: result.data.bonusCode,
+                                        Name: result.data.name,
+                                        WalletType: result.data.walletType
+                                    });
+                        alert("BonusCode " + bonusCode + " exist")       
+                    }
+                } else {
+                    alert(result.message);
+                    this.setState({ RollOver: 1,
+                        Amount: 1,
+                        HasBonusCode: false,
+                        CheckedBonusCode: "",
+                        Name: "",
+                        WalletType: 0
+                    });
+                }
+            }.bind(this)).catch(function (error) {
+                //Loading.UnLoading();
+                alert(error);
+            }.bind(this));
+        }
         render() {
             let custData = this.state.CustData;
             let tpWallet = null;
@@ -237,7 +325,6 @@ import qs from 'qs';
                     {custData != null ?
                         <div>
                             <h4 className="page-name">Cust Info</h4>
-                            <form method="post" onSubmit={this.onSumbitPaymentAdjustment.bind(this)}>
                                 <table className="table table-detail">
                                     <tbody>
                                         <tr>
@@ -277,7 +364,44 @@ import qs from 'qs';
                                         <input type="radio" id="Option_4" name="Option" className="custom-control-input" value={4} onChange={this.onChange.bind(this)} />
                                         <label className="custom-control-label" htmlFor="Option_4">Bonus(-)</label>
                                     </div>
+                                    <div className="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="Option_5" name="Option" className="custom-control-input" value={5} onChange={this.onChange.bind(this)} />
+                                        <label className="custom-control-label" htmlFor="Option_5">Retention Bonus</label>
+                                    </div>
                                 </div>
+                                {this.state.Option == 5 ? 
+                                <div className="form-group width-200">
+                                    <div>
+                                        <label className="col-form-label">BonusCode</label>
+                                        <input className="form-control" name="BonusCode" onChange={this.onChange.bind(this)}/>
+                                    </div>
+                                    <div className="button-group mt-10">
+                                        <button onClick={this.onCheckBonusCode.bind(this)}>CheckBonusCode</button>
+                                    </div>
+                                </div>
+                                :null}
+                                {
+                                    this.state.HasBonusCode ? 
+                                    <>
+                                    <h4 className="page-name">Retention Bonus Info</h4>
+                                    <table className="table table-detail">
+                                        <tr>
+                                            <th scope="row">BonusCode</th>
+                                            <td>{this.state.CheckedBonusCode}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">WalletType</th>
+                                            <td>{this.state.WalletType == 0 ? "Transfer" : "Seamless" }</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">ProductCategory</th>
+                                            <td>{this.state.Name}</td>
+                                        </tr>
+                                    </table>
+                                    </>
+                                    :null
+                                }
+                                {this.state.Option != 5 ? 
                                 <div className="form-group">
                                     <div className="custom-control custom-checkbox custom-control-inline">
                                         <input className="custom-control-input" id="checkwd" type="checkbox" name="Checkwd" checked={this.state.Checkwd} onChange={this.onCheck.bind(this, this.state.Checkwd)} />
@@ -285,18 +409,24 @@ import qs from 'qs';
                                     </div>
                                     <input className="form-control width-200" type="number" name="Withdrawal" pattern="[0-9]*" value={this.state.Withdrawal} onChange={this.onChange.bind(this)}/>
                                 </div>
+                                :null}
                                 <div className="form-group width-200">
                                     <label className="col-form-label">Amount</label>
-                                    <input className="form-control" type="number" name="Amount" onChange={this.onChange.bind(this)} step="1" min="1" />
+                                    <input className="form-control" type="number" name="Amount" onChange={this.onChange.bind(this)} step="1" min="1" disabled={this.state.Option == 5 ? true:false} value={this.state.Amount} />
                                 </div>
+                                {this.state.Option == 5 ? 
+                                <div className="form-group width-200">
+                                    <label className="col-form-label">RollOver</label>
+                                    <input className="form-control" type="number" name="RollOver" onChange={this.onChange.bind(this)} disabled={this.state.Option == 5 ? true:false} value={this.state.RollOver}/>
+                                </div>
+                                :null}
                                 <div className="form-group width-200">
                                     <label className="col-form-label">Memo</label>
                                     <textarea className="form-control" name="Memo" onChange={this.onChange.bind(this)} />
                                 </div>
                                 <div className="button-group mt-10">
-                                    <button type="submit" className="btn btn-primary">Submit</button>
+                                    <button type="submit" className="btn btn-primary" onClick={this.onSumbitPaymentAdjustment.bind(this)}>Submit</button>
                                 </div>
-                            </form>
                         {this.state.CheckPassword ? <PopBoxContent 
                                                     currency={i18n["lbl_Currency" + this.state.CustData.currencyId]} 
                                                     amount={this.state.Amount}

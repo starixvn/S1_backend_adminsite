@@ -20,6 +20,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class MessageController : ControllerBase
     {
         #region Fields
@@ -101,7 +102,19 @@ namespace BackendSite.Controllers.Api
                     siteList.Add(0, "All");
                 }
 
-                var result = messageBLL.GetAnnouncements(para.SelectSite, para.StartDate, para.EndDate, para.Status, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                if (para.StartDate > 2147483647)
+                {
+                    para.StartDate = 2147483647;
+                }
+
+                if (para.EndDate > 2147483647)
+                {
+                    para.EndDate = 2147483647;
+                }
+
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate);
+                var result = messageBLL.GetAnnouncements(para.SelectSite, startTime, endTime, para.Status, PageNumber, PageSize, ref TotalPages, ref RowCount);
                 foreach (var r in result)
                 {
                     siteList.TryGetValue(r.SiteId, out var siteName);
@@ -109,11 +122,9 @@ namespace BackendSite.Controllers.Api
                 }
                 apiResult.Data = result;
                 apiResult.ErrorCode = 0;
-
                 apiResult.PageNumber = PageNumber;
                 apiResult.RowCount = RowCount;
                 apiResult.TotalPages = TotalPages;
-                apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
             {
@@ -172,14 +183,25 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
         [HttpPost]
-        public ApiResult AddAnnouncement([FromForm] Announcement Datas, [FromForm] long _StartTime, [FromForm] long _EndTime)
+        public ApiResult AddAnnouncement([FromForm] AddAnnouncementModel Datas, [FromForm] long _StartTime, [FromForm] long _EndTime)
         {
             var apiResult = new ApiResult<dynamic>();
 
             try
             {
                 var authData = authorizeBLL.GetAuthData();
-                var result = messageBLL.AddAnnouncement(Datas, authData.UserName, authData.UserId, _StartTime, _EndTime);
+                if (_StartTime > 2147483647)
+                {
+                    _StartTime = 2147483647;
+                }
+
+                if (_EndTime > 2147483647)
+                {
+                    _EndTime = 2147483647;
+                }
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(_StartTime);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(_EndTime);
+                var result = messageBLL.AddAnnouncement(Datas, authData.UserName, authData.UserId, startTime, endTime);
                 apiResult.Data = new { result.CreateTime, result.Creator, result.Id };
                 apiResult.ErrorCode = 0;
             }
@@ -208,14 +230,25 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
         [HttpPost]
-        public ApiResult UpdateAnnouncement([FromForm] Announcement Datas, [FromForm] long _StartTime, [FromForm] long _EndTime)
+        public ApiResult UpdateAnnouncement([FromForm] UpdateAnnouncementModel Datas, [FromForm] long _StartTime, [FromForm] long _EndTime)
         {
             var apiResult = new ApiResult<dynamic>();
 
             try
             {
                 var authData = authorizeBLL.GetAuthData();
-                var result = messageBLL.UpdateAnnouncement(Datas, authData.UserName, authData.UserId, _StartTime, _EndTime);
+                if (_StartTime > 2147483647)
+                {
+                    _StartTime = 2147483647;
+                }
+
+                if (_EndTime > 2147483647)
+                {
+                    _EndTime = 2147483647;
+                }
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(_StartTime);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(_EndTime);
+                var result = messageBLL.UpdateAnnouncement(Datas, authData.UserName, authData.UserId, startTime, endTime);
                 apiResult.Data = new { result.LastUpdater, result.LastUpdateTime };
                 apiResult.ErrorCode = 0;
             }
@@ -262,6 +295,21 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        #region CustInfo > Personal Message
+
+        /// <summary>
+        /// Message/GetPersonalMsg 取得指定客戶個人訊息資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Personal Message > Get Personal Message
+        /// 
+        /// </remarks>
+        /// <param name="CustId"></param>
+        /// <param name="PageNumber"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
         [HttpPost]
         public ApiListResult<PersonalMsg> GetPersonalMsg([FromForm] int CustId, [FromForm] int PageNumber)
@@ -289,6 +337,18 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// Message/GetCustLang 取得指定客戶語系
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo  > Personal Message > Get Customer Lang
+        /// 
+        /// </remarks>
+        /// <param name="CustId"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
         [HttpPost]
         public ApiResult<CustLang> GetCustLang([FromForm] int CustId)
@@ -308,6 +368,21 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// Message/SendPersonalMsg 送出指定客戶個人訊息
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo  > Personal Message >  Click [Add] > Click [Send]
+        /// 
+        /// </remarks>
+        /// <param name="CustId"></param>
+        /// <param name="Title"></param>
+        /// <param name="Content"></param>
+        /// <param name="PageNumber"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
         [HttpPost]
         public ApiListResult<PersonalMsg> SendPersonalMsg([FromForm] int CustId, [FromForm] string Title, [FromForm] string Content, [FromForm] int PageNumber)
@@ -337,6 +412,20 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// Message/DeletePersonalMsg 刪除指定客戶個人訊息
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo  > Personal Message > Click [Delete]
+        /// 
+        /// </remarks>
+        /// <param name="Id"></param>
+        /// <param name="CustId"></param>
+        /// <param name="PageNumber"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
         [HttpPost]
         public ApiListResult<PersonalMsg> DeletePersonalMsg([FromForm] int Id, [FromForm] int CustId, [FromForm] int PageNumber)
@@ -364,6 +453,8 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
+        #endregion
 
         #region CSD > Personal Message Batch
 
@@ -546,7 +637,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiListResult<BatchMsg> DeleteBatchMessage([FromForm] IEnumerable<int> SelectSite, [FromForm] long? StartDate, [FromForm] long? EndDate, [FromForm] int batchId, [FromForm] int PageNumber)
+        public ApiListResult<BatchMsg> DeleteBatchMessage([FromForm] IEnumerable<int> SelectSite, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int batchId, [FromForm] int PageNumber)
         {
             var PageSize = 10;
             var TotalPages = 0;
@@ -555,7 +646,9 @@ namespace BackendSite.Controllers.Api
             try
             {
                 messageBLL.DeleteBatchMessage(batchId);
-                apiResult.Data = messageBLL.GetBatchMessageList(SelectSite, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+                apiResult.Data = messageBLL.GetBatchMessageList(SelectSite, startTime, endTime, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
 
                 apiResult.PageNumber = PageNumber;
@@ -651,7 +744,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiListResult<BatchMsg> GetBatchMessageList([FromForm] IEnumerable<int> SelectSite, [FromForm] long? StartDate, [FromForm] long? EndDate, [FromForm] int PageNumber)
+        public ApiListResult<BatchMsg> GetBatchMessageList([FromForm] IEnumerable<int> SelectSite, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)
         {
             var PageSize = 10;
             var TotalPages = 0;
@@ -659,9 +752,15 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<BatchMsg>();
             try
             {
-                apiResult.Data = messageBLL.GetBatchMessageList(SelectSite, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
-                apiResult.ErrorCode = 0;
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+                apiResult.Data = messageBLL.GetBatchMessageList(SelectSite, startTime, endTime, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
 
+                foreach (var data in apiResult.Data)
+                {
+                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                }
                 apiResult.PageNumber = PageNumber;
                 apiResult.RowCount = RowCount;
                 apiResult.TotalPages = TotalPages;

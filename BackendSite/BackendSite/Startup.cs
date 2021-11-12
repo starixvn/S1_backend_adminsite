@@ -17,7 +17,7 @@ using BackendSite.ExceptionHandling;
 using Microsoft.AspNetCore.HttpOverrides;
 using NSwag;
 using System.Collections.Generic;
-
+using NSwag.Generation.AspNetCore;
 
 namespace BackendSite
 {
@@ -212,7 +212,7 @@ namespace BackendSite
                 config.Filters.Add<ExceptionFilter>();
             });
 
-            services.AddOpenApiDocument(); //Swagger Setting
+            services.AddOpenApiDocument();//Swagger Setting
 
         }
 
@@ -233,16 +233,19 @@ namespace BackendSite
                 app.UseOpenApi(config =>
                 {
                     config.PostProcess = (document, http) =>
-                    {        
+                    {
                         document.Schemes = new List<OpenApiSchema>()
                         {
                             OpenApiSchema.Http,
                             OpenApiSchema.Https
                         };
                         document.Info.Title = "AdminSite API Document";
+                        document.Info.Version = "2.0.7985.29061";
                     };
                 });
+
                 app.UseSwaggerUi3();
+
                 app.UseReDoc(config =>
                 {
                     config.Path = "/redoc";

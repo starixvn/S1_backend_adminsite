@@ -11,7 +11,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
-
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class CommonController : ControllerBase
     {
         private readonly ServerInfoBLL serverInfoBLL;
@@ -52,6 +52,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+
         /// <summary>
         /// Common/GetEnumType 取得列舉清單
         /// </summary>
@@ -64,6 +65,7 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="enumName">參數</param>
         /// <returns>結果</returns>
+        //有新舊API，這支是舊API，另一支新的API=apiV2/Enum/GetEnumType
         [HttpPost]
         public ApiResult<List<dynamic>> GetEnumType([FromQuery] string enumName)
         {

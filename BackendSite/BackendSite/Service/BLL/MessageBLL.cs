@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BatchMessageSendLog;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -33,29 +34,36 @@ namespace BackendSite.Service.BLL
             return messageService.SendMessageToPlayer(customer.SiteId, sender, title, content, custId, customer.UserName, customer.UserLang, SenderCustId);
         }
 
-        public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, long startDate, long endDate, int status, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, DateTimeOffset startDate, DateTimeOffset endDate, int status,int PageNumber, int PageSize, ref int TotalPages, ref int RowCount)
         {
-            return messageService.GetAnnouncements(selectSite, startDate, endDate, status, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            return messageService.GetAnnouncements(JsonConvert.SerializeObject(selectSite),
+                startDate,
+                endDate,
+                status,
+                (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize),
+                Math.Abs(PageSize),
+                ref TotalPages,
+                ref RowCount);
         }
 
-        public Announcement GetAnnouncementById(int Id)
+        public Announcement GetAnnouncementById(int id)
         {
-            return messageService.GetAnnouncementById(Id);
+            return messageService.GetAnnouncementById(id);
         }
 
-        public Announcement AddAnnouncement(Announcement Datas, string Creator, int CreatorId, long _StartTime, long _EndTime)
+        public Announcement AddAnnouncement(AddAnnouncementModel data, string creator, int creatorId, DateTimeOffset startTime, DateTimeOffset endTime)
         {
-            return messageService.AddAnnouncement(Datas, Creator, CreatorId, _StartTime, _EndTime);
+            return messageService.AddAnnouncement(data, creator, creatorId, startTime, endTime);
         }
 
-        public Announcement UpdateAnnouncement(Announcement Datas, string LastUpdater, int LastUpdaterId, long _StartTime, long _EndTime)
+        public Announcement UpdateAnnouncement(UpdateAnnouncementModel data, string lastUpdater, int lastUpdaterId, DateTimeOffset startTime, DateTimeOffset endTime)
         {
-            return messageService.UpdateAnnouncement(Datas, LastUpdater, LastUpdaterId, _StartTime, _EndTime);
+            return messageService.UpdateAnnouncement(data, lastUpdater, lastUpdaterId, startTime, endTime);
         }
 
-        public void DeleteAnnouncement(int Id)
+        public int DeleteAnnouncement(int id)
         {
-            messageService.DeleteAnnouncement(Id);
+           return messageService.DeleteAnnouncement(id);
         }
 
         public IEnumerable<PersonalMsg> GetPersonalMsg(int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
@@ -102,9 +110,9 @@ namespace BackendSite.Service.BLL
         {
             return messageService.GetBatchMessage(batchId);
         }
-        public IEnumerable<BatchMsg> GetBatchMessageList(IEnumerable<int> SelectSite, long? StartDate, long? EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<BatchMsg> GetBatchMessageList(IEnumerable<int> selectSite, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount)
         {
-            var batchMessageList = messageService.GetBatchMessageList(SelectSite, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            var batchMessageList = messageService.GetBatchMessageList(selectSite, startDate, endDate, pageSize, ref pageNumber, ref totalPages, ref rowCount);
             batchMessageList.ToList().ForEach(x =>
             {
                 x.Content = StripHTML(x.Content);

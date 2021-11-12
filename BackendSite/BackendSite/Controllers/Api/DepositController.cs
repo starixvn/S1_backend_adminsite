@@ -17,6 +17,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class DepositController : ControllerBase
     {
         private readonly DepositBLL depositBLL;
@@ -262,7 +263,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        public async Task<ApiResult<TransferResult>> Process(PendingFund pendingFund)
+        private async Task<ApiResult<TransferResult>> Process(PendingFund pendingFund)
         {
             return await pendingFundBLL.ProcessAsync(pendingFund);
         }

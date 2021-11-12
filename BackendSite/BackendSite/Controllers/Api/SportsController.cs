@@ -9,6 +9,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class SportsController : ControllerBase
     {
         private readonly SportsBLL sportsBLL;

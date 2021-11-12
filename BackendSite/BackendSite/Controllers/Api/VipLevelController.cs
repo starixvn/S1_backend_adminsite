@@ -13,6 +13,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class VipLevelController : ControllerBase
     {
         #region Fields
@@ -91,6 +92,18 @@ namespace BackendSite.Controllers.Api
 
         #region CustInfo > VipLevel
 
+        /// <summary>
+        /// VipLevel/GetVipLevelSetting 取得VIP等級設定資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Get Vip Level Setting
+        /// 
+        /// </remarks>
+        /// <param name="custIdReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiListResult<VipLevelSetting> GetVipLevelSetting(CustIdReq custIdReq)
         {
@@ -103,6 +116,18 @@ namespace BackendSite.Controllers.Api
             return apiListResult;
         }
 
+        /// <summary>
+        /// VipLevel/GetVipLevelInfo 取得指定客戶VIP等級資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level
+        /// 
+        /// </remarks>
+        /// <param name="custIdReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiResult<VipLevelInfo> GetVipLevelInfo(CustIdReq custIdReq)
         {
@@ -114,6 +139,18 @@ namespace BackendSite.Controllers.Api
             return apiListResult;
         }
 
+        /// <summary>
+        /// VipLevel/GetVipLevelLog 取得指定客戶VIP等級紀錄
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level Log
+        /// 
+        /// </remarks>
+        /// <param name="custIdReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiListResult<VipLevelLog> GetVipLevelLog(CustIdReq custIdReq)
         {
@@ -125,6 +162,18 @@ namespace BackendSite.Controllers.Api
             return apiListResult;
         }
 
+        /// <summary>
+        /// VipLevel/SetVipLevel 設定指定客戶VIP等級
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level > Click [Edit]
+        /// 
+        /// </remarks>
+        /// <param name="custIdReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiResult SetVipLevel(CustIdReq custIdReq)
         {
@@ -148,6 +197,18 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        /// <summary>
+        /// VipLevel/SetVipLevelManually 設定VIP等級為手動
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level > Click [Manually]
+        /// 
+        /// </remarks>
+        /// <param name="custIdReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiResult SetVipLevelManually(CustIdReq custIdReq)
         {

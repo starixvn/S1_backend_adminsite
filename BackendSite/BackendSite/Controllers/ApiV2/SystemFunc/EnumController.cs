@@ -7,10 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BackendSite.Controllers.ApiV2.System
+namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
     [Authorize]
-    [Route("api/[controller]/[action]")]
+    [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class EnumController : ControllerBase
     {
@@ -20,6 +20,11 @@ namespace BackendSite.Controllers.ApiV2.System
             public string EnumName { set; get; }
         }
 
+        public class EnumTypeModel
+        {
+            public string Name { set; get; }
+            public int Value { set; get; }
+        }
 
         /// <summary>
         /// Enum/GetEnumType 取得列舉清單
@@ -31,11 +36,12 @@ namespace BackendSite.Controllers.ApiV2.System
         /// </remarks>
         /// <param name="reqest">參數</param>
         /// <returns>結果</returns>
+        //有新舊API，這支是新API，另一支新的API=api/Common/GetEnumType
         [HttpPost]
-        public ApiResult<List<dynamic>> GetEnumType(GetEnumTypeReqest reqest)
+        public ApiResult<List<EnumTypeModel>> GetEnumType(GetEnumTypeReqest reqest)
         {
-            var apiResult = new ApiResult<List<dynamic>>();
-            var result = new List<dynamic>();
+            var apiResult = new ApiResult<List<EnumTypeModel>>();
+            var result = new List<EnumTypeModel>();
             try
             {
                 var allTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes());
@@ -46,7 +52,11 @@ namespace BackendSite.Controllers.ApiV2.System
                     {
                         foreach (var enumValue in Enum.GetValues(getType))
                         {
-                            result.Add(new { name = Enum.GetName(getType, enumValue), value = (int)enumValue });
+                            result.Add(new EnumTypeModel
+                            {
+                                Name = Enum.GetName(getType, enumValue),
+                                Value = (int)enumValue
+                            });
                         }
                         apiResult.Data = result;
                         apiResult.ErrorCode = 0;

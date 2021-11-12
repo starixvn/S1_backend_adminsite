@@ -23,6 +23,7 @@ namespace BackendSite.Controllers.Api
     [Route("api/[controller]/[action]")]
     [ApiController]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusManage" })]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class BonusManageController : Controller
     {
         #region Fields

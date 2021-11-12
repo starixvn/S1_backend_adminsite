@@ -17,10 +17,10 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
-
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class HomeController : ControllerBase
     {
         #region Fields
@@ -65,7 +65,7 @@ namespace BackendSite.Controllers.Api
         #region API Model
 
         public class LoginModel
-        { 
+        {
             /// <summary>
             /// 使用者帳號
             /// </summary>
@@ -266,7 +266,6 @@ namespace BackendSite.Controllers.Api
 
         #region Temp，沒再使用
 
-        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public ApiResult<int> RegisteredCustomers([FromForm] int SiteId, [FromForm] long StartDate, [FromForm] long EndDate)
         {
@@ -286,7 +285,6 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public ApiResult<int> DepositCustomers([FromForm] int SiteId, [FromForm] long StartDate, [FromForm] long EndDate)
         {
@@ -351,7 +349,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult GetMenu()
         {
 
-            var data = _menuBLL.GetMenuData();
+            var data = _menuBLL.GetMenuData(false, out var errorCodeEnum);
 
             if (data.Count == 0)
             {

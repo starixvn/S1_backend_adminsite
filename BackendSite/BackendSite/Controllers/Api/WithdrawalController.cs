@@ -23,6 +23,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class WithdrawalController : ControllerBase
     {
         private readonly WithdrawalBLL withdrawalBLL;
@@ -205,13 +206,13 @@ namespace BackendSite.Controllers.Api
             //var apiResult = new ApiResult();
             var withdrawConfirmReuslt = -1;
             var authData = _authorizeBLL.GetAuthData();
-            if (withdrawalReq.Action == (int) WithdrawalStatus.Approved)
+            if (withdrawalReq.Action == (int)WithdrawalStatus.Approved)
             {
                 //Check has pic or not
                 var hasPic = await CheckWithdrawalPictureAsync(withdrawalReq.TransId);
 
                 withdrawConfirmReuslt = withdrawalBLL.WithdrawalApproved(withdrawalReq.TransId, withdrawalReq.Comment,
-                    User.Identity.Name, authData.UserId,hasPic);
+                    User.Identity.Name, authData.UserId, hasPic);
 
                 if (withdrawConfirmReuslt > 0)
                 {
@@ -227,7 +228,7 @@ namespace BackendSite.Controllers.Api
 
                     #region Copy Picture
 
-                    if (withdrawalRequest.WithdrawalType == (int) WithdrawalType.LocalBank
+                    if (withdrawalRequest.WithdrawalType == (int)WithdrawalType.LocalBank
                         && hasPic)
                     {
                         await CopyWithdrawalPictureAsync(withdrawalRequest.TransId);
@@ -236,7 +237,7 @@ namespace BackendSite.Controllers.Api
                     #endregion
                 }
             }
-            else if (withdrawalReq.Action == (int) WithdrawalStatus.Rejected)
+            else if (withdrawalReq.Action == (int)WithdrawalStatus.Rejected)
             {
                 withdrawConfirmReuslt =
                     withdrawalBLL.WithdrawalRejected(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
@@ -254,20 +255,20 @@ namespace BackendSite.Controllers.Api
                     messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
                 }
             }
-            else if (withdrawalReq.Action == (int) WithdrawalStatus.Verify)
+            else if (withdrawalReq.Action == (int)WithdrawalStatus.Verify)
             {
                 withdrawConfirmReuslt =
                     withdrawalBLL.WithdrawalVerify(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
             }
-            else if (withdrawalReq.Action == (int) WithdrawalStatus.Process)
+            else if (withdrawalReq.Action == (int)WithdrawalStatus.Process)
             {
                 var withdrawalInfo =
                     Newtonsoft.Json.JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalReq.WithdrawalInfo);
-                if (withdrawalReq.WithdrawalType == (int) WithdrawalType.OnlinePayment)
+                if (withdrawalReq.WithdrawalType == (int)WithdrawalType.OnlinePayment)
                 {
                     withdrawalInfo.PayId = withdrawalReq.SelId;
                 }
-                else if (withdrawalReq.WithdrawalType == (int) WithdrawalType.LocalBank)
+                else if (withdrawalReq.WithdrawalType == (int)WithdrawalType.LocalBank)
                 {
                     var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
                     var bankInfoOff = bankDetailBLL.GetBankInfoOff(withdrawalRequest.SiteId)
@@ -282,14 +283,14 @@ namespace BackendSite.Controllers.Api
                         withdrawalInfo.BankId = bankInfoOff.BankId;
                     }
                 }
-                else if (withdrawalReq.WithdrawalType == (int) WithdrawalType.CryptoPay)
+                else if (withdrawalReq.WithdrawalType == (int)WithdrawalType.CryptoPay)
                 {
                     withdrawalInfo.PayId = withdrawalReq.SelId;
                     withdrawalInfo.ChannelId = withdrawalReq.ChannelId;
                 }
 
                 if (withdrawalReq.WithdrawalType == null ||
-                    withdrawalReq.WithdrawalType == (int) WithdrawalType.Undefine)
+                    withdrawalReq.WithdrawalType == (int)WithdrawalType.Undefine)
                 {
                     apiResult.ErrorCode = 1101;
                     apiResult.Message = "Select 1 Type of Withdrawal Please.";
@@ -305,8 +306,8 @@ namespace BackendSite.Controllers.Api
                         out custId, out amount);
 
                     if (withdrawConfirmReuslt > 0 &&
-                        ((withdrawalReq.WithdrawalType == (int) WithdrawalType.OnlinePayment) ||
-                         (withdrawalReq.WithdrawalType == (int) WithdrawalType.CryptoPay)))
+                        ((withdrawalReq.WithdrawalType == (int)WithdrawalType.OnlinePayment) ||
+                         (withdrawalReq.WithdrawalType == (int)WithdrawalType.CryptoPay)))
                     {
                         var reqWithdrawalOnline = new ReqWithdrawalOnline
                         {
@@ -324,7 +325,7 @@ namespace BackendSite.Controllers.Api
 
 
                         var myUrl = "";
-                        if (withdrawalReq.WithdrawalType == (int) WithdrawalType.CryptoPay)
+                        if (withdrawalReq.WithdrawalType == (int)WithdrawalType.CryptoPay)
                             myUrl = $"{payApiUrl}CryptoWithdrawal";
                         else
                             myUrl = $"{payApiUrl}Withdrawal";
@@ -348,22 +349,22 @@ namespace BackendSite.Controllers.Api
                     }
                 }
             }
-            else if (withdrawalReq.Action == (int) WithdrawalStatus.OnHold)
+            else if (withdrawalReq.Action == (int)WithdrawalStatus.OnHold)
             {
                 withdrawConfirmReuslt =
                     withdrawalBLL.WithdrawalOnHold(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
             }
-            else if (withdrawalReq.Action == (int) WithdrawalStatus.Draft)
+            else if (withdrawalReq.Action == (int)WithdrawalStatus.Draft)
             {
                 withdrawConfirmReuslt =
                     withdrawalBLL.WithdrawalDraft(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
             }
-            else if (withdrawalReq.Action == (int) WithdrawalStatus.Pending)
+            else if (withdrawalReq.Action == (int)WithdrawalStatus.Pending)
             {
                 withdrawConfirmReuslt =
                     withdrawalBLL.WithdrawalPending(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
             }
-            else if (withdrawalReq.Action == (int) WithdrawalStatus.ToKyc)
+            else if (withdrawalReq.Action == (int)WithdrawalStatus.ToKyc)
             {
                 withdrawConfirmReuslt =
                     withdrawalBLL.WithdrawalToKyc(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
@@ -407,6 +408,7 @@ namespace BackendSite.Controllers.Api
             public string ChannelName { get; set; }
         }
 
+        //有新舊API，這支是舊API，另一支新的API=api/BaseData/GetBankInfoOffList
         [HttpPost]
         public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffList(WithdrawalReq3 withdrawalReq)
         {
@@ -426,23 +428,25 @@ namespace BackendSite.Controllers.Api
             public int ChannelId { get; set; }
         }
 
+        //有新舊API，這支是新API，另一支新的API=api/BaseData/GetBankInfoOffList
         [HttpPost]
         public ApiResult<IEnumerable<Pay>> GetPayList(WithdrawalReq3 withdrawalReq)
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
             var bankInfoPay = bankDetailBLL.GetBankInfoPay();
             var _payInfo = (from x in bankInfoPay
-                where x.CurrencyId == withdrawalReq.CurrencyId && x.SysId == withdrawalReq.SysId
-                select new Pay
-                {
-                    PayId = x.PayId,
-                    PayName = x.PayName
-                }).Distinct(bankInfoPayComparer);
+                            where x.CurrencyId == withdrawalReq.CurrencyId && x.SysId == withdrawalReq.SysId
+                            select new Pay
+                            {
+                                PayId = x.PayId,
+                                PayName = x.PayName
+                            }).Distinct(bankInfoPayComparer);
             apiResult.Data = _payInfo;
             apiResult.ErrorCode = 0;
             return apiResult;
         }
 
+        //有新舊API，這支是新API，另一支新的API=api/BaseData/GetBankInfoOffList
         [HttpPost]
         public ApiResult<IEnumerable<Pay>> GetCryptoPayList(WithdrawalReq3 withdrawalReq)
         {
@@ -450,13 +454,13 @@ namespace BackendSite.Controllers.Api
             var cryptoPay = bankDetailBLL.GetCryptoPay();
             var _payInfo = (from x in cryptoPay
                             where x.CurrencyId == withdrawalReq.CurrencyId && x.ChannelName.Equals(withdrawalReq.ChannelName, StringComparison.OrdinalIgnoreCase)
-                             select new Pay
+                            select new Pay
                             {
                                 PayId = x.PayId,
                                 PayName = x.PayName,
                                 ChannelId = x.ChannelId
                             }).Distinct(bankInfoPayComparer);
-            
+
             apiResult.Data = _payInfo;
             apiResult.ErrorCode = 0;
             return apiResult;
@@ -475,7 +479,7 @@ namespace BackendSite.Controllers.Api
             }
         }
 
-        public class WithdrawalReq4: ApiRequestPageModel
+        public class WithdrawalReq4 : ApiRequestPageModel
         {
             public int CustId { get; set; }
             public string TransId { get; set; }
@@ -502,7 +506,7 @@ namespace BackendSite.Controllers.Api
             var CurrencyAmount = new List<string>();
             var data = withdrawalBLL.GetWithdrawalListByCust(withdrawalReq.CustId,
                 withdrawalReq.TransId,
-                withdrawalReq.Status == 0 ? (int?) null : withdrawalReq.Status,
+                withdrawalReq.Status == 0 ? (int?)null : withdrawalReq.Status,
                 withdrawalReq.startDate,
                 withdrawalReq.endDate,
                 withdrawalReq.PageSize,
@@ -518,12 +522,12 @@ namespace BackendSite.Controllers.Api
                 PageNumber = pageNumber,
                 RowCount = rowCount,
                 CurrencyAmount = CurrencyAmount,
-                ErrorCode = (int) ErrorCodeEnum.Success
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Finance/WithdrawalLimitManagement"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         public ApiResult<IEnumerable<WithdrawalLimitInfoManage>> GetWithdrawalLimitInfos(
             WithdrawalLimit withdrawalLimit)
         {
@@ -536,7 +540,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Finance/WithdrawalLimitManagement"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         public ApiResult AddWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
         {
             var result = withdrawalBLL.AddWithdrawalLimit(withdrawalLimitInfoManage, User.Identity.Name);
@@ -556,7 +560,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Finance/WithdrawalLimitManagement"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         public ApiResult EditWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
         {
             var result = withdrawalBLL.EditWithdrawalLimit(withdrawalLimitInfoManage, User.Identity.Name);
@@ -575,11 +579,11 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Finance/WithdrawalLimitManagement"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
         public ApiResult DeleteWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
         {
-            var result = withdrawalBLL.DeleteWithdrawalLimit(withdrawalLimitInfoManage,User.Identity.Name);
+            var result = withdrawalBLL.DeleteWithdrawalLimit(withdrawalLimitInfoManage, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result > 0)
             {
@@ -609,7 +613,7 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="withdrawalKYC">參數</param>
         /// <returns>結果</returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/WithdrawalKYCControl"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/WithdrawalKYCControl" })]
         [HttpPost]
         public ApiResult<IEnumerable<WithdrawalKYC>> WithdrawalKYCList(WithdrawalKYC withdrawalKYC)
         {
@@ -635,7 +639,7 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="withdrawalKYC">參數</param>
         /// <returns>是否成功</returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/WithdrawalKYCControl"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/WithdrawalKYCControl" })]
         [HttpPost]
         public ApiResult EditWithdrawalKYCList(WithdrawalKYC withdrawalKYC)
         {
@@ -871,7 +875,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Finance/WithdrawalTimeReport"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalTimeReport" })]
         public ApiListResult<WithdrawalTimeList> WithdrawalTimeReportGet(WithdrawalTimeReportPara para)
         {
             var apiListResult = new ApiListResult<WithdrawalTimeList>();
@@ -894,13 +898,13 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Finance/WithdrawalTimeReport"})]
-        public IActionResult ExportWithdrawalTime(string SelectSite, string WithdrawalID, long StartDate, long EndDate,
-            int Status, int CurrencyId)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalTimeReport" })]
+        public IActionResult ExportWithdrawalTime(string selectSite, string withdrawalId, long startDate, long endDate,
+            int status, int currencyId)
         {
-            var ExportData =
-                withdrawalBLL.WithdrawalTimeExportGet(SelectSite, WithdrawalID, StartDate, EndDate, Status, CurrencyId);
-            var stream = excelBLL.Export(ExportData);
+            var exportData =
+                withdrawalBLL.WithdrawalTimeExportGet(selectSite, withdrawalId, startDate, endDate, status, currencyId);
+            var stream = excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"WithdrawalTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

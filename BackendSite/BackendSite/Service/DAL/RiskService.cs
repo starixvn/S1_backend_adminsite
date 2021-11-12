@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -21,11 +25,10 @@ namespace BackendSite.Service.DAL
 
         #region Constructor
 
-        public RiskService(IConfiguration configuration,
-            ILogger<MySqlClient> logger)
+        public RiskService(IServiceProvider provider)
         {
-            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
-            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
         #endregion
@@ -53,20 +56,20 @@ namespace BackendSite.Service.DAL
             return await _mainDbClient.ExecuteAsync("Admin_TpDisableUserStatus_Set", p);
         }
 
-        public IEnumerable<TpDisableUser> TpDisableUserGet(IEnumerable<int> siteIds, string userName, long startDate, long endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<TpDisableUser> TpDisableUserGet(IEnumerable<int> siteIds, string userName, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
         {
             var p = new DynamicParameters();
             p.Add("_SiteIds", JsonConvert.SerializeObject(siteIds));
             p.Add("_UserName", userName);
-            p.Add("_StartDate", startDate);
-            p.Add("_EndDate", endDate);
-            p.Add("_PageSize", pageSize);
-            p.Add("_PageNumber", pageNumber);
+            p.Add("_StartDate", startDate.DateTime);
+            p.Add("_EndDate", endDate.DateTime.AddDays(1).AddSeconds(-1));
+            p.Add("_PageSize", Math.Abs(pageSize));
+            p.Add("_PageNumber", Math.Abs(pageNumber));
+            p.Add("_StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("_StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<TpDisableUser>("Admin_TpDisableUser_Get", p);
+            var result = _reportDbClient.Query<TpDisableUser>("Admin_TpDisableUser_Get_V2", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             return result;

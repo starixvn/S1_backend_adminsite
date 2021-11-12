@@ -13,7 +13,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
-    
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class ReferralManagementController : Controller
     {
         private readonly ServerInfoBLL serverInfoBLL;
@@ -134,6 +134,21 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
         }
+
+        #region CSD > Customer Administration > CustInfo > Referral History
+
+        /// <summary>
+        /// ReferralManagement/GetRefFriendList 取得推薦朋友清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Referral History
+        /// 
+        /// </remarks>
+        /// <param name="refFriendListReq"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiListResult<ReferralFriend> GetRefFriendList(RefFriendListReq refFriendListReq)
         {
@@ -166,5 +181,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
+        #endregion
     }
 }

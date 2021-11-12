@@ -4,12 +4,15 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackendSite.Controllers.Api
 {
+    [Authorize]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/AdjustmentReport" })]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class PaymentAdjustmentReportController : Controller
     {
         private readonly PaymentAdjustmentReportBLL paymentAdjustmentBLL;

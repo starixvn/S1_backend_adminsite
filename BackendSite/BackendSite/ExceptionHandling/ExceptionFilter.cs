@@ -23,6 +23,8 @@ namespace BackendSite.ExceptionHandling
 
         public void OnException(ExceptionContext context)
         {
+            var contrllerActionPath = $"{context.RouteData.Values["controller"]}/{context.RouteData.Values["action"]}";
+
             var code = HttpStatusCode.InternalServerError;
 
             var exception = context.Exception;
@@ -34,7 +36,7 @@ namespace BackendSite.ExceptionHandling
                 rawMessage = exception.Message,
                 stackTrace = exception.StackTrace
             });
-            
+
             if (context.Exception.GetType() == typeof(AdminException))
             {
                 code = HttpStatusCode.OK;
@@ -52,11 +54,11 @@ namespace BackendSite.ExceptionHandling
                     errorCode = adminException.ErrorCode,
                     message = message
                 });
-                _logger.LogError(message);
+                _logger.LogError(exception, message);
             }
             else
             {
-                _logger.LogError(context.Exception, $"Ex massage: {exception.Message}, StackTrace: {context.Exception.StackTrace}");
+                _logger.LogError(context.Exception, contrllerActionPath);
             }
 
             var httpContext = context.HttpContext;

@@ -14,25 +14,46 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class UserBetLimitController : Controller
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public class UserBetLimitController : ControllerBase
     {
         private readonly UserBetLimitBLL _userBetLimitBll;
         private readonly CustInfoBLL _custInfoBll;
-        public UserBetLimitController(UserBetLimitBLL userBetLimitBll, CustInfoBLL custInfoBll)
+        public UserBetLimitController(UserBetLimitBLL userBetLimitBll,
+            CustInfoBLL custInfoBll)
         {
             _userBetLimitBll = userBetLimitBll;
             _custInfoBll = custInfoBll;
         }
-        
+
+        /// <summary>
+        /// UserBetLimit/Get 取得會員下注限額資料清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > User Bet Limit > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="query"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiListResult<UserBetLimit> Get([FromForm] QueryUserBetLimit query)
         {
             var pageNumber = query.PageNumber;
-            var data = _userBetLimitBll.GetUserBetLimit(query.SiteIds, query.UserName, query.StartDate, query.EndDate,
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(query.StartDate);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(query.EndDate);
+            var datas = _userBetLimitBll.GetUserBetLimit(query.SiteIds, query.UserName, startTime, endTime,
                 query.PageSize, query.PageNumber, out var totalPages, out var rowCount);
+            foreach (var data in datas)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
             var apiResult = new ApiListResult<UserBetLimit>
             {
-                Data = data,
+                Data = datas,
                 TotalPages = totalPages,
                 PageNumber = pageNumber,
                 RowCount = rowCount,
@@ -41,7 +62,19 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        
+
+        /// <summary>
+        /// UserBetLimit/GetByCustId 取得指定會員下注限額資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > User Bet Limit > [Submit] > Click[Edit]
+        /// 
+        /// </remarks>
+        /// <param name="custId"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("{custId:int}")]
         public async Task<ApiResult<CustBetLimitByCustId>> GetByCustId(int custId)
@@ -54,6 +87,18 @@ namespace BackendSite.Controllers.Api
             };
         }
 
+        /// <summary>
+        /// UserBetLimit/PostUserBetLimit 更新指定會員下注限額資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > User Bet Limit > [Submit] > Click[Edit] > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="custBetLimit"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ApiResult> PostUserBetLimit([FromForm] CustBetLimit custBetLimit)
         {
@@ -72,7 +117,20 @@ namespace BackendSite.Controllers.Api
                 ErrorCode = (result == 1 || result == 2) ? 0 : result,
             };
         }
-        
+
+        /// <summary>
+        /// UserBetLimit/UpdateStatus 更新指定會員下注限額資料狀態
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：
+        /// 
+        /// </remarks>
+        /// <param name="betLimitStatus"></param>
+        /// <returns></returns>
+        //
         [HttpPost]
         public async Task<ApiResult> UpdateStatus([FromForm] BetLimitStatus betLimitStatus)
         {
@@ -83,7 +141,19 @@ namespace BackendSite.Controllers.Api
                 ErrorCode = result == 1 ? 0 : result,
             };
         }
-        
+
+        /// <summary>
+        /// UserBetLimit/Delete 刪除指定會員下注限額資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > User Bet Limit > [Submit] > Click[Delete]
+        /// 
+        /// </remarks>
+        /// <param name="custId"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ApiResult> Delete([FromForm] int custId)
         {
@@ -93,7 +163,18 @@ namespace BackendSite.Controllers.Api
                 ErrorCode = result == 1 ? 0 : result,
             };
         }
-        
+
+        /// <summary>
+        /// UserBetLimit/GetTpCategoryList 取得第三方遊戲大分類清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > User Bet Limit > [Submit] > Click[Edit] > [Available Category]
+        /// 
+        /// </remarks>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategoryList()
         {
@@ -106,7 +187,19 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        
+
+        /// <summary>
+        /// UserBetLimit/GetTpGameTypeListbyCategory 取得指定第三方遊戲類型清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > User Bet Limit > [Submit] > Click[Edit] > Check[Available Category] > [Game]
+        /// 
+        /// </remarks>
+        /// <param name="categoryId"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("{categoryId:int}")]
         public async Task<ApiResult<IEnumerable<GameTypeBetLimit>>> GetTpGameTypeListbyCategory(int categoryId)

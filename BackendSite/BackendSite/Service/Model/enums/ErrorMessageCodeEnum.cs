@@ -4,6 +4,13 @@ namespace BackendSite.Service.Model.enums
 {
     public enum ErrorMessageCodeEnum
     {
+        //編碼規則
+        //1XXX:Home
+        //2XXX:Deposit
+        //3XXX:Withdrawal
+        //4XXX:Adjustment
+        //9XXX:System常使用代碼
+        
         #region In Common Use
 
         [Description("msg_Success")]
@@ -17,6 +24,9 @@ namespace BackendSite.Service.Model.enums
 
         [Description("msg_SystemException")]
         SystemException = 9999,
+
+        [Description("msg_UserNotFound")]
+        CustNotFound = 9000,
 
         #endregion
 
@@ -39,6 +49,13 @@ namespace BackendSite.Service.Model.enums
 
         [Description("msg_OldpwdNotMatch")]
         OldpwdNotMatch = 1006,
+
+        #endregion
+
+        #region Finance
+
+        [Description("msg_WithdrawalLimitAdjustmentNotBalance")]
+        WithdrawalLimitAdjustmentNotBalance = 4002
 
         #endregion
     }

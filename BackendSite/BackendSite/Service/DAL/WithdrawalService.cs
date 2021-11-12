@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
+using BackendSite.Service.Library;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.DAL
 {
@@ -22,22 +24,22 @@ namespace BackendSite.Service.DAL
         private readonly WalletService _walletService;
         private readonly WithdrawalBankAccountingService _withdrawalBankAccountingService;
         private readonly ILogger<WithdrawalService> _logger;
-
-        private int _typePosition = 1000;
+        private const int TypePosition = 1000;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
         #endregion
 
         #region Constructors
 
-        public WithdrawalService(IConfiguration configuration,
-            WalletService walletService,
-            WithdrawalBankAccountingService withdrawalBankAccountingService,
-            ILogger<WithdrawalService> logger)
+        public WithdrawalService(IServiceProvider provider)
         {
-            _configuration = configuration;
-            _walletService = walletService;
-            _withdrawalBankAccountingService = withdrawalBankAccountingService;
-            _logger = logger;
+            _configuration = provider.GetRequiredService<IConfiguration>();
+            _walletService = provider.GetRequiredService<WalletService>();
+            _withdrawalBankAccountingService = provider.GetRequiredService<WithdrawalBankAccountingService>();
+            _logger = provider.GetRequiredService<ILogger<WithdrawalService>>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
         #endregion
@@ -229,20 +231,14 @@ namespace BackendSite.Service.DAL
             return depositList;
         }
 
-        public IEnumerable<WithdrawalKYC> GetWithdrawalKYC(int SiteId)
+        public IEnumerable<WithdrawalKYC> GetWithdrawalKYC(int siteId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var withdrawalKYCList = conn.Query<WithdrawalKYC>("Admin_WithdrawalKyc_Get", new { SiteId },
-                commandType: CommandType.StoredProcedure);
-            return withdrawalKYCList;
+            return _mainDbClient.Query<WithdrawalKYC>("Admin_WithdrawalKyc_Get", new DynamicParameters(new {SiteId = siteId }));
         }
 
         public bool EditWithdrawalKYC(WithdrawalKYC withdrawalKYC)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_WithdrawalKyc_Set",
-                new { withdrawalKYC.SiteId, withdrawalKYC.CurrencyId, withdrawalKYC.Amount },
-                commandType: CommandType.StoredProcedure) > 0;
+            return _mainDbClient.Execute("Admin_WithdrawalKyc_Set",new DynamicParameters(new { withdrawalKYC.SiteId, withdrawalKYC.CurrencyId, withdrawalKYC.Amount })) > 0;
         }
 
         public IEnumerable<WithdrawalMinInfo> GetWithdrawalLimitData(int SiteId)
@@ -291,36 +287,34 @@ namespace BackendSite.Service.DAL
 
         public WithdrawalTimeData WithdrawalTimeReportGet(WithdrawalTimeReportPara para)
         {
-            var SelectSite = JsonConvert.SerializeObject(para.SelectSite);
-            var selectstatus = new List<int>();
+            var selectSite = JsonConvert.SerializeObject(para.SelectSite);
+            var selectStatus = new List<int>();
             if (para.Status == 0)
             {
-                selectstatus.Add(3);
-                selectstatus.Add(4);
-                selectstatus.Add(5);
-                selectstatus.Add(6);
-                selectstatus.Add(7);
+                selectStatus.Add(3);
+                selectStatus.Add(4);
+                selectStatus.Add(5);
+                selectStatus.Add(6);
+                selectStatus.Add(7);
             }
             else
             {
-                selectstatus.Add(para.Status);
+                selectStatus.Add(para.Status);
             }
-
-            var SelectStatus = JsonConvert.SerializeObject(selectstatus);
-
-            var SearchData = new WithdrawalTimeData();
+            
+            var searchData = new WithdrawalTimeData();
             var props = new DynamicParameters();
             using var conn =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            int.TryParse(para.WithdrawalID, out var tempWithdrawalID);
+            int.TryParse(para.WithdrawalID, out var tempWithdrawalId);
 
-            props.Add("SelectSite", SelectSite);
-            props.Add("WithdrawalId", tempWithdrawalID);
+            props.Add("SelectSite", selectSite);
+            props.Add("WithdrawalId", tempWithdrawalId);
             props.Add("StartDate", para.StartDate);
             props.Add("EndDate", para.EndDate);
-            props.Add("SelectStatus", SelectStatus);
+            props.Add("SelectStatus", JsonConvert.SerializeObject(selectStatus));
             props.Add("CurrencyId", para.CurrencyId);
-            props.Add("PageNumber", para.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("PageNumber", para.PageNumber, DbType.Int32, ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -328,11 +322,11 @@ namespace BackendSite.Service.DAL
             var result = conn.Query<WithdrawalTimeList>("Admin_WithdrawalStatusTimeV2_Get", props,
                 commandType: CommandType.StoredProcedure).ToList();
 
-            SearchData.WithdrawalTimeList = result;
-            SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            SearchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
-            return SearchData;
+            searchData.WithdrawalTimeList = result;
+            searchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            searchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            searchData.RowCount = props.Get<int?>("RowCount") ?? 0;
+            return searchData;
         }
 
         public List<WithdrawalTimeList> GetExportData(IEnumerable<int> selectSite, string withdrawalId, long startDate,
@@ -419,7 +413,7 @@ namespace BackendSite.Service.DAL
                         {
                             case WithdrawalStatus.Rejected:
                                 var balanceResult = 0;
-                                var type = 2 + _typePosition; /*Rejected  Withdrawal 1002*/
+                                var type = 2 + TypePosition; /*Rejected  Withdrawal 1002*/
 
                                 updateFlowEndResult = SetWithdrawalInfoFlowEndTime(withdrawalId, conn, trans);
 

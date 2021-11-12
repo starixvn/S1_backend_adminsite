@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,36 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<FuncPermissionModel> GetPermissionJSONData()
         {
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<FuncPermissionModel>>(permissionService.GetPermissionJSONData());
+            var result = JsonConvert.DeserializeObject<IEnumerable<FuncPermissionModel>>(permissionService.GetPermissionJSONData());
+            return result;
+        }
+
+        public IEnumerable<GroupPermisison> GetAllPermission()
+        {
+            var result = new List<GroupPermisison>();
+            
+            var permissionDatas = GetPermissionJSONData();
+            foreach (var func in permissionDatas)
+            {
+                foreach (var funcKeyItem in func.Settings.Where(funcKeyItem => funcKeyItem != null))
+                {
+                    if (funcKeyItem.SubFuncKeys != null)
+                    {
+                        var subFuncKeyDatas = funcKeyItem.SubFuncKeys.Select(x => x.FuncKey);
+                        result.AddRange(subFuncKeyDatas.Select(
+                            subFuncKeyItem => new GroupPermisison {GroupSEQ = 0, FuncKey = funcKeyItem.FuncKey, SubFuncKeys = subFuncKeyItem}));
+                    }
+                    else
+                    {
+                        result.Add(new GroupPermisison
+                        {
+                            GroupSEQ = 0,
+                            FuncKey = funcKeyItem.FuncKey,
+                            SubFuncKeys = null
+                        });
+                    }
+                }
+            }
             return result;
         }
 
@@ -35,7 +65,7 @@ namespace BackendSite.Service.BLL
 
         public GroupPermisison GetUserPermission(int GroupSEQ, string FuncKey)
         {
-            var permission = adminGroupService.GetGroupPermissions(GroupSEQ)?.FirstOrDefault(x=> string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase));
+            var permission = adminGroupService.GetGroupPermissions(GroupSEQ)?.FirstOrDefault(x => string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase));
             return permission;
         }
 
@@ -161,7 +191,7 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                if(loginUser.GroupSEQ == null)
+                if (loginUser.GroupSEQ == null)
                 {
                     result = false;
                 }
@@ -187,7 +217,7 @@ namespace BackendSite.Service.BLL
                     }
                 }
             }
-            
+
             return result;
         }
 
@@ -227,7 +257,7 @@ namespace BackendSite.Service.BLL
             if (loginUser.IsSuper)
             {
                 var initDatas = GetPermissionJSONData();
-                foreach(var func in initDatas)
+                foreach (var func in initDatas)
                 {
                     var item = GetFuncItem(func.Settings, FuncKey);
                     if (item != null)
@@ -237,12 +267,12 @@ namespace BackendSite.Service.BLL
                     }
                 }
             }
-            else if(loginUser.GroupSEQ != null)
+            else if (loginUser.GroupSEQ != null)
             {
                 var permissions = GetUserPermission((int)loginUser.GroupSEQ, FuncKey);
-                if(permissions != null && permissions.SubFuncKeys != null)
+                if (permissions != null && permissions.SubFuncKeys != null)
                 {
-                    result = Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<string>>(permissions.SubFuncKeys);
+                    result = JsonConvert.DeserializeObject<IEnumerable<string>>(permissions.SubFuncKeys);
                 }
             }
 

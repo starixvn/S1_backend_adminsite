@@ -77,6 +77,9 @@ namespace BackendSite.Controllers
             var selectSite = new List<int>();
             var selectCurrency = new List<int>();
             var selectStatus = new List<int>();
+            DateTime? startDate = null;
+            DateTime? endDate = null;
+
             if (custInfoReq.SelectSite != null)
             {
                 selectSite = Array.ConvertAll<string, int>(custInfoReq.SelectSite.Split(','), s => int.Parse(s)).ToList();
@@ -89,22 +92,38 @@ namespace BackendSite.Controllers
             {
                 selectStatus = Array.ConvertAll<string, int>(custInfoReq.SelectStatus.Split(','), s => int.Parse(s)).ToList();
             }
-            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(selectSite, 
-                                                                    custInfoReq.BirDate, 
-                                                                    custInfoReq.BirMonth, 
-                                                                    custInfoReq.BirYear, 
-                                                                    custInfoReq.UserName?.Trim(), 
-                                                                    custInfoReq.AccountName?.Trim(), 
-                                                                    custInfoReq.LoginIp?.Trim(), 
-                                                                    custInfoReq.TransId?.Trim(), 
-                                                                    custInfoReq.TpUserName?.Trim(), 
-                                                                    custInfoReq.Email?.Trim(), 
-                                                                    custInfoReq.PhoneNo?.Trim(), 
-                                                                    custInfoReq.StartDate, 
-                                                                    custInfoReq.EndDate, 
-                                                                    custInfoReq.AffId, 
-                                                                    selectCurrency, 
-                                                                    custInfoReq.BankAccountNumber?.Trim(), 
+
+            if (custInfoReq.StartDate != null)
+            {
+                if (custInfoReq.StartDate > 2147483647)
+                    custInfoReq.StartDate = 2147483647;
+                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoReq.StartDate);
+            }
+
+            if (custInfoReq.EndDate != null)
+            {
+                if (custInfoReq.EndDate > 2147483647)
+                    custInfoReq.EndDate = 2147483647;
+                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoReq.EndDate);
+            }
+
+       
+            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(selectSite,
+                                                                    custInfoReq.BirDate,
+                                                                    custInfoReq.BirMonth,
+                                                                    custInfoReq.BirYear,
+                                                                    custInfoReq.UserName?.Trim(),
+                                                                    custInfoReq.AccountName?.Trim(),
+                                                                    custInfoReq.LoginIp?.Trim(),
+                                                                    custInfoReq.TransId?.Trim(),
+                                                                    custInfoReq.TpUserName?.Trim(),
+                                                                    custInfoReq.Email?.Trim(),
+                                                                    custInfoReq.PhoneNo?.Trim(),
+                                                                    startDate,
+                                                                    endDate,
+                                                                    custInfoReq.AffId,
+                                                                    selectCurrency,
+                                                                    custInfoReq.BankAccountNumber?.Trim(),
                                                                     selectStatus);
 
             var stream = excelBLL.Export(ExportCustInfo);
@@ -130,13 +149,13 @@ namespace BackendSite.Controllers
         {
             return View();
         }
-        
+
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         public IActionResult DisableUserForGame()
         {
             return View();
         }
-        
+
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/UserBetLimit" })]
         public IActionResult UserBetLimit()
         {

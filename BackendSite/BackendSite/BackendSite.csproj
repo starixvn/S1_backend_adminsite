@@ -86,9 +86,11 @@
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.7.0.23" />
     <PackageReference Include="Dapper" Version="2.0.30" />
+    <PackageReference Include="Dapper.ParameterExtensions" Version="2018.12.7.1" />
     <PackageReference Include="EPPlus" Version="4.5.3.2" />
     <PackageReference Include="LazZiya.ImageResize" Version="3.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.19" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.3" />
     <PackageReference Include="MySql.Data" Version="8.0.19" />
@@ -126,7 +128,6 @@
     <Folder Include="Controllers\ApiV2\Marketing\Bonus\" />
     <Folder Include="Controllers\ApiV2\Marketing\Setting\" />
     <Folder Include="Controllers\ApiV2\Report\" />
-    <Folder Include="Controllers\ApiV2\Admin\Home\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties app_3data_4menu_1json__JsonSchema="http://json-schema.org/draft-04/schema" package_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
