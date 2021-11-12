@@ -1137,10 +1137,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 var temp = new List<string>();
                 var selectTag = JsonConvert.SerializeObject(temp);
-                if (para.SelectTag != null && para.SelectTag.Any())
+                if (para.Tags != null && para.Tags.Any())
                 {
                     var alltagDict = _custInfoBll.GetAllTag().ToDictionary(x => x.Id, x => x.TagName);
-                    para.SelectTag.ToList().ForEach(x =>
+                    para.Tags.ToList().ForEach(x =>
                     {
                         temp.Add(alltagDict[x]);
                     });
