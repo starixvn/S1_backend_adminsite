@@ -43,6 +43,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ILogger<CustomerManageController> _logger;
         private readonly SelLangBLL _selLangBll;
         private readonly Tools _tools;
+        private readonly VipLevelBLL _vipLevelBll;
+        private readonly AuthorizeBLL _authorizeBLL;
 
         /// <summary>
         /// 確認圖檔檔案類型
@@ -73,6 +75,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _tools = provider.GetRequiredService<Tools>();
+            _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
+            _authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
         }
 
         #endregion
@@ -104,6 +108,22 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             /// 異動原因
             /// </summary>
             public string Reason { get; set; }
+        }
+
+        public class CustIdWithVipLevelRequest : CustIdRequest
+        {
+            /// <summary>
+            /// 異動原因
+            /// </summary>
+            public int VipLevel { get; set; }
+        }
+
+        public class CustIdWithVipLevelManuallyRequest : CustIdRequest
+        {
+            /// <summary>
+            /// 手動否
+            /// </summary>
+            public int Manually { get; set; }
         }
 
 
@@ -281,7 +301,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int Status { get; set; }
         }
 
-        public class GetBonusLogRequest :ApiRequestPageModel
+        public class GetBonusLogRequest : ApiRequestPageModel
         {
             public int CustId { get; set; }
             public int PromoCategoryId { get; set; }
@@ -1137,36 +1157,287 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         #endregion
 
-        #region  CSD > Customer Administration > CustInfo > Tag
+        #region CSD > Customer Administration > CustInfo > Reset Password
 
         /// <summary>
-        /// CustomerManage/GetAllTag 取得所有標籤資料
+        /// CustManage/ResetPwd 重新設定密碼
         /// </summary>
         /// <remarks>
         /// 
         /// Http Method：POST
         /// 
-        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Tag > Tag List
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Reset Password > [Reset Password]
         /// 
         /// </remarks>
+        /// <param name="custInfoReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<TagData>> GetAllTag()
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_resetpwd" })]
+        public ApiResult<string> ResetPwd(CustInfoReq custInfoReq)
         {
-            var apiResult = new ApiResult<IEnumerable<TagData>>();
+            var NewPwd = "";
+            if (_custInfoBll.SetResetPwd(custInfoReq.CustId, out NewPwd))
+            {
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("NewPwd", NewPwd);
+                _serverInfoBll.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                return new ApiResult<string>
+                {
+                    Data = NewPwd,
+                    ErrorCode = 0
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
+            }
+        }
+
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > Notes
+
+        /// <summary>
+        /// CustManage/AddCustNote 新增客戶備註
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Notes > [Add]
+        /// 
+        /// </remarks>
+        /// <param name="addCustNoteReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult AddCustNote(AddCustNoteReq addCustNoteReq)
+        {
+
+            var data = _custInfoBll.AddCustNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name);
+
+            if (data)
+            {
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("Action", "Add Note");
+                _serverInfoBll.AdminOperateLog(null, addCustNoteReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
+                return new ApiResult
+                {
+                    ErrorCode = 0,
+                    Message = "Add Success."
+                };
+
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Add Fail.");
+            }
+        }
+
+        /// <summary>
+        /// CustManage/GetCustNotes 取得客戶備註
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Notes
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<CustNote>> GetCustNotes(CustIdWithPageRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<CustNote>>
+            {
+                Data = _custInfoBll.GetCustNotes(request.CustId),
+                ErrorCode = 0
+            };
+
+            return apiResult;
+        }
+
+        /// <summary>
+        /// CustManage/SetCustNotes 設定客戶備註
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Notes > [Edit] / [Delete]
+        /// 
+        /// </remarks>
+        /// <param name="setCustNoteReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult SetCustNotes(SetCustNoteReq setCustNoteReq)
+        {
+            if (setCustNoteReq.Type == 1 && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteEdit"))
+            {
+                throw new AdminException(ErrorCodeEnum.PermissionDenied);
+            }
+            if (setCustNoteReq.Type == 2 && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteDelete"))
+            {
+                throw new AdminException(ErrorCodeEnum.PermissionDenied);
+            }
+            else
+            {
+                var data = _custInfoBll.SetCustNotes(setCustNoteReq.CustId, setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
+
+                if (data)
+                {
+                    var Menu = "CustManage/CustInfoList";
+                    var Info = new Dictionary<string, dynamic>();
+                    Info.Add("MenuName", "Customer Info");
+                    if (setCustNoteReq.Type == 1)
+                    {
+                        Info.Add("Action", "Edit Note");
+                    }
+                    else if (setCustNoteReq.Type == 1)
+                    {
+                        Info.Add("Action", "Delete Note");
+                    }
+                    _serverInfoBll.AdminOperateLog(null, setCustNoteReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
+                    return new ApiResult
+                    {
+                        ErrorCode = 0,
+                        Message = "Modify Success."
+                    };
+                }
+                else
+                {
+                    throw new AdminException(ErrorCodeEnum.Fail, "Modify Fail.");
+                }
+            }
+        }
+
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > VipLevel
+
+        /// <summary>
+        /// VipLevel/GetVipLevelInfo 取得指定客戶VIP等級資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<VipLevelInfo> GetVipLevelInfo(CustIdRequest request)
+        {
+            var apiListResult = new ApiResult<VipLevelInfo>
+            {
+                Data = _vipLevelBll.GetVipLevelInfo(request.CustId),
+                ErrorCode = 0
+            };
+            return apiListResult;
+        }
+
+        /// <summary>
+        /// VipLevel/GetVipLevelLog 取得指定客戶VIP等級紀錄
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level Log
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiListResult<VipLevelLog> GetVipLevelLog(CustIdRequest request)
+        {
+            var apiListResult = new ApiListResult<VipLevelLog>
+            {
+                Data = _vipLevelBll.GetVipLevelLog(request.CustId),
+                ErrorCode = 0
+            };
+            return apiListResult;
+        }
+
+        /// <summary>
+        /// VipLevel/SetVipLevel 設定指定客戶VIP等級
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level > Click [Edit]
+        /// 
+        /// </remarks>
+        /// <param name="custIdReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult SetVipLevel(CustIdWithVipLevelRequest custIdReq)
+        {
+            var apiResult = new ApiResult();
+
             try
             {
-                apiResult.Data = _custInfoBll.GetAllTag();
+                var custInfo = _custInfoBll.GetCustInfoWithCache(custIdReq.CustId);
+                var authData = _authorizeBLL.GetAuthData();
+                var result = _vipLevelBll.SetVipLevel(custInfo.SiteId, custInfo.CustId, custInfo.UserName,
+                    custIdReq.VipLevel, authData.UserName);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
             {
+                apiResult.RawMessage = ex.ToString();
                 apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
             }
+
             return apiResult;
         }
+
+        /// <summary>
+        /// VipLevel/SetVipLevelManually 設定VIP等級為手動
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level > Click [Manually]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult SetVipLevelManually(CustIdWithVipLevelManuallyRequest request)
+        {
+            var apiResult = new ApiResult();
+
+            try
+            {
+                var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+                var authData = _authorizeBLL.GetAuthData();
+                var result = _vipLevelBll.SetVipLevelManually(custInfo.SiteId, custInfo.CustId, custInfo.UserName,
+                    request.Manually, authData.UserName);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.ToString();
+                apiResult.ErrorCode = 999;
+            }
+
+            return apiResult;
+        }
+
+        #endregion
+
+        #region  CSD > Customer Administration > CustInfo > Tag
 
         /// <summary>
         /// CustomerManage/SetTag 設定標籤

@@ -498,15 +498,8 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<TagData> GetAllTag()
         {
-            var SearchResult = new GetTagDataResult();
-            var props = new DynamicParameters();
-            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("PageNumber", 0, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-            props.Add("PageSize", 0);
-            props.Add("Status", 1);
-            return _reportDbClient.Query<TagData>("Admin_Tag_Get", props);
+
+            return _reportDbClient.Query<TagData>("Admin_Tag_GetAll");
         }
 
         public int SetCustTag(int custid, IEnumerable<int> SelectTag)
