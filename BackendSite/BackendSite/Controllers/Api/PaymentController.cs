@@ -411,31 +411,6 @@ namespace BackendSite.Controllers.Api
         /// </summary>
         /// <remarks>
         /// Use：
-        /// CSD > Customer Administration > CustInfo > Bonus Log [Promotion Category]
-        /// </remarks>
-        /// <returns></returns>
-        public ApiResult<IEnumerable<PromotionCategory>> GetPromotionCategory()
-        {
-            var data = _paymentBLL.GetPromotionCategory();
-            if (!data.Any())
-            {
-                throw new AdminException(ErrorCodeEnum.NoData);
-            }
-            else
-            {
-                return new ApiResult<IEnumerable<PromotionCategory>>
-                {
-                    Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <remarks>
-        /// Use：
         /// CSD > Customer Administration > CustInfo > Statement
         /// </remarks>
         /// <param name="custTpBetRecordListOneWeekReq"></param>

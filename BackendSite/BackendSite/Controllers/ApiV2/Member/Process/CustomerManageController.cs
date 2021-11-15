@@ -281,6 +281,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int Status { get; set; }
         }
 
+        public class GetBonusLogRequest :ApiRequestPageModel
+        {
+            public int CustId { get; set; }
+            public int PromoCategoryId { get; set; }
+            public long? StartDate { get; set; }
+            public long? EndDate { get; set; }
+            public string RefTransId { get; set; }
+        }
+
         #endregion
 
         #region CSD > Customer Administration
@@ -444,7 +453,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// CustomerManage/GetCustBonus 取得客戶獎金
+        /// CustomerManage/GetBonusByCustId 取得客戶獎金
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -467,7 +476,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// CustomerManage/GetRebateInfo 取得客戶返水資料
+        /// CustomerManage/GetRebateInfoByCustId 取得客戶返水資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -1084,6 +1093,46 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Kick out fail.Customer is not online now.");
             }
+        }
+
+        #endregion
+
+        #region CSD > Customer Administration > Bonus Log
+
+        /// <summary>
+        /// CustomerManage/GetBonusLog 取得指定客戶獎金紀錄
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > CustInfo > Bonus Log > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ApiResult GetBonusLog(GetBonusLogRequest request)
+        {
+            var pageNumber = request.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
+            var data = _paymentBll.GetBonusLog(request.CustId,
+                request.PromoCategoryId,
+                request.StartDate,
+                request.EndDate,
+                request.RefTransId,
+                request.PageSize,
+                ref pageNumber,
+                out totalPages,
+                out rowCount);
+
+            return new ApiListResult<BonusLog>
+            {
+                Data = data,
+                TotalPages = totalPages,
+                PageNumber = pageNumber,
+                RowCount = rowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         #endregion
