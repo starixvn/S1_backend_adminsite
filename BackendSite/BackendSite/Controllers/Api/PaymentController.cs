@@ -367,6 +367,31 @@ namespace BackendSite.Controllers.Api
             return apiListResult;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Use：
+        /// CSD > Customer Administration > CustInfo > Bonus Log [Promotion Category]
+        /// </remarks>
+        /// <returns></returns>
+        public ApiResult<IEnumerable<PromotionCategory>> GetPromotionCategory()
+        {
+            var data = _paymentBLL.GetPromotionCategory();
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<PromotionCategory>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+        }
+
         [HttpPost]
         public IActionResult ExportRebateLog(string SelectSite, string UserName, int RebateType, long StartDate,
             long EndDate, int CurrencyId, int BaseCurrencyId, int RebateCategoriesId)
