@@ -320,7 +320,7 @@ namespace BackendSite.Service.DAL
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("PageSize", para.PageSize);
-            var result = conn.Query<WithdrawalTimeList>("Admin_WithdrawalStatusTimeV2_Get", props,
+            var result = conn.Query<WithdrawalTimeList>("Admin_WithdrawalStatusTime_Get_V2", props,
                 commandType: CommandType.StoredProcedure).ToList();
 
             searchData.WithdrawalTimeList = result;
@@ -360,7 +360,7 @@ namespace BackendSite.Service.DAL
             props.Add("CurrencyId", currencyId);
             props.Add("WithdrawalId", tempWithdrawalId);
             props.Add("SelectStatus", selectStatusString);
-            return conn.Query<WithdrawalTimeList>("Admin_WithdrawalStatusTimeExport_Get", props,
+            return conn.Query<WithdrawalTimeList>("Admin_WithdrawalStatusTimeExport_Get_V2", props,
                 commandType: CommandType.StoredProcedure).ToList();
         }
 
