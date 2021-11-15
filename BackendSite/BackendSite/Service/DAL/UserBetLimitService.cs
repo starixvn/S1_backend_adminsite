@@ -52,8 +52,8 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters();
             p.Add("_SiteIds", JsonConvert.SerializeObject(siteIds));
             p.Add("_UserName", userName);
-            p.Add("_StartDate", startDate.DateTime.AddDays(1).AddSeconds(-1));
-            p.Add("_EndDate", endDate.DateTime);
+            p.Add("_StartDate", startDate.DateTime);
+            p.Add("_EndDate", endDate.DateTime.AddDays(1).AddSeconds(-1));
             p.Add("_PageSize", Math.Abs(pageSize));
             p.Add("_PageNumber", Math.Abs(pageNumber));
             p.Add("_StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
