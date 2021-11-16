@@ -44,7 +44,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly SelLangBLL _selLangBll;
         private readonly Tools _tools;
         private readonly VipLevelBLL _vipLevelBll;
-        private readonly AuthorizeBLL _authorizeBLL;
+        private readonly AuthorizeBLL _authorizeBll;
+        private readonly MessageBLL _messageBll;
 
         /// <summary>
         /// 確認圖檔檔案類型
@@ -76,7 +77,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _tools = provider.GetRequiredService<Tools>();
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
-            _authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _messageBll = provider.GetRequiredService<MessageBLL>();
         }
 
         #endregion
@@ -126,6 +128,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int Manually { get; set; }
         }
 
+
+        public class DeleteMessageRequest
+        {
+            public int Id { get; set; }
+        }
 
         public class CustInfoListRequest : ApiRequestPageModel
         {
@@ -202,16 +209,21 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string EMail { get; set; }
         }
 
-        public class AddCustNoteReq
+        public class AddCustNoteRequest : CustIdRequest
         {
-            public int CustId { get; set; }
             public string Note { get; set; }
         }
 
-        public class SetCustNoteReq : AddCustNoteReq
+        public class SetCustNoteRequest : CustIdRequest
         {
-            public int NoteId { get; set; }
+            /// <summary>
+            /// 異動類型(1=更新, 2=刪除)
+            /// </summary>
             public int Type { get; set; }
+
+            public int NoteId { get; set; }
+
+            public string Note { get; set; }
         }
 
         public class CustInfoReq
@@ -219,6 +231,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int CustId { get; set; }
             public string UserName { get; set; }
             public string Reason { get; set; }
+        }
+
+        public class SendCustMessageRequest : CustIdRequest
+        {
+            public string Title { get; set; }
+            public string Content { get; set; }
         }
 
         public class DepositRep3
@@ -1209,13 +1227,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Notes > [Add]
         /// 
         /// </remarks>
-        /// <param name="addCustNoteReq"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult AddCustNote(AddCustNoteReq addCustNoteReq)
+        public ApiResult AddCustNote(AddCustNoteRequest request)
         {
 
-            var data = _custInfoBll.AddCustNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name);
+            var data = _custInfoBll.AddCustNote(request.CustId, request.Note, User.Identity.Name);
 
             if (data)
             {
@@ -1223,7 +1241,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("Action", "Add Note");
-                _serverInfoBll.AdminOperateLog(null, addCustNoteReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                _serverInfoBll.AdminOperateLog(null, request.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
                 return new ApiResult
                 {
@@ -1272,37 +1290,37 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Notes > [Edit] / [Delete]
         /// 
         /// </remarks>
-        /// <param name="setCustNoteReq"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult SetCustNotes(SetCustNoteReq setCustNoteReq)
+        public ApiResult SetCustNotes(SetCustNoteRequest request)
         {
-            if (setCustNoteReq.Type == 1 && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteEdit"))
+            if (request.Type == 1 && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteEdit"))
             {
                 throw new AdminException(ErrorCodeEnum.PermissionDenied);
             }
-            if (setCustNoteReq.Type == 2 && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteDelete"))
+            if (request.Type == 2 && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteDelete"))
             {
                 throw new AdminException(ErrorCodeEnum.PermissionDenied);
             }
             else
             {
-                var data = _custInfoBll.SetCustNotes(setCustNoteReq.CustId, setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
+                var data = _custInfoBll.SetCustNotes(request.CustId, request.NoteId, request.Note, request.Type, User.Identity.Name);
 
                 if (data)
                 {
                     var Menu = "CustManage/CustInfoList";
                     var Info = new Dictionary<string, dynamic>();
                     Info.Add("MenuName", "Customer Info");
-                    if (setCustNoteReq.Type == 1)
+                    if (request.Type == 1)
                     {
                         Info.Add("Action", "Edit Note");
                     }
-                    else if (setCustNoteReq.Type == 1)
+                    else if (request.Type == 1)
                     {
                         Info.Add("Action", "Delete Note");
                     }
-                    _serverInfoBll.AdminOperateLog(null, setCustNoteReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                    _serverInfoBll.AdminOperateLog(null, request.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
                     return new ApiResult
                     {
@@ -1315,6 +1333,155 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     throw new AdminException(ErrorCodeEnum.Fail, "Modify Fail.");
                 }
             }
+        }
+
+        #endregion
+
+        #region CustInfo > Personal Message
+
+        /// <summary>
+        /// Message/GetPersonalMsg 取得指定客戶個人訊息資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Personal Message > Get Personal Message
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
+        [HttpPost]
+        public ApiListResult<PersonalMsg> GetPersonalMsg(CustIdWithPageRequest request)
+        {
+            var pageNumber = request.PageNumber;
+            var TotalPages = 0;
+            var RowCount = 0;
+            var apiResult = new ApiListResult<PersonalMsg>();
+            try
+            {
+                apiResult.Data = _messageBll.GetPersonalMsg(request.CustId, request.PageSize, ref pageNumber, ref TotalPages, ref RowCount);
+                apiResult.ErrorCode = 0;
+
+                apiResult.PageNumber = pageNumber;
+                apiResult.RowCount = RowCount;
+                apiResult.TotalPages = TotalPages;
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.ToString();
+                apiResult.ErrorCode = 999;
+            }
+
+            return apiResult;
+        }
+
+        /// <summary>
+        /// Message/GetCustLang 取得指定客戶語系
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo  > Personal Message > Get Customer Lang
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
+        [HttpPost]
+        public ApiResult<CustLang> GetCustLang(CustIdRequest request)
+        {
+            var apiResult = new ApiResult<CustLang>();
+            try
+            {
+                apiResult.Data = _messageBll.GetCustLang(request.CustId);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.ToString();
+                apiResult.ErrorCode = 999;
+            }
+
+            return apiResult;
+        }
+
+        /// <summary>
+        /// Message/SendPersonalMsg 送出指定客戶個人訊息
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo  > Personal Message >  Click [Add] > Click [Send]
+        /// 
+        /// </remarks>
+        /// <param name="CustId"></param>
+        /// <param name="Title"></param>
+        /// <param name="Content"></param>
+        /// <param name="PageNumber"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
+        [HttpPost]
+        public ApiListResult<PersonalMsg> SendPersonalMsg(SendCustMessageRequest request)
+        {
+            var apiResult = new ApiListResult<PersonalMsg>();
+            try
+            {
+                var authData = _authorizeBll.GetAuthData();
+                if (_messageBll.SendMessageToPlayer(authData.UserName,
+                    request.Title,
+                    request.Content,
+                    request.CustId,
+                    authData.UserId) == 0)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Send Fail.";
+                }
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.ToString();
+                apiResult.ErrorCode = 999;
+            }
+
+            return apiResult;
+        }
+
+        /// <summary>
+        /// Message/DeletePersonalMsg 刪除指定客戶個人訊息
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo  > Personal Message > Click [Delete]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
+        [HttpPost]
+        public ApiResult DeletePersonalMsg(DeleteMessageRequest request)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                _messageBll.DeletePersonalMsg(request.Id);
+
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.ToString();
+                apiResult.ErrorCode = 999;
+            }
+
+            return apiResult;
         }
 
         #endregion
@@ -1387,7 +1554,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             try
             {
                 var custInfo = _custInfoBll.GetCustInfoWithCache(custIdReq.CustId);
-                var authData = _authorizeBLL.GetAuthData();
+                var authData = _authorizeBll.GetAuthData();
                 var result = _vipLevelBll.SetVipLevel(custInfo.SiteId, custInfo.CustId, custInfo.UserName,
                     custIdReq.VipLevel, authData.UserName);
                 apiResult.ErrorCode = 0;
@@ -1421,7 +1588,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             try
             {
                 var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
-                var authData = _authorizeBLL.GetAuthData();
+                var authData = _authorizeBll.GetAuthData();
                 var result = _vipLevelBll.SetVipLevelManually(custInfo.SiteId, custInfo.CustId, custInfo.UserName,
                     request.Manually, authData.UserName);
                 apiResult.ErrorCode = 0;

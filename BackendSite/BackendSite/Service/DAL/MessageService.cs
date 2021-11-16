@@ -156,10 +156,10 @@ namespace BackendSite.Service.DAL
             return conn.Query<CustLang>("Admin_CustLang_Get", new { CustId }, commandType: CommandType.StoredProcedure).FirstOrDefault();
         }
 
-        public void DeletePersonalMsg(int Id, int CustId)
+        public void DeletePersonalMsg(int Id)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            conn.Execute("Admin_PersonalMsg_Del", new { Id, CustId }, commandType: CommandType.StoredProcedure);
+            conn.Execute("Admin_PersonalMsg_Del", new { Id }, commandType: CommandType.StoredProcedure);
         }
         public bool SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
         {

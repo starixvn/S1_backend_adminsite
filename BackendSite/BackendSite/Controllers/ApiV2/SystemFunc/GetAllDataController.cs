@@ -23,6 +23,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
         private readonly ReportBLL _reportBll;
         private readonly GameCasinoBLL _gameCasinoBll;
+        private readonly WinLostReportBLL _winLostReportBll;
 
         #endregion
 
@@ -32,6 +33,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _gameCasinoBll = provider.GetRequiredService<GameCasinoBLL>();
+            _winLostReportBll = provider.GetRequiredService<WinLostReportBLL>();
         }
 
         #endregion
@@ -116,6 +118,35 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
 
             return apiResult;
+        }
+
+        /// <summary>
+        /// GetAllData/GetTpGameType 取得所有遊戲類型清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path： Show tp  GameType List
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult GetAllGameTypeList()
+        {
+            var data = _winLostReportBll.GetTpGameType();
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<GameType>>
+                {
+                    Data = data,
+                    ErrorCode = 0
+                };
+            }
         }
 
         #endregion
