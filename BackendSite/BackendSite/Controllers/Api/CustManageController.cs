@@ -374,6 +374,8 @@ namespace BackendSite.Controllers.Api
                                                    out totalPages,
                                                    out rowCount);
 
+            data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
@@ -457,7 +459,8 @@ namespace BackendSite.Controllers.Api
                                                                     custInfoReq.AffId,
                                                                     custInfoReq.SelectCurrency,
                                                                     custInfoReq.BankAccountNumber,
-                                                                    custInfoReq.SelectStatus);
+                                                                    custInfoReq.SelectStatus,
+                                                                    TimeSpan.FromHours(8));
 
             var stream = excelBLL.Export(ExportCustInfo);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportCustInfo)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
