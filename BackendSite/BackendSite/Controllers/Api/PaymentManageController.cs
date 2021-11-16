@@ -4,11 +4,14 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackendSite.Controllers.Api
 {
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class PaymentManageController : Controller
     {
         private readonly PaymentManageBLL paymentManageBLL;

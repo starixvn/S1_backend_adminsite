@@ -14,6 +14,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class GameCasinoManagementController : ControllerBase
     {
         private readonly GameCasinoManageBLL gameCasinoManageBLL;
@@ -27,20 +28,23 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
-        public ApiResult SetGameCasinoDetail(SetGameCasionPara para) 
+        public ApiResult SetGameCasinoDetail(SetGameCasionPara para)
         {
             var apiResult = new ApiResult();
             try
             {
                 gameCasinoManageBLL.SetGameCasinoDetail(para);
-                var beforeStatus = para.Type == "hot" ? para.Hot : para.Type == "featured" ? para.Featured : para.Type == "status" ? para.Status:para.Promotion;
+                var beforeStatus = para.Type == "hot" ? para.Hot : para.Type == "featured" ? para.Featured : para.Type == "status" ? para.Status : para.Promotion;
                 var afterStatus = beforeStatus == 1 ? 2 : 1;
-                var log = new GameCasinoDetailLog() {GameCasinoId = para.GameCasinoId,
-                                                    SiteId = para.SiteId,
-                                                    CurrencyId = para.CurrencyId,
-                                                    ChangeData = para.Type,
-                                                    Before = beforeStatus,
-                                                    After = afterStatus};
+                var log = new GameCasinoDetailLog()
+                {
+                    GameCasinoId = para.GameCasinoId,
+                    SiteId = para.SiteId,
+                    CurrencyId = para.CurrencyId,
+                    ChangeData = para.Type,
+                    Before = beforeStatus,
+                    After = afterStatus
+                };
                 gameCasinoManageBLL.AddLog("Marketing/GameCasinoManagement/Detail", ActionType.Update, JsonConvert.SerializeObject(log), User.Identity.Name);
                 apiResult.ErrorCode = 0;
             }
@@ -137,14 +141,14 @@ namespace BackendSite.Controllers.Api
             try
             {
                 gameCasinoManageBLL.SetGameCasino(para);
-                var beforeStatus = para.Type == "hot" ? para.Hot : para.Type == "featured" ? para.Featured : para.Type == "status" ? para.Status:para.Promotion;
+                var beforeStatus = para.Type == "hot" ? para.Hot : para.Type == "featured" ? para.Featured : para.Type == "status" ? para.Status : para.Promotion;
                 var afterStatus = !beforeStatus;
                 var log = new GameCasinoLog()
                 {
                     GameCasinoId = para.GameCasinoId,
                     ChangeData = para.Type,
-                    Before = beforeStatus ? 1:2,
-                    After = afterStatus? 1:2
+                    Before = beforeStatus ? 1 : 2,
+                    After = afterStatus ? 1 : 2
                 };
                 gameCasinoManageBLL.AddLog("Marketing/GameCasinoManagement", ActionType.Update, JsonConvert.SerializeObject(log), User.Identity.Name);
                 apiResult.ErrorCode = 0;

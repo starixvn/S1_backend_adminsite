@@ -116,7 +116,7 @@ const Panel = (props) => {
             timeFormat: false,
             onChange: (e) => {
               try {
-                props.ExportOnChange(e, "StartDate");
+                props.onChange(e, "StartDate");
               } catch (ex) {}
             },
           }}
@@ -129,7 +129,7 @@ const Panel = (props) => {
             timeFormat: false,
             onChange: (e) => {
               try {
-                props.ExportOnChange(e, "EndDate");
+                props.onChange(e, "EndDate");
               } catch (ex) {}
             },
           }}
@@ -261,6 +261,7 @@ const DropDownBox2 = (props) => {
 };
 
 const DateTimePickerElem = (props) => {
+  console.log(props);
   return (
     <div className="input-item">
       <span className="label">{props.columnTitle}</span>

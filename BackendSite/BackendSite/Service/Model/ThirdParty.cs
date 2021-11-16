@@ -41,6 +41,7 @@ namespace BackendSite.Service.Model
         public string ThirdId { get; set; }
         public string Memo { get; set; }
         public int Status { get; set; }
+        public int TpId { get; set; }
     }
     public class AdminTpTransferInfo : TpTransferInfo
     {

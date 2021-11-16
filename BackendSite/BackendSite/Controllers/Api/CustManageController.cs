@@ -23,6 +23,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class CustManageController : ControllerBase
     {
         #region Fields
@@ -1492,7 +1493,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiListResult<CustTele> GetTeleCSD(TeleCSDpara para)
         {
             var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate);
@@ -1563,7 +1563,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult UpdateCustomerTele(TeleCSDUpdatepara para)
         {
             if (custInfoBLL.UpdateCustomerTele(para.SiteId, para.CustId, User.Identity.Name) > 0)
@@ -1600,7 +1599,6 @@ namespace BackendSite.Controllers.Api
         /// <returns>檔案</returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult ExportTeleCSDData(string SiteIds,
                                                string Currency,
                                                int Deposit,
@@ -1691,7 +1689,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult EditTagManagement(EditTagManagementpara para)
         {
             if (custInfoBLL.EditTagManagement(para.Id, para.TagName, para.TagColour, para.Description, User.Identity.Name) > 0)
@@ -1722,7 +1719,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiListResult<TagData> GetTagData(GetTagDatapara para)
         {
             var apiResult = new ApiListResult<TagData>();
@@ -1762,7 +1758,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult SetTagStatus(SetTagStatuspara para)
         {
             if (custInfoBLL.SetTagStatus(para.Id, User.Identity.Name) > 0)
@@ -1900,7 +1895,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiListResult<RegLiveStatus> GetRegLiveStatusList(RegLiveStatusPara custInfoReq)
         {
             var apiResult = new ApiListResult<RegLiveStatus>();
@@ -1944,7 +1938,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult SetRegLiveStatus(SetRegLiveStatusPara para)
         {
             var apiResult = new ApiResult();
@@ -1974,7 +1967,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(AddRegLiveStatusNotes addCustNoteReq)
         {
             var apiResult = new ApiResult<IEnumerable<RegLiveStatusNotes>>
@@ -2006,7 +1998,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_add_note" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult AddRegLiveStatusNote(AddRegLiveStatusNotes addCustNoteReq)
         {
             var apiResult = new ApiResult();
@@ -2036,7 +2027,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_delete_note" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult DeleteRegLiveStatusNote(DeleteRegLiveStatusNotes deleteCustNoteReq)
         {
             var apiResult = new ApiResult();
@@ -2066,7 +2056,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_edit_note" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult EditRegLiveStatusNote(EditRegLiveStatusNotes EditRegLiveStatusNote)
         {
             var apiResult = new ApiResult();
@@ -2105,7 +2094,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult ExportRegLiveStatusList(string SelectSite,
             int Currency,
             int DepositStatus,

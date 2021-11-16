@@ -15,6 +15,7 @@ namespace BackendSite.Controllers.Api
     [Route("api/[controller]/[action]")]
     [ApiController]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class BannerManageController : Controller
     {
         private readonly CustInfoBLL custInfoBLL;

@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -76,6 +78,34 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #endregion
 
         #region API Model
+
+        /// <summary>
+        /// 客戶ID要求
+        /// </summary>
+        /// <remarks>
+        /// 只需要傳參數CustId
+        /// </remarks>
+        public class CustIdRequest
+        {
+            public int CustId { get; set; }
+        }
+
+        /// <summary>
+        /// 客戶ID分頁要求
+        /// </summary>
+        public class CustIdWithPageRequest : ApiRequestPageModel
+        {
+            public int CustId { get; set; }
+        }
+
+        public class CustIdWithReasonRequest : CustIdRequest
+        {
+            /// <summary>
+            /// 異動原因
+            /// </summary>
+            public string Reason { get; set; }
+        }
+
 
         public class CustInfoListRequest : ApiRequestPageModel
         {
@@ -145,7 +175,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             /// <summary>
             /// 電話
             /// </summary>
-            public string PhoneNumber { get; set; }
+            public string Phone { get; set; }
             /// <summary>
             /// Email
             /// </summary>
@@ -214,10 +244,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int CustId { get; set; }
         }
 
-        public class CustBonusReq
-        {
-            public int CustId { get; set; }
-        }
 
         public class GetCustTurnOverReportReq
         {
@@ -231,7 +257,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public class SetCustTagPara
         {
             public int CustId { get; set; }
-            public IEnumerable<int> SelectTag { get; set; }
+            public IEnumerable<int> Tags { get; set; }
         }
 
         public class CustPromotionpara
@@ -243,10 +269,25 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int PageSize { get; set; }
         }
 
-        public class SetEnableDisableBonusPara
+        public class SetEnableDisableBonusRequest
+        {
+            /// <summary>
+            /// 客戶ID
+            /// </summary>
+            public int CustId { get; set; }
+            /// <summary>
+            /// 開關(0=Disble,1=Enable)
+            /// </summary>
+            public int Status { get; set; }
+        }
+
+        public class GetBonusLogRequest :ApiRequestPageModel
         {
             public int CustId { get; set; }
-            public int EnablePromotion { get; set; }
+            public int PromoCategoryId { get; set; }
+            public long? StartDate { get; set; }
+            public long? EndDate { get; set; }
+            public string RefTransId { get; set; }
         }
 
         #endregion
@@ -412,7 +453,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// CustomerManage/GetCustBonus 取得客戶獎金
+        /// CustomerManage/GetBonusByCustId 取得客戶獎金
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -420,13 +461,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Bonus Wallet
         /// 
         /// </remarks>
-        /// <param name="custBonusReq"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public ApiResult GetCustBonus(CustBonusReq custBonusReq)
+        public ApiResult GetBonusByCustId(CustIdRequest request)
         {
-            var data = _custInfoBll.GetCustBonus(custBonusReq.CustId);
+            var data = _custInfoBll.GetCustBonus(request.CustId);
             return new ApiResult<IEnumerable<CustBonus>>
             {
                 Data = data,
@@ -435,7 +476,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// CustomerManage/GetRebateInfo 取得客戶返水資料
+        /// CustomerManage/GetRebateInfoByCustId 取得客戶返水資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -443,13 +484,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Rebate Info
         /// 
         /// </remarks>
-        /// <param name="custBonusReq"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public ApiResult GetRebateInfoByCust(CustBonusReq custBonusReq)
+        public ApiResult GetRebateInfoByCustId(CustIdRequest request)
         {
-            var data = _paymentBll.GetRebateInfoByCust(custBonusReq.CustId);
+            var data = _paymentBll.GetRebateInfoByCust(request.CustId);
             return new ApiResult<IEnumerable<RebateInfo>>
             {
                 Data = data,
@@ -457,12 +498,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
         }
 
-        #endregion
-
-        #region CustInfo > Switch On IsKyc、IsRisk、PhoneVerified、EmailVerified
-
         /// <summary>
-        /// CustomerManage/SetCustStatusSwitch 設定客戶狀態開關
+        /// CustomerManage/SetCustStatusSwitch 設定客戶狀態開關(客戶驗證、風險、電話驗證、Email驗證)
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -537,10 +574,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
         }
 
-        #endregion
-
-        #region CustInfo > Edit User Level、Full Name、Birthday (M/D/Y)、Phone Number、E-Mail
-
         /// <summary>
         /// CustomerManage/SetCustInfo 設定客戶資料(等級、全名；生日(年月日)、電話、Email)
         /// </summary>
@@ -564,7 +597,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.Birthday_Y,
                 request.Birthday_M,
                 request.Birthday_D,
-                request.PhoneNumber,
+                request.Phone,
                 request.EMail,
                 User.Identity.Name) > 0;
 
@@ -591,9 +624,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 Info.Add("Action", $"Change Birthday To {request.Birthday_Y}/{request.Birthday_M}/{request.Birthday_D}");
                 Info.Add("Before Change Birthday", $"{custProfile.Birth_y}/{custProfile.Birth_m}/{custProfile.Birth_d}");
             }
-            else if (request.PhoneNumber != null)
+            else if (request.Phone != null)
             {
-                Info.Add("Action", $"Change Phone Number To {request.PhoneNumber}");
+                Info.Add("Action", $"Change Phone Number To {request.Phone}");
                 Info.Add("Before Change Phone Number", custProfile.PhoneNo);
             }
             else if (request.EMail != null)
@@ -611,10 +644,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
         }
 
-        #endregion
-
-        #region CSD > Customer Administration > CustInfo Photo
-
         /// <summary>
         /// CustomerManage/GetCustPhotoId 取得客戶圖片
         /// </summary>
@@ -624,13 +653,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > [Edit] User Level、Full Name、Birthday (M/D/Y)、Phone Number、E-Mail
         /// 
         /// </remarks>
-        /// <param name="CustId"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
         [HttpGet]
-        public IActionResult GetCustPhotoId(int CustId)
+        public IActionResult GetCustPhotoId(CustIdRequest request)
         {
-            var custPhotoId = _custInfoBll.GetCustPhotoId(CustId);
+            var custPhotoId = _custInfoBll.GetCustPhotoId(request.CustId);
             if (custPhotoId == null)
             {
                 //return StatusCode(404);
@@ -643,20 +672,28 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// Upload
+        /// CustomerManage/UploadCustPhotoId 上傳客戶圖片
         /// </summary>
-        /// <param name="CustId"></param>
-        /// <param name="File"></param>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Content-Type：multipart/form-data
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Photo > [Upload]
+        /// 
+        /// </remarks>
+        /// <param name="custId"></param>
+        /// <param name="file"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult UploadCustPhotoId([FromForm] int CustId, [FromForm] IFormFile File)
+        public ApiResult UploadCustPhotoId([FromForm] int custId, [FromForm] IFormFile file)
         {
             var xSize = 500m;
-            var custInfo = _custInfoBll.GetCustInfoWithCache(CustId);
+            var custInfo = _custInfoBll.GetCustInfoWithCache(custId);
             decimal xCell = 1;
-            if (_contentTypesCheck.ContainsKey(File.ContentType))
+            if (_contentTypesCheck.ContainsKey(file.ContentType))
             {
-                using var fileStream = File.OpenReadStream();
+                using var fileStream = file.OpenReadStream();
                 using var uploadedImage = Image.FromStream(fileStream);
                 using var ms = new System.IO.MemoryStream();
 
@@ -682,12 +719,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
                 img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 
-                var fileName = File.FileName;
+                var fileName = file.FileName;
                 fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
                 fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
 
                 var fileBytes = ms.ToArray();
                 var result = _custInfoBll.SetCustPhotoId(custInfo.CustId, custInfo.SiteId, fileName, fileBytes);
+
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("Action", "Upload Photo");
+                _serverInfoBll.AdminOperateLog(null, custId, Menu, ActionType.Delete, Info, User.Identity.Name);
 
                 if (result > 0)
                 {
@@ -708,15 +751,22 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
         }
 
-
         /// <summary>
-        /// Ask Re-Upload
+        /// CustomerManage/DelCustPhotoId 刪除客戶圖片
         /// </summary>
-        /// <param name="custInfoReq"></param>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Content-Type：multipart/form-data
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Photo > [Ask Re-Upload]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
         /// <returns></returns>
-        public ApiResult DelCustPhotoId(CustInfoReq custInfoReq)
+        public ApiResult DelCustPhotoId(CustIdRequest request)
         {
-            var data = _custInfoBll.DelCustPhotoId(custInfoReq.CustId);
+            var data = _custInfoBll.DelCustPhotoId(request.CustId);
 
             if (data)
             {
@@ -724,7 +774,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("Action", "Delete Photo");
-                _serverInfoBll.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                _serverInfoBll.AdminOperateLog(null, request.CustId, Menu, ActionType.Delete, Info, User.Identity.Name);
 
                 return new ApiResult
                 {
@@ -738,8 +788,457 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
         }
 
+        /// <summary>
+        /// CustomerManage/ResetProfile 重新設定客戶資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > CustInfo [ResetProfile]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
+        [HttpPost]
+        public ApiResult ResetProfile(CustIdRequest request)
+        {
+            var custProfile = _custInfoBll.GetCustProfile(request.CustId);
+            if (_custInfoBll.ResetProfile(request.CustId))
+            {
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("Action", "Reset Profile");
+
+                if (!string.IsNullOrWhiteSpace(custProfile.Profile))
+                {
+                    var jsonObject = JObject.Parse(custProfile.Profile);
+                    var jTokens = jsonObject.Descendants().Where(p => !p.Any());
+                    jTokens.ToList().ForEach(jToken =>
+                    {
+                        Info.Add(jToken.Path, jToken.ToString());
+                    });
+                }
+
+                _serverInfoBll.AdminOperateLog(null, request.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Reset Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
+            }
+        }
+
+        /// <summary>
+        /// CustomerManage/ResetCustBankInfo 重新設定客戶帳戶資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > CustInfo [Reset Cust Bank Info.]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
+        [HttpPost]
+        public ApiResult ResetCustBankInfo(CustIdRequest request)
+        {
+            var apiResult = new ApiResult();
+            var custProfile = _custInfoBll.GetCustProfile(request.CustId);
+            if (_custInfoBll.ResetCustBankInfo(request.CustId))
+            {
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("Action", "Reset Bank Info");
+                if (!string.IsNullOrWhiteSpace(custProfile.BankInfo))
+                {
+                    var bankInfoDetailList = JsonConvert.DeserializeObject<IEnumerable<BankInfoDetail>>(custProfile.BankInfo);
+
+                    bankInfoDetailList.ToList().ForEach(x =>
+                    {
+                        Info.Add("SysId", x.SysId);
+                        Info.Add("AccountNo", x.AccountNo);
+                        Info.Add("IFSCCode", x.IFSCCode);
+                    });
+                }
+                _serverInfoBll.AdminOperateLog(null, request.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Reset Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
+            }
+        }
+
+        /// <summary>
+        /// CustomerManage/ResetCustUSDTInfo 重新設定客戶USDT資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > CustInfo [Reset Cust USDT Info.]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
+        [HttpPost]
+        public ApiResult ResetCustUSDTInfo(CustIdRequest request)
+        {
+            var apiResult = new ApiResult();
+            var custProfile = _custInfoBll.GetCustProfile(request.CustId);
+            if (_custInfoBll.ResetCustUSDTInfo(request.CustId))
+            {
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                Info.Add("Action", "Reset USDT Info");
+                if (!string.IsNullOrWhiteSpace(custProfile.USDTInfo))
+                {
+                    var USDTDetailList = JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo);
+
+                    USDTDetailList.ToList().ForEach(x =>
+                    {
+                        Info.Add("NickName", x.NickName);
+                        Info.Add("USDTAddress", x.USDTAddress);
+                    });
+
+                }
+                _serverInfoBll.AdminOperateLog(null, request.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Reset Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
+            }
+        }
+
+        /// <summary>
+        /// CustomerManage/SetUnlock 解鎖用戶
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > CustInfo [Unlock]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_unlock" })]
+        public ApiResult SetUnlock(CustIdWithReasonRequest request)
+        {
+            if (_custInfoBll.SetCustStatus("CustManage/CustInfoList",
+                                          request.CustId,
+                                          1,
+                                          request.Reason,
+                                          "Set Unlock",
+                                          User.Identity.Name))
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Set Unlock Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Set Unlock Fail.Please Contact admin.");
+            }
+        }
+
+        /// <summary>
+        /// CustomerManage/SetLock 鎖定用戶
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > CustInfo [Lock]
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_lock" })]
+        public ApiResult SetLock(CustIdWithReasonRequest request)
+        {
+            if (_custInfoBll.SetCustStatus("CustManage/CustInfoList",
+                                          request.CustId,
+                                          2,
+                                          request.Reason,
+                                          "Set Lock",
+                                          User.Identity.Name))
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Set Lock Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Set Lock Fail.Please Contact admin.");
+            }
+        }
+
+        /// <summary>
+        /// CustomerManage/SetClose 關閉用戶
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > CustInfo [Closed]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_close" })]
+        [HttpPost]
+        public ApiResult SetClose(CustIdWithReasonRequest request)
+        {
+            if (_custInfoBll.SetCustStatus("CustManage/CustInfoList",
+                                          request.CustId,
+                                          3,
+                                          request.Reason,
+                                          "Set Close",
+                                          User.Identity.Name))
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Set Close Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Set Close Fail.Please Contact admin.");
+            }
+        }
+
+        /// <summary>
+        /// CustomerManage/SetEnablePromotionStatus 客戶是否可以領取促銷
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > CustInfo [Enable Promotion] / [Disable Promotion]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_promotion" })]
+        [HttpPost]
+        public ApiResult SetEnablePromotionStatus(SetEnableDisableBonusRequest request)
+        {
+            if (_custInfoBll.SetEnableDisablePromotion(request.CustId, request.Status, User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Set Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Set Fail.");
+            }
+        }
+
+        /// <summary>
+        /// CustomerManage/KickOut 踢出/登出客戶
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > CustInfo [KickOut]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_kickout" })]
+        public ApiResult KickOut(CustIdWithReasonRequest request)
+        {
+            if (_custInfoBll.DeleteOnUserData("CustManage/CustInfoList",
+                                                    request.CustId,
+                                                    request.Reason,
+                                                    User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Kick Out Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Kick out fail.Customer is not online now.");
+            }
+        }
+
         #endregion
 
+        #region CSD > Customer Administration > Bonus Log
+
+        /// <summary>
+        /// CustomerManage/GetBonusLog 取得指定客戶獎金紀錄
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > CustInfo > Bonus Log > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ApiResult GetBonusLog(GetBonusLogRequest request)
+        {
+            var pageNumber = request.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
+            var data = _paymentBll.GetBonusLog(request.CustId,
+                request.PromoCategoryId,
+                request.StartDate,
+                request.EndDate,
+                request.RefTransId,
+                request.PageSize,
+                ref pageNumber,
+                out totalPages,
+                out rowCount);
+
+            return new ApiListResult<BonusLog>
+            {
+                Data = data,
+                TotalPages = totalPages,
+                PageNumber = pageNumber,
+                RowCount = rowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        #endregion
+
+        #region  CSD > Customer Administration > CustInfo > Tag
+
+        /// <summary>
+        /// CustomerManage/GetAllTag 取得所有標籤資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Tag > Tag List
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<TagData>> GetAllTag()
+        {
+            var apiResult = new ApiResult<IEnumerable<TagData>>();
+            try
+            {
+                apiResult.Data = _custInfoBll.GetAllTag();
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
+            }
+            return apiResult;
+        }
+
+        /// <summary>
+        /// CustomerManage/SetTag 設定標籤
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Tag > [Add] / [Remove]
+        /// </remarks>
+        /// <param name="para"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_setCustTag" })]
+        [HttpPost]
+        public ApiResult SetTag(SetCustTagPara para)
+        {
+            if (_custInfoBll.SetCustTag(para.CustId, para.Tags, User.Identity.Name) > 0)
+            {
+                var temp = new List<string>();
+                var selectTag = JsonConvert.SerializeObject(temp);
+                if (para.Tags != null && para.Tags.Any())
+                {
+                    var alltagDict = _custInfoBll.GetAllTag().ToDictionary(x => x.Id, x => x.TagName);
+                    para.Tags.ToList().ForEach(x =>
+                    {
+                        temp.Add(alltagDict[x]);
+                    });
+                    selectTag = JsonConvert.SerializeObject(temp);
+                }
+                _custInfoBll.AddCustNote(para.CustId, $"Set Cust Tag:{selectTag}", User.Identity.Name);
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Edit Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+        }
+
+        /// <summary>
+        /// CustomerManage/GetAllTag 取得指定客戶標籤
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Tag > Added Tag List
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<int>> GetCustTag(CustIdRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<int>>();
+
+            try
+            {
+                var custInfoDetail = _custInfoBll.GetCustData(request.CustId, null);
+                apiResult.Data = custInfoDetail.ITagList; //Just Use Tag List
+                apiResult.ErrorCode = 0;
+            }
+            catch
+            {
+                apiResult.ErrorCode = 999;
+            }
+            return apiResult;
+        }
+
+        #endregion
 
         #region Private Methods
 

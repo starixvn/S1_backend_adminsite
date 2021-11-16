@@ -4,13 +4,16 @@ using System.Linq;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.Api
 {
+    [Authorize]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/NewsManage" })]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class NewsController : Controller
     {
         private readonly NewsBLL newsBLL;
@@ -44,7 +47,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public class GetNewsPara 
+        public class GetNewsPara
         {
             public IEnumerable<int> SelectSite { get; set; }
             public long StartDate { get; set; }
@@ -77,7 +80,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<News> GetNewsById([FromForm]int NewsId)
+        public ApiResult<News> GetNewsById([FromForm] int NewsId)
         {
             var result = new ApiResult<News>();
 
@@ -128,7 +131,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<dynamic> SetStatus([FromForm]int NewsId, [FromForm]int Status)
+        public ApiResult<dynamic> SetStatus([FromForm] int NewsId, [FromForm] int Status)
         {
             var result = new ApiResult<dynamic>();
             try

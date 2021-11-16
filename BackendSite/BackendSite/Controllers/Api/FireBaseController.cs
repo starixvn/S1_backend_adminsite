@@ -1,12 +1,15 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class FireBaseController
     {
         private readonly FireBaseBLL fireBaseBLL;
@@ -21,7 +24,6 @@ namespace BackendSite.Controllers.Api
             public int FireBaseId { get; set; }
         }
 
-        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public async Task<ApiResult> SendFireBaseMessageAsync(SendFireBaseMessageReq sendFireBaseMessageReq)
         {

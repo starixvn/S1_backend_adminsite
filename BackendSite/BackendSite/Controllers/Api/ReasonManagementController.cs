@@ -10,6 +10,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class ReasonManagementController : Controller
     {
         private readonly ReasonManagementBLL reasonManagementBLL;
