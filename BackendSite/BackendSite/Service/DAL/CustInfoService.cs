@@ -154,6 +154,9 @@ namespace BackendSite.Service.DAL
             string SelectSite = null;
             string SelectCurrency = null;
             string SelectStatus = null;
+            DateTime? startDateParam = null;
+            DateTime? endDateParam = null;
+
             if (selectSite != null && selectSite.Any())
             {
                 SelectSite = JsonConvert.SerializeObject(selectSite);
@@ -174,7 +177,18 @@ namespace BackendSite.Service.DAL
                     SelectStatus = JsonConvert.SerializeObject(selectstatus);
                 }
             }
-            var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TpUserName = TpUserName, TransId = transId, Email = Email, PhoneNo = PhoneNo, StartDate = startDate, EndDate = endDate, SiteList = siteList, AffId, BankAccountNumber = BankAccountNumber, SelectCurrency = SelectCurrency, CurrncyList = currncyList, SelectStatus = SelectStatus });
+
+            if (startDate != null)
+            {
+                startDateParam = DateTimeOffset.Parse(startDate.ToString()).DateTime;
+            }
+
+            if (endDate != null)
+            {
+                endDateParam = DateTimeOffset.Parse(endDate.ToString()).DateTime;
+            }
+
+            var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TpUserName = TpUserName, TransId = transId, Email = Email, PhoneNo = PhoneNo, StartDate = startDateParam, EndDate = endDateParam, SiteList = siteList, AffId, BankAccountNumber = BankAccountNumber, SelectCurrency = SelectCurrency, CurrncyList = currncyList, SelectStatus = SelectStatus });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V5", p, commandType: CommandType.StoredProcedure);
