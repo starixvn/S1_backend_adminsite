@@ -133,7 +133,7 @@ namespace BackendSite.Service.DAL
             IEnumerable<PersonalMsg> result = null;
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
-            var SpName = "Admin_PersonalMessage_Get";
+            var SpName = "Admin_PersonalMessage_Get_V2";
             var props = new DynamicParameters();
             props.Add("@CustId", CustId, dbType: DbType.Int32);
             props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);

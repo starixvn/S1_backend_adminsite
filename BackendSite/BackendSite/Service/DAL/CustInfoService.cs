@@ -242,15 +242,33 @@ namespace BackendSite.Service.DAL
             return conn.Execute("Admin_CustNotes_Ins", new { CustId = custId, Note = Note, Operator = Operator }, commandType: CommandType.StoredProcedure) > 0;
         }
 
-        public IEnumerable<CustNote> GetCustNotes(int custId)
+        public IEnumerable<CustNote> GetCustNotes(int custId,
+            int pageSize,
+            int startIndex,
+            out int totalPages,
+            out int rowCount)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<CustNote>("Admin_CustNotes_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            var parameter = new DynamicParameters();
+
+            parameter.Add("_CustId", custId);
+            parameter.Add("_PageSize", pageSize);
+            parameter.Add("_StartIndex", startIndex);
+            parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var data = _reportDbClient.Query<CustNote>("Admin_CustNotes_Get_V2", parameter);
+
+
+            totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
+            rowCount = parameter.Get<int?>("_RowCount") ?? 0;
+
+            return data;
         }
-        public bool SetCustNotes(int custId, int noteId, string note, int type, string Operator)
+        public bool SetCustNotes(int noteId, string note, int type, string Operator)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_CustNotes_Set", new { CustId = custId, NoteId = noteId, Note = note, Type = type, Operator = Operator }, commandType: CommandType.StoredProcedure) > 0;
+            return conn.Execute("Admin_CustNotes_Set_V2", new { NoteId = noteId, Note = note, Type = type, Operator = Operator }, commandType: CommandType.StoredProcedure) > 0;
         }
         public IEnumerable<LoginLog> GetLoginLogByCust(int CustId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
@@ -304,15 +322,47 @@ namespace BackendSite.Service.DAL
         {
             return conn.ExecuteScalar<decimal>("Common_WithdrawalAvailableBalance_Get", new { CustId = custId }, transaction: trans, commandType: CommandType.StoredProcedure);
         }
-        public IEnumerable<CustBankInfoLog> GetCustBankInfoLogList(int custId, int siteId)
+        public IEnumerable<CustBankInfoLog> GetCustBankInfoLogList(int custId,
+            int startIndex,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<CustBankInfoLog>("Admin_BankInfoLogList_Get", new { CustId = custId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            var parameter = new DynamicParameters();
+
+            parameter.Add("_CustId", custId);
+            parameter.Add("_PageSize", pageSize);
+            parameter.Add("_StartIndex", startIndex);
+            parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var data = conn.Query<CustBankInfoLog>("Admin_BankInfoLogList_Get_V2", parameter, commandType: CommandType.StoredProcedure);
+
+            totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
+            rowCount = parameter.Get<int?>("_RowCount") ?? 0;
+
+            return data;
         }
-        public IEnumerable<CustCryptoWalletLog> GetCustCryptoWalletLogList(int custId, int siteId)
+        public IEnumerable<CustCryptoWalletLog> GetCustCryptoWalletLogList(int custId,
+            int startIndex,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<CustCryptoWalletLog>("Admin_CryptoWalletLogList_Get", new { CustId = custId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            var parameter = new DynamicParameters();
+
+            parameter.Add("_CustId", custId);
+            parameter.Add("_PageSize", pageSize);
+            parameter.Add("_StartIndex", startIndex);
+            parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var data = conn.Query<CustCryptoWalletLog>("Admin_CryptoWalletLogList_Get_V2", parameter, commandType: CommandType.StoredProcedure);
+
+            totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
+            rowCount = parameter.Get<int?>("_RowCount") ?? 0;
+
+            return data;
         }
         public IEnumerable<CustBonus> GetCustBonus(int custId)
         {
@@ -477,7 +527,7 @@ namespace BackendSite.Service.DAL
             props.Add("PageSize", Math.Abs(pageSize));
             props.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
             props.Add("Status", status);
-           
+
             var result = _reportDbClient.Query<TagData>("Admin_Tag_Get_V3", props);
             searchResult.TagDatas = result.ToList();
             searchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
@@ -550,7 +600,7 @@ namespace BackendSite.Service.DAL
             props.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            
+
             var result = _reportDbClient.Query<RegLiveStatus>("Admin_CustRegLiveStatus_Get_V4", props).ToList();
             searchData.RegLiveStatusDatas = result;
             searchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;

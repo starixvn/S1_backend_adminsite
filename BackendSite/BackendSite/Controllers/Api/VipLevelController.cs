@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
+using System.Linq;
 
 namespace BackendSite.Controllers.Api
 {
@@ -131,9 +132,13 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<VipLevelInfo> GetVipLevelInfo(CustIdReq custIdReq)
         {
+            var data = _vipLevelBLL.GetVipLevelInfo(custIdReq.CustId);
+
+            data.QualifiedTime = new DateTimeOffset(data.QualifiedTime.DateTime.AddHours(8), TimeSpan.FromHours(8));
+
             var apiListResult = new ApiResult<VipLevelInfo>
             {
-                Data = _vipLevelBLL.GetVipLevelInfo(custIdReq.CustId),
+                Data = data,
                 ErrorCode = 0
             };
             return apiListResult;
@@ -154,9 +159,13 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<VipLevelLog> GetVipLevelLog(CustIdReq custIdReq)
         {
+            var data = _vipLevelBLL.GetVipLevelLog(custIdReq.CustId);
+
+            data.ToList().ForEach(s => s.UpdateTime = new DateTimeOffset(s.UpdateTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+
             var apiListResult = new ApiListResult<VipLevelLog>
             {
-                Data = _vipLevelBLL.GetVipLevelLog(custIdReq.CustId),
+                Data = data,
                 ErrorCode = 0
             };
             return apiListResult;

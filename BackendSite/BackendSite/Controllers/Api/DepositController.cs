@@ -101,11 +101,25 @@ namespace BackendSite.Controllers.Api
             var totalPages = 0;
             var rowCount = 0;
             decimal totalAmount = 0;
+
+            if (depositListReq.startDate > 2147483647)
+            {
+                depositListReq.startDate = 2147483647;
+            }
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)depositListReq.startDate);
+
+            if (depositListReq.endDate > 2147483647)
+            {
+                depositListReq.endDate = 2147483647;
+            }
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)depositListReq.endDate);
+
+
             var data = depositBLL.GetDepositListByCust(depositListReq.CustId,
                                                        depositListReq.TransId,
                                                        depositListReq.Status == 0 ? (int?)null : depositListReq.Status,
-                                                       depositListReq.startDate,
-                                                       depositListReq.endDate,
+                                                       startTime,
+                                                       endTime,
                                                        depositListReq.PageSize,
                                                        ref pageNumber,
                                                        out totalPages,

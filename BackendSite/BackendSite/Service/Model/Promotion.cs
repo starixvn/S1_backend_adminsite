@@ -21,11 +21,11 @@ namespace BackendSite.Service.Model
         public decimal MaxBonus { get; set; }
         public decimal LockedAmount { get; set; }
         public decimal BonusAmount { get; set; }
-        public DateTime ExpiryTime { get; set; }
+        public DateTimeOffset ExpiryTime { get; set; }
         public int BonusInfoStatus { get; set; }
         public int Sort { get; set; }
         public CustRollOver custRollOver { get; set; }
-        public DateTime ClaimDate { get;set; }
+        public DateTimeOffset ClaimDate { get;set; }
     }
     public class PromotionListData
     {

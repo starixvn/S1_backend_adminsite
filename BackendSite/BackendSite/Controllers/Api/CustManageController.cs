@@ -1227,7 +1227,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<CustNote>>
             {
-                Data = custInfoBLL.GetCustNotes(addCustNoteReq.CustId),
+                Data = custInfoBLL.GetCustNotes(addCustNoteReq.CustId, 1000, 1, out _, out _),
                 ErrorCode = 0
             };
 
@@ -1259,7 +1259,7 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                var data = custInfoBLL.SetCustNotes(setCustNoteReq.CustId, setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
+                var data = custInfoBLL.SetCustNotes(setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
 
                 if (data)
                 {
@@ -1309,10 +1309,25 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetCustTurnOverReport(GetCustTurnOverReportReq request)
         {
+
+            if (request.StartTime > 2147483647)
+            {
+                request.StartTime = 2147483647;
+            }
+
+            if (request.EndTime > 2147483647)
+            {
+                request.EndTime = 2147483647;
+            }
+
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(request.StartTime);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(request.EndTime);
+
             var data = custInfoBLL.GetCustTurnover(request.CustId,
                                                    JsonConvert.SerializeObject(request.GameTypes),
-                                                   request.StartTime,
-                                                   request.EndTime);
+                                                   startTime,
+                                                   endTime);
+
             return new ApiResult<dynamic>
             {
                 Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover }),
@@ -1370,10 +1385,16 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<CustBankInfoLog> GetBankInfoLogList(BankInfoLogListReq bankInfoLogListReq)
         {
             var apiListResult = new ApiListResult<CustBankInfoLog>();
-            var custInfo = custInfoBLL.GetCustInfoWithCache(bankInfoLogListReq.CustId);
             apiListResult.ErrorCode = 0;
-            var bankInfoPay = custInfoBLL.GetCustBankInfoLogList(bankInfoLogListReq.CustId, custInfo.SiteId);
+            var bankInfoPay = custInfoBLL.GetCustBankInfoLogList(bankInfoLogListReq.CustId,
+                1,
+                1000,
+                out var totalPages,
+                out var rowCount);
             apiListResult.Data = bankInfoPay;
+            apiListResult.PageNumber = 1;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.RowCount = rowCount;
             return apiListResult;
         }
 
@@ -1399,8 +1420,15 @@ namespace BackendSite.Controllers.Api
             var apiListResult = new ApiListResult<CustCryptoWalletLog>();
             var custInfo = custInfoBLL.GetCustInfoWithCache(cryptoWalletLogListReq.CustId);
             apiListResult.ErrorCode = 0;
-            var cryptoWalletInfo = custInfoBLL.GetCustCryptoWalletLogList(cryptoWalletLogListReq.CustId, custInfo.SiteId);
+            var cryptoWalletInfo = custInfoBLL.GetCustCryptoWalletLogList(cryptoWalletLogListReq.CustId,
+                1,
+                1000,
+                out var totalPages,
+                out var rowCount);
             apiListResult.Data = cryptoWalletInfo;
+            apiListResult.PageNumber = 1;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.RowCount = rowCount;
             return apiListResult;
         }
 
@@ -1430,7 +1458,22 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResultCurrencyAmount<Promotion>();
             try
             {
-                var SearchResult = custInfoBLL.GetPromotionListByCustIdAndDate(CustId, StartDate, EndDate, PageNumber, PageSize);
+
+                if (StartDate > 2147483647)
+                {
+                    StartDate = 2147483647;
+                }
+
+                if (EndDate > 2147483647)
+                {
+                    EndDate = 2147483647;
+                }
+
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+
+                var SearchResult = custInfoBLL.GetPromotionListByCustIdAndDate(CustId, startTime, endTime, PageNumber, PageSize);
+                SearchResult.PromotionList.ForEach(s => s.ClaimDate = new DateTimeOffset(s.ClaimDate.DateTime.AddHours(8), TimeSpan.FromHours(8)));
                 apiResult.Data = SearchResult.PromotionList;
                 apiResult.PageNumber = SearchResult.PageNumber;
                 apiResult.TotalPages = SearchResult.TotalPages;

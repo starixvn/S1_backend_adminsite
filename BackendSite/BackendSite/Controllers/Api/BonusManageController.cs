@@ -48,7 +48,7 @@ namespace BackendSite.Controllers.Api
             PrizeBLL prizeBLL,
             AuthorizeBLL authorizeBLL,
             ExcelBLL excelBLL,
-            CustInfoBLL custInfoBLL, 
+            CustInfoBLL custInfoBLL,
             IServiceProvider provider)
         {
             _bonusManageBLL = bonusManageBLL;
@@ -123,7 +123,7 @@ namespace BackendSite.Controllers.Api
             public string UserName { get; set; }
             public decimal ExtraPoint { get; set; }
         }
-        
+
         public class GetTpGameListReq
         {
             public int TpId { get; set; }
@@ -517,6 +517,27 @@ namespace BackendSite.Controllers.Api
                 {2, "Expired"}
             };
 
+            DateTime? startTime = null;
+            DateTime? endTime = null;
+
+            if (refFriendListReq.StartDate!=null)
+            {
+                if (refFriendListReq.StartDate > 2147483647)
+                {
+                    refFriendListReq.StartDate = 2147483647;
+                }
+                startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.StartDate);
+            }
+
+            if(refFriendListReq.EndDate!=null)
+            {
+                if (refFriendListReq.EndDate > 2147483647)
+                {
+                    refFriendListReq.EndDate = 2147483647;
+                }
+                endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.EndDate);
+            }
+
             var PageSize = 10;
             if (refFriendListReq.PageSize > 0)
                 PageSize = refFriendListReq.PageSize;
@@ -524,8 +545,8 @@ namespace BackendSite.Controllers.Api
             var totalPages = 0;
             var rowCount = 0;
             var apiResult = new ApiListResult<ReferralFriend>();
-            var data = _referralManagementBLL.GetRefFriendList(refFriendListReq.CustId, refFriendListReq.StartDate,
-                refFriendListReq.EndDate, PageSize, ref pageNumber, ref totalPages, ref rowCount);
+            var data = _referralManagementBLL.GetRefFriendList(refFriendListReq.CustId, startTime,
+                endTime, PageSize, ref pageNumber, ref totalPages, ref rowCount);
             foreach (var x in data)
             {
                 referralStatus.TryGetValue(x.Status, out var name);
@@ -563,7 +584,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        
+
 
         [HttpPost]
         public ApiResult<IEnumerable<ScratchCard>> GetScratchCardList(GetScratchCardListReq getScratchCardListReq)
@@ -641,7 +662,7 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                apiResult.Data = _bonusManageBLL.GetCashBackGameList(para.TpId,para.CategoryId);
+                apiResult.Data = _bonusManageBLL.GetCashBackGameList(para.TpId, para.CategoryId);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -677,7 +698,7 @@ namespace BackendSite.Controllers.Api
             if (leaderboardExtraPointReq.PageSize > 0)
                 pageSize = leaderboardExtraPointReq.PageSize;
             apiResult.Data = _bonusManageBLL.GetLeaderboardExtraPointList(leaderboardExtraPointReq.SelectSite,
-                leaderboardExtraPointReq.CategoryId, leaderboardExtraPointReq.Currency, leaderboardExtraPointReq.StartDate, 
+                leaderboardExtraPointReq.CategoryId, leaderboardExtraPointReq.Currency, leaderboardExtraPointReq.StartDate,
                 leaderboardExtraPointReq.EndDate, pageSize, ref pageNumber, out totalPages, out rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
@@ -696,7 +717,7 @@ namespace BackendSite.Controllers.Api
             };
             var UserName = _authorizeBLL.GetAuthData().UserName;
             var rtn = _bonusManageBLL.SetLeaderboardExtraPoint(
-                setLeaderboardExtraPointReq.ActiveDate, setLeaderboardExtraPointReq.SiteId, setLeaderboardExtraPointReq.CategoryId, 
+                setLeaderboardExtraPointReq.ActiveDate, setLeaderboardExtraPointReq.SiteId, setLeaderboardExtraPointReq.CategoryId,
                 setLeaderboardExtraPointReq.UserName, setLeaderboardExtraPointReq.ExtraPoint, UserName
                 );
             if (rtn == 0)
