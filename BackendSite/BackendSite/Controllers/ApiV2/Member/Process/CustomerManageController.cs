@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
-    [Authorize]
+    //[Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class CustomerManageController : ControllerBase
@@ -280,14 +280,160 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             /// </summary>
             public int Status { get; set; }
         }
+        
+        public class GetFinancialLogReq
+        {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public int CustId { get; set; }
+            public DateTimeOffset? StartDate
+            {
+                get => _startDate;
+                set
+                {
+                    if (value != null)
+                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset? EndDate
+            {
+                get => _endDate;
+                set
+                {
+                    if (value != null)
+                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public string RefTransId { get; set; }
+            public int PageNumber { get; set; }
+        }
 
         public class GetBonusLogRequest :ApiRequestPageModel
         {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
             public int CustId { get; set; }
             public int PromoCategoryId { get; set; }
-            public long? StartDate { get; set; }
-            public long? EndDate { get; set; }
+            public DateTimeOffset? StartDate
+            {
+                get => _startDate;
+                set
+                {
+                    if (value != null)
+                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset? EndDate
+            {
+                get => _endDate;
+                set
+                {
+                    if (value != null)
+                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
             public string RefTransId { get; set; }
+        }
+        
+        public class VipRebateInfoByCustIdPara
+        {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public int CustId { get; set; }
+            public DateTimeOffset? StartDate
+            {
+                get => _startDate;
+                set
+                {
+                    if (value != null)
+                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset? EndDate
+            {
+                get => _endDate;
+                set
+                {
+                    if (value != null)
+                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public int PageNumber { get; set; }
+        }
+        
+        public class CustTpBetRecordListOneDayReq
+        {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public int CustId { get; set; }
+            public DateTime SelDate { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
+        
+        public class CustTpBetRecordListReq
+        {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public int CustId { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
+        
+        public class CustTpBetRecordListbyCategoryIdReq
+        {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public int CustId { get; set; }
+            public DateTime SelDate { get; set; }
+            public int CategoryId { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
+        
+        public class CustTpBetRecordDetailListbyGameTypeReq
+        {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public int CustId { get; set; }
+            public DateTime SelDate { get; set; }
+            public int GameTypeId { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
         }
 
         #endregion
@@ -1106,24 +1252,24 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Http Method：POST
         /// 
         /// Func Path：CSD > Customer Administration > CustInfo > Bonus Log > [Submit]
-        /// 
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         public ApiResult GetBonusLog(GetBonusLogRequest request)
         {
             var pageNumber = request.PageNumber;
-            var totalPages = 0;
-            var rowCount = 0;
+            var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
+            var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
+            
             var data = _paymentBll.GetBonusLog(request.CustId,
                 request.PromoCategoryId,
-                request.StartDate,
-                request.EndDate,
+                startDate,
+                endDate,
                 request.RefTransId,
                 request.PageSize,
                 ref pageNumber,
-                out totalPages,
-                out rowCount);
+                out var totalPages,
+                out var rowCount);
 
             return new ApiListResult<BonusLog>
             {
@@ -1134,7 +1280,32 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
+        
+        /// <summary>
+        /// CustomerManage/GetPromotionCategory
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// CSD > Customer Administration > CustInfo > Bonus Log [Promotion Category]
+        /// </remarks>
+        /// <returns></returns>
+        public ApiResult<IEnumerable<PromotionCategory>> GetPromotionCategory()
+        {
+            var data = _paymentBll.GetPromotionCategory();
+            
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
 
+            return new ApiResult<IEnumerable<PromotionCategory>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        
         #endregion
 
         #region  CSD > Customer Administration > CustInfo > Tag
@@ -1238,6 +1409,220 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return apiResult;
         }
 
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > Financial Log
+
+        /// <summary>
+        /// CustomerManage/GetFinancialLog
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// CSD > Customer Administration > CustInfo > Financial Log
+        /// </remarks>
+        /// <param name="getFinancialLogReq"></param>
+        /// <returns></returns>
+        public ApiListResult<FinancialLog> GetFinancialLog(GetFinancialLogReq getFinancialLogReq)
+        {
+            var pageNumber = getFinancialLogReq.PageNumber;
+            var startDate = getFinancialLogReq.StartDate != new DateTimeOffset() ? getFinancialLogReq.StartDate?.DateTime : null;
+            var endDate = getFinancialLogReq.EndDate != new DateTimeOffset() ? getFinancialLogReq.EndDate?.DateTime : null;
+
+            var data = _paymentBll.GetFinancialLog(
+                getFinancialLogReq.CustId, 
+                startDate,
+                endDate,
+                getFinancialLogReq.RefTransId,
+                10, 
+                ref pageNumber, 
+                out var totalPages,
+                out var rowCount);
+            
+            return new ApiListResult<FinancialLog>
+            {
+                Data = data,
+                TotalPages = totalPages,
+                PageNumber = pageNumber,
+                RowCount = rowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > Vip Rebate Log
+
+        /// <summary>
+        /// CustomerManage/GetVipRebateInfoListByCustId
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// CSD > Customer Administration > CustInfo > Vip Rebate Log
+        /// </remarks>
+        /// <param name="para"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoListByCustId(VipRebateInfoByCustIdPara para)
+        {
+            var startDate = para.StartDate != new DateTimeOffset() ? para.StartDate?.DateTime : null;
+            var endDate = para.EndDate != new DateTimeOffset() ? para.EndDate?.DateTime : null;
+            
+            var searchResult = _paymentBll.GetVipRebateInfoListByCustId(
+                para.CustId,
+                startDate,
+                endDate,
+                10,
+                para.PageNumber);
+
+            return new ApiListResultCurrencyAmount<VipRebateInfo>
+            {
+                Data = searchResult.VipRebateInfoList,
+                TotalPages = searchResult.TotalPages,
+                PageNumber = searchResult.PageNumber,
+                RowCount = searchResult.RowCount,
+                CurrencyAmount = searchResult.CurrencyAmount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > Statement
+
+        /// <summary>
+        /// CustomerManage/GetCustTpBetRecordList
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// CSD > Customer Administration > CustInfo > Statement
+        /// </remarks>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecordList(
+            CustTpBetRecordListReq req)
+        {
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordByDate>>
+            {
+                Data = _paymentBll.GetCustTpBetRecordList(
+                    req.CustId,
+                    req.StartDate.DateTime, 
+                    req.EndDate.DateTime),
+                ErrorCode = (int) ErrorCodeEnum.Success
+            };
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// CustomerManage/TpBetRecordListOneDayRes
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// CSD > Customer Administration > CustInfo > Statement
+        /// </remarks>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<TpBetRecordListOneDayRes>> GetCustTpBetRecordListOneDay(
+            CustTpBetRecordListOneDayReq req)
+        {
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneDayRes>>
+            {
+                ErrorCode = (int) ErrorCodeEnum.Success,
+                Data = _paymentBll.GetCustTpBetRecordListOneDay(
+                    req.CustId,
+                    req.SelDate.Date,
+                    req.StartDate.DateTime, 
+                    req.EndDate.DateTime)
+            };
+            return apiResult;
+        }
+
+        /// <summary>
+        /// CustomerManage/GetCustTpBetRecordListByCategoryId
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// CSD > Customer Administration > CustInfo > Statement
+        /// </remarks>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<TpBetRecordbyCategoryIdRes>> GetCustTpBetRecordListByCategoryId(
+            CustTpBetRecordListbyCategoryIdReq req)
+        {
+            var apiResult = new ApiResult<IEnumerable<TpBetRecordbyCategoryIdRes>>
+            {
+                ErrorCode = (int) ErrorCodeEnum.Success,
+                Data = _paymentBll.GetCustTpBetRecordListbyCategoryId(
+                    req.CustId,
+                    req.SelDate.Date,
+                    req.CategoryId, 
+                    req.StartDate.DateTime,
+                    req.EndDate.DateTime)
+            };
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// CustomerManage/GetCustTpBetRecordDetailListByGameType
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// CSD > Customer Administration > CustInfo > Statement
+        /// </remarks>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiListResult<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListByGameType(
+            CustTpBetRecordDetailListbyGameTypeReq req)
+        {
+            var apiResult = new ApiListResult<TpBetRecordDetailbyGameType>();
+            var pageSize = req.PageSize;
+            var totalPages = 0;
+            var rowCount = 0;
+            var pageNumber = req.PageNumber;
+            var result = _paymentBll.GetCustTpBetRecordDetailListbyGameType(
+                req.CustId,
+                req.SelDate.Date,
+                req.GameTypeId,
+                req.StartDate.DateTime,
+                req.EndDate.DateTime,
+                pageSize,
+                ref pageNumber,
+                ref totalPages,
+                ref rowCount);
+
+            apiResult.ErrorCode = 0;
+            apiResult.Data = result;
+            apiResult.PageNumber = pageNumber;
+            apiResult.RowCount = rowCount;
+            apiResult.TotalPages = totalPages;
+            return apiResult;
+        }
+
+        /// <summary>
+        /// CustomerManage/GetTpBetRecordDetail
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// CSD > Customer Administration > CustInfo > Statement
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<dynamic>> GetTpBetRecordDetailAsync(GetTpBetRecordDetailRequest request)
+        {
+            return await _tpBll.GetBetDetail(request);
+        }
+        
         #endregion
 
         #region Private Methods
