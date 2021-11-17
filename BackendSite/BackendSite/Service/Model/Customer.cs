@@ -104,7 +104,7 @@ namespace BackendSite.Service.Model
         //public int VipLevel { get; set; }
         public string LevelName { get; set; }
         public string Agent { get; set; }
-        public DateTime RegTime { get; set; }
+        public DateTimeOffset RegTime { get; set; }
         public int Status { get; set; }
         public string SabaID { get; set; }
         public string SignupUrl { get; set; }
