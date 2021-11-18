@@ -124,7 +124,10 @@ namespace BackendSite.Controllers
                                                                     custInfoReq.AffId,
                                                                     selectCurrency,
                                                                     custInfoReq.BankAccountNumber?.Trim(),
-                                                                    selectStatus);
+                                                                    selectStatus,
+                                                                    TimeSpan.FromHours(8));
+
+            ExportCustInfo.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
 
             var stream = excelBLL.Export(ExportCustInfo);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportCustInfo)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

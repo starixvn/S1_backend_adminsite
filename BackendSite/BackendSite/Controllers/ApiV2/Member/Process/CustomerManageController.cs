@@ -524,7 +524,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             DateTimeOffset? startDate = null;
             DateTimeOffset? endDate = null;
 
-            if (_tools.StringConvertDateTimeOffset(request.StartDate, out var startDateResult, out _))
+            if (_tools.StringConvertDateTimeOffset(request.StartDate, out var startDateResult, out var timeZone))
             {
                 startDate = startDateResult.DateTime;
             }
@@ -549,7 +549,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                                     request.AffId,
                                                                     request.CurrencyIds,
                                                                     request.BankAccountNumber,
-                                                                    request.Statuses);
+                                                                    request.Statuses,
+                                                                    timeZone);
 
             var stream = _excelBll.Export(exportCustInfo);
             return _excelBll.ExcelFile(stream, "CustInfoList");
