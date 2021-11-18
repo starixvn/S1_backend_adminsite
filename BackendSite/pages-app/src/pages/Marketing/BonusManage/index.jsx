@@ -338,7 +338,6 @@ const App = () => {
 				})
 			}).then(
 				res => {
-					console.log(res.data.data);
 					return {
 						errorCode: res.data.errorCode,
 						data: res.data.data,
@@ -474,7 +473,9 @@ const App = () => {
 			promotionData: state.promotionList[idx],
 			clonePromotionData: {
 				bonusCode: state.promotionList[idx].bonusCode,
-				siteId: state.promotionList[idx].siteId
+				siteId: state.promotionList[idx].siteId,
+				cloneSpecialCode: "",
+				isSpecial: state.promotionList[idx].isSpecial
 			}
 		});
 	};
@@ -511,6 +512,9 @@ const App = () => {
 
 	const SubmitClone = () => {
 		if (!processing && state.clonePromotionData.cloneBonusCode) {
+			if(state.clonePromotionData.isSpecial && state.clonePromotionData.cloneSpecialCode.replace(/(^[\s]*)|([\s]*$)/g, "").length == 0){
+				return false;
+			}
 			if (isMountedRef.current) {
 				setProcessing(true);
 			}
@@ -518,6 +522,8 @@ const App = () => {
 				BonusCode: state.clonePromotionData.bonusCode,
 				SiteId: state.clonePromotionData.siteId,
 				NewBonusCode: state.clonePromotionData.cloneBonusCode,
+				NewSpecialCode: state.clonePromotionData.cloneSpecialCode,
+				IsSpecial: state.clonePromotionData.isSpecial
 			};
 			const SiteIds = [];
 			siteNameFilter.map((o) => {

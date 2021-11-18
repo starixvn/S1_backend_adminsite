@@ -104,7 +104,12 @@ export function reducer(state, action) {
 				...state,
 				popBoxIsOpen: action.popBoxIsOpen,
 				promotionData: action.promotionData,
-				clonePromotionData: { siteId: action.promotionData.siteId, bonusCode: action.promotionData.bonusCode }
+				clonePromotionData: {
+					siteId: action.promotionData.siteId, 
+					bonusCode: action.promotionData.bonusCode,
+					cloneSpecialCode: "",
+					isSpecial: action.promotionData.isSpecial,
+				}
 			};
 		case defActionType.HANDEL_POPBOXGEN:
 			return {
