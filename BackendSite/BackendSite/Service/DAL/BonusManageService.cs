@@ -655,16 +655,20 @@ namespace BackendSite.Service.DAL
         /// <param name="expectedSpecificRow"></param>
         /// <param name="expectedRebateRow"></param>
         /// <param name="expectedConditionRow"></param>
+        /// <param name="expectedCashBackRow"></param>
+        /// <param name="Operator"></param>
+        /// <param name="newSpecialCode"></param>
+        /// <param name="isSpecial"></param>
         /// <returns></returns>
         public bool DuplicatePromotionFlow(string bonusCode, int siteId, string newBonusCode, int expectedSpecificRow,
-            int expectedRebateRow, int expectedConditionRow, int expectedCashBackRow,string Operator)
+            int expectedRebateRow, int expectedConditionRow, int expectedCashBackRow,string Operator,string newSpecialCode, bool isSpecial)
         {
             using var connection =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             connection.Open();
             using var transaction = connection.BeginTransaction();
 
-            var promotionRessult = DuplicatePromotion(bonusCode, siteId, newBonusCode, connection, transaction);
+            var promotionRessult = DuplicatePromotion(bonusCode, siteId, newBonusCode, newSpecialCode, isSpecial, connection, transaction);
 
             if (!promotionRessult)
             {
@@ -721,6 +725,17 @@ namespace BackendSite.Service.DAL
             return true;
         }
 
+        public IEnumerable<CheckSpecialCodeDuplicate> CheckSpecialCodeDuplicate(PromotionInfo promotion)
+        {
+            var p = new DynamicParameters();
+
+            p.Add("_SpecialCode", promotion.SpecialCode);
+
+            using var conn =
+                    new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<CheckSpecialCodeDuplicate>("Admin_PromotionSpecialCode_Get", p,
+                commandType: CommandType.StoredProcedure);
+        }
         #endregion
 
         #region Private Methods
@@ -954,7 +969,7 @@ namespace BackendSite.Service.DAL
         /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        private bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode, MySqlConnection connection,
+        private bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode, string newSpecialCode, bool isSpecial, MySqlConnection connection,
             MySqlTransaction transaction)
         {
             var p = new DynamicParameters();
@@ -962,9 +977,11 @@ namespace BackendSite.Service.DAL
             p.Add("_BonusCode", bonusCode);
             p.Add("_SiteId", siteId);
             p.Add("_NewBonusCode", newBonusCode);
+            p.Add("_NewSpecialCode", newSpecialCode);
+            p.Add("_IsSpecial", isSpecial ? 1:0);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            connection.Execute("Admin_PromotionDuplicateV2_Set", p, transaction: transaction,
+            connection.Execute("Admin_PromotionDuplicate_Set_V3", p, transaction: transaction,
                 commandType: CommandType.StoredProcedure);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");

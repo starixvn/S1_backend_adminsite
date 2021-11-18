@@ -171,7 +171,6 @@ export default ({
 	titleData.forEach((e, i) => {
 		headerRows.push(<th key={`title-${i}`}>{e.columnTitle}</th>);
 	});
-
 	let bodyRows = promotionList.map((_data, d_idx) => {
 		let arr = titleData.map((element, t_idx) => {
 			let body_content = null;
