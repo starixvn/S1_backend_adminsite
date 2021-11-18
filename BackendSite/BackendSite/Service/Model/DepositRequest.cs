@@ -21,7 +21,7 @@ namespace BackendSite.Service.Model
         public decimal Amount { set; get; }
         public decimal ActualDeposit { set; get; }
         public string Comment { set; get; }
-        public DateTime CreateTime { set; get; }
+        public DateTimeOffset CreateTime { set; get; }
         [System.Text.Json.Serialization.JsonIgnore]
         public IDepositInfo oDepositInfo =>
                 DepositType switch
@@ -36,7 +36,7 @@ namespace BackendSite.Service.Model
         public int Status { set; get; }
         public bool Receipt { set; get; }
         public string RefId { set; get; }
-        public DateTime DepositTime { set; get; }
+        public DateTimeOffset? DepositTime { set; get; }
         public string AccountName { set; get; }
         public string AccountNo { set; get; }
         public string BankName { set; get; }
@@ -61,7 +61,7 @@ namespace BackendSite.Service.Model
         public string VipLevelName { set; get; }
         public int DepositCnt { set; get; }
         public int Flag { set; get; }
-        public DateTime? UpdateTime { set; get; }
+        public DateTimeOffset? UpdateTime { set; get; }
         public string ChannelName { set; get; }
         public int VipLevel { set; get; }
     }
@@ -79,9 +79,9 @@ namespace BackendSite.Service.Model
         public decimal Amount { set; get; }
         public decimal ActualDeposit { set; get; }
         public string Comment { set; get; }
-        public DateTime CreateTime { set; get; }
+        public DateTimeOffset CreateTime { set; get; }
         public bool FirstDeposit { set; get; }
-        public DateTime DepositTime { set; get; }
+        public DateTimeOffset? DepositTime { set; get; }
         public string RefId { set; get; }
         public int Status { set; get; }
         public string AccountName { set; get; }
@@ -107,7 +107,7 @@ namespace BackendSite.Service.Model
         public int IsRisk { set; get; }
         public int DepositCnt { set; get; }
         public string Operator { set; get; }
-        public DateTime? UpdateTime { set; get; }
+        public DateTimeOffset? UpdateTime { set; get; }
         public string AffiliateCode { get; set; }
 
     }
@@ -182,7 +182,7 @@ namespace BackendSite.Service.Model
     public class Comments
     {
         public string Comment { get; set; }
-        public DateTime CreateTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
         public int Action { get; set; }
 
         public string ActionString { get; set; }

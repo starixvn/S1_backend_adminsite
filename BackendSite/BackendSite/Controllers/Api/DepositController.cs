@@ -60,12 +60,25 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResultCurrencyAmount<DepositRequest> GetDepositRequestList(DepositListReq depositListReq)
         {
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(depositListReq.startDate);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(depositListReq.endDate);
             var apiListResult = new ApiListResultCurrencyAmount<DepositRequest>();
             var pageNumber = depositListReq.PageNumber;
             var totalPages = 0;
             var rowCount = 0;
             var CurrencyAmount = new List<string>();
-            var depositRequestList = depositBLL.GetDepositRequestList(depositListReq.SelectSite, depositListReq.DepositType, depositListReq.startDate, depositListReq.endDate, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, depositListReq.LevelStatus, 10, depositListReq.AmountType, depositListReq.Amount, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
+            
+            var depositRequestList = depositBLL.GetDepositRequestList(depositListReq.SelectSite, depositListReq.DepositType, startTime, endTime, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, depositListReq.LevelStatus, 10, depositListReq.AmountType, depositListReq.Amount, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
+
+            foreach (var data in depositRequestList)
+            {
+                data.CreateTime =new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (data.DepositTime != null)
+                    data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (data.UpdateTime != null)
+                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+            
             apiListResult.Data = depositRequestList;
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;
@@ -136,6 +149,12 @@ namespace BackendSite.Controllers.Api
             {
                 var depositRequest = depositBLL.GetDepositRequest(depositReq.TransId);
 
+                depositRequest.CreateTime =new DateTimeOffset(depositRequest.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (depositRequest.DepositTime != null)
+                    depositRequest.DepositTime = new DateTimeOffset(depositRequest.DepositTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (depositRequest.UpdateTime != null)
+                    depositRequest.UpdateTime = new DateTimeOffset(depositRequest.UpdateTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                
                 apiResult.Data = depositRequest;
                 apiResult.ErrorCode = 0;
             }
@@ -152,6 +171,12 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<Comments>>();
             var comments = depositBLL.GetDepositRequestComment(depositReq.TransId);
+            
+            foreach (var data in comments)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8,0,0)).AddHours(8);
+            }
+            
             apiResult.Data = comments;
             apiResult.ErrorCode = 0;
             return apiResult;
