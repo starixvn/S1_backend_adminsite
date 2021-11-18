@@ -69,7 +69,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
-        /// GetAllData/GetTpCategoryList 取得第三方遊戲大分類清單
+        /// GetAllData/GetTpCategory 取得第三方遊戲大分類清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -77,7 +77,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// Func Path： [Available Category]
         /// </remarks>
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategoryList()
+        public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategory()
         {
             var data = await _reportBll.GetTpCategoryList();
             var apiResult = new ApiResult<IEnumerable<TpCategoryBetLimit>>

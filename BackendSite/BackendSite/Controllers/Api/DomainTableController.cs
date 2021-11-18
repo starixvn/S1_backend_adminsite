@@ -11,6 +11,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class DomainTableController
     {
         private readonly DomainTableBLL domainTableBLL;

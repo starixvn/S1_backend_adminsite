@@ -73,7 +73,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         #endregion
 
         /// <summary>
-        /// TpDisable/GetTpDisableUser 取得第三方被禁止的用戶資料清單
+        /// TpDisable/GetList 取得第三方被禁止的用戶資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -83,7 +83,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
-        public ApiListResult<TpDisableUser> GetTpDisableUserList(QueryTpDisableUserReq req)
+        public ApiListResult<TpDisableUser> GetList(QueryTpDisableUserReq req)
         {
             var apiResult = new ApiListResult<TpDisableUser>();
 
@@ -115,7 +115,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// TpDisable/GetTpDisableUserByCustId 取得指定第三方被禁止的會員資料
+        /// TpDisable/GetByCustId 取得指定第三方被禁止的會員資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -125,7 +125,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
-        public async Task<ApiResult<TpDisableUserForGameDetail>> GetTpDisableUserByCustId(TpDisableUserForGameDetailReq req)
+        public async Task<ApiResult<TpDisableUserForGameDetail>> GetByCustId(TpDisableUserForGameDetailReq req)
         {
             var apiResult = new ApiResult<TpDisableUserForGameDetail>();
             try
@@ -175,7 +175,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// TpDisable/TpDisableUserForGame 更新會員第三方被禁止的資料
+        /// TpDisable/Set 新增or更新會員第三方被禁止的資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -185,7 +185,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="disableGames"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
-        public async Task<ApiResult> TpDisableUserForGame(DisableUser disableGames)
+        public async Task<ApiResult> Set(DisableUser disableGames)
         {
             var apiResult = new ApiResult();
             try

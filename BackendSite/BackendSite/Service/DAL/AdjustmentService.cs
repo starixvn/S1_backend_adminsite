@@ -159,7 +159,7 @@ namespace BackendSite.Service.DAL
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<AdjustWithdrawalLimit>("Admin_AdjustWithdrawalLimitInfo_Get", props, commandType: CommandType.StoredProcedure);
+            var result = conn.Query<AdjustWithdrawalLimit>("Admin_AdjustWithdrawalLimitInfo_Get_V2", props, commandType: CommandType.StoredProcedure);
             TotalPages = props.Get<int?>("TotalPages") ?? 0;
             RowCount = props.Get<int?>("RowCount") ?? 0;
 

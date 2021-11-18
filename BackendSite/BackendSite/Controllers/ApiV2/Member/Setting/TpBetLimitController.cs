@@ -60,7 +60,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         #endregion
 
         /// <summary>
-        /// TpBetLimit/Get 取得會員下注限額資料清單
+        /// TpBetLimit/GetList 取得會員下注限額資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -69,7 +69,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        public ApiListResult<UserBetLimit> Get(QueryUserBetLimitReq req)
+        public ApiListResult<UserBetLimit> GetList(QueryUserBetLimitReq req)
         {
             var pageNumber = req.PageNumber;
             var datas = _userBetLimitBll.GetUserBetLimit(req.SiteIds, req.UserName, req.StartDate, req.EndDate,
@@ -112,7 +112,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// TpBetLimit/PostUserBetLimit 更新指定會員下注限額資料
+        /// TpBetLimit/Set 新增or更新指定會員下注限額資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -121,7 +121,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        public async Task<ApiResult> PostUserBetLimit(CustBetLimit req)
+        public async Task<ApiResult> Set(CustBetLimit req)
         {
             var updateOperator = User.Identity.Name;
             var customer = await _custInfoBll.GetCustId(req.UserName, req.SiteId);

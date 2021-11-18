@@ -66,7 +66,7 @@ namespace BackendSite.Service.DAL
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<Announcement>("Admin_AnnouncementV2_Get", props);
+            var result = _reportDbClient.Query<Announcement>("Admin_Announcement_Get_V2", props);
             totalPages = props.Get<int?>("TotalPages") ?? 0;
             rowCount = props.Get<int?>("RowCount") ?? 0;
 
@@ -75,10 +75,10 @@ namespace BackendSite.Service.DAL
 
         public Announcement GetAnnouncementById(int id)
         {
-            return _mainDbClient.QueryFirst<Announcement>("Admin_Announcement_GetById", new DynamicParameters(new {Id = id}));
+            return _mainDbClient.QueryFirst<Announcement>("Admin_Announcement_GetById_V2", new DynamicParameters(new {Id = id}));
         }
         
-        public Announcement AddAnnouncement(Announcement data, string creator, int creatorId, DateTimeOffset startTime, DateTimeOffset endTime)
+        public Announcement AddAnnouncement(AddAnnouncementModel data, string creator, int creatorId, DateTimeOffset startTime, DateTimeOffset endTime)
         {
             var result = new Announcement();
             var param = new DynamicParameters();
@@ -93,17 +93,17 @@ namespace BackendSite.Service.DAL
             param.Add("@CreatorId", creatorId);
             param.Add("@IsTest", data.IsTest);
 
-            _mainDbClient.Execute("Admin_Announcement_Ins", param);
+            _mainDbClient.Execute("Admin_Announcement_Ins_V2", param);
 
             var id = param.Get<int?>("@Id");
             if (id != null)
             {
-                result = _mainDbClient.QueryFirst<Announcement>("Admin_Announcement_GetById", new DynamicParameters(new {Id = id }));
+                result = _mainDbClient.QueryFirst<Announcement>("Admin_Announcement_GetById_V2", new DynamicParameters(new {Id = id }));
             }
             return result;
         }
 
-        public Announcement UpdateAnnouncement(Announcement data, string lastUpdater, int lastUpdaterId, DateTimeOffset startTime, DateTimeOffset endTime)
+        public Announcement UpdateAnnouncement(UpdateAnnouncementModel data, string lastUpdater, int lastUpdaterId, DateTimeOffset startTime, DateTimeOffset endTime)
         {
             var param = new DynamicParameters();
             param.Add("@Id", data.Id);
@@ -117,8 +117,8 @@ namespace BackendSite.Service.DAL
             param.Add("@LastUpdaterId", lastUpdaterId);
             param.Add("@IsTest", data.IsTest);
 
-            _mainDbClient.Execute("Admin_Announcement_Upd", param);
-            var result = _mainDbClient.QueryFirst<Announcement>("Admin_Announcement_GetById",new DynamicParameters(new { data.Id }));
+            _mainDbClient.Execute("Admin_Announcement_Upd_V2", param);
+            var result = _mainDbClient.QueryFirst<Announcement>("Admin_Announcement_GetById_V2",new DynamicParameters(new { data.Id }));
 
             return result;
         }
@@ -249,6 +249,7 @@ namespace BackendSite.Service.DAL
         {
             var props = new DynamicParameters();
             props.Add("@SelectSite", JsonConvert.SerializeObject(selectSite));
+            props.Add("@StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32);
             props.Add("@PageNumber", Math.Abs(pageNumber),DbType.Int32, ParameterDirection.InputOutput);
             props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -256,7 +257,7 @@ namespace BackendSite.Service.DAL
             props.Add("@StartDate", startDate.DateTime);
             props.Add("@EndDate", endDate.DateTime);
 
-            var result = _mainDbClient.Query<BatchMsg>("Admin_BatchMessageList_Get", props);
+            var result = _mainDbClient.Query<BatchMsg>("Admin_BatchMessageList_Get_V2", props);
             pageNumber = props.Get<int?>("@PageNumber") ?? 0;
             totalPages = props.Get<int?>("@TotalPages") ?? 0;
             rowCount = props.Get<int?>("@RowCount") ?? 0;

@@ -22,6 +22,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class WithdrawalBankAccountingController : ControllerBase
     {
         #region Fields
@@ -153,7 +154,7 @@ namespace BackendSite.Controllers.Api
         #region Action
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute),
-            Arguments = new object[] {"Finance/WithdrawalAccountingList"})]
+            Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
         public ApiResult GetWithdrawalInfoAndAccountingList(GetWithdrawalInfoAndAccountingListRequest request)
         {
             var result = _withdrawalBLL.GetWithdrawalInfoAndAccountingList(request.SiteIds,
@@ -168,7 +169,7 @@ namespace BackendSite.Controllers.Api
             return new ApiListResult<WithdrawalInfoAndAccountingListModel>
             {
                 Data = result.Datas,
-                ErrorCode = (int) ErrorCodeEnum.Success,
+                ErrorCode = (int)ErrorCodeEnum.Success,
                 PageNumber = result.PageNumber,
                 TotalPages = result.TotalPages,
                 RowCount = result.RowCount
@@ -209,7 +210,7 @@ namespace BackendSite.Controllers.Api
                 return new ApiResult<GetWithdrawalInfoAndAccountingModel>
                 {
                     Data = data,
-                    ErrorCode = (int) ErrorCodeEnum.Success
+                    ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
         }
@@ -223,14 +224,14 @@ namespace BackendSite.Controllers.Api
             {
                 return new ApiResult
                 {
-                    ErrorCode = (int) ErrorCodeEnum.Fail
+                    ErrorCode = (int)ErrorCodeEnum.Fail
                 };
             }
             else
                 return new ApiResult<GetWithdrawalBankAccountingModel>
                 {
                     Data = data,
-                    ErrorCode = (int) ErrorCodeEnum.Success
+                    ErrorCode = (int)ErrorCodeEnum.Success
                 };
         }
 
@@ -257,7 +258,7 @@ namespace BackendSite.Controllers.Api
                     OperatorName = authData.UserName,
                     OperateTime = DateTime.Now.AddHours(8)
                 },
-                ErrorCode = (int) ErrorCodeEnum.Success
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
 
@@ -283,7 +284,7 @@ namespace BackendSite.Controllers.Api
             {
                 return new ApiResult
                 {
-                    ErrorCode = (int) ErrorCodeEnum.Success,
+                    ErrorCode = (int)ErrorCodeEnum.Success,
                     Message = "Insert Successful."
                 };
             }
@@ -311,7 +312,7 @@ namespace BackendSite.Controllers.Api
             {
                 return new ApiResult
                 {
-                    ErrorCode = (int) ErrorCodeEnum.Success,
+                    ErrorCode = (int)ErrorCodeEnum.Success,
                     Message = "Update Successful."
                 };
             }
@@ -332,7 +333,7 @@ namespace BackendSite.Controllers.Api
 
                 return new ApiResult
                 {
-                    ErrorCode = (int) ErrorCodeEnum.Success,
+                    ErrorCode = (int)ErrorCodeEnum.Success,
                     Message = "Delete Successful."
                 };
             }
@@ -353,14 +354,14 @@ namespace BackendSite.Controllers.Api
                 {
                     return new ApiResult()
                     {
-                        ErrorCode = (int) ErrorCodeEnum.Success
+                        ErrorCode = (int)ErrorCodeEnum.Success
                     };
                 }
             }
 
             return new ApiResult()
             {
-                ErrorCode = (int) ErrorCodeEnum.Fail,
+                ErrorCode = (int)ErrorCodeEnum.Fail,
                 Message = "Upload Fail."
             };
         }
@@ -381,14 +382,14 @@ namespace BackendSite.Controllers.Api
             {
                 return new ApiResult()
                 {
-                    ErrorCode = (int) ErrorCodeEnum.Fail,
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
                     Message = "Delete Fail."
                 };
             }
 
             return new ApiResult()
             {
-                ErrorCode = (int) ErrorCodeEnum.Success,
+                ErrorCode = (int)ErrorCodeEnum.Success,
                 Message = "Delete Successful."
             };
         }
@@ -399,7 +400,7 @@ namespace BackendSite.Controllers.Api
             return new ApiResult<bool>()
             {
                 Data = await CheckAccountingPictureAsync(request.TransId, request.Seq, request.UploadPicTimes),
-                ErrorCode = (int) ErrorCodeEnum.Success
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
 

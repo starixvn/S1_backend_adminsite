@@ -52,15 +52,15 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters();
             p.Add("_SiteIds", JsonConvert.SerializeObject(siteIds));
             p.Add("_UserName", userName);
-            p.Add("_StartDate", startDate.DateTime.AddDays(1).AddSeconds(-1));
-            p.Add("_EndDate", endDate.DateTime);
+            p.Add("_StartDate", startDate.DateTime);
+            p.Add("_EndDate", endDate.DateTime.AddDays(1).AddSeconds(-1));
             p.Add("_PageSize", Math.Abs(pageSize));
             p.Add("_PageNumber", Math.Abs(pageNumber));
             p.Add("_StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
          
-            var result = _reportDbClient.Query<UserBetLimit>("Admin_CustBetLimitV2_Get", p);
+            var result = _reportDbClient.Query<UserBetLimit>("Admin_CustBetLimit_Get_V2", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             return result;

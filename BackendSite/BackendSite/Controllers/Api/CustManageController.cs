@@ -23,6 +23,7 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class CustManageController : ControllerBase
     {
         #region Fields
@@ -334,6 +335,22 @@ namespace BackendSite.Controllers.Api
         {
             int totalPages = 0, rowCount = 0;
             var pageNumber = custInfoListReq.PageNumber;
+            DateTime? startDate = null;
+            DateTime? endDate = null;
+
+            if (custInfoListReq.StartDate != null)
+            {
+                if (custInfoListReq.StartDate > 2147483647)
+                    custInfoListReq.StartDate = 2147483647;
+                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoListReq.StartDate);
+            }
+
+            if (custInfoListReq.EndDate != null)
+            {
+                if (custInfoListReq.EndDate > 2147483647)
+                    custInfoListReq.EndDate = 2147483647;
+                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoListReq.EndDate);
+            }
 
             var data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite,
                                                    custInfoListReq.BirDate,
@@ -346,8 +363,8 @@ namespace BackendSite.Controllers.Api
                                                    custInfoListReq.TpUserName?.Trim(),
                                                    custInfoListReq.Email?.Trim(),
                                                    custInfoListReq.PhoneNo?.Trim(),
-                                                   custInfoListReq.StartDate,
-                                                   custInfoListReq.EndDate,
+                                                   startDate,
+                                                   endDate,
                                                    custInfoListReq.PageSize,
                                                    custInfoListReq.AffId,
                                                    custInfoListReq.SelectCurrency,
@@ -406,6 +423,24 @@ namespace BackendSite.Controllers.Api
             //{
             //    selectStatus = Array.ConvertAll<string, int>(custInfoReq.SelectStatus.Split(','), s => int.Parse(s)).ToList();
             //}
+
+            DateTime? startDate = null;
+            DateTime? endDate = null;
+
+            if (custInfoReq.StartDate != null)
+            {
+                if (custInfoReq.StartDate > 2147483647)
+                    custInfoReq.StartDate = 2147483647;
+                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoReq.StartDate);
+            }
+
+            if (custInfoReq.EndDate != null)
+            {
+                if (custInfoReq.EndDate > 2147483647)
+                    custInfoReq.EndDate = 2147483647;
+                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoReq.EndDate);
+            }
+
             var ExportCustInfo = custInfoBLL.GetCustInfoExportList(custInfoReq.SelectSite,
                                                                     custInfoReq.BirDate,
                                                                     custInfoReq.BirMonth,
@@ -417,8 +452,8 @@ namespace BackendSite.Controllers.Api
                                                                     custInfoReq.TpUserName,
                                                                     custInfoReq.Email,
                                                                     custInfoReq.PhoneNo,
-                                                                    custInfoReq.StartDate,
-                                                                    custInfoReq.EndDate,
+                                                                    startDate,
+                                                                    endDate,
                                                                     custInfoReq.AffId,
                                                                     custInfoReq.SelectCurrency,
                                                                     custInfoReq.BankAccountNumber,
@@ -850,7 +885,7 @@ namespace BackendSite.Controllers.Api
         }
 
         #endregion
-        
+
         #region CSD > Customer Administration > CustInfo [ResetCustUSDTInfo]
 
         [HttpPost]
@@ -1458,7 +1493,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiListResult<CustTele> GetTeleCSD(TeleCSDpara para)
         {
             var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate);
@@ -1472,7 +1506,7 @@ namespace BackendSite.Controllers.Api
                                                       para.CallOut,
                                                       para.PageNumber,
                                                       para.PageSize);
-            
+
             if (SearchResult.CustTeleList.Count == 0)
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
@@ -1481,7 +1515,7 @@ namespace BackendSite.Controllers.Api
             {
                 foreach (var list in SearchResult.CustTeleList)
                 {
-                    list.RegTime = new DateTimeOffset(list.RegTime.DateTime,new TimeSpan(8,0,0)).AddHours(8);
+                    list.RegTime = new DateTimeOffset(list.RegTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
 
                     if (list.UpdateAt != null)
                     {
@@ -1492,10 +1526,10 @@ namespace BackendSite.Controllers.Api
                             updateAtArray[i] = DateTime.Parse(updateAtArray[i]).AddHours(8).ToString("yyyy-MM-dd HH:mm:ss");
                             list.UpdateAt += $"{updateAtArray[i]},";
                         }
-                        list.UpdateAt = list.UpdateAt.Remove(list.UpdateAt.LastIndexOf(","), 1); 
-                    
+                        list.UpdateAt = list.UpdateAt.Remove(list.UpdateAt.LastIndexOf(","), 1);
+
                         var operatorArray = list.Operator.Split(',');
-                    
+
                         list.UpdateRemark = new List<string>();
                         for (var i = 0; i < updateAtArray.Length; i++)
                         {
@@ -1503,7 +1537,7 @@ namespace BackendSite.Controllers.Api
                         }
                     }
                 }
-                
+
                 return new ApiListResult<CustTele>
                 {
                     Data = SearchResult.CustTeleList,
@@ -1529,7 +1563,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult UpdateCustomerTele(TeleCSDUpdatepara para)
         {
             if (custInfoBLL.UpdateCustomerTele(para.SiteId, para.CustId, User.Identity.Name) > 0)
@@ -1566,7 +1599,6 @@ namespace BackendSite.Controllers.Api
         /// <returns>檔案</returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult ExportTeleCSDData(string SiteIds,
                                                string Currency,
                                                int Deposit,
@@ -1587,13 +1619,13 @@ namespace BackendSite.Controllers.Api
 
             foreach (var data in exportData)
             {
-                data.RegDate = new DateTimeOffset(data.RegDate.DateTime,new TimeSpan(8,0,0)).AddHours(8);
-                if(data.FirstTimeCall != string.Empty)
-                    data.FirstTimeCall = $"{DateTime.Parse(data.FirstTimeCall.Substring(0,19)).AddHours(8):yyyy-MM-dd HH:mm:ss}-{data.FirstTimeCall.Substring(20,data.FirstTimeCall.Length-20)}";
-                if(data.SecondTimeCall != string.Empty)
-                    data.SecondTimeCall = $"{DateTime.Parse(data.SecondTimeCall.Substring(0,19)).AddHours(8):yyyy-MM-dd HH:mm:ss}-{data.SecondTimeCall.Substring(20,data.SecondTimeCall.Length-20)}";
-                if(data.ThirdTimeCall != string.Empty)
-                    data.ThirdTimeCall = $"{DateTime.Parse(data.ThirdTimeCall.Substring(0,19)).AddHours(8):yyyy-MM-dd HH:mm:ss}-{data.ThirdTimeCall.Substring(20,data.ThirdTimeCall.Length-20)}";
+                data.RegDate = new DateTimeOffset(data.RegDate.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (data.FirstTimeCall != string.Empty)
+                    data.FirstTimeCall = $"{DateTime.Parse(data.FirstTimeCall.Substring(0, 19)).AddHours(8):yyyy-MM-dd HH:mm:ss}-{data.FirstTimeCall.Substring(20, data.FirstTimeCall.Length - 20)}";
+                if (data.SecondTimeCall != string.Empty)
+                    data.SecondTimeCall = $"{DateTime.Parse(data.SecondTimeCall.Substring(0, 19)).AddHours(8):yyyy-MM-dd HH:mm:ss}-{data.SecondTimeCall.Substring(20, data.SecondTimeCall.Length - 20)}";
+                if (data.ThirdTimeCall != string.Empty)
+                    data.ThirdTimeCall = $"{DateTime.Parse(data.ThirdTimeCall.Substring(0, 19)).AddHours(8):yyyy-MM-dd HH:mm:ss}-{data.ThirdTimeCall.Substring(20, data.ThirdTimeCall.Length - 20)}";
             }
             var stream = excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"TeleCSD_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
@@ -1657,7 +1689,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult EditTagManagement(EditTagManagementpara para)
         {
             if (custInfoBLL.EditTagManagement(para.Id, para.TagName, para.TagColour, para.Description, User.Identity.Name) > 0)
@@ -1688,7 +1719,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiListResult<TagData> GetTagData(GetTagDatapara para)
         {
             var apiResult = new ApiListResult<TagData>();
@@ -1728,7 +1758,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult SetTagStatus(SetTagStatuspara para)
         {
             if (custInfoBLL.SetTagStatus(para.Id, User.Identity.Name) > 0)
@@ -1866,7 +1895,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiListResult<RegLiveStatus> GetRegLiveStatusList(RegLiveStatusPara custInfoReq)
         {
             var apiResult = new ApiListResult<RegLiveStatus>();
@@ -1910,7 +1938,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult SetRegLiveStatus(SetRegLiveStatusPara para)
         {
             var apiResult = new ApiResult();
@@ -1940,7 +1967,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(AddRegLiveStatusNotes addCustNoteReq)
         {
             var apiResult = new ApiResult<IEnumerable<RegLiveStatusNotes>>
@@ -1972,7 +1998,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_add_note" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult AddRegLiveStatusNote(AddRegLiveStatusNotes addCustNoteReq)
         {
             var apiResult = new ApiResult();
@@ -2002,7 +2027,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_delete_note" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult DeleteRegLiveStatusNote(DeleteRegLiveStatusNotes deleteCustNoteReq)
         {
             var apiResult = new ApiResult();
@@ -2032,7 +2056,6 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_edit_note" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         public ApiResult EditRegLiveStatusNote(EditRegLiveStatusNotes EditRegLiveStatusNote)
         {
             var apiResult = new ApiResult();
@@ -2071,16 +2094,15 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public IActionResult ExportRegLiveStatusList(string SelectSite, 
-            int Currency, 
+        public IActionResult ExportRegLiveStatusList(string SelectSite,
+            int Currency,
             int DepositStatus,
-            int Status, 
-            string User, 
-            int Sort, 
-            long StartDate, 
-            long EndDate, 
-            string AffiliatesCode, 
+            int Status,
+            string User,
+            int Sort,
+            long StartDate,
+            long EndDate,
+            string AffiliatesCode,
             int AgentCodeType)
         {
             var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
