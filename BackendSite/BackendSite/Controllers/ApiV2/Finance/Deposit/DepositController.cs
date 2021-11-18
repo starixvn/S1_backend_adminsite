@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 {
-    //[Authorize]
+    [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DepositController : Controller
