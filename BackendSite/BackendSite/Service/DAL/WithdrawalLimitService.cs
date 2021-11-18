@@ -22,7 +22,7 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters(new { CustId = custId, UserName = userName, SiteId = siteId, WithdrawalLimit = withdrawalLimit, Memo = memo, RefTransId = refTransId });
             p.Add("AfterWithdrawalLimit", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-            var result = conn.Execute("Common_WithdrawalLimit_Set", p, transaction: trans, commandType: CommandType.StoredProcedure);
+            var result = conn.Execute("Common_WithdrawalLimit_Set", p, trans, commandType: CommandType.StoredProcedure);
             afterWithdrawalLimit = p.Get<decimal?>("AfterWithdrawalLimit") ?? 0;
             return result;
         }
