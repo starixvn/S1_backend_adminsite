@@ -224,7 +224,7 @@ namespace BackendSite.Controllers.Api
                 //如果是新增時有填SpecialCode 檢查SpecialCode是否有重複
                 if (isAdd && promotion.IsSpecial)
                 {
-                    if (_bonusManageBLL.CheckSpecialCodeDuplicate(promotion))
+                    if (_bonusManageBLL.CheckSpecialCodeDuplicate(promotion.SpecialCode))
                     {
                         apiResult.ErrorCode = 999;
                         apiResult.Message = "Duplicate Special Code.";
@@ -274,6 +274,15 @@ namespace BackendSite.Controllers.Api
 
             try
             {
+                if (duplicateRequest.IsSpecial)
+                {
+                    if (_bonusManageBLL.CheckSpecialCodeDuplicate(duplicateRequest.NewSpecialCode))
+                    {
+                        apiResult.ErrorCode = 99;
+                        apiResult.Message = "Duplicate datas abount Special Code.";
+                        return apiResult;
+                    }
+                }
                 apiResult.ErrorCode = _bonusManageBLL.DuplicatePromotion(duplicateRequest.BonusCode,
                     duplicateRequest.SiteId,
                     duplicateRequest.NewBonusCode, User.Identity.Name, duplicateRequest.NewSpecialCode, duplicateRequest.IsSpecial) ? 0 : 1;
