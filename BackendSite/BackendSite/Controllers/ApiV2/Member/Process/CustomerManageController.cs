@@ -1609,7 +1609,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #region CSD > Customer Administration > CustInfo > Login Log
 
         /// <summary>
-        /// CustomerManage/GetLoginLogByCust 取得指定客戶登入紀錄
+        /// CustomerManage/GetLoginLogByCustId 取得指定客戶登入紀錄
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -1619,7 +1619,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiListResult<LoginLog> GetLoginLogByCust(CustIdWithDateRangeAndPageRequest request)
+        public ApiListResult<LoginLog> GetLoginLogByCustId(CustIdWithDateRangeAndPageRequest request)
         {
             var apiListResult = new ApiListResult<LoginLog>();
             var withdrawalList = _custInfoBll.GetLoginLogByCust(request.CustId,
@@ -1716,7 +1716,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// CustomerManage/GetCustNotes 取得客戶備註
+        /// CustomerManage/GetCustNote 取得客戶備註
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -1726,7 +1726,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiListResult<CustNote> GetCustNotes(CustIdWithPageRequest request)
+        public ApiListResult<CustNote> GetCustNote(CustIdWithPageRequest request)
         {
 
             var Data = _custInfoBll.GetCustNotes(request.CustId,
@@ -1747,7 +1747,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// CustomerManage/SetCustNotes 設定客戶備註
+        /// CustomerManage/SetCustNote 設定客戶備註
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -1757,7 +1757,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult SetCustNotes(SetCustNoteRequest request)
+        public ApiResult SetCustNote(SetCustNoteRequest request)
         {
             if (request.Type == 1 && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteEdit"))
             {
@@ -1842,36 +1842,36 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return apiResult;
         }
 
-        /// <summary>
-        /// CustomerManage/GetCustLang 取得指定客戶語系
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo  > Personal Message > Get Customer Lang
-        /// 
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
-        [HttpPost]
-        public ApiResult<CustLang> GetCustLang(CustIdRequest request)
-        {
-            var apiResult = new ApiResult<CustLang>();
-            try
-            {
-                apiResult.Data = _messageBll.GetCustLang(request.CustId);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.RawMessage = ex.ToString();
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-            }
+        ///// <summary>
+        ///// CustomerManage/GetCustLang 取得指定客戶語系
+        ///// </summary>
+        ///// <remarks>
+        ///// 
+        ///// Http Method：POST
+        ///// 
+        ///// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo  > Personal Message > Get Customer Lang
+        ///// 
+        ///// </remarks>
+        ///// <param name="request"></param>
+        ///// <returns></returns>
+        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
+        //[HttpPost]
+        //public ApiResult<CustLang> GetCustLang(CustIdRequest request)
+        //{
+        //    var apiResult = new ApiResult<CustLang>();
+        //    try
+        //    {
+        //        apiResult.Data = _messageBll.GetCustLang(request.CustId);
+        //        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        apiResult.RawMessage = ex.ToString();
+        //        apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+        //    }
 
-            return apiResult;
-        }
+        //    return apiResult;
+        //}
 
         /// <summary>
         /// CustomerManage/SendPersonalMsg 送出指定客戶個人訊息
