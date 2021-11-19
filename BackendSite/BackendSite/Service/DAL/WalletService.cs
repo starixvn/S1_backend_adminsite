@@ -147,7 +147,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<RebateInfo> GetRebateInfoByCust(int CustId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var rebateInfoList = conn.Query<RebateInfo>("Admin_RebateInfoByCust_Get", new { CustId }, commandType: CommandType.StoredProcedure);
+            var rebateInfoList = conn.Query<RebateInfo>("Admin_RebateInfoByCust_Get_V2", new { CustId }, commandType: CommandType.StoredProcedure);
             return rebateInfoList;
         }
         public IEnumerable<RebateInfo> GetRebateInfoList(IEnumerable<int> selectSite, string userName, int rebateType, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)

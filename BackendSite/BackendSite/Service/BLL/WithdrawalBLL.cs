@@ -220,12 +220,27 @@ namespace BackendSite.Service.BLL
                 WithdrawalStatus.ToKyc, null, null, out _, out _);
         }
 
-        public IEnumerable<WithdrawalRequest> GetWithdrawalListByCust(int custId, string transId, int? status,
-            long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount,
+        public IEnumerable<WithdrawalRequest> GetWithdrawalListByCust(int custId,
+            string transId,
+            int? status,
+            DateTimeOffset startDate,
+            DateTimeOffset endDate,
+            int pageSize,
+            int pageNumber,
+            out int totalPages,
+            out int rowCount,
             ref List<string> currencyAmount)
         {
-            return _withdrawalService.GetWithdrawalListByCust(custId, transId, status, startDate, endDate, pageSize,
-                ref pageNumber, out totalPages, out rowCount, ref currencyAmount);
+            return _withdrawalService.GetWithdrawalListByCust(custId,
+                transId,
+                status,
+                startDate, 
+                endDate, 
+                Math.Abs(pageSize),
+                 (Math.Abs(pageNumber)-1)* Math.Abs(pageSize),
+                 out totalPages,
+                 out rowCount,
+                 ref currencyAmount);
         }
 
         public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(string selectSite, string withdrawalType,

@@ -6,6 +6,10 @@ namespace BackendSite.Service.Model
 {
     public class Promotion
     {
+        private DateTimeOffset _expiryTime { get; set; }
+
+        public DateTimeOffset _claimDate { get; set; }
+
         public int BonusId { get; set; }
         public string BonusCode { get; set; }
         public string Description { get; set; }
@@ -21,11 +25,19 @@ namespace BackendSite.Service.Model
         public decimal MaxBonus { get; set; }
         public decimal LockedAmount { get; set; }
         public decimal BonusAmount { get; set; }
-        public DateTime ExpiryTime { get; set; }
+        public DateTimeOffset ExpiryTime
+        {
+            get => _expiryTime;
+            set => _expiryTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public int BonusInfoStatus { get; set; }
         public int Sort { get; set; }
         public CustRollOver custRollOver { get; set; }
-        public DateTime ClaimDate { get;set; }
+        public DateTimeOffset ClaimDate
+        {
+            get => _claimDate;
+            set => _claimDate = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
     }
     public class PromotionListData
     {

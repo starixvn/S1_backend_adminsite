@@ -166,7 +166,29 @@ namespace BackendSite.Controllers.Api
             var totalPages = 0;
             var rowCount = 0;
             var apiResult = new ApiListResult<ReferralFriend>();
-            var data = referralManagementBLL.GetRefFriendList(refFriendListReq.CustId, refFriendListReq.StartDate, refFriendListReq.EndDate, PageSize, ref pageNumber, ref totalPages, ref rowCount);
+
+            DateTime? startTime = null;
+            DateTime? endTime = null;
+
+            if (refFriendListReq.StartDate != null)
+            {
+                if (refFriendListReq.StartDate > 2147483647)
+                {
+                    refFriendListReq.StartDate = 2147483647;
+                }
+                startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.StartDate);
+            }
+
+            if (refFriendListReq.EndDate != null)
+            {
+                if (refFriendListReq.EndDate > 2147483647)
+                {
+                    refFriendListReq.EndDate = 2147483647;
+                }
+                endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.EndDate);
+            }
+
+            var data = referralManagementBLL.GetRefFriendList(refFriendListReq.CustId, startTime, endTime, PageSize, ref pageNumber, ref totalPages, ref rowCount);
             foreach (var x in data)
             {
                 referralStatus.TryGetValue(x.Status, out var name);

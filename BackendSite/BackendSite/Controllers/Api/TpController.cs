@@ -53,12 +53,22 @@ namespace BackendSite.Controllers.Api
             var pageNumber = transferInfoReq.PageNumber;
             var totalPages = 0;
             var rowCount = 0;
+
+            if (transferInfoReq.startDate > 2147483647)
+                transferInfoReq.startDate = 2147483647;
+
+            if (transferInfoReq.endDate > 2147483647)
+                transferInfoReq.endDate = 2147483647;
+
+            var startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)transferInfoReq.startDate);
+            var endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)transferInfoReq.endDate);
+
             var data = tpBLL.GetTpTransferInfoByCust(transferInfoReq.CustId,
                                                      transferInfoReq.TransId,
-                                                     transferInfoReq.startDate,
-                                                     transferInfoReq.endDate,
+                                                     startDate,
+                                                     endDate,
                                                      10,
-                                                     ref pageNumber,
+                                                     transferInfoReq.PageNumber,
                                                      out totalPages,
                                                      out rowCount);
 
@@ -67,7 +77,7 @@ namespace BackendSite.Controllers.Api
                 Data = data,
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 TotalPages = totalPages,
-                PageNumber = pageNumber,
+                PageNumber = transferInfoReq.PageNumber,
                 RowCount = rowCount
             };
         }

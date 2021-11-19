@@ -110,17 +110,30 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetDepositListByCust(DepositListReq1 depositListReq)
         {
-            var pageNumber = depositListReq.PageNumber;
             var totalPages = 0;
             var rowCount = 0;
             decimal totalAmount = 0;
+
+            if (depositListReq.startDate > 2147483647)
+            {
+                depositListReq.startDate = 2147483647;
+            }
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)depositListReq.startDate);
+
+            if (depositListReq.endDate > 2147483647)
+            {
+                depositListReq.endDate = 2147483647;
+            }
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)depositListReq.endDate);
+
+
             var data = depositBLL.GetDepositListByCust(depositListReq.CustId,
                                                        depositListReq.TransId,
                                                        depositListReq.Status == 0 ? (int?)null : depositListReq.Status,
-                                                       depositListReq.startDate,
-                                                       depositListReq.endDate,
+                                                       startTime,
+                                                       endTime,
                                                        depositListReq.PageSize,
-                                                       ref pageNumber,
+                                                       depositListReq.PageNumber,
                                                        out totalPages,
                                                        out rowCount,
                                                        out totalAmount);
@@ -129,7 +142,7 @@ namespace BackendSite.Controllers.Api
             {
                 Data = data,
                 TotalPages = totalPages,
-                PageNumber = pageNumber,
+                PageNumber = depositListReq.PageNumber,
                 RowCount = rowCount,
                 TotalAmount = totalAmount,
                 ErrorCode = (int)ErrorCodeEnum.Success

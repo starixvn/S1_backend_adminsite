@@ -71,7 +71,7 @@ namespace BackendSite.Service.Model
         public string LangId { get; set; }
         public string Recipient { get; set; }
         public string Sender { get; set; }
-        public DateTime CreateTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
         public int Status { get; set; }
         public bool Flag { get; set; }
         public string ContentRemoveTag { get; set; }

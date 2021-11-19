@@ -209,9 +209,9 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.SetCustInfo(custId, Level, FullName, Birthday_Y, Birthday_M, Birthday_D, PhoneNumber, EMail, Operator);
         }
-        public IEnumerable<LoginLog> GetLoginLogByCust(int CustId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<LoginLog> GetLoginLogByCust(int CustId, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
         {
-            return custInfoService.GetLoginLogByCust(CustId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+            return custInfoService.GetLoginLogByCust(CustId, startDate, endDate, Math.Abs(pageSize), (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), out totalPages, out rowCount);
         }
         public bool SetResetPwd(int CustId, out string NewPassword)
         {
@@ -249,9 +249,15 @@ namespace BackendSite.Service.BLL
             return _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), out var CustId);
         }
 
-        public List<CustTurnoverRes> GetCustTurnover(int CustId, string GameTypes, long StartTime, long EndTime)
+        public List<CustTurnoverRes> GetCustTurnover(int CustId,
+            string GameTypes,
+            DateTimeOffset StartTime,
+            DateTimeOffset EndTime)
         {
-            var datas = custTurnoverService.GetCustTurnover(CustId, GameTypes, StartTime, EndTime);
+            var datas = custTurnoverService.GetCustTurnover(CustId,
+                GameTypes,
+                StartTime,
+                EndTime);
 
             var result = new List<CustTurnoverRes>();
 
@@ -280,13 +286,29 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        public IEnumerable<CustBankInfoLog> GetCustBankInfoLogList(int custId, int siteId)
+        public IEnumerable<CustBankInfoLog> GetCustBankInfoLogList(int custId,
+            int pageSize,
+            int pageNumber,
+            out int totalPages,
+            out int rowCount)
         {
-            return custInfoService.GetCustBankInfoLogList(custId, siteId);
+            return custInfoService.GetCustBankInfoLogList(custId,
+                 Math.Abs(pageSize),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                out totalPages,
+                out rowCount);
         }
-        public IEnumerable<CustCryptoWalletLog> GetCustCryptoWalletLogList(int custId, int siteId)
+        public IEnumerable<CustCryptoWalletLog> GetCustCryptoWalletLogList(int custId,
+            int pageSize,
+            int pageNumber,
+            out int totalPages,
+            out int rowCount)
         {
-            return custInfoService.GetCustCryptoWalletLogList(custId, siteId);
+            return custInfoService.GetCustCryptoWalletLogList(custId,
+                 Math.Abs(pageSize),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                out totalPages,
+                out rowCount); ;
         }
         public IEnumerable<CustBonus> GetCustBonus(int custId)
         {
@@ -307,7 +329,7 @@ namespace BackendSite.Service.BLL
             return custInfoService.GetTeleCSDExportData(siteIds, currency, startDate, endDate, deposit, dormantUser, callOut);
         }
 
-        public PromotionListData GetPromotionListByCustIdAndDate(int custId, long StartDate, long EndDate, int PageNumber, int PageSize)
+        public PromotionListData GetPromotionListByCustIdAndDate(int custId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
         {
             var result = promotionService.GetPromotionListByCustIdAndDate(custId, StartDate, EndDate, PageNumber, PageSize);
             if (result.PromotionList != null)
@@ -359,13 +381,21 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.AddCustNote(custId, Note, Operator);
         }
-        public IEnumerable<CustNote> GetCustNotes(int custId)
+        public IEnumerable<CustNote> GetCustNotes(int custId,
+            int pageSize,
+            int pageNumber,
+            out int totalPages,
+            out int rowCount)
         {
-            return custInfoService.GetCustNotes(custId);
+            return custInfoService.GetCustNotes(custId,
+                 Math.Abs(pageSize),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                out totalPages,
+                out rowCount);
         }
-        public bool SetCustNotes(int custId, int noteId, string note, int type, string Operator)
+        public bool SetCustNotes(int noteId, string note, int type, string Operator)
         {
-            return custInfoService.SetCustNotes(custId, noteId, note, type, Operator);
+            return custInfoService.SetCustNotes(noteId, note, type, Operator);
         }
 
         #endregion

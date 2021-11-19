@@ -133,7 +133,7 @@ namespace BackendSite.Service.DAL
             IEnumerable<PersonalMsg> result = null;
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
-            var SpName = "Admin_PersonalMessage_Get";
+            var SpName = "Admin_PersonalMessage_Get_V2";
             var props = new DynamicParameters();
             props.Add("@CustId", CustId, dbType: DbType.Int32);
             props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
@@ -156,10 +156,10 @@ namespace BackendSite.Service.DAL
             return conn.Query<CustLang>("Admin_CustLang_Get", new { CustId }, commandType: CommandType.StoredProcedure).FirstOrDefault();
         }
 
-        public void DeletePersonalMsg(int Id, int CustId)
+        public void DeletePersonalMsg(int Id)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            conn.Execute("Admin_PersonalMsg_Del", new { Id, CustId }, commandType: CommandType.StoredProcedure);
+            conn.Execute("Admin_PersonalMsg_Del", new { Id }, commandType: CommandType.StoredProcedure);
         }
         public bool SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
         {

@@ -23,6 +23,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly BankDetailBLL _bankDetailBll;
         private readonly UserBetLimitBLL _userBetLimitBll;
         private readonly GameCasinoBLL _gameCasinoBll;
+        private readonly CustInfoBLL _custInfoBll;
+        private readonly VipLevelBLL _vipLevelBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
         public BaseDataController(IServiceProvider provider)
@@ -30,6 +32,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _userBetLimitBll = provider.GetRequiredService<UserBetLimitBLL>();
             _gameCasinoBll = provider.GetRequiredService<GameCasinoBLL>();
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
+            _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
         }
 
         #region Model
@@ -87,17 +91,29 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// </summary>
             public int ChannelId { get; set; }
         }
-        
+
         public class GetTpGameTypeListByCategoryReq
         {
             public int CategoryId { get; set; }
         }
-        
+
         public class GameCasinoByTpIdReq
         {
             public int TpId { get; set; }
         }
-        
+
+        public class GetTagRequest
+        {
+            /// <summary>
+            /// 資料狀態(0 = All, 1 = Enable, 2 = Disable)
+            /// </summary>
+            public int Status { get; set; }
+        }
+
+        public class SiteIdRequest
+        {
+            public int SiteId { get; set; }
+        }
 
         #endregion
 
@@ -231,7 +247,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             {
                 var gameCasinoData = await _gameCasinoBll.GameCasinoByTPIdV3(req.TpId);
                 apiResult.Data = gameCasinoData;
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
@@ -241,7 +257,74 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-        
+
+        /// <summary>
+        /// BaseData/GetTagByStatus 取得指定狀態標籤資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Show Tag List in Status
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<TagData>> GetTagByStatus(GetTagRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<TagData>>();
+            try
+            {
+                var data = _custInfoBll.GetAllTag();
+
+                switch (request.Status)
+                {
+
+                    case 1: //1 = Enable
+                        data = data.Where(x => x.Status == 1);
+                        break;
+                    case 2:  //2 = Disable
+                        data = data.Where(x => x.Status == 0);
+                        break;
+                    case 0: //0 = All
+                    default:
+                        break;
+                }
+
+                apiResult.Data = data;
+
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
+            }
+            return apiResult;
+        }
+
+        /// <summary>
+        /// BaseData/GetVipLevelSettingBySiteId 取得指定品牌的VIP等級設定資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Get Vip Level Setting
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiListResult<VipLevelSetting> GetVipLevelSettingBySiteId(SiteIdRequest request)
+        {
+            var apiListResult = new ApiListResult<VipLevelSetting>
+            {
+                Data = _vipLevelBll.GetVipLevelSetting(request.SiteId),
+                ErrorCode = 0
+            };
+            return apiListResult;
+        }
+
         #region Private Methods
 
         private class BankInfoPayComparer : IEqualityComparer<Pay>
