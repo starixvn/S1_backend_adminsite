@@ -29,7 +29,6 @@ namespace BackendSite.Controllers.Api
         #region Fields
 
         private readonly CustInfoBLL custInfoBLL;
-        private readonly TpBLL tpBLL;
         private readonly WinLostReportService winLostReportService;
         private readonly PermissionBLL permissionBLL;
         private readonly ServerInfoBLL serverInfoBLL;
@@ -42,7 +41,6 @@ namespace BackendSite.Controllers.Api
         #region Constructors
 
         public CustManageController(CustInfoBLL custInfoBLL,
-                                    TpBLL tpBLL,
                                     WinLostReportService winLostReportService,
                                     PermissionBLL permissionBLL,
                                     ServerInfoBLL serverInfoBLL,
@@ -51,7 +49,6 @@ namespace BackendSite.Controllers.Api
                                     ExcelBLL excelBLL)
         {
             this.custInfoBLL = custInfoBLL;
-            this.tpBLL = tpBLL;
             this.winLostReportService = winLostReportService;
             this.permissionBLL = permissionBLL;
             this.serverInfoBLL = serverInfoBLL;
@@ -134,19 +131,6 @@ namespace BackendSite.Controllers.Api
             public int CustId { get; set; }
             public string UserName { get; set; }
             public string Reason { get; set; }
-        }
-
-        public class DepositRep3
-        {
-            public string BankName { set; get; }
-            public string BankLogo { set; get; }
-            public string BankSite { set; get; }
-            public string AccountNo { get; set; }
-            public string AccountName { get; set; }
-            public string TransId { get; set; }
-            public string PostScript { get; set; }
-            public decimal MinAmount { get; set; }
-            public decimal MaxAmount { get; set; }
         }
 
         public class CustInfosReq : CustInfoReq
@@ -252,15 +236,6 @@ namespace BackendSite.Controllers.Api
             public IEnumerable<int> SelectTag { get; set; }
         }
         #endregion
-
-        public class CustPromotionpara
-        {
-            public int CustId { get; set; }
-            public long StartDate { get; set; }
-            public long EndDate { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
-        }
 
         public class SetEnableDisableBonusPara
         {
@@ -1114,13 +1089,22 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<LoginLog> GetLoginLogByCust(LoginLogReq loginLogReq)
         {
             var apiListResult = new ApiListResult<LoginLog>();
-            var pageNumber = loginLogReq.PageNumber;
             var totalPages = 0;
             var rowCount = 0;
-            var withdrawalList = custInfoBLL.GetLoginLogByCust(loginLogReq.CustId, loginLogReq.startDate, loginLogReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
+
+            if (loginLogReq.startDate > 2147483647)
+                loginLogReq.startDate = 2147483647;
+
+            if (loginLogReq.endDate > 2147483647)
+                loginLogReq.endDate = 2147483647;
+
+            var startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)loginLogReq.startDate);
+            var endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)loginLogReq.endDate);
+
+            var withdrawalList = custInfoBLL.GetLoginLogByCust(loginLogReq.CustId, startDate, endDate, 10, loginLogReq.PageNumber, out totalPages, out rowCount);
             apiListResult.Data = withdrawalList;
             apiListResult.ErrorCode = 0;
-            apiListResult.PageNumber = pageNumber;
+            apiListResult.PageNumber = loginLogReq.PageNumber;
             apiListResult.TotalPages = totalPages;
             apiListResult.RowCount = rowCount;
 

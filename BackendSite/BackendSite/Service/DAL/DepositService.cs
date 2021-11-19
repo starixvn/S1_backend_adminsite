@@ -87,7 +87,7 @@ namespace BackendSite.Service.DAL
             DateTimeOffset startDate,
             DateTimeOffset endDate,
             int pageSize,
-            ref int pageNumber,
+            int startIndex,
             out int totalPages,
             out int rowCount,
             out decimal totalAmount)
@@ -98,18 +98,17 @@ namespace BackendSite.Service.DAL
             p.Add("_Status", Status, dbType: DbType.Int32);
             p.Add("_StartDate", startDate.DateTime);
             p.Add("_EndDate", endDate.DateTime);
-            p.Add("_StartIndex", pageSize, dbType: DbType.Int32);
-            p.Add("_PageNumber", pageSize, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            p.Add("_StartIndex", startIndex, dbType: DbType.Int32);
+            p.Add("_PageSize", pageSize, dbType: DbType.Int32);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("_StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_TotalAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var depositList = conn.Query<DepositRequest>("Admin_DepositInfoListByCust_Get_V5", p, commandType: CommandType.StoredProcedure);
-            totalPages = p.Get<int?>("TotalPages") ?? 0;
-            rowCount = p.Get<int?>("RowCount") ?? 0;
-            totalAmount = p.Get<decimal?>("TotalAmount") ?? 0;
+            totalPages = p.Get<int?>("_TotalPages") ?? 0;
+            rowCount = p.Get<int?>("_RowCount") ?? 0;
+            totalAmount = p.Get<decimal?>("_TotalAmount") ?? 0;
             return depositList;
         }
 

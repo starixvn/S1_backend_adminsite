@@ -97,7 +97,6 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetDepositListByCust(DepositListReq1 depositListReq)
         {
-            var pageNumber = depositListReq.PageNumber;
             var totalPages = 0;
             var rowCount = 0;
             decimal totalAmount = 0;
@@ -121,7 +120,7 @@ namespace BackendSite.Controllers.Api
                                                        startTime,
                                                        endTime,
                                                        depositListReq.PageSize,
-                                                       ref pageNumber,
+                                                       depositListReq.PageNumber,
                                                        out totalPages,
                                                        out rowCount,
                                                        out totalAmount);
@@ -130,7 +129,7 @@ namespace BackendSite.Controllers.Api
             {
                 Data = data,
                 TotalPages = totalPages,
-                PageNumber = pageNumber,
+                PageNumber = depositListReq.PageNumber,
                 RowCount = rowCount,
                 TotalAmount = totalAmount,
                 ErrorCode = (int)ErrorCodeEnum.Success

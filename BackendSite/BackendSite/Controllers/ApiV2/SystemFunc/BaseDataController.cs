@@ -259,7 +259,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
-        /// CustomerManage/GetTag 取得指定狀態標籤資料
+        /// BaseData/GetTagByStatus 取得指定狀態標籤資料
         /// </summary>
         /// <remarks>
         /// 
@@ -270,7 +270,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<TagData>> GetAllTag(GetTagRequest request)
+        public ApiResult<IEnumerable<TagData>> GetTagByStatus(GetTagRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<TagData>>();
             try
@@ -305,19 +305,17 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
-        /// VipLevel/GetVipLevelSetting 取得VIP等級設定資料
+        /// BaseData/GetVipLevelSettingBySiteId 取得指定品牌的VIP等級設定資料
         /// </summary>
         /// <remarks>
-        /// 
         /// Http Method：POST
         /// 
         /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Get Vip Level Setting
-        /// 
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiListResult<VipLevelSetting> GetVipLevelSetting(SiteIdRequest request)
+        public ApiListResult<VipLevelSetting> GetVipLevelSettingBySiteId(SiteIdRequest request)
         {
             var apiListResult = new ApiListResult<VipLevelSetting>
             {

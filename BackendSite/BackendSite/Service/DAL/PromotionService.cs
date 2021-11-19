@@ -20,7 +20,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<Promotion> GetPromotionListByCustId(int custId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<Promotion>("Admin_PromotionListByCustId_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+            return conn.Query<Promotion>("Admin_PromotionListByCustId_Get_V2", new { _CustId = custId }, commandType: CommandType.StoredProcedure);
         }
 
         //public int CancelBonusByBonusId(int bonusId)

@@ -45,12 +45,21 @@ namespace BackendSite.Service.BLL
             DateTimeOffset startDate,
             DateTimeOffset endDate,
             int pageSize,
-            ref int pageNumber,
+            int pageNumber,
             out int totalPages,
             out int rowCount,
             out decimal totalAmount)
         {
-            return depositService.GetDepositListByCust(CustId, TransId, Status, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount, out totalAmount);
+            return depositService.GetDepositListByCust(CustId,
+                TransId,
+                Status,
+                startDate,
+                endDate,
+                Math.Abs(pageSize),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                out totalPages,
+                out rowCount,
+                out totalAmount);
         }
 
         public int CreateDeposit(DepositDetailInfo deposit, IFormFile receipt)
