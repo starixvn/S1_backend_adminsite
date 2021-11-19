@@ -160,6 +160,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// CSD > Customer Administration > CustInfo > Bonus Log [Promotion Category]
         /// </remarks>
         /// <returns></returns>
+        [HttpPost]
         public ApiResult<IEnumerable<PromotionCategory>> GetPromotionCategory()
         {
             var data = _paymentBll.GetPromotionCategory();
