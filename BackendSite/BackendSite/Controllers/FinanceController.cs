@@ -84,7 +84,7 @@ namespace BackendSite.Controllers
             public string CurrencyId { get; set; }
             public long startDate { get; set; }
             public long endDate { get; set; }
-            public string status { get; set; }
+            public string Status { get; set; }
             public string LevelStatus { get; set; }
             public int AmountType { get; set; }
             public string Amount { get; set; }
@@ -93,10 +93,27 @@ namespace BackendSite.Controllers
         [HttpPost]
         public IActionResult ExportDepositList(DepositListReq depositListReq)
         {
-            var ExportDeposit = depositBLL.GetDepositExportList(depositListReq.SelectSite, depositListReq.DepositType, depositListReq.startDate, depositListReq.endDate, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, depositListReq.LevelStatus, depositListReq.AmountType, depositListReq.Amount);
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(depositListReq.startDate);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(depositListReq.endDate);
+            depositListReq.SelectSite =$"[{depositListReq.SelectSite}]";
+            depositListReq.DepositType =$"[{depositListReq.DepositType}]";
+            depositListReq.CurrencyId =$"[{depositListReq.CurrencyId}]";
+            depositListReq.Status =$"[{depositListReq.Status}]";
+            depositListReq.LevelStatus =$"[{depositListReq.LevelStatus}]";
+            
+            var exportDeposit = depositBLL.GetDepositExportList(depositListReq.SelectSite, depositListReq.DepositType, startTime, endTime, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.Status, depositListReq.LevelStatus, depositListReq.AmountType, depositListReq.Amount);
 
-            var stream = excelBLL.Export(ExportDeposit);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportDeposit)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            foreach (var data in exportDeposit)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if(data.DepositTime !=null)
+                    data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (data.UpdateTime != null) 
+                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+            
+            var stream = excelBLL.Export(exportDeposit);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(exportDeposit)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
         public class WithdrawalListReq
         {

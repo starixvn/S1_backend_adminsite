@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
-    //[Authorize]
+    [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class CustomerManageController : ControllerBase

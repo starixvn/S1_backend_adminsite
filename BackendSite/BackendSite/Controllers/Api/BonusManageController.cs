@@ -71,6 +71,8 @@ namespace BackendSite.Controllers.Api
             public string BonusCode { get; set; }
             public int SiteId { get; set; }
             public string NewBonusCode { get; set; }
+            public string NewSpecialCode { get; set; }
+            public bool IsSpecial { get; set; }
         }
 
         public class ReferralCustListReq
@@ -218,6 +220,18 @@ namespace BackendSite.Controllers.Api
             try
             {
                 //var errorCode = _bonusManageBLL.SetPromotion(IsAdd, Promotion);
+
+                //如果是新增時有填SpecialCode 檢查SpecialCode是否有重複
+                if (isAdd && promotion.IsSpecial)
+                {
+                    if (_bonusManageBLL.CheckSpecialCodeDuplicate(promotion.SpecialCode))
+                    {
+                        apiResult.ErrorCode = 999;
+                        apiResult.Message = "Duplicate Special Code.";
+                        return apiResult;
+                    }
+                }
+                
                 var errorCode = _bonusManageBLL.SetPromotion(isAdd, promotion, vipLevelCondition, User.Identity.Name) ? 0 : 1;
 
                 apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
@@ -260,9 +274,18 @@ namespace BackendSite.Controllers.Api
 
             try
             {
+                if (duplicateRequest.IsSpecial)
+                {
+                    if (_bonusManageBLL.CheckSpecialCodeDuplicate(duplicateRequest.NewSpecialCode))
+                    {
+                        apiResult.ErrorCode = 99;
+                        apiResult.Message = "Duplicate datas abount Special Code.";
+                        return apiResult;
+                    }
+                }
                 apiResult.ErrorCode = _bonusManageBLL.DuplicatePromotion(duplicateRequest.BonusCode,
                     duplicateRequest.SiteId,
-                    duplicateRequest.NewBonusCode, User.Identity.Name) ? 0 : 1;
+                    duplicateRequest.NewBonusCode, User.Identity.Name, duplicateRequest.NewSpecialCode, duplicateRequest.IsSpecial) ? 0 : 1;
                 apiResult.Message = apiResult.ErrorCode == 1
                     ? "Duplicate fail.The bonus setting already exists which with same promotion-type & product-category."
                     : string.Empty;
