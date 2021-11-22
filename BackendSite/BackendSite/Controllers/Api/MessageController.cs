@@ -320,7 +320,10 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
-                apiResult.Data = messageBLL.GetPersonalMsg(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                var data = messageBLL.GetPersonalMsg(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+
+                data.ToList().ForEach(s => s.CreateTime = new DateTimeOffset(s.CreateTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+                apiResult.Data = data;
                 apiResult.ErrorCode = 0;
 
                 apiResult.PageNumber = PageNumber;
@@ -436,7 +439,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
-                messageBLL.DeletePersonalMsg(Id, CustId);
+                messageBLL.DeletePersonalMsg(Id);
                 apiResult.Data = messageBLL.GetPersonalMsg(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
 

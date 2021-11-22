@@ -2,6 +2,7 @@
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 
 namespace BackendSite.Controllers.Api
@@ -37,15 +38,40 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         public ApiListResultCurrencyAmount<PaymentAdjustment> GetAdjustmentInfoByCust(GetAdjustmentInfoReq getAdjustmentInfoReq)
         {
-            var pageNumber = getAdjustmentInfoReq.PageNumber;
             var totalPages = 0;
             var rowCount = 0;
             var CurrencyAmount = new List<string>();
+
+            DateTime? startDate = null;
+            DateTime? endDate = null;
+
+            if (getAdjustmentInfoReq.StartDate != null)
+            {
+                if (getAdjustmentInfoReq.StartDate > 2147483647)
+                    getAdjustmentInfoReq.StartDate = 2147483647;
+                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getAdjustmentInfoReq.StartDate);
+            }
+
+            if (getAdjustmentInfoReq.EndDate != null)
+            {
+                if (getAdjustmentInfoReq.EndDate > 2147483647)
+                    getAdjustmentInfoReq.EndDate = 2147483647;
+                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getAdjustmentInfoReq.EndDate);
+            }
+
+
             var apiListResult = new ApiListResultCurrencyAmount<PaymentAdjustment>
             {
-                Data = paymentAdjustmentBLL.GetAdjustmentInfoByCust(getAdjustmentInfoReq.CustId, getAdjustmentInfoReq.StartDate, getAdjustmentInfoReq.EndDate, 10, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount),
+                Data = paymentAdjustmentBLL.GetAdjustmentInfoByCust(getAdjustmentInfoReq.CustId,
+                startDate,
+                endDate,
+                10,
+                getAdjustmentInfoReq.PageNumber,
+                out totalPages,
+                out rowCount,
+                ref CurrencyAmount),
                 ErrorCode = 0,
-                PageNumber = pageNumber,
+                PageNumber = getAdjustmentInfoReq.PageNumber,
                 TotalPages = totalPages,
                 RowCount = rowCount,
                 CurrencyAmount = CurrencyAmount
