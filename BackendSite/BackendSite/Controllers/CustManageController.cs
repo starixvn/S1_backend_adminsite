@@ -108,7 +108,7 @@ namespace BackendSite.Controllers
             }
 
        
-            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(selectSite,
+            var data = custInfoBLL.GetCustInfoExportList(selectSite,
                                                                     custInfoReq.BirDate,
                                                                     custInfoReq.BirMonth,
                                                                     custInfoReq.BirYear,
@@ -126,8 +126,10 @@ namespace BackendSite.Controllers
                                                                     custInfoReq.BankAccountNumber?.Trim(),
                                                                     selectStatus);
 
-            var stream = excelBLL.Export(ExportCustInfo);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportCustInfo)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+
+            var stream = excelBLL.Export(data);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(data)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
         #endregion
