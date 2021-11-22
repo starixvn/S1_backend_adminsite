@@ -74,8 +74,8 @@ namespace BackendSite.Service.DAL
             return result;
         }
         public IEnumerable<ReferralFriend> GetRefFriendList(int custId,
-            DateTimeOffset? startDate,
-            DateTimeOffset? endDate,
+            DateTime? startDate,
+            DateTime? endDate,
             int pageSize,
             int startIndex,
             out int TotalPages,
@@ -85,8 +85,8 @@ namespace BackendSite.Service.DAL
             var SpName = "Admin_ReferralFriendList_Get_V3";
             var props = new DynamicParameters();
             props.Add("_CustId", custId);
-            props.Add("_StartDate", startDate == null ? null : startDate);
-            props.Add("_EndDate", endDate == null ? null : endDate);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
             props.Add("_PageSize", pageSize);
             props.Add("_StartIndex", startIndex);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
