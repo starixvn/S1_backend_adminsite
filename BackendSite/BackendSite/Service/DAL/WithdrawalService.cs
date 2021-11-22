@@ -304,23 +304,20 @@ namespace BackendSite.Service.DAL
             
             var searchData = new WithdrawalTimeData();
             var props = new DynamicParameters();
-            using var conn =
-                new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            int.TryParse(para.WithdrawalID, out var tempWithdrawalId);
+            int.TryParse(para.WithdrawalId, out var tempWithdrawalId);
 
             props.Add("SelectSite", selectSite);
             props.Add("WithdrawalId", tempWithdrawalId);
-            props.Add("StartDate", para.StartDate);
-            props.Add("EndDate", para.EndDate);
+            props.Add("StartDate", para.StartDate.DateTime);
+            props.Add("EndDate", para.EndDate.DateTime);
             props.Add("SelectStatus", JsonConvert.SerializeObject(selectStatus));
             props.Add("CurrencyId", para.CurrencyId);
-            props.Add("PageNumber", para.PageNumber, DbType.Int32, ParameterDirection.InputOutput);
+            props.Add("StartIndex", (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize),DbType.Int32,ParameterDirection.Input);
+            props.Add("PageNumber", Math.Abs(para.PageNumber), DbType.Int32, ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("PageSize", para.PageSize);
-            var result = conn.Query<WithdrawalTimeList>("Admin_WithdrawalStatusTime_Get_V2", props,
-                commandType: CommandType.StoredProcedure).ToList();
+            props.Add("PageSize", Math.Abs(para.PageSize));
+            var result = _reportDbClient.Query<WithdrawalTimeList>("Admin_WithdrawalStatusTime_Get_V3", props).ToList();
 
             searchData.WithdrawalTimeList = result;
             searchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
@@ -329,8 +326,8 @@ namespace BackendSite.Service.DAL
             return searchData;
         }
 
-        public List<WithdrawalTimeList> GetExportData(IEnumerable<int> selectSite, string withdrawalId, long startDate,
-            long endDate, int status, int currencyId)
+        public List<WithdrawalTimeList> GetExportData(IEnumerable<int> selectSite, string withdrawalId, DateTime startDate,
+            DateTime endDate, int status, int currencyId)
         {
             var selectSiteString = JsonConvert.SerializeObject(selectSite);
             var selectStatus = new List<int>();
@@ -359,7 +356,7 @@ namespace BackendSite.Service.DAL
             props.Add("CurrencyId", currencyId);
             props.Add("WithdrawalId", tempWithdrawalId);
             props.Add("SelectStatus", selectStatusString);
-            return conn.Query<WithdrawalTimeList>("Admin_WithdrawalStatusTimeExport_Get_V2", props,
+            return conn.Query<WithdrawalTimeList>("Admin_WithdrawalStatusTimeExport_Get_V3", props,
                 commandType: CommandType.StoredProcedure).ToList();
         }
 
