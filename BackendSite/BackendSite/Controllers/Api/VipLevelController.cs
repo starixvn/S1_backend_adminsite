@@ -134,7 +134,11 @@ namespace BackendSite.Controllers.Api
         {
             var data = _vipLevelBLL.GetVipLevelInfo(custIdReq.CustId);
 
-            data.QualifiedTime = new DateTimeOffset(data.QualifiedTime.DateTime.AddHours(8), TimeSpan.FromHours(8));
+            if(data != null)
+            {
+                data.QualifiedTime = new DateTimeOffset(data.QualifiedTime.DateTime.AddHours(8), TimeSpan.FromHours(8));
+
+            }
 
             var apiListResult = new ApiResult<VipLevelInfo>
             {
