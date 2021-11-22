@@ -351,39 +351,36 @@ namespace BackendSite.Service.BLL
         {
             return _withdrawalService.GetWithdrawalPicCount(transId);
         }
-
+        
         public WithdrawalTimeData WithdrawalTimeReportGet(WithdrawalTimeReportPara para)
         {
             var result = _withdrawalService.WithdrawalTimeReportGet(para);
 
-            if (result != null)
+            result?.WithdrawalTimeList.ForEach(x =>
             {
-                result.WithdrawalTimeList.ForEach(x =>
+                var ts1 = new TimeSpan(x.CreateTime.Ticks);
+                var timeSpanOfFlowEndTime = new TimeSpan(x.FlowEndTime.Ticks);
+                var ts = ts1.Subtract(timeSpanOfFlowEndTime).Duration();
+                x.CompleteTime = GetTimeString(ts);
+                if (x.VerifyTime > DateTime.Now.AddYears(-1000))
                 {
-                    var ts1 = new TimeSpan(x.CreateTime.Ticks);
-                    var timeSpanOfFlowEndTime = new TimeSpan(x.FlowEndTime.Ticks);
-                    var ts = ts1.Subtract(timeSpanOfFlowEndTime).Duration();
-                    x.CompleteTime = GetTimeString(ts);
-                    if (x.VerifyTime > DateTime.Now.AddYears(-1000))
+                    var ts3 = new TimeSpan(x.VerifyTime.Value.Ticks);
+                    var tsv = ts1.Subtract(ts3).Duration();
+                    if (x.Status == 6)
                     {
-                        var ts3 = new TimeSpan(x.VerifyTime.Ticks);
-                        var tsv = ts1.Subtract(ts3).Duration();
-                        if (x.Status == 6)
-                        {
-                            var tsa = ts3.Subtract(timeSpanOfFlowEndTime).Duration();
-                            x.ToApprovedTime = GetTimeString(tsa);
-                        }
-
-                        x.ToVerifyTime = GetTimeString(tsv);
+                        var tsa = ts3.Subtract(timeSpanOfFlowEndTime).Duration();
+                        x.ToApprovedTime = GetTimeString(tsa);
                     }
-                });
-            }
+
+                    x.ToVerifyTime = GetTimeString(tsv);
+                }
+            });
 
             return result;
         }
 
         public IEnumerable<WithdrawalTimeExportData> WithdrawalTimeExportGet(string selectSite, string withdrawalId,
-            long startDate, long endDate, int status, int currencyId)
+            DateTime startDate, DateTime endDate, int status, int currencyId)
         {
             var exportDataToExcel = new List<WithdrawalTimeExportData>();
             var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(selectSite);
@@ -403,10 +400,10 @@ namespace BackendSite.Service.BLL
                     var tempToApprovedTime = "";
                     if (x.VerifyTime > DateTime.Now.AddYears(-1000))
                     {
-                        var ts2 = new TimeSpan(x.VerifyTime.Ticks);
+                        var ts2 = new TimeSpan(x.VerifyTime.Value.Ticks);
                         if (x.ProcessTime>DateTime.Now.AddYears(-1000))
                         {
-                            var ts3 = new TimeSpan(x.ProcessTime.Ticks);
+                            var ts3 = new TimeSpan(x.ProcessTime.Value.Ticks);
                             var tsp = ts2.Subtract(ts3).Duration();
                             tempToProcessTime = GetTimeString(tsp);
                         }
@@ -427,7 +424,7 @@ namespace BackendSite.Service.BLL
                     || x.Status == (int)WithdrawalStatus.Approved
                     || x.Status == (int)WithdrawalStatus.Rejected)
                     {
-                        flowEndTime = x.FlowEndTime;
+                        flowEndTime = x.FlowEndTime.DateTime;
                     }
 
                     exportDataToExcel.Add(new WithdrawalTimeExportData

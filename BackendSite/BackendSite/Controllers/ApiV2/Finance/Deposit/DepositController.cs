@@ -17,7 +17,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class DepositController : Controller
+    public class DepositController : ControllerBase
     {
         #region Fields
 
@@ -122,6 +122,26 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             public IEnumerable<int> LevelStatus { get; set; }
             public int AmountType { get; set; }
             public string Amount { get; set; }
+        }
+        
+        public class ExportDepositTimeReq
+        {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public string DepositId { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public int Status { get; set; }
+            public int CurrencyId { get; set; }
         }
 
         #endregion
@@ -447,9 +467,80 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(exportDeposit)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
         
+         #region Finance > Withdrawal Time Report > [Submit]
+
+         /// <summary>
+         /// Deposit/DepositTimeReportGet 
+         /// </summary>
+         /// <remarks>
+         /// Http Method：POST
+         /// 
+         /// Func Path：Finance >  Deposit Time Report > [Submit]
+         /// </remarks>
+         /// <param name="req"></param>
+         [HttpPost]
+         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
+         public ApiListResult<DepositTimeList> DepositTimeReportGet(DepositTimeReportPara req)
+         {
+             var apiListResult = new ApiListResult<DepositTimeList>();
+             try
+             {
+                 var searchResult = _depositBll.DepositTimeReportGet(req);
+                 foreach (var data in searchResult.DepositTimeList)
+                 {
+                     data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
+                     data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
+                     if (data.DepositTime != null)
+                         data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, TimeSpan.Zero);
+                 }
+
+                 apiListResult.Data = searchResult.DepositTimeList;
+                 apiListResult.PageNumber = searchResult.PageNumber;
+                 apiListResult.TotalPages = searchResult.TotalPages;
+                 apiListResult.RowCount = searchResult.RowCount;
+                 apiListResult.ErrorCode = (int) ErrorCodeEnum.Success;
+             }
+             catch (Exception ex)
+             {
+                 apiListResult.ErrorCode = (int) ErrorCodeEnum.SystemException;
+                 apiListResult.Message = ex.Message;
+             }
+             return apiListResult;
+         }
+
+         /// <summary>
+         /// Deposit/ExportDepositTime 
+         /// </summary>
+         /// <remarks>
+         /// Http Method：POST
+         /// 
+         /// Func Path：Finance >  Deposit Time Report > [Submit] > Export
+         /// </remarks>
+         /// <param name="req"></param>
+         [HttpPost]
+         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
+         public IActionResult ExportDepositTime(ExportDepositTimeReq req)
+         {
+             var exportData = _depositBll.DepositTimeExportGet(JsonConvert.SerializeObject(req.SiteIds), req.DepositId, req.StartDate.DateTime, req.EndDate.DateTime, req.Status, req.CurrencyId);
+             foreach (var data in exportData)
+             {
+                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
+                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
+             }
+             var stream = _excelBll.Export(exportData);
+             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DepositTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+         }
+         
+        #endregion
+
+        #region Private function
+
         private async Task<ApiResult<TransferResult>> Process(PendingFund pendingFund)
         {
             return await _pendingFundBll.ProcessAsync(pendingFund);
         }
+
+        #endregion
+        
     }
 }

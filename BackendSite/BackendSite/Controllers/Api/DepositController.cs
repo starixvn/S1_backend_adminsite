@@ -458,16 +458,37 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
-        public ApiListResult<DepositTimeList> DepositTimeReportGet(DepositTimeReportPara para)
+        public ApiListResult<DepositTimeList> DepositTimeReportGet(DepositTimeReportOldPara para)
         {
             var apiListResult = new ApiListResult<DepositTimeList>();
             try
             {
-                var SearchResult = depositBLL.DepositTimeReportGet(para);
-                apiListResult.Data = SearchResult.DepositTimeList;
-                apiListResult.PageNumber = SearchResult.PageNumber;
-                apiListResult.TotalPages = SearchResult.TotalPages;
-                apiListResult.RowCount = SearchResult.RowCount;
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate).AddHours(8);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate).AddHours(8);
+                var req = new DepositTimeReportPara
+                {
+                    DepositId = para.DepositId,
+                    StartDate = startTime,
+                    EndDate = endTime,
+                    SiteIds = para.SelectSite,
+                    CurrencyId = para.CurrencyId,
+                    Status = para.Status,
+                    PageNumber = para.PageNumber,
+                    PageSize = para.PageSize
+                };
+                
+                var searchResult = depositBLL.DepositTimeReportGet(req);
+                foreach (var data in searchResult.DepositTimeList)
+                {
+                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    if (data.DepositTime != null) 
+                        data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                }
+                apiListResult.Data = searchResult.DepositTimeList;
+                apiListResult.PageNumber = searchResult.PageNumber;
+                apiListResult.TotalPages = searchResult.TotalPages;
+                apiListResult.RowCount = searchResult.RowCount;
                 apiListResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -480,10 +501,17 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
-        public IActionResult ExportDepositTime(string SelectSite, string DepositID, long StartDate, long EndDate, int Status, int CurrencyId)
+        public IActionResult ExportDepositTime(string selectSite, string depositId, long startDate, long endDate, int status, int currencyId)
         {
-            var ExportData = depositBLL.DepositTimeExportGet(SelectSite, DepositID, StartDate, EndDate, Status, CurrencyId);
-            var stream = excelBLL.Export(ExportData);
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(startDate);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(endDate);
+            var exportData = depositBLL.DepositTimeExportGet(selectSite, depositId, startTime, endTime, status, currencyId);
+            foreach (var data in exportData)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8); 
+            }
+            var stream = excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DepositTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
         [HttpPost]

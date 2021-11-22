@@ -384,49 +384,48 @@ namespace BackendSite.Service.DAL
 
         public DepositTimeData DepositTimeReportGet(DepositTimeReportPara para)
         {
-            var SelectSite = JsonConvert.SerializeObject(para.SelectSite);
-            var selectstatus = new List<int>();
-            if (para.Status == 0)
+            var selectSite = JsonConvert.SerializeObject(para.SiteIds);
+            var selectStatus = new List<int>();
+            if(para.Status == 0)
             {
-                selectstatus.Add(3);
-                selectstatus.Add(4);
-                selectstatus.Add(5);
+                selectStatus.Add(3);
+                selectStatus.Add(4);
+                selectStatus.Add(5);
             }
             else
             {
-                selectstatus.Add(para.Status);
+                selectStatus.Add(para.Status);
             }
-            var SelectStatus = JsonConvert.SerializeObject(selectstatus);
+            var SelectStatus = JsonConvert.SerializeObject(selectStatus);
 
-            var SearchData = new DepositTimeData();
+            var searchData = new DepositTimeData();
             var props = new DynamicParameters();
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            int.TryParse(para.DepositID, out var tempDepositId);
-
-            props.Add("SelectSite", SelectSite);
+            int.TryParse(para.DepositId, out var tempDepositId);
+            
+            props.Add("SelectSite", selectSite);
             props.Add("DepositId", tempDepositId);
-            props.Add("StartDate", para.StartDate);
-            props.Add("EndDate", para.EndDate);
+            props.Add("StartDate", para.StartDate.DateTime);
+            props.Add("EndDate", para.EndDate.DateTime);
             props.Add("SelectStatus", SelectStatus);
             props.Add("CurrencyId", para.CurrencyId);
-            props.Add("PageNumber", para.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("StartIndex", (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize), DbType.Int32,ParameterDirection.Input);
+            props.Add("PageNumber", Math.Abs(para.PageNumber), DbType.Int32,ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("PageSize", para.PageSize);
-            var result = conn.Query<DepositTimeList>("Admin_DepositStatusTime_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            props.Add("PageSize", Math.Abs(para.PageSize));
+            var result = _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTime_Get_V2", props).ToList();
 
-            SearchData.DepositTimeList = result;
-            SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            SearchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
-            return SearchData;
+            searchData.DepositTimeList = result;
+            searchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            searchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            searchData.RowCount = props.Get<int?>("RowCount") ?? 0;
+            return searchData;
         }
-        public List<DepositTimeList> GetExportData(IEnumerable<int> SelectSite, string DepositID, long StartDate, long EndDate, int Status, int CurrencyId)
+        public List<DepositTimeList> GetExportData(IEnumerable<int> SelectSite, string depositId, DateTime startDate, DateTime endDate, int status, int currencyId)
         {
             var selectSite = JsonConvert.SerializeObject(SelectSite);
             var selectstatus = new List<int>();
-            if (Status == 0)
+            if (status == 0)
             {
                 selectstatus.Add(3);
                 selectstatus.Add(4);
@@ -434,20 +433,19 @@ namespace BackendSite.Service.DAL
             }
             else
             {
-                selectstatus.Add(Status);
+                selectstatus.Add(status);
             }
-            var SelectStatus = JsonConvert.SerializeObject(selectstatus);
-            int.TryParse(DepositID, out var tempDepositId);
+            var selectStatus = JsonConvert.SerializeObject(selectstatus);
+            int.TryParse(depositId, out var tempDepositId);
 
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var props = new DynamicParameters();
-            props.Add("StartDate", StartDate);
-            props.Add("EndDate", EndDate);
+            props.Add("StartDate", startDate);
+            props.Add("EndDate", endDate);
             props.Add("SelectSite", selectSite);
-            props.Add("CurrencyId", CurrencyId);
+            props.Add("CurrencyId", currencyId);
             props.Add("DepositId", tempDepositId);
-            props.Add("SelectStatus", SelectStatus);
-            return conn.Query<DepositTimeList>("Admin_DepositStatusTimeExport_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            props.Add("SelectStatus", selectStatus);
+            return _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTimeExport_Get_V2", props).ToList();
 
         }
         public bool SetDepositRequestAmount(string transId, decimal amount, string Operator)
