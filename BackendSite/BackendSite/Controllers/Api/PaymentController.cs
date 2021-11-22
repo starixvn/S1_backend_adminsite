@@ -681,11 +681,11 @@ namespace BackendSite.Controllers.Api
                             Operator = authData.UserName
                         };
                         var apiOnlineResult =
-                            await courierAdapter.MyPostAsync<string, RetionBonus>(bonusUrl, retionbonus);
+                            await courierAdapter.MyPostAsync<ApiResult, RetionBonus>(bonusUrl, retionbonus);
                         if (apiOnlineResult.ErrorCode == 0)
                         {
                             apiResult.ErrorCode = apiOnlineResult.ErrorCode;
-                            apiResult.Message = $"Success. ID is {apiOnlineResult.Data}";
+                            apiResult.Message = $"Success.";
                         }
                         else
                         {
@@ -867,13 +867,13 @@ namespace BackendSite.Controllers.Api
                                             Operator = authData.UserName
                                         };
                                         var apiOnlineResult =
-                                             await courierAdapter.MyPostAsync<string, RetionBonus>(bonusUrl, retionbonus);
+                                             await courierAdapter.MyPostAsync<ApiResult, RetionBonus>(bonusUrl, retionbonus);
                                         if (apiOnlineResult.ErrorCode == 0)
                                         {
                                             apiResult.Add(new ApiResult()
                                             {
                                                 ErrorCode = 1,
-                                                Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. ID is {apiOnlineResult.Data}."
+                                                Message = $"Success. Username: {custUsername}. SabaId: {sabaId}."
                                             });
                                         }
                                         else
