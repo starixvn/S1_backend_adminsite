@@ -349,6 +349,8 @@ namespace BackendSite.Controllers.Api
                                                    out totalPages,
                                                    out rowCount);
 
+            data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
@@ -416,7 +418,7 @@ namespace BackendSite.Controllers.Api
                 endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoReq.EndDate);
             }
 
-            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(custInfoReq.SelectSite,
+            var data = custInfoBLL.GetCustInfoExportList(custInfoReq.SelectSite,
                                                                     custInfoReq.BirDate,
                                                                     custInfoReq.BirMonth,
                                                                     custInfoReq.BirYear,
@@ -434,8 +436,10 @@ namespace BackendSite.Controllers.Api
                                                                     custInfoReq.BankAccountNumber,
                                                                     custInfoReq.SelectStatus);
 
-            var stream = excelBLL.Export(ExportCustInfo);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportCustInfo)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+
+            var stream = excelBLL.Export(data);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(data)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
         #endregion

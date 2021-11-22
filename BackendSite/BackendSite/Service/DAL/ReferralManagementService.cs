@@ -49,9 +49,9 @@ namespace BackendSite.Service.DAL
         public void SetReferralStatus(int SiteId, int CurrencyId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            conn.Execute("Admin_Referral_Status_Set", new { SiteId , CurrencyId }, commandType: CommandType.StoredProcedure);
+            conn.Execute("Admin_Referral_Status_Set", new { SiteId, CurrencyId }, commandType: CommandType.StoredProcedure);
         }
-        public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId,int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             string SelectSite = null;
             if (selectSite != null && selectSite.Any())
@@ -60,7 +60,7 @@ namespace BackendSite.Service.DAL
             }
             totalPages = 0;
 
-            var p = new DynamicParameters(new { SelectSite, UserName = userName, CurrencyId = currencyId, PageSize = pageSize});
+            var p = new DynamicParameters(new { SelectSite, UserName = userName, CurrencyId = currencyId, PageSize = pageSize });
             p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -73,23 +73,28 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return result;
         }
-        public IEnumerable<ReferralFriend> GetRefFriendList(int custId, DateTimeOffset? StartDate, DateTimeOffset? EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<ReferralFriend> GetRefFriendList(int custId,
+            DateTime? startDate,
+            DateTime? endDate,
+            int pageSize,
+            int startIndex,
+            out int TotalPages,
+            out int RowCount)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var SpName = "Admin_ReferralFriendList_Get_V2";
-            var props = new DynamicParameters(new { CustId = custId });
-            props.Add("PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("PageSize", PageSize);
-            props.Add("StartDate", StartDate);
-            props.Add("EndDate", EndDate);
+            var SpName = "Admin_ReferralFriendList_Get_V3";
+            var props = new DynamicParameters();
+            props.Add("_CustId", custId);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_PageSize", pageSize);
+            props.Add("_StartIndex", startIndex);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             var result = conn.Query<ReferralFriend>(SpName, props, commandType: CommandType.StoredProcedure);
-            PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            RowCount = props.Get<int?>("RowCount") ?? 0;
+            TotalPages = props.Get<int?>("_TotalPages") ?? 0;
+            RowCount = props.Get<int?>("_RowCount") ?? 0;
 
             return result;
         }
