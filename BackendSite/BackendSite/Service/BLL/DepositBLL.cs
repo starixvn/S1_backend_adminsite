@@ -291,48 +291,42 @@ namespace BackendSite.Service.BLL
         {
              var result = depositService.DepositTimeReportGet(para);
 
-            if(result != null)
+             result?.DepositTimeList.ForEach(x =>
             {
-                result.DepositTimeList.ForEach(x =>
-                {
-                    var ts1 = new TimeSpan(x.CreateTime.Ticks);
-                    var ts2 = new TimeSpan(x.UpdateTime.Ticks);
-                    var ts = ts1.Subtract(ts2).Duration();
-                    x.CompleteTime = GetTimeString(ts);
-                });
-            }
+                var ts1 = new TimeSpan(x.CreateTime.Ticks);
+                var ts2 = new TimeSpan(x.UpdateTime.Ticks);
+                var ts = ts1.Subtract(ts2).Duration();
+                x.CompleteTime = GetTimeString(ts);
+            });
 
             return result;
         }
 
-        public IEnumerable<DepositTimeExportData> DepositTimeExportGet(string SelectSite, string DepositID, long StartDate, long EndDate, int Status, int CurrencyId)
+        public IEnumerable<DepositTimeExportData> DepositTimeExportGet(string selectSite, string depositId, DateTime startDate, DateTime endDate, int status, int currencyId)
         {
-            var ExportDataToExcel = new List<DepositTimeExportData>();
-            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(SelectSite);
+            var exportDataToExcel = new List<DepositTimeExportData>();
+            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(selectSite);
 
-            var result = depositService.GetExportData(siteList, DepositID, StartDate, EndDate, Status, CurrencyId);
+            var result = depositService.GetExportData(siteList, depositId, startDate, endDate, status, currencyId);
 
-            if(result != null)
-            {
-                result.ForEach(x => {
-                    var ts1 = new TimeSpan(x.CreateTime.Ticks);
-                    var ts2 = new TimeSpan(x.UpdateTime.Ticks);
-                    var ts = ts1.Subtract(ts2).Duration();
-                    ExportDataToExcel.Add(new DepositTimeExportData
-                    {
-                        SiteName = x.SiteName,
-                        DepositId = x.DepositId,
-                        DepositType = x.DepositTypeName,
-                        UserName = x.UserName,
-                        Currency = x.IsoCode,
-                        Status = x.StatusName,
-                        CreateTime = x.CreateTime,
-                        UpdateTime = x.UpdateTime,
-                        CompleteTime = GetTimeString(ts)
-                    });
+            result?.ForEach(x => {
+                var ts1 = new TimeSpan(x.CreateTime.Ticks);
+                var ts2 = new TimeSpan(x.UpdateTime.Ticks);
+                var ts = ts1.Subtract(ts2).Duration();
+                exportDataToExcel.Add(new DepositTimeExportData
+                {
+                    SiteName = x.SiteName,
+                    DepositId = x.DepositId,
+                    DepositType = x.DepositTypeName,
+                    UserName = x.UserName,
+                    Currency = x.IsoCode,
+                    Status = x.StatusName,
+                    CreateTime = x.CreateTime.DateTime,
+                    UpdateTime = x.UpdateTime.DateTime,
+                    CompleteTime = GetTimeString(ts)
                 });
-            }
-            return ExportDataToExcel;
+            });
+            return exportDataToExcel;
         }
         private string GetTimeString(TimeSpan ts)
         {

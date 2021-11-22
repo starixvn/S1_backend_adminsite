@@ -881,9 +881,9 @@ namespace BackendSite.Controllers.Api
             var apiListResult = new ApiListResult<WithdrawalTimeList>();
             try
             {
-                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate);
-                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate);
-                var req = new WithdrawalTimeReportPara()
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate).AddHours(8);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate).AddHours(8);
+                var req = new WithdrawalTimeReportPara
                 {
                     WithdrawalId = para.WithdrawalId,
                     StartDate = startTime,
