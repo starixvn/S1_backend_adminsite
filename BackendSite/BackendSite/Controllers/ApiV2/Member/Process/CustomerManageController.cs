@@ -2087,7 +2087,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiListResult<ReferralFriend> GetRefFriendByCustId(CustIdWithDateRangeAndPageRequest request)
+        public ApiListResult<ReferralFriend> GetRefFriendByCustId(CustIdWithDateRangeNullAndPageRequest request)
         {
             var referralStatus = new Dictionary<int, string>()
             {
@@ -2096,17 +2096,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 {2,"Expired" }
             };
 
+            var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
+            var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
+
             var pageNumber = request.PageNumber;
-            var totalPages = 0;
-            var rowCount = 0;
             var apiResult = new ApiListResult<ReferralFriend>();
             var data = _referralManagementBll.GetRefFriendList(request.CustId,
-                request.StartDate,
-                request.EndDate,
+                startDate,
+                endDate,
                 request.PageSize,
-                ref pageNumber,
-                ref totalPages,
-                ref rowCount);
+                request.PageNumber,
+                out int totalPages,
+                out int rowCount);
 
             foreach (var x in data)
             {

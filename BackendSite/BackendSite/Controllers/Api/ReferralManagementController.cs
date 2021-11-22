@@ -159,36 +159,25 @@ namespace BackendSite.Controllers.Api
                 {2,"Expired" }
             };
 
-            var PageSize = 10;
+            var pageSize = 10;
             if (refFriendListReq.PageSize > 0)
-                PageSize = refFriendListReq.PageSize;
+                pageSize = refFriendListReq.PageSize;
             var pageNumber = refFriendListReq.PageNumber;
-            var totalPages = 0;
-            var rowCount = 0;
             var apiResult = new ApiListResult<ReferralFriend>();
 
-            DateTime? startTime = null;
-            DateTime? endTime = null;
 
-            if (refFriendListReq.StartDate != null)
-            {
-                if (refFriendListReq.StartDate > 2147483647)
-                {
-                    refFriendListReq.StartDate = 2147483647;
-                }
-                startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.StartDate);
-            }
+            var startDate = refFriendListReq.StartDate == null ? (DateTime?)null
+                : new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.StartDate);
+            var endDate = refFriendListReq.EndDate == null ? (DateTime?)null
+                : new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.EndDate);
 
-            if (refFriendListReq.EndDate != null)
-            {
-                if (refFriendListReq.EndDate > 2147483647)
-                {
-                    refFriendListReq.EndDate = 2147483647;
-                }
-                endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.EndDate);
-            }
-
-            var data = referralManagementBLL.GetRefFriendList(refFriendListReq.CustId, startTime, endTime, PageSize, ref pageNumber, ref totalPages, ref rowCount);
+            var data = referralManagementBLL.GetRefFriendList(refFriendListReq.CustId,
+                startDate,
+                endDate,
+                pageSize,
+                pageNumber,
+                out var totalPages,
+                out var rowCount);
             foreach (var x in data)
             {
                 referralStatus.TryGetValue(x.Status, out var name);

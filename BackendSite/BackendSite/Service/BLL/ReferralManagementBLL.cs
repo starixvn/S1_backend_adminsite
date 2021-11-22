@@ -24,7 +24,7 @@ namespace BackendSite.Service.BLL
         {
             referralManagementService.SetReferral(referralList);
         }
-        public void SetReferralStatus(int SiteId,int CurrencyId)
+        public void SetReferralStatus(int SiteId, int CurrencyId)
         {
             referralManagementService.SetReferralStatus(SiteId, CurrencyId);
         }
@@ -36,17 +36,17 @@ namespace BackendSite.Service.BLL
             DateTimeOffset? StartDate,
             DateTimeOffset? EndDate,
             int PageSize,
-            ref int PageNumber,
-            ref int TotalPages,
-            ref int RowCount)
+            int PageNumber,
+            out int TotalPages,
+            out int RowCount)
         {
             return referralManagementService.GetRefFriendList(custId,
                 StartDate,
                 EndDate,
-                PageSize,
-                ref PageNumber,
-                ref TotalPages,
-                ref RowCount);
+                Math.Abs(PageSize),
+                (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize),
+                out TotalPages,
+                out RowCount);
         }
     }
 }

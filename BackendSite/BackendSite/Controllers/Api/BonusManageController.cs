@@ -231,7 +231,7 @@ namespace BackendSite.Controllers.Api
                         return apiResult;
                     }
                 }
-                
+
                 var errorCode = _bonusManageBLL.SetPromotion(isAdd, promotion, vipLevelCondition, User.Identity.Name) ? 0 : 1;
 
                 apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
@@ -540,36 +540,18 @@ namespace BackendSite.Controllers.Api
                 {2, "Expired"}
             };
 
-            DateTime? startTime = null;
-            DateTime? endTime = null;
-
-            if (refFriendListReq.StartDate!=null)
-            {
-                if (refFriendListReq.StartDate > 2147483647)
-                {
-                    refFriendListReq.StartDate = 2147483647;
-                }
-                startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.StartDate);
-            }
-
-            if(refFriendListReq.EndDate!=null)
-            {
-                if (refFriendListReq.EndDate > 2147483647)
-                {
-                    refFriendListReq.EndDate = 2147483647;
-                }
-                endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.EndDate);
-            }
+            var startDate = refFriendListReq.StartDate == null ? (DateTime?)null
+                : new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.StartDate);
+            var endDate = refFriendListReq.EndDate == null ? (DateTime?)null
+                : new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.EndDate);
 
             var PageSize = 10;
             if (refFriendListReq.PageSize > 0)
                 PageSize = refFriendListReq.PageSize;
             var pageNumber = refFriendListReq.PageNumber;
-            var totalPages = 0;
-            var rowCount = 0;
             var apiResult = new ApiListResult<ReferralFriend>();
-            var data = _referralManagementBLL.GetRefFriendList(refFriendListReq.CustId, startTime,
-                endTime, PageSize, ref pageNumber, ref totalPages, ref rowCount);
+            var data = _referralManagementBLL.GetRefFriendList(refFriendListReq.CustId, startDate,
+                endDate, PageSize, pageNumber, out var totalPages, out var rowCount);
             foreach (var x in data)
             {
                 referralStatus.TryGetValue(x.Status, out var name);
