@@ -29,7 +29,6 @@ namespace BackendSite.Controllers.Api
         #region Fields
 
         private readonly CustInfoBLL custInfoBLL;
-        private readonly TpBLL tpBLL;
         private readonly WinLostReportService winLostReportService;
         private readonly PermissionBLL permissionBLL;
         private readonly ServerInfoBLL serverInfoBLL;
@@ -42,7 +41,6 @@ namespace BackendSite.Controllers.Api
         #region Constructors
 
         public CustManageController(CustInfoBLL custInfoBLL,
-                                    TpBLL tpBLL,
                                     WinLostReportService winLostReportService,
                                     PermissionBLL permissionBLL,
                                     ServerInfoBLL serverInfoBLL,
@@ -51,7 +49,6 @@ namespace BackendSite.Controllers.Api
                                     ExcelBLL excelBLL)
         {
             this.custInfoBLL = custInfoBLL;
-            this.tpBLL = tpBLL;
             this.winLostReportService = winLostReportService;
             this.permissionBLL = permissionBLL;
             this.serverInfoBLL = serverInfoBLL;
@@ -134,19 +131,6 @@ namespace BackendSite.Controllers.Api
             public int CustId { get; set; }
             public string UserName { get; set; }
             public string Reason { get; set; }
-        }
-
-        public class DepositRep3
-        {
-            public string BankName { set; get; }
-            public string BankLogo { set; get; }
-            public string BankSite { set; get; }
-            public string AccountNo { get; set; }
-            public string AccountName { get; set; }
-            public string TransId { get; set; }
-            public string PostScript { get; set; }
-            public decimal MinAmount { get; set; }
-            public decimal MaxAmount { get; set; }
         }
 
         public class CustInfosReq : CustInfoReq
@@ -252,15 +236,6 @@ namespace BackendSite.Controllers.Api
             public IEnumerable<int> SelectTag { get; set; }
         }
         #endregion
-
-        public class CustPromotionpara
-        {
-            public int CustId { get; set; }
-            public long StartDate { get; set; }
-            public long EndDate { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
-        }
 
         public class SetEnableDisableBonusPara
         {
@@ -443,7 +418,7 @@ namespace BackendSite.Controllers.Api
                 endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoReq.EndDate);
             }
 
-            var ExportCustInfo = custInfoBLL.GetCustInfoExportList(custInfoReq.SelectSite,
+            var data = custInfoBLL.GetCustInfoExportList(custInfoReq.SelectSite,
                                                                     custInfoReq.BirDate,
                                                                     custInfoReq.BirMonth,
                                                                     custInfoReq.BirYear,
@@ -459,11 +434,12 @@ namespace BackendSite.Controllers.Api
                                                                     custInfoReq.AffId,
                                                                     custInfoReq.SelectCurrency,
                                                                     custInfoReq.BankAccountNumber,
-                                                                    custInfoReq.SelectStatus,
-                                                                    TimeSpan.FromHours(8));
+                                                                    custInfoReq.SelectStatus);
 
-            var stream = excelBLL.Export(ExportCustInfo);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportCustInfo)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+
+            var stream = excelBLL.Export(data);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(data)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
         #endregion
@@ -1117,13 +1093,22 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<LoginLog> GetLoginLogByCust(LoginLogReq loginLogReq)
         {
             var apiListResult = new ApiListResult<LoginLog>();
-            var pageNumber = loginLogReq.PageNumber;
             var totalPages = 0;
             var rowCount = 0;
-            var withdrawalList = custInfoBLL.GetLoginLogByCust(loginLogReq.CustId, loginLogReq.startDate, loginLogReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
+
+            if (loginLogReq.startDate > 2147483647)
+                loginLogReq.startDate = 2147483647;
+
+            if (loginLogReq.endDate > 2147483647)
+                loginLogReq.endDate = 2147483647;
+
+            var startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)loginLogReq.startDate);
+            var endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)loginLogReq.endDate);
+
+            var withdrawalList = custInfoBLL.GetLoginLogByCust(loginLogReq.CustId, startDate, endDate, 10, loginLogReq.PageNumber, out totalPages, out rowCount);
             apiListResult.Data = withdrawalList;
             apiListResult.ErrorCode = 0;
-            apiListResult.PageNumber = pageNumber;
+            apiListResult.PageNumber = loginLogReq.PageNumber;
             apiListResult.TotalPages = totalPages;
             apiListResult.RowCount = rowCount;
 
@@ -1230,7 +1215,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<CustNote>>
             {
-                Data = custInfoBLL.GetCustNotes(addCustNoteReq.CustId),
+                Data = custInfoBLL.GetCustNotes(addCustNoteReq.CustId, 1000, 1, out _, out _),
                 ErrorCode = 0
             };
 
@@ -1262,7 +1247,7 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                var data = custInfoBLL.SetCustNotes(setCustNoteReq.CustId, setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
+                var data = custInfoBLL.SetCustNotes(setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
 
                 if (data)
                 {
@@ -1312,10 +1297,25 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetCustTurnOverReport(GetCustTurnOverReportReq request)
         {
+
+            if (request.StartTime > 2147483647)
+            {
+                request.StartTime = 2147483647;
+            }
+
+            if (request.EndTime > 2147483647)
+            {
+                request.EndTime = 2147483647;
+            }
+
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(request.StartTime);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(request.EndTime);
+
             var data = custInfoBLL.GetCustTurnover(request.CustId,
                                                    JsonConvert.SerializeObject(request.GameTypes),
-                                                   request.StartTime,
-                                                   request.EndTime);
+                                                   startTime,
+                                                   endTime);
+
             return new ApiResult<dynamic>
             {
                 Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover }),
@@ -1373,10 +1373,16 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<CustBankInfoLog> GetBankInfoLogList(BankInfoLogListReq bankInfoLogListReq)
         {
             var apiListResult = new ApiListResult<CustBankInfoLog>();
-            var custInfo = custInfoBLL.GetCustInfoWithCache(bankInfoLogListReq.CustId);
             apiListResult.ErrorCode = 0;
-            var bankInfoPay = custInfoBLL.GetCustBankInfoLogList(bankInfoLogListReq.CustId, custInfo.SiteId);
+            var bankInfoPay = custInfoBLL.GetCustBankInfoLogList(bankInfoLogListReq.CustId,
+                1,
+                1000,
+                out var totalPages,
+                out var rowCount);
             apiListResult.Data = bankInfoPay;
+            apiListResult.PageNumber = 1;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.RowCount = rowCount;
             return apiListResult;
         }
 
@@ -1402,8 +1408,15 @@ namespace BackendSite.Controllers.Api
             var apiListResult = new ApiListResult<CustCryptoWalletLog>();
             var custInfo = custInfoBLL.GetCustInfoWithCache(cryptoWalletLogListReq.CustId);
             apiListResult.ErrorCode = 0;
-            var cryptoWalletInfo = custInfoBLL.GetCustCryptoWalletLogList(cryptoWalletLogListReq.CustId, custInfo.SiteId);
+            var cryptoWalletInfo = custInfoBLL.GetCustCryptoWalletLogList(cryptoWalletLogListReq.CustId,
+                1,
+                1000,
+                out var totalPages,
+                out var rowCount);
             apiListResult.Data = cryptoWalletInfo;
+            apiListResult.PageNumber = 1;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.RowCount = rowCount;
             return apiListResult;
         }
 
@@ -1433,7 +1446,22 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResultCurrencyAmount<Promotion>();
             try
             {
-                var SearchResult = custInfoBLL.GetPromotionListByCustIdAndDate(CustId, StartDate, EndDate, PageNumber, PageSize);
+
+                if (StartDate > 2147483647)
+                {
+                    StartDate = 2147483647;
+                }
+
+                if (EndDate > 2147483647)
+                {
+                    EndDate = 2147483647;
+                }
+
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+
+                var SearchResult = custInfoBLL.GetPromotionListByCustIdAndDate(CustId, startTime, endTime, PageNumber, PageSize);
+                SearchResult.PromotionList.ForEach(s => s.ClaimDate = new DateTimeOffset(s.ClaimDate.DateTime.AddHours(8), TimeSpan.FromHours(8)));
                 apiResult.Data = SearchResult.PromotionList;
                 apiResult.PageNumber = SearchResult.PageNumber;
                 apiResult.TotalPages = SearchResult.TotalPages;

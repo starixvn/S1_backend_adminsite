@@ -147,7 +147,27 @@ namespace BackendSite.Controllers.Api
             var pageNumber = adminOperateLogReq.PageNumber;
             var totalPages = 0;
             var rowCount = 0;
-            var depositRequestList = serverInfoBLL.GetAdminOperateLog(adminOperateLogReq.SiteId, adminOperateLogReq.CustId, adminOperateLogReq.Menu, adminOperateLogReq.Operator, adminOperateLogReq.startDate, adminOperateLogReq.endDate, 10, ref pageNumber, out totalPages, out rowCount);
+
+            if (adminOperateLogReq.startDate > 2147483647)
+            {
+                adminOperateLogReq.startDate = 2147483647;
+            }
+
+            if (adminOperateLogReq.endDate > 2147483647)
+            {
+                adminOperateLogReq.endDate = 2147483647;
+            }
+
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(adminOperateLogReq.startDate);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(adminOperateLogReq.endDate);
+
+            var depositRequestList = serverInfoBLL.GetAdminOperateLog(adminOperateLogReq.CustId,
+                adminOperateLogReq.Menu,
+                adminOperateLogReq.Operator,
+                startTime,
+                endTime,
+                10,
+                ref pageNumber, out totalPages, out rowCount);
             apiListResult.Data = depositRequestList;
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;

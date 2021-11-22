@@ -22,6 +22,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
         private readonly ReportBLL _reportBll;
         private readonly GameCasinoBLL _gameCasinoBll;
+        private readonly WinLostReportBLL _winLostReportBll;
+        private readonly PaymentBLL _paymentBll;
 
         #endregion
 
@@ -31,6 +33,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _gameCasinoBll = provider.GetRequiredService<GameCasinoBLL>();
+            _winLostReportBll = provider.GetRequiredService<WinLostReportBLL>();
+            _paymentBll = provider.GetRequiredService<PaymentBLL>();
         }
 
         #endregion
@@ -68,27 +72,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
-        /// GetAllData/GetTpCategory 取得第三方遊戲大分類清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path： [Available Category]
-        /// </remarks>
-        [HttpPost]
-        public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategory()
-        {
-            var data = await _reportBll.GetTpCategoryList();
-            var apiResult = new ApiResult<IEnumerable<TpCategoryBetLimit>>
-            {
-                Data = data,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-
-            return apiResult;
-        }
-
-        /// <summary>
         /// GetAllData/GetTpList 取得Slot第三方品牌
         /// </summary>
         /// <remarks>
@@ -115,6 +98,82 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
 
             return apiResult;
+        }
+
+        /// <summary>
+        /// GetAllData/GetTpCategory 取得第三方遊戲分類
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path： [Available Category]
+        /// </remarks>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategory()
+        {
+            var data = await _reportBll.GetTpCategoryList();
+            var apiResult = new ApiResult<IEnumerable<TpCategoryBetLimit>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+
+        /// <summary>
+        /// GetAllData/GetTpGameType 取得第三方遊戲類型
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path： Show tp  GameType List
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult GetTpGameType()
+        {
+            var data = _winLostReportBll.GetTpGameType();
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<GameType>>
+                {
+                    Data = data,
+                    ErrorCode = 0
+                };
+            }
+        }
+
+        /// <summary>
+        /// GetAllData/GetPromotionCategory 取得促銷分類
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// CSD > Customer Administration > CustInfo > Bonus Log [Promotion Category]
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<PromotionCategory>> GetPromotionCategory()
+        {
+            var data = _paymentBll.GetPromotionCategory();
+
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+
+            return new ApiResult<IEnumerable<PromotionCategory>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         #endregion

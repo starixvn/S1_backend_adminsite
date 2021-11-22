@@ -81,9 +81,9 @@ namespace BackendSite.Service.BLL
             return messageService.GetCustLang(CustId);
         }
 
-        public void DeletePersonalMsg(int Id, int CustId)
+        public void DeletePersonalMsg(int Id)
         {
-            messageService.DeletePersonalMsg(Id, CustId);
+            messageService.DeletePersonalMsg(Id);
         }
 
         public bool SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)

@@ -500,17 +500,26 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetWithdrawalListByCust(WithdrawalReq4 withdrawalReq)
         {
-            var pageNumber = withdrawalReq.PageNumber;
             var totalPages = 0;
             var rowCount = 0;
             var CurrencyAmount = new List<string>();
+
+            if (withdrawalReq.startDate > 2147483647)
+                withdrawalReq.startDate = 2147483647;
+
+            if (withdrawalReq.endDate > 2147483647)
+                withdrawalReq.endDate = 2147483647;
+
+            var startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)withdrawalReq.startDate);
+            var endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)withdrawalReq.endDate);
+
             var data = withdrawalBLL.GetWithdrawalListByCust(withdrawalReq.CustId,
                 withdrawalReq.TransId,
                 withdrawalReq.Status == 0 ? (int?)null : withdrawalReq.Status,
-                withdrawalReq.startDate,
-                withdrawalReq.endDate,
+                startDate,
+                endDate,
                 withdrawalReq.PageSize,
-                ref pageNumber,
+                withdrawalReq.PageNumber,
                 out totalPages,
                 out rowCount,
                 ref CurrencyAmount);
@@ -519,7 +528,7 @@ namespace BackendSite.Controllers.Api
             {
                 Data = data,
                 TotalPages = totalPages,
-                PageNumber = pageNumber,
+                PageNumber = withdrawalReq.PageNumber,
                 RowCount = rowCount,
                 CurrencyAmount = CurrencyAmount,
                 ErrorCode = (int)ErrorCodeEnum.Success

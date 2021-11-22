@@ -159,14 +159,25 @@ namespace BackendSite.Controllers.Api
                 {2,"Expired" }
             };
 
-            var PageSize = 10;
+            var pageSize = 10;
             if (refFriendListReq.PageSize > 0)
-                PageSize = refFriendListReq.PageSize;
+                pageSize = refFriendListReq.PageSize;
             var pageNumber = refFriendListReq.PageNumber;
-            var totalPages = 0;
-            var rowCount = 0;
             var apiResult = new ApiListResult<ReferralFriend>();
-            var data = referralManagementBLL.GetRefFriendList(refFriendListReq.CustId, refFriendListReq.StartDate, refFriendListReq.EndDate, PageSize, ref pageNumber, ref totalPages, ref rowCount);
+
+
+            var startDate = refFriendListReq.StartDate == null ? (DateTime?)null
+                : new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.StartDate);
+            var endDate = refFriendListReq.EndDate == null ? (DateTime?)null
+                : new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.EndDate);
+
+            var data = referralManagementBLL.GetRefFriendList(refFriendListReq.CustId,
+                startDate,
+                endDate,
+                pageSize,
+                pageNumber,
+                out var totalPages,
+                out var rowCount);
             foreach (var x in data)
             {
                 referralStatus.TryGetValue(x.Status, out var name);

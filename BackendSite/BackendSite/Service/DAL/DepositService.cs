@@ -83,21 +83,34 @@ namespace BackendSite.Service.DAL
             return depositList;
         }
 
-        public IEnumerable<DepositRequest> GetDepositListByCust(int CustId, string TransId, int? Status, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount, out decimal totalAmount)
+        public IEnumerable<DepositRequest> GetDepositListByCust(int CustId,
+            string TransId,
+            int? Status,
+            DateTimeOffset startDate,
+            DateTimeOffset endDate,
+            int pageSize,
+            int startIndex,
+            out int totalPages,
+            out int rowCount,
+            out decimal totalAmount)
         {
-            var p = new DynamicParameters(new { CustId, TransId, Status, StartDate = startDate, EndDate = endDate, PageSize = pageSize });
-            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("TotalAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            var p = new DynamicParameters();
+            p.Add("_CustId", CustId, dbType: DbType.Int32);
+            p.Add("_TransId", TransId, dbType: DbType.String);
+            p.Add("_Status", Status, dbType: DbType.Int32);
+            p.Add("_StartDate", startDate.DateTime);
+            p.Add("_EndDate", endDate.DateTime);
+            p.Add("_StartIndex", startIndex, dbType: DbType.Int32);
+            p.Add("_PageSize", pageSize, dbType: DbType.Int32);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_TotalAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var depositList = conn.Query<DepositRequest>("Admin_DepositInfoListByCustV4_Get", p, commandType: CommandType.StoredProcedure);
-            pageNumber = p.Get<int?>("PageNumber") ?? 0;
-            totalPages = p.Get<int?>("TotalPages") ?? 0;
-            rowCount = p.Get<int?>("RowCount") ?? 0;
-            totalAmount = p.Get<decimal?>("TotalAmount") ?? 0;
+            var depositList = conn.Query<DepositRequest>("Admin_DepositInfoListByCust_Get_V5", p, commandType: CommandType.StoredProcedure);
+            totalPages = p.Get<int?>("_TotalPages") ?? 0;
+            rowCount = p.Get<int?>("_RowCount") ?? 0;
+            totalAmount = p.Get<decimal?>("_TotalAmount") ?? 0;
             return depositList;
         }
 
@@ -159,7 +172,7 @@ namespace BackendSite.Service.DAL
 
             p.Add("vTransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
-            
+
             var result = conn.Execute("Admin_DepositInfo_Ins", p, transaction: trans, commandType: CommandType.StoredProcedure);
             if (result > 0)
             {
@@ -267,6 +280,7 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return conn.QueryFirstOrDefault<DepositReceipt>("DepositReceipt_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
+
         public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string depositType, DateTime startDate, DateTime endDate, string DepositId, string userName, string currencyId, string status,string levelStatus, int amountType, string amount)
         {
             var depositId = 0;
@@ -318,7 +332,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public bool EditDepositLimitInfo(DepositLimitInfo depositLimitInfo,string Operator)
+        public bool EditDepositLimitInfo(DepositLimitInfo depositLimitInfo, string Operator)
         {
             var result = false;
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));

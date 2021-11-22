@@ -725,11 +725,11 @@ namespace BackendSite.Service.DAL
             return true;
         }
 
-        public IEnumerable<CheckSpecialCodeDuplicate> CheckSpecialCodeDuplicate(PromotionInfo promotion)
+        public IEnumerable<CheckSpecialCodeDuplicate> CheckSpecialCodeDuplicate(string SpecialCode)
         {
             var p = new DynamicParameters();
 
-            p.Add("_SpecialCode", promotion.SpecialCode);
+            p.Add("_SpecialCode", SpecialCode);
 
             using var conn =
                     new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));

@@ -30,9 +30,24 @@ namespace BackendSite.Service.BLL
             this.serverInfoService = serverInfoService;
             _balanceTimeoutSecond = configuration.GetValue<int>("BalanceTimeoutSecond");
         }
-        public IEnumerable<TpTransferInfo> GetTpTransferInfoByCust(int CustId, string TransId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+
+        public IEnumerable<TpTransferInfo> GetTpTransferInfoByCust(int CustId,
+            string TransId,
+            DateTimeOffset startDate,
+            DateTimeOffset endDate,
+            int pageSize,
+            int pageNumber,
+            out int totalPages,
+            out int rowCount)
         {
-            return thirdPartyService.GetTpTransferInfoByCust(CustId, TransId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+            return thirdPartyService.GetTpTransferInfoByCust(CustId,
+                TransId,
+                startDate,
+                endDate,
+                Math.Abs(pageSize),
+                (Math.Abs(pageNumber)-1) * Math.Abs(pageSize),
+                out totalPages,
+                out rowCount);
         }
         public async Task<IEnumerable<TpWallet>> GetTpWalletAsync(int custId)
         {
@@ -173,11 +188,11 @@ namespace BackendSite.Service.BLL
             IEnumerable<SiteTpListIfo> result = null;
             if (UserSiteList.Where(x => x.SiteId == TpDetailPara.Site).Select(x => x).ToList().FirstOrDefault().ICurrencyList.Contains(TpDetailPara.Currency))
             {
-                result =  thirdPartyService.GetTpBySiteAndCurrency(TpDetailPara);
+                result = thirdPartyService.GetTpBySiteAndCurrency(TpDetailPara);
             }
             return result;
         }
-        public void SetAdjustmentTpCustInfoLog(string Menu,int ActionType,string DetailInfo,string Operator)
+        public void SetAdjustmentTpCustInfoLog(string Menu, int ActionType, string DetailInfo, string Operator)
         {
             thirdPartyService.SetAdjustmentTpCustInfoLog(Menu, ActionType, DetailInfo, Operator);
         }
@@ -227,7 +242,7 @@ namespace BackendSite.Service.BLL
 
             var tempSetting = betSettings
                 .Where(a => sportType.Contains(a.sport_type))
-                .Select(b=> new SabaBetSetting()
+                .Select(b => new SabaBetSetting()
                 {
                     sport_type = b.sport_type,
                     min_bet = decimal.ToInt32(b.min_bet),

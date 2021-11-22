@@ -20,7 +20,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<Promotion> GetPromotionListByCustId(int custId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<Promotion>("Admin_PromotionListByCustId_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+            return conn.Query<Promotion>("Admin_PromotionListByCustId_Get_V2", new { _CustId = custId }, commandType: CommandType.StoredProcedure);
         }
 
         //public int CancelBonusByBonusId(int bonusId)
@@ -34,18 +34,19 @@ namespace BackendSite.Service.DAL
         //    return result;
         //}
 
-        public PromotionListData GetPromotionListByCustIdAndDate(int CustId, long StartDate, long EndDate, int PageNumber, int PageSize)
+        public PromotionListData GetPromotionListByCustIdAndDate(int CustId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
         {
             var PromotionListData = new PromotionListData();
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var props = new DynamicParameters();
             var tempCurrencyTotalAmount = new List<string>();
-            props.Add("CustId", CustId);
-            props.Add("StartDate", StartDate);
-            props.Add("EndDate", EndDate);
+
+            var props = new DynamicParameters();
+            props.Add("CustId", CustId,DbType.Int32);
+            props.Add("StartDate", StartDate.DateTime, DbType.DateTime);
+            props.Add("EndDate", EndDate.DateTime, DbType.DateTime);
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_PromotionTotalAmountByCustIdAndDate_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_PromotionTotalAmountByCustIdAndDate_Get_V2", props, commandType: CommandType.StoredProcedure).ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
                 CurrencyTotalAmount.ForEach(x =>
@@ -61,7 +62,7 @@ namespace BackendSite.Service.DAL
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("PageSize", PageSize);
-            var result =  conn.Query<Promotion>("Admin_PromotionListByCustIdAndDate_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var result =  conn.Query<Promotion>("Admin_PromotionListByCustIdAndDate_Get_V2", props, commandType: CommandType.StoredProcedure).ToList();
 
             PromotionListData.PromotionList = result;
             PromotionListData.PageNumber = props.Get<int?>("PageNumber") ?? 0;

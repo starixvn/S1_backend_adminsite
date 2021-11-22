@@ -562,7 +562,10 @@ const App = () => {
 							SelectClick();
 						} else if (res.data.errorCode === 1062) {
 							alert("Duplicate datas abount Bonus Code.");
-						} else {
+						} else if(res.data.errorCode === 99){
+							alert(res.data.message);
+						}
+						else {
 							alert(res.data.message ?? "failed to set data.");
 						}
 						setProcessing(false);

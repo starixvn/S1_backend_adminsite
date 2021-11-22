@@ -6,7 +6,7 @@ namespace BackendSite.Service.Model
     {
         public string VipLevel { get; set; }
         public int Manually { get; set; }
-        public DateTime QualifiedTime { get; set; }
+        public DateTimeOffset QualifiedTime { get; set; }
 
     }
     public class VipLevelLog
@@ -14,7 +14,7 @@ namespace BackendSite.Service.Model
         public int OldLevel { get; set; }
         public int NewLevel { get; set; }
         public string Memo { get; set; }
-        public DateTime UpdateTime { get; set; }
+        public DateTimeOffset UpdateTime { get; set; }
         public string Updaters { get; set; }
     }
     public class VipLevelSetting

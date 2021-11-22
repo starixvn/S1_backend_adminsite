@@ -149,18 +149,30 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public IEnumerable<WithdrawalRequest> GetWithdrawalListByCust(int CustId, string transId, int? Status,
-            long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount,
-            ref List<string> CurrencyAmount)
+        public IEnumerable<WithdrawalRequest> GetWithdrawalListByCust(int custId,
+            string transId,
+            int? status,
+            DateTimeOffset startDate,
+            DateTimeOffset endDate,
+            int pageSize,
+            int startIndex,
+            out int totalPages,
+            out int rowCount,
+            ref List<string> currencyAmount)
         {
             var tempCurrencyTotalAmount = new List<string>();
-            var p = new DynamicParameters(new
-            { CustId, TransId = transId, Status, StartDate = startDate, EndDate = endDate, PageSize = pageSize });
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId, dbType: DbType.Int32);
+            p.Add("_TransId", transId, dbType: DbType.String);
+            p.Add("_Status", status, dbType: DbType.Int32);
+            p.Add("_StartDate", startDate.DateTime, dbType: DbType.DateTime);
+            p.Add("_EndDate", endDate.DateTime, dbType: DbType.DateTime);
+
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
 
             #region GetCurrencyTotalAmount
 
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_WithdrawalTotalAmountByCustV2_Get", p,
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_WithdrawalTotalAmountByCust_Get_V3", p,
                 commandType: CommandType.StoredProcedure).ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
@@ -170,22 +182,19 @@ namespace BackendSite.Service.DAL
                 });
             }
 
-            CurrencyAmount = tempCurrencyTotalAmount;
+            currencyAmount = tempCurrencyTotalAmount;
 
             #endregion
+            p.Add("_PageSize", pageSize, dbType: DbType.Int32);
+            p.Add("_StartIndex", startIndex, dbType: DbType.Int32);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
 
-            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-
-            var depositList = conn.Query<WithdrawalRequest>("Admin_WithdrawalListByCustV2_Get", p,
+            var depositList = conn.Query<WithdrawalRequest>("Admin_WithdrawalListByCust_Get_V3", p,
                 commandType: CommandType.StoredProcedure);
-            pageNumber = p.Get<int?>("PageNumber") ?? 0;
-            totalPages = p.Get<int?>("TotalPages") ?? 0;
-            rowCount = p.Get<int?>("RowCount") ?? 0;
+            totalPages = p.Get<int?>("_TotalPages") ?? 0;
+            rowCount = p.Get<int?>("_RowCount") ?? 0;
             return depositList;
         }
 
@@ -233,12 +242,12 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<WithdrawalKYC> GetWithdrawalKYC(int siteId)
         {
-            return _mainDbClient.Query<WithdrawalKYC>("Admin_WithdrawalKyc_Get", new DynamicParameters(new {SiteId = siteId }));
+            return _mainDbClient.Query<WithdrawalKYC>("Admin_WithdrawalKyc_Get", new DynamicParameters(new { SiteId = siteId }));
         }
 
         public bool EditWithdrawalKYC(WithdrawalKYC withdrawalKYC)
         {
-            return _mainDbClient.Execute("Admin_WithdrawalKyc_Set",new DynamicParameters(new { withdrawalKYC.SiteId, withdrawalKYC.CurrencyId, withdrawalKYC.Amount })) > 0;
+            return _mainDbClient.Execute("Admin_WithdrawalKyc_Set", new DynamicParameters(new { withdrawalKYC.SiteId, withdrawalKYC.CurrencyId, withdrawalKYC.Amount })) > 0;
         }
 
         public IEnumerable<WithdrawalMinInfo> GetWithdrawalLimitData(int SiteId)
@@ -301,7 +310,7 @@ namespace BackendSite.Service.DAL
             {
                 selectStatus.Add(para.Status);
             }
-            
+
             var searchData = new WithdrawalTimeData();
             var props = new DynamicParameters();
             int.TryParse(para.WithdrawalId, out var tempWithdrawalId);
@@ -427,7 +436,7 @@ namespace BackendSite.Service.DAL
                                 var accountingResult = 0;
                                 var withdrawalInfoData = JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalInfo);
 
-                                updateFlowEndResult = SetWithdrawalInfoFlowEndTime(withdrawalId,conn, trans);
+                                updateFlowEndResult = SetWithdrawalInfoFlowEndTime(withdrawalId, conn, trans);
 
                                 switch (withdrawalType)
                                 {
