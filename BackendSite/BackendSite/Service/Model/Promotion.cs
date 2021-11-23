@@ -9,6 +9,7 @@ namespace BackendSite.Service.Model
         private DateTimeOffset _expiryTime { get; set; }
 
         public DateTimeOffset _claimDate { get; set; }
+        public DateTimeOffset _updateTime { get; set; }
 
         public int BonusId { get; set; }
         public string BonusCode { get; set; }
@@ -38,6 +39,12 @@ namespace BackendSite.Service.Model
             get => _claimDate;
             set => _claimDate = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
+        public DateTimeOffset UpdateTime
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public int AtPage { get; set; }
     }
     public class PromotionListData
     {
