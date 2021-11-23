@@ -299,20 +299,19 @@ namespace BackendSite.Service.DAL
             var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V8", p);
             return depositList;
         }
+        
         public IEnumerable<DepositLimitCurrencyInfo> GetDepositLimitCurrencyList(int siteId, int depositType)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<DepositLimitCurrencyInfo>("Admin_DepositCurrencyList_Get", new { SiteId = siteId, DepositType = depositType }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<DepositLimitCurrencyInfo>("Admin_DepositCurrencyList_Get", new DynamicParameters(new { SiteId = siteId, DepositType = depositType }));
         }
+        
         public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(int siteId, int depositType, int currencyId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<DepositLimitInfo>("Admin_DepositLimitInfo_Get", new { SiteId = siteId, DepositType = depositType, CurrencyId = currencyId }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<DepositLimitInfo>("Admin_DepositLimitInfo_Get", new DynamicParameters(new { SiteId = siteId, DepositType = depositType, CurrencyId = currencyId }));
         }
 
         public bool AddDepositLimitInfo(DepositLimitInfo depositLimitInfo, string Operator)
         {
-            var result = false;
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var tran = conn.BeginTransaction();
@@ -326,7 +325,7 @@ namespace BackendSite.Service.DAL
                 depositLimitInfo.DepositMax
             };
             conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu = "DepositLimitManagement", ActionType = 1, DetailInfo = JsonConvert.SerializeObject(param), Operator }, tran, commandType: CommandType.StoredProcedure);
-            result = conn.Execute("Admin_DepositLimitInfo_Ins", param, tran, commandType: CommandType.StoredProcedure) > 0;
+            var result = conn.Execute("Admin_DepositLimitInfo_Ins", param, tran, commandType: CommandType.StoredProcedure) > 0;
             tran.Commit();
 
             return result;
@@ -334,7 +333,6 @@ namespace BackendSite.Service.DAL
 
         public bool EditDepositLimitInfo(DepositLimitInfo depositLimitInfo, string Operator)
         {
-            var result = false;
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var tran = conn.BeginTransaction();
@@ -349,22 +347,19 @@ namespace BackendSite.Service.DAL
                 depositLimitInfo.DepositStatus
             };
             conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu = "DepositLimitManagement", ActionType = 1, DetailInfo = JsonConvert.SerializeObject(param), Operator }, tran, commandType: CommandType.StoredProcedure);
-
-            result = conn.Execute("Admin_DepositLimitInfo_Set", param, tran, commandType: CommandType.StoredProcedure) > 0;
+            var result = conn.Execute("Admin_DepositLimitInfo_Set", param, tran, commandType: CommandType.StoredProcedure) > 0;
             tran.Commit();
 
             return result;
         }
 
-        public DepositLimitInfo GetDepositLimitInfo(int siteId, int depositType, int currencyId, int viplevel)
+        public DepositLimitInfo GetDepositLimitInfo(int siteId, int depositType, int currencyId, int vipLevel)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.QueryFirstOrDefault<DepositLimitInfo>("Admin_DepositLimitInfoDetail_Get", new { SiteId = siteId, DepositType = depositType, CurrencyId = currencyId, VipLevel = viplevel }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.QueryFirst<DepositLimitInfo>("Admin_DepositLimitInfoDetail_Get", new DynamicParameters(new { SiteId = siteId, DepositType = depositType, CurrencyId = currencyId, VipLevel = vipLevel }));
         }
 
         public int DeleteDepositLimitInfo(DepositLimitInfo depositLimitInfo, string Operator)
         {
-            var result = 0;
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var tran = conn.BeginTransaction();
@@ -376,7 +371,7 @@ namespace BackendSite.Service.DAL
                 depositLimitInfo.DepositType
             };
             conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu = "DepositLimitManagement", ActionType = 2, DetailInfo = JsonConvert.SerializeObject(param), Operator }, tran, commandType: CommandType.StoredProcedure);
-            result = conn.Execute("Admin_DepositLimitInfo_Del", new { SiteId = depositLimitInfo.SiteId, CurrencyId = depositLimitInfo.CurrencyId, VipLevel = depositLimitInfo.VipLevel, DepositType = depositLimitInfo.DepositType }, commandType: CommandType.StoredProcedure);
+            var result = conn.Execute("Admin_DepositLimitInfo_Del", new { depositLimitInfo.SiteId,  depositLimitInfo.CurrencyId,  depositLimitInfo.VipLevel, depositLimitInfo.DepositType }, commandType: CommandType.StoredProcedure);
             tran.Commit();
 
             return result;

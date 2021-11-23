@@ -214,6 +214,7 @@ namespace BackendSite.Service.Model
         public double DepositMin { get; set; }
 
         public double DepositMax { get; set; }
+        
         public int DepositStatus { get; set; }
     }
 

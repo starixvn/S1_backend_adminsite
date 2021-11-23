@@ -47,7 +47,7 @@ namespace BackendSite.ExceptionHandling
         AccountLocked = 1005,
 
         [Description("msg_OldpwdNotMatch")]
-        OldpwdNotMatch = 1006,
+        OldPwdNotMatch = 1006,
 
         #endregion
     }

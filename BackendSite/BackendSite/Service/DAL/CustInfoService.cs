@@ -210,9 +210,7 @@ namespace BackendSite.Service.DAL
 
         public CustInfoDetail GetCustInfos(int? custId, string userName, int? siteId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfo_Get", new { CustId = custId, UserName = userName, SiteId = siteId }, commandType: CommandType.StoredProcedure);
-            return result;
+            return _mainDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfo_Get", new DynamicParameters(new { CustId = custId, UserName = userName, SiteId = siteId }));
         }
 
         public LastDepositAndWithdrawalTime GetCustDepositAndWithdrawalTime(int custId)
