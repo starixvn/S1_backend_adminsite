@@ -91,7 +91,7 @@ namespace BackendSite.Service.BLL
             else
             {
                 if (Md5Userpwd != changePwd.OldPwd)
-                    return ErrorCodeEnum.OldpwdNotMatch;
+                    return ErrorCodeEnum.OldPwdNotMatch;
                 else
                     return ErrorCodeEnum.Fail;
             }

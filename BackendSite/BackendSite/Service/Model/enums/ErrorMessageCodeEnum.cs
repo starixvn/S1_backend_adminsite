@@ -21,6 +21,9 @@ namespace BackendSite.Service.Model.enums
 
         [Description("msg_NoData")]
         NoData = -2,
+        
+        [Description("msg_UpdateFailed")]
+        UpdateFailed = 9,
 
         [Description("msg_SystemException")]
         SystemException = 9999,

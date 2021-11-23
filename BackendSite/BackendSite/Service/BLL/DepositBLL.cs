@@ -249,44 +249,11 @@ namespace BackendSite.Service.BLL
 
         public bool AddDepositLimit(DepositLimitInfo depositLimitInfo, string Operator)
         {
-            //if (depositLimitInfo.VipLevel > 1)
-            //{
-            //    var currentMaxLevel = depositService.GetDepositLimitInfo(depositLimitInfo.SiteId, depositLimitInfo.DepositType, depositLimitInfo.CurrencyId, depositLimitInfo.VipLevel - 1);
-
-            //    if (depositLimitInfo.DepositMin <= currentMaxLevel.DepositMin || depositLimitInfo.DepositMax <= currentMaxLevel.DepositMax)
-            //        return false;
-            //}
-            //else
-            //{
-            //    if (depositLimitInfo.DepositMin <= 0 || depositLimitInfo.DepositMax <= 0)
-            //        return false;
-            //}
-
             return depositService.AddDepositLimitInfo(depositLimitInfo, Operator);
         }
 
         public bool EditDepositLimit(DepositLimitInfo depositLimitInfo, string Operator)
         {
-            //var currentBelowLevel = depositService.GetDepositLimitInfo(depositLimitInfo.SiteId, depositLimitInfo.DepositType, depositLimitInfo.CurrencyId, depositLimitInfo.VipLevel - 1);
-            //var currentUpperLevel = depositService.GetDepositLimitInfo(depositLimitInfo.SiteId, depositLimitInfo.DepositType, depositLimitInfo.CurrencyId, depositLimitInfo.VipLevel + 1);
-
-            //if (currentBelowLevel != null)
-            //{
-            //    if (depositLimitInfo.DepositMin <= currentBelowLevel.DepositMin || depositLimitInfo.DepositMax <= currentBelowLevel.DepositMax)
-            //        return false;
-            //}
-            //else
-            //{
-            //    if (depositLimitInfo.DepositMin <= 0 || depositLimitInfo.DepositMax <= 0)
-            //        return false;
-            //}
-
-            //if (currentUpperLevel != null)
-            //{
-            //    if (depositLimitInfo.DepositMin >= currentUpperLevel.DepositMin || depositLimitInfo.DepositMax >= currentUpperLevel.DepositMax)
-            //        return false;
-            //}
-
             return depositService.EditDepositLimitInfo(depositLimitInfo, Operator);
         }
 
