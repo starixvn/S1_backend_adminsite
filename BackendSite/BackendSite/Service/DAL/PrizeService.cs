@@ -109,7 +109,7 @@ namespace BackendSite.Service.DAL
             props.Add("CurrencyId", CurrencyId);
             props.Add("EventName", string.IsNullOrWhiteSpace(EventName) ? null : EventName);
 
-            return _reportDbClient.Query<DrawPrizeExcelData>("Admin_DrawPrizeExport_Get_V2", props);
+            return _reportDbClient.Query<DrawPrizeExcelData>("Admin_DrawPrizeExport_Get", props);
 
         }
     }
