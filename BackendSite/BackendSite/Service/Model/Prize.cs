@@ -88,6 +88,7 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public string Currency { get; set; }
         public string PrizeName { get; set; }
+        public decimal Amount { get; set; }
         public string UserName { get; set; }
     }
 }
