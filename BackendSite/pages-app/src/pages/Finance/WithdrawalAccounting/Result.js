@@ -59,9 +59,9 @@ const dataColumnDefs = () => {
     {
       dataColumn: "flowEndTime",
       columnTitle: "Approved Time" + " (" + moment().format("Z") + ")",
-      body: {
-        format: dateFormat,
-      },
+      // body: {
+      //   format: dateFormat,
+      // },
     },
     { dataColumn: "detail", columnTitle: "Detail" },
   ];

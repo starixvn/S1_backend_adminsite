@@ -9,6 +9,17 @@ namespace BackendSite.Service.Model.enums
     //2.命名大部分請以 [Table欄位名稱] + Enum，ex.Customer.IsKyc => IsKycEnum
     //3.如欄位名稱重複率很高，命名請以 [Table名稱] + [Table欄位名稱] + Enum，ex.Customer.Status => CustomerStatusEnum
 
+    /// <summary>
+    /// DB環境列舉(不屬於任何Table，For專案使用)
+    /// </summary>
+    public enum DataBase
+    {
+        Main,   //ConnectionString
+        Report, //ConnectionStringReport
+        Wager,  //ConnectionStringWager
+        Log,    //ConnectionStringLog
+    }
+
     #region Customer
 
     public enum IsKycEnum
@@ -21,6 +32,12 @@ namespace BackendSite.Service.Model.enums
     {
         Unverified = 0,
         Verified = 1
+    }
+
+    public enum ActStatusEnum
+    {
+        NonDepoist = 1,
+        Depoisted = 2,
     }
 
     #endregion
@@ -41,20 +58,34 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    public enum DataBase
-    {
-        Main, //ConnectionString
-        Report,//ConnectionStringReport
-        Wager,//ConnectionStringWager
-        Log,//ConnectionStringLog
-    }
-    
+    #region CustIovation
+
+    //public enum IovationEnum
+    //{
+    //    Allow = "A",
+    //    Deny = "D",
+    //    Review = "R"
+    //}
+
+    #endregion
+
     #region Tag
 
     public enum TagStatusEnum
     {
         Disable = 0,
         Enable = 1
+    }
+
+    #endregion
+
+    #region DepositInfo
+
+    public enum DepositTypeEnum
+    {
+        OnlineBanking = 1,
+        MobilePayment = 2,
+        LocalBank = 3,
     }
 
     #endregion
@@ -75,12 +106,6 @@ namespace BackendSite.Service.Model.enums
         Suspend = 2,
         Closed = 3,
         Lock = 4,
-    }
-    public enum DepositType
-    {
-        OnlineBanking = 1,
-        MobilePayment = 2,
-        LocalBank = 3,
     }
 
     public enum WithdrawalType
@@ -402,10 +427,10 @@ namespace BackendSite.Service.Model.enums
         ERC20 = 1,
         TRC20 = 2
     }
-    
+
     public enum SendMessageStatus
     {
-        Pending = 0, 
+        Pending = 0,
         Approved = 1,
         Processing = 2,
         Success = 3,

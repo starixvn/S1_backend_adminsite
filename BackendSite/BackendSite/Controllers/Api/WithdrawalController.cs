@@ -897,7 +897,7 @@ namespace BackendSite.Controllers.Api
                     WithdrawalId = para.WithdrawalId,
                     StartDate = startTime,
                     EndDate = endTime,
-                    SelectSite = para.SelectSite,
+                    SiteIds = para.SelectSite,
                     CurrencyId = para.CurrencyId,
                     Status = para.Status,
                     PageNumber = para.PageNumber,

@@ -197,7 +197,7 @@ namespace BackendSite.Service.BLL
             return adjustmentService.GetAdjustmentData(SiteId, CurrencyId);
         }
 
-        public int AddAdjustmentLimitInfo(int SiteId, int CurrencyId, double AdjustmentMax, string Operator)
+        public int AddAdjustmentLimitInfo(int SiteId, int CurrencyId, decimal AdjustmentMax, string Operator)
         {
             return adjustmentService.AddAdjustmentLimitInfo(SiteId, CurrencyId, AdjustmentMax, Operator);
         }

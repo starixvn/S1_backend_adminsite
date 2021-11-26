@@ -104,12 +104,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                                 {
                                     if (_messageBll.ChangeVipLevelBatch(custInfoDetail.SiteId, custInfoDetail.CustId, custInfoDetail.UserName, vipLevel, memo, authData.UserName) > 0)
                                     {
-                                        apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorMessageCodeEnum.Success, Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. " });
+                                        apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorCodeEnum.Success, Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. " });
                                     }
                                 }
                                 catch (Exception ex)
                                 {
-                                    apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorMessageCodeEnum.SystemException, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {ex}" });
+                                    apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorCodeEnum.SystemException, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {ex}" });
                                 }
                             }
                             else if (custInfoDetail.Status == (int)CustStatus.Suspend)
@@ -131,13 +131,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 }
                 else
                 {
-                    apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorMessageCodeEnum.Fail, Message = "File Type Error" });
+                    apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorCodeEnum.Fail, Message = "File Type Error" });
                     return apiResult;
                 }
             }
             catch (Exception ex)
             {
-                apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorMessageCodeEnum.SystemException, Message = ex.ToString() });
+                apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorCodeEnum.SystemException, Message = ex.ToString() });
                 return apiResult;
             }
         }

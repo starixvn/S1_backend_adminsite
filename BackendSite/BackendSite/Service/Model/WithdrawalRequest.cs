@@ -206,7 +206,7 @@ namespace BackendSite.Service.Model
             get => _endDate;
             set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
-        public IEnumerable<int> SelectSite { get; set; }
+        public IEnumerable<int> SiteIds { get; set; }
         public int CurrencyId { get; set; }
         public int Status { get; set; }
         public int PageNumber { get; set; }

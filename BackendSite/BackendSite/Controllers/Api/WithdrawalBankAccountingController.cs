@@ -5,6 +5,7 @@ using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.WithdrawalBankAccounting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -66,13 +67,23 @@ namespace BackendSite.Controllers.Api
 
         public class GetWithdrawalInfoAndAccountingListRequest
         {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+
             public IEnumerable<int> SiteIds { get; set; }
 
             public IEnumerable<int> CurrencyIds { get; set; }
 
-            public string StartDate { get; set; }
-
-            public string EndDate { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
 
             public string TransId { get; set; }
 
@@ -153,14 +164,15 @@ namespace BackendSite.Controllers.Api
 
         #region Action
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute),
-            Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
+        [HttpPost]
         public ApiResult GetWithdrawalInfoAndAccountingList(GetWithdrawalInfoAndAccountingListRequest request)
         {
+
             var result = _withdrawalBLL.GetWithdrawalInfoAndAccountingList(request.SiteIds,
                 request.CurrencyIds,
-                request.StartDate,
-                request.EndDate,
+                request.StartDate.DateTime,
+                request.EndDate.DateTime,
                 request.TransId,
                 request.UserName,
                 request.PageNumber,
@@ -176,26 +188,32 @@ namespace BackendSite.Controllers.Api
             };
         }
 
+        [HttpPost]
         public IActionResult ExportWithdrawalAccountingList(string siteIds,
             string currencyIds,
-            string startDate,
-            string endDate,
+            DateTimeOffset startDate,
+            DateTimeOffset endDate,
             string transId,
             string userName)
         {
+
+            startDate = new DateTimeOffset(startDate.ToUniversalTime().DateTime, TimeSpan.Zero);
+            endDate = new DateTimeOffset(endDate.ToUniversalTime().DateTime, TimeSpan.Zero);
+
             var data = _withdrawalBLL.GetWithdrawalInfoAndAccountingListForExport(siteIds,
                 currencyIds,
-                startDate,
-                endDate,
+                startDate.DateTime,
+                endDate.DateTime,
                 transId,
                 userName);
+
+
             var stream = _excelBLL.Export(data);
 
-            return File(stream,
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                $"WithdrawalInfoAndAccountList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBLL.ExcelFile(stream, "WithdrawalInfoAndAccountList");
         }
 
+        [HttpPost]
         public ApiResult GetWithdrawalInfoAndAccountingByTransId(GetWithdrawalInfoAndAccountingByTransIdRequest request)
         {
             var result = _withdrawalBLL.GetAccountingListByTransId(request.TransId,
@@ -215,6 +233,7 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        [HttpPost]
         public ApiResult GetWithdrawalBankAccounting(GetWithdrawalBankAccountingRequest request)
         {
             var result =
@@ -235,6 +254,7 @@ namespace BackendSite.Controllers.Api
                 };
         }
 
+        [HttpPost]
         public ApiResult CreateWithdrawalBankAccounting(CreateWithdrawalAccountingRequest request)
         {
             var authData = _authorizeBLL.GetAuthData();
@@ -262,6 +282,7 @@ namespace BackendSite.Controllers.Api
             };
         }
 
+        [HttpPost]
         public ApiResult InsertWithdrawalAccounting(SetWithdrawalAccountingRequest request)
         {
             var result = _withdrawalBLL.InsertWithdrawalAccounting(new WithdrawalBankAccountingModel()
@@ -290,6 +311,7 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        [HttpPost]
         public ApiResult UpdateWithdrawalAccounting(SetWithdrawalAccountingRequest request)
         {
             var result = _withdrawalBLL.UpdateWithdrawalAccounting(new WithdrawalBankAccountingModel()
@@ -318,6 +340,7 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        [HttpPost]
         public ApiResult DeleteWithdrawalAccounting(DeleteWithdrawalAccountingRequest request)
         {
             var result = _withdrawalBLL.DeleteWithdrawalAccounting(request.Id, out var transId, out var seq,
