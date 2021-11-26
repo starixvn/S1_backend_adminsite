@@ -38,8 +38,8 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<WithdrawalInfoAndAccountingListModel> GetWithdrawalInfoAndAccountingList(string siteIds,
             string currencyIds,
-            string startDate,
-            string endDate,
+            DateTime startDate,
+            DateTime endDate,
             string transId,
             string userName,
             int pageSize,
@@ -61,7 +61,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             var data = _reportDbClient.Query<WithdrawalInfoAndAccountingListModel>(
-                "Admin_WithdrawalInfoAndAccountingV2_Get", parameter);
+                "Admin_WithdrawalInfoAndAccounting_Get_V3", parameter);
 
 
             totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
@@ -73,8 +73,8 @@ namespace BackendSite.Service.DAL
         public IEnumerable<WithdrawalInfoAndAccountingListForExportModel> GetWithdrawalInfoAndAccountingListForExport(
             string siteIds,
             string currencyIds,
-            string startDate,
-            string endDate,
+            DateTime startDate,
+            DateTime endDate,
             string transId,
             string userName)
         {
@@ -88,7 +88,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_UserName", userName);
 
             return _reportDbClient.Query<WithdrawalInfoAndAccountingListForExportModel>(
-                "Admin_WithdrawalInfoAndAccountingForExportV2_Get", parameter);
+                "Admin_WithdrawalInfoAndAccountingForExport_Get_V3", parameter);
         }
 
         public IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingListByTransId(string transId, int siteId,int currencyId)
@@ -99,7 +99,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_SiteId", siteId);
             parameter.Add("_CurrencyId", currencyId);
 
-            return _reportDbClient.Query<GetWithdrawalBankAccountingModel>("Admin_WithdrawalBankAccounting_Get",
+            return _reportDbClient.Query<GetWithdrawalBankAccountingModel>("Admin_WithdrawalBankAccounting_Get_V2",
                 parameter);
         }
 

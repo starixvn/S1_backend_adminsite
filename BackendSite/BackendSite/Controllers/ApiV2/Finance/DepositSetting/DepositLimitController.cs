@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using BackendSite.Attributes;
-using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -35,7 +34,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
 
         #region Model
 
-       
+
         #endregion
 
         #region Finance > Deposit Limit Management 
@@ -49,39 +48,40 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// Func Path：Finance > Deposit Limit Management > [Submit]
         /// </remarks>
         /// <param name="req"></param>
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
-        public ApiResult<IEnumerable<DepositLimitCurrencyInfo>> GetDepositLimitCurrencyList(DepositLimit req)
-        {
-            var apiResult = new ApiResult<IEnumerable<DepositLimitCurrencyInfo>>();
-            var depositLimitCurrencyList = _depositBll.GetDepositLimitCurrencyList(req.SiteId, req.DepositType);
-            apiResult.Data = depositLimitCurrencyList;
-            apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
-            return apiResult;
-        }
-        
+        // 判斷流程，應可以被Permission/GetUserSiteList取代，Currency可以透過GetAllData/GetCurrency取得，先暫時mark
+        //[HttpPost]
+        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
+        //public ApiResult<IEnumerable<DepositLimitCurrencyInfo>> GetDepositLimitCurrencyList(DepositLimit req)
+        //{
+        //    var apiResult = new ApiResult<IEnumerable<DepositLimitCurrencyInfo>>();
+        //    var depositLimitCurrencyList = _depositBll.GetDepositLimitCurrencyList(req.SiteId, req.DepositType);
+        //    apiResult.Data = depositLimitCurrencyList;
+        //    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+        //    return apiResult;
+        //}
+
         /// <summary>
-        /// DepositLimit/GetDepositLimitInfos
+        /// DepositLimit/GetList 取得存款限額資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Deposit Limit Management > [Submit]
+        /// Func Path：Finance > Deposit Limit Management > Clikc[Site Name] & [Deposit Type]
         /// </remarks>
         /// <param name="req"></param>
-        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
-        public ApiResult<IEnumerable<DepositLimitInfo>> GetDepositLimitInfos(DepositLimit req)
+        [HttpPost]
+        public ApiResult<IEnumerable<DepositLimitInfo>> GetList(DepositLimit req)
         {
             var apiResult = new ApiResult<IEnumerable<DepositLimitInfo>>();
             var depositLimitInfos = _depositBll.GetDepositLimitInfos(req.SiteId, req.DepositType, req.CurrencyId);
             apiResult.Data = depositLimitInfos;
-            apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             return apiResult;
         }
 
         /// <summary>
-        /// DepositLimit/AddDepositLimitInfo
+        /// DepositLimit/Create 新增存款限額
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -90,79 +90,80 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// </remarks>
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
-        public ApiResult AddDepositLimitInfo(DepositLimitInfo req)
+        [HttpPost]
+        public ApiResult Create(DepositLimitInfo req)
         {
             var result = _depositBll.AddDepositLimit(req, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result)
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.UpdateFailed;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
                 apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
             }
             return apiResult;
         }
-        
+
         /// <summary>
-        /// DepositLimit/EditDepositLimitInfo
+        /// DepositLimit/Update 更新存款限額
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Deposit Limit Management > [Submit] > Edit
+        /// Func Path：Finance > Deposit Limit Management > Clikc[Site Name] & [Deposit Type] > [Edit] > [Save]
         /// </remarks>
         /// <param name="req"></param>
-        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
-        public ApiResult EditDepositLimitInfo(DepositLimitInfo req)
+        [HttpPost]
+        public ApiResult Update(DepositLimitInfo req)
         {
             var result = _depositBll.EditDepositLimit(req, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result)
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.UpdateFailed;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
                 apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
             }
             return apiResult;
         }
-        
+
         /// <summary>
-        /// DepositLimit/DeleteDepositLimitInfo
+        /// DepositLimit/Delete 刪除存款限額
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Deposit Limit Management > [Submit] > Delete
+        /// Func Path：Finance > Deposit Limit Management > Clikc[Site Name] & [Deposit Type] > [Delete]
         /// </remarks>
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
-        public ApiResult DeleteDepositLimitInfo(DepositLimitInfo req)
+        public ApiResult Delete(DepositLimitInfo req)
         {
             var result = _depositBll.DeleteDepositLimit(req, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result > 0)
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.UpdateFailed;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
                 apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
             }
             return apiResult;
         }
-       
+
         #endregion
     }
 }

@@ -33,7 +33,7 @@ namespace BackendSite.Service.BLL
         /// <param name="ex"></param>
         /// <param name="lang"></param>
         /// <returns></returns>
-        public ApiResult SetResponse(ErrorMessageCodeEnum status,
+        public ApiResult SetResponse(ErrorCodeEnum status,
                                      Exception ex = null,
                                      string lang = "en",
                                      string custMessage = null)
@@ -56,7 +56,7 @@ namespace BackendSite.Service.BLL
         /// <param name="ex"></param>
         /// <param name="lang"></param>
         /// <returns></returns>
-        public ApiResult SetResponse<T>(ErrorMessageCodeEnum status,
+        public ApiResult SetResponse<T>(ErrorCodeEnum status,
                                         T data,
                                         Exception ex = null,
                                         string lang = "en",
@@ -84,7 +84,7 @@ namespace BackendSite.Service.BLL
         /// <param name="ex"></param>
         /// <param name="lang"></param>
         /// <returns></returns>
-        public ApiListResult<T> SetResponse<T>(ErrorMessageCodeEnum status,
+        public ApiListResult<T> SetResponse<T>(ErrorCodeEnum status,
                                         IEnumerable<T> data,
                                         int totalPages = 0,
                                         int pageNum = 0,
@@ -119,8 +119,8 @@ namespace BackendSite.Service.BLL
         {
             return new ApiResult()
             {
-                ErrorCode = (int)ErrorMessageCodeEnum.SystemException,
-                Message = string.IsNullOrEmpty(custMessage) ? _selLangBLL.GetMsg(ErrorMessageCodeEnum.SystemException.GetDescription(), lang) : custMessage,
+                ErrorCode = (int)ErrorCodeEnum.SystemException,
+                Message = string.IsNullOrEmpty(custMessage) ? _selLangBLL.GetMsg(ErrorCodeEnum.SystemException.GetDescription(), lang) : custMessage,
                 RawErrorCode = ex == null ? "0" : ex.HResult.ToString(),
                 RawMessage = ex == null ? "" : ex.Message
             };

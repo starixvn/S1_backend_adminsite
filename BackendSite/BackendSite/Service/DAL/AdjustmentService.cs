@@ -341,7 +341,7 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<AdjustmentLimtData>("Admin_AdjustmentLimitInfo_Get", new DynamicParameters(new { SiteId = SiteId, CurrencyId= CurrencyId })).FirstOrDefault();
         }
-        public int AddAdjustmentLimitInfo(int SiteId, int CurrencyId, double AdjustmentMax, string Operator)
+        public int AddAdjustmentLimitInfo(int SiteId, int CurrencyId, decimal AdjustmentMax, string Operator)
         {
             var props = new DynamicParameters();
             props.Add("SiteId", SiteId);

@@ -130,11 +130,9 @@ const VipLevelReview = lazy(() =>
   import("./pages/Marketing/VipLevelReview/index")
 );
 
-const UserBetLimit = lazy(() =>
-  import("./pages/CSD/UserBetLimit/index")
-);
+const UserBetLimit = lazy(() => import("./pages/CSD/UserBetLimit/index"));
 
-export const defaultPage = "UserBetLimit";
+export const defaultPage = "PersonalMsgBatch";
 
 export const layoutType = {
   N88: "N88",

@@ -140,7 +140,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == withdrawalReq.CurrencyId && (x.Purpose & 2) > 0)
                 .OrderBy(x => x.BSort);
             apiResult.Data = bankInfoOff;
-            apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             return apiResult;
         }
 
@@ -170,7 +170,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                                 PayName = x.PayName
                             }).Distinct(bankInfoPayComparer);
             apiResult.Data = _payInfo;
-            apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             return apiResult;
         }
 
@@ -204,7 +204,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                             }).Distinct(bankInfoPayComparer);
 
             apiResult.Data = _payInfo;
-            apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             return apiResult;
         }
 
@@ -293,7 +293,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
                 apiResult.Data = data;
 
-                apiResult.ErrorCode = 0;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
@@ -320,8 +320,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var apiListResult = new ApiListResult<VipLevelSetting>
             {
                 Data = _vipLevelBll.GetVipLevelSetting(request.SiteId),
-                ErrorCode = 0
-            };
+                ErrorCode = (int)ErrorCodeEnum.Success
+        };
             return apiListResult;
         }
 

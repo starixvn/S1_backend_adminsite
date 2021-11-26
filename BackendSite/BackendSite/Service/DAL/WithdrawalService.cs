@@ -296,7 +296,7 @@ namespace BackendSite.Service.DAL
 
         public WithdrawalTimeData WithdrawalTimeReportGet(WithdrawalTimeReportPara para)
         {
-            var selectSite = JsonConvert.SerializeObject(para.SelectSite);
+            var selectSite = JsonConvert.SerializeObject(para.SiteIds);
             var selectStatus = new List<int>();
             if (para.Status == 0)
             {

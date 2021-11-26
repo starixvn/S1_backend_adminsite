@@ -221,7 +221,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 return new ApiResult<int>()
                 {
-                    ErrorCode = (int)ErrorMessageCodeEnum.SystemException,
+                    ErrorCode = (int)ErrorCodeEnum.SystemException,
                     Message = "Unknown Error"
                 };
             }
@@ -376,12 +376,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 apiResult.PageNumber = pageNumber;
                 apiResult.RowCount = rowCount;
                 apiResult.TotalPages = totalPages;
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
                 apiResult.RawMessage = ex.ToString();
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
             }
 
             return apiResult;

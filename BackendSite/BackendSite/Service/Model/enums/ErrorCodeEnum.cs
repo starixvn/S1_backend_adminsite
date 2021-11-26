@@ -2,7 +2,7 @@
 
 namespace BackendSite.Service.Model.enums
 {
-    public enum ErrorMessageCodeEnum
+    public enum ErrorCodeEnum
     {
         //編碼規則
         //1XXX:Home
@@ -21,7 +21,16 @@ namespace BackendSite.Service.Model.enums
 
         [Description("msg_NoData")]
         NoData = -2,
-        
+
+        [Description("msg_FileTypeNotMatch")]
+        FileTypeNotMatch = -3,
+
+        [Description("msg_PermissionDenied")]
+        PermissionDenied = -4,
+
+        [Description("msg_DuplicateData")]
+        DuplicateData = -5,
+
         [Description("msg_UpdateFailed")]
         UpdateFailed = 9,
 

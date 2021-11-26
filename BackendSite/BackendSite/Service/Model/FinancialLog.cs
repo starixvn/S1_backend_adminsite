@@ -177,7 +177,7 @@ namespace BackendSite.Service.Model
 
         public int CurrencyId { get; set; }
 
-        public double AdjustmentMax { get; set; }
+        public decimal AdjustmentMax { get; set; }
         public DateTime UpdateTime { get; set; }
         public string UpdateOperator { get; set; }
     }

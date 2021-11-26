@@ -102,12 +102,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 apiResult.TotalPages = totalPages;
                 apiResult.PageNumber = pageNumber;
                 apiResult.RowCount = rowCount;
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
 
@@ -163,12 +163,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                     DisableGames = tpList.ToList()
                 };
                 apiResult.Data = editInfo;
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
             return apiResult;
@@ -194,7 +194,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 var customer = await _custInfoBll.GetCustId(disableGames.UserName, disableGames.SiteId);
                 if (customer == null)
                 {
-                    apiResult.ErrorCode = (int)ErrorMessageCodeEnum.NoData; ;
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.NoData; ;
                     apiResult.Message = "User Not Found";
                     return apiResult;
                 }
@@ -204,7 +204,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 return new ApiResult
                 {
                     //result: 1 (新增成功),2 (修改成功)
-                    ErrorCode = (result == 1 || result == 2) ? (int)ErrorMessageCodeEnum.Success : result,
+                    ErrorCode = (result == 1 || result == 2) ? (int)ErrorCodeEnum.Success : result,
                 };
             }
             catch (Exception ex)
@@ -212,7 +212,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 _logger.LogError(ex, ex.Message);
                 return new ApiResult
                 {
-                    ErrorCode = (int)ErrorMessageCodeEnum.SystemException,
+                    ErrorCode = (int)ErrorCodeEnum.SystemException,
                     Message = ex.Message,
                 };
             }
@@ -237,7 +237,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 var result = await _riskBll.UpdateStatus(disable.CustId, disable.Status, updateOperator);
                 return new ApiResult
                 {
-                    ErrorCode = result == 1 ? (int)ErrorMessageCodeEnum.Success : result,
+                    ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
                 };
             }
             catch (Exception ex)
@@ -245,7 +245,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 _logger.LogError(ex, ex.Message);
                 return new ApiResult
                 {
-                    ErrorCode = (int)ErrorMessageCodeEnum.SystemException,
+                    ErrorCode = (int)ErrorCodeEnum.SystemException,
                     Message = ex.Message,
                 };
             }
@@ -269,7 +269,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 var result = await _riskBll.DeleteTpDisableUser(req.CustId);
                 return new ApiResult
                 {
-                    ErrorCode = result == 1 ? (int)ErrorMessageCodeEnum.Success : result,
+                    ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
                 };
             }
             catch (Exception ex)
@@ -277,7 +277,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 _logger.LogError(ex, ex.Message);
                 return new ApiResult
                 {
-                    ErrorCode = (int)ErrorMessageCodeEnum.SystemException,
+                    ErrorCode = (int)ErrorCodeEnum.SystemException,
                     Message = ex.Message,
                 };
             }
