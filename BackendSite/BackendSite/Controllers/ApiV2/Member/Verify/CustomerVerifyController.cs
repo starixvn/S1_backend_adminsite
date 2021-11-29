@@ -11,7 +11,7 @@ using System;
 namespace BackendSite.Controllers.ApiV2.Member.Verify
 {
 
-    [Route("api/[controller]")]
+    [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class CustomerVerifyController : ControllerBase
     {
