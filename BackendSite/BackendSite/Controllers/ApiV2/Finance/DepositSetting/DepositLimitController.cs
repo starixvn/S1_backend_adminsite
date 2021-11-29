@@ -32,33 +32,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
 
         #endregion
 
-        #region Model
-
-
-        #endregion
-
         #region Finance > Deposit Limit Management 
-
-        /// <summary>
-        /// DepositLimit/GetDepositLimitCurrencyList
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Deposit Limit Management > [Submit]
-        /// </remarks>
-        /// <param name="req"></param>
-        // 判斷流程，應可以被Permission/GetUserSiteList取代，Currency可以透過GetAllData/GetCurrency取得，先暫時mark
-        //[HttpPost]
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
-        //public ApiResult<IEnumerable<DepositLimitCurrencyInfo>> GetDepositLimitCurrencyList(DepositLimit req)
-        //{
-        //    var apiResult = new ApiResult<IEnumerable<DepositLimitCurrencyInfo>>();
-        //    var depositLimitCurrencyList = _depositBll.GetDepositLimitCurrencyList(req.SiteId, req.DepositType);
-        //    apiResult.Data = depositLimitCurrencyList;
-        //    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-        //    return apiResult;
-        //}
 
         /// <summary>
         /// DepositLimit/GetList 取得存款限額資料清單
@@ -66,7 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Deposit Limit Management > Clikc[Site Name] & [Deposit Type]
+        /// Func Path：Finance > Deposit Limit Management > Clikc[Site Name] [Deposit Type]
         /// </remarks>
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
@@ -114,7 +88,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Deposit Limit Management > Clikc[Site Name] & [Deposit Type] > [Edit] > [Save]
+        /// Func Path：Finance > Deposit Limit Management > Clikc[Site Name] [Deposit Type] > [Edit] > [Save]
         /// </remarks>
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
@@ -142,7 +116,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Deposit Limit Management > Clikc[Site Name] & [Deposit Type] > [Delete]
+        /// Func Path：Finance > Deposit Limit Management > Clikc[Site Name] [Deposit Type] > [Delete]
         /// </remarks>
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
@@ -163,6 +137,28 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
             }
             return apiResult;
         }
+
+        // <summary>
+        // DepositLimit/GetDepositLimitCurrencyList
+        // </summary>
+        // <remarks>
+        // Http Method：POST
+        // 
+        // Func Path：Finance > Deposit Limit Management > [Submit]
+        // </remarks>
+        // <param name="req"></param>
+        // 判斷流程，應可以被Permission/GetUserSiteList取代，Currency可以透過GetAllData/GetCurrency取得，先暫時mark
+        //[HttpPost]
+        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
+        //public ApiResult<IEnumerable<DepositLimitCurrencyInfo>> GetDepositLimitCurrencyList(DepositLimit req)
+        //{
+        //    var apiResult = new ApiResult<IEnumerable<DepositLimitCurrencyInfo>>();
+        //    var depositLimitCurrencyList = _depositBll.GetDepositLimitCurrencyList(req.SiteId, req.DepositType);
+        //    apiResult.Data = depositLimitCurrencyList;
+        //    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+        //    return apiResult;
+        //}
+
 
         #endregion
     }
