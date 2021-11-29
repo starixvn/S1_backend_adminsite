@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 {
     [Authorize]
-    [Route("api/[controller]/[action]")]
+    [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class TpFundsAdjustmentController : ControllerBase
     {

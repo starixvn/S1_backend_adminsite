@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
 {
     [Authorize]
-    [Route("api/[controller]/[action]")]
+    [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DepositLimitController : ControllerBase
     {
