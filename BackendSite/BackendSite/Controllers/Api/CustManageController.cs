@@ -1461,7 +1461,7 @@ namespace BackendSite.Controllers.Api
                 var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
 
                 var SearchResult = custInfoBLL.GetPromotionListByCustIdAndDate(CustId, startTime, endTime, PageNumber, PageSize);
-                SearchResult.PromotionList.ForEach(s => s.ClaimDate = new DateTimeOffset(s.ClaimDate.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+                //SearchResult.PromotionList.ForEach(s => s.ClaimDate = new DateTimeOffset(s.ClaimDate.DateTime.AddHours(8), TimeSpan.FromHours(8)));
                 apiResult.Data = SearchResult.PromotionList;
                 apiResult.PageNumber = SearchResult.PageNumber;
                 apiResult.TotalPages = SearchResult.TotalPages;
