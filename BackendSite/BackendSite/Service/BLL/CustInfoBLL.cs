@@ -198,6 +198,11 @@ namespace BackendSite.Service.BLL
         {
             return custInfoService.GetCustInfos(custId, userName, siteId);
         }
+        
+        public bool SendMessageBatch(BatchPersonalMsg req)
+        {
+            return custInfoService.SendMessageBatch(req);
+        }
 
         public decimal GetBalance(int custId)
         {

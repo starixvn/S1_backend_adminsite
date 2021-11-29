@@ -214,6 +214,21 @@ namespace BackendSite.Service.DAL
             var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfo_Get", new { CustId = custId, UserName = userName, SiteId = siteId }, commandType: CommandType.StoredProcedure);
             return result;
         }
+        
+        public bool SendMessageBatch(BatchPersonalMsg req)
+        {
+            return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins", 
+                new DynamicParameters(new { 
+                    _BatchId = req.BatchId,
+                    _SiteId = req.SiteId,
+                    _LangId = req.LangId,  
+                    _CurrencyId = req.CurrencyId,
+                    _Status = req.AccountStatus,
+                    _Title = req.Title ,
+                    _Content =req.Content,
+                    _Operator = req.Operator
+                })) > 0;
+        }
 
         public LastDepositAndWithdrawalTime GetCustDepositAndWithdrawalTime(int custId)
         {
