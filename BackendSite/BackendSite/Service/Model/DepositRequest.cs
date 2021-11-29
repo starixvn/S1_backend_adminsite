@@ -182,8 +182,14 @@ namespace BackendSite.Service.Model
     }
     public class Comments
     {
+        private DateTimeOffset _createTime { get; set; }
+
         public string Comment { get; set; }
-        public DateTimeOffset CreateTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public int Action { get; set; }
 
         public string ActionString { get; set; }

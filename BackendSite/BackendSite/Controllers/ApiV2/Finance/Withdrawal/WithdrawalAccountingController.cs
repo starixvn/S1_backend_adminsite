@@ -67,7 +67,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
         #region API Model
 
-        public class GetWithdrawalInfoAndAccountingListRequest : ApiRequestPageModel
+        public class GetListRequest : ApiRequestPageModel
         {
             public IEnumerable<int> SiteIds { get; set; }
 
@@ -152,9 +152,19 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
         #region Action
 
+        /// <summary>
+        /// WithdrawalAccounting/GetList 取得提款帳務清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Accounting > [Submit](Query)
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
         [HttpPost]
-        public ApiResult GetWithdrawalInfoAndAccountingList(GetWithdrawalInfoAndAccountingListRequest request)
+        public ApiResult GetList(GetListRequest request)
         {
 
             var result = _withdrawalBll.GetWithdrawalInfoAndAccountingList(request.SiteIds,
@@ -176,24 +186,30 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             };
         }
 
+        /// <summary>
+        /// WithdrawalAccounting/Export 匯出提款帳務清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Accounting > [Submit](Query) > [Export Excel]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
         [HttpPost]
-        public IActionResult ExportWithdrawalAccountingList(string siteIds,
-            string currencyIds,
-            DateTimeOffset startDate,
-            DateTimeOffset endDate,
-            string transId,
-            string userName)
+        public IActionResult Export(GetListRequest request)
         {
 
-            startDate = new DateTimeOffset(startDate.ToUniversalTime().DateTime, TimeSpan.Zero);
-            endDate = new DateTimeOffset(endDate.ToUniversalTime().DateTime, TimeSpan.Zero);
+            var startDate = new DateTimeOffset(request.StartDate.ToUniversalTime().DateTime, TimeSpan.Zero);
+            var endDate = new DateTimeOffset(request.EndDate.ToUniversalTime().DateTime, TimeSpan.Zero);
 
-            var data = _withdrawalBll.GetWithdrawalInfoAndAccountingListForExport(siteIds,
-                currencyIds,
+            var data = _withdrawalBll.GetWithdrawalInfoAndAccountingListForExport(JsonConvert.SerializeObject(request.SiteIds),
+                JsonConvert.SerializeObject(request.CurrencyIds),
                 startDate.DateTime,
                 endDate.DateTime,
-                transId,
-                userName);
+                request.TransId,
+                request.UserName);
 
 
             var stream = _excelBll.Export(data);
@@ -201,8 +217,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             return _excelBll.ExcelFile(stream, "WithdrawalInfoAndAccountList");
         }
 
+        /// <summary>
+        /// WithdrawalAccounting/GetWithdrawalInfoByTransId 取得指定提款資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Accounting > [Submit](Query) > [Detail] > Withdrawal Info
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
-        public ApiResult GetWithdrawalByTransId(GetByTransIdRequest request)
+        [HttpPost]
+        public ApiResult GetWithdrawalInfoByTransId(GetByTransIdRequest request)
         {
             var result = _withdrawalBll.GetWithdrawalInfoByTransId(request.TransId,
                 out var data);
@@ -221,8 +249,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             }
         }
 
+        /// <summary>
+        /// WithdrawalAccounting/GetAccountingListByTransId 取得指定提款帳務清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Accounting > [Submit](Query) > [Detail] > Accounting List
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
-        public ApiResult GetWithdrawalAccountingByTransId(GetByTransIdRequest request)
+        [HttpPost]
+        public ApiResult GetAccountingListByTransId(GetByTransIdRequest request)
         {
             var result = _withdrawalBll.GetWithdrawalAccountingByTransId(request.TransId,
                 out var data);
@@ -241,8 +281,19 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             }
         }
 
+        /// <summary>
+        /// WithdrawalAccounting/GetById 取得指定提款帳務
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Accounting > [Submit](Query) > [Detail] > Accounting List > [Edit]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
-        public ApiResult GetWithdrawalBankAccounting(GetWithdrawalBankAccountingRequest request)
+        [HttpPost]
+        public ApiResult GetById(GetWithdrawalBankAccountingRequest request)
         {
             var result = _withdrawalBll.GetWithdrawalBankAccountingById(request.Id, out var data);
 
@@ -261,8 +312,19 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 };
         }
 
+        /// <summary>
+        /// WithdrawalAccounting/Create 建立提款帳務(提供Defalt Value)
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Accounting > [Submit](Query) > [Detail] > [Create]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
-        public ApiResult CreateWithdrawalBankAccounting(CreateWithdrawalAccountingRequest request)
+        [HttpPost]
+        public ApiResult Create(CreateWithdrawalAccountingRequest request)
         {
             var authData = _authorizeBll.GetAuthData();
 
@@ -289,8 +351,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             };
         }
 
+        /// <summary>
+        /// WithdrawalAccounting/Insert 新增提款帳務
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Accounting > [Submit](Query) > [Detail] > [Create] > [Submit]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
-        public ApiResult InsertWithdrawalAccounting(SetWithdrawalAccountingRequest request)
+        [HttpPost]
+        public ApiResult Insert(SetWithdrawalAccountingRequest request)
         {
             var result = _withdrawalBll.InsertWithdrawalAccounting(new WithdrawalBankAccountingModel()
             {
@@ -318,8 +392,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             }
         }
 
+        /// <summary>
+        /// WithdrawalAccounting/Update 更新提款帳務
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Accounting > [Submit](Query) > [Detail] > Accounting List > [Edit]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
-        public ApiResult UpdateWithdrawalAccounting(SetWithdrawalAccountingRequest request)
+        [HttpPost]
+        public ApiResult Update(SetWithdrawalAccountingRequest request)
         {
             var result = _withdrawalBll.UpdateWithdrawalAccounting(new WithdrawalBankAccountingModel()
             {
@@ -347,8 +433,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             }
         }
 
+        /// <summary>
+        /// WithdrawalAccounting/Delete 刪除提款帳務
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Accounting > [Submit](Query) > [Detail] > Accounting List > [Delete]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
-        public ApiResult DeleteWithdrawalAccounting(DeleteWithdrawalAccountingRequest request)
+        [HttpPost]
+        public ApiResult Delete(DeleteWithdrawalAccountingRequest request)
         {
             var result = _withdrawalBll.DeleteWithdrawalAccounting(request.Id, out var transId, out var seq,
                 out var uploadPicTimes);
@@ -369,6 +467,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             }
         }
 
+        /// <summary>
+        /// WithdrawalAccounting/UploadAccountingPicture 上傳帳務圖片
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Accounting > [Submit](Query) > [Detail] > Accounting List > [Pic] > [Paste Area]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
         [HttpPost]
         public async Task<ApiResult> UploadAccountingPicture(UploadAccountingPictureRequest request)
@@ -396,6 +504,18 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             };
         }
 
+        /// <summary>
+        /// WithdrawalAccounting/GetAccountingPicture 取得帳務圖片
+        /// </summary>
+        /// <remarks>
+        /// Http Method：GET
+        /// 
+        /// Func Path：Finance > Withdrawal Accounting > [Submit](Query) > [Detail] > Accounting List > [Pic]
+        /// </remarks>
+        /// <param name="transId"></param>
+        /// <param name="seq"></param>
+        /// <param name="uploadPicTimes"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
         [HttpGet]
         public ActionResult GetAccountingPicture(string transId, int seq, int uploadPicTimes)
@@ -404,6 +524,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 $"{_awsWithdrawalUrl}{_awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png");
         }
 
+        /// <summary>
+        /// WithdrawalAccounting/DeleteAccountingPicture 刪除帳務圖片
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Accounting > [Submit](Query) > [Detail] > Accounting List > [Pic] > [Delete]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
         [HttpPost]
         public async Task<ApiResult> DeleteAccountingPicture(DeleteAccountingPictureRequest request)
@@ -426,6 +556,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             };
         }
 
+        /// <summary>
+        /// WithdrawalAccounting/CheckAccountingPicture 檢查帳務圖片
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Accounting > [Submit](Query) > [Detail] > Accounting List > [Pic]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalAccountingList" })]
         [HttpPost]
         public async Task<ApiResult> CheckAccountingPicture(CheckAccountingPictureRequest request)

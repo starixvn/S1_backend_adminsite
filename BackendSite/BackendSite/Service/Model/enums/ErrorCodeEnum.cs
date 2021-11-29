@@ -9,6 +9,7 @@ namespace BackendSite.Service.Model.enums
         //2XXX:Deposit
         //3XXX:Withdrawal
         //4XXX:Adjustment
+        //5XXX:Customer相關代碼
         //9XXX:System常使用代碼
         
         #region In Common Use
@@ -37,9 +38,6 @@ namespace BackendSite.Service.Model.enums
         [Description("msg_SystemException")]
         SystemException = 9999,
 
-        [Description("msg_UserNotFound")]
-        CustNotFound = 9000,
-
         #endregion
 
         #region Home
@@ -67,7 +65,23 @@ namespace BackendSite.Service.Model.enums
         #region Finance
 
         [Description("msg_WithdrawalLimitAdjustmentNotBalance")]
-        WithdrawalLimitAdjustmentNotBalance = 4002
+        WithdrawalLimitAdjustmentNotBalance = 4002,
+
+        #endregion
+
+        #region CSD
+
+        [Description("msg_UserNotFound")]
+        CustNotFound = 5001,
+
+        [Description("msg_CustStatusIsSuspend")]
+        CustStatusIsSuspend = 5002,
+
+        [Description("msg_CustStatusIsClosed")]
+        CustStatusIsClosed = 5003,
+
+        [Description("msg_CustStatusIsLocked")]
+        CustStatusIsLocked = 5004,
 
         #endregion
     }

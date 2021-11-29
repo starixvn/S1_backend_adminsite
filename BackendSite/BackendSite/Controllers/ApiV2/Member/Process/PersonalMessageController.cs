@@ -167,8 +167,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                             {
                                 switch (custInfosDetail.Status)
                                 {
-                                    case (int)CustStatus.Running:
-                                    case (int)CustStatus.Lock:
+                                    case (int)CustomerStatusEnum.Running:
+                                    case (int)CustomerStatusEnum.Lock:
                                         SendBatchMessage(personalMsg,
                                             custInfosDetail.CustId,
                                             siteId,
@@ -176,19 +176,19 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                             batchId,
                                             custUsername,
                                             sabaId,
-                                            (CustStatus)custInfosDetail.Status,
+                                            (CustomerStatusEnum)custInfosDetail.Status,
                                             out errorCode,
                                             out resultMessage);
                                         break;
 
-                                    case (int)CustStatus.Suspend:
+                                    case (int)CustomerStatusEnum.Suspend:
                                         resultMessage =
-                                            $"Fail. CustId={custId}. Username={custUsername}. SabaId={sabaId}. Status={CustStatus.Suspend.GetDescription()}";
+                                            $"Fail. CustId={custId}. Username={custUsername}. SabaId={sabaId}. Status={CustomerStatusEnum.Suspend.GetDescription()}";
                                         break;
 
-                                    case (int)CustStatus.Closed:
+                                    case (int)CustomerStatusEnum.Closed:
                                         resultMessage =
-                                            $"Fail. CustId={custId}. Username={custUsername}. SabaId={sabaId}. Status={CustStatus.Closed.GetDescription()}";
+                                            $"Fail. CustId={custId}. Username={custUsername}. SabaId={sabaId}. Status={CustomerStatusEnum.Closed.GetDescription()}";
                                         break;
                                 }
                             }
@@ -398,7 +398,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             int batchMessageId,
             string userName,
             string sabaId,
-            CustStatus custStatus,
+            CustomerStatusEnum custStatus,
             out int errorCode,
             out string resultMessage)
         {

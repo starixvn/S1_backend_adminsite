@@ -110,7 +110,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_Id", id);
 
             return _reportDbClient.QueryFirst<GetWithdrawalBankAccountingModel>(
-                "Admin_WithdrawalBankAccountingById_Get", parameter);
+                "Admin_WithdrawalBankAccountingById_Get_V2", parameter);
         }
 
         public bool SetFlow(ActionType action, WithdrawalBankAccountingModel model)

@@ -98,7 +98,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                             {
                                 apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Not fund. Username: {custUsername}. SabaId: {sabaId}." });
                             }
-                            else if (custInfoDetail.Status == (int)CustStatus.Running)
+                            else if (custInfoDetail.Status == (int)CustomerStatusEnum.Running)
                             {
                                 try
                                 {
@@ -112,11 +112,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                                     apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorCodeEnum.SystemException, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {ex}" });
                                 }
                             }
-                            else if (custInfoDetail.Status == (int)CustStatus.Suspend)
+                            else if (custInfoDetail.Status == (int)CustomerStatusEnum.Suspend)
                             {
                                 apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Suspend Status." });
                             }
-                            else if (custInfoDetail.Status == (int)CustStatus.Lock)
+                            else if (custInfoDetail.Status == (int)CustomerStatusEnum.Lock)
                             {
                                 apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Lock Status." });
                             }
