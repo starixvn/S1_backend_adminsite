@@ -522,7 +522,7 @@ namespace BackendSite.Controllers.Api
                         {
                             switch (custInfosDetail.Status)
                             {
-                                case (int)CustStatus.Running:
+                                case (int)CustomerStatusEnum.Running:
                                     SendBatchMessage(personalMsg,
                                         custInfosDetail.CustId,
                                         optSite,
@@ -530,23 +530,23 @@ namespace BackendSite.Controllers.Api
                                         BatchId,
                                         custUsername,
                                         sabaId,
-                                        (CustStatus)custInfosDetail.Status,
+                                        (CustomerStatusEnum)custInfosDetail.Status,
                                         out errorCode,
                                         out resultMessage);
                                     //apiResult.Add(new ApiResult() { ErrorCode = errorCode, Message = resultMessage });
                                     break;
 
-                                case (int)CustStatus.Suspend:
-                                    resultMessage = $"Fail. CustId={custId}. Username={custUsername}. SabaId={sabaId}. Status={CustStatus.Suspend.GetDescription()}";
+                                case (int)CustomerStatusEnum.Suspend:
+                                    resultMessage = $"Fail. CustId={custId}. Username={custUsername}. SabaId={sabaId}. Status={CustomerStatusEnum.Suspend.GetDescription()}";
                                     //apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = resultMessage });
                                     break;
 
-                                case (int)CustStatus.Closed:
-                                    resultMessage = $"Fail. CustId={custId}. Username={custUsername}. SabaId={sabaId}. Status={CustStatus.Closed.GetDescription()}";
+                                case (int)CustomerStatusEnum.Closed:
+                                    resultMessage = $"Fail. CustId={custId}. Username={custUsername}. SabaId={sabaId}. Status={CustomerStatusEnum.Closed.GetDescription()}";
                                     //apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = resultMessage });
                                     break;
 
-                                case (int)CustStatus.Lock:
+                                case (int)CustomerStatusEnum.Lock:
                                     SendBatchMessage(personalMsg,
                                         custInfosDetail.CustId,
                                         optSite,
@@ -554,7 +554,7 @@ namespace BackendSite.Controllers.Api
                                         BatchId,
                                         custUsername,
                                         sabaId,
-                                        (CustStatus)custInfosDetail.Status,
+                                        (CustomerStatusEnum)custInfosDetail.Status,
                                         out errorCode,
                                         out resultMessage);
                                     //apiResult.Add(new ApiResult() { ErrorCode = errorCode, Message = resultMessage });
@@ -898,7 +898,7 @@ namespace BackendSite.Controllers.Api
             int batchMessageId,
             string userName,
             string sabaId,
-            CustStatus custStatus,
+            CustomerStatusEnum custStatus,
             out int errorCode,
             out string resultMessage)
         {

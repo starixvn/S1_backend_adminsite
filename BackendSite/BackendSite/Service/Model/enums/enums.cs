@@ -40,6 +40,14 @@ namespace BackendSite.Service.Model.enums
         Depoisted = 2,
     }
 
+    public enum CustomerStatusEnum
+    {
+        Running = 1,
+        Suspend = 2,
+        Closed = 3,
+        Lock = 4,
+    }
+
     #endregion
 
     #region CustProfile
@@ -94,18 +102,6 @@ namespace BackendSite.Service.Model.enums
     {
         Add = 1,
         Deduct = 2
-    }
-    public enum CustActStatus
-    {
-        NonDepoist = 1,
-        Depoisted = 2,
-    }
-    public enum CustStatus
-    {
-        Running = 1,
-        Suspend = 2,
-        Closed = 3,
-        Lock = 4,
     }
 
     public enum WithdrawalType
