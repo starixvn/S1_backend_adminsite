@@ -179,12 +179,34 @@ namespace BackendSite.Service.Model
     {
         public int BankSlipPicCount { get; set; }
     }
-    public class WithdrawalTimeReportPara
+    public class WithdrawalTimeReportOldReq
     {
-        public string WithdrawalID { get; set; }
+        public string WithdrawalId { get; set; }
         public long StartDate { get; set; }
         public long EndDate { get; set; }
         public IEnumerable<int> SelectSite { get; set; }
+        public int CurrencyId { get; set; }
+        public int Status { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+    }
+    
+    public class WithdrawalTimeReportPara
+    {
+        private DateTimeOffset _startDate { get; set; }
+        private DateTimeOffset _endDate { get; set; }
+        public string WithdrawalId { get; set; }
+        public DateTimeOffset StartDate
+        {
+            get => _startDate;
+            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset EndDate
+        {
+            get => _endDate;
+            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        public IEnumerable<int> SiteIds { get; set; }
         public int CurrencyId { get; set; }
         public int Status { get; set; }
         public int PageNumber { get; set; }
@@ -202,17 +224,17 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int SiteId { get; set; }
         public int Status { get; set; }
-        public DateTime CreateTime { get; set; }
-        public DateTime UpdateTime { get; set; }
-        public DateTime VerifyTime { get; set; }
-        public DateTime ProcessTime { get; set; }
-        public DateTime FlowEndTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
+        public DateTimeOffset UpdateTime { get; set; }
+        public DateTimeOffset? VerifyTime { get; set; }
+        public DateTimeOffset? ProcessTime { get; set; }
+        public DateTimeOffset FlowEndTime { get; set; }
         public string TransId { get; set; }
         public int WithdrawalType { get; set; }
         public string UserName { get; set; }
         public int CustId { get; set; }
         public string IsoCode { get; set; }
-        public DateTime DepositTime { get; set; }
+        public DateTimeOffset? DepositTime { get; set; }
         public string CompleteTime { get; set; }
         public string WithdrawalTypeName => Enum.GetName(typeof(WithdrawalType), WithdrawalType);
         public string StatusName => Enum.GetName(typeof(WithdrawalStatus), Status);
@@ -234,9 +256,9 @@ namespace BackendSite.Service.Model
         public string Currency { get; set; }
         public string Status { get; set; }
         public string OperateBy { get; set; }
-        public DateTime CreateTime { get; set; }
-        public DateTime UpdateTime { get; set; }
-        public DateTime? FlowEndTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
+        public DateTimeOffset UpdateTime { get; set; }
+        public DateTimeOffset? FlowEndTime { get; set; }
         public string ToVerifyTime { get; set; }
         public string VerifiedBy { get; set; }
         public string ToProcessTime { get; set; }

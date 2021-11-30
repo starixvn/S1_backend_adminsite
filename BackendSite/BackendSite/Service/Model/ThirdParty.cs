@@ -33,7 +33,7 @@ namespace BackendSite.Service.Model
     }
     public class TpTransferInfo
     {
-        public DateTime CreateTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
         public string TpName { get; set; }
         public string TransId { get; set; }
         public int Direction { get; set; }

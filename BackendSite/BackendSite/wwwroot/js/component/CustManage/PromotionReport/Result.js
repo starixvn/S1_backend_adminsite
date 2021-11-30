@@ -18,13 +18,13 @@ const Result = (props) => {
             <tr key={`result-${dIdx}`}>
               <td>{d.bonusId}</td>
               <td>{d.bonusCode}</td>
-              <td>{d.description}</td>
+              <td>{d.description}-{d.AtPage == 0 ? "Promotion page":"Deposit page"}</td>
               <td>{number_format(d.bonusAmount)}</td>
               <td>{number_format(d.lockedAmount)}</td>
               <td>{number_format(d.custRollOver.rollOver)}</td>
               <td>{number_format(d.custRollOver.turnOver)}</td>
               <td>{moment(d.claimDate).format("l LTS")}</td>
-              <td>{BonusInfoStatus[d.bonusInfoStatus]}</td>
+              <td>{BonusInfoStatus[d.bonusInfoStatus]}{d.bonusInfoStatus == 1 ? "" : "-"}{d.bonusInfoStatus == 1 ? "" : moment(d.updateTime).format("l LTS")}</td>
               <td>
                 {d.bonusInfoStatus == 1 ? (
                   <button

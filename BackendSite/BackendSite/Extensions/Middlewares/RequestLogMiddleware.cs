@@ -2,10 +2,14 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Serilog.Context;
@@ -43,17 +47,19 @@ namespace BackendSite.Extensions.Middlewares
 
         #region Action
 
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context,IWebHostEnvironment env)
         {
             var url = context.Request.GetDisplayUrl();
             var path = context.Request.Path.Value;
-            //if (path == "/" && (context.Request.Method.Equals("OPTIONS", StringComparison.OrdinalIgnoreCase) ||
-            //                    context.Request.Method.Equals("GET", StringComparison.OrdinalIgnoreCase)))
-            //{
-            //    await _next(context);
-            //}
-            //else
-            //{
+            
+            if (env.IsProduction())
+            {
+                if (path.IndexOf("apiV2", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    throw new AdminException(ErrorCodeEnum.Fail);
+                }
+            }
+            
             var requestBodyStream = new MemoryStream();
             var originalRequestBody = context.Request.Body;
             var content = string.Empty;

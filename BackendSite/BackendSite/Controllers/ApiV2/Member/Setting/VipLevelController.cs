@@ -98,25 +98,25 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                             {
                                 apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Not fund. Username: {custUsername}. SabaId: {sabaId}." });
                             }
-                            else if (custInfoDetail.Status == (int)CustStatus.Running)
+                            else if (custInfoDetail.Status == (int)CustomerStatusEnum.Running)
                             {
                                 try
                                 {
                                     if (_messageBll.ChangeVipLevelBatch(custInfoDetail.SiteId, custInfoDetail.CustId, custInfoDetail.UserName, vipLevel, memo, authData.UserName) > 0)
                                     {
-                                        apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorMessageCodeEnum.Success, Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. " });
+                                        apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorCodeEnum.Success, Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. " });
                                     }
                                 }
                                 catch (Exception ex)
                                 {
-                                    apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorMessageCodeEnum.SystemException, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {ex}" });
+                                    apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorCodeEnum.SystemException, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {ex}" });
                                 }
                             }
-                            else if (custInfoDetail.Status == (int)CustStatus.Suspend)
+                            else if (custInfoDetail.Status == (int)CustomerStatusEnum.Suspend)
                             {
                                 apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Suspend Status." });
                             }
-                            else if (custInfoDetail.Status == (int)CustStatus.Lock)
+                            else if (custInfoDetail.Status == (int)CustomerStatusEnum.Lock)
                             {
                                 apiResult.Add(new ApiResult() { ErrorCode = 1002, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Lock Status." });
                             }
@@ -131,13 +131,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 }
                 else
                 {
-                    apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorMessageCodeEnum.Fail, Message = "File Type Error" });
+                    apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorCodeEnum.Fail, Message = "File Type Error" });
                     return apiResult;
                 }
             }
             catch (Exception ex)
             {
-                apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorMessageCodeEnum.SystemException, Message = ex.ToString() });
+                apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorCodeEnum.SystemException, Message = ex.ToString() });
                 return apiResult;
             }
         }

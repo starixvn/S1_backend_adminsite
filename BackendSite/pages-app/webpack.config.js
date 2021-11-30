@@ -145,10 +145,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/TransferAccountManage/index.jsx",
     // ],
-    "Marketing/VipRebateInfoReport.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/VipRebateInfoReport/index.js",
-    ],
+    // "Marketing/VipRebateInfoReport.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/VipRebateInfoReport/index.js",
+    // ],
     // "Marketing/VipRebateMangetment.min": [
     //   '@babel/polyfill',
     //   "./src/pages/Marketing/VipRebateMangetment/index.jsx"
@@ -210,10 +210,10 @@ module.exports = {
     //  // '@babel/polyfill',
     //  "./src/pages/Finance/AdjustmentLogReport/index.js",
     //],
-    // "Finance/WithdrawalAccounting.min": [
-    //   "@babel/polyfill",
-    //   "./src/pages/Finance/WithdrawalAccounting/index.js",
-    // ],
+    "Finance/WithdrawalAccounting.min": [
+      "@babel/polyfill",
+      "./src/pages/Finance/WithdrawalAccounting/index.js",
+    ],
     // "CSD/RegistrationManagement.min": [
     //   '@babel/polyfill',
     // "./src/pages/CSD/RegistrationManagement/index.js",
@@ -242,9 +242,9 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/CSD/UserBetLimit/index.js"
     // ],
-    "Finance/USDTWithdrawalLimitManagement.min": [
-      "./src/pages/Finance/USDTWithdrawalLimitManagement/index.js",
-    ],
+    // "Finance/USDTWithdrawalLimitManagement.min": [
+    //   "./src/pages/Finance/USDTWithdrawalLimitManagement/index.js",
+    // ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

@@ -126,11 +126,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 apiResult.PageNumber = searchResult.PageNumber;
                 apiResult.TotalPages = searchResult.TotalPages;
                 apiResult.RowCount = searchResult.RowCount;
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
 
@@ -153,11 +153,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult();
             if (_custInfoBll.SetRegLiveStatus(para.CustId, para.Status, para.SiteId, User.Identity.Name) > 0)
             {
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else
             {
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Fail;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 apiResult.Message = "update fail";
             }
             return apiResult;
@@ -186,7 +186,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult<IEnumerable<RegLiveStatusNotes>>
             {
                 Data = result,
-                ErrorCode = (int)ErrorMessageCodeEnum.Success
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
 
             return apiResult;
@@ -208,11 +208,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult();
             if (_custInfoBll.AddRegLiveStatusNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name) > 0)
             {
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else
             {
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Fail;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 apiResult.Message = "Create fail.";
             }
             return apiResult;
@@ -234,11 +234,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult();
             if (_custInfoBll.DeleteRegLiveStatusNote(deleteCustNoteReq.CustId, deleteCustNoteReq.Id) > 0)
             {
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else
             {
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Fail;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 apiResult.Message = "Delete fail.";
             }
             return apiResult;
@@ -260,11 +260,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult();
             if (_custInfoBll.EditRegLiveStatusNote(editRegLiveStatusNote.CustId, editRegLiveStatusNote.Id, editRegLiveStatusNote.Note, User.Identity.Name) > 0)
             {
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else
             {
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = "Update fail.";
             }
             return apiResult;

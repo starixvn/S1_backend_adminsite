@@ -28,7 +28,7 @@ namespace BackendSite.Service.Model.BankFinancial
             set;
         }
 
-        public DepositType DepositType
+        public DepositTypeEnum DepositType
         {
             get;
             set;

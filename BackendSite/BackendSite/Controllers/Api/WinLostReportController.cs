@@ -7,6 +7,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using Microsoft.AspNetCore.Authorization;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Controllers.Api
 {

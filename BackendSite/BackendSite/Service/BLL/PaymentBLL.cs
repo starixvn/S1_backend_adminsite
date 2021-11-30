@@ -35,17 +35,17 @@ namespace BackendSite.Service.BLL
             return adjustmentService.PaymentAdjustment(adjustmentInfo, Operator, out transId);
         }
 
-        public IEnumerable<FinancialLog> GetFinancialLog(int CustId, long? startDate, long? endDate, string refTransId,
+        public IEnumerable<FinancialLog> GetFinancialLog(int custId, DateTime? startDate, DateTime? endDate, string refTransId,
             int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            return walletService.GetFinancialLog(CustId, startDate, endDate, refTransId, pageSize, ref pageNumber,
+            return walletService.GetFinancialLog(custId, startDate, endDate, refTransId, pageSize, ref pageNumber,
                 out totalPages, out rowCount);
         }
 
-        public IEnumerable<BonusLog> GetBonusLog(int CustId, int promoCategoryId, long? startDate, long? endDate,
+        public IEnumerable<BonusLog> GetBonusLog(int custId, int promoCategoryId, DateTime? startDate, DateTime? endDate,
             string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            return walletService.GetBonusLog(CustId, promoCategoryId, startDate, endDate, refTransId, pageSize,
+            return walletService.GetBonusLog(custId, promoCategoryId, startDate, endDate, refTransId, pageSize,
                 ref pageNumber, out totalPages, out rowCount);
         }
 
@@ -107,14 +107,13 @@ namespace BackendSite.Service.BLL
             return walletService.GetCustTpBetRecordListOneWeek(custId);
         }
 
-        public IEnumerable<TpBetRecordListOneDayRes> GetCustTpBetRecordListOneDay(int custId, string selDate, long startDate, long endDate)
+        public IEnumerable<TpBetRecordListOneDayRes> GetCustTpBetRecordListOneDay(int custId, DateTime selDate, DateTime startDate, DateTime endDate)
         {
-            var result = new List<TpBetRecordListOneDayRes>();
-            result = walletService.GetCustTpBetRecordListOneDay(custId, selDate, startDate, endDate).ToList().GroupBy(x => new
+            var result = walletService.GetCustTpBetRecordListOneDay(custId, selDate, startDate, endDate).ToList().GroupBy(x => new
             {
-                SettledDate = x.SettledDate,
-                CategoryName = x.CategoryName,
-                CategoryId = x.CategoryId
+                x.SettledDate,
+                x.CategoryName,
+                x.CategoryId
             }).Select(x => new TpBetRecordListOneDayRes
             {
                 SettledDate = x.Key.SettledDate,
@@ -130,11 +129,10 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<TpBetRecordbyCategoryIdRes> GetCustTpBetRecordListbyCategoryId(int custId, string selDate,
-            int categoryId, long startDate, long endDate)
+        public IEnumerable<TpBetRecordbyCategoryIdRes> GetCustTpBetRecordListbyCategoryId(int custId, DateTime selDate,
+            int categoryId, DateTime startDate, DateTime endDate)
         {
-            var result = new List<TpBetRecordbyCategoryIdRes>();
-            result = walletService.GetCustTpBetRecordListbyCategoryId(custId, selDate, categoryId, startDate, endDate).GroupBy(x => new
+            var result = walletService.GetCustTpBetRecordListbyCategoryId(custId, selDate, categoryId, startDate, endDate).GroupBy(x => new
             {
                 SettledDate = x.SettledDate,
                 GameTypeName = x.GameTypeName,
@@ -155,10 +153,10 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId,
-            string selDate, int gameTypeId, long startDate, long endDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+            DateTime selDate, int gameTypeId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount)
         {
-            var result = walletService.GetCustTpBetRecordDetailListbyGameType(custId, selDate, gameTypeId, startDate, endDate, PageSize,
-                ref PageNumber, ref TotalPages, ref RowCount);
+            var result = walletService.GetCustTpBetRecordDetailListbyGameType(custId, selDate, gameTypeId, startDate, endDate, pageSize,
+                ref pageNumber, ref totalPages, ref rowCount);
             result.ToList().ForEach(x =>
             {
                 x.SettlementTypeName = Enum.GetName(typeof(SettlementType), x.SettlementType);
@@ -176,7 +174,7 @@ namespace BackendSite.Service.BLL
                 pageNumber, CategoryId, BaseCurrencyId, ref CurrencyAmount);
         }
 
-        public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, long? startDate, long? endDate, int pageSize,
+        public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, DateTime? startDate, DateTime? endDate, int pageSize,
             int pageNumber)
         {
             return walletService.GetVipRebateInfoListByCustId(custId, startDate, endDate, pageSize, pageNumber);
@@ -199,7 +197,7 @@ namespace BackendSite.Service.BLL
             return adjustmentService.GetAdjustmentData(SiteId, CurrencyId);
         }
 
-        public int AddAdjustmentLimitInfo(int SiteId, int CurrencyId, double AdjustmentMax, string Operator)
+        public int AddAdjustmentLimitInfo(int SiteId, int CurrencyId, decimal AdjustmentMax, string Operator)
         {
             return adjustmentService.AddAdjustmentLimitInfo(SiteId, CurrencyId, AdjustmentMax, Operator);
         }
@@ -217,13 +215,11 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public IEnumerable<TpBetRecordByDate> GetCustTpBetRecordList(int custId, long startDate, long endDate)
+        public IEnumerable<TpBetRecordByDate> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate)
         {
-            var result = new List<TpBetRecordByDate>();
-
-            result = walletService.GetCustTpBetRecordList(custId, startDate, endDate).ToList().GroupBy(x => new
+            var result = walletService.GetCustTpBetRecordList(custId, startDate, endDate).ToList().GroupBy(x => new
             {
-                SettledDate = x.SettledDate
+                SettledDate = x.SettledDate.AddHours(8).Date
             }).Select(x => new TpBetRecordByDate
             {
                 SettledDate = x.Key.SettledDate,

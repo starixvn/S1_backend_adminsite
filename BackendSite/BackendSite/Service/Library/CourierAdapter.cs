@@ -5,20 +5,20 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using BackendSite.Service.BLL;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.Library
 { 
     public class CourierAdapter
     {
         private readonly ILogger<CourierAdapter> _logger;
-        public IConfiguration _configuration;
 
-        public CourierAdapter(ILogger<CourierAdapter> logger, IConfiguration configuration)
+        public CourierAdapter(IServiceProvider provider)
         {
-            _logger = logger;
-            _configuration = configuration;
+            _logger = provider.GetRequiredService<ILogger<CourierAdapter>>();
         }
 
         public async Task<ApiResult<T>> MyPostAsync<T, U>(string url, U oTpInfo, int timeout = 0)

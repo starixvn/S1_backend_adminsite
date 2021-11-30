@@ -339,8 +339,10 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
-                apiResult.Data =
-                    messageBLL.GetPersonalMsg(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                var data = messageBLL.GetPersonalMsg(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+
+                data.ToList().ForEach(s => s.CreateTime = new DateTimeOffset(s.CreateTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+                apiResult.Data = data;
                 apiResult.ErrorCode = 0;
 
                 apiResult.PageNumber = PageNumber;
@@ -462,9 +464,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
-                messageBLL.DeletePersonalMsg(Id, CustId);
-                apiResult.Data =
-                    messageBLL.GetPersonalMsg(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                messageBLL.DeletePersonalMsg(Id);
+                apiResult.Data = messageBLL.GetPersonalMsg(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
 
                 apiResult.PageNumber = PageNumber;
@@ -950,7 +951,7 @@ namespace BackendSite.Controllers.Api
             {
                 switch (data.CustInfoDetail.Status)
                 {
-                    case (int) CustStatus.Running:
+                    case (int) CustomerStatusEnum.Running:
                         SendBatchMessage(personalMsg,
                             data.CustInfoDetail.CustId,
                             optSite,
@@ -958,22 +959,22 @@ namespace BackendSite.Controllers.Api
                             batchId,
                             data.CustUserName,
                             data.SabaId,
-                            (CustStatus) data.CustInfoDetail.Status,
+                            (CustomerStatusEnum) data.CustInfoDetail.Status,
                             out errorCode,
                             out resultMessage);
                         break;
 
-                    case (int) CustStatus.Suspend:
+                    case (int) CustomerStatusEnum.Suspend:
                         resultMessage =
-                            $"Fail. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}. Status={CustStatus.Suspend.GetDescription()}";
+                            $"Fail. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}. Status={CustomerStatusEnum.Suspend.GetDescription()}";
                         break;
 
-                    case (int) CustStatus.Closed:
+                    case (int) CustomerStatusEnum.Closed:
                         resultMessage =
-                            $"Fail. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}. Status={CustStatus.Closed.GetDescription()}";
+                            $"Fail. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}. Status={CustomerStatusEnum.Closed.GetDescription()}";
                         break;
 
-                    case (int) CustStatus.Lock:
+                    case (int) CustomerStatusEnum.Lock:
                         SendBatchMessage(personalMsg,
                             data.CustInfoDetail.CustId,
                             optSite,
@@ -981,7 +982,7 @@ namespace BackendSite.Controllers.Api
                             batchId,
                             data.CustUserName,
                             data.SabaId,
-                            (CustStatus) data.CustInfoDetail.Status,
+                            (CustomerStatusEnum) data.CustInfoDetail.Status,
                             out errorCode,
                             out resultMessage);
                         break;
@@ -1007,7 +1008,7 @@ namespace BackendSite.Controllers.Api
             int batchMessageId,
             string userName,
             string sabaId,
-            CustStatus custStatus,
+            CustomerStatusEnum custStatus,
             out int errorCode,
             out string resultMessage)
         {
