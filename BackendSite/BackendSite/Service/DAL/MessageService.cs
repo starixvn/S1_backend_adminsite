@@ -163,18 +163,26 @@ namespace BackendSite.Service.DAL
         }
         public bool SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
         {
-            using var connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            connection.Open();
-            using var trans = connection.BeginTransaction();
-            var result = _mainDbClient.Execute("Admin_Msg_BatchV2_Ins",new DynamicParameters(new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg, BatchId = batchId }) ,trans);
-
-            if (result == 1)
+            try
             {
-                trans.Commit();
-                return true;
-            } 
-            trans.Rollback();
-            return false;
+                using var connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+                connection.Open();
+                using var trans = connection.BeginTransaction();
+                var result = _mainDbClient.Execute("Admin_Msg_BatchV2_Ins",new DynamicParameters(new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg, BatchId = batchId }) ,trans);
+
+                if (result == 1)
+                {
+                    trans.Commit();
+                    return true;
+                } 
+                trans.Rollback();
+                return false;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            
         }
         public int ChangeVipLevelBatch(int siteId, int custId, string userName, int vipLevel, string memo, string Operator)
         {

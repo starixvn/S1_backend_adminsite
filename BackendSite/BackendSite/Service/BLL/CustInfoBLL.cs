@@ -189,6 +189,11 @@ namespace BackendSite.Service.BLL
         {
             return _custInfoService.GetCustInfos(custId, userName, siteId);
         }
+        
+        public bool SendMessageBatch(BatchPersonalMsg req)
+        {
+            return _custInfoService.SendMessageBatch(req);
+        }
 
         public decimal GetBalance(int custId)
         {
@@ -298,8 +303,8 @@ namespace BackendSite.Service.BLL
             out int rowCount)
         {
             return _custInfoService.GetCustCryptoWalletLogList(custId,
-                 Math.Abs(pageSize),
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
                 out totalPages,
                 out rowCount); ;
         }

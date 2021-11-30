@@ -7,23 +7,30 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.DAL
 {
     public class PrizeService
     {
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration _configuration;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public PrizeService(IConfiguration configuration)
+        public PrizeService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _configuration = provider.GetRequiredService<IConfiguration>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
         public PrizeSearchResult PrizeSearch(PrizeSelect prizeSelect)
         {
             var SearchResult = new PrizeSearchResult();
             var tempCurrencyTotalAmount = new List<string>();
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var props = new DynamicParameters();
 
             props.Add("PageSize", prizeSelect.PageSize);
@@ -66,7 +73,7 @@ namespace BackendSite.Service.DAL
         public PrizeLogResult GetPrizeLog(PrizeLogPara prizeLogPara)
         {
             var LogResult = new PrizeLogResult();
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var props = new DynamicParameters();
             props.Add("PageNumber", prizeLogPara.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -89,14 +96,12 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<EventDraw> GetEventName()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<EventDraw>("Admin_EventDraw_Get", commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<DrawPrizeExcelData> GetExportData(IEnumerable<int> SelectSite, string StartDate, string EndDate, int CurrencyId, string EventName)
         {
-            var SearchResult = new PrizeSearchResult();
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var props = new DynamicParameters();
             props.Add("StartDate", StartDate);
             props.Add("EndDate", EndDate);
@@ -104,7 +109,7 @@ namespace BackendSite.Service.DAL
             props.Add("CurrencyId", CurrencyId);
             props.Add("EventName", string.IsNullOrWhiteSpace(EventName) ? null : EventName);
 
-            return conn.Query<DrawPrizeExcelData>("Admin_DrawPrizeExport_Get", props, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<DrawPrizeExcelData>("Admin_DrawPrizeExport_Get", props);
 
         }
     }

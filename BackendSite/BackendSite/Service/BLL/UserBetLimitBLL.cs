@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL

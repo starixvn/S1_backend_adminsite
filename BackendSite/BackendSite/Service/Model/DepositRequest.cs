@@ -3,6 +3,7 @@ using System;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Service.Model
 {
@@ -93,9 +94,9 @@ namespace BackendSite.Service.Model
         public string CalCode =>
             DepositType switch
             {
-                (int)enums.DepositType.OnlineBanking => $"{SiteName}-{PayName}-{BankCode}",
-                (int)enums.DepositType.MobilePayment => $"{SiteName}-{PayName}-{ChannelName}",
-                (int)enums.DepositType.LocalBank => $"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
+                (int)enums.DepositTypeEnum.OnlineBanking => $"{SiteName}-{PayName}-{BankCode}",
+                (int)enums.DepositTypeEnum.MobilePayment => $"{SiteName}-{PayName}-{ChannelName}",
+                (int)enums.DepositTypeEnum.LocalBank => $"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
                 _ => null
             };
 
@@ -181,8 +182,14 @@ namespace BackendSite.Service.Model
     }
     public class Comments
     {
+        private DateTimeOffset _createTime { get; set; }
+
         public string Comment { get; set; }
-        public DateTimeOffset CreateTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public int Action { get; set; }
 
         public string ActionString { get; set; }
@@ -214,7 +221,7 @@ namespace BackendSite.Service.Model
         public double DepositMin { get; set; }
 
         public double DepositMax { get; set; }
-        
+
         public int DepositStatus { get; set; }
     }
 
@@ -231,7 +238,7 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
     }
-    public class DepositTimeList 
+    public class DepositTimeList
     {
         public string SiteName { get; set; }
         public int SiteId { get; set; }
@@ -245,12 +252,12 @@ namespace BackendSite.Service.Model
         public string IsoCode { get; set; }
         public DateTimeOffset? DepositTime { get; set; }
         public string CompleteTime { get; set; }
-        public string DepositTypeName => Enum.GetName(typeof(DepositType), DepositType);
+        public string DepositTypeName => Enum.GetName(typeof(DepositTypeEnum), DepositType);
         public string StatusName => Enum.GetName(typeof(DepositStatus), Status);
         public int DepositId { get; set; }
     }
 
-    public class DepositTimeReportOldPara
+    public class DepositTimeReportOldPara : ApiRequestPageModel
     {
         public string DepositId { get; set; }
         public long StartDate { get; set; }
@@ -258,11 +265,9 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> SelectSite { get; set; }
         public int CurrencyId { get; set; }
         public int Status { get; set; }
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
     }
-    
-    public class DepositTimeReportPara
+
+    public class DepositTimeReportPara : ApiRequestPageModel
     {
         private DateTimeOffset _startDate { get; set; }
         private DateTimeOffset _endDate { get; set; }
@@ -280,8 +285,6 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> SiteIds { get; set; }
         public int CurrencyId { get; set; }
         public int Status { get; set; }
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
     }
 
     public class DepositTimeExportData
@@ -294,9 +297,9 @@ namespace BackendSite.Service.Model
         public string Status { get; set; }
         public DateTimeOffset CreateTime { get; set; }
         public DateTimeOffset UpdateTime { get; set; }
-        public string CompleteTime { get; set; }      
+        public string CompleteTime { get; set; }
     }
-    public class DepositRequestAmountPara 
+    public class DepositRequestAmountPara
     {
         public string TransId { get; set; }
         public decimal Amount { get; set; }

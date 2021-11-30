@@ -2,6 +2,7 @@
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +18,9 @@ namespace BackendSite.Service.BLL
         private readonly ServerInfoService serverInfoService;
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public AdminBLL(Tools tools, 
-            AdminService adminService, 
-            ServerInfoService serverInfoService, 
+        public AdminBLL(Tools tools,
+            AdminService adminService,
+            ServerInfoService serverInfoService,
             AdminUserService adminUserService,
             IHttpContextAccessor httpContextAccessor)
         {
@@ -91,7 +92,7 @@ namespace BackendSite.Service.BLL
             else
             {
                 if (Md5Userpwd != changePwd.OldPwd)
-                    return ErrorCodeEnum.OldPwdNotMatch;
+                    return ErrorCodeEnum.OldpwdNotMatch;
                 else
                     return ErrorCodeEnum.Fail;
             }

@@ -82,7 +82,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode = (int) ErrorMessageCodeEnum.SystemException;
+                apiResult.ErrorCode = (int) ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
 

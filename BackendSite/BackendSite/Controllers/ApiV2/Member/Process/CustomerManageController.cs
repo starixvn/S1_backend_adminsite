@@ -1862,7 +1862,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         //    try
         //    {
         //        apiResult.Data = _messageBll.GetCustLang(request.CustId);
-        //        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+        //        apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
         //    }
         //    catch (Exception ex)
         //    {

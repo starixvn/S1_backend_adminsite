@@ -86,10 +86,10 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/DrawPrizeReport" })]
-        public IActionResult ExportPrizeData(string SelectSite, string StartDate, string EndDate, int CurrencyId, string EventName)
+        public IActionResult ExportPrizeData(string selectSite, string startDate, string endDate, int currencyId, string eventName)
         {
-            var ExportData = prizeBLL.GetExportData(SelectSite, StartDate, EndDate, CurrencyId, EventName);
-            var stream = excelBLL.Export(ExportData);
+            var exportData = prizeBLL.GetExportData(selectSite, startDate, endDate, currencyId, eventName);
+            var stream = excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DrawPrize_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
     }

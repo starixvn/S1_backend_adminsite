@@ -308,7 +308,7 @@ namespace BackendSite.Service.Model
             set;
         }
 
-        public DepositType DepositType
+        public DepositTypeEnum DepositType
         {
             get;
             set;

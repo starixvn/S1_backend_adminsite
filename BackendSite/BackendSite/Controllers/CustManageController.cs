@@ -129,7 +129,7 @@ namespace BackendSite.Controllers
             data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
 
             var stream = excelBLL.Export(data);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(data)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return excelBLL.ExcelFile(stream, "CustInfoList");
         }
 
         #endregion

@@ -60,7 +60,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
             var apiResult = new ApiResult<IEnumerable<WithdrawalKYC>>
             {
                 Data = result,
-                ErrorCode = (int)ErrorMessageCodeEnum.Success
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
 
             return apiResult;
@@ -83,12 +83,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
             var apiResult = new ApiResult();
             if (result)
             {
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
             }
             else
             {
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Fail;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
             }
 

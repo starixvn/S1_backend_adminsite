@@ -73,7 +73,7 @@ namespace BackendSite.Service.BLL
                 SysId = deposit.SysId,
                 Ver = 1
             };
-            deposit.DepositInfo = Newtonsoft.Json.JsonConvert.SerializeObject(depositInfo);
+            deposit.DepositInfo = JsonConvert.SerializeObject(depositInfo);
 
             var custId = (string.IsNullOrEmpty(deposit.SabaId)) ? null : common.TpIdToCustId(deposit.SabaId);
             var customer = custInfoBLL.GetCustInfoDetails(custId, deposit.UserName, deposit.SiteId);

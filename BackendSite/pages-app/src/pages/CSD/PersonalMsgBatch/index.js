@@ -13,6 +13,8 @@ const Panel = () => {
     SelectSite: [],
     StartDate: moment().add(-10, "days").format("l"),
     EndDate: moment().format("l"),
+    AccountStatus: 0,
+    Currency: 0
   });
 
   const [stateDatas, setDatas] = useState({
@@ -22,7 +24,6 @@ const Panel = () => {
   });
   const [editMode, setEdit] = useState(false);
   const [detailDatas, setDetail] = useState(null);
-
   const [siteList, setSiteList] = useState(null);
 
   useEffect(() => {
@@ -251,10 +252,12 @@ const Panel = () => {
       ) : (
         <EditPanel
           {...stateDatas}
+          filterInfo={stateFilter}
           DetailDatas={detailDatas}
           SiteList={siteList}
           SetEditMode={SetEditMode}
           FilterSubmit={Filter_Submit}
+          onChange={Filter_OnChange}
         />
       )}
     </div>
