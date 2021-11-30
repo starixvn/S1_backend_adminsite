@@ -129,7 +129,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        public IActionResult ExportPaymentAdjustmentReport(ExportPaymentAdjustmentReportReq req)
+        public IActionResult ExportAdjustmentReport(ExportPaymentAdjustmentReportReq req)
         {
             var exportData = _paymentAdjustmentBll.GetPaymentAdjustmentExportReport(req.TransId, req.CurrencyId, req.UserName, req.AdjustType, req.StartDate.DateTime, req.EndDate.DateTime);
             foreach (var data in exportData)
