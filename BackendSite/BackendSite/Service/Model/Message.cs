@@ -77,6 +77,17 @@ namespace BackendSite.Service.Model
         public string ContentRemoveTag { get; set; }
 
     }
+    
+    public class BatchPersonalMsg : PersonalMsgBase
+    {
+        public int BatchId { get; set; }
+        public int SiteId { get; set; }
+        public string LangId { get; set; }
+        public int CurrencyId { get; set; }
+        public int AccountStatus { get; set; }
+        public string Operator { get; set; }
+    }
+    
     public class PersonalMsgBase
     {
         public string Title { get; set; }
