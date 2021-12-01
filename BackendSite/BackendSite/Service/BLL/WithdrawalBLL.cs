@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BackendSite.Service.Model.WithdrawalBankAccounting;
+using BackendSite.ExceptionHandling;
+using BackendSite.Service.Library;
 
 namespace BackendSite.Service.BLL
 {
@@ -78,6 +80,14 @@ namespace BackendSite.Service.BLL
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+
+            if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
+            {
+                var status = (WithdrawalStatus)withdrawalRequest.Status;
+                throw new AdminException(ErrorCodeEnum.Fail,
+                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Process Can Set.");
+            }
+
             var withdrawalInfo =
                 JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalRequest.WithdrawalInfo);
             withdrawalInfo.CurrencyId = withdrawalRequest.CurrencyId;
@@ -101,6 +111,14 @@ namespace BackendSite.Service.BLL
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+
+            if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
+            {
+                var status = (WithdrawalStatus)withdrawalRequest.Status;
+                throw new AdminException(ErrorCodeEnum.Fail,
+                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only OnHold, Verify, ToKyc, Pending Can Set.");
+            }
+
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus), updater,
                 WithdrawalStatus.Rejected, null, null, out _, out _);
@@ -120,6 +138,14 @@ namespace BackendSite.Service.BLL
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+
+            if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
+            {
+                var status = (WithdrawalStatus)withdrawalRequest.Status;
+                throw new AdminException(ErrorCodeEnum.Fail,
+                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Pending, OnHold, Process Can Set.");
+            }
+
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus), updater,
                 WithdrawalStatus.Verify, null, null, out _, out _);
@@ -137,6 +163,14 @@ namespace BackendSite.Service.BLL
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+
+            if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
+            {
+                var status = (WithdrawalStatus)withdrawalRequest.Status;
+                throw new AdminException(ErrorCodeEnum.Fail,
+                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Verify Can Set.");
+            }
+
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus), updater,
                 WithdrawalStatus.Process, withdrawalInfo, withdrawalType, out custId, out amount);
@@ -155,6 +189,14 @@ namespace BackendSite.Service.BLL
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+
+            if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
+            {
+                var status = (WithdrawalStatus)withdrawalRequest.Status;
+                throw new AdminException(ErrorCodeEnum.Fail,
+                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Pending Can Set.");
+            }
+
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus), updater,
                 WithdrawalStatus.OnHold, null, null, out _, out _);
@@ -197,6 +239,14 @@ namespace BackendSite.Service.BLL
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+
+            if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
+            {
+                var status = (WithdrawalStatus)withdrawalRequest.Status;
+                throw new AdminException(ErrorCodeEnum.Fail,
+                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Verify, ToKyc Can Set.");
+            }
+
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus),
                 updater,
@@ -210,14 +260,21 @@ namespace BackendSite.Service.BLL
             {
                 (int) WithdrawalStatus.Pending
             };
-
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+
+            if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
+            {
+                var status = (WithdrawalStatus)withdrawalRequest.Status;
+                throw new AdminException(ErrorCodeEnum.Fail,
+                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Pending Can Set.");
+            }
+
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
-                JsonConvert.SerializeObject(forStatus),
-                updater,
-                WithdrawalStatus.ToKyc, null, null, out _, out _);
+            JsonConvert.SerializeObject(forStatus),
+            updater,
+            WithdrawalStatus.ToKyc, null, null, out _, out _);
         }
 
         public IEnumerable<WithdrawalRequest> GetWithdrawalListByCust(int custId,
@@ -690,6 +747,15 @@ namespace BackendSite.Service.BLL
         #endregion
 
         #region Private Methods
+
+        private bool CheckWithdrawalFlow(IEnumerable<int> approvedStatusList, int status)
+        {
+            if (approvedStatusList.Contains(status))
+            {
+                return true;
+            }
+            return false;
+        }
 
         private string GetTimeString(TimeSpan ts)
         {

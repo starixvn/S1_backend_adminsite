@@ -321,7 +321,7 @@ namespace BackendSite.Service.DAL
             props.Add("EndDate", para.EndDate.DateTime);
             props.Add("SelectStatus", JsonConvert.SerializeObject(selectStatus));
             props.Add("CurrencyId", para.CurrencyId);
-            props.Add("StartIndex", (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize),DbType.Int32,ParameterDirection.Input);
+            props.Add("StartIndex", (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize), DbType.Int32, ParameterDirection.Input);
             props.Add("PageNumber", Math.Abs(para.PageNumber), DbType.Int32, ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);

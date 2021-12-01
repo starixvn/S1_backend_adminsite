@@ -92,8 +92,68 @@ namespace BackendSite.Service.Model.enums
     public enum DepositTypeEnum
     {
         OnlineBanking = 1,
-        MobilePayment = 2,
-        LocalBank = 3,
+        MobilePay = 2,
+        LocalBanking = 3,
+        CryptoPay = 4,
+        LoadCard = 5
+    }
+
+    #endregion
+
+    #region PayList
+
+    public enum PayListStatusEnum
+    {
+        Enable = 1,
+        Disable = 2
+    }
+
+    #endregion
+
+    #region PayChannel
+
+    public enum PayChannelModeEnum
+    {
+        Initial = 0, //初始設定
+        NewTabAndFilledWithHtml = 1, //開新視窗，將html內容置入
+        NewTabRedirectToUrl = 2, //開新視窗，導頁至該Url
+        PresentUrlAsQrCode = 3 //將 url 以QrCode 呈現
+    }
+
+    public enum PayChannelTypeEnum
+    {
+        OnlineBanking = 1,
+        MobilePay = 2,
+        LocalBanking = 3,
+        CryptoPay = 4,
+        LoadCard = 5
+    }
+
+    public enum PayChannelStatusEnum
+    {
+        Enable = 1,
+        Disable = 2
+    }
+
+    #endregion
+
+    #region PayCurrency
+
+    public enum AmountRuleEnum
+    {
+        Integer = 1,
+        Decimal = 2,
+        Fixed = 3
+    }
+
+    #endregion
+
+    #region BankInfoPay
+
+    public enum BankInfoPayStatusEnum
+    {
+        Enable = 1,
+        Disable = 2
     }
 
     #endregion
