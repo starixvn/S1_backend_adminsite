@@ -26,24 +26,24 @@ namespace BackendSite.Service.DAL
         }
         public AdjustmentLogReportResult GetAdjustmentInfoLog(GetAdjustmentInfoLogPara para)
         {
-            var SearchResult = new AdjustmentLogReportResult();
+            var searchResult = new AdjustmentLogReportResult();
             var props = new DynamicParameters();
-            props.Add("PageNumber", para.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("PageSize", Math.Abs(para.PageSize));
+            props.Add("Menu", para.Menu == "0" ? null : para.Menu);
+            props.Add("StartDate", para.StartDate.DateTime);
+            props.Add("EndDate", para.EndDate.DateTime);
+            props.Add("UserName", string.IsNullOrWhiteSpace(para.User) ? null : para.User);
+            props.Add("PageNumber", Math.Abs(para.PageNumber), DbType.Int32, ParameterDirection.InputOutput);
+            props.Add("StartIndex", (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize),DbType.Int32,ParameterDirection.Input);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("PageSize", para.PageSize);
-            props.Add("Menu", para.Menu == "0" ? null : para.Menu);
-            props.Add("StartDate", para.StartDate);
-            props.Add("EndDate", para.EndDate);
-            props.Add("UserName", string.IsNullOrWhiteSpace(para.User) ? null : para.User);
-            var result = _reportDbClient.Query<AdjustmentLogReport>("Admin_AdjustmentInfoLog_Get", props).ToList();
+            var result = _reportDbClient.Query<AdjustmentLogReport>("Admin_AdjustmentInfoLog_Get_V2", props).ToList();
 
-            SearchResult.AdjustmentLogReport = result;
-            SearchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            SearchResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            SearchResult.RowCount = props.Get<int?>("RowCount") ?? 0;
-            return SearchResult;
+            searchResult.AdjustmentLogReport = result;
+            searchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            searchResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            searchResult.RowCount = props.Get<int?>("RowCount") ?? 0;
+            return searchResult;
         }
     }
 }

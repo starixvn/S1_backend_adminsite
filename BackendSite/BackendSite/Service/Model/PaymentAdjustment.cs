@@ -29,7 +29,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public string CurrencyName { get; set; }
         public decimal Amount { get; set; }
-        public DateTime CreateTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
         public string StatusName { get; set; }
         public string Memo { set; get; }
         public string SabaID { get; set; }
