@@ -1933,13 +1933,13 @@ namespace BackendSite.Controllers.Api
             {
                 var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(custInfoReq.StartDate);
                 var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(custInfoReq.EndDate);
-                var SearchResult = custInfoBLL.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status
-                , custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort, startTime, endTime, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
+                var SearchResult = custInfoBLL.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status,
+                    custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort, startTime, endTime, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
 
-                foreach (var data in SearchResult.RegLiveStatusDatas)
-                {
-                    data.RegTime = new DateTimeOffset(data.RegTime.DateTime, new TimeSpan(8, 0, 0));
-                }
+                //foreach (var data in SearchResult.RegLiveStatusDatas)
+                //{
+                //    data.RegTime = new DateTimeOffset(data.RegTime.DateTime, new TimeSpan(8, 0, 0));
+                //}
                 apiResult.Data = SearchResult.RegLiveStatusDatas;
                 apiResult.PageNumber = SearchResult.PageNumber;
                 apiResult.TotalPages = SearchResult.TotalPages;
