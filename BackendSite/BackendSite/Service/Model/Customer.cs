@@ -303,9 +303,14 @@ namespace BackendSite.Service.Model
     }
     public class RegLiveStatus
     {
+        private DateTimeOffset _regTime { get; set; }
         public string UserName { get; set; }
         public int ActStatus { get; set; }
-        public DateTimeOffset RegTime { get; set; }
+        public DateTimeOffset RegTime
+        {
+            get => _regTime;
+            set => _regTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public string AccountName { get; set; }
         public int CustId { get; set; }
         public int SiteId { get; set; }
