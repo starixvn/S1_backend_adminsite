@@ -35,6 +35,7 @@ namespace BackendSite.Controllers.Api
         private readonly Common common;
         private readonly PaymentBLL paymentBLL;
         private readonly ExcelBLL excelBLL;
+        private readonly ImageEditorBLL _imageEditorBll;
 
         #endregion
 
@@ -46,7 +47,8 @@ namespace BackendSite.Controllers.Api
                                     ServerInfoBLL serverInfoBLL,
                                     Common common,
                                     PaymentBLL paymentBLL,
-                                    ExcelBLL excelBLL)
+                                    ExcelBLL excelBLL,
+                                    ImageEditorBLL imageEditorBll)
         {
             this.custInfoBLL = custInfoBLL;
             this.winLostReportService = winLostReportService;
@@ -55,6 +57,7 @@ namespace BackendSite.Controllers.Api
             this.common = common;
             this.paymentBLL = paymentBLL;
             this.excelBLL = excelBLL;
+            _imageEditorBll = imageEditorBll;
         }
 
         #endregion
@@ -696,63 +699,32 @@ namespace BackendSite.Controllers.Api
         /// <param name="File"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult UploadCustPhotoId([FromForm] int CustId, [FromForm] IFormFile File)
+        public async Task<ApiResult> UploadCustPhotoId([FromForm] int CustId, [FromForm] IFormFile File)
         {
-            var xSize = 500m;
             var custInfo = custInfoBLL.GetCustInfoWithCache(CustId);
-            decimal xCell = 1;
-            if (_contentTypesCheck.ContainsKey(File.ContentType))
-            {
-                using var fileStream = File.OpenReadStream();
-                using var uploadedImage = Image.FromStream(fileStream);
-                using var ms = new System.IO.MemoryStream();
-
-                if (uploadedImage.Width > xSize || uploadedImage.Height > xSize)
-                {
-
-                    if (uploadedImage.Width > uploadedImage.Height)
-                    {
-                        xCell = xSize / uploadedImage.Width;
-                    }
-                    else
-                    {
-                        xCell = xSize / uploadedImage.Height;
-                    }
-
-                }
-
-                var graphicOptions = new GraphicOptions
-                {
-                    CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed,
-                    SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed
-                };
-                var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
-                img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-                var fileName = File.FileName;
-                fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
-                fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
-
-                var fileBytes = ms.ToArray();
-                var result = custInfoBLL.SetCustPhotoId(custInfo.CustId, custInfo.SiteId, fileName, fileBytes);
-
-                if (result > 0)
-                {
-                    return new ApiResult
-                    {
-                        ErrorCode = (int)ErrorCodeEnum.Success,
-                        Message = "Upload Success."
-                    };
-                }
-                else
-                {
-                    throw new AdminException(ErrorCodeEnum.Fail, "Upload Fail.");
-                }
-            }
-            else
-            {
+            if (!_contentTypesCheck.ContainsKey(File.ContentType))
                 throw new AdminException(ErrorCodeEnum.FileTypeNotMatch);
+
+            await using var fileStream = File.OpenReadStream();
+            using var uploadedImage = await SixLabors.ImageSharp.Image.LoadAsync(fileStream);
+            var fileBytes = await _imageEditorBll.Resize(uploadedImage);
+            var fileName = File.FileName;
+            fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
+            fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
+
+            var result = custInfoBLL.SetCustPhotoId(custInfo.CustId, custInfo.SiteId, fileName, fileBytes);
+                
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Upload Success."
+                };
             }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Upload Fail.");
+
         }
 
         /// <summary>
