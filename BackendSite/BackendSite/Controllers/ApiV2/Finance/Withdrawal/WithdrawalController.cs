@@ -168,7 +168,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var withdrawalRequestList = _withdrawalBll.GetWithdrawalRequestList(request.SiteIds,
                 request.WithdrawalTypes, request.StartDate.DateTime, request.EndDate.DateTime,
                 request.WithdrawalId, request.UserName, request.CurrencyIds,
-                request.Statuses, request.LevelStatuses, request.PageSize, request.AmountType, request.Amount, pageNumber, out totalPages,
+                request.Statuses, request.LevelStatuses, request.PageSize, request.AmountType, request.Amount, request.PageNumber, out totalPages,
                 out rowCount, ref CurrencyAmount);
             apiListResult.Data = withdrawalRequestList;
             apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;

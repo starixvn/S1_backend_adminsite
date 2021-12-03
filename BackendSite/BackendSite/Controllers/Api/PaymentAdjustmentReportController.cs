@@ -29,11 +29,20 @@ namespace BackendSite.Controllers.Api
             var result = new ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd>();
             try
             {
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+                
                 var PageSize = 10;
                 var TotalPages = 0;
                 var RowCount = 0;
                 var CurrencyAmount = new List<string>();
-                result.Data = paymentAdjustmentBLL.GetPaymentAdjustmentReport(TransId, CurrencyId, UserName, AdjustType, StartDate, EndDate, PageSize, ref PageNumber, ref TotalPages, ref RowCount, ref CurrencyAmount);
+                var dataList = paymentAdjustmentBLL.GetPaymentAdjustmentReport(TransId, CurrencyId, UserName, AdjustType, startTime, endTime, PageSize, ref PageNumber, ref TotalPages, ref RowCount, ref CurrencyAmount);
+                
+                foreach (var data in dataList)
+                {
+                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
+                }
+                result.Data = dataList; 
                 result.PageNumber = PageNumber;
                 result.RowCount = RowCount;
                 result.TotalPages = TotalPages;
@@ -54,8 +63,15 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public IActionResult ExportPaymentAdjustmentReport(string TransId, int CurrencyId, string UserName, int AdjustType, long StartDate, long EndDate)
         {
-            var ExportData = paymentAdjustmentBLL.GetPaymentAdjustmentExportReport(TransId, CurrencyId, UserName, AdjustType, StartDate, EndDate);
-            var stream = excelBLL.Export(ExportData);
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+            var exportData = paymentAdjustmentBLL.GetPaymentAdjustmentExportReport(TransId, CurrencyId, UserName, AdjustType, startTime, endTime);
+            foreach (var data in exportData)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime,  TimeSpan.Zero);
+            }
+            
+            var stream = excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"PaymentAdjustmentReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 

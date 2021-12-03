@@ -13,7 +13,8 @@ const columnDefs = (props) => {
     return window.subFuncKeys && window.subFuncKeys.includes('f_pm_editAmountRule') && window.subFuncKeys.includes('f_pm_edit') ?
         [
             {
-                dataColumn: 'payCurrencyId', columnTitle: 'Currency'
+                dataColumn: 'currencyId', columnTitle: 'Currency',
+                body: { format: currencyFormat }
             },
             {
                 dataColumn: 'minAmount', columnTitle: 'MinAmount',
@@ -71,7 +72,8 @@ const columnDefs = (props) => {
             }
         ] : window.subFuncKeys && !window.subFuncKeys.includes('f_pm_editAmountRule') && window.subFuncKeys.includes('f_pm_edit') ? [
             {
-                dataColumn: 'payCurrencyId', columnTitle: 'Currency'
+                dataColumn: 'currencyId', columnTitle: 'Currency',
+                body: { format: currencyFormat }
             },
             {
                 dataColumn: 'minAmount', columnTitle: 'MinAmount',
@@ -108,7 +110,8 @@ const columnDefs = (props) => {
             }
         ] : [
                 {
-                    dataColumn: 'payCurrencyId', columnTitle: 'Currency'
+                    dataColumn: 'currencyId', columnTitle: 'Currency',
+                    body: { format: currencyFormat }
                 },
                 {
                     dataColumn: 'minAmount', columnTitle: 'MinAmount',
@@ -223,6 +226,7 @@ export const CurrencyResultTable = (props) => {
                             break;
                     }
                 } else {
+                    // console.log(data[col.dataColumn]);
                     body_content = col.body && col.body.format ? col.body.format(data[col.dataColumn], col.body && col.body.subElem ? data[col.body.subElem.dataColumn] : null) : data[col.dataColumn];
                 }
             }
@@ -250,6 +254,9 @@ export const CurrencyResultTable = (props) => {
         </table>
     )
 }
+
+
+const currencyFormat = (CurrencyId)=>{ return window.i18n["lbl_Currency" + CurrencyId] }
 
 const numberFormat = (number) => {
     return number_format(number_toFixed(number, 2));

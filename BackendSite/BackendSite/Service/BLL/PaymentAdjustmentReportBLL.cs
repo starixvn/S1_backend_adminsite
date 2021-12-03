@@ -20,22 +20,22 @@ namespace BackendSite.Service.BLL
             this.selLangBLL = selLangBLL;
         }
 
-        public IEnumerable<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport(string TransId, int Currency, string UserName, int adjustType, long StartDate, long EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount, ref List<string> CurrencyAmount)
+        public IEnumerable<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport(string transId, int currency, string userName, int adjustType, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount, ref List<string> currencyAmount)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
             var datas = paymentAdjustmentService.GetPaymentAdjustmentReport(
-                    TransId,
-                    Currency,
-                    UserName,
+                    transId,
+                    currency,
+                    userName,
                     adjustType,
                     siteList?.Select(x => x.SiteId),
-                    StartDate,
-                    EndDate,
-                    PageSize,
-                    ref PageNumber,
-                    ref TotalPages,
-                    ref RowCount,
-                    ref CurrencyAmount
+                    startDate,
+                    endDate,
+                    pageSize,
+                    ref pageNumber,
+                    ref totalPages,
+                    ref rowCount,
+                    ref currencyAmount
                 );
 
             var result = new List<PaymentAdjustmentFrontEnd>();
@@ -65,17 +65,17 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public List<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentExportReport(string TransId, int Currency, string UserName, int adjustType, long StartDate, long EndDate)
+        public List<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentExportReport(string transId, int currency, string userName, int adjustType, DateTime startDate, DateTime endDate)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
             var datas = paymentAdjustmentService.GetPaymentAdjustmentExportReport(
-                    TransId,
-                    Currency,
-                    UserName,
+                    transId,
+                    currency,
+                    userName,
                     adjustType,
                     siteList?.Select(x => x.SiteId),
-                    StartDate,
-                    EndDate
+                    startDate,
+                    endDate
                 );
 
             var result = new List<PaymentAdjustmentFrontEnd>();

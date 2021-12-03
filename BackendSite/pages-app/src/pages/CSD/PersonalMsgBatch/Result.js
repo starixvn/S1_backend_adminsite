@@ -154,7 +154,7 @@ const ActionButtons = (props) => {
 const ExportButtons = (props) => {
   return (
     <>
-      <div onClick={props.downloadResult}>
+      <div>
         <button
           type="button"
           className="btn btn-approved"
