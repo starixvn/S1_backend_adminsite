@@ -55,8 +55,7 @@ namespace BackendSite.Service.Model
     }
     public class AdminOperateLogReq
     {
-        public int? SiteId { get; set; }
-        public int? CustId { get; set; }
+        public int CustId { get; set; }
         public string Menu { get; set; }
         public string Operator { get; set; }
         public long startDate { get; set; }

@@ -1,7 +1,15 @@
-﻿namespace BackendSite.Service.Model.WithdrawalBankAccounting
+﻿using System;
+
+namespace BackendSite.Service.Model.WithdrawalBankAccounting
 {
     public class WithdrawalInfoAndAccountingListForExportModel
     {
+
+        private DateTimeOffset _createTime { get; set; }
+        private DateTimeOffset _flowEndTime { get; set; }
+        private DateTimeOffset _accountingCreateTime { get; set; }
+        private DateTimeOffset _accountingOperateTime { get; set; }
+
         public string TransId
         {
             get;
@@ -56,10 +64,10 @@
             set;
         }
 
-        public string CreateTime
+        public DateTimeOffset CreateTime
         {
-            get;
-            set;
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
 
         public string Operator
@@ -68,10 +76,10 @@
             set;
         }
 
-        public string FlowEndTime
+        public DateTimeOffset FlowEndTime
         {
-            get;
-            set;
+            get => _flowEndTime;
+            set => _flowEndTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
 
         public int AccountingSeq
@@ -122,10 +130,10 @@
             set;
         }
 
-        public string AccountingCreateTime
+        public DateTimeOffset AccountingCreateTime
         {
-            get;
-            set;
+            get => _accountingCreateTime;
+            set => _accountingCreateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
 
         public string AccountingOperatorName
@@ -134,10 +142,10 @@
             set;
         }
 
-        public string AccountingOperateTime
+        public DateTimeOffset AccountingOperateTime
         {
-            get;
-            set;
+            get => _accountingOperateTime;
+            set => _accountingOperateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,12 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int Value { set; get; }
         }
 
+        public class EnumTypeWithStringModel
+        {
+            public string Name { set; get; }
+            public string Value { set; get; }
+        }
+
         /// <summary>
         /// Enum/GetEnumType 取得列舉清單
         /// </summary>
@@ -33,17 +40,36 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// Http Method：POST
         /// 
         /// Func Path：Global Func.
+        /// 
+        /// Enum List：
+        /// 
+        /// Customer - IsKycEnum、IsRiskEnum、ActStatusEnum
+        /// 
+        /// CustIovation - IovationEnum
+        /// 
+        /// CustProfile - PhoneVerifiedEnum、EmailVerifiedEnum
+        /// 
+        /// DepositInfo - DepositTypeEnum
         /// </remarks>
         /// <param name="reqest">參數</param>
-        /// <returns>結果</returns>
+        /// <returns>Data 結果</returns>
         //有新舊API，這支是新API，另一支新的API=api/Common/GetEnumType
         [HttpPost]
-        public ApiResult<List<EnumTypeModel>> GetEnumType(GetEnumTypeReqest reqest)
+        public ApiResult GetEnumType(GetEnumTypeReqest reqest)
         {
             var apiResult = new ApiResult<List<EnumTypeModel>>();
             var result = new List<EnumTypeModel>();
             try
             {
+                if (reqest.EnumName == "IovationEnum")
+                {
+                    return new ApiResult<List<EnumTypeWithStringModel>>()
+                    {
+                        Data = GetIovationEnumData(),
+                        ErrorCode = (int)ErrorCodeEnum.Success
+                    };
+                };
+
                 var allTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes());
                 var getType = allTypes.FirstOrDefault(t => string.Equals(t.Name, reqest.EnumName, StringComparison.OrdinalIgnoreCase));
                 if (getType != null)
@@ -71,5 +97,34 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
             return apiResult;
         }
+
+        #region Private Methods
+
+        private List<EnumTypeWithStringModel> GetIovationEnumData()
+        {
+            var result = new List<EnumTypeWithStringModel>();
+
+            result.Add(new EnumTypeWithStringModel
+            {
+                Name = "Allow",
+                Value = "A"
+            });
+
+            result.Add(new EnumTypeWithStringModel
+            {
+                Name = "Deny",
+                Value = "D"
+            });
+
+            result.Add(new EnumTypeWithStringModel
+            {
+                Name = "Review",
+                Value = "R"
+            });
+
+            return result;
+        }
+
+        #endregion
     }
 }

@@ -71,12 +71,23 @@ namespace BackendSite.Service.Model
         public string LangId { get; set; }
         public string Recipient { get; set; }
         public string Sender { get; set; }
-        public DateTime CreateTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
         public int Status { get; set; }
         public bool Flag { get; set; }
         public string ContentRemoveTag { get; set; }
 
     }
+    
+    public class BatchPersonalMsg : PersonalMsgBase
+    {
+        public int BatchId { get; set; }
+        public int SiteId { get; set; }
+        public string LangId { get; set; }
+        public int CurrencyId { get; set; }
+        public int AccountStatus { get; set; }
+        public string Operator { get; set; }
+    }
+    
     public class PersonalMsgBase
     {
         public string Title { get; set; }

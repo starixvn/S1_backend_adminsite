@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BackendSite.Service.Model.enums;
+using System;
 using System.Runtime.Serialization;
 
 namespace BackendSite.ExceptionHandling

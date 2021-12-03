@@ -500,17 +500,26 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetWithdrawalListByCust(WithdrawalReq4 withdrawalReq)
         {
-            var pageNumber = withdrawalReq.PageNumber;
             var totalPages = 0;
             var rowCount = 0;
             var CurrencyAmount = new List<string>();
+
+            if (withdrawalReq.startDate > 2147483647)
+                withdrawalReq.startDate = 2147483647;
+
+            if (withdrawalReq.endDate > 2147483647)
+                withdrawalReq.endDate = 2147483647;
+
+            var startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)withdrawalReq.startDate);
+            var endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)withdrawalReq.endDate);
+
             var data = withdrawalBLL.GetWithdrawalListByCust(withdrawalReq.CustId,
                 withdrawalReq.TransId,
                 withdrawalReq.Status == 0 ? (int?)null : withdrawalReq.Status,
-                withdrawalReq.startDate,
-                withdrawalReq.endDate,
+                startDate,
+                endDate,
                 withdrawalReq.PageSize,
-                ref pageNumber,
+                withdrawalReq.PageNumber,
                 out totalPages,
                 out rowCount,
                 ref CurrencyAmount);
@@ -519,7 +528,7 @@ namespace BackendSite.Controllers.Api
             {
                 Data = data,
                 TotalPages = totalPages,
-                PageNumber = pageNumber,
+                PageNumber = withdrawalReq.PageNumber,
                 RowCount = rowCount,
                 CurrencyAmount = CurrencyAmount,
                 ErrorCode = (int)ErrorCodeEnum.Success
@@ -876,16 +885,44 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalTimeReport" })]
-        public ApiListResult<WithdrawalTimeList> WithdrawalTimeReportGet(WithdrawalTimeReportPara para)
+        public ApiListResult<WithdrawalTimeList> WithdrawalTimeReportGet(WithdrawalTimeReportOldReq para)
         {
             var apiListResult = new ApiListResult<WithdrawalTimeList>();
             try
             {
-                var SearchResult = withdrawalBLL.WithdrawalTimeReportGet(para);
-                apiListResult.Data = SearchResult.WithdrawalTimeList;
-                apiListResult.PageNumber = SearchResult.PageNumber;
-                apiListResult.TotalPages = SearchResult.TotalPages;
-                apiListResult.RowCount = SearchResult.RowCount;
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate).AddHours(8);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate).AddHours(8);
+                var req = new WithdrawalTimeReportPara
+                {
+                    WithdrawalId = para.WithdrawalId,
+                    StartDate = startTime,
+                    EndDate = endTime,
+                    SiteIds = para.SelectSite,
+                    CurrencyId = para.CurrencyId,
+                    Status = para.Status,
+                    PageNumber = para.PageNumber,
+                    PageSize = para.PageSize
+                };
+                
+                var searchResult = withdrawalBLL.WithdrawalTimeReportGet(req);
+
+                foreach (var data in searchResult.WithdrawalTimeList)
+                {
+                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    data.FlowEndTime = new DateTimeOffset(data.FlowEndTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    if (data.VerifyTime != null)
+                        data.VerifyTime = new DateTimeOffset(data.VerifyTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    if (data.ProcessTime != null)
+                        data.ProcessTime = new DateTimeOffset(data.ProcessTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    if (data.DepositTime != null)
+                        data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                }
+                
+                apiListResult.Data = searchResult.WithdrawalTimeList;
+                apiListResult.PageNumber = searchResult.PageNumber;
+                apiListResult.TotalPages = searchResult.TotalPages;
+                apiListResult.RowCount = searchResult.RowCount;
                 apiListResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -902,8 +939,18 @@ namespace BackendSite.Controllers.Api
         public IActionResult ExportWithdrawalTime(string selectSite, string withdrawalId, long startDate, long endDate,
             int status, int currencyId)
         {
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(startDate);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(endDate);
             var exportData =
-                withdrawalBLL.WithdrawalTimeExportGet(selectSite, withdrawalId, startDate, endDate, status, currencyId);
+                withdrawalBLL.WithdrawalTimeExportGet(selectSite, withdrawalId, startTime, endTime, status, currencyId);
+            
+            foreach (var data in exportData)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (data.FlowEndTime != null) 
+                    data.FlowEndTime = new DateTimeOffset(data.FlowEndTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
             var stream = excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"WithdrawalTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

@@ -133,8 +133,8 @@ namespace BackendSite.Service.Model
         public int Id { get; set; }
         public int CustId { get; set; }
         public string Note { get; set; }
-        public DateTime CreateTime { get; set; }
-        public DateTime? UpdateTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
+        public DateTimeOffset UpdateTime { get; set; }
         public string Operator { get; set; }
     }
     public class CustRollOver
@@ -167,13 +167,13 @@ namespace BackendSite.Service.Model
         public string BankName { set; get; }
         public string AccountNum { set; get; }
         public string IFSCCode { set; get; }
-        public string CreateTime { set; get; }
+        public DateTimeOffset CreateTime { set; get; }
     }
     public class CustCryptoWalletLog
     {
         public string NetWork { set; get; }
         public string UsdtAddress { set; get; }
-        public string CreateTime { set; get; }
+        public DateTimeOffset CreateTime { set; get; }
     }
     public class CustBonus
     {
@@ -303,9 +303,14 @@ namespace BackendSite.Service.Model
     }
     public class RegLiveStatus
     {
+        private DateTimeOffset _regTime { get; set; }
         public string UserName { get; set; }
         public int ActStatus { get; set; }
-        public DateTimeOffset RegTime { get; set; }
+        public DateTimeOffset RegTime
+        {
+            get => _regTime;
+            set => _regTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public string AccountName { get; set; }
         public int CustId { get; set; }
         public int SiteId { get; set; }

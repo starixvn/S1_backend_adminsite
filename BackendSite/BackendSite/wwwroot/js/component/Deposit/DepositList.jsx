@@ -483,7 +483,7 @@ import DateTimePicker from 'react-datetime';
                             {PayFrom}
                             <tr>
                                 <th scope="row">{"Deposit Time" + " (" + moment().format('Z') + ")"}</th>
-                                <td>{moment(data.depositTime).format('l LTS')}</td>
+                                <td>{data.depositTime ? moment(data.depositTime).format('l LTS') : "N/A" }</td>
                             </tr>
                             <tr>
                                 <th scope="row">Ref ID</th>

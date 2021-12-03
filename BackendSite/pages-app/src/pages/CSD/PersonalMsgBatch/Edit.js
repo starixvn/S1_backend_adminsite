@@ -7,9 +7,52 @@ import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
 import { EditorState, convertToRaw, ContentState } from "draft-js";
 
+const AccountStatus = {
+  1: "Running",
+  4: "Lock"
+};
+
+const defCurrencyType = {
+  2: "MYR",
+  4: "THB",
+  13: "RMB",
+  15: "IDR",
+  51: "VND",
+  61: "INR",
+};
+
+const DropDownBox = (props) => {
+  const onChange = (e) => {
+    if (props.onChange) {
+      props.onChange(e.target.value, props.dataColumn);
+    }
+  };
+  let optionRows = props.options.map((item) => {
+    return (
+        <option key={`${props.ColumnTitle}-${item.value}`} value={item.value}>
+          {item.displayText}
+        </option>
+    );
+  });
+  
+  return (
+      <div className="input-item width-100" style={{ marginTop: "20px", marginBottom: "20px" }}>
+        <span className="label">{props.columnTitle}</span>
+        <div className="field">
+          <select defaultValue={props.selectedValue} onChange={onChange}>
+            {props.hasAll ? <option value="0">-</option> : null}
+            {optionRows}
+          </select>
+        </div>
+      </div>
+  );
+};
+
 const EditPanel = (props) => {
   let defaultData = {
     optSite: "",
+    accountstatus:0,
+    currency:0,
     file: "",
     subject: {},
     content: {},
@@ -32,6 +75,8 @@ const EditPanel = (props) => {
     // console.log('props.DetailDatas.siteId = '+props.DetailDatas.siteId,'iLangList = '+props.SiteList[props.DetailDatas.siteId-1].iLangList);
     // setlangDatas( props.SiteList[props.DetailDatas.siteId-1].iLangList);
   }
+  defaultData.accountstatus = props.filterInfo.AccountStatus;
+  defaultData.currency = props.filterInfo.Currency;
 
   const [stateData, updateData] = useState(defaultData);
   const [stateSend, updateSend] = useState(false);
@@ -75,43 +120,42 @@ const EditPanel = (props) => {
   };
 
   const SetMsg = () => {
+    
     if (!stateSend) {
       if (isMountedRef.current) {
         updateSend(true);
       }
-
+      
       let msg = "";
       let check = true;
       if (!stateData.optSite) {
         check = false;
         msg = "Please check Site.";
-      } else if (!stateData.file) {
+      } 
+      else if ( (props.filterInfo.AccountStatus == 0 || props.filterInfo.Currency == 0 ) && !stateData.file) {
         check = false;
-        msg = "Please choose upload excel file.";
-      } else if (!stateData.subject || !stateData.subject.en) {
+        msg = "Please choose AccountStatus / Currency  Or  upload excel file.";
+      }
+      else if (!stateData.subject || !stateData.subject.en) {
         check = false;
         msg = "Please input en subject.";
       } else if (!stateData.content || !stateData.content.en) {
         check = false;
         msg = "Please input en content.";
       }
-
+      
       if (
         check &&
         window.confirm(
           "Are you sure to import data to " + _site[stateData.optSite] + "?"
         )
       ) {
+        
         let msg = {};
-        if (langDatas != null) {
-          langDatas.forEach((lang) => {
-            msg[lang] = {
-              Title: stateData.subject.en,
-              Content: stateData.content.en,
-            };
-          });
-        }
-
+        
+        defaultData.accountstatus = props.filterInfo.AccountStatus;
+        defaultData.currency = props.filterInfo.Currency;
+        
         Object.keys(stateData.subject).forEach((sKey) => {
           if (stateData.subject[sKey]) {
             if (msg[sKey]) {
@@ -142,9 +186,21 @@ const EditPanel = (props) => {
         let file = document.getElementById("uploadfile").files[0];
         let formData = new FormData();
         formData.append("optSite", parseInt(stateData.optSite));
-        formData.append("excelUpload", file, file.name);
+        formData.append("accountStatus", parseInt(defaultData.accountstatus));
+        formData.append("currency", parseInt(defaultData.currency));
+        if (file != null){
+          formData.append("excelUpload", file, file.name);
+          if (langDatas != null) {
+            langDatas.forEach((lang) => {
+              msg[lang] = {
+                Title: stateData.subject.en,
+                Content: stateData.content.en,
+              };
+            });
+          }
+        }
         formData.append("personalMsg", JSON.stringify(msg));
-
+        
         api
           .post("/api/Message/SendMessageBatch", formData, settings)
           .then(function (response) {
@@ -156,7 +212,9 @@ const EditPanel = (props) => {
                     BatchId: response.data.data,
                   },
                 };
-
+                props.filterInfo.AccountStatus = 0;
+                props.filterInfo.Currency = 0;
+                
                 WebAPI.DownloadData(param);
 
                 updateData({
@@ -287,6 +345,7 @@ const EditPanel = (props) => {
       }
     }
   };
+  
   let radio = "";
   if (props.SiteList === null) {
     return <></>;
@@ -386,32 +445,60 @@ const EditPanel = (props) => {
       {radio}
       {props.DetailDatas === null ? (
         <>
-          <div className="form-group">
-            <label className="col-form-label d-block">
-              Download Template File{" "}
-            </label>
-            <a
-              className="btn btn-danger"
-              role="button"
-              href="../../../resource/examplefile/PersonalMessageBatch.xlsx"
-              download="PersonalMessageTemplateFile.xlsx"
-            >
-              Template File
-            </a>
-          </div>
-          <div className="form-group width-200">
-            <label className="col-form-label">Upload File</label>
-            <input
-              id="uploadfile"
-              className="form-control"
-              type="file"
-              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-              onChange={(e) => {
-                EditFiled(e.target.value, "file");
-              }}
-              disabled={stateSend}
-              value={stateData.file}
-            />
+          {/*<div className="filter" >*/}
+            <div className="row-flex" style={{ display: "flex"}}>
+              <label className="input-item width-100"> Method 1 :  </label>
+              <DropDownBox
+                  columnTitle="Account Status"
+                  options={Object.keys(AccountStatus).map((key) => {
+                    return { value: key, displayText: AccountStatus[key] };
+                  })}
+                  hasAll={true}
+                  selectedValue={0}
+                  dataColumn="AccountStatus"
+                  onChange={props.onChange}
+              />
+              <DropDownBox
+                  columnTitle="Currency"
+                  options={Object.keys(defCurrencyType).map((key) => {
+                    return { value: key, displayText: defCurrencyType[key] };
+                  })}
+                  hasAll={true}
+                  selectedValue={0}
+                  dataColumn="Currency"
+                  onChange={props.onChange}
+              />
+            </div>
+          {/*</div>*/}
+          <div className="row-flex" style={{ display: "flex"}}>
+            <label className="input-item width-100"> Method 2 :  </label>
+              <div className="form-group width-200" >
+                <label className="col-form-label d-block">
+                  Download Template File{" "}
+                </label>
+                <a
+                  className="btn btn-danger"
+                  role="button"
+                  href="../../../resource/examplefile/PersonalMessageBatch.xlsx"
+                  download="PersonalMessageTemplateFile.xlsx"
+                >
+                  Template File
+                </a>
+              </div>
+              <div className="form-group width-200" >
+                <label className="col-form-label">Upload File</label>
+                <input
+                  id="uploadfile"
+                  className="form-control"
+                  type="file"
+                  accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                  onChange={(e) => {
+                    EditFiled(e.target.value, "file");
+                  }}
+                  disabled={stateSend}
+                  value={stateData.file}
+                />
+              </div>
           </div>
         </>
       ) : null}

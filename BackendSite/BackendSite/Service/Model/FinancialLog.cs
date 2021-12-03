@@ -40,17 +40,22 @@ namespace BackendSite.Service.Model
         public string BonusCode { get; set; }
         //public long RelId { get; set; }
         public DateTime CreateTime { get; set; }
-      
+
     }
     public class RebateInfo
     {
+        private DateTimeOffset _claimTime { get; set; }
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
         public string BonusCode { get; set; }
         public string Description { get; set; }
         public string RebateTypeName { get; set; }
-        public DateTime ClaimTime { get; set; }
+        public DateTimeOffset ClaimTime
+        {
+            get => _claimTime;
+            set => _claimTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
 
     }
     public class PromotionCategory
@@ -172,7 +177,7 @@ namespace BackendSite.Service.Model
 
         public int CurrencyId { get; set; }
 
-        public double AdjustmentMax { get; set; }
+        public decimal AdjustmentMax { get; set; }
         public DateTime UpdateTime { get; set; }
         public string UpdateOperator { get; set; }
     }
@@ -189,8 +194,8 @@ namespace BackendSite.Service.Model
         public int CategoryId { get; set; }
         public string Name { get; set; }
     }
-    public class CheckBalanceAdjustData 
-    { 
+    public class CheckBalanceAdjustData
+    {
         public string BonusCode { get; set; }
         public decimal Bonus { get; set; }
         public int RollOver { get; set; }
@@ -208,7 +213,7 @@ namespace BackendSite.Service.Model
         public string Name { get; set; }
         public List<BalanceAdjustBonusCodeBatchDetail> Detail { get; set; }
     }
-    public class BalanceAdjustBonusCodeBatchDetail 
+    public class BalanceAdjustBonusCodeBatchDetail
     {
         public decimal Bonus { get; set; }
         public int RollOver { get; set; }

@@ -6,85 +6,99 @@ using BackendSite.Service.Model;
 using MySql.Data.MySqlClient;
 using Dapper;
 using System.Data;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
     public class PaymentAdjustmentReportService
     {
-        private readonly IConfiguration configuration;
-        public PaymentAdjustmentReportService(IConfiguration configuration)
+        private readonly IConfiguration _configuration;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
+        public PaymentAdjustmentReportService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _configuration = provider.GetRequiredService<IConfiguration>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public IEnumerable<PaymentAdjustment> GetPaymentAdjustmentReport(string TransId, int CurrencyId, string UserName, int AdjustType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount, ref List<string> CurrencyAmount)
+        public IEnumerable<PaymentAdjustment> GetPaymentAdjustmentReport(string transId, int currencyId, string userName, int adjustType, IEnumerable<int> siteList, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount, ref List<string> currencyAmount)
         {
-            IEnumerable<PaymentAdjustment> result = null;
             var tempCurrencyTotalAmount = new List<string>();
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var props = new DynamicParameters();
-            props.Add("@PageSize", PageSize);
-            props.Add("@TransID", TransId);
-            props.Add("@Currency", CurrencyId);
-            props.Add("@UserName", UserName);
-            props.Add("@AdjustType", AdjustType);
-            props.Add("@StartDate", StartDate);
-            props.Add("@EndDate", EndDate);
-            props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
+            props.Add("@PageSize", Math.Abs(pageSize));
+            props.Add("@TransID", transId);
+            props.Add("@Currency", currencyId);
+            props.Add("@UserName", userName);
+            props.Add("@AdjustType", adjustType);
+            props.Add("@StartDate", startDate);
+            props.Add("@EndDate", endDate);
+            props.Add("@SiteIds", JsonConvert.SerializeObject(siteList));
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_AdjustmentTotalAmountV3_Get", props, commandType: CommandType.StoredProcedure).ToList();
-            if (CurrencyTotalAmount.Count > 0)
+            var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_AdjustmentTotalAmount_Get_V4", props).ToList();
+            if (currencyTotalAmount.Count > 0)
             {
-                CurrencyTotalAmount.ForEach(x =>
+                currencyTotalAmount.ForEach(x =>
                 {
                     tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.Currency, Math.Round(x.Amount, 2)));
                 });
             }
-            CurrencyAmount = tempCurrencyTotalAmount;
+            currencyAmount = tempCurrencyTotalAmount;
             #endregion
 
-            props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("@StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),DbType.Int32, ParameterDirection.Input);
+            props.Add("@PageNumber", Math.Abs(pageNumber), DbType.Int32,ParameterDirection.InputOutput);
             props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            
 
-            result = conn.Query<PaymentAdjustment>("Admin_AdjustmentInfoV3_Get", props, commandType: CommandType.StoredProcedure);
-            PageNumber = props.Get<int?>("@PageNumber") ?? 0;
-            TotalPages = props.Get<int?>("@TotalPages") ?? 0;
-            RowCount = props.Get<int?>("@RowCount") ?? 0;
+            var result = _reportDbClient.Query<PaymentAdjustment>("Admin_AdjustmentInfo_Get_V4", props);
+            pageNumber = props.Get<int?>("@PageNumber") ?? 0;
+            totalPages = props.Get<int?>("@TotalPages") ?? 0;
+            rowCount = props.Get<int?>("@RowCount") ?? 0;
 
             return result;
         }
 
-        public IEnumerable<PaymentAdjustment> GetPaymentAdjustmentExportReport(string TransId, int CurrencyId, string UserName, int AdjustType, IEnumerable<int> SiteList, long StartDate, long EndDate)
+        public IEnumerable<PaymentAdjustment> GetPaymentAdjustmentExportReport(string transId, int currencyId, string userName, int adjustType, IEnumerable<int> siteList, DateTime startDate, DateTime endDate)
         {
-            IEnumerable<PaymentAdjustment> result = null;
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var SpName = "Admin_AdjustmentInfoExportV3_Get";
             var props = new DynamicParameters();
-            props.Add("@TransID", TransId);
-            props.Add("@Currency", CurrencyId);
-            props.Add("@UserName", UserName);
-            props.Add("@AdjustType", AdjustType);
-            props.Add("@StartDate", StartDate);
-            props.Add("@EndDate", EndDate);
-            props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
+            props.Add("@TransID", transId);
+            props.Add("@Currency", currencyId);
+            props.Add("@UserName", userName);
+            props.Add("@AdjustType", adjustType);
+            props.Add("@StartDate", startDate);
+            props.Add("@EndDate", endDate);
+            props.Add("@SiteIds", JsonConvert.SerializeObject(siteList));
 
-            result = conn.Query<PaymentAdjustment>(SpName, props, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.Query<PaymentAdjustment>("Admin_AdjustmentInfoExport_Get_V4", props);
 
             return result;
         }
 
-        public IEnumerable<PaymentAdjustment> GetAdjustmentInfoByCust(int CustId, long? startDate, long? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
+        public IEnumerable<PaymentAdjustment> GetAdjustmentInfoByCust(int custId,
+            DateTime? startDate,
+            DateTime? endDate,
+            int pageSize,
+            int startIndex,
+            out int totalPages,
+            out int rowCount,
+            ref List<string> CurrencyAmount)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var tempCurrencyTotalAmount = new List<string>();
-            var p = new DynamicParameters(new { CustId = CustId, StartDate = startDate, EndDate = endDate, PageSize = pageSize });
+            var p = new DynamicParameters();
+
+            p.Add("_CustId", custId, dbType: DbType.Int32);
+            p.Add("_StartDate", startDate, dbType: DbType.DateTime);
+            p.Add("_EndDate", endDate, dbType: DbType.DateTime);
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_AdjustmentTotalAmountByCustV2_Get", p, commandType: CommandType.StoredProcedure).ToList();
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_AdjustmentTotalAmountByCust_Get_V3", p, commandType: CommandType.StoredProcedure).ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
                 CurrencyTotalAmount.ForEach(x =>
@@ -95,16 +109,16 @@ namespace BackendSite.Service.DAL
             CurrencyAmount = tempCurrencyTotalAmount;
             #endregion
 
-            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_PageSize", pageSize, dbType: DbType.Int32);
+            p.Add("_StartIndex", startIndex, dbType: DbType.Int32);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             
-            var depositList = conn.Query<PaymentAdjustment>("Admin_AdjustmentInfoByCustV2_Get", p, commandType: CommandType.StoredProcedure);
-            pageNumber = p.Get<int?>("PageNumber") ?? 0;
-            totalPages = p.Get<int?>("TotalPages") ?? 0;
-            rowCount = p.Get<int?>("RowCount") ?? 0;
+            var depositList = conn.Query<PaymentAdjustment>("Admin_AdjustmentInfoByCust_Get_V3", p, commandType: CommandType.StoredProcedure);
+ 
+            totalPages = p.Get<int?>("_TotalPages") ?? 0;
+            rowCount = p.Get<int?>("_RowCount") ?? 0;
             return depositList;
         }
     }

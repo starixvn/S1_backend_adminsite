@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BackendSite.ExceptionHandling;
 using Newtonsoft.Json;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL
 {

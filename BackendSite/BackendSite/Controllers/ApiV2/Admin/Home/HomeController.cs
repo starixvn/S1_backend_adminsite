@@ -2,15 +2,13 @@
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -22,21 +20,21 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
     {
         #region Fields
 
-        private readonly AuthorizeBLL _authorizeBLL;
+        private readonly AuthorizeBLL _authorizeBll;
         private readonly Tools _tools;
-        private readonly AdminBLL _adminBLL;
+        private readonly AdminBLL _adminBll;
 
         #endregion
 
         #region Constructors
 
-        public HomeController(AuthorizeBLL authorizeBLL,
+        public HomeController(AuthorizeBLL authorizeBll,
                               Tools tools,
-                              AdminBLL adminBLL)
+                              AdminBLL adminBll)
         {
-            _authorizeBLL = authorizeBLL;
+            _authorizeBll = authorizeBll;
             _tools = tools;
-            _adminBLL = adminBLL;
+            _adminBll = adminBll;
         }
 
         #endregion
@@ -100,7 +98,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
 
             AdminUser adminUser = null;
 
-            var userLoginResult = _authorizeBLL.UserLogin(loginModel.UserName,
+            var userLoginResult = _authorizeBll.UserLogin(loginModel.UserName,
                                                           loginModel.UserPwd,
                                                           _tools.GetClientIP(HttpContext),
                                                           _tools.GetFromUrl(HttpContext),
@@ -194,7 +192,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
         public ApiResult ChangePwd(ChangePwdReqest changePwd)
         {
 
-            var result = _adminBLL.ChangePwd(new Service.Model.ChangePwd { OldPwd = changePwd.OldPwd, NewPwd = changePwd.NewPwd });
+            var result = _adminBll.ChangePwd(new Service.Model.ChangePwd { OldPwd = changePwd.OldPwd, NewPwd = changePwd.NewPwd });
 
             if (result != ErrorCodeEnum.Success)
             {

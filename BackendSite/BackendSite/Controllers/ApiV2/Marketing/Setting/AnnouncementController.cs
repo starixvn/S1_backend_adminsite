@@ -120,13 +120,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
                 apiResult.PageNumber = para.PageNumber;
                 apiResult.RowCount = rowCount;
                 apiResult.TotalPages = totalPages;
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.RawMessage = ex.ToString();
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
             }
 
             return apiResult;
@@ -150,13 +150,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             try
             {
                 apiResult.Data = _messageBll.GetAnnouncementById(para.Id);
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.RawMessage = ex.ToString();
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
             }
 
             return apiResult;
@@ -182,11 +182,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
                 var result = _messageBll.AddAnnouncement(para.Announcement, authData.UserName, authData.UserId, para.StartTime, para.EndTime);
                 if (result != null)
                 {
-                    apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 }
                 else
                 {
-                    apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Fail;
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Create Fail.";
                 }
             }
@@ -194,7 +194,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             {
                 _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.RawMessage = ex.ToString();
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
             }
 
             return apiResult;
@@ -220,13 +220,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             {
                 var authData = _authorizeBll.GetAuthData();
                 var result = _messageBll.UpdateAnnouncement(para.Announcement, authData.UserName, authData.UserId, para.StartTime, para.EndTime);
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.RawMessage = ex.ToString();
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
             }
 
             return apiResult;
@@ -252,11 +252,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
                 var result = _messageBll.DeleteAnnouncement(para.Id);
                 if (result > 0)
                 {
-                    apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 }
                 else
                 {
-                    apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Fail;
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Delete Fail";
                 }
             }
@@ -264,7 +264,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             {
                 _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.RawMessage = ex.ToString();
-                apiResult.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
             }
 
             return apiResult;

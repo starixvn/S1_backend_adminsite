@@ -1,9 +1,17 @@
 ﻿using System.ComponentModel;
 
-namespace BackendSite.ExceptionHandling
+namespace BackendSite.Service.Model.enums
 {
     public enum ErrorCodeEnum
     {
+        //編碼規則
+        //1XXX:Home
+        //2XXX:Deposit
+        //3XXX:Withdrawal
+        //4XXX:Adjustment
+        //5XXX:Customer相關代碼
+        //9XXX:System常使用代碼
+        
         #region In Common Use
 
         [Description("msg_Success")]
@@ -23,6 +31,9 @@ namespace BackendSite.ExceptionHandling
 
         [Description("msg_DuplicateData")]
         DuplicateData = -5,
+
+        [Description("msg_UpdateFailed")]
+        UpdateFailed = 9,
 
         [Description("msg_SystemException")]
         SystemException = 9999,
@@ -48,6 +59,29 @@ namespace BackendSite.ExceptionHandling
 
         [Description("msg_OldpwdNotMatch")]
         OldpwdNotMatch = 1006,
+
+        #endregion
+
+        #region Finance
+
+        [Description("msg_WithdrawalLimitAdjustmentNotBalance")]
+        WithdrawalLimitAdjustmentNotBalance = 4002,
+
+        #endregion
+
+        #region CSD
+
+        [Description("msg_UserNotFound")]
+        CustNotFound = 5001,
+
+        [Description("msg_CustStatusIsSuspend")]
+        CustStatusIsSuspend = 5002,
+
+        [Description("msg_CustStatusIsClosed")]
+        CustStatusIsClosed = 5003,
+
+        [Description("msg_CustStatusIsLocked")]
+        CustStatusIsLocked = 5004,
 
         #endregion
     }

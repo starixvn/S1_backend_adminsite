@@ -140,7 +140,15 @@ namespace BackendSite.Service.BLL
             };
             return serverInfoService.AddAdminOperateLog(addAdminOperateLog);
         }
-        public IEnumerable<GetAdminOperateLog> GetAdminOperateLog(int? SiteId, int? CustId, string Menu, string Operator, long StartDate, long EndDate, int PageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<GetAdminOperateLog> GetAdminOperateLog(int CustId,
+            string Menu,
+            string Operator,
+            DateTimeOffset StartDate,
+            DateTimeOffset EndDate,
+            int pageSize,
+            ref int pageNumber,
+            out int totalPages,
+            out int rowCount)
         {
             var permissionJson = permissionBLL.GetPermissionJSONData();
             var dictKeys = new Dictionary<string, string>();
@@ -151,9 +159,18 @@ namespace BackendSite.Service.BLL
                 permissionLoop(permission.Settings, ref dictKeys);
             }
 
-            var returndata = serverInfoService.GetAdminOperateLog(SiteId, CustId, Menu, Operator, StartDate, EndDate, PageSize, ref pageNumber, out totalPages, out rowCount);
+            var returndata = serverInfoService.GetAdminOperateLog(CustId,
+                Menu,
+                Operator,
+                StartDate,
+                EndDate,
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                out totalPages,
+                out rowCount);
 
-            foreach (var data in returndata) {
+            foreach (var data in returndata)
+            {
                 dictKeys.TryGetValue(data.Menu, out var displayKey);
                 data.Menu = displayKey;
             }

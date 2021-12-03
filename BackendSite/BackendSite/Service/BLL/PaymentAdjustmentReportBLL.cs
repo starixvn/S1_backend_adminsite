@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
@@ -19,26 +20,26 @@ namespace BackendSite.Service.BLL
             this.selLangBLL = selLangBLL;
         }
 
-        public IEnumerable<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport(string TransId, int Currency, string UserName, int adjustType, long StartDate, long EndDate, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount, ref List<string> CurrencyAmount)
+        public IEnumerable<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport(string transId, int currency, string userName, int adjustType, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount, ref List<string> currencyAmount)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
             var datas = paymentAdjustmentService.GetPaymentAdjustmentReport(
-                    TransId, 
-                    Currency, 
-                    UserName,
-                    adjustType, 
-                    siteList?.Select(x => x.SiteId), 
-                    StartDate, 
-                    EndDate, 
-                    PageSize, 
-                    ref PageNumber, 
-                    ref TotalPages, 
-                    ref RowCount,
-                    ref CurrencyAmount
+                    transId,
+                    currency,
+                    userName,
+                    adjustType,
+                    siteList?.Select(x => x.SiteId),
+                    startDate,
+                    endDate,
+                    pageSize,
+                    ref pageNumber,
+                    ref totalPages,
+                    ref rowCount,
+                    ref currencyAmount
                 );
 
             var result = new List<PaymentAdjustmentFrontEnd>();
-            if(datas != null && datas.Any())
+            if (datas != null && datas.Any())
             {
                 foreach (var row in datas)
                 {
@@ -56,25 +57,25 @@ namespace BackendSite.Service.BLL
                         Memo = row.Memo,
                         SabaID = row.SabaID,
                         Operator = row.Operator,
-                        WalletType = string.IsNullOrWhiteSpace(row.WalletType) ? string.Empty: row.WalletType
+                        WalletType = string.IsNullOrWhiteSpace(row.WalletType) ? string.Empty : row.WalletType
                     });
                 }
             }
-            
+
             return result;
         }
 
-        public List<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentExportReport(string TransId, int Currency, string UserName, int adjustType, long StartDate, long EndDate)
+        public List<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentExportReport(string transId, int currency, string userName, int adjustType, DateTime startDate, DateTime endDate)
         {
             var siteList = serverInfoBLL.GetSiteListByLoginUser();
             var datas = paymentAdjustmentService.GetPaymentAdjustmentExportReport(
-                    TransId,
-                    Currency,
-                    UserName,
+                    transId,
+                    currency,
+                    userName,
                     adjustType,
                     siteList?.Select(x => x.SiteId),
-                    StartDate,
-                    EndDate
+                    startDate,
+                    endDate
                 );
 
             var result = new List<PaymentAdjustmentFrontEnd>();
@@ -103,9 +104,16 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<PaymentAdjustment> GetAdjustmentInfoByCust(int CustId, long? startDate, long? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
+        public IEnumerable<PaymentAdjustment> GetAdjustmentInfoByCust(int CustId,
+            DateTime? startDate,
+            DateTime? endDate,
+            int pageSize,
+            int pageNumber,
+            out int totalPages,
+            out int rowCount,
+            ref List<string> CurrencyAmount)
         {
-            return paymentAdjustmentService.GetAdjustmentInfoByCust(CustId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount,ref CurrencyAmount);
+            return paymentAdjustmentService.GetAdjustmentInfoByCust(CustId, startDate, endDate, Math.Abs(pageSize), (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), out totalPages, out rowCount, ref CurrencyAmount);
         }
     }
 }

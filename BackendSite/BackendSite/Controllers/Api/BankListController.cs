@@ -75,14 +75,6 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        //[HttpPost]
-        //public ApiListResult<IEnumerable<BankDetail>> GetBankListAll()
-        //{
-        //    var apiListResult = new ApiListResult<IEnumerable<BankDetail>>();
-        //    apiListResult.Data = bankDetailBLL.BankInfoList(int pageSize, ref int pageNumber, out int totalPages, out int rowCount);
-        //    apiListResult.ErrorCode = 0;
-        //    return apiListResult;
-        //}
         public class bankCardReq
         {
             public int siteId { get; set; }

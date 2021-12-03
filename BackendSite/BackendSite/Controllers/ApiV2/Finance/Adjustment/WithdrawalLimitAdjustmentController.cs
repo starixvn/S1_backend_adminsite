@@ -8,6 +8,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitAdjust" })]
     public class WithdrawalLimitAdjustmentController : ControllerBase
     {
         private readonly CustInfoBLL _custInfoBLL;
@@ -31,15 +31,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         private readonly AuthorizeBLL _authorizeBLL;
         private readonly Common _common;
 
-        public WithdrawalLimitAdjustmentController(CustInfoBLL custInfoBLL,
-            AdjustWithdrawalLimitBLL adjustWithdrawalLimitBLL,
-            AuthorizeBLL authorizeBLL,
-            Common common)
+        public WithdrawalLimitAdjustmentController(IServiceProvider provider)
         {
-            _custInfoBLL = custInfoBLL;
-            _adjustWithdrawalLimitBLL = adjustWithdrawalLimitBLL;
-            _authorizeBLL = authorizeBLL;
-            _common = common;
+            _custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
+            _adjustWithdrawalLimitBLL = provider.GetRequiredService<AdjustWithdrawalLimitBLL>(); ;
+            _authorizeBLL = provider.GetRequiredService<AuthorizeBLL>(); ;
+            _common = provider.GetRequiredService<Common>(); ;
         }
 
         #region API Model
@@ -94,7 +91,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         #endregion
 
         /// <summary>
-        /// WithdrawalLimitAdjustment/GetCustAndWalletInfoAsync 取得會員錢包資訊
+        /// WithdrawalLimitAdjustment/GetCustAndWalletInfo 取得會員和錢包資訊
         /// </summary>
         /// <remarks>
         /// 
@@ -107,6 +104,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// </remarks>
         /// <param name="request"></param>
         /// <returns>結果</returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitAdjust" })]
         [HttpPost]
         //有新舊API，這支是新API，另一支新的API=api/AdjustWithdrawalLimit/GetCustAndWalletInfo
         public ApiResult<dynamic> GetCustAndWalletInfoAsync(GetCustAndWalletInfoRequest request)
@@ -131,17 +129,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                         differenceAmount = walletInfo.DifferenceAmount,
                         eligibleWithdrawalAmount = walletInfo.AvailableBalance
                     };
-                    result.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+                    result.ErrorCode = (int)ErrorCodeEnum.Success;
                 }
                 else
                 {
-                    result.ErrorCode = (int)ErrorMessageCodeEnum.CustNotFound;
+                    result.ErrorCode = (int)ErrorCodeEnum.CustNotFound;
                     result.Message = "Player not found.";
                 }
             }
             catch (Exception ex)
             {
-                result.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
+                result.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 result.RawMessage = ex.ToString();
             }
 
@@ -149,7 +147,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         }
 
         /// <summary>
-        /// WithdrawalLimitAdjustment/GetAdjustWithdrawalLimitsLog 取得調整提款限額紀錄
+        /// WithdrawalLimitAdjustment/GetLog 取得調整提款限額紀錄
         /// </summary>
         /// <remarks>
         ///
@@ -160,9 +158,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// </remarks>
         /// <param name="request"></param>
         /// <returns>結果</returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitAdjust" })]
         [HttpPost]
         //有新舊API，這支是新API，另一支新的API=api/AdjustWithdrawalLimit/GetAdjustWithdrawalLimitsLog
-        public ApiListResult<AdjustWithdrawalLimit> GetAdjustWithdrawalLimitsLog(GetAdjustWithdrawalLimitsLogRequest request)
+        public ApiListResult<AdjustWithdrawalLimit> GetLog(GetAdjustWithdrawalLimitsLogRequest request)
         {
 
             var result = new ApiListResult<AdjustWithdrawalLimit>();
@@ -177,11 +176,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 result.PageNumber = request.PageNumber;
                 result.RowCount = RowCount;
                 result.TotalPages = TotalPages;
-                result.ErrorCode = (int)ErrorMessageCodeEnum.Success;
+                result.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
-                result.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
+                result.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 result.RawMessage = ex.ToString();
             }
 
@@ -189,20 +188,19 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         }
 
         /// <summary>
-        /// WithdrawalLimitAdjustment/SetAdjustWithdrawalLimit 設定提款限額
+        /// WithdrawalLimitAdjustment/Submit 提交提款限額
         /// </summary>
         /// <remarks>
-        ///
         /// Http Method：POST
         /// 
         /// Func Path：Finance > Withdrawal Limit Adjustment > Setting > [Submit]
-        /// 
         /// </remarks>
         /// <param name="request"></param>
         /// <returns>結果</returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitAdjust" })]
         [HttpPost]
         //有新舊API，這支是新API，另一支新的API=api/AdjustWithdrawalLimit/SetAdjustWithdrawalLimit
-        public ApiResult SetAdjustWithdrawalLimit(SetAdjustWithdrawalLimitRequest request)
+        public ApiResult Submit(SetAdjustWithdrawalLimitRequest request)
         {
             var result = new ApiResult();
             try
@@ -226,12 +224,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 
                 if (resultCode == 21)
                 {
-                    result.ErrorCode = (int)ErrorMessageCodeEnum.WithdrawalLimitAdjustmentNotBalance;
+                    result.ErrorCode = (int)ErrorCodeEnum.WithdrawalLimitAdjustmentNotBalance;
                     result.Message = "debit amount can not more then difference amount";
                 }
                 else if (result.ErrorCode == 22)
                 {
-                    result.ErrorCode = (int)ErrorMessageCodeEnum.Fail;
+                    result.ErrorCode = (int)ErrorCodeEnum.Fail;
                     result.Message = "Update Fail";
                 }
                 else
@@ -241,7 +239,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             }
             catch (Exception ex)
             {
-                result.ErrorCode = (int)ErrorMessageCodeEnum.SystemException;
+                result.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 result.RawMessage = ex.ToString();
             }
 

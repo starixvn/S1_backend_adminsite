@@ -144,6 +144,15 @@
   <data name="msg_ConfirmpwdNotMatch" xml:space="preserve">
     <value>New password and confirm password does not match</value>
   </data>
+  <data name="msg_CustStatusIsClosed" xml:space="preserve">
+    <value>Customer's Status is Closed.</value>
+  </data>
+  <data name="msg_CustStatusIsLocked" xml:space="preserve">
+    <value>Customer's Status is Locked.</value>
+  </data>
+  <data name="msg_CustStatusIsSuspend" xml:space="preserve">
+    <value>Customer's Status is Suspend.</value>
+  </data>
   <data name="msg_Draft" xml:space="preserve">
     <value>Draft</value>
   </data>

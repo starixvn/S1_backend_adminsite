@@ -56,6 +56,11 @@ namespace BackendSite.Service.BLL
             return report;
         }
 
+        public IEnumerable<GameType> GetTpGameType()
+        {
+            return winLostReportService.GetAllGameType();
+        }
+
         #endregion
     }
 }
