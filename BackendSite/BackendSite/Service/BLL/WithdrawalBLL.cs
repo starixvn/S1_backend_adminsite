@@ -44,42 +44,49 @@ namespace BackendSite.Service.BLL
         #region Public Methods
 
         public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite,
-            IEnumerable<int> withdrawalType, long startDate, long endDate, string withdrawalId, string userName,
-            IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus, int pageSize, int amounttype, string amount,
-            ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
+            IEnumerable<int> withdrawalType,
+            DateTime startDate,
+            DateTime endDate,
+            string withdrawalId,
+            string userName,
+            IEnumerable<int> currencyId,
+            IEnumerable<int> status,
+            IEnumerable<int> levelStatus,
+            int pageSize,
+            int amounttype,
+            string amount,
+            ref int pageNumber,
+            out int totalPages,
+            out int rowCount,
+            ref List<string> currencyAmount)
         {
-            var serverInfo = _serverInfoService.GetModel();
             return _withdrawalService.GetWithdrawalRequestList(selectSite, withdrawalType, startDate, endDate,
-                serverInfo.SiteId /*Not require*/, withdrawalId, userName, currencyId, status, levelStatus, pageSize, amounttype, amount,
+                withdrawalId, userName, currencyId, status, levelStatus, pageSize, amounttype, amount,
                 ref pageNumber, out totalPages, out rowCount, ref currencyAmount);
         }
 
         public WithdrawalRequest GetWithdrawalRequest(string transId)
         {
-            var serverInfo = _serverInfoService.GetModel();
-
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
-            return _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId /*Not require*/);
+            return _withdrawalService.GetWithdrawalRequest(withdrawalId);
         }
 
         public IEnumerable<Comments> GetWithdrawalRequestComment(string transId)
         {
             var withdrawalRequest = GetWithdrawalRequest(transId);
-            var results =
-                _withdrawalService.GetWithdrawalRequestComment(withdrawalRequest.WithdrawalId,
-                    withdrawalRequest.SiteId);
+            var results = _withdrawalService.GetWithdrawalRequestComment(withdrawalRequest.WithdrawalId,
+                withdrawalRequest.SiteId);
             return results;
         }
 
         public int WithdrawalApproved(string transId, string comment, string updater, int userId, bool hasPic)
         {
-            var serverInfo = _serverInfoService.GetModel();
             var forStatus = new List<int> { (int)WithdrawalStatus.Process };
 
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
-            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
 
             if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
             {
@@ -99,7 +106,6 @@ namespace BackendSite.Service.BLL
 
         public int WithdrawalRejected(string transId, string comment, string updater)
         {
-            var serverInfo = _serverInfoService.GetModel();
             var forStatus = new List<int>
             {
                 (int) WithdrawalStatus.OnHold,
@@ -110,7 +116,7 @@ namespace BackendSite.Service.BLL
 
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
-            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
 
             if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
             {
@@ -126,7 +132,6 @@ namespace BackendSite.Service.BLL
 
         public int WithdrawalVerify(string transId, string comment, string updater)
         {
-            var serverInfo = _serverInfoService.GetModel();
             var forStatus = new List<int>
             {
                 (int) WithdrawalStatus.Pending,
@@ -137,7 +142,7 @@ namespace BackendSite.Service.BLL
 
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
-            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
 
             if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
             {
@@ -154,7 +159,6 @@ namespace BackendSite.Service.BLL
         public int WithdrawalProcess(string transId, string comment, string updater, string withdrawalInfo,
             int? withdrawalType, out int custId, out decimal amount)
         {
-            var serverInfo = _serverInfoService.GetModel();
             var forStatus = new List<int>
             {
                 (int) WithdrawalStatus.Verify
@@ -162,7 +166,7 @@ namespace BackendSite.Service.BLL
 
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
-            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
 
             if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
             {
@@ -178,7 +182,6 @@ namespace BackendSite.Service.BLL
 
         public int WithdrawalOnHold(string transId, string comment, string updater)
         {
-            var serverInfo = _serverInfoService.GetModel();
             var forStatus = new List<int>
             {
                 (int) WithdrawalStatus.Pending
@@ -188,7 +191,7 @@ namespace BackendSite.Service.BLL
 
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
-            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
 
             if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
             {
@@ -204,7 +207,6 @@ namespace BackendSite.Service.BLL
 
         public int WithdrawalDraft(string transId, string comment, string updater)
         {
-            var serverInfo = _serverInfoService.GetModel();
             var forStatus = new List<int>
             {
                 (int) WithdrawalStatus.Pending,
@@ -219,7 +221,7 @@ namespace BackendSite.Service.BLL
 
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
-            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus),
                 updater,
@@ -228,7 +230,6 @@ namespace BackendSite.Service.BLL
 
         public int WithdrawalPending(string transId, string comment, string updater)
         {
-            var serverInfo = _serverInfoService.GetModel();
             var forStatus = new List<int>
             {
                 (int) WithdrawalStatus.Verify,
@@ -238,7 +239,7 @@ namespace BackendSite.Service.BLL
 
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
-            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
 
             if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
             {
@@ -255,14 +256,13 @@ namespace BackendSite.Service.BLL
 
         public int WithdrawalToKyc(string transId, string comment, string updater)
         {
-            var serverInfo = _serverInfoService.GetModel();
             var forStatus = new List<int>
             {
                 (int) WithdrawalStatus.Pending
             };
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
-            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId, serverInfo.SiteId);
+            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
 
             if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
             {
@@ -301,7 +301,7 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(string selectSite, string withdrawalType,
-            long startDate, long endDate, string withdrawalId, string userName, string currencyId, string status,
+            DateTime startDate, DateTime endDate, string withdrawalId, string userName, string currencyId, string status,
             string levelStatus, int AmountType, string Amount)
         {
             return _withdrawalService.GetWithdrawalExportList(selectSite, withdrawalType, startDate, endDate,

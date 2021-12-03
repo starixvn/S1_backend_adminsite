@@ -7,6 +7,12 @@ namespace BackendSite.Service.Model
 {
     public class WithdrawalRequest
     {
+        private DateTimeOffset _flowEndTime { set; get; }
+
+        private DateTimeOffset _createTime { set; get; }
+
+        private DateTimeOffset? _updateTime { set; get; }
+
         public int WithdrawalId { set; get; }
         public string TransId { set; get; }
         public int WithdrawalType { set; get; }
@@ -20,7 +26,11 @@ namespace BackendSite.Service.Model
         public decimal ChargeFee { set; get; }
         public string Memo { set; get; }
         public string Comment { set; get; }
-        public DateTime CreateTime { set; get; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public int Status { set; get; }
         public string SiteName { set; get; }
         public string BankName { set; get; }
@@ -46,23 +56,34 @@ namespace BackendSite.Service.Model
         public int VipLevel { set; get; }
         public string Operator { set; get; }
         public bool SameOperator { get; set; }
-        public string CalCode =>
-    WithdrawalType switch
-    {
-        (int)enums.WithdrawalType.LocalBank => $"{SiteName}-{FromBankCode}-{FromAccountName?.Replace(" ", string.Empty)}-{FromAccountNo?.Substring(FromAccountNo.Length > 4 ? FromAccountNo.Length - 4 : 0)}",
-        (int)enums.WithdrawalType.OnlinePayment => $"{SiteName}-{FromBankCode}",
-        _ => null
-    };
+        public string CalCode => WithdrawalType switch
+        {
+            (int)enums.WithdrawalType.LocalBank => $"{SiteName}-{FromBankCode}-{FromAccountName?.Replace(" ", string.Empty)}-{FromAccountNo?.Substring(FromAccountNo.Length > 4 ? FromAccountNo.Length - 4 : 0)}",
+            (int)enums.WithdrawalType.OnlinePayment => $"{SiteName}-{FromBankCode}",
+            _ => null
+        };
         public int IsKyc { set; get; }
         public int IsRisk { set; get; }
         public int WithdrawlCnt { set; get; }
         public int Flag { set; get; }
-        public DateTime? UpdateTime { set; get; }
-        //public virtual IEnumerable<Comments> Comments { get; set; }
+        public DateTimeOffset? UpdateTime
+        {
+            get => _updateTime;
+            set
+            {
+                if (value != null)
+                    _updateTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
         public bool HasPic { get; set; }
         public int BankSlipPicCount { get; set; }
 
-        public DateTime FlowEndTime { set; get; }
+        public DateTimeOffset FlowEndTime
+        {
+            get => _flowEndTime;
+            set => _flowEndTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+
     }
     public class WithdrawalInfo
     {
@@ -95,6 +116,12 @@ namespace BackendSite.Service.Model
     }
     public class WithdrawalInfoForExport
     {
+
+        private DateTimeOffset? _flowEndTime { set; get; }
+
+        private DateTimeOffset _createTime { set; get; }
+
+        private DateTimeOffset? _updateTime { set; get; }
         public int WithdrawalId { set; get; }
         public string TransId { set; get; }
         public int WithdrawalType { set; get; }
@@ -107,7 +134,11 @@ namespace BackendSite.Service.Model
         public string BankCode { set; get; }
         public string AccountNo { set; get; }
         public string AccountName { set; get; }
-        public DateTime CreateTime { set; get; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public int Status { set; get; }
         public string SiteName { set; get; }
         public string FromBankName { set; get; }
@@ -128,9 +159,24 @@ namespace BackendSite.Service.Model
         public int IsRisk { set; get; }
         public int WithdrawlCnt { set; get; }
         public string Operator { set; get; }
-        public DateTime? UpdateTime { set; get; }
-
-        public DateTime FlowEndTime { set; get; }
+        public DateTimeOffset? UpdateTime
+        {
+            get => _updateTime;
+            set
+            {
+                if (value != null)
+                    _updateTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
+        public DateTimeOffset? FlowEndTime
+        {
+            get => _flowEndTime;
+            set
+            {
+                if (value != null)
+                    _flowEndTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
     }
 
     public class WithdrawalLimit
@@ -190,7 +236,7 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
     }
-    
+
     public class WithdrawalTimeReportPara
     {
         private DateTimeOffset _startDate { get; set; }

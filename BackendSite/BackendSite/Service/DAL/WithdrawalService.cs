@@ -45,7 +45,7 @@ namespace BackendSite.Service.DAL
         #endregion
 
         public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite,
-            IEnumerable<int> withdrawalType, long startDate, long endDate, int siteId, string WithdrawalId,
+            IEnumerable<int> withdrawalType, DateTime startDate, DateTime endDate, string WithdrawalId,
             string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,
             int pageSize, int amounttype, string amount, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
         {
@@ -74,7 +74,6 @@ namespace BackendSite.Service.DAL
                 WithdrawalType,
                 StartDate = startDate,
                 EndDate = endDate,
-                SiteId = siteId,
                 WithdrawalId = withdrawalId,
                 TransId = WithdrawalId,
                 UserName,
@@ -89,7 +88,7 @@ namespace BackendSite.Service.DAL
             #region GetCurrencyTotalAmount
 
             var CurrencyTotalAmount =
-                conn.Query<TotalAmount>("Admin_WithdrawalTotalAmountV2_Get", p, commandType: CommandType.StoredProcedure)
+                conn.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V3", p, commandType: CommandType.StoredProcedure)
                     .ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
@@ -108,7 +107,7 @@ namespace BackendSite.Service.DAL
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<WithdrawalRequest>("Admin_WithdrawalListV5_Get", p,
+            var result = conn.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V6", p,
                 commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
@@ -116,11 +115,11 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public WithdrawalRequest GetWithdrawalRequest(int withdrawalId, int siteId)
+        public WithdrawalRequest GetWithdrawalRequest(int withdrawalId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.QueryFirstOrDefault<WithdrawalRequest>("Admin_WithdrawalRequestTransIDV3_Get",
-                new { WithdrawalId = withdrawalId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            return conn.QueryFirstOrDefault<WithdrawalRequest>("Admin_WithdrawalRequestTransId_Get_V4",
+                new { WithdrawalId = withdrawalId}, commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<Comments> GetWithdrawalRequestComment(int withdrawalId, int siteId)
@@ -199,7 +198,7 @@ namespace BackendSite.Service.DAL
         }
 
         public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(string selectSite, string withdrawalType,
-            long startDate, long endDate, string WithdrawalId, string UserName, string currencyId, string status,
+            DateTime startDate, DateTime endDate, string WithdrawalId, string UserName, string currencyId, string status,
             string LevelStatus, int AmountType, string Amount)
         {
             var SelectSite = "[" + selectSite + "]";
@@ -235,7 +234,7 @@ namespace BackendSite.Service.DAL
             });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var depositList = conn.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExportV6_Get", p,
+            var depositList = conn.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExport_Get_V7", p,
                 commandType: CommandType.StoredProcedure);
             return depositList;
         }
