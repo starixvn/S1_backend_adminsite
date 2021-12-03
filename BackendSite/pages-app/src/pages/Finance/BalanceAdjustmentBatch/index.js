@@ -52,7 +52,7 @@ const App = () => {
         if (!stateData.file) { check = false; msg = "Please choose excel file."; }
         if (!stateData.option) { check = false; msg = "Please check Option."; }
         if (!stateData.optSite) { check = false; msg = "Please check Site."; }
-        if (stateData.option == 5 && stateData.CheckedBonusCode == '') { check = false; msg = "Please check BonusCode."; }
+        if ((stateData.option == 5 || stateData.option == 6) && stateData.CheckedBonusCode == '') { check = false; msg = "Please check BonusCode."; }
         if(stateData.checkwd && (isNaN(parseInt(stateData.withdrawal))? 0:parseInt(stateData.withdrawal)) === 0) { check = false; msg = "Please Enter Withdrawal Limit."; }
         if (check && window.confirm("Are you sure to import data to " + _site[stateData.optSite] + "?")) {
             let settings = { headers: { 'content-type': 'multipart/form-data' } }
@@ -69,7 +69,7 @@ const App = () => {
                 SiteId: parseInt(stateData.optSite)
             };
             if (!stateSend) {
-                if(!hasCheckPassword){
+                if(!hasCheckPassword && stateData.option == 5){
                     api.post('/api/Payment/CheckRententionBonusAdjustmentLimit', Data)
                     .then(function (response) {
                         if(response.data.errorCode == 0){

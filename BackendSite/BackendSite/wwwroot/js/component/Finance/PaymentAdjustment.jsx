@@ -148,11 +148,6 @@ import qs from 'qs';
                 return;
             }
 
-            if(amount > adjustMentLimitMax && adjustMentLimitMax !== 0 && (parseInt(option) === 1 || parseInt(option) === 3 || parseInt(option) === 5 || parseInt(option) === 6)){
-                this.setState({ CheckPassword: true });
-                return;
-            }
-
             if(parseInt(option) === 5 && bonusCode == ""){
                 alert('Please Check BonusCode');
                 return;
@@ -160,6 +155,11 @@ import qs from 'qs';
 
             if(parseInt(option) === 6 && bonusCode == ""){
                 alert('Please Check BonusCode');
+                return;
+            }
+
+            if(amount > adjustMentLimitMax && adjustMentLimitMax !== 0 && (parseInt(option) === 1 || parseInt(option) === 3 || parseInt(option) === 5 || parseInt(option) === 6)){
+                this.setState({ CheckPassword: true });
                 return;
             }
 
