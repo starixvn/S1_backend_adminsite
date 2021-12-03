@@ -162,18 +162,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetList(GetListRequest request)
         {
             var apiListResult = new ApiListResultCurrencyAmount<WithdrawalRequest>();
-            var pageNumber = request.PageNumber;
             var totalPages = 0;
             var rowCount = 0;
             var CurrencyAmount = new List<string>();
             var withdrawalRequestList = _withdrawalBll.GetWithdrawalRequestList(request.SiteIds,
                 request.WithdrawalTypes, request.StartDate.DateTime, request.EndDate.DateTime,
                 request.WithdrawalId, request.UserName, request.CurrencyIds,
-                request.Statuses, request.LevelStatuses, request.PageSize, request.AmountType, request.Amount, ref pageNumber, out totalPages,
+                request.Statuses, request.LevelStatuses, request.PageSize, request.AmountType, request.Amount, pageNumber, out totalPages,
                 out rowCount, ref CurrencyAmount);
             apiListResult.Data = withdrawalRequestList;
-            apiListResult.ErrorCode = 0;
-            apiListResult.PageNumber = pageNumber;
+            apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            apiListResult.PageNumber = request.PageNumber;
             apiListResult.TotalPages = totalPages;
             apiListResult.RowCount = rowCount;
             apiListResult.CurrencyAmount = CurrencyAmount;

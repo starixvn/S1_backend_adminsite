@@ -55,14 +55,27 @@ namespace BackendSite.Service.BLL
             int pageSize,
             int amounttype,
             string amount,
-            ref int pageNumber,
+            int pageNumber,
             out int totalPages,
             out int rowCount,
             ref List<string> currencyAmount)
         {
-            return _withdrawalService.GetWithdrawalRequestList(selectSite, withdrawalType, startDate, endDate,
-                withdrawalId, userName, currencyId, status, levelStatus, pageSize, amounttype, amount,
-                ref pageNumber, out totalPages, out rowCount, ref currencyAmount);
+            return _withdrawalService.GetWithdrawalRequestList(selectSite,
+                withdrawalType,
+                startDate,
+                endDate,
+                withdrawalId,
+                userName,
+                currencyId,
+                status,
+                levelStatus,
+                Math.Abs(pageSize) * (Math.Abs(pageNumber) - 1),
+                pageSize,
+                amounttype,
+                amount,
+                out totalPages,
+                out rowCount,
+                ref currencyAmount);
         }
 
         public WithdrawalRequest GetWithdrawalRequest(string transId)

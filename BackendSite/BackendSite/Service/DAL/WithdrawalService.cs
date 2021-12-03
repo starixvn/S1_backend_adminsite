@@ -45,9 +45,21 @@ namespace BackendSite.Service.DAL
         #endregion
 
         public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite,
-            IEnumerable<int> withdrawalType, DateTime startDate, DateTime endDate, string WithdrawalId,
-            string UserName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelstatus,
-            int pageSize, int amounttype, string amount, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
+            IEnumerable<int> withdrawalType,
+            DateTime startDate,
+            DateTime endDate,
+            string WithdrawalId,
+            string UserName,
+            IEnumerable<int> currencyId,
+            IEnumerable<int> status,
+            IEnumerable<int> levelstatus,
+            int startIndex,
+            int pageSize,
+            int amounttype,
+            string amount,
+            out int totalPages,
+            out int rowCount,
+            ref List<string> CurrencyAmount)
         {
             var SelectSite = JsonConvert.SerializeObject(selectSite);
             var WithdrawalType = JsonConvert.SerializeObject(withdrawalType);
@@ -70,19 +82,20 @@ namespace BackendSite.Service.DAL
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var p = new DynamicParameters(new
             {
-                SelectSite,
-                WithdrawalType,
-                StartDate = startDate,
-                EndDate = endDate,
-                WithdrawalId = withdrawalId,
-                TransId = WithdrawalId,
-                UserName,
-                CurrencyId,
-                Status,
-                VipStatus = VipStatus,
-                PageSize = pageSize,
-                AmountType = amounttype,
-                Amount = tempAmount
+                _SiteIds = SelectSite,
+                _WithdrawalTypes = WithdrawalType,
+                _StartDate = startDate,
+                _EndDate = endDate,
+                _WithdrawalId = withdrawalId,
+                _TransId = WithdrawalId,
+                _UserName = UserName,
+                _CurrencyIds = CurrencyId,
+                _Statuses = Status,
+                _VipStatuses = VipStatus,
+                _StartIndex = startIndex,
+                _PageSize = pageSize,
+                _AmountType = amounttype,
+                _Amount = tempAmount
             });
 
             #region GetCurrencyTotalAmount
@@ -102,16 +115,14 @@ namespace BackendSite.Service.DAL
 
             #endregion
 
-            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             var result = conn.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V6", p,
                 commandType: CommandType.StoredProcedure);
-            pageNumber = p.Get<int?>("PageNumber") ?? 0;
-            totalPages = p.Get<int?>("TotalPages") ?? 0;
-            rowCount = p.Get<int?>("RowCount") ?? 0;
+            totalPages = p.Get<int?>("_TotalPages") ?? 0;
+            rowCount = p.Get<int?>("_RowCount") ?? 0;
+
             return result;
         }
 
@@ -119,7 +130,7 @@ namespace BackendSite.Service.DAL
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.QueryFirstOrDefault<WithdrawalRequest>("Admin_WithdrawalRequestTransId_Get_V4",
-                new { WithdrawalId = withdrawalId}, commandType: CommandType.StoredProcedure);
+                new { WithdrawalId = withdrawalId }, commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<Comments> GetWithdrawalRequestComment(int withdrawalId, int siteId)
@@ -219,18 +230,18 @@ namespace BackendSite.Service.DAL
             }
             var p = new DynamicParameters(new
             {
-                SelectSite,
-                WithdrawalType,
-                StartDate = startDate,
-                EndDate = endDate,
-                WithdrawalId = withdrawalId,
-                TransId = WithdrawalId,
-                UserName,
-                CurrencyId,
-                Status,
-                VipStatus = VipStatus,
-                AmountType = AmountType,
-                Amount = tempAmount
+                 _SiteIds = SelectSite,
+                _WithdrawalTypes = WithdrawalType,
+                _StartDate = startDate,
+                _EndDate = endDate,
+                _WithdrawalId = withdrawalId,
+                _TransId = WithdrawalId,
+                _UserName = UserName,
+                _CurrencyIds = CurrencyId,
+                _Statuses = Status,
+                _VipStatuses = VipStatus,
+                _AmountType = AmountType,
+                _Amount = tempAmount
             });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
