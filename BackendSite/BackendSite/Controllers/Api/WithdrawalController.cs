@@ -100,10 +100,14 @@ namespace BackendSite.Controllers.Api
             var totalPages = 0;
             var rowCount = 0;
             var CurrencyAmount = new List<string>();
+
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(withdrawalListReq.startDate);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(withdrawalListReq.endDate);
+
             var withdrawalRequestList = withdrawalBLL.GetWithdrawalRequestList(withdrawalListReq.SelectSite,
-                withdrawalListReq.withdrawalType, withdrawalListReq.startDate, withdrawalListReq.endDate,
+                withdrawalListReq.withdrawalType, startTime, endTime,
                 withdrawalListReq.WithdrawalId, withdrawalListReq.UserName, withdrawalListReq.CurrencyId,
-                withdrawalListReq.status, withdrawalListReq.LevelStatus, 10, withdrawalListReq.AmountType, withdrawalListReq.Amount, ref pageNumber, out totalPages,
+                withdrawalListReq.status, withdrawalListReq.LevelStatus, 10, withdrawalListReq.AmountType, withdrawalListReq.Amount, pageNumber, out totalPages,
                 out rowCount, ref CurrencyAmount);
             apiListResult.Data = withdrawalRequestList;
             apiListResult.ErrorCode = 0;
@@ -125,14 +129,6 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<WithdrawalRequest>();
             var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
-
-            if (withdrawalRequest.BankId > 0)
-            {
-            }
-
-            if (withdrawalRequest.PayId > 0)
-            {
-            }
 
             if (withdrawalRequest.Operator == User.Identity.Name)
             {
@@ -175,7 +171,7 @@ namespace BackendSite.Controllers.Api
             }
 
             apiResult.Data = withdrawalRequest;
-            apiResult.ErrorCode = 0;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             return apiResult;
         }
 

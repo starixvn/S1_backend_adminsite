@@ -78,6 +78,8 @@ namespace BackendSite.Controllers.Api
         public class bankCardReq
         {
             public int siteId { get; set; }
+
+            public int CurrencyId { get; set; }
             public int SysId { get; set; }
             public string BankAccountName { get; set; }
             public string BankAccountNo { get; set; }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BackendSite.Service.Model.ApiModel;
+using System;
 using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
@@ -6,7 +7,7 @@ namespace BackendSite.Service.Model
     public class AdjustmentLogReport
     {
         private DateTimeOffset _createTime { get; set; }
-        public DateTimeOffset CreateTime 
+        public DateTimeOffset CreateTime
         {
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
@@ -29,7 +30,7 @@ namespace BackendSite.Service.Model
     {
         public string Menu { get; set; }
     }
-    public class GetAdjustmentInfoLogPara
+    public class GetAdjustmentInfoLogPara : ApiRequestPageModel
     {
         private DateTimeOffset _startDate { get; set; }
         private DateTimeOffset _endDate { get; set; }
@@ -45,10 +46,8 @@ namespace BackendSite.Service.Model
         }
         public string User { get; set; }
         public string Menu { get; set; }
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
     }
-    
+
     public class GetAdjustmentInfoLogParaOld
     {
         public long StartDate { get; set; }

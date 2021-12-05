@@ -9,6 +9,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.WithdrawalBankAccounting;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +24,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 {
+    [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalAccountingController : ControllerBase
