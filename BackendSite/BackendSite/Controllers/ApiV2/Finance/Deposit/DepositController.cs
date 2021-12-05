@@ -364,7 +364,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance >   >  Deposit Request > [Submit] > Click CheckBox > [Reject Multiple]
+        /// Func Path：Finance > Deposit Request > [Submit] > Click CheckBox > [Reject Multiple]
         /// </remarks>
         /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList", "f_dp_execute" })]

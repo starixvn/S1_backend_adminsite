@@ -158,6 +158,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// <summary>
         /// Withdrawal/GetList 取得提款清單
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Request > [Search]
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
@@ -186,6 +191,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// <summary>
         /// Withdrawal/Export 匯出提款清單
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Request > [Search] > [Export Excel]
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
@@ -221,6 +231,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// <summary>
         /// Withdrawal/GetByTransId 取得指定提款資訊
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Request > [Search] > Click [Trxn.ID] > Withdrawal Info
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
@@ -278,6 +293,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// <summary>
         /// Withdrawal/GetCommentByTransId 取得指定提款註解
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Request > [Search] > Click [Trxn.ID] > Withdrawal Comment
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
@@ -294,6 +314,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// <summary>
         /// Withdrawal/SendToNext 提款送至下一流程
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Request > [Search] > Click [Trxn.ID] > [Draft] [Pending] [OnHold] [Verify] [Process] [Approved] [Rejected] [ToKyc]
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
@@ -492,6 +517,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// <summary>
         /// Withdrawal/GetPicture 取得提款圖擋
         /// </summary>
+        /// <remarks>
+        /// Http Method：GET
+        /// 
+        /// **Memo：只有在Status=Process Or Approved 才會有此功能
+        /// 
+        /// Func Path：Finance > Withdrawal Request > [Search] > Click [Trxn.ID] > Withdrawal Pic
+        /// </remarks>
         /// <param name="transId"></param>
         /// <param name="BankSlipPicCount"></param>
         /// <returns></returns>
@@ -507,6 +539,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// <summary>
         /// Withdrawal/UploadPicture 上傳提款圖擋
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// **Memo：只有在Status=Process Or Approved 才會有此功能
+        /// 
+        /// Func Path：Finance > Withdrawal Request > [Search] > Click [Trxn.ID] > Withdrawal Pic > [Paste Area]
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
@@ -564,6 +603,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// <summary>
         /// Withdrawal/DeletePicture  刪除提款圖擋
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// **Memo：只有在Status=Process Or Approved 才會有此功能
+        /// 
+        /// Func Path：Finance > Withdrawal Request > [Search] > Click [Trxn.ID] > Withdrawal Pic > [Delete]
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
