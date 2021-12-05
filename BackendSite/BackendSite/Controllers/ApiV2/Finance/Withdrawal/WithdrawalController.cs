@@ -113,7 +113,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public string TransId { get; set; }
         }
 
-        public class ConfirmRequest : GetByTransIdRequest
+        public class SendToNextRequest : GetByTransIdRequest
         {
             public string Comment { set; get; }
             public int Action { set; get; }
@@ -141,15 +141,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public string Url { get; set; }
         }
 
-        public class UploadPictureRequest
+        public class UploadPictureRequest : GetByTransIdRequest
         {
             public string Pic { get; set; }
-            public string TransId { get; set; }
         }
 
-        public class DeletePictureRequest
+        public class DeletePictureRequest : GetByTransIdRequest
         {
-            public string TransId { get; set; }
         }
 
 
@@ -157,6 +155,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
         #region Actions
 
+        /// <summary>
+        /// Withdrawal/GetList 取得提款清單
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpPost]
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetList(GetListRequest request)
@@ -180,6 +183,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             return apiListResult;
         }
 
+        /// <summary>
+        /// Withdrawal/Export 匯出提款清單
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpPost]
         public IActionResult Export(GetListRequest request)
@@ -210,6 +218,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             return _excelBll.ExcelFile(stream, "WithdrawalRequestList");
         }
 
+        /// <summary>
+        /// Withdrawal/GetByTransId 取得指定提款資訊
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpPost]
         public async Task<ApiResult<WithdrawalRequest>> GetByTransId(GetByTransIdRequest request)
@@ -262,6 +275,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             return apiResult;
         }
 
+        /// <summary>
+        /// Withdrawal/GetCommentByTransId 取得指定提款註解
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpPost]
         public ApiResult<IEnumerable<Comments>> GetCommentByTransId(GetByTransIdRequest request)
@@ -273,9 +291,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             return apiResult;
         }
 
+        /// <summary>
+        /// Withdrawal/SendToNext 提款送至下一流程
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpPost]
-        public async Task<ApiResult> ConfirmAsync(ConfirmRequest request)
+        public async Task<ApiResult> SendToNextAsync(SendToNextRequest request)
         {
             var apiResult = new ApiResult(_selLangBll);
             var withdrawConfirmReuslt = -1;
@@ -466,6 +489,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             return apiResult;
         }
 
+        /// <summary>
+        /// Withdrawal/GetPicture 取得提款圖擋
+        /// </summary>
+        /// <param name="transId"></param>
+        /// <param name="BankSlipPicCount"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpGet]
         public ActionResult GetPicture(string transId, int BankSlipPicCount)
@@ -475,6 +504,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 WithdrawalPic.BankSlipPicCount));
         }
 
+        /// <summary>
+        /// Withdrawal/UploadPicture 上傳提款圖擋
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpPost]
         public async Task<ApiResult> UploadPicture(UploadPictureRequest request)
@@ -527,6 +561,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             return apiResult;
         }
 
+        /// <summary>
+        /// Withdrawal/DeletePicture  刪除提款圖擋
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpPost]
         public async Task<ApiResult> DeletePicture(DeletePictureRequest request)

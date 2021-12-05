@@ -98,8 +98,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         #region Actions
 
         /// <summary>
-        /// 
+        /// ThirdPartyManagement/GetList 取得第三方支付資料清單
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Payment Management
+        /// </remarks>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
         [HttpPost]
@@ -114,8 +119,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         }
 
         /// <summary>
-        /// 
+        /// ThirdPartyManagement/UpdatePayInfo 更新第三方支付資訊
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Payment Management > Pay Tab > Click Pay [Status]
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
@@ -131,8 +141,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         }
 
         /// <summary>
-        /// 
+        /// ThirdPartyManagement/UpdatePayChannel 更新支付渠道資訊
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Payment Management > Pay Tab > Channel Tab > Click Channel [Status]
+        /// 
+        ///            Finance > Payment Management > Pay Tab > Channel Tab > Click Channel [Edit]
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
@@ -148,8 +165,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         }
 
         /// <summary>
-        /// 
+        /// ThirdPartyManagement/UpdatePayCurrency 更新支付幣別資訊
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Payment Management > Pay Tab > Channel Tab > Click Currency [Edit]
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage", "f_pm_editAmountRule" })]
@@ -203,8 +225,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         //}
 
         /// <summary>
-        /// 
+        /// ThirdPartyManagement/GetBankListByPayId 取得指定第三方支付銀行清單
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Payment Management > Pay Tab > Channel Tab > Click [Type]
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
@@ -220,13 +247,18 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         }
 
         /// <summary>
-        /// 
+        /// ThirdPartyManagement/UpdateBankInfoByPayId 更新指定第三方支付銀行資訊
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Payment Management > Pay Tab > Channel Tab > Click [Type] > Click [Status]
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
         [HttpPost]
-        public ApiResult UpdateBankInfoPay(UpdateBankInfoByPayIdRequest request)
+        public ApiResult UpdateBankInfoByPayId(UpdateBankInfoByPayIdRequest request)
         {
             var result = new ApiResult<IEnumerable<PayListBankInfoSys>>();
 

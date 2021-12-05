@@ -35,7 +35,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
         #region API Model
 
-        public class GetListRequest
+        public class GetListBySiteIdRequest
         {
             public int SiteId { get; set; }
         }
@@ -68,13 +68,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         #region Actions
 
         /// <summary>
-        /// 
+        /// BankCardManagement/GetList 取得指定品牌銀行卡清單
         /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Bank Card Management > Click [Site Name] > List
+        /// 
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BankInfoList" })]
         [HttpPost]
-        public ApiResult<IEnumerable<BankDetail>> GetList(GetListRequest request)
+        public ApiResult<IEnumerable<BankDetail>> GetListBySiteId(GetListBySiteIdRequest request)
         {
             var apiListResult = new ApiResult<IEnumerable<BankDetail>>();
             var depositRequestList = _bankDetailBll.GetLoaclBankList(request.SiteId);
@@ -116,8 +123,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         //}
 
         /// <summary>
-        /// 
+        /// BankCardManagement/Set 設定銀行卡(新增/更新)
         /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Bank Card Management > Click [Site Name] > List > [Add Bank Card] / [Edit]
+        /// 
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BankInfoList" })]
@@ -158,8 +172,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         }
 
         /// <summary>
-        /// 
+        /// BankCardManagement/Delete 刪除銀行卡
         /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Bank Card Management > Click [Site Name] > List > [Delete]
+        /// 
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BankInfoList" })]
