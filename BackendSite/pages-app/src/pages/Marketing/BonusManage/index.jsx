@@ -705,7 +705,7 @@ const App = () => {
 		"2": ["currentLang", "productCategory", "lockedType", "periodWeek", "periodMonth", "redeemHours", "minPayout", "specialCode", "promotionAction"],
 		"6": ["expiryDays", "walletType", "categoryId", "tpId", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "affid", "specialCode", "promotionAction"],
 		"7": ["expiryDays", "walletType", "categoryId", "tpId", "requiredAmount", "currentLang", "productCategory", "lockedType", "affid", "specialCode", "promotionAction", "periodType", "periodWeek", "periodMonth", "redeemHours"],
-		"8": ["rollOver", "minPayout", "bonusAmountType", "bonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours", "affid", "specialCode"],
+		"8": ["expiryDays", "walletType", "categoryId", "tpId", "rollOver", "minPayout", "bonusAmountType", "bonus", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours", "affid", "specialCode"],
 		"9": ["tpId", "minPayout", "maxBonus", "requiredAmount", "currentLang", "productCategory", "lockedType", "periodType", "periodWeek", "periodMonth", "redeemHours", "affid", "specialCode", "promotionAction"],
 	}
 

@@ -386,44 +386,45 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 							/>
 						</div>
 					</div>) :
-					<div className="filter">
-						<div className="row-flex">
-							<InputBox
-								Title="ExpiryDays"
-								OnChange={action.EditMainValue}
-								dataColumn="expiryDays"
-								value={state.expiryDays}
-								type="number"
-							/>
-						</div>
-						<RadioBox
-							Title="Wallet Type"
-							Options={initWalletType()}
-							OnChange={action.GetPromoCategories.bind(
-								this,
-								false,
-								state.walletType
-							)}
-							dataColumn="walletType"
-							Selected={state.walletType}
-						/>
-						{state.walletType !== null && state.productCategory !== undefined ? (
+					(state.promotionType == 8) ?
+						null : (<div className="filter">
+							<div className="row-flex">
+								<InputBox
+									Title="ExpiryDays"
+									OnChange={action.EditMainValue}
+									dataColumn="expiryDays"
+									value={state.expiryDays}
+									type="number"
+								/>
+							</div>
 							<RadioBox
-								Title="Product Category"
-								Options={state.productCategory}
-								OnChange={action.SelectTpId}
-								dataColumn={"categoryId"
-									// state.walletType === 0 ? "tpId" : "categoryId"
-								}
-								Selected={state.categoryId
-									// state.walletType === 0
-									// 	? state.tpId
-									// 	: state.categoryId
-								}
+								Title="Wallet Type"
+								Options={initWalletType()}
+								OnChange={action.GetPromoCategories.bind(
+									this,
+									false,
+									state.walletType
+								)}
+								dataColumn="walletType"
+								Selected={state.walletType}
 							/>
-						) : null}
-					</div>
-				}
+							{state.walletType !== null && state.productCategory !== undefined ? (
+								<RadioBox
+									Title="Product Category"
+									Options={state.productCategory}
+									OnChange={action.SelectTpId}
+									dataColumn={"categoryId"
+										// state.walletType === 0 ? "tpId" : "categoryId"
+									}
+									Selected={state.categoryId
+										// state.walletType === 0
+										// 	? state.tpId
+										// 	: state.categoryId
+									}
+								/>
+							) : null}
+						</div>
+				)}
 				{(state.promotionType == 2) ? 
 					<div className="filter">
 								<RadioBox
@@ -690,20 +691,11 @@ const SubPanel = props => {
 					) :
 					(props.state.promotionType == 8 || props.state.promotionType == 9) ?
 						(<>
-							{/* <InputBox
+							<InputBox
 								Title="Rollover"
 								OnChange={props.EditMainValue}
 								dataColumn="rollOver"
 								value={props.state.specific[props.currencyId].rollOver}
-							/> */}
-							<InputBox
-								Type="Number"
-								Title="Max Bonus"
-								OnChange={props.EditMainValue}
-								dataColumn="maxBonus"
-								value={
-									props.state.specific[props.currencyId].maxBonus
-								}
 							/>
 							{props.state.promotionType == 9 ? 
 								<>

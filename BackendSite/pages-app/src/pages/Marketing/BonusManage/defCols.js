@@ -19,7 +19,7 @@ export const defPromotionType = {
   5: "Wallet Bonus",
   6: "Rebate",
   7: "CashBack",
-  8: "Manual Bonus",
+  8: "Static page",
   9: "Retention free bet"
 };
 

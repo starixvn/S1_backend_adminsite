@@ -618,8 +618,8 @@ namespace BackendSite.Controllers.Api
 
                 if (custInfo != null)
                 {
-                    //非RetentionBonus,ManualBonus
-                    if (adjustmentAndWithdrawalLimitReq.Option != 5 && adjustmentAndWithdrawalLimitReq.Option != 6)
+                    //非RetentionBonus
+                    if (adjustmentAndWithdrawalLimitReq.Option != 5)
                     {
                         adjustmentAndWithdrawalLimit.CustId = custInfo.CustId;
                         adjustmentAndWithdrawalLimit.CurrencyId = custInfo.CurrencyId;
@@ -730,18 +730,15 @@ namespace BackendSite.Controllers.Api
                     }
                     else
                     {
-                        var setAdjustBonusReq = new SetAdjustBonusReq()
+                        var retionbonus = new RetionBonus()
                         {
                             CustId = custInfo.CustId,
                             BonusCode = adjustmentAndWithdrawalLimitReq.BounsCode,
                             Memo = adjustmentAndWithdrawalLimitReq.Memo,
-                            Operator = authData.UserName,
-                            Amount = adjustmentAndWithdrawalLimitReq.Amount,
-                            RollOver = adjustmentAndWithdrawalLimitReq.RollOver,
-                            PromotionType = adjustmentAndWithdrawalLimitReq.Option == 5 ?  9 : 8
+                            Operator = authData.UserName
                         };
                         var apiOnlineResult =
-                            await courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
+                            await courierAdapter.MyPostAsync<ApiResult, RetionBonus>(bonusUrl, retionbonus);
                         if (apiOnlineResult.ErrorCode == 0)
                         {
                             apiResult.ErrorCode = apiOnlineResult.ErrorCode;
@@ -793,8 +790,7 @@ namespace BackendSite.Controllers.Api
                         var custId = (string.IsNullOrEmpty(sabaId)) ? null : _common.TpIdToCustId(sabaId);
 
                         decimal.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out var amount);
-                        int.TryParse(sheet.Cells[RowId, 4].Text.Trim(), out var rollOver);
-                        var memo = sheet.Cells[RowId, 5].Text.Trim();
+                        var memo = sheet.Cells[RowId, 4].Text.Trim();
                         if (string.IsNullOrEmpty(custUsername) && custId == null)
                         {
                             isLastRow = true;
@@ -815,7 +811,7 @@ namespace BackendSite.Controllers.Api
                                 try
                                 {
                                     //非Retention Bonus
-                                    if (option != 5 && option != 6)
+                                    if (option != 5)
                                     {
                                         var withdrawalLimitAmount =
                                         (withdrawalLimitOption == 1) ? amount * withdrawal : 0;
@@ -920,18 +916,15 @@ namespace BackendSite.Controllers.Api
                                     }
                                     else
                                     {
-                                        var setAdjustBonusReq = new SetAdjustBonusReq()
+                                        var retionbonus = new RetionBonus()
                                         {
                                             CustId = custInfoDetail.CustId,
                                             BonusCode = bonuscode,
                                             Memo = memo,
-                                            Operator = authData.UserName,
-                                            Amount = amount,
-                                            RollOver = rollOver,
-                                            PromotionType = option == 5 ? 9 : 8
+                                            Operator = authData.UserName
                                         };
                                         var apiOnlineResult =
-                                             await courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
+                                             await courierAdapter.MyPostAsync<ApiResult, RetionBonus>(bonusUrl, retionbonus);
                                         if (apiOnlineResult.ErrorCode == 0)
                                         {
                                             apiResult.Add(new ApiResult()
