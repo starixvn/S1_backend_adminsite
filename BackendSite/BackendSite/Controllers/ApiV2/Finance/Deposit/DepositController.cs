@@ -5,6 +5,7 @@ using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -48,16 +49,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
         #region ApiModel
 
-        public class DepositListReq
+        public class GetListRequest : ApiRequestPageModel
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SelectSite { get; set; }
-            public int PageNumber { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
             public string DepositId { get; set; }
             public string UserName { get; set; }
-            public IEnumerable<int> DepositType { get; set; }
-            public IEnumerable<int> CurrencyId { get; set; }
+            public IEnumerable<int> DepositTypes { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
             public DateTimeOffset StartDate
             {
                 get => _startDate;
@@ -68,100 +68,66 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
-            public IEnumerable<int> Status { get; set; }
-            public IEnumerable<int> LevelStatus { get; set; }
+            public IEnumerable<int> Statuses { get; set; }
+            public IEnumerable<int> LevelStatuses { get; set; }
             public int AmountType { get; set; }
             public string Amount { get; set; }
         }
 
-        public class DepositReq
+        public class GetByTransIdRequest
         {
             public string TransId { get; set; }
         }
 
-        public class DepositConfirmReq : DepositReq
+        public class SendToNextRequest : GetByTransIdRequest
         {
             public decimal ActualDeposit { set; get; }
             public string Comment { set; get; }
             public int Action { set; get; }
         }
 
-        public class BatchRejectedDepositList
+        public class SetAmountByTransIdRequest : GetByTransIdRequest
         {
-            public IEnumerable<string> TransId { get; set; }
-        }
-
-        public class DepositRequestAmountReq
-        {
-            public string TransId { get; set; }
             public decimal Amount { get; set; }
         }
 
-        public class ExportDepositListReq
+        public class BatchRejectedDepositList
         {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
-            public string DepositId { get; set; }
-            public string UserName { get; set; }
-            public IEnumerable<int> DepositType { get; set; }
-            public IEnumerable<int> CurrencyId { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public IEnumerable<int> Status { get; set; }
-            public IEnumerable<int> LevelStatus { get; set; }
-            public int AmountType { get; set; }
-            public string Amount { get; set; }
-        }
-
-        public class ExportDepositTimeReq
-        {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
-            public string DepositId { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public int Status { get; set; }
-            public int CurrencyId { get; set; }
+            public IEnumerable<string> TransIds { get; set; }
         }
 
         #endregion
 
         /// <summary>
-        /// Deposit/GetDepositRequestList 
+        /// Deposit/GetList 取得存款清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
         /// Func Path：Finance >  Deposit Request > [Submit]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList" })]
         [HttpPost]
-        public ApiListResultCurrencyAmount<DepositRequest> GetDepositRequestList(DepositListReq req)
+        public ApiListResultCurrencyAmount<DepositRequest> GetList(GetListRequest request)
         {
             var apiListResult = new ApiListResultCurrencyAmount<DepositRequest>();
-            var pageNumber = req.PageNumber;
+            var pageNumber = request.PageNumber;
             var currencyAmount = new List<string>();
 
-            var depositList = _depositBll.GetDepositRequestList(req.SelectSite, req.DepositType, req.StartDate.DateTime, req.EndDate.DateTime, req.DepositId, req.UserName, req.CurrencyId, req.Status, req.LevelStatus, 10, req.AmountType, req.Amount, ref pageNumber, out var totalPages, out var rowCount, ref currencyAmount);
+            var depositList = _depositBll.GetDepositRequestList(request.SiteIds,
+                request.DepositTypes,
+                request.StartDate.DateTime,
+                request.EndDate.DateTime,
+                request.DepositId,
+                request.UserName,
+                request.CurrencyIds,
+                request.Statuses,
+                request.LevelStatuses,
+                request.PageSize,
+                request.AmountType,
+                request.Amount,
+                ref pageNumber, out var totalPages, out var rowCount, ref currencyAmount);
 
             foreach (var data in depositList)
             {
@@ -183,22 +149,61 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         }
 
         /// <summary>
-        /// Deposit/GetDepositRequest 
+        /// Deposit/Export 匯出存款清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance >  Deposit Request > [Submit] > ID
+        /// Func Path：Finance >  Deposit Request > [Submit] > [Export Excel]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList" })]
         [HttpPost]
-        public ApiResult<DepositRequest> GetDepositRequest(DepositReq req)
+        public IActionResult Export(GetListRequest request)
+        {
+            var exportDeposit = _depositBll.GetDepositExportList(
+                JsonConvert.SerializeObject(request.SiteIds),
+                JsonConvert.SerializeObject(request.DepositTypes),
+                request.StartDate.DateTime,
+                request.EndDate.DateTime,
+                request.DepositId,
+                request.UserName,
+                JsonConvert.SerializeObject(request.CurrencyIds),
+                JsonConvert.SerializeObject(request.Statuses),
+                JsonConvert.SerializeObject(request.LevelStatuses),
+                request.AmountType,
+                request.Amount);
+
+            foreach (var data in exportDeposit)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
+                if (data.DepositTime != null)
+                    data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, TimeSpan.Zero);
+                if (data.UpdateTime != null)
+                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, TimeSpan.Zero);
+            }
+
+            var stream = _excelBll.Export(exportDeposit);
+            return _excelBll.ExcelFile(stream, "DepositRequestList");
+        }
+
+        /// <summary>
+        /// Deposit/GetByTransId 取得指定存款資訊
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance >  Deposit Request > [Submit] > Click [Trxn.ID] > Deposit Info
+        /// </remarks>
+        /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList" })]
+        [HttpPost]
+        public ApiResult<DepositRequest> GetByTransId(GetByTransIdRequest request)
         {
             var apiResult = new ApiResult<DepositRequest>();
             try
             {
-                var depositRequest = _depositBll.GetDepositRequest(req.TransId);
+                var depositRequest = _depositBll.GetDepositRequest(request.TransId);
 
                 depositRequest.CreateTime = new DateTimeOffset(depositRequest.CreateTime.DateTime, TimeSpan.Zero);
                 if (depositRequest.DepositTime != null)
@@ -218,20 +223,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         }
 
         /// <summary>
-        /// Deposit/GetDepositRequestComment 
+        /// Deposit/GetCommentByTransId 取得指定存款註解
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance >  Deposit Request > [Submit] > ID
+        /// Func Path：Finance >  Deposit Request > [Submit] > Click [Trxn.ID] > Comment List
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList" })]
         [HttpPost]
-        public ApiResult<IEnumerable<Comments>> GetDepositRequestComment(DepositReq req)
+        public ApiResult<IEnumerable<Comments>> GetCommentByTransId(GetByTransIdRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<Comments>>();
-            var comments = _depositBll.GetDepositRequestComment(req.TransId);
+            var comments = _depositBll.GetDepositRequestComment(request.TransId);
 
             foreach (var data in comments)
             {
@@ -245,25 +250,25 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         }
 
         /// <summary>
-        /// Deposit/DepositConfirm 
+        /// Deposit/SendToNext 存款送至下一流程
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance >  Deposit Request > [Submit] > ID > [Submit]
+        /// Func Path：Finance >  Deposit Request > [Submit] > Click [Trxn.ID] > [Draft] [OnHold] [Pending] [Approved] [Rejected]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList", "f_dp_execute" })]
         [HttpPost]
-        public async Task<ApiResult> DepositConfirmAsync(DepositConfirmReq req)
+        public async Task<ApiResult> SendToNextAsync(SendToNextRequest request)
         {
             var apiResult = new ApiResult(_selLangBll);
             var depositConfirmResult = (int)ErrorCodeEnum.Fail;
 
-            if (req.Action == (int)DepositStatus.Approved)
+            if (request.Action == (int)DepositStatus.Approved)
             {
-                if (req.ActualDeposit > 0)
-                    depositConfirmResult = _depositBll.DepositApproved(req.TransId, req.ActualDeposit, req.Comment, User.Identity.Name);
+                if (request.ActualDeposit > 0)
+                    depositConfirmResult = _depositBll.DepositApproved(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name);
 
                 if (depositConfirmResult > 0)
                 {
@@ -287,33 +292,33 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     }
                     else
                     {
-                        var depositRequest = _depositBll.GetDepositRequest(req.TransId);
+                        var depositRequest = _depositBll.GetDepositRequest(request.TransId);
                         var userLang = _custInfoBll.GetCustInfoWithCache(depositRequest.CustId).UserLang;
                         // Send message to player
                         var sender = _selLangBll.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
                         var title = _selLangBll.GetResourceValue("lbl_DepositApprovedTitle", userLang);
-                        title = string.Format(title, req.TransId);
+                        title = string.Format(title, request.TransId);
                         var content = _selLangBll.GetResourceValue("lbl_DepositApprovedContent", userLang);
-                        content = string.Format(content, req.TransId);
+                        content = string.Format(content, request.TransId);
                         _messageBll.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
                     }
                 }
             }
-            else if (req.Action == (int)DepositStatus.Rejected)
+            else if (request.Action == (int)DepositStatus.Rejected)
             {
-                depositConfirmResult = _depositBll.DepositRejectd(req.TransId, req.ActualDeposit, req.Comment, User.Identity.Name);
+                depositConfirmResult = _depositBll.DepositRejectd(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name);
 
                 if (depositConfirmResult > 0)
                 {
-                    var depositRequest = _depositBll.GetDepositRequest(req.TransId);
+                    var depositRequest = _depositBll.GetDepositRequest(request.TransId);
                     var custInfo = _custInfoBll.GetCustInfoWithCache(depositRequest.CustId);
                     var userLang = custInfo.UserLang;
                     // Send message to player
                     var sender = _selLangBll.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
                     var title = _selLangBll.GetResourceValue("lbl_DepositRejectTitle", userLang);
-                    title = string.Format(title, req.TransId);
+                    title = string.Format(title, request.TransId);
                     var content = _selLangBll.GetResourceValue("lbl_DepositRejectContent", userLang);
-                    content = string.Format(content, req.TransId);
+                    content = string.Format(content, request.TransId);
                     _messageBll.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
                     if (custInfo.SiteId == 1)
                     {
@@ -321,17 +326,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     }
                 }
             }
-            else if (req.Action == (int)DepositStatus.Draft)
+            else if (request.Action == (int)DepositStatus.Draft)
             {
-                depositConfirmResult = _depositBll.DepositDraft(req.TransId, req.ActualDeposit, req.Comment, User.Identity.Name);
+                depositConfirmResult = _depositBll.DepositDraft(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name);
             }
-            else if (req.Action == (int)DepositStatus.OnHold)
+            else if (request.Action == (int)DepositStatus.OnHold)
             {
-                depositConfirmResult = _depositBll.DepositOnHold(req.TransId, req.ActualDeposit, req.Comment, User.Identity.Name);
+                depositConfirmResult = _depositBll.DepositOnHold(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name);
             }
-            else if (req.Action == (int)DepositStatus.Pending)
+            else if (request.Action == (int)DepositStatus.Pending)
             {
-                depositConfirmResult = _depositBll.DepositPending(req.TransId, req.ActualDeposit, req.Comment, User.Identity.Name);
+                depositConfirmResult = _depositBll.DepositPending(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name);
             }
 
             if (depositConfirmResult == -4)
@@ -354,22 +359,22 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         }
 
         /// <summary>
-        /// Deposit/BatchRejectedDeposit 
+        /// Deposit/BatchRejected 回絕多筆存款
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance >  Deposit Request > [Submit] > Reject Multiple
+        /// Func Path：Finance > Deposit Request > [Submit] > Click CheckBox > [Reject Multiple]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList", "f_dp_execute" })]
         [HttpPost]
-        public List<ApiResult> BatchRejectedDeposit(BatchRejectedDepositList req)
+        public List<ApiResult> BatchRejected(BatchRejectedDepositList request)
         {
             var apiResult = new List<ApiResult>();
             var comment = $"{ User.Identity.Name} Rejected Deposit Multiple";
 
-            foreach (var transId in req.TransId)
+            foreach (var transId in request.TransIds)
             {
                 var depositConfirmResult = _depositBll.DepositRejectd(transId, 0, comment, User.Identity.Name);
 
@@ -402,24 +407,24 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         }
 
         /// <summary>
-        /// Deposit/SetDepositRequestAmount 
+        /// Deposit/SetAmountByTransId 更新指定存款金額
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance >  Deposit Request > [Submit] > ID > Request Amount	[Edit]
+        /// Func Path：Finance > [Submit] > Click [Trxn.ID] > Deposit Info [Request Amount] > [Edit]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList" })]
         [HttpPost]
-        public ApiResult SetDepositRequestAmount(DepositRequestAmountReq req)
+        public ApiResult SetAmountByTransId(SetAmountByTransIdRequest request)
         {
-            var depositRequest = _depositBll.GetDepositRequest(req.TransId);
+            var depositRequest = _depositBll.GetDepositRequest(request.TransId);
             if (depositRequest == null)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
             }
-            if (_depositBll.SetDepositRequestAmount(req.TransId, req.Amount, User.Identity.Name, depositRequest.CustId) > 0)
+            if (_depositBll.SetDepositRequestAmount(request.TransId, request.Amount, User.Identity.Name, depositRequest.CustId) > 0)
             {
                 return new ApiResult
                 {
@@ -429,45 +434,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             }
 
             throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
-        }
-
-        /// <summary>
-        /// Deposit/SetDepositRequestAmount 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance >  Deposit Request > [Submit] > Export
-        /// </remarks>
-        /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList" })]
-        [HttpPost]
-        public IActionResult ExportDepositList(ExportDepositListReq req)
-        {
-            var exportDeposit = _depositBll.GetDepositExportList(
-                JsonConvert.SerializeObject(req.SiteIds),
-                JsonConvert.SerializeObject(req.DepositType),
-                req.StartDate.DateTime,
-                req.EndDate.DateTime,
-                req.DepositId,
-                req.UserName,
-                JsonConvert.SerializeObject(req.CurrencyId),
-                JsonConvert.SerializeObject(req.Status),
-                JsonConvert.SerializeObject(req.LevelStatus),
-                req.AmountType,
-                req.Amount);
-
-            foreach (var data in exportDeposit)
-            {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                if (data.DepositTime != null)
-                    data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, TimeSpan.Zero);
-                if (data.UpdateTime != null)
-                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, TimeSpan.Zero);
-            }
-
-            var stream = _excelBll.Export(exportDeposit);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(exportDeposit)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
         #region Private function

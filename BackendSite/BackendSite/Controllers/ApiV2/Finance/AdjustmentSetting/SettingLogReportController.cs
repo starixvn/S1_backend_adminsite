@@ -30,7 +30,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
         #endregion
         
         /// <summary>
-        /// SettingLogReport/GetAdjustmentInfoLog 取得調整資料紀錄
+        /// SettingLogReport/GetList 取得調整資料紀錄
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -39,7 +39,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
         /// </remarks>
         /// <param name="para">參數</param>
         [HttpPost]
-        public ApiListResult<AdjustmentLogReport> GetAdjustmentInfoLog(GetAdjustmentInfoLogPara para)
+        public ApiListResult<AdjustmentLogReport> GetList(GetAdjustmentInfoLogPara para)
         {
             var apiResult = new ApiListResult<AdjustmentLogReport>();
             try

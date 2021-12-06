@@ -13,6 +13,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Verify
 
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class CustomerVerifyController : ControllerBase
     {
         private readonly CustInfoBLL _custInfoBll;

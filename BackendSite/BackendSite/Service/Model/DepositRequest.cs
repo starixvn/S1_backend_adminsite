@@ -95,8 +95,8 @@ namespace BackendSite.Service.Model
             DepositType switch
             {
                 (int)enums.DepositTypeEnum.OnlineBanking => $"{SiteName}-{PayName}-{BankCode}",
-                (int)enums.DepositTypeEnum.MobilePayment => $"{SiteName}-{PayName}-{ChannelName}",
-                (int)enums.DepositTypeEnum.LocalBank => $"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
+                (int)enums.DepositTypeEnum.MobilePay => $"{SiteName}-{PayName}-{ChannelName}",
+                (int)enums.DepositTypeEnum.LocalBanking => $"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
                 _ => null
             };
 
