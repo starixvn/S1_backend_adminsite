@@ -46,7 +46,7 @@ const DepositLimitInfo = () => {
                 alert(error);
             })
 
-        api.post('/api/Common/GetEnumType?enumName=DepositType')
+        api.post('/api/Common/GetEnumType?enumName=DepositTypeEnum')
             .then(function (response) {
                 if (response.data.errorCode === 0) {
                     setdeposit(response.data === null ? [] : response.data);
