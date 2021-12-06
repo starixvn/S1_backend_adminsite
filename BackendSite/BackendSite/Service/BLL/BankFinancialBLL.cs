@@ -1565,7 +1565,7 @@ namespace BackendSite.Service.BLL
             {
                 BankFinancialDataModel bankFinancialDataModel = null;
 
-                if (data.WithdrawalType == WithdrawalType.LocalBank)
+                if (data.WithdrawalType == WithdrawalTypeEnum.LocalBank)
                 {
                     var account = accountData.FirstOrDefault(x => x.AccountNo == data.AccountNo);
 
@@ -1593,7 +1593,7 @@ namespace BackendSite.Service.BLL
                         //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
                     }
                 }
-                else if (data.WithdrawalType == WithdrawalType.OnlinePayment)
+                else if (data.WithdrawalType == WithdrawalTypeEnum.OnlinePayment)
                 {
                     var account = accountData.FirstOrDefault(x => x.PayId.ToString() == data.AccountNo && x.SiteId == data.SiteId && x.CurrencyId == data.CurrencyId);
                     var pay = payData.FirstOrDefault(x => x.Id.ToString() == data.AccountNo);

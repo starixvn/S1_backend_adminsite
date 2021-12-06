@@ -158,19 +158,41 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    public enum Direction
+    #region FinancialLog
+
+    public enum DirectionEnum
     {
         Add = 1,
         Deduct = 2
     }
 
-    public enum WithdrawalType
+    #endregion
+
+    #region WithdrawalInfo
+
+    public enum WithdrawalTypeEnum
     {
         Undefine = 0,
         OnlinePayment = 1,
         LocalBank = 2,
         CryptoPay = 4
     }
+
+    public enum WithdrawalStatusEnum
+    {
+        Draft = 0,
+        Pending = 1,
+        OnHold = 2,
+        Verify = 3,
+        Process = 4,
+        Cancelled = 5,
+        Approved = 6,
+        Rejected = 7,
+        ToKyc = 8,
+        Error = 99
+    }
+
+    #endregion
 
     public enum DepositStatus
     {
@@ -182,20 +204,6 @@ namespace BackendSite.Service.Model.enums
         Canceled = 5,
         Expired = 6,
         OnHold = 7,
-        Error = 99
-    }
-
-    public enum WithdrawalStatus
-    {
-        Draft = 0,
-        Pending = 1,
-        OnHold = 2,
-        Verify = 3,
-        Process = 4,
-        Cancelled = 5,
-        Approved = 6,
-        Rejected = 7,
-        ToKyc = 8,
         Error = 99
     }
 
