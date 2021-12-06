@@ -573,32 +573,28 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                var langList = new List<string>
+                var landId = GetLangIdByCurrencyId(currency);
+                var currencyMsg = JObject.Parse(personalMsg)[landId] ;
+                if (currencyMsg == null)
                 {
-                    "en","th","cs","id","vn","hi","hi_en","id_en","th_en"
-                };
-
-                foreach (var lang in langList)
-                {
-                    var msg = JObject.Parse(personalMsg)[lang];
-                    if (msg != null)
-                    {
-                        var title = msg.Value<string>("Title");
-                        var content = msg.Value<string>("Content");
-                        var req = new BatchPersonalMsg()
-                        {
-                            BatchId = batchId,
-                            SiteId = optSite,
-                            LangId = lang,
-                            Operator = authData.UserName,
-                            CurrencyId = currency,
-                            AccountStatus = accountStatus,
-                            Content = content,
-                            Title = title
-                        };
-                        custInfoBLL.SendMessageBatch(req);
-                    }
+                    currencyMsg = JObject.Parse(personalMsg)["en"];
+                    landId = "en";
                 }
+                var title = currencyMsg.Value<string>("Title") ?? "";
+                var content = currencyMsg.Value<string>("Content") ?? "";
+                
+                var req = new BatchPersonalMsg()
+                {
+                    BatchId = batchId,
+                    SiteId = optSite,
+                    LangId = landId,
+                    Operator = authData.UserName,
+                    CurrencyId = currency,
+                    AccountStatus = accountStatus,
+                    Content = content,
+                    Title = title
+                };
+                custInfoBLL.SendMessageBatch(req);
                 _logger.LogInformation($@"MessageService-Filter Account And Send End At {DateTime.UtcNow}.");
             }
 
@@ -1065,6 +1061,26 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        private string GetLangIdByCurrencyId(int currencyId)
+        {
+            switch (currencyId)
+            {
+                case 2:
+                    return "en"; // 馬來西亞
+                case 4:
+                    return "th"; // 泰國
+                case 13:
+                    return "cs"; //中國
+                case 15:
+                    return "id"; //印尼
+                case 51:
+                    return "vn"; //越南
+                case 61:
+                    return "hi"; //印度
+               default:
+                   return "en";
+            }
+        }
         #endregion
 
     }
