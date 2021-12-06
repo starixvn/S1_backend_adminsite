@@ -170,7 +170,7 @@ namespace BackendSite.Controllers.Api
             var inTpTransfer = new AdminTpTransfer() { TpId = TpId, CustId = custInfosDetail.CustId, Amount = Amount, direction = (TpDirection)Opt, Operator = User.Identity.Name, Remarks = Memo };
 
             var result = await tpBLL.AdminAdjustmentTransferAsync(inTpTransfer);
-            if (result.ErrorCode == (int)ErrorCodeType.Success)
+            if (result.ErrorCode == (int)ErrorCodeEnum.Success)
             {
                 var param = new
                 {

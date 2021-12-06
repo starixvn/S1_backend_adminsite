@@ -632,9 +632,9 @@ namespace BackendSite.Service.BLL
                     UserName = x.UserName,
                     FullName = x.AccountName,
                     PhoneNo = x.PhoneNo,
-                    Verify = Enum.GetName(typeof(VerifyType), x.PhoneVerified),
+                    Verify = Enum.GetName(typeof(PhoneVerifiedEnum), x.PhoneVerified),
                     RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
-                    DepositStatus = Enum.GetName(typeof(DepositStatusType), x.ActStatus),
+                    DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
                     Status = Enum.GetName(typeof(RegLiveStatusType), x.Status),
                     AffCode = x.AffCode,
                     Agent = x.Agent

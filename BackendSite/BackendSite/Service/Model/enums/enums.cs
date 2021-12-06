@@ -95,7 +95,20 @@ namespace BackendSite.Service.Model.enums
         MobilePay = 2,
         LocalBanking = 3,
         CryptoPay = 4,
-        LoadCard = 5
+        LoadCard = 5  //No Use
+    }
+
+    public enum DepositStatusEnum
+    {
+        Draft = 0,    //No Use
+        Pending = 1,
+        Paid = 2,     //No Use
+        Approved = 3,
+        Rejected = 4,
+        Canceled = 5,
+        Expired = 6,  //No Use
+        OnHold = 7,   //No Use
+        Error = 99    //No Use
     }
 
     #endregion
@@ -172,7 +185,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum WithdrawalTypeEnum
     {
-        Undefine = 0,
+        Undefine = 0,  //No Use
         OnlinePayment = 1,
         LocalBank = 2,
         CryptoPay = 4
@@ -180,7 +193,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum WithdrawalStatusEnum
     {
-        Draft = 0,
+        Draft = 0,  //No Use
         Pending = 1,
         OnHold = 2,
         Verify = 3,
@@ -189,23 +202,10 @@ namespace BackendSite.Service.Model.enums
         Approved = 6,
         Rejected = 7,
         ToKyc = 8,
-        Error = 99
+        Error = 99  //No Use
     }
 
     #endregion
-
-    public enum DepositStatus
-    {
-        Draft = 0,
-        Pending = 1,
-        Paid = 2,
-        Approved = 3,
-        Rejected = 4,
-        Canceled = 5,
-        Expired = 6,
-        OnHold = 7,
-        Error = 99
-    }
 
     public enum AdjustStatus
     {
@@ -435,38 +435,24 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    public enum VerifyType
-    {
-        No = 0,
-        Verfified = 1
-    }
-    public enum DepositStatusType
-    {
-        Nondeposit = 1,
-        Deposited = 2
-    }
     public enum RegLiveStatusType
     {
         Pending = 1,
         Done = 2,
         Invalid = 3
     }
-    public enum ErrorCodeType
-    {
-        Success = 0
-    }
 
-    public enum TpCategory
-    {
-        Sports = 1,
-        Casino = 2,
-        LiveCasino = 3,
-        Fishing = 4,
-        Cockfighting = 5,
-        Lottery = 6,
-        VirtualSports = 7,
-        Poker = 8,
-    }
+    //public enum TpCategory
+    //{
+    //    Sports = 1,
+    //    Casino = 2,
+    //    LiveCasino = 3,
+    //    Fishing = 4,
+    //    Cockfighting = 5,
+    //    Lottery = 6,
+    //    VirtualSports = 7,
+    //    Poker = 8,
+    //}
 
     public enum SettlementType
     {

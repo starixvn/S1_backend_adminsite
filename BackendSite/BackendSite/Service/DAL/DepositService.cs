@@ -190,7 +190,7 @@ namespace BackendSite.Service.DAL
             return conn.Execute("Admin_DepositReceiptPic_Set", new { CustId = custId, DepositId = depositId, PicFileName = picFileName, DepositPic = depositPic }, commandType: CommandType.StoredProcedure);
         }
 
-        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatus status, DepositRequest depositRequest)
+        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest)
         {
             var type = 1;
             var m = Regex.Match(transId, @"\d+");
@@ -212,7 +212,7 @@ namespace BackendSite.Service.DAL
                 {
                     SetDepositLog(depositId, siteId, comment, (int)status, actualDeposit, Operator);
 
-                    if (status == DepositStatus.Approved)
+                    if (status == DepositStatusEnum.Approved)
                     {
                         if (depositRequest.DepositType != 3)
                         {
@@ -258,7 +258,7 @@ namespace BackendSite.Service.DAL
             }
             catch (Exception ex)
             {
-                SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatus.Error, actualDeposit, Operator);
+                SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatusEnum.Error, actualDeposit, Operator);
             }
 
             return result;
