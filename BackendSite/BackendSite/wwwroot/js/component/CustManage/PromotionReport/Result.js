@@ -18,7 +18,7 @@ const Result = (props) => {
             <tr key={`result-${dIdx}`}>
               <td>{d.bonusId}</td>
               <td>{d.bonusCode}</td>
-              <td>{d.description}-{d.AtPage == 0 ? "Promotion page":"Deposit page"}</td>
+              <td>{d.description}-{d.atPage == 0 ? "Promotion page":"Deposit page"}</td>
               <td>{number_format(d.bonusAmount)}</td>
               <td>{number_format(d.lockedAmount)}</td>
               <td>{number_format(d.custRollOver.rollOver)}</td>
