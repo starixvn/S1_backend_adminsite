@@ -169,10 +169,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         public ApiResult GetList(GetListRequest request)
         {
 
+            var endDate = new DateTimeOffset(request.EndDate.ToUniversalTime().DateTime, TimeSpan.Zero).AddDays(1).AddMilliseconds(-1);
+
             var result = _withdrawalBll.GetWithdrawalInfoAndAccountingList(request.SiteIds,
                 request.CurrencyIds,
                 request.StartDate.DateTime,
-                request.EndDate.DateTime,
+                endDate.DateTime,
                 request.TransId,
                 request.UserName,
                 request.PageNumber,
