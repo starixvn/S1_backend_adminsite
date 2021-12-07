@@ -33,7 +33,6 @@ namespace BackendSite.Service.Model
         public string Operator { get; set; }
         public string Memo { get; set; }
         public decimal Amount { get; set; }
-        public int RollOver { get; set; }
         public int PromotionType { get; set; }
     }
     public class RetionBonusRep

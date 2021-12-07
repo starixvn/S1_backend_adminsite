@@ -737,7 +737,6 @@ namespace BackendSite.Controllers.Api
                             Memo = adjustmentAndWithdrawalLimitReq.Memo,
                             Operator = authData.UserName,
                             Amount = adjustmentAndWithdrawalLimitReq.Amount,
-                            RollOver = adjustmentAndWithdrawalLimitReq.RollOver,
                             PromotionType = adjustmentAndWithdrawalLimitReq.Option == (int)BalanceAdjustmentType.RetentionBouns ?  9 : 8
                         };
                         var apiOnlineResult =
@@ -793,8 +792,7 @@ namespace BackendSite.Controllers.Api
                         var custId = (string.IsNullOrEmpty(sabaId)) ? null : _common.TpIdToCustId(sabaId);
 
                         decimal.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out var amount);
-                        int.TryParse(sheet.Cells[RowId, 4].Text.Trim(), out var rollOver);
-                        var memo = sheet.Cells[RowId, 5].Text.Trim();
+                        var memo = sheet.Cells[RowId, 4].Text.Trim();
                         if (string.IsNullOrEmpty(custUsername) && custId == null)
                         {
                             isLastRow = true;
@@ -927,7 +925,6 @@ namespace BackendSite.Controllers.Api
                                             Memo = memo,
                                             Operator = authData.UserName,
                                             Amount = amount,
-                                            RollOver = rollOver,
                                             PromotionType = option == (int)BalanceAdjustmentType.RetentionBouns ? 9 : 8
                                         };
                                         var apiOnlineResult =
