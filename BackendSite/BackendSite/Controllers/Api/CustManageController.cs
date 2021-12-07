@@ -1347,8 +1347,8 @@ namespace BackendSite.Controllers.Api
             var apiListResult = new ApiListResult<CustBankInfoLog>();
             apiListResult.ErrorCode = 0;
             var bankInfoPay = custInfoBLL.GetCustBankInfoLogList(bankInfoLogListReq.CustId,
-                1,
                 1000,
+                1,
                 out var totalPages,
                 out var rowCount);
             apiListResult.Data = bankInfoPay;
@@ -1381,8 +1381,8 @@ namespace BackendSite.Controllers.Api
             var custInfo = custInfoBLL.GetCustInfoWithCache(cryptoWalletLogListReq.CustId);
             apiListResult.ErrorCode = 0;
             var cryptoWalletInfo = custInfoBLL.GetCustCryptoWalletLogList(cryptoWalletLogListReq.CustId,
-                1,
                 1000,
+                1,
                 out var totalPages,
                 out var rowCount);
             apiListResult.Data = cryptoWalletInfo;
