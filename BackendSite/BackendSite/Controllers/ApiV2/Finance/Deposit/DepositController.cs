@@ -265,7 +265,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             var apiResult = new ApiResult(_selLangBll);
             var depositConfirmResult = (int)ErrorCodeEnum.Fail;
 
-            if (request.Action == (int)DepositStatus.Approved)
+            if (request.Action == (int)DepositStatusEnum.Approved)
             {
                 if (request.ActualDeposit > 0)
                     depositConfirmResult = _depositBll.DepositApproved(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name);
@@ -304,7 +304,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     }
                 }
             }
-            else if (request.Action == (int)DepositStatus.Rejected)
+            else if (request.Action == (int)DepositStatusEnum.Rejected)
             {
                 depositConfirmResult = _depositBll.DepositRejectd(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name);
 
@@ -326,15 +326,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     }
                 }
             }
-            else if (request.Action == (int)DepositStatus.Draft)
+            else if (request.Action == (int)DepositStatusEnum.Draft)
             {
                 depositConfirmResult = _depositBll.DepositDraft(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name);
             }
-            else if (request.Action == (int)DepositStatus.OnHold)
+            else if (request.Action == (int)DepositStatusEnum.OnHold)
             {
                 depositConfirmResult = _depositBll.DepositOnHold(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name);
             }
-            else if (request.Action == (int)DepositStatus.Pending)
+            else if (request.Action == (int)DepositStatusEnum.Pending)
             {
                 depositConfirmResult = _depositBll.DepositPending(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name);
             }
