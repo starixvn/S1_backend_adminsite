@@ -80,7 +80,7 @@ namespace BackendSite.Service.DAL
                     EndDate = endDate,
                     RefTransId = refTransId,
                     PageSize = pageSize });
-            p.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(totalPages), DbType.Int32,ParameterDirection.Input);
+            p.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32,ParameterDirection.Input);
             p.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", Math.Abs(totalPages), DbType.Int32, ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);

@@ -168,11 +168,12 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetWithdrawalInfoAndAccountingList(GetWithdrawalInfoAndAccountingListRequest request)
         {
+            var endDate = new DateTimeOffset(request.EndDate.ToUniversalTime().DateTime, TimeSpan.Zero).AddDays(1).AddMilliseconds(-1);
 
             var result = _withdrawalBLL.GetWithdrawalInfoAndAccountingList(request.SiteIds,
                 request.CurrencyIds,
                 request.StartDate.DateTime,
-                request.EndDate.DateTime,
+                endDate.DateTime,
                 request.TransId,
                 request.UserName,
                 request.PageNumber,
@@ -198,7 +199,7 @@ namespace BackendSite.Controllers.Api
         {
 
             startDate = new DateTimeOffset(startDate.ToUniversalTime().DateTime, TimeSpan.Zero);
-            endDate = new DateTimeOffset(endDate.ToUniversalTime().DateTime, TimeSpan.Zero);
+            endDate = new DateTimeOffset(endDate.ToUniversalTime().DateTime, TimeSpan.Zero).AddDays(1).AddMilliseconds(-1);
 
             var data = _withdrawalBLL.GetWithdrawalInfoAndAccountingListForExport(siteIds,
                 currencyIds,

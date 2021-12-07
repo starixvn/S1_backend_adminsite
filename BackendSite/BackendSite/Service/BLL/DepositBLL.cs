@@ -280,10 +280,17 @@ namespace BackendSite.Service.BLL
 
              result?.DepositTimeList.ForEach(x =>
             {
-                var ts1 = new TimeSpan(x.CreateTime.Ticks);
-                var ts2 = new TimeSpan(x.UpdateTime.Ticks);
-                var ts = ts1.Subtract(ts2).Duration();
+                var tsC = new TimeSpan(x.CreateTime.Ticks);
+                var tsU = new TimeSpan(x.UpdateTime.Ticks);
+                var ts = tsC.Subtract(tsU).Duration();
                 x.CompleteTime = GetTimeString(ts);
+                
+                if (x.ApprovedTime > DateTime.Now.AddYears(-1000))
+                {
+                    var tsA = new TimeSpan(x.ApprovedTime.Value.Ticks);
+                    var ts2 = tsC.Subtract(tsA).Duration();
+                    x.ToApprovedTime =GetTimeString(ts2);
+                }
             });
 
             return result;
@@ -300,6 +307,13 @@ namespace BackendSite.Service.BLL
                 var ts1 = new TimeSpan(x.CreateTime.Ticks);
                 var ts2 = new TimeSpan(x.UpdateTime.Ticks);
                 var ts = ts1.Subtract(ts2).Duration();
+                
+                if (x.ApprovedTime > DateTime.Now.AddYears(-1000))
+                {
+                    var tsA = new TimeSpan(x.ApprovedTime.Value.Ticks);
+                    var ts3 = ts1.Subtract(tsA).Duration();
+                    x.ToApprovedTime =GetTimeString(ts3);
+                }
                 exportDataToExcel.Add(new DepositTimeExportData
                 {
                     SiteName = x.SiteName,
@@ -310,7 +324,10 @@ namespace BackendSite.Service.BLL
                     Status = x.StatusName,
                     CreateTime = x.CreateTime.DateTime,
                     UpdateTime = x.UpdateTime.DateTime,
-                    CompleteTime = GetTimeString(ts)
+                    CompleteTime = GetTimeString(ts),
+                    ToApprovedTime = x.ToApprovedTime,
+                    EndFlowTime = x.ApprovedTime,
+                    ApprovedBy = x.ApprovedBy
                 });
             });
             return exportDataToExcel;

@@ -408,7 +408,7 @@ namespace BackendSite.Service.DAL
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("PageSize", Math.Abs(para.PageSize));
-            var result = _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTime_Get_V2", props).ToList();
+            var result = _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTime_Get_V3", props).ToList();
 
             searchData.DepositTimeList = result;
             searchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
@@ -440,7 +440,7 @@ namespace BackendSite.Service.DAL
             props.Add("CurrencyId", currencyId);
             props.Add("DepositId", tempDepositId);
             props.Add("SelectStatus", selectStatus);
-            return _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTimeExport_Get_V2", props).ToList();
+            return _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTimeExport_Get_V3", props).ToList();
 
         }
         public bool SetDepositRequestAmount(string transId, decimal amount, string Operator)

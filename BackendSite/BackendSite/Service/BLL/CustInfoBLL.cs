@@ -291,8 +291,8 @@ namespace BackendSite.Service.BLL
             out int rowCount)
         {
             return _custInfoService.GetCustBankInfoLogList(custId,
-                 Math.Abs(pageSize),
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
         }
