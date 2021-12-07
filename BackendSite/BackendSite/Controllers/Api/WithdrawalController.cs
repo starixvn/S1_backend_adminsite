@@ -506,8 +506,8 @@ namespace BackendSite.Controllers.Api
             if (withdrawalReq.endDate > 2147483647)
                 withdrawalReq.endDate = 2147483647;
 
-            var startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)withdrawalReq.startDate);
-            var endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)withdrawalReq.endDate);
+            var startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)withdrawalReq.startDate).AddHours(-8);
+            var endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)withdrawalReq.endDate).AddHours(-8);
 
             var data = withdrawalBLL.GetWithdrawalListByCust(withdrawalReq.CustId,
                 withdrawalReq.TransId,
@@ -899,7 +899,7 @@ namespace BackendSite.Controllers.Api
                     PageNumber = para.PageNumber,
                     PageSize = para.PageSize
                 };
-                
+
                 var searchResult = withdrawalBLL.WithdrawalTimeReportGet(req);
 
                 foreach (var data in searchResult.WithdrawalTimeList)
@@ -914,7 +914,7 @@ namespace BackendSite.Controllers.Api
                     if (data.DepositTime != null)
                         data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 }
-                
+
                 apiListResult.Data = searchResult.WithdrawalTimeList;
                 apiListResult.PageNumber = searchResult.PageNumber;
                 apiListResult.TotalPages = searchResult.TotalPages;
@@ -939,12 +939,12 @@ namespace BackendSite.Controllers.Api
             var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(endDate);
             var exportData =
                 withdrawalBLL.WithdrawalTimeExportGet(selectSite, withdrawalId, startTime, endTime, status, currencyId);
-            
+
             foreach (var data in exportData)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-                if (data.FlowEndTime != null) 
+                if (data.FlowEndTime != null)
                     data.FlowEndTime = new DateTimeOffset(data.FlowEndTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
             var stream = excelBLL.Export(exportData);
