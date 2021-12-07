@@ -420,13 +420,11 @@ namespace BackendSite.Service.BLL
             return Data;
         }
 
-        public IEnumerable<UserOnlineReportModel> GetUserOnlineReport(string siteIds,
-                                                                      string selectDate)
+        public IEnumerable<UserOnlineReportModel> GetUserOnlineReport(string siteIds, string selectDate,string timeZome)
         {
             var keyValuePairs = new Dictionary<string, UserOnlineReportModel>();
-            var dateTimeFormat = string.Empty;
-            var userOnlineList = reportService.GetUserOnlineReport(siteIds,
-                                                                   selectDate);
+            string dateTimeFormat;
+            var userOnlineList = reportService.GetUserOnlineReport(siteIds, selectDate,timeZome);
             var siteList = JsonConvert.DeserializeObject<List<int>>(siteIds);
             var serverInfoList = reportService.GetServerInfoList();
 
@@ -434,17 +432,13 @@ namespace BackendSite.Service.BLL
 
             foreach (var data in userOnlineList)
             {
-                UserOnlineReportModel userOnlineReportModel = null;
-
                 dateTimeFormat = data.Time.ToString("HH:00");
-
-                userOnlineReportModel = new UserOnlineReportModel();
+                var userOnlineReportModel = new UserOnlineReportModel();
                 keyValuePairs.Add($"{dateTimeFormat}_{data.SiteId}", userOnlineReportModel);
                 userOnlineReportModel.LocalTime = $"{dateTimeFormat}~{data.Time.AddHours(1).ToString("HH:00")}";
                 userOnlineReportModel.SiteId = data.SiteId;
                 userOnlineReportModel.SiteName = serverInfoList.Where(y => y.SiteId == data.SiteId).Select(x => x.SiteName).FirstOrDefault();
                 userOnlineReportModel.MaxCount = data.MaxCount;
-
             }
 
             #endregion
@@ -453,15 +447,13 @@ namespace BackendSite.Service.BLL
 
             for (var i = 0; i < 24; i++)
             {
-                UserOnlineReportModel userOnlineReportModel = null;
-
                 foreach (var site in siteList)
                 {
                     dateTimeFormat = Convert.ToDateTime(selectDate).AddHours(i).ToString("HH:00");
 
                     if (!keyValuePairs.ContainsKey($"{dateTimeFormat}_{site}"))
                     {
-                        userOnlineReportModel = new UserOnlineReportModel();
+                        var userOnlineReportModel = new UserOnlineReportModel();
                         keyValuePairs.Add($"{dateTimeFormat}_{site}", userOnlineReportModel);
                         userOnlineReportModel.LocalTime = $"{dateTimeFormat}~{Convert.ToDateTime(selectDate).AddHours(i + 1).ToString("HH:00")}";
                         userOnlineReportModel.SiteName = serverInfoList.Where(y => y.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
@@ -471,11 +463,11 @@ namespace BackendSite.Service.BLL
             }
 
             #endregion
-
-            var Data = keyValuePairs.Select(s => s.Value).OrderBy(value => value.LocalTime)
-                                                         .ThenBy(value => value.SiteId);
-
-            return Data;
+            
+            return keyValuePairs
+                .Select(s => s.Value)
+                .OrderBy(value => value.LocalTime)
+                .ThenBy(value => value.SiteId);
         }
 
         public IEnumerable<DepositReportModel> GetDepositReport(IEnumerable<int> CurrencyIds,

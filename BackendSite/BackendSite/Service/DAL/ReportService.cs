@@ -1,27 +1,35 @@
-﻿using BackendSite.Service.Model;
+﻿using System;
+using BackendSite.Service.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.DAL
 {
     public class ReportService
     {
+         #region Fields
 
-        #region Fields
-
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration _configuration;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
         #endregion
 
         #region Constructors
 
-        public ReportService(IConfiguration configuration)
+        public ReportService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _configuration = provider.GetRequiredService<IConfiguration>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
         #endregion
@@ -30,21 +38,19 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<CurrencyModel> GetCurrencyList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var SpName = "Common_Currency_Get";
             return conn.Query<CurrencyModel>(SpName, commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<ServerInfoModel> GetServerInfoList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var SpName = "Admin_ServerInfoList_Get";
-            return conn.Query<ServerInfoModel>(SpName, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<ServerInfoModel>("Admin_ServerInfoList_Get");
         }
         
         public async Task<IEnumerable<TpCategoryData>> GetTpCategoryList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             return await conn.QueryAsync<TpCategoryData>("Admin_TPCategory_Get", commandType: CommandType.StoredProcedure);
         }
 
@@ -66,7 +72,7 @@ namespace BackendSite.Service.DAL
                     EndDate = endDate
                 });
 
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
 
             conn.Open();
 
@@ -109,7 +115,7 @@ namespace BackendSite.Service.DAL
                                                                                         string startDate,
                                                                                         string endDate)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -128,7 +134,7 @@ namespace BackendSite.Service.DAL
                                                                                  string startDate,
                                                                                  string endDate)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -142,19 +148,9 @@ namespace BackendSite.Service.DAL
             return conn.Query<StatisticalPartcialSummeryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<UserOnlinePartcialSummaryModel> GetUserOnlineReport(string siteIds,
-                                                                               string selectDate)
+        public IEnumerable<UserOnlinePartcialSummaryModel> GetUserOnlineReport(string siteIds, string selectDate , string timeZone)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var parameters = new DynamicParameters(
-                new
-                {
-                    SiteIds = siteIds,
-                    SelDate = selectDate
-                });
-
-            var SpName = "Admin_OnlineReport_Get";
-            return conn.Query<UserOnlinePartcialSummaryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<UserOnlinePartcialSummaryModel>("Admin_OnlineReport_Get_V2", new DynamicParameters(new {SiteIds = siteIds, SelDate = selectDate , TimeZone = timeZone }));
         }
 
         public IEnumerable<DepositReportParticalModel> GetDepositReport(string siteIds,
@@ -162,7 +158,7 @@ namespace BackendSite.Service.DAL
                                                                         string startDate,
                                                                         string endDate)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -188,7 +184,7 @@ namespace BackendSite.Service.DAL
                                                                                         string endDate,
                                                                                         string userName)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -207,7 +203,7 @@ namespace BackendSite.Service.DAL
                                                                int gameId,
                                                                string date)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
