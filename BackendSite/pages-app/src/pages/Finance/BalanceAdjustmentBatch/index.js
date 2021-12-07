@@ -247,10 +247,11 @@ const App = () => {
                     <td>
                         {value.bonus}
                     </td>
-                    <td>
-                        {value.rollOver}
-                    </td>
-                </>:null}
+                </>
+                :null}
+                <td>
+                    {value.rollOver}
+                </td>
             </tr>
         })
     }
@@ -347,11 +348,11 @@ const App = () => {
                                         <>
                                             <th>
                                                 Amount
-                                            </th>
-                                            <th>
-                                                RollOver
-                                            </th>
+                                            </th>                                          
                                         </>:null}
+                                        <th>
+                                            RollOver
+                                        </th>
                                     </tr>
                                     {bnousCodeDetail}
                                 </td>

@@ -271,7 +271,8 @@ import qs from 'qs';
                             });
                         }
                         else{
-                            this.setState({ 
+                            this.setState({
+                                RollOver: result.data.rollOver, 
                                 HasBonusCode: true,
                                 CheckedBonusCode: result.data.bonusCode,
                                 Name: result.data.name,
@@ -448,7 +449,7 @@ import qs from 'qs';
                                 {this.state.Option == 5 || this.state.Option == 6 ? 
                                 <div className="form-group width-200">
                                     <label className="col-form-label">RollOver</label>
-                                    <input className="form-control" type="number" name="RollOver" onChange={this.onChange.bind(this)} disabled={this.state.Option == 5 ? true:false} value={this.state.RollOver}/>
+                                    <input className="form-control" type="number" name="RollOver" onChange={this.onChange.bind(this)} disabled={this.state.Option == 5 || this.state.Option == 6 ? true:false} value={this.state.RollOver}/>
                                 </div>
                                 :null}
                                 <div className="form-group width-200">

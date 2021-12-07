@@ -690,12 +690,12 @@ const SubPanel = props => {
 					) :
 					(props.state.promotionType == 8 || props.state.promotionType == 9) ?
 						(<>
-							{/* <InputBox
+							<InputBox
 								Title="Rollover"
 								OnChange={props.EditMainValue}
 								dataColumn="rollOver"
 								value={props.state.specific[props.currencyId].rollOver}
-							/> */}
+							/>
 							<InputBox
 								Type="Number"
 								Title="Max Bonus"
