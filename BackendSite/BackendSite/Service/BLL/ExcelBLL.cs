@@ -130,6 +130,12 @@ namespace BackendSite.Service.BLL
                         ws.Cells[currentRow, j + 1].Value = time.ToOffset(TimeSpan.FromHours(8)).DateTime;
                         ws.Cells[currentRow, j + 1].Style.Numberformat.Format = "mm/dd/yyyy h:mm:ss\\ AM/PM";
                     }
+                    else if (propValue != null && propValue.GetType().Name == "DateTimeOffset" && ((DateTimeOffset)propValue).Year > 1)
+                    {
+                        var time = (DateTimeOffset)propValue;
+                        ws.Cells[currentRow, j + 1].Value = time.DateTime;
+                        ws.Cells[currentRow, j + 1].Style.Numberformat.Format = "mm/dd/yyyy h:mm:ss\\ AM/PM";
+                    }
                     else
                     {
                         ws.Cells[currentRow, j + 1].Value = propValue;
