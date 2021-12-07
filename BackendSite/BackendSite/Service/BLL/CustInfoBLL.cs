@@ -177,8 +177,11 @@ namespace BackendSite.Service.BLL
                         {
                             promotion.custRollOver = new CustRollOver() { RollOver = 0, TurnOver = 0 };
                         };
-
                     }
+                }
+                if (custInfoDetail.CustPhoneReward.HasValue || custInfoDetail.CustEmailReward.HasValue)
+                {
+                    custInfoDetail.VerificationReward = GetRewardMessage(custInfoDetail);
                 }
                 custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
             }
@@ -656,6 +659,27 @@ namespace BackendSite.Service.BLL
         public CustProfileReq GetCustProfile(int custId)
         {
             return _custInfoService.GetCustProfile(custId);
+        }
+
+        private string GetRewardMessage(CustInfoDetail custInfoDetail)
+        {
+            var rewardMessage = "";
+            switch (custInfoDetail.VerificationType)
+            {
+                case 0:
+                {
+                    if (custInfoDetail.CustPhoneReward.HasValue)
+                        rewardMessage += $"Phone: {custInfoDetail.CustPhoneReward.Value:0.00} ";
+                    if (custInfoDetail.CustEmailReward.HasValue)
+                        rewardMessage += $"Email : {custInfoDetail.CustEmailReward.Value:0.00}";
+                    break;
+                }
+                case 1:
+                    rewardMessage = $"Phone & Email: {custInfoDetail.CustPhoneReward:0.00}";
+                    break;
+            }
+
+            return rewardMessage;
         }
     }
 }
