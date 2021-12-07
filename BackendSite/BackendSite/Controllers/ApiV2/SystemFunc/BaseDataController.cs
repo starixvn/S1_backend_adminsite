@@ -337,6 +337,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// <summary>
         /// BaseData/GetBankInfoOffListByCustVerify 根據客戶驗證取得銀行戶口資料清單
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Deposit Submission > Click[Submit] > Get [Account No] List
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
