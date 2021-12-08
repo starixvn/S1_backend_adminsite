@@ -229,8 +229,13 @@ namespace BackendSite.Service.Model.enums
     {
         FstDeposit = 1,
         ReDeposit = 2,
-        Rebate = 3,
-        Special = 4
+        FreeBet = 3,
+        Special = 4,
+        WalletBonus = 5,
+        Rebate = 6,
+        Cashback = 7,
+        StaticPage = 8,
+        RetentionBonus = 9
     }
 
     public enum BonusType

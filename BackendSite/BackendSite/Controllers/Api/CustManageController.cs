@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
@@ -36,19 +37,27 @@ namespace BackendSite.Controllers.Api
         private readonly PaymentBLL paymentBLL;
         private readonly ExcelBLL excelBLL;
         private readonly ImageEditorBLL _imageEditorBll;
+        private readonly BonusInfoBLL _bonusInfoBLL;
+        private readonly SelLangBLL _selLangBLL;
+        private readonly MessageBLL _messageBLL;
+        private readonly AuthorizeBLL _authorizeBLL;
 
         #endregion
 
         #region Constructors
 
         public CustManageController(CustInfoBLL custInfoBLL,
-                                    WinLostReportService winLostReportService,
-                                    PermissionBLL permissionBLL,
-                                    ServerInfoBLL serverInfoBLL,
-                                    Common common,
-                                    PaymentBLL paymentBLL,
-                                    ExcelBLL excelBLL,
-                                    ImageEditorBLL imageEditorBll)
+            WinLostReportService winLostReportService,
+            PermissionBLL permissionBLL,
+            ServerInfoBLL serverInfoBLL,
+            Common common,
+            PaymentBLL paymentBLL,
+            ExcelBLL excelBLL,
+            BonusInfoBLL bonusInfoBLL,
+            ImageEditorBLL imageEditorBll,
+            SelLangBLL selLangBLL,
+            MessageBLL messageBLL,
+            AuthorizeBLL authorizeBLL)
         {
             this.custInfoBLL = custInfoBLL;
             this.winLostReportService = winLostReportService;
@@ -57,7 +66,11 @@ namespace BackendSite.Controllers.Api
             this.common = common;
             this.paymentBLL = paymentBLL;
             this.excelBLL = excelBLL;
+            _bonusInfoBLL = bonusInfoBLL;
             _imageEditorBll = imageEditorBll;
+            _selLangBLL = selLangBLL;
+            _messageBLL = messageBLL;
+            _authorizeBLL = authorizeBLL;
         }
 
         #endregion
@@ -1465,16 +1478,77 @@ namespace BackendSite.Controllers.Api
         public ApiResult CancelBonusByBonusId(BonusReq bonusReq)
         {
             var apiResult = new ApiResult();
-            custInfoBLL.CancelBonusByBonusId(bonusReq.BonusId);
 
-            var Menu = "CustManage/CustInfoList";
-            var Info = new Dictionary<string, dynamic>();
-            Info.Add("MenuName", "Customer Info");
-            Info.Add("Action", "Cancel Bonus");
-            serverInfoBLL.AdminOperateLog(null, bonusReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+            var data = _bonusInfoBLL.GetTransferBonusCancel(bonusReq.BonusId);
+            if (data != null)
+            {
+                var winLossAmount = _bonusInfoBLL.GetBonusWinLoss(bonusReq.BonusId)?.FirstOrDefault() ?? 0m; 
+                var transferBonusAmount = data.BonusAmount + data.LockedAmount; 
+                var remainingBonus = transferBonusAmount + winLossAmount;
+            
+                switch (data.PromotionType)
+                {
+                    case PromotionType.FstDeposit:
+                    case PromotionType.ReDeposit:
+                    case PromotionType.FreeBet:
+                    case PromotionType.WalletBonus:
+                    case PromotionType.Rebate:
+                    case PromotionType.Cashback:
+                    case PromotionType.StaticPage:
+                    case PromotionType.RetentionBonus:
 
-            apiResult.ErrorCode = 0;
+                        //確認剩餘本金
+                        var refundAmount = remainingBonus - data.BonusAmount;
+                        if (refundAmount < 0)
+                        {
+                            refundAmount = 0;
+                        }
+                        else if (refundAmount > data.LockedAmount)
+                        {
+                            refundAmount = data.LockedAmount;
+                        }
+                        
+                        //呼叫轉帳 API 扣款
+                        if (remainingBonus > 0)
+                        {
+                            var tpBonusCancelTransfer = new TpBonusCancelTransfer
+                            {
+                                TpId = data.TpId,
+                                CustId = data.CustId,
+                                UserName = data.UserName,
+                                SiteId = data.SiteId,
+                                PromoCategoryId = data.PromoCategoryId,
+                                BonusId = data.BonusId,
+                                RemainingBonus = remainingBonus,
+                                RefundAmount = refundAmount
+                            };
+                            _bonusInfoBLL.BonusCancelTransfer(tpBonusCancelTransfer);
+                        }
+                        else
+                        {
+                            custInfoBLL.CancelBonusByBonusId(bonusReq.BonusId);
+                            
+                            var title = _selLangBLL.GetResourceValue("lbl_CancelBonusTitle", data.UserLang);
+                            var msg = new StringBuilder();
+                            msg.AppendLine(_selLangBLL.GetResourceValue("lbl_CancelBonus1", data.UserLang));
+                            var authData = _authorizeBLL.GetAuthData();
+                            _messageBLL.SendMessageToPlayer("Bonus Service", title,msg.ToString(),data.CustId,authData.UserId);
+                            
+                            var info = new Dictionary<string, dynamic>
+                            {
+                                {"MenuName", "Customer Info"},
+                                {"Action", "Cancel Bonus"}
+                            };
+                            serverInfoBLL.AdminOperateLog(null, bonusReq.CustId, "CustManage/CustInfoList", ActionType.Update, info, User.Identity.Name);
+                        } 
+                        break; 
+                }
+                apiResult.ErrorCode = (int) ErrorCodeEnum.Success; 
+                return apiResult;
+            }
 
+            apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+            apiResult.Message = "Bonus is not successfully redeemed, cancellation not eligible to execute";
             return apiResult;
         }
 
