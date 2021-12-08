@@ -39,6 +39,10 @@ namespace BackendSite.Service.Model
         public bool IsRisk { get; set; }
         public bool PhoneVerified { get; set; }
         public bool EmailVerified { get; set; }
+        public int VerificationType { get; set; }
+        public decimal? CustPhoneReward { get; set; }
+        public decimal? CustEmailReward { get; set; }
+        public string VerificationReward { get; set; }
         public string Iovation { get; set; }
         public int Status { get; set; }
         public DateTimeOffset LastLoginTime { get; set; }
