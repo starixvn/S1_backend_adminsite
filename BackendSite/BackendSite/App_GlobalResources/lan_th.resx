@@ -141,4 +141,10 @@
   <data name="lbl_WithdrawalRejectTitle" xml:space="preserve">
     <value>รายการถอนของคุณ {0} ถูกปฏิเสธ!</value>
   </data>
+  <data name="lbl_CancelBonus1" xml:space="preserve">
+    <value>โปรโมชั่นโบนัสของคุณถูกยกเลิก</value>
+  </data>
+  <data name="lbl_CancelBonusTitle" xml:space="preserve">
+    <value>ประกาศการหมดอายุของโปรโมชั่น</value>
+  </data>
 </root>

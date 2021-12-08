@@ -1,27 +1,35 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.BLL
 {
     public class BonusInfoBLL
     {
-        private readonly ServerInfoBLL serverInfoBLL;
-        private readonly SelLangBLL selLangBLL;
-        private readonly BonusInfoService bonusInfoService;
+        private readonly ServerInfoBLL _serverInfoBll;
+        private readonly SelLangBLL _selLangBll;
+        private readonly BonusInfoService _bonusInfoService;
+        private readonly CourierAdapter _courierAdapter;
+        private readonly string _apiUrl;
 
-        public BonusInfoBLL(BonusInfoService bonusInfoService, ServerInfoBLL serverInfoBLL, SelLangBLL selLangBLL)
+        public BonusInfoBLL(IServiceProvider provider)
         {
-            this.bonusInfoService = bonusInfoService;
-            this.serverInfoBLL = serverInfoBLL;
-            this.selLangBLL = selLangBLL;
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+            _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
+            _selLangBll = provider.GetRequiredService<SelLangBLL>();
+            _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+            _apiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("TpService");
         }
 
         public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId,ref int PageNumber, ref int TotalPages, ref int RowCount, ref List<string> CurrencyAmount)
         {
-            var siteList = serverInfoBLL.GetSiteListByLoginUser();
-            var datas = bonusInfoService.GetBonusInfoReport(
+            var siteList = _serverInfoBll.GetSiteListByLoginUser();
+            var datas = _bonusInfoService.GetBonusInfoReport(
                     SelectSite,
                     BonusCode,
                     TransId,
@@ -49,12 +57,12 @@ namespace BackendSite.Service.BLL
                     {
                         CustId = row.CustId,
                         TransId = row.TransId,
-                        CurrencyName = selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}"),
-                        PromotionName = selLangBLL.GetResourceValue($"lbl_PromotionType{row.PromotionType}"),
+                        CurrencyName = _selLangBll.GetResourceValue($"Currency_{row.CurrencyId}"),
+                        PromotionName = _selLangBll.GetResourceValue($"lbl_PromotionType{row.PromotionType}"),
                         SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
                         UserName = row.UserName,
                         CreateTime = row.CreateTime,
-                        StatusName = selLangBLL.GetResourceValue($"lbl_BonusStatus{row.Status}"),
+                        StatusName = _selLangBll.GetResourceValue($"lbl_BonusStatus{row.Status}"),
                         Bonus = row.Bonus,
                         BonusAmount = row.BonusAmount,
                         BonusCode = row.BonusCode,
@@ -71,8 +79,8 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BonusInfoFrontEnd> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate, int BaseCurrencyId, int RebateCategoriesId)
         {
-            var siteList = serverInfoBLL.GetSiteListByLoginUser();
-            var datas = bonusInfoService.GetBonusInfoExportReport(
+            var siteList = _serverInfoBll.GetSiteListByLoginUser();
+            var datas = _bonusInfoService.GetBonusInfoExportReport(
                     SelectSite,
                     BonusCode,
                     TransId,
@@ -94,12 +102,12 @@ namespace BackendSite.Service.BLL
                     result.Add(new BonusInfoFrontEnd
                     {
                         TransId = row.TransId,
-                        CurrencyName = selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}"),
-                        PromotionName = selLangBLL.GetResourceValue($"lbl_PromotionType{row.PromotionType}"),
+                        CurrencyName = _selLangBll.GetResourceValue($"Currency_{row.CurrencyId}"),
+                        PromotionName = _selLangBll.GetResourceValue($"lbl_PromotionType{row.PromotionType}"),
                         SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
                         UserName = row.UserName,
                         CreateTime = row.CreateTime,
-                        StatusName = selLangBLL.GetResourceValue($"lbl_BonusStatus{row.Status}"),
+                        StatusName = _selLangBll.GetResourceValue($"lbl_BonusStatus{row.Status}"),
                         Bonus = row.Bonus,
                         BonusAmount = row.BonusAmount,
                         BonusCode = row.BonusCode,
@@ -116,8 +124,23 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<PendingBonus> GetPendingBonusList()
         {
-            return bonusInfoService.GetPendingBonusList();
+            return _bonusInfoService.GetPendingBonusList();
+        }
+        
+        public CancelBonus GetTransferBonusCancel(int bonusId)
+        {
+            return _bonusInfoService.GetTransferBonusCancel(bonusId);
+        }
+        public IEnumerable<decimal> GetBonusWinLoss(int bonusId)
+        {
+            return _bonusInfoService.GetBonusWinLoss(bonusId);
         }
 
+        public ApiResult<TransferResult> BonusCancelTransfer(TpBonusCancelTransfer tpBonusCancelTransfer)
+        {
+            var myUrl = $"{_apiUrl}BonusCancelTransfer";
+            var data = _courierAdapter.MyPostAsync<TransferResult, TpBonusCancelTransfer>(myUrl, tpBonusCancelTransfer).Result;
+            return data;
+        }
     }
 }

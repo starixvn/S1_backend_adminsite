@@ -141,4 +141,10 @@
   <data name="lbl_WithdrawalRejectTitle" xml:space="preserve">
     <value>您的提款交易 {0} 已被取消！</value>
   </data>
+  <data name="lbl_CancelBonus1" xml:space="preserve">
+    <value>您的优惠红利已被取消。</value>
+  </data>
+  <data name="lbl_CancelBonusTitle" xml:space="preserve">
+    <value>优惠活动过期通知</value>
+  </data>
 </root>
