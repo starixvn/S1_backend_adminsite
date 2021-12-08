@@ -1801,8 +1801,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
-                apiResult.Data = _messageBll.GetPersonalMsg(request.CustId, request.PageSize,
-                    ref pageNumber, ref TotalPages, ref RowCount);
+                apiResult.Data = _messageBll.GetPersonalMsg(request.CustId, request.PageNumber, request.PageSize,
+                    ref TotalPages, ref RowCount);
 
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.PageNumber = pageNumber;

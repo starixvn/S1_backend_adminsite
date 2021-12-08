@@ -118,13 +118,13 @@ namespace BackendSite.Controllers.Api
             {
                 depositListReq.startDate = 2147483647;
             }
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)depositListReq.startDate);
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)depositListReq.startDate).AddHours(-8);
 
             if (depositListReq.endDate > 2147483647)
             {
                 depositListReq.endDate = 2147483647;
             }
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)depositListReq.endDate);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)depositListReq.endDate).AddHours(-8);
 
 
             var data = depositBLL.GetDepositListByCust(depositListReq.CustId,
@@ -137,6 +137,8 @@ namespace BackendSite.Controllers.Api
                                                        out totalPages,
                                                        out rowCount,
                                                        out totalAmount);
+
+
 
             return new ApiListResultTotalAmount<DepositRequest>
             {
@@ -209,7 +211,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult(selLangBLL);
             var depositConfirmReuslt = -1;
 
-            if (depositReq.Action == (int)DepositStatus.Approved)
+            if (depositReq.Action == (int)DepositStatusEnum.Approved)
             {
                 if (depositReq.ActualDeposit > 0)
                     depositConfirmReuslt = depositBLL.DepositApproved(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment, User.Identity.Name);
@@ -248,7 +250,7 @@ namespace BackendSite.Controllers.Api
                     }
                 }
             }
-            else if (depositReq.Action == (int)DepositStatus.Rejected)
+            else if (depositReq.Action == (int)DepositStatusEnum.Rejected)
             {
                 depositConfirmReuslt = depositBLL.DepositRejectd(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment, User.Identity.Name);
 
@@ -270,15 +272,15 @@ namespace BackendSite.Controllers.Api
                     }
                 }
             }
-            else if (depositReq.Action == (int)DepositStatus.Draft)
+            else if (depositReq.Action == (int)DepositStatusEnum.Draft)
             {
                 depositConfirmReuslt = depositBLL.DepositDraft(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment, User.Identity.Name);
             }
-            else if (depositReq.Action == (int)DepositStatus.OnHold)
+            else if (depositReq.Action == (int)DepositStatusEnum.OnHold)
             {
                 depositConfirmReuslt = depositBLL.DepositOnHold(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment, User.Identity.Name);
             }
-            else if (depositReq.Action == (int)DepositStatus.Pending)
+            else if (depositReq.Action == (int)DepositStatusEnum.Pending)
             {
                 depositConfirmReuslt = depositBLL.DepositPending(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment, User.Identity.Name);
             }
@@ -484,6 +486,8 @@ namespace BackendSite.Controllers.Api
                     data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                     if (data.DepositTime != null) 
                         data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    if (data.ApprovedTime != null)
+                        data.ApprovedTime = new DateTimeOffset(data.ApprovedTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 }
                 apiListResult.Data = searchResult.DepositTimeList;
                 apiListResult.PageNumber = searchResult.PageNumber;
@@ -509,7 +513,9 @@ namespace BackendSite.Controllers.Api
             foreach (var data in exportData)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8); 
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (data.EndFlowTime != null) 
+                    data.EndFlowTime = new DateTimeOffset(data.EndFlowTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
             var stream = excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DepositTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

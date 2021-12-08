@@ -60,8 +60,8 @@ namespace BackendSite.Controllers.Api
             if (transferInfoReq.endDate > 2147483647)
                 transferInfoReq.endDate = 2147483647;
 
-            var startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)transferInfoReq.startDate);
-            var endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)transferInfoReq.endDate);
+            var startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)transferInfoReq.startDate).AddHours(-8); ;
+            var endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)transferInfoReq.endDate).AddHours(-8); ;
 
             var data = tpBLL.GetTpTransferInfoByCust(transferInfoReq.CustId,
                                                      transferInfoReq.TransId,
@@ -170,7 +170,7 @@ namespace BackendSite.Controllers.Api
             var inTpTransfer = new AdminTpTransfer() { TpId = TpId, CustId = custInfosDetail.CustId, Amount = Amount, direction = (TpDirection)Opt, Operator = User.Identity.Name, Remarks = Memo };
 
             var result = await tpBLL.AdminAdjustmentTransferAsync(inTpTransfer);
-            if (result.ErrorCode == (int)ErrorCodeType.Success)
+            if (result.ErrorCode == (int)ErrorCodeEnum.Success)
             {
                 var param = new
                 {

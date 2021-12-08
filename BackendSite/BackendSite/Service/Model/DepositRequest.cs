@@ -253,8 +253,11 @@ namespace BackendSite.Service.Model
         public DateTimeOffset? DepositTime { get; set; }
         public string CompleteTime { get; set; }
         public string DepositTypeName => Enum.GetName(typeof(DepositTypeEnum), DepositType);
-        public string StatusName => Enum.GetName(typeof(DepositStatus), Status);
+        public string StatusName => Enum.GetName(typeof(DepositStatusEnum), Status);
         public int DepositId { get; set; }
+        public DateTimeOffset? ApprovedTime { get; set; }
+        public string ToApprovedTime { get; set; }
+        public string ApprovedBy { get; set; }
     }
 
     public class DepositTimeReportOldPara : ApiRequestPageModel
@@ -298,6 +301,9 @@ namespace BackendSite.Service.Model
         public DateTimeOffset CreateTime { get; set; }
         public DateTimeOffset UpdateTime { get; set; }
         public string CompleteTime { get; set; }
+        public DateTimeOffset? EndFlowTime { get; set; }
+        public string ToApprovedTime { get; set; }
+        public string ApprovedBy { get; set; }
     }
     public class DepositRequestAmountPara
     {

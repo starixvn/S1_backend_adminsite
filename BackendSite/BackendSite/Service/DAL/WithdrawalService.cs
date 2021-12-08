@@ -384,7 +384,7 @@ namespace BackendSite.Service.DAL
             string comment,
             string forStatus,
             string updater,
-            WithdrawalStatus status,
+            WithdrawalStatusEnum status,
             string withdrawalInfo,
             int? withdrawalType,
             out int custId,
@@ -410,7 +410,7 @@ namespace BackendSite.Service.DAL
                 result = SetWithdrawalInfo(withdrawalId, siteId, comment,
                     forStatus, updater, status,
                     /*Approved don't to Set WithdrawalInfo*/
-                    (status == WithdrawalStatus.Approved ? null : withdrawalInfo),
+                    (status == WithdrawalStatusEnum.Approved ? null : withdrawalInfo),
                     withdrawalType,
                     out custId, out var userName, out amount, out paraLog,
                     conn, trans);
@@ -427,7 +427,7 @@ namespace BackendSite.Service.DAL
                         //step3: special Flow by Status.
                         switch (status)
                         {
-                            case WithdrawalStatus.Rejected:
+                            case WithdrawalStatusEnum.Rejected:
                                 var balanceResult = 0;
                                 var type = 2 + TypePosition; /*Rejected  Withdrawal 1002*/
 
@@ -441,7 +441,7 @@ namespace BackendSite.Service.DAL
 
 
                                 break;
-                            case WithdrawalStatus.Approved:
+                            case WithdrawalStatusEnum.Approved:
                                 var dummyResult = 0;
                                 var accountingResult = 0;
                                 var withdrawalInfoData = JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalInfo);
@@ -450,7 +450,7 @@ namespace BackendSite.Service.DAL
 
                                 switch (withdrawalType)
                                 {
-                                    case (int)WithdrawalType.OnlinePayment:
+                                    case (int)WithdrawalTypeEnum.OnlinePayment:
                                         dummyResult = _walletService.SetPayDummy(siteId,
                                             withdrawalInfoData.PayId ?? 0,
                                             withdrawalInfoData.CurrencyId ?? 0,
@@ -458,7 +458,7 @@ namespace BackendSite.Service.DAL
                                             conn,
                                             trans);
                                         break;
-                                    case (int)WithdrawalType.LocalBank:
+                                    case (int)WithdrawalTypeEnum.LocalBank:
                                         dummyResult = _walletService.SetBankOffDummy(siteId,
                                             withdrawalInfoData.FromSysId ?? 0,
                                             withdrawalInfoData.FromAccountNo,
@@ -475,7 +475,7 @@ namespace BackendSite.Service.DAL
                                 {
                                     //Insert Withdrawal Accounting
                                     var withdrawalInfoItem = GetWithdrawalInfo(0, transId);
-                                    if (withdrawalType == (int)WithdrawalType.LocalBank)
+                                    if (withdrawalType == (int)WithdrawalTypeEnum.LocalBank)
                                     {
                                         var model = new WithdrawalBankAccountingModel()
                                         {
@@ -517,7 +517,7 @@ namespace BackendSite.Service.DAL
             }
             catch (Exception ex)
             {
-                SetWithdrawalLog(withdrawalId, siteId, ex.Message, (int)WithdrawalStatus.Error, updater);
+                SetWithdrawalLog(withdrawalId, siteId, ex.Message, (int)WithdrawalStatusEnum.Error, updater);
                 _logger.LogError(ex,
                     $"TransactionFlow:SetWithdrawalInfo,Para:{JsonConvert.SerializeObject(paraLog)}");
             }
@@ -530,7 +530,7 @@ namespace BackendSite.Service.DAL
             string comment,
             string forStatus,
             string updater,
-            WithdrawalStatus status,
+            WithdrawalStatusEnum status,
             string withdrawalInfo,
             int? withdrawalType,
             out int custId,
@@ -598,7 +598,7 @@ namespace BackendSite.Service.DAL
         {
             using var conn =
                 new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.QueryFirstOrDefault<WithdrawalRequest>("Admin_WithdrawalInfo_Get",
+            return conn.QueryFirstOrDefault<WithdrawalRequest>("Admin_WithdrawalInfo_Get_V2",
                 new { _WithdrawalId = withdrawalId, _TransId = transId }, commandType: CommandType.StoredProcedure);
         }
 

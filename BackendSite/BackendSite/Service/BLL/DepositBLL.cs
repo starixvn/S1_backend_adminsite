@@ -191,44 +191,44 @@ namespace BackendSite.Service.BLL
 
         public int DepositApproved(string transId, decimal actualDeposit, string comment, string Operator)
         {
-            var forStatus = new List<int> {(int)DepositStatus.Pending};
+            var forStatus = new List<int> {(int)DepositStatusEnum.Pending};
             var depositRequest = GetDepositRequest(transId);
 
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, depositRequest.Amount, comment, Operator, forStatus, DepositStatus.Approved, depositRequest);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, depositRequest.Amount, comment, Operator, forStatus, DepositStatusEnum.Approved, depositRequest);
         }
 
         public int DepositRejectd(string transId, decimal actualDeposit, string comment, string Operator)
         {
-            var forStatus = new List<int> {(int)DepositStatus.Pending};
+            var forStatus = new List<int> {(int)DepositStatusEnum.Pending};
 
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.Rejected, null);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.Rejected, null);
         }
 
         public int DepositDraft(string transId, decimal actualDeposit, string comment, string Operator)
         {
             var forStatus = new List<int>
             {
-                (int) DepositStatus.Pending,
-                (int) DepositStatus.OnHold
+                (int) DepositStatusEnum.Pending,
+                (int) DepositStatusEnum.OnHold
             };
 
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.Draft, null);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.Draft, null);
         }
         public int DepositOnHold(string transId, decimal actualDeposit, string comment, string Operator)
         {
             var forStatus = new List<int>();
-            forStatus.Add((int)DepositStatus.Pending);
+            forStatus.Add((int)DepositStatusEnum.Pending);
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.OnHold, null);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.OnHold, null);
         }
         public int DepositPending(string transId, decimal actualDeposit, string comment, string Operator)
         {
             var forStatus = new List<int>();
-            forStatus.Add((int)DepositStatus.OnHold);
+            forStatus.Add((int)DepositStatusEnum.OnHold);
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.Pending, null);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.Pending, null);
         }
         public DepositReceipt GetDepositReceipt(string transId)
         {
@@ -280,10 +280,17 @@ namespace BackendSite.Service.BLL
 
              result?.DepositTimeList.ForEach(x =>
             {
-                var ts1 = new TimeSpan(x.CreateTime.Ticks);
-                var ts2 = new TimeSpan(x.UpdateTime.Ticks);
-                var ts = ts1.Subtract(ts2).Duration();
+                var tsC = new TimeSpan(x.CreateTime.Ticks);
+                var tsU = new TimeSpan(x.UpdateTime.Ticks);
+                var ts = tsC.Subtract(tsU).Duration();
                 x.CompleteTime = GetTimeString(ts);
+                
+                if (x.ApprovedTime > DateTime.Now.AddYears(-1000))
+                {
+                    var tsA = new TimeSpan(x.ApprovedTime.Value.Ticks);
+                    var ts2 = tsC.Subtract(tsA).Duration();
+                    x.ToApprovedTime =GetTimeString(ts2);
+                }
             });
 
             return result;
@@ -300,6 +307,13 @@ namespace BackendSite.Service.BLL
                 var ts1 = new TimeSpan(x.CreateTime.Ticks);
                 var ts2 = new TimeSpan(x.UpdateTime.Ticks);
                 var ts = ts1.Subtract(ts2).Duration();
+                
+                if (x.ApprovedTime > DateTime.Now.AddYears(-1000))
+                {
+                    var tsA = new TimeSpan(x.ApprovedTime.Value.Ticks);
+                    var ts3 = ts1.Subtract(tsA).Duration();
+                    x.ToApprovedTime =GetTimeString(ts3);
+                }
                 exportDataToExcel.Add(new DepositTimeExportData
                 {
                     SiteName = x.SiteName,
@@ -310,7 +324,10 @@ namespace BackendSite.Service.BLL
                     Status = x.StatusName,
                     CreateTime = x.CreateTime.DateTime,
                     UpdateTime = x.UpdateTime.DateTime,
-                    CompleteTime = GetTimeString(ts)
+                    CompleteTime = GetTimeString(ts),
+                    ToApprovedTime = x.ToApprovedTime,
+                    EndFlowTime = x.ApprovedTime,
+                    ApprovedBy = x.ApprovedBy
                 });
             });
             return exportDataToExcel;

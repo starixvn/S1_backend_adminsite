@@ -66,7 +66,12 @@ namespace BackendSite.Service.Model.enums
 
         [Description("msg_WithdrawalLimitAdjustmentNotBalance")]
         WithdrawalLimitAdjustmentNotBalance = 4002,
-
+        [Description("msg_TransferError")]
+        TransferError = 4003,
+        [Description("msg_BalanceAdjustmentError")]
+        BalanceAdjustmentError = 4004,
+        [Description("msg_FileTypeError")]
+        FileTypeError = 4005,
         #endregion
 
         #region CSD

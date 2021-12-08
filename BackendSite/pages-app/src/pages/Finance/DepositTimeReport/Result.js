@@ -34,7 +34,16 @@ const dataColumnDefs = () => {
       body: {
         format: dateFormat,
       },
+    }, 
+    {
+      dataColumn: "approvedTime",
+      columnTitle: "Flow End Time" + " (" + moment().format("Z") + ")",
+      body: {
+          format: dateFormat,
+      },
     },
+    { dataColumn: "toApprovedTime", columnTitle: "To Approved Time" },
+    { dataColumn: "approvedBy", columnTitle: "Approved By" },
     { dataColumn: "completeTime", columnTitle: "Complete Time" },
   ];
 };
@@ -66,6 +75,13 @@ const Panel = (props) => {
           subData[s] = data[s];
         });
       }
+      
+        if (element.dataColumn === "approvedTime") {
+            if (data.approvedTime == null ) {
+                data[element.dataColumn] = null;
+            }
+        }
+        
       return (
         <td
           key={`td-${element.dataColumn}-${idx}`}
@@ -133,6 +149,7 @@ const numberFormat = (number) => {
   return number_format(number_toFixed(number, 0));
 };
 const dateFormat = (createTime) => {
+    if (createTime == null) return "";
   return moment(createTime).format("l LTS");
 };
 

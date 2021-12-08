@@ -25,6 +25,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly GameCasinoBLL _gameCasinoBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly VipLevelBLL _vipLevelBll;
+        private readonly CustVerifyBLL _custVerifyBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
         public BaseDataController(IServiceProvider provider)
@@ -34,6 +35,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _gameCasinoBll = provider.GetRequiredService<GameCasinoBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
+            _custVerifyBll = provider.GetRequiredService<CustVerifyBLL>();
         }
 
         #region Model
@@ -115,6 +117,13 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int SiteId { get; set; }
         }
 
+        public class GetBankInfoOffListByCustVerifyRequest
+        {
+            public string SabaId { get; set; }
+            public string UserName { get; set; }
+            public int SiteId { get; set; }
+        }
+
         #endregion
 
         /// <summary>
@@ -129,15 +138,15 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// Use：Finance > Withdrawal Request > [select Pay], When Type = 2.Local Bank.
         /// 
         /// </remarks>
-        /// <param name="withdrawalReq"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         //有新舊API，這支是新API，另一支新的API=api/Withdrawal/GetBankInfoOffList
         [HttpPost]
-        public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffList(GetBankInfoOffListRequest withdrawalReq)
+        public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffList(GetBankInfoOffListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
-            var bankInfoOff = _bankDetailBll.GetBankInfoOff(withdrawalReq.SiteId);
-            bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == withdrawalReq.CurrencyId && (x.Purpose & 2) > 0)
+            var bankInfoOff = _bankDetailBll.GetBankInfoOff(request.SiteId);
+            bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == request.CurrencyId && (x.Purpose & 2) > 0)
                 .OrderBy(x => x.BSort);
             apiResult.Data = bankInfoOff;
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -154,16 +163,16 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// 
         /// Use：Finance > Withdrawal Request > [select Pay], When Type = 1.Online Payment.
         /// </remarks>
-        /// <param name="withdrawalReq"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         //有新舊API，這支是新API，另一支新的API=api/Withdrawal/GetPayList
         [HttpPost]
-        public ApiResult<IEnumerable<Pay>> GetPayList(GetPayListRequest withdrawalReq)
+        public ApiResult<IEnumerable<Pay>> GetPayList(GetPayListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
             var bankInfoPay = _bankDetailBll.GetBankInfoPay();
             var _payInfo = (from x in bankInfoPay
-                            where x.CurrencyId == withdrawalReq.CurrencyId && x.SysId == withdrawalReq.PayId
+                            where x.CurrencyId == request.CurrencyId && x.SysId == request.PayId
                             select new Pay
                             {
                                 PayId = x.PayId,
@@ -186,16 +195,16 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// Use：Finance > Withdrawal Request > [select Pay], When Type = 4.Crypto Pay.
         /// 
         /// </remarks>
-        /// <param name="withdrawalReq"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         //有新舊API，這支是新API，另一支新的API=api/Withdrawal/GetCryptoPayList
         [HttpPost]
-        public ApiResult<IEnumerable<Pay>> GetCryptoPayList(GetCryptoPayListRequest withdrawalReq)
+        public ApiResult<IEnumerable<Pay>> GetCryptoPayList(GetCryptoPayListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
             var cryptoPay = _bankDetailBll.GetCryptoPay();
             var _payInfo = (from x in cryptoPay
-                            where x.CurrencyId == withdrawalReq.CurrencyId && x.ChannelName.Equals(withdrawalReq.ChannelName, StringComparison.OrdinalIgnoreCase)
+                            where x.CurrencyId == request.CurrencyId && x.ChannelName.Equals(request.ChannelName, StringComparison.OrdinalIgnoreCase)
                             select new Pay
                             {
                                 PayId = x.PayId,
@@ -216,11 +225,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// 
         /// Func Path：CSD > User Bet Limit > [Submit] > Click[Edit] > Check[Available Category] > [Game]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<GameTypeBetLimit>>> GetTpGameTypeListByCategory(GetTpGameTypeListByCategoryReq req)
+        public async Task<ApiResult<IEnumerable<GameTypeBetLimit>>> GetTpGameTypeListByCategory(GetTpGameTypeListByCategoryReq request)
         {
-            var data = await _userBetLimitBll.GetTpGameTypeListbyCategoryAsync(req.CategoryId);
+            var data = await _userBetLimitBll.GetTpGameTypeListbyCategoryAsync(request.CategoryId);
             var apiResult = new ApiResult<IEnumerable<GameTypeBetLimit>>
             {
                 Data = data,
@@ -237,15 +246,15 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// 
         /// Func Path： Slot Tp List 
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<RiskGameCasinoData>>> GetGameCasinoByTpId(GameCasinoByTpIdReq req)
+        public async Task<ApiResult<IEnumerable<RiskGameCasinoData>>> GetGameCasinoByTpId(GameCasinoByTpIdReq request)
         {
             var apiResult = new ApiResult<IEnumerable<RiskGameCasinoData>>();
             try
             {
-                var gameCasinoData = await _gameCasinoBll.GameCasinoByTPIdV3(req.TpId);
+                var gameCasinoData = await _gameCasinoBll.GameCasinoByTPIdV3(request.TpId);
                 apiResult.Data = gameCasinoData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -321,8 +330,53 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             {
                 Data = _vipLevelBll.GetVipLevelSetting(request.SiteId),
                 ErrorCode = (int)ErrorCodeEnum.Success
-        };
+            };
             return apiListResult;
+        }
+
+        /// <summary>
+        /// BaseData/GetBankInfoOffListByCustVerify 根據客戶驗證取得銀行戶口資料清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Deposit Submission > Click[Submit] > Get [Account No] List
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
+        [HttpPost]
+        public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffListByCustVerify(GetBankInfoOffListByCustVerifyRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
+
+            if (!_custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo))
+            {
+                throw new AdminException(ErrorCodeEnum.CustNotFound);
+            }
+
+            if (custInfo != null)
+            {
+                var bankInfoOff = _bankDetailBll.GetBankInfoOff(request.SiteId).Where(x => x.CurrencyId == custInfo.CurrencyId);
+
+                if (bankInfoOff != null)
+                {
+                    apiResult.Data = bankInfoOff;
+                    apiResult.ErrorCode = 0;
+                }
+                else
+                {
+                    apiResult.ErrorCode = 21;
+                    apiResult.Message = "BankAccount not found.";
+                }
+            }
+            else
+            {
+                apiResult.ErrorCode = 21;
+                apiResult.Message = "Player not found.";
+            }
+
+            return apiResult;
         }
 
         #region Private Methods

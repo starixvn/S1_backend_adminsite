@@ -202,7 +202,7 @@ namespace BackendSite.Controllers.Api
             //var apiResult = new ApiResult();
             var withdrawConfirmReuslt = -1;
             var authData = _authorizeBLL.GetAuthData();
-            if (withdrawalReq.Action == (int)WithdrawalStatus.Approved)
+            if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Approved)
             {
                 //Check has pic or not
                 var hasPic = await CheckWithdrawalPictureAsync(withdrawalReq.TransId);
@@ -224,7 +224,7 @@ namespace BackendSite.Controllers.Api
 
                     #region Copy Picture
 
-                    if (withdrawalRequest.WithdrawalType == (int)WithdrawalType.LocalBank
+                    if (withdrawalRequest.WithdrawalType == (int)WithdrawalTypeEnum.LocalBank
                         && hasPic)
                     {
                         await CopyWithdrawalPictureAsync(withdrawalRequest.TransId);
@@ -233,7 +233,7 @@ namespace BackendSite.Controllers.Api
                     #endregion
                 }
             }
-            else if (withdrawalReq.Action == (int)WithdrawalStatus.Rejected)
+            else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Rejected)
             {
                 withdrawConfirmReuslt =
                     withdrawalBLL.WithdrawalRejected(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
@@ -251,20 +251,20 @@ namespace BackendSite.Controllers.Api
                     messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
                 }
             }
-            else if (withdrawalReq.Action == (int)WithdrawalStatus.Verify)
+            else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Verify)
             {
                 withdrawConfirmReuslt =
                     withdrawalBLL.WithdrawalVerify(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
             }
-            else if (withdrawalReq.Action == (int)WithdrawalStatus.Process)
+            else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Process)
             {
                 var withdrawalInfo =
                     Newtonsoft.Json.JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalReq.WithdrawalInfo);
-                if (withdrawalReq.WithdrawalType == (int)WithdrawalType.OnlinePayment)
+                if (withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.OnlinePayment)
                 {
                     withdrawalInfo.PayId = withdrawalReq.SelId;
                 }
-                else if (withdrawalReq.WithdrawalType == (int)WithdrawalType.LocalBank)
+                else if (withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.LocalBank)
                 {
                     var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
                     var bankInfoOff = bankDetailBLL.GetBankInfoOff(withdrawalRequest.SiteId)
@@ -279,14 +279,14 @@ namespace BackendSite.Controllers.Api
                         withdrawalInfo.BankId = bankInfoOff.BankId;
                     }
                 }
-                else if (withdrawalReq.WithdrawalType == (int)WithdrawalType.CryptoPay)
+                else if (withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.CryptoPay)
                 {
                     withdrawalInfo.PayId = withdrawalReq.SelId;
                     withdrawalInfo.ChannelId = withdrawalReq.ChannelId;
                 }
 
                 if (withdrawalReq.WithdrawalType == null ||
-                    withdrawalReq.WithdrawalType == (int)WithdrawalType.Undefine)
+                    withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.Undefine)
                 {
                     apiResult.ErrorCode = 1101;
                     apiResult.Message = "Select 1 Type of Withdrawal Please.";
@@ -302,8 +302,8 @@ namespace BackendSite.Controllers.Api
                         out custId, out amount);
 
                     if (withdrawConfirmReuslt > 0 &&
-                        ((withdrawalReq.WithdrawalType == (int)WithdrawalType.OnlinePayment) ||
-                         (withdrawalReq.WithdrawalType == (int)WithdrawalType.CryptoPay)))
+                        ((withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.OnlinePayment) ||
+                         (withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.CryptoPay)))
                     {
                         var reqWithdrawalOnline = new ReqWithdrawalOnline
                         {
@@ -321,7 +321,7 @@ namespace BackendSite.Controllers.Api
 
 
                         var myUrl = "";
-                        if (withdrawalReq.WithdrawalType == (int)WithdrawalType.CryptoPay)
+                        if (withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.CryptoPay)
                             myUrl = $"{payApiUrl}CryptoWithdrawal";
                         else
                             myUrl = $"{payApiUrl}Withdrawal";
@@ -345,22 +345,22 @@ namespace BackendSite.Controllers.Api
                     }
                 }
             }
-            else if (withdrawalReq.Action == (int)WithdrawalStatus.OnHold)
+            else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.OnHold)
             {
                 withdrawConfirmReuslt =
                     withdrawalBLL.WithdrawalOnHold(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
             }
-            else if (withdrawalReq.Action == (int)WithdrawalStatus.Draft)
+            else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Draft)
             {
                 withdrawConfirmReuslt =
                     withdrawalBLL.WithdrawalDraft(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
             }
-            else if (withdrawalReq.Action == (int)WithdrawalStatus.Pending)
+            else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Pending)
             {
                 withdrawConfirmReuslt =
                     withdrawalBLL.WithdrawalPending(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
             }
-            else if (withdrawalReq.Action == (int)WithdrawalStatus.ToKyc)
+            else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.ToKyc)
             {
                 withdrawConfirmReuslt =
                     withdrawalBLL.WithdrawalToKyc(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
@@ -506,8 +506,8 @@ namespace BackendSite.Controllers.Api
             if (withdrawalReq.endDate > 2147483647)
                 withdrawalReq.endDate = 2147483647;
 
-            var startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)withdrawalReq.startDate);
-            var endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)withdrawalReq.endDate);
+            var startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)withdrawalReq.startDate).AddHours(-8);
+            var endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)withdrawalReq.endDate).AddHours(-8);
 
             var data = withdrawalBLL.GetWithdrawalListByCust(withdrawalReq.CustId,
                 withdrawalReq.TransId,
@@ -899,7 +899,7 @@ namespace BackendSite.Controllers.Api
                     PageNumber = para.PageNumber,
                     PageSize = para.PageSize
                 };
-                
+
                 var searchResult = withdrawalBLL.WithdrawalTimeReportGet(req);
 
                 foreach (var data in searchResult.WithdrawalTimeList)
@@ -914,7 +914,7 @@ namespace BackendSite.Controllers.Api
                     if (data.DepositTime != null)
                         data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 }
-                
+
                 apiListResult.Data = searchResult.WithdrawalTimeList;
                 apiListResult.PageNumber = searchResult.PageNumber;
                 apiListResult.TotalPages = searchResult.TotalPages;
@@ -939,12 +939,12 @@ namespace BackendSite.Controllers.Api
             var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(endDate);
             var exportData =
                 withdrawalBLL.WithdrawalTimeExportGet(selectSite, withdrawalId, startTime, endTime, status, currencyId);
-            
+
             foreach (var data in exportData)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-                if (data.FlowEndTime != null) 
+                if (data.FlowEndTime != null)
                     data.FlowEndTime = new DateTimeOffset(data.FlowEndTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
             var stream = excelBLL.Export(exportData);

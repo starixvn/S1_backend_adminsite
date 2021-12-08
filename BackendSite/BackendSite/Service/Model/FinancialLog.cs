@@ -9,7 +9,7 @@ namespace BackendSite.Service.Model
         public int Id { get; set; }
         public DateTime CreateTime { get; set; }
         public string TypeName { get; set; }
-        public Direction Direction { get; set; }
+        public DirectionEnum Direction { get; set; }
         public decimal ChangeAmount { get; set; }
         public decimal BeforeAmount { get; set; }
         public decimal AfterAmount { get; set; }
@@ -21,7 +21,7 @@ namespace BackendSite.Service.Model
         public int Id { get; set; }
         public DateTime CreateTime { get; set; }
         public string TypeName { get; set; }
-        public Direction Direction { get; set; }
+        public DirectionEnum Direction { get; set; }
         public decimal ChangeBonus { get; set; }
         public decimal BeforeBonus { get; set; }
         public decimal AfterBonus { get; set; }
