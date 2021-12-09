@@ -119,7 +119,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\ApiV2\Admin\SpecialFunc\" />
     <Folder Include="Controllers\ApiV2\Admin\Permission\" />
     <Folder Include="Controllers\ApiV2\Finance\DepositSetting\" />
     <Folder Include="Controllers\ApiV2\Marketing\Bonus\" />

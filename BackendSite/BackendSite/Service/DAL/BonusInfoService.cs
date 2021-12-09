@@ -99,6 +99,19 @@ namespace BackendSite.Service.DAL
             var SpName = "Admin_PendingBonusList_Get";
             return conn.Query<PendingBonus>(SpName, commandType: CommandType.StoredProcedure);
         }
+        
+        public CancelBonus GetTransferBonusCancel(int bonusId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.QueryFirstOrDefault<CancelBonus>("Admin_TransferBonusCancel_Get",new { _BonusId = bonusId },commandType: CommandType.StoredProcedure);
+        }
+        
+        public IEnumerable<decimal> GetBonusWinLoss(int bonusId)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<decimal>("Service_BonusWinLoss_Get", new { BonusId = bonusId },commandType: CommandType.StoredProcedure);
+        }
+        
         public int CancelBonusByBonusId(bool isReturnAmount, int bonusId, string statusList, out int custId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
