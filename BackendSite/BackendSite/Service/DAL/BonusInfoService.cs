@@ -104,7 +104,7 @@ namespace BackendSite.Service.DAL
         public CancelBonus GetTransferBonusCancel(int bonusId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.QueryFirstOrDefault<CancelBonus>("Admin_TransferBonusCancel_Get",new { _BonusId = bonusId },commandType: CommandType.StoredProcedure);
+            return conn.QueryFirstOrDefault<CancelBonus>("Admin_BonusCancel_Get",new { _BonusId = bonusId },commandType: CommandType.StoredProcedure);
         }
         
         public IEnumerable<decimal> GetBonusWinLoss(int bonusId)

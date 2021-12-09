@@ -497,4 +497,9 @@ namespace BackendSite.Service.Model.enums
         Success = 3,
         Failed = 4
     }
+    public enum TpEnum
+    {
+        SA = 2,
+        PT = 27
+    }
 }

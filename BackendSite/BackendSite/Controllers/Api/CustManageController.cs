@@ -1472,11 +1472,10 @@ namespace BackendSite.Controllers.Api
         public ApiResult CancelBonusByBonusId(BonusReq bonusReq)
         {
             var apiResult = new ApiResult();
-
             var data = _bonusInfoBll.GetTransferBonusCancel(bonusReq.BonusId);
             
             //轉帳制
-            if (data != null && (data.TpId == 1 || data.TpId == 27))
+            if (data != null && (data.TpId == (int)TpEnum.SA || data.TpId == (int)TpEnum.PT))
             {
                 if( data.Status == (int) BonusStatus.Running )
                 {
@@ -1527,28 +1526,47 @@ namespace BackendSite.Controllers.Api
                                 RemainingBonus = remainingBonus,
                                 RefundAmount = refundAmount
                             };
-                            _bonusInfoBll.BonusCancelTransfer(tpBonusCancelTransfer);
+                            var result = _bonusInfoBll.BonusCancelTransfer(tpBonusCancelTransfer);
+                            apiResult.ErrorCode = result.ErrorCode;
+                            apiResult.Message = result.Message;
                         }
                         else
                         {
-                            _custInfoBll.CancelBonusByBonusId(bonusReq.BonusId);
-                            
-                            var title = _selLangBll.GetResourceValue("lbl_CancelBonusTitle", data.UserLang);
-                            var msg = new StringBuilder();
-                            msg.AppendLine(_selLangBll.GetResourceValue("lbl_CancelBonus1", data.UserLang));
-                            var authData = _authorizeBll.GetAuthData();
-                            _messageBll.SendMessageToPlayer("Bonus Service", title,msg.ToString(),data.CustId,authData.UserId);
+                            var result = _custInfoBll.CancelBonusByBonusId(bonusReq.BonusId);
+
+                            if (result > 0)
+                            {
+                                var title = _selLangBll.GetResourceValue("lbl_CancelBonusTitle", data.UserLang);
+                                var msg = new StringBuilder();
+                                msg.AppendLine(_selLangBll.GetResourceValue("lbl_CancelBonus1", data.UserLang));
+                                var authData = _authorizeBll.GetAuthData();
+                                _messageBll.SendMessageToPlayer("Bonus Service", title,msg.ToString(),data.CustId,authData.UserId);
+                                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                            }
+                            else
+                            {
+                                apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                                apiResult.Message = "Fail.";
+                            }
                         } 
                         break; 
                 }
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success; 
                 return apiResult;
             }
             
             //單一錢包
             if (data != null)
             {
-                _bonusInfoBll.CancelBonusByBonusId(bonusReq.BonusId,out _);
+                var result = _bonusInfoBll.CancelBonusByBonusId(bonusReq.BonusId,out _);
+                if (result > 0)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Fail";
+                }
             }
             else
             {
@@ -1563,7 +1581,6 @@ namespace BackendSite.Controllers.Api
                 {"Action", "Cancel Bonus"}
             };
             _serverInfoBll.AdminOperateLog(null, bonusReq.CustId, "CustManage/CustInfoList", ActionType.Update, info, User.Identity.Name);
-            apiResult.ErrorCode = (int) ErrorCodeEnum.Success; 
             return apiResult;
         }
 
