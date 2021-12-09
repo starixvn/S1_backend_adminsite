@@ -52,7 +52,7 @@ namespace BackendSite.Service.BLL
             adminUserService.SetUserStatus(UserId, Status);
         }
 
-        public IEnumerable<AdminUser> AddUser(string UserName, string Userpwd, int[] SiteList, int? GroupSEQ)
+        public IEnumerable<AdminUser> AddUser(string UserName, string Userpwd, IEnumerable<int> SiteList, int? GroupSEQ)
         {
             var MD5Pwd = tools.MD5Encrypt(Userpwd);
             return adminUserService.AddUser(UserName, MD5Pwd, SiteList, GroupSEQ);
