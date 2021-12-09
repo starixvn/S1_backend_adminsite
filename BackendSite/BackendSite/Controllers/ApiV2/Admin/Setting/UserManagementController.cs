@@ -140,7 +140,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Setting
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Administration > User Setting > Permission > Group > [Edit]
+        /// Func Path：Administration > User Setting > Enable > Click [V] or [ ]
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
