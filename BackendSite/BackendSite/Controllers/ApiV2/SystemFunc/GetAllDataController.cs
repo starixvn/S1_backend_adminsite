@@ -228,6 +228,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// Func Path：Administration > User Setting > Permission > Group > [Edit]
         /// </remarks>
         /// <returns></returns>
+        [HttpPost]
         public ApiResult<IEnumerable<AdminGroup>> GetGroupList()
         {
             var apiResult = new ApiResult<IEnumerable<AdminGroup>>
