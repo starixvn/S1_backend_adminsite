@@ -4,8 +4,10 @@ using System.Linq;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -141,6 +143,16 @@ namespace BackendSite.Service.BLL
             var myUrl = $"{_apiUrl}BonusCancelTransfer";
             var data = _courierAdapter.MyPostAsync<TransferResult, TpBonusCancelTransfer>(myUrl, tpBonusCancelTransfer).Result;
             return data;
+        }
+        
+        public int CancelBonusByBonusId(int bonusId ,out int custId)
+        {
+            var statusList = new List<int>
+            {
+                (int) BonusStatusType.Running,
+            };
+
+            return _bonusInfoService.CancelBonusByBonusId(true, bonusId, JsonConvert.SerializeObject(statusList), out custId);
         }
     }
 }

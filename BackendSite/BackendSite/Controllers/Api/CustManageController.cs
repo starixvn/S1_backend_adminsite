@@ -16,8 +16,10 @@ using LazZiya.ImageResize;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Logical;
 
 namespace BackendSite.Controllers.Api
 {
@@ -29,48 +31,40 @@ namespace BackendSite.Controllers.Api
     {
         #region Fields
 
-        private readonly CustInfoBLL custInfoBLL;
-        private readonly WinLostReportService winLostReportService;
-        private readonly PermissionBLL permissionBLL;
-        private readonly ServerInfoBLL serverInfoBLL;
-        private readonly Common common;
-        private readonly PaymentBLL paymentBLL;
-        private readonly ExcelBLL excelBLL;
+        private readonly CustInfoBLL _custInfoBll;
+        private readonly WinLostReportService _winLostReportService;
+        private readonly PermissionBLL _permissionBll;
+        private readonly ServerInfoBLL _serverInfoBll;
+        private readonly Common _common;
+        private readonly PaymentBLL _paymentBll;
+        private readonly ExcelBLL _excelBll;
         private readonly ImageEditorBLL _imageEditorBll;
-        private readonly BonusInfoBLL _bonusInfoBLL;
-        private readonly SelLangBLL _selLangBLL;
-        private readonly MessageBLL _messageBLL;
-        private readonly AuthorizeBLL _authorizeBLL;
+        private readonly BonusInfoBLL _bonusInfoBll;
+        private readonly SelLangBLL _selLangBll;
+        private readonly MessageBLL _messageBll;
+        private readonly AuthorizeBLL _authorizeBll;
+        private readonly BonusInfoService _bonusInfoService;
+        
 
         #endregion
 
         #region Constructors
 
-        public CustManageController(CustInfoBLL custInfoBLL,
-            WinLostReportService winLostReportService,
-            PermissionBLL permissionBLL,
-            ServerInfoBLL serverInfoBLL,
-            Common common,
-            PaymentBLL paymentBLL,
-            ExcelBLL excelBLL,
-            BonusInfoBLL bonusInfoBLL,
-            ImageEditorBLL imageEditorBll,
-            SelLangBLL selLangBLL,
-            MessageBLL messageBLL,
-            AuthorizeBLL authorizeBLL)
+        public CustManageController(IServiceProvider provider)
         {
-            this.custInfoBLL = custInfoBLL;
-            this.winLostReportService = winLostReportService;
-            this.permissionBLL = permissionBLL;
-            this.serverInfoBLL = serverInfoBLL;
-            this.common = common;
-            this.paymentBLL = paymentBLL;
-            this.excelBLL = excelBLL;
-            _bonusInfoBLL = bonusInfoBLL;
-            _imageEditorBll = imageEditorBll;
-            _selLangBLL = selLangBLL;
-            _messageBLL = messageBLL;
-            _authorizeBLL = authorizeBLL;
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
+            _winLostReportService = provider.GetRequiredService<WinLostReportService>();
+            _permissionBll = provider.GetRequiredService<PermissionBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+            _common = provider.GetRequiredService<Common>();
+            _paymentBll = provider.GetRequiredService<PaymentBLL>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _bonusInfoBll = provider.GetRequiredService<BonusInfoBLL>();
+            _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
+            _selLangBll = provider.GetRequiredService<SelLangBLL>();
+            _messageBll = provider.GetRequiredService<MessageBLL>();
+            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
         }
 
         #endregion
@@ -343,7 +337,7 @@ namespace BackendSite.Controllers.Api
                 endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoListReq.EndDate);
             }
 
-            var data = custInfoBLL.GetCustInfoList(custInfoListReq.SelectSite,
+            var data = _custInfoBll.GetCustInfoList(custInfoListReq.SelectSite,
                                                    custInfoListReq.BirDate,
                                                    custInfoListReq.BirMonth,
                                                    custInfoListReq.BirYear,
@@ -434,7 +428,7 @@ namespace BackendSite.Controllers.Api
                 endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoReq.EndDate);
             }
 
-            var data = custInfoBLL.GetCustInfoExportList(custInfoReq.SelectSite,
+            var data = _custInfoBll.GetCustInfoExportList(custInfoReq.SelectSite,
                                                                     custInfoReq.BirDate,
                                                                     custInfoReq.BirMonth,
                                                                     custInfoReq.BirYear,
@@ -454,8 +448,8 @@ namespace BackendSite.Controllers.Api
 
             data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
 
-            var stream = excelBLL.Export(data);
-            return excelBLL.ExcelFile(stream, "CustInfoList");
+            var stream = _excelBll.Export(data);
+            return _excelBll.ExcelFile(stream, "CustInfoList");
         }
 
         #endregion
@@ -477,10 +471,10 @@ namespace BackendSite.Controllers.Api
         public async Task<ApiResult<CustInfoDetail>> GetCustInfoDetailAsync(CustInfoReq custInfoReq)
         {
 
-            var custInfoDetail = await custInfoBLL.GetCustInfoDetailAsync(custInfoReq.CustId, custInfoReq.UserName);
+            var custInfoDetail = await _custInfoBll.GetCustInfoDetailAsync(custInfoReq.CustId, custInfoReq.UserName);
             if (custInfoDetail != null)
             {
-                if (!permissionBLL.CheckPermission("CustManage/CustInfoList", "ca_readDetail"))
+                if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_readDetail"))
                 {
                     custInfoDetail.Email = MaskEmail(custInfoDetail.Email);
                     custInfoDetail.PhoneNo = MaskPhone(custInfoDetail.PhoneNo);
@@ -514,7 +508,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetCustBonus(CustBonusReq custBonusReq)
         {
-            var data = custInfoBLL.GetCustBonus(custBonusReq.CustId);
+            var data = _custInfoBll.GetCustBonus(custBonusReq.CustId);
             return new ApiResult<IEnumerable<CustBonus>>
             {
                 Data = data,
@@ -537,7 +531,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetRebateInfoByCust(CustBonusReq custBonusReq)
         {
-            var data = paymentBLL.GetRebateInfoByCust(custBonusReq.CustId);
+            var data = _paymentBll.GetRebateInfoByCust(custBonusReq.CustId);
             return new ApiResult<IEnumerable<RebateInfo>>
             {
                 Data = data,
@@ -560,7 +554,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<bool>();
             int OldStatus = 0;
             int NewStatus = 0;
-            var custSwitchInfo = custInfoBLL.GetCustSwitchStatus(custStatusSwitch.CustId);
+            var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(custStatusSwitch.CustId);
             switch (custStatusSwitch.Op)
             {
                 case 1:
@@ -577,7 +571,7 @@ namespace BackendSite.Controllers.Api
                     break;
             }
             NewStatus = OldStatus == 0 ? 1 : 0;
-            var data = custInfoBLL.SetCustStatusSwitch(custStatusSwitch.CustId, custStatusSwitch.Op) > 0;
+            var data = _custInfoBll.SetCustStatusSwitch(custStatusSwitch.CustId, custStatusSwitch.Op) > 0;
 
             if (data)
             {
@@ -608,7 +602,7 @@ namespace BackendSite.Controllers.Api
                     Info.Add("OldStatus", OldStatus == 0 ? "NO" : "YES");
                     Info.Add("NewStatus", NewStatus == 0 ? "NO" : "YES");
                 }
-                serverInfoBLL.AdminOperateLog(null, custStatusSwitch.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                _serverInfoBll.AdminOperateLog(null, custStatusSwitch.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
                 return new ApiResult
                 {
@@ -631,8 +625,8 @@ namespace BackendSite.Controllers.Api
         public ApiResult SetCustInfo(CustStatus custStatus)
         {
             var apiResult = new ApiResult<bool>();
-            var custProfile = custInfoBLL.GetCustProfile(custStatus.CustId);
-            var data = custInfoBLL.SetCustInfo(custStatus.CustId, custStatus.Level, custStatus.FullName, custStatus.Birthday_Y, custStatus.Birthday_M, custStatus.Birthday_D, custStatus.PhoneNumber, custStatus.EMail, User.Identity.Name) > 0;
+            var custProfile = _custInfoBll.GetCustProfile(custStatus.CustId);
+            var data = _custInfoBll.SetCustInfo(custStatus.CustId, custStatus.Level, custStatus.FullName, custStatus.Birthday_Y, custStatus.Birthday_M, custStatus.Birthday_D, custStatus.PhoneNumber, custStatus.EMail, User.Identity.Name) > 0;
 
             if (data)
             {
@@ -665,7 +659,7 @@ namespace BackendSite.Controllers.Api
                     Info.Add("Before Change EMail", custProfile.Email);
                 }
 
-                serverInfoBLL.AdminOperateLog(null, custStatus.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                _serverInfoBll.AdminOperateLog(null, custStatus.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
                 return new ApiResult
                 {
@@ -693,7 +687,7 @@ namespace BackendSite.Controllers.Api
         [HttpGet]
         public IActionResult GetCustPhotoId(int CustId)
         {
-            var custPhotoId = custInfoBLL.GetCustPhotoId(CustId);
+            var custPhotoId = _custInfoBll.GetCustPhotoId(CustId);
             if (custPhotoId == null)
             {
                 //return StatusCode(404);
@@ -714,7 +708,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public async Task<ApiResult> UploadCustPhotoId([FromForm] int CustId, [FromForm] IFormFile File)
         {
-            var custInfo = custInfoBLL.GetCustInfoWithCache(CustId);
+            var custInfo = _custInfoBll.GetCustInfoWithCache(CustId);
             if (!_contentTypesCheck.ContainsKey(File.ContentType))
                 throw new AdminException(ErrorCodeEnum.FileTypeNotMatch);
 
@@ -725,7 +719,7 @@ namespace BackendSite.Controllers.Api
             fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
             fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
 
-            var result = custInfoBLL.SetCustPhotoId(custInfo.CustId, custInfo.SiteId, fileName, fileBytes);
+            var result = _custInfoBll.SetCustPhotoId(custInfo.CustId, custInfo.SiteId, fileName, fileBytes);
                 
             if (result > 0)
             {
@@ -747,7 +741,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         public ApiResult DelCustPhotoId(CustInfoReq custInfoReq)
         {
-            var data = custInfoBLL.DelCustPhotoId(custInfoReq.CustId);
+            var data = _custInfoBll.DelCustPhotoId(custInfoReq.CustId);
 
             if (data)
             {
@@ -755,7 +749,7 @@ namespace BackendSite.Controllers.Api
                 var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("Action", "Delete Photo");
-                serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                _serverInfoBll.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
                 return new ApiResult
                 {
@@ -776,8 +770,8 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult ResetProfile(CustInfoReq custInfoReq)
         {
-            var custProfile = custInfoBLL.GetCustProfile(custInfoReq.CustId);
-            if (custInfoBLL.ResetProfile(custInfoReq.CustId))
+            var custProfile = _custInfoBll.GetCustProfile(custInfoReq.CustId);
+            if (_custInfoBll.ResetProfile(custInfoReq.CustId))
             {
                 var Menu = "CustManage/CustInfoList";
                 var Info = new Dictionary<string, dynamic>();
@@ -794,7 +788,7 @@ namespace BackendSite.Controllers.Api
                     });
                 }
 
-                serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                _serverInfoBll.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
                 return new ApiResult
                 {
@@ -816,8 +810,8 @@ namespace BackendSite.Controllers.Api
         public ApiResult ResetCustBankInfo(CustInfoReq custInfoReq)
         {
             var apiResult = new ApiResult();
-            var custProfile = custInfoBLL.GetCustProfile(custInfoReq.CustId);
-            if (custInfoBLL.ResetCustBankInfo(custInfoReq.CustId))
+            var custProfile = _custInfoBll.GetCustProfile(custInfoReq.CustId);
+            if (_custInfoBll.ResetCustBankInfo(custInfoReq.CustId))
             {
                 var Menu = "CustManage/CustInfoList";
                 var Info = new Dictionary<string, dynamic>();
@@ -834,7 +828,7 @@ namespace BackendSite.Controllers.Api
                         Info.Add("IFSCCode", x.IFSCCode);
                     });
                 }
-                serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                _serverInfoBll.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
                 return new ApiResult
                 {
@@ -856,8 +850,8 @@ namespace BackendSite.Controllers.Api
         public ApiResult ResetCustUSDTInfo(CustInfoReq custInfoReq)
         {
             var apiResult = new ApiResult();
-            var custProfile = custInfoBLL.GetCustProfile(custInfoReq.CustId);
-            if (custInfoBLL.ResetCustUSDTInfo(custInfoReq.CustId))
+            var custProfile = _custInfoBll.GetCustProfile(custInfoReq.CustId);
+            if (_custInfoBll.ResetCustUSDTInfo(custInfoReq.CustId))
             {
                 var Menu = "CustManage/CustInfoList";
                 var Info = new Dictionary<string, dynamic>();
@@ -874,7 +868,7 @@ namespace BackendSite.Controllers.Api
                     });
 
                 }
-                serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                _serverInfoBll.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
                 return new ApiResult
                 {
@@ -920,7 +914,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_unlock" })]
         public ApiResult SetUnlock(CustInfoReq setCustStatusReq)
         {
-            if (custInfoBLL.SetCustStatus("CustManage/CustInfoList",
+            if (_custInfoBll.SetCustStatus("CustManage/CustInfoList",
                                           setCustStatusReq.CustId,
                                           1,
                                           setCustStatusReq.Reason,
@@ -952,7 +946,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_lock" })]
         public ApiResult SetLock(CustInfoReq setCustStatusReq)
         {
-            if (custInfoBLL.SetCustStatus("CustManage/CustInfoList",
+            if (_custInfoBll.SetCustStatus("CustManage/CustInfoList",
                                           setCustStatusReq.CustId,
                                           2,
                                           setCustStatusReq.Reason,
@@ -984,7 +978,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult SetClose(CustInfoReq setCustStatusReq)
         {
-            if (custInfoBLL.SetCustStatus("CustManage/CustInfoList",
+            if (_custInfoBll.SetCustStatus("CustManage/CustInfoList",
                                           setCustStatusReq.CustId,
                                           3,
                                           setCustStatusReq.Reason,
@@ -1013,7 +1007,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult SetEnableDisablePromotion(SetEnableDisableBonusPara para)
         {
-            if (custInfoBLL.SetEnableDisablePromotion(para.CustId, para.EnablePromotion, User.Identity.Name) > 0)
+            if (_custInfoBll.SetEnableDisablePromotion(para.CustId, para.EnablePromotion, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -1041,7 +1035,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_kickout" })]
         public ApiResult KickOut(CustInfoReq setCustStatusReq)
         {
-            if (custInfoBLL.DeleteOnUserData("CustManage/CustInfoList",
+            if (_custInfoBll.DeleteOnUserData("CustManage/CustInfoList",
                                                     setCustStatusReq.CustId,
                                                     setCustStatusReq.Reason,
                                                     User.Identity.Name) > 0)
@@ -1090,7 +1084,7 @@ namespace BackendSite.Controllers.Api
             var startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)loginLogReq.startDate);
             var endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)loginLogReq.endDate);
 
-            var withdrawalList = custInfoBLL.GetLoginLogByCust(loginLogReq.CustId, startDate, endDate, 10, loginLogReq.PageNumber, out totalPages, out rowCount);
+            var withdrawalList = _custInfoBll.GetLoginLogByCust(loginLogReq.CustId, startDate, endDate, 10, loginLogReq.PageNumber, out totalPages, out rowCount);
             apiListResult.Data = withdrawalList;
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = loginLogReq.PageNumber;
@@ -1121,13 +1115,13 @@ namespace BackendSite.Controllers.Api
         public ApiResult<string> SetResetPwd(CustInfoReq custInfoReq)
         {
             var NewPwd = "";
-            if (custInfoBLL.SetResetPwd(custInfoReq.CustId, out NewPwd))
+            if (_custInfoBll.SetResetPwd(custInfoReq.CustId, out NewPwd))
             {
                 var Menu = "CustManage/CustInfoList";
                 var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("NewPwd", NewPwd);
-                serverInfoBLL.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                _serverInfoBll.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
                 return new ApiResult<string>
                 {
                     Data = NewPwd,
@@ -1160,7 +1154,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult AddCustNote(AddCustNoteReq addCustNoteReq)
         {
 
-            var data = custInfoBLL.AddCustNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name);
+            var data = _custInfoBll.AddCustNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name);
 
             if (data)
             {
@@ -1168,7 +1162,7 @@ namespace BackendSite.Controllers.Api
                 var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
                 Info.Add("Action", "Add Note");
-                serverInfoBLL.AdminOperateLog(null, addCustNoteReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                _serverInfoBll.AdminOperateLog(null, addCustNoteReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
                 return new ApiResult
                 {
@@ -1200,7 +1194,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<CustNote>>
             {
-                Data = custInfoBLL.GetCustNotes(addCustNoteReq.CustId, 1000, 1, out _, out _),
+                Data = _custInfoBll.GetCustNotes(addCustNoteReq.CustId, 1000, 1, out _, out _),
                 ErrorCode = 0
             };
 
@@ -1222,17 +1216,17 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult SetCustNotes(SetCustNoteReq setCustNoteReq)
         {
-            if (setCustNoteReq.Type == 1 && !permissionBLL.CheckPermission("CustManage/CustInfoList", "ca_noteEdit"))
+            if (setCustNoteReq.Type == 1 && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteEdit"))
             {
                 throw new AdminException(ErrorCodeEnum.PermissionDenied);
             }
-            if (setCustNoteReq.Type == 2 && !permissionBLL.CheckPermission("CustManage/CustInfoList", "ca_noteDelete"))
+            if (setCustNoteReq.Type == 2 && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteDelete"))
             {
                 throw new AdminException(ErrorCodeEnum.PermissionDenied);
             }
             else
             {
-                var data = custInfoBLL.SetCustNotes(setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
+                var data = _custInfoBll.SetCustNotes(setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
 
                 if (data)
                 {
@@ -1247,7 +1241,7 @@ namespace BackendSite.Controllers.Api
                     {
                         Info.Add("Action", "Delete Note");
                     }
-                    serverInfoBLL.AdminOperateLog(null, setCustNoteReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                    _serverInfoBll.AdminOperateLog(null, setCustNoteReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
                     return new ApiResult
                     {
@@ -1296,7 +1290,7 @@ namespace BackendSite.Controllers.Api
             var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(request.StartTime);
             var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(request.EndTime);
 
-            var data = custInfoBLL.GetCustTurnover(request.CustId,
+            var data = _custInfoBll.GetCustTurnover(request.CustId,
                                                    JsonConvert.SerializeObject(request.GameTypes),
                                                    startTime,
                                                    endTime);
@@ -1323,7 +1317,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetAllGameTypeList()
         {
-            var data = winLostReportService.GetAllGameType();
+            var data = _winLostReportService.GetAllGameType();
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
@@ -1359,7 +1353,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiListResult = new ApiListResult<CustBankInfoLog>();
             apiListResult.ErrorCode = 0;
-            var bankInfoPay = custInfoBLL.GetCustBankInfoLogList(bankInfoLogListReq.CustId,
+            var bankInfoPay = _custInfoBll.GetCustBankInfoLogList(bankInfoLogListReq.CustId,
                 1000,
                 1,
                 out var totalPages,
@@ -1391,9 +1385,9 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<CustCryptoWalletLog> GetCryptoWalletLog(CryptoWalletLogListReq cryptoWalletLogListReq)
         {
             var apiListResult = new ApiListResult<CustCryptoWalletLog>();
-            var custInfo = custInfoBLL.GetCustInfoWithCache(cryptoWalletLogListReq.CustId);
+            var custInfo = _custInfoBll.GetCustInfoWithCache(cryptoWalletLogListReq.CustId);
             apiListResult.ErrorCode = 0;
-            var cryptoWalletInfo = custInfoBLL.GetCustCryptoWalletLogList(cryptoWalletLogListReq.CustId,
+            var cryptoWalletInfo = _custInfoBll.GetCustCryptoWalletLogList(cryptoWalletLogListReq.CustId,
                 1000,
                 1,
                 out var totalPages,
@@ -1445,7 +1439,7 @@ namespace BackendSite.Controllers.Api
                 var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
                 var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
 
-                var SearchResult = custInfoBLL.GetPromotionListByCustIdAndDate(CustId, startTime, endTime, PageNumber, PageSize);
+                var SearchResult = _custInfoBll.GetPromotionListByCustIdAndDate(CustId, startTime, endTime, PageNumber, PageSize);
                 //SearchResult.PromotionList.ForEach(s => s.ClaimDate = new DateTimeOffset(s.ClaimDate.DateTime.AddHours(8), TimeSpan.FromHours(8)));
                 apiResult.Data = SearchResult.PromotionList;
                 apiResult.PageNumber = SearchResult.PageNumber;
@@ -1479,10 +1473,19 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult();
 
-            var data = _bonusInfoBLL.GetTransferBonusCancel(bonusReq.BonusId);
-            if (data != null)
+            var data = _bonusInfoBll.GetTransferBonusCancel(bonusReq.BonusId);
+            
+            //轉帳制
+            if (data != null && (data.TpId == 1 || data.TpId == 27))
             {
-                var winLossAmount = _bonusInfoBLL.GetBonusWinLoss(bonusReq.BonusId)?.FirstOrDefault() ?? 0m; 
+                if( data.Status == (int) BonusStatus.Running )
+                {
+                    apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                    apiResult.Message = "Bonus is not successfully redeemed, cancellation not eligible to execute";
+                    return apiResult;
+                }
+                
+                var winLossAmount = _bonusInfoBll.GetBonusWinLoss(bonusReq.BonusId)?.FirstOrDefault() ?? 0m; 
                 var transferBonusAmount = data.BonusAmount + data.LockedAmount; 
                 var remainingBonus = transferBonusAmount + winLossAmount;
             
@@ -1507,6 +1510,8 @@ namespace BackendSite.Controllers.Api
                         {
                             refundAmount = data.LockedAmount;
                         }
+
+                        // var bonus = remainingBonus - refundAmount;
                         
                         //呼叫轉帳 API 扣款
                         if (remainingBonus > 0)
@@ -1522,33 +1527,43 @@ namespace BackendSite.Controllers.Api
                                 RemainingBonus = remainingBonus,
                                 RefundAmount = refundAmount
                             };
-                            _bonusInfoBLL.BonusCancelTransfer(tpBonusCancelTransfer);
+                            _bonusInfoBll.BonusCancelTransfer(tpBonusCancelTransfer);
                         }
                         else
                         {
-                            custInfoBLL.CancelBonusByBonusId(bonusReq.BonusId);
+                            _custInfoBll.CancelBonusByBonusId(bonusReq.BonusId);
                             
-                            var title = _selLangBLL.GetResourceValue("lbl_CancelBonusTitle", data.UserLang);
+                            var title = _selLangBll.GetResourceValue("lbl_CancelBonusTitle", data.UserLang);
                             var msg = new StringBuilder();
-                            msg.AppendLine(_selLangBLL.GetResourceValue("lbl_CancelBonus1", data.UserLang));
-                            var authData = _authorizeBLL.GetAuthData();
-                            _messageBLL.SendMessageToPlayer("Bonus Service", title,msg.ToString(),data.CustId,authData.UserId);
-                            
-                            var info = new Dictionary<string, dynamic>
-                            {
-                                {"MenuName", "Customer Info"},
-                                {"Action", "Cancel Bonus"}
-                            };
-                            serverInfoBLL.AdminOperateLog(null, bonusReq.CustId, "CustManage/CustInfoList", ActionType.Update, info, User.Identity.Name);
+                            msg.AppendLine(_selLangBll.GetResourceValue("lbl_CancelBonus1", data.UserLang));
+                            var authData = _authorizeBll.GetAuthData();
+                            _messageBll.SendMessageToPlayer("Bonus Service", title,msg.ToString(),data.CustId,authData.UserId);
                         } 
                         break; 
                 }
                 apiResult.ErrorCode = (int) ErrorCodeEnum.Success; 
                 return apiResult;
             }
+            
+            //單一錢包
+            if (data != null)
+            {
+                _bonusInfoBll.CancelBonusByBonusId(bonusReq.BonusId,out _);
+            }
+            else
+            {
+                apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                apiResult.Message = "Can't find available bonus";
+                return apiResult;
+            }
 
-            apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
-            apiResult.Message = "Bonus is not successfully redeemed, cancellation not eligible to execute";
+            var info = new Dictionary<string, dynamic>
+            {
+                {"MenuName", "Customer Info"},
+                {"Action", "Cancel Bonus"}
+            };
+            _serverInfoBll.AdminOperateLog(null, bonusReq.CustId, "CustManage/CustInfoList", ActionType.Update, info, User.Identity.Name);
+            apiResult.ErrorCode = (int) ErrorCodeEnum.Success; 
             return apiResult;
         }
 
@@ -1574,7 +1589,7 @@ namespace BackendSite.Controllers.Api
         {
             var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate);
             var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate);
-            var SearchResult = custInfoBLL.GetTeleCSD(JsonConvert.SerializeObject(para.SiteIds),
+            var SearchResult = _custInfoBll.GetTeleCSD(JsonConvert.SerializeObject(para.SiteIds),
                                                      JsonConvert.SerializeObject(para.Currency),
                                                       startTime,
                                                       endTime,
@@ -1642,7 +1657,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult UpdateCustomerTele(TeleCSDUpdatepara para)
         {
-            if (custInfoBLL.UpdateCustomerTele(para.SiteId, para.CustId, User.Identity.Name) > 0)
+            if (_custInfoBll.UpdateCustomerTele(para.SiteId, para.CustId, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -1686,7 +1701,7 @@ namespace BackendSite.Controllers.Api
         {
             var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
             var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
-            var exportData = custInfoBLL.GetTeleCSDExportData(SiteIds,
+            var exportData = _custInfoBll.GetTeleCSDExportData(SiteIds,
                                                               Currency,
                                                               startTime,
                                                               endTime,
@@ -1704,7 +1719,7 @@ namespace BackendSite.Controllers.Api
                 if (data.ThirdTimeCall != string.Empty)
                     data.ThirdTimeCall = $"{DateTime.Parse(data.ThirdTimeCall.Substring(0, 19)).AddHours(8):yyyy-MM-dd HH:mm:ss}-{data.ThirdTimeCall.Substring(20, data.ThirdTimeCall.Length - 20)}";
             }
-            var stream = excelBLL.Export(exportData);
+            var stream = _excelBll.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"TeleCSD_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
@@ -1718,9 +1733,9 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<CustInfoDetail>();
 
             var custUsername = string.IsNullOrEmpty(custInfosReq.UserName) ? null : custInfosReq.UserName;
-            var custId = (string.IsNullOrEmpty(custInfosReq.sabaId)) ? null : common.TpIdToCustId(custInfosReq.sabaId);
+            var custId = (string.IsNullOrEmpty(custInfosReq.sabaId)) ? null : _common.TpIdToCustId(custInfosReq.sabaId);
 
-            var custInfosDetail = custInfoBLL.GetCustInfoDetails(custId, custUsername, custInfosReq.SiteId);
+            var custInfosDetail = _custInfoBll.GetCustInfoDetails(custId, custUsername, custInfosReq.SiteId);
 
             if (custInfosDetail != null)
             {
@@ -1768,7 +1783,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult EditTagManagement(EditTagManagementpara para)
         {
-            if (custInfoBLL.EditTagManagement(para.Id, para.TagName, para.TagColour, para.Description, User.Identity.Name) > 0)
+            if (_custInfoBll.EditTagManagement(para.Id, para.TagName, para.TagColour, para.Description, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -1801,7 +1816,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<TagData>();
             try
             {
-                var searchResult = custInfoBLL.GetTagData(para.Status, para.PageNumber, para.PageSize);
+                var searchResult = _custInfoBll.GetTagData(para.Status, para.PageNumber, para.PageSize);
                 foreach (var tagData in searchResult.TagDatas)
                 {
                     tagData.UpdateTime = new DateTimeOffset(tagData.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
@@ -1837,7 +1852,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult SetTagStatus(SetTagStatuspara para)
         {
-            if (custInfoBLL.SetTagStatus(para.Id, User.Identity.Name) > 0)
+            if (_custInfoBll.SetTagStatus(para.Id, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -1872,7 +1887,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<TagData>>();
             try
             {
-                apiResult.Data = custInfoBLL.GetAllTag();
+                apiResult.Data = _custInfoBll.GetAllTag();
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -1898,20 +1913,20 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult SetCustTag(SetCustTagPara para)
         {
-            if (custInfoBLL.SetCustTag(para.CustId, para.SelectTag, User.Identity.Name) > 0)
+            if (_custInfoBll.SetCustTag(para.CustId, para.SelectTag, User.Identity.Name) > 0)
             {
                 var temp = new List<string>();
                 var selectTag = JsonConvert.SerializeObject(temp);
                 if (para.SelectTag != null && para.SelectTag.Any())
                 {
-                    var alltagDict = custInfoBLL.GetAllTag().ToDictionary(x => x.Id, x => x.TagName);
+                    var alltagDict = _custInfoBll.GetAllTag().ToDictionary(x => x.Id, x => x.TagName);
                     para.SelectTag.ToList().ForEach(x =>
                     {
                         temp.Add(alltagDict[x]);
                     });
                     selectTag = JsonConvert.SerializeObject(temp);
                 }
-                custInfoBLL.AddCustNote(para.CustId, $"Set Cust Tag:{selectTag}", User.Identity.Name);
+                _custInfoBll.AddCustNote(para.CustId, $"Set Cust Tag:{selectTag}", User.Identity.Name);
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
@@ -1943,7 +1958,7 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                var custInfoDetail = custInfoBLL.GetCustData(custInfoReq.CustId, custInfoReq.UserName);
+                var custInfoDetail = _custInfoBll.GetCustData(custInfoReq.CustId, custInfoReq.UserName);
                 apiResult.Data = custInfoDetail;
                 apiResult.ErrorCode = 0;
             }
@@ -1979,7 +1994,7 @@ namespace BackendSite.Controllers.Api
             {
                 var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(custInfoReq.StartDate);
                 var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(custInfoReq.EndDate);
-                var SearchResult = custInfoBLL.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status,
+                var SearchResult = _custInfoBll.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status,
                     custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort, startTime, endTime, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
 
                 //foreach (var data in SearchResult.RegLiveStatusDatas)
@@ -2018,7 +2033,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult SetRegLiveStatus(SetRegLiveStatusPara para)
         {
             var apiResult = new ApiResult();
-            if (custInfoBLL.SetRegLiveStatus(para.CustId, para.Status, para.SiteId, User.Identity.Name) > 0)
+            if (_custInfoBll.SetRegLiveStatus(para.CustId, para.Status, para.SiteId, User.Identity.Name) > 0)
             {
                 apiResult.ErrorCode = 0;
             }
@@ -2048,7 +2063,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<RegLiveStatusNotes>>
             {
-                Data = custInfoBLL.GetRegLiveStatusNotes(addCustNoteReq.CustId),
+                Data = _custInfoBll.GetRegLiveStatusNotes(addCustNoteReq.CustId),
                 ErrorCode = 0
             };
 
@@ -2078,7 +2093,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult AddRegLiveStatusNote(AddRegLiveStatusNotes addCustNoteReq)
         {
             var apiResult = new ApiResult();
-            if (custInfoBLL.AddRegLiveStatusNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name) > 0)
+            if (_custInfoBll.AddRegLiveStatusNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name) > 0)
             {
                 apiResult.ErrorCode = 0;
             }
@@ -2107,7 +2122,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult DeleteRegLiveStatusNote(DeleteRegLiveStatusNotes deleteCustNoteReq)
         {
             var apiResult = new ApiResult();
-            if (custInfoBLL.DeleteRegLiveStatusNote(deleteCustNoteReq.CustId, deleteCustNoteReq.Id) > 0)
+            if (_custInfoBll.DeleteRegLiveStatusNote(deleteCustNoteReq.CustId, deleteCustNoteReq.Id) > 0)
             {
                 apiResult.ErrorCode = 0;
             }
@@ -2136,7 +2151,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult EditRegLiveStatusNote(EditRegLiveStatusNotes EditRegLiveStatusNote)
         {
             var apiResult = new ApiResult();
-            if (custInfoBLL.EditRegLiveStatusNote(EditRegLiveStatusNote.CustId, EditRegLiveStatusNote.Id, EditRegLiveStatusNote.Note, User.Identity.Name) > 0)
+            if (_custInfoBll.EditRegLiveStatusNote(EditRegLiveStatusNote.CustId, EditRegLiveStatusNote.Id, EditRegLiveStatusNote.Note, User.Identity.Name) > 0)
             {
                 apiResult.ErrorCode = 0;
             }
@@ -2184,12 +2199,12 @@ namespace BackendSite.Controllers.Api
         {
             var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
             var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
-            var exportData = custInfoBLL.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, startTime, endTime, AffiliatesCode, AgentCodeType);
+            var exportData = _custInfoBll.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, startTime, endTime, AffiliatesCode, AgentCodeType);
             foreach (var data in exportData)
             {
                 data.RegTime = new DateTimeOffset(data.RegTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-            var stream = excelBLL.Export(exportData);
+            var stream = _excelBll.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Registration_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 

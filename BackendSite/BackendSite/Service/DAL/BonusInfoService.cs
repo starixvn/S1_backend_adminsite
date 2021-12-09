@@ -6,6 +6,7 @@ using BackendSite.Service.Model;
 using MySql.Data.MySqlClient;
 using Dapper;
 using System.Data;
+using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -124,7 +125,7 @@ namespace BackendSite.Service.DAL
             p.Add("_LockedAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_BonusAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_Bonus", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-            var result = conn.Execute("Common_CancelBonusByBonusId_SetV3", p, transaction: trans, commandType: CommandType.StoredProcedure);
+            var result = conn.Execute("Common_CancelBonusByBonusId_SetV3", p, trans, commandType: CommandType.StoredProcedure);
 
             var siteId = p.Get<int?>("_SiteId") ?? 0;
             custId = p.Get<int?>("_CustId") ?? 0;
@@ -144,13 +145,27 @@ namespace BackendSite.Service.DAL
                 {
                     backAmount = bonus - bonusAmount;
                 }
-
+                
+                //避免輸光 負負得正
+                if (backAmount < 0)
+                {
+                    backAmount = 0;
+                }
+                
                 if (backAmount > 0)
                 {
                     result = walletService.SetBalance(custId, siteId, userName, backAmount, 7, $"Cancel Bonus({bonus.ToString("#,##0.##")}), Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterAmount, out var is1stDepoist, conn, trans);
 
                     if (result > 0)
                         result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, $"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterWithdrawalLimit, conn, trans);
+                } 
+                
+                //需扣回金額
+                var cancelBonusAmount = bonus - backAmount;
+                if (cancelBonusAmount > 0 && result > 0 )
+                {
+                    var cp = new DynamicParameters(new { _BonusId = bonusId, _CancelBonus = cancelBonusAmount });
+                    result = conn.Execute("Common_CancelBonusAmount_Set", cp, trans, commandType: CommandType.StoredProcedure);
                 }
             }
 
