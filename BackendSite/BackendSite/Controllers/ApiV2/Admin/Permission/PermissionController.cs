@@ -119,7 +119,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         }
 
         /// <summary>
-        /// Permission/GetSiteList 取得所有品牌清單
+        /// Permission/GetAllSiteList 取得所有品牌清單
         /// </summary>
         /// <remarks>
         /// 
@@ -130,7 +130,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// </remarks>
         /// <returns>結果</returns>
         [HttpPost]
-        public ApiResult GetSiteList()
+        public ApiResult GetAllSiteList()
         {
             var data = _serverInfoBll.GetSiteList();
 
