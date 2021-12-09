@@ -1616,6 +1616,10 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                         </td>
                                     </tr>
                                     <tr>
+                                        <th scope="row">VerifiedReward</th>
+                                        <td>{data.verificationReward}</td>
+                                    </tr>
+                                    <tr>
                                         <th scope="row">Iovation</th>
                                         <td>{data.iovation ? CustIovationOp[data.iovation] : null}</td>
                                     </tr>
