@@ -207,9 +207,9 @@ const ActionButtons = props => {
 			<button className="btn btn-add" onClick={props.ClickTransfer} disabled={props.Processing}>
 				Transfer
 			</button>
-			<button className="btn btn-rejected" onClick={props.ClickCancel} style={{marginLeft:'10px'}} disabled={props.Processing}>
-				Cancel
-			</button>
+			{/*<button className="btn btn-rejected" onClick={props.ClickCancel} style={{marginLeft:'10px'}} disabled={props.Processing}>*/}
+			{/*	Cancel*/}
+			{/*</button>*/}
 		</>
 	);
 };
