@@ -493,7 +493,7 @@ namespace BackendSite.Service.Model.enums
     }
     public enum TpEnum
     {
-        SA = 2,
+        Saba = 1,
         PT = 27
     }
     
