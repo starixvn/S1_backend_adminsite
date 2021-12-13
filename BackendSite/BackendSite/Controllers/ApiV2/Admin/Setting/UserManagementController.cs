@@ -96,7 +96,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Setting
         {
             var data = _adminUserBll.GetUserList();
 
-            if (data.Any())
+            if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
