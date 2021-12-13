@@ -160,12 +160,12 @@ namespace BackendSite.Service.DAL
                         result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, $"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterWithdrawalLimit, conn, trans);
                 } 
                 
-                //需扣回金額
+                //回收bonus紀錄
                 var cancelBonusAmount = bonus - backAmount;
                 if (cancelBonusAmount > 0 && result > 0 )
                 {
                     var cp = new DynamicParameters(new { _BonusId = bonusId, _CancelBonus = cancelBonusAmount });
-                    result = conn.Execute("Common_CancelBonusAmount_Set", cp, trans, commandType: CommandType.StoredProcedure);
+                    result = conn.Execute("Service_CancelBonusAmount_Set", cp, trans, commandType: CommandType.StoredProcedure);
                 }
             }
 

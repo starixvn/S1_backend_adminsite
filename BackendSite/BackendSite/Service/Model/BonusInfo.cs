@@ -88,5 +88,6 @@ namespace BackendSite.Service.Model
         public int BonusId { set; get; }
         public decimal RemainingBonus { set; get; }
         public decimal RefundAmount { set; get; }
+        public bool UpdateBonusTransferStatus { set; get; }
     }
 }
