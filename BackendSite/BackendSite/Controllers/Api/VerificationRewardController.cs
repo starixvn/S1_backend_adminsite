@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
@@ -14,18 +15,26 @@ namespace BackendSite.Controllers.Api
     [ApiExplorerSettings(IgnoreApi = true)]
     public class VerificationRewardController : Controller
     {
-        private readonly VerificationRewardBLL _verificationRewardBll; 
+        private readonly VerificationRewardBLL _verificationRewardBll;
         public VerificationRewardController(VerificationRewardBLL verificationRewardBll)
         {
             _verificationRewardBll = verificationRewardBll;
         }
         
-        [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationReward" })]
-        public async Task<ApiResult<IEnumerable<VerificationRewardModel>>> Get(int siteId)
+        public class GetVerificationRewardReq
         {
-            var apiResult = new ApiResult<IEnumerable<VerificationRewardModel>>();
-            var reward = await _verificationRewardBll.GetVerificationRewardSetting(siteId);
+            public int SiteId { get; set; }
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationReward" })]
+        public async Task<ApiResult<IEnumerable<VerificationRewardModel>>> Get(GetVerificationRewardReq req)
+        {
+            var apiResult = new ApiResult<IEnumerable<VerificationRewardModel>>
+            {
+                ErrorCode = 0, 
+                Data = await _verificationRewardBll.GetVerificationRewardSetting(req.SiteId)
+            };
             return apiResult;
         }
     }
