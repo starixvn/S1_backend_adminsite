@@ -10,17 +10,35 @@ namespace BackendSite.Service.DAL
 {
     public class VerificationRewardService
     {
+        private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
-        public VerificationRewardService(IEnumerable<MySqlClient> reportDbClient)
+        public VerificationRewardService(IEnumerable<MySqlClient> dbClient)
         {
-            _reportDbClient = reportDbClient.FirstOrDefault(a => a.DataBase == DataBase.Report);
+            var mySqlClients = dbClient.ToList();
+            _mainDbClient = mySqlClients.FirstOrDefault(a => a.DataBase == DataBase.Main);
+            _reportDbClient = mySqlClients.FirstOrDefault(a => a.DataBase == DataBase.Report);
         }
         public async Task<IEnumerable<VerificationRewardModel>> GetVerificationRewardSetting(int siteId)
         {
             var p = new DynamicParameters(new {_SiteId = siteId});
             var verificationRewards = await _reportDbClient.QueryAsync<VerificationRewardModel>("Admin_VerificationReward_Get", p);
             return verificationRewards;
+        }
+        
+        public async Task<int> InsertOrUpdate(int siteId, int currencyId, int verificationType, decimal phoneReward, decimal emailReward, string updateOperator)
+        {
+            var p = new DynamicParameters(new {_SiteId = siteId, _CurrencyId = currencyId,
+                _VerificationType = verificationType, _PhoneReward = phoneReward, 
+                _EmailReward = emailReward, _Operator = updateOperator});
+            return await _mainDbClient.ExecuteAsync("Admin_VerificationReward_Set", p);
+        }
+        
+        public async Task<int> UpdateStatus(int siteId, int currencyId, int status, string updateOperator)
+        {
+            var p = new DynamicParameters(new {_SiteId = siteId, _CurrencyId = currencyId, 
+                                                       _Status = status, _Operator = updateOperator});
+            return await _mainDbClient.ExecuteAsync("Admin_VerificationRewardStatus_Set", p);
         }
     }
 }
