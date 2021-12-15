@@ -4,13 +4,14 @@ import RadioGroup from "./Components/RadioGroup"
 import WebAPI from "../../../module//WebAPI";
 import TabButtonGroup from "./Components/TabButtonGroup"
 import SubPanel from "./SubPanel";
-import { initVerificationType } from "./defCols";
+import ActionButtons from "./Components/ActionButtons"
 
 const App = () => {
     const [siteList, setSiteList] = useState([]);
     const [siteOptions, setSiteOptions] = useState([]);
     const [currencyOptions, setCurrencyOptions] = useState([]);
     const [reward, setReward] = useState({});
+    const [tempReward, setTempReward] = useState({});
     const [siteReward, setSiteReward] = useState([]);
     const [current, setCurrent] = useState({ siteId:0, currencyId:0, currencyName:"" });
     
@@ -57,6 +58,30 @@ const App = () => {
         });
     }
 
+    const switchStatus = (status) => {
+        let invert = status^= 1
+        setReward({
+            ...reward,
+            status: invert
+        });
+        let param = {
+            Url: "VerificationReward/UpdateStatus",
+            Data: { SiteId: current.siteId, CurrencyId: current.currencyId, Status: invert },
+        };
+          
+        WebAPI.JsonPost(param).then((res) => {
+            if (res.data.errorCode === 0) {
+                alert("success.");
+            } else {
+                alert(res.data.message);
+            }
+        });
+    }
+
+    const clickEdit = () => {
+        console.log("Hello")
+    }
+
     const clickTab = (id, name) => {
         let curReward = siteReward.find(item => {
             return item.currencyId === id
@@ -96,13 +121,9 @@ const App = () => {
                 <TabButtonGroup currencyOptions={currencyOptions} activeTab={current} clickTab={clickTab}/>
             </div>
             <div className="filter">
-                <div className="panel level-1 mt-20">
-                    <a className="panel-title no-arrow" style={{ justifyContent: "space-between" }}>
-                        <span style={{ color: "white" }}>{current.currencyName}</span>
-                    </a>
-                </div>  
-            {Object.keys(reward).length === 0 ? null : <SubPanel reward={reward} currencyOptions={currencyOptions} current={current} clickTab={clickTab} />} 
+                {Object.keys(reward).length === 0 ? null : <SubPanel isEdit={false} reward={reward} currencyTitle={current.currencyName} switchStatus={switchStatus} clickEdit={clickEdit} />}
             </div>
+            
         </div>
     )
 }
