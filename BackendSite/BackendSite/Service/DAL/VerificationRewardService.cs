@@ -25,7 +25,7 @@ namespace BackendSite.Service.DAL
             var verificationRewards = await _reportDbClient.QueryAsync<VerificationRewardModel>("Admin_VerificationReward_Get", p);
             return verificationRewards;
         }
-        
+
         public async Task<int> InsertOrUpdate(int siteId, int currencyId, int verificationType, decimal phoneReward, decimal emailReward, string updateOperator)
         {
             var p = new DynamicParameters(new {_SiteId = siteId, _CurrencyId = currencyId,
