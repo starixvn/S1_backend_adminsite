@@ -27,7 +27,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         #region Marketing > VerificationReward
         
         /// <summary>
-        /// Announcement/GetAnnouncement 取得驗證獎勵設定
+        /// VerificationReward/Get 取得驗證獎勵設定
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -48,7 +48,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         }
 
         /// <summary>
-        /// Announcement/GetAnnouncement 設定驗證獎勵
+        /// VerificationReward/Set 設定驗證獎勵
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -78,7 +78,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         }
         
         /// <summary>
-        /// Announcement/GetAnnouncement 變更狀態
+        /// VerificationReward/UpdateStatus 變更狀態
         /// </summary>
         /// <remarks>
         /// Http Method：POST
