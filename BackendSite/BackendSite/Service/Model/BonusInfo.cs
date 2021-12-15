@@ -69,6 +69,7 @@ namespace BackendSite.Service.Model
         public string UserLang { set; get; }
         public int CurrencyId { set; get; }
         public int Refund { set; get; }
+        public int Status { set; get; }
         public int PromoCategoryId { get; set; }
         public PromotionType PromotionType { get; set; }
         public decimal Bonus { set; get; }
@@ -87,5 +88,6 @@ namespace BackendSite.Service.Model
         public int BonusId { set; get; }
         public decimal RemainingBonus { set; get; }
         public decimal RefundAmount { set; get; }
+        public bool UpdateBonusTransferStatus { set; get; }
     }
 }

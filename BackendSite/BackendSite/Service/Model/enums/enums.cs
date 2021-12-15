@@ -491,6 +491,12 @@ namespace BackendSite.Service.Model.enums
         Success = 3,
         Failed = 4
     }
+    public enum TpEnum
+    {
+        Saba = 1,
+        PT = 27
+    }
+    
     public enum BalanceAdjustmentType
     {
         BalancePlus = 1,

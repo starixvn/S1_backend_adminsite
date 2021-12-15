@@ -1222,8 +1222,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/UserOnlineReport" })]
         public ApiResult GetUserOnlineReport(GetUserOnlineReportReq request)
         {
-            var data = _reportBLL.GetUserOnlineReport(JsonConvert.SerializeObject(request.SiteIds),
-                                                           request.SelectDate);
+            var data = _reportBLL.GetUserOnlineReport(JsonConvert.SerializeObject(request.SiteIds), request.SelectDate ,"+08:00");
 
             if (!data.Any())
             {
@@ -1260,8 +1259,7 @@ namespace BackendSite.Controllers.Api
 
             var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(SiteIds);
 
-            var ExportData = _reportBLL.GetUserOnlineReport(SiteIds,
-                                                           SelectDate);
+            var ExportData = _reportBLL.GetUserOnlineReport(SiteIds, SelectDate ,"+08:00");
 
             var totalMaxCount = ExportData.GroupBy(x => new
             {

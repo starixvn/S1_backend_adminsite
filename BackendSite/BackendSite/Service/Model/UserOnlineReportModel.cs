@@ -4,30 +4,10 @@ namespace BackendSite.Service.Model
 {
     public class UserOnlineReportModel
     {
-
-        public string LocalTime
-        {
-            get;
-            set;
-        }
-
-        public int SiteId
-        {
-            get;
-            set;
-        }
-
-        public string SiteName
-        {
-            get;
-            set;
-        }
-
-        public int MaxCount
-        {
-            get;
-            set;
-        }
+        public string LocalTime { get; set; }
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
+        public int MaxCount { get; set; }
     }
 
     public class UserOnlinePartcialSummaryModel
