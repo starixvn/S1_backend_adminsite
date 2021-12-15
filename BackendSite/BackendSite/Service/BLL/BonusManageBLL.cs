@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Controllers.ApiV2.Marketing.Bonus;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -32,9 +33,8 @@ namespace BackendSite.Service.BLL
             long endDate,
             int device,
             string bonusCode,
-            bool IsSpecial)
+            bool isSpecial)
         {
-
             var siteList = _serverInfoBLL.GetSiteListByLoginUser().Select(x => x.SiteId);
 
             return _bonusManageService.GetPromotionList(JsonConvert.SerializeObject(siteIds),
@@ -45,7 +45,7 @@ namespace BackendSite.Service.BLL
                         device,
                         bonusCode,
                         JsonConvert.SerializeObject(siteList),
-                        IsSpecial);
+                        isSpecial);
         }
 
         public PromotionInfo GetPromotion(string bonusCode, int siteId)
@@ -70,28 +70,11 @@ namespace BackendSite.Service.BLL
             return promotion;
         }
 
-        public bool SetPromotion(bool isAdd, PromotionInfo promotion, DisplayConditionAbountVipLevel vipLevelCondition,string Operator)
+        public bool SetPromotion(bool isAdd, PromotionInfoReq promotion, DisplayConditionAboutVipLevel vipLevelCondition,string Operator)
         {
             promotion.LastUpdateUser = isAdd ? "" : _authorizeBLL.GetAuthData().UserName;
             var promotionDisplayConditionList = new List<PromotionDisplayConditionModel>();
-
-            //TODO:(Pending) If update,how to check expected delete row
-            //PromotionSpecific/PrmotionRebate/PromotionDisplayCondiction
-            // int expectedDelSpecificRow = 0;
-            // int expectedDelRebateRow = 0;
-            //
-            // if (!isAdd)
-            // {
-            //     var oldPromotionSpecificList =
-            //         bonusManageService.GetPromotionSpecific(promotion.BonusCode, promotion.SiteId);
-            //
-            //     if (promotion.PromotionType == 6 || promotion.PromotionType == 7)
-            //     {
-            //         var oldPromotionRebateList =
-            //             bonusManageService.GetPromotionRebate(promotion.BonusCode, promotion.SiteId);
-            //     }
-            // }
-
+            
             //Display Condition Logic Process
             if (vipLevelCondition.IsForVipLevel)
             {
@@ -108,14 +91,11 @@ namespace BackendSite.Service.BLL
 
         public bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode,string Operator, string newSpecialCode, bool isSpecial)
         {
-            //return _bonusManageService.DuplicatePromotion(bonusCode, siteId, newBonusCode);
-
             var expectedSpecificRow = _bonusManageService.GetPromotionSpecific(bonusCode, siteId).Count();
             var expectedRebateRow = _bonusManageService.GetPromotionRebate(bonusCode, siteId).Count();
             var expectedConditionRow = _bonusManageService.GetPromotionDisplayCondition(bonusCode, siteId).Count();
             var expectedCashBackRow = _bonusManageService.GetPromotionCashBack(bonusCode, siteId).Count();
-
-
+            
             return _bonusManageService.DuplicatePromotionFlow(bonusCode,
                  siteId,
                  newBonusCode,
@@ -130,8 +110,7 @@ namespace BackendSite.Service.BLL
 
         public int SetPromotionStatus(string bonusCode, int siteId, int status)
         {
-            return _bonusManageService.SetPromotionStatus(bonusCode, siteId, status,
-                _authorizeBLL.GetAuthData().UserName);
+            return _bonusManageService.SetPromotionStatus(bonusCode, siteId, status,_authorizeBLL.GetAuthData().UserName);
         }
 
         public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
@@ -147,14 +126,14 @@ namespace BackendSite.Service.BLL
         public IEnumerable<GetCashBackGamerep> GetCashBackGameList(int tpId,int categoryId)
         {
             var result = new List<GetCashBackGamerep>();
-            var trmpresult = _bonusManageService.GetCashBackGameList(tpId, categoryId);
+            var tempResult = _bonusManageService.GetCashBackGameList(tpId, categoryId);
 
             //tpId == 0,WalletType is Seamless
             //tpId != 0,WalletType is Transfer
             if (tpId == 0)
             {
-                //WalletType is Seamless key by tpid
-                trmpresult.ToList().ForEach(x =>
+                //WalletType is Seamless key by tpId
+                tempResult.ToList().ForEach(x =>
                 {
                     result.Add(new GetCashBackGamerep {GameName= x.GameName,Key = x.TpId});
                 });
@@ -162,7 +141,7 @@ namespace BackendSite.Service.BLL
             else
             {
                 //WalletType is Seamless key by CategoryId
-                trmpresult.ToList().ForEach(x =>
+                tempResult.ToList().ForEach(x =>
                 {
                     result.Add(new GetCashBackGamerep { GameName = x.GameName, Key = x.CategoryId });
                 });
@@ -200,8 +179,8 @@ namespace BackendSite.Service.BLL
         public int GenScratchCardCode(string specialCode, int num, string lastUpdateUser)
         {
             var count = num;
-            var errorcount = 0;
-            while (count > 0 && errorcount < 30)
+            var errorCount = 0;
+            while (count > 0 && errorCount < 30)
             {
                 var scratchCardCode = $"{RandomString(5, 2)}-{RandomString(6, 3)}";
                 if (_bonusManageService.SetScratchCardCode(specialCode, scratchCardCode, lastUpdateUser) == 0)
@@ -210,34 +189,31 @@ namespace BackendSite.Service.BLL
                 }
                 else
                 {
-                    errorcount++; //Prevent infinite loops
+                    errorCount++; //Prevent infinite loops
                 }
             }
 
-            if (errorcount >= 30)
-            {
-                return 90;
-            }
-
-            return 0;
+            return errorCount >= 30 ? 90 : 0;
         }
         public IEnumerable<ScratchCard> GetScratchCardList(string specialCode, int filterType)
         {
-            var ScratchCardList = _bonusManageService.GetScratchCardList(specialCode);
+            var scratchCardList = _bonusManageService.GetScratchCardList(specialCode);
             if(filterType == 1) //unused
-                 ScratchCardList = ScratchCardList.Where(x => x.CustId == 0);
+                 scratchCardList = scratchCardList.Where(x => x.CustId == 0);
             else if (filterType == 2) //used
-                ScratchCardList = ScratchCardList.Where(x => x.CustId != 0);
-            return ScratchCardList;
+                scratchCardList = scratchCardList.Where(x => x.CustId != 0);
+            
+            return scratchCardList;
         }
         public IEnumerable<ScratchCardExport> GetScratchCardListExport(string specialCode, int filterType)
         {
-            var ScratchCardList = _bonusManageService.GetScratchCardListExport(specialCode);
+            var scratchCardList = _bonusManageService.GetScratchCardListExport(specialCode);
             if (filterType == 1) //unused
-                ScratchCardList = ScratchCardList.Where(x => x.Joiner == "-");
+                scratchCardList = scratchCardList.Where(x => x.Joiner == "-");
             else if (filterType == 2) //used
-                ScratchCardList = ScratchCardList.Where(x => x.Joiner != "-");
-            return ScratchCardList;
+                scratchCardList = scratchCardList.Where(x => x.Joiner != "-");
+            
+            return scratchCardList;
         }
         public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(IEnumerable<int> selectSite, int categoryType, int currencyId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
@@ -248,13 +224,9 @@ namespace BackendSite.Service.BLL
             return _bonusManageService.SetLeaderboardExtraPoint( activeDate, siteId, categoryId, userName, extraPoint, lastUpdateUser);
         }
 
-        public bool CheckSpecialCodeDuplicate(string SpecialCode)
+        public bool CheckSpecialCodeDuplicate(string specialCode)
         {
-            if(_bonusManageService.CheckSpecialCodeDuplicate(SpecialCode).ToList().Count > 0)
-            {
-                return true;
-            }
-            return false;
+            return _bonusManageService.CheckSpecialCodeDuplicate(specialCode).ToList().Count > 0;
         }
     }
 }

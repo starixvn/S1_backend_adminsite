@@ -5,46 +5,22 @@ namespace BackendSite.Service.Model.PromotionDisplayCondition
 {
     public class PromotionDisplayConditionModel
     {
-        public int Id
+        private DateTimeOffset _createTime { get; set; }
+        private DateTimeOffset _updateTime { get; set; }
+        public int Id { get; set; }
+        public string BonusCode { get; set; }
+        public int SiteId { get; set; }
+        public PromotionDisplayConditionType ConditionType { get; set; }
+        public dynamic Description { get; set; }
+        public DateTimeOffset CreateTime 
         {
-            get;
-            set;
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
-
-        public string BonusCode
+        public DateTimeOffset UpdateTime 
         {
-            get;
-            set;
-        }
-
-        public int SiteId
-        {
-            get;
-            set;
-        }
-
-        public PromotionDisplayConditionType ConditionType
-        {
-            get;
-            set;
-        }
-
-        public dynamic Description
-        {
-            get;
-            set;
-        }
-
-        public DateTime CreateTime
-        {
-            get;
-            set;
-        }
-
-        public DateTime UpdateTime
-        {
-            get;
-            set;
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
     }
 }

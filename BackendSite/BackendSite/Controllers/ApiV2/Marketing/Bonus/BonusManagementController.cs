@@ -1,0 +1,437 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using BackendSite.Attributes;
+using BackendSite.Controllers.Api;
+using BackendSite.Extensions;
+using BackendSite.Service.BLL;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using MySql.Data.MySqlClient;
+
+namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
+{
+    [Authorize]
+    [Route("apiV2/[controller]/[action]")]
+    [ApiController]
+    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusManage" })]
+    public class BonusManagementController : ControllerBase
+    {
+        #region Fields
+
+        private readonly BonusManageBLL _bonusManageBll;
+        private readonly ServerInfoBLL _serverInfoBll;
+        private readonly AuthorizeBLL _authorizeBll;
+        private readonly ExcelBLL _excelBll;
+        private readonly ILogger<BonusManageController> _logger;
+        #endregion
+
+        #region Constructors
+
+        public BonusManagementController(IServiceProvider provider)
+        {
+            _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
+        }
+
+        #endregion
+
+        #region API Model
+
+        public class GetPromotionListReq
+        {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> PromotionTypes { get; set; }
+            public int Status { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public int Device { get; set; }
+            public string BonusCode { get; set; }
+            public bool IsSpecial { get; set; }
+        }
+        public class GetPromotionReq
+        {
+            public string BonusCode { get; set; }
+            public int SiteId { get; set; }
+        }
+        public class GetSiteListByLoginUserReq
+        {
+            public int? SiteId { get; set; }
+        }
+        public class SetPromotionReq
+        {
+            public bool IsAdd { get; set; }
+            public PromotionInfoReq PromotionInfo { get; set; }
+            public DisplayConditionAboutVipLevel DisplayConditionAboutVipLevel { get; set; }
+        }
+        public class DuplicateReq
+        {
+            public string BonusCode { get; set; }
+            public int SiteId { get; set; }
+            public string NewBonusCode { get; set; }
+            public string NewSpecialCode { get; set; }
+            public bool IsSpecial { get; set; }
+        }
+        public class GenScratchCardCodeReq
+        {
+            public string SpecialCode { get; set; }
+            public int Num { get; set; }
+        }
+        public class GetScratchCardListReq
+        {
+            public string SpecialCode { get; set; }
+            public int FilterType { get; set; }
+        }
+        public class UpdatePromotionStatusReq
+        {
+            public string BonusCode{ get; set; }
+            public int SiteId{ get; set; }
+            public int Status{ get; set; }
+        }
+        
+        #endregion
+
+        #region API
+
+        /// <summary>
+        /// BonusManagement/GetPromotionList 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Bonus Management > [Search] 
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        public ApiResult<IEnumerable<PromotionInfo>> GetPromotionList(GetPromotionListReq request)
+        {
+            var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
+
+            try
+            {
+                apiResult.Data = _bonusManageBll.GetPromotionList(request.SiteIds,
+                    request.PromotionTypes,
+                    request.Status,
+                    request.StartDate.ToUnixTimeSeconds(),
+                    request.EndDate.ToUnixTimeSeconds(),
+                    request.Device,
+                    request.BonusCode,
+                    request.IsSpecial);
+
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// BonusManagement/GetPromotion 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Bonus Management > [Search] > [edit]
+        /// </remarks>
+        /// <param name="req"></param>
+        [HttpPost]
+        public ApiResult<PromotionInfo> GetPromotion(GetPromotionReq req)
+        {
+            var apiResult = new ApiResult<PromotionInfo>();
+            try
+            {
+                apiResult.Data = _bonusManageBll.GetPromotion(req.BonusCode, req.SiteId);
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// BonusManagement/GetSiteListByLoginUser 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Bonus Management > [Search] > [edit]
+        /// </remarks>
+        /// <param name="req"></param>
+        [HttpPost]
+        public ApiResult<IEnumerable<dynamic>> GetSiteListByLoginUser(GetSiteListByLoginUserReq req)
+        {
+            var apiResult = new ApiResult<IEnumerable<dynamic>>();
+            try
+            {
+                apiResult.Data = _serverInfoBll.GetSiteListByLoginUser()?.Select(x =>
+                    new { x.SiteName, x.SiteId, CurrencyList = x.ICurrencyList, LangList = x.ILangList });
+                if (req.SiteId != null && apiResult.Data != null && apiResult.Data.Any())
+                {
+                    apiResult.Data = apiResult.Data.Where(s => s.SiteId == req.SiteId);
+                }
+
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        /// <summary>
+        /// BonusManagement/GetScratchCardList 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Bonus Management > [Search] > [edit] > [ScratchCard]
+        /// </remarks>
+        /// <param name="req"></param>
+        [HttpPost]
+        public ApiResult<IEnumerable<ScratchCard>> GetScratchCardList(GetScratchCardListReq req)
+        {
+            var apiResult = new ApiResult<IEnumerable<ScratchCard>>();
+            try
+            {
+                var result = _bonusManageBll.GetScratchCardList(req.SpecialCode, req.FilterType);
+                foreach (var data in result)
+                {
+                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime,  TimeSpan.Zero);
+                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime,  TimeSpan.Zero);
+                }
+                
+                apiResult.Data = result;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// BonusManagement/GetScratchCardListExport 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Bonus Management > [Search] > [ScratchCard] > [export]
+        /// </remarks>
+        /// <param name="req"></param>
+        [HttpPost]
+        public IActionResult GetScratchCardListExport(GetScratchCardListReq req)
+        {
+            var exportData = _bonusManageBll.GetScratchCardListExport(req.SpecialCode, req.FilterType);
+            foreach (var data in exportData)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime,  TimeSpan.Zero);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime,  TimeSpan.Zero);
+            }
+            var stream = _excelBll.Export(exportData);
+            
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"ScratchCardList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
+        
+        /// <summary>
+        /// BonusManagement/UpdatePromotionStatus 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Bonus Management > [Search] > [Update] 
+        /// </remarks>
+        /// <param name="req"></param>
+        [HttpPost]
+        public ApiResult<dynamic> UpdatePromotionStatus(UpdatePromotionStatusReq req)
+        {
+            var apiResult = new ApiResult<dynamic>();
+            try
+            {
+                apiResult.ErrorCode = _bonusManageBll.SetPromotionStatus(req.BonusCode, req.SiteId, req.Status);
+                var promotion = _bonusManageBll.GetPromotion(req.BonusCode, req.SiteId);
+                apiResult.Data = new { promotion.LastUpdateUser, promotion.LastUpdateTime };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// BonusManagement/SetPromotion 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Bonus Management > [Create]
+        /// </remarks>
+        /// <param name="req"></param>
+        [HttpPost]
+        public ApiResult<IEnumerable<PromotionInfo>> SetPromotion(SetPromotionReq req)
+        {
+            var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
+           
+            try
+            {
+                //如果是新增時有填SpecialCode 檢查SpecialCode是否有重複
+                if (req.IsAdd && req.PromotionInfo.IsSpecial)
+                {
+                    if (_bonusManageBll.CheckSpecialCodeDuplicate(req.PromotionInfo.SpecialCode))
+                    {
+                        apiResult.ErrorCode = (int)ErrorCodeEnum.DuplicateData;
+                        apiResult.Message = "Duplicate Special Code.";
+                        return apiResult;
+                    }
+                }
+
+                var errorCode = _bonusManageBll.SetPromotion(req.IsAdd, req.PromotionInfo, req.DisplayConditionAboutVipLevel, User.Identity.Name) ? 0 : 1;
+                
+                apiResult.ErrorCode = errorCode;
+                apiResult.Message = errorCode == 1
+                    ? "The bonus setting already exists which with same promotion-type & product-category."
+                    : "";
+            }
+            catch (MySqlException sqlException)
+            {
+                _logger.LogError(sqlException, MethodExtension.GetCurrentMethod());
+                apiResult.ErrorCode = sqlException.Number;
+                apiResult.Message = sqlException.Message;
+                apiResult.RawMessage = sqlException.ToString();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// BonusManagement/DuplicatePromotion 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Bonus Management > [Edit] > Copy Button
+        /// </remarks>
+        /// <param name="req"></param>
+        [HttpPost]
+        public ApiResult<IEnumerable<PromotionInfo>> DuplicatePromotion(DuplicateReq req)
+        {
+            var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
+        
+            try
+            {
+                if (req.IsSpecial)
+                {
+                    if (_bonusManageBll.CheckSpecialCodeDuplicate(req.NewSpecialCode))
+                    {
+                        apiResult.ErrorCode = (int)ErrorCodeEnum.DuplicateData;
+                        apiResult.Message = "Duplicate datas about Special Code.";
+                        return apiResult;
+                    }
+                }
+                apiResult.ErrorCode = _bonusManageBll.DuplicatePromotion(
+                    req.BonusCode,
+                    req.SiteId,
+                    req.NewBonusCode,
+                    User.Identity.Name, 
+                    req.NewSpecialCode,
+                    req.IsSpecial) ? 0 : 1;
+                apiResult.Message = apiResult.ErrorCode == 1
+                    ? "Duplicate fail.The bonus setting already exists which with same promotion-type & product-category."
+                    : string.Empty;
+            }
+            catch (MySqlException sqlException)
+            {
+                _logger.LogError(sqlException, MethodExtension.GetCurrentMethod());
+                apiResult.ErrorCode = sqlException.Number;
+                apiResult.Message = sqlException.Message;
+                apiResult.RawMessage = sqlException.ToString();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// BonusManagement/GenScratchCardCode 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Bonus Management > [ScratchCard] 
+        /// </remarks>
+        /// <param name="req"></param>
+        [HttpPost]
+        public ApiResult<dynamic> GenScratchCardCode(GenScratchCardCodeReq req)
+        {
+            var apiResult = new ApiResult<dynamic>();
+            try
+            {
+                apiResult.ErrorCode = _bonusManageBll.GenScratchCardCode(req.SpecialCode, req.Num, _authorizeBll.GetAuthData().UserName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+        #endregion
+    }
+}

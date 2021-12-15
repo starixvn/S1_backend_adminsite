@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
@@ -26,6 +27,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly WinLostReportBLL _winLostReportBll;
         private readonly PaymentBLL _paymentBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+        private readonly BonusManageBLL _bonusManageBll;
 
         #endregion
 
@@ -38,6 +40,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _winLostReportBll = provider.GetRequiredService<WinLostReportBLL>();
             _paymentBll = provider.GetRequiredService<PaymentBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
         }
 
         #endregion
@@ -199,6 +202,27 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             };
             return apiResult;
         }
+        
+        
+        [HttpPost]
+        public ApiResult<IEnumerable<TpGameType>> GetTpGameList()
+        {
+            var apiResult = new ApiResult<IEnumerable<TpGameType>>();
+
+            try
+            {
+                apiResult.Data = _bonusManageBll.GetTpGameList();
+                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int) ErrorCodeEnum.SystemException;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+        
         
         #endregion
 
