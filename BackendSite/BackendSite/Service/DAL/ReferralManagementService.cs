@@ -64,13 +64,12 @@ namespace BackendSite.Service.DAL
             totalPages = 0;
 
             var p = new DynamicParameters(new { SelectSite, UserName = userName, CurrencyId = currencyId, PageSize = pageSize });
-            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            p.Add("PageNumber", pageNumber, DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.Query<ReferralCustList>("Admin_ReferralCustlist_Get", p, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.Query<ReferralCustList>("Admin_ReferralCustlist_Get", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -81,11 +80,9 @@ namespace BackendSite.Service.DAL
             DateTime? endDate,
             int pageSize,
             int startIndex,
-            out int TotalPages,
-            out int RowCount)
+            out int totalPages,
+            out int rowCount)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var SpName = "Admin_ReferralFriendList_Get_V3";
             var props = new DynamicParameters();
             props.Add("_CustId", custId);
             props.Add("_StartDate", startDate);
@@ -95,9 +92,9 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<ReferralFriend>(SpName, props, commandType: CommandType.StoredProcedure);
-            TotalPages = props.Get<int?>("_TotalPages") ?? 0;
-            RowCount = props.Get<int?>("_RowCount") ?? 0;
+            var result = _reportDbClient.Query<ReferralFriend>("Admin_ReferralFriendList_Get_V3", props);
+            totalPages = props.Get<int?>("_TotalPages") ?? 0;
+            rowCount = props.Get<int?>("_RowCount") ?? 0;
 
             return result;
         }

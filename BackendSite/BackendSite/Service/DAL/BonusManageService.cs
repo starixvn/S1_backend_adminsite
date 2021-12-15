@@ -184,7 +184,7 @@ namespace BackendSite.Service.DAL
             {
                 _mainDbClient.Execute("Admin_ScratchCardCode_set", new DynamicParameters(new {specialCode, scratchCardCode, lastUpdateUser}));
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 errorCode = (int)ErrorCodeEnum.SystemException;
             }

@@ -30,20 +30,20 @@ namespace BackendSite.Service.BLL
             return referralManagementService.GetReferralCustList(selectSite, userName, currencyId, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
         public IEnumerable<ReferralFriend> GetRefFriendList(int custId,
-            DateTime? StartDate,
-            DateTime? EndDate,
-            int PageSize,
-            int PageNumber,
-            out int TotalPages,
-            out int RowCount)
+            DateTime? startDate,
+            DateTime? endDate,
+            int pageSize,
+            int pageNumber,
+            out int totalPages,
+            out int rowCount)
         {
             return referralManagementService.GetRefFriendList(custId,
-                StartDate,
-                EndDate,
-                Math.Abs(PageSize),
-                (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize),
-                out TotalPages,
-                out RowCount);
+                startDate,
+                endDate,
+                Math.Abs(pageSize),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                out totalPages,
+                out rowCount);
         }
     }
 }

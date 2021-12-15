@@ -15,7 +15,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusManage" })]
     public class ReferralManagementController : ControllerBase
     {
         #region Fields
@@ -59,6 +58,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         
         #region API
 
+        /// <summary>
+        /// ReferralManagement/GetReferral 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Referral Management
+        /// </remarks>
+        /// <param name="req"></param>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
         public ApiResult<List<ReferralManagement>> GetReferral(GetReferralReq req)
@@ -100,6 +108,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             }
         }
 
+        /// <summary>
+        /// ReferralManagement/SetReferralStatus 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Referral Management
+        /// </remarks>
+        /// <param name="req"></param>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
         public ApiResult<dynamic> SetReferralStatus(SetReferralStatusReq req)
@@ -127,6 +144,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             return apiResult;
         }
         
+        /// <summary>
+        /// ReferralManagement/SetReferral 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Referral Management
+        /// </remarks>
+        /// <param name="req"></param>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
         public ApiResult<dynamic> SetReferral(SetReferralReq req)
