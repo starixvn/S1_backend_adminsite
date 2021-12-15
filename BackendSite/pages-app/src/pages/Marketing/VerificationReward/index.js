@@ -4,15 +4,14 @@ import RadioGroup from "./Components/RadioGroup"
 import WebAPI from "../../../module//WebAPI";
 import TabButtonGroup from "./Components/TabButtonGroup"
 import SubPanel from "./SubPanel";
-import ActionButtons from "./Components/ActionButtons"
 
 const App = () => {
     const [siteList, setSiteList] = useState([]);
     const [siteOptions, setSiteOptions] = useState([]);
     const [currencyOptions, setCurrencyOptions] = useState([]);
     const [reward, setReward] = useState({});
-    const [tempReward, setTempReward] = useState({});
-    const [siteReward, setSiteReward] = useState([]);
+    const [copyReward, setCopyReward] = useState({});
+    const [isEdit, setFlag] = useState(false);
     const [current, setCurrent] = useState({ siteId:0, currencyId:0, currencyName:"" });
     
     useEffect(() => {
@@ -30,7 +29,7 @@ const App = () => {
         });
       }, []);
 
-    const SelectSite = (id) => {
+    const selectSite = (id) => {
 
         var site = siteList.find(item => {
             return item.siteId === id;
@@ -39,38 +38,18 @@ const App = () => {
         setCurrencyOptions(currencyOpts)
         setCurrent({ siteId:id, currencyId: currencyOpts[0].value, currencyName: currencyOpts[0].displayText })
 
-        WebAPI.JsonPost({ Url: "VerificationReward/Get", Data: { SiteId: id } }).then((res) => {
-            if (res.data.errorCode === 0) {
-                setSiteReward(res.data.data)
-                let firstSetting = res.data.data[0];
-                setReward({ 
-                    verificationType: firstSetting.verificationType,
-                    phoneReward: firstSetting.phoneReward,
-                    emailReward: firstSetting.emailReward,
-                    lastUpdateTime: firstSetting.lastUpdateTime,
-                    lastUpdateUser: firstSetting.lastUpdateUser,
-                    status: firstSetting.status
-                })
-                
-            } else {
-              alert(res.data.message ?? "failed to get data.");
-            }
-        });
+        getVerificationReward(id, currencyOpts[0].value)
     }
 
     const switchStatus = (status) => {
-        let invert = status^= 1
-        setReward({
-            ...reward,
-            status: invert
-        });
         let param = {
             Url: "VerificationReward/UpdateStatus",
-            Data: { SiteId: current.siteId, CurrencyId: current.currencyId, Status: invert },
+            Data: { SiteId: current.siteId, CurrencyId: current.currencyId, Status: status^= 1 },
         };
           
-        WebAPI.JsonPost(param).then((res) => {
+        WebAPI.PostData(param).then((res) => {
             if (res.data.errorCode === 0) {
+                setReward(res.data.data)
                 alert("success.");
             } else {
                 alert(res.data.message);
@@ -78,24 +57,57 @@ const App = () => {
         });
     }
 
+    const inputReward = (value, column) => {
+        switch (column) {
+            case 'phoneReward':
+                setReward({ ...reward, phoneReward: value })
+                break;
+            case 'emailReward':
+                setReward({ ...reward, emailReward: value })
+                break;
+        }
+    }
+
+    const toggleType = (value) => {
+        setReward({ ...reward, verificationType: value })
+    }
+    
     const clickEdit = () => {
-        console.log("Hello")
+        setFlag(!isEdit)
+    }
+
+    const clickCancel = () => {
+        setReward({ ...copyReward })
+        setFlag(!isEdit)
+    }
+
+    const clickSummit = () => {
+        let param = {
+            Url: "VerificationReward/Set",
+            Data: { 
+                SiteId: current.siteId, 
+                CurrencyId: current.currencyId, 
+                VerificationType: reward.verificationType,
+                PhoneReward: reward.phoneReward,
+                EmailReward: reward.emailReward
+            }
+        };
+          
+        WebAPI.PostData(param).then((res) => {
+            if (res.data.errorCode === 0) {
+                setReward(res.data.data)
+                setFlag(!isEdit)
+                alert("success.");
+            } else {
+                alert(res.data.message);
+            }
+        });
+        
     }
 
     const clickTab = (id, name) => {
-        let curReward = siteReward.find(item => {
-            return item.currencyId === id
-        })
-        setReward({
-            ...reward,
-            verificationType: curReward.verificationType,
-            phoneReward: curReward.phoneReward,
-            emailReward: curReward.emailReward,
-            lastUpdateTime: curReward.lastUpdateTime,
-            lastUpdateUser: curReward.lastUpdateUser,
-            status: curReward.status
-        })
-        setCurrent({...current, currencyId:id, currencyName: name })
+        getVerificationReward( current.siteId, id)
+        setCurrent({ ...current, currencyId:id, currencyName: name })
     }
 
     const mapCurrency = currencyList => {
@@ -113,17 +125,51 @@ const App = () => {
         });
     }
 
+    const getVerificationReward = (siteId, currencyId) => {
+        if(isEdit === true) {
+            setFlag(false)
+        }
+        WebAPI.PostData({ Url: "VerificationReward/Get", Data: { SiteId: siteId, CurrencyId: currencyId } }).then((res) => {
+            if (res.data.errorCode === 0) {
+                if(res.data.data !== null) {
+                    setReward(res.data.data)
+                    setCopyReward(res.data.data)
+                } else {
+                    let initial = {
+                        verificationType: 0,
+                        phoneReward: 0,
+                        emailReward: 0,
+                        status: 0
+                    }
+                    setReward(initial);
+                    setCopyReward(initial)
+                }
+            } else {
+              alert(res.data.message ?? "failed to get data.");
+            }
+        });
+    }
+
     return (
         <div className="container-fluid">
             <h4 className="page-name">Verification Reward</h4>
-            <div className="filter noBGcolor"><RadioGroup title="Available Sites" options={siteOptions} toggle={SelectSite} selected={current.siteId} /></div>
+            <div className="filter noBGcolor"><RadioGroup title="Available Sites" options={siteOptions} toggle={selectSite} selected={current.siteId} /></div>
             <div className="filter noBGcolor tag">
                 <TabButtonGroup currencyOptions={currencyOptions} activeTab={current} clickTab={clickTab}/>
             </div>
             <div className="filter">
-                {Object.keys(reward).length === 0 ? null : <SubPanel isEdit={false} reward={reward} currencyTitle={current.currencyName} switchStatus={switchStatus} clickEdit={clickEdit} />}
+                {Object.keys(reward).length === 0 ? null : 
+                    <SubPanel isEdit={isEdit} 
+                              reward={reward} 
+                              currencyTitle={current.currencyName} 
+                              switchStatus={switchStatus} 
+                              clickEdit={clickEdit}
+                              clickCancel={clickCancel}
+                              clickSubmit={clickSummit}
+                              inputReward={inputReward}
+                              toggleType={toggleType}
+                              />}
             </div>
-            
         </div>
     )
 }

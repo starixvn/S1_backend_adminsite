@@ -6,7 +6,7 @@ import RadioGroup from "./Components/RadioGroup"
 import InputBox from "./Components/InputBox";
 import StatusButton from "./Components/StatusButton";
 
-function SubPanel ( { isEdit, reward, currencyTitle, switchStatus, clickEdit, clickCancel, clickSubmit} ) {
+function SubPanel ( { isEdit, reward, currencyTitle, switchStatus, clickEdit, clickCancel, clickSubmit, inputReward, toggleType } ) {
     return (
         <>
             <div className="panel level-1 mt-20">
@@ -16,13 +16,13 @@ function SubPanel ( { isEdit, reward, currencyTitle, switchStatus, clickEdit, cl
             </div>
             <div className="panel-body">
                 <div className="filter">
-                    <RadioGroup title="Verification Type" options={initVerificationType} disabled={!isEdit} toggle={() => {}} selected={reward.verificationType} />
+                    <RadioGroup title="Verification Type" options={initVerificationType} disabled={!isEdit} toggle={toggleType} selected={reward.verificationType} />
                     <div className="row-flex">
-                        <InputBox type="Number" value={reward.phoneReward} title={reward.verificationType === 0 ? "Phone Reward": "Phone & Email Reward"} disabled={!isEdit} dataColumn="123456789" />
+                        <InputBox type="Number" value={reward.phoneReward} title={reward.verificationType === 0 ? "Phone Reward": "Phone & Email Reward"} disabled={!isEdit} onChange={inputReward} dataColumn="phoneReward" />
                     </div>
                     {reward.verificationType === 0 ?
                     <div className="row-flex">
-                        <InputBox type="Number" value={reward.emailReward} title="Email Reward" disabled={!isEdit} dataColumn="123456789" />
+                        <InputBox type="Number" value={reward.emailReward} title="Email Reward" disabled={!isEdit} onChange={inputReward} dataColumn="emailReward" />
                     </div> : null}
 
                     <div className="row-flex">
