@@ -54,6 +54,7 @@ namespace BackendSite.Controllers.Api
             }
 
             apiResult.Data = referralManagementList;
+            apiResult.ErrorCode = 0;
             return apiResult;
         }
         [HttpPost]
@@ -96,8 +97,8 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
             }
+            apiResult.ErrorCode = 0;
             return apiResult;
-
         }
         public class ReferralCustListReq
         {
