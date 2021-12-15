@@ -113,13 +113,12 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<ReferralCustList> GetReferralCustList(ReferralCustListReq referralCustListReq)
         {
             var apiResult = new ApiListResult<ReferralCustList>();
-            int totalPages = 0, rowCount = 0;
 
             var pageNumber = referralCustListReq.PageNumber;
             var pageSize = 10;
             if (referralCustListReq.PageSize > 0)
                 pageSize = referralCustListReq.PageSize;
-            apiResult.Data = referralManagementBLL.GetReferralCustList(referralCustListReq.SelectSite, referralCustListReq.UserName, referralCustListReq.CurrencyId, pageSize, ref pageNumber, out totalPages, out rowCount);
+            apiResult.Data = referralManagementBLL.GetReferralCustList(referralCustListReq.SelectSite, referralCustListReq.UserName, referralCustListReq.CurrencyId, pageSize, ref pageNumber, out var totalPages, out var rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;
