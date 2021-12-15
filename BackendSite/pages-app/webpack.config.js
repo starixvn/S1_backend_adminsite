@@ -69,10 +69,10 @@ module.exports = {
     // "CSD/ChangeVipLevelBatch.min": [
     // 	"./src/pages/CSD/ChangeVipLevelBatch/index.js"
     // ],
-    "Marketing/BonusManage.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/BonusManage/index.jsx",
-    ],
+    // "Marketing/BonusManage.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/BonusManage/index.jsx",
+    // ],
     // "Marketing/PendingBonus.min": [
     // 	"./src/pages/Marketing/PendingBonus/index.jsx"
     // ],
@@ -245,6 +245,10 @@ module.exports = {
     // "Finance/USDTWithdrawalLimitManagement.min": [
     //   "./src/pages/Finance/USDTWithdrawalLimitManagement/index.js",
     // ],
+    "Marketing/VerificationReward.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/VerificationReward/index.js",
+    ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
