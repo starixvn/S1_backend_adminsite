@@ -631,6 +631,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult<bool>();
             int OldStatus = 0;
             int NewStatus = 0;
+            string rewardMsg = "";
             var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(request.CustId);
             switch (request.Option)
             {
@@ -653,6 +654,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             if (!data)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+            }
+            
+            if (OldStatus == 0 && (request.Option == 3 || request.Option == 4))
+            {
+                var rtn = _custInfoBll.SetVerificationReward(request.CustId, request.Option);
+                rewardMsg = "VerificationReward : " + rtn.Message;
             }
 
             var Menu = "CustManage/CustInfoList";
@@ -687,7 +694,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return new ApiResult
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Message = "Update Success."
+                Message = "Update Success."+ rewardMsg
             };
         }
 
