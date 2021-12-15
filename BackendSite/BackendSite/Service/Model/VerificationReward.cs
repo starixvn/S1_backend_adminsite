@@ -5,6 +5,7 @@ namespace BackendSite.Service.Model
     public class GetVerificationRewardRequest
     {
         public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
     }
     
     public class VerificationRewardModel

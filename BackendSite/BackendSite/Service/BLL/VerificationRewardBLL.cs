@@ -13,10 +13,9 @@ namespace BackendSite.Service.BLL
         {
             _verificationRewardService = verificationRewardService;
         }
-        public async Task<IEnumerable<VerificationRewardModel>> GetVerificationRewardSetting(int siteId)
+        public async Task<VerificationRewardModel> GetVerificationReward(int siteId, int currencyId)
         {
-            var verificationRewards = await _verificationRewardService.GetVerificationRewardSetting(siteId);
-            return verificationRewards;
+            return await _verificationRewardService.GetVerificationReward(siteId, currencyId);
         }
         
         public async Task<int> SetVerificationReward(int siteId, int currencyId, int verificationType, decimal phoneReward, decimal emailReward, string updateOperator)
