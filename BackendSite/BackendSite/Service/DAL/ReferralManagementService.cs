@@ -7,27 +7,31 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.DAL
 {
     public class ReferralManagementService
     {
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration _configuration;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public ReferralManagementService(IConfiguration configuration)
+        public ReferralManagementService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _configuration = provider.GetRequiredService<IConfiguration>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public IEnumerable<ReferralList> GetReferralBySiteId(int SiteId)
+        public IEnumerable<ReferralList> GetReferralBySiteId(int siteId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            conn.Open();
-            return conn.Query<ReferralList>("Admin_Referral_Get", new { SiteId }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<ReferralList>("Admin_Referral_Get", new DynamicParameters(new {SiteId = siteId }));
         }
         public void SetReferral(List<ReferralManagement> referralList)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var para = new List<ReferralList>();
             referralList.ForEach(x =>
             {
@@ -44,12 +48,11 @@ namespace BackendSite.Service.DAL
                     });
                 }
             });
-            conn.Execute("Admin_Referral_Set", para, commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_Referral_Set", new DynamicParameters(para));
         }
-        public void SetReferralStatus(int SiteId, int CurrencyId)
+        public void SetReferralStatus(int siteId, int currencyId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            conn.Execute("Admin_Referral_Status_Set", new { SiteId, CurrencyId }, commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_Referral_Status_Set", new DynamicParameters(new {SiteId = siteId, CurrencyId = currencyId }));
         }
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
@@ -66,7 +69,7 @@ namespace BackendSite.Service.DAL
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var result = conn.Query<ReferralCustList>("Admin_ReferralCustlist_Get", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
@@ -81,7 +84,7 @@ namespace BackendSite.Service.DAL
             out int TotalPages,
             out int RowCount)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var SpName = "Admin_ReferralFriendList_Get_V3";
             var props = new DynamicParameters();
             props.Add("_CustId", custId);
