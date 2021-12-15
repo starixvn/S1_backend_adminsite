@@ -554,6 +554,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<bool>();
             int OldStatus = 0;
             int NewStatus = 0;
+
+            string rewardMsg = "";
             var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(custStatusSwitch.CustId);
             switch (custStatusSwitch.Op)
             {
@@ -575,6 +577,11 @@ namespace BackendSite.Controllers.Api
 
             if (data)
             {
+                if(OldStatus == 0 &&(custStatusSwitch.Op == 3 || custStatusSwitch.Op == 4))
+                {
+                    var rtn = custInfoBLL.SetVerificationReward(custStatusSwitch.CustId, custStatusSwitch.Op);
+                    rewardMsg = " VerificationReward : "+ rtn.Message;
+                }
                 var Menu = "CustManage/CustInfoList";
                 var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
@@ -607,13 +614,23 @@ namespace BackendSite.Controllers.Api
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
-                    Message = "Update Success."
+                    Message = "Update Success." + rewardMsg
                 };
             }
             else
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
             }
+        }
+        [HttpPost]
+        public ApiResult CheckRewardCondination(CustStatusSwitch custStatusSwitch)
+        {
+            var apiResult = new ApiResult();
+            if  (custStatusSwitch.Op == 3 || custStatusSwitch.Op == 4)
+            {
+                apiResult = custInfoBLL.CheckRewardCondination(custStatusSwitch.CustId, custStatusSwitch.Op);
+            }
+            return apiResult;
         }
 
         #endregion

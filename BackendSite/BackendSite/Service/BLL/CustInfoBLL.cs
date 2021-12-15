@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 namespace BackendSite.Service.BLL
 {
@@ -28,6 +29,9 @@ namespace BackendSite.Service.BLL
         private readonly RollOverService _rolloverService;
         private readonly CustTurnoverService _custTurnoverService;
         private readonly BonusInfoService _bonusInfoService;
+        private readonly CourierAdapter _courierAdapter;
+        private readonly string _bonusApiUrl;
+
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -41,6 +45,9 @@ namespace BackendSite.Service.BLL
             _rolloverService = provider.GetRequiredService<RollOverService>();
             _custTurnoverService = provider.GetRequiredService<CustTurnoverService>();
             _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+            _bonusApiUrl = configuration.GetValue<string>("BonusService");
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -680,6 +687,68 @@ namespace BackendSite.Service.BLL
             }
 
             return rewardMessage;
+        }
+        public ApiResult SetVerificationReward(int custId,int Op)
+        {
+            var apiResult = new ApiResult();
+            var myUrl = $"{_bonusApiUrl}SetVerificationReward";
+            int type = -1;
+            switch (Op)
+            {
+                case 3:
+                    type = (int)VerificationType.SMS;
+                    break;
+                case 4:
+                    type = (int)VerificationType.Email;
+                    break;
+            }
+            if (type == -1)
+            {
+                apiResult.Message = "Unsupport Type";
+                return apiResult;
+            }
+
+            var verificationReq = new SetVerificationReq()
+            {
+                CustId = custId,
+                VerificationType = type
+            };
+
+          
+                apiResult =  _courierAdapter.MyPostAsync<ApiResult, SetVerificationReq>(myUrl, verificationReq).Result;
+
+            return apiResult;
+        }
+
+        public ApiResult CheckRewardCondination(int custId, int Op)
+        {
+            var apiResult = new ApiResult();
+            var myUrl = $"{_bonusApiUrl}CheckRewardCondination";
+            int type = -1;
+            switch (Op)
+            {
+                case 3:
+                    type = (int)VerificationType.SMS;
+                    break;
+                case 4:
+                    type = (int)VerificationType.Email;
+                    break;
+            }
+            if (type == -1)
+            {
+                apiResult.ErrorCode = -1;
+                return apiResult;
+            }
+
+            var verificationReq = new SetVerificationReq()
+            {
+                CustId = custId,
+                VerificationType = type
+            };
+
+            var data = _courierAdapter.MyPostAsync<ApiResult, SetVerificationReq>(myUrl, verificationReq).Result;
+            
+            return data;
         }
     }
 }

@@ -954,41 +954,104 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
         }
 
         onPhoneVerifiedChange(e) {
-            if (confirm('Are you sure change PhoneVerified ?')) {
-                let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetCustStatusSwitch', { CustId: data.custId, OP: 3 })
+            let data = this.props.CustInfoData;
+            let text = "";
+            let defaultmsg = 'Are you sure change PhoneVerified ? ';
+                axios.post('/api/CustManage/CheckRewardCondination', { CustId: data.custId, OP: 3 })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
                         if (result.errorCode == 0) {
-                            this.props.onGetCustInfoDetail();
+                            text = result.message +'\r\nVerification Reward will payout immediately. \r\n'
+                            if (confirm(text + defaultmsg)) {
+                
+                                axios.post('/api/CustManage/SetCustStatusSwitch', { CustId: data.custId, OP: 3 })
+                                    .then(function (response) {
+                                        //Loading.UnLoading();
+                                        let result = response.data;
+                                        if (result.errorCode == 0) {
+                                            this.props.onGetCustInfoDetail();
+                                        } else {
+                                            alert(result.message);
+                                        }
+                                    }.bind(this)).catch(function (error) {
+                                        //Loading.UnLoading();
+                                        alert(error);
+                                    }.bind(this));
+                            }
                         } else {
-                            alert(result.message);
+                            if (confirm(defaultmsg)) {
+                
+                                axios.post('/api/CustManage/SetCustStatusSwitch', { CustId: data.custId, OP: 3 })
+                                    .then(function (response) {
+                                        //Loading.UnLoading();
+                                        let result = response.data;
+                                        if (result.errorCode == 0) {
+                                            this.props.onGetCustInfoDetail();
+                                        } else {
+                                            alert(result.message);
+                                        }
+                                    }.bind(this)).catch(function (error) {
+                                        //Loading.UnLoading();
+                                        alert(error);
+                                    }.bind(this));
+                            }
+                           
                         }
                     }.bind(this)).catch(function (error) {
-                        //Loading.UnLoading();
-                        alert(error);
+                       
                     }.bind(this));
-            }
         }
 
         onEmailVerifiedChange(e) {
-            if (confirm('Are you sure change EmailVerified ?')) {
-                let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetCustStatusSwitch', { CustId: data.custId, OP: 4 })
-                    .then(function (response) {
-                        //Loading.UnLoading();
-                        let result = response.data;
-                        if (result.errorCode == 0) {
-                            this.props.onGetCustInfoDetail();
-                        } else {
-                            alert(result.message);
+            let data = this.props.CustInfoData;
+            let text = "";
+            let defaultmsg = 'Are you sure change EmailVerified ?';
+            axios.post('/api/CustManage/CheckRewardCondination', { CustId: data.custId, OP: 4 })
+                .then(function (response) {
+                    //Loading.UnLoading();
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        text = result.message +'\r\nVerification Reward will payout immediately. \r\n'
+                        if (confirm(text+defaultmsg)) {
+            
+                            axios.post('/api/CustManage/SetCustStatusSwitch', { CustId: data.custId, OP: 4 })
+                                .then(function (response) {
+                                    //Loading.UnLoading();
+                                    let result = response.data;
+                                    if (result.errorCode == 0) {
+                                        this.props.onGetCustInfoDetail();
+                                    } else {
+                                        alert(result.message);
+                                    }
+                                }.bind(this)).catch(function (error) {
+                                    //Loading.UnLoading();
+                                    alert(error);
+                                }.bind(this));
                         }
-                    }.bind(this)).catch(function (error) {
-                        //Loading.UnLoading();
-                        alert(error);
-                    }.bind(this));
-            }
+                    } else {
+                        if (confirm(defaultmsg)) {
+            
+                            axios.post('/api/CustManage/SetCustStatusSwitch', { CustId: data.custId, OP: 4 })
+                                .then(function (response) {
+                                    //Loading.UnLoading();
+                                    let result = response.data;
+                                    if (result.errorCode == 0) {
+                                        this.props.onGetCustInfoDetail();
+                                    } else {
+                                        alert(result.message);
+                                    }
+                                }.bind(this)).catch(function (error) {
+                                    //Loading.UnLoading();
+                                    alert(error);
+                                }.bind(this));
+                        }
+                        
+                    }
+                }.bind(this)).catch(function (error) {
+                    
+                }.bind(this));
+            
         }
 
         onAskReupload() {
