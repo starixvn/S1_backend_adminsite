@@ -19,11 +19,10 @@ namespace BackendSite.Service.DAL
             _mainDbClient = mySqlClients.FirstOrDefault(a => a.DataBase == DataBase.Main);
             _reportDbClient = mySqlClients.FirstOrDefault(a => a.DataBase == DataBase.Report);
         }
-        public async Task<IEnumerable<VerificationRewardModel>> GetVerificationRewardSetting(int siteId)
+        public async Task<VerificationRewardModel> GetVerificationReward(int siteId, int currencyId)
         {
-            var p = new DynamicParameters(new {_SiteId = siteId});
-            var verificationRewards = await _reportDbClient.QueryAsync<VerificationRewardModel>("Admin_VerificationReward_Get", p);
-            return verificationRewards;
+            var p = new DynamicParameters(new {_SiteId = siteId, _CurrencyId = currencyId});
+            return await _reportDbClient.QueryFirstAsync<VerificationRewardModel>("Admin_VerificationReward_Get", p);
         }
 
         public async Task<int> InsertOrUpdate(int siteId, int currencyId, int verificationType, decimal phoneReward, decimal emailReward, string updateOperator)
