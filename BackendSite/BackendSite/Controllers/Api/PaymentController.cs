@@ -1020,16 +1020,25 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResultCurrencyAmount<VipRebateInfo>();
             try
             {
-                var CurrencyAmount = new List<string>();
-                var SearchResult = _paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, para.StartDate,
-                    para.EndDate, para.User, para.PageSize, para.PageNumber,
-                    para.CategoryId, para.BaseCurrencyId, ref CurrencyAmount);
-                apiResult.Data = SearchResult.VipRebateInfoList;
-                apiResult.PageNumber = SearchResult.PageNumber;
-                apiResult.TotalPages = SearchResult.TotalPages;
-                apiResult.RowCount = SearchResult.RowCount;
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate).AddHours(8);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate).AddHours(8).AddDays(1).AddSeconds(-1);
+                
+                var currencyAmount = new List<string>();
+                var searchResult = _paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, startTime,
+                    endTime, para.User, para.PageSize, para.PageNumber,
+                    para.CategoryId, para.BaseCurrencyId, ref currencyAmount);
+                
+                foreach (var data in searchResult.VipRebateInfoList)
+                {
+                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0));
+                }
+                
+                apiResult.Data = searchResult.VipRebateInfoList;
+                apiResult.PageNumber = searchResult.PageNumber;
+                apiResult.TotalPages = searchResult.TotalPages;
+                apiResult.RowCount = searchResult.RowCount;
                 apiResult.ErrorCode = 0;
-                apiResult.CurrencyAmount = CurrencyAmount;
+                apiResult.CurrencyAmount = currencyAmount;
             }
             catch (Exception ex)
             {
@@ -1078,13 +1087,22 @@ namespace BackendSite.Controllers.Api
         public IActionResult GetVipRebateInfoListExport(string SelectSite, int Currency, long StartDate, long EndDate,
             string User, int CategoryId, int BaseCurrencyId, int RebateCategoriesId)
         {
-            var SearchResult = _paymentBLL.GetVipRebateInfoListExport(SelectSite, Currency, StartDate, EndDate, User,
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate).AddHours(8);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate).AddHours(8).AddDays(1).AddSeconds(-1);
+            
+            var searchResult = _paymentBLL.GetVipRebateInfoListExport(SelectSite, Currency, startTime, endTime, User,
                 CategoryId, BaseCurrencyId, RebateCategoriesId);
-            var stream = _excelBLL.Export(SearchResult.VipRebateInfoList);
+            foreach (var data in searchResult.VipRebateInfoList)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+            
+            var stream = _excelBLL.Export(searchResult.VipRebateInfoList);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VipRebateReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
+        
         public ApiResult<IEnumerable<VipTPCategory>> GetTPCategoryListByVipRebate()
         {
             var apiResult = new ApiResult<IEnumerable<VipTPCategory>>
