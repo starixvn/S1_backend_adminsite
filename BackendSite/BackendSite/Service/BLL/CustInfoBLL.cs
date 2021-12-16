@@ -696,10 +696,10 @@ namespace BackendSite.Service.BLL
             switch (Op)
             {
                 case 3:
-                    type = (int)VerificationType.SMS;
+                    type = (int)OTPTypeEnum.SMS;
                     break;
                 case 4:
-                    type = (int)VerificationType.Email;
+                    type = (int)OTPTypeEnum.Email;
                     break;
             }
             if (type == -1)
@@ -711,7 +711,7 @@ namespace BackendSite.Service.BLL
             var verificationReq = new SetVerificationReq()
             {
                 CustId = custId,
-                VerificationType = type
+                OTPType = type
             };
 
           
@@ -728,10 +728,10 @@ namespace BackendSite.Service.BLL
             switch (Op)
             {
                 case 3:
-                    type = (int)VerificationType.SMS;
+                    type = (int)OTPTypeEnum.SMS;
                     break;
                 case 4:
-                    type = (int)VerificationType.Email;
+                    type = (int)OTPTypeEnum.Email;
                     break;
             }
             if (type == -1)
@@ -743,7 +743,7 @@ namespace BackendSite.Service.BLL
             var verificationReq = new SetVerificationReq()
             {
                 CustId = custId,
-                VerificationType = type
+                OTPType = type
             };
 
             var data = _courierAdapter.MyPostAsync<ApiResult, SetVerificationReq>(myUrl, verificationReq).Result;
