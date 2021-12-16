@@ -166,12 +166,12 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate,
-            long endDate, string User, int pageSize, int pageNumber, int CategoryId, int BaseCurrencyId,
-            ref List<string> CurrencyAmount)
+        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, DateTime startDate,
+            DateTime endDate, string user, int pageSize, int pageNumber, int categoryId, int baseCurrencyId,
+            ref List<string> currencyAmount)
         {
-            return walletService.GetVipRebateInfoList(selectSite, currency, startDate, endDate, User, pageSize,
-                pageNumber, CategoryId, BaseCurrencyId, ref CurrencyAmount);
+            return walletService.GetVipRebateInfoList(selectSite, currency, startDate, endDate, user, pageSize,
+                pageNumber, categoryId, baseCurrencyId, ref currencyAmount);
         }
 
         public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, DateTime? startDate, DateTime? endDate, int pageSize,
@@ -180,11 +180,11 @@ namespace BackendSite.Service.BLL
             return walletService.GetVipRebateInfoListByCustId(custId, startDate, endDate, pageSize, pageNumber);
         }
 
-        public VipRebateInfoData GetVipRebateInfoListExport(string selectSite, int currency, long startDate,
-            long endDate, string User, int CategoryId, int BaseCurrencyId, int RebateCategoriesId)
+        public VipRebateInfoData GetVipRebateInfoListExport(string selectSite, int currency, DateTime startDate,
+            DateTime endDate, string user, int categoryId, int baseCurrencyId, int rebateCategoriesId)
         {
-            return walletService.GetVipRebateInfoListExport(selectSite, currency, startDate, endDate, User, CategoryId,
-                BaseCurrencyId, RebateCategoriesId);
+            return walletService.GetVipRebateInfoListExport(selectSite, currency, startDate, endDate, user, categoryId,
+                baseCurrencyId, rebateCategoriesId);
         }
 
         public IEnumerable<VipTPCategory> GetTPCategoryList()

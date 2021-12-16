@@ -152,7 +152,7 @@ namespace BackendSite.Service.Model
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
         public decimal RCRedeemAmount { get; set; }
-        public DateTime CreateTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
         public string RefId { get; set; }
         public int SettledDate { get; set; }
     }
