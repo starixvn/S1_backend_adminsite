@@ -10,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static BackendSite.Controllers.Api.AdminUserController;
 
 namespace BackendSite.Controllers.ApiV2.Admin.Setting
 {
@@ -193,13 +192,13 @@ namespace BackendSite.Controllers.ApiV2.Admin.Setting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Admin/UserAuthoritySetting" })]
         [HttpPost]
-        public ApiResult<IEnumerable<DisplayList>> GetAllowedSiteListByUserId(GetByUserIdRequest request)
+        public ApiResult<IEnumerable<Api.AdminUserController.DisplayList>> GetAllowedSiteListByUserId(GetByUserIdRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<DisplayList>>();
+            var apiResult = new ApiResult<IEnumerable<Api.AdminUserController.DisplayList>>();
 
             var assignSites = _adminUserBll.GetAssignSiteList(request.UserId);
             var allSiteList = _serverInfoBll.GetSiteList();
-            apiResult.Data = allSiteList.Select(x => new DisplayList() { Id = x.SiteId, DisplayText = x.SiteName, Selected = assignSites.Any(y => y.SiteId == x.SiteId) });
+            apiResult.Data = allSiteList.Select(x => new Api.AdminUserController.DisplayList() { Id = x.SiteId, DisplayText = x.SiteName, Selected = assignSites.Any(y => y.SiteId == x.SiteId) });
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return apiResult;
