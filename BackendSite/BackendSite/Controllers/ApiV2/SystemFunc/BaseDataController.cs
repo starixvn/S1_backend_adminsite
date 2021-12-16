@@ -428,25 +428,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-        
-        /// <summary>
-        /// BaseData/GetTpGameTypeListbyCategory 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<TpGameType>> GetTpGameTypeListByCategory(GameTypeListReq gameTypeListReq)
-        {
-            var apiResult = new ApiResult<IEnumerable<TpGameType>>
-            {
-                ErrorCode = 0,
-                Data = _rebateManageBll.GetTpGameTypeListByCategory(gameTypeListReq.CategoryId)
-            };
-            return apiResult;
-        }
 
         /// <summary>
         /// BaseData/GetBankInfoOffListByCustVerify 根據客戶驗證取得銀行戶口資料清單
