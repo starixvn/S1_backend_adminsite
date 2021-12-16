@@ -15,6 +15,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralReport" })]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class ReferralReportController : ControllerBase
     {
         #region Fields

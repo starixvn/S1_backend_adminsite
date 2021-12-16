@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.Admin.Home
 {
+    [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class HomeController : ControllerBase

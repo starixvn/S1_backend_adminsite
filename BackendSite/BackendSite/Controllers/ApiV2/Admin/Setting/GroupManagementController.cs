@@ -11,6 +11,7 @@ using System.Collections.Generic;
 
 namespace BackendSite.Controllers.ApiV2.Admin.Setting
 {
+    [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class GroupManagementController : ControllerBase

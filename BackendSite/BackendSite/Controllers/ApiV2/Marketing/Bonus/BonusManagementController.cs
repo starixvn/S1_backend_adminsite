@@ -19,6 +19,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusManage" })]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class BonusManagementController : ControllerBase
     {
         #region Fields
@@ -120,7 +121,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> GetPromotionList(GetPromotionListReq request)
+        public ApiResult<IEnumerable<PromotionInfo>> GetList(GetPromotionListReq request)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
 
@@ -310,7 +311,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> SetPromotion(SetPromotionReq req)
+        public ApiResult<IEnumerable<PromotionInfo>> Set(SetPromotionReq req)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
            
@@ -362,7 +363,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> DuplicatePromotion(DuplicateReq req)
+        public ApiResult<IEnumerable<PromotionInfo>> Duplicate(DuplicateReq req)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
         

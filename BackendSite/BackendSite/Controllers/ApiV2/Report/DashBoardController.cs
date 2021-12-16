@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -13,10 +14,10 @@ namespace BackendSite.Controllers.ApiV2.Report
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class DashBoardController : Controller
+    public class DashBoardController : ControllerBase
     {
         #region Fields
-        
+
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly DashBoardBLL _dashBoardBll;
 
@@ -32,9 +33,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         #endregion
 
-        #region Model
+        #region API Model
 
-        public class DashBoardReq
+        public class GetDataRequest
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
@@ -43,38 +44,32 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         #endregion
-        
-        // GET
+
         /// <summary>
-        /// DashBoard/GetDashBoardData 取得首頁儀錶板資訊資料
+        /// DashBoard/GetData 取得首頁儀錶板資訊資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
         /// Func Path：Home > Dash Board > [Refresh]
         /// </remarks>
-        /// <param name="req">參數</param>
+        /// <param name="request">參數</param>
         /// <returns>結果</returns>
         [HttpPost]
-        public ApiResult GetDashBoardData(DashBoardReq req)
+        public ApiResult GetData(GetDataRequest request)
         {
             var canSearchSite = new List<int>();
-            if (req.TimeZone <= 14 && req.TimeZone >= -12)
-            {
-                _serverInfoBll.GetSiteListByLoginUser().ToList().ForEach(x => canSearchSite.Add(x.SiteId));
-                var result = _dashBoardBll.GetDashBoardData(req.SiteId, req.CurrencyId, req.BaseCurrencyId, canSearchSite , req.TimeZone);
 
-                return new ApiResult<DashBoardData>
-                {
-                    Data = result,
-                    ErrorCode = (int)ErrorCodeEnum.Success,
-                };
-            }
-            
+            if (request.TimeZone > 14 || request.TimeZone < -12)
+                throw new AdminException(ErrorCodeEnum.Fail, "Invalid TimeZone");
+
+            _serverInfoBll.GetSiteListByLoginUser().ToList().ForEach(x => canSearchSite.Add(x.SiteId));
+            var result = _dashBoardBll.GetDashBoardData(request.SiteId, request.CurrencyId, request.BaseCurrencyId, canSearchSite, request.TimeZone);
+
             return new ApiResult<DashBoardData>
             {
-                Message ="Invalid TimeZone",
-                ErrorCode = (int)ErrorCodeEnum.Fail,
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success,
             };
         }
     }
