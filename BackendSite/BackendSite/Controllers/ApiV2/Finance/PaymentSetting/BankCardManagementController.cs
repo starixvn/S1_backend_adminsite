@@ -3,6 +3,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 
 namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 {
+    [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BankCardManagementController : ControllerBase
