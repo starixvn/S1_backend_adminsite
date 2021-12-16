@@ -31,6 +31,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly AdminGroupBLL _adminGroupBll;
         private readonly BonusManageBLL _bonusManageBll;
+        private RebateManageBLL _rebateManageBll;
 
         #endregion
 
@@ -46,6 +47,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _adminGroupBll = provider.GetRequiredService<AdminGroupBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
+            _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
         }
 
         #endregion
@@ -264,6 +266,23 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             return apiResult;
         }
         
+        /// <summary>
+        /// GetAllData/GetTPCategoryList 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<TPCategory>> GetTPCategoryList()
+        {
+            var apiResult = new ApiResult<IEnumerable<TPCategory>>
+            {
+                ErrorCode = 0,
+                Data = _rebateManageBll.GetTPCategoryList()
+            };
+            return apiResult;
+        }
         
         #endregion
 
