@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
@@ -40,6 +41,8 @@ namespace BackendSite.Controllers.ApiV2.Report
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
             public int BaseCurrencyId { get; set; }
+            
+            [Range(-12, 14)]
             public int TimeZone { get; set; }
         }
 
