@@ -20,6 +20,8 @@ namespace BackendSite.Service.Model
         public decimal Bonus { get; set; }
         public decimal MaxBonus { get; set; }
         public int RollOver { get; set; }
+        public decimal CancelBonusAmount { get; set; }
+        public bool ExpiredCancel { get; set; }
     }
 
     public class BonusInfoFrontEnd
@@ -39,7 +41,9 @@ namespace BackendSite.Service.Model
         public decimal BonusAmount { get; set; }
         public DateTime ExpiryTime { get; set; }
         public DateTime CreateTime { get; set; }
-        public string StatusName { get; set; }   
+        public string StatusName { get; set; }
+        public decimal CancelBonusAmount { get; set; }
+        public bool ExpiredCancel { get; set; }
     }
 
     public class PendingBonus
@@ -69,6 +73,7 @@ namespace BackendSite.Service.Model
         public string UserLang { set; get; }
         public int CurrencyId { set; get; }
         public int Refund { set; get; }
+        public int Status { set; get; }
         public int PromoCategoryId { get; set; }
         public PromotionType PromotionType { get; set; }
         public decimal Bonus { set; get; }
@@ -87,5 +92,6 @@ namespace BackendSite.Service.Model
         public int BonusId { set; get; }
         public decimal RemainingBonus { set; get; }
         public decimal RefundAmount { set; get; }
+        public bool UpdateBonusTransferStatus { set; get; }
     }
 }

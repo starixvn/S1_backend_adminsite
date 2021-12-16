@@ -90,6 +90,21 @@ const dataColumnDefs = ()=>{
             }
         },
         {
+            dataColumn:'cancelBonusAmount',
+            columnTitle:'CancelBonusAmount',
+            header:{
+                attr:{
+                    class:"text-right"
+                }
+            },
+            body:{
+                attr:{
+                    class:"text-right"
+                },
+                format:numberFormat
+            }
+        },
+        {
             dataColumn:'expiryTime', 
             columnTitle:'ExpiryTime',
             body:{
@@ -104,8 +119,16 @@ const dataColumnDefs = ()=>{
             }
         },
         {
-            dataColumn:'statusName', columnTitle:'Status'
+            dataColumn:'statusName',
+            columnTitle:'Status'
         },
+        {
+            dataColumn:'expiredCancel',
+            columnTitle:'ExpiredCancel',
+            body:{
+                format:boolFormat
+            }
+        }        
     ]
 }
 
@@ -127,6 +150,7 @@ const Panel = (props)=>{
             if(element.body && element.body.subData){
                 element.body.subData.forEach(s=>{ subData[s]=data[s]});
             }
+            console.log( data[element.dataColumn]);
             return ( 
                 <td key={`td-${element.dataColumn}-${idx}`} className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}>
                     {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
@@ -179,6 +203,10 @@ const numberFormat = (number)=>{
 
 const userNameFormat = (userName, subData)=>{
     return <a href={"/CustManage/CustInfo?UserName="+userName+"&custId="+ subData.custId +"&TransId=" + subData.transId} target="_blank">{userName}</a>
+}
+
+const boolFormat = (bool)=>{
+    return (bool)? "TRUE" : "FALSE";
 }
 
 export default Panel;

@@ -253,6 +253,45 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public IEnumerable<int> Statuses { get; set; }
         }
 
+        public class ExportCustInfoListRequest
+        {
+            private DateTimeOffset _startDate;
+            private DateTimeOffset _endDate;
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            public DateTimeOffset? StartDate
+            {
+                get => _startDate;
+                set
+                {
+                    if (value != null)
+                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset? EndDate
+            {
+                get => _endDate;
+                set
+                {
+                    if (value != null)
+                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public int? BirDate { get; set; }
+            public int? BirMonth { get; set; }
+            public int? BirYear { get; set; }
+            public string UserName { get; set; }
+            public string AccountName { get; set; }
+            public string LoginIp { get; set; }
+            public string TransId { get; set; }
+            public string TpUserName { get; set; }
+            public string Email { get; set; }
+            public string PhoneNo { get; set; }
+            public int? AffId { get; set; }
+            public string BankAccountNumber { get; set; }
+            public IEnumerable<int> Statuses { get; set; }
+        }
+
         public class CustIdWithReasonRequest : CustIdRequest
         {
             /// <summary>
@@ -500,7 +539,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         [RequestSizeLimit(40000000)]
-        public IActionResult ExportCustInfoList(CustInfoListRequest request)
+        public IActionResult ExportCustInfoList(ExportCustInfoListRequest request)
         {
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
@@ -631,6 +670,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult<bool>();
             int OldStatus = 0;
             int NewStatus = 0;
+            string rewardMsg = "";
             var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(request.CustId);
             switch (request.Option)
             {
@@ -653,6 +693,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             if (!data)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+            }
+            
+            if (OldStatus == 0 && (request.Option == 3 || request.Option == 4))
+            {
+                var rtn = _custInfoBll.SetVerificationReward(request.CustId, request.Option);
+                rewardMsg = "VerificationReward : " + rtn.Message;
             }
 
             var Menu = "CustManage/CustInfoList";
@@ -687,7 +733,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return new ApiResult
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Message = "Update Success."
+                Message = "Update Success."+ rewardMsg
             };
         }
 

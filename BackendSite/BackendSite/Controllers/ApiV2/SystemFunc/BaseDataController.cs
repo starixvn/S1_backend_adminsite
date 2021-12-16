@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.ExceptionHandling;
+using BackendSite.Service.Model.CustVipLevel;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
@@ -26,6 +27,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly CustInfoBLL _custInfoBll;
         private readonly VipLevelBLL _vipLevelBll;
         private readonly CustVerifyBLL _custVerifyBll;
+        private readonly BonusManageBLL _bonusManageBll;
+        private readonly RebateManageBLL _rebateManageBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
         public BaseDataController(IServiceProvider provider)
@@ -36,6 +39,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
             _custVerifyBll = provider.GetRequiredService<CustVerifyBLL>();
+            _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
+            _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
         }
 
         #region Model
@@ -116,6 +121,12 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             public int SiteId { get; set; }
         }
+        
+        public class GetTpGameListReq
+        {
+            public int TpId { get; set; }
+            public int CategoryId { get; set; }
+        }
 
         public class GetBankInfoOffListByCustVerifyRequest
         {
@@ -124,6 +135,17 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int SiteId { get; set; }
         }
 
+        public class GetPromoCategoriesReq
+        {
+            public int WalletType { get; set; }
+            
+        }
+        
+        public class GameTypeListReq
+        {
+            public int CategoryId { get; set; }
+        }
+        
         #endregion
 
         /// <summary>
@@ -332,6 +354,79 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
             return apiListResult;
+        }
+        
+        /// <summary>
+        /// BaseData/GetCashBackGameList 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <param name="para"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<GetCashBackGamerep>> GetCashBackGameList(GetTpGameListReq para)
+        {
+            var apiResult = new ApiResult<IEnumerable<GetCashBackGamerep>>();
+
+            try
+            {
+                apiResult.Data = _bonusManageBll.GetCashBackGameList(para.TpId, para.CategoryId);
+                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int) ErrorCodeEnum.SystemException;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// BaseData/GetAllSiteVipLevelList 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<VipLevelModel>> GetAllSiteVipLevelList()
+        {
+            return new ApiResult<IEnumerable<VipLevelModel>>
+            {
+                Data = _custInfoBll.GetAllSiteVipLevelList(),
+                ErrorCode = (int) ErrorCodeEnum.Success
+            };
+        }
+        
+        /// <summary>
+        /// BaseData/GetPromoCategories 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<PromoCategory>> GetPromoCategories(GetPromoCategoriesReq req)
+        {
+            var apiResult = new ApiResult<IEnumerable<PromoCategory>>();
+
+            try
+            {
+                apiResult.Data = _bonusManageBll.GetPromoCategories(req.WalletType);
+                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int) ErrorCodeEnum.SystemException;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
         }
 
         /// <summary>

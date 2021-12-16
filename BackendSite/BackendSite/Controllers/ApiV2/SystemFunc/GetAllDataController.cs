@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using static BackendSite.Controllers.Api.AdminUserController;
+using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
@@ -29,6 +30,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly BankDetailBLL _bankDetailBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly AdminGroupBLL _adminGroupBll;
+        private readonly BonusManageBLL _bonusManageBll;
+        private RebateManageBLL _rebateManageBll;
 
         #endregion
 
@@ -43,6 +46,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _adminGroupBll = provider.GetRequiredService<AdminGroupBLL>();
+            _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
+            _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
         }
 
         #endregion
@@ -240,6 +245,45 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
 
+        
+        
+        [HttpPost]
+        public ApiResult<IEnumerable<TpGameType>> GetTpGameList()
+        {
+            var apiResult = new ApiResult<IEnumerable<TpGameType>>();
+
+            try
+            {
+                apiResult.Data = _bonusManageBll.GetTpGameList();
+                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int) ErrorCodeEnum.SystemException;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// GetAllData/GetTPCategoryList 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<TPCategory>> GetTPCategoryList()
+        {
+            var apiResult = new ApiResult<IEnumerable<TPCategory>>
+            {
+                ErrorCode = 0,
+                Data = _rebateManageBll.GetTPCategoryList()
+            };
+            return apiResult;
+        }
+        
         #endregion
 
     }

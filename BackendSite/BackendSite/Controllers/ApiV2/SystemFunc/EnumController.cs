@@ -50,6 +50,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// CustProfile - PhoneVerifiedEnum、EmailVerifiedEnum
         /// 
         /// DepositInfo - DepositTypeEnum
+        /// 
+        /// TpBetRecord - SettlementTypeEnum
         /// </remarks>
         /// <param name="reqest">參數</param>
         /// <returns>Data 結果</returns>

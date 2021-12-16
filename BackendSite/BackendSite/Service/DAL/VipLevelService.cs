@@ -1,27 +1,34 @@
-﻿using BackendSite.Service.Model;
+﻿using System;
+using BackendSite.Service.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model.CustVipLevel;
+using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.DAL
 {
     public class VipLevelService
     {
         private readonly IConfiguration _configuration;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public VipLevelService(IConfiguration configuration)
+        public VipLevelService(IServiceProvider provider)
         {
-            _configuration = configuration;
+            _configuration = provider.GetRequiredService<IConfiguration>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public IEnumerable<VipLevelSetting> GetVipLevelSetting(int SiteId)
+        public IEnumerable<VipLevelSetting> GetVipLevelSetting(int siteId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var vipLevelSetting = conn.Query<VipLevelSetting>("Admin_VipLevel_Get", new { SiteId },
-                commandType: CommandType.StoredProcedure);
+            var vipLevelSetting = _mainDbClient.Query<VipLevelSetting>("Admin_VipLevel_Get", new DynamicParameters(new {SiteId = siteId }));
             return vipLevelSetting;
         }
 
