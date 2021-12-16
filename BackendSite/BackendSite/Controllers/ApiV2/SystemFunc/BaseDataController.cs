@@ -27,6 +27,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly CustInfoBLL _custInfoBll;
         private readonly VipLevelBLL _vipLevelBll;
         private readonly BonusManageBLL _bonusManageBll;
+        private readonly RebateManageBLL _rebateManageBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
         public BaseDataController(IServiceProvider provider)
@@ -37,6 +38,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
+            _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
         }
 
         #region Model
@@ -129,6 +131,12 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int WalletType { get; set; }
             
         }
+        
+        public class GameTypeListReq
+        {
+            public int CategoryId { get; set; }
+        }
+        
         #endregion
 
         /// <summary>
@@ -409,6 +417,25 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 apiResult.RawMessage = ex.ToString();
             }
 
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// BaseData/GetTpGameTypeListbyCategory 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<TpGameType>> GetTpGameTypeListByCategory(GameTypeListReq gameTypeListReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<TpGameType>>
+            {
+                ErrorCode = 0,
+                Data = _rebateManageBll.GetTpGameTypeListByCategory(gameTypeListReq.CategoryId)
+            };
             return apiResult;
         }
 
