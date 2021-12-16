@@ -609,7 +609,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<VipLevelModel> GetAllSiteVipLevelList()
         {
-            return _reportDbClient.Query<VipLevelModel>("Common_VipLevel_Get");
+            return _reportDbClient.Query<VipLevelModel>("Common_VipLevel_Get_V2");
         }
 
         public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
