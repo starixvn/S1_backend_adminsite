@@ -1,10 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Setting
 {
@@ -18,9 +22,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         #endregion
         
         #region Constructor
-        public VerificationRewardController(VerificationRewardBLL verificationRewardBll)
+        public VerificationRewardController(IServiceProvider provider)
         {
-            _verificationRewardBll = verificationRewardBll;
+            _verificationRewardBll = provider.GetService<VerificationRewardBLL>();
         }
         #endregion
         
@@ -58,22 +62,18 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         /// <param name="request"></param>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationReward" })]
-        public async Task<ApiResult<VerificationRewardModel>> Set(SetVerificationRewardRequest request)
+        public async Task<ApiResult> Set(SetVerificationRewardRequest request)
         {
-            var apiResult = new ApiResult<VerificationRewardModel>();
+            
             var updateOperator = User.Identity.Name;
             var result = await _verificationRewardBll.SetVerificationReward(request.SiteId, request.CurrencyId,
                 request.VerificationType, request.PhoneReward, request.EmailReward, updateOperator);
-            
-            if (result == 1 || result == 2)
+
+            var apiResult = new ApiResult()
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
-                apiResult.Data = await _verificationRewardBll.GetVerificationReward(request.SiteId, request.CurrencyId);
-            }
-            else
-            {
-                apiResult.ErrorCode = result;
-            }
+                ErrorCode = (result == 1 || result == 2) ? (int) ErrorCodeEnum.Success : (int) ErrorCodeEnum.UpdateFailed,
+                Message = ErrorCodeEnum.UpdateFailed.GetDescription()
+            };
             return apiResult;
         }
         
@@ -90,19 +90,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationReward" })]
         public async Task<ApiResult> UpdateStatus(UpdateVerificationRewardStatusReq request)
         {
-            var apiResult = new ApiResult<VerificationRewardModel>();
             var updateOperator = User.Identity.Name;
             var result = await _verificationRewardBll.UpdateStatus(request.SiteId, request.CurrencyId, request.Status, updateOperator);
-            if (result == 1)
+            var apiResult = new ApiResult()
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
-                apiResult.Data = await _verificationRewardBll.GetVerificationReward(request.SiteId, request.CurrencyId);
-            }
-            else
-            {
-                apiResult.ErrorCode = result;
-            }
-
+                ErrorCode = (result == 1 || result == 2) ? (int) ErrorCodeEnum.Success : (int) ErrorCodeEnum.UpdateFailed,
+                Message = ErrorCodeEnum.UpdateFailed.GetDescription()
+            };
             return apiResult;
         }
         #endregion

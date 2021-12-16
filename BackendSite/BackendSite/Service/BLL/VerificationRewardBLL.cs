@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.BLL
 {
@@ -10,10 +12,10 @@ namespace BackendSite.Service.BLL
         private readonly VerificationRewardService _verificationRewardService;
         private readonly AdjustmentInfoLogService _adjustmentInfoLogService;
 
-        public VerificationRewardBLL(VerificationRewardService verificationRewardService, AdjustmentInfoLogService adjustmentInfoLogService)
+        public VerificationRewardBLL(IServiceProvider provider)
         {
-            _verificationRewardService = verificationRewardService;
-            _adjustmentInfoLogService = adjustmentInfoLogService;
+            _verificationRewardService = provider.GetService<VerificationRewardService>();
+            _adjustmentInfoLogService = provider.GetService<AdjustmentInfoLogService>();
         }
         public async Task<VerificationRewardModel> GetVerificationReward(int siteId, int currencyId)
         {

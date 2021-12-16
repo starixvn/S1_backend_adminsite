@@ -49,7 +49,7 @@ const App = () => {
           
         WebAPI.PostData(param).then((res) => {
             if (res.data.errorCode === 0) {
-                setReward(res.data.data)
+                getVerificationReward(current.siteId, current.currencyId)
                 alert("success.");
             } else {
                 alert(res.data.message);
@@ -95,7 +95,7 @@ const App = () => {
           
         WebAPI.PostData(param).then((res) => {
             if (res.data.errorCode === 0) {
-                setReward(res.data.data)
+                getVerificationReward(current.siteId, current.currencyId)
                 setFlag(!isEdit)
                 alert("success.");
             } else {
