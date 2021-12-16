@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
@@ -15,18 +16,20 @@ namespace BackendSite.Service.BLL
 
         private readonly ReportService reportService;
         private readonly SelLangBLL selLangBLL;
+        private readonly Common _common;
 
         #endregion
 
         #region Constructors
 
         public ReportBLL(ReportService reportService,
-                         SelLangBLL selLangBLL)
+                         SelLangBLL selLangBLL,
+                         Common common)
         {
             this.reportService = reportService;
             this.selLangBLL = selLangBLL;
+            _common = common;
         }
-
 
         #endregion
 
@@ -66,14 +69,14 @@ namespace BackendSite.Service.BLL
         {
             return reportService.GetCurrencyList();
         }
-        
+
         public async Task<IEnumerable<TpCategoryBetLimit>> GetTpCategoryList()
         {
             var tpCategories = await reportService.GetTpCategoryList();
 
-            return tpCategories.Select(category => new TpCategoryBetLimit() {CategoryId = category.CategoryId, CategoryName = category.CategoryName}).ToList();
+            return tpCategories.Select(category => new TpCategoryBetLimit() { CategoryId = category.CategoryId, CategoryName = category.CategoryName }).ToList();
         }
-        
+
 
         #endregion
 
@@ -420,13 +423,19 @@ namespace BackendSite.Service.BLL
             return Data;
         }
 
-        public IEnumerable<UserOnlineReportModel> GetUserOnlineReport(string siteIds, string selectDate,string timeZome)
+        public IEnumerable<UserOnlineReportModel> GetUserOnlineReport(string siteIds, string selectDate, int timeZone)
         {
             var keyValuePairs = new Dictionary<string, UserOnlineReportModel>();
             string dateTimeFormat;
-            var userOnlineList = reportService.GetUserOnlineReport(siteIds, selectDate,timeZome);
             var siteList = JsonConvert.DeserializeObject<List<int>>(siteIds);
             var serverInfoList = reportService.GetServerInfoList();
+
+            var date = new DateTimeOffset(Convert.ToDateTime(selectDate), TimeSpan.FromHours(timeZone));
+            var startTime = new DateTimeOffset(date.ToUniversalTime().DateTime, TimeSpan.Zero);
+            var endTime = new DateTimeOffset(date.ToUniversalTime().DateTime, TimeSpan.Zero).AddHours(24).AddMilliseconds(-1);
+            var timeZoneString = _common.TransferToTimeZoneFormat(timeZone);
+
+            var userOnlineList = reportService.GetUserOnlineReport(siteIds, startTime.DateTime, endTime.DateTime, timeZoneString);
 
             #region Data Statistical
 
@@ -463,7 +472,7 @@ namespace BackendSite.Service.BLL
             }
 
             #endregion
-            
+
             return keyValuePairs
                 .Select(s => s.Value)
                 .OrderBy(value => value.LocalTime)

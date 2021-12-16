@@ -37,7 +37,7 @@ namespace BackendSite.Service.Model.enums
     public enum ActStatusEnum
     {
         NonDepoist = 1,
-        Depoisted = 2,
+        Deposited = 2,
     }
 
     public enum CustomerStatusEnum
@@ -203,6 +203,19 @@ namespace BackendSite.Service.Model.enums
         Rejected = 7,
         ToKyc = 8,
         Error = 99  //No Use
+    }
+
+    #endregion
+
+    #region TpBetRecord
+
+    public enum SettlementTypeEnum
+    {
+        UnSettled = 0,
+        SettledForValid = 1,
+        SettledForInvalid = 2,
+        SettledForValidNotRollover = 3,
+        Cheating = 4,
     }
 
     #endregion
@@ -496,7 +509,7 @@ namespace BackendSite.Service.Model.enums
         Saba = 1,
         PT = 27
     }
-    
+
     public enum BalanceAdjustmentType
     {
         BalancePlus = 1,
