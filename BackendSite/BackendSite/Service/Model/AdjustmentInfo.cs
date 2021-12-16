@@ -42,7 +42,7 @@ namespace BackendSite.Service.Model
     public class SetVerificationReq
     {
         public int CustId { get; set; }
-        public int VerificationType { get; set; }
+        public int OTPType { get; set; }
     }
 }
 
