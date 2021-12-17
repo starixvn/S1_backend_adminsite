@@ -194,10 +194,10 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<Comments>>();
             var comments = depositBLL.GetDepositRequestComment(depositReq.TransId);
             
-            foreach (var data in comments)
-            {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8,0,0)).AddHours(8);
-            }
+            //foreach (var data in comments)
+            //{
+            //    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8,0,0)).AddHours(8);
+            //}
             
             apiResult.Data = comments;
             apiResult.ErrorCode = 0;
