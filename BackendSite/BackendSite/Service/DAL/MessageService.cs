@@ -167,7 +167,7 @@ namespace BackendSite.Service.DAL
                 using var connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
                 connection.Open();
                 using var trans = connection.BeginTransaction();
-                var result = _mainDbClient.Execute("Admin_Msg_BatchV2_Ins", new DynamicParameters(new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg, BatchId = batchId }), trans);
+                var result = _mainDbClient.Execute("Admin_Msg_BatchV2_Ins", new DynamicParameters(new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg, BatchId = batchId }), connection, trans);
 
                 if (result == 1)
                 {
