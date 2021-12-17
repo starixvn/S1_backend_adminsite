@@ -138,7 +138,14 @@ namespace BackendSite.Controllers.Api
                                                        out rowCount,
                                                        out totalAmount);
 
-
+            foreach (var item in data)
+            {
+                item.CreateTime = new DateTimeOffset(item.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (item.UpdateTime != null)
+                    item.UpdateTime = new DateTimeOffset(item.UpdateTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (item.DepositTime != null)
+                    item.DepositTime = new DateTimeOffset(item.DepositTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
 
             return new ApiListResultTotalAmount<DepositRequest>
             {
