@@ -276,9 +276,9 @@ namespace BackendSite.Controllers.Api
         {
             var pageNumber = getFinancialLogReq.PageNumber;
             var startDate = getFinancialLogReq.StartDate == null ? (DateTime?) null
-                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getFinancialLogReq.StartDate);
+                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getFinancialLogReq.StartDate).AddHours(-8);
             var endDate = getFinancialLogReq.EndDate == null ? (DateTime?) null
-                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getFinancialLogReq.EndDate);
+                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getFinancialLogReq.EndDate).AddHours(-8);
             
             var data = _paymentBLL.GetFinancialLog(getFinancialLogReq.CustId, startDate,
                 endDate, getFinancialLogReq.RefTransId, 10, ref pageNumber, out var totalPages,
