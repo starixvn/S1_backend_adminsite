@@ -283,11 +283,11 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             props.Add("CustId", custId);
             props.Add("StartDate", startDate);
-            if (endDate != null) { props.Add("EndDate", endDate.Value.AddDays(1).AddSeconds(-1)); }
-            else { props.Add("EndDate"); }
-
+            //if (endDate != null) { props.Add("EndDate", endDate.Value.AddDays(1).AddSeconds(-1)); }
+            //else { props.Add("EndDate"); }
+            props.Add("EndDate", endDate);
             #region GetCurrencyTotalAmount
-            
+
             var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_VipRebateTotalAmountbyCust_Get_V3", props).ToList();
             if (currencyTotalAmount.Count > 0)
             {
