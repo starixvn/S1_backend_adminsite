@@ -34,7 +34,7 @@ namespace BackendSite.Service.BLL
             return messageService.SendMessageToPlayer(customer.SiteId, sender, title, content, custId, customer.UserName, customer.UserLang, SenderCustId);
         }
 
-        public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, DateTimeOffset startDate, DateTimeOffset endDate, int status,int PageNumber, int PageSize, ref int TotalPages, ref int RowCount)
+        public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, DateTimeOffset startDate, DateTimeOffset endDate, int status, int PageNumber, int PageSize, ref int TotalPages, ref int RowCount)
         {
             return messageService.GetAnnouncements(JsonConvert.SerializeObject(selectSite),
                 startDate,
@@ -63,12 +63,18 @@ namespace BackendSite.Service.BLL
 
         public int DeleteAnnouncement(int id)
         {
-           return messageService.DeleteAnnouncement(id);
+            return messageService.DeleteAnnouncement(id);
         }
 
-        public IEnumerable<PersonalMsg> GetPersonalMsg(int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<PersonalMsg> GetPersonalMsg(int custId, int pageNumber, int pageSize, 
+            ref int TotalPages, ref int RowCount)
         {
-            var personMsg =  messageService.GetPersonalMsg(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+            var personMsg = messageService.GetPersonalMsg(custId,
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                ref TotalPages,
+                ref RowCount);
+
             personMsg.ToList().ForEach(x =>
             {
                 x.ContentRemoveTag = StripHTML(x.Content);

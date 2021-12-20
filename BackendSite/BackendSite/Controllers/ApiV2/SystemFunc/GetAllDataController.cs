@@ -26,6 +26,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly GameCasinoBLL _gameCasinoBll;
         private readonly WinLostReportBLL _winLostReportBll;
         private readonly PaymentBLL _paymentBll;
+        private readonly BankDetailBLL _bankDetailBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly BonusManageBLL _bonusManageBll;
         private RebateManageBLL _rebateManageBll;
@@ -40,6 +41,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _gameCasinoBll = provider.GetRequiredService<GameCasinoBLL>();
             _winLostReportBll = provider.GetRequiredService<WinLostReportBLL>();
             _paymentBll = provider.GetRequiredService<PaymentBLL>();
+            _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
             _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
@@ -48,6 +50,27 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         #endregion
 
         #region Actions
+
+        /// <summary>
+        /// GetAllData/BankInfoSys 取得銀行系統資訊
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Bank Card Management.
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<BankInfoSys>> GetBankInfoSys()
+        {
+            var apiResult = new ApiResult<IEnumerable<BankInfoSys>>();
+            var sysBankList = _bankDetailBll.GetSysBankList();
+            apiResult.Data = sysBankList;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            return apiResult;
+        }
 
         /// <summary>
         /// GetAllData/GetCurrency 取得幣別資料

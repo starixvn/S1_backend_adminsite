@@ -58,8 +58,8 @@ namespace BackendSite.Service.DAL
         {
             var props = new DynamicParameters();
             props.Add("SelectSite", selectSite);
-            props.Add("StartDate", startDate.DateTime,DbType.DateTime);
-            props.Add("EndDate", endDate.DateTime,DbType.DateTime);
+            props.Add("StartDate", startDate.DateTime, DbType.DateTime);
+            props.Add("EndDate", endDate.DateTime, DbType.DateTime);
             props.Add("Status", status, DbType.Int32);
             props.Add("StartIndex", startIndex, DbType.Int32);
             props.Add("PageSize", pageSize);
@@ -75,9 +75,9 @@ namespace BackendSite.Service.DAL
 
         public Announcement GetAnnouncementById(int id)
         {
-            return _mainDbClient.QueryFirst<Announcement>("Admin_Announcement_GetById_V2", new DynamicParameters(new {Id = id}));
+            return _mainDbClient.QueryFirst<Announcement>("Admin_Announcement_GetById_V2", new DynamicParameters(new { Id = id }));
         }
-        
+
         public Announcement AddAnnouncement(AddAnnouncementModel data, string creator, int creatorId, DateTimeOffset startTime, DateTimeOffset endTime)
         {
             var result = new Announcement();
@@ -98,7 +98,7 @@ namespace BackendSite.Service.DAL
             var id = param.Get<int?>("@Id");
             if (id != null)
             {
-                result = _mainDbClient.QueryFirst<Announcement>("Admin_Announcement_GetById_V2", new DynamicParameters(new {Id = id }));
+                result = _mainDbClient.QueryFirst<Announcement>("Admin_Announcement_GetById_V2", new DynamicParameters(new { Id = id }));
             }
             return result;
         }
@@ -118,34 +118,33 @@ namespace BackendSite.Service.DAL
             param.Add("@IsTest", data.IsTest);
 
             _mainDbClient.Execute("Admin_Announcement_Upd_V2", param);
-            var result = _mainDbClient.QueryFirst<Announcement>("Admin_Announcement_GetById_V2",new DynamicParameters(new { data.Id }));
+            var result = _mainDbClient.QueryFirst<Announcement>("Admin_Announcement_GetById_V2", new DynamicParameters(new { data.Id }));
 
             return result;
         }
 
         public int DeleteAnnouncement(int id)
         {
-            return _mainDbClient.Execute("Admin_Announcement_Del", new DynamicParameters(new {Id = id}));
+            return _mainDbClient.Execute("Admin_Announcement_Del", new DynamicParameters(new { Id = id }));
         }
 
-        public IEnumerable<PersonalMsg> GetPersonalMsg(int CustId, int PageSize, ref int PageNumber, ref int TotalPages, ref int RowCount)
+        public IEnumerable<PersonalMsg> GetPersonalMsg(int custId, int startIndex, int PageSize,
+            ref int TotalPages, ref int RowCount)
         {
             IEnumerable<PersonalMsg> result = null;
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             var SpName = "Admin_PersonalMessage_Get_V2";
             var props = new DynamicParameters();
-            props.Add("@CustId", CustId, dbType: DbType.Int32);
-            props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-            props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("@PageSize", PageSize);
+            props.Add("_CustId", custId, dbType: DbType.Int32);
+            props.Add("_StartIndex", startIndex, dbType: DbType.Int32);
+            props.Add("_PageSize", PageSize, dbType: DbType.Int32);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             result = conn.Query<PersonalMsg>(SpName, props, commandType: CommandType.StoredProcedure);
-            PageNumber = props.Get<int?>("@PageNumber") ?? 0;
-            TotalPages = props.Get<int?>("@TotalPages") ?? 0;
-            RowCount = props.Get<int?>("@RowCount") ?? 0;
+            TotalPages = props.Get<int?>("_TotalPages") ?? 0;
+            RowCount = props.Get<int?>("_RowCount") ?? 0;
 
             return result;
         }
@@ -168,13 +167,13 @@ namespace BackendSite.Service.DAL
                 using var connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
                 connection.Open();
                 using var trans = connection.BeginTransaction();
-                var result = _mainDbClient.Execute("Admin_Msg_BatchV2_Ins",new DynamicParameters(new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg, BatchId = batchId }) ,trans);
+                var result = _mainDbClient.Execute("Admin_Msg_BatchV2_Ins", new DynamicParameters(new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg, BatchId = batchId }), connection, trans);
 
                 if (result == 1)
                 {
                     trans.Commit();
                     return true;
-                } 
+                }
                 trans.Rollback();
                 return false;
             }
@@ -182,7 +181,7 @@ namespace BackendSite.Service.DAL
             {
                 return false;
             }
-            
+
         }
         public int ChangeVipLevelBatch(int siteId, int custId, string userName, int vipLevel, string memo, string Operator)
         {
@@ -200,7 +199,7 @@ namespace BackendSite.Service.DAL
         public bool DeleteBatchMessage(int batchId)
         {
             _logger.LogInformation($@"MessageService-DeleteBatchMessage Start.");
-            
+
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
@@ -258,7 +257,7 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             props.Add("@SelectSite", JsonConvert.SerializeObject(selectSite));
             props.Add("@StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32);
-            props.Add("@PageNumber", Math.Abs(pageNumber),DbType.Int32, ParameterDirection.InputOutput);
+            props.Add("@PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("@PageSize", Math.Abs(pageSize));

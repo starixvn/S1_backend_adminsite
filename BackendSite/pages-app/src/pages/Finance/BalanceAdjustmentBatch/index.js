@@ -26,7 +26,25 @@ const App = () => {
     const [stateSend, updateSend] = useState(false);
     const [stateData, updateData] = useState({ ...initData });
     const [sendData, updateSendData] = useState([]);
-    const EditFiled = (v, datacolumn) => {updateData({ ...stateData, [datacolumn]: v }); };
+    const EditFiled = (v, datacolumn) => {
+        if(datacolumn == 'option'){
+            updateData(
+                { ...stateData,
+                    bonusCode:'',
+                    HasBonusCode:false,
+                    Name:'',
+                    CheckedBonusCode:'',
+                    BonusCodeDetail:null,
+                    WalletType:0,
+                    NeedCheckPassword:false,
+                    HasCheckPassword:false,
+                    [datacolumn]: v 
+                }); 
+        }
+        else{
+            updateData({ ...stateData, [datacolumn]: v }); 
+        }       
+    };
     const SetMsg = () => {
         let msg = "";
         let check = true;
@@ -34,7 +52,7 @@ const App = () => {
         if (!stateData.file) { check = false; msg = "Please choose excel file."; }
         if (!stateData.option) { check = false; msg = "Please check Option."; }
         if (!stateData.optSite) { check = false; msg = "Please check Site."; }
-        if (stateData.option == 5 && stateData.CheckedBonusCode == '') { check = false; msg = "Please check BonusCode."; }
+        if ((stateData.option == 5 || stateData.option == 6) && stateData.CheckedBonusCode == '') { check = false; msg = "Please check BonusCode."; }
         if(stateData.checkwd && (isNaN(parseInt(stateData.withdrawal))? 0:parseInt(stateData.withdrawal)) === 0) { check = false; msg = "Please Enter Withdrawal Limit."; }
         if (check && window.confirm("Are you sure to import data to " + _site[stateData.optSite] + "?")) {
             let settings = { headers: { 'content-type': 'multipart/form-data' } }
@@ -51,7 +69,7 @@ const App = () => {
                 SiteId: parseInt(stateData.optSite)
             };
             if (!stateSend) {
-                if(!hasCheckPassword){
+                if(!hasCheckPassword && stateData.option == 5){
                     api.post('/api/Payment/CheckRententionBonusAdjustmentLimit', Data)
                     .then(function (response) {
                         if(response.data.errorCode == 0){
@@ -148,7 +166,7 @@ const App = () => {
         }
         let Data = {
             BonusCode: stateData.bonusCode,
-            PromotionType: 9,
+            PromotionType: parseInt(stateData.option) == 5 ? 9 : 8,
             SiteId: parseInt(stateData.optSite)
           };
         api.post('/api/Payment/CheckBalanceAdjustBonusCodeBatch',Data)
@@ -224,9 +242,13 @@ const App = () => {
                 <td>
                     {value.currency}
                 </td>
-                <td>
-                    {value.bonus}
-                </td>
+                {stateData.option == 5 ? 
+                <>
+                    <td>
+                        {value.bonus}
+                    </td>
+                </>
+                :null}
                 <td>
                     {value.rollOver}
                 </td>
@@ -273,9 +295,23 @@ const App = () => {
                         <input type="radio" id="Option_5" name="Option" className="custom-control-input" onChange={(e) => { EditFiled(5, 'option') }} disabled={stateSend} checked={stateData.option === 5} />
                         <label className="custom-control-label" htmlFor="Option_5">Retention Bonus</label>
                     </div>
+                    <div className="custom-control custom-radio custom-control-inline">
+                        <input type="radio" id="Option_6" name="Option" className="custom-control-input" onChange={(e) => { EditFiled(6, 'option') }} disabled={stateSend} checked={stateData.option === 6} />
+                        <label className="custom-control-label" htmlFor="Option_6">Manual Bonus</label>
+                    </div>
                 </div>
                 {
-                    stateData.option == 5 ? 
+                    stateData.option == 5 || stateData.option == 6? 
+                    <>
+                        <div className="form-group">
+                            <label className="col-form-label d-block">BonusCode</label>
+                            <input className="form-control width-200" value={stateData.bonusCode} onChange={(e) => { EditFiled(e.target.value, 'bonusCode') }} />
+                        </div>
+                        <button className="btn btn-add" style={{marginBottom: '5px' }} onClick={CheckBonusCode}>CheckBonusCode</button>
+                    </>:null
+                }
+                {/* {
+                    stateData.option == 6 ? 
                     <>
                         <div className="form-group">
                             <label className="col-form-label d-block">BonusCode</label>
@@ -283,11 +319,11 @@ const App = () => {
                         </div>
                         <button className="btn btn-add" style={{marginBottom: '5px' }} onClick={CheckBonusCode}>CheckBonusCode</button>
                     </>:null
-                }
+                } */}
                 {
-                    stateData.BonusCodeDetail !== null && stateData.option == 5 ?
+                    stateData.BonusCodeDetail !== null && (stateData.option == 5 || stateData.option == 6) ?
                     <>
-                        <h4 className="page-name">Retention Bonus Info</h4>
+                        <h4 className="page-name">{stateData.option == 5 ? "Retention Bonus Info" : "Manual Bonus Info"}</h4>
                         <table className="table table-detail">
                             <tr>
                                 <th scope="row">BonusCode</th>
@@ -308,9 +344,12 @@ const App = () => {
                                         <th>
                                             Currency
                                         </th>
-                                        <th>
-                                            Amount
-                                        </th>
+                                        {stateData.option == 5 ? 
+                                        <>
+                                            <th>
+                                                Amount
+                                            </th>                                          
+                                        </>:null}
                                         <th>
                                             RollOver
                                         </th>
@@ -322,7 +361,7 @@ const App = () => {
                     </>:null
                 }
                 {
-                    stateData.option != 5 ?
+                    (stateData.option != 5 && stateData.option != 6) ?
                     <div className="form-group">
                         <div className="custom-control custom-checkbox custom-control-inline">
                             <input className="custom-control-input" id="checkwd" type="checkbox" onChange={(e) => { EditFiled(e.target.checked, 'checkwd') }} disabled={stateSend} checked={stateData.checkwd === true} />

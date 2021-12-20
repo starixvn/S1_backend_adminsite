@@ -72,8 +72,8 @@ namespace BackendSite.Service.DAL
             propsLog.Add("Operator", Operator);
             #endregion
 
-            _mainDbClient.Execute("Admin_PayList_Set", props, trans);
-            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, trans);
+            _mainDbClient.Execute("Admin_PayList_Set", props, conn, trans);
+            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, conn, trans);
             if (result > 0)
             {
                 trans.Commit();
@@ -112,8 +112,8 @@ namespace BackendSite.Service.DAL
             propsLog.Add("Operator", Operator);
             #endregion
 
-            _mainDbClient.Execute("Admin_PayChannel_Set", props, trans);
-            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, trans);
+            _mainDbClient.Execute("Admin_PayChannel_Set", props, conn, trans);
+            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, conn, trans);
             if (result > 0)
             {
                 trans.Commit();
@@ -180,8 +180,8 @@ namespace BackendSite.Service.DAL
             propsLog.Add("Operator", Operator);
             #endregion
 
-            _mainDbClient.Execute("Admin_PayCurrency_SetAmount", props, trans);
-            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, trans);
+            _mainDbClient.Execute("Admin_PayCurrency_SetAmount", props, conn, trans);
+            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, conn, trans);
             if (result > 0)
             {
                 trans.Commit();
@@ -226,8 +226,8 @@ namespace BackendSite.Service.DAL
             propsLog.Add("Operator", Operator);
             #endregion
 
-            _mainDbClient.Execute("Admin_BankInfoPay_Set", props, trans);
-            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, trans);
+            _mainDbClient.Execute("Admin_BankInfoPay_Set", props, conn, trans);
+            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, conn, trans);
             if (result > 0)
             {
                 trans.Commit();

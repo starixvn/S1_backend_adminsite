@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,12 +34,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 
         #region Model
 
-        public class GetAdjustmentReportReq
+        public class GetListRequest : ApiRequestPageModel
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
             public string TransId { get; set; }
-            public int CurrencyId { get; set; } 
+            public int CurrencyId { get; set; }
             public string UserName { get; set; }
             public int AdjustType { get; set; }
             public DateTimeOffset StartDate
@@ -51,15 +52,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
-            public int PageNumber { get; set; }
         }
 
-        public class ExportPaymentAdjustmentReportReq
+        public class ExportRequest
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
             public string TransId { get; set; }
-            public int CurrencyId { get; set; } 
+            public int CurrencyId { get; set; }
             public string UserName { get; set; }
             public int AdjustType { get; set; }
             public DateTimeOffset StartDate
@@ -73,72 +73,76 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
         }
-        
+
         #endregion
-        
+
         /// <summary>
-        /// AdjustmentReport/GetAdjustmentReport 
+        /// AdjustmentReport/GetList 取得調整資訊報表
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Payment Adjustment > [Submit]
+        /// Func Path：Finance > Adjustment Report > [Submit]
         /// </remarks>
         /// <param name="req"></param>
-        public ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd> GetAdjustmentReport(GetAdjustmentReportReq req)
+        public ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd> GetList(GetListRequest request)
         {
             var result = new ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd>();
-            try
+
+            var pageNumber = request.PageNumber;
+            var totalPages = 0;
+            var rowCount = 0;
+            var currencyAmount = new List<string>();
+
+            var dataList = _paymentAdjustmentBll.GetPaymentAdjustmentReport(request.TransId,
+                request.CurrencyId,
+                request.UserName,
+                request.AdjustType,
+                request.StartDate.DateTime,
+                request.EndDate.DateTime,
+                request.PageSize,
+                ref pageNumber, ref totalPages, ref rowCount, ref currencyAmount);
+
+            foreach (var data in dataList)
             {
-                var pageSize = 10;
-                var pageNumber = req.PageNumber;
-                var totalPages = 0;
-                var rowCount = 0;
-                var currencyAmount = new List<string>();
-                
-                var dataList = _paymentAdjustmentBll.GetPaymentAdjustmentReport(req.TransId, req.CurrencyId, req.UserName, req.AdjustType, req.StartDate.DateTime, req.EndDate.DateTime, pageSize, ref pageNumber, ref totalPages, ref rowCount, ref currencyAmount);
-                
-                foreach (var data in dataList)
-                {
-                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                }
-                result.Data = dataList;
-                result.PageNumber = pageNumber;
-                result.RowCount = rowCount;
-                result.TotalPages = totalPages;
-                result.ErrorCode = (int)ErrorCodeEnum.Success;
-                result.CurrencyAmount = currencyAmount;
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
             }
-            catch (Exception ex)
-            {
-                result.Message = "something went wrong.";
-                result.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                result.RawMessage = ex.ToString();
-            }
+            result.Data = dataList;
+            result.PageNumber = pageNumber;
+            result.RowCount = rowCount;
+            result.TotalPages = totalPages;
+            result.ErrorCode = (int)ErrorCodeEnum.Success;
+            result.CurrencyAmount = currencyAmount;
 
             return result;
         }
-        
+
         /// <summary>
-        /// AdjustmentReport/ExportPaymentAdjustmentReport 
+        /// AdjustmentReport/Export 匯出調整資訊報表
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Payment Adjustment > [Export]
+        /// Func Path：Finance > Adjustment Report > [Submit] > [Export Excel]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [HttpPost]
-        public IActionResult ExportAdjustmentReport(ExportPaymentAdjustmentReportReq req)
+        public IActionResult Export(ExportRequest request)
         {
-            var exportData = _paymentAdjustmentBll.GetPaymentAdjustmentExportReport(req.TransId, req.CurrencyId, req.UserName, req.AdjustType, req.StartDate.DateTime, req.EndDate.DateTime);
+            var exportData = _paymentAdjustmentBll.GetPaymentAdjustmentExportReport(request.TransId,
+                request.CurrencyId,
+                request.UserName,
+                request.AdjustType,
+                request.StartDate.DateTime,
+                request.EndDate.DateTime);
+
             foreach (var data in exportData)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
             }
-            
+
             var stream = _excelBll.Export(exportData);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"PaymentAdjustmentReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBll.ExcelFile(stream, "PaymentAdjustmentReport");
         }
 
     }

@@ -67,7 +67,7 @@ namespace BackendSite.Controllers.Api
             public long EndDate { get; set; }
             public int PageNumber { get; set; }
         }
-        
+
         public class ExcelData
         {
             public int RowId { get; set; }
@@ -75,7 +75,7 @@ namespace BackendSite.Controllers.Api
             public string CustUserName { get; set; }
             public string SabaId { get; set; }
             public CustInfoDetail CustInfoDetail { get; set; }
-            
+
         }
 
         #endregion
@@ -96,7 +96,7 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="para"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/Announcement"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
         [HttpPost]
         public ApiListResult<Announcement> GetAnnouncement(GetAnnouncementreq para)
         {
@@ -160,7 +160,7 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="Id"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/Announcement"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
         [HttpPost]
         public ApiResult<Announcement> GetAnnouncementById([FromForm] int Id)
         {
@@ -194,7 +194,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="_StartTime"></param>
         /// <param name="_EndTime"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/Announcement"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
         [HttpPost]
         public ApiResult AddAnnouncement([FromForm] AddAnnouncementModel Datas, [FromForm] long _StartTime,
             [FromForm] long _EndTime)
@@ -217,7 +217,7 @@ namespace BackendSite.Controllers.Api
                 var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(_StartTime);
                 var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(_EndTime);
                 var result = messageBLL.AddAnnouncement(Datas, authData.UserName, authData.UserId, startTime, endTime);
-                apiResult.Data = new {result.CreateTime, result.Creator, result.Id};
+                apiResult.Data = new { result.CreateTime, result.Creator, result.Id };
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -243,7 +243,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="_StartTime"></param>
         /// <param name="_EndTime"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/Announcement"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
         [HttpPost]
         public ApiResult UpdateAnnouncement([FromForm] UpdateAnnouncementModel Datas, [FromForm] long _StartTime,
             [FromForm] long _EndTime)
@@ -267,7 +267,7 @@ namespace BackendSite.Controllers.Api
                 var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(_EndTime);
                 var result =
                     messageBLL.UpdateAnnouncement(Datas, authData.UserName, authData.UserId, startTime, endTime);
-                apiResult.Data = new {result.LastUpdater, result.LastUpdateTime};
+                apiResult.Data = new { result.LastUpdater, result.LastUpdateTime };
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -291,7 +291,7 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="Id"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/Announcement"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
         [HttpPost]
         public ApiResult DeleteAnnouncement([FromForm] int Id)
         {
@@ -329,7 +329,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="PageNumber"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute),
-            Arguments = new object[] {"CustManage/CustInfoList", "ca_personalMsg"})]
+            Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
         [HttpPost]
         public ApiListResult<PersonalMsg> GetPersonalMsg([FromForm] int CustId, [FromForm] int PageNumber)
         {
@@ -339,7 +339,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
-                var data = messageBLL.GetPersonalMsg(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                var data = messageBLL.GetPersonalMsg(CustId, PageNumber, PageSize, ref TotalPages, ref RowCount);
 
                 data.ToList().ForEach(s => s.CreateTime = new DateTimeOffset(s.CreateTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
                 apiResult.Data = data;
@@ -372,7 +372,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="CustId"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute),
-            Arguments = new object[] {"CustManage/CustInfoList", "ca_personalMsg"})]
+            Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
         [HttpPost]
         public ApiResult<CustLang> GetCustLang([FromForm] int CustId)
         {
@@ -407,7 +407,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="PageNumber"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute),
-            Arguments = new object[] {"CustManage/CustInfoList", "ca_personalMsg"})]
+            Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
         [HttpPost]
         public ApiListResult<PersonalMsg> SendPersonalMsg([FromForm] int CustId, [FromForm] string Title,
             [FromForm] string Content, [FromForm] int PageNumber)
@@ -421,7 +421,7 @@ namespace BackendSite.Controllers.Api
                 var authData = authorizeBLL.GetAuthData();
                 messageBLL.SendMessageToPlayer(authData.UserName, Title, Content, CustId, authData.UserId);
                 apiResult.Data =
-                    messageBLL.GetPersonalMsg(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                    messageBLL.GetPersonalMsg(CustId, PageNumber, PageSize, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
 
                 apiResult.PageNumber = PageNumber;
@@ -453,7 +453,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="PageNumber"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute),
-            Arguments = new object[] {"CustManage/CustInfoList", "ca_personalMsg"})]
+            Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
         [HttpPost]
         public ApiListResult<PersonalMsg> DeletePersonalMsg([FromForm] int Id, [FromForm] int CustId,
             [FromForm] int PageNumber)
@@ -465,7 +465,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 messageBLL.DeletePersonalMsg(Id);
-                apiResult.Data = messageBLL.GetPersonalMsg(CustId, PageSize, ref PageNumber, ref TotalPages, ref RowCount);
+                apiResult.Data = messageBLL.GetPersonalMsg(CustId, PageNumber, PageSize, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
 
                 apiResult.PageNumber = PageNumber;
@@ -502,7 +502,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="excelUpload"></param>
         /// <param name="personalMsg"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/PersonalMsgBatch"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
         public ApiResult<int> SendMessageBatch([FromForm] int optSite,
             [FromForm] int accountStatus,
@@ -515,7 +515,7 @@ namespace BackendSite.Controllers.Api
             var excelList = new List<ExcelData>();
             messageBLL.NewBatchMessage(optSite, authData.UserName, personalMsg, ref batchId);
             _logger.LogInformation($@"MessageService-Read Excel And Send Start At {DateTime.UtcNow}.");
-            
+
             if (excelUpload != null)
             {
                 if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -527,7 +527,7 @@ namespace BackendSite.Controllers.Api
                     var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
                     var isLastRow = false;
                     var rowId = 2; // 因為有標題列，所以從第2列開始讀起
-                    
+
                     do // 讀取資料，直到讀到空白列為止
                     {
                         var custUsername = string.IsNullOrEmpty(sheet.Cells[rowId, 1].Text)
@@ -548,13 +548,13 @@ namespace BackendSite.Controllers.Api
                                 CustId = custId,
                                 CustUserName = custUsername,
                                 SabaId = sabaId,
-                                RowId = rowId ,
-                                CustInfoDetail =custInfosDetail
+                                RowId = rowId,
+                                CustInfoDetail = custInfosDetail
                             });
                             rowId += 1;
                         }
                     } while (!isLastRow);
-                    
+
                     foreach (var data in excelList)
                     {
                         PreSendBatchMessage(data, personalMsg, authData, optSite, batchId);
@@ -573,28 +573,32 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                var landId = GetLangIdByCurrencyId(currency);
-                var currencyMsg = JObject.Parse(personalMsg)[landId] ;
-                if (currencyMsg == null)
+                var langList = new List<string>
                 {
-                    currencyMsg = JObject.Parse(personalMsg)["en"];
-                    landId = "en";
-                }
-                var title = currencyMsg.Value<string>("Title") ?? "";
-                var content = currencyMsg.Value<string>("Content") ?? "";
-                
-                var req = new BatchPersonalMsg()
-                {
-                    BatchId = batchId,
-                    SiteId = optSite,
-                    LangId = landId,
-                    Operator = authData.UserName,
-                    CurrencyId = currency,
-                    AccountStatus = accountStatus,
-                    Content = content,
-                    Title = title
+                    "en","th","cs","id","vn","hi","hi_en","id_en","th_en"
                 };
-                custInfoBLL.SendMessageBatch(req);
+
+                foreach (var lang in langList)
+                {
+                    var msg = JObject.Parse(personalMsg)[lang];
+                    if (msg != null)
+                    {
+                        var title = msg.Value<string>("Title");
+                        var content = msg.Value<string>("Content");
+                        var req = new BatchPersonalMsg()
+                        {
+                            BatchId = batchId,
+                            SiteId = optSite,
+                            LangId = lang,
+                            Operator = authData.UserName,
+                            CurrencyId = currency,
+                            AccountStatus = accountStatus,
+                            Content = content,
+                            Title = title
+                        };
+                        custInfoBLL.SendMessageBatch(req);
+                    }
+                }
                 _logger.LogInformation($@"MessageService-Filter Account And Send End At {DateTime.UtcNow}.");
             }
 
@@ -618,7 +622,7 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="BatchId"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/PersonalMsgBatch"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
         public IActionResult ExportSendMessageBatchResultReport(int BatchId)
         {
@@ -646,7 +650,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="batchId"></param>
         /// <param name="PageNumber"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/PersonalMsgBatch"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
         public ApiListResult<BatchMsg> DeleteBatchMessage([FromForm] IEnumerable<int> SelectSite,
             [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int batchId, [FromForm] int PageNumber)
@@ -691,7 +695,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="batchId"></param>
         /// <param name="personalMsg"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/PersonalMsgBatch"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
         public ApiResult UpdateBatchMessage([FromForm] int batchId, [FromForm] string personalMsg)
         {
@@ -722,7 +726,7 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="batchId"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/PersonalMsgBatch"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
         public ApiResult<BatchMsg> GetBatchMessage([FromForm] int batchId)
         {
@@ -756,7 +760,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="EndDate"></param>
         /// <param name="PageNumber"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/PersonalMsgBatch"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
         public ApiListResult<BatchMsg> GetBatchMessageList([FromForm] IEnumerable<int> SelectSite,
             [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)
@@ -809,7 +813,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="optSite"></param>
         /// <param name="excelUpload"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/ChangeVipLevelBatch"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/ChangeVipLevelBatch" })]
         [HttpPost]
         public async Task<List<ApiResult>> ChangeVipLevelBatch([FromForm] int optSite, [FromForm] IFormFile excelUpload)
         {
@@ -847,7 +851,7 @@ namespace BackendSite.Controllers.Api
                         }
 
                         var m = Regex.Match(_sabaId, @"\d+");
-                        var _custId = int.TryParse(m.Value, out var custId) ? custId : (int?) null;
+                        var _custId = int.TryParse(m.Value, out var custId) ? custId : (int?)null;
                         int.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out var vipLevel);
                         var memo = sheet.Cells[RowId, 4].Text.Trim();
                         if (string.IsNullOrEmpty(custUsername) && _custId == null)
@@ -862,7 +866,8 @@ namespace BackendSite.Controllers.Api
                             {
                                 apiResult.Add(new ApiResult()
                                 {
-                                    ErrorCode = 1002, Message = $"Not fund. Username: {custUsername}. SabaId: {sabaId}."
+                                    ErrorCode = 1002,
+                                    Message = $"Not fund. Username: {custUsername}. SabaId: {sabaId}."
                                 });
                             }
                             else if (custInfoDetail.Status == 1)
@@ -921,13 +926,13 @@ namespace BackendSite.Controllers.Api
                 }
                 else
                 {
-                    apiResult.Add(new ApiResult() {ErrorCode = -1, Message = "File Type Error"});
+                    apiResult.Add(new ApiResult() { ErrorCode = -1, Message = "File Type Error" });
                     return apiResult;
                 }
             }
             catch (Exception ex)
             {
-                apiResult.Add(new ApiResult() {ErrorCode = -1, Message = ex.ToString()});
+                apiResult.Add(new ApiResult() { ErrorCode = -1, Message = ex.ToString() });
                 return apiResult;
             }
         }
@@ -938,7 +943,7 @@ namespace BackendSite.Controllers.Api
 
         #region Private Methods
 
-        private void PreSendBatchMessage(ExcelData data,string personalMsg ,AuthData authData,int optSite , int batchId)
+        private void PreSendBatchMessage(ExcelData data, string personalMsg, AuthData authData, int optSite, int batchId)
         {
             var resultMessage = string.Empty;
             var errorCode = 0;
@@ -947,11 +952,11 @@ namespace BackendSite.Controllers.Api
                 resultMessage =
                     $"Not found. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}.";
             }
-            else 
+            else
             {
                 switch (data.CustInfoDetail.Status)
                 {
-                    case (int) CustomerStatusEnum.Running:
+                    case (int)CustomerStatusEnum.Running:
                         SendBatchMessage(personalMsg,
                             data.CustInfoDetail.CustId,
                             optSite,
@@ -959,22 +964,22 @@ namespace BackendSite.Controllers.Api
                             batchId,
                             data.CustUserName,
                             data.SabaId,
-                            (CustomerStatusEnum) data.CustInfoDetail.Status,
+                            (CustomerStatusEnum)data.CustInfoDetail.Status,
                             out errorCode,
                             out resultMessage);
                         break;
 
-                    case (int) CustomerStatusEnum.Suspend:
+                    case (int)CustomerStatusEnum.Suspend:
                         resultMessage =
                             $"Fail. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}. Status={CustomerStatusEnum.Suspend.GetDescription()}";
                         break;
 
-                    case (int) CustomerStatusEnum.Closed:
+                    case (int)CustomerStatusEnum.Closed:
                         resultMessage =
                             $"Fail. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}. Status={CustomerStatusEnum.Closed.GetDescription()}";
                         break;
 
-                    case (int) CustomerStatusEnum.Lock:
+                    case (int)CustomerStatusEnum.Lock:
                         SendBatchMessage(personalMsg,
                             data.CustInfoDetail.CustId,
                             optSite,
@@ -982,13 +987,13 @@ namespace BackendSite.Controllers.Api
                             batchId,
                             data.CustUserName,
                             data.SabaId,
-                            (CustomerStatusEnum) data.CustInfoDetail.Status,
+                            (CustomerStatusEnum)data.CustInfoDetail.Status,
                             out errorCode,
                             out resultMessage);
                         break;
                 }
             }
-            
+
             int status = (errorCode == 1) ? 3 : 4;
 
             InsertBatchMessageSendLog(batchId,
@@ -1060,26 +1065,6 @@ namespace BackendSite.Controllers.Api
             }
         }
 
-        private string GetLangIdByCurrencyId(int currencyId)
-        {
-            switch (currencyId)
-            {
-                case 2:
-                    return "en"; // 馬來西亞
-                case 4:
-                    return "th"; // 泰國
-                case 13:
-                    return "cs"; //中國
-                case 15:
-                    return "id"; //印尼
-                case 51:
-                    return "vn"; //越南
-                case 61:
-                    return "hi"; //印度
-               default:
-                   return "en";
-            }
-        }
         #endregion
 
     }

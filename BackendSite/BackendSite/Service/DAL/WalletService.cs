@@ -31,7 +31,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new { CustId = custId, SiteId = siteId, UserName = userName, Amount = Amount, Type = type, Memo = Memo, RefTransId = RefTransId });
             p.Add("Is1stDepoist", dbType: DbType.Boolean, direction: ParameterDirection.Output);
             p.Add("AfterAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-            conn.Execute("Wallet_Set", p, transaction: trans, commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Wallet_Set", p, conn, trans);
             is1stDepoist = p.Get<byte?>("Is1stDepoist") ?? 0;
             afterAmount = p.Get<decimal?>("AfterAmount") ?? 0;
             return afterAmount >= 0 ? 1 : 0;
@@ -43,11 +43,28 @@ namespace BackendSite.Service.DAL
         }
         public int SetPayDummy(int siteId, int payId, int currencyId, decimal amount, MySqlConnection conn, MySqlTransaction trans)
         {
-            return conn.Execute("PayDummy_Set", new { SiteId = siteId, PayId = payId, CurrencyId = currencyId, Amount = amount }, trans, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute("PayDummy_Set",
+                new DynamicParameters(new
+                {
+                    SiteId = siteId, 
+                    PayId = payId, 
+                    CurrencyId = currencyId, 
+                    Amount = amount
+                }),
+                conn, trans);
         }
         public int SetBankOffDummy(int siteId, int sysId, string accountNo, int currencyId, decimal amount, MySqlConnection conn, MySqlTransaction trans)
         {
-            return conn.Execute("BankOffDummy_Set", new { SiteId = siteId, SysId = sysId, AccountNo = accountNo, CurrencyId = currencyId, Amount = amount }, trans, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute("BankOffDummy_Set",
+                new DynamicParameters(new
+                {
+                    SiteId = siteId, 
+                    SysId = sysId, 
+                    AccountNo = accountNo, 
+                    CurrencyId = currencyId, 
+                    Amount = amount
+                }),
+                conn, trans);
         }
         public IEnumerable<FinancialLog> GetFinancialLog(int custId, DateTime? startDate, DateTime? endDate, string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
@@ -80,7 +97,7 @@ namespace BackendSite.Service.DAL
                     EndDate = endDate,
                     RefTransId = refTransId,
                     PageSize = pageSize });
-            p.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(totalPages), DbType.Int32,ParameterDirection.Input);
+            p.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32,ParameterDirection.Input);
             p.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", Math.Abs(totalPages), DbType.Int32, ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -267,11 +284,11 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             props.Add("CustId", custId);
             props.Add("StartDate", startDate);
-            if (endDate != null) { props.Add("EndDate", endDate.Value.AddDays(1).AddSeconds(-1)); }
-            else { props.Add("EndDate"); }
-
+            //if (endDate != null) { props.Add("EndDate", endDate.Value.AddDays(1).AddSeconds(-1)); }
+            //else { props.Add("EndDate"); }
+            props.Add("EndDate", endDate);
             #region GetCurrencyTotalAmount
-            
+
             var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_VipRebateTotalAmountbyCust_Get_V3", props).ToList();
             if (currencyTotalAmount.Count > 0)
             {

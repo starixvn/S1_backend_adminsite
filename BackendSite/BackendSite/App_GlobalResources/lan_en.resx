@@ -636,4 +636,10 @@
   <data name="lbl_DepositSubmission" xml:space="preserve">
     <value>Deposit Submission</value>
   </data>
+  <data name="lbl_CancelBonus1" xml:space="preserve">
+    <value>Your bonus promotion has been canceled.</value>
+  </data>
+  <data name="lbl_CancelBonusTitle" xml:space="preserve">
+    <value>Promotion expiration notice.</value>
+  </data>
 </root>

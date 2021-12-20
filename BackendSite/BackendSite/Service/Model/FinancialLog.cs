@@ -6,8 +6,14 @@ namespace BackendSite.Service.Model
 {
     public class FinancialLog
     {
+        private DateTimeOffset _createTime { get; set; }
         public int Id { get; set; }
-        public DateTime CreateTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+
         public string TypeName { get; set; }
         public Direction Direction { get; set; }
         public decimal ChangeAmount { get; set; }

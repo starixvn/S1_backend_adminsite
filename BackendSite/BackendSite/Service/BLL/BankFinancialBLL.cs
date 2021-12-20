@@ -1500,7 +1500,7 @@ namespace BackendSite.Service.BLL
                 //string channel = string.Empty;
                 //string AccountName = string.Empty;
 
-                if (data.DepositType == DepositTypeEnum.LocalBank)
+                if (data.DepositType == DepositTypeEnum.LocalBanking)
                 {
                     var account = accountData.FirstOrDefault(x => x.AccountNo == data.AccountNo);
 

@@ -141,4 +141,10 @@
   <data name="lbl_WithdrawalRejectTitle" xml:space="preserve">
     <value>Penarikan anda {0} telah ditolak!</value>
   </data>
+  <data name="lbl_CancelBonus1" xml:space="preserve">
+    <value>Bonus promosi Anda telah dibatalkan.</value>
+  </data>
+  <data name="lbl_CancelBonusTitle" xml:space="preserve">
+    <value>Pemberitahuan kedaluwarsa promosi.</value>
+  </data>
 </root>

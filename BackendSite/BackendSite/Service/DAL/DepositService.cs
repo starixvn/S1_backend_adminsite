@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
+using BackendSite.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.DAL
 {
@@ -23,15 +25,17 @@ namespace BackendSite.Service.DAL
         private int payTypePosition = 100;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
+        private readonly ILogger<DepositService> _logger;
 
-        public DepositService(IConfiguration configuration, WalletService walletService, Common common, WithdrawalLimitService withdrawalLimitService, ILogger<MySqlClient> logger)
+        public DepositService(IServiceProvider provider)
         {
-            this.configuration = configuration;
-            this.walletService = walletService;
-            this.common = common;
-            this.withdrawalLimitService = withdrawalLimitService;
-            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
-            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
+            configuration = provider.GetRequiredService<IConfiguration>();
+            walletService = provider.GetRequiredService<WalletService>();
+            common = provider.GetRequiredService<Common>();
+            withdrawalLimitService = provider.GetRequiredService<WithdrawalLimitService>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
+            _logger = provider.GetRequiredService<ILogger<DepositService>>();
         }
 
         public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, DateTime startDate, DateTime endDate, int siteId, string DepositId, string userName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus,int pageSize, int amountType, string amount, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
@@ -206,7 +210,7 @@ namespace BackendSite.Service.DAL
                 var p = new DynamicParameters(new { DepositId = depositId, SiteId = siteId, ActualDeposit = actualDeposit, Comment = comment, ForStatus = sForStatus, Status = (int)status, ThirdId = (string)null, Operator = Operator });
                 p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
-                result = _mainDbClient.Execute("Admin_DepositInfo_Set", p, trans);
+                result = _mainDbClient.Execute("Admin_DepositInfo_Set", p, conn, trans);
 
                 if (result > 0)
                 {
@@ -258,6 +262,7 @@ namespace BackendSite.Service.DAL
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatus.Error, actualDeposit, Operator);
             }
 
@@ -266,13 +271,28 @@ namespace BackendSite.Service.DAL
 
         private int SetDepositInfoFirstDeposit(int depositId, int siteId, MySqlConnection conn, MySqlTransaction trans)
         {
-            return conn.Execute("DepositInfoFirstDeposit_Set", new { DepositId = depositId, SiteId = siteId }, trans, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute("DepositInfoFirstDeposit_Set",
+                new DynamicParameters(new
+                {
+                    DepositId = depositId,
+                    SiteId = siteId
+                }),
+                conn, trans);
         }
 
         private int SetDepositLog(int depositId, int siteId, string comment, int status, decimal actualDeposit, string Operator)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("DepositLog_Ins", new { DepositId = depositId, SiteId = siteId, Comment = comment, Action = status, ActualDeposit = actualDeposit, Operator = Operator }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute("DepositLog_Ins",
+                new DynamicParameters(new
+                {
+                    DepositId = depositId, 
+                    SiteId = siteId, 
+                    Comment = comment, 
+                    Action = status,
+                    ActualDeposit = actualDeposit,
+                    Operator
+                }));
         }
 
         public DepositReceipt GetDepositReceipt(int depositId, int siteId)
@@ -408,7 +428,7 @@ namespace BackendSite.Service.DAL
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("PageSize", Math.Abs(para.PageSize));
-            var result = _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTime_Get_V2", props).ToList();
+            var result = _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTime_Get_V3", props).ToList();
 
             searchData.DepositTimeList = result;
             searchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
@@ -440,7 +460,7 @@ namespace BackendSite.Service.DAL
             props.Add("CurrencyId", currencyId);
             props.Add("DepositId", tempDepositId);
             props.Add("SelectStatus", selectStatus);
-            return _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTimeExport_Get_V2", props).ToList();
+            return _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTimeExport_Get_V3", props).ToList();
 
         }
         public bool SetDepositRequestAmount(string transId, decimal amount, string Operator)
