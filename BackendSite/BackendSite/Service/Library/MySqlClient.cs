@@ -67,14 +67,14 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public int Execute(string name, SqlMapper.IDynamicParameters parameters)
+        public int Execute(string name, SqlMapper.IDynamicParameters parameters ,int? timeOut = 30)
         {
             var result = 0;
             var sw = Stopwatch.StartNew();
             try
             {
                 using var connection = new MySqlConnection(_connectionString);
-                result = connection.Execute(name, parameters, commandType: CommandType.StoredProcedure);
+                result = connection.Execute(name, parameters, commandType: CommandType.StoredProcedure ,commandTimeout:timeOut );
             }
             catch (Exception e)
             {
