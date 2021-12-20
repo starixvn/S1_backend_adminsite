@@ -143,22 +143,15 @@ const EditPanel = (props) => {
         check = false;
         msg = "Please input en content.";
       }
-
+      
       if (
         check &&
         window.confirm(
           "Are you sure to import data to " + _site[stateData.optSite] + "?"
         )
       ) {
+        
         let msg = {};
-        if (langDatas != null) {
-          langDatas.forEach((lang) => {
-            msg[lang] = {
-              Title: stateData.subject.en,
-              Content: stateData.content.en,
-            };
-          });
-        }
         
         defaultData.accountstatus = props.filterInfo.AccountStatus;
         defaultData.currency = props.filterInfo.Currency;
@@ -195,11 +188,19 @@ const EditPanel = (props) => {
         formData.append("optSite", parseInt(stateData.optSite));
         formData.append("accountStatus", parseInt(defaultData.accountstatus));
         formData.append("currency", parseInt(defaultData.currency));
-        formData.append("personalMsg", JSON.stringify(msg));
         if (file != null){
           formData.append("excelUpload", file, file.name);
+          if (langDatas != null) {
+            langDatas.forEach((lang) => {
+              msg[lang] = {
+                Title: stateData.subject.en,
+                Content: stateData.content.en,
+              };
+            });
+          }
         }
-
+        formData.append("personalMsg", JSON.stringify(msg));
+        
         api
           .post("/api/Message/SendMessageBatch", formData, settings)
           .then(function (response) {

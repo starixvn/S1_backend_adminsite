@@ -148,13 +148,18 @@ import qs from 'qs';
                 return;
             }
 
-            if(amount > adjustMentLimitMax && adjustMentLimitMax !== 0 && (parseInt(option) === 1 || parseInt(option) === 3 || parseInt(option) === 5)){
-                this.setState({ CheckPassword: true });
+            if(parseInt(option) === 5 && bonusCode == ""){
+                alert('Please Check BonusCode');
                 return;
             }
 
-            if(parseInt(option) === 5 && bonusCode == ""){
+            if(parseInt(option) === 6 && bonusCode == ""){
                 alert('Please Check BonusCode');
+                return;
+            }
+
+            if(amount > adjustMentLimitMax && adjustMentLimitMax !== 0 && (parseInt(option) === 1 || parseInt(option) === 3 || parseInt(option) === 5 || parseInt(option) === 6)){
+                this.setState({ CheckPassword: true });
                 return;
             }
 
@@ -233,7 +238,7 @@ import qs from 'qs';
             event.preventDefault();
             let bonusCode = this.state.BonusCode;
             let custData = this.state.CustData;
-            let bonusType = 9;
+            let bonusType = this.state.Option == 5 ? 9 : 8;
 
             if(bonusCode == null || bonusCode.replace(/\s/g,"") == ""){
                 alert('Please Enter BonusCode');
@@ -255,13 +260,25 @@ import qs from 'qs';
                         });
                     }
                     else{
-                        this.setState({ RollOver: result.data.rollOver,
-                                        Amount: result.data.bonus,
-                                        HasBonusCode: true,
-                                        CheckedBonusCode: result.data.bonusCode,
-                                        Name: result.data.name,
-                                        WalletType: result.data.walletType
-                                    });
+                        if(bonusType == 9){
+                            this.setState({ 
+                                RollOver: result.data.rollOver,
+                                Amount: result.data.bonus,
+                                HasBonusCode: true,
+                                CheckedBonusCode: result.data.bonusCode,
+                                Name: result.data.name,
+                                WalletType: result.data.walletType
+                            });
+                        }
+                        else{
+                            this.setState({
+                                RollOver: result.data.rollOver, 
+                                HasBonusCode: true,
+                                CheckedBonusCode: result.data.bonusCode,
+                                Name: result.data.name,
+                                WalletType: result.data.walletType
+                            });
+                        }
                         alert("BonusCode " + bonusCode + " exist")       
                     }
                 } else {
@@ -368,8 +385,23 @@ import qs from 'qs';
                                         <input type="radio" id="Option_5" name="Option" className="custom-control-input" value={5} onChange={this.onChange.bind(this)} />
                                         <label className="custom-control-label" htmlFor="Option_5">Retention Bonus</label>
                                     </div>
+                                    <div className="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="Option_6" name="Option" className="custom-control-input" value={6} onChange={this.onChange.bind(this)} />
+                                        <label className="custom-control-label" htmlFor="Option_6">Manual Bonus</label>
+                                    </div>
                                 </div>
-                                {this.state.Option == 5 ? 
+                                {this.state.Option == 5? 
+                                <div className="form-group width-200">
+                                    <div>
+                                        <label className="col-form-label">BonusCode</label>
+                                        <input className="form-control" name="BonusCode" onChange={this.onChange.bind(this)}/>
+                                    </div>
+                                    <div className="button-group mt-10">
+                                        <button onClick={this.onCheckBonusCode.bind(this)}>CheckBonusCode</button>
+                                    </div>
+                                </div>
+                                :null}
+                                {this.state.Option == 6 ? 
                                 <div className="form-group width-200">
                                     <div>
                                         <label className="col-form-label">BonusCode</label>
@@ -383,7 +415,7 @@ import qs from 'qs';
                                 {
                                     this.state.HasBonusCode ? 
                                     <>
-                                    <h4 className="page-name">Retention Bonus Info</h4>
+                                    <h4 className="page-name">{this.state.Option == 5 ? "Retention Bonus Info" : "Manual Bonus Info"}</h4>
                                     <table className="table table-detail">
                                         <tr>
                                             <th scope="row">BonusCode</th>
@@ -401,7 +433,7 @@ import qs from 'qs';
                                     </>
                                     :null
                                 }
-                                {this.state.Option != 5 ? 
+                                {this.state.Option != 5 && this.state.Option != 6 ? 
                                 <div className="form-group">
                                     <div className="custom-control custom-checkbox custom-control-inline">
                                         <input className="custom-control-input" id="checkwd" type="checkbox" name="Checkwd" checked={this.state.Checkwd} onChange={this.onCheck.bind(this, this.state.Checkwd)} />
@@ -414,10 +446,10 @@ import qs from 'qs';
                                     <label className="col-form-label">Amount</label>
                                     <input className="form-control" type="number" name="Amount" onChange={this.onChange.bind(this)} step="1" min="1" disabled={this.state.Option == 5 ? true:false} value={this.state.Amount} />
                                 </div>
-                                {this.state.Option == 5 ? 
+                                {this.state.Option == 5 || this.state.Option == 6 ? 
                                 <div className="form-group width-200">
                                     <label className="col-form-label">RollOver</label>
-                                    <input className="form-control" type="number" name="RollOver" onChange={this.onChange.bind(this)} disabled={this.state.Option == 5 ? true:false} value={this.state.RollOver}/>
+                                    <input className="form-control" type="number" name="RollOver" onChange={this.onChange.bind(this)} disabled={this.state.Option == 5 || this.state.Option == 6 ? true:false} value={this.state.RollOver}/>
                                 </div>
                                 :null}
                                 <div className="form-group width-200">
