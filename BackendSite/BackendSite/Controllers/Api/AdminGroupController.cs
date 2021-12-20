@@ -29,7 +29,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<AdminGroup>>
             {
-                Data = adminGroupBLL.GetGroupList(),
+                Data = adminGroupBLL.GetGroupList(1, 1000, out _, out _),
                 ErrorCode = 0
             };
             return apiResult;
@@ -50,7 +50,7 @@ namespace BackendSite.Controllers.Api
                 try
                 {
                     adminGroupBLL.AddGroup(GroupInfo);
-                    var result = adminGroupBLL.GetGroupList();
+                    var result = adminGroupBLL.GetGroupList(0, 1000, out _, out _);
                     apiResult.Data = result;
                     apiResult.ErrorCode = 0;
                 }
