@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using System;
 using System.Collections.Generic;
 
 namespace BackendSite.Service.BLL
@@ -16,9 +17,12 @@ namespace BackendSite.Service.BLL
             this.tools = tools;
         }
 
-        public IEnumerable<AdminUser> GetUserList()
+        public IEnumerable<AdminUser> GetUserList(int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
-            return adminUserService.GetUserList();
+            return adminUserService.GetUserList((Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                out totalPages,
+                out rowCount);
         }
 
         public IEnumerable<AssignSites> GetAssignSiteList(int UserId)

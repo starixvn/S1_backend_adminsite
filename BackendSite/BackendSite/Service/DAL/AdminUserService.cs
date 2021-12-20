@@ -31,10 +31,21 @@ namespace BackendSite.Service.DAL
             return conn.QueryFirstOrDefault<AdminUser>("LoginAdminUser_Get", new { UserName = userName }, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<AdminUser> GetUserList()
+        public IEnumerable<AdminUser> GetUserList(int startIndex, int pageSize, out int totalPages, out int rowCount)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<AdminUser>("Admin_User_GetAll", commandType: CommandType.StoredProcedure);
+            var para = new DynamicParameters();
+            para.Add("_StartIndex", startIndex);
+            para.Add("_PageSize", pageSize);
+            para.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            para.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = conn.Query<AdminUser>("Admin_User_GetAll_V2", para, commandType: CommandType.StoredProcedure);
+
+            totalPages = para.Get<int?>("_TotalPages") ?? 0;
+            rowCount = para.Get<int?>("_RowCount") ?? 0;
+
+            return result;
         }
 
         public IEnumerable<AssignSites> GetAssignSiteList(int userId)

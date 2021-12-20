@@ -31,7 +31,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<AdminUser>>();
             try
             {
-                apiResult.Data = adminUserBLL.GetUserList();
+                apiResult.Data = adminUserBLL.GetUserList(1, 1000, out _, out _);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -106,7 +106,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<DisplayList>>();
             try
             {
-                var groupList = adminGroupBLL.GetGroupList(0, 1000, out _, out _);
+                var groupList = adminGroupBLL.GetGroupList(1, 1000, out _, out _);
                 apiResult.Data = groupList.Select(g => new DisplayList() { Id = (int)g.GroupSEQ, DisplayText = g.GroupName });
                 apiResult.ErrorCode = 0;
             }
@@ -192,7 +192,7 @@ namespace BackendSite.Controllers.Api
                 var newUserList = adminUserBLL.AddUser(UserName, Userpwd, SiteList, GroupSEQ);
                 if (newUserList != null)
                 {
-                    apiResult.Data = adminUserBLL.GetUserList();
+                    apiResult.Data = adminUserBLL.GetUserList(0, 1000, out _, out _);
                     apiResult.ErrorCode = 0;
                 }
                 else

@@ -50,7 +50,7 @@ namespace BackendSite.Controllers.Api
                 try
                 {
                     adminGroupBLL.AddGroup(GroupInfo);
-                    var result = adminGroupBLL.GetGroupList(0, 1000, out _, out _);
+                    var result = adminGroupBLL.GetGroupList(1, 1000, out _, out _);
                     apiResult.Data = result;
                     apiResult.ErrorCode = 0;
                 }
