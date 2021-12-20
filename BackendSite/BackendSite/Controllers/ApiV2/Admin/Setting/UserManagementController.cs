@@ -2,6 +2,7 @@
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -91,19 +92,22 @@ namespace BackendSite.Controllers.ApiV2.Admin.Setting
         /// <exception cref="AdminException"></exception>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Admin/UserAuthoritySetting" })]
         [HttpPost]
-        public ApiResult<IEnumerable<AdminUser>> GetList()
+        public ApiListResult<AdminUser> GetList(ApiRequestPageModel request)
         {
-            var data = _adminUserBll.GetUserList();
+            var data = _adminUserBll.GetUserList(request.PageNumber, request.PageSize, out int totalPages, out int rowCount);
 
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
 
-            return new ApiResult<IEnumerable<AdminUser>>()
+            return new ApiListResult<AdminUser>()
             {
                 Data = data,
-                ErrorCode = (int)ErrorCodeEnum.Success
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                TotalPages = totalPages,
+                PageNumber = request.PageNumber,
+                RowCount = rowCount
             };
         }
 
@@ -119,14 +123,13 @@ namespace BackendSite.Controllers.ApiV2.Admin.Setting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Admin/UserAuthoritySetting" })]
         [HttpPost]
-        public ApiResult<IEnumerable<AdminUser>> CreateUser(CreateUserRequest request)
+        public ApiResult CreateUser(CreateUserRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<AdminUser>>();
 
             var newUserList = _adminUserBll.AddUser(request.UserName, request.UserPwd, request.SiteIdList, request.GroupId);
             if (newUserList != null)
             {
-                apiResult.Data = _adminUserBll.GetUserList();
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
 

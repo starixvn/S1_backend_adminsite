@@ -238,7 +238,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var apiResult = new ApiResult<IEnumerable<AdminGroup>>
             {
-                Data = _adminGroupBll.GetGroupList(0,1000,out _,out _),
+                Data = _adminGroupBll.GetGroupList(1,1000,out _,out _),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
             return apiResult;
