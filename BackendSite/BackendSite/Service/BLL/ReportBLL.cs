@@ -1009,5 +1009,8 @@ namespace BackendSite.Service.BLL
 
             return detailList;
         }
+
+        public (IEnumerable<TpFailRecordReport> Result, int RowCount) GetTpFailRecordReport(GetTpFailRecordReportInput input) 
+            => reportService.GetTpFailRecordReport(input);
     }
 }

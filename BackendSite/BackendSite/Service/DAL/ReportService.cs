@@ -219,5 +219,29 @@ namespace BackendSite.Service.DAL
             var SpName = "Admin_TpBetRecord_ByCustIdAndGameIdAndDate_Get";
             return conn.Query<TpBetRecordDataModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
         }
+
+        public (IEnumerable<TpFailRecordReport> Result, int RowCount) GetTpFailRecordReport(GetTpFailRecordReportInput input)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var parameters = new DynamicParameters(
+                new
+                {
+                    SiteId = input.SiteId,
+                    TpId = input.TpId,
+                    FromTransTime = input.FromTransTime,
+                    ToTransTime = input.ToTransTime,
+                    UserName = input.UserName,
+                    TransId = input.TransId,
+                    PageSize = input.PageSize,
+                    StartIndex = input.StartIndex
+                });
+            parameters.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var spName = "Admin_TpBetFailureRecord_Get";
+            var result = conn.Query<TpFailRecordReport>(spName, parameters, commandType: CommandType.StoredProcedure);
+            var rowCount = parameters.Get<int>("RowCount");
+            
+            return (result, rowCount);
+        }
     }
 }
