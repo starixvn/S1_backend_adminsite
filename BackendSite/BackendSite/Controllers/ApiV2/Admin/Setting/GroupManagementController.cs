@@ -1,6 +1,7 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -72,13 +73,19 @@ namespace BackendSite.Controllers.ApiV2.Admin.Setting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Admin/GroupAuthoritySetting" })]
         [HttpPost]
-        public ApiResult<IEnumerable<AdminGroup>> GetList()
+        public ApiListResult<AdminGroup> GetList(ApiRequestPageModel request)
         {
-            var apiResult = new ApiResult<IEnumerable<AdminGroup>>
+            var data = _adminGroupBll.GetGroupList(request.PageNumber, request.PageSize, out int totalPages, out int rowCount);
+
+            var apiResult = new ApiListResult<AdminGroup>
             {
-                Data = _adminGroupBll.GetGroupList(),
-                ErrorCode = (int)ErrorCodeEnum.Success
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                TotalPages = totalPages,
+                PageNumber = request.PageNumber,
+                RowCount = rowCount
             };
+
             return apiResult;
         }
 
@@ -105,12 +112,14 @@ namespace BackendSite.Controllers.ApiV2.Admin.Setting
             }
             else
             {
+                var newData = request.Permission.Select(x => new Service.Model.FunctionPermission { FuncKey = x.FuncKey, SubFuncKeys = x.SubFuncKeys });
+
                 var data = new GroupWithPermission()
                 {
                     GroupSEQ = request.GroupId,
                     GroupName = request.GroupName,
                     Remark = request.Remark,
-                    Permission = (IEnumerable<Service.Model.FunctionPermission>)request.Permission
+                    Permission = newData
                 };
 
                 _adminGroupBll.AddGroup(data);
