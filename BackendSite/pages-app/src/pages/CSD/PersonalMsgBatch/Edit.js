@@ -192,10 +192,12 @@ const EditPanel = (props) => {
           formData.append("excelUpload", file, file.name);
           if (langDatas != null) {
             langDatas.forEach((lang) => {
-              msg[lang] = {
-                Title: stateData.subject.en,
-                Content: stateData.content.en,
-              };
+              if(msg[lang] == null){
+                msg[lang] = {
+                  Title: stateData.subject.en,
+                  Content: stateData.content.en,
+                };
+              }
             });
           }
         }
