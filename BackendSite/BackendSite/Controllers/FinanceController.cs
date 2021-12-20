@@ -95,23 +95,23 @@ namespace BackendSite.Controllers
         {
             var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(depositListReq.startDate);
             var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(depositListReq.endDate);
-            depositListReq.SelectSite =$"[{depositListReq.SelectSite}]";
-            depositListReq.DepositType =$"[{depositListReq.DepositType}]";
-            depositListReq.CurrencyId =$"[{depositListReq.CurrencyId}]";
-            depositListReq.Status =$"[{depositListReq.Status}]";
-            depositListReq.LevelStatus =$"[{depositListReq.LevelStatus}]";
-            
+            depositListReq.SelectSite = $"[{depositListReq.SelectSite}]";
+            depositListReq.DepositType = $"[{depositListReq.DepositType}]";
+            depositListReq.CurrencyId = $"[{depositListReq.CurrencyId}]";
+            depositListReq.Status = $"[{depositListReq.Status}]";
+            depositListReq.LevelStatus = $"[{depositListReq.LevelStatus}]";
+
             var exportDeposit = depositBLL.GetDepositExportList(depositListReq.SelectSite, depositListReq.DepositType, startTime, endTime, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.Status, depositListReq.LevelStatus, depositListReq.AmountType, depositListReq.Amount);
 
             foreach (var data in exportDeposit)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-                if(data.DepositTime !=null)
+                if (data.DepositTime != null)
                     data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-                if (data.UpdateTime != null) 
+                if (data.UpdateTime != null)
                     data.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-            
+
             var stream = excelBLL.Export(exportDeposit);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(exportDeposit)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
@@ -137,10 +137,19 @@ namespace BackendSite.Controllers
             var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(withdrawalListReq.startDate);
             var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(withdrawalListReq.endDate);
 
-            var ExportWithdrawal = withdrawalBLL.GetWithdrawalExportList(withdrawalListReq.SelectSite, withdrawalListReq.withdrawalType, startTime, endTime, withdrawalListReq.WithdrawalId, withdrawalListReq.UserName, withdrawalListReq.CurrencyId, withdrawalListReq.status, withdrawalListReq.LevelStatus, withdrawalListReq.AmountType, withdrawalListReq.Amount);
+            var exportWithdrawal = withdrawalBLL.GetWithdrawalExportList(withdrawalListReq.SelectSite, withdrawalListReq.withdrawalType, startTime, endTime, withdrawalListReq.WithdrawalId, withdrawalListReq.UserName, withdrawalListReq.CurrencyId, withdrawalListReq.status, withdrawalListReq.LevelStatus, withdrawalListReq.AmountType, withdrawalListReq.Amount);
 
-            var stream = excelBLL.Export(ExportWithdrawal);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(ExportWithdrawal)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            foreach (var data in exportWithdrawal)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (data.UpdateTime != null)
+                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (data.FlowEndTime != null)
+                    data.FlowEndTime = new DateTimeOffset(data.FlowEndTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+
+            var stream = excelBLL.Export(exportWithdrawal);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(exportWithdrawal)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]

@@ -141,4 +141,10 @@
   <data name="lbl_WithdrawalRejectTitle" xml:space="preserve">
     <value>आपकी निकासी {0} को अस्वीकार कर दिया गया है!</value>
   </data>
+  <data name="lbl_CancelBonus1" xml:space="preserve">
+    <value>आपका बोनस प्रमोशन रद्द कर दिया गया है</value>
+  </data>
+  <data name="lbl_CancelBonusTitle" xml:space="preserve">
+    <value>प्रमोशन समाप्ति सूचना</value>
+  </data>
 </root>

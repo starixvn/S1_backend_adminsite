@@ -138,7 +138,14 @@ namespace BackendSite.Controllers.Api
                                                        out rowCount,
                                                        out totalAmount);
 
-
+            foreach (var item in data)
+            {
+                item.CreateTime = new DateTimeOffset(item.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (item.UpdateTime != null)
+                    item.UpdateTime = new DateTimeOffset(item.UpdateTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (item.DepositTime != null)
+                    item.DepositTime = new DateTimeOffset(item.DepositTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
 
             return new ApiListResultTotalAmount<DepositRequest>
             {
@@ -187,10 +194,10 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<Comments>>();
             var comments = depositBLL.GetDepositRequestComment(depositReq.TransId);
             
-            foreach (var data in comments)
-            {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8,0,0)).AddHours(8);
-            }
+            //foreach (var data in comments)
+            //{
+            //    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8,0,0)).AddHours(8);
+            //}
             
             apiResult.Data = comments;
             apiResult.ErrorCode = 0;

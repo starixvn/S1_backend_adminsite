@@ -229,8 +229,13 @@ namespace BackendSite.Service.Model.enums
     {
         FstDeposit = 1,
         ReDeposit = 2,
-        Rebate = 3,
-        Special = 4
+        FreeBet = 3,
+        Special = 4,
+        WalletBonus = 5,
+        Rebate = 6,
+        Cashback = 7,
+        StaticPage = 8,
+        RetentionBonus = 9
     }
 
     public enum BonusType
@@ -491,6 +496,11 @@ namespace BackendSite.Service.Model.enums
         Processing = 2,
         Success = 3,
         Failed = 4
+    }
+    public enum TpEnum
+    {
+        Saba = 1,
+        PT = 27
     }
     public enum BalanceAdjustmentType
     {
