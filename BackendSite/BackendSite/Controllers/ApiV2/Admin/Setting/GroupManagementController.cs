@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BackendSite.Controllers.ApiV2.Admin.Setting
 {
@@ -163,12 +164,15 @@ namespace BackendSite.Controllers.ApiV2.Admin.Setting
             }
             else
             {
+
+                var newData = request.Permission.Select(x => new Service.Model.FunctionPermission { FuncKey = x.FuncKey, SubFuncKeys = x.SubFuncKeys });
+
                 var data = new GroupWithPermission()
                 {
                     GroupSEQ = request.GroupId,
                     GroupName = request.GroupName,
                     Remark = request.Remark,
-                    Permission = (IEnumerable<Service.Model.FunctionPermission>)request.Permission
+                    Permission = newData
                 };
 
                 _adminGroupBll.UpdateGroup(data);
