@@ -517,7 +517,7 @@ namespace BackendSite.Service.BLL
 
                 switch (data.DepositType)
                 {
-                    case DepositTypeEnum.LocalBank:
+                    case DepositTypeEnum.LocalBanking:
                         AccountType = 3;
                         break;
                     default:
@@ -554,11 +554,11 @@ namespace BackendSite.Service.BLL
                         depositAccountModel.SummaryTotalData.OnlineDeposit += RoundingNumber(data.DepositSummary * rate, 2);
                         summaryTotalData.OnlineDeposit += RoundingNumber(data.DepositSummary * rate, 2);
                         break;
-                    case DepositTypeEnum.MobilePayment:
+                    case DepositTypeEnum.MobilePay:
                         depositAccountModel.SummaryTotalData.MobileDeposit += RoundingNumber(data.DepositSummary * rate, 2);
                         summaryTotalData.MobileDeposit += RoundingNumber(data.DepositSummary * rate, 2);
                         break;
-                    case DepositTypeEnum.LocalBank:
+                    case DepositTypeEnum.LocalBanking:
                         depositAccountModel.SummaryTotalData.LocalDeposit += RoundingNumber(data.DepositSummary * rate, 2);
                         summaryTotalData.LocalDeposit += RoundingNumber(data.DepositSummary * rate, 2);
                         break;
@@ -604,7 +604,7 @@ namespace BackendSite.Service.BLL
 
                 switch (data.DepositType)
                 {
-                    case DepositTypeEnum.LocalBank:
+                    case DepositTypeEnum.LocalBanking:
                         AccountType = 3;
                         break;
                     default:
@@ -663,13 +663,13 @@ namespace BackendSite.Service.BLL
                         summaryCurrencyModel.OnlineDeposit += data.DepositSummary;
                         summaryCurrencyModel.OnlineDepositInMYR += RoundingNumber(data.DepositSummary * rate, 2);
                         break;
-                    case DepositTypeEnum.MobilePayment:
+                    case DepositTypeEnum.MobilePay:
                         accountCurrencyModel.MobileDeposit += data.DepositSummary;
                         accountCurrencyModel.MobileDepositInMYR += RoundingNumber(data.DepositSummary * rate, 2);
                         summaryCurrencyModel.MobileDeposit += data.DepositSummary;
                         summaryCurrencyModel.MobileDepositInMYR += RoundingNumber(data.DepositSummary * rate, 2);
                         break;
-                    case DepositTypeEnum.LocalBank:
+                    case DepositTypeEnum.LocalBanking:
                         accountCurrencyModel.LocalDeposit += data.DepositSummary;
                         accountCurrencyModel.LocalDepositInMYR += RoundingNumber(data.DepositSummary * rate, 2);
                         summaryCurrencyModel.LocalDeposit += data.DepositSummary;
@@ -760,7 +760,7 @@ namespace BackendSite.Service.BLL
 
                 switch (data.DepositType)
                 {
-                    case DepositTypeEnum.LocalBank:
+                    case DepositTypeEnum.LocalBanking:
                         AccountType = 3;
                         break;
                     default:

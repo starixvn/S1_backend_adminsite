@@ -92,8 +92,68 @@ namespace BackendSite.Service.Model.enums
     public enum DepositTypeEnum
     {
         OnlineBanking = 1,
-        MobilePayment = 2,
-        LocalBank = 3,
+        MobilePay = 2,
+        LocalBanking = 3,
+        CryptoPay = 4,
+        LoadCard = 5
+    }
+
+    #endregion
+
+    #region PayList
+
+    public enum PayListStatusEnum
+    {
+        Enable = 1,
+        Disable = 2
+    }
+
+    #endregion
+
+    #region PayChannel
+
+    public enum PayChannelModeEnum
+    {
+        Initial = 0, //初始設定
+        NewTabAndFilledWithHtml = 1, //開新視窗，將html內容置入
+        NewTabRedirectToUrl = 2, //開新視窗，導頁至該Url
+        PresentUrlAsQrCode = 3 //將 url 以QrCode 呈現
+    }
+
+    public enum PayChannelTypeEnum
+    {
+        OnlineBanking = 1,
+        MobilePay = 2,
+        LocalBanking = 3,
+        CryptoPay = 4,
+        LoadCard = 5
+    }
+
+    public enum PayChannelStatusEnum
+    {
+        Enable = 1,
+        Disable = 2
+    }
+
+    #endregion
+
+    #region PayCurrency
+
+    public enum AmountRuleEnum
+    {
+        Integer = 1,
+        Decimal = 2,
+        Fixed = 3
+    }
+
+    #endregion
+
+    #region BankInfoPay
+
+    public enum BankInfoPayStatusEnum
+    {
+        Enable = 1,
+        Disable = 2
     }
 
     #endregion
@@ -169,8 +229,13 @@ namespace BackendSite.Service.Model.enums
     {
         FstDeposit = 1,
         ReDeposit = 2,
-        Rebate = 3,
-        Special = 4
+        FreeBet = 3,
+        Special = 4,
+        WalletBonus = 5,
+        Rebate = 6,
+        Cashback = 7,
+        StaticPage = 8,
+        RetentionBonus = 9
     }
 
     public enum BonusType
@@ -431,5 +496,19 @@ namespace BackendSite.Service.Model.enums
         Processing = 2,
         Success = 3,
         Failed = 4
+    }
+    public enum TpEnum
+    {
+        Saba = 1,
+        PT = 27
+    }
+    public enum BalanceAdjustmentType
+    {
+        BalancePlus = 1,
+        BalanceMinus = 2,
+        BonusPlus = 3,
+        BonusMinus = 4,
+        RetentionBouns = 5,
+        ManualBonus = 6
     }
 }

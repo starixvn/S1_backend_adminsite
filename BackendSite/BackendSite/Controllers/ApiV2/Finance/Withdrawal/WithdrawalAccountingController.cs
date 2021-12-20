@@ -9,6 +9,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.WithdrawalBankAccounting;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +24,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 {
+    [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalAccountingController : ControllerBase
@@ -167,10 +169,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         public ApiResult GetList(GetListRequest request)
         {
 
+            var endDate = new DateTimeOffset(request.EndDate.ToUniversalTime().DateTime, TimeSpan.Zero).AddDays(1).AddMilliseconds(-1);
+
             var result = _withdrawalBll.GetWithdrawalInfoAndAccountingList(request.SiteIds,
                 request.CurrencyIds,
                 request.StartDate.DateTime,
-                request.EndDate.DateTime,
+                endDate.DateTime,
                 request.TransId,
                 request.UserName,
                 request.PageNumber,

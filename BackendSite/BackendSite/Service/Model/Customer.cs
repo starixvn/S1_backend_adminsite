@@ -130,11 +130,25 @@ namespace BackendSite.Service.Model
 
     public class CustNote
     {
+        private DateTimeOffset _createTime { get; set; }
+        private DateTimeOffset? _updateTime { get; set; }
         public int Id { get; set; }
         public int CustId { get; set; }
         public string Note { get; set; }
-        public DateTimeOffset CreateTime { get; set; }
-        public DateTimeOffset UpdateTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset? UpdateTime
+        {
+            get => _updateTime;
+            set
+            {
+                if (value != null)
+                    _updateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
         public string Operator { get; set; }
     }
     public class CustRollOver
@@ -303,9 +317,14 @@ namespace BackendSite.Service.Model
     }
     public class RegLiveStatus
     {
+        private DateTimeOffset _regTime { get; set; }
         public string UserName { get; set; }
         public int ActStatus { get; set; }
-        public DateTimeOffset RegTime { get; set; }
+        public DateTimeOffset RegTime
+        {
+            get => _regTime;
+            set => _regTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public string AccountName { get; set; }
         public int CustId { get; set; }
         public int SiteId { get; set; }

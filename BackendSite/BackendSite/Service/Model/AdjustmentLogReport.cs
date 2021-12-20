@@ -1,15 +1,21 @@
-﻿using System;
+﻿using BackendSite.Service.Model.ApiModel;
+using System;
 using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
 {
     public class AdjustmentLogReport
     {
+        private DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public int Id { get; set; }
         public string Menu { get; set; }
         public int ActionType { get; set; }
         public string DetailInfo { get; set; }
-        public DateTime CreateTime { get; set; }
         public string Operator { get; set; }
 
     }
@@ -24,7 +30,25 @@ namespace BackendSite.Service.Model
     {
         public string Menu { get; set; }
     }
-    public class GetAdjustmentInfoLogPara
+    public class GetAdjustmentInfoLogPara : ApiRequestPageModel
+    {
+        private DateTimeOffset _startDate { get; set; }
+        private DateTimeOffset _endDate { get; set; }
+        public DateTimeOffset StartDate
+        {
+            get => _startDate;
+            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset EndDate
+        {
+            get => _endDate;
+            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        public string User { get; set; }
+        public string Menu { get; set; }
+    }
+
+    public class GetAdjustmentInfoLogParaOld
     {
         public long StartDate { get; set; }
         public long EndDate { get; set; }

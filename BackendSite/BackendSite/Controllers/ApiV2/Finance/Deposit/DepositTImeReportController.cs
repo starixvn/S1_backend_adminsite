@@ -82,6 +82,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
                     if (data.DepositTime != null)
                         data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, TimeSpan.Zero);
+                    if (data.ApprovedTime != null)
+                        data.ApprovedTime = new DateTimeOffset(data.ApprovedTime.Value.DateTime, TimeSpan.Zero);
                 }
 
                 apiListResult.Data = searchResult.DepositTimeList;
@@ -117,6 +119,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
+                if (data.EndFlowTime != null) 
+                    data.EndFlowTime = new DateTimeOffset(data.EndFlowTime.Value.DateTime, TimeSpan.Zero);
             }
 
             var stream = _excelBll.Export(exportData);

@@ -54,21 +54,32 @@ namespace BackendSite.Controllers.Api
         /// Http Method：POST
         /// 
         /// Func Path：Finance > Adjustment Log Report > [Submit]
-        /// 
         /// </remarks>
         /// <param name="para">參數</param>
         /// <returns>結果</returns>
         [HttpPost]
-        public ApiListResult<AdjustmentLogReport> GetAdjustmentInfoLog(GetAdjustmentInfoLogPara para)
+        public ApiListResult<AdjustmentLogReport> GetAdjustmentInfoLog(GetAdjustmentInfoLogParaOld para)
         {
+            var startTime = new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate),TimeSpan.Zero) ;
+            var endTime =new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate),TimeSpan.Zero) ;
             var apiResult = new ApiListResult<AdjustmentLogReport>();
             try
             {
-                var SearchResult = adjustmentLogReportBLL.GetAdjustmentInfoLog(para);
-                apiResult.Data = SearchResult.AdjustmentLogReport;
-                apiResult.PageNumber = SearchResult.PageNumber;
-                apiResult.TotalPages = SearchResult.TotalPages;
-                apiResult.RowCount = SearchResult.RowCount;
+                var req = new GetAdjustmentInfoLogPara() 
+                {
+                    StartDate = startTime,
+                    EndDate = endTime,
+                    User = para.User,
+                    Menu= para.Menu,
+                    PageNumber= para.PageNumber,
+                    PageSize= para.PageSize
+                };
+                var searchResult = adjustmentLogReportBLL.GetAdjustmentInfoLog(req);
+                
+                apiResult.Data = searchResult.AdjustmentLogReport;
+                apiResult.PageNumber = searchResult.PageNumber;
+                apiResult.TotalPages = searchResult.TotalPages;
+                apiResult.RowCount = searchResult.RowCount;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)

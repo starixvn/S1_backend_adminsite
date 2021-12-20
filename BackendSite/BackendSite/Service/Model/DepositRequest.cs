@@ -95,8 +95,8 @@ namespace BackendSite.Service.Model
             DepositType switch
             {
                 (int)enums.DepositTypeEnum.OnlineBanking => $"{SiteName}-{PayName}-{BankCode}",
-                (int)enums.DepositTypeEnum.MobilePayment => $"{SiteName}-{PayName}-{ChannelName}",
-                (int)enums.DepositTypeEnum.LocalBank => $"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
+                (int)enums.DepositTypeEnum.MobilePay => $"{SiteName}-{PayName}-{ChannelName}",
+                (int)enums.DepositTypeEnum.LocalBanking => $"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
                 _ => null
             };
 
@@ -255,6 +255,9 @@ namespace BackendSite.Service.Model
         public string DepositTypeName => Enum.GetName(typeof(DepositTypeEnum), DepositType);
         public string StatusName => Enum.GetName(typeof(DepositStatus), Status);
         public int DepositId { get; set; }
+        public DateTimeOffset? ApprovedTime { get; set; }
+        public string ToApprovedTime { get; set; }
+        public string ApprovedBy { get; set; }
     }
 
     public class DepositTimeReportOldPara : ApiRequestPageModel
@@ -298,6 +301,9 @@ namespace BackendSite.Service.Model
         public DateTimeOffset CreateTime { get; set; }
         public DateTimeOffset UpdateTime { get; set; }
         public string CompleteTime { get; set; }
+        public DateTimeOffset? EndFlowTime { get; set; }
+        public string ToApprovedTime { get; set; }
+        public string ApprovedBy { get; set; }
     }
     public class DepositRequestAmountPara
     {

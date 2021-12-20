@@ -21,6 +21,8 @@ namespace BackendSite.Service.BLL
         private readonly BonusInfoService bonusInfoService;
         private readonly ServerInfoBLL _serverInfoBLL;
         private readonly AuthorizeBLL _authorizeBLL;
+        private readonly BonusInfoBLL _bonusInfoBLL;
+        
 
         public PendingFundBLL(CourierAdapter courierAdapter,
             IConfiguration configuration,
@@ -30,7 +32,8 @@ namespace BackendSite.Service.BLL
             WalletService walletService,
             BonusInfoService bonusInfoService,
             ServerInfoBLL serverInfoBLL,
-            AuthorizeBLL authorizeBLL)
+            AuthorizeBLL authorizeBLL,
+            BonusInfoBLL bonusInfoBLL)
         {
             this.courierAdapter = courierAdapter;
             this.configuration = configuration;
@@ -40,6 +43,7 @@ namespace BackendSite.Service.BLL
             this.bonusInfoService = bonusInfoService;
             _serverInfoBLL = serverInfoBLL;
             _authorizeBLL = authorizeBLL;
+            _bonusInfoBLL = bonusInfoBLL;
             apiUrl = configuration.GetValue<string>("TpService");
         }
 
@@ -108,14 +112,8 @@ namespace BackendSite.Service.BLL
         public ApiResult BonusCancel(int bonusId)
         {
             var apiResult = new ApiResult();
-
-            var statusList = new List<int>
-            {
-                (int) BonusStatusType.Running,
-            };
-
-            var result = bonusInfoService.CancelBonusByBonusId(true, bonusId, JsonConvert.SerializeObject(statusList), out var custId);
-
+            
+            var result = _bonusInfoBLL.CancelBonusByBonusId(bonusId,out var custId);
             if (result > 0)
             {
                 var userData = _authorizeBLL.GetAuthData();

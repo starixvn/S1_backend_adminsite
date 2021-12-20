@@ -141,4 +141,10 @@
   <data name="lbl_WithdrawalRejectTitle" xml:space="preserve">
     <value>Giao dịch rút tiền {0} đã bị từ chối!</value>
   </data>
+  <data name="lbl_CancelBonus1" xml:space="preserve">
+    <value>Phần thưởng khuyến mãi của bạn đã bị hủy.</value>
+  </data>
+  <data name="lbl_CancelBonusTitle" xml:space="preserve">
+    <value>Thông báo khuyến mãi hết hạn</value>
+  </data>
 </root>

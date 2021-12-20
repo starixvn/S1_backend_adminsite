@@ -71,7 +71,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
             var apiResult = new ApiResult<AdjustmentLimtData>
             {
                 Data = _paymentBll.GetAdjustmentData(request.SiteId, request.CurrencyId),
-                ErrorCode = 0
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
             return apiResult;
         }
