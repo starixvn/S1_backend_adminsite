@@ -8,6 +8,7 @@ namespace BackendSite.Service.Model.enums
     //1.請按照table欄位放置區塊(region)
     //2.命名大部分請以 [Table欄位名稱] + Enum，ex.Customer.IsKyc => IsKycEnum
     //3.如欄位名稱重複率很高，命名請以 [Table名稱] + [Table欄位名稱] + Enum，ex.Customer.Status => CustomerStatusEnum
+    //4.如果有特殊選單需要給前端使用，請按照欄位名稱命名。ex.DepositRequest.AmountType => AmountTypeEnum
 
     /// <summary>
     /// DB環境列舉(不屬於任何Table，For專案使用)
@@ -19,6 +20,31 @@ namespace BackendSite.Service.Model.enums
         Wager,  //ConnectionStringWager
         Log,    //ConnectionStringLog
     }
+
+    #region Deposit Request / Withdrawal Request For Frontend Use
+
+    public enum AmountTypeEnum
+    {
+        NoUse = 0,
+        AmountSmallerThan = 1,
+        AmountGreaterThan = 2,
+    }
+
+    #endregion
+
+    #region Adjustment Report For Frontend Use
+
+    public enum AdjustTypeEnum
+    {
+        Debit = 1,
+        Credit = 2,
+        IncreaseBonus = 3,
+        ReduceBonus = 4,
+        ThirdAdd = 5,
+        ThirdMinus = 6
+    }
+
+    #endregion
 
     #region Customer
 
@@ -246,7 +272,37 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    public enum AdjustStatus
+    #region AdjustWithdrawalLimitInfo
+
+    public enum AdjustWithdrawalLimitInfoAdjustTypeEnum
+    {
+        Debit = 1,
+        Credit = 2,
+        //Bonus = 3  NoUse
+    }
+
+    public enum AdjustWithdrawalLimitInfoStatusEnum
+    {
+        Pending = 1,
+        Approved = 2,
+        Rejected = 3
+    }
+
+    #endregion
+
+    #region AdjustmentInfo
+
+    public enum AdjustmentInfoAdjustTypeEnum
+    {
+        BalancePlus = 1,
+        BalanceMinus = 2,
+        BonusPlus = 3,
+        BonusMinus = 4,
+        RetentionBouns = 5,
+        ManualBonus = 6
+    }
+
+    public enum AdjustmentInfoStatusEnum
     {
         Draft = 0,
         Pending = 1,
@@ -256,15 +312,7 @@ namespace BackendSite.Service.Model.enums
         Error = 99
     }
 
-    public enum AdjustType
-    {
-        Debit = 1,
-        Credit = 2,
-        IncreaseBonus = 3,
-        ReduceBonus = 4,
-        ThirdAdd = 5,
-        ThirdMinus = 6
-    }
+    #endregion
 
     public enum AdminUserStatus
     {
@@ -539,13 +587,4 @@ namespace BackendSite.Service.Model.enums
         PT = 27
     }
 
-    public enum BalanceAdjustmentType
-    {
-        BalancePlus = 1,
-        BalanceMinus = 2,
-        BonusPlus = 3,
-        BonusMinus = 4,
-        RetentionBouns = 5,
-        ManualBonus = 6
-    }
 }
