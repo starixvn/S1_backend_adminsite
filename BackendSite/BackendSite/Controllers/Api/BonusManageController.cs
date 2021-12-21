@@ -568,9 +568,9 @@ namespace BackendSite.Controllers.Api
             };
 
             var startDate = refFriendListReq.StartDate == null ? (DateTime?)null
-                : new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.StartDate);
+                : DateTimeExtensions.UnixToDateTime((long)refFriendListReq.StartDate);
             var endDate = refFriendListReq.EndDate == null ? (DateTime?)null
-                : new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.EndDate);
+                : DateTimeExtensions.UnixToDateTime((long)refFriendListReq.EndDate);
 
             var PageSize = 10;
             if (refFriendListReq.PageSize > 0)

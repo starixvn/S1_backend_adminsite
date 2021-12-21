@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.Api
 {
@@ -158,8 +159,8 @@ namespace BackendSite.Controllers.Api
                 adminOperateLogReq.endDate = 2147483647;
             }
 
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(adminOperateLogReq.startDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(adminOperateLogReq.endDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(adminOperateLogReq.startDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(adminOperateLogReq.endDate);
 
             var depositRequestList = serverInfoBLL.GetAdminOperateLog(adminOperateLogReq.CustId,
                 adminOperateLogReq.Menu,

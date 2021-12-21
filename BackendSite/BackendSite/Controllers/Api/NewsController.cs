@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -63,8 +64,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<News>();
             try
             {
-                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate);
-                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate);
+                var startTime = DateTimeExtensions.UnixToDateTime(para.StartDate);
+                var endTime = DateTimeExtensions.UnixToDateTime(para.EndDate);
                 var searchResult = newsBLL.GetNewsList(para.SelectSite, startTime, endTime, para.PageSize, para.PageNumber, para.Status);
                 
                 apiResult.Data = searchResult.NewsList;
