@@ -620,7 +620,7 @@ namespace BackendSite.Controllers.Api
                 if (custInfo != null)
                 {
                     //非RetentionBonus,ManualBonus
-                    if (adjustmentAndWithdrawalLimitReq.Option != (int)BalanceAdjustmentType.RetentionBouns && adjustmentAndWithdrawalLimitReq.Option != (int)BalanceAdjustmentType.ManualBonus)
+                    if (adjustmentAndWithdrawalLimitReq.Option != (int)AdjustmentInfoAdjustTypeEnum.RetentionBouns && adjustmentAndWithdrawalLimitReq.Option != (int)AdjustmentInfoAdjustTypeEnum.ManualBonus)
                     {
                         adjustmentAndWithdrawalLimit.CustId = custInfo.CustId;
                         adjustmentAndWithdrawalLimit.CurrencyId = custInfo.CurrencyId;
@@ -640,7 +640,7 @@ namespace BackendSite.Controllers.Api
 
                         switch (adjustmentAndWithdrawalLimit.AdjustType)
                         {
-                            case (int)BalanceAdjustmentType.BalanceMinus:  //Balance(-)
+                            case (int)AdjustmentInfoAdjustTypeEnum.BalanceMinus:  //Balance(-)
                                 {
                                     if (balance < adjustmentAndWithdrawalLimit.Amount)
                                     {
@@ -683,8 +683,8 @@ namespace BackendSite.Controllers.Api
                                     }
                                 }
                                 break;
-                            case (int)BalanceAdjustmentType.BalancePlus:  //Balance(+)
-                            case (int)BalanceAdjustmentType.BonusPlus:  //Bonus(+)
+                            case (int)AdjustmentInfoAdjustTypeEnum.BalancePlus:  //Balance(+)
+                            case (int)AdjustmentInfoAdjustTypeEnum.BonusPlus:  //Bonus(+)
                                 {
                                     if (_mainWalletType == 1 && (balance + adjustmentAndWithdrawalLimit.Amount) < 0)
                                     {
@@ -694,7 +694,7 @@ namespace BackendSite.Controllers.Api
                                     }
                                 }
                                 break;
-                            case (int)BalanceAdjustmentType.BonusMinus:  //Bonus(-)
+                            case (int)AdjustmentInfoAdjustTypeEnum.BonusMinus:  //Bonus(-)
                                 {
                                     if (_mainWalletType == 1 && (balance - adjustmentAndWithdrawalLimit.Amount) < 0)
                                     {
@@ -710,7 +710,7 @@ namespace BackendSite.Controllers.Api
                         if (_paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, User.Identity.Name,
                             out transId) > 0)
                         {
-                            if (_mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == (int)BalanceAdjustmentType.BalancePlus)
+                            if (_mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == (int)AdjustmentInfoAdjustTypeEnum.BalancePlus)
                             {
                                 var inTpTransfer = new TpTransfer()
                                 { TpId = 1, Amount = balance, CustId = custInfo.CustId, direction = TpDirection.ToTp };
@@ -738,7 +738,7 @@ namespace BackendSite.Controllers.Api
                             Memo = adjustmentAndWithdrawalLimitReq.Memo,
                             Operator = authData.UserName,
                             Amount = adjustmentAndWithdrawalLimitReq.Amount,
-                            PromotionType = adjustmentAndWithdrawalLimitReq.Option == (int)BalanceAdjustmentType.RetentionBouns ?  9 : 8
+                            PromotionType = adjustmentAndWithdrawalLimitReq.Option == (int)AdjustmentInfoAdjustTypeEnum.RetentionBouns ?  9 : 8
                         };
                         var apiOnlineResult =
                             await courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
@@ -814,7 +814,7 @@ namespace BackendSite.Controllers.Api
                                 try
                                 {
                                     //非Retention Bonus
-                                    if (option != (int)BalanceAdjustmentType.RetentionBouns && option != (int)BalanceAdjustmentType.ManualBonus)
+                                    if (option != (int)AdjustmentInfoAdjustTypeEnum.RetentionBouns && option != (int)AdjustmentInfoAdjustTypeEnum.ManualBonus)
                                     {
                                         var withdrawalLimitAmount =
                                         (withdrawalLimitOption == 1) ? amount * withdrawal : 0;
@@ -835,7 +835,7 @@ namespace BackendSite.Controllers.Api
                                             };
 
                                         string transId = null;
-                                        if (adjustmentAndWithdrawalLimit.AdjustType == (int)BalanceAdjustmentType.BalanceMinus)
+                                        if (adjustmentAndWithdrawalLimit.AdjustType == (int)AdjustmentInfoAdjustTypeEnum.BalanceMinus)
                                         {
                                             var balance = _custInfoBLL.GetBalance(custInfoDetail.CustId);
                                             if (balance < adjustmentAndWithdrawalLimit.Amount)
@@ -884,7 +884,7 @@ namespace BackendSite.Controllers.Api
                                         if (_paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit,
                                             authData.UserName, out transId) > 0)
                                         {
-                                            if (_mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == (int)BalanceAdjustmentType.BalancePlus)
+                                            if (_mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == (int)AdjustmentInfoAdjustTypeEnum.BalancePlus)
                                             {
                                                 var balance = _custInfoBLL.GetBalance(custInfoDetail.CustId);
                                                 var inTpTransfer = new TpTransfer()
@@ -926,7 +926,7 @@ namespace BackendSite.Controllers.Api
                                             Memo = memo,
                                             Operator = authData.UserName,
                                             Amount = amount,
-                                            PromotionType = option == (int)BalanceAdjustmentType.RetentionBouns ? 9 : 8
+                                            PromotionType = option == (int)AdjustmentInfoAdjustTypeEnum.RetentionBouns ? 9 : 8
                                         };
                                         var apiOnlineResult =
                                              await courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
