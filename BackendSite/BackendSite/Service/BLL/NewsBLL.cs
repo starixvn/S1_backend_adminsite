@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.DAL;
+﻿using System;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using System.Collections.Generic;
 
@@ -13,24 +14,24 @@ namespace BackendSite.Service.BLL
             this.newsServices = newsServices;
         }
 
-        public NewsData GetNewsList(IEnumerable<int> SelectSite, long StartDate, long EndDate, int PageSize, int PageNumber, int Status)
+        public NewsData GetNewsList(IEnumerable<int> selectSite, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, int status)
         {
-            return newsServices.GetNewsList(SelectSite, StartDate, EndDate, PageSize, PageNumber, Status);
+            return newsServices.GetNewsList(selectSite, startDate, endDate, pageSize, pageNumber, status);
         }
 
-        public News GetNewsById(int NewsId)
+        public News GetNewsById(int newsId)
         {
-            return newsServices.GetNewsById(NewsId);
+            return newsServices.GetNewsById(newsId);
         }
 
-        public int? SetNews(bool IsAdd, News newsDatas)
+        public int? SetNews(bool isAdd, News newsDatas)
         {
-            return newsServices.SetNews(IsAdd, newsDatas);
+            return newsServices.SetNews(isAdd, newsDatas);
         }
 
-        public void SetStatus(int NewsId, int Status, string LastUpdateUser)
+        public void SetStatus(int newsId, int status, string lastUpdateUser)
         {
-            newsServices.SetStatus(NewsId, Status, LastUpdateUser);
+            newsServices.SetStatus(newsId, status, lastUpdateUser);
         }
     }
 }

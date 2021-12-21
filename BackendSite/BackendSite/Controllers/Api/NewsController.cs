@@ -63,11 +63,14 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<News>();
             try
             {
-                var SearchResult = newsBLL.GetNewsList(para.SelectSite, para.StartDate, para.EndDate, para.PageSize, para.PageNumber, para.Status);
-                apiResult.Data = SearchResult.NewsList;
-                apiResult.PageNumber = SearchResult.PageNumber;
-                apiResult.TotalPages = SearchResult.TotalPages;
-                apiResult.RowCount = SearchResult.RowCount;
+                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate);
+                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate);
+                var searchResult = newsBLL.GetNewsList(para.SelectSite, startTime, endTime, para.PageSize, para.PageNumber, para.Status);
+                
+                apiResult.Data = searchResult.NewsList;
+                apiResult.PageNumber = searchResult.PageNumber;
+                apiResult.TotalPages = searchResult.TotalPages;
+                apiResult.RowCount = searchResult.RowCount;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
