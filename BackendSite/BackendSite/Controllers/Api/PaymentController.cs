@@ -1062,9 +1062,9 @@ namespace BackendSite.Controllers.Api
         public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoListByCustId(VipRebateInfoByCustIdPara para)
         {
             var startDate = para.StartDate == null ? (DateTime?) null
-                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)para.StartDate);
+                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)para.StartDate).AddHours(-8);
             var endDate = para.EndDate == null ? (DateTime?) null
-                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)para.EndDate);
+                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)para.EndDate).AddHours(-8);
             
             var searchResult = _paymentBLL.GetVipRebateInfoListByCustId(para.CustId,
                 startDate,
