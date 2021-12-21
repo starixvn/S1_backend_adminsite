@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -60,8 +61,8 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResultCurrencyAmount<DepositRequest> GetDepositRequestList(DepositListReq depositListReq)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(depositListReq.startDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(depositListReq.endDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(depositListReq.startDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(depositListReq.endDate);
             var apiListResult = new ApiListResultCurrencyAmount<DepositRequest>();
             var pageNumber = depositListReq.PageNumber;
             var totalPages = 0;
@@ -118,13 +119,13 @@ namespace BackendSite.Controllers.Api
             {
                 depositListReq.startDate = 2147483647;
             }
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)depositListReq.startDate).AddHours(-8);
+            var startTime = DateTimeExtensions.UnixToDateTime((long)depositListReq.startDate).AddHours(-8);
 
             if (depositListReq.endDate > 2147483647)
             {
                 depositListReq.endDate = 2147483647;
             }
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)depositListReq.endDate).AddHours(-8);
+            var endTime = DateTimeExtensions.UnixToDateTime((long)depositListReq.endDate).AddHours(-8);
 
 
             var data = depositBLL.GetDepositListByCust(depositListReq.CustId,
@@ -472,8 +473,8 @@ namespace BackendSite.Controllers.Api
             var apiListResult = new ApiListResult<DepositTimeList>();
             try
             {
-                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate).AddHours(8);
-                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate).AddHours(8);
+                var startTime = DateTimeExtensions.UnixToDateTime(para.StartDate).AddHours(8);
+                var endTime = DateTimeExtensions.UnixToDateTime(para.EndDate).AddHours(8);
                 var req = new DepositTimeReportPara
                 {
                     DepositId = para.DepositId,
@@ -514,8 +515,8 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
         public IActionResult ExportDepositTime(string selectSite, string depositId, long startDate, long endDate, int status, int currencyId)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(startDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(endDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(startDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(endDate);
             var exportData = depositBLL.DepositTimeExportGet(selectSite, depositId, startTime, endTime, status, currencyId);
             foreach (var data in exportData)
             {

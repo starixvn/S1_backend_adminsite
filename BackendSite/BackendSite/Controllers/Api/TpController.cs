@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Library;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using Newtonsoft.Json;
 using BackendSite.Service.Model.enums;
 
@@ -60,8 +61,8 @@ namespace BackendSite.Controllers.Api
             if (transferInfoReq.endDate > 2147483647)
                 transferInfoReq.endDate = 2147483647;
 
-            var startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)transferInfoReq.startDate).AddHours(-8); ;
-            var endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)transferInfoReq.endDate).AddHours(-8); ;
+            var startDate = DateTimeExtensions.UnixToDateTime(transferInfoReq.startDate).AddHours(-8); ;
+            var endDate = DateTimeExtensions.UnixToDateTime(transferInfoReq.endDate).AddHours(-8); ;
 
             var data = tpBLL.GetTpTransferInfoByCust(transferInfoReq.CustId,
                                                      transferInfoReq.TransId,

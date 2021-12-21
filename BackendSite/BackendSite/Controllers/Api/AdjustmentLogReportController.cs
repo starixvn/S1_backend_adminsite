@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.Api
 {
@@ -60,8 +61,8 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<AdjustmentLogReport> GetAdjustmentInfoLog(GetAdjustmentInfoLogParaOld para)
         {
-            var startTime = new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate),TimeSpan.Zero) ;
-            var endTime =new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate),TimeSpan.Zero) ;
+            var startTime = DateTimeExtensions.UnixToDateTimeOffset(para.StartDate);
+            var endTime =DateTimeExtensions.UnixToDateTimeOffset(para.EndDate);
             var apiResult = new ApiListResult<AdjustmentLogReport>();
             try
             {
