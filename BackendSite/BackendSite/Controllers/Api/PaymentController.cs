@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.Api
 {
@@ -276,9 +277,9 @@ namespace BackendSite.Controllers.Api
         {
             var pageNumber = getFinancialLogReq.PageNumber;
             var startDate = getFinancialLogReq.StartDate == null ? (DateTime?) null
-                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getFinancialLogReq.StartDate).AddHours(-8);
+                :  DateTimeExtensions.UnixToDateTime((long)getFinancialLogReq.StartDate).AddHours(-8);
             var endDate = getFinancialLogReq.EndDate == null ? (DateTime?) null
-                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getFinancialLogReq.EndDate).AddHours(-8);
+                :  DateTimeExtensions.UnixToDateTime((long)getFinancialLogReq.EndDate).AddHours(-8);
             
             var data = _paymentBLL.GetFinancialLog(getFinancialLogReq.CustId, startDate,
                 endDate, getFinancialLogReq.RefTransId, 10, ref pageNumber, out var totalPages,
@@ -307,9 +308,9 @@ namespace BackendSite.Controllers.Api
         {
             var pageNumber = getBonusLogReq.PageNumber;
             var startDate = getBonusLogReq.StartDate == null ? (DateTime?) null
-                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getBonusLogReq.StartDate);
+                :  DateTimeExtensions.UnixToDateTime((long)getBonusLogReq.StartDate);
             var endDate = getBonusLogReq.EndDate == null ? (DateTime?) null
-                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getBonusLogReq.EndDate);
+                :  DateTimeExtensions.UnixToDateTime((long)getBonusLogReq.EndDate);
             
             var data = _paymentBLL.GetBonusLog(getBonusLogReq.CustId,
                 getBonusLogReq.PromoCategoryId,
@@ -462,8 +463,8 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecordList(
             CustTpBetRecordListReq custTpBetRecordListReq)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(custTpBetRecordListReq.StartDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(custTpBetRecordListReq.EndDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(custTpBetRecordListReq.StartDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(custTpBetRecordListReq.EndDate);
 
             var result = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId, startTime, endTime);
             
@@ -488,8 +489,8 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<TpBetRecordListOneDayRes>> GetCustTpBetRecordListOneDay(
             CustTpBetRecordListOneDayReq req)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(req.StartDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(req.EndDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(req.StartDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(req.EndDate);
             if (startTime < req.SelDate.AddHours(-8))
             {
                 startTime = req.SelDate.AddHours(-8);
@@ -524,8 +525,8 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<TpBetRecordbyCategoryIdRes>> GetCustTpBetRecordListbyCategoryId(
             CustTpBetRecordListbyCategoryIdReq req)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(req.StartDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(req.EndDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(req.StartDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(req.EndDate);
             if (startTime < req.SelDate.AddHours(-8))
             {
                 startTime = req.SelDate.AddHours(-8);
@@ -561,8 +562,8 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(
             CustTpBetRecordDetailListbyGameTypeReq req)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(req.StartDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(req.EndDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(req.StartDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(req.EndDate);
             if (startTime < req.SelDate.AddHours(-8))
             {
                 startTime = req.SelDate.AddHours(-8);
@@ -1020,8 +1021,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResultCurrencyAmount<VipRebateInfo>();
             try
             {
-                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate).AddHours(8);
-                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate).AddHours(8).AddDays(1).AddSeconds(-1);
+                var startTime = DateTimeExtensions.UnixToDateTime(para.StartDate).AddHours(8);
+                var endTime = DateTimeExtensions.UnixToDateTime(para.EndDate).AddHours(8).AddDays(1).AddSeconds(-1);
                 
                 var currencyAmount = new List<string>();
                 var searchResult = _paymentBLL.GetVipRebateInfoList(para.SelectSite, para.Currency, startTime,
@@ -1062,9 +1063,9 @@ namespace BackendSite.Controllers.Api
         public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoListByCustId(VipRebateInfoByCustIdPara para)
         {
             var startDate = para.StartDate == null ? (DateTime?) null
-                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)para.StartDate).AddHours(-8);
+                :  DateTimeExtensions.UnixToDateTime((long)para.StartDate).AddHours(-8);
             var endDate = para.EndDate == null ? (DateTime?) null
-                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)para.EndDate).AddHours(-8);
+                :  DateTimeExtensions.UnixToDateTime((long)para.EndDate).AddHours(-8);
             
             var searchResult = _paymentBLL.GetVipRebateInfoListByCustId(para.CustId,
                 startDate,
@@ -1087,8 +1088,8 @@ namespace BackendSite.Controllers.Api
         public IActionResult GetVipRebateInfoListExport(string SelectSite, int Currency, long StartDate, long EndDate,
             string User, int CategoryId, int BaseCurrencyId, int RebateCategoriesId)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate).AddHours(8);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate).AddHours(8).AddDays(1).AddSeconds(-1);
+            var startTime = DateTimeExtensions.UnixToDateTime(StartDate).AddHours(8);
+            var endTime = DateTimeExtensions.UnixToDateTime(EndDate).AddHours(8).AddDays(1).AddSeconds(-1);
             
             var searchResult = _paymentBLL.GetVipRebateInfoListExport(SelectSite, Currency, startTime, endTime, User,
                 CategoryId, BaseCurrencyId, RebateCategoriesId);
