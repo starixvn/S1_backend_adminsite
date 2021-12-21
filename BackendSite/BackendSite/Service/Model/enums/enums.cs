@@ -220,6 +220,32 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    #region USDTWithdrawalLimitInfo
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// DB欄位開String，此Enum主要for前台顯示判斷使用
+    /// </remarks>
+    public enum NetworkTypeEnum
+    {
+        ERC20 = 1,
+        TRC20 = 2
+    }
+
+    #endregion
+
+    #region OTPVerifyinfo
+
+    public enum OTPTypeEnum
+    {
+        SMS = 0,
+        Email = 1
+    }
+
+    #endregion
+
     public enum AdjustStatus
     {
         Draft = 0,
@@ -325,7 +351,9 @@ namespace BackendSite.Service.Model.enums
         VipLevel = 1
     }
 
-    public enum BonusStatusType
+    #region BonusInfo
+
+    public enum BonusInfoStatusEnum
     {
         Initial = 0,
         Running = 1,
@@ -334,6 +362,8 @@ namespace BackendSite.Service.Model.enums
         Fulfill = 4,
         TrasferOut = 5
     }
+
+    #endregion
 
     #region Bank Financial Account
 
@@ -453,12 +483,16 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    public enum RegLiveStatusType
+    #region Customer_RegLiveStatus
+
+    public enum Customer_RegLiveStatusStatusEnum
     {
         Pending = 1,
         Done = 2,
         Invalid = 3
     }
+
+    #endregion
 
     //public enum TpCategory
     //{
@@ -490,11 +524,6 @@ namespace BackendSite.Service.Model.enums
         HTTP = 1,
         HTTPS = 2
     }
-    public enum NetworkType
-    {
-        ERC20 = 1,
-        TRC20 = 2
-    }
 
     public enum SendMessageStatus
     {
@@ -518,11 +547,5 @@ namespace BackendSite.Service.Model.enums
         BonusMinus = 4,
         RetentionBouns = 5,
         ManualBonus = 6
-    }
-    
-    public enum OTPTypeEnum
-    {
-        SMS = 0,
-        Email = 1
     }
 }

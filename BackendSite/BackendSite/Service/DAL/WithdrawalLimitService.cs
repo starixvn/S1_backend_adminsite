@@ -130,7 +130,7 @@ namespace BackendSite.Service.DAL
                 USDTwithdrawalLimitInfoManage.WithdrawalMin,
                 USDTwithdrawalLimitInfoManage.WithdrawalMax,
                 UpdateOperator,
-                Network = Enum.GetName(typeof(NetworkType), USDTwithdrawalLimitInfoManage.NetworkType)
+                Network = Enum.GetName(typeof(NetworkTypeEnum), USDTwithdrawalLimitInfoManage.NetworkType)
             };
             conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu = "USDTWithdrawalLimitManagement", ActionType = 1, DetailInfo = JsonConvert.SerializeObject(param), Operator = UpdateOperator }, tran, commandType: CommandType.StoredProcedure);
 
@@ -140,10 +140,11 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public USDTWithdrawalLimitInfoManage GetUSDTWithdrawalLimitInfo(int siteId, int currencyId, int viplevel,string Network)
+        public USDTWithdrawalLimitInfoManage GetUSDTWithdrawalLimitInfo(int siteId, int currencyId, int viplevel, int Network)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.QueryFirstOrDefault<USDTWithdrawalLimitInfoManage>("Admin_USDTWithdrawalLimitInfoDetail_Get", new { SiteId = siteId, CurrencyId = currencyId, VipLevel = viplevel, Network  = Network }, commandType: CommandType.StoredProcedure);
+            var a = new { SiteId = siteId, CurrencyId = currencyId, VipLevel = viplevel, Network = Enum.GetName(typeof(NetworkTypeEnum), Network) };
+            return conn.QueryFirstOrDefault<USDTWithdrawalLimitInfoManage>("Admin_USDTWithdrawalLimitInfoDetail_Get", new { SiteId = siteId, CurrencyId = currencyId, VipLevel = viplevel, Network = Enum.GetName(typeof(NetworkTypeEnum), Network) }, commandType: CommandType.StoredProcedure);
         }
 
         public int DeleteUSDTWithdrawalLimitInfo(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage, string Operator)
@@ -157,11 +158,11 @@ namespace BackendSite.Service.DAL
                 USDTwithdrawalLimitInfoManage.SiteId,
                 USDTwithdrawalLimitInfoManage.CurrencyId,
                 USDTwithdrawalLimitInfoManage.VipLevel,
-                Network = Enum.GetName(typeof(NetworkType), USDTwithdrawalLimitInfoManage.NetworkType)
+                Network = Enum.GetName(typeof(NetworkTypeEnum), USDTwithdrawalLimitInfoManage.NetworkType)
             };
             conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu = "USDTWithdrawalLimitManagement", ActionType = 2, DetailInfo = JsonConvert.SerializeObject(param), Operator = Operator }, tran, commandType: CommandType.StoredProcedure);
 
-            result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Del", new { SiteId = USDTwithdrawalLimitInfoManage.SiteId, CurrencyId = USDTwithdrawalLimitInfoManage.CurrencyId, VipLevel = USDTwithdrawalLimitInfoManage.VipLevel , Network = Enum.GetName(typeof(NetworkType), USDTwithdrawalLimitInfoManage.NetworkType) }, commandType: CommandType.StoredProcedure);
+            result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Del", new { SiteId = USDTwithdrawalLimitInfoManage.SiteId, CurrencyId = USDTwithdrawalLimitInfoManage.CurrencyId, VipLevel = USDTwithdrawalLimitInfoManage.VipLevel , Network = Enum.GetName(typeof(NetworkTypeEnum), USDTwithdrawalLimitInfoManage.NetworkType) }, commandType: CommandType.StoredProcedure);
             tran.Commit();
 
             return result;
@@ -181,7 +182,7 @@ namespace BackendSite.Service.DAL
                 USDTwithdrawalLimitInfoManage.WithdrawalMin,
                 USDTwithdrawalLimitInfoManage.WithdrawalMax,
                 UpdateOperator,
-                Network = Enum.GetName(typeof(NetworkType), USDTwithdrawalLimitInfoManage.NetworkType)
+                Network = Enum.GetName(typeof(NetworkTypeEnum), USDTwithdrawalLimitInfoManage.NetworkType)
             };
 
             conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu = "USDTWithdrawalLimitManagement", ActionType = 1, DetailInfo = JsonConvert.SerializeObject(param), Operator = UpdateOperator }, tran, commandType: CommandType.StoredProcedure);

@@ -153,7 +153,7 @@ namespace BackendSite.Service.BLL
         {
             var statusList = new List<int>
             {
-                (int) BonusStatusType.Running,
+                (int) BonusInfoStatusEnum.Running,
             };
 
             return _bonusInfoService.CancelBonusByBonusId(true, bonusId, JsonConvert.SerializeObject(statusList), out custId);

@@ -958,7 +958,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<USDTWithdrawalLimitInfoManage>>();
             var USDTwithdrawalLimitInfoManages =
-                withdrawalBLL.GetUSDTWithdrawalLimitInfos(USDTwithdrawalLimit.SiteId, USDTwithdrawalLimit.CurrencyId, Enum.GetName(typeof(NetworkType), USDTwithdrawalLimit.NetworkType));
+                withdrawalBLL.GetUSDTWithdrawalLimitInfos(USDTwithdrawalLimit.SiteId, USDTwithdrawalLimit.CurrencyId, Enum.GetName(typeof(NetworkTypeEnum), USDTwithdrawalLimit.NetworkType));
             apiResult.Data = USDTwithdrawalLimitInfoManages;
             apiResult.ErrorCode = 0;
             return apiResult;

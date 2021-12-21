@@ -33,6 +33,35 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
 
         #endregion
 
+        #region API Model
+
+        public class GetListRequest
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public NetworkTypeEnum NetworkType { get; set; }
+        }
+
+        public class CreateOrUpdateRequest
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int VipLevel { get; set; }
+            public double WithdrawalMin { get; set; }
+            public double WithdrawalMax { get; set; }
+            public NetworkTypeEnum NetworkType { get; set; }
+        }
+
+        public class DeleteRequest
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int VipLevel { get; set; }
+            public NetworkTypeEnum NetworkType { get; set; }
+        }
+
+        #endregion
+
         #region Actions
 
         /// <summary>
@@ -47,11 +76,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult<IEnumerable<USDTWithdrawalLimitInfoManage>> GetList(USDTWithdrawalLimit USDTwithdrawalLimit)
+        public ApiResult<IEnumerable<USDTWithdrawalLimitInfoManage>> GetList(GetListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<USDTWithdrawalLimitInfoManage>>();
-            var USDTwithdrawalLimitInfoManages =
-                _withdrawalBll.GetUSDTWithdrawalLimitInfos(USDTwithdrawalLimit.SiteId, USDTwithdrawalLimit.CurrencyId, Enum.GetName(typeof(NetworkType), USDTwithdrawalLimit.NetworkType));
+            var USDTwithdrawalLimitInfoManages =_withdrawalBll.GetUSDTWithdrawalLimitInfos(request.SiteId,
+                request.CurrencyId,
+                Enum.GetName(typeof(NetworkTypeEnum), request.NetworkType));
             apiResult.Data = USDTwithdrawalLimitInfoManages;
             apiResult.ErrorCode = 0;
             return apiResult;
@@ -69,19 +99,28 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Create(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage)
+        public ApiResult Create(CreateOrUpdateRequest request)
         {
-            var result = _withdrawalBll.AddUSDTWithdrawalLimit(USDTwithdrawalLimitInfoManage, User.Identity.Name);
+            var data = new USDTWithdrawalLimitInfoManage()
+            {
+                SiteId = request.SiteId,
+                CurrencyId = request.CurrencyId,
+                VipLevel = request.VipLevel,
+                WithdrawalMax = request.WithdrawalMax,
+                WithdrawalMin = request.WithdrawalMin,
+                NetworkType = (int)request.NetworkType,
+            };
+
+            var result = _withdrawalBll.AddUSDTWithdrawalLimit(data, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
             }
             else
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
-                apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
+                apiResult.Message = _selLangBll.GetMsg("msg_Fail");
             }
 
             return apiResult;
@@ -99,19 +138,28 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Update(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage)
+        public ApiResult Update(CreateOrUpdateRequest request)
         {
-            var result = _withdrawalBll.EditUSDTWithdrawalLimit(USDTwithdrawalLimitInfoManage, User.Identity.Name);
+            var data = new USDTWithdrawalLimitInfoManage()
+            {
+                SiteId = request.SiteId,
+                CurrencyId = request.CurrencyId,
+                VipLevel = request.VipLevel,
+                WithdrawalMax = request.WithdrawalMax,
+                WithdrawalMin = request.WithdrawalMin,
+                NetworkType = (int)request.NetworkType,
+            };
+
+            var result = _withdrawalBll.EditUSDTWithdrawalLimit(data, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result)
             {
                 apiResult.ErrorCode = 0;
-                apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
             }
             else
             {
                 apiResult.ErrorCode = 9;
-                apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
+                apiResult.Message = _selLangBll.GetMsg("msg_Fail");
             }
 
             return apiResult;
@@ -129,19 +177,26 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Delete(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage)
+        public ApiResult Delete(DeleteRequest request)
         {
-            var result = _withdrawalBll.DeleteUSDTWithdrawalLimit(USDTwithdrawalLimitInfoManage, User.Identity.Name);
+            var data = new USDTWithdrawalLimitInfoManage()
+            {
+                SiteId = request.SiteId,
+                CurrencyId = request.CurrencyId,
+                VipLevel = request.VipLevel,
+                NetworkType = (int)request.NetworkType,
+            };
+
+            var result = _withdrawalBll.DeleteUSDTWithdrawalLimit(data, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result > 0)
             {
                 apiResult.ErrorCode = 0;
-                apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
             }
             else
             {
                 apiResult.ErrorCode = 9;
-                apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
+                apiResult.Message = _selLangBll.GetMsg("msg_Fail");
             }
 
             return apiResult;
