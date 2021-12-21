@@ -202,7 +202,8 @@ const EditPanel = (props) => {
           }
         }
         formData.append("personalMsg", JSON.stringify(msg));
-        
+
+        window.confirm("Please wait a few seconds to 2 minutes")
         api
           .post("/api/Message/SendMessageBatch", formData, settings)
           .then(function (response) {
