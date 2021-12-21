@@ -16,7 +16,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class DepositTImeReportController : ControllerBase
+    public class DepositTimeReportController : ControllerBase
     {
         #region Fields
 
@@ -51,7 +51,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
         #region Constructors
 
-        public DepositTImeReportController(IServiceProvider provider)
+        public DepositTimeReportController(IServiceProvider provider)
         {
             _depositBll = provider.GetRequiredService<DepositBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
@@ -62,7 +62,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         #region Finance > Deposit Time Report
 
         /// <summary>
-        /// DepositTImeReport/GetList 取得存款時間報表
+        /// DepositTimeReport/GetList 取得存款時間報表
         /// </summary>
         /// <remarks>
         /// Http Method：POST
