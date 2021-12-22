@@ -92,16 +92,6 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
-      },
-      {
-        "Key": "",
-        "Title": "Bet Failure Record",
-        "FuncKey": "Report/TpFailRecordReport",
-        "Controller": "Report",
-        "Action": "TpFailRecordReport",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
       }
     ]
   },
@@ -207,6 +197,16 @@
         "FuncKey": "CustManage/UserBetLimit",
         "Controller": "CustManage",
         "Action": "UserBetLimit",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Bet Failure Record",
+        "FuncKey": "Report/TpFailRecordReport",
+        "Controller": "Report",
+        "Action": "TpFailRecordReport",
         "Icon": "",
         "Roles": null,
         "Childs": null

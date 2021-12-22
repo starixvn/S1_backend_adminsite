@@ -6,6 +6,10 @@ const dateFormat = (createTime) => {
     return moment(createTime).add(8, "hour").format('l LTS');
 }
 
+const alertInfo = (info) => {
+    alert(info);
+}
+
 const dataColumnDefs = () => {
     return [
         {
@@ -67,12 +71,12 @@ const dataColumnDefs = () => {
         { 
             columnTitle: 'Info',
             dataColumn: 'info',
-            header:
+            body:
             {
                 style: { 
-                    position:"sticky",
-                    top:"36.8px"
-                }
+                    cursor: "pointer"
+                },
+                clickBack: alertInfo
             }
         }
     ]
@@ -89,7 +93,7 @@ const Panel = (props) => {
             <th key={`th-${element.dataColumn}-${idx}`} 
                 scope="col" 
                 className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''}
-                style={element.header && element.header.style ? element.header.style : ''}>
+                style={element.header && element.header.style ? element.header.style : {position:"sticky", top:"36.8px"}}>
                 {element.columnTitle}
             </th>
         );
@@ -101,10 +105,19 @@ const Panel = (props) => {
             if (element.body && element.body.subData) {
                 element.body.subData.forEach(s => { subData[s] = data[s] });
             }
+            if (element.dataColumn === "info")
+            {
+                return <td key={`td-${element.dataColumn}-${idx}`} 
+                    className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
+                    style={element.body && element.body.style ? element.body.style : {}}
+                    onClick={() => { alert(data[element.dataColumn]); }}>
+                    {data[element.dataColumn]}
+                </td>
+            }
             return (
                 <td key={`td-${element.dataColumn}-${idx}`} 
                     className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}
-                    >
+                    style={element.body && element.body.style ? element.body.style : {}}>
                     {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}
                 </td>
             );

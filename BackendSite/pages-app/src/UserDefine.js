@@ -133,7 +133,7 @@ const VipLevelReview = lazy(() =>
 const UserBetLimit = lazy(() => import("./pages/CSD/UserBetLimit/index"));
 
 const TpFailRecordReport = lazy(() =>
-  import("./pages/Report/TpFailRecordReport/index")
+  import("./pages/CSD/TpFailRecordReport/index")
 );
 
 export const defaultPage = "PersonalMsgBatch";

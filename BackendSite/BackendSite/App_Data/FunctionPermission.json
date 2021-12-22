@@ -31,11 +31,6 @@
         "DisplayKey": "User Online Report",
         "FuncKey": "Report/UserOnlineReport",
         "Enable": false
-      },
-      {
-        "DisplayKey": "Bet Failure Record",
-        "FuncKey": "Report/TpFailRecordReport",
-        "Enable": false
       }
     ]
   },
@@ -191,6 +186,11 @@
       {
         "DisplayKey": "User Bet Limit",
         "FuncKey": "CustManage/UserBetLimit",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Bet Failure Record",
+        "FuncKey": "Report/TpFailRecordReport",
         "Enable": false
       }
     ]
