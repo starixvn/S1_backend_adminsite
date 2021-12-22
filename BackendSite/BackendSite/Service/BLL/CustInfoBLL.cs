@@ -688,64 +688,31 @@ namespace BackendSite.Service.BLL
 
             return rewardMessage;
         }
-        public ApiResult SetVerificationReward(int custId,int Op)
+        public ApiResult SetVerificationReward(int custId,int OTPType)
         {
             var apiResult = new ApiResult();
             var myUrl = $"{_bonusApiUrl}SetVerificationReward";
-            int type = -1;
-            switch (Op)
-            {
-                case 3:
-                    type = (int)OTPTypeEnum.SMS;
-                    break;
-                case 4:
-                    type = (int)OTPTypeEnum.Email;
-                    break;
-            }
-            if (type == -1)
-            {
-                apiResult.Message = "Unsupport Type";
-                return apiResult;
-            }
 
             var verificationReq = new SetVerificationReq()
             {
                 CustId = custId,
-                OTPType = type
+                OTPType = OTPType
             };
 
-          
                 apiResult =  _courierAdapter.MyPostAsync<ApiResult, SetVerificationReq>(myUrl, verificationReq).Result;
 
             return apiResult;
         }
 
-        public ApiResult CheckRewardCondination(int custId, int Op)
+        public ApiResult CheckRewardCondination(int custId, int OTPType)
         {
             var apiResult = new ApiResult();
             var myUrl = $"{_bonusApiUrl}CheckRewardCondination";
-            int type = -1;
-            switch (Op)
-            {
-                case 3:
-                    type = (int)OTPTypeEnum.SMS;
-                    break;
-                case 4:
-                    type = (int)OTPTypeEnum.Email;
-                    break;
-            }
-            if (type == -1)
-            {
-                apiResult.ErrorCode = -1;
-                return apiResult;
-            }
-
             var verificationReq = new SetVerificationReq()
             {
                 CustId = custId,
-                OTPType = type
+                OTPType = OTPType
             };
-
             var data = _courierAdapter.MyPostAsync<ApiResult, SetVerificationReq>(myUrl, verificationReq).Result;
             
             return data;
