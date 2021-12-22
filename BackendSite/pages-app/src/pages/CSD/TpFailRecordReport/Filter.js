@@ -36,7 +36,7 @@ const Panel = (props) => {
                     onChange={props.onChange}
                 />
                 <DateTimePickerElem
-                    columnTitle="From Trans Time"
+                    columnTitle="Trans Time From"
                     dateTimePickerProps={{
                         defaultValue: props.filterInfo.FromTransTime,
                         timeFormat: false,
@@ -46,12 +46,12 @@ const Panel = (props) => {
                                     moment(e).format('l'),
                                     "FromTransTime"
                                 );
-                            } catch (ex) { }
+                            } catch (ex) { console.log(ex); }
                         }
                     }}
                 />
                 <DateTimePickerElem
-                    columnTitle="To Trans Time"
+                    columnTitle="To (Adjusted to GMT+8)"
                     dateTimePickerProps={{
                         defaultValue: props.filterInfo.ToTransTime,
                         timeFormat: false,
@@ -61,7 +61,7 @@ const Panel = (props) => {
                                     moment(e).format('l'),
                                     "ToTransTime"
                                 );
-                            } catch (ex) { }
+                            } catch (ex) { console.log(ex); }
                         }
                     }}
                 />
