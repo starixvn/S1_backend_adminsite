@@ -10,28 +10,70 @@ const dataColumnDefs = () => {
     return [
         {
             columnTitle: 'Site Name',
-            dataColumn: "siteName"
+            dataColumn: "siteName",
+            header: {
+                style: { 
+                    width:"5%",
+                    position:"sticky",
+                    top:"36.8px"
+                }
+            }
         },
         {
             columnTitle: 'User',
-            dataColumn: "userName"
+            dataColumn: "userName",
+            header: {
+                style: { 
+                    width:"10%",
+                    position:"sticky",
+                    top:"36.8px"
+                }
+            }
         },
         { 
             columnTitle: 'Trans Time (GMT +8)',
             dataColumn: 'transTime',
+            header: {
+                style: { 
+                    width:"15%",
+                    position:"sticky",
+                    top:"36.8px"
+                }
+            },
             body: { format: dateFormat }
         },
         { 
             columnTitle: 'Vendor',
-            dataColumn: 'tpName'
+            dataColumn: 'tpName',
+            header: {
+                style: { 
+                    width:"5%",
+                    position:"sticky",
+                    top:"36.8px"
+                }
+            }
         },
         { 
             columnTitle: 'Trans Id',
-            dataColumn: 'transId'
+            dataColumn: 'transId',
+            header: {
+                style: { 
+                    width:"15%",
+                    position:"sticky",
+                    top:"36.8px"
+                }
+            }
         },
         { 
             columnTitle: 'Info',
-            dataColumn: 'info'
+            dataColumn: 'info',
+            header:
+            {
+                style: { 
+                    position:"sticky",
+                    top:"36.8px"
+                }
+            }
         }
     ]
 }
@@ -47,7 +89,7 @@ const Panel = (props) => {
             <th key={`th-${element.dataColumn}-${idx}`} 
                 scope="col" 
                 className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''}
-                style={{position:"sticky", top:"36.8px" }}>
+                style={element.header && element.header.style ? element.header.style : ''}>
                 {element.columnTitle}
             </th>
         );
