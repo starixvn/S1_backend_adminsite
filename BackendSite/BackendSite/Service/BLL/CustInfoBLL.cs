@@ -250,9 +250,9 @@ namespace BackendSite.Service.BLL
         {
             var statusList = new List<int>
             {
-                (int) BonusStatusType.Initial,
-                (int) BonusStatusType.Running,
-                (int) BonusStatusType.TrasferOut,
+                (int) BonusInfoStatusEnum.Initial,
+                (int) BonusInfoStatusEnum.Running,
+                (int) BonusInfoStatusEnum.TrasferOut,
             };
             return _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), out var CustId);
         }
@@ -642,10 +642,10 @@ namespace BackendSite.Service.BLL
                     UserName = x.UserName,
                     FullName = x.AccountName,
                     PhoneNo = x.PhoneNo,
-                    Verify = Enum.GetName(typeof(VerifyType), x.PhoneVerified),
+                    Verify = Enum.GetName(typeof(PhoneVerifiedEnum), x.PhoneVerified),
                     RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
-                    DepositStatus = Enum.GetName(typeof(DepositStatusType), x.ActStatus),
-                    Status = Enum.GetName(typeof(RegLiveStatusType), x.Status),
+                    DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
+                    Status = Enum.GetName(typeof(Customer_RegLiveStatusStatusEnum), x.Status),
                     AffCode = x.AffCode,
                     Agent = x.Agent
                 });
@@ -688,64 +688,31 @@ namespace BackendSite.Service.BLL
 
             return rewardMessage;
         }
-        public ApiResult SetVerificationReward(int custId,int Op)
+        public ApiResult SetVerificationReward(int custId,int OTPType)
         {
             var apiResult = new ApiResult();
             var myUrl = $"{_bonusApiUrl}SetVerificationReward";
-            int type = -1;
-            switch (Op)
-            {
-                case 3:
-                    type = (int)VerificationType.SMS;
-                    break;
-                case 4:
-                    type = (int)VerificationType.Email;
-                    break;
-            }
-            if (type == -1)
-            {
-                apiResult.Message = "Unsupport Type";
-                return apiResult;
-            }
 
             var verificationReq = new SetVerificationReq()
             {
                 CustId = custId,
-                VerificationType = type
+                OTPType = OTPType
             };
 
-          
                 apiResult =  _courierAdapter.MyPostAsync<ApiResult, SetVerificationReq>(myUrl, verificationReq).Result;
 
             return apiResult;
         }
 
-        public ApiResult CheckRewardCondination(int custId, int Op)
+        public ApiResult CheckRewardCondination(int custId, int OTPType)
         {
             var apiResult = new ApiResult();
             var myUrl = $"{_bonusApiUrl}CheckRewardCondination";
-            int type = -1;
-            switch (Op)
-            {
-                case 3:
-                    type = (int)VerificationType.SMS;
-                    break;
-                case 4:
-                    type = (int)VerificationType.Email;
-                    break;
-            }
-            if (type == -1)
-            {
-                apiResult.ErrorCode = -1;
-                return apiResult;
-            }
-
             var verificationReq = new SetVerificationReq()
             {
                 CustId = custId,
-                VerificationType = type
+                OTPType = OTPType
             };
-
             var data = _courierAdapter.MyPostAsync<ApiResult, SetVerificationReq>(myUrl, verificationReq).Result;
             
             return data;

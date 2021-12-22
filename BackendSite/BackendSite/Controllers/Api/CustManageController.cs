@@ -253,6 +253,18 @@ namespace BackendSite.Controllers.Api
             public int EnablePromotion { get; set; }
         }
 
+        public class VerificationRewardReq
+        {
+            /// <summary>
+            /// 客戶ID
+            /// </summary>
+            public int CustId { get; set; }
+            /// <summary>
+            /// OTPType (0=SMS, 1=Email)
+            /// </summary>
+            public int OTPType { get; set; }
+        }
+        
         #region RegLiveStatus
         public class RegLiveStatusPara
         {
@@ -554,8 +566,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<bool>();
             int OldStatus = 0;
             int NewStatus = 0;
-
-            string rewardMsg = "";
+            
             var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(custStatusSwitch.CustId);
             switch (custStatusSwitch.Op)
             {
@@ -577,11 +588,6 @@ namespace BackendSite.Controllers.Api
 
             if (data)
             {
-                if(OldStatus == 0 &&(custStatusSwitch.Op == 3 || custStatusSwitch.Op == 4))
-                {
-                    var rtn = custInfoBLL.SetVerificationReward(custStatusSwitch.CustId, custStatusSwitch.Op);
-                    rewardMsg = " VerificationReward : "+ rtn.Message;
-                }
                 var Menu = "CustManage/CustInfoList";
                 var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
@@ -614,7 +620,7 @@ namespace BackendSite.Controllers.Api
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
-                    Message = "Update Success." + rewardMsg
+                    Message = "Update Success." 
                 };
             }
             else
@@ -622,14 +628,44 @@ namespace BackendSite.Controllers.Api
                 throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
             }
         }
+        /// <summary>
+        /// CustManage/PayoutVerificationReward 派發客戶驗證獎勵金
+        /// </summary>
+        /// <param name="verificationRewardReq"></param>
+        /// <returns></returns>
         [HttpPost]
-        public ApiResult CheckRewardCondination(CustStatusSwitch custStatusSwitch)
+        public ApiResult PayoutVerificationReward(VerificationRewardReq verificationRewardReq)
         {
             var apiResult = new ApiResult();
-            if  (custStatusSwitch.Op == 3 || custStatusSwitch.Op == 4)
+
+            apiResult = _custInfoBll.SetVerificationReward(verificationRewardReq.CustId, verificationRewardReq.OTPType);
+            if (apiResult.ErrorCode == 0)
             {
-                apiResult = custInfoBLL.CheckRewardCondination(custStatusSwitch.CustId, custStatusSwitch.Op);
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                if (verificationRewardReq.OTPType == 0)
+                {
+                    Info.Add("Action", "Payout Verification Reward");
+                    Info.Add("OTPType","SMS");
+                }
+                else if (verificationRewardReq.OTPType == 1)
+                {
+                    Info.Add("Action", "Payout Verification Reward");
+                    Info.Add("OTPType", "EMAIL");
+                }
+                
+                _serverInfoBll.AdminOperateLog(null, verificationRewardReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
             }
+            return apiResult;
+        }
+        [HttpPost]
+        public ApiResult CheckRewardCondination(VerificationRewardReq verificationRewardReq)
+        {
+            var apiResult = new ApiResult();
+
+            apiResult = _custInfoBll.CheckRewardCondination(verificationRewardReq.CustId, verificationRewardReq.OTPType);
+
             return apiResult;
         }
 

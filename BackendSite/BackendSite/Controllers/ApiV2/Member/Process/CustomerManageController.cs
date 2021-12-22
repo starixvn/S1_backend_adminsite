@@ -330,7 +330,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             /// </summary>
             public string EMail { get; set; }
         }
-
+        public class VerificationRewardReq
+        {
+            /// <summary>
+            /// 客戶ID
+            /// </summary>
+            public int CustId { get; set; }
+            /// <summary>
+            /// OTPType (0=SMS, 1=Email)
+            /// </summary>
+            public int OTPType { get; set; }
+        }
         public class AddCustNoteRequest : CustIdRequest
         {
             public string Note { get; set; }
@@ -626,7 +636,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult<bool>();
             int OldStatus = 0;
             int NewStatus = 0;
-            string rewardMsg = "";
             var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(request.CustId);
             switch (request.Option)
             {
@@ -649,12 +658,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             if (!data)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
-            }
-            
-            if (OldStatus == 0 && (request.Option == 3 || request.Option == 4))
-            {
-                var rtn = _custInfoBll.SetVerificationReward(request.CustId, request.Option);
-                rewardMsg = "VerificationReward : " + rtn.Message;
             }
 
             var Menu = "CustManage/CustInfoList";
@@ -689,10 +692,23 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return new ApiResult
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Message = "Update Success."+ rewardMsg
+                Message = "Update Success."
             };
         }
+        /// <summary>
+        /// CustManage/PayoutVerificationReward 派發客戶驗證獎勵金
+        /// </summary>
+        /// <param name="verificationRewardReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult PayoutVerificationReward(VerificationRewardReq verificationRewardReq)
+        {
+            var apiResult = new ApiResult();
 
+            apiResult = _custInfoBll.SetVerificationReward(verificationRewardReq.CustId, verificationRewardReq.OTPType);
+
+            return apiResult;
+        }
         /// <summary>
         /// CustomerManage/SetCustInfo 設定客戶資料(等級、全名；生日(年月日)、電話、Email)
         /// </summary>
