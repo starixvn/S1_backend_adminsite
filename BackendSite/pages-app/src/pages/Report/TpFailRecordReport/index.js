@@ -75,9 +75,7 @@ const App = () => {
     WebAPI.PostData(param).then((res) => {
       setSubmitStatus(false);
       setExportStatus(false);
-
       if (res.data.errorCode === 0) {
-        console.log(res.data);
         setDatas({
           PageInfo: {
             totalPages: res.data.totalPages,
@@ -109,26 +107,23 @@ const App = () => {
         PageNumber: PageNumber
       }
     };
-    WebAPI.PostData(param)
-    .then((res) => {
-        console.log(res);
-        if (res.data.errorCode === 0) {
-
-          setDatas({
-            PageInfo: {
-              totalPages: res.data.totalPages,
-              pageNumber: PageNumber,
-              rowCount: res.data.rowCount,
-            },
-            Datas: [...res.data.data],
-            FilterInfo: {
-              ...stateFilter,
-            },
-          });
-        } else {
-          alert(res.data.message ?? "failed to get data.");
-        }
-      });
+    WebAPI.PostData(param).then((res) => {
+      if (res.data.errorCode === 0) {
+        setDatas({
+          PageInfo: {
+            totalPages: res.data.totalPages,
+            pageNumber: PageNumber,
+            rowCount: res.data.rowCount,
+          },
+          Datas: [...res.data.data],
+          FilterInfo: {
+            ...stateFilter,
+          },
+        });
+      } else {
+        alert(res.data.message ?? "failed to get data.");
+      }
+    });
   };
 
   const ExportToExcel = () => {
@@ -152,6 +147,11 @@ const App = () => {
     };
 
     WebAPI.DownloadData(param);
+
+    setTimeout(() => {
+      setSubmitStatus(false);
+      setExportStatus(false);
+    }, 5000);
   };
 
   
