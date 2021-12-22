@@ -14,6 +14,8 @@ namespace BackendSite.Service.Model
 
         public int SiteId { get; set; }
 
+        public string SiteName { get; set; }
+
         public string UserName { get; set; }
 
         public DateTime TransTime { get; set; }

@@ -1010,7 +1010,12 @@ namespace BackendSite.Service.BLL
             return detailList;
         }
 
-        public (IEnumerable<TpFailRecordReport> Result, int RowCount) GetTpFailRecordReport(GetTpFailRecordReportInput input) 
-            => reportService.GetTpFailRecordReport(input);
+        public IEnumerable<TpFailRecordReport> GetTpFailRecordReport(GetTpFailRecordReportInput input,
+            out int totalPages,
+            out int rowCount) 
+            => reportService.GetTpFailRecordReport(input, out totalPages, out rowCount);
+
+        public IEnumerable<TpFailRecordReport> GetTpFailRecordReportForExport(GetTpFailRecordReportInput input)
+            => reportService.GetTpFailRecordReportForExport(input);
     }
 }

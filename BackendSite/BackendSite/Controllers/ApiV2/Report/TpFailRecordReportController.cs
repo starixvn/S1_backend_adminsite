@@ -44,9 +44,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             public int TpId { get; set; }
 
-            public DateTime FromTransTime { get; set; }
+            public long FromTransTime { get; set; }
 
-            public DateTime ToTransTime { get; set; }
+            public long ToTransTime { get; set; }
 
             public string UserName { get; set; }
 
@@ -54,95 +54,124 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             public int PageSize { get; set; }
 
-            public int StartIndex { get; set; }
-            
-            public int TimeZone { get; set; }
+            public int PageNumber { get; set; }
         }
 
         #endregion
 
         #region TpFailRocordReport
 
+        /// <summary>
+        /// TpFailRecordReport/GetList 取得資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Reports > Bet Failure Record > [Submit]
+        /// </remarks>
+        /// <param name="req">參數:
+        ///     SiteId 
+        ///     TpId
+        ///     FromTransTime: 交易時間起(Unix)
+        ///     ToTransTime: 交易時間迄(Unix)
+        ///     UserName: 用戶
+        ///     TransId: 交易單號
+        ///     PageSize: 分頁筆數
+        ///     PageNumber: 頁數
+        /// </param>
+        /// <returns>結果</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/TpFailRecordReport" })]
-        public ApiResult GetList(GetTpFailRecordReportReq req)
+        public ApiListResult<object> GetList(GetTpFailRecordReportReq req)
         {
-            if (!TimeZoneValidation(req.TimeZone))
-                return new ApiResult<object>
+            var data =
+                _reportBll.GetTpFailRecordReport(new GetTpFailRecordReportInput
                 {
-                    Message = "Invalid TimeZone",
-                    ErrorCode = (int)ErrorCodeEnum.Fail,
-                };
-            
-            var data = _reportBll.GetTpFailRecordReport(new GetTpFailRecordReportInput
-            {
-                SiteId = req.SiteId,
-                TpId = req.TpId,
-                FromTransTime = ToUnixTimeStamp(req.FromTransTime, req.TimeZone),
-                ToTransTime = ToUnixTimeStamp(req.ToTransTime, req.TimeZone),
-                UserName = req.UserName,
-                TransId = req.TransId,
-                PageSize = req.PageSize,
-                StartIndex = req.StartIndex
-            });
+                    SiteId = req.SiteId,
+                    TpId = req.TpId,
+                    FromTransTime = req.FromTransTime,
+                    ToTransTime = req.ToTransTime,
+                    UserName = req.UserName,
+                    TransId = req.TransId,
+                    PageSize = req.PageSize,
+                    StartIndex = (Math.Abs(req.PageNumber) - 1) * Math.Abs(req.PageSize)
+                }, out int totalPages, out int rowCount);
 
-            if (!data.Result.Any())
+            if (!data.Any())
                 throw new AdminException(ErrorCodeEnum.NoData);
 
-            return new ApiResult<object>
+            var serverData = _reportBll.GetServer();
+            var siteNameMapper =
+                serverData.ToDictionary(x => x.SiteId, x => x.SiteName);
+            var result = data.ToList();
+            result.ForEach(x => x.SiteName = siteNameMapper[x.SiteId]);
+            
+            return new ApiListResult<object>
             {
-                Data = new
-                {
-                    Result = data.Result,
-                    RowCount = data.RowCount
-                },
+                Data = data,
+                PageNumber = req.PageNumber,
+                RowCount = rowCount,
+                TotalPages = totalPages,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
 
+        /// <summary>
+        /// TpFailRecordReport/Export 匯出 Excel
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Reports > Bet Failure Record > [Submit]
+        /// </remarks>
+        /// <param name="siteId">SiteId</param>
+        /// <param name="tpId">TpId</param>
+        /// <param name="fromTransTime">交易時間起(Unix)</param>
+        /// <param name="toTransTime">交易時間迄(Unix)</param>
+        /// <param name="userName">用戶</param>
+        /// <param name="transId">交易單號</param>
+        /// <param name="timezone">時區(-12~14)</param>
+        /// <returns>Excel File</returns>
         [HttpPost]
-        public IActionResult Export(GetTpFailRecordReportReq req)
+        public IActionResult Export(int siteId,
+            int tpId,
+            long fromTransTime,
+            long toTransTime,
+            string userName,
+            string transId,
+            int timezone)
         {
-            #region Get Data
-
-            var exportData = _reportBll.GetTpFailRecordReport(new GetTpFailRecordReportInput
-            {
-                SiteId = req.SiteId,
-                TpId = req.TpId,
-                FromTransTime = ToUnixTimeStamp(req.FromTransTime, req.TimeZone),
-                ToTransTime = ToUnixTimeStamp(req.ToTransTime, req.TimeZone),
-                UserName = req.UserName,
-                TransId = req.TransId,
-                PageSize = req.PageSize,
-                StartIndex = req.StartIndex
-            });
+            var exportData = 
+                _reportBll.GetTpFailRecordReportForExport(new GetTpFailRecordReportInput
+                {
+                    SiteId = siteId,
+                    TpId = tpId,
+                    FromTransTime = fromTransTime,
+                    ToTransTime = toTransTime,
+                    UserName = userName,
+                    TransId = transId
+                });
 
             var serverData = _reportBll.GetServer();
             var siteNameMapper = 
                 serverData.ToDictionary(x => x.SiteId, x => x.SiteName);
-
-            #endregion
-
-            #region Set Title
-
+            
             var titles = new Dictionary<string, Api.ReportController.TitleModel>
             {
-                { "SiteName", new Api.ReportController.TitleModel { Name = "Site Name", SortId = 1 } },
+                { "Site", new Api.ReportController.TitleModel { Name = "Site", SortId = 1 } },
                 { "User", new Api.ReportController.TitleModel { Name = "User", SortId = 2 } },
-                { "TransTime", new Api.ReportController.TitleModel { Name = "Trans Time(GMT " + req.TimeZone + ")", SortId = 3 } },
+                { "TransTime", new Api.ReportController.TitleModel { Name = "TransTime", SortId = 3 } },
                 { "Vendor", new Api.ReportController.TitleModel { Name = "Vendor", SortId = 4 } },
-                { "TransId", new Api.ReportController.TitleModel { Name = "Trans Id", SortId = 5 } },
+                { "TransId", new Api.ReportController.TitleModel { Name = "TransId", SortId = 5 } },
                 { "Info", new Api.ReportController.TitleModel { Name = "Info", SortId = 6 } }
             };
-
-            #endregion
-
-            var content = exportData.Result.Select(x =>
-                new Dictionary<string, object>
+            
+            var content = exportData.Select(x =>
+                new Dictionary<string, dynamic>
                 {
-                    {"SiteName", siteNameMapper[x.SiteId]},
+                    {"Site", siteNameMapper[x.SiteId]},
                     {"User", x.UserName},
-                    {"TransTime", x.TransTime.AddHours(req.TimeZone).ToString("yyyy-MM-dd HH:mm:ss")},
+                    {"TransTime", x.TransTime.AddHours(timezone).ToString("MM/dd/yyyy HH:mm:ss")},
                     {"Vendor", x.TpName},
                     {"TransId", x.TransId},
                     {"Info", x.Info}
@@ -166,24 +195,6 @@ namespace BackendSite.Controllers.ApiV2.Report
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         $"TpFailedRecordReport_{DateTime.Now:yyyyMMddHHmmss}.xlsx");
         }
-
-        #endregion
-
-        #region Private Method
-
-        private bool TimeZoneValidation(int timeZone)
-            => timeZone <= 14 && timeZone >= -12;
-
-        private long ToUnixTimeStamp(DateTime dateTime, int timeZone)
-        {
-            var datetimeStr = $"{dateTime:yyyy-MM-dd} {TransferToTimeZoneFormat(timeZone)}";
-
-            return DateTimeOffset.Parse(datetimeStr).ToUnixTimeSeconds();
-        }
-
-        private string TransferToTimeZoneFormat(int timeZone)
-            => (Math.Sign(timeZone) >= 0 ? "+" : "-") + Math.Abs(timeZone).ToString("D2") + ":00";
-
 
         #endregion
     }
