@@ -224,7 +224,7 @@ namespace BackendSite.Service.DAL
             out int totalPages,
             out int rowCount)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -250,7 +250,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReportForExport(GetTpFailRecordReportInput input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {

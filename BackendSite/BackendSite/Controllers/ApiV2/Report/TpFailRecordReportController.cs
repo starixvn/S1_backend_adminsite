@@ -130,7 +130,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <param name="toTransTime">交易時間迄(Unix)</param>
         /// <param name="userName">用戶</param>
         /// <param name="transId">交易單號</param>
-        /// <param name="timezone">時區(-12~14)</param>
+        /// <param name="timezone">匯出資料顯示的時區(-12~14)</param>
         /// <returns>Excel File</returns>
         [HttpPost]
         public IActionResult Export(int siteId,
