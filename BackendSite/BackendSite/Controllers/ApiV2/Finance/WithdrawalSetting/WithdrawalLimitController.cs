@@ -39,28 +39,24 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         public class GetListRequest
         {
             public int SiteId { get; set; }
-
             public int CurrencyId { get; set; }
         }
 
-        public class InsertWithdrawalLimitPara
+        public class InsertOrUpdateRequest
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
+            public int VipLevel { get; set; }
             public int WithdrawalMin { get; set; }
+            public int WithdrawalMax { get; set; }
         }
 
-        public class UpdateWithdrawalLimitPara
+
+        public class DeleteRequest
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
-            public int WithdrawalMin { get; set; }
-        }
-
-        public class DeleteWithdrawalLimitPara
-        {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
+            public int VipLevel { get; set; }
         }
 
         #endregion
@@ -75,7 +71,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// 
         /// Func Path：Finance > Withdrawal Limit Management > Click [SiteName]
         /// </remarks>
-        /// <param name="para"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
@@ -104,13 +100,22 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// 
         /// Func Path：Finance > Withdrawal Limit Management > Click [SiteName] > [Add] > [Save]
         /// </remarks>
-        /// <param name="para"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Create(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        public ApiResult Create(InsertOrUpdateRequest request)
         {
-            var result = _withdrawalBll.AddWithdrawalLimit(withdrawalLimitInfoManage,
+            var data = new WithdrawalLimitInfoManage()
+            {
+                SiteId = request.SiteId,
+                CurrencyId = request.CurrencyId,
+                VipLevel = request.VipLevel,
+                WithdrawalMax = request.WithdrawalMax,
+                WithdrawalMin = request.WithdrawalMin,
+            };
+
+            var result = _withdrawalBll.AddWithdrawalLimit(data,
                 User.Identity.Name);
             var apiResult = new ApiResult();
             if (result)
@@ -135,13 +140,22 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// 
         /// Func Path：Finance > Withdrawal Limit Management > Click [SiteName] > [Edit] > [Save]
         /// </remarks>
-        /// <param name="para"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Update(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        public ApiResult Update(InsertOrUpdateRequest request)
         {
-            var result = _withdrawalBll.EditWithdrawalLimit(withdrawalLimitInfoManage,
+            var data = new WithdrawalLimitInfoManage()
+            {
+                SiteId = request.SiteId,
+                CurrencyId = request.CurrencyId,
+                VipLevel = request.VipLevel,
+                WithdrawalMax = request.WithdrawalMax,
+                WithdrawalMin = request.WithdrawalMin,
+            };
+
+            var result = _withdrawalBll.EditWithdrawalLimit(data,
                 User.Identity.Name);
             var apiResult = new ApiResult();
             if (result)
@@ -166,13 +180,21 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// 
         /// Func Path：Finance > Withdrawal Limit Management > Click [SiteName] > [Delete]
         /// </remarks>
-        /// <param name="para"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Delete(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        public ApiResult Delete(DeleteRequest request)
         {
-            var result = _withdrawalBll.DeleteWithdrawalLimit(withdrawalLimitInfoManage, User.Identity.Name);
+
+            var data = new WithdrawalLimitInfoManage()
+            {
+                SiteId = request.SiteId,
+                CurrencyId = request.CurrencyId,
+                VipLevel = request.VipLevel
+            };
+
+            var result = _withdrawalBll.DeleteWithdrawalLimit(data, User.Identity.Name);
             var apiResult = new ApiResult();
             if (result > 0)
             {
