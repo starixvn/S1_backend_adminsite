@@ -28,6 +28,11 @@ namespace BackendSite.Service.BLL
         public bool CustVerify(int siteId, string userName, string sabaId, out CustInfoDetail custInfo)
         {
 
+            if (string.IsNullOrWhiteSpace(sabaId))
+                sabaId = null;
+            if (string.IsNullOrWhiteSpace(userName))
+                userName = null;
+
             var custUsername = string.IsNullOrEmpty(userName) ? null : userName;
             var custId = (string.IsNullOrEmpty(sabaId)) ? null : _common.TpIdToCustId(sabaId);
 
