@@ -2196,12 +2196,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiListResult<VipLevelLog> GetVipLevelLogByCustId(CustIdRequest request)
+        public ApiListResult<VipLevelLog> GetVipLevelLogByCustId(CustIdWithPageRequest request)
         {
+            int totalPages = 0;
+            int rowCount = 0;
+
+            var result = _vipLevelBll.GetVipLevelLog(request.CustId, request.PageNumber, request.PageSize, out totalPages, out rowCount);
+
             var apiListResult = new ApiListResult<VipLevelLog>
             {
-                Data = _vipLevelBll.GetVipLevelLog(request.CustId),
-                ErrorCode = (int)ErrorCodeEnum.Success
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                TotalPages = totalPages,
+                RowCount = rowCount,
+                PageNumber = request.PageNumber
             };
             return apiListResult;
         }

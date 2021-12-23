@@ -134,7 +134,7 @@ namespace BackendSite.Controllers.Api
         {
             var data = _vipLevelBLL.GetVipLevelInfo(custIdReq.CustId);
 
-            if(data != null)
+            if (data != null)
             {
                 data.QualifiedTime = new DateTimeOffset(data.QualifiedTime.DateTime.AddHours(8), TimeSpan.FromHours(8));
 
@@ -163,7 +163,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<VipLevelLog> GetVipLevelLog(CustIdReq custIdReq)
         {
-            var data = _vipLevelBLL.GetVipLevelLog(custIdReq.CustId);
+            var data = _vipLevelBLL.GetVipLevelLog(custIdReq.CustId, 1, 1000, out _, out _);
 
             data.ToList().ForEach(s => s.UpdateTime = new DateTimeOffset(s.UpdateTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
 
