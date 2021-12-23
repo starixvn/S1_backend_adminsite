@@ -81,7 +81,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// </param>
         /// <returns>結果</returns>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/TpFailRecordReport" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
         public ApiListResult<object> GetList(GetTpFailRecordReportReq req)
         {
             var data =

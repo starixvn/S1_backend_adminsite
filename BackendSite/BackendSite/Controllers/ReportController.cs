@@ -40,11 +40,5 @@ namespace BackendSite.Controllers
         {
             return View();
         }
-
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/TpFailRecordReport" })]
-        public IActionResult TpFailRecordReport()
-        {
-            return View();
-        }
     }
 }
