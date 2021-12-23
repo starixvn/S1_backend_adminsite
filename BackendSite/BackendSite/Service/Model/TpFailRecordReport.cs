@@ -4,6 +4,8 @@ namespace BackendSite.Service.Model
 {
     public class TpFailRecordReport
     {
+        private DateTimeOffset _transTime { get; set; }
+
         public int Id { get; set; }
 
         public string TransId { get; set; }
@@ -18,9 +20,11 @@ namespace BackendSite.Service.Model
 
         public string UserName { get; set; }
 
-        public DateTime TransTime { get; set; }
-
-        public string TransUnix { get; set; }
+        public DateTimeOffset TransTime
+        {
+            get => _transTime;
+            set => _transTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
 
         public string Info { get; set; }
     }
@@ -31,9 +35,9 @@ namespace BackendSite.Service.Model
 
         public int TpId { get; set; }
 
-        public long FromTransTime { get; set; }
+        public DateTime FromTransTime { get; set; }
 
-        public long ToTransTime { get; set; }
+        public DateTime ToTransTime { get; set; }
 
         public string UserName { get; set; }
 
@@ -42,5 +46,20 @@ namespace BackendSite.Service.Model
         public int PageSize { get; set; }
 
         public int StartIndex { get; set; }
+    }
+
+    public class TpFailRecordForExport
+    {
+        public string SiteName { get; set; }
+
+        public string User { get; set; }
+        
+        public DateTimeOffset TransTime { get; set; }
+
+        public string Vendor { get; set; }
+
+        public string TransId { get; set; }
+
+        public string Info { get; set; }
     }
 }
