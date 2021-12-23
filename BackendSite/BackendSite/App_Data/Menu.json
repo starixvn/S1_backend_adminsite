@@ -204,8 +204,8 @@
       {
         "Key": "",
         "Title": "Bet Failure Record",
-        "FuncKey": "Report/TpFailRecordReport",
-        "Controller": "Report",
+        "FuncKey": "CustManage/TpFailRecordReport",
+        "Controller": "CustManage",
         "Action": "TpFailRecordReport",
         "Icon": "",
         "Roles": null,
