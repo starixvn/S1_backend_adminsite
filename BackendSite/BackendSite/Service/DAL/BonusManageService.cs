@@ -56,10 +56,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
         {
-            using var conn =
-                new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var SpName = "Admin_PromotionCategory_Get";
-            return conn.Query<PromoCategory>(SpName, new {walletType}, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<PromoCategory>("Admin_PromotionCategory_Get", new DynamicParameters(new {walletType}));
         }
 
         public IEnumerable<TpGameType> GetTpGameList()

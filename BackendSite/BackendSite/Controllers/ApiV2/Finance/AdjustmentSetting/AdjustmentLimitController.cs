@@ -66,9 +66,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/AdjustmentLimitManagement" })]
         [HttpPost]
-        public ApiResult<AdjustmentLimtData> GetList(GetAdjustmentRequest request)
+        public ApiResult<AdjustmentLimitData> GetList(GetAdjustmentRequest request)
         {
-            var apiResult = new ApiResult<AdjustmentLimtData>
+            var apiResult = new ApiResult<AdjustmentLimitData>
             {
                 Data = _paymentBll.GetAdjustmentData(request.SiteId, request.CurrencyId),
                 ErrorCode = (int)ErrorCodeEnum.Success

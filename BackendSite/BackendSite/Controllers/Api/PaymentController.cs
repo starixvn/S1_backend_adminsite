@@ -1124,9 +1124,9 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<AdjustmentLimtData> GetAdjustmentData(GetAdjustmentPara para)
+        public ApiResult<AdjustmentLimitData> GetAdjustmentData(GetAdjustmentPara para)
         {
-            var apiResult = new ApiResult<AdjustmentLimtData>
+            var apiResult = new ApiResult<AdjustmentLimitData>
             {
                 Data = _paymentBLL.GetAdjustmentData(para.SiteId, para.CurrencyId),
                 ErrorCode = 0
