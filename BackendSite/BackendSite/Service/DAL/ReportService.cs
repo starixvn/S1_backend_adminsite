@@ -221,22 +221,22 @@ namespace BackendSite.Service.DAL
             var parameters = new DynamicParameters(
                 new
                 {
-                    SiteId = input.SiteId,
-                    TpId = input.TpId,
-                    FromTransTime = input.FromTransTime,
-                    ToTransTime = input.ToTransTime,
-                    UserName = input.UserName,
-                    TransId = input.TransId,
-                    PageSize = input.PageSize,
-                    StartIndex = input.StartIndex
+                    _SiteId = input.SiteId,
+                    _TpId = input.TpId,
+                    _FromTransTime = input.FromTransTime,
+                    _ToTransTime = input.ToTransTime,
+                    _UserName = input.UserName,
+                    _TransId = input.TransId,
+                    _PageSize = input.PageSize,
+                    _StartIndex = input.StartIndex
                 });
-            parameters.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            parameters.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameters.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             var spName = "Admin_TpBetFailureRecord_Get";
             var result = conn.Query<TpFailRecordReport>(spName, parameters, commandType: CommandType.StoredProcedure);
-            rowCount = parameters.Get<int>("RowCount");
-            totalPages = parameters.Get<int>("TotalPages");
+            rowCount = parameters.Get<int>("_RowCount");
+            totalPages = parameters.Get<int>("_TotalPages");
 
             return result;
         }
@@ -247,12 +247,12 @@ namespace BackendSite.Service.DAL
             var parameters = new DynamicParameters(
                 new
                 {
-                    SiteId = input.SiteId,
-                    TpId = input.TpId,
-                    FromTransTime = input.FromTransTime,
-                    ToTransTime = input.ToTransTime,
-                    UserName = input.UserName,
-                    TransId = input.TransId
+                    _SiteId = input.SiteId,
+                    _TpId = input.TpId,
+                    _FromTransTime = input.FromTransTime,
+                    _ToTransTime = input.ToTransTime,
+                    _UserName = input.UserName,
+                    _TransId = input.TransId
                 });
 
             var spName = "Admin_TpBetFailureRecordForExport_Get";
