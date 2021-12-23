@@ -190,7 +190,7 @@
       },
       {
         "DisplayKey": "Bet Failure Record",
-        "FuncKey": "Report/TpFailRecordReport",
+        "FuncKey": "CustManage/TpFailRecordReport",
         "Enable": false
       }
     ]
