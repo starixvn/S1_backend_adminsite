@@ -192,9 +192,9 @@ namespace BackendSite.Service.BLL
             return walletService.GetTPCategoryList();
         }
 
-        public AdjustmentLimtData GetAdjustmentData(int SiteId, int CurrencyId)
+        public AdjustmentLimitData GetAdjustmentData(int siteId, int currencyId)
         {
-            return adjustmentService.GetAdjustmentData(SiteId, CurrencyId);
+            return adjustmentService.GetAdjustmentData(siteId, currencyId);
         }
 
         public int AddAdjustmentLimitInfo(int SiteId, int CurrencyId, decimal AdjustmentMax, string Operator)
@@ -202,9 +202,9 @@ namespace BackendSite.Service.BLL
             return adjustmentService.AddAdjustmentLimitInfo(SiteId, CurrencyId, AdjustmentMax, Operator);
         }
 
-        public bool CheckPassWord(string password, int SiteId)
+        public bool CheckPassWord(string password, int siteId)
         {
-            var result = adminService.GetSpecialPasswordData(SiteId);
+            var result = adminService.GetSpecialPasswordData(siteId);
             if (result == null)
             {
                 return true;
@@ -233,22 +233,22 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        public BalanceAdjustBonusCodeRep CheckBalanceAdjustBonusCode(string BonusCode,int PromotionType, int SiteId,int CurrencyId)
+        public BalanceAdjustBonusCodeRep CheckBalanceAdjustBonusCode(string bonusCode,int promotionType, int siteId,int currencyId)
         {
-            BalanceAdjustBonusCodeRep result = new BalanceAdjustBonusCodeRep();
-            var BalanceAdjustBonusCodeData = adjustmentService.CheckBalanceAdjustBonusCode(BonusCode, PromotionType, SiteId, CurrencyId);
+            var result = new BalanceAdjustBonusCodeRep();
+            var balanceAdjustBonusCodeData = adjustmentService.CheckBalanceAdjustBonusCode(bonusCode, promotionType, siteId, currencyId);
 
-            if(BalanceAdjustBonusCodeData != null)
+            if(balanceAdjustBonusCodeData != null)
             {
-                var promoCategories = _bonusManageService.GetPromoCategories(BalanceAdjustBonusCodeData.WalletType).Where(x => x.Id == BalanceAdjustBonusCodeData.CategoryId && x.TpId == BalanceAdjustBonusCodeData.TpId)?.FirstOrDefault();
+                var promoCategories = _bonusManageService.GetPromoCategories(balanceAdjustBonusCodeData.WalletType).Where(x => x.Id == balanceAdjustBonusCodeData.CategoryId && x.TpId == balanceAdjustBonusCodeData.TpId)?.FirstOrDefault();
                 result.HasBonusCode = true;
-                result.BonusCode = BonusCode;
-                result.RollOver = BalanceAdjustBonusCodeData.RollOver;
-                result.Bonus = BalanceAdjustBonusCodeData.Bonus;
-                result.TpId = BalanceAdjustBonusCodeData.TpId;
-                result.CategoryId = BalanceAdjustBonusCodeData.CategoryId;
+                result.BonusCode = bonusCode;
+                result.RollOver = balanceAdjustBonusCodeData.RollOver;
+                result.Bonus = balanceAdjustBonusCodeData.Bonus;
+                result.TpId = balanceAdjustBonusCodeData.TpId;
+                result.CategoryId = balanceAdjustBonusCodeData.CategoryId;
                 result.Name = promoCategories == null ? string.Empty : promoCategories.Name;
-                result.WalletType = BalanceAdjustBonusCodeData.WalletType;
+                result.WalletType = balanceAdjustBonusCodeData.WalletType;
             }
             else
             {

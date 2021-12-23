@@ -42,6 +42,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly PaymentAdjustmentReportBLL _paymentAdjustmentReportBll;
         private readonly ImageEditorBLL _imageEditorBll;
+        private readonly Common _common;
 
         /// <summary>
         /// 確認圖檔檔案類型
@@ -76,6 +77,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _paymentAdjustmentReportBll = provider.GetRequiredService<PaymentAdjustmentReportBLL>();
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
+            _common = provider.GetRequiredService<Common>();
         }
 
         #endregion
@@ -470,6 +472,19 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             public DateTime SelDate { get; set; }
             public int GameTypeId { get; set; }
+        }
+        
+        public class CustInfoReq
+        {
+            public int CustId { get; set; }
+            public string UserName { get; set; }
+            public string Reason { get; set; }
+        }
+        
+        public class CustInfosReq : CustInfoReq
+        {
+            public string SabaId { get; set; }
+            public int SiteId { get; set; }
         }
 
         #endregion
@@ -2424,6 +2439,57 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
             }
+            return apiResult;
+        }
+
+        #endregion
+
+        #region Finance > Balance Adjustment
+
+        /// <summary>
+        /// CustomerManage/GetCustInfoDetails 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Balance Adjustment > [Search] 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<CustInfoDetail> GetCustInfoDetails(CustInfosReq request)
+        {
+            var apiResult = new ApiResult<CustInfoDetail>();
+
+            var custUsername = string.IsNullOrEmpty(request.UserName) ? null : request.UserName;
+            var custId = (string.IsNullOrEmpty(request.SabaId)) ? null : _common.TpIdToCustId(request.SabaId);
+
+            var custInfosDetail = _custInfoBll.GetCustInfoDetails(custId, custUsername, request.SiteId);
+
+            if (custInfosDetail != null)
+            {
+                if (custInfosDetail.Status == (int)CustomerStatusEnum.Running)
+                {
+                    apiResult.Data = custInfosDetail;
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else if (custInfosDetail.Status == (int)CustomerStatusEnum.Suspend)
+                {
+                    apiResult.Message = "Suspend Status.";
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.CustStatusIsSuspend;
+                }
+                else
+                {
+                    apiResult.Message = "Closed Status.";
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.CustStatusIsClosed;
+                }
+            }
+            else
+            {
+                apiResult.Message = "No find";
+                apiResult.ErrorCode = (int)ErrorCodeEnum.CustNotFound;
+            }
+
             return apiResult;
         }
 

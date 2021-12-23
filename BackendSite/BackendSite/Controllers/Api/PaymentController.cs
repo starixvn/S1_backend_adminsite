@@ -620,7 +620,7 @@ namespace BackendSite.Controllers.Api
                 if (custInfo != null)
                 {
                     //非RetentionBonus,ManualBonus
-                    if (adjustmentAndWithdrawalLimitReq.Option != (int)AdjustmentInfoAdjustTypeEnum.RetentionBouns && adjustmentAndWithdrawalLimitReq.Option != (int)AdjustmentInfoAdjustTypeEnum.ManualBonus)
+                    if (adjustmentAndWithdrawalLimitReq.Option != (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus && adjustmentAndWithdrawalLimitReq.Option != (int)AdjustmentInfoAdjustTypeEnum.ManualBonus)
                     {
                         adjustmentAndWithdrawalLimit.CustId = custInfo.CustId;
                         adjustmentAndWithdrawalLimit.CurrencyId = custInfo.CurrencyId;
@@ -738,7 +738,7 @@ namespace BackendSite.Controllers.Api
                             Memo = adjustmentAndWithdrawalLimitReq.Memo,
                             Operator = authData.UserName,
                             Amount = adjustmentAndWithdrawalLimitReq.Amount,
-                            PromotionType = adjustmentAndWithdrawalLimitReq.Option == (int)AdjustmentInfoAdjustTypeEnum.RetentionBouns ?  9 : 8
+                            PromotionType = adjustmentAndWithdrawalLimitReq.Option == (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus ?  9 : 8
                         };
                         var apiOnlineResult =
                             await courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
@@ -814,7 +814,7 @@ namespace BackendSite.Controllers.Api
                                 try
                                 {
                                     //非Retention Bonus
-                                    if (option != (int)AdjustmentInfoAdjustTypeEnum.RetentionBouns && option != (int)AdjustmentInfoAdjustTypeEnum.ManualBonus)
+                                    if (option != (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus && option != (int)AdjustmentInfoAdjustTypeEnum.ManualBonus)
                                     {
                                         var withdrawalLimitAmount =
                                         (withdrawalLimitOption == 1) ? amount * withdrawal : 0;
@@ -926,7 +926,7 @@ namespace BackendSite.Controllers.Api
                                             Memo = memo,
                                             Operator = authData.UserName,
                                             Amount = amount,
-                                            PromotionType = option == (int)AdjustmentInfoAdjustTypeEnum.RetentionBouns ? 9 : 8
+                                            PromotionType = option == (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus ? 9 : 8
                                         };
                                         var apiOnlineResult =
                                              await courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
@@ -1124,9 +1124,9 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<AdjustmentLimtData> GetAdjustmentData(GetAdjustmentPara para)
+        public ApiResult<AdjustmentLimitData> GetAdjustmentData(GetAdjustmentPara para)
         {
-            var apiResult = new ApiResult<AdjustmentLimtData>
+            var apiResult = new ApiResult<AdjustmentLimitData>
             {
                 Data = _paymentBLL.GetAdjustmentData(para.SiteId, para.CurrencyId),
                 ErrorCode = 0

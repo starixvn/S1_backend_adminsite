@@ -298,7 +298,7 @@ namespace BackendSite.Service.Model.enums
         BalanceMinus = 2,
         BonusPlus = 3,
         BonusMinus = 4,
-        RetentionBouns = 5,
+        RetentionBonus = 5,
         ManualBonus = 6
     }
 
