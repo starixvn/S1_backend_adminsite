@@ -420,11 +420,11 @@ namespace BackendSite.Service.BLL
             return Data;
         }
 
-        public IEnumerable<UserOnlineReportModel> GetUserOnlineReport(string siteIds, string selectDate,string timeZome)
+        public IEnumerable<UserOnlineReportModel> GetUserOnlineReport(string siteIds, string selectDate,string timeZone)
         {
             var keyValuePairs = new Dictionary<string, UserOnlineReportModel>();
             string dateTimeFormat;
-            var userOnlineList = reportService.GetUserOnlineReport(siteIds, selectDate,timeZome);
+            var userOnlineList = reportService.GetUserOnlineReport(siteIds, selectDate,timeZone);
             var siteList = JsonConvert.DeserializeObject<List<int>>(siteIds);
             var serverInfoList = reportService.GetServerInfoList();
 
