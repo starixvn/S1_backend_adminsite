@@ -15,7 +15,6 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
         public string EventName { get; set; }
-
         public PrizeSelect()
         {
             //PageSize預設10
@@ -59,7 +58,7 @@ namespace BackendSite.Service.Model
     public class PrizeLogData
     {
         public string UserName { get; set; }
-        public DateTime DrawTime { get; set; }
+        public DateTimeOffset DrawTime { get; set; }
     }
     public class PrizeSearchResult
     {
