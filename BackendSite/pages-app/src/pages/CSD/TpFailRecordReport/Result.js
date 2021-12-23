@@ -2,8 +2,8 @@ import React from "react";
 import moment from 'moment';
 import Pagination from './Pagination';
 
-const dateFormat = (createTime) => {
-    return moment(createTime).add(8, "hour").format('l LTS');
+const dateFormat = (dateTime) => {
+    return moment(dateTime).format('l LTS');
 }
 
 const alertInfo = (info) => {

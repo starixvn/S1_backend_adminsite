@@ -11,8 +11,8 @@ const App = () => {
   const timeZone = 8;
   const [stateFilter, setFilter] = useState({
     SelectSite: [],
-    FromTransTime: moment().format("l"),
-    ToTransTime: moment().format("l"),
+    StartTime: moment().format("l"),
+    EndTime: moment().format("l"),
     SiteId: 0,
     TpId: 0,
     UserName: '',
@@ -54,14 +54,16 @@ const App = () => {
   const Filter_Submit = () => {
     if (!CheckTransTime())
       return false;
-
+    let startTime = moment(stateFilter.StartTime).format('YYYY-MM-DD HH:mm:ss.SSSZ');
+    let endTime = moment(stateFilter.EndTime).format('YYYY-MM-DD 23:59:59.999Z');
+    console.log(startTime, endTime);
     let param = {
       Url: 'apiV2/TpFailRecordReport/GetList',
       Data: {
         SiteId:stateFilter.SiteId,
         TpId:stateFilter.TpId,
-        FromTransTime: moment(stateFilter.FromTransTime).unix(),
-        ToTransTime: moment(stateFilter.ToTransTime).add(1, 'days').unix() - 1,
+        StartTime: startTime,
+        EndTime: endTime,
         UserName: stateFilter.UserName,
         TransId: stateFilter.TransId,
         PageSize: pageSize,
@@ -94,13 +96,16 @@ const App = () => {
   };
 
   const ChangePage = (PageNumber) => {
+    let startTime = moment(stateFilter.StartTime).format('YYYY-MM-DD HH:mm:ss.SSSZ');
+    let endTime = moment(stateFilter.EndTime).format('YYYY-MM-DD 23:59:59.999Z');
+
     let param = {
       Url: 'apiV2/TpFailRecordReport/GetList',
       Data: {
         SiteId:stateFilter.SiteId,
         TpId:stateFilter.TpId,
-        FromTransTime: moment(stateFilter.FromTransTime).unix(),
-        ToTransTime: moment(stateFilter.ToTransTime).add(1, 'days').unix() - 1,
+        StartTime: startTime,
+        EndTime: endTime,
         UserName: stateFilter.UserName,
         TransId: stateFilter.TransId,
         PageSize: pageSize,
@@ -133,13 +138,15 @@ const App = () => {
     setSubmitStatus(true);
     setExportStatus(true);
 
+    let startTime = moment(stateFilter.StartTime).format('YYYY-MM-DD HH:mm:ss.SSSZ');
+    let endTime = moment(stateFilter.EndTime).format('YYYY-MM-DD 23:59:59.999Z');
     let param = {
-      Url: 'apiV2/TpFailRecordReport/Export',
+      Url: 'apiV2/TpFailRecordReport/ExportV1',
       Data: {
         SiteId: stateFilter.SiteId,
         TpId: stateFilter.TpId,
-        FromTransTime: moment(stateFilter.FromTransTime).unix(),
-        ToTransTime: moment(stateFilter.ToTransTime).add(1, 'days').unix() - 1,
+        StartTime: startTime,
+        EndTime: endTime,
         UserName: stateFilter.UserName,
         TransId: stateFilter.TransId,
         TimeZone: timeZone
@@ -156,8 +163,8 @@ const App = () => {
 
   
   const CheckTransTime = () => {
-    let momFromTransTime = moment(stateFilter.FromTransTime);
-    let momToTransTime = moment(stateFilter.FromTransTime)
+    let momFromTransTime = moment(stateFilter.StartTime);
+    let momToTransTime = moment(stateFilter.StartTime)
 
     if (!momFromTransTime.unix() || !momToTransTime.unix()) {
       alert("Please choose TransTime of report.");

@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,46 +16,120 @@ namespace BackendSite.Controllers.ApiV2.Report
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class TpFailRecordReportController : Controller
+    public class TpFailRecordReportController : ControllerBase
     {
 
         #region Fields
 
         private readonly ReportBLL _reportBll;
-        private readonly ReportExcelBLL _reportExcelBll;
+        private readonly ExcelBLL _excelBll;
 
         #endregion
-
-
+        
         #region Constructor
 
         public TpFailRecordReportController(IServiceProvider provider)
         {
             _reportBll = provider.GetRequiredService<ReportBLL>();
-            _reportExcelBll = provider.GetRequiredService<ReportExcelBLL>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
         #endregion
 
         #region Model
 
-        public class GetTpFailRecordReportReq
+        public class GetListReq : ApiRequestPageModel
         {
+            private DateTimeOffset _startTime { get; set; }
+            private DateTimeOffset _endTime { get; set; }
+
+            /// <summary>
+            /// 品牌ID
+            /// </summary>
             public int SiteId { get; set; }
 
+            /// <summary>
+            /// 三方ID
+            /// </summary>
             public int TpId { get; set; }
 
-            public long FromTransTime { get; set; }
+            /// <summary>
+            /// 交易時間起
+            /// </summary>
+            public DateTimeOffset StartTime
+            {
+                get => _startTime;
+                set => _startTime = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
 
-            public long ToTransTime { get; set; }
+            /// <summary>
+            /// 交易時間迄
+            /// </summary>
+            public DateTimeOffset EndTime
+            {
+                get => _endTime;
+                set => _endTime = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
 
+            /// <summary>
+            /// 用戶
+            /// </summary>
             public string UserName { get; set; }
 
+            /// <summary>
+            /// 交易單號
+            /// </summary>
+            public string TransId { get; set; }
+        }
+
+        public class ExportReq
+        {
+            private DateTimeOffset _startTime { get; set; }
+            private DateTimeOffset _endTime { get; set; }
+
+            /// <summary>
+            /// 品牌ID
+            /// </summary>
+            public int SiteId { get; set; }
+
+            /// <summary>
+            /// 三方ID
+            /// </summary>
+            public int TpId { get; set; }
+
+            /// <summary>
+            /// 交易時間起
+            /// </summary>
+            public DateTimeOffset StartTime
+            {
+                get => _startTime;
+                set => _startTime = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+
+            /// <summary>
+            /// 交易時間迄
+            /// </summary>
+            public DateTimeOffset EndTime
+            {
+                get => _endTime;
+                set => _endTime = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+
+            /// <summary>
+            /// 用戶
+            /// </summary>
+            public string UserName { get; set; }
+
+            /// <summary>
+            /// 交易單號
+            /// </summary>
             public string TransId { get; set; }
 
-            public int PageSize { get; set; }
-
-            public int PageNumber { get; set; }
+            /// <summary>
+            /// 匯出資料顯示的時區(-12~14)
+            /// </summary>
+            [Range(-12, 14)]
+            public int TimeZone { get; set; }
         }
 
         #endregion
@@ -69,28 +144,19 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// 
         /// Func Path：Reports > Bet Failure Record > [Submit]
         /// </remarks>
-        /// <param name="req">參數:
-        ///     SiteId 
-        ///     TpId
-        ///     FromTransTime: 交易時間起(Unix)
-        ///     ToTransTime: 交易時間迄(Unix)
-        ///     UserName: 用戶
-        ///     TransId: 交易單號
-        ///     PageSize: 分頁筆數
-        ///     PageNumber: 頁數
-        /// </param>
+        /// <param name="req">參數</param>
         /// <returns>結果</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
-        public ApiListResult<object> GetList(GetTpFailRecordReportReq req)
+        public ApiListResult<object> GetList(GetListReq req)
         {
             var data =
                 _reportBll.GetTpFailRecordReport(new GetTpFailRecordReportInput
                 {
                     SiteId = req.SiteId,
                     TpId = req.TpId,
-                    FromTransTime = req.FromTransTime,
-                    ToTransTime = req.ToTransTime,
+                    FromTransTime = req.StartTime.DateTime,
+                    ToTransTime = req.EndTime.DateTime,
                     UserName = req.UserName,
                     TransId = req.TransId,
                     PageSize = req.PageSize,
@@ -99,12 +165,6 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             if (!data.Any())
                 throw new AdminException(ErrorCodeEnum.NoData);
-
-            var serverData = _reportBll.GetServer();
-            var siteNameMapper =
-                serverData.ToDictionary(x => x.SiteId, x => x.SiteName);
-            var result = data.ToList();
-            result.ForEach(x => x.SiteName = siteNameMapper[x.SiteId]);
             
             return new ApiListResult<object>
             {
@@ -117,7 +177,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         /// <summary>
-        /// TpFailRecordReport/Export 匯出 Excel
+        /// TpFailRecordReport/ExportV1 匯出 Excel
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -126,22 +186,67 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// </remarks>
         /// <param name="siteId">SiteId</param>
         /// <param name="tpId">TpId</param>
-        /// <param name="fromTransTime">交易時間起(Unix)</param>
-        /// <param name="toTransTime">交易時間迄(Unix)</param>
+        /// <param name="startTime">交易時間起</param>
+        /// <param name="endTime">交易時間迄</param>
         /// <param name="userName">用戶</param>
         /// <param name="transId">交易單號</param>
         /// <param name="timezone">匯出資料顯示的時區(-12~14)</param>
         /// <returns>Excel File</returns>
         [HttpPost]
-        public IActionResult Export(int siteId,
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
+        public IActionResult ExportV1(int siteId,
             int tpId,
-            long fromTransTime,
-            long toTransTime,
+            DateTimeOffset startTime,
+            DateTimeOffset endTime,
             string userName,
             string transId,
             int timezone)
         {
-            var exportData = 
+            return ExportTpFailRecordReport(siteId,
+                tpId,
+                new DateTimeOffset(startTime.DateTime, TimeSpan.Zero).DateTime,
+                new DateTimeOffset(endTime.DateTime, TimeSpan.Zero).DateTime,
+                userName,
+                transId,
+                timezone);
+        }
+
+        /// <summary>
+        /// TpFailRecordReport/Export 匯出 Excel
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Reports > Bet Failure Record > [Submit]
+        /// </remarks>
+        /// <param name="req">參數</param>
+        /// <returns>Excel File</returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
+        public IActionResult Export(ExportReq req)
+        {
+            return ExportTpFailRecordReport(req.SiteId,
+                req.TpId,
+                req.StartTime.DateTime,
+                req.EndTime.DateTime,
+                req.UserName,
+                req.TransId,
+                req.TimeZone);
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private FileContentResult ExportTpFailRecordReport(int siteId,
+            int tpId,
+            DateTime fromTransTime,
+            DateTime toTransTime,
+            string userName,
+            string transId,
+            int timezone)
+        {
+            var exportData =
                 _reportBll.GetTpFailRecordReportForExport(new GetTpFailRecordReportInput
                 {
                     SiteId = siteId,
@@ -152,48 +257,19 @@ namespace BackendSite.Controllers.ApiV2.Report
                     TransId = transId
                 });
 
-            var serverData = _reportBll.GetServer();
-            var siteNameMapper = 
-                serverData.ToDictionary(x => x.SiteId, x => x.SiteName);
-            
-            var titles = new Dictionary<string, Api.ReportController.TitleModel>
+            var resultData = exportData.Select(x => new TpFailRecordForExport
             {
-                { "Site", new Api.ReportController.TitleModel { Name = "Site", SortId = 1 } },
-                { "User", new Api.ReportController.TitleModel { Name = "User", SortId = 2 } },
-                { "TransTime", new Api.ReportController.TitleModel { Name = "TransTime", SortId = 3 } },
-                { "Vendor", new Api.ReportController.TitleModel { Name = "Vendor", SortId = 4 } },
-                { "TransId", new Api.ReportController.TitleModel { Name = "TransId", SortId = 5 } },
-                { "Info", new Api.ReportController.TitleModel { Name = "Info", SortId = 6 } }
-            };
-            
-            var content = exportData.Select(x =>
-                new Dictionary<string, dynamic>
-                {
-                    {"Site", siteNameMapper[x.SiteId]},
-                    {"User", x.UserName},
-                    {"TransTime", x.TransTime.AddHours(timezone).ToString("MM/dd/yyyy HH:mm:ss")},
-                    {"Vendor", x.TpName},
-                    {"TransId", x.TransId},
-                    {"Info", x.Info}
-                });
-            
-            var excels = new List<GeneralReportExportDataToExcel>()
-            {
-                new GeneralReportExportDataToExcel()
-                {
-                    SheetName = "Tp Failed Record Report",
-                    Content = content,
-                    Titles = titles
-                        .OrderBy(x=> x.Value.SortId)
-                        .ToDictionary(x => x.Key, x => x.Value.Name)
-                },
-            };
+                SiteName = x.SiteName,
+                User = x.UserName,
+                TransTime = x.TransTime.ToOffset(TimeSpan.FromHours(timezone)),
+                Vendor = x.TpName,
+                TransId = x.TransId,
+                Info = x.Info
+            });
 
-            var stream = _reportExcelBll.GeneralReportExportToMultiSheet(excels);
+            var stream = _excelBll.Export(resultData);
 
-            return File(stream,
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        $"TpFailedRecordReport_{DateTime.Now:yyyyMMddHHmmss}.xlsx");
+            return _excelBll.ExcelFile(stream, "TpFailedRecordReport");
         }
 
         #endregion
