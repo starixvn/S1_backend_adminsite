@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -25,8 +26,13 @@ namespace BackendSite.Service.BLL
         /// <param name="sabaId"></param>
         /// <param name="custInfo"></param>
         /// <returns></returns>
-        public bool CustVerify(int siteId, string userName, string sabaId, out CustInfoDetail custInfo)
+        public ErrorCodeEnum CustVerify(int siteId, string userName, string sabaId, out CustInfoDetail custInfo)
         {
+            custInfo = null;
+
+            if (string.IsNullOrWhiteSpace(sabaId) && string.IsNullOrWhiteSpace(userName))
+                return ErrorCodeEnum.VerifyCustErrorByParaNotEnough;
+
 
             if (string.IsNullOrWhiteSpace(sabaId))
                 sabaId = null;
@@ -40,10 +46,10 @@ namespace BackendSite.Service.BLL
 
             if (custInfo == null)
             {
-                return false;
+                return ErrorCodeEnum.CustNotFound;
             }
 
-            return true;
+            return ErrorCodeEnum.Success;
         }
 
     }

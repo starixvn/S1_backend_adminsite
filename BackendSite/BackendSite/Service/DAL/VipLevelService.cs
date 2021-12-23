@@ -28,7 +28,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<VipLevelSetting> GetVipLevelSetting(int siteId)
         {
-            var vipLevelSetting = _mainDbClient.Query<VipLevelSetting>("Admin_VipLevel_Get", new DynamicParameters(new {SiteId = siteId }));
+            var vipLevelSetting = _mainDbClient.Query<VipLevelSetting>("Admin_VipLevel_Get", new DynamicParameters(new { SiteId = siteId }));
             return vipLevelSetting;
         }
 
@@ -40,12 +40,22 @@ namespace BackendSite.Service.DAL
             return vipLevelInfo;
         }
 
-        public IEnumerable<VipLevelLog> GetVipLevelLog(int CustId)
+        public IEnumerable<VipLevelLog> GetVipLevelLog(int custId, int startIndex, int pageSize, out int totalPages, out int rowCount)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var GetVipLevelLog = conn.Query<VipLevelLog>("Admin_CustVipLevelLog_Get_V3", new { CustId },
-                commandType: CommandType.StoredProcedure);
-            return GetVipLevelLog;
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            var props = new DynamicParameters();
+            props.Add("_CustId", custId);
+            props.Add("_PageSize", pageSize);
+            props.Add("_StartIndex", startIndex);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = conn.Query<VipLevelLog>("Admin_CustVipLevelLog_Get_V4", props, commandType: CommandType.StoredProcedure);
+
+            totalPages = props.Get<int?>("_TotalPages") ?? 0;
+            rowCount = props.Get<int?>("_RowCount") ?? 0;
+
+            return result;
         }
 
         public int SetVipLevel(int SiteId, int CustId, string UserName, int VipLevel, string Memo, string Operator)

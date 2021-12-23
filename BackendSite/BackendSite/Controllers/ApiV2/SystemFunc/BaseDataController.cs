@@ -444,13 +444,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffListByCustVerify(GetBankInfoOffListByCustVerifyRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
+            var result = _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
 
-            if (string.IsNullOrWhiteSpace(request.SabaId) && string.IsNullOrWhiteSpace(request.UserName))
-                throw new AdminException(ErrorCodeEnum.VerifyCustErrorByParaNotEnough);
-
-            if (!_custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo))
+            if (result != ErrorCodeEnum.Success)
             {
-                throw new AdminException(ErrorCodeEnum.CustNotFound);
+                throw new AdminException(result);
             }
 
             if (custInfo != null)
