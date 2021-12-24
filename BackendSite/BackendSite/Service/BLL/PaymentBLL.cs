@@ -257,18 +257,18 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        public BalanceAdjustBonusCodeBatchRep CheckBalanceAdjustBonusCodeBatch(string BonusCode, int PromotionType, int SiteId)
+        public BalanceAdjustBonusCodeBatchRep CheckBalanceAdjustBonusCodeBatch(string bonusCode, int promotionType, int siteId)
         {
-            BalanceAdjustBonusCodeBatchRep result = new BalanceAdjustBonusCodeBatchRep();
-            List<BalanceAdjustBonusCodeBatchDetail> detail = new List<BalanceAdjustBonusCodeBatchDetail>();
-            var BalanceAdjustBonusCodeBatchData = adjustmentService.CheckBalanceAdjustBonusCodeBatch(BonusCode, PromotionType, SiteId).ToList();
+            var result = new BalanceAdjustBonusCodeBatchRep();
+            var detail = new List<BalanceAdjustBonusCodeBatchDetail>();
+            var balanceAdjustBonusCodeBatchData = adjustmentService.CheckBalanceAdjustBonusCodeBatch(bonusCode, promotionType, siteId).ToList();
 
-            if (BalanceAdjustBonusCodeBatchData.Count != 0)
+            if (balanceAdjustBonusCodeBatchData.Count != 0)
             {
-                var promoCategories = _bonusManageService.GetPromoCategories(BalanceAdjustBonusCodeBatchData.FirstOrDefault().WalletType)
-                    .Where(x => x.Id == BalanceAdjustBonusCodeBatchData.FirstOrDefault().CategoryId && x.TpId == BalanceAdjustBonusCodeBatchData.FirstOrDefault().TpId)?.FirstOrDefault();
+                var promoCategories = _bonusManageService.GetPromoCategories(balanceAdjustBonusCodeBatchData.FirstOrDefault().WalletType)
+                    .Where(x => x.Id == balanceAdjustBonusCodeBatchData.FirstOrDefault().CategoryId && x.TpId == balanceAdjustBonusCodeBatchData.FirstOrDefault().TpId)?.FirstOrDefault();
 
-                BalanceAdjustBonusCodeBatchData.ForEach(x =>
+                balanceAdjustBonusCodeBatchData.ForEach(x =>
                 {
                     detail.Add(new BalanceAdjustBonusCodeBatchDetail()
                     {
@@ -278,8 +278,8 @@ namespace BackendSite.Service.BLL
                     });
                 });
                 result.HasBonusCode = true;
-                result.BonusCode = BonusCode;
-                result.WalletType = BalanceAdjustBonusCodeBatchData.FirstOrDefault().WalletType;
+                result.BonusCode = bonusCode;
+                result.WalletType = balanceAdjustBonusCodeBatchData.FirstOrDefault().WalletType;
                 result.Detail = detail;
                 result.Name = promoCategories == null ? string.Empty : promoCategories.Name;
             }
@@ -291,9 +291,9 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<CheckBalanceAdjustData> CheckRententionBonusAdjustmentLimit(string BonusCode, int SiteId)
+        public IEnumerable<CheckBalanceAdjustData> CheckRententionBonusAdjustmentLimit(string bonusCode, int siteId)
         {
-            return  adjustmentService.CheckBalanceAdjustBonusCodeBatch(BonusCode, 9, SiteId);
+            return  adjustmentService.CheckBalanceAdjustBonusCodeBatch(bonusCode, 9, siteId);
         }
     }
 }
