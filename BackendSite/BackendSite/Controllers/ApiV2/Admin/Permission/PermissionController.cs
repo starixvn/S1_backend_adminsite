@@ -40,6 +40,16 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
 
         #endregion
 
+        #region API Model
+
+        public class GetUserPermissionResponseModel
+        {
+            public bool IsSuper { get; set; }
+            public IEnumerable<GroupPermisison> PermissionDatas { get; set; }
+        }
+
+        #endregion
+
         /// <summary>
         /// Permission/GetAllPermission 取得所有的權限
         /// </summary>
@@ -203,9 +213,13 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
 
-            return new ApiResult<IEnumerable<GroupPermisison>>
+            return new ApiResult<GetUserPermissionResponseModel>
             {
-                Data = result,
+                Data = new GetUserPermissionResponseModel()
+                {
+                    IsSuper = loginUser.IsSuper,
+                    PermissionDatas = result
+                },
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
