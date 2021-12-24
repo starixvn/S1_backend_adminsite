@@ -111,6 +111,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         public async Task<ApiResult<dynamic>> GetTpCustInfo(GetTpCustInfoRequest request)
         {
             var apiResult = new ApiResult<dynamic>();
+
+            if (string.IsNullOrWhiteSpace(request.UserTpId))
+                request.UserTpId = null;
+            if (string.IsNullOrWhiteSpace(request.UserName))
+                request.UserName = null;
+
             var custId = (string.IsNullOrEmpty(request.UserTpId)) ? null : _common.TpIdToCustId(request.UserTpId);
             var custInfosDetail = _custInfoBll.GetCustInfoDetails(custId, request.UserName, request.SiteId);
 
@@ -185,7 +191,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 Remarks = request.Memo
             };
             var result = await _tpBll.AdminAdjustmentTransferAsync(inTpTransfer);
-            if (result.ErrorCode == (int)ErrorCodeType.Success)
+            if (result.ErrorCode == (int)ErrorCodeEnum.Success)
             {
                 var param = new
                 {
@@ -231,7 +237,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 result.PageNumber = request.PageNumber;
                 result.RowCount = rowCount;
                 result.TotalPages = totalPages;
-                result.ErrorCode = (int)ErrorCodeType.Success;
+                result.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {

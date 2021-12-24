@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 namespace BackendSite.Service.BLL
 {
@@ -28,6 +29,9 @@ namespace BackendSite.Service.BLL
         private readonly RollOverService _rolloverService;
         private readonly CustTurnoverService _custTurnoverService;
         private readonly BonusInfoService _bonusInfoService;
+        private readonly CourierAdapter _courierAdapter;
+        private readonly string _bonusApiUrl;
+
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -41,6 +45,9 @@ namespace BackendSite.Service.BLL
             _rolloverService = provider.GetRequiredService<RollOverService>();
             _custTurnoverService = provider.GetRequiredService<CustTurnoverService>();
             _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+            _bonusApiUrl = configuration.GetValue<string>("BonusService");
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -177,8 +184,11 @@ namespace BackendSite.Service.BLL
                         {
                             promotion.custRollOver = new CustRollOver() { RollOver = 0, TurnOver = 0 };
                         };
-
                     }
+                }
+                if (custInfoDetail.CustPhoneReward.HasValue || custInfoDetail.CustEmailReward.HasValue)
+                {
+                    custInfoDetail.VerificationReward = GetRewardMessage(custInfoDetail);
                 }
                 custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
             }
@@ -240,9 +250,9 @@ namespace BackendSite.Service.BLL
         {
             var statusList = new List<int>
             {
-                (int) BonusStatusType.Initial,
-                (int) BonusStatusType.Running,
-                (int) BonusStatusType.TrasferOut,
+                (int) BonusInfoStatusEnum.Initial,
+                (int) BonusInfoStatusEnum.Running,
+                (int) BonusInfoStatusEnum.TrasferOut,
             };
             return _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), out var CustId);
         }
@@ -632,10 +642,10 @@ namespace BackendSite.Service.BLL
                     UserName = x.UserName,
                     FullName = x.AccountName,
                     PhoneNo = x.PhoneNo,
-                    Verify = Enum.GetName(typeof(VerifyType), x.PhoneVerified),
+                    Verify = Enum.GetName(typeof(PhoneVerifiedEnum), x.PhoneVerified),
                     RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
-                    DepositStatus = Enum.GetName(typeof(DepositStatusType), x.ActStatus),
-                    Status = Enum.GetName(typeof(RegLiveStatusType), x.Status),
+                    DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
+                    Status = Enum.GetName(typeof(Customer_RegLiveStatusStatusEnum), x.Status),
                     AffCode = x.AffCode,
                     Agent = x.Agent
                 });
@@ -656,6 +666,56 @@ namespace BackendSite.Service.BLL
         public CustProfileReq GetCustProfile(int custId)
         {
             return _custInfoService.GetCustProfile(custId);
+        }
+
+        private string GetRewardMessage(CustInfoDetail custInfoDetail)
+        {
+            var rewardMessage = "";
+            switch (custInfoDetail.VerificationType)
+            {
+                case 0:
+                {
+                    if (custInfoDetail.CustPhoneReward.HasValue)
+                        rewardMessage += $"Phone: {custInfoDetail.CustPhoneReward.Value:0.00} ";
+                    if (custInfoDetail.CustEmailReward.HasValue)
+                        rewardMessage += $"Email : {custInfoDetail.CustEmailReward.Value:0.00}";
+                    break;
+                }
+                case 1:
+                    rewardMessage = $"Phone & Email: {custInfoDetail.CustPhoneReward:0.00}";
+                    break;
+            }
+
+            return rewardMessage;
+        }
+        public ApiResult SetVerificationReward(int custId,int OTPType)
+        {
+            var apiResult = new ApiResult();
+            var myUrl = $"{_bonusApiUrl}SetVerificationReward";
+
+            var verificationReq = new SetVerificationReq()
+            {
+                CustId = custId,
+                OTPType = OTPType
+            };
+
+                apiResult =  _courierAdapter.MyPostAsync<ApiResult, SetVerificationReq>(myUrl, verificationReq).Result;
+
+            return apiResult;
+        }
+
+        public ApiResult CheckRewardCondination(int custId, int OTPType)
+        {
+            var apiResult = new ApiResult();
+            var myUrl = $"{_bonusApiUrl}CheckRewardCondination";
+            var verificationReq = new SetVerificationReq()
+            {
+                CustId = custId,
+                OTPType = OTPType
+            };
+            var data = _courierAdapter.MyPostAsync<ApiResult, SetVerificationReq>(myUrl, verificationReq).Result;
+            
+            return data;
         }
     }
 }

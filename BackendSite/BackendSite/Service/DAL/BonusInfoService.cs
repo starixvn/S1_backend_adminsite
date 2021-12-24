@@ -24,27 +24,27 @@ namespace BackendSite.Service.DAL
             this.withdrawalLimitService = withdrawalLimitService;
         }
 
-        public IEnumerable<BonusInfo> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId, ref int PageNumber, ref int TotalPages, ref int RowCount, ref List<string> CurrencyAmount)
+        public IEnumerable<BonusInfo> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId, int Startindex, out int TotalPages, out int RowCount, out List<string> CurrencyAmount)
         {
             IEnumerable<BonusInfo> result = null;
             var tempCurrencyTotalAmount = new List<string>();
 
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var props = new DynamicParameters();
-            props.Add("@SelectSite", JsonConvert.SerializeObject(SelectSite));
-            props.Add("@BonusCode", BonusCode);
-            props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
-            props.Add("@PromotionType", PromotionType);
-            props.Add("@Currency", CurrencyId);
-            props.Add("@UserName", UserName);
-            props.Add("@TransID", TransId);
-            props.Add("@StartDate", StartDate);
-            props.Add("@EndDate", EndDate);
-            props.Add("@CategoryType", RebateCategoriesId);
-            props.Add("@BaseCurrencyId", BaseCurrencyId);
+            props.Add("_SelectSite", JsonConvert.SerializeObject(SelectSite));
+            props.Add("_BonusCode", BonusCode);
+            props.Add("_SiteIds", JsonConvert.SerializeObject(SiteList));
+            props.Add("_PromotionType", PromotionType);
+            props.Add("_Currency", CurrencyId);
+            props.Add("_UserName", UserName);
+            props.Add("_TransID", TransId);
+            props.Add("_StartDate", StartDate);
+            props.Add("_EndDate", EndDate);
+            props.Add("_CategoryType", RebateCategoriesId);
+            props.Add("_BaseCurrencyId", BaseCurrencyId);
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_BonusInfoTotalAmountV2_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_BonusInfoTotalAmount_Get_V3", props, commandType: CommandType.StoredProcedure).ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
                 CurrencyTotalAmount.ForEach(x =>
@@ -56,16 +56,14 @@ namespace BackendSite.Service.DAL
             #endregion
 
 
-            props.Add("@PageSize", PageSize);
-            props.Add("@PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-            props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("@StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            result = conn.Query<BonusInfo>("Admin_BonusInfoV4_Get", props, commandType: CommandType.StoredProcedure);
-            PageNumber = props.Get<int?>("@PageNumber") ?? 0;
-            TotalPages = props.Get<int?>("@TotalPages") ?? 0;
-            RowCount = props.Get<int?>("@RowCount") ?? 0;
+            props.Add("_PageSize", PageSize);
+            props.Add("_Startindex", Startindex);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            
+            result = conn.Query<BonusInfo>("Admin_BonusInfo_Get_V5", props, commandType: CommandType.StoredProcedure);
+            TotalPages = props.Get<int?>("_TotalPages") ?? 0;
+            RowCount = props.Get<int?>("_RowCount") ?? 0;
 
 
             return result;
@@ -75,19 +73,19 @@ namespace BackendSite.Service.DAL
         {
             IEnumerable<BonusInfo> result = null;
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var SpName = "Admin_BonusInfoExportV4_Get";
+            var SpName = "Admin_BonusInfoExport_Get_V5";
             var props = new DynamicParameters();
-            props.Add("@SelectSite", SelectSite);
-            props.Add("@BonusCode", BonusCode);
-            props.Add("@SiteIds", JsonConvert.SerializeObject(SiteList));
-            props.Add("@PromotionType", PromotionType);
-            props.Add("@Currency", CurrencyId);
-            props.Add("@UserName", UserName);
-            props.Add("@TransID", TransId);
-            props.Add("@StartDate", StartDate);
-            props.Add("@EndDate", EndDate);
-            props.Add("@BaseCurrencyId", BaseCurrencyId);
-            props.Add("@CategoryType", RebateCategoriesId);
+            props.Add("_SelectSite", SelectSite);
+            props.Add("_BonusCode", BonusCode);
+            props.Add("_SiteIds", JsonConvert.SerializeObject(SiteList));
+            props.Add("_PromotionType", PromotionType);
+            props.Add("_Currency", CurrencyId);
+            props.Add("_UserName", UserName);
+            props.Add("_TransID", TransId);
+            props.Add("_StartDate", StartDate);
+            props.Add("_EndDate", EndDate);
+            props.Add("_BaseCurrencyId", BaseCurrencyId);
+            props.Add("_CategoryType", RebateCategoriesId);
 
             result = conn.Query<BonusInfo>(SpName, props, commandType: CommandType.StoredProcedure);
 
@@ -160,12 +158,12 @@ namespace BackendSite.Service.DAL
                         result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, $"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterWithdrawalLimit, conn, trans);
                 } 
                 
-                //需扣回金額
+                //回收bonus紀錄
                 var cancelBonusAmount = bonus - backAmount;
                 if (cancelBonusAmount > 0 && result > 0 )
                 {
                     var cp = new DynamicParameters(new { _BonusId = bonusId, _CancelBonus = cancelBonusAmount });
-                    result = conn.Execute("Common_CancelBonusAmount_Set", cp, trans, commandType: CommandType.StoredProcedure);
+                    result = conn.Execute("Service_CancelBonusAmount_Set", cp, trans, commandType: CommandType.StoredProcedure);
                 }
             }
 

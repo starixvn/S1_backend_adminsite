@@ -28,7 +28,7 @@ namespace BackendSite.Service.BLL
             _apiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("TpService");
         }
 
-        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId,ref int PageNumber, ref int TotalPages, ref int RowCount, ref List<string> CurrencyAmount)
+        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId, int PageNumber, out int TotalPages, out int RowCount, out List<string> CurrencyAmount)
         {
             var siteList = _serverInfoBll.GetSiteListByLoginUser();
             var datas = _bonusInfoService.GetBonusInfoReport(
@@ -41,13 +41,13 @@ namespace BackendSite.Service.BLL
                     siteList?.Select(x => x.SiteId),
                     StartDate,
                     EndDate,
-                    PageSize,
+                    Math.Abs(PageSize),
                     BaseCurrencyId,
                     RebateCategoriesId,
-                    ref PageNumber,
-                    ref TotalPages,
-                    ref RowCount,
-                    ref CurrencyAmount
+                    (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize),
+                    out TotalPages,
+                    out RowCount,
+                    out CurrencyAmount
                 );
 
             var result = new List<BonusInfoFrontEnd>();
@@ -71,7 +71,9 @@ namespace BackendSite.Service.BLL
                         ExpiryTime = row.ExpiryTime,
                         LockedAmount = row.LockedAmount,
                         MaxBonus = row.MaxBonus,
-                        RollOver = row.RollOver
+                        RollOver = row.RollOver,
+                        CancelBonusAmount = row.CancelBonusAmount,
+                        ExpiredCancel = row.ExpiredCancel
                     });
                 }
             }
@@ -116,7 +118,9 @@ namespace BackendSite.Service.BLL
                         ExpiryTime = row.ExpiryTime,
                         LockedAmount = row.LockedAmount,
                         MaxBonus = row.MaxBonus,
-                        RollOver = row.RollOver
+                        RollOver = row.RollOver,
+                        CancelBonusAmount = row.CancelBonusAmount,
+                        ExpiredCancel = row.ExpiredCancel
                     });
                 }
             }
@@ -128,7 +132,7 @@ namespace BackendSite.Service.BLL
         {
             return _bonusInfoService.GetPendingBonusList();
         }
-        
+
         public CancelBonus GetTransferBonusCancel(int bonusId)
         {
             return _bonusInfoService.GetTransferBonusCancel(bonusId);
@@ -144,12 +148,12 @@ namespace BackendSite.Service.BLL
             var data = _courierAdapter.MyPostAsync<TransferResult, TpBonusCancelTransfer>(myUrl, tpBonusCancelTransfer).Result;
             return data;
         }
-        
-        public int CancelBonusByBonusId(int bonusId ,out int custId)
+
+        public int CancelBonusByBonusId(int bonusId, out int custId)
         {
             var statusList = new List<int>
             {
-                (int) BonusStatusType.Running,
+                (int) BonusInfoStatusEnum.Running,
             };
 
             return _bonusInfoService.CancelBonusByBonusId(true, bonusId, JsonConvert.SerializeObject(statusList), out custId);

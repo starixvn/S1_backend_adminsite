@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.Api
 {
@@ -49,14 +50,14 @@ namespace BackendSite.Controllers.Api
             {
                 if (getAdjustmentInfoReq.StartDate > 2147483647)
                     getAdjustmentInfoReq.StartDate = 2147483647;
-                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getAdjustmentInfoReq.StartDate).AddHours(-8);
+                startDate = DateTimeExtensions.UnixToDateTime((long)getAdjustmentInfoReq.StartDate);
             }
 
             if (getAdjustmentInfoReq.EndDate != null)
             {
                 if (getAdjustmentInfoReq.EndDate > 2147483647)
                     getAdjustmentInfoReq.EndDate = 2147483647;
-                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getAdjustmentInfoReq.EndDate).AddHours(-8);
+                endDate = DateTimeExtensions.UnixToDateTime((long)getAdjustmentInfoReq.EndDate);
             }
 
 

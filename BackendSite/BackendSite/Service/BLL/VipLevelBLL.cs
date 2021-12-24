@@ -28,9 +28,13 @@ namespace BackendSite.Service.BLL
             return _vipLevelService.GetVipLevelInfo(custId);
         }
 
-        public IEnumerable<VipLevelLog> GetVipLevelLog(int custId)
+        public IEnumerable<VipLevelLog> GetVipLevelLog(int custId, int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
-            return _vipLevelService.GetVipLevelLog(custId);
+            return _vipLevelService.GetVipLevelLog(custId,
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                out totalPages,
+                out rowCount);
         }
 
         public int SetVipLevel(int siteId, int custId, string userName, int vipLevel, string updator)
@@ -190,7 +194,7 @@ namespace BackendSite.Service.BLL
                     return c;
                 }).ToList();
             }
-            
+
             details = details.Select(c =>
             {
                 if (c.Status == VipStatus.Settled)

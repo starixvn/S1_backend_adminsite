@@ -200,6 +200,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Bet Failure Record",
+        "FuncKey": "CustManage/TpFailRecordReport",
+        "Controller": "CustManage",
+        "Action": "TpFailRecordReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
@@ -581,6 +591,16 @@
         "FuncKey": "Marketing/VipRebateMangetment",
         "Controller": "Marketing",
         "Action": "VipRebateMangetment",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "VerificationReward",
+        "Title": "Verification Reward",
+        "FuncKey": "Marketing/VerificationReward",
+        "Controller": "Marketing",
+        "Action": "VerificationReward",
         "Icon": "",
         "Roles": null,
         "Childs": null

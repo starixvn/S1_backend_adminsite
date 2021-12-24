@@ -139,7 +139,6 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<PromotionInfo>> GetPromotionList([FromForm] GetPromotionListReq request)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
-
             try
             {
                 apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
@@ -214,13 +213,38 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<PromotionInfo>> SetPromotion([FromForm] bool isAdd,
             [FromForm] PromotionInfo promotion,
             [FromForm] GetPromotionListReq request,
-            [FromForm] DisplayConditionAbountVipLevel vipLevelCondition)
+            [FromForm] DisplayConditionAboutVipLevel vipLevelCondition)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
+
+            var req = new PromotionInfoReq
+            {
+                BonusCode =promotion.BonusCode,
+                Description = promotion.Description,
+                PromotionType =promotion.PromotionType,
+                CategoryId = promotion.CategoryId,
+                UnixPeriodFrom = promotion.UnixPeriodFrom,
+                UnixPeriodTo = promotion.UnixPeriodTo,
+                ExpiryDays = promotion.ExpiryDays,
+                Sort = promotion.Sort,
+                Status = promotion.Status,
+                SiteId = promotion.SiteId,
+                WalletType = promotion.WalletType,
+                TpId = promotion.TpId,
+                RedeemHours = promotion.RedeemHours,
+                PeriodType= promotion.PeriodType,
+                PeriodDay = promotion.PeriodDay,
+                SpecialCode = promotion.SpecialCode,
+                IsSpecial = promotion.IsSpecial,
+                OnlyRegistered = promotion.OnlyRegistered,
+                PromotionDeviceType= promotion.PromotionType,
+                PromotionAction = promotion.PromotionAction,
+                AutoExtend = promotion.AutoExtend,
+                Specific = promotion.Specific
+            };
+            
             try
             {
-                //var errorCode = _bonusManageBLL.SetPromotion(IsAdd, Promotion);
-
                 //如果是新增時有填SpecialCode 檢查SpecialCode是否有重複
                 if (isAdd && promotion.IsSpecial)
                 {
@@ -232,7 +256,7 @@ namespace BackendSite.Controllers.Api
                     }
                 }
 
-                var errorCode = _bonusManageBLL.SetPromotion(isAdd, promotion, vipLevelCondition, User.Identity.Name) ? 0 : 1;
+                var errorCode = _bonusManageBLL.SetPromotion(isAdd, req, vipLevelCondition, User.Identity.Name) ? 0 : 1;
 
                 apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
                     request.PromotionTypes,
@@ -279,13 +303,17 @@ namespace BackendSite.Controllers.Api
                     if (_bonusManageBLL.CheckSpecialCodeDuplicate(duplicateRequest.NewSpecialCode))
                     {
                         apiResult.ErrorCode = 99;
-                        apiResult.Message = "Duplicate datas abount Special Code.";
+                        apiResult.Message = "Duplicate datas about Special Code.";
                         return apiResult;
                     }
                 }
-                apiResult.ErrorCode = _bonusManageBLL.DuplicatePromotion(duplicateRequest.BonusCode,
+                apiResult.ErrorCode = _bonusManageBLL.DuplicatePromotion(
+                    duplicateRequest.BonusCode,
                     duplicateRequest.SiteId,
-                    duplicateRequest.NewBonusCode, User.Identity.Name, duplicateRequest.NewSpecialCode, duplicateRequest.IsSpecial) ? 0 : 1;
+                    duplicateRequest.NewBonusCode,
+                    User.Identity.Name, 
+                    duplicateRequest.NewSpecialCode,
+                    duplicateRequest.IsSpecial) ? 0 : 1;
                 apiResult.Message = apiResult.ErrorCode == 1
                     ? "Duplicate fail.The bonus setting already exists which with same promotion-type & product-category."
                     : string.Empty;
@@ -318,8 +346,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<dynamic> UpdatePromotionStatus([FromForm] string BonusCode, [FromForm] int SiteId,
-            [FromForm] int Status)
+        public ApiResult<dynamic> UpdatePromotionStatus([FromForm] string BonusCode, [FromForm] int SiteId,[FromForm] int Status)
         {
             var apiResult = new ApiResult<dynamic>();
             try
@@ -541,9 +568,9 @@ namespace BackendSite.Controllers.Api
             };
 
             var startDate = refFriendListReq.StartDate == null ? (DateTime?)null
-                : new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.StartDate);
+                : DateTimeExtensions.UnixToDateTime((long)refFriendListReq.StartDate);
             var endDate = refFriendListReq.EndDate == null ? (DateTime?)null
-                : new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.EndDate);
+                : DateTimeExtensions.UnixToDateTime((long)refFriendListReq.EndDate);
 
             var PageSize = 10;
             if (refFriendListReq.PageSize > 0)
@@ -574,9 +601,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<dynamic>();
             try
             {
-                apiResult.ErrorCode = _bonusManageBLL.GenScratchCardCode(genScratchCardCodeReq.SpecialCode,
-                    genScratchCardCodeReq.Num, _authorizeBLL.GetAuthData().UserName);
-                //  apiResult.Data = new { promotion.LastUpdateUser, promotion.LastUpdateTime };
+                apiResult.ErrorCode = _bonusManageBLL.GenScratchCardCode(genScratchCardCodeReq.SpecialCode, genScratchCardCodeReq.Num, _authorizeBLL.GetAuthData().UserName);
             }
             catch (Exception ex)
             {
@@ -588,16 +613,20 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-
-
-
+        
         [HttpPost]
         public ApiResult<IEnumerable<ScratchCard>> GetScratchCardList(GetScratchCardListReq getScratchCardListReq)
         {
             var apiResult = new ApiResult<IEnumerable<ScratchCard>>();
             try
             {
-                apiResult.Data = _bonusManageBLL.GetScratchCardList(getScratchCardListReq.SpecialCode, getScratchCardListReq.FilterType);
+                var result = _bonusManageBLL.GetScratchCardList(getScratchCardListReq.SpecialCode, getScratchCardListReq.FilterType);
+                foreach (var data in result)
+                {
+                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                }
+                apiResult.Data = result;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -614,6 +643,11 @@ namespace BackendSite.Controllers.Api
         public IActionResult GetScratchCardListExport(string SpecialCode, int FilterType)
         {
             var exportData = _bonusManageBLL.GetScratchCardListExport(SpecialCode, FilterType);
+            foreach (var data in exportData)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
             var stream = _excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"ScratchCardList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

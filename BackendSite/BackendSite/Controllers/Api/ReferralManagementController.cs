@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.Api
 {
@@ -54,6 +55,7 @@ namespace BackendSite.Controllers.Api
             }
 
             apiResult.Data = referralManagementList;
+            apiResult.ErrorCode = 0;
             return apiResult;
         }
         [HttpPost]
@@ -96,8 +98,8 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
             }
+            apiResult.ErrorCode = 0;
             return apiResult;
-
         }
         public class ReferralCustListReq
         {
@@ -112,13 +114,12 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<ReferralCustList> GetReferralCustList(ReferralCustListReq referralCustListReq)
         {
             var apiResult = new ApiListResult<ReferralCustList>();
-            int totalPages = 0, rowCount = 0;
 
             var pageNumber = referralCustListReq.PageNumber;
             var pageSize = 10;
             if (referralCustListReq.PageSize > 0)
                 pageSize = referralCustListReq.PageSize;
-            apiResult.Data = referralManagementBLL.GetReferralCustList(referralCustListReq.SelectSite, referralCustListReq.UserName, referralCustListReq.CurrencyId, pageSize, ref pageNumber, out totalPages, out rowCount);
+            apiResult.Data = referralManagementBLL.GetReferralCustList(referralCustListReq.SelectSite, referralCustListReq.UserName, referralCustListReq.CurrencyId, pageSize, ref pageNumber, out var totalPages, out var rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;
@@ -167,9 +168,9 @@ namespace BackendSite.Controllers.Api
 
 
             var startDate = refFriendListReq.StartDate == null ? (DateTime?)null
-                : new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.StartDate);
+                : DateTimeExtensions.UnixToDateTime((long)refFriendListReq.StartDate);
             var endDate = refFriendListReq.EndDate == null ? (DateTime?)null
-                : new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.EndDate);
+                : DateTimeExtensions.UnixToDateTime((long)refFriendListReq.EndDate);
 
             var data = referralManagementBLL.GetRefFriendList(refFriendListReq.CustId,
                 startDate,

@@ -132,6 +132,14 @@ const VipLevelReview = lazy(() =>
 
 const UserBetLimit = lazy(() => import("./pages/CSD/UserBetLimit/index"));
 
+const TpFailRecordReport = lazy(() =>
+  import("./pages/CSD/TpFailRecordReport/index")
+);
+
+const VerificationReward = lazy(() =>
+  import("./pages/Marketing/VerificationReward/index")
+);
+
 export const defaultPage = "PersonalMsgBatch";
 
 export const layoutType = {
@@ -765,6 +773,32 @@ export const pages = {
       "./css/css/main.css",
       "./css/common/fonts/main-font/style.css",
       "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  TpFailRecordReport: {
+    comp: (
+      <Suspense fallback="loading...">
+        <TpFailRecordReport />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  VerificationReward: {
+    comp: (
+      <Suspense fallback="loading...">
+        <VerificationReward />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/pages/Marketing.css",
     ],
     layout: layoutType.N88,
   },
