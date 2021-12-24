@@ -13,6 +13,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class RebateReportController : ControllerBase
     {
         #region Fields
