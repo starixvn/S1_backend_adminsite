@@ -260,9 +260,8 @@ namespace BackendSite.Service.DAL
             Adjustment_transId = adjustmentP.Get<string>("TransId");
             if (result > 0)
             {
-                var forStatus = new List<int>();
-                forStatus.Add((int)AdjustmentInfoStatusEnum.Pending);
-                result = SetAdjustmentInfo(Adjustment_transId, adjustmentAndWithdrawalLimit.SiteId, $"Payment Adjustment: {adjustmentAndWithdrawalLimit.Amount * (adjustmentAndWithdrawalLimit.AdjustType % 2 == 1/*1, 3(Add)2, 4(Deduct)*/ ? 1 : -1)}", Operator, forStatus, AdjustmentInfoStatusEnum.Approved, adjustmentAndWithdrawalLimit, conn, trans);
+                var forStatus = new List<int> {(int)AdjustStatus.Pending};
+                result = SetAdjustmentInfo(Adjustment_transId, adjustmentAndWithdrawalLimit.SiteId, $"Payment Adjustment: {adjustmentAndWithdrawalLimit.Amount * (adjustmentAndWithdrawalLimit.AdjustType % 2 == 1/*1, 3(Add)2, 4(Deduct)*/ ? 1 : -1)}", Operator, forStatus, AdjustStatus.Approved, adjustmentAndWithdrawalLimit, conn, trans);
 
                 if (result > 0)
                 {
@@ -358,12 +357,12 @@ namespace BackendSite.Service.DAL
             props.Add("CurrencyId", currencyId);
             return _reportDbClient.Query<CheckBalanceAdjustData>("Admin_CheckBalanceAdjust_Get_V2", props).FirstOrDefault();
         }
-        public IEnumerable<CheckBalanceAdjustData> CheckBalanceAdjustBonusCodeBatch(string BonusCode, int PromotionType, int SiteId)
+        public IEnumerable<CheckBalanceAdjustData> CheckBalanceAdjustBonusCodeBatch(string bonusCode, int promotionType, int siteId)
         {
             var props = new DynamicParameters();
-            props.Add("BonusCode", BonusCode);
-            props.Add("SiteId", SiteId);
-            props.Add("PromotionType", PromotionType);
+            props.Add("BonusCode", bonusCode);
+            props.Add("SiteId", siteId);
+            props.Add("PromotionType", promotionType);
             props.Add("CurrencyId", 0);
             return _reportDbClient.Query<CheckBalanceAdjustData>("Admin_CheckBalanceAdjust_Get_V2", props);
         }
