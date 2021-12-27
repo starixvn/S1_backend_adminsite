@@ -28,6 +28,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly VipLevelBLL _vipLevelBll;
         private readonly BonusManageBLL _bonusManageBll;
         private readonly RebateManageBLL _rebateManageBll;
+        private readonly SportsBLL _sportsBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
         public BaseDataController(IServiceProvider provider)
@@ -39,6 +40,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
             _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
+            _sportsBll = provider.GetRequiredService<SportsBLL>();
         }
 
         #region Model
@@ -135,6 +137,16 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public class GameTypeListReq
         {
             public int CategoryId { get; set; }
+        }
+        
+        public class SportLeaguesReq
+        {
+            public int SportCategoryId { get; set; }
+        }
+        
+        public class SportTeamsReq
+        {
+            public int SportLeaguesId { get; set; }
         }
         
         #endregion
@@ -420,6 +432,30 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             return apiResult;
         }
 
+        [HttpPost]
+        public ApiResult<IEnumerable<SportLeagues>> GetSportLeaguesList(SportLeaguesReq sportLeaguesReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<SportLeagues>>
+            {
+                Data = _sportsBll.GetSportLeaguesList(sportLeaguesReq.SportCategoryId),
+                ErrorCode = (int) ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
+        [HttpPost]
+        public ApiResult<IEnumerable<SportTeams>> GetSportTeamsList(SportTeamsReq sportTeamsReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<SportTeams>>
+            {
+                Data = _sportsBll.GetSportTeamsList(sportTeamsReq.SportLeaguesId),
+                ErrorCode = (int) ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
         #region Private Methods
 
         private class BankInfoPayComparer : IEqualityComparer<Pay>
