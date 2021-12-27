@@ -229,10 +229,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/LeaderBoardExtraPoint/index.js",
     // ],
-    // "Marketing/VipLevelReview.min": [
-    //   "@babel/polyfill",
-    //   "./src/pages/Marketing/VipLevelReview/index.js",
-    // ],
+    "Marketing/VipLevelReview.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/VipLevelReview/index.js",
+    ],
     // "Marketing/LeaderBoardExtraPoint.min": [
     // 	 '@babel/polyfill',
     // 	"./src/pages/Marketing/LeaderBoardExtraPoint/index.js"
