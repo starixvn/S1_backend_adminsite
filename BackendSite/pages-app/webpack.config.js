@@ -69,10 +69,10 @@ module.exports = {
     // "CSD/ChangeVipLevelBatch.min": [
     // 	"./src/pages/CSD/ChangeVipLevelBatch/index.js"
     // ],
-    "Marketing/BonusManage.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/BonusManage/index.jsx",
-    ],
+    // "Marketing/BonusManage.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/BonusManage/index.jsx",
+    // ],
     // "Marketing/PendingBonus.min": [
     // 	"./src/pages/Marketing/PendingBonus/index.jsx"
     // ],
@@ -226,10 +226,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/LeaderBoardExtraPoint/index.js",
     // ],
-    // "Marketing/VipLevelReview.min": [
-    //   "@babel/polyfill",
-    //   "./src/pages/Marketing/VipLevelReview/index.js",
-    // ],
+    "Marketing/VipLevelReview.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/VipLevelReview/index.js",
+    ],
     // "Marketing/LeaderBoardExtraPoint.min": [
     // 	 '@babel/polyfill',
     // 	"./src/pages/Marketing/LeaderBoardExtraPoint/index.js"
