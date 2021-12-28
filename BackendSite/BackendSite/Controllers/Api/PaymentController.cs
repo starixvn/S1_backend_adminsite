@@ -276,9 +276,9 @@ namespace BackendSite.Controllers.Api
         {
             var pageNumber = getFinancialLogReq.PageNumber;
             var startDate = getFinancialLogReq.StartDate == null ? (DateTime?) null
-                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getFinancialLogReq.StartDate);
+                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getFinancialLogReq.StartDate).AddHours(-8);
             var endDate = getFinancialLogReq.EndDate == null ? (DateTime?) null
-                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getFinancialLogReq.EndDate);
+                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getFinancialLogReq.EndDate).AddHours(-8);
             
             var data = _paymentBLL.GetFinancialLog(getFinancialLogReq.CustId, startDate,
                 endDate, getFinancialLogReq.RefTransId, 10, ref pageNumber, out var totalPages,
@@ -1053,9 +1053,9 @@ namespace BackendSite.Controllers.Api
         public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoListByCustId(VipRebateInfoByCustIdPara para)
         {
             var startDate = para.StartDate == null ? (DateTime?) null
-                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)para.StartDate);
+                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)para.StartDate).AddHours(-8);
             var endDate = para.EndDate == null ? (DateTime?) null
-                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)para.EndDate);
+                :  new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)para.EndDate).AddHours(-8);
             
             var searchResult = _paymentBLL.GetVipRebateInfoListByCustId(para.CustId,
                 startDate,

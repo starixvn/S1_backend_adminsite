@@ -509,7 +509,6 @@ namespace BackendSite.Service.Model.enums
         Saba = 1,
         PT = 27
     }
-
     public enum BalanceAdjustmentType
     {
         BalancePlus = 1,
