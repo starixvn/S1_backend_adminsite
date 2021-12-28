@@ -20,7 +20,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class TpMaintenanceController : Controller
+    public class TpMaintenanceController : ControllerBase
     {
         #region Fields
         

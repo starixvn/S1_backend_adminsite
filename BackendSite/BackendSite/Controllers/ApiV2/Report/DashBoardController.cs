@@ -13,7 +13,7 @@ namespace BackendSite.Controllers.ApiV2.Report
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class DashBoardController : Controller
+    public class DashBoardController : ControllerBase
     {
         #region Fields
         

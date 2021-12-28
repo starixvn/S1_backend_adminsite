@@ -16,7 +16,7 @@ namespace BackendSite.Controllers.ApiV2.Report
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class UserOnlineReportController : Controller
+    public class UserOnlineReportController : ControllerBase
     {
         #region Fields
 

@@ -13,7 +13,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class BannerController : Controller
+    public class BannerController : ControllerBase
     {
         #region Fields
         

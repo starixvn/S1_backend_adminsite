@@ -15,7 +15,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class VipLevelReviewController : Controller
+    public class VipLevelReviewController : ControllerBase
     {
         #region Fields
 
