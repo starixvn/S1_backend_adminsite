@@ -200,6 +200,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Bet Failure Record",
+        "FuncKey": "CustManage/TpFailRecordReport",
+        "Controller": "CustManage",
+        "Action": "TpFailRecordReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },

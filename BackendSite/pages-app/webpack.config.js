@@ -109,6 +109,9 @@ module.exports = {
     // "Report/DepositReport.min": [
     //     "./src/pages/Report/DepositReport/index.js"
     // ],
+    // "CSD/TpFailRecordReport.min": [
+    //     "./src/pages/CSD/TpFailRecordReport/index.js"
+    // ],
     // "Marketing/BonusImport.min": [
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/BonusImport/index.js"
