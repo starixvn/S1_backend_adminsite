@@ -224,7 +224,7 @@ namespace BackendSite.Service.DAL
                     _Title = req.Title ,
                     _Content =req.Content,
                     _Operator = req.Operator
-                })) > 0;
+                }),120) > 0;
         }
 
         public LastDepositAndWithdrawalTime GetCustDepositAndWithdrawalTime(int custId)

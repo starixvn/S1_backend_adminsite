@@ -90,6 +90,21 @@ const dataColumnDefs = ()=>{
             }
         },
         {
+            dataColumn:'cancelBonusAmount',
+            columnTitle:'CancelBonusAmount',
+            header:{
+                attr:{
+                    class:"text-right"
+                }
+            },
+            body:{
+                attr:{
+                    class:"text-right"
+                },
+                format:numberFormat
+            }
+        },
+        {
             dataColumn:'expiryTime', 
             columnTitle:'ExpiryTime',
             body:{
@@ -104,8 +119,16 @@ const dataColumnDefs = ()=>{
             }
         },
         {
-            dataColumn:'statusName', columnTitle:'Status'
+            dataColumn:'statusName',
+            columnTitle:'Status'
         },
+        {
+            dataColumn:'expiredCancel',
+            columnTitle:'ExpiredCancel',
+            body:{
+                format:boolFormat
+            }
+        }        
     ]
 }
 
@@ -179,6 +202,10 @@ const numberFormat = (number)=>{
 
 const userNameFormat = (userName, subData)=>{
     return <a href={"/CustManage/CustInfo?UserName="+userName+"&custId="+ subData.custId +"&TransId=" + subData.transId} target="_blank">{userName}</a>
+}
+
+const boolFormat = (bool)=>{
+    return (bool)? "TRUE" : "FALSE";
 }
 
 export default Panel;

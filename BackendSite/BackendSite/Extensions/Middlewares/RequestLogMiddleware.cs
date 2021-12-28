@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BackendSite.ExceptionHandling;
@@ -25,6 +27,10 @@ namespace BackendSite.Extensions.Middlewares
         private readonly AuthorizeBLL _authorizeBLL;
         private readonly ServerInfoBLL _serverInfoBLL;
         private readonly Tools _tools;
+        private readonly List<string> _accessController = new List<string>
+        {
+            "TpFailRecordReport"
+        };
 
         #endregion
 
@@ -54,8 +60,10 @@ namespace BackendSite.Extensions.Middlewares
             
             if (env.IsProduction())
             {
-                if (path.IndexOf("apiV2", StringComparison.OrdinalIgnoreCase) >= 0)
+                if (path.IndexOf("apiV2", StringComparison.OrdinalIgnoreCase) >= 0
+                    && !_accessController.Any(x => path.Contains(x)))
                 {
+                    _logger.LogInformation("Cannot access apiV2: " + path);
                     throw new AdminException(ErrorCodeEnum.Fail);
                 }
             }
