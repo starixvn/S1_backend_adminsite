@@ -1524,7 +1524,8 @@ namespace BackendSite.Controllers.Api
                                 PromoCategoryId = data.PromoCategoryId,
                                 BonusId = data.BonusId,
                                 RemainingBonus = remainingBonus,
-                                RefundAmount = refundAmount
+                                RefundAmount = refundAmount,
+                                UpdateBonusTransferStatus = true
                             };
                             var result = _bonusInfoBll.BonusCancelTransfer(tpBonusCancelTransfer);
                             apiResult.ErrorCode = result.ErrorCode;
