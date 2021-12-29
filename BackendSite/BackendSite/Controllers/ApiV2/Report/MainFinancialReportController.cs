@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
-    //[Authorize]
+    [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class MainFinancialReportController : ControllerBase
@@ -22,7 +22,6 @@ namespace BackendSite.Controllers.ApiV2.Report
         
         private readonly ReportBLL _reportBll;
         private readonly ReportExcelBLL _reportExcelBll;
-        private readonly ResponseSettingBLL _responseSettingBll;
         private readonly Common _common;
 
         #endregion
@@ -33,7 +32,6 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _reportExcelBll = provider.GetRequiredService<ReportExcelBLL>();
-            _responseSettingBll = provider.GetRequiredService<ResponseSettingBLL>();
             _common = provider.GetRequiredService<Common>();
         }
 
@@ -115,11 +113,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// MainFinancialReport/Export 匯出金融報表資料
         /// </summary>
         /// <remarks>
-        /// 
         /// Http Method：POST
         /// 
         /// Func Path：Reports > Main Financial Report > [Export Excel]
-        /// 
         /// </remarks>
         /// <param name="req"></param>
         /// <returns>檔案</returns>
