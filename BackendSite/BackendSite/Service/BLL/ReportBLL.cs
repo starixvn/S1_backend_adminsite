@@ -80,35 +80,20 @@ namespace BackendSite.Service.BLL
 
         #endregion
 
-        public IEnumerable<MainFinancialModel> GetMainFinancialReport(string siteIds,
-                                                                      string currencyIds,
-                                                                      string startDate,
-                                                                      string endDate)
+        public IEnumerable<MainFinancialModel> GetMainFinancialReport(string siteIds, string currencyIds, string startDate, string endDate ,string timeZone)
         {
             var keyValuePairs = new Dictionary<string, MainFinancialModel>();
-            var dateFormat = string.Empty;
-
-
-            var CurrencyIds = JsonConvert.DeserializeObject<List<int>>(currencyIds);
-
-            var reportList = reportService.GetMainFinancialReport(siteIds,
-                                                                  currencyIds,
-                                                                  startDate,
-                                                                  endDate);
-
-            var turnoverAndWinlossList = reportService.GetTurnoverAndWinlossSummary(siteIds,
-                                                                                    currencyIds,
-                                                                                    startDate,
-                                                                                    endDate);
-
+            string dateFormat;
+            var currencyIdList = JsonConvert.DeserializeObject<List<int>>(currencyIds);
+            var reportList = reportService.GetMainFinancialReport(siteIds, currencyIds, startDate, endDate ,timeZone);
+            var turnoverAndWinLossList = reportService.GetTurnoverAndWinLossSummary(siteIds, currencyIds, startDate, endDate,timeZone);
             var currencyList = reportService.GetCurrencyList();
 
             #region Data Combine
 
             foreach (var data in reportList["Deposit"])
             {
-                MainFinancialModel mainFinancialModel = null;
-
+                MainFinancialModel mainFinancialModel;
                 dateFormat = data.Date.ToString("yyyy/MM/dd");
 
                 if (!keyValuePairs.ContainsKey($"{dateFormat}-{data.CurrencyId}"))
@@ -129,7 +114,7 @@ namespace BackendSite.Service.BLL
 
             foreach (var data in reportList["Withdrawal"])
             {
-                MainFinancialModel mainFinancialModel = null;
+                MainFinancialModel mainFinancialModel;
 
                 dateFormat = data.Date.ToString("yyyy/MM/dd");
 
@@ -152,7 +137,7 @@ namespace BackendSite.Service.BLL
 
             foreach (var data in reportList["Adjustment"])
             {
-                MainFinancialModel mainFinancialModel = null;
+                MainFinancialModel mainFinancialModel;
 
                 dateFormat = data.Date.ToString("yyyy/MM/dd");
 
@@ -175,7 +160,7 @@ namespace BackendSite.Service.BLL
 
             foreach (var data in reportList["Bonus"])
             {
-                MainFinancialModel mainFinancialModel = null;
+                MainFinancialModel mainFinancialModel;
 
                 dateFormat = data.Date.ToString("yyyy/MM/dd");
 
@@ -197,7 +182,7 @@ namespace BackendSite.Service.BLL
 
             foreach (var data in reportList["Rebate"])
             {
-                MainFinancialModel mainFinancialModel = null;
+                MainFinancialModel mainFinancialModel;
 
                 dateFormat = data.Date.ToString("yyyy/MM/dd");
 
@@ -217,9 +202,9 @@ namespace BackendSite.Service.BLL
                 mainFinancialModel.RebateInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
             }
 
-            foreach (var data in turnoverAndWinlossList)
+            foreach (var data in turnoverAndWinLossList)
             {
-                MainFinancialModel mainFinancialModel = null;
+                MainFinancialModel mainFinancialModel;
 
                 dateFormat = data.Date.ToString("yyyy/MM/dd");
 
@@ -250,11 +235,11 @@ namespace BackendSite.Service.BLL
 
             var dateList = keyValuePairs.Select(s => s.Value).Select(x => x.Date).Distinct().ToList();
 
-            foreach (var curr in CurrencyIds)
+            foreach (var curr in currencyIdList)
             {
                 foreach (var date in dateList)
                 {
-                    MainFinancialModel mainFinancialModel = null;
+                    MainFinancialModel mainFinancialModel;
 
                     if (!keyValuePairs.ContainsKey($"{date}-{curr}"))
                     {
@@ -277,10 +262,9 @@ namespace BackendSite.Service.BLL
 
             #endregion
 
-            var Data = keyValuePairs.Select(s => s.Value).OrderBy(key => key.Date)
+            var response = keyValuePairs.Select(s => s.Value).OrderBy(key => key.Date)
                                                         .ThenBy(key => key.CurrencyId);
-
-            return Data;
+            return response;
         }
 
         public IEnumerable<StatisticalReportModel> GetStatisticalReport(string siteIds,

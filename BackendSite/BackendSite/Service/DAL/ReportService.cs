@@ -36,8 +36,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<CurrencyModel> GetCurrencyList()
         {
-            var SpName = "Common_Currency_Get";
-            return _reportDbClient.Query<CurrencyModel>(SpName);
+            return _reportDbClient.Query<CurrencyModel>("Common_Currency_Get");
         }
 
         public IEnumerable<ServerInfoModel> GetServerInfoList()
@@ -52,64 +51,42 @@ namespace BackendSite.Service.DAL
 
         #endregion
 
-        public Dictionary<string, IEnumerable<PartcialSummeryModel>> GetMainFinancialReport(string siteIds,
-                                                                                            string currencyIds,
-                                                                                            string startDate,
-                                                                                            string endDate)
+        public Dictionary<string, IEnumerable<PartcialSummeryModel>> GetMainFinancialReport(string siteIds, string currencyIds, string startDate, string endDate ,string timeZone)
         {
-            var partcialSummeryModels = new Dictionary<string, IEnumerable<PartcialSummeryModel>>();
-
+            var partialSummeryModels = new Dictionary<string, IEnumerable<PartcialSummeryModel>>();
             var parameters = new DynamicParameters(
                 new
                 {
                     SiteIds = siteIds,
                     CurrencyIds = currencyIds,
                     StartDate = startDate,
-                    EndDate = endDate
+                    EndDate = endDate,
+                    TimeZone = timeZone
                 });
-
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-
-            conn.Open();
-
+            
             #region Get Data StoreProcedure
 
-            var reportDepositList = conn.Query<PartcialSummeryModel>("Admin_ReportDeposit_GroupByDay_Get",
-                                                                     parameters,
-                                                                     commandType: CommandType.StoredProcedure);
-            partcialSummeryModels.Add("Deposit", reportDepositList);
+            var reportDepositList = _reportDbClient.Query<PartcialSummeryModel>("Admin_ReportDeposit_GroupByDay_Get_V2", parameters);
+            partialSummeryModels.Add("Deposit", reportDepositList);
 
-            var reportWithdrawalList = conn.Query<PartcialSummeryModel>("Admin_ReportWithdrawal_GroupByDay_Get",
-                                                                        parameters,
-                                                                        commandType: CommandType.StoredProcedure);
-            partcialSummeryModels.Add("Withdrawal", reportWithdrawalList);
+            var reportWithdrawalList = _reportDbClient.Query<PartcialSummeryModel>("Admin_ReportWithdrawal_GroupByDay_Get_V2", parameters);
+            partialSummeryModels.Add("Withdrawal", reportWithdrawalList);
 
-            var reportAdjustmentList = conn.Query<PartcialSummeryModel>("Admin_ReportAdjustment_GroupByDay_Get",
-                                                                        parameters,
-                                                                        commandType: CommandType.StoredProcedure);
-            partcialSummeryModels.Add("Adjustment", reportAdjustmentList);
+            var reportAdjustmentList = _reportDbClient.Query<PartcialSummeryModel>("Admin_ReportAdjustment_GroupByDay_Get_V2", parameters);
+            partialSummeryModels.Add("Adjustment", reportAdjustmentList);
 
-            var reportBonusList = conn.Query<PartcialSummeryModel>("Admin_ReportBonus_GroupByDay_Get",
-                                                                        parameters,
-                                                                        commandType: CommandType.StoredProcedure);
-            partcialSummeryModels.Add("Bonus", reportBonusList);
+            var reportBonusList = _reportDbClient.Query<PartcialSummeryModel>("Admin_ReportBonus_GroupByDay_Get_V2", parameters);
+            partialSummeryModels.Add("Bonus", reportBonusList);
 
-            var reportRebateList = conn.Query<PartcialSummeryModel>("Admin_ReportRebate_GroupByDay_Get",
-                                                                        parameters,
-                                                                        commandType: CommandType.StoredProcedure);
-            partcialSummeryModels.Add("Rebate", reportRebateList);
+            var reportRebateList = _reportDbClient.Query<PartcialSummeryModel>("Admin_ReportRebate_GroupByDay_Get_V2", parameters);
+            partialSummeryModels.Add("Rebate", reportRebateList);
 
             #endregion
-
-            conn.Close();
-
-            return partcialSummeryModels;
+            
+            return partialSummeryModels;
         }
 
-        public IEnumerable<TurnoverAndWinlossSummeryModel> GetTurnoverAndWinlossSummary(string siteIds,
-                                                                                        string currencyIds,
-                                                                                        string startDate,
-                                                                                        string endDate)
+        public IEnumerable<TurnoverAndWinlossSummeryModel> GetTurnoverAndWinLossSummary(string siteIds, string currencyIds, string startDate, string endDate , string timeZone)
         {
             var parameters = new DynamicParameters(
                 new
@@ -117,11 +94,11 @@ namespace BackendSite.Service.DAL
                     SiteIds = siteIds,
                     CurrencyIds = currencyIds,
                     StartDate = startDate,
-                    EndDate = endDate
+                    EndDate = endDate,
+                    TimeZone = timeZone
                 });
 
-            var SpName = "Admin_ReportTurnOverAndWinlost_GroupByDay_Get";
-            return _reportDbClient.Query<TurnoverAndWinlossSummeryModel>(SpName, parameters);
+            return _reportDbClient.Query<TurnoverAndWinlossSummeryModel>("Admin_ReportTurnOverAndWinlost_GroupByDay_Get_V2", parameters);
         }
 
         public IEnumerable<StatisticalPartcialSummeryModel> GetStatisticalReport(string siteIds,
