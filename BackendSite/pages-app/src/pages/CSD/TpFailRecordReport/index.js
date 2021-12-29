@@ -28,6 +28,8 @@ const App = () => {
   const [siteList, setSiteList] = useState();
   const [SubmitStatus, setSubmitStatus] = useState(false);
   const [ExportStatus, setExportStatus] = useState(false);
+  const [ShowInfoStatus, setShowInfoStatus] = useState(false);
+  const [InfoJson, setInfoJson] = useState();
 
   useEffect(() => {
     let param = {
@@ -179,6 +181,15 @@ const App = () => {
     return true;
   };
 
+  const ShowInfo = (info) => {
+    setShowInfoStatus(true);
+    setInfoJson(JSON.parse(info));
+  };
+
+  const CloseInfo = () => {
+    setShowInfoStatus(false);
+  };
+
   return (
     <div className="container-fluid" style={{ width: "auto" }}>
       <h4 className="page-name">Bet Failure Record</h4>
@@ -196,6 +207,10 @@ const App = () => {
           ExportToExcel={ExportToExcel}
           ExportBtnDisabled={ExportStatus}
           ChangePage={ChangePage}
+          ShowInfo={ShowInfo}
+          CloseInfo={CloseInfo}
+          ShowInfoStatus={ShowInfoStatus}
+          InfoJson={InfoJson}
         />
       )}
     </div>
