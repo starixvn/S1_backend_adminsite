@@ -317,13 +317,13 @@ const dateFormat = (createTime) => {
   return moment(createTime).format("l LTS");
 };
 const settletimeFormat = (createTime) => {
-  if (createTime === "") {
+  if (createTime === null) {
     return "";
   }
   return moment(createTime).format("l LTS");
 };
 const qualifiedTimeFormat = (dateTime) => {
-  if (dateTime === "") {
+  if (dateTime === null) {
     return "";
   }
   return moment(dateTime).format("l LTS");
