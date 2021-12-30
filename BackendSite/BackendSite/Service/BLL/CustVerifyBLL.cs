@@ -33,7 +33,6 @@ namespace BackendSite.Service.BLL
             if (string.IsNullOrWhiteSpace(sabaId) && string.IsNullOrWhiteSpace(userName))
                 return ErrorCodeEnum.VerifyCustErrorByParaNotEnough;
 
-
             if (string.IsNullOrWhiteSpace(sabaId))
                 sabaId = null;
             if (string.IsNullOrWhiteSpace(userName))

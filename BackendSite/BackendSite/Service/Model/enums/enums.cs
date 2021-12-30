@@ -320,6 +320,9 @@ namespace BackendSite.Service.Model.enums
         Suspend = 2,
         Closed = 3,
     }
+
+    #region Promotion
+
     public enum PromotionType
     {
         FstDeposit = 1,
@@ -332,6 +335,8 @@ namespace BackendSite.Service.Model.enums
         StaticPage = 8,
         RetentionBonus = 9
     }
+
+    #endregion
 
     public enum BonusType
     {
