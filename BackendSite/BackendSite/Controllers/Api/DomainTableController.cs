@@ -54,7 +54,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<DomainTable>>
             {
-                Data = domainTableBLL.GetDomainListbySite(domainListbySiteReq.SiteId, domainListbySiteReq.CurrencyId),
+                Data = domainTableBLL.GetDomainListBySite(domainListbySiteReq.SiteId, domainListbySiteReq.CurrencyId),
                 ErrorCode = 0
             };
 
