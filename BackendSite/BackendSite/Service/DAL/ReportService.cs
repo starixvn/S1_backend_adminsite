@@ -101,13 +101,9 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<TurnoverAndWinlossSummeryModel>("Admin_ReportTurnOverAndWinlost_GroupByDay_Get_V2", parameters);
         }
 
-        public IEnumerable<StatisticalPartcialSummeryModel> GetStatisticalReport(string siteIds,
-                                                                                 string timeZone,
-                                                                                 string startDate,
-                                                                                 string endDate)
+        public IEnumerable<StatisticalPartialSummeryModel> GetStatisticalReport(string siteIds, string timeZone, string startDate, string endDate)
         {
-            var parameters = new DynamicParameters(
-                new
+            var parameters = new DynamicParameters( new
                 {
                     _SiteIds = siteIds,
                     _TimeZone = timeZone,
@@ -115,8 +111,7 @@ namespace BackendSite.Service.DAL
                     _EndDate = endDate
                 });
 
-            var SpName = "Admin_ReportTurnOverValidBet_Statistical_Get";
-            return _reportDbClient.Query<StatisticalPartcialSummeryModel>(SpName, parameters);
+            return _reportDbClient.Query<StatisticalPartialSummeryModel>("Admin_ReportTurnOverValidBet_Statistical_Get", parameters);
         }
 
         public IEnumerable<UserOnlinePartcialSummaryModel> GetUserOnlineReport(string siteIds,

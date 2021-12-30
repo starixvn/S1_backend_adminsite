@@ -55,23 +55,9 @@ namespace BackendSite.Controllers.Api
 
         public class GetStatisticalReportReq
         {
-            public IEnumerable<int> SiteIds
-            {
-                get;
-                set;
-            }
-
-            public string TimeZone
-            {
-                get;
-                set;
-            }
-
-            public string EndDate
-            {
-                get;
-                set;
-            }
+            public IEnumerable<int> SiteIds {get; set; }
+            public string TimeZone { get; set; }
+            public string EndDate { get; set; }
         }
 
         public class GetUserOnlineReportReq

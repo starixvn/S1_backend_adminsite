@@ -267,28 +267,18 @@ namespace BackendSite.Service.BLL
             return response;
         }
 
-        public IEnumerable<StatisticalReportModel> GetStatisticalReport(string siteIds,
-                                                                        string timeZone,
-                                                                        string startDate,
-                                                                        string endDate)
+        public IEnumerable<StatisticalReportModel> GetStatisticalReport(string siteIds, string timeZone, string startDate, string endDate)
         {
             var keyValuePairs = new Dictionary<string, StatisticalReportModel>();
-            var dateFormat = string.Empty;
-            var statisticalList = reportService.GetStatisticalReport(siteIds,
-                                                                     timeZone,
-                                                                     startDate,
-                                                                     endDate);
-
+            var statisticalList = reportService.GetStatisticalReport(siteIds,timeZone, startDate, endDate);
             var currencyList = reportService.GetCurrencyList();
 
             #region Data Statistical
 
             foreach (var data in statisticalList)
             {
-                StatisticalReportModel statisticalReportModel = null;
-
-                //dateFormat = data.Date.ToString("yyyy/MM/dd");
-
+                StatisticalReportModel statisticalReportModel;
+                
                 if (!keyValuePairs.ContainsKey($"{data.CategoryId}-{data.GameId}-{data.CurrencyId}"))
                 {
                     statisticalReportModel = new StatisticalReportModel();
@@ -304,7 +294,7 @@ namespace BackendSite.Service.BLL
 
                 statisticalReportModel = keyValuePairs[$"{data.CategoryId}-{data.GameId}-{data.CurrencyId}"];
 
-                dateFormat = data.Date.ToString("yyyy-MM-dd");
+                var dateFormat = data.Date.ToString("yyyy-MM-dd");
 
                 if (dateFormat == endDate)
                 {
@@ -381,11 +371,9 @@ namespace BackendSite.Service.BLL
             {
                 foreach (var item in categoryGameList)
                 {
-                    StatisticalReportModel statisticalReportModel = null;
-
                     if (!keyValuePairs.ContainsKey($"{item.IdentifyString}-{curr}"))
                     {
-                        statisticalReportModel = new StatisticalReportModel();
+                        var statisticalReportModel = new StatisticalReportModel();
                         keyValuePairs.Add($"{item.IdentifyString}-{curr}", statisticalReportModel);
                         statisticalReportModel.CurrencyId = curr;
                         statisticalReportModel.IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
@@ -400,11 +388,11 @@ namespace BackendSite.Service.BLL
 
             #endregion
 
-            var Data = keyValuePairs.Select(s => s.Value).OrderBy(value => value.CategoryId)
+            var response = keyValuePairs.Select(s => s.Value).OrderBy(value => value.CategoryId)
                                                          .ThenBy(value => value.GameId)
-                                                         .ThenBy(Value => Value.CurrencyId);
+                                                         .ThenBy(value => value.CurrencyId);
 
-            return Data;
+            return response;
         }
 
         public IEnumerable<UserOnlineReportModel> GetUserOnlineReport(string siteIds, string selectDate, int timeZone)
