@@ -93,9 +93,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PendingBonus> GetPendingBonusList()
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var SpName = "Admin_PendingBonusList_Get";
-            return conn.Query<PendingBonus>(SpName, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<PendingBonus>("Admin_PendingBonusList_Get_V2");
         }
         
         public CancelBonus GetTransferBonusCancel(int bonusId)
