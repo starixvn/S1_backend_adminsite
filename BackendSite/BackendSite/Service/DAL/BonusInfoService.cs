@@ -6,114 +6,113 @@ using BackendSite.Service.Model;
 using MySql.Data.MySqlClient;
 using Dapper;
 using System.Data;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
     public class BonusInfoService
     {
-        private readonly IConfiguration configuration;
-        private readonly WalletService walletService;
-        private readonly WithdrawalLimitService withdrawalLimitService;
+        private readonly IConfiguration _configuration;
+        private readonly WalletService _walletService;
+        private readonly WithdrawalLimitService _withdrawalLimitService;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public BonusInfoService(IConfiguration configuration, WalletService walletService, WithdrawalLimitService withdrawalLimitService)
+        public BonusInfoService(IServiceProvider provider)
         {
-            this.configuration = configuration;
-            this.walletService = walletService;
-            this.withdrawalLimitService = withdrawalLimitService;
+            _configuration = provider.GetRequiredService<IConfiguration>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
+            _walletService = provider.GetRequiredService<WalletService>();
+            _withdrawalLimitService = provider.GetRequiredService<WithdrawalLimitService>();
         }
 
-        public IEnumerable<BonusInfo> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId, int Startindex, out int TotalPages, out int RowCount, out List<string> CurrencyAmount)
+        public IEnumerable<BonusInfo> GetBonusInfoReport(IEnumerable<int> selectSite, string bonusCode, string transId, int currencyId, string userName, int promotionType, IEnumerable<int> siteList, DateTime startDate, DateTime endDate, int pageSize, int baseCurrencyId, int rebateCategoriesId, int startIndex, out int totalPages, out int rowCount, out List<string> currencyAmount)
         {
-            IEnumerable<BonusInfo> result = null;
             var tempCurrencyTotalAmount = new List<string>();
 
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var props = new DynamicParameters();
-            props.Add("_SelectSite", JsonConvert.SerializeObject(SelectSite));
-            props.Add("_BonusCode", BonusCode);
-            props.Add("_SiteIds", JsonConvert.SerializeObject(SiteList));
-            props.Add("_PromotionType", PromotionType);
-            props.Add("_Currency", CurrencyId);
-            props.Add("_UserName", UserName);
-            props.Add("_TransID", TransId);
-            props.Add("_StartDate", StartDate);
-            props.Add("_EndDate", EndDate);
-            props.Add("_CategoryType", RebateCategoriesId);
-            props.Add("_BaseCurrencyId", BaseCurrencyId);
+            props.Add("_SelectSite", JsonConvert.SerializeObject(selectSite));
+            props.Add("_BonusCode", bonusCode);
+            props.Add("_SiteIds", JsonConvert.SerializeObject(siteList));
+            props.Add("_PromotionType", promotionType);
+            props.Add("_Currency", currencyId);
+            props.Add("_UserName", userName);
+            props.Add("_TransID", transId);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_CategoryType", rebateCategoriesId);
+            props.Add("_BaseCurrencyId", baseCurrencyId);
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_BonusInfoTotalAmount_Get_V3", props, commandType: CommandType.StoredProcedure).ToList();
-            if (CurrencyTotalAmount.Count > 0)
+            
+            var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_BonusInfoTotalAmount_Get_V4", props).ToList();
+            if (currencyTotalAmount.Count > 0)
             {
-                CurrencyTotalAmount.ForEach(x =>
+                currencyTotalAmount.ForEach(x =>
                 {
-                    tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.Currency, Math.Round(x.Amount, 2)));
+                    tempCurrencyTotalAmount.Add($"{x.Currency}:{Math.Round(x.Amount, 2)}");
                 });
             }
-            CurrencyAmount = tempCurrencyTotalAmount;
+            currencyAmount = tempCurrencyTotalAmount;
+            
             #endregion
-
-
-            props.Add("_PageSize", PageSize);
-            props.Add("_Startindex", Startindex);
+            
+            props.Add("_PageSize", pageSize);
+            props.Add("_StartIndex", startIndex);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             
-            result = conn.Query<BonusInfo>("Admin_BonusInfo_Get_V5", props, commandType: CommandType.StoredProcedure);
-            TotalPages = props.Get<int?>("_TotalPages") ?? 0;
-            RowCount = props.Get<int?>("_RowCount") ?? 0;
-
-
+            var result = _reportDbClient.Query<BonusInfo>("Admin_BonusInfo_Get_V6", props);
+            totalPages = props.Get<int?>("_TotalPages") ?? 0;
+            rowCount = props.Get<int?>("_RowCount") ?? 0;
             return result;
         }
 
-        public IEnumerable<BonusInfo> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int BaseCurrencyId, int RebateCategoriesId)
+        public IEnumerable<BonusInfo> GetBonusInfoExportReport(string selectSite, string bonusCode, string transId, int currencyId, string userName, int promotionType, IEnumerable<int> siteList, DateTime startDate, DateTime endDate, int baseCurrencyId, int rebateCategoriesId)
         {
-            IEnumerable<BonusInfo> result = null;
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var SpName = "Admin_BonusInfoExport_Get_V5";
             var props = new DynamicParameters();
-            props.Add("_SelectSite", SelectSite);
-            props.Add("_BonusCode", BonusCode);
-            props.Add("_SiteIds", JsonConvert.SerializeObject(SiteList));
-            props.Add("_PromotionType", PromotionType);
-            props.Add("_Currency", CurrencyId);
-            props.Add("_UserName", UserName);
-            props.Add("_TransID", TransId);
-            props.Add("_StartDate", StartDate);
-            props.Add("_EndDate", EndDate);
-            props.Add("_BaseCurrencyId", BaseCurrencyId);
-            props.Add("_CategoryType", RebateCategoriesId);
+            props.Add("_SelectSite", selectSite);
+            props.Add("_BonusCode", bonusCode);
+            props.Add("_SiteIds", JsonConvert.SerializeObject(siteList));
+            props.Add("_PromotionType", promotionType);
+            props.Add("_Currency", currencyId);
+            props.Add("_UserName", userName);
+            props.Add("_TransID", transId);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_BaseCurrencyId", baseCurrencyId);
+            props.Add("_CategoryType", rebateCategoriesId);
 
-            result = conn.Query<BonusInfo>(SpName, props, commandType: CommandType.StoredProcedure);
-
+            var result = _mainDbClient.Query<BonusInfo>("Admin_BonusInfoExport_Get_V6", props);
             return result;
         }
 
         public IEnumerable<PendingBonus> GetPendingBonusList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var SpName = "Admin_PendingBonusList_Get";
             return conn.Query<PendingBonus>(SpName, commandType: CommandType.StoredProcedure);
         }
         
         public CancelBonus GetTransferBonusCancel(int bonusId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             return conn.QueryFirstOrDefault<CancelBonus>("Admin_BonusCancel_Get",new { _BonusId = bonusId },commandType: CommandType.StoredProcedure);
         }
         
         public IEnumerable<decimal> GetBonusWinLoss(int bonusId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<decimal>("Service_BonusWinLoss_Get", new { BonusId = bonusId },commandType: CommandType.StoredProcedure);
         }
         
         public int CancelBonusByBonusId(bool isReturnAmount, int bonusId, string statusList, out int custId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
             var p = new DynamicParameters(new { _BonusId = bonusId, _StatusList = statusList });
@@ -152,10 +151,10 @@ namespace BackendSite.Service.DAL
                 
                 if (backAmount > 0)
                 {
-                    result = walletService.SetBalance(custId, siteId, userName, backAmount, 7, $"Cancel Bonus({bonus.ToString("#,##0.##")}), Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterAmount, out var is1stDepoist, conn, trans);
+                    result = _walletService.SetBalance(custId, siteId, userName, backAmount, 7, $"Cancel Bonus({bonus.ToString("#,##0.##")}), Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterAmount, out var is1stDepoist, conn, trans);
 
                     if (result > 0)
-                        result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, $"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterWithdrawalLimit, conn, trans);
+                        result = _withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, $"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterWithdrawalLimit, conn, trans);
                 } 
                 
                 //回收bonus紀錄
