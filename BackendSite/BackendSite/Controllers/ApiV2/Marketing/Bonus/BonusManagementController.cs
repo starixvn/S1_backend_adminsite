@@ -6,6 +6,7 @@ using BackendSite.Controllers.Api;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -46,7 +47,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
         #region API Model
 
-        public class GetPromotionListReq
+        public class GetListRequest : ApiRequestPageModel
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
@@ -102,11 +103,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         }
         public class UpdatePromotionStatusReq
         {
-            public string BonusCode{ get; set; }
-            public int SiteId{ get; set; }
-            public int Status{ get; set; }
+            public string BonusCode { get; set; }
+            public int SiteId { get; set; }
+            public int Status { get; set; }
         }
-        
+
         #endregion
 
         #region API
@@ -121,7 +122,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> GetList(GetPromotionListReq request)
+        public ApiResult<IEnumerable<PromotionInfo>> GetList(GetListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
 
@@ -134,7 +135,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     request.EndDate.ToUnixTimeSeconds(),
                     request.Device,
                     request.BonusCode,
-                    request.IsSpecial);
+                    request.IsSpecial,
+                    request.PageNumber,
+                    request.PageSize,
+                    out int totalPages,
+                    out int rowCount);
 
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -148,7 +153,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// BonusManagement/GetPromotion 
         /// </summary>
@@ -176,7 +181,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             }
             return apiResult;
         }
-        
+
         /// <summary>
         /// BonusManagement/GetSiteListByLoginUser 
         /// </summary>
@@ -230,10 +235,10 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 var result = _bonusManageBll.GetScratchCardList(req.SpecialCode, req.FilterType);
                 foreach (var data in result)
                 {
-                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime,  TimeSpan.Zero);
-                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime,  TimeSpan.Zero);
+                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
+                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
                 }
-                
+
                 apiResult.Data = result;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -246,7 +251,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// BonusManagement/GetScratchCardListExport 
         /// </summary>
@@ -262,15 +267,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             var exportData = _bonusManageBll.GetScratchCardListExport(req.SpecialCode, req.FilterType);
             foreach (var data in exportData)
             {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime,  TimeSpan.Zero);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime,  TimeSpan.Zero);
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
             }
             var stream = _excelBll.Export(exportData);
-            
+
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"ScratchCardList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
-        
+
         /// <summary>
         /// BonusManagement/UpdatePromotionStatus 
         /// </summary>
@@ -300,7 +305,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// BonusManagement/SetPromotion 
         /// </summary>
@@ -314,7 +319,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public ApiResult<IEnumerable<PromotionInfo>> Set(SetPromotionReq req)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
-           
+
             try
             {
                 //如果是新增時有填SpecialCode 檢查SpecialCode是否有重複
@@ -329,7 +334,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 }
 
                 var errorCode = _bonusManageBll.SetPromotion(req.IsAdd, req.PromotionInfo, req.DisplayConditionAboutVipLevel, User.Identity.Name) ? 0 : 1;
-                
+
                 apiResult.ErrorCode = errorCode;
                 apiResult.Message = errorCode == 1
                     ? "The bonus setting already exists which with same promotion-type & product-category."
@@ -352,7 +357,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// BonusManagement/DuplicatePromotion 
         /// </summary>
@@ -366,7 +371,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public ApiResult<IEnumerable<PromotionInfo>> Duplicate(DuplicateReq req)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
-        
+
             try
             {
                 if (req.IsSpecial)
@@ -382,7 +387,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     req.BonusCode,
                     req.SiteId,
                     req.NewBonusCode,
-                    User.Identity.Name, 
+                    User.Identity.Name,
                     req.NewSpecialCode,
                     req.IsSpecial) ? 0 : 1;
                 apiResult.Message = apiResult.ErrorCode == 1
@@ -405,7 +410,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             }
             return apiResult;
         }
-        
+
         /// <summary>
         /// BonusManagement/GenScratchCardCode 
         /// </summary>
