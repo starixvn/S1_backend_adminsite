@@ -42,6 +42,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly PaymentAdjustmentReportBLL _paymentAdjustmentReportBll;
         private readonly ImageEditorBLL _imageEditorBll;
+        private readonly CustVerifyBLL _custVerifyBll;
         private readonly Common _common;
 
         /// <summary>
@@ -77,6 +78,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _paymentAdjustmentReportBll = provider.GetRequiredService<PaymentAdjustmentReportBLL>();
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
+            _custVerifyBll = provider.GetRequiredService<CustVerifyBLL>();
             _common = provider.GetRequiredService<Common>();
         }
 
@@ -473,18 +475,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public DateTime SelDate { get; set; }
             public int GameTypeId { get; set; }
         }
-        
+
         public class CustInfoReq
         {
             public int CustId { get; set; }
             public string UserName { get; set; }
             public string Reason { get; set; }
         }
-        
-        public class CustInfosReq : CustInfoReq
+
+        public class GetCustDetailRequest
         {
-            public string SabaId { get; set; }
             public int SiteId { get; set; }
+            public string UserName { get; set; }
+            public string SabaId { get; set; }
+
         }
 
         #endregion
@@ -2447,7 +2451,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #region Finance > Balance Adjustment
 
         /// <summary>
-        /// CustomerManage/GetCustInfoDetails 
+        /// CustomerManage/GetCustDetail 取得客戶明細
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -2456,38 +2460,38 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustment" })]
         [HttpPost]
-        public ApiResult<CustInfoDetail> GetCustInfoDetails(CustInfosReq request)
+        public ApiResult<CustInfoDetail> GetCustDetail(GetCustDetailRequest request)
         {
             var apiResult = new ApiResult<CustInfoDetail>();
 
-            var custUsername = string.IsNullOrEmpty(request.UserName) ? null : request.UserName;
-            var custId = (string.IsNullOrEmpty(request.SabaId)) ? null : _common.TpIdToCustId(request.SabaId);
+            var result = _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
 
-            var custInfosDetail = _custInfoBll.GetCustInfoDetails(custId, custUsername, request.SiteId);
-
-            if (custInfosDetail != null)
+            if (result != ErrorCodeEnum.Success)
             {
-                if (custInfosDetail.Status == (int)CustomerStatusEnum.Running)
+                throw new AdminException(result);
+            }
+
+            if (custInfo != null)
+            {
+                if (custInfo.Status == (int)CustomerStatusEnum.Running)
                 {
-                    apiResult.Data = custInfosDetail;
+                    apiResult.Data = custInfo;
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 }
-                else if (custInfosDetail.Status == (int)CustomerStatusEnum.Suspend)
+                else if (custInfo.Status == (int)CustomerStatusEnum.Suspend)
                 {
-                    apiResult.Message = "Suspend Status.";
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.CustStatusIsSuspend;
+                    throw new AdminException(ErrorCodeEnum.CustStatusIsSuspend);
                 }
                 else
                 {
-                    apiResult.Message = "Closed Status.";
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.CustStatusIsClosed;
+                    throw new AdminException(ErrorCodeEnum.CustStatusIsClosed);
                 }
             }
             else
             {
-                apiResult.Message = "No find";
-                apiResult.ErrorCode = (int)ErrorCodeEnum.CustNotFound;
+                throw new AdminException(ErrorCodeEnum.CustNotFound);
             }
 
             return apiResult;

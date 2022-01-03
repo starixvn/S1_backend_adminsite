@@ -6,21 +6,28 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using BackendSite.Controllers.ApiV2.CMS.Setting;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.DAL
 {
     public class BannerManageService
     {
-        private readonly IConfiguration configuration;
-
-        public BannerManageService(IConfiguration configuration)
+        private readonly IConfiguration _configuration;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
+        
+        public BannerManageService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _configuration = provider.GetRequiredService<IConfiguration>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
-
-        public int SetBanner(BannerInfo bannerInfo, string user)
+        public int SetBanner(BannerController.SetBannerReq bannerInfo, string user)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var p = new DynamicParameters();
             p.Add("BannerName", bannerInfo.BannerName);
             p.Add("SiteId", bannerInfo.SiteId);
@@ -41,40 +48,39 @@ namespace BackendSite.Service.DAL
             p.Add("SpecificList", JsonConvert.SerializeObject(bannerInfo.Specific));
             p.Add("Sort", bannerInfo.Sort);
             p.Add("AdminUser", user);
-
-            return conn.Execute("Admin_Banner_Set", p, commandType: CommandType.StoredProcedure);
+            
+            return _mainDbClient.Execute("Admin_Banner_Set", p);
         }
-        public IEnumerable<BannerInfoList> GetBannerList(int SiteId,int BannerTypeId,int Status)
+        public IEnumerable<BannerInfoList> GetBannerList(int siteId,int bannerTypeId,int status)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<BannerInfoList>("Admin_BannerListV3_Get", new { SiteId, BannerTypeId, Status }, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<BannerInfoList>("Admin_BannerList_Get_V4", new DynamicParameters(new {SiteId = siteId, BannerTypeId = bannerTypeId, Status = status }));
         }
-        public BannerInfo GetBanner(int SiteId, string BannerName)
+        public BannerInfo GetBanner(int siteId, string bannerName)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var result = new BannerInfo();
-            var queryresult = conn.QueryFirstOrDefault("Admin_Banner_Get", new { SiteId, BannerName }, commandType: CommandType.StoredProcedure);
+            var queryResult = conn.QueryFirstOrDefault("Admin_Banner_Get_V2", new {SiteId = siteId, BannerName = bannerName }, commandType: CommandType.StoredProcedure);
 
-            if (queryresult != null)
+            if (queryResult != null)
             {
-                result.SiteId = Convert.ToInt32(queryresult.SiteId);
-                result.BannerName = queryresult.BannerName;
-                result.BannerType = Convert.ToInt32(queryresult.BannerType);
-                result.ActionMode = Convert.ToInt32(queryresult.ActionMode);
-                result.ShowStatus = Convert.ToInt32(queryresult.ShowStatus);
-                result.StartTime = Convert.ToDateTime(queryresult.StartTime);
-                result.EndTime = Convert.ToDateTime(queryresult.EndTime);
-                result.BonusCode = queryresult.BonusCode;
-                result.MatchId = Convert.ToInt32(queryresult.MatchId);
-                result.TpId = Convert.ToInt32(queryresult.TpId);
-                result.GameId = queryresult.GameId;
-                result.UrlRouter = queryresult.UrlRouter;
-                result.SportBattleDateTime = Convert.ToDateTime(queryresult.SportBattleDateTime);
-                result.SportCategoryId = Convert.ToInt32(queryresult.SportCategoryId);
-                result.SportLeaguesId = Convert.ToInt32(queryresult.SportLeaguesId);
-                if (queryresult.SportTeamsId != null)
+                result.SiteId = Convert.ToInt32(queryResult.SiteId);
+                result.BannerName = queryResult.BannerName;
+                result.BannerType = Convert.ToInt32(queryResult.BannerType);
+                result.ActionMode = Convert.ToInt32(queryResult.ActionMode);
+                result.ShowStatus = Convert.ToInt32(queryResult.ShowStatus);
+                result.StartTime = Convert.ToDateTime(queryResult.StartTime);
+                result.EndTime = Convert.ToDateTime(queryResult.EndTime);
+                result.BonusCode = queryResult.BonusCode;
+                result.MatchId = Convert.ToInt32(queryResult.MatchId);
+                result.TpId = Convert.ToInt32(queryResult.TpId);
+                result.GameId = queryResult.GameId;
+                result.UrlRouter = queryResult.UrlRouter;
+                result.SportBattleDateTime = queryResult.SportBattleDateTime == null ? null : Convert.ToDateTime(queryResult.SportBattleDateTime);
+                result.SportCategoryId = Convert.ToInt32(queryResult.SportCategoryId);
+                result.SportLeaguesId = Convert.ToInt32(queryResult.SportLeaguesId);
+                if (queryResult.SportTeamsId != null)
                 {
-                    result.SportTeamsId = JsonConvert.DeserializeObject<IEnumerable<BannerSportTeamsDetails>>(queryresult.SportTeamsId, new JsonSerializerSettings
+                    result.SportTeamsId = JsonConvert.DeserializeObject<IEnumerable<BannerSportTeamsDetails>>(queryResult.SportTeamsId, new JsonSerializerSettings
                     {
                         Formatting = Formatting.Indented,
                         NullValueHandling = NullValueHandling.Ignore
@@ -84,12 +90,12 @@ namespace BackendSite.Service.DAL
                 {
                     result.SportTeamsId = null;
                 }
-                result.Specific = JsonConvert.DeserializeObject<IEnumerable<BannerDetails>>(queryresult.Specific, new JsonSerializerSettings
+                result.Specific = JsonConvert.DeserializeObject<IEnumerable<BannerDetails>>(queryResult.Specific, new JsonSerializerSettings
                 {
                     Formatting = Formatting.Indented,
                     NullValueHandling = NullValueHandling.Ignore
                 });
-                result.Sort = Convert.ToInt32(queryresult.Sort);
+                result.Sort = Convert.ToInt32(queryResult.Sort);
             }
             else
             {
@@ -98,13 +104,12 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-        public int UpdateBannerStatus(int SiteId, string BannerName, int Status, string User)
+        public int UpdateBannerStatus(int siteId, string bannerName, int status, string user)
         {
             var errorCode = 0;
             try
             {
-                using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-                conn.Execute("Admin_BannerStatus_Set", new { SiteId, BannerName, Status, AdminUser = User }, commandType: CommandType.StoredProcedure);
+                _mainDbClient.Execute("Admin_BannerStatus_Set", new DynamicParameters(new {SiteId = siteId, BannerName = bannerName, Status = status, AdminUser = user }));
             }
             catch (Exception)
             {

@@ -260,7 +260,8 @@ namespace BackendSite.Service.DAL
             Adjustment_transId = adjustmentP.Get<string>("TransId");
             if (result > 0)
             {
-                var forStatus = new List<int> {(int)AdjustmentInfoStatusEnum.Pending};
+
+                var forStatus = new List<int> { (int)AdjustmentInfoStatusEnum.Pending };
                 result = SetAdjustmentInfo(Adjustment_transId, adjustmentAndWithdrawalLimit.SiteId, $"Payment Adjustment: {adjustmentAndWithdrawalLimit.Amount * (adjustmentAndWithdrawalLimit.AdjustType % 2 == 1/*1, 3(Add)2, 4(Deduct)*/ ? 1 : -1)}", Operator, forStatus, AdjustmentInfoStatusEnum.Approved, adjustmentAndWithdrawalLimit, conn, trans);
 
                 if (result > 0)
@@ -335,9 +336,9 @@ namespace BackendSite.Service.DAL
 
         public AdjustmentLimitData GetAdjustmentData(int siteId, int currencyId)
         {
-            return _reportDbClient.Query<AdjustmentLimitData>("Admin_AdjustmentLimitInfo_Get", new DynamicParameters(new { SiteId = siteId, CurrencyId= currencyId })).FirstOrDefault();
+            return _reportDbClient.Query<AdjustmentLimitData>("Admin_AdjustmentLimitInfo_Get", new DynamicParameters(new { SiteId = siteId, CurrencyId = currencyId })).FirstOrDefault();
         }
-        
+
         public int AddAdjustmentLimitInfo(int SiteId, int CurrencyId, decimal AdjustmentMax, string Operator)
         {
             var props = new DynamicParameters();
@@ -348,7 +349,7 @@ namespace BackendSite.Service.DAL
 
             return _mainDbClient.Execute("Admin_AdjustmentLimitInfo_Set", props);
         }
-        public CheckBalanceAdjustData CheckBalanceAdjustBonusCode(string bonusCode, int promotionType, int siteId,int currencyId)
+        public CheckBalanceAdjustData CheckBalanceAdjustBonusCode(string bonusCode, int promotionType, int siteId, int currencyId)
         {
             var props = new DynamicParameters();
             props.Add("BonusCode", bonusCode);

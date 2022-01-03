@@ -30,12 +30,12 @@ namespace BackendSite.Service.BLL
 
         public async Task<bool> InsertTpMaintain(TpMaintain input)
         {
-            if (input.TpGameTypeList != "0")//處理多個tpGametypeList
+            if (input.TpGameTypeList != "0")//處理多個tpGameTypeList
             {
                 var list = GetTpMaintainListByTpGameTypeList(input);
-                var Tasks = list.Select(item => Task.Run(() => tpMaintainService.InsertTpMaintain(item))).ToArray();
-                var result = await Task.WhenAll(Tasks);
-                return !result.Any(item => item == false);
+                var tasks = list.Select(item => Task.Run(() => tpMaintainService.InsertTpMaintain(item))).ToArray();
+                var result = await Task.WhenAll(tasks);
+                return result.All(item => item);
             }
             return tpMaintainService.InsertTpMaintain(input);
         }
@@ -55,7 +55,7 @@ namespace BackendSite.Service.BLL
             return tpMaintainService.GetTpGameTypeList();
         }
 
-        public IEnumerable<Model.TpMaintain.TpCategory> GetTPCategoryList()
+        public IEnumerable<TpCategory> GetTPCategoryList()
         {
             return tpMaintainService.GetTPCategoryList();
         }

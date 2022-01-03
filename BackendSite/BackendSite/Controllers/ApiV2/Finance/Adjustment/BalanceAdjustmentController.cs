@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -22,16 +23,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
     public class BalanceAdjustmentController : ControllerBase
     {
         #region Fields
-        
+
         private readonly PaymentBLL _paymentBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly TpBLL _tpBll;
         private readonly AuthorizeBLL _authorizeBll;
-        private readonly int _mainWalletType;
-        private readonly string _bonusApiUrl;
         private readonly CourierAdapter _courierAdapter;
         private readonly Common _common;
-        
+
+        private readonly int _mainWalletType;
+        private readonly string _bonusApiUrl;
+
         #endregion
 
         #region Constructors
@@ -43,308 +45,331 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             _tpBll = provider.GetRequiredService<TpBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _common = provider.GetRequiredService<Common>();
-            _mainWalletType = provider.GetRequiredService<IConfiguration>().GetValue<int>("MainWalletType"); //1=主錢包
-            _bonusApiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("BonusService");
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+
+            _mainWalletType = provider.GetRequiredService<IConfiguration>().GetValue<int>("MainWalletType"); //1=主錢包,2=體育錢包
+            _bonusApiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("BonusService");
         }
 
         #endregion
 
         #region API Model
 
-        public class PaymentAdjustmentReq
+        public class SubmitRequest
         {
             public int CustId { get; set; }
-            public int Option { get; set; }
+            public AdjustmentInfoAdjustTypeEnum Option { get; set; }
             public decimal Amount { get; set; }
-        }
-
-        public class AdjustmentAndWithdrawalLimitReq : PaymentAdjustmentReq
-        {
             public decimal WithdrawalLimitAmount { get; set; }
             public int WithdrawalLimitOption { get; set; }
             public string Memo { set; get; }
             public string BonusCode { get; set; }
             public int RollOver { get; set; }
         }
-        
-        public class GetAdjustmentReq
+
+        public class GetAdjustmentLimitInfoRequest
         {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-        }
-        
-        public class CheckPassWordReq
-        {
-            public string PassWord { get; set; }
-            public int SiteId { get; set; }
-        }
-        
-        public class CheckBalanceAdjustBonusCodeReq
-        {
-            public string BonusCode { get; set; }
-            public int PromotionType { get; set; }
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
         }
 
-        public class CheckBalanceAdjustBonusCodeBatchReq
+        public class CheckPassWordRequest
         {
-            public string BonusCode { get; set; }
-            public int PromotionType { get; set; }
             public int SiteId { get; set; }
+            public string PassWord { get; set; }
         }
-        
-        public class CheckAdjustmentLimitReq
+
+        public class CheckBonusCodeRequest
         {
-            public string BonusCode { get; set; }
             public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public string BonusCode { get; set; }
+            public PromotionType PromotionType { get; set; }
         }
-        
+
+        public class CheckBonusCodeForBatchRequest
+        {
+            public int SiteId { get; set; }
+            public PromotionType PromotionType { get; set; }
+            public string BonusCode { get; set; }
+        }
+
+        public class CheckLimitForRententionBonusRequest
+        {
+            public int SiteId { get; set; }
+            public string BonusCode { get; set; }
+        }
+
         #endregion
 
         #region API
 
         #region Balance Adjustment
-        
+
         /// <summary>
-        /// BalanceAdjustment/AdjustmentAndWithdrawalLimitAsync 
+        /// BalanceAdjustment/GetAdjustmentLimitInfo 取得調整限額資訊
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Balance Adjustment > [Submit] > [Submit]
+        /// Func Path：Finance > Balance Adjustment > [Submit]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [HttpPost]
-        public async Task<ApiResult> AdjustmentAndWithdrawalLimitAsync(AdjustmentAndWithdrawalLimitReq req)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustment" })]
+        public ApiResult<AdjustmentLimitData> GetAdjustmentLimitInfo(GetAdjustmentLimitInfoRequest request)
+        {
+            var apiResult = new ApiResult<AdjustmentLimitData>
+            {
+                Data = _paymentBll.GetAdjustmentData(request.SiteId, request.CurrencyId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+            return apiResult;
+        }
+
+        /// <summary>
+        /// BalanceAdjustment/CheckBonusCode 檢查獎金代碼
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Balance Adjustment > [Submit] > [Check Bonus Code]
+        /// 
+        /// Memo：當調整選項選擇為Retention Bonus或Manual Bonus，才需要有此步驟。
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustment" })]
+        public ApiResult<BalanceAdjustBonusCodeRep> CheckBonusCode(CheckBonusCodeRequest request)
+        {
+            var apiResult = new ApiResult<BalanceAdjustBonusCodeRep>();
+            var data = _paymentBll.CheckBalanceAdjustBonusCode(request.BonusCode, (int)request.PromotionType, request.SiteId, request.CurrencyId);
+            apiResult.Data = data;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            return apiResult;
+        }
+
+        /// <summary>
+        /// BalanceAdjustment/CheckPassWord 驗證調帳密碼
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Balance Adjustment > [Submit] > [Submit] > [OK]
+        /// 
+        /// Memo：當異動金額超過限制，則需要輸入密碼，限制金額請參考GetAdjustmentLimitInfo取的資訊
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustment" })]
+        public ApiResult CheckPassWord(CheckPassWordRequest request)
         {
             var apiResult = new ApiResult();
-            var adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit();
-            var bonusUrl = $"{_bonusApiUrl}SetAdjustBonus";
-            try
+            if (_paymentBll.CheckPassWord(request.PassWord, request.SiteId))
             {
-                var authData = _authorizeBll.GetAuthData();
-                var custInfo = _custInfoBll.GetCustInfoWithCache(req.CustId);
-                
-                if (custInfo != null)
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            else
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.PasswordError;
+            }
+
+            return apiResult;
+        }
+
+        /// <summary>
+        /// BalanceAdjustment/Submit 提交餘額調整資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Balance Adjustment > [Submit] > [Submit] > if have [PopOut] to enter password, Then need to press [OK]
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustment" })]
+        public async Task<ApiResult> SubmitAsync(SubmitRequest request)
+        {
+            var apiResult = new ApiResult();
+            var bonusUrl = $"{_bonusApiUrl}SetAdjustBonus";
+
+            var authData = _authorizeBll.GetAuthData();
+            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+
+            if (custInfo != null)
+            {
+                var balance = _custInfoBll.GetBalance(custInfo.CustId);
+
+                //非RetentionBonus,ManualBonus
+                if (request.Option != AdjustmentInfoAdjustTypeEnum.RetentionBonus
+                    && request.Option != AdjustmentInfoAdjustTypeEnum.ManualBonus)
                 {
-                    var balance = _custInfoBll.GetBalance(custInfo.CustId);
-                    //非RetentionBonus,ManualBonus
-                    if (req.Option != (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus && req.Option != (int)AdjustmentInfoAdjustTypeEnum.ManualBonus)
+                    switch (request.Option)
                     {
-                        adjustmentAndWithdrawalLimit.CustId = custInfo.CustId;
-                        adjustmentAndWithdrawalLimit.CurrencyId = custInfo.CurrencyId;
-                        adjustmentAndWithdrawalLimit.UserName = custInfo.UserName;
-                        adjustmentAndWithdrawalLimit.SiteId = custInfo.SiteId;
-                        adjustmentAndWithdrawalLimit.Amount = req.Amount;
-                        adjustmentAndWithdrawalLimit.AdjustType = req.Option;
-                        adjustmentAndWithdrawalLimit.SiteName = custInfo.SiteName;
-                        adjustmentAndWithdrawalLimit.Operator = authData.UserName;
-                        adjustmentAndWithdrawalLimit.WithdrawalLimitAmount = req.WithdrawalLimitAmount;
-                        adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType = req.WithdrawalLimitOption;
-                        adjustmentAndWithdrawalLimit.Memo = req.Memo;
+                        case AdjustmentInfoAdjustTypeEnum.BalanceMinus:  //Balance(-)
+                            {
 
-                        switch (adjustmentAndWithdrawalLimit.AdjustType)
-                        {
-                            case (int)AdjustmentInfoAdjustTypeEnum.BalanceMinus:  //Balance(-)
+                                if (balance < request.Amount)
                                 {
-                                    if (balance < adjustmentAndWithdrawalLimit.Amount)
+                                    if (_mainWalletType == 2) //體育錢包
                                     {
-                                        if (_mainWalletType == 2)
+                                        var deAmount = request.Amount - balance;
+                                        var inTpTransfer = new TpTransfer()
                                         {
-                                            var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
-                                            var inTpTransfer = new TpTransfer()
-                                            {
-                                                TpId = 1,
-                                                Amount = deAmount,
-                                                CustId = custInfo.CustId,
-                                                direction = TpDirection.ToMain
-                                            };
+                                            TpId = 1,
+                                            Amount = deAmount,
+                                            CustId = custInfo.CustId,
+                                            direction = TpDirection.ToMain
+                                        };
 
-                                            var acc = await _tpBll.TransferAsync(inTpTransfer);
-                                            if (acc.ErrorCode != (int)ErrorCodeEnum.Success || acc.Data.Status != TransferStatus.Success)
-                                            {
-                                                apiResult.ErrorCode = (int)ErrorCodeEnum.TransferError;
-                                                apiResult.Message = $"{balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}";
-                                                return apiResult;
-                                            }
+                                        var acc = await _tpBll.TransferAsync(inTpTransfer);
+                                        if (acc.ErrorCode != (int)ErrorCodeEnum.Success || acc.Data.Status != TransferStatus.Success)
+                                        {
+                                            throw new AdminException(ErrorCodeEnum.TransferError,
+                                        $"{balance.ToString("#,##0.##")} < {request.Amount.ToString("#,##0.##")}. Balance(-)：SportBook Wallet Fail.");
                                         }
                                     }
-
-
-                                    if (balance < adjustmentAndWithdrawalLimit.Amount)
+                                    else
                                     {
-                                        apiResult.ErrorCode = (int)ErrorCodeEnum.BalanceAdjustmentError;
-                                        apiResult.Message = $"{balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}";
-                                        return apiResult;
-                                    }
-
-                                    if (_mainWalletType == 1 && (balance - adjustmentAndWithdrawalLimit.Amount) < 0)
-                                    {
-                                        apiResult.ErrorCode = (int)ErrorCodeEnum.BalanceAdjustmentError;
-                                        apiResult.Message = $"{balance.ToString("#,##0.##")} + {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")} < 0. Reject";
-                                        return apiResult;
+                                        //主錢包
+                                        throw new AdminException(ErrorCodeEnum.BalanceAdjustmentError,
+                                            $"{balance.ToString("#,##0.##")} < {request.Amount.ToString("#,##0.##")}. Balance(-)：Main Wallet Fail.");
                                     }
                                 }
-                                break; 
-                            
-                            case (int)AdjustmentInfoAdjustTypeEnum.BalancePlus:  //Balance(+)
-                            case (int)AdjustmentInfoAdjustTypeEnum.BonusPlus:  //Bonus(+)
-                                {
-                                    if (_mainWalletType == 1 && (balance + adjustmentAndWithdrawalLimit.Amount) < 0)
-                                    {
-                                        apiResult.ErrorCode = (int)ErrorCodeEnum.BalanceAdjustmentError;
-                                        apiResult.Message = $"{balance.ToString("#,##0.##")} + {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")} < 0. Reject";
-                                        return apiResult;
-                                    }
-                                }
-                                break;
-                            case (int)AdjustmentInfoAdjustTypeEnum.BonusMinus:  //Bonus(-)
-                                {
-                                    if (_mainWalletType == 1 && (balance - adjustmentAndWithdrawalLimit.Amount) < 0)
-                                    {
-                                        apiResult.ErrorCode = (int)ErrorCodeEnum.BalanceAdjustmentError;
-                                        apiResult.Message = $"{balance.ToString("#,##0.##")} - {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")} < 0. Reject";
-                                        return apiResult;
-                                    }
-                                }
-                                break;
 
-                        }
-
-                        if (_paymentBll.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, User.Identity.Name,
-                            out var transId) > 0)
-                        {
-                            if (_mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == (int)AdjustmentInfoAdjustTypeEnum.BalancePlus)
-                            {
-                                var inTpTransfer = new TpTransfer()
-                                { TpId = 1, Amount = balance, CustId = custInfo.CustId, direction = TpDirection.ToTp };
-
-                                var acc = await _tpBll.TransferAsync(inTpTransfer);
-                                if (acc.ErrorCode == (int)ErrorCodeEnum.Success && acc.Data.Status == TransferStatus.Success)
+                                if (_mainWalletType == 1 && (balance - request.Amount) < 0)
                                 {
-                                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                                    apiResult.Message = $"Success. ID is {transId}";
+                                    throw new AdminException(ErrorCodeEnum.BalanceAdjustmentError,
+                                        $"{balance.ToString("#,##0.##")} + {request.Amount.ToString("#,##0.##")} < 0. Balance(-)：Main Wallet Reject.");
                                 }
                             }
-                            else
+                            break;
+
+                        case AdjustmentInfoAdjustTypeEnum.BalancePlus:
+                        case AdjustmentInfoAdjustTypeEnum.BonusPlus:
+                            {
+                                if (_mainWalletType == 1 && (balance + request.Amount) < 0)
+                                {
+                                    throw new AdminException(ErrorCodeEnum.BalanceAdjustmentError,
+                                     $"{balance.ToString("#,##0.##")} + {request.Amount.ToString("#,##0.##")} < 0. Balance(+) or Bonus(+)：Main Wallet Reject");
+                                }
+                            }
+                            break;
+
+                        case AdjustmentInfoAdjustTypeEnum.BonusMinus:
+                            {
+                                if (balance < request.Amount)
+                                {
+                                    throw new AdminException(ErrorCodeEnum.BalanceAdjustmentError,
+                                     $"{balance.ToString("#,##0.##")} < {request.Amount.ToString("#,##0.##")}. Bonus(-)：Fail.");
+                                }
+
+                                if (_mainWalletType == 1 && (balance - request.Amount) < 0)
+                                {
+                                    throw new AdminException(ErrorCodeEnum.BalanceAdjustmentError,
+                                    $"{balance.ToString("#,##0.##")} - {request.Amount.ToString("#,##0.##")} < 0.Bonus(-)：Main Wallet Reject");
+                                }
+                            }
+                            break;
+                    }
+
+                    var adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit()
+                    {
+                        CustId = custInfo.CustId,
+                        CurrencyId = custInfo.CurrencyId,
+                        UserName = custInfo.UserName,
+                        SiteId = custInfo.SiteId,
+                        Amount = request.Amount,
+                        AdjustType = (int)request.Option,
+                        SiteName = custInfo.SiteName,
+                        Operator = authData.UserName,
+                        WithdrawalLimitAmount = request.WithdrawalLimitAmount,
+                        WithdrawalLimitAmountAdjustType = request.WithdrawalLimitOption,
+                        Memo = request.Memo
+                    };
+
+                    if (_paymentBll.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, User.Identity.Name, out var transId) > 0)
+                    {
+                        if (_mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == (int)AdjustmentInfoAdjustTypeEnum.BalancePlus)
+                        {
+                            var inTpTransfer = new TpTransfer()
+                            {
+                                TpId = 1,
+                                Amount = balance,
+                                CustId = custInfo.CustId,
+                                direction = TpDirection.ToTp
+                            };
+
+                            var acc = await _tpBll.TransferAsync(inTpTransfer);
+                            if (acc.ErrorCode == (int)ErrorCodeEnum.Success && acc.Data.Status == TransferStatus.Success)
                             {
                                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                                 apiResult.Message = $"Success. ID is {transId}";
                             }
+                            else
+                            {
+                                throw new AdminException(ErrorCodeEnum.TransferError,
+                                      "Balance(+)：SportBook Wallet Fail.");
+                            }
+                        }
+                        else
+                        {
+                            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                            apiResult.Message = $"Success. ID is {transId}";
                         }
                     }
                     else
                     {
-                        var setAdjustBonusReq = new SetAdjustBonusReq()
-                        {
-                            CustId = custInfo.CustId,
-                            BonusCode = req.BonusCode,
-                            Memo = req.Memo,
-                            Operator = authData.UserName,
-                            Amount = req.Amount,
-                            PromotionType = req.Option == (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus ?  9 : 8
-                        };
-                        var apiOnlineResult =
-                            await _courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
-                        if (apiOnlineResult.ErrorCode == (int)ErrorCodeEnum.Success)
-                        {
-                            apiResult.ErrorCode = apiOnlineResult.ErrorCode;
-                            apiResult.Message = $"Success.";
-                        }
-                        else
-                        {
-                            apiResult.ErrorCode = apiOnlineResult.ErrorCode;
-                            apiResult.Message = apiOnlineResult.Message;
-                        }
+                        throw new AdminException(ErrorCodeEnum.Fail,
+                                      "AdjustmentAndWithdrawalLimit Fail.");
+                    }
+                }
+                else
+                {
+                    var setAdjustBonusReq = new SetAdjustBonusReq()
+                    {
+                        CustId = custInfo.CustId,
+                        BonusCode = request.BonusCode,
+                        Memo = request.Memo,
+                        Operator = authData.UserName,
+                        Amount = request.Amount,
+                        PromotionType = request.Option == AdjustmentInfoAdjustTypeEnum.RetentionBonus ? 9 : 8
+                    };
+
+                    var apiOnlineResult =
+                        await _courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
+
+                    if (apiOnlineResult.ErrorCode == (int)ErrorCodeEnum.Success)
+                    {
+                        apiResult.ErrorCode = apiOnlineResult.ErrorCode;
+                        apiResult.Message = $"Success.";
+                    }
+                    else
+                    {
+                        apiResult.ErrorCode = apiOnlineResult.ErrorCode;
+                        apiResult.Message = apiOnlineResult.Message;
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.ToString();
-            }
-
-            return apiResult;
-        }
-        
-        /// <summary>
-        /// BalanceAdjustment/GetAdjustmentLimitInfo 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Balance Adjustment 
-        /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
-        public ApiResult<AdjustmentLimitData> GetAdjustmentLimitInfo(GetAdjustmentReq req)
-        {
-            var apiResult = new ApiResult<AdjustmentLimitData>
-            {
-                Data = _paymentBll.GetAdjustmentData(req.SiteId, req.CurrencyId),
-                ErrorCode = (int) ErrorCodeEnum.Success
-            };
-            return apiResult;
-        }
-        
-        /// <summary>
-        /// BalanceAdjustment/CheckPassWord 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Balance Adjustment > [submit] > [submit] > [Popup]
-        /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
-        public ApiResult CheckPassWord(CheckPassWordReq req)
-        {
-            var apiResult = new ApiResult();
-            if ( _paymentBll.CheckPassWord(req.PassWord, req.SiteId))
-            {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
-            }
             else
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.PasswordError;
+                throw new AdminException(ErrorCodeEnum.CustNotFound);
             }
 
             return apiResult;
         }
-        
-        /// <summary>
-        /// BalanceAdjustment/CheckBalanceAdjustBonusCode 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Balance Adjustment 
-        /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
-        public ApiResult<BalanceAdjustBonusCodeRep> CheckBalanceAdjustBonusCode(CheckBalanceAdjustBonusCodeReq req)
-        {
-            var apiResult = new ApiResult<BalanceAdjustBonusCodeRep>();
-            var data = _paymentBll.CheckBalanceAdjustBonusCode(req.BonusCode, req.PromotionType, req.SiteId, req.CurrencyId);
-            apiResult.Data = data;
-            apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
-            return apiResult;
-        }
-        
+
         #endregion
 
         #region Balance Adjustment Batch
 
         /// <summary>
-        /// BalanceAdjustment/BalanceAdjustmentBatch 
+        /// BalanceAdjustment/SubmitBatch 批次提交餘額調整資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Balance Adjustment Batch 
+        /// Func Path：Finance > Balance Adjustment Batch > [Submit]
         /// </remarks>
         /// <param name="option"></param>
         /// <param name="optSite"></param>
@@ -354,12 +379,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// <param name="bonusCode"></param>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BalanceAdjustmentBatch" })]
-        public async Task<List<ApiResult>> BalanceAdjustmentBatch(
-            [FromForm] int option, 
+        public async Task<List<ApiResult>> SubmitBatchAsync(
+            [FromForm] int option,
             [FromForm] int optSite,
-            [FromForm] int withdrawalLimitOption, 
-            [FromForm] IFormFile excelUpload, 
-            [FromForm] decimal withdrawal, 
+            [FromForm] int withdrawalLimitOption,
+            [FromForm] IFormFile excelUpload,
+            [FromForm] decimal withdrawal,
             [FromForm] string bonusCode)
         {
             var apiResult = new List<ApiResult>();
@@ -404,23 +429,24 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                                 try
                                 {
                                     //非Retention Bonus
-                                    if (option != (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus && option != (int)AdjustmentInfoAdjustTypeEnum.ManualBonus)
+                                    if (option != (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus
+                                        && option != (int)AdjustmentInfoAdjustTypeEnum.ManualBonus)
                                     {
                                         var withdrawalLimitAmount = (withdrawalLimitOption == 1) ? amount * withdrawal : 0;
                                         var adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit
-                                            {
-                                                CustId = custInfoDetail.CustId,
-                                                CurrencyId = custInfoDetail.CurrencyId,
-                                                UserName = custInfoDetail.UserName,
-                                                SiteId = custInfoDetail.SiteId,
-                                                Amount = amount,
-                                                AdjustType = option,
-                                                SiteName = custInfoDetail.SiteName,
-                                                Operator = authData.UserName,
-                                                WithdrawalLimitAmount = withdrawalLimitAmount,
-                                                WithdrawalLimitAmountAdjustType = withdrawalLimitOption,
-                                                Memo = memo
-                                            };
+                                        {
+                                            CustId = custInfoDetail.CustId,
+                                            CurrencyId = custInfoDetail.CurrencyId,
+                                            UserName = custInfoDetail.UserName,
+                                            SiteId = custInfoDetail.SiteId,
+                                            Amount = amount,
+                                            AdjustType = option,
+                                            SiteName = custInfoDetail.SiteName,
+                                            Operator = authData.UserName,
+                                            WithdrawalLimitAmount = withdrawalLimitAmount,
+                                            WithdrawalLimitAmountAdjustType = withdrawalLimitOption,
+                                            Memo = memo
+                                        };
 
                                         if (adjustmentAndWithdrawalLimit.AdjustType == (int)AdjustmentInfoAdjustTypeEnum.BalanceMinus)
                                         {
@@ -439,7 +465,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                                                     };
 
                                                     var acc = await _tpBll.TransferAsync(inTpTransfer);
-                                                    if (acc.ErrorCode != (int) ErrorCodeEnum.Success || acc.Data.Status != TransferStatus.Success)
+                                                    if (acc.ErrorCode != (int)ErrorCodeEnum.Success || acc.Data.Status != TransferStatus.Success)
                                                     {
                                                         apiResult.Add(new ApiResult()
                                                         {
@@ -480,7 +506,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                                                 };
 
                                                 var acc = await _tpBll.TransferAsync(inTpTransfer);
-                                                if (acc.ErrorCode == (int) ErrorCodeEnum.Success && acc.Data.Status == TransferStatus.Success)
+                                                if (acc.ErrorCode == (int)ErrorCodeEnum.Success && acc.Data.Status == TransferStatus.Success)
                                                 {
                                                     apiResult.Add(new ApiResult()
                                                     {
@@ -511,7 +537,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                                             PromotionType = option == (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus ? 9 : 8
                                         };
                                         var apiOnlineResult = await _courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
-                                        if (apiOnlineResult.ErrorCode == (int) ErrorCodeEnum.Success )
+                                        if (apiOnlineResult.ErrorCode == (int)ErrorCodeEnum.Success)
                                         {
                                             apiResult.Add(new ApiResult()
                                             {
@@ -543,7 +569,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                             {
                                 apiResult.Add(new ApiResult()
                                 {
-                                    ErrorCode = (int)ErrorCodeEnum.BalanceAdjustmentError,
+                                    ErrorCode = (int)ErrorCodeEnum.CustStatusIsSuspend,
                                     Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Suspend Status."
                                 });
                             }
@@ -551,7 +577,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                             {
                                 apiResult.Add(new ApiResult()
                                 {
-                                    ErrorCode = (int)ErrorCodeEnum.BalanceAdjustmentError,
+                                    ErrorCode = (int)ErrorCodeEnum.CustStatusIsLocked,
                                     Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Lock Status."
                                 });
                             }
@@ -559,7 +585,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                             {
                                 apiResult.Add(new ApiResult()
                                 {
-                                    ErrorCode = (int)ErrorCodeEnum.BalanceAdjustmentError,
+                                    ErrorCode = (int)ErrorCodeEnum.CustStatusIsClosed,
                                     Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. Closed Status."
                                 });
                             }
@@ -582,45 +608,51 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 return apiResult;
             }
         }
-        
+
         /// <summary>
-        /// BalanceAdjustment/CheckBalanceAdjustBonusCodeBatch 
+        /// BalanceAdjustment/CheckBonusCodeForBatch 檢查批次的獎金代碼
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Balance Adjustment Batch 
+        /// Func Path：Finance > Balance Adjustment Batch > [Check Bonus Code]
+        /// 
+        /// Memo：當調整選項選擇為Retention Bonus或Manual Bonus，才需要有此步驟。
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [HttpPost]
-        public ApiResult<BalanceAdjustBonusCodeBatchRep> CheckBalanceAdjustBonusCodeBatch(CheckBalanceAdjustBonusCodeBatchReq req)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BalanceAdjustmentBatch" })]
+        public ApiResult<BalanceAdjustBonusCodeBatchRep> CheckBonusCodeForBatch(CheckBonusCodeForBatchRequest request)
         {
             var apiResult = new ApiResult<BalanceAdjustBonusCodeBatchRep>();
-            var data = _paymentBll.CheckBalanceAdjustBonusCodeBatch(req.BonusCode, req.PromotionType, req.SiteId);
+            var data = _paymentBll.CheckBalanceAdjustBonusCodeBatch(request.BonusCode, (int)request.PromotionType, request.SiteId);
             apiResult.Data = data;
-            apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             return apiResult;
         }
-        
+
         /// <summary>
-        /// BalanceAdjustment/CheckRententionBonusAdjustmentLimit 
+        /// BalanceAdjustment/CheckLimitForRententionBonus  檢查保留獎金的限制
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Balance Adjustment Batch 
+        /// Func Path：Finance > Balance Adjustment Batch > [Submit]
+        /// 
+        /// Memo：當調整選項選擇為Retention Bonus，才需要有此步驟。
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [HttpPost]
-        public ApiResult CheckRententionBonusAdjustmentLimit(CheckAdjustmentLimitReq req)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BalanceAdjustmentBatch" })]
+        public ApiResult CheckLimitForRententionBonus(CheckLimitForRententionBonusRequest request)
         {
             var apiResult = new ApiResult();
             try
             {
-                var bonusCodeData = _paymentBll.CheckRententionBonusAdjustmentLimit(req.BonusCode, req.SiteId).ToList();
+                var bonusCodeData = _paymentBll.CheckRententionBonusAdjustmentLimit(request.BonusCode, request.SiteId).ToList();
                 bonusCodeData.ForEach(x =>
                 {
-                    var adjustmentLimit = _paymentBll.GetAdjustmentData(req.SiteId, x.CurrencyId);
+                    var adjustmentLimit = _paymentBll.GetAdjustmentData(request.SiteId, x.CurrencyId);
 
                     if (adjustmentLimit != null)
                     {
@@ -631,17 +663,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                         }
                     }
                 });
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.ToString();
                 return apiResult;
             }
             return apiResult;
         }
-        
+
         #endregion
 
         #endregion
