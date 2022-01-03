@@ -1,65 +1,74 @@
-﻿using BackendSite.Service.Model;
+﻿using System;
+using BackendSite.Service.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.DAL
 {
     public class GameCasinoManageService
     {
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration _configuration;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public GameCasinoManageService(IConfiguration configuration)
+        public GameCasinoManageService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _configuration = provider.GetRequiredService<IConfiguration>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public int SetGameCasinoDetail(SetGameCasionPara para)
+        public int SetGameCasinoDetail(SetGameCasinoPara para)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var props = new DynamicParameters();
             props.Add("SiteId", para.SiteId);
             props.Add("CurrencyId", para.CurrencyId);
             props.Add("GameCasinoId", para.GameCasinoId);
-            props.Add("Type", para.Type == "hot" ? 0 : para.Type == "featured" ? 1 : para.Type == "status" ? 2:3);
-            return conn.Execute("Admin_GameCasinoDetail_Set", props, commandType: CommandType.StoredProcedure);
+            props.Add("Type", para.Type switch
+            {
+                "hot" => 0,
+                "featured" => 1,
+                "status" => 2,
+                _ => 3
+            });
+            return _mainDbClient.Execute("Admin_GameCasinoDetail_Set", props);
         }
 
-        public int InsertGameCasinoDetail (InsertGameCasionPara para) 
+        public int InsertGameCasinoDetail (InsertGameCasinoPara para) 
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var props = new DynamicParameters();
             props.Add("SiteId", para.SiteId);
             props.Add("CurrencyId", para.CurrencyId);
             props.Add("GameCasinoId", para.GameCasinoId);
-            return conn.Execute("Admin_GameCasinoDetail_Ins", props, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute("Admin_GameCasinoDetail_Ins", props);
         }
 
-        public int DeleteGameCasinoDetail(DeleteGameCasionPara para)
+        public int DeleteGameCasinoDetail(DeleteGameCasinoPara para)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var props = new DynamicParameters();
             props.Add("SiteId", para.SiteId);
             props.Add("CurrencyId", para.CurrencyId);
             props.Add("GameCasinoId", para.GameCasinoId);
-            return conn.Execute("Admin_GameCasinoDetail_Del", props, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute("Admin_GameCasinoDetail_Del", props);
         }
 
         public IEnumerable<SiteTpListIfo> GetTpList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<SiteTpListIfo>("Admin_TpList_Get", new {}, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<SiteTpListIfo>("Admin_TpList_Get");
         }
 
         public GameCasinoResult GameCasinoByTPIdV2(GameCasinoPara gameCasinoPara)
         {
-            var LogResult = new GameCasinoResult();
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var logResult = new GameCasinoResult();
             var props = new DynamicParameters();
-            props.Add("PageNumber", gameCasinoPara.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("PageNumber", gameCasinoPara.PageNumber, DbType.Int32,ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -70,34 +79,39 @@ namespace BackendSite.Service.DAL
             props.Add("CurrencyId", gameCasinoPara.Currency);
             props.Add("Names", string.IsNullOrEmpty(gameCasinoPara.Name?.Replace(" ", "")) ? null : $"%{gameCasinoPara.Name.Trim()}%");
 
-            var result = conn.Query<GameCasinoData>("Admin_GameCasinoV3_Get", props, commandType: CommandType.StoredProcedure);
-            LogResult.GameCasinoData = result.ToList();
-            LogResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            LogResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            LogResult.RowCount = props.Get<int?>("RowCount") ?? 0;
+            var result = _mainDbClient.Query<GameCasinoData>("Admin_GameCasinoV3_Get", props);
+            logResult.GameCasinoData = result.ToList();
+            logResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            logResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            logResult.RowCount = props.Get<int?>("RowCount") ?? 0;
 
-            return LogResult;
+            return logResult;
         }
 
         public int SetGameCasino(SetGameCasionV2Para para)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var props = new DynamicParameters();
             props.Add("GameCasinoId", para.GameCasinoId);
-            props.Add("Type", para.Type == "hot"? 0: para.Type == "featured"? 1: para.Type == "status"? 2: 3);
-            return conn.Execute("Admin_GameCasino_Set", props, commandType: CommandType.StoredProcedure);
+            props.Add("Type", para.Type switch
+            {
+                "hot" => 0,
+                "featured" => 1,
+                "status" => 2,
+                _ => 3
+            });
+            return _mainDbClient.Execute("Admin_GameCasino_Set", props);
         }
 
         public IEnumerable<CurrencyDataV2> GetCurrency(GetGameCasinoDetailPara para)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var props = new DynamicParameters();
             props.Add("GameCasinoId", para.GameCasinoId);
             return conn.Query<CurrencyDataV2>("Admin_Currency_GetByCasinoId", props, commandType: CommandType.StoredProcedure);
         }
         public List<GameCasinoDetail> GetGameCasinoDetailBySiteAndCasinoIdV2(GetGameCasinoDetailPara para,int SiteId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var props = new DynamicParameters();
             props.Add("GameCasinoId", para.GameCasinoId);
             props.Add("SiteId", SiteId);

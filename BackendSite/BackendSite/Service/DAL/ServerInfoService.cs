@@ -43,8 +43,7 @@ namespace BackendSite.Service.DAL
         }
         public int AddAdminOperateLog(AddAdminOperateLog addAdminOperateLog)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Log_LogAdminOperateInfo_Ins", addAdminOperateLog, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute("Log_LogAdminOperateInfo_Ins", new DynamicParameters(addAdminOperateLog));
         }
         public IEnumerable<GetAdminOperateLog> GetAdminOperateLog(int custId,
             string operater,

@@ -4,22 +4,26 @@ using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
 {
+    [Authorize]
+    [Route("apiV2/[controller]/[action]")]
+    [ApiController]
     public class PointLevelController : ControllerBase
     {
         #region Fields
-        
+
         private readonly SelLangBLL _selLangBll;
         private readonly MarketingBLL _marketingBll;
-        
+
         #endregion
-        
+
         #region Constructor
-        
+
         public PointLevelController(IServiceProvider provider)
         {
             _marketingBll = provider.GetRequiredService<MarketingBLL>();
@@ -29,118 +33,134 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         #endregion
 
         #region APIModel
-        
-        public class PointLevelModel
+
+        public class GetRequest
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
         }
 
+        public class DeleteRequest
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int PointLevel { get; set; }
+        }
+
         #endregion
-        
+
         /// <summary>
-        /// PointLevel/Get 
+        /// PointLevel/GetList 取得績分等級資訊清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Marketing > Point Level Management 
+        /// Func Path：Marketing > Point Level Management > Click [Site Name]
         /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
+        /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PointLevelManagement" })]
-        public ApiResult<IEnumerable<PointLevelInfo>> Get(PointLevelModel req)
+        [HttpPost]
+        public ApiResult<IEnumerable<PointLevelInfo>> GetList(GetRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<PointLevelInfo>>();
-            var pointLevelInfos = _marketingBll.GetPointLevelInfos(req.SiteId, req.CurrencyId);
+            var pointLevelInfos = _marketingBll.GetPointLevelInfos(request.SiteId, request.CurrencyId);
             apiResult.Data = pointLevelInfos;
-            apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             return apiResult;
         }
-        
+
         /// <summary>
-        /// PointLevel/Add 
+        /// PointLevel/Create 新增積分等級
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Marketing > Point Level Management > [Add]
+        /// Func Path：Marketing > Point Level Management > [Add Point Level]
         /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
+        /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PointLevelManagement" })]
-        public ApiResult Add(PointLevelInfo req)
+        [HttpPost]
+        public ApiResult Create(PointLevelInfo request)
         {
-            var result = _marketingBll.AddPointLevel(req);
+            var result = _marketingBll.AddPointLevel(request);
             var apiResult = new ApiResult();
             if (result)
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
-                apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
-            }
-            return apiResult;
-        }
-        
-        /// <summary>
-        /// PointLevel/Edit 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Marketing > Point Level Management > [Edit]
-        /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PointLevelManagement" })]
-        public ApiResult Edit(PointLevelInfo req)
-        {
-            var result = _marketingBll.EditPointLevel(req);
-            var apiResult = new ApiResult();
-            if (result)
-            {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
-                apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
-            }
-            else
-            {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
             }
             return apiResult;
         }
 
         /// <summary>
-        /// PointLevel/Delete 
+        /// PointLevel/Update 更新積分等級
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Marketing > Point Level Management > [Delete]
+        /// Func Path：Marketing > Point Level Management > Click [Site Name] > [Edit]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PointLevelManagement" })]
         [HttpPost]
-        public ApiResult Delete(PointLevelInfo req)
+        public ApiResult Update(PointLevelInfo request)
         {
-            var result = _marketingBll.DeletePointLevel(req);
+            var result = _marketingBll.EditPointLevel(request);
             var apiResult = new ApiResult();
-            if (result > 0)
+            if (result)
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
             }
             return apiResult;
         }
-        
+
+        /// <summary>
+        /// PointLevel/Delete 刪除積分等級
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing > Point Level Management  > Click [Site Name] > [Delete]
+        /// 
+        /// Memo：只能刪除最後一筆績分等級。
+        /// </remarks>
+        /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PointLevelManagement" })]
+        [HttpPost]
+        public ApiResult Delete(DeleteRequest request)
+        {
+            var data = new PointLevelInfo()
+            {
+                SiteId = request.SiteId,
+                CurrencyId = request.CurrencyId,
+                PointLevel = request.PointLevel
+            };
+
+            var result = _marketingBll.DeletePointLevel(data);
+            var apiResult = new ApiResult();
+            if (result > 0)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
+            }
+            else
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
+            }
+            return apiResult;
+        }
+
     }
 }

@@ -50,14 +50,16 @@ namespace BackendSite.Controllers.Api
             {
                 if (getAdjustmentInfoReq.StartDate > 2147483647)
                     getAdjustmentInfoReq.StartDate = 2147483647;
-                startDate = DateTimeExtensions.UnixToDateTime((long)getAdjustmentInfoReq.StartDate);
+
+                startDate = DateTimeExtensions.UnixToDateTime((long)getAdjustmentInfoReq.StartDate).AddHours(-8);
             }
 
             if (getAdjustmentInfoReq.EndDate != null)
             {
                 if (getAdjustmentInfoReq.EndDate > 2147483647)
                     getAdjustmentInfoReq.EndDate = 2147483647;
-                endDate = DateTimeExtensions.UnixToDateTime((long)getAdjustmentInfoReq.EndDate);
+
+                endDate = DateTimeExtensions.UnixToDateTime((long)getAdjustmentInfoReq.EndDate).AddHours(-8);
             }
 
 
