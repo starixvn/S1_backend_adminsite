@@ -516,7 +516,7 @@ import DateTimePicker from 'react-datetime';
 
     class DepositPanel extends React.Component {
         _myTimer;
-        _timeInterval = 30;
+        _timeInterval = 15;
         constructor(props) {
             super(props);
             this.selectdate_start = React.createRef();
