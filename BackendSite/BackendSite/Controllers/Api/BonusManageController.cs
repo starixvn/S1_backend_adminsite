@@ -148,7 +148,11 @@ namespace BackendSite.Controllers.Api
                     request.EndDate,
                     request.Device,
                     request.BonusCode,
-                    request.IsSpecial);
+                    request.IsSpecial,
+                    1,
+                    1000,
+                    out _,
+                    out _);
 
                 apiResult.ErrorCode = 0;
             }
@@ -219,9 +223,9 @@ namespace BackendSite.Controllers.Api
 
             var req = new PromotionInfoReq
             {
-                BonusCode =promotion.BonusCode,
+                BonusCode = promotion.BonusCode,
                 Description = promotion.Description,
-                PromotionType =promotion.PromotionType,
+                PromotionType = promotion.PromotionType,
                 CategoryId = promotion.CategoryId,
                 UnixPeriodFrom = promotion.UnixPeriodFrom,
                 UnixPeriodTo = promotion.UnixPeriodTo,
@@ -232,17 +236,17 @@ namespace BackendSite.Controllers.Api
                 WalletType = promotion.WalletType,
                 TpId = promotion.TpId,
                 RedeemHours = promotion.RedeemHours,
-                PeriodType= promotion.PeriodType,
+                PeriodType = promotion.PeriodType,
                 PeriodDay = promotion.PeriodDay,
                 SpecialCode = promotion.SpecialCode,
                 IsSpecial = promotion.IsSpecial,
                 OnlyRegistered = promotion.OnlyRegistered,
-                PromotionDeviceType= promotion.PromotionType,
+                PromotionDeviceType = promotion.PromotionType,
                 PromotionAction = promotion.PromotionAction,
                 AutoExtend = promotion.AutoExtend,
                 Specific = promotion.Specific
             };
-            
+
             try
             {
                 //如果是新增時有填SpecialCode 檢查SpecialCode是否有重複
@@ -265,7 +269,8 @@ namespace BackendSite.Controllers.Api
                     request.EndDate,
                     request.Device,
                     request.BonusCode,
-                    request.IsSpecial);
+                    request.IsSpecial,
+                    1, 1000, out _, out _);
 
                 apiResult.ErrorCode = errorCode;
                 apiResult.Message = errorCode == 1
@@ -311,7 +316,7 @@ namespace BackendSite.Controllers.Api
                     duplicateRequest.BonusCode,
                     duplicateRequest.SiteId,
                     duplicateRequest.NewBonusCode,
-                    User.Identity.Name, 
+                    User.Identity.Name,
                     duplicateRequest.NewSpecialCode,
                     duplicateRequest.IsSpecial) ? 0 : 1;
                 apiResult.Message = apiResult.ErrorCode == 1
@@ -340,13 +345,14 @@ namespace BackendSite.Controllers.Api
                     request.EndDate,
                     request.Device,
                     request.BonusCode,
-                    request.IsSpecial);
+                    request.IsSpecial,
+                    1, 1000, out _, out _);
 
             return apiResult;
         }
 
         [HttpPost]
-        public ApiResult<dynamic> UpdatePromotionStatus([FromForm] string BonusCode, [FromForm] int SiteId,[FromForm] int Status)
+        public ApiResult<dynamic> UpdatePromotionStatus([FromForm] string BonusCode, [FromForm] int SiteId, [FromForm] int Status)
         {
             var apiResult = new ApiResult<dynamic>();
             try
@@ -613,7 +619,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        
+
         [HttpPost]
         public ApiResult<IEnumerable<ScratchCard>> GetScratchCardList(GetScratchCardListReq getScratchCardListReq)
         {
