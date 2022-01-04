@@ -56,5 +56,18 @@ namespace BackendSite.Service.BLL
             }
             return result;
         }
+
+        public IEnumerable<CustVerificationReward> GetVerificationRewardReport(IEnumerable<int> siteIds, int currencyId, string userName,
+            DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages,
+            out int rowCount)
+        {
+            return _verificationRewardService.GetCustVerificationReward(siteIds, currencyId, userName, 
+                startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
+        }
+        
+        public async Task<IEnumerable<CustVerificationReward>> GetVerificationRewardWithoutPage(IEnumerable<int> siteIds, int currencyId, string userName, DateTimeOffset startDate, DateTimeOffset endDate)
+        {
+            return await _verificationRewardService.GetCustVerificationRewardExport(siteIds, currencyId, userName, startDate, endDate);
+        }
     }
 }

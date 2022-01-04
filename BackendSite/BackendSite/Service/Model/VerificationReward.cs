@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Service.Model
 {
@@ -52,5 +54,57 @@ namespace BackendSite.Service.Model
         public int VerificationType { get; set; }
         public decimal PhoneReward { get; set; }
         public decimal EmailReward { get; set; }
+    }
+    
+    public class QueryVerificationRewardReport : ApiRequestPageModel
+    {
+        private DateTimeOffset _startDate { get; set; }
+        private DateTimeOffset _endDate { get; set; }
+        public IEnumerable<int> SiteIds { get; set; }
+        public string UserName { get; set; }
+        public int CurrencyId { get; set; }
+        public DateTimeOffset StartDate
+        {
+            get => _startDate;
+            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset EndDate
+        {
+            get => _endDate;
+            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+    }
+    
+    public class CustVerificationReward
+    {
+        private DateTimeOffset? _phoneRewardTime;
+        private DateTimeOffset? _emailRewardTime;
+        public string SiteName { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int CurrencyId { get; set; }
+        public string Currency { get; set; }
+        public bool PhoneVerified { get; set; }
+        public decimal PhoneReward { get; set; }
+        public DateTimeOffset? PhoneRewardTime
+        {
+            get => _phoneRewardTime;
+            set
+            {
+                if(value.HasValue)
+                    _phoneRewardTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
+        public bool EmailVerified { get; set; }
+        public decimal EmailReward { get; set; }
+        public DateTimeOffset? EmailRewardTime
+        {
+            get => _emailRewardTime;
+            set 
+            { 
+                if(value.HasValue)
+                    _emailRewardTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero); 
+            }
+        }
     }
 }

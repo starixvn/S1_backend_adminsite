@@ -18,9 +18,6 @@
     var authData = authorizeBLL.GetAuthData();
     var loginUser = adminUserService.GetUser(authData.UserId);
 
-    var subFuncKeys = permissionBLL.GetSubFunckeys("Marketing/VipLevelReview");
-    subFuncKeys = subFuncKeys ?? new List<string>();
-
     var i18n = new Dictionary<string, string>();
 
     for (var currency = 1; currency <= 61; currency++)
@@ -46,6 +43,5 @@
         window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
         window.RootUrl = '@Url.Content("~/api")';
         window.LangCode = 'en'
-        window.subFuncKeys = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(subFuncKeys));
     </script>
 }
