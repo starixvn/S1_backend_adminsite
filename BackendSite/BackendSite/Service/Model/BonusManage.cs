@@ -77,12 +77,30 @@ namespace BackendSite.Service.Model
 
     public class PromotionInfoReq 
     {
+        private DateTimeOffset? _periodFromTime;
+        private DateTimeOffset? _periodToTime;
         public string BonusCode { get; set; }
         public string Description { get; set; }
         public int PromotionType { get; set; }
         public int? CategoryId { get; set; }
-        public long? UnixPeriodFrom { get; set; }
-        public long? UnixPeriodTo { get; set; }
+        public DateTimeOffset? PeriodFromTime 
+        {
+            get => _periodFromTime;
+            set
+            {
+                if (value != null)
+                    _periodFromTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
+        public DateTimeOffset? PeriodToTime 
+        {
+            get => _periodToTime;
+            set
+            {
+                if (value != null)
+                    _periodToTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
         public int ExpiryDays { get; set; }
         public int? Sort { get; set; }
         public int Status { get; set; }

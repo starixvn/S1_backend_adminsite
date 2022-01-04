@@ -334,7 +334,7 @@ namespace BackendSite.Service.Model.enums
 
     #region Promotion
 
-    public enum PromotionType
+    public enum PromotionTypeEnum
     {
         FstDeposit = 1,
         ReDeposit = 2,

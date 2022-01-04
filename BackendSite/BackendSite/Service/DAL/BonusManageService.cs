@@ -736,8 +736,8 @@ namespace BackendSite.Service.DAL
             p.Add("_Description", promotion.Description);
             p.Add("_PromotionType", promotion.PromotionType);
             p.Add("_CategoryId", promotion.CategoryId);
-            //p.Add("_PeriodFrom", promotion.UnixPeriodFrom);
-            //p.Add("_PeriodTo", promotion.UnixPeriodTo);
+            p.Add("_PeriodFrom", promotion.PeriodFromTime?.ToUnixTimeSeconds());
+            p.Add("_PeriodTo", promotion.PeriodToTime?.ToUnixTimeSeconds());
             p.Add("_ExpiryDays", promotion.ExpiryDays);
             p.Add("_Sort", promotion.Sort);
             p.Add("_Status", promotion.Status);

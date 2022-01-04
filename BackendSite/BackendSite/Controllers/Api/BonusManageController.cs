@@ -227,8 +227,6 @@ namespace BackendSite.Controllers.Api
                 Description = promotion.Description,
                 PromotionType = promotion.PromotionType,
                 CategoryId = promotion.CategoryId,
-                UnixPeriodFrom = promotion.UnixPeriodFrom,
-                UnixPeriodTo = promotion.UnixPeriodTo,
                 ExpiryDays = promotion.ExpiryDays,
                 Sort = promotion.Sort,
                 Status = promotion.Status,
@@ -246,6 +244,15 @@ namespace BackendSite.Controllers.Api
                 AutoExtend = promotion.AutoExtend,
                 Specific = promotion.Specific
             };
+            
+            if (promotion.UnixPeriodFrom != null)
+            {
+                req.PeriodFromTime = DateTimeExtensions.UnixToDateTimeOffset(promotion.UnixPeriodFrom.Value);
+            }
+            if (promotion.UnixPeriodTo != null)
+            {
+                req.PeriodToTime = DateTimeExtensions.UnixToDateTimeOffset(promotion.UnixPeriodTo.Value);
+            }
 
             try
             {
