@@ -84,13 +84,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
             public string BonusCode { get; set; }
-            public PromotionType PromotionType { get; set; }
+            public PromotionTypeEnum PromotionType { get; set; }
         }
 
         public class CheckBonusCodeForBatchRequest
         {
             public int SiteId { get; set; }
-            public PromotionType PromotionType { get; set; }
+            public PromotionTypeEnum PromotionType { get; set; }
             public string BonusCode { get; set; }
         }
 
@@ -647,11 +647,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         public ApiResult CheckLimitForRententionBonus(CheckLimitForRententionBonusRequest request)
         {
             var apiResult = new ApiResult();
-
-            var bonusCodeData = _paymentBll.CheckRententionBonusAdjustmentLimit(request.BonusCode, request.SiteId).ToList();
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
-            if (!bonusCodeData.Any())
+            var bonusCodeData = _paymentBll.CheckRententionBonusAdjustmentLimit(request.BonusCode, request.SiteId).ToList();
+
+            if (bonusCodeData.Count() > 0)
             {
                 bonusCodeData.ForEach(x =>
                 {
