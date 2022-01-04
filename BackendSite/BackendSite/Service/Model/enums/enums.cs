@@ -26,8 +26,8 @@ namespace BackendSite.Service.Model.enums
     public enum AmountTypeEnum
     {
         NoUse = 0,
-        AmountSmallerThan = 1,
-        AmountGreaterThan = 2,
+        AmountGreaterThan = 1,
+        AmountSmallerThan = 2
     }
 
     #endregion
@@ -42,6 +42,17 @@ namespace BackendSite.Service.Model.enums
         ReduceBonus = 4,
         ThirdAdd = 5,
         ThirdMinus = 6
+    }
+
+    #endregion
+
+    #region Bonus Management For Frontend Use
+
+    public enum ScratchCardStatusEnum
+    {
+        All = 0,
+        UnUsed = 1,
+        Used = 2
     }
 
     #endregion

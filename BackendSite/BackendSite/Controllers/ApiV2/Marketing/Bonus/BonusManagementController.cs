@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BackendSite.Attributes;
 using BackendSite.Controllers.Api;
+using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
@@ -20,7 +21,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusManage" })]
-    [ApiExplorerSettings(IgnoreApi = true)]
     public class BonusManagementController : ControllerBase
     {
         #region Fields
@@ -77,36 +77,52 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             public int? SiteId { get; set; }
         }
-        public class SetPromotionReq
+        public class SetRequest
         {
             public bool IsAdd { get; set; }
             public PromotionInfoReq PromotionInfo { get; set; }
             public DisplayConditionAboutVipLevel DisplayConditionAboutVipLevel { get; set; }
         }
-        public class DuplicateReq
+        public class DuplicateRequest
         {
-            public string BonusCode { get; set; }
             public int SiteId { get; set; }
+            public string BonusCode { get; set; }
             public string NewBonusCode { get; set; }
             public string NewSpecialCode { get; set; }
             public bool IsSpecial { get; set; }
         }
-        public class GenScratchCardCodeReq
+
+        public class UpdatePromotionStatusReq
+        {
+            public int SiteId { get; set; }
+            public string BonusCode { get; set; }
+            /// <summary>
+            /// 狀態(1=開啟,2=關閉)
+            /// </summary>
+            public int Status { get; set; }
+        }
+
+        #region ScratchCard
+
+        public class GetScratchCardListRequest : ApiRequestPageModel
+        {
+            public string SpecialCode { get; set; }
+            public ScratchCardStatusEnum Status { get; set; }
+        }
+
+        public class ExportScratchCardListRequest
+        {
+            public string SpecialCode { get; set; }
+            public ScratchCardStatusEnum Status { get; set; }
+        }
+
+        public class GenScratchCardCodeRequest
         {
             public string SpecialCode { get; set; }
             public int Num { get; set; }
         }
-        public class GetScratchCardListReq
-        {
-            public string SpecialCode { get; set; }
-            public int FilterType { get; set; }
-        }
-        public class UpdatePromotionStatusReq
-        {
-            public string BonusCode { get; set; }
-            public int SiteId { get; set; }
-            public int Status { get; set; }
-        }
+
+        #endregion
 
         #endregion
 
@@ -221,114 +237,48 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         //}
 
         /// <summary>
-        /// BonusManagement/GetScratchCardList 
+        /// BonusManagement/UpdateStatus 更新促銷獎勵狀態
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Marketing  > Bonus Management > [Search] > [edit] > [ScratchCard]
+        /// Func Path：Marketing  > Bonus Management > [Search] > [Update Status] 
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        public ApiResult<IEnumerable<ScratchCard>> GetScratchCardList(GetScratchCardListReq req)
+        public ApiResult UpdatePromotionStatus(UpdatePromotionStatusReq req)
         {
-            var apiResult = new ApiResult<IEnumerable<ScratchCard>>();
-            try
-            {
-                var result = _bonusManageBll.GetScratchCardList(req.SpecialCode, req.FilterType);
-                foreach (var data in result)
-                {
-                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
-                }
+            var result = _bonusManageBll.SetPromotionStatus(req.BonusCode, req.SiteId, req.Status);
 
-                apiResult.Data = result;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.RawMessage = ex.ToString();
-            }
+            if (result != 0)
+                throw new AdminException(ErrorCodeEnum.Fail);
 
-            return apiResult;
+            return new ApiResult()
+            {
+                ErrorCode = result
+            };
         }
 
         /// <summary>
-        /// BonusManagement/GetScratchCardListExport 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Marketing  > Bonus Management > [Search] > [ScratchCard] > [export]
-        /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
-        public IActionResult GetScratchCardListExport(GetScratchCardListReq req)
-        {
-            var exportData = _bonusManageBll.GetScratchCardListExport(req.SpecialCode, req.FilterType);
-            foreach (var data in exportData)
-            {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
-            }
-            var stream = _excelBll.Export(exportData);
-
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                $"ScratchCardList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
-        }
-
-        /// <summary>
-        /// BonusManagement/UpdatePromotionStatus 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Marketing  > Bonus Management > [Search] > [Update] 
-        /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
-        public ApiResult<dynamic> UpdatePromotionStatus(UpdatePromotionStatusReq req)
-        {
-            var apiResult = new ApiResult<dynamic>();
-            try
-            {
-                apiResult.ErrorCode = _bonusManageBll.SetPromotionStatus(req.BonusCode, req.SiteId, req.Status);
-                var promotion = _bonusManageBll.GetPromotion(req.BonusCode, req.SiteId);
-                apiResult.Data = new { promotion.LastUpdateUser, promotion.LastUpdateTime };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-                apiResult.RawMessage = ex.ToString();
-            }
-
-            return apiResult;
-        }
-
-        /// <summary>
-        /// BonusManagement/SetPromotion 
+        /// BonusManagement/Set 更新促銷獎勵
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
         /// Func Path：Marketing  > Bonus Management > [Create]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> Set(SetPromotionReq req)
+        public ApiResult Set(SetRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
+            var apiResult = new ApiResult();
 
             try
             {
                 //如果是新增時有填SpecialCode 檢查SpecialCode是否有重複
-                if (req.IsAdd && req.PromotionInfo.IsSpecial)
+                if (request.IsAdd && request.PromotionInfo.IsSpecial)
                 {
-                    if (_bonusManageBll.CheckSpecialCodeDuplicate(req.PromotionInfo.SpecialCode))
+                    if (_bonusManageBll.CheckSpecialCodeDuplicate(request.PromotionInfo.SpecialCode))
                     {
                         apiResult.ErrorCode = (int)ErrorCodeEnum.DuplicateData;
                         apiResult.Message = "Duplicate Special Code.";
@@ -336,12 +286,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     }
                 }
 
-                var errorCode = _bonusManageBll.SetPromotion(req.IsAdd, req.PromotionInfo, req.DisplayConditionAboutVipLevel, User.Identity.Name) ? 0 : 1;
+                var errorCode = _bonusManageBll.SetPromotion(request.IsAdd,
+                    request.PromotionInfo,
+                    request.DisplayConditionAboutVipLevel,
+                    User.Identity.Name) ? 0 : 1;
 
                 apiResult.ErrorCode = errorCode;
                 apiResult.Message = errorCode == 1
                     ? "The bonus setting already exists which with same promotion-type & product-category."
-                    : "";
+                    : string.Empty;
             }
             catch (MySqlException sqlException)
             {
@@ -350,36 +303,29 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 apiResult.Message = sqlException.Message;
                 apiResult.RawMessage = sqlException.ToString();
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-                apiResult.RawMessage = ex.ToString();
-            }
 
             return apiResult;
         }
 
         /// <summary>
-        /// BonusManagement/DuplicatePromotion 
+        /// BonusManagement/Duplicate 複製促銷獎勵
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Marketing  > Bonus Management > [Edit] > Copy Button
+        /// Func Path：Marketing  > Bonus Management > [Edit] > [Copy] > [Save]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> Duplicate(DuplicateReq req)
+        public ApiResult<IEnumerable<PromotionInfo>> Duplicate(DuplicateRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
 
             try
             {
-                if (req.IsSpecial)
+                if (request.IsSpecial)
                 {
-                    if (_bonusManageBll.CheckSpecialCodeDuplicate(req.NewSpecialCode))
+                    if (_bonusManageBll.CheckSpecialCodeDuplicate(request.NewSpecialCode))
                     {
                         apiResult.ErrorCode = (int)ErrorCodeEnum.DuplicateData;
                         apiResult.Message = "Duplicate datas about Special Code.";
@@ -387,12 +333,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     }
                 }
                 apiResult.ErrorCode = _bonusManageBll.DuplicatePromotion(
-                    req.BonusCode,
-                    req.SiteId,
-                    req.NewBonusCode,
+                    request.BonusCode,
+                    request.SiteId,
+                    request.NewBonusCode,
                     User.Identity.Name,
-                    req.NewSpecialCode,
-                    req.IsSpecial) ? 0 : 1;
+                    request.NewSpecialCode,
+                    request.IsSpecial) ? 0 : 1;
                 apiResult.Message = apiResult.ErrorCode == 1
                     ? "Duplicate fail.The bonus setting already exists which with same promotion-type & product-category."
                     : string.Empty;
@@ -404,43 +350,92 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 apiResult.Message = sqlException.Message;
                 apiResult.RawMessage = sqlException.ToString();
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-                apiResult.RawMessage = ex.ToString();
-            }
+
             return apiResult;
         }
 
+        #region ScratchCard
+
         /// <summary>
-        /// BonusManagement/GenScratchCardCode 
+        /// BonusManagement/GetScratchCardList 取得刮刮卡清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Marketing  > Bonus Management > [ScratchCard] 
+        /// Func Path：Marketing  > Bonus Management > [Search] > [edit] > [ScratchCard]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [HttpPost]
-        public ApiResult<dynamic> GenScratchCardCode(GenScratchCardCodeReq req)
+        public ApiListResult<ScratchCard> GetScratchCardList(GetScratchCardListRequest request)
         {
-            var apiResult = new ApiResult<dynamic>();
-            try
+            var apiResult = new ApiListResult<ScratchCard>();
+
+            var result = _bonusManageBll.GetScratchCardList(request.SpecialCode,
+                (int)request.Status,
+                request.PageNumber,
+                request.PageSize,
+                out int totalPages,
+                out int rowCount);
+
+            foreach (var data in result)
             {
-                apiResult.ErrorCode = _bonusManageBll.GenScratchCardCode(req.SpecialCode, req.Num, _authorizeBll.GetAuthData().UserName);
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-                apiResult.RawMessage = ex.ToString();
-            }
+
+            apiResult.Data = result;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            apiResult.PageNumber = request.PageNumber;
+            apiResult.TotalPages = totalPages;
+            apiResult.RowCount = rowCount;
 
             return apiResult;
         }
+
+        /// <summary>
+        /// BonusManagement/ExportScratchCardList 匯出刮刮卡清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Bonus Management > [Search] > [ScratchCard] > [export]
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        public IActionResult ExportScratchCardList(ExportScratchCardListRequest request)
+        {
+            var exportData = _bonusManageBll.GetScratchCardListExport(request.SpecialCode, (int)request.Status);
+            foreach (var data in exportData)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
+            }
+            var stream = _excelBll.Export(exportData);
+
+            return _excelBll.ExcelFile(stream, "ScratchCardList");
+        }
+
+        /// <summary>
+        /// BonusManagement/GenScratchCardCode 產生刮刮卡號碼
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Bonus Management > [ScratchCard] > [Generar ScratchCard] > [Generar]
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        public ApiResult<dynamic> GenScratchCardCode(GenScratchCardCodeRequest request)
+        {
+            var apiResult = new ApiResult<dynamic>();
+
+            apiResult.ErrorCode = _bonusManageBll.GenScratchCardCode(request.SpecialCode, request.Num, _authorizeBll.GetAuthData().UserName);
+
+            return apiResult;
+        }
+
+        #endregion
+
         #endregion
     }
 }

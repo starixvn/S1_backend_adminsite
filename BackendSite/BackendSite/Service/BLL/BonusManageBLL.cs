@@ -203,13 +203,19 @@ namespace BackendSite.Service.BLL
 
             return errorCount >= 30 ? 90 : 0;
         }
-        public IEnumerable<ScratchCard> GetScratchCardList(string specialCode, int filterType)
+        public IEnumerable<ScratchCard> GetScratchCardList(string specialCode,
+            int filterType,
+            int pageNumber,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
         {
-            var scratchCardList = _bonusManageService.GetScratchCardList(specialCode);
-            if (filterType == 1) //unused
-                scratchCardList = scratchCardList.Where(x => x.CustId == 0);
-            else if (filterType == 2) //used
-                scratchCardList = scratchCardList.Where(x => x.CustId != 0);
+            var scratchCardList = _bonusManageService.GetScratchCardList(specialCode,
+                filterType,
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                out totalPages,
+                out rowCount);
 
             return scratchCardList;
         }
