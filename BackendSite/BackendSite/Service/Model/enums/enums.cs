@@ -46,6 +46,17 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    #region Bonus Management For Frontend Use
+
+    public enum ScratchCardStatusEnum
+    {
+        All = 0,
+        UnUsed = 1,
+        Used = 2
+    }
+
+    #endregion
+
     #region Customer
 
     public enum IsKycEnum

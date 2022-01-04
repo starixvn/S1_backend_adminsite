@@ -34,21 +34,15 @@ namespace BackendSite.Service.DAL
         public int SetPromotionStatus(string bonusCode, int siteId, int status, string lastUpdateUser)
         {
             int errorCode;
-            try
+
+            var result = _mainDbClient.Execute("Admin_Promotion_SetStatus", new DynamicParameters(new { bonusCode, siteId, status, lastUpdateUser }));
+            if (result > 0)
             {
-                var result = _mainDbClient.Execute("Admin_Promotion_SetStatus", new DynamicParameters(new { bonusCode, siteId, status, lastUpdateUser }));
-                if (result > 0)
-                {
-                    errorCode = (int)ErrorCodeEnum.Success;
-                }
-                else
-                {
-                    errorCode = (int)ErrorCodeEnum.Fail;
-                }
+                errorCode = (int)ErrorCodeEnum.Success;
             }
-            catch (Exception)
+            else
             {
-                errorCode = (int)ErrorCodeEnum.SystemException;
+                errorCode = (int)ErrorCodeEnum.Fail;
             }
 
             return errorCode;
@@ -56,7 +50,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
         {
-            return _reportDbClient.Query<PromoCategory>("Admin_PromotionCategory_Get", new DynamicParameters(new { walletType }));
+            return _reportDbClient.Query<PromoCategory>("Admin_PromotionCategory_Get_V2", new DynamicParameters(new { _WalletType = walletType }));
         }
 
         public IEnumerable<TpGameType> GetTpGameList()
@@ -189,9 +183,27 @@ namespace BackendSite.Service.DAL
             return errorCode;
         }
 
-        public IEnumerable<ScratchCard> GetScratchCardList(string specialCode)
+        public IEnumerable<ScratchCard> GetScratchCardList(string specialCode,
+            int statusType,
+            int startIndex,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
         {
-            return _mainDbClient.Query<ScratchCard>("Admin_ScratchCardCodeList_Get_V2", new DynamicParameters(new { SpecialCode = specialCode, CustId = -1 }));
+            var p = new DynamicParameters();
+            p.Add("_SpecialCode", specialCode);
+            p.Add("_StatusType", statusType);
+            p.Add("_StartIndex", startIndex);
+            p.Add("_PageSize", pageSize);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = _mainDbClient.Query<ScratchCard>("Admin_ScratchCardCodeList_Get_V3", p);
+
+            totalPages = p.Get<int?>("_TotalPages") ?? 0;
+            rowCount = p.Get<int?>("_RowCount") ?? 0;
+
+            return result;
         }
 
         public IEnumerable<ScratchCardExport> GetScratchCardListExport(string specialCode)
@@ -251,6 +263,10 @@ namespace BackendSite.Service.DAL
         /// <param name="bonusCode"></param>
         /// <param name="permissionSiteIds"></param>
         /// <param name="isSpecial"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalPages"></param>
+        /// <param name="rowCount"></param>
         /// <returns></returns>
         public IEnumerable<PromotionInfo> GetPromotionList(string siteIds,
             string promotionTypes,
@@ -720,8 +736,8 @@ namespace BackendSite.Service.DAL
             p.Add("_Description", promotion.Description);
             p.Add("_PromotionType", promotion.PromotionType);
             p.Add("_CategoryId", promotion.CategoryId);
-            p.Add("_PeriodFrom", promotion.UnixPeriodFrom);
-            p.Add("_PeriodTo", promotion.UnixPeriodTo);
+            //p.Add("_PeriodFrom", promotion.UnixPeriodFrom);
+            //p.Add("_PeriodTo", promotion.UnixPeriodTo);
             p.Add("_ExpiryDays", promotion.ExpiryDays);
             p.Add("_Sort", promotion.Sort);
             p.Add("_Status", promotion.Status);
