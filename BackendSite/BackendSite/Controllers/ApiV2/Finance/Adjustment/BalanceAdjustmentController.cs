@@ -380,7 +380,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BalanceAdjustmentBatch" })]
         public async Task<List<ApiResult>> SubmitBatchAsync(
-            [FromForm] int option,
+            [FromForm] AdjustmentInfoAdjustTypeEnum option,
             [FromForm] int optSite,
             [FromForm] int withdrawalLimitOption,
             [FromForm] IFormFile excelUpload,
@@ -429,8 +429,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                                 try
                                 {
                                     //非Retention Bonus
-                                    if (option != (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus
-                                        && option != (int)AdjustmentInfoAdjustTypeEnum.ManualBonus)
+                                    if (option != AdjustmentInfoAdjustTypeEnum.RetentionBonus
+                                        && option != AdjustmentInfoAdjustTypeEnum.ManualBonus)
                                     {
                                         var withdrawalLimitAmount = (withdrawalLimitOption == 1) ? amount * withdrawal : 0;
                                         var adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit
@@ -440,7 +440,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                                             UserName = custInfoDetail.UserName,
                                             SiteId = custInfoDetail.SiteId,
                                             Amount = amount,
-                                            AdjustType = option,
+                                            AdjustType = (int)option,
                                             SiteName = custInfoDetail.SiteName,
                                             Operator = authData.UserName,
                                             WithdrawalLimitAmount = withdrawalLimitAmount,
@@ -534,7 +534,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                                             Memo = memo,
                                             Operator = authData.UserName,
                                             Amount = amount,
-                                            PromotionType = option == (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus ? 9 : 8
+                                            PromotionType = option == AdjustmentInfoAdjustTypeEnum.RetentionBonus ? 9 : 8
                                         };
                                         var apiOnlineResult = await _courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
                                         if (apiOnlineResult.ErrorCode == (int)ErrorCodeEnum.Success)
@@ -647,9 +647,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         public ApiResult CheckLimitForRententionBonus(CheckLimitForRententionBonusRequest request)
         {
             var apiResult = new ApiResult();
-            try
+
+            var bonusCodeData = _paymentBll.CheckRententionBonusAdjustmentLimit(request.BonusCode, request.SiteId).ToList();
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+
+            if (!bonusCodeData.Any())
             {
-                var bonusCodeData = _paymentBll.CheckRententionBonusAdjustmentLimit(request.BonusCode, request.SiteId).ToList();
                 bonusCodeData.ForEach(x =>
                 {
                     var adjustmentLimit = _paymentBll.GetAdjustmentData(request.SiteId, x.CurrencyId);
@@ -663,14 +666,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                         }
                     }
                 });
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
-            catch (Exception ex)
+            else
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.ToString();
-                return apiResult;
+                throw new AdminException(ErrorCodeEnum.Fail);
             }
+
             return apiResult;
         }
 
