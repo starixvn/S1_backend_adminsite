@@ -626,7 +626,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<ScratchCard>>();
             try
             {
-                var result = _bonusManageBLL.GetScratchCardList(getScratchCardListReq.SpecialCode, getScratchCardListReq.FilterType);
+                var result = _bonusManageBLL.GetScratchCardList(getScratchCardListReq.SpecialCode, getScratchCardListReq.FilterType,1,10000,
+                    out _, out _);
                 foreach (var data in result)
                 {
                     data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);

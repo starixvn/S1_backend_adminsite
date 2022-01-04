@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using static BackendSite.Controllers.Api.AdminUserController;
 using BackendSite.Extensions;
+using BackendSite.Service.Model.CustVipLevel;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
@@ -31,7 +32,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly AdminGroupBLL _adminGroupBll;
         private readonly BonusManageBLL _bonusManageBll;
-        private RebateManageBLL _rebateManageBll;
+        private readonly RebateManageBLL _rebateManageBll;
+        private readonly CustInfoBLL _custInfoBll;
 
         #endregion
 
@@ -48,6 +50,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _adminGroupBll = provider.GetRequiredService<AdminGroupBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
             _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
         }
 
         #endregion
@@ -238,34 +241,31 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var apiResult = new ApiResult<IEnumerable<AdminGroup>>
             {
-                Data = _adminGroupBll.GetGroupList(1,1000,out _,out _),
+                Data = _adminGroupBll.GetGroupList(1, 1000, out _, out _),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
             return apiResult;
         }
 
+        //[HttpPost]
+        //public ApiResult<IEnumerable<TpGameType>> GetTpGameList()
+        //{
+        //    var apiResult = new ApiResult<IEnumerable<TpGameType>>();
 
-        
-        
-        [HttpPost]
-        public ApiResult<IEnumerable<TpGameType>> GetTpGameList()
-        {
-            var apiResult = new ApiResult<IEnumerable<TpGameType>>();
+        //    try
+        //    {
+        //        apiResult.Data = _bonusManageBll.GetTpGameList();
+        //        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+        //        apiResult.RawMessage = ex.ToString();
+        //    }
 
-            try
-            {
-                apiResult.Data = _bonusManageBll.GetTpGameList();
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.SystemException;
-                apiResult.RawMessage = ex.ToString();
-            }
+        //    return apiResult;
+        //}
 
-            return apiResult;
-        }
-        
         /// <summary>
         /// GetAllData/GetTPCategoryList 
         /// </summary>
@@ -283,7 +283,26 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             };
             return apiResult;
         }
-        
+
+        /// <summary>
+        /// BaseData/GetAllSiteVipLevelList  取得所有品牌VIP等級清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<VipLevelModel>> GetAllSiteVipLevelList()
+        {
+            return new ApiResult<IEnumerable<VipLevelModel>>
+            {
+                Data = _custInfoBll.GetAllSiteVipLevelList(),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+
         #endregion
 
     }
