@@ -647,9 +647,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         public ApiResult CheckLimitForRententionBonus(CheckLimitForRententionBonusRequest request)
         {
             var apiResult = new ApiResult();
-            try
+
+            var bonusCodeData = _paymentBll.CheckRententionBonusAdjustmentLimit(request.BonusCode, request.SiteId).ToList();
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+
+            if (!bonusCodeData.Any())
             {
-                var bonusCodeData = _paymentBll.CheckRententionBonusAdjustmentLimit(request.BonusCode, request.SiteId).ToList();
                 bonusCodeData.ForEach(x =>
                 {
                     var adjustmentLimit = _paymentBll.GetAdjustmentData(request.SiteId, x.CurrencyId);
@@ -663,14 +666,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                         }
                     }
                 });
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
-            catch (Exception ex)
+            else
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.ToString();
-                return apiResult;
+                throw new AdminException(ErrorCodeEnum.Fail);
             }
+
             return apiResult;
         }
 

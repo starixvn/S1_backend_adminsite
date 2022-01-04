@@ -26,8 +26,8 @@ namespace BackendSite.Service.Model.enums
     public enum AmountTypeEnum
     {
         NoUse = 0,
-        AmountSmallerThan = 1,
-        AmountGreaterThan = 2,
+        AmountGreaterThan = 1,
+        AmountSmallerThan = 2
     }
 
     #endregion
