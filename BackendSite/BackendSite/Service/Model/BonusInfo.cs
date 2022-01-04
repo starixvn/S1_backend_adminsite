@@ -95,7 +95,7 @@ namespace BackendSite.Service.Model
         public int Refund { set; get; }
         public int Status { set; get; }
         public int PromoCategoryId { get; set; }
-        public PromotionType PromotionType { get; set; }
+        public PromotionTypeEnum PromotionType { get; set; }
         public decimal Bonus { set; get; }
         public decimal BonusAmount { set; get; }
         public decimal LockedAmount { set; get; }

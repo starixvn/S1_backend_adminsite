@@ -58,6 +58,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// TpBetRecord - SettlementTypeEnum
         /// 
         /// AdjustWithdrawalLimitInfo - AdjustWithdrawalLimitInfoAdjustTypeEnum、AdjustWithdrawalLimitInfoStatusEnum
+        /// 
+        /// Promotion - PromotionTypeEnum
         /// </remarks>
         /// <param name="reqest">參數</param>
         /// <returns>Data 結果</returns>

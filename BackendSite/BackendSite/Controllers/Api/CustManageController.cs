@@ -1548,14 +1548,14 @@ namespace BackendSite.Controllers.Api
             
                 switch (data.PromotionType)
                 {
-                    case PromotionType.FstDeposit:
-                    case PromotionType.ReDeposit:
-                    case PromotionType.FreeBet:
-                    case PromotionType.WalletBonus:
-                    case PromotionType.Rebate:
-                    case PromotionType.Cashback:
-                    case PromotionType.StaticPage:
-                    case PromotionType.RetentionBonus:
+                    case PromotionTypeEnum.FstDeposit:
+                    case PromotionTypeEnum.ReDeposit:
+                    case PromotionTypeEnum.FreeBet:
+                    case PromotionTypeEnum.WalletBonus:
+                    case PromotionTypeEnum.Rebate:
+                    case PromotionTypeEnum.Cashback:
+                    case PromotionTypeEnum.StaticPage:
+                    case PromotionTypeEnum.RetentionBonus:
 
                         //確認剩餘本金
                         var refundAmount = remainingBonus - data.BonusAmount;

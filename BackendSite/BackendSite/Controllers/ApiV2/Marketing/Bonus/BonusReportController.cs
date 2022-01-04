@@ -45,7 +45,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public string TransId { get; set; }
             public int CurrencyId { get; set; }
             public string UserName { get; set; }
-            public PromotionType PromotionType { get; set; }
+            public PromotionTypeEnum PromotionType { get; set; }
             public DateTimeOffset StartDate
             {
                 get => _startDate;
@@ -69,7 +69,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public string TransId { get; set; }
             public int CurrencyId { get; set; }
             public string UserName { get; set; }
-            public PromotionType PromotionType { get; set; }
+            public PromotionTypeEnum PromotionType { get; set; }
             public DateTimeOffset StartDate
             {
                 get => _startDate;
