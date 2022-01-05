@@ -65,7 +65,7 @@ namespace BackendSite.Service.BLL
                 startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
         }
         
-        public async Task<IEnumerable<CustVerificationReward>> GetVerificationRewardWithoutPage(IEnumerable<int> siteIds, int currencyId, string userName, DateTimeOffset startDate, DateTimeOffset endDate)
+        public async Task<IEnumerable<CustVerificationReward>> GetVerificationRewardWithoutPage(string siteIds, int currencyId, string userName, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             return await _verificationRewardService.GetCustVerificationRewardExport(siteIds, currencyId, userName, startDate, endDate);
         }

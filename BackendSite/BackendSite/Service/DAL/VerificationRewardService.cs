@@ -64,10 +64,10 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public async Task<IEnumerable<CustVerificationReward>> GetCustVerificationRewardExport(IEnumerable<int> siteIds, int currencyId, string userName, DateTimeOffset startDate, DateTimeOffset endDate)
+        public async Task<IEnumerable<CustVerificationReward>> GetCustVerificationRewardExport(string siteIds, int currencyId, string userName, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var p = new DynamicParameters();
-            p.Add("_SiteIds", JsonConvert.SerializeObject(siteIds));
+            p.Add("_SiteIds", siteIds);
             p.Add("_Currency", currencyId);
             p.Add("_UserName", userName);
             p.Add("_StartDate", startDate.DateTime);

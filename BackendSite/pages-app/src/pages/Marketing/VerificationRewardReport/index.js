@@ -74,18 +74,18 @@ const App = () => {
       });
     }
 
-    const exportReport = (filter) => {
+    const exportReport = () => {
       let query = {
-        SiteIds: filter.siteIds,
-        UserName: filter.userName === "" ? null : filter.userName,
-        CurrencyId: filter.currency,
-        StartDate: moment(filter.startDate).utc(),
-        EndDate: moment(filter.endDate).utc(),
+        siteIds: JSON.stringify(stateFilter.siteIds),
+        userName: stateFilter.userName,
+        currencyId: stateFilter.currency,
+        startDate: stateFilter.startDate,
+        endDate: stateFilter.endDate,
       };
   
       let param = {
         Url: "VerificationRewardReport/Export",
-        Data: query,
+        Data: query
       };
       WebAPI.DownloadData(param);
     }
@@ -95,7 +95,6 @@ const App = () => {
     };
 
     const datePickerOnChange = (value) => {
-      console.log(value)
       let _startDate = "";
       let _endDate = "";
   
