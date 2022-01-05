@@ -128,9 +128,9 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<PendingBonus> GetPendingBonusList()
+        public IEnumerable<PendingBonus> GetPendingBonusList(int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
-            return _bonusInfoService.GetPendingBonusList(0, 10000, out _, out _);
+            return _bonusInfoService.GetPendingBonusList((Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), Math.Abs(pageSize), out totalPages, out rowCount);
         }
 
         public CancelBonus GetTransferBonusCancel(int bonusId)

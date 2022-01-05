@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -56,13 +59,24 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PendingBonus" })]
         [HttpPost]
-        public ApiResult<IEnumerable<PendingBonus>> GetList()
+        public ApiListResult<PendingBonus> GetList(ApiRequestPageModel request)
         {
-            var apiResult = new ApiResult<IEnumerable<PendingBonus>>
+            var data = _bonusInfoBll.GetPendingBonusList(request.PageNumber, request.PageSize, out int totalPages, out int rowCount);
+
+            if (!data.Any())
             {
-                Data = _bonusInfoBll.GetPendingBonusList(),
-                ErrorCode = (int)ErrorCodeEnum.Success
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+
+            var apiResult = new ApiListResult<PendingBonus>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                PageNumber = request.PageNumber,
+                TotalPages = totalPages,
+                RowCount = rowCount
             };
+
             return apiResult;
         }
 
@@ -82,10 +96,17 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             var resultData = await _pendingFundBll.TransferMultiAsync(request.BonusIdList);
 
+            var finalResult = ErrorCodeEnum.Success;
+
+            if (resultData.Select(x => x.Result.ErrorCode).Contains((int)ErrorCodeEnum.Fail))
+            {
+                finalResult = ErrorCodeEnum.Fail;
+            }
+
             return new ApiResult<List<TransferMultiResult>>
             {
                 Data = resultData,
-                ErrorCode = (int)ErrorCodeEnum.Success
+                ErrorCode = (int)finalResult
             };
         }
 
