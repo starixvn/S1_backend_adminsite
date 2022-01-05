@@ -68,8 +68,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing  > Referral Management
         /// </remarks>
         /// <param name="req"></param>
-        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
+        [HttpPost]
         public ApiResult<List<ReferralManagement>> GetReferral(GetReferralReq req)
         {
             var apiResult = new ApiResult<List<ReferralManagement>>();
@@ -118,8 +118,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing  > Referral Management
         /// </remarks>
         /// <param name="req"></param>
-        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
+        [HttpPost]
         public ApiResult<dynamic> SetReferralStatus(SetReferralStatusReq req)
         {
             var apiResult = new ApiResult<dynamic>();
@@ -154,8 +154,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing  > Referral Management
         /// </remarks>
         /// <param name="req"></param>
-        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
+        [HttpPost]
         public ApiResult<dynamic> SetReferral(SetReferralReq req)
         {
             var apiResult = new ApiResult<dynamic>();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -89,6 +90,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path： Marketing > Vip Rebate Report > [Submit]
         /// </remarks>
         /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateLogReport" })]
         [HttpPost]
         public ApiListResultCurrencyAmount<VipRebateInfo> GetListForVip(GetListForVipRequest request)
         {
@@ -133,6 +135,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path： Marketing > Vip Rebate Report > [Submit] > [Export Excel]
         /// </remarks>
         /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateLogReport" })]
         [HttpPost]
         public IActionResult ExportForVip(GetVipRebateInfoListExportReq req)
         {
