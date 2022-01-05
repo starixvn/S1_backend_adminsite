@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
@@ -58,7 +59,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// VerificationRewardReport/Export 匯出用戶領取驗證獎勵報表
         /// </summary>
@@ -67,12 +68,16 @@ namespace BackendSite.Controllers.Api
         /// 
         /// Func Path：Marketing  > Verification Reward Report > [Submit] > [Export Excel]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="siteIds"></param>
+        /// <param name="currencyId"></param>
+        /// <param name="userName"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationRewardReport" })]
-        public async Task<IActionResult> Export(QueryVerificationRewardReport req)
+        public async Task<IActionResult> Export(string siteIds, string userName, int currencyId, DateTimeOffset startDate, DateTimeOffset endDate)
         {
-            var exportData = await _verificationRewardBll.GetVerificationRewardWithoutPage(req.SiteIds, req.CurrencyId, req.UserName, req.StartDate, req.EndDate);
+            var exportData = await _verificationRewardBll.GetVerificationRewardWithoutPage(siteIds, currencyId, userName, startDate, endDate);
             var stream = _excelBll.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VerificationReward_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
