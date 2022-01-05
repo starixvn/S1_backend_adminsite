@@ -130,7 +130,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<PendingBonus> GetPendingBonusList()
         {
-            return _bonusInfoService.GetPendingBonusList();
+            return _bonusInfoService.GetPendingBonusList(0, 10000, out _, out _);
         }
 
         public CancelBonus GetTransferBonusCancel(int bonusId)

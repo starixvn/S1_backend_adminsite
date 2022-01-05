@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
@@ -22,7 +23,7 @@ namespace BackendSite.Service.BLL
         private readonly ServerInfoBLL _serverInfoBLL;
         private readonly AuthorizeBLL _authorizeBLL;
         private readonly BonusInfoBLL _bonusInfoBLL;
-        
+
 
         public PendingFundBLL(CourierAdapter courierAdapter,
             IConfiguration configuration,
@@ -92,7 +93,14 @@ namespace BackendSite.Service.BLL
             public Dictionary<string, string> inputs { set; get; }
         }
 
-        public async Task<ApiResult<TransferResult>> BonusTransferAsync(int custId,int tpId)
+        public class TransferMultiResult
+        {
+            public int BonusId { get; set; }
+
+            public ApiResult Result { get; set; }
+        }
+
+        public async Task<ApiResult<TransferResult>> BonusTransferAsync(int custId, int tpId)
         {
             var tpBonusTransfer = new TpBonusTransfer
             {
@@ -109,8 +117,8 @@ namespace BackendSite.Service.BLL
         public ApiResult BonusCancel(int bonusId)
         {
             var apiResult = new ApiResult();
-            
-            var result = _bonusInfoBLL.CancelBonusByBonusId(bonusId,out var custId);
+
+            var result = _bonusInfoBLL.CancelBonusByBonusId(bonusId, out var custId);
             if (result > 0)
             {
                 var userData = _authorizeBLL.GetAuthData();
@@ -129,7 +137,7 @@ namespace BackendSite.Service.BLL
         {
             var apiResult = new ApiResult();
             var errorMsg = new List<string>();
-            foreach (var pendingBonus in bonusInfoService.GetPendingBonusList())
+            foreach (var pendingBonus in bonusInfoService.GetPendingBonusList(0,10000,out _,out _))
             {
                 var tpBonusTransfer = new TpBonusTransfer
                 {
@@ -148,6 +156,72 @@ namespace BackendSite.Service.BLL
             apiResult.Message = string.Join("\n\r", errorMsg);
 
             return apiResult;
+        }
+
+        public async Task<List<TransferMultiResult>> TransferMultiAsync(List<int> bonusIdList)
+        {
+            var apiResult = new ApiResult();
+            var result = new List<TransferMultiResult>();
+            var pendingBonusList = bonusInfoService.GetPendingBonusList(0, 10000, out _, out _);
+            var pendingBonusIdList = bonusInfoService.GetPendingBonusList(0, 10000, out _, out _).Select(x => x.BonusId);
+
+            foreach (var item in bonusIdList)
+            {
+                if (pendingBonusIdList.Contains(item))
+                {
+                    var processItem = pendingBonusList.Where(x => x.BonusId == item).FirstOrDefault();
+
+                    var tpBonusTransfer = new TpBonusTransfer
+                    {
+                        TpId = processItem.TpId,
+                        CustId = processItem.CustId,
+                        inputs = new Dictionary<string, string>()
+                    };
+
+                    var myUrl = $"{apiUrl}BonusTransfer";
+
+                    apiResult = await courierAdapter.MyPostAsync<TransferResult, TpBonusTransfer>(myUrl, tpBonusTransfer);
+
+                    if (apiResult.ErrorCode == 0)
+                    {
+                        result.Add(new TransferMultiResult()
+                        {
+                            BonusId = item,
+                            Result = new ApiResult()
+                            {
+                                ErrorCode = (int)ErrorCodeEnum.Success,
+                                Message = $"BonusId:{item}, UserName:{processItem.UserName}, Message:Transfer Successful !"
+                            }
+                        });
+                    }
+                    else
+                    {
+                        result.Add(new TransferMultiResult()
+                        {
+                            BonusId = item,
+                            Result = new ApiResult()
+                            {
+                                ErrorCode = (int)ErrorCodeEnum.Fail,
+                                Message = $"BonusId:{item}, UserName:{processItem.UserName}, Message:{(string.IsNullOrWhiteSpace(apiResult.RawMessage) ? apiResult.Message : apiResult.RawMessage)}"
+                            }
+                        });
+                    }
+                }
+                else
+                {
+                    result.Add(new TransferMultiResult()
+                    {
+                        BonusId = item,
+                        Result = new ApiResult()
+                        {
+                            ErrorCode = (int)ErrorCodeEnum.Fail,
+                            Message = $"BonusId:{item}, Message:Not Found."
+                        }
+                    });
+                }
+            }
+
+            return result;
         }
     }
 }
