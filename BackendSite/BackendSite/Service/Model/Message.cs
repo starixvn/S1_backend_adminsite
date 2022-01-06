@@ -36,8 +36,8 @@ namespace BackendSite.Service.Model
             set => _lastUpdateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
         public string LastUpdater { get; set; }
-
         public int IsTest { get; set; }
+        public int Seq { get; set; }
     }
     public class AddAnnouncementModel
     {
@@ -46,6 +46,7 @@ namespace BackendSite.Service.Model
         public string Content { get; set; }
         public int Status { get; set; }
         public int IsTest { get; set; }
+        public int Seq { get; set; }
     }
     
     public class UpdateAnnouncementModel
@@ -56,6 +57,7 @@ namespace BackendSite.Service.Model
         public string Content { get; set; }
         public int Status { get; set; }
         public int IsTest { get; set; }
+        public int Seq { get; set; }
     }
     
     public class CustLang
