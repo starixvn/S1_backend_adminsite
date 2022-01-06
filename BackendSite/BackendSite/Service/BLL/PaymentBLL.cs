@@ -181,10 +181,10 @@ namespace BackendSite.Service.BLL
         }
 
         public VipRebateInfoData GetVipRebateInfoListExport(string selectSite, int currency, DateTime startDate,
-            DateTime endDate, string user, int categoryId, int baseCurrencyId, int rebateCategoriesId)
+            DateTime endDate, string user, int categoryId, int baseCurrencyId)
         {
             return walletService.GetVipRebateInfoListExport(selectSite, currency, startDate, endDate, user, categoryId,
-                baseCurrencyId, rebateCategoriesId);
+                baseCurrencyId);
         }
 
         public IEnumerable<VipTPCategory> GetTPCategoryList()

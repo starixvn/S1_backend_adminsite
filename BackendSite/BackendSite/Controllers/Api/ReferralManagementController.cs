@@ -85,13 +85,18 @@ namespace BackendSite.Controllers.Api
             {
                 var referralList = referralManagementBLL.GetReferralBySiteId(SiteId).ToList();
                 var referral = referralList.FirstOrDefault(x => x.CurrencyId == CurrencyId);
+                var status = 1;
                 if (referral == null)
                 {
                     apiResult.ErrorCode = 7;
                     apiResult.Message = "";
                     return apiResult;
                 }
-                referralManagementBLL.SetReferralStatus(SiteId, CurrencyId);
+
+                if (referral.Status)
+                    status = 0;
+
+                referralManagementBLL.SetReferralStatus(SiteId, CurrencyId, status);
             }
             catch (Exception ex)
             {

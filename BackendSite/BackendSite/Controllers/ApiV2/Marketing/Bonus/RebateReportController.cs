@@ -57,7 +57,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int BaseCurrencyId { get; set; }
         }
 
-        public class GetVipRebateInfoListExportReq
+        public class ExportForVipRequest
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
@@ -76,7 +76,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public string UserName { get; set; }
             public int CategoryId { get; set; }
             public int BaseCurrencyId { get; set; }
-            public int RebateCategoriesId { get; set; }
         }
 
         #endregion
@@ -134,19 +133,18 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// 
         /// Func Path： Marketing > Vip Rebate Report > [Submit] > [Export Excel]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateLogReport" })]
         [HttpPost]
-        public IActionResult ExportForVip(GetVipRebateInfoListExportReq req)
+        public IActionResult ExportForVip(ExportForVipRequest request)
         {
-            var searchResult = _paymentBll.GetVipRebateInfoListExport(JsonConvert.SerializeObject(req.SiteIds),
-                req.CurrencyId,
-                req.StartDate.DateTime, 
-                req.EndDate.DateTime,
-                req.UserName,
-                req.CategoryId,
-                req.BaseCurrencyId,
-                req.RebateCategoriesId);
+            var searchResult = _paymentBll.GetVipRebateInfoListExport(JsonConvert.SerializeObject(request.SiteIds),
+                request.CurrencyId,
+                request.StartDate.DateTime,
+                request.EndDate.DateTime,
+                request.UserName,
+                request.CategoryId,
+                request.BaseCurrencyId);
             
             foreach (var data in searchResult.VipRebateInfoList)
             {
