@@ -37,9 +37,9 @@ namespace BackendSite.Controllers.Api
         /// <param name="req"></param>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationRewardReport" })]
-        public ApiListResult<CustVerificationReward> Get(QueryVerificationRewardReport req)
+        public ApiListResult<CustVerificationRewardModel> Get(QueryVerificationRewardReport req)
         {
-            var apiResult = new ApiListResult<CustVerificationReward>();
+            var apiResult = new ApiListResult<CustVerificationRewardModel>();
 
             var pageNumber = req.PageNumber;
             apiResult.Data = _verificationRewardBll.GetVerificationRewardReport(

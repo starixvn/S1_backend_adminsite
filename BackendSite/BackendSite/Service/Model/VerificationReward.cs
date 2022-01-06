@@ -78,7 +78,7 @@ namespace BackendSite.Service.Model
             set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
     }
-
+    
     public class CustVerificationReward
     {
         private DateTimeOffset? _phoneRewardTime;
@@ -113,9 +113,66 @@ namespace BackendSite.Service.Model
                     _emailRewardTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
             }
         }
+    }
+    
+    public class CustVerificationRewardModel
+    {
+        private DateTimeOffset? _phoneRewardTime;
+        private DateTimeOffset? _emailRewardTime;
+        private DateTimeOffset _verificationReawardTime;
+        public string SiteName { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int CurrencyId { get; set; }
+        public string Currency { get; set; }
+        public bool PhoneVerified { get; set; }
+        public decimal PhoneReward { get; set; }
+
+        public DateTimeOffset? PhoneRewardTime
+        {
+            get => _phoneRewardTime;
+            set
+            {
+                if (value.HasValue)
+                    _phoneRewardTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
+
+        public bool EmailVerified { get; set; }
+        public decimal EmailReward { get; set; }
+
+        public DateTimeOffset? EmailRewardTime
+        {
+            get => _emailRewardTime;
+            set
+            {
+                if (value.HasValue)
+                    _emailRewardTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
 
         public decimal VerificationReawardAmount { get; set; }
 
+        public DateTimeOffset VerificationReawardTime
+        {
+            get => _verificationReawardTime;
+            set => _verificationReawardTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+    }
+    public class ExportVerificationRewardModel
+    {
+        public string SiteName { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int CurrencyId { get; set; }
+        public string Currency { get; set; }
+        public bool PhoneVerified { get; set; }
+        public decimal PhoneReward { get; set; }
+        public DateTimeOffset? PhoneRewardTime { get; set; }
+        public bool EmailVerified { get; set; }
+        public decimal EmailReward { get; set; }
+        public DateTimeOffset? EmailRewardTime { get; set; }
+        public decimal VerificationReawardAmount { get; set; }
         public DateTimeOffset VerificationReawardTime { get; set; }
     }
 }

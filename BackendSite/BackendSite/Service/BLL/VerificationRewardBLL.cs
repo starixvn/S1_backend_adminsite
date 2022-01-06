@@ -57,33 +57,66 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<CustVerificationReward> GetVerificationRewardReport(List<int> siteIds, int currencyId, string userName,
+        public IEnumerable<CustVerificationRewardModel> GetVerificationRewardReport(List<int> siteIds, int currencyId, string userName,
             DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages,
             out int rowCount)
         {
-            var rewardDatas =  _verificationRewardService.GetCustVerificationReward(siteIds, currencyId, userName, 
+            var custVerificationReward =  _verificationRewardService.GetCustVerificationReward(siteIds, currencyId, userName, 
                 startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
-            foreach (var data in rewardDatas)
+
+            var listRewardModels = new List<CustVerificationRewardModel>();
+            foreach (var data in custVerificationReward)
             {
-                data.VerificationReawardAmount = data.PhoneReward + data.EmailReward;
-                data.VerificationReawardTime = GetVerificationReawardTime(data.PhoneRewardTime, data.EmailRewardTime);
+                var model = new CustVerificationRewardModel()
+                {
+                    SiteName = data.SiteName,
+                    CustId = data.CustId,
+                    UserName = data.UserName,
+                    CurrencyId = data.CurrencyId,
+                    Currency = data.Currency,
+                    PhoneVerified = data.PhoneVerified,
+                    PhoneReward = data.PhoneReward,
+                    PhoneRewardTime = data.PhoneRewardTime,
+                    EmailVerified = data.EmailVerified,
+                    EmailReward = data.EmailReward,
+                    EmailRewardTime = data.EmailRewardTime,
+                    VerificationReawardAmount = data.PhoneReward + data.EmailReward,
+                    VerificationReawardTime = GetVerificationReawardTime(data.PhoneRewardTime, data.EmailRewardTime)
+                };
+                listRewardModels.Add(model);
             }
 
-            return rewardDatas;
+            return listRewardModels;
         }
         
-        public async Task<IEnumerable<CustVerificationReward>> GetVerificationRewardWithoutPage(string siteIds, int currencyId, string userName, DateTimeOffset startDate, DateTimeOffset endDate)
+        public async Task<IEnumerable<ExportVerificationRewardModel>> GetVerificationRewardWithoutPage(string siteIds, int currencyId, string userName, DateTimeOffset startDate, DateTimeOffset endDate, int timezone = 8)
         {
-            var rewardDatas = await _verificationRewardService.GetCustVerificationRewardExport(siteIds, currencyId, userName, startDate, endDate);
-            foreach (var data in rewardDatas)
+            var custVerificationReward = await _verificationRewardService.GetCustVerificationRewardExport(siteIds, currencyId, userName, startDate, endDate);
+            var listRewardModels = new List<ExportVerificationRewardModel>();
+            foreach (var data in custVerificationReward)
             {
-                data.VerificationReawardAmount = data.PhoneReward + data.EmailReward;
-                data.VerificationReawardTime = GetVerificationReawardTime(data.PhoneRewardTime, data.EmailRewardTime);
+                var model = new ExportVerificationRewardModel()
+                {
+                    SiteName = data.SiteName,
+                    CustId = data.CustId,
+                    UserName = data.UserName,
+                    CurrencyId = data.CurrencyId,
+                    Currency = data.Currency,
+                    PhoneVerified = data.PhoneVerified,
+                    PhoneReward = data.PhoneReward,
+                    PhoneRewardTime = ConvertTimezone(data.PhoneRewardTime, timezone),
+                    EmailVerified = data.EmailVerified,
+                    EmailReward = data.EmailReward,
+                    EmailRewardTime = ConvertTimezone(data.EmailRewardTime, timezone),
+                    VerificationReawardAmount = data.PhoneReward + data.EmailReward,
+                    VerificationReawardTime = GetVerificationReawardTime(data.PhoneRewardTime, data.EmailRewardTime).ToOffset(TimeSpan.FromHours(timezone))
+                };
+                listRewardModels.Add(model);
             }
 
-            return rewardDatas;
+            return listRewardModels;
         }
-
+        
         public DateTimeOffset GetVerificationReawardTime(DateTimeOffset? phoneRewardTime, DateTimeOffset? emailRewardTime)
         {
             if (phoneRewardTime.HasValue && emailRewardTime.HasValue)
@@ -96,7 +129,14 @@ namespace BackendSite.Service.BLL
             else if (emailRewardTime.HasValue)
                 return emailRewardTime.Value;
             else
-                return new DateTimeOffset(new DateTime(1900, 1, 1), TimeSpan.Zero);
+                return new DateTime(1900, 1, 1);
+        }
+
+        public DateTimeOffset? ConvertTimezone(DateTimeOffset? dateTimeOffset, int timezone)
+        {
+            if (dateTimeOffset.HasValue)
+                return dateTimeOffset.Value.ToOffset(TimeSpan.FromHours(timezone));
+            return null;
         }
     }
 }
