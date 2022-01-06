@@ -248,9 +248,13 @@ module.exports = {
     // "Finance/USDTWithdrawalLimitManagement.min": [
     //   "./src/pages/Finance/USDTWithdrawalLimitManagement/index.js",
     // ],
-    "Marketing/VerificationReward.min": [
+    // "Marketing/VerificationReward.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/VerificationReward/index.js",
+    // ],
+    "Marketing/VerificationRewardReport.min": [
       "@babel/polyfill",
-      "./src/pages/Marketing/VerificationReward/index.js",
+      "./src/pages/Marketing/VerificationRewardReport/index.js",
     ],
   },
   output: {
