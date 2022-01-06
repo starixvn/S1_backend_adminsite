@@ -43,7 +43,7 @@ namespace BackendSite.Service.DAL
             return await _mainDbClient.ExecuteAsync("Admin_VerificationRewardStatus_Set", p);
         }
 
-        public IEnumerable<CustVerificationReward> GetCustVerificationReward(IEnumerable<int> siteIds, int currencyId, string userName,
+        public IEnumerable<CustVerificationReward> GetCustVerificationReward(List<int> siteIds, int currencyId, string userName,
             DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages,
             out int rowCount)
         {
