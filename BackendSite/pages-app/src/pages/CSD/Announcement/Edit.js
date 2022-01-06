@@ -107,6 +107,9 @@ const EditPanel = props => {
 		} else if (!stateData.content || !stateData.content.en) {
 			check = false;
 			msg = "Please input en content.";
+		}else if (!stateData.seq) {
+			check = false;
+			msg = "Please input sequence.";
 		}
 
 		if (check) {
