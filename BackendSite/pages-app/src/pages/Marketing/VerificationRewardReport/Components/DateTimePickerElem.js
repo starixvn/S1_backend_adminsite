@@ -2,18 +2,17 @@ import React from "react";
 import DateTimePicker from "react-datetime";
 import moment from "moment";
 
-const filterdateformat = "YYYY-MM-DD";
-
-export default function DateTimePickerElem ({ title, value, timeFormat, dataColumn, onChange = f => f }) {
+export default function DateTimePickerElem ({ title, datetime, timeFormat, dataColumn, onChange = f => f }) {
 	return (
 		<div className="input-item">
 			<span className="label">{title}</span>
-			<DateTimePicker 
-                value={moment(value).format(filterdateformat)}
+			<DateTimePicker
+                defaultValue={datetime}
+                value={datetime}
                 timeFormat={timeFormat}
-                onBlur={(e) => {
+                onChange={(e) => {
                     try {
-                        onChange(moment(e).format(filterdateformat), dataColumn);
+                        onChange(moment(e).format("l"), dataColumn);
                     } catch (ex) { }
                 }} />
 		</div>
