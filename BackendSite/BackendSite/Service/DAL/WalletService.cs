@@ -314,7 +314,13 @@ namespace BackendSite.Service.DAL
             searchData.RowCount = props.Get<int?>("RowCount") ?? 0;
             return searchData;
         }
-        public VipRebateInfoData GetVipRebateInfoListExport(string selectSite, int currency, DateTime startDate, DateTime endDate, string user, int categoryId, int baseCurrencyId, int rebateCategoriesId)
+        public VipRebateInfoData GetVipRebateInfoListExport(string selectSite,
+            int currency,
+            DateTime startDate,
+            DateTime endDate, 
+            string user, 
+            int categoryId, 
+            int baseCurrencyId)
         {
             var searchData = new VipRebateInfoData();
             var props = new DynamicParameters();
@@ -325,8 +331,7 @@ namespace BackendSite.Service.DAL
             props.Add("EndDate", endDate);
             props.Add("CategoryId", categoryId);
             props.Add("BaseCurrencyId", baseCurrencyId);
-            props.Add("CategoryType", rebateCategoriesId);
-            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportListExport_Get_V5", props).ToList();
+            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportListExport_Get_V6", props).ToList();
 
             searchData.VipRebateInfoList = result;
             searchData.PageNumber = 0;

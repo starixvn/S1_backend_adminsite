@@ -13,7 +13,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public class RebateManagementController : ControllerBase
+    public class RebateForVipController : ControllerBase
     {
         #region Fields
         
@@ -25,7 +25,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
         #region Constructors
 
-        public RebateManagementController(IServiceProvider provider)
+        public RebateForVipController(IServiceProvider provider)
         {
             _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();

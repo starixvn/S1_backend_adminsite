@@ -48,7 +48,7 @@ namespace BackendSite.Service.DAL
             props.Add("_BaseCurrencyId", baseCurrencyId);
 
             #region GetCurrencyTotalAmount
-            
+
             var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_BonusInfoTotalAmount_Get_V4", props).ToList();
             if (currencyTotalAmount.Count > 0)
             {
@@ -58,14 +58,14 @@ namespace BackendSite.Service.DAL
                 });
             }
             currencyAmount = tempCurrencyTotalAmount;
-            
+
             #endregion
-            
+
             props.Add("_PageSize", pageSize);
             props.Add("_StartIndex", startIndex);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            
+
             var result = _reportDbClient.Query<BonusInfo>("Admin_BonusInfo_Get_V6", props);
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;
@@ -91,23 +91,34 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<PendingBonus> GetPendingBonusList()
+        public IEnumerable<PendingBonus> GetPendingBonusList(int startIndex, int pageSize, out int totalPages, out int rowCount)
         {
-            return _mainDbClient.Query<PendingBonus>("Admin_PendingBonusList_Get_V2");
+            var props = new DynamicParameters();
+            props.Add("_PageSize", pageSize);
+            props.Add("_StartIndex", startIndex);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = _mainDbClient.Query<PendingBonus>("Admin_PendingBonusList_Get_V3", props);
+
+            totalPages = props.Get<int?>("_TotalPages") ?? 0;
+            rowCount = props.Get<int?>("_RowCount") ?? 0;
+
+            return result;
         }
-        
+
         public CancelBonus GetTransferBonusCancel(int bonusId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.QueryFirstOrDefault<CancelBonus>("Admin_BonusCancel_Get",new { _BonusId = bonusId },commandType: CommandType.StoredProcedure);
+            return conn.QueryFirstOrDefault<CancelBonus>("Admin_BonusCancel_Get", new { _BonusId = bonusId }, commandType: CommandType.StoredProcedure);
         }
-        
+
         public IEnumerable<decimal> GetBonusWinLoss(int bonusId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<decimal>("Service_BonusWinLoss_Get", new { BonusId = bonusId },commandType: CommandType.StoredProcedure);
+            return conn.Query<decimal>("Service_BonusWinLoss_Get", new { BonusId = bonusId }, commandType: CommandType.StoredProcedure);
         }
-        
+
         public int CancelBonusByBonusId(bool isReturnAmount, int bonusId, string statusList, out int custId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
@@ -140,24 +151,24 @@ namespace BackendSite.Service.DAL
                 {
                     backAmount = bonus - bonusAmount;
                 }
-                
+
                 //避免輸光 負負得正
                 if (backAmount < 0)
                 {
                     backAmount = 0;
                 }
-                
+
                 if (backAmount > 0)
                 {
                     result = _walletService.SetBalance(custId, siteId, userName, backAmount, 7, $"Cancel Bonus({bonus.ToString("#,##0.##")}), Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterAmount, out var is1stDepoist, conn, trans);
 
                     if (result > 0)
                         result = _withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, $"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterWithdrawalLimit, conn, trans);
-                } 
-                
+                }
+
                 //回收bonus紀錄
                 var cancelBonusAmount = bonus - backAmount;
-                if (cancelBonusAmount > 0 && result > 0 )
+                if (cancelBonusAmount > 0 && result > 0)
                 {
                     var cp = new DynamicParameters(new { _BonusId = bonusId, _CancelBonus = cancelBonusAmount });
                     result = conn.Execute("Service_CancelBonusAmount_Set", cp, trans, commandType: CommandType.StoredProcedure);

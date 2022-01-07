@@ -15,11 +15,10 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralReport" })]
-    [ApiExplorerSettings(IgnoreApi = true)]
     public class ReferralReportController : ControllerBase
     {
         #region Fields
-        
+
         private readonly ReferralManagementBLL _referralManagementBll;
 
         #endregion
@@ -34,16 +33,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         #endregion
 
         #region API Model
-        
-        public class ReferralCustListReq
+
+        public class GetListRequest : ApiRequestPageModel
         {
-            public IEnumerable<int> SelectSite { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
             public string UserName { get; set; }
             public int CurrencyId { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
         }
-        public class GetRefFriendByCustIdReq : ApiRequestPageModel
+
+        public class GetByCustIdRequest : ApiRequestPageModel
         {
             private DateTimeOffset _startDate;
             private DateTimeOffset _endDate;
@@ -69,44 +67,37 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         }
 
         #endregion
-        
+
         /// <summary>
-        /// ReferralReport/GetReferralCustList 
+        /// ReferralReport/GetList 取得推薦朋友資料報表清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
         /// Func Path：Marketing  > Referral Report > [Submit] 
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [HttpPost]
-        public ApiListResult<ReferralCustList> GetReferralCustList(ReferralCustListReq req)
+        public ApiListResult<ReferralCustList> GetList(GetListRequest request)
         {
             var apiResult = new ApiListResult<ReferralCustList>();
 
-            try
-            {
-                var pageNumber = req.PageNumber;
-                var pageSize = 10;
-                if (req.PageSize > 0)
-                    pageSize = req.PageSize;
-                apiResult.Data = _referralManagementBll.GetReferralCustList(req.SelectSite, req.UserName, req.CurrencyId, pageSize, ref pageNumber, out var totalPages, out var rowCount);
-                apiResult.TotalPages = totalPages;
-                apiResult.PageNumber = pageNumber;
-                apiResult.RowCount = rowCount;
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
+            var pageNumber = request.PageNumber;
+            apiResult.Data = _referralManagementBll.GetReferralCustList(request.SiteIds,
+                request.UserName,
+                request.CurrencyId,
+                request.PageSize,
+                ref pageNumber, out var totalPages, out var rowCount);
+            apiResult.TotalPages = totalPages;
+            apiResult.PageNumber = pageNumber;
+            apiResult.RowCount = rowCount;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return apiResult;
         }
-        
+
         /// <summary>
-        /// ReferralReport/GetRefFriendByCustId 取得指定客戶推薦朋友資料
+        /// ReferralReport/GetByCustId 取得指定客戶推薦朋友資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -116,7 +107,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiListResult<ReferralFriend> GetRefFriendByCustId(GetRefFriendByCustIdReq request)
+        public ApiListResult<ReferralFriend> GetByCustId(GetByCustIdRequest request)
         {
             var apiResult = new ApiListResult<ReferralFriend>();
             var referralStatus = new Dictionary<int, string>()
@@ -127,11 +118,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             };
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
-            
+
             try
             {
                 var pageNumber = request.PageNumber;
-                
+
                 var data = _referralManagementBll.GetRefFriendList(request.CustId,
                     startDate,
                     endDate,

@@ -244,7 +244,7 @@ namespace BackendSite.Controllers.Api
                 AutoExtend = promotion.AutoExtend,
                 Specific = promotion.Specific
             };
-            
+
             if (promotion.UnixPeriodFrom != null)
             {
                 req.PeriodFromTime = DateTimeExtensions.UnixToDateTimeOffset(promotion.UnixPeriodFrom.Value);
@@ -531,6 +531,7 @@ namespace BackendSite.Controllers.Api
             {
                 var referralList = _referralManagementBLL.GetReferralBySiteId(SiteId).ToList();
                 var referral = referralList.FirstOrDefault(x => x.CurrencyId == CurrencyId);
+                int status = 1;
                 if (referral == null)
                 {
                     apiResult.ErrorCode = 7;
@@ -538,7 +539,12 @@ namespace BackendSite.Controllers.Api
                     return apiResult;
                 }
 
-                _referralManagementBLL.SetReferralStatus(SiteId, CurrencyId);
+                if (referral.Status)
+                {
+                    status = 0;
+                }
+
+                _referralManagementBLL.SetReferralStatus(SiteId, CurrencyId, status);
             }
             catch (Exception ex)
             {
@@ -633,7 +639,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<ScratchCard>>();
             try
             {
-                var result = _bonusManageBLL.GetScratchCardList(getScratchCardListReq.SpecialCode, getScratchCardListReq.FilterType,1,10000,
+                var result = _bonusManageBLL.GetScratchCardList(getScratchCardListReq.SpecialCode, getScratchCardListReq.FilterType, 1, 10000,
                     out _, out _);
                 foreach (var data in result)
                 {
