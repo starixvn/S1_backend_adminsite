@@ -262,6 +262,7 @@ namespace BackendSite.Service.DAL
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatusEnum.Error, actualDeposit, Operator);
             }
 

@@ -166,12 +166,12 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate,
-            long endDate, string User, int pageSize, int pageNumber, int CategoryId, int BaseCurrencyId,
-            ref List<string> CurrencyAmount)
+        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, DateTime startDate,
+            DateTime endDate, string user, int pageSize, int pageNumber, int categoryId, int baseCurrencyId,
+            ref List<string> currencyAmount)
         {
-            return walletService.GetVipRebateInfoList(selectSite, currency, startDate, endDate, User, pageSize,
-                pageNumber, CategoryId, BaseCurrencyId, ref CurrencyAmount);
+            return walletService.GetVipRebateInfoList(selectSite, currency, startDate, endDate, user, pageSize,
+                pageNumber, categoryId, baseCurrencyId, ref currencyAmount);
         }
 
         public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, DateTime? startDate, DateTime? endDate, int pageSize,
@@ -180,11 +180,11 @@ namespace BackendSite.Service.BLL
             return walletService.GetVipRebateInfoListByCustId(custId, startDate, endDate, pageSize, pageNumber);
         }
 
-        public VipRebateInfoData GetVipRebateInfoListExport(string selectSite, int currency, long startDate,
-            long endDate, string User, int CategoryId, int BaseCurrencyId, int RebateCategoriesId)
+        public VipRebateInfoData GetVipRebateInfoListExport(string selectSite, int currency, DateTime startDate,
+            DateTime endDate, string user, int categoryId, int baseCurrencyId, int rebateCategoriesId)
         {
-            return walletService.GetVipRebateInfoListExport(selectSite, currency, startDate, endDate, User, CategoryId,
-                BaseCurrencyId, RebateCategoriesId);
+            return walletService.GetVipRebateInfoListExport(selectSite, currency, startDate, endDate, user, categoryId,
+                baseCurrencyId, rebateCategoriesId);
         }
 
         public IEnumerable<VipTPCategory> GetTPCategoryList()
@@ -192,9 +192,9 @@ namespace BackendSite.Service.BLL
             return walletService.GetTPCategoryList();
         }
 
-        public AdjustmentLimtData GetAdjustmentData(int SiteId, int CurrencyId)
+        public AdjustmentLimitData GetAdjustmentData(int siteId, int currencyId)
         {
-            return adjustmentService.GetAdjustmentData(SiteId, CurrencyId);
+            return adjustmentService.GetAdjustmentData(siteId, currencyId);
         }
 
         public int AddAdjustmentLimitInfo(int SiteId, int CurrencyId, decimal AdjustmentMax, string Operator)
@@ -202,9 +202,9 @@ namespace BackendSite.Service.BLL
             return adjustmentService.AddAdjustmentLimitInfo(SiteId, CurrencyId, AdjustmentMax, Operator);
         }
 
-        public bool CheckPassWord(string password, int SiteId)
+        public bool CheckPassWord(string password, int siteId)
         {
-            var result = adminService.GetSpecialPasswordData(SiteId);
+            var result = adminService.GetSpecialPasswordData(siteId);
             if (result == null)
             {
                 return true;
@@ -233,22 +233,22 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        public BalanceAdjustBonusCodeRep CheckBalanceAdjustBonusCode(string BonusCode,int PromotionType, int SiteId,int CurrencyId)
+        public BalanceAdjustBonusCodeRep CheckBalanceAdjustBonusCode(string bonusCode,int promotionType, int siteId,int currencyId)
         {
-            BalanceAdjustBonusCodeRep result = new BalanceAdjustBonusCodeRep();
-            var BalanceAdjustBonusCodeData = adjustmentService.CheckBalanceAdjustBonusCode(BonusCode, PromotionType, SiteId, CurrencyId);
+            var result = new BalanceAdjustBonusCodeRep();
+            var balanceAdjustBonusCodeData = adjustmentService.CheckBalanceAdjustBonusCode(bonusCode, promotionType, siteId, currencyId);
 
-            if(BalanceAdjustBonusCodeData != null)
+            if(balanceAdjustBonusCodeData != null)
             {
-                var promoCategories = _bonusManageService.GetPromoCategories(BalanceAdjustBonusCodeData.WalletType).Where(x => x.Id == BalanceAdjustBonusCodeData.CategoryId && x.TpId == BalanceAdjustBonusCodeData.TpId)?.FirstOrDefault();
+                var promoCategories = _bonusManageService.GetPromoCategories(balanceAdjustBonusCodeData.WalletType).Where(x => x.Id == balanceAdjustBonusCodeData.CategoryId && x.TpId == balanceAdjustBonusCodeData.TpId)?.FirstOrDefault();
                 result.HasBonusCode = true;
-                result.BonusCode = BonusCode;
-                result.RollOver = BalanceAdjustBonusCodeData.RollOver;
-                result.Bonus = BalanceAdjustBonusCodeData.Bonus;
-                result.TpId = BalanceAdjustBonusCodeData.TpId;
-                result.CategoryId = BalanceAdjustBonusCodeData.CategoryId;
+                result.BonusCode = bonusCode;
+                result.RollOver = balanceAdjustBonusCodeData.RollOver;
+                result.Bonus = balanceAdjustBonusCodeData.Bonus;
+                result.TpId = balanceAdjustBonusCodeData.TpId;
+                result.CategoryId = balanceAdjustBonusCodeData.CategoryId;
                 result.Name = promoCategories == null ? string.Empty : promoCategories.Name;
-                result.WalletType = BalanceAdjustBonusCodeData.WalletType;
+                result.WalletType = balanceAdjustBonusCodeData.WalletType;
             }
             else
             {
@@ -257,18 +257,18 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        public BalanceAdjustBonusCodeBatchRep CheckBalanceAdjustBonusCodeBatch(string BonusCode, int PromotionType, int SiteId)
+        public BalanceAdjustBonusCodeBatchRep CheckBalanceAdjustBonusCodeBatch(string bonusCode, int promotionType, int siteId)
         {
-            BalanceAdjustBonusCodeBatchRep result = new BalanceAdjustBonusCodeBatchRep();
-            List<BalanceAdjustBonusCodeBatchDetail> detail = new List<BalanceAdjustBonusCodeBatchDetail>();
-            var BalanceAdjustBonusCodeBatchData = adjustmentService.CheckBalanceAdjustBonusCodeBatch(BonusCode, PromotionType, SiteId).ToList();
+            var result = new BalanceAdjustBonusCodeBatchRep();
+            var detail = new List<BalanceAdjustBonusCodeBatchDetail>();
+            var balanceAdjustBonusCodeBatchData = adjustmentService.CheckBalanceAdjustBonusCodeBatch(bonusCode, promotionType, siteId).ToList();
 
-            if (BalanceAdjustBonusCodeBatchData.Count != 0)
+            if (balanceAdjustBonusCodeBatchData.Count != 0)
             {
-                var promoCategories = _bonusManageService.GetPromoCategories(BalanceAdjustBonusCodeBatchData.FirstOrDefault().WalletType)
-                    .Where(x => x.Id == BalanceAdjustBonusCodeBatchData.FirstOrDefault().CategoryId && x.TpId == BalanceAdjustBonusCodeBatchData.FirstOrDefault().TpId)?.FirstOrDefault();
+                var promoCategories = _bonusManageService.GetPromoCategories(balanceAdjustBonusCodeBatchData.FirstOrDefault().WalletType)
+                    .Where(x => x.Id == balanceAdjustBonusCodeBatchData.FirstOrDefault().CategoryId && x.TpId == balanceAdjustBonusCodeBatchData.FirstOrDefault().TpId)?.FirstOrDefault();
 
-                BalanceAdjustBonusCodeBatchData.ForEach(x =>
+                balanceAdjustBonusCodeBatchData.ForEach(x =>
                 {
                     detail.Add(new BalanceAdjustBonusCodeBatchDetail()
                     {
@@ -278,8 +278,8 @@ namespace BackendSite.Service.BLL
                     });
                 });
                 result.HasBonusCode = true;
-                result.BonusCode = BonusCode;
-                result.WalletType = BalanceAdjustBonusCodeBatchData.FirstOrDefault().WalletType;
+                result.BonusCode = bonusCode;
+                result.WalletType = balanceAdjustBonusCodeBatchData.FirstOrDefault().WalletType;
                 result.Detail = detail;
                 result.Name = promoCategories == null ? string.Empty : promoCategories.Name;
             }
@@ -291,9 +291,9 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<CheckBalanceAdjustData> CheckRententionBonusAdjustmentLimit(string BonusCode, int SiteId)
+        public IEnumerable<CheckBalanceAdjustData> CheckRententionBonusAdjustmentLimit(string bonusCode, int siteId)
         {
-            return  adjustmentService.CheckBalanceAdjustBonusCodeBatch(BonusCode, 9, SiteId);
+            return  adjustmentService.CheckBalanceAdjustBonusCodeBatch(bonusCode, 9, siteId);
         }
     }
 }

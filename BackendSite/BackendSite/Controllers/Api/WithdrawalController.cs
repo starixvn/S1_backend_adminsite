@@ -16,6 +16,7 @@ using System.IO;
 using System.Net;
 using Amazon;
 using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Controllers.Api
@@ -101,8 +102,8 @@ namespace BackendSite.Controllers.Api
             var rowCount = 0;
             var CurrencyAmount = new List<string>();
 
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(withdrawalListReq.startDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(withdrawalListReq.endDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(withdrawalListReq.startDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(withdrawalListReq.endDate);
 
             var withdrawalRequestList = withdrawalBLL.GetWithdrawalRequestList(withdrawalListReq.SelectSite,
                 withdrawalListReq.withdrawalType, startTime, endTime,
@@ -506,8 +507,8 @@ namespace BackendSite.Controllers.Api
             if (withdrawalReq.endDate > 2147483647)
                 withdrawalReq.endDate = 2147483647;
 
-            var startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)withdrawalReq.startDate).AddHours(-8);
-            var endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)withdrawalReq.endDate).AddHours(-8);
+            var startDate = DateTimeExtensions.UnixToDateTime((long)withdrawalReq.startDate).AddHours(-8);
+            var endDate = DateTimeExtensions.UnixToDateTime((long)withdrawalReq.endDate).AddHours(-8);
 
             var data = withdrawalBLL.GetWithdrawalListByCust(withdrawalReq.CustId,
                 withdrawalReq.TransId,
@@ -886,8 +887,8 @@ namespace BackendSite.Controllers.Api
             var apiListResult = new ApiListResult<WithdrawalTimeList>();
             try
             {
-                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate).AddHours(8);
-                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate).AddHours(8);
+                var startTime = DateTimeExtensions.UnixToDateTime(para.StartDate).AddHours(8);
+                var endTime = DateTimeExtensions.UnixToDateTime(para.EndDate).AddHours(8);
                 var req = new WithdrawalTimeReportPara
                 {
                     WithdrawalId = para.WithdrawalId,
@@ -935,8 +936,8 @@ namespace BackendSite.Controllers.Api
         public IActionResult ExportWithdrawalTime(string selectSite, string withdrawalId, long startDate, long endDate,
             int status, int currencyId)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(startDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(endDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(startDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(endDate);
             var exportData =
                 withdrawalBLL.WithdrawalTimeExportGet(selectSite, withdrawalId, startTime, endTime, status, currencyId);
 
@@ -958,7 +959,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<USDTWithdrawalLimitInfoManage>>();
             var USDTwithdrawalLimitInfoManages =
-                withdrawalBLL.GetUSDTWithdrawalLimitInfos(USDTwithdrawalLimit.SiteId, USDTwithdrawalLimit.CurrencyId, Enum.GetName(typeof(NetworkType), USDTwithdrawalLimit.NetworkType));
+                withdrawalBLL.GetUSDTWithdrawalLimitInfos(USDTwithdrawalLimit.SiteId, USDTwithdrawalLimit.CurrencyId, Enum.GetName(typeof(NetworkTypeEnum), USDTwithdrawalLimit.NetworkType));
             apiResult.Data = USDTwithdrawalLimitInfoManages;
             apiResult.ErrorCode = 0;
             return apiResult;

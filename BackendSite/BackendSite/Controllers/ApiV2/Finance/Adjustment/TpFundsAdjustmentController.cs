@@ -111,6 +111,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         public async Task<ApiResult<dynamic>> GetTpCustInfo(GetTpCustInfoRequest request)
         {
             var apiResult = new ApiResult<dynamic>();
+
+            if (string.IsNullOrWhiteSpace(request.UserTpId))
+                request.UserTpId = null;
+            if (string.IsNullOrWhiteSpace(request.UserName))
+                request.UserName = null;
+
             var custId = (string.IsNullOrEmpty(request.UserTpId)) ? null : _common.TpIdToCustId(request.UserTpId);
             var custInfosDetail = _custInfoBll.GetCustInfoDetails(custId, request.UserName, request.SiteId);
 

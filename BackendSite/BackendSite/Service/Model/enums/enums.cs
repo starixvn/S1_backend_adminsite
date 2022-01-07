@@ -8,6 +8,7 @@ namespace BackendSite.Service.Model.enums
     //1.請按照table欄位放置區塊(region)
     //2.命名大部分請以 [Table欄位名稱] + Enum，ex.Customer.IsKyc => IsKycEnum
     //3.如欄位名稱重複率很高，命名請以 [Table名稱] + [Table欄位名稱] + Enum，ex.Customer.Status => CustomerStatusEnum
+    //4.如果有特殊選單需要給前端使用，請按照欄位名稱命名。ex.DepositRequest.AmountType => AmountTypeEnum
 
     /// <summary>
     /// DB環境列舉(不屬於任何Table，For專案使用)
@@ -19,6 +20,42 @@ namespace BackendSite.Service.Model.enums
         Wager,  //ConnectionStringWager
         Log,    //ConnectionStringLog
     }
+
+    #region Deposit Request / Withdrawal Request For Frontend Use
+
+    public enum AmountTypeEnum
+    {
+        NoUse = 0,
+        AmountGreaterThan = 1,
+        AmountSmallerThan = 2
+    }
+
+    #endregion
+
+    #region Adjustment Report For Frontend Use
+
+    public enum AdjustTypeEnum
+    {
+        Debit = 1,
+        Credit = 2,
+        IncreaseBonus = 3,
+        ReduceBonus = 4,
+        ThirdAdd = 5,
+        ThirdMinus = 6
+    }
+
+    #endregion
+
+    #region Bonus Management For Frontend Use
+
+    public enum ScratchCardStatusEnum
+    {
+        All = 0,
+        UnUsed = 1,
+        Used = 2
+    }
+
+    #endregion
 
     #region Customer
 
@@ -220,7 +257,63 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    public enum AdjustStatus
+    #region USDTWithdrawalLimitInfo
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// DB欄位開String，此Enum主要for前台顯示判斷使用
+    /// </remarks>
+    public enum NetworkTypeEnum
+    {
+        ERC20 = 1,
+        TRC20 = 2
+    }
+
+    #endregion
+
+    #region OTPVerifyinfo
+
+    public enum OTPTypeEnum
+    {
+        SMS = 0,
+        Email = 1
+    }
+
+    #endregion
+
+    #region AdjustWithdrawalLimitInfo
+
+    public enum AdjustWithdrawalLimitInfoAdjustTypeEnum
+    {
+        Debit = 1,
+        Credit = 2,
+        //Bonus = 3  NoUse
+    }
+
+    public enum AdjustWithdrawalLimitInfoStatusEnum
+    {
+        Pending = 1,
+        Approved = 2,
+        Rejected = 3
+    }
+
+    #endregion
+
+    #region AdjustmentInfo
+
+    public enum AdjustmentInfoAdjustTypeEnum
+    {
+        BalancePlus = 1,
+        BalanceMinus = 2,
+        BonusPlus = 3,
+        BonusMinus = 4,
+        RetentionBonus = 5,
+        ManualBonus = 6
+    }
+
+    public enum AdjustmentInfoStatusEnum
     {
         Draft = 0,
         Pending = 1,
@@ -230,15 +323,7 @@ namespace BackendSite.Service.Model.enums
         Error = 99
     }
 
-    public enum AdjustType
-    {
-        Debit = 1,
-        Credit = 2,
-        IncreaseBonus = 3,
-        ReduceBonus = 4,
-        ThirdAdd = 5,
-        ThirdMinus = 6
-    }
+    #endregion
 
     public enum AdminUserStatus
     {
@@ -246,7 +331,10 @@ namespace BackendSite.Service.Model.enums
         Suspend = 2,
         Closed = 3,
     }
-    public enum PromotionType
+
+    #region Promotion
+
+    public enum PromotionTypeEnum
     {
         FstDeposit = 1,
         ReDeposit = 2,
@@ -258,6 +346,8 @@ namespace BackendSite.Service.Model.enums
         StaticPage = 8,
         RetentionBonus = 9
     }
+
+    #endregion
 
     public enum BonusType
     {
@@ -325,7 +415,9 @@ namespace BackendSite.Service.Model.enums
         VipLevel = 1
     }
 
-    public enum BonusStatusType
+    #region BonusInfo
+
+    public enum BonusInfoStatusEnum
     {
         Initial = 0,
         Running = 1,
@@ -334,6 +426,8 @@ namespace BackendSite.Service.Model.enums
         Fulfill = 4,
         TrasferOut = 5
     }
+
+    #endregion
 
     #region Bank Financial Account
 
@@ -453,12 +547,16 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    public enum RegLiveStatusType
+    #region Customer_RegLiveStatus
+
+    public enum Customer_RegLiveStatusStatusEnum
     {
         Pending = 1,
         Done = 2,
         Invalid = 3
     }
+
+    #endregion
 
     //public enum TpCategory
     //{
@@ -489,11 +587,6 @@ namespace BackendSite.Service.Model.enums
     {
         HTTP = 1,
         HTTPS = 2
-    }
-    public enum NetworkType
-    {
-        ERC20 = 1,
-        TRC20 = 2
     }
 
     public enum SendMessageStatus

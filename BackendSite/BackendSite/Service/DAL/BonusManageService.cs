@@ -23,7 +23,7 @@ namespace BackendSite.Service.DAL
         private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-        
+
         public BonusManageService(IServiceProvider provider)
         {
             _configuration = provider.GetRequiredService<IConfiguration>();
@@ -34,21 +34,15 @@ namespace BackendSite.Service.DAL
         public int SetPromotionStatus(string bonusCode, int siteId, int status, string lastUpdateUser)
         {
             int errorCode;
-            try
+
+            var result = _mainDbClient.Execute("Admin_Promotion_SetStatus", new DynamicParameters(new { bonusCode, siteId, status, lastUpdateUser }));
+            if (result > 0)
             {
-                var result = _mainDbClient.Execute("Admin_Promotion_SetStatus", new DynamicParameters(new {bonusCode, siteId, status, lastUpdateUser}));
-                if (result > 0)
-                {
-                    errorCode = (int)ErrorCodeEnum.Success;
-                }
-                else
-                {
-                    errorCode = (int)ErrorCodeEnum.Fail;
-                }
+                errorCode = (int)ErrorCodeEnum.Success;
             }
-            catch (Exception)
+            else
             {
-                errorCode = (int)ErrorCodeEnum.SystemException;
+                errorCode = (int)ErrorCodeEnum.Fail;
             }
 
             return errorCode;
@@ -56,10 +50,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
         {
-            using var conn =
-                new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var SpName = "Admin_PromotionCategory_Get";
-            return conn.Query<PromoCategory>(SpName, new {walletType}, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<PromoCategory>("Admin_PromotionCategory_Get_V2", new DynamicParameters(new { _WalletType = walletType }));
         }
 
         public IEnumerable<TpGameType> GetTpGameList()
@@ -69,7 +60,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<CashBackGame> GetCashBackGameList(int? tpId, int? categoryId)
         {
-            return _reportDbClient.Query<CashBackGame>("Admin_CashBackGameType_Get", new DynamicParameters(new { TpId = tpId , PromoCategoryId = categoryId }) );
+            return _reportDbClient.Query<CashBackGame>("Admin_CashBackGameType_Get", new DynamicParameters(new { TpId = tpId, PromoCategoryId = categoryId }));
         }
 
         public async Task<BonusImportResult> BonusImportAsync(BonusImportPara bonusImportPara)
@@ -182,7 +173,7 @@ namespace BackendSite.Service.DAL
             var errorCode = 0;
             try
             {
-                _mainDbClient.Execute("Admin_ScratchCardCode_set", new DynamicParameters(new {specialCode, scratchCardCode, lastUpdateUser}));
+                _mainDbClient.Execute("Admin_ScratchCardCode_set", new DynamicParameters(new { specialCode, scratchCardCode, lastUpdateUser }));
             }
             catch (Exception ex)
             {
@@ -192,14 +183,32 @@ namespace BackendSite.Service.DAL
             return errorCode;
         }
 
-        public IEnumerable<ScratchCard> GetScratchCardList(string specialCode)
+        public IEnumerable<ScratchCard> GetScratchCardList(string specialCode,
+            int statusType,
+            int startIndex,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
         {
-            return _mainDbClient.Query<ScratchCard>("Admin_ScratchCardCodeList_Get_V2", new DynamicParameters(new {SpecialCode = specialCode, CustId = -1}));
+            var p = new DynamicParameters();
+            p.Add("_SpecialCode", specialCode);
+            p.Add("_StatusType", statusType);
+            p.Add("_StartIndex", startIndex);
+            p.Add("_PageSize", pageSize);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = _mainDbClient.Query<ScratchCard>("Admin_ScratchCardCodeList_Get_V3", p);
+
+            totalPages = p.Get<int?>("_TotalPages") ?? 0;
+            rowCount = p.Get<int?>("_RowCount") ?? 0;
+
+            return result;
         }
 
         public IEnumerable<ScratchCardExport> GetScratchCardListExport(string specialCode)
         {
-            return _reportDbClient.Query<ScratchCardExport>("Admin_ScratchCardCodeListExport_Get_V2", new DynamicParameters(new {SpecialCode = specialCode}));
+            return _reportDbClient.Query<ScratchCardExport>("Admin_ScratchCardCodeListExport_Get_V2", new DynamicParameters(new { SpecialCode = specialCode }));
         }
         public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(IEnumerable<int> selectSite, int categoryType, int currencyId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
@@ -228,7 +237,7 @@ namespace BackendSite.Service.DAL
 
         public int SetLeaderboardExtraPoint(long activeDate, int siteId, int categoryId, string userName, decimal extraPoint, string lastUpdateUser)
         {
-            
+
             var Rtn = -1;
 
             var p = new DynamicParameters(new { _ActiveDate = activeDate, _SiteId = siteId, _CategoryId = categoryId, _UserName = userName, _ExtraPoint = extraPoint, _LastUpdateUser = lastUpdateUser });
@@ -254,6 +263,10 @@ namespace BackendSite.Service.DAL
         /// <param name="bonusCode"></param>
         /// <param name="permissionSiteIds"></param>
         /// <param name="isSpecial"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalPages"></param>
+        /// <param name="rowCount"></param>
         /// <returns></returns>
         public IEnumerable<PromotionInfo> GetPromotionList(string siteIds,
             string promotionTypes,
@@ -263,7 +276,11 @@ namespace BackendSite.Service.DAL
             int device,
             string bonusCode,
             string permissionSiteIds,
-            bool isSpecial)
+            bool isSpecial,
+            int startIndex,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
         {
             var p = new DynamicParameters();
             p.Add("_SiteIds", siteIds);
@@ -275,8 +292,17 @@ namespace BackendSite.Service.DAL
             p.Add("_BonusCode", bonusCode);
             p.Add("_PermissionSiteIds", permissionSiteIds);
             p.Add("_IsSpecial", isSpecial ? 1 : 0);
-            
-            return _reportDbClient.Query<PromotionInfo>("Admin_PromotionList_Get_V5", p);
+            p.Add("_StartIndex", startIndex);
+            p.Add("_PageSize", pageSize);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = _reportDbClient.Query<PromotionInfo>("Admin_PromotionList_Get_V5", p);
+
+            totalPages = p.Get<int?>("_TotalPages") ?? 0;
+            rowCount = p.Get<int?>("_RowCount") ?? 0;
+
+            return result;
         }
 
         /// <summary>
@@ -299,8 +325,8 @@ namespace BackendSite.Service.DAL
                 {
                     var rebateList = GetPromotionRebate(bonusCode, siteId, conn);
                     var cashBackList = GetPromotionCashBack(bonusCode, siteId, conn);
-                    var tempCashBackList = cashBackList.GroupBy(x => new { x.CurrencyId, x.GameType, x.LossAmount, x.Percentage, x.Status,x.TpId }).Select(x=> new PromotionCashBack1 
-                    { 
+                    var tempCashBackList = cashBackList.GroupBy(x => new { x.CurrencyId, x.GameType, x.LossAmount, x.Percentage, x.Status, x.TpId }).Select(x => new PromotionCashBack1
+                    {
                         CurrencyId = x.Key.CurrencyId,
                         GameType = x.Key.GameType,
                         LossAmount = x.Key.LossAmount,
@@ -452,7 +478,7 @@ namespace BackendSite.Service.DAL
         /// <returns></returns>
         public bool SetPromotionFlow(bool isAdd, PromotionInfoReq promotion,
             List<PromotionDisplayConditionModel> promotionDisplayConditionList, int expectedDelSpecificRow,
-            int expectedDelRebateRow, int expectedDelConditionRow,string Operator, DisplayConditionAboutVipLevel vipLevelCondition)
+            int expectedDelRebateRow, int expectedDelConditionRow, string Operator, DisplayConditionAboutVipLevel vipLevelCondition)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
@@ -577,7 +603,7 @@ namespace BackendSite.Service.DAL
                 }
             }
 
-            if(promotion.PromotionType == 7)
+            if (promotion.PromotionType == 7)
             {
                 var cashBackList = new List<PromotionCashBackSetting>();
                 var cashBackGameList = GetCashBackGameList(promotion.TpId, promotion.CategoryId).ToList(); ;
@@ -598,14 +624,14 @@ namespace BackendSite.Service.DAL
                                 LossAmount = r.LossAmount,
                                 Status = r.Status,
                                 TpId = promotion.TpId == 0 ? r.GameType : promotion.TpId
-                            }); 
-                        });              
+                            });
+                        });
                     }
                 }
                 if (setAffectCount == 2)
                 {
                     DeletePromotionCashBack(promotion.BonusCode, promotion.SiteId,
-                        conn, trans);                    
+                        conn, trans);
                 }
                 InsertPromotionCashBack(promotion.BonusCode, promotion.SiteId, Operator, cashBackList,
                     conn, trans);
@@ -630,7 +656,7 @@ namespace BackendSite.Service.DAL
         /// <param name="isSpecial"></param>
         /// <returns></returns>
         public bool DuplicatePromotionFlow(string bonusCode, int siteId, string newBonusCode, int expectedSpecificRow,
-            int expectedRebateRow, int expectedConditionRow, int expectedCashBackRow,string Operator,string newSpecialCode, bool isSpecial)
+            int expectedRebateRow, int expectedConditionRow, int expectedCashBackRow, string Operator, string newSpecialCode, bool isSpecial)
         {
             using var connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             connection.Open();
@@ -669,7 +695,7 @@ namespace BackendSite.Service.DAL
                 }
             }
 
-            if(expectedCashBackRow > 0)
+            if (expectedCashBackRow > 0)
             {
                 var promotionCashBackResult = DuplicatePromotionCashBack(bonusCode, siteId, newBonusCode, expectedCashBackRow, connection, transaction, Operator);
                 if (!promotionCashBackResult)
@@ -687,7 +713,7 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters();
             p.Add("_SpecialCode", specialCode);
-            
+
             return _reportDbClient.Query<CheckSpecialCodeDuplicate>("Admin_PromotionSpecialCode_Get", p);
         }
         #endregion
@@ -710,8 +736,8 @@ namespace BackendSite.Service.DAL
             p.Add("_Description", promotion.Description);
             p.Add("_PromotionType", promotion.PromotionType);
             p.Add("_CategoryId", promotion.CategoryId);
-            p.Add("_PeriodFrom", promotion.UnixPeriodFrom);
-            p.Add("_PeriodTo", promotion.UnixPeriodTo);
+            p.Add("_PeriodFrom", promotion.PeriodFromTime?.ToUnixTimeSeconds());
+            p.Add("_PeriodTo", promotion.PeriodToTime?.ToUnixTimeSeconds());
             p.Add("_ExpiryDays", promotion.ExpiryDays);
             p.Add("_Sort", promotion.Sort);
             p.Add("_Status", promotion.Status);
@@ -730,7 +756,7 @@ namespace BackendSite.Service.DAL
             p.Add("_AutoExtend", promotion.AutoExtend);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            connection.Execute("Admin_PromotionV4_Set", p,transaction, commandType: CommandType.StoredProcedure);
+            connection.Execute("Admin_PromotionV4_Set", p, transaction, commandType: CommandType.StoredProcedure);
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
             return affectCount;
@@ -930,10 +956,10 @@ namespace BackendSite.Service.DAL
             p.Add("_SiteId", siteId);
             p.Add("_NewBonusCode", newBonusCode);
             p.Add("_NewSpecialCode", newSpecialCode);
-            p.Add("_IsSpecial", isSpecial ? 1:0);
+            p.Add("_IsSpecial", isSpecial ? 1 : 0);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             connection.Execute("Admin_PromotionDuplicate_Set_V3", p, transaction, commandType: CommandType.StoredProcedure);
-           
+
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
             return affectCount == 1;
         }
@@ -1026,21 +1052,21 @@ namespace BackendSite.Service.DAL
         }
 
         #endregion
-        
+
         #region
         private int InsertAdjustmentInfoLog(PromotionInfoReq promotion, MySqlConnection connection,
-            MySqlTransaction transaction,string Operator)
+            MySqlTransaction transaction, string Operator)
         {
             var propsLog = new DynamicParameters();
 
             var tempPromotion = JsonConvert.SerializeObject(promotion);
             var jObject = JObject.Parse(tempPromotion);
             var tokenSelect = jObject.SelectToken("Specific") as JArray;
-            if(tokenSelect != null)
+            if (tokenSelect != null)
             {
                 foreach (var jToken in tokenSelect)
                 {
-                    var item = (JObject) jToken;
+                    var item = (JObject)jToken;
                     item.Remove("Details");
                 }
             }
@@ -1049,7 +1075,7 @@ namespace BackendSite.Service.DAL
             propsLog.Add("ActionType", 1);
             propsLog.Add("DetailInfo", detailInfo);
             propsLog.Add("Operator", Operator);
-            return connection.Execute("Admin_AdjustmentInfoLog_Set", propsLog,transaction, commandType: CommandType.StoredProcedure);
+            return connection.Execute("Admin_AdjustmentInfoLog_Set", propsLog, transaction, commandType: CommandType.StoredProcedure);
         }
         #endregion
 
@@ -1063,10 +1089,10 @@ namespace BackendSite.Service.DAL
             p.Add("_BonusCode", bonusCode);
             p.Add("_SiteId", siteId);
 
-            return connection.Execute("Admin_PromotionCashBack_Del", p,transaction, commandType: CommandType.StoredProcedure) > 0;
+            return connection.Execute("Admin_PromotionCashBack_Del", p, transaction, commandType: CommandType.StoredProcedure) > 0;
         }
 
-        private bool InsertPromotionCashBack(string bonusCode, int siteId, string Operator,List<PromotionCashBackSetting> cashbacklist,
+        private bool InsertPromotionCashBack(string bonusCode, int siteId, string Operator, List<PromotionCashBackSetting> cashbacklist,
             MySqlConnection connection,
             MySqlTransaction transaction)
         {
@@ -1077,7 +1103,7 @@ namespace BackendSite.Service.DAL
             p.Add("_Operator", Operator);
             p.Add("_CashBackList", JsonConvert.SerializeObject(cashbacklist));
 
-            return connection.Execute("Admin_PromotionCashBack_Set", p,transaction, commandType: CommandType.StoredProcedure) > 0;
+            return connection.Execute("Admin_PromotionCashBack_Set", p, transaction, commandType: CommandType.StoredProcedure) > 0;
         }
 
         public IEnumerable<PromotionCashBack1> GetPromotionCashBack(string bonusCode, int siteId,
@@ -1091,12 +1117,12 @@ namespace BackendSite.Service.DAL
 
             if (connection == null)
             {
-                
+
                 return _reportDbClient.Query<PromotionCashBack1>("Admin_PromotionCashBack_Get", p);
             }
             else
             {
-                return connection.Query<PromotionCashBack1>("Admin_PromotionCashBack_Get", p,transaction, commandType: CommandType.StoredProcedure);
+                return connection.Query<PromotionCashBack1>("Admin_PromotionCashBack_Get", p, transaction, commandType: CommandType.StoredProcedure);
             }
         }
 

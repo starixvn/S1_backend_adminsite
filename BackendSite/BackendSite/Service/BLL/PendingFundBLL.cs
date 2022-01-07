@@ -94,8 +94,6 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult<TransferResult>> BonusTransferAsync(int custId,int tpId)
         {
-            var apiResult = new ApiResult<TransferResult>();
-
             var tpBonusTransfer = new TpBonusTransfer
             {
                 TpId = tpId,
@@ -104,8 +102,7 @@ namespace BackendSite.Service.BLL
             };
 
             var myUrl = $"{apiUrl}BonusTransfer";
-            apiResult = await courierAdapter.MyPostAsync<TransferResult, TpBonusTransfer>(myUrl, tpBonusTransfer);
-
+            var apiResult = await courierAdapter.MyPostAsync<TransferResult, TpBonusTransfer>(myUrl, tpBonusTransfer);
             return apiResult;
         }
 

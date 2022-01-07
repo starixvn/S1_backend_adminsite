@@ -31,8 +31,7 @@ namespace BackendSite.Service.DAL
 
         public Customer GetCustInfo(int custId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.QueryFirstOrDefault<Customer>("Customer_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.QueryFirst<Customer>("Customer_Get", new DynamicParameters(new { CustId = custId }));
         }
 
         public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite,

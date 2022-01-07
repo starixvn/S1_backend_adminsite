@@ -12,6 +12,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class RebateManagementController : ControllerBase
     {
         #region Fields
@@ -95,26 +96,40 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         
         #endregion
         
+        /// <summary>
+        /// RebateManagement/GetVipLevel 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="req"></param>
         [HttpPost]
-        public ApiResult<IEnumerable<VipLevelSetting>> GetVipLevel(VipLevelReq vipLevelReq)
+        public ApiResult<IEnumerable<VipLevelSetting>> GetVipLevel(VipLevelReq req)
         {
             var apiResult = new ApiResult<IEnumerable<VipLevelSetting>>
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = _vipLevelBll.GetVipLevelSetting(vipLevelReq.SiteId)
+                Data = _vipLevelBll.GetVipLevelSetting(req.SiteId)
             };
             return apiResult;
         }
         
+        /// <summary>
+        /// RebateManagement/GetRebatePeriod 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="req"></param>
         [HttpPost]
-        public ApiResult<RebatePeriod> GetRebatePeriod(RebatePeriodReq rebatePeriodReq)
+        public ApiResult<RebatePeriod> GetRebatePeriod(RebatePeriodReq req)
         {
             var apiResult = new ApiResult<RebatePeriod>
             {
                 Data = new RebatePeriod()
             };
             
-            _rebateManageBll.GetRebatePeriod(rebatePeriodReq.SiteId, out var periodType, out var periodDay, out var redeemHours);
+            _rebateManageBll.GetRebatePeriod(req.SiteId, out var periodType, out var periodDay, out var redeemHours);
             apiResult.Data.PeriodType = periodType;
             apiResult.Data.PeriodDay = periodDay;
             apiResult.Data.RedeemHours = redeemHours;
@@ -122,12 +137,19 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             return apiResult;
         }
         
+        /// <summary>
+        /// RebateManagement/SetRebatePeriod 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="req"></param>
         [HttpPost]
-        public ApiResult SetRebatePeriod(SetRebatePeriodReq setRebatePeriodReq)
+        public ApiResult SetRebatePeriod(SetRebatePeriodReq req)
         {
             var apiResult = new ApiResult();
             var userName = _authorizeBll.GetAuthData().UserName;
-            var result = _rebateManageBll.SetRebatePeriod(setRebatePeriodReq.SiteId, setRebatePeriodReq.PeriodType, setRebatePeriodReq.PeriodDay, setRebatePeriodReq.RedeemHours, userName); ;
+            var result = _rebateManageBll.SetRebatePeriod(req.SiteId, req.PeriodType, req.PeriodDay, req.RedeemHours, userName); ;
             
             if (result)
             {
@@ -140,36 +162,57 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             return apiResult;
         }
         
+        /// <summary>
+        /// RebateManagement/GetRebateInfo 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="req"></param>
         [HttpPost]
-        public ApiResult<RebateCurrencyData> GetRebateInfo(RebateInfoReq rebateInfoReq)
+        public ApiResult<RebateCurrencyData> GetRebateInfo(RebateInfoReq req)
         {
             var apiResult = new ApiResult<RebateCurrencyData>
             {
                 ErrorCode = (int) ErrorCodeEnum.Success,
-                Data = _rebateManageBll.GeRebateInfo(rebateInfoReq.SiteId, rebateInfoReq.CurrencyId)
+                Data = _rebateManageBll.GeRebateInfo(req.SiteId, req.CurrencyId)
             };
             
             return apiResult;
         }
         
+        /// <summary>
+        /// RebateManagement/GetRebateInfoByGameType 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="req"></param>
         [HttpPost]
-        public ApiResult<IEnumerable<RebateLevelData>> GetRebateInfoByGameType(RebateInfoByGameTypeReq rebateInfoByGameTypeReq)
+        public ApiResult<IEnumerable<RebateLevelData>> GetRebateInfoByGameType(RebateInfoByGameTypeReq req)
         {
             var apiResult = new ApiResult<IEnumerable<RebateLevelData>>
             {
                 ErrorCode = (int) ErrorCodeEnum.Success,
-                Data = _rebateManageBll.GetRebateDataByGameType(rebateInfoByGameTypeReq.SiteId, rebateInfoByGameTypeReq.GameType, rebateInfoByGameTypeReq.CurrencyId)
+                Data = _rebateManageBll.GetRebateDataByGameType(req.SiteId, req.GameType, req.CurrencyId)
             };
             
             return apiResult;
         }
         
+        /// <summary>
+        /// RebateManagement/SetRebateCategory 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="req"></param>
         [HttpPost]
-        public ApiResult SetRebateCategory(SetRebateCategoryReq setRebateCategoryReq)
+        public ApiResult SetRebateCategory(SetRebateCategoryReq req)
         {
             var apiResult = new ApiResult();
             var userName = _authorizeBll.GetAuthData().UserName;
-            var result = _rebateManageBll.SetRebateCategory(setRebateCategoryReq.SiteId, setRebateCategoryReq.CurrencyId, setRebateCategoryReq.CategoryId, setRebateCategoryReq.Level, setRebateCategoryReq.Percentage, userName);
+            var result = _rebateManageBll.SetRebateCategory(req.SiteId, req.CurrencyId, req.CategoryId, req.Level, req.Percentage, userName);
            
             if (result)
             {
@@ -183,12 +226,19 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             return apiResult;
         }
         
+        /// <summary>
+        /// RebateManagement/SetRebateGameType 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="req"></param>
         [HttpPost]
-        public ApiResult SetRebateGameType(SetRebateGameTypeReq setRebateCategoryGameTypeReq)
+        public ApiResult SetRebateGameType(SetRebateGameTypeReq req)
         {
             var apiResult = new ApiResult();
             var userName = _authorizeBll.GetAuthData().UserName;
-            var result = _rebateManageBll.SetRebateGameType(setRebateCategoryGameTypeReq.SiteId, setRebateCategoryGameTypeReq.CurrencyId, setRebateCategoryGameTypeReq.GameType, setRebateCategoryGameTypeReq.Level, setRebateCategoryGameTypeReq.Percentage, userName);
+            var result = _rebateManageBll.SetRebateGameType(req.SiteId, req.CurrencyId, req.GameType, req.Level, req.Percentage, userName);
             if (result)
             {
                 apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
@@ -201,12 +251,19 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             return apiResult;
         }
         
+        /// <summary>
+        /// RebateManagement/SetRebatePayoutLimit 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="req"></param>
         [HttpPost]
-        public ApiResult SetRebatePayoutLimit(SetRebatePayoutLimitReq setRebatePayoutLimitReq)
+        public ApiResult SetRebatePayoutLimit(SetRebatePayoutLimitReq req)
         {
             var apiResult = new ApiResult();
             var userName = _authorizeBll.GetAuthData().UserName;
-            var result = _rebateManageBll.SetRebatePayoutLimit(setRebatePayoutLimitReq.SiteId, setRebatePayoutLimitReq.CurrencyId, setRebatePayoutLimitReq.CategoryId, setRebatePayoutLimitReq.MaxPayout, setRebatePayoutLimitReq.MinPayout, userName);
+            var result = _rebateManageBll.SetRebatePayoutLimit(req.SiteId, req.CurrencyId, req.CategoryId, req.MaxPayout, req.MinPayout, userName);
             if (result)
             {
                 apiResult.ErrorCode =(int) ErrorCodeEnum.Success;

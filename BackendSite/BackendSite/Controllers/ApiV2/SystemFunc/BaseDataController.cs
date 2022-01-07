@@ -29,6 +29,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly CustVerifyBLL _custVerifyBll;
         private readonly BonusManageBLL _bonusManageBll;
         private readonly RebateManageBLL _rebateManageBll;
+        private readonly SportsBLL _sportsBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
         public BaseDataController(IServiceProvider provider)
@@ -41,6 +42,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _custVerifyBll = provider.GetRequiredService<CustVerifyBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
             _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
+            _sportsBll = provider.GetRequiredService<SportsBLL>();
         }
 
         #region Model
@@ -121,7 +123,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             public int SiteId { get; set; }
         }
-        
+
         public class GetTpGameListReq
         {
             public int TpId { get; set; }
@@ -135,17 +137,30 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int SiteId { get; set; }
         }
 
-        public class GetPromoCategoriesReq
+        public class GetPromoCategoryRequest
         {
+            /// <summary>
+            /// 0=全部, 1=主錢包, 2=體育錢包
+            /// </summary>
             public int WalletType { get; set; }
-            
+
         }
-        
+
         public class GameTypeListReq
         {
             public int CategoryId { get; set; }
         }
-        
+
+        public class SportLeaguesReq
+        {
+            public int SportCategoryId { get; set; }
+        }
+
+        public class SportTeamsReq
+        {
+            public int SportLeaguesId { get; set; }
+        }
+
         #endregion
 
         /// <summary>
@@ -355,9 +370,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             };
             return apiListResult;
         }
-        
+
         /// <summary>
-        /// BaseData/GetCashBackGameList 
+        /// BaseData/GetCashBackGameList 取得指定現金回饋遊戲清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -370,22 +385,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var apiResult = new ApiResult<IEnumerable<GetCashBackGamerep>>();
 
-            try
-            {
-                apiResult.Data = _bonusManageBll.GetCashBackGameList(para.TpId, para.CategoryId);
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.SystemException;
-                apiResult.RawMessage = ex.ToString();
-            }
+            apiResult.Data = _bonusManageBll.GetCashBackGameList(para.TpId, para.CategoryId);
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return apiResult;
         }
-        
+
         /// <summary>
-        /// BaseData/GetAllSiteVipLevelList 
+        /// BaseData/GetPromotionCategories 
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -393,36 +400,18 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<VipLevelModel>> GetAllSiteVipLevelList()
-        {
-            return new ApiResult<IEnumerable<VipLevelModel>>
-            {
-                Data = _custInfoBll.GetAllSiteVipLevelList(),
-                ErrorCode = (int) ErrorCodeEnum.Success
-            };
-        }
-        
-        /// <summary>
-        /// BaseData/GetPromoCategories 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<PromoCategory>> GetPromoCategories(GetPromoCategoriesReq req)
+        public ApiResult<IEnumerable<PromoCategory>> GetPromotionCategory(GetPromoCategoryRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<PromoCategory>>();
 
             try
             {
-                apiResult.Data = _bonusManageBll.GetPromoCategories(req.WalletType);
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                apiResult.Data = _bonusManageBll.GetPromoCategories(request.WalletType);
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.RawMessage = ex.ToString();
             }
 
@@ -444,10 +433,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffListByCustVerify(GetBankInfoOffListByCustVerifyRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
+            var result = _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
 
-            if (!_custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo))
+            if (result != ErrorCodeEnum.Success)
             {
-                throw new AdminException(ErrorCodeEnum.CustNotFound);
+                throw new AdminException(result);
             }
 
             if (custInfo != null)
@@ -470,6 +460,30 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 apiResult.ErrorCode = 21;
                 apiResult.Message = "Player not found.";
             }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<SportLeagues>> GetSportLeaguesList(SportLeaguesReq sportLeaguesReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<SportLeagues>>
+            {
+                Data = _sportsBll.GetSportLeaguesList(sportLeaguesReq.SportCategoryId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public ApiResult<IEnumerable<SportTeams>> GetSportTeamsList(SportTeamsReq sportTeamsReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<SportTeams>>
+            {
+                Data = _sportsBll.GetSportTeamsList(sportTeamsReq.SportLeaguesId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
 
             return apiResult;
         }

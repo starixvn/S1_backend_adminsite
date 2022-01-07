@@ -14,6 +14,10 @@ export const dataColumnDefs = () => {
 			columnTitle: "SiteName"
 		},
 		{
+			dataColumn: "seq",
+			columnTitle: "Sequence"
+		},
+		{
 			dataColumn: "startTime",
 			columnTitle: "StartTime (Adjusted to GMT+8)",
 			body: {

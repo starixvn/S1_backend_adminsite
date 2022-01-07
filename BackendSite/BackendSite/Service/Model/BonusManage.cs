@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Extensions;
 using BackendSite.Service.Model.PromotionDisplayCondition;
 
 namespace BackendSite.Service.Model
@@ -17,14 +18,14 @@ namespace BackendSite.Service.Model
             {
                 if (UnixPeriodFrom != null)
                 {
-                    return new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(UnixPeriodFrom.Value), TimeSpan.Zero);
+                    return DateTimeExtensions.UnixToDateTimeOffset(UnixPeriodFrom.Value);
                 }
                 return null;
             }
             set
             {
                 if (UnixPeriodFrom != null) 
-                    new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(UnixPeriodFrom.Value), TimeSpan.Zero);
+                    DateTimeExtensions.UnixToDateTimeOffset(UnixPeriodFrom.Value);
             }
         }
         public DateTimeOffset? PeriodTo 
@@ -33,15 +34,14 @@ namespace BackendSite.Service.Model
             {
                 if (UnixPeriodTo != null)
                 {
-                    return new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(UnixPeriodTo.Value), TimeSpan.Zero);
+                    return DateTimeExtensions.UnixToDateTimeOffset(UnixPeriodTo.Value);
                 }
                 return null;
             }
             set
             {
                 if (UnixPeriodTo != null) 
-                    new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(UnixPeriodTo.Value), TimeSpan.Zero);
-            }
+                    DateTimeExtensions.UnixToDateTimeOffset(UnixPeriodTo.Value); }
         }
         public long? UnixPeriodFrom { get; set; }
         public long? UnixPeriodTo { get; set; }
@@ -77,12 +77,30 @@ namespace BackendSite.Service.Model
 
     public class PromotionInfoReq 
     {
+        private DateTimeOffset? _periodFromTime;
+        private DateTimeOffset? _periodToTime;
         public string BonusCode { get; set; }
         public string Description { get; set; }
         public int PromotionType { get; set; }
         public int? CategoryId { get; set; }
-        public long? UnixPeriodFrom { get; set; }
-        public long? UnixPeriodTo { get; set; }
+        public DateTimeOffset? PeriodFromTime 
+        {
+            get => _periodFromTime;
+            set
+            {
+                if (value != null)
+                    _periodFromTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
+        public DateTimeOffset? PeriodToTime 
+        {
+            get => _periodToTime;
+            set
+            {
+                if (value != null)
+                    _periodToTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
         public int ExpiryDays { get; set; }
         public int? Sort { get; set; }
         public int Status { get; set; }

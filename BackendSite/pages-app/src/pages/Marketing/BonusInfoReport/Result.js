@@ -150,7 +150,6 @@ const Panel = (props)=>{
             if(element.body && element.body.subData){
                 element.body.subData.forEach(s=>{ subData[s]=data[s]});
             }
-            console.log( data[element.dataColumn]);
             return ( 
                 <td key={`td-${element.dataColumn}-${idx}`} className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}>
                     {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}

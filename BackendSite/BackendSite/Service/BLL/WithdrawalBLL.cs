@@ -528,7 +528,7 @@ namespace BackendSite.Service.BLL
             var USDTWithdrawalLimitInfos = _withdrawalLimitService.GetUSDTWithdrawalLimitInfos(siteId, currencyId, Network);
             USDTWithdrawalLimitInfos.ToList().ForEach(x =>
             {
-                x.NetworkType = (int)(NetworkType)Enum.Parse(typeof(NetworkType), x.Network);
+                x.NetworkType = (int)(NetworkTypeEnum)Enum.Parse(typeof(NetworkTypeEnum), x.Network);
             });
             return USDTWithdrawalLimitInfos;
         }
@@ -546,7 +546,7 @@ namespace BackendSite.Service.BLL
         public int DeleteUSDTWithdrawalLimit(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage, string Operator)
         {
             var currentUpperPoint = _withdrawalLimitService.GetUSDTWithdrawalLimitInfo(USDTwithdrawalLimitInfoManage.SiteId,
-                USDTwithdrawalLimitInfoManage.CurrencyId, USDTwithdrawalLimitInfoManage.VipLevel + 1, USDTwithdrawalLimitInfoManage.Network);
+                USDTwithdrawalLimitInfoManage.CurrencyId, USDTwithdrawalLimitInfoManage.VipLevel + 1, USDTwithdrawalLimitInfoManage.NetworkType);
 
             if (currentUpperPoint != null)
                 return 0;

@@ -42,6 +42,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly PaymentAdjustmentReportBLL _paymentAdjustmentReportBll;
         private readonly ImageEditorBLL _imageEditorBll;
+        private readonly CustVerifyBLL _custVerifyBll;
+        private readonly Common _common;
 
         /// <summary>
         /// 確認圖檔檔案類型
@@ -76,6 +78,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _paymentAdjustmentReportBll = provider.GetRequiredService<PaymentAdjustmentReportBLL>();
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
+            _custVerifyBll = provider.GetRequiredService<CustVerifyBLL>();
+            _common = provider.GetRequiredService<Common>();
         }
 
         #endregion
@@ -369,7 +373,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             /// </summary>
             public string EMail { get; set; }
         }
-
+        public class VerificationRewardReq
+        {
+            /// <summary>
+            /// 客戶ID
+            /// </summary>
+            public int CustId { get; set; }
+            /// <summary>
+            /// OTPType (0=SMS, 1=Email)
+            /// </summary>
+            public int OTPType { get; set; }
+        }
         public class AddCustNoteRequest : CustIdRequest
         {
             public string Note { get; set; }
@@ -460,6 +474,21 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             public DateTime SelDate { get; set; }
             public int GameTypeId { get; set; }
+        }
+
+        public class CustInfoReq
+        {
+            public int CustId { get; set; }
+            public string UserName { get; set; }
+            public string Reason { get; set; }
+        }
+
+        public class GetCustDetailRequest
+        {
+            public int SiteId { get; set; }
+            public string UserName { get; set; }
+            public string SabaId { get; set; }
+
         }
 
         #endregion
@@ -665,7 +694,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult<bool>();
             int OldStatus = 0;
             int NewStatus = 0;
-            string rewardMsg = "";
             var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(request.CustId);
             switch (request.Option)
             {
@@ -688,12 +716,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             if (!data)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
-            }
-            
-            if (OldStatus == 0 && (request.Option == 3 || request.Option == 4))
-            {
-                var rtn = _custInfoBll.SetVerificationReward(request.CustId, request.Option);
-                rewardMsg = "VerificationReward : " + rtn.Message;
             }
 
             var Menu = "CustManage/CustInfoList";
@@ -728,10 +750,23 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return new ApiResult
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Message = "Update Success."+ rewardMsg
+                Message = "Update Success."
             };
         }
+        /// <summary>
+        /// CustManage/PayoutVerificationReward 派發客戶驗證獎勵金
+        /// </summary>
+        /// <param name="verificationRewardReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult PayoutVerificationReward(VerificationRewardReq verificationRewardReq)
+        {
+            var apiResult = new ApiResult();
 
+            apiResult = _custInfoBll.SetVerificationReward(verificationRewardReq.CustId, verificationRewardReq.OTPType);
+
+            return apiResult;
+        }
         /// <summary>
         /// CustomerManage/SetCustInfo 設定客戶資料(等級、全名；生日(年月日)、電話、Email)
         /// </summary>
@@ -2180,12 +2215,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiListResult<VipLevelLog> GetVipLevelLogByCustId(CustIdRequest request)
+        public ApiListResult<VipLevelLog> GetVipLevelLogByCustId(CustIdWithPageRequest request)
         {
+            int totalPages = 0;
+            int rowCount = 0;
+
+            var result = _vipLevelBll.GetVipLevelLog(request.CustId, request.PageNumber, request.PageSize, out totalPages, out rowCount);
+
             var apiListResult = new ApiListResult<VipLevelLog>
             {
-                Data = _vipLevelBll.GetVipLevelLog(request.CustId),
-                ErrorCode = (int)ErrorCodeEnum.Success
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                TotalPages = totalPages,
+                RowCount = rowCount,
+                PageNumber = request.PageNumber
             };
             return apiListResult;
         }
@@ -2400,6 +2443,57 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
             }
+            return apiResult;
+        }
+
+        #endregion
+
+        #region Finance > Balance Adjustment
+
+        /// <summary>
+        /// CustomerManage/GetCustDetail 取得客戶明細
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Balance Adjustment > [Search] 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustment" })]
+        [HttpPost]
+        public ApiResult<CustInfoDetail> GetCustDetail(GetCustDetailRequest request)
+        {
+            var apiResult = new ApiResult<CustInfoDetail>();
+
+            var result = _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
+
+            if (result != ErrorCodeEnum.Success)
+            {
+                throw new AdminException(result);
+            }
+
+            if (custInfo != null)
+            {
+                if (custInfo.Status == (int)CustomerStatusEnum.Running)
+                {
+                    apiResult.Data = custInfo;
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else if (custInfo.Status == (int)CustomerStatusEnum.Suspend)
+                {
+                    throw new AdminException(ErrorCodeEnum.CustStatusIsSuspend);
+                }
+                else
+                {
+                    throw new AdminException(ErrorCodeEnum.CustStatusIsClosed);
+                }
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.CustNotFound);
+            }
+
             return apiResult;
         }
 

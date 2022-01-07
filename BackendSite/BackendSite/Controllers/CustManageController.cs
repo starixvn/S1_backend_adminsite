@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using Microsoft.AspNetCore.Mvc;
 
@@ -97,14 +98,14 @@ namespace BackendSite.Controllers
             {
                 if (custInfoReq.StartDate > 2147483647)
                     custInfoReq.StartDate = 2147483647;
-                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoReq.StartDate);
+                startDate = DateTimeExtensions.UnixToDateTime((long)custInfoReq.StartDate);
             }
 
             if (custInfoReq.EndDate != null)
             {
                 if (custInfoReq.EndDate > 2147483647)
                     custInfoReq.EndDate = 2147483647;
-                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoReq.EndDate);
+                endDate = DateTimeExtensions.UnixToDateTime((long)custInfoReq.EndDate);
             }
 
        

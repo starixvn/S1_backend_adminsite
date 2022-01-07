@@ -28,7 +28,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<VipLevelSetting> GetVipLevelSetting(int siteId)
         {
-            var vipLevelSetting = _mainDbClient.Query<VipLevelSetting>("Admin_VipLevel_Get", new DynamicParameters(new {SiteId = siteId }));
+            var vipLevelSetting = _mainDbClient.Query<VipLevelSetting>("Admin_VipLevel_Get", new DynamicParameters(new { SiteId = siteId }));
             return vipLevelSetting;
         }
 
@@ -40,12 +40,22 @@ namespace BackendSite.Service.DAL
             return vipLevelInfo;
         }
 
-        public IEnumerable<VipLevelLog> GetVipLevelLog(int CustId)
+        public IEnumerable<VipLevelLog> GetVipLevelLog(int custId, int startIndex, int pageSize, out int totalPages, out int rowCount)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var GetVipLevelLog = conn.Query<VipLevelLog>("Admin_CustVipLevelLog_Get_V3", new { CustId },
-                commandType: CommandType.StoredProcedure);
-            return GetVipLevelLog;
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            var props = new DynamicParameters();
+            props.Add("_CustId", custId);
+            props.Add("_PageSize", pageSize);
+            props.Add("_StartIndex", startIndex);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = conn.Query<VipLevelLog>("Admin_CustVipLevelLog_Get_V4", props, commandType: CommandType.StoredProcedure);
+
+            totalPages = props.Get<int?>("_TotalPages") ?? 0;
+            rowCount = props.Get<int?>("_RowCount") ?? 0;
+
+            return result;
         }
 
         public int SetVipLevel(int SiteId, int CustId, string UserName, int VipLevel, string Memo, string Operator)
@@ -67,11 +77,9 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<VipSettingModel> GetVipSetting(int vipType)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var props = new DynamicParameters();
             props.Add("_Status", vipType);
-            return conn.Query<VipSettingModel>("Admin_VipSetting_Get", props,
-                commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<VipSettingModel>("Admin_VipSetting_Get", props);
         }
 
         public IEnumerable<VipUpgradeReviewDataModel> GetVipUpgradeReviewList(int siteId,
@@ -84,8 +92,6 @@ namespace BackendSite.Service.DAL
             out int rowCount)
         {
             var props = new DynamicParameters();
-            using var conn =
-                new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             props.Add("_SiteId", siteId);
             props.Add("_CalculateMonth", calculateMonth);
             props.Add("_Status", status);
@@ -95,8 +101,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<VipUpgradeReviewDataModel>("Admin_VipUpgradeReview_Get", props,
-                commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.Query<VipUpgradeReviewDataModel>("Admin_VipUpgradeReview_Get_V2", props);
 
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;
@@ -104,20 +109,14 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public bool UpdateVipUpgradeReviewFlow(string custIds,
-            string yearMonth,
-            int newStatus,
-            string updater)
+        public bool UpdateVipUpgradeReviewFlow(string custIds, string yearMonth, int newStatus, string updater)
         {
             var props = new DynamicParameters();
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-
             props.Add("_CustIds", custIds);
             props.Add("_CalculateMonth", yearMonth);
             props.Add("_Status", newStatus);
             props.Add("_LastUpdateUser", updater);
-
-            conn.Execute("Admin_VipUpgradeReviewV2_Set", props, commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_VipUpgradeReviewV2_Set", props);
 
             return true;
         }
@@ -140,9 +139,7 @@ namespace BackendSite.Service.DAL
             props.Add("_StartIndex", startIndex);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.Query<VipDowngradeReviewDataModel>("Admin_VipDowngradeReview_Get", props,
-                commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.Query<VipDowngradeReviewDataModel>("Admin_VipDowngradeReview_Get_V2", props);
 
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;
@@ -150,21 +147,15 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public bool UpdateVipDowngradeReviewFlow(string custIdList,
-            string calculateYearMonth,
-            int newStatus,
-            string updater)
+        public bool UpdateVipDowngradeReviewFlow(string custIdList, string calculateYearMonth, int newStatus, string updater)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-
             var props = new DynamicParameters();
             props.Add("_CustIdList", custIdList);
             props.Add("_CalculateYearMonth", calculateYearMonth);
             props.Add("_Status", newStatus);
             props.Add("_LastUpdateUser", updater);
-
-            conn.Execute("Admin_VipDowngradeReview_Set", props, commandType: CommandType.StoredProcedure);
-
+            _mainDbClient.Execute("Admin_VipDowngradeReview_Set", props);
+            
             return true;
         }
 
