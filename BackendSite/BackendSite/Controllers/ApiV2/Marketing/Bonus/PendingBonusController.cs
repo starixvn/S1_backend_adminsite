@@ -92,7 +92,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PendingBonus" })]
         [HttpPost]
-        public async Task<ApiResult> TransferMultiAsync(TransferListRequest request)
+        public async Task<ApiResult<List<TransferMultiResult>>> TransferMultiAsync(TransferListRequest request)
         {
             var resultData = await _pendingFundBll.TransferMultiAsync(request.BonusIdList);
 

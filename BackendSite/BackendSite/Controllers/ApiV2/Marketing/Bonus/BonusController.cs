@@ -317,7 +317,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> Duplicate(DuplicateRequest request)
+        public ApiResult Duplicate(DuplicateRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
 
@@ -425,7 +425,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult<dynamic> GenScratchCardCode(GenScratchCardCodeRequest request)
+        public ApiResult GenScratchCardCode(GenScratchCardCodeRequest request)
         {
             var apiResult = new ApiResult<dynamic>();
 
