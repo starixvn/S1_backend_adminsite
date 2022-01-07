@@ -26,7 +26,7 @@ const defDateType = {
 };
 
 export default function Filter ({ siteList, filterInfo, onChange = f => f, siteChecked = g => g, search = h => h, datePickerOnChange = i => i }) {
-
+    console.log(filterInfo)
     return (
         <div className="filter">
             <div className="row-flex">
@@ -43,13 +43,13 @@ export default function Filter ({ siteList, filterInfo, onChange = f => f, siteC
                     dataColumn="currency"/>
                 <DateTimePickerElem
 					title="From Date"
-                    value={filterInfo.startDate}
+                    datetime={filterInfo.startDate}
                     timeFormat={false}
                     onChange={onChange}
                     dataColumn="startDate"/>
                 <DateTimePickerElem
 					title="To Date"
-                    value={filterInfo.endDate}
+                    datetime={filterInfo.endDate}
                     timeFormat={false}
                     onChange={onChange}
                     dataColumn="endDate"/>
@@ -60,7 +60,8 @@ export default function Filter ({ siteList, filterInfo, onChange = f => f, siteC
                     })}
                     hasAll={false}
                     onChange={datePickerOnChange}
-                    dataColumn="DateQuickPicker" />
+                    selectedValue={filterInfo.dateQuickPicker}
+                    dataColumn="dateQuickPicker" />
             </div>
             <button className="btn btn-add" 
                     style={{ marginTop: "20px", marginBottom: "40px" }} 
