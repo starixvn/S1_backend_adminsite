@@ -33,7 +33,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly PaymentBLL _paymentBll;
         private readonly ExcelBLL _excelBll;
-        private readonly Tools _tools;
         private readonly VipLevelBLL _vipLevelBll;
         private readonly AuthorizeBLL _authorizeBll;
         private readonly MessageBLL _messageBll;
@@ -43,7 +42,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly PaymentAdjustmentReportBLL _paymentAdjustmentReportBll;
         private readonly ImageEditorBLL _imageEditorBll;
         private readonly CustVerifyBLL _custVerifyBll;
-        private readonly Common _common;
 
         /// <summary>
         /// 確認圖檔檔案類型
@@ -69,7 +67,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _paymentBll = provider.GetRequiredService<PaymentBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-            _tools = provider.GetRequiredService<Tools>();
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _messageBll = provider.GetRequiredService<MessageBLL>();
@@ -79,7 +76,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _paymentAdjustmentReportBll = provider.GetRequiredService<PaymentAdjustmentReportBLL>();
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
             _custVerifyBll = provider.GetRequiredService<CustVerifyBLL>();
-            _common = provider.GetRequiredService<Common>();
         }
 
         #endregion

@@ -21,7 +21,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusManage" })]
-    public class BonusManagementController : ControllerBase
+    public class BonusController : ControllerBase
     {
         #region Fields
 
@@ -34,7 +34,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
         #region Constructors
 
-        public BonusManagementController(IServiceProvider provider)
+        public BonusController(IServiceProvider provider)
         {
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
@@ -246,7 +246,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        public ApiResult UpdatePromotionStatus(UpdatePromotionStatusReq req)
+        public ApiResult UpdateStatus(UpdatePromotionStatusReq req)
         {
             var result = _bonusManageBll.SetPromotionStatus(req.BonusCode, req.SiteId, req.Status);
 
@@ -317,7 +317,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionInfo>> Duplicate(DuplicateRequest request)
+        public ApiResult Duplicate(DuplicateRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
 
@@ -425,7 +425,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult<dynamic> GenScratchCardCode(GenScratchCardCodeRequest request)
+        public ApiResult GenScratchCardCode(GenScratchCardCodeRequest request)
         {
             var apiResult = new ApiResult<dynamic>();
 

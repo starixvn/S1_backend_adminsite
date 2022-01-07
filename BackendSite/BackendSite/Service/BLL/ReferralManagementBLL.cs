@@ -21,9 +21,9 @@ namespace BackendSite.Service.BLL
         {
             referralManagementService.SetReferral(referralList);
         }
-        public void SetReferralStatus(int siteId, int currencyId)
+        public void SetReferralStatus(int siteId, int currencyId,int status)
         {
-            referralManagementService.SetReferralStatus(siteId, currencyId);
+            referralManagementService.SetReferralStatus(siteId, currencyId, status);
         }
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {

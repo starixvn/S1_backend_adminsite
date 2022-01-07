@@ -325,12 +325,16 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    public enum AdminUserStatus
+    #region AdminUser
+
+    public enum AdminUserStatusEnum
     {
         Running = 1,
         Suspend = 2,
         Closed = 3,
     }
+
+    #endregion
 
     #region Promotion
 
@@ -345,6 +349,16 @@ namespace BackendSite.Service.Model.enums
         Cashback = 7,
         StaticPage = 8,
         RetentionBonus = 9
+    }
+
+    #endregion
+
+    #region Referral
+
+    public enum ReferralStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
     }
 
     #endregion

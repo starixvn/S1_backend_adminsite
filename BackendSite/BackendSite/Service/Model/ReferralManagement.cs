@@ -17,6 +17,7 @@ namespace BackendSite.Service.Model
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
         public int PeriodDays { get; set; }
         public decimal BonusAmount { get; set; }
         public decimal VaildBet { get; set; }

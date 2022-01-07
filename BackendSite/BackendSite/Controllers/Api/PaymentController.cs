@@ -1086,13 +1086,13 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         public IActionResult GetVipRebateInfoListExport(string SelectSite, int Currency, long StartDate, long EndDate,
-            string User, int CategoryId, int BaseCurrencyId, int RebateCategoriesId)
+            string User, int CategoryId, int BaseCurrencyId)
         {
             var startTime = DateTimeExtensions.UnixToDateTime(StartDate).AddHours(8);
             var endTime = DateTimeExtensions.UnixToDateTime(EndDate).AddHours(8).AddDays(1).AddSeconds(-1);
             
             var searchResult = _paymentBLL.GetVipRebateInfoListExport(SelectSite, Currency, startTime, endTime, User,
-                CategoryId, BaseCurrencyId, RebateCategoriesId);
+                CategoryId, BaseCurrencyId);
             foreach (var data in searchResult.VipRebateInfoList)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);

@@ -28,7 +28,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<ReferralList> GetReferralBySiteId(int siteId)
         {
-            return _mainDbClient.Query<ReferralList>("Admin_Referral_Get", new DynamicParameters(new {SiteId = siteId }));
+            return _mainDbClient.Query<ReferralList>("Admin_Referral_Get", new DynamicParameters(new { SiteId = siteId }));
         }
         public void SetReferral(List<ReferralManagement> referralList)
         {
@@ -50,9 +50,9 @@ namespace BackendSite.Service.DAL
             });
             _mainDbClient.Execute("Admin_Referral_Set", new DynamicParameters(para));
         }
-        public void SetReferralStatus(int siteId, int currencyId)
+        public void SetReferralStatus(int siteId, int currencyId, int status)
         {
-            _mainDbClient.Execute("Admin_Referral_Status_Set", new DynamicParameters(new {SiteId = siteId, CurrencyId = currencyId }));
+            _mainDbClient.Execute("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));
         }
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
