@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,14 +44,22 @@ namespace BackendSite.Controllers.Api
 
         public class LoaclBankReq
         {
-            public int SiteId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+
+            public IEnumerable<int> CurrencyIds { get; set; }
+
+            public List<BankDetailOffStatusEnum> Statuses { get; set; }
         }
 
         [HttpPost]
         public ApiResult<IEnumerable<BankDetail>> GetLoaclBankList(LoaclBankReq loaclBankReq)
         {
             var apiListResult = new ApiResult<IEnumerable<BankDetail>>();
-            var depositRequestList = bankDetailBLL.GetLoaclBankList(loaclBankReq.SiteId);
+            var statusList = new List<int>();
+            if (loaclBankReq.Statuses != null)
+                statusList = loaclBankReq.Statuses.Select(x => (int)x).ToList();
+            var depositRequestList = bankDetailBLL.GetLoaclBankList(loaclBankReq.SiteIds, loaclBankReq.CurrencyIds, statusList,
+                1, 1000, out _, out _);
             apiListResult.Data = depositRequestList;
             apiListResult.ErrorCode = 0;
             return apiListResult;
@@ -173,7 +183,7 @@ namespace BackendSite.Controllers.Api
 
 
         [HttpPost]
-        public ApiResult EditBank([FromBody]BankDetail bankDetail)
+        public ApiResult EditBank([FromBody] BankDetail bankDetail)
         {
             var result = bankDetailBLL.EditBankInfo(bankDetail);
             var apiResult = new ApiResult();
@@ -201,7 +211,7 @@ namespace BackendSite.Controllers.Api
             {
                 var bankInfoOff = bankDetailBLL.GetBankAccountOffByCurrency(custInfosDetail.CurrencyId);
 
-                if(bankInfoOff != null)
+                if (bankInfoOff != null)
                 {
                     apiResult.Data = bankInfoOff;
                     apiResult.ErrorCode = 0;
