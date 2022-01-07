@@ -2,22 +2,24 @@
 @using BackendSite.Service.DAL
 @inject SelLangBLL selLangBLL
 @inject AuthorizeBLL authorizeBLL
+@inject ServerInfoBLL serverInfoBLL
 @inject AdminUserService adminUserService
 @inject PermissionBLL permissionBLL
+@section Style {
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/lib/bootstrap-multiselect/bootstrap-multiselect-modify.css" rel="stylesheet" />
+    <link href="~/css/vendor/DateTimePicker/DateTimePicker.css" rel="stylesheet" />
+}
 @{
     Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
-    ViewData["Title"] = "VipLevelReview";
+    ViewData["Title"] = "VerificationRewardReport";
 }
-
-<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-<link href="~/css/main.css" rel="stylesheet" asp-append-version="true"/>
-<link href="~/lib/bootstrap-multiselect/bootstrap-multiselect-modify.css" rel="stylesheet"/>
-<link href="~/css/vendor/DateTimePicker/DateTimePicker.css" rel="stylesheet"/>
 
 @{
     var authData = authorizeBLL.GetAuthData();
     var loginUser = adminUserService.GetUser(authData.UserId);
-    
+    var currencyList = serverInfoBLL.GetCurrencyList();
     var i18n = new Dictionary<string, string>();
 
     for (var currency = 1; currency <= 61; currency++)
@@ -37,11 +39,11 @@
 </div>
 
 @section Scripts {
-    @* <script src="~/js/component/Marketing/VerificationReward.min.js" asp-append-version="true"></script> *@
-    <script type="text/javascript">
-        //$('.collapse').collapse();
-        window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
-        window.RootUrl = '@Url.Content("~/api")';
-        window.LangCode = 'en'
-    </script>
+    <script>
+            window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
+            window.RootUrl = '@Url.Content("~/api")';
+            window.LangCode = 'en'
+            window.gCurrencyList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(currencyList));
+        </script>
+    <script src="~/js/component/Marketing/VerificationRewardReport.min.js" asp-append-version="true"></script>
 }
