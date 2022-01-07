@@ -7,10 +7,9 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BackendSite.Controllers.ApiV2.Marketing.Setting
+namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
 {
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
