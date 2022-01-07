@@ -2,6 +2,7 @@
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 {
@@ -37,9 +39,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
         #region API Model
 
-        public class GetListBySiteIdRequest
+        public class GetListRequest : ApiRequestPageModel
         {
-            public int SiteId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+
+            public IEnumerable<int> CurrencyIds { get; set; }
+
+            public List<BankDetailOffStatusEnum> Statuses { get; set; }
         }
 
         public class SetRequest
@@ -83,11 +89,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BankInfoList" })]
         [HttpPost]
-        public ApiResult<IEnumerable<BankDetail>> GetListBySiteId(GetListBySiteIdRequest request)
+        public ApiListResult<BankDetail> GetListBySiteId(GetListRequest request)
         {
-            var apiListResult = new ApiResult<IEnumerable<BankDetail>>();
-            var depositRequestList = _bankDetailBll.GetLoaclBankList(request.SiteId);
-            apiListResult.Data = depositRequestList;
+            var apiListResult = new ApiListResult<BankDetail>();
+            var statusList = request.Statuses.Select(x => (int)x).ToList();
+            var datas = _bankDetailBll.GetLoaclBankList(request.SiteIds, request.CurrencyIds, statusList,
+                request.PageNumber, request.PageSize, out int totalPages, out int rowCount);
+            apiListResult.Data = datas;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.PageNumber = request.PageNumber;
+            apiListResult.RowCount = rowCount;
             apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
             return apiListResult;
         }
