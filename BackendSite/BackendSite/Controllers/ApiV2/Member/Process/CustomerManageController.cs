@@ -2155,7 +2155,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.PageSize,
                 request.PageNumber,
                 out int totalPages,
-                out int rowCount);
+                out int rowCount,false);
 
             foreach (var x in data)
             {

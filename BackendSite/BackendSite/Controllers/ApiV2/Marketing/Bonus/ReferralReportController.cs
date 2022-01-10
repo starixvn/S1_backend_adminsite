@@ -86,6 +86,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             apiResult.Data = _referralManagementBll.GetReferralCustList(request.SiteIds,
                 request.UserName,
                 request.CurrencyId,
+                null,
+                null,
                 request.PageSize,
                 ref pageNumber, out var totalPages, out var rowCount);
             apiResult.TotalPages = totalPages;
@@ -129,7 +131,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     request.PageSize,
                     request.PageNumber,
                     out var totalPages,
-                    out var rowCount);
+                    out var rowCount,true);
 
                 foreach (var x in data)
                 {
