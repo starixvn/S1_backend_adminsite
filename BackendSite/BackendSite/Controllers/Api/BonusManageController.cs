@@ -77,13 +77,40 @@ namespace BackendSite.Controllers.Api
 
         public class ReferralCustListReq
         {
+            private DateTimeOffset? _startDate;
+            private DateTimeOffset? _endDate;
             public IEnumerable<int> SelectSite { get; set; }
             public string UserName { get; set; }
             public int CurrencyId { get; set; }
+            public DateTimeOffset? StartDate
+            {
+                get => _startDate;
+                set
+                {
+                    if (value != null)
+                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset? EndDate
+            {
+                get => _endDate;
+                set
+                {
+                    if (value != null)
+                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
         }
 
+        public class ExportReferralCustListReq
+        {
+            public IEnumerable<int> SelectSite { get; set; }
+            public string UserName { get; set; }
+            public int CurrencyId { get; set; }
+        }
+        
         public class RefFriendListReq
         {
             public int CustId { get; set; }
@@ -557,17 +584,22 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiListResult<ReferralCustList> GetReferralCustList(ReferralCustListReq referralCustListReq)
+        public ApiListResult<ReferralCustList> GetReferralCustList(ReferralCustListReq req)
         {
             var apiResult = new ApiListResult<ReferralCustList>();
 
-            var pageNumber = referralCustListReq.PageNumber;
+            var pageNumber = req.PageNumber;
             var pageSize = 10;
-            if (referralCustListReq.PageSize > 0)
-                pageSize = referralCustListReq.PageSize;
-            apiResult.Data = _referralManagementBLL.GetReferralCustList(referralCustListReq.SelectSite,
-                referralCustListReq.UserName, referralCustListReq.CurrencyId, pageSize, ref pageNumber, out var totalPages,
-                out var rowCount);
+            if (req.PageSize > 0)
+                pageSize = req.PageSize;
+            apiResult.Data = _referralManagementBLL.GetReferralCustList(
+                req.SelectSite,
+                req.UserName,
+                req.CurrencyId,
+                req.StartDate?.DateTime,
+                req.EndDate?.DateTime,
+                pageSize, 
+                ref pageNumber, out var totalPages, out var rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;
@@ -575,7 +607,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-
+        
         [HttpPost]
         public ApiListResult<ReferralFriend> GetRefFriendList(RefFriendListReq refFriendListReq)
         {
@@ -597,7 +629,7 @@ namespace BackendSite.Controllers.Api
             var pageNumber = refFriendListReq.PageNumber;
             var apiResult = new ApiListResult<ReferralFriend>();
             var data = _referralManagementBLL.GetRefFriendList(refFriendListReq.CustId, startDate,
-                endDate, PageSize, pageNumber, out var totalPages, out var rowCount);
+                endDate, PageSize, pageNumber, out var totalPages, out var rowCount,false);
             foreach (var x in data)
             {
                 referralStatus.TryGetValue(x.Status, out var name);

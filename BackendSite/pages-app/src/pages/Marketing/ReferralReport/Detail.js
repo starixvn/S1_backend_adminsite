@@ -7,7 +7,7 @@ import moment from "moment";
 const Panel = (props) => {
   const [detailBody, setDetailBody] = useState([]);
   const [stateDatas, setDatas] = useState({
-    PageInfo: null,
+    PageInfo: null
   });
   const titleData = [
     { dataColumn: "UserName", columnTitle: "UserName" },
@@ -27,6 +27,8 @@ const Panel = (props) => {
   useEffect(() => {
     let Data = {
       CustId: props.CustId,
+      StartDate: props.Filter.StartDate === "" ? null : moment(props.Filter.StartDate).format("YYYY-MM-DD") ,
+      EndDate: props.Filter.EndDate === "" ? null : moment(props.Filter.EndDate).format("YYYY-MM-DD"),
       PageNumber: 1,
     };
     api
@@ -53,6 +55,8 @@ const Panel = (props) => {
   const ChangePage = (PageNumber) => {
     let Data = {
         CustId: props.CustId,
+        StartDate:props.StartDate,
+        EndDate:props.EndDate,
         PageNumber: PageNumber,
       };
       api
@@ -102,7 +106,7 @@ const Panel = (props) => {
           <span className="label">{item.bonusAmount}</span>
         </td>
         <td>
-          <span className="label">{moment(item.rewardTime).format("l LTS")}</span>
+          <span className="label">{ item.rewardTime != null ? moment(item.rewardTime).format("l LTS") : null }</span>
         </td>
         <td>
           <span className="label">{item.statusName}</span>

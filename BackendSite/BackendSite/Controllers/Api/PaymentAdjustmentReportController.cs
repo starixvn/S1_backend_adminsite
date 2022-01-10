@@ -69,7 +69,7 @@ namespace BackendSite.Controllers.Api
             var exportData = paymentAdjustmentBLL.GetPaymentAdjustmentExportReport(TransId, CurrencyId, UserName, AdjustType, startTime, endTime);
             foreach (var data in exportData)
             {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime,  TimeSpan.Zero);
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
             
             var stream = excelBLL.Export(exportData);

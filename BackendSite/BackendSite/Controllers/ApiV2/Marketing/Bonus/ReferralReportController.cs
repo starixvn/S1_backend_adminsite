@@ -39,6 +39,26 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public IEnumerable<int> SiteIds { get; set; }
             public string UserName { get; set; }
             public int CurrencyId { get; set; }
+            private DateTimeOffset? _startDate;
+            private DateTimeOffset? _endDate;
+            public DateTimeOffset? StartDate
+            {
+                get => _startDate;
+                set
+                {
+                    if (value != null)
+                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset? EndDate
+            {
+                get => _endDate;
+                set
+                {
+                    if (value != null)
+                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
         }
 
         public class GetByCustIdRequest : ApiRequestPageModel
@@ -86,6 +106,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             apiResult.Data = _referralManagementBll.GetReferralCustList(request.SiteIds,
                 request.UserName,
                 request.CurrencyId,
+                request.StartDate?.DateTime,
+                request.EndDate?.DateTime,
                 request.PageSize,
                 ref pageNumber, out var totalPages, out var rowCount);
             apiResult.TotalPages = totalPages;
@@ -129,7 +151,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     request.PageSize,
                     request.PageNumber,
                     out var totalPages,
-                    out var rowCount);
+                    out var rowCount,true);
 
                 foreach (var x in data)
                 {
