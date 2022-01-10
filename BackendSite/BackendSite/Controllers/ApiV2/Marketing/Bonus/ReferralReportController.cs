@@ -8,6 +8,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
@@ -20,6 +21,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         #region Fields
 
         private readonly ReferralManagementBLL _referralManagementBll;
+        private readonly ExcelBLL _excelBll;
 
         #endregion
 
@@ -28,6 +30,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public ReferralReportController(IServiceProvider provider)
         {
             _referralManagementBll = provider.GetRequiredService<ReferralManagementBLL>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
         #endregion
@@ -36,11 +39,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
         public class GetListRequest : ApiRequestPageModel
         {
+            private DateTimeOffset? _startDate;
+            private DateTimeOffset? _endDate;
             public IEnumerable<int> SiteIds { get; set; }
             public string UserName { get; set; }
             public int CurrencyId { get; set; }
-            private DateTimeOffset? _startDate;
-            private DateTimeOffset? _endDate;
             public DateTimeOffset? StartDate
             {
                 get => _startDate;
@@ -75,6 +78,34 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                         _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
                 }
             }
+            public DateTimeOffset? EndDate
+            {
+                get => _endDate;
+                set
+                {
+                    if (value != null)
+                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+        }
+        
+        public class ReferralCustListExportReq
+        {
+            private DateTimeOffset? _startDate;
+            private DateTimeOffset? _endDate;
+            public IEnumerable<int> SelectSite { get; set; }
+            public string UserName { get; set; }
+            public int CurrencyId { get; set; }
+            public DateTimeOffset? StartDate
+            {
+                get => _startDate;
+                set
+                {
+                    if (value != null)
+                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+
             public DateTimeOffset? EndDate
             {
                 get => _endDate;
@@ -171,6 +202,32 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 apiResult.RawMessage = ex.Message;
             }
             return apiResult;
+        }
+        
+        /// <summary>
+        /// ReferralReport/ExportList 取得指定客戶推薦朋友資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing > Referral Report > [Submit] > [Export] 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralReport" })]
+        public IActionResult ExportList(ReferralCustListExportReq request)
+        {
+            var exportData = _referralManagementBll.GetReferralCustListExport(
+                JsonConvert.SerializeObject(request.SelectSite),
+                request.UserName,
+                request.CurrencyId,
+                request.StartDate?.ToUniversalTime().DateTime,
+                request.EndDate?.ToUniversalTime().DateTime);
+
+            var stream = _excelBll.Export(exportData);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"ReferralCustList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
     }
 }
