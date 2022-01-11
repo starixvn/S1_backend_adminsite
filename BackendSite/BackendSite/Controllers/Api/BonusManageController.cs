@@ -239,7 +239,7 @@ namespace BackendSite.Controllers.Api
                 SpecialCode = promotion.SpecialCode,
                 IsSpecial = promotion.IsSpecial,
                 OnlyRegistered = promotion.OnlyRegistered,
-                PromotionDeviceType = promotion.PromotionType,
+                PromotionDeviceType = promotion.PromotionDeviceType,
                 PromotionAction = promotion.PromotionAction,
                 AutoExtend = promotion.AutoExtend,
                 Specific = promotion.Specific
