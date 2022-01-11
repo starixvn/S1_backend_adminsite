@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useReducer, useState } from "react";
 import ReactDOM from "react-dom";
-import WebAPI from "../../../module/WebAPI";
 import { api } from "../../../module/WebAPI";
+import WebAPI from "../../../module/WebAPI";
 import Filter from "./Filter";
-import qs from "qs";
 import Result from "./Result";
 import Detail from "./Detail";
+import moment from "moment-timezone";
 
 const App = () => {
   const [state, setstate] = useState(0);
@@ -14,6 +14,8 @@ const App = () => {
     SelectSite: [],
     Type: 0,
     User: "",
+    StartDate: "",
+    EndDate: "",
   });
   const [custId, setCustId] = useState();
 
@@ -82,10 +84,15 @@ const App = () => {
     if (stateFilter.SelectSite.length === 0) {
       alert("Please Choose at least one Site");
       return false;
+    }else if(stateFilter.StartDate && !stateFilter.EndDate ||  !stateFilter.StartDate && stateFilter.EndDate){
+      alert("Please Choose both FromDate and ToDate or none");
+      return false;
     }
     let Data = {
       SelectSite: stateFilter.SelectSite,
       CurrencyId: parseInt(stateFilter.Type, 10),
+      StartDate: stateFilter.StartDate === "" ? null : moment(stateFilter.StartDate).format("YYYY-MM-DD") ,
+      EndDate: stateFilter.EndDate === "" ? null : moment(stateFilter.EndDate).format("YYYY-MM-DD"),
       UserName: stateFilter.User,
       PageNumber: 1,
     };
@@ -117,10 +124,15 @@ const App = () => {
     if (stateDatas.FilterInfo.SelectSite.length === 0) {
       alert("Please Choose at least one Site");
       return false;
+    }else if(stateFilter.StartDate && !stateFilter.EndDate ||  !stateFilter.StartDate && stateFilter.EndDate){
+      alert("Please Choose both FromDate and ToDate or none");
+      return false;
     }
     let Data = {
         SelectSite: stateFilter.SelectSite,
         CurrencyId: parseInt(stateFilter.Type, 10),
+        StartDate: stateFilter.StartDate === "" ? null : moment(stateFilter.StartDate).format("YYYY-MM-DD") ,
+        EndDate: stateFilter.EndDate === "" ? null : moment(stateFilter.EndDate).format("YYYY-MM-DD"),
         UserName: stateFilter.User,
         PageNumber: PageNumber,
       };
@@ -145,6 +157,22 @@ const App = () => {
         });
   };
 
+  const Result_ExportToExcel = () => {
+    let param = {};
+      param = {
+        Url: "ReferralManagement/GetReferralCustListExport",
+        Data: {
+          SelectSite: JSON.stringify(stateFilter.SelectSite) ,
+          CurrencyId: parseInt(stateFilter.Type, 10),
+          StartDate: stateFilter.StartDate === "" ? null : moment(stateFilter.StartDate).format("YYYY-MM-DD") ,
+          EndDate: stateFilter.EndDate === "" ? null : moment(stateFilter.EndDate).format("YYYY-MM-DD"),
+          UserName: stateFilter.User,
+        },
+      };
+      
+    WebAPI.DownloadData(param);
+  };
+  
   const Click_Detail = (prop) => {
     setCustId(prop.custId);
     setstate(1);
@@ -169,6 +197,7 @@ const App = () => {
         {stateDatas.Datas === null ? null : (
           <Result
             {...stateDatas}
+            Result_ExportToExcel={Result_ExportToExcel}
             ChangePage={Result_ChangePage}
             Detail={Click_Detail}
           />
@@ -179,7 +208,7 @@ const App = () => {
     return (
       <div>
         <h4 className="detail">Referral Report History</h4>
-        <Detail CustId={custId} />
+        <Detail CustId={custId} Filter={stateFilter} />
         <div className="button-group">
           <button
             className="btn btn-search"
