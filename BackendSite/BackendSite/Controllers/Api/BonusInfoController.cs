@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Model;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using Microsoft.AspNetCore.Authorization;
 
 namespace BackendSite.Controllers.Api
@@ -37,8 +38,8 @@ namespace BackendSite.Controllers.Api
                     CurrencyId, 
                     UserName, 
                     PromotionType, 
-                    StartDate, 
-                    EndDate, 
+                    DateTimeExtensions.UnixToDateTimeOffset(StartDate).DateTime, 
+                    DateTimeExtensions.UnixToDateTimeOffset(EndDate).DateTime, 
                     PageSize, 
                     BaseCurrencyId, 
                     RebateCategoriesId,
@@ -67,7 +68,12 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public IActionResult ExportBonusInfoReport(string SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, long StartDate, long EndDate, int BaseCurrencyId, int RebateCategoriesId)
         {
-            var ExportData = bonusInfoBLL.GetBonusInfoExportReport(SelectSite, BonusCode, TransId, CurrencyId, UserName, PromotionType, StartDate, EndDate, BaseCurrencyId, RebateCategoriesId);
+            var ExportData = bonusInfoBLL.GetBonusInfoExportReport(SelectSite, BonusCode, TransId, CurrencyId, UserName, PromotionType, DateTimeExtensions.UnixToDateTimeOffset(StartDate).DateTime, DateTimeExtensions.UnixToDateTimeOffset(EndDate).DateTime, BaseCurrencyId, RebateCategoriesId);
+            foreach (var data in ExportData)
+            {
+                data.ExpiryTime = new DateTimeOffset(data.ExpiryTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
             var stream = excelBLL.Export(ExportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
@@ -77,7 +83,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<PendingBonus>>
             {
-                Data = bonusInfoBLL.GetPendingBonusList(),
+                Data = bonusInfoBLL.GetPendingBonusList(1, 10000, out _, out _),
                 ErrorCode = 0
             };
             return apiResult;

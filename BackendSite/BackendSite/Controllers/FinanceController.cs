@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using Microsoft.AspNetCore.Mvc;
 
@@ -93,8 +94,8 @@ namespace BackendSite.Controllers
         [HttpPost]
         public IActionResult ExportDepositList(DepositListReq depositListReq)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(depositListReq.startDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(depositListReq.endDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(depositListReq.startDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(depositListReq.endDate);
             depositListReq.SelectSite = $"[{depositListReq.SelectSite}]";
             depositListReq.DepositType = $"[{depositListReq.DepositType}]";
             depositListReq.CurrencyId = $"[{depositListReq.CurrencyId}]";
@@ -133,9 +134,8 @@ namespace BackendSite.Controllers
         [HttpPost]
         public IActionResult ExportWithdrawalList(WithdrawalListReq withdrawalListReq)
         {
-
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(withdrawalListReq.startDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(withdrawalListReq.endDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(withdrawalListReq.startDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(withdrawalListReq.endDate);
 
             var exportWithdrawal = withdrawalBLL.GetWithdrawalExportList(withdrawalListReq.SelectSite, withdrawalListReq.withdrawalType, startTime, endTime, withdrawalListReq.WithdrawalId, withdrawalListReq.UserName, withdrawalListReq.CurrencyId, withdrawalListReq.status, withdrawalListReq.LevelStatus, withdrawalListReq.AmountType, withdrawalListReq.Amount);
 

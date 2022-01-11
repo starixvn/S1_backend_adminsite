@@ -40,7 +40,7 @@ module.exports = {
     // 	// '@babel/polyfill',
     // 	"./src/pages/Finance/PaymentManagement/index.js"
     // ],
-    // "CSD/Announcement.min": ["./src/pages/CSD/Announcement/index.js"],
+    "CSD/Announcement.min": ["./src/pages/CSD/Announcement/index.js"],
     // "Finance/WithdrawalLimitAdjust.min": [
     //   "./src/pages/Finance/WithdrawalLimitAdjust/index.js",
     // ],
@@ -229,10 +229,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/LeaderBoardExtraPoint/index.js",
     // ],
-    // "Marketing/VipLevelReview.min": [
-    //   "@babel/polyfill",
-    //   "./src/pages/Marketing/VipLevelReview/index.js",
-    // ],
+    "Marketing/VipLevelReview.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/VipLevelReview/index.js",
+    ],
     // "Marketing/LeaderBoardExtraPoint.min": [
     // 	 '@babel/polyfill',
     // 	"./src/pages/Marketing/LeaderBoardExtraPoint/index.js"
@@ -248,6 +248,14 @@ module.exports = {
     // "Finance/USDTWithdrawalLimitManagement.min": [
     //   "./src/pages/Finance/USDTWithdrawalLimitManagement/index.js",
     // ],
+    // "Marketing/VerificationReward.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/VerificationReward/index.js",
+    // ],
+    "Marketing/VerificationRewardReport.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/VerificationRewardReport/index.js",
+    ],
     "Finance/BonusPayout.min": [
       "./src/pages/Finance/BonusPayout/index.js",
     ],

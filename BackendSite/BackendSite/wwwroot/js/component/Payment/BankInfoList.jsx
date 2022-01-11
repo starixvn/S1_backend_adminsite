@@ -10,6 +10,14 @@ import { number_format } from '../commJS/common';
         2: <span>Withdrawal</span>,
         3: <span>Deposit & Withdrawal</span>
     };
+    const defStatus = {
+        0: "Initial",
+        1: "Open(Active)",
+        2: "Suspend",
+        3: "Closed",
+        4: "Maintenance",
+        5: "ALL"
+    };
 
     class EditRow extends React.Component {
         constructor(props) {
@@ -28,7 +36,6 @@ import { number_format } from '../commJS/common';
         }
 
         onSaveBankCard() {
-            console.log('onSaveBankCard()',this.state.row);
             let thisState = this.state.row;
             let status = parseInt(thisState.status);
             status = status == 0 ? 1 : status;
@@ -39,7 +46,6 @@ import { number_format } from '../commJS/common';
 
         render() {
             let row = this.state.row; 
-           //console.log("render1",row);
             return (
                 <tr>
                     <th scope="row">{row.bankCode}</th>
@@ -105,8 +111,6 @@ import { number_format } from '../commJS/common';
 
         render() {
             let row = this.props.row;
-         //   console.log("render2",row);
-          //  console.log("render3",this.props);
 
             return (
                 <tr>
@@ -205,7 +209,6 @@ import { number_format } from '../commJS/common';
                 }
             }).map(row => onEdit.indexOf(row.bankId) > -1 ? <EditRow SiteId={this.props.SiteId} CurrencyId={this.props.CurrencyId} onSaveBankCard={this.props.onSaveBankCard} key={row.bankId} row={row} onCancel={this.onCancel.bind(this)} /> : <DataRow key={row.bankId} CurrencyId={this.props.CurrencyId} row={row} onDelete={this.onDelete.bind(this)} onEdit={this.onEdit.bind(this)} />
             );
-          //  console.log(this.props.CurrencyId);
             return (
                 
                 <div className="table">
@@ -338,7 +341,6 @@ import { number_format } from '../commJS/common';
 
             let data = { currencyId: thisState.SelCcyId , siteId: SelSite.siteId, SysId: thisState.SelSysId, BankAccountName: thisState.BankAccountName, BankAccountNo: thisState.BankAccountNo, IFSCCode: thisState.IFSCCode, MaxAmount: parseFloat(thisState.MaxAmount), MinAmount: parseFloat(thisState.MinAmount), DailyLimitAmount: parseFloat(thisState.DailyLimitAmount), PointLevel: parseInt(thisState.PointLevel), Purpose: parseInt(thisState.Purpose), Status: thisState.Status, Sort: thisState.Sort }
 
-           // console.log('handleSubmit', thisState, data);
             this.props.onSaveBankCard(data);
         }
 
@@ -370,7 +372,6 @@ import { number_format } from '../commJS/common';
         onChange(event) {
             let obj = {};
             obj[event.target.name] = event.target.value;
-            //console.log('onChange',event.target);
             this.setState(obj);
         }
 
@@ -558,9 +559,45 @@ import { number_format } from '../commJS/common';
             }.bind(this));
         }
 
+        onStatusChanged(e) {
+            let status = parseInt(e.target.value);
+            let statusList=[];
+            if(status==5) //ALL
+            {
+                var allStatus=Object.keys(defStatus);
+                allStatus.forEach(element => {
+                    if (element!=5)
+                    statusList.push(element);
+                });
+            }
+            else
+            {
+                statusList.push(status);
+            }
+            this.setState({ SelStatus: statusList }, function () {
+                this.onSearch();
+            }.bind(this));
+        }
+
         onSearch() {
             //Loading.OnLoading();
-            let data = { SiteId: this.state.SiteId };
+            let siteIds=[this.state.SiteId];
+            let currencyIds=[];
+            let statusList=[];
+            let siteData=this.state.SiteList.find(x=>x.siteId==this.state.SiteId);
+            if(siteData)
+            {
+                currencyIds=siteData.iCurrencyList;
+            }
+            if(this.state.SelStatus==null)
+            {
+                statusList=[1];
+            }
+            else
+            {
+                statusList=this.state.SelStatus;
+            }
+            let data = { SiteIds: siteIds,CurrencyIds: currencyIds, Statuses:statusList };
 
             /*if(this.state.selectCurrency!=""){
                 data.CurrencyID = parseInt(this.state.selectCurrency);
@@ -590,10 +627,8 @@ import { number_format } from '../commJS/common';
         }
 
         onSaveBankCard(data, finishFunc) {
-            //console.log('onSaveBankCard func',data);
             if(data.currencyId == 61)
             {
-               // console.log('axios.post(/api/BankList/SetBankCardwithIFSC, data)');
                 axios.post('/api/BankList/SetBankCardwithIFSC', data)
                     .then(function (response) {
                         //Loading.UnLoading();
@@ -617,7 +652,6 @@ import { number_format } from '../commJS/common';
 
             }else
             {
-               // console.log('axios.post(/api/BankList/SetBankCard, data)');
                 axios.post('/api/BankList/SetBankCard', data)
                     .then(function (response) {
                         //Loading.UnLoading();
@@ -678,6 +712,34 @@ import { number_format } from '../commJS/common';
                     <label className="custom-control-label" htmlFor={"SiteId_" + obj.siteId}>{obj.siteName}</label>
                 </div>;
             }.bind(this));
+            
+            
+         let statusList = Object.keys(defStatus).map((key) => {
+             if(this.state.SelStatus===undefined)
+             {
+                 console.log(123);
+                if(key==1)
+                {               
+                   return <option key={key} value={key} selected="selected">{defStatus[key]}</option>;
+                }
+                else
+                {
+                    return <option key={key} value={key}>{defStatus[key]}</option>;
+                }
+             }
+             else
+             {
+                console.log(456);
+                if(key==this.state.SelStatus)
+                {               
+                   return <option key={key} value={key} selected="selected">{defStatus[key]}</option>;
+                }
+                else
+                {
+                    return <option key={key} value={key}>{defStatus[key]}</option>;
+                }
+             }
+        });
             return (
                 this.state.ShowForm ? <BankCardForm onSaveBankCard={this.onSaveBankCard.bind(this)} closeForm={this.closeForm.bind(this)} {...this.state} onSiteChanged={this.onSiteChanged.bind(this)} /> :
                     <div>
@@ -686,6 +748,10 @@ import { number_format } from '../commJS/common';
                             <label className="col-form-label d-block">Site Name</label>
                             {siteList}
                         </div>
+                        <div className="form-group">
+                            <label className="col-form-label d-block">Status</label>
+                            <select id="selectStatus" name="selectStatus[]" onChange={this.onStatusChanged.bind(this)} >{statusList}</select>
+                        </div>                      
                         {searchData && searchData.data != null ? ccyPanel : null}
                     </div>
             )

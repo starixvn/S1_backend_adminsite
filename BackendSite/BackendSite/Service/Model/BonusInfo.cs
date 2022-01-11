@@ -5,6 +5,8 @@ namespace BackendSite.Service.Model
 {
     public class BonusInfo
     {
+        private DateTimeOffset _expiryTime { get; set; }
+        private DateTimeOffset _createTime { get; set; }
         public int CustId { get; set; }
         public string TransId { get; set; }
         public int PromotionType { get; set; }
@@ -14,8 +16,16 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public decimal LockedAmount { get; set; }
         public decimal BonusAmount { get; set; }
-        public DateTime ExpiryTime { get; set; }
-        public DateTime CreateTime { get; set; }
+        public DateTimeOffset ExpiryTime 
+        {
+            get => _expiryTime;
+            set => _expiryTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset CreateTime 
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public int Status { get; set; }
         public decimal Bonus { get; set; }
         public decimal MaxBonus { get; set; }
@@ -39,8 +49,8 @@ namespace BackendSite.Service.Model
         public int RollOver { get; set; }
         public decimal LockedAmount { get; set; }
         public decimal BonusAmount { get; set; }
-        public DateTime ExpiryTime { get; set; }
-        public DateTime CreateTime { get; set; }
+        public DateTimeOffset ExpiryTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
         public string StatusName { get; set; }
         public decimal CancelBonusAmount { get; set; }
         public bool ExpiredCancel { get; set; }
@@ -48,6 +58,8 @@ namespace BackendSite.Service.Model
 
     public class PendingBonus
     {
+        private DateTimeOffset _expiryTime { get; set; }
+        private DateTimeOffset _createTime { get; set; }
         public string BonusCode { get; set; }
         public int PromotionType { get; set; }
         public string SiteId { get; set; }
@@ -58,8 +70,16 @@ namespace BackendSite.Service.Model
         public decimal BonusAmount { get; set; }
         public decimal Bonus { get; set; }
         public decimal Rollover { get; set; }
-        public DateTime ExpiryTime { get; set; }
-        public DateTime CreateTime { get; set; }
+        public DateTimeOffset ExpiryTime 
+        {
+            get => _expiryTime;
+            set => _expiryTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset CreateTime 
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public int CustId { get; set; }
         public int TpId { get; set; }
     }
@@ -75,7 +95,7 @@ namespace BackendSite.Service.Model
         public int Refund { set; get; }
         public int Status { set; get; }
         public int PromoCategoryId { get; set; }
-        public PromotionType PromotionType { get; set; }
+        public PromotionTypeEnum PromotionType { get; set; }
         public decimal Bonus { set; get; }
         public decimal BonusAmount { set; get; }
         public decimal LockedAmount { set; get; }

@@ -112,7 +112,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             var result = new ApiResult<dynamic>();
             try
             {
+                if (string.IsNullOrWhiteSpace(request.SabaId))
+                    request.SabaId = null;
+                if (string.IsNullOrWhiteSpace(request.UserName))
+                    request.UserName = null;
+
                 var custId = (string.IsNullOrEmpty(request.SabaId)) ? null : _common.TpIdToCustId(request.SabaId);
+
                 var custInfo = _custInfoBLL.GetCustInfoDetails(custId, request.UserName, request.SiteId);
 
                 if (custInfo != null)

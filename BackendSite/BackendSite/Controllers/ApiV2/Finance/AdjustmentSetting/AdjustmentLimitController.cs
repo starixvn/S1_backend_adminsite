@@ -2,6 +2,7 @@
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +11,7 @@ using System;
 
 namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
 {
+    [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class AdjustmentLimitController : ControllerBase
@@ -66,9 +68,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/AdjustmentLimitManagement" })]
         [HttpPost]
-        public ApiResult<AdjustmentLimtData> GetList(GetAdjustmentRequest request)
+        public ApiResult<AdjustmentLimitData> GetList(GetAdjustmentRequest request)
         {
-            var apiResult = new ApiResult<AdjustmentLimtData>
+            var apiResult = new ApiResult<AdjustmentLimitData>
             {
                 Data = _paymentBll.GetAdjustmentData(request.SiteId, request.CurrencyId),
                 ErrorCode = (int)ErrorCodeEnum.Success

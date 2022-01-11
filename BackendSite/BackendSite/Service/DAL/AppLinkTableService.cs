@@ -7,26 +7,29 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.DAL
 {
     public class AppLinkTableService
     {
-        private IConfiguration configuration;
-        public AppLinkTableService(IConfiguration configuration)
+        private readonly MySqlClient _mainDbClient;
+
+        public AppLinkTableService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
         }
+        
         public IEnumerable<AppLinkTable> GetAppLinkTable(int siteId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<AppLinkTable>("Service_AppLinkTable_Get", new { SiteId = siteId}, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<AppLinkTable>("Service_AppLinkTable_Get", new DynamicParameters(new { SiteId = siteId}));
         }
 
-        public int SetAppLink(int SiteId, int AppType, string Domain, int ProtocolType,string LastUpdateUser)
+        public int SetAppLink(int siteId, int appType, string domain, int protocolType,string lastUpdateUser)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_AppLinkTable_Set", new { SiteId = SiteId, ProtocolType = ProtocolType, Domain = Domain, AppType = AppType, LastUpdateUser = LastUpdateUser }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute("Admin_AppLinkTable_Set", new DynamicParameters(new { SiteId = siteId, ProtocolType = protocolType, Domain = domain, AppType = appType, LastUpdateUser = lastUpdateUser }));
         }
     }
 }

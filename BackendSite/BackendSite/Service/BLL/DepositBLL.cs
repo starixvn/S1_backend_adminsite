@@ -191,44 +191,44 @@ namespace BackendSite.Service.BLL
 
         public int DepositApproved(string transId, decimal actualDeposit, string comment, string Operator)
         {
-            var forStatus = new List<int> {(int)DepositStatus.Pending};
+            var forStatus = new List<int> {(int)DepositStatusEnum.Pending};
             var depositRequest = GetDepositRequest(transId);
 
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, depositRequest.Amount, comment, Operator, forStatus, DepositStatus.Approved, depositRequest);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, depositRequest.Amount, comment, Operator, forStatus, DepositStatusEnum.Approved, depositRequest);
         }
 
         public int DepositRejectd(string transId, decimal actualDeposit, string comment, string Operator)
         {
-            var forStatus = new List<int> {(int)DepositStatus.Pending};
+            var forStatus = new List<int> {(int)DepositStatusEnum.Pending};
 
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.Rejected, null);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.Rejected, null);
         }
 
         public int DepositDraft(string transId, decimal actualDeposit, string comment, string Operator)
         {
             var forStatus = new List<int>
             {
-                (int) DepositStatus.Pending,
-                (int) DepositStatus.OnHold
+                (int) DepositStatusEnum.Pending,
+                (int) DepositStatusEnum.OnHold
             };
 
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.Draft, null);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.Draft, null);
         }
         public int DepositOnHold(string transId, decimal actualDeposit, string comment, string Operator)
         {
             var forStatus = new List<int>();
-            forStatus.Add((int)DepositStatus.Pending);
+            forStatus.Add((int)DepositStatusEnum.Pending);
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.OnHold, null);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.OnHold, null);
         }
         public int DepositPending(string transId, decimal actualDeposit, string comment, string Operator)
         {
             var forStatus = new List<int>();
-            forStatus.Add((int)DepositStatus.OnHold);
+            forStatus.Add((int)DepositStatusEnum.OnHold);
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatus.Pending, null);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.Pending, null);
         }
         public DepositReceipt GetDepositReceipt(string transId)
         {
@@ -245,7 +245,14 @@ namespace BackendSite.Service.BLL
         }
         public IEnumerable<DepositLimitCurrencyInfo> GetDepositLimitCurrencyList(int siteId, int depositType) => depositService.GetDepositLimitCurrencyList(siteId, depositType);
 
-        public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(int siteId, int depositType, int currencyId) => depositService.GetDepositLimitInfos(siteId, depositType, currencyId);
+        public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(IEnumerable<int> siteId, IEnumerable<int> depositType, IEnumerable<int> currencyId,int PageNumber,int PageSize,out int totalPages,out int rowCount) 
+            => depositService.GetDepositLimitInfos(JsonConvert.SerializeObject(siteId),
+                JsonConvert.SerializeObject(depositType),
+                JsonConvert.SerializeObject(currencyId),
+                (Math.Abs(PageNumber)-1)*Math.Abs(PageSize),
+                Math.Abs(PageSize),
+                out totalPages,
+                out rowCount);
 
         public bool AddDepositLimit(DepositLimitInfo depositLimitInfo, string Operator)
         {
