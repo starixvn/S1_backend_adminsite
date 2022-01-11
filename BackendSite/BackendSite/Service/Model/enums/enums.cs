@@ -511,4 +511,17 @@ namespace BackendSite.Service.Model.enums
         RetentionBouns = 5,
         ManualBonus = 6
     }
+
+    #region BankDetailOff
+
+    public enum BankDetailOffStatusEnum
+    {
+        Initial = 0,     //Front-End Hidden
+        Open = 1,        //Front-End green
+        Suspend = 2,
+        Closed = 3,      //Never Open
+        Maintenance = 4  //frontend red
+    }
+
+    #endregion
 }
