@@ -25,25 +25,32 @@ namespace BackendSite.Service.BLL
         {
             referralManagementService.SetReferralStatus(siteId, currencyId, status);
         }
-        public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            return referralManagementService.GetReferralCustList(selectSite, userName, currencyId, pageSize, ref pageNumber, out totalPages, out rowCount);
+            return referralManagementService.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate , pageSize, ref pageNumber, out totalPages, out rowCount);
+        }
+        
+        public IEnumerable<ReferralCustList> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
+        {
+            return referralManagementService.GetReferralCustListExport(selectSite, userName, currencyId, startDate, endDate);
         }
         public IEnumerable<ReferralFriend> GetRefFriendList(int custId,
-            DateTime? startDate,
-            DateTime? endDate,
-            int pageSize,
-            int pageNumber,
-            out int totalPages,
-            out int rowCount)
+            DateTime? StartDate,
+            DateTime? EndDate,
+            int PageSize,
+            int PageNumber,
+            out int TotalPages,
+            out int RowCount,
+            bool byRewardTime)
         {
             return referralManagementService.GetRefFriendList(custId,
-                startDate,
-                endDate,
-                Math.Abs(pageSize),
-                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
-                out totalPages,
-                out rowCount);
+                StartDate,
+                EndDate,
+                Math.Abs(PageSize),
+                (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize),
+                out TotalPages,
+                out RowCount,
+                byRewardTime);
         }
     }
 }
