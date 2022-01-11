@@ -15,7 +15,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralReport" })]
     public class ReferralReportController : ControllerBase
     {
         #region Fields
@@ -88,8 +87,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 }
             }
         }
-        
-        public class ReferralCustListExportReq
+
+        public class ExportRequest
         {
             private DateTimeOffset? _startDate;
             private DateTimeOffset? _endDate;
@@ -128,6 +127,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing  > Referral Report > [Submit] 
         /// </remarks>
         /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralReport" })]
         [HttpPost]
         public ApiListResult<ReferralCustList> GetList(GetListRequest request)
         {
@@ -159,6 +159,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralReport" })]
         [HttpPost]
         public ApiListResult<ReferralFriend> GetByCustId(GetByCustIdRequest request)
         {
@@ -182,7 +183,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     request.PageSize,
                     request.PageNumber,
                     out var totalPages,
-                    out var rowCount,true);
+                    out var rowCount, true);
 
                 foreach (var x in data)
                 {
@@ -203,9 +204,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             }
             return apiResult;
         }
-        
+
         /// <summary>
-        /// ReferralReport/ExportList 取得指定客戶推薦朋友資料
+        /// ReferralReport/Export 匯出推薦朋友資料報表清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -214,9 +215,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralReport" })]
-        public IActionResult ExportList(ReferralCustListExportReq request)
+        [HttpPost]
+        public IActionResult Export(ExportRequest request)
         {
             var exportData = _referralManagementBll.GetReferralCustListExport(
                 JsonConvert.SerializeObject(request.SelectSite),
@@ -226,8 +227,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 request.EndDate?.ToUniversalTime().DateTime);
 
             var stream = _excelBll.Export(exportData);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                $"ReferralCustList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBll.ExcelFile(stream, "ReferralReport");
         }
     }
 }
