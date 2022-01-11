@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
@@ -37,6 +40,8 @@ namespace BackendSite.Controllers.Api
         private readonly ExcelBLL _excelBLL;
         private readonly CustInfoBLL _custInfoBLL;
         private readonly ILogger<BonusManageController> _logger;
+        private readonly CourierAdapter courierAdapter;
+        private readonly string _bonusApiUrl;
         #endregion
 
         #region Constructors
@@ -49,7 +54,9 @@ namespace BackendSite.Controllers.Api
             AuthorizeBLL authorizeBLL,
             ExcelBLL excelBLL,
             CustInfoBLL custInfoBLL,
-            IServiceProvider provider)
+            IServiceProvider provider,
+            CourierAdapter courierAdapter,
+            IConfiguration configuration)
         {
             _bonusManageBLL = bonusManageBLL;
             _serverInfoBLL = serverInfoBLL;
@@ -60,6 +67,8 @@ namespace BackendSite.Controllers.Api
             _excelBLL = excelBLL;
             _custInfoBLL = custInfoBLL;
             _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
+            this.courierAdapter = courierAdapter;
+            _bonusApiUrl = configuration.GetValue<string>("BonusService");
         }
 
         #endregion
@@ -130,6 +139,15 @@ namespace BackendSite.Controllers.Api
         {
             public int TpId { get; set; }
             public int CategoryId { get; set; }
+        }
+        public class BonusPayoutReq 
+        {
+            public int CustId { get; set; }
+            public decimal Amount { get; set; }
+            public string Memo { set; get; }
+            public string BounsCode { get; set; }
+            public int RollOver { get; set; }
+            public int PromotionType { get; set; }
         }
         #endregion
 
@@ -748,6 +766,46 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         #endregion
+
+        [HttpPost]
+        public async Task<ApiResult> BonusPayout(BonusPayoutReq bonusPayoutReq)
+        {
+            var apiResult = new ApiResult();
+            string bonusUrl = $"{_bonusApiUrl}SetAdjustBonus";
+            try
+            {
+                var authData = _authorizeBLL.GetAuthData();
+                var custInfo = _custInfoBLL.GetCustInfoWithCache(bonusPayoutReq.CustId);
+
+                var setAdjustBonusReq = new SetAdjustBonusReq()
+                {
+                    CustId = custInfo.CustId,
+                    BonusCode = bonusPayoutReq.BounsCode,
+                    Memo = bonusPayoutReq.Memo,
+                    Operator = authData.UserName,
+                    Amount = bonusPayoutReq.Amount,
+                    PromotionType = bonusPayoutReq.PromotionType
+                };
+                var apiOnlineResult =
+                    await courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
+                if (apiOnlineResult.ErrorCode == 0)
+                {
+                    apiResult.ErrorCode = apiOnlineResult.ErrorCode;
+                    apiResult.Message = $"Success.";
+                }
+                else
+                {
+                    apiResult.ErrorCode = apiOnlineResult.ErrorCode;
+                    apiResult.Message = apiOnlineResult.Message;
+                }
+            }
+            catch(Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.ToString();
+            }
+            return apiResult;
+        }
         #endregion
     }
 }
