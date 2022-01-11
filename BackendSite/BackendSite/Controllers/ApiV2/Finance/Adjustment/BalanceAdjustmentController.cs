@@ -119,9 +119,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustment" })]
         public ApiResult<AdjustmentLimitData> GetAdjustmentLimitInfo(GetAdjustmentLimitInfoRequest request)
         {
+            var siteIds = new List<int>(); siteIds.Add(request.SiteId);
+            var currencyIds = new List<int>(); currencyIds.Add(request.CurrencyId);
+
             var apiResult = new ApiResult<AdjustmentLimitData>
             {
-                Data = _paymentBll.GetAdjustmentData(request.SiteId, request.CurrencyId),
+                Data = _paymentBll.GetAdjustmentData(siteIds, currencyIds,1,1000,out _,out _).FirstOrDefault(),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
             return apiResult;
@@ -655,7 +658,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             {
                 bonusCodeData.ForEach(x =>
                 {
-                    var adjustmentLimit = _paymentBll.GetAdjustmentData(request.SiteId, x.CurrencyId);
+                    var siteIds = new List<int>(); siteIds.Add(request.SiteId);
+                    var currencyIds = new List<int>(); currencyIds.Add(x.CurrencyId);
+
+                    var adjustmentLimit = _paymentBll.GetAdjustmentData(siteIds, currencyIds, 1, 1000, out _, out _).FirstOrDefault();
 
                     if (adjustmentLimit != null)
                     {
