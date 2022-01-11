@@ -334,9 +334,26 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public AdjustmentLimitData GetAdjustmentData(int siteId, int currencyId)
+        public IEnumerable<AdjustmentLimitData> GetAdjustmentData(string siteId, string currencyId,
+            int startIndex, int pageSize,
+            out int totalPages, out int rowCount)
         {
-            return _reportDbClient.Query<AdjustmentLimitData>("Admin_AdjustmentLimitInfo_Get", new DynamicParameters(new { SiteId = siteId, CurrencyId = currencyId })).FirstOrDefault();
+
+            var props = new DynamicParameters();
+
+            props.Add("_SiteIds", siteId);
+            props.Add("_CurrencyIds", currencyId);
+            props.Add("_StartIndex", startIndex);
+            props.Add("_PageSize", pageSize);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = _reportDbClient.Query<AdjustmentLimitData>("Admin_AdjustmentLimitInfo_Get_V2", props);
+
+            totalPages = props.Get<int?>("_TotalPages") ?? 0;
+            rowCount = props.Get<int?>("_RowCount") ?? 0;
+
+            return result;
         }
 
         public int AddAdjustmentLimitInfo(int SiteId, int CurrencyId, decimal AdjustmentMax, string Operator)

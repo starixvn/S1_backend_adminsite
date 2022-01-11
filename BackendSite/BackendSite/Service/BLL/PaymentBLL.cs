@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Configuration;
 using BackendSite.Service.Library;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -192,9 +193,15 @@ namespace BackendSite.Service.BLL
             return walletService.GetTPCategoryList();
         }
 
-        public AdjustmentLimitData GetAdjustmentData(int siteId, int currencyId)
+        public IEnumerable<AdjustmentLimitData> GetAdjustmentData(IEnumerable<int> siteId, IEnumerable<int> currencyId,
+            int pageNumber,int pageSize,out int totalPages,out int rowCount)
         {
-            return adjustmentService.GetAdjustmentData(siteId, currencyId);
+            return adjustmentService.GetAdjustmentData(JsonConvert.SerializeObject(siteId),
+                JsonConvert.SerializeObject(currencyId),
+                (Math.Abs(pageNumber)-1)*Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                out totalPages,
+                out rowCount);
         }
 
         public int AddAdjustmentLimitInfo(int SiteId, int CurrencyId, decimal AdjustmentMax, string Operator)
