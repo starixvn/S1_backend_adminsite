@@ -256,6 +256,9 @@ module.exports = {
       "@babel/polyfill",
       "./src/pages/Marketing/VerificationRewardReport/index.js",
     ],
+    "Finance/BonusPayout.min": [
+      "./src/pages/Finance/BonusPayout/index.js",
+    ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
