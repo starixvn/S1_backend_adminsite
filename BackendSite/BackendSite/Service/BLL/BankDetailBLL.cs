@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -21,12 +22,20 @@ namespace BackendSite.Service.BLL
             this.cache = cache;
         }
 
-        public IEnumerable<BankDetail> GetLoaclBankList(int siteId)
+        public IEnumerable<BankDetail> GetLoaclBankList(IEnumerable<int> siteIds,
+            IEnumerable<int> currencyIdList,
+            IEnumerable<int> statusList,
+            int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
-            return bankDetailService.GetLoaclBankList(siteId);
+            return bankDetailService.GetLoaclBankList(JsonConvert.SerializeObject(siteIds),
+                JsonConvert.SerializeObject(currencyIdList),
+                JsonConvert.SerializeObject(statusList),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                out totalPages, out rowCount);
         }
 
-        public int SetBankCard(int siteId, int SysId, string BankAccountName, string BankAccountNo, decimal MinAmount, decimal MaxAmount, decimal DailyLimitAmount, int PointLevel, int Purpose, int Status, int Sort,string Operator)
+        public int SetBankCard(int siteId, int SysId, string BankAccountName, string BankAccountNo, decimal MinAmount, decimal MaxAmount, decimal DailyLimitAmount, int PointLevel, int Purpose, int Status, int Sort, string Operator)
         {
             return bankDetailService.SetBankCard(siteId, SysId, BankAccountName, BankAccountNo, MinAmount, MaxAmount, DailyLimitAmount, PointLevel, Purpose, Status, Sort, Operator);
         }
