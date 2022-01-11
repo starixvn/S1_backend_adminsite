@@ -737,8 +737,12 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
 
         handleSubmit(event) {
             event.preventDefault();
-            this.props.onChangeValue("FinancialLog", { StartDate: moment(this.startDate.current.state.inputValue).unix(), EndDate: moment(this.endDate.current.state.inputValue).unix(), RefTransId: this.state.RefTransId.trim() == '' ? null : this.state.RefTransId,
-                                    UTCStartDate:moment.utc(this.startDate.current.state.inputValue).unix(),UTCEndDate:moment.utc(this.endDate.current.state.inputValue).add(1, 'days').unix()-1 });
+            this.props.onChangeValue("FinancialLog", { 
+                StartDate: moment(this.startDate.current.state.inputValue).unix(),
+                EndDate: moment(this.endDate.current.state.inputValue).unix(), 
+                RefTransId: this.state.RefTransId.trim() == '' ? null : this.state.RefTransId,
+                UTCStartDate:moment.utc(this.startDate.current.state.inputValue).unix(),
+                UTCEndDate:moment.utc(this.endDate.current.state.inputValue).unix()-1 });
             this.props.GetFinancialLog(1);
         }
 
