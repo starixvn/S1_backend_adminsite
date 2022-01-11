@@ -1126,10 +1126,13 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<AdjustmentLimitData> GetAdjustmentData(GetAdjustmentPara para)
         {
+            var siteIds = new List<int>(); siteIds.Add(para.SiteId);
+            var currencyIds = new List<int>(); currencyIds.Add(para.CurrencyId);
+
             var apiResult = new ApiResult<AdjustmentLimitData>
             {
-                Data = _paymentBLL.GetAdjustmentData(para.SiteId, para.CurrencyId),
-                ErrorCode = 0
+                Data = _paymentBLL.GetAdjustmentData(siteIds, currencyIds, 1, 5, out _, out _).FirstOrDefault(),
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
             return apiResult;
         }
@@ -1234,7 +1237,9 @@ namespace BackendSite.Controllers.Api
 
                 BonusCodeData.ForEach(x =>
                 {
-                    var adjustmentLimit = _paymentBLL.GetAdjustmentData(para.SiteId, x.CurrencyId);
+                    var siteIds = new List<int>(); siteIds.Add(para.SiteId);
+                    var currencyIds = new List<int>(); currencyIds.Add(x.CurrencyId);
+                    var adjustmentLimit = _paymentBLL.GetAdjustmentData(siteIds, currencyIds, 1, 1000, out _, out _).FirstOrDefault();
 
                     if (adjustmentLimit != null)
                     {
