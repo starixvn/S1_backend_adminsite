@@ -30,10 +30,23 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var PageSize = 10;
-                var TotalPages = 0;
-                var RowCount = 0;
-                var CurrencyAmount = new List<string>();
-                result.Data = bonusInfoBLL.GetBonusInfoReport(SelectSite, BonusCode, TransId, CurrencyId, UserName, PromotionType, StartDate, EndDate, PageSize, BaseCurrencyId, RebateCategoriesId, ref PageNumber, ref TotalPages, ref RowCount, ref CurrencyAmount);
+                result.Data = bonusInfoBLL.GetBonusInfoReport(
+                    SelectSite, 
+                    BonusCode, 
+                    TransId, 
+                    CurrencyId, 
+                    UserName, 
+                    PromotionType, 
+                    StartDate, 
+                    EndDate, 
+                    PageSize, 
+                    BaseCurrencyId, 
+                    RebateCategoriesId,
+                    PageNumber, 
+                    out var TotalPages,
+                    out var RowCount,
+                    out var CurrencyAmount
+                );
                 result.PageNumber = PageNumber;
                 result.RowCount = RowCount;
                 result.TotalPages = TotalPages;

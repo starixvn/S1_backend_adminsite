@@ -109,6 +109,7 @@ const App = () => {
       Data: qs.stringify({
         Datas: {
           ...newDatas,
+          Seq: datas.seq,
           Subject: JSON.stringify(subject),
           Content: JSON.stringify(content),
           StartTime: moment(datas.startTime).toJSON(),

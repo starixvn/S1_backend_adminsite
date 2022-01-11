@@ -81,12 +81,14 @@ const EditPanel = (props) => {
   const [stateData, updateData] = useState(defaultData);
   const [stateSend, updateSend] = useState(false);
   const [sendData, updateSendData] = useState([]);
+  const [SubmitStatus, setSubmitStatus] = useState(false);
   const [langDatas, setlangDatas] = useState(
     props.DetailDatas !== null
       ? props.SiteList[props.DetailDatas.siteId - 1].iLangList
       : null
   );
   const isMountedRef = useRef(null);
+  
   useEffect(() => {
     isMountedRef.current = true;
     return () => (isMountedRef.current = false);
@@ -152,7 +154,7 @@ const EditPanel = (props) => {
       ) {
         
         let msg = {};
-        
+        setSubmitStatus(true);
         defaultData.accountstatus = props.filterInfo.AccountStatus;
         defaultData.currency = props.filterInfo.Currency;
         
@@ -202,10 +204,10 @@ const EditPanel = (props) => {
           }
         }
         formData.append("personalMsg", JSON.stringify(msg));
-        
         api
           .post("/api/Message/SendMessageBatch", formData, settings)
           .then(function (response) {
+            setSubmitStatus(false);
             if (isMountedRef.current) {
               if (response.data) {
                 let param = {
@@ -442,6 +444,7 @@ const EditPanel = (props) => {
   let result = sendData.map((value, key) => {
     return <p key={`result-${key}`}>{value.message}</p>;
   });
+  
   return (
     <>
       {radio}
@@ -510,6 +513,7 @@ const EditPanel = (props) => {
           className="btn btn-add"
           style={{ marginTop: "20px", marginBottom: "40px", float: "right" }}
           onClick={SetMsg}
+          disabled={SubmitStatus}
         >
           Submit
         </button>
