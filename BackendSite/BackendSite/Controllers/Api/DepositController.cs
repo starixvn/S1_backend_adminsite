@@ -332,7 +332,12 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<DepositLimitInfo>> GetDepositLimitInfos(DepositLimit depositLimit)
         {
             var apiResult = new ApiResult<IEnumerable<DepositLimitInfo>>();
-            var depositLimitInfos = depositBLL.GetDepositLimitInfos(depositLimit.SiteId, depositLimit.DepositType, depositLimit.CurrencyId);
+
+            var siteIdList = new List<int>(); siteIdList.Add(depositLimit.SiteId);
+            var depositTypeList = new List<int>(); depositTypeList.Add(depositLimit.DepositType);
+            var currencyIdList = new List<int>(); currencyIdList.Add(depositLimit.CurrencyId);
+
+            var depositLimitInfos = depositBLL.GetDepositLimitInfos(siteIdList, depositTypeList, currencyIdList,1,1000,out _,out _);
             apiResult.Data = depositLimitInfos;
             apiResult.ErrorCode = 0;
             return apiResult;

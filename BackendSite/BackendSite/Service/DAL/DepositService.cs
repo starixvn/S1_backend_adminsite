@@ -38,7 +38,7 @@ namespace BackendSite.Service.DAL
             _logger = provider.GetRequiredService<ILogger<DepositService>>();
         }
 
-        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, DateTime startDate, DateTime endDate, int siteId, string DepositId, string userName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus,int pageSize, int amountType, string amount, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
+        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, DateTime startDate, DateTime endDate, int siteId, string DepositId, string userName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus, int pageSize, int amountType, string amount, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
         {
             var SelectSite = JsonConvert.SerializeObject(selectSite);
             var DepositType = JsonConvert.SerializeObject(depositType);
@@ -57,12 +57,27 @@ namespace BackendSite.Service.DAL
                 var m = Regex.Match(DepositId, @"\d+");
                 int.TryParse(m.Value, out depositId);
             }
-            
-            var p = new DynamicParameters(new { SelectSite, DepositType, StartDate = startDate, EndDate = endDate, SiteId = siteId, DepositId = depositId, TransId = DepositId,
-                UserName = userName, CurrencyId, Status, VipStatus= VipStatus, PageSize = pageSize, AmountType = amountType, Amount = tempAmount });
+
+            var p = new DynamicParameters(new
+            {
+                SelectSite,
+                DepositType,
+                StartDate = startDate,
+                EndDate = endDate,
+                SiteId = siteId,
+                DepositId = depositId,
+                TransId = DepositId,
+                UserName = userName,
+                CurrencyId,
+                Status,
+                VipStatus = VipStatus,
+                PageSize = pageSize,
+                AmountType = amountType,
+                Amount = tempAmount
+            });
 
             #region GetCurrencyTotalAmount
-            
+
             var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V3", p).ToList();
             if (currencyTotalAmount.Count > 0)
             {
@@ -72,14 +87,14 @@ namespace BackendSite.Service.DAL
                 });
             }
             currencyAmount = tempCurrencyTotalAmount;
-            
+
             #endregion
 
-            p.Add("PageNumber", pageNumber, DbType.Int32,ParameterDirection.InputOutput);
-            p.Add("StartIndex",Math.Abs(pageNumber - 1) * Math.Abs(pageSize),DbType.Int32, ParameterDirection.Input);
+            p.Add("PageNumber", pageNumber, DbType.Int32, ParameterDirection.InputOutput);
+            p.Add("StartIndex", Math.Abs(pageNumber - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            
+
             var depositList = _reportDbClient.Query<DepositRequest>("Admin_DepositList_Get_V7", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
@@ -286,9 +301,9 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("DepositLog_Ins",
                 new DynamicParameters(new
                 {
-                    DepositId = depositId, 
-                    SiteId = siteId, 
-                    Comment = comment, 
+                    DepositId = depositId,
+                    SiteId = siteId,
+                    Comment = comment,
                     Action = status,
                     ActualDeposit = actualDeposit,
                     Operator
@@ -301,7 +316,7 @@ namespace BackendSite.Service.DAL
             return conn.QueryFirstOrDefault<DepositReceipt>("DepositReceipt_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string depositType, DateTime startDate, DateTime endDate, string DepositId, string userName, string currencyId, string status,string levelStatus, int amountType, string amount)
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string depositType, DateTime startDate, DateTime endDate, string DepositId, string userName, string currencyId, string status, string levelStatus, int amountType, string amount)
         {
             var depositId = 0;
             if (!string.IsNullOrWhiteSpace(DepositId))
@@ -314,20 +329,48 @@ namespace BackendSite.Service.DAL
             {
                 tempAmount = Convert.ToDecimal(amount);
             }
-            var p = new DynamicParameters(new { selectSite, depositType, StartDate = startDate, EndDate = endDate, DepositId = depositId, TransId = DepositId,
-                UserName = userName, currencyId, status, VipStatus = levelStatus, AmountType = amountType, Amount = tempAmount });
+            var p = new DynamicParameters(new
+            {
+                selectSite,
+                depositType,
+                StartDate = startDate,
+                EndDate = endDate,
+                DepositId = depositId,
+                TransId = DepositId,
+                UserName = userName,
+                currencyId,
+                status,
+                VipStatus = levelStatus,
+                AmountType = amountType,
+                Amount = tempAmount
+            });
             var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V8", p);
             return depositList;
         }
-        
+
         public IEnumerable<DepositLimitCurrencyInfo> GetDepositLimitCurrencyList(int siteId, int depositType)
         {
             return _mainDbClient.Query<DepositLimitCurrencyInfo>("Admin_DepositCurrencyList_Get", new DynamicParameters(new { SiteId = siteId, DepositType = depositType }));
         }
-        
-        public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(int siteId, int depositType, int currencyId)
+
+        public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(string siteId, string depositType, string currencyId, int startIndex, int pageSize, out int totalPages, out int rowCount)
         {
-            return _mainDbClient.Query<DepositLimitInfo>("Admin_DepositLimitInfo_Get", new DynamicParameters(new { SiteId = siteId, DepositType = depositType, CurrencyId = currencyId }));
+            var props = new DynamicParameters();
+
+            props.Add("_SiteIds", siteId);
+            props.Add("_DepositTypes", depositType);
+            props.Add("_CurrencyIds", currencyId);
+            props.Add("_StartIndex", startIndex);
+            props.Add("_PageSize", pageSize);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = _reportDbClient.Query<DepositLimitInfo>("Admin_DepositLimitInfo_Get_V2", props);
+
+            totalPages = props.Get<int?>("_TotalPages") ?? 0;
+            rowCount = props.Get<int?>("_RowCount") ?? 0;
+
+            return result;
         }
 
         public bool AddDepositLimitInfo(DepositLimitInfo depositLimitInfo, string Operator)
@@ -391,7 +434,7 @@ namespace BackendSite.Service.DAL
                 depositLimitInfo.DepositType
             };
             conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu = "DepositLimitManagement", ActionType = 2, DetailInfo = JsonConvert.SerializeObject(param), Operator }, tran, commandType: CommandType.StoredProcedure);
-            var result = conn.Execute("Admin_DepositLimitInfo_Del", new { depositLimitInfo.SiteId,  depositLimitInfo.CurrencyId,  depositLimitInfo.VipLevel, depositLimitInfo.DepositType }, commandType: CommandType.StoredProcedure);
+            var result = conn.Execute("Admin_DepositLimitInfo_Del", new { depositLimitInfo.SiteId, depositLimitInfo.CurrencyId, depositLimitInfo.VipLevel, depositLimitInfo.DepositType }, commandType: CommandType.StoredProcedure);
             tran.Commit();
 
             return result;
@@ -401,7 +444,7 @@ namespace BackendSite.Service.DAL
         {
             var selectSite = JsonConvert.SerializeObject(para.SiteIds);
             var selectStatus = new List<int>();
-            if(para.Status == 0)
+            if (para.Status == 0)
             {
                 selectStatus.Add(3);
                 selectStatus.Add(4);
@@ -416,15 +459,15 @@ namespace BackendSite.Service.DAL
             var searchData = new DepositTimeData();
             var props = new DynamicParameters();
             int.TryParse(para.DepositId, out var tempDepositId);
-            
+
             props.Add("SelectSite", selectSite);
             props.Add("DepositId", tempDepositId);
             props.Add("StartDate", para.StartDate.DateTime);
             props.Add("EndDate", para.EndDate.DateTime);
             props.Add("SelectStatus", SelectStatus);
             props.Add("CurrencyId", para.CurrencyId);
-            props.Add("StartIndex", (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize), DbType.Int32,ParameterDirection.Input);
-            props.Add("PageNumber", Math.Abs(para.PageNumber), DbType.Int32,ParameterDirection.InputOutput);
+            props.Add("StartIndex", (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize), DbType.Int32, ParameterDirection.Input);
+            props.Add("PageNumber", Math.Abs(para.PageNumber), DbType.Int32, ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("PageSize", Math.Abs(para.PageSize));
@@ -472,7 +515,7 @@ namespace BackendSite.Service.DAL
             props.Add("_DepositId", depositId);
             props.Add("_Amount", amount);
             props.Add("_Operator", Operator);
-            
+
             return _mainDbClient.Execute("Admin_DepositRequestAmountV2_Set", props) > 0;
         }
     }
