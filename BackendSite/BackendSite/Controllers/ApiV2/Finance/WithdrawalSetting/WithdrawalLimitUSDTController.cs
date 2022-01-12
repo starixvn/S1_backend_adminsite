@@ -1,6 +1,7 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
 {
@@ -35,10 +37,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
 
         #region API Model
 
-        public class GetListRequest
+        public class GetListRequest : ApiRequestPageModel
         {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
             public NetworkTypeEnum NetworkType { get; set; }
         }
 
@@ -76,13 +78,22 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult<IEnumerable<USDTWithdrawalLimitInfoManage>> GetList(GetListRequest request)
+        public ApiListResult<USDTWithdrawalLimitInfoManage> GetList(GetListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<USDTWithdrawalLimitInfoManage>>();
-            var USDTwithdrawalLimitInfoManages =_withdrawalBll.GetUSDTWithdrawalLimitInfos(request.SiteId,
-                request.CurrencyId,
-                Enum.GetName(typeof(NetworkTypeEnum), request.NetworkType));
-            apiResult.Data = USDTwithdrawalLimitInfoManages;
+            var apiResult = new ApiListResult<USDTWithdrawalLimitInfoManage>();
+
+            var datas = _withdrawalBll.GetUSDTWithdrawalLimitInfos(request.SiteIds,
+                request.CurrencyIds,
+                Enum.GetName(typeof(NetworkTypeEnum), request.NetworkType),
+                request.PageNumber,
+                request.PageSize,
+                out int totalPages,
+                out int rowCount);
+
+            apiResult.Data = datas;
+            apiResult.PageNumber = request.PageNumber;
+            apiResult.TotalPages = totalPages;
+            apiResult.RowCount = rowCount;
             apiResult.ErrorCode = 0;
             return apiResult;
         }
