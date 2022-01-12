@@ -66,7 +66,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<BonusInfo>("Admin_BonusInfo_Get_V6", props);
+            var result = _reportDbClient.Query<BonusInfo>("Admin_BonusInfo_Get_V7", props);
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;
             return result;

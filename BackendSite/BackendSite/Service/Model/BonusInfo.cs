@@ -32,6 +32,7 @@ namespace BackendSite.Service.Model
         public int RollOver { get; set; }
         public decimal CancelBonusAmount { get; set; }
         public bool ExpiredCancel { get; set; }
+        public string Operator { get; set; }
     }
 
     public class BonusInfoFrontEnd
@@ -54,6 +55,7 @@ namespace BackendSite.Service.Model
         public string StatusName { get; set; }
         public decimal CancelBonusAmount { get; set; }
         public bool ExpiredCancel { get; set; }
+        public string Operator { get; set; }
     }
 
     public class PendingBonus
