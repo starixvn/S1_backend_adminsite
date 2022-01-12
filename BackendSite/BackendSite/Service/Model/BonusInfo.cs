@@ -16,12 +16,12 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public decimal LockedAmount { get; set; }
         public decimal BonusAmount { get; set; }
-        public DateTimeOffset ExpiryTime 
+        public DateTimeOffset ExpiryTime
         {
             get => _expiryTime;
             set => _expiryTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
-        public DateTimeOffset CreateTime 
+        public DateTimeOffset CreateTime
         {
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);

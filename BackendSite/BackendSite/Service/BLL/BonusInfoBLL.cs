@@ -121,7 +121,8 @@ namespace BackendSite.Service.BLL
                         MaxBonus = row.MaxBonus,
                         RollOver = row.RollOver,
                         CancelBonusAmount = row.CancelBonusAmount,
-                        ExpiredCancel = row.ExpiredCancel
+                        ExpiredCancel = row.ExpiredCancel,
+                        Operator = string.IsNullOrWhiteSpace(row.Operator) ? string.Empty : row.Operator.Replace("\"", string.Empty)
                     });
                 }
             }

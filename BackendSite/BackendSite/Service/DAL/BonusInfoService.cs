@@ -87,7 +87,7 @@ namespace BackendSite.Service.DAL
             props.Add("_BaseCurrencyId", baseCurrencyId);
             props.Add("_CategoryType", rebateCategoriesId);
 
-            var result = _mainDbClient.Query<BonusInfo>("Admin_BonusInfoExport_Get_V6", props);
+            var result = _mainDbClient.Query<BonusInfo>("Admin_BonusInfoExport_Get_V7", props);
             return result;
         }
 
