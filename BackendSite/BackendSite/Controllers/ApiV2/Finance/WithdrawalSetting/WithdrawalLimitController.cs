@@ -2,6 +2,7 @@
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -35,12 +36,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         #endregion
 
         #region API Model
-
-        public class GetListRequest
+        public class GetListRequest : ApiRequestPageModel
         {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+
+            public IEnumerable<int> CurrencyIds { get; set; }
         }
+
 
         public class InsertOrUpdateRequest
         {
@@ -50,7 +52,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
             public int WithdrawalMin { get; set; }
             public int WithdrawalMax { get; set; }
         }
-
 
         public class DeleteRequest
         {
@@ -75,19 +76,21 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult<IEnumerable<WithdrawalLimitInfoManage>> GetList(GetListRequest request)
+        public ApiListResult<WithdrawalLimitInfoManage> GetList(GetListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<WithdrawalLimitInfoManage>>();
-            try
-            {
-                apiResult.Data = _withdrawalBll.GetWithdrawalLimitInfos(request.SiteId, request.CurrencyId);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
+            var apiResult = new ApiListResult<WithdrawalLimitInfoManage>();
+
+            apiResult.Data = _withdrawalBll.GetWithdrawalLimitInfos(request.SiteIds,
+                request.CurrencyIds,
+                request.PageNumber,
+                request.PageSize,
+                out int totalPages,
+                out int rowCount);
+
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            apiResult.PageNumber = request.PageNumber;
+            apiResult.TotalPages = totalPages;
+            apiResult.RowCount = rowCount;
 
             return apiResult;
         }

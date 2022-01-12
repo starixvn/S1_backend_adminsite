@@ -321,8 +321,18 @@ namespace BackendSite.Service.BLL
                 withdrawalId, userName, currencyId, status, levelStatus, AmountType, Amount);
         }
 
-        public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(int siteId, int currencyId) =>
-            _withdrawalLimitService.GetWithdrawalLimitInfos(siteId, currencyId);
+        public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(IEnumerable<int> siteId,
+            IEnumerable<int> currencyId,
+            int pageNumber,
+            int pageSize,
+            out int totalPages,
+            out int rowCount) =>
+            _withdrawalLimitService.GetWithdrawalLimitInfos(JsonConvert.SerializeObject(siteId),
+                JsonConvert.SerializeObject(currencyId),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                out totalPages,
+                out rowCount);
 
         public bool AddWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
         {
@@ -523,14 +533,23 @@ namespace BackendSite.Service.BLL
             return exportDataToExcel;
         }
 
-        public IEnumerable<USDTWithdrawalLimitInfoManage> GetUSDTWithdrawalLimitInfos(int siteId, int currencyId, string Network)
+        public IEnumerable<USDTWithdrawalLimitInfoManage> GetUSDTWithdrawalLimitInfos(IEnumerable<int> siteId,
+            IEnumerable<int> currencyId, string network,
+            int pageNumber,int pageSize,out int totalPages,out int rowCount)
         {
-            var USDTWithdrawalLimitInfos = _withdrawalLimitService.GetUSDTWithdrawalLimitInfos(siteId, currencyId, Network);
-            USDTWithdrawalLimitInfos.ToList().ForEach(x =>
+            var datas = _withdrawalLimitService.GetUSDTWithdrawalLimitInfos(JsonConvert.SerializeObject(siteId),
+                JsonConvert.SerializeObject(currencyId),
+                network,
+                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                out totalPages,
+                out rowCount);
+
+            datas.ToList().ForEach(x =>
             {
                 x.NetworkType = (int)(NetworkTypeEnum)Enum.Parse(typeof(NetworkTypeEnum), x.Network);
             });
-            return USDTWithdrawalLimitInfos;
+            return datas;
         }
 
         public bool AddUSDTWithdrawalLimit(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage, string updater)
