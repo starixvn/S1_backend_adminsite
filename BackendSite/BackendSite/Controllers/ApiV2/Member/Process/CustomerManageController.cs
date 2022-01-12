@@ -213,6 +213,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             private DateTimeOffset _startDate;
             private DateTimeOffset _endDate;
+            private DateTimeOffset _tagStartDate;
+            private DateTimeOffset _tagEndDate;
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public DateTimeOffset? StartDate
@@ -233,6 +235,24 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                         _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
                 }
             }
+            public DateTimeOffset? TagStartDate
+            {
+                get => _tagStartDate;
+                set
+                {
+                    if (value != null)
+                        _tagStartDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset? TagEndDate
+            {
+                get => _tagEndDate;
+                set
+                {
+                    if (value != null)
+                        _tagEndDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
             public int? BirDate { get; set; }
             public int? BirMonth { get; set; }
             public int? BirYear { get; set; }
@@ -246,6 +266,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int? AffId { get; set; }
             public string BankAccountNumber { get; set; }
             public IEnumerable<int> Statuses { get; set; }
+            public IEnumerable<int> SelectTag { get; set; }
         }
 
         public class ExportCustInfoListRequest
@@ -507,6 +528,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
+            var tagStartDate = request.TagStartDate != new DateTimeOffset() ? request.TagStartDate?.DateTime : null;
+            var tagEndDate = request.TagEndDate != new DateTimeOffset() ? request.TagEndDate?.DateTime : null;
 
             var pageNumber = request.PageNumber;
             var data = _custInfoBll.GetCustInfoList(request.SiteIds,
@@ -522,11 +545,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.PhoneNo?.Trim(),
                 startDate,
                 endDate,
+                tagStartDate,
+                tagEndDate,
                 request.PageSize,
                 request.AffId,
                 request.CurrencyIds,
                 request.BankAccountNumber?.Trim(),
                 request.Statuses,
+                request.SelectTag,
                 ref pageNumber,
                 out var totalPages,
                 out var rowCount);
