@@ -46,8 +46,10 @@ namespace BackendSite.Service.DAL
             string tpUserName,
             string email,
             string phoneNo,
-            DateTimeOffset? startDate,
-            DateTimeOffset? endDate,
+            DateTime? startDate,
+            DateTime? endDate,
+            DateTime? tagStartDate,
+            DateTime? tagEndDate,
             int pageSize,
             int? affId,
             IEnumerable<int> selectCurrency,
@@ -62,8 +64,6 @@ namespace BackendSite.Service.DAL
             var jsonSelectSite = string.Empty;
             var jsonSelectCurrency = string.Empty;
             var jsonSelectStatus = string.Empty;
-            DateTime? startDateParam = null;
-            DateTime? endDateParam = null;
 
             if (selectSite != null && selectSite.Any())
             {
@@ -86,16 +86,7 @@ namespace BackendSite.Service.DAL
                 }
             }
             totalPages = 0;
-
-            if (startDate != null)
-            {
-                startDateParam = DateTimeOffset.Parse(startDate.ToString()).DateTime;
-            }
-
-            if (endDate != null)
-            {
-                endDateParam = DateTimeOffset.Parse(endDate.ToString()).DateTime;
-            }
+            
 
             var p = new DynamicParameters(new
             {
@@ -110,8 +101,10 @@ namespace BackendSite.Service.DAL
                 TpUserName = tpUserName,
                 Email = email,
                 PhoneNo = phoneNo,
-                StartDate = startDateParam,
-                EndDate = endDateParam,
+                StartDate = startDate,
+                EndDate = endDate,
+                TagStartDate = tagStartDate,
+                TagEndDate = tagEndDate,
                 PageSize = pageSize,
                 SelectCurrency = jsonSelectCurrency,
                 SiteList = siteList,
@@ -124,7 +117,7 @@ namespace BackendSite.Service.DAL
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearch_Get_V7", p);
+            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearch_Get_V8", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;

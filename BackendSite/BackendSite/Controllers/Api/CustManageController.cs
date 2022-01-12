@@ -76,6 +76,8 @@ namespace BackendSite.Controllers.Api
             public IEnumerable<int> SelectSite { get; set; }
             public long? StartDate { get; set; }
             public long? EndDate { get; set; }
+            public long? TagStartDate { get; set; }
+            public long? TagEndDate { get; set; }
             public int? BirDate { get; set; }
             public int? BirMonth { get; set; }
             public int? BirYear { get; set; }
@@ -92,6 +94,7 @@ namespace BackendSite.Controllers.Api
             public IEnumerable<int> SelectCurrency { get; set; }
             public string BankAccountNumber { get; set; }
             public IEnumerable<int> SelectStatus { get; set; }
+            public IEnumerable<int> SelectTag { get; set; }
         }
 
         public class CustStatusSwitch
@@ -312,55 +315,63 @@ namespace BackendSite.Controllers.Api
         /// Func Path：CSD >  Customer Administration > [Submit]
         /// 
         /// </remarks>
-        /// <param name="custInfoListReq"></param>
+        /// <param name="req"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq custInfoListReq)
+        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq req)
         {
-            int totalPages = 0, rowCount = 0;
-            var pageNumber = custInfoListReq.PageNumber;
+            var pageNumber = req.PageNumber;
             DateTime? startDate = null;
             DateTime? endDate = null;
+            DateTime? tagStartDate = null;
+            DateTime? tagEndDate = null;
 
-            if (custInfoListReq.StartDate != null)
+            if (req.StartDate != null)
             {
-                if (custInfoListReq.StartDate > 2147483647)
-                    custInfoListReq.StartDate = 2147483647;
-                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoListReq.StartDate);
+                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)req.StartDate);
             }
 
-            if (custInfoListReq.EndDate != null)
+            if (req.EndDate != null)
             {
-                if (custInfoListReq.EndDate > 2147483647)
-                    custInfoListReq.EndDate = 2147483647;
-                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoListReq.EndDate);
+                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)req.EndDate);
             }
 
-            var data = _custInfoBll.GetCustInfoList(custInfoListReq.SelectSite,
-                                                   custInfoListReq.BirDate,
-                                                   custInfoListReq.BirMonth,
-                                                   custInfoListReq.BirYear,
-                                                   custInfoListReq.UserName?.Trim(),
-                                                   custInfoListReq.AccountName?.Trim(),
-                                                   custInfoListReq.LoginIp?.Trim(),
-                                                   custInfoListReq.TransId?.Trim(),
-                                                   custInfoListReq.TpUserName?.Trim(),
-                                                   custInfoListReq.Email?.Trim(),
-                                                   custInfoListReq.PhoneNo?.Trim(),
+            if (req.TagStartDate != null)
+            {
+                tagStartDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)req.TagStartDate);
+            }
+
+            if (req.TagEndDate != null)
+            {
+                tagEndDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)req.TagEndDate);
+            }
+            
+            var data = _custInfoBll.GetCustInfoList(req.SelectSite,
+                                                   req.BirDate,
+                                                   req.BirMonth,
+                                                   req.BirYear,
+                                                   req.UserName?.Trim(),
+                                                   req.AccountName?.Trim(),
+                                                   req.LoginIp?.Trim(),
+                                                   req.TransId?.Trim(),
+                                                   req.TpUserName?.Trim(),
+                                                   req.Email?.Trim(),
+                                                   req.PhoneNo?.Trim(),
                                                    startDate,
                                                    endDate,
-                                                   custInfoListReq.PageSize,
-                                                   custInfoListReq.AffId,
-                                                   custInfoListReq.SelectCurrency,
-                                                   custInfoListReq.BankAccountNumber?.Trim(),
-                                                   custInfoListReq.SelectStatus,
+                                                   tagStartDate,
+                                                   tagEndDate,
+                                                   req.PageSize,
+                                                   req.AffId,
+                                                   req.SelectCurrency,
+                                                   req.BankAccountNumber?.Trim(),
+                                                   req.SelectStatus,
+                                                   req.SelectTag,
                                                    ref pageNumber,
-                                                   out totalPages,
-                                                   out rowCount);
-
-            data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
-
+                                                   out var totalPages,
+                                                   out var rowCount);
+            
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);

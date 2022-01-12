@@ -41,9 +41,18 @@ namespace BackendSite.Service.Model
         public bool EmailVerified { get; set; }
         public string Iovation { get; set; }
         public int Status { get; set; }
-        public DateTimeOffset LastLoginTime { get; set; }
-        public DateTimeOffset RegTime { get; set; }
-
+        private DateTimeOffset _lastLoginTime  { get; set; }
+        public DateTimeOffset LastLoginTime 
+        {
+            get => _lastLoginTime;
+            set => _lastLoginTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        private DateTimeOffset _regTime  { get; set; }
+        public DateTimeOffset RegTime 
+        {
+            get => _regTime;
+            set => _regTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public string Email { get; set; }
         public string Profile { get; set; }
         public decimal Balance { get; set; }
@@ -67,7 +76,26 @@ namespace BackendSite.Service.Model
         public IEnumerable<TpWallet> tpWallet { get; set; }
         public IEnumerable<Promotion> promotions { get; set; }
         public string AffiliateId { get; set; }
-        public string ReloadTime { get; set; }
+        private DateTimeOffset? _reloadTime { get; set; }
+        public DateTimeOffset? ReloadTime 
+        {
+            get => _reloadTime;
+            set
+            {
+                if (value != null)
+                    _reloadTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
+        private DateTimeOffset? _lastTagUpdateTime  { get; set; }
+        public DateTimeOffset? LastTagUpdateTime 
+        {
+            get => _lastTagUpdateTime;
+            set
+            {
+                if (value != null)
+                    _lastTagUpdateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
         public string IP { get; set; }
         public string LevelName { get; set; }
         public string AffiliateCode { get; set; }
