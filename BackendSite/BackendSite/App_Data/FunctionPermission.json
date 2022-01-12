@@ -262,6 +262,11 @@
         "Enable": false
       },
       {
+        "DisplayKey": "Bonus Payout",
+        "FuncKey": "Finance/BonusPayout",
+        "Enable": false
+      },
+      {
         "DisplayKey": "WithdrawalLimit Adjustment",
         "FuncKey": "Finance/WithdrawalLimitAdjust",
         "Enable": false
