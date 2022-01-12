@@ -24,7 +24,7 @@ namespace BackendSite.Service.DAL
             this.withdrawalLimitService = withdrawalLimitService;
         }
 
-        public IEnumerable<BonusInfo> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId, int Startindex, out int TotalPages, out int RowCount, out List<string> CurrencyAmount)
+        public IEnumerable<BonusInfo> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, DateTime StartDate, DateTime EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId, int Startindex, out int TotalPages, out int RowCount, out List<string> CurrencyAmount)
         {
             IEnumerable<BonusInfo> result = null;
             var tempCurrencyTotalAmount = new List<string>();
@@ -44,7 +44,7 @@ namespace BackendSite.Service.DAL
             props.Add("_BaseCurrencyId", BaseCurrencyId);
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_BonusInfoTotalAmount_Get_V3", props, commandType: CommandType.StoredProcedure).ToList();
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_BonusInfoTotalAmount_Get_V4", props, commandType: CommandType.StoredProcedure).ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
                 CurrencyTotalAmount.ForEach(x =>
@@ -61,7 +61,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             
-            result = conn.Query<BonusInfo>("Admin_BonusInfo_Get_V5", props, commandType: CommandType.StoredProcedure);
+            result = conn.Query<BonusInfo>("Admin_BonusInfo_Get_V7", props, commandType: CommandType.StoredProcedure);
             TotalPages = props.Get<int?>("_TotalPages") ?? 0;
             RowCount = props.Get<int?>("_RowCount") ?? 0;
 

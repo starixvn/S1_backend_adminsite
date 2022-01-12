@@ -28,7 +28,7 @@ namespace BackendSite.Service.BLL
             _apiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("TpService");
         }
 
-        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId, int PageNumber, out int TotalPages, out int RowCount, out List<string> CurrencyAmount)
+        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, DateTime StartDate, DateTime EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId, int PageNumber, out int TotalPages, out int RowCount, out List<string> CurrencyAmount)
         {
             var siteList = _serverInfoBll.GetSiteListByLoginUser();
             var datas = _bonusInfoService.GetBonusInfoReport(
@@ -73,8 +73,9 @@ namespace BackendSite.Service.BLL
                         MaxBonus = row.MaxBonus,
                         RollOver = row.RollOver,
                         CancelBonusAmount = row.CancelBonusAmount,
-                        ExpiredCancel = row.ExpiredCancel
-                    });
+                        ExpiredCancel = row.ExpiredCancel,
+                        Operator = string.IsNullOrWhiteSpace(row.Operator) ? string.Empty : row.Operator.Replace("\"",string.Empty)
+                    }); ;
                 }
             }
 

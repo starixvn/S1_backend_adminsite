@@ -5,6 +5,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
 using Microsoft.AspNetCore.Authorization;
+using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.Api
 {
@@ -36,9 +37,9 @@ namespace BackendSite.Controllers.Api
                     TransId, 
                     CurrencyId, 
                     UserName, 
-                    PromotionType, 
-                    StartDate, 
-                    EndDate, 
+                    PromotionType,
+                    DateTimeExtensions.UnixToDateTimeOffset(StartDate).DateTime,
+                    DateTimeExtensions.UnixToDateTimeOffset(EndDate).DateTime,
                     PageSize, 
                     BaseCurrencyId, 
                     RebateCategoriesId,
