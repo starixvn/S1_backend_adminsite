@@ -53,7 +53,7 @@ namespace BackendSite.Service.BLL
             {
                 return ErrorCodeEnum.PasswordError;
             }
-            else if (adminUser.Status != (int)AdminUserStatus.Running)
+            else if (adminUser.Status != (int)AdminUserStatusEnum.Running)
             {
                 return ErrorCodeEnum.AccountLocked;
             }

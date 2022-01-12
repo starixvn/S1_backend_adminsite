@@ -31,7 +31,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<AdminUser>>();
             try
             {
-                apiResult.Data = adminUserBLL.GetUserList();
+                apiResult.Data = adminUserBLL.GetUserList(1, 1000, out _, out _);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -44,7 +44,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public ApiResult<IEnumerable<DisplayList>> GetSiteList([FromForm]int UserId)
+        public ApiResult<IEnumerable<DisplayList>> GetSiteList([FromForm] int UserId)
         {
             var apiResult = new ApiResult<IEnumerable<DisplayList>>();
             try
@@ -83,7 +83,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public ApiResult AssignSiteList([FromForm]int UserId, [FromForm]IEnumerable<int> SiteIdList)
+        public ApiResult AssignSiteList([FromForm] int UserId, [FromForm] IEnumerable<int> SiteIdList)
         {
             var apiResult = new ApiResult();
             try
@@ -106,7 +106,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<DisplayList>>();
             try
             {
-                var groupList = adminGroupBLL.GetGroupList();
+                var groupList = adminGroupBLL.GetGroupList(1, 1000, out _, out _);
                 apiResult.Data = groupList.Select(g => new DisplayList() { Id = (int)g.GroupSEQ, DisplayText = g.GroupName });
                 apiResult.ErrorCode = 0;
             }
@@ -119,7 +119,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public ApiResult AssignGroup([FromForm]int UserId, [FromForm]int? GroupSEQ)
+        public ApiResult AssignGroup([FromForm] int UserId, [FromForm] int? GroupSEQ)
         {
             var apiResult = new ApiResult();
             try
@@ -137,7 +137,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public ApiResult UpdatePassword([FromForm]int UserId, [FromForm]string Password)
+        public ApiResult UpdatePassword([FromForm] int UserId, [FromForm] string Password)
         {
             var apiResult = new ApiResult();
             try
@@ -163,7 +163,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public ApiResult UpdateStatus([FromForm]int UserId, [FromForm]int Status)
+        public ApiResult UpdateStatus([FromForm] int UserId, [FromForm] int Status)
         {
             var apiResult = new ApiResult();
             try
@@ -184,7 +184,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public ApiResult<IEnumerable<AdminUser>> AddUser([FromForm]string UserName, [FromForm]string Userpwd, [FromForm]int[] SiteList, [FromForm]int? GroupSEQ)
+        public ApiResult<IEnumerable<AdminUser>> AddUser([FromForm] string UserName, [FromForm] string Userpwd, [FromForm] int[] SiteList, [FromForm] int? GroupSEQ)
         {
             var apiResult = new ApiResult<IEnumerable<AdminUser>>();
             try
@@ -192,7 +192,7 @@ namespace BackendSite.Controllers.Api
                 var newUserList = adminUserBLL.AddUser(UserName, Userpwd, SiteList, GroupSEQ);
                 if (newUserList != null)
                 {
-                    apiResult.Data = adminUserBLL.GetUserList();
+                    apiResult.Data = adminUserBLL.GetUserList(0, 1000, out _, out _);
                     apiResult.ErrorCode = 0;
                 }
                 else

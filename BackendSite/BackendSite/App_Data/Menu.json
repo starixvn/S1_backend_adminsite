@@ -281,6 +281,16 @@
       },
       {
         "Key": "",
+        "Title": "Bonus Payout",
+        "FuncKey": "Finance/BonusPayout",
+        "Controller": "Finance",
+        "Action": "BonusPayout",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
         "Title": "WithdrawalLimit Adjustment",
         "FuncKey": "Finance/WithdrawalLimitAdjust",
         "Controller": "Finance",
@@ -591,6 +601,26 @@
         "FuncKey": "Marketing/VipRebateMangetment",
         "Controller": "Marketing",
         "Action": "VipRebateMangetment",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "VerificationReward",
+        "Title": "Verification Reward",
+        "FuncKey": "Marketing/VerificationReward",
+        "Controller": "Marketing",
+        "Action": "VerificationReward",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "VerificationRewardReport",
+        "Title": "Verification Reward Report",
+        "FuncKey": "Marketing/VerificationRewardReport",
+        "Controller": "Marketing",
+        "Action": "VerificationRewardReport",
         "Icon": "",
         "Roles": null,
         "Childs": null

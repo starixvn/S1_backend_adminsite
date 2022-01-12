@@ -8,25 +8,22 @@ namespace BackendSite.Service.BLL
     public class ReferralManagementBLL
     {
         private readonly ReferralManagementService referralManagementService;
-        private readonly ServerInfoBLL serverInfoBLL;
-        private readonly AuthorizeBLL authorizeBLL;
-        public ReferralManagementBLL(ReferralManagementService referralManagementService, ServerInfoBLL serverInfoBLL, AuthorizeBLL authorizeBLL)
+     
+        public ReferralManagementBLL(ReferralManagementService referralManagementService)
         {
             this.referralManagementService = referralManagementService;
-            this.serverInfoBLL = serverInfoBLL;
-            this.authorizeBLL = authorizeBLL;
         }
-        public IEnumerable<ReferralList> GetReferralBySiteId(int SiteId)
+        public IEnumerable<ReferralList> GetReferralBySiteId(int siteId)
         {
-            return referralManagementService.GetReferralBySiteId(SiteId);
+            return referralManagementService.GetReferralBySiteId(siteId);
         }
         public void SetReferral(List<ReferralManagement> referralList)
         {
             referralManagementService.SetReferral(referralList);
         }
-        public void SetReferralStatus(int SiteId, int CurrencyId)
+        public void SetReferralStatus(int siteId, int currencyId,int status)
         {
-            referralManagementService.SetReferralStatus(SiteId, CurrencyId);
+            referralManagementService.SetReferralStatus(siteId, currencyId, status);
         }
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {

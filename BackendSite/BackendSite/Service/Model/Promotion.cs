@@ -14,7 +14,7 @@ namespace BackendSite.Service.Model
         public int BonusId { get; set; }
         public string BonusCode { get; set; }
         public string Description { get; set; }
-        public PromotionType PromotionType { get; set; }
+        public PromotionTypeEnum PromotionType { get; set; }
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
         public int ExpiryDays { get; set; }
