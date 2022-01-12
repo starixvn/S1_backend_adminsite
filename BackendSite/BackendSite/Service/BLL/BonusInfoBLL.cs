@@ -82,7 +82,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, long StartDate, long EndDate, int BaseCurrencyId, int RebateCategoriesId)
+        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, DateTime StartDate, DateTime EndDate, int BaseCurrencyId, int RebateCategoriesId)
         {
             var siteList = _serverInfoBll.GetSiteListByLoginUser();
             var datas = _bonusInfoService.GetBonusInfoExportReport(
@@ -121,7 +121,8 @@ namespace BackendSite.Service.BLL
                         MaxBonus = row.MaxBonus,
                         RollOver = row.RollOver,
                         CancelBonusAmount = row.CancelBonusAmount,
-                        ExpiredCancel = row.ExpiredCancel
+                        ExpiredCancel = row.ExpiredCancel,
+                        Operator = string.IsNullOrWhiteSpace(row.Operator) ? string.Empty : row.Operator.Replace("\"", string.Empty)
                     });
                 }
             }

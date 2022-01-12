@@ -69,11 +69,11 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<BonusInfo> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, long StartDate, long EndDate, int BaseCurrencyId, int RebateCategoriesId)
+        public IEnumerable<BonusInfo> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, IEnumerable<int> SiteList, DateTime StartDate, DateTime EndDate, int BaseCurrencyId, int RebateCategoriesId)
         {
             IEnumerable<BonusInfo> result = null;
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var SpName = "Admin_BonusInfoExport_Get_V5";
+            var SpName = "Admin_BonusInfoExport_Get_V7";
             var props = new DynamicParameters();
             props.Add("_SelectSite", SelectSite);
             props.Add("_BonusCode", BonusCode);
