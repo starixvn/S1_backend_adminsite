@@ -28,6 +28,17 @@ export default class WidgetApi {
     return axios.post(url, data);
   }
 
+  static JsonPost(param) {
+    let data = param.Data || {};
+    let _rootUrl = window.RootUrl;
+    const url = _rootUrl + "/" + param.Url;
+    return axios.post(url, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+
   static MultiPostData(params) {
     return axios.all(
       params.map((param) => {
