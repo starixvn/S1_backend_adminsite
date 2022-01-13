@@ -518,10 +518,7 @@ namespace BackendSite.Controllers.Api
 
             if (req.excelUpload != null)
             {
-                if (req.excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        StringComparison.OrdinalIgnoreCase)
-                    || req.excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase)
-                    || req.excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
+                if (_excelBLL.IsValidFile(req.excelUpload.ContentType))
                 {
                     var excelPkg = new ExcelPackage(req.excelUpload.OpenReadStream());
                     var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
