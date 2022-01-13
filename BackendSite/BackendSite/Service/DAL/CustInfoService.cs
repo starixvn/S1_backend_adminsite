@@ -55,6 +55,7 @@ namespace BackendSite.Service.DAL
             IEnumerable<int> selectCurrency,
             string bankAccountNumber,
             IEnumerable<int> selectStatus,
+            IEnumerable<int> selectTag,
             ref int pageNumber,
             out int totalPages,
             out int rowCount,
@@ -64,6 +65,7 @@ namespace BackendSite.Service.DAL
             var jsonSelectSite = string.Empty;
             var jsonSelectCurrency = string.Empty;
             var jsonSelectStatus = string.Empty;
+            var jsonSelectTagList = string.Empty;
 
             if (selectSite != null && selectSite.Any())
             {
@@ -84,6 +86,14 @@ namespace BackendSite.Service.DAL
                 {
                     jsonSelectStatus = JsonConvert.SerializeObject(selectStatus);
                 }
+            }
+            if (selectTag.Any() )
+            {
+                jsonSelectTagList = JsonConvert.SerializeObject(selectTag);
+            }
+            else
+            {
+                jsonSelectTagList = null;
             }
             totalPages = 0;
             
@@ -111,7 +121,8 @@ namespace BackendSite.Service.DAL
                 AffId = affId,
                 CurrncyList = currencyList,
                 BankAccountNumber = bankAccountNumber,
-                SelectStatus = jsonSelectStatus
+                SelectStatus = jsonSelectStatus,
+                SelectTagList = jsonSelectTagList
             });
             p.Add("PageNumber", pageNumber, DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
