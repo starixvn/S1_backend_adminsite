@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.Api
 {
@@ -56,6 +57,7 @@ namespace BackendSite.Controllers.Api
             }
 
             apiResult.Data = referralManagementList;
+            apiResult.ErrorCode = 0;
             return apiResult;
         }
         [HttpPost]
@@ -85,21 +87,26 @@ namespace BackendSite.Controllers.Api
             {
                 var referralList = referralManagementBLL.GetReferralBySiteId(SiteId).ToList();
                 var referral = referralList.FirstOrDefault(x => x.CurrencyId == CurrencyId);
+                var status = 1;
                 if (referral == null)
                 {
                     apiResult.ErrorCode = 7;
                     apiResult.Message = "";
                     return apiResult;
                 }
-                referralManagementBLL.SetReferralStatus(SiteId, CurrencyId);
+
+                if (referral.Status)
+                    status = 0;
+
+                referralManagementBLL.SetReferralStatus(SiteId, CurrencyId, status);
             }
             catch (Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
             }
+            apiResult.ErrorCode = 0;
             return apiResult;
-
         }
         public class ReferralCustListReq
         {

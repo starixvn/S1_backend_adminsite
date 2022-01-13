@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using System.Collections.Generic;
+using BackendSite.Controllers.ApiV2.CMS.Setting;
 
 namespace BackendSite.Service.BLL
 {
@@ -14,22 +15,22 @@ namespace BackendSite.Service.BLL
             this.bannerManageService = bannerManageService;
             this.serverInfoBLL = serverInfoBLL;
         }
-        public int SetBanner(BannerInfo bannerInfo, string user)
+        public int SetBanner(BannerController.SetBannerReq bannerInfo, string user)
         {
             return bannerManageService.SetBanner(bannerInfo, user);
         }
-        public IEnumerable<BannerInfoList> GetBannerList(int SiteId,int BannerTypeId,int Status)
+        public IEnumerable<BannerInfoList> GetBannerList(int siteId,int bannerTypeId,int status)
         {
-            return bannerManageService.GetBannerList(SiteId, BannerTypeId, Status);
+            return bannerManageService.GetBannerList(siteId, bannerTypeId, status);
 
         }
-        public BannerInfo GetBanner(int SiteId, string BannerName)
+        public BannerInfo GetBanner(int siteId, string bannerName)
         {
-            return bannerManageService.GetBanner(SiteId, BannerName);
+            return bannerManageService.GetBanner(siteId, bannerName);
         }
-        public int UpdateBannerStatus(int SiteId, string BannerName, int Status, string User)
+        public int UpdateBannerStatus(int siteId, string bannerName, int status, string user)
         {
-            return bannerManageService.UpdateBannerStatus(SiteId, BannerName, Status, User);
+            return bannerManageService.UpdateBannerStatus(siteId, bannerName, status, user);
         }
     }
 }

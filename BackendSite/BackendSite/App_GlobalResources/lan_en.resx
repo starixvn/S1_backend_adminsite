@@ -628,7 +628,7 @@
     <value>CashBack</value>
   </data>
   <data name="lbl_PromotionType8" xml:space="preserve">
-    <value>Advertising</value>
+    <value>Manual Bonus</value>
   </data>
   <data name="lbl_PromotionType9" xml:space="preserve">
     <value>Retention free bet</value>

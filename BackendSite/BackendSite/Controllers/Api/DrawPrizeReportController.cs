@@ -29,7 +29,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResultCurrencyAmount<DrawPrize>();
             try
             {
-                var prizeSearchResult = prizeBLL.PrizeSearch(prizeSelect);
+                var prizeSearchResult = prizeBLL.PrizeSearch(prizeSelect,8);
                 apiResult.Data = prizeSearchResult.DrawPrize;
                 apiResult.PageNumber = prizeSearchResult.PageNumber;
                 apiResult.TotalPages = prizeSearchResult.TotalPages;
@@ -53,7 +53,11 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<PrizeLogData>();
             try
             {
-                var logResult = prizeBLL.GetPrizeLog(prizeLogPara);
+                var logResult = prizeBLL.GetPrizeLog(prizeLogPara,0);
+                foreach (var data in logResult.PrizeLogData)
+                {
+                    data.DrawTime = new DateTimeOffset(data.DrawTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                }
                 apiResult.Data = logResult.PrizeLogData;
                 apiResult.PageNumber = logResult.PageNumber;
                 apiResult.TotalPages = logResult.TotalPages;
@@ -88,7 +92,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/DrawPrizeReport" })]
         public IActionResult ExportPrizeData(string selectSite, string startDate, string endDate, int currencyId, string eventName)
         {
-            var exportData = prizeBLL.GetExportData(selectSite, startDate, endDate, currencyId, eventName);
+            var exportData = prizeBLL.GetExportData(selectSite, startDate, endDate, currencyId, eventName,0);
             var stream = excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DrawPrize_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

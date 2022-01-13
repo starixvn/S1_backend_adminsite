@@ -31,8 +31,7 @@ namespace BackendSite.Service.DAL
 
         public Customer GetCustInfo(int custId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.QueryFirstOrDefault<Customer>("Customer_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.QueryFirst<Customer>("Customer_Get", new DynamicParameters(new { CustId = custId }));
         }
 
         public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite,
@@ -46,13 +45,16 @@ namespace BackendSite.Service.DAL
             string tpUserName,
             string email,
             string phoneNo,
-            DateTimeOffset? startDate,
-            DateTimeOffset? endDate,
+            DateTime? startDate,
+            DateTime? endDate,
+            DateTime? tagStartDate,
+            DateTime? tagEndDate,
             int pageSize,
             int? affId,
             IEnumerable<int> selectCurrency,
             string bankAccountNumber,
             IEnumerable<int> selectStatus,
+            IEnumerable<int> selectTag,
             ref int pageNumber,
             out int totalPages,
             out int rowCount,
@@ -62,8 +64,7 @@ namespace BackendSite.Service.DAL
             var jsonSelectSite = string.Empty;
             var jsonSelectCurrency = string.Empty;
             var jsonSelectStatus = string.Empty;
-            DateTime? startDateParam = null;
-            DateTime? endDateParam = null;
+            var jsonSelectTagList = string.Empty;
 
             if (selectSite != null && selectSite.Any())
             {
@@ -85,17 +86,16 @@ namespace BackendSite.Service.DAL
                     jsonSelectStatus = JsonConvert.SerializeObject(selectStatus);
                 }
             }
+            if (selectTag.Any() )
+            {
+                jsonSelectTagList = JsonConvert.SerializeObject(selectTag);
+            }
+            else
+            {
+                jsonSelectTagList = null;
+            }
             totalPages = 0;
-
-            if (startDate != null)
-            {
-                startDateParam = DateTimeOffset.Parse(startDate.ToString()).DateTime;
-            }
-
-            if (endDate != null)
-            {
-                endDateParam = DateTimeOffset.Parse(endDate.ToString()).DateTime;
-            }
+            
 
             var p = new DynamicParameters(new
             {
@@ -110,21 +110,24 @@ namespace BackendSite.Service.DAL
                 TpUserName = tpUserName,
                 Email = email,
                 PhoneNo = phoneNo,
-                StartDate = startDateParam,
-                EndDate = endDateParam,
+                StartDate = startDate,
+                EndDate = endDate,
+                TagStartDate = tagStartDate,
+                TagEndDate = tagEndDate,
                 PageSize = pageSize,
                 SelectCurrency = jsonSelectCurrency,
                 SiteList = siteList,
                 AffId = affId,
                 CurrncyList = currencyList,
                 BankAccountNumber = bankAccountNumber,
-                SelectStatus = jsonSelectStatus
+                SelectStatus = jsonSelectStatus,
+                SelectTagList = jsonSelectTagList
             });
             p.Add("PageNumber", pageNumber, DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearch_Get_V7", p);
+            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearch_Get_V8", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -204,7 +207,7 @@ namespace BackendSite.Service.DAL
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V7", new { CustId = custId, UserName = userName, SiteList = siteList }, commandType: CommandType.StoredProcedure);
+            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V8", new { CustId = custId, UserName = userName, SiteList = siteList }, commandType: CommandType.StoredProcedure);
             return result;
         }
 
@@ -241,22 +244,26 @@ namespace BackendSite.Service.DAL
             var result = conn.Execute("Admin_CustStatusSwitch_Set", new { CustId = custId, Op }, commandType: CommandType.StoredProcedure);
             return result;
         }
+        
         public int SetCustInfo(int custId, int? Level, string FullName, int? Birthday_Y, int? Birthday_M, int? Birthday_D, string PhoneNumber, string EMail, string Operator)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var result = conn.Execute("Admin_CustInfo_Set", new { CustId = custId, Level, FullName, Birthday_Y, Birthday_M, Birthday_D, PhoneNumber, EMail, Operator }, commandType: CommandType.StoredProcedure);
             return result;
         }
+        
         public CustPhotoId GetCustPhotoId(int CustId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.QueryFirstOrDefault<CustPhotoId>("Admin_CustPhotoId_Get", new { CustId = CustId }, commandType: CommandType.StoredProcedure);
         }
+        
         public int SetCustPhotoId(int custId, int siteId, string picFileName, byte[] photoIdPic)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_CustPhotoId_Ins", new { CustId = custId, SiteId = siteId, PicFileName = picFileName, PhotoIdPic = photoIdPic }, commandType: CommandType.StoredProcedure);
         }
+       
         public bool DelCustPhotoId(int custId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
@@ -605,7 +612,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<VipLevelModel> GetAllSiteVipLevelList()
         {
-            return _reportDbClient.Query<VipLevelModel>("Common_VipLevel_Get");
+            return _reportDbClient.Query<VipLevelModel>("Common_VipLevel_Get_V2");
         }
 
         public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)

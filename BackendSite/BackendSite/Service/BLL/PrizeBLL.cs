@@ -7,30 +7,30 @@ namespace BackendSite.Service.BLL
 {
     public class PrizeBLL
     {
-        private readonly PrizeService prizeService;
+        private readonly PrizeService _prizeService;
 
         public PrizeBLL(PrizeService prizeService)
         {
-            this.prizeService = prizeService;
+            this._prizeService = prizeService;
         }
 
-        public PrizeSearchResult PrizeSearch(PrizeSelect prizeSelect)
+        public PrizeSearchResult PrizeSearch(PrizeSelect prizeSelect ,int timeZone)
         {
-            return prizeService.PrizeSearch(prizeSelect);
+            return _prizeService.PrizeSearch(prizeSelect,timeZone);
         }
-        public PrizeLogResult GetPrizeLog(PrizeLogPara prizeLogPara)
+        public PrizeLogResult GetPrizeLog(PrizeLogPara prizeLogPara,int timeZone)
         {
-             return prizeService.GetPrizeLog(prizeLogPara);
+             return _prizeService.GetPrizeLog(prizeLogPara,timeZone);
         }
         public IEnumerable<EventDraw> GetEventName()
         {
-            return prizeService.GetEventName();
+            return _prizeService.GetEventName();
         }
 
-        public IEnumerable<DrawPrizeExcelData> GetExportData(string selectSite, string startDate, string endDate, int currencyId, string eventName)
+        public IEnumerable<DrawPrizeExcelData> GetExportData(string selectSite, string startDate, string endDate, int currencyId, string eventName, int timeZone)
         {
             var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(selectSite);
-            return prizeService.GetExportData(siteList, startDate, endDate, currencyId, eventName);
+            return _prizeService.GetExportData(siteList, startDate, endDate, currencyId, eventName , timeZone);
         }
     }
 }

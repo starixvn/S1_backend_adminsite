@@ -40,6 +40,16 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
 
         #endregion
 
+        #region API Model
+
+        public class GetUserPermissionResponseModel
+        {
+            public bool IsSuper { get; set; }
+            public IEnumerable<GroupPermisison> PermissionDatas { get; set; }
+        }
+
+        #endregion
+
         /// <summary>
         /// Permission/GetAllPermission 取得所有的權限
         /// </summary>
@@ -119,7 +129,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         }
 
         /// <summary>
-        /// Permission/GetSiteList 取得所有品牌清單
+        /// Permission/GetAllSiteList 取得所有品牌清單
         /// </summary>
         /// <remarks>
         /// 
@@ -130,7 +140,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// </remarks>
         /// <returns>結果</returns>
         [HttpPost]
-        public ApiResult GetSiteList()
+        public ApiResult GetAllSiteList()
         {
             var data = _serverInfoBll.GetSiteList();
 
@@ -203,9 +213,13 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
 
-            return new ApiResult<IEnumerable<GroupPermisison>>
+            return new ApiResult<GetUserPermissionResponseModel>
             {
-                Data = result,
+                Data = new GetUserPermissionResponseModel()
+                {
+                    IsSuper = loginUser.IsSuper,
+                    PermissionDatas = result
+                },
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }

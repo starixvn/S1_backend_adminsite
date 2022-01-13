@@ -15,7 +15,7 @@ namespace BackendSite.Service.Model
         }
 
         public string TypeName { get; set; }
-        public Direction Direction { get; set; }
+        public DirectionEnum Direction { get; set; }
         public decimal ChangeAmount { get; set; }
         public decimal BeforeAmount { get; set; }
         public decimal AfterAmount { get; set; }
@@ -27,7 +27,7 @@ namespace BackendSite.Service.Model
         public int Id { get; set; }
         public DateTime CreateTime { get; set; }
         public string TypeName { get; set; }
-        public Direction Direction { get; set; }
+        public DirectionEnum Direction { get; set; }
         public decimal ChangeBonus { get; set; }
         public decimal BeforeBonus { get; set; }
         public decimal AfterBonus { get; set; }
@@ -158,7 +158,7 @@ namespace BackendSite.Service.Model
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
         public decimal RCRedeemAmount { get; set; }
-        public DateTime CreateTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
         public string RefId { get; set; }
         public int SettledDate { get; set; }
     }
@@ -177,14 +177,17 @@ namespace BackendSite.Service.Model
     }
 
     #region Adjustment
-    public class AdjustmentLimtData
+    public class AdjustmentLimitData
     {
+        private DateTimeOffset _updateTime { get; set; }
         public int SiteId { get; set; }
-
         public int CurrencyId { get; set; }
-
         public decimal AdjustmentMax { get; set; }
-        public DateTime UpdateTime { get; set; }
+        public DateTimeOffset UpdateTime 
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public string UpdateOperator { get; set; }
     }
     #endregion

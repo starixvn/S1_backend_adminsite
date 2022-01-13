@@ -26,15 +26,15 @@ namespace BackendSite.Service.BLL
             public string ch { get; set; }
             public string cs { get; set; }
         }
-        public int SetGameCasinoDetail(SetGameCasionPara para)
+        public int SetGameCasinoDetail(SetGameCasinoPara para)
         {
             return gameCasinoManageService.SetGameCasinoDetail(para);          
         }
-        public int InsertGameCasinoDetail(InsertGameCasionPara para)
+        public int InsertGameCasinoDetail(InsertGameCasinoPara para)
         {
             return gameCasinoManageService.InsertGameCasinoDetail(para);
         }
-        public int DeleteGameCasinoDetail(DeleteGameCasionPara para)
+        public int DeleteGameCasinoDetail(DeleteGameCasinoPara para)
         {
             return gameCasinoManageService.DeleteGameCasinoDetail(para);
         }
@@ -65,14 +65,10 @@ namespace BackendSite.Service.BLL
 
         public List<GameCasinoDetailBySite> GetGameCasinoDetailV2(GetGameCasinoDetailPara para, List<ServerInfo> siteList)
         {
-            IEnumerable<CurrencyDataV2> CurrencyData = null;
-            IEnumerable<ServerInfo> SiteList = null;
-            var GameCasinoDetailList = new List<GameCasinoDetail>();
-            //List<int> siteData = new List<int>();
-            //List<GameCasinoDetailData> gameCasinoDetailData = new List<GameCasinoDetailData>();
+            List<GameCasinoDetail> gameCasinoDetailList;
             var result = new List<GameCasinoDetailBySite>();
             //這個GameCasinoId是屬於哪個TP,哪個Currency有這個TP
-            CurrencyData = gameCasinoManageService.GetCurrency(para);
+            var currencyData = gameCasinoManageService.GetCurrency(para);
             
             siteList.ForEach(x =>
             {
@@ -80,26 +76,26 @@ namespace BackendSite.Service.BLL
                 var siteData = new List<int>();
                 var gameCasinoDetailData = new List<GameCasinoDetailData>();
                 //取出GameCasinoDetail資料,只看SiteAndCasinoId,不分Currency
-                GameCasinoDetailList = gameCasinoManageService.GetGameCasinoDetailBySiteAndCasinoIdV2(para, x.SiteId);
+                gameCasinoDetailList = gameCasinoManageService.GetGameCasinoDetailBySiteAndCasinoIdV2(para, x.SiteId);
                 //取出指定的site有哪些Currency
-                var CurrencyList = x.ICurrencyList.ToList();
-                CurrencyData.ToList().ForEach(y => { if (CurrencyList.Contains(y.CurrencyId)) { siteData.Add(y.CurrencyId); } });
+                var currencyList = x.ICurrencyList.ToList();
+                currencyData.ToList().ForEach(y => { if (currencyList.Contains(y.CurrencyId)) { siteData.Add(y.CurrencyId); } });
 
                 siteData.ForEach(z =>
                 {
-                    if (GameCasinoDetailList.Exists(y => y.CurrencyId == z))
+                    if (gameCasinoDetailList.Exists(y => y.CurrencyId == z))
                     {
-                        var taget = GameCasinoDetailList.Find(y => y.CurrencyId == z);
+                        var target = gameCasinoDetailList.Find(y => y.CurrencyId == z);
                         gameCasinoDetailData.Add(new GameCasinoDetailData
                         {
                             HasDetail = true,
                             SiteId = x.SiteId,
                             CurrencyId = z,
-                            Hot = taget.Hot,
-                            Featured = taget.Featured,
-                            Status = taget.Status,
-                            Promotion = taget.Promotion,
-                            CurrencyName = CurrencyData.ToList().Find(y => y.CurrencyId == z).IsoCode,
+                            Hot = target.Hot,
+                            Featured = target.Featured,
+                            Status = target.Status,
+                            Promotion = target.Promotion,
+                            CurrencyName = currencyData.ToList().Find(y => y.CurrencyId == z).IsoCode,
                             GameCasinoId = para.GameCasinoId
                         });
                     }
@@ -110,7 +106,7 @@ namespace BackendSite.Service.BLL
                             HasDetail = false,
                             SiteId = x.SiteId,
                             CurrencyId = z,
-                            CurrencyName = CurrencyData.ToList().Find(y => y.CurrencyId == z).IsoCode,
+                            CurrencyName = currencyData.ToList().Find(y => y.CurrencyId == z).IsoCode,
                             GameCasinoId = para.GameCasinoId
                         });
                     }

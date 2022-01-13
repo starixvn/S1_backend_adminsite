@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Org.BouncyCastle.Ocsp;
 
 namespace BackendSite.Service.BLL
 {
@@ -95,13 +96,16 @@ namespace BackendSite.Service.BLL
             string tpUserName,
             string email,
             string phoneNo,
-            DateTimeOffset? startDate,
-            DateTimeOffset? endDate,
+            DateTime? startDate,
+            DateTime? endDate,
+            DateTime? tagStartDate,
+            DateTime? tagEndDate,
             int pageSize,
             int? affId,
             IEnumerable<int> selectCurrency,
             string bankAccountNumber,
             IEnumerable<int> selectStatus,
+            IEnumerable<int> selectTag,
             ref int pageNumber,
             out int totalPages,
             out int rowCount)
@@ -113,7 +117,7 @@ namespace BackendSite.Service.BLL
                 currencyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
 
-            var custInfoList = _custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, transId, tpUserName, email, phoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, selectStatus, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList())).ToList();
+            var custInfoList = _custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, transId, tpUserName, email, phoneNo, startDate, endDate,tagStartDate, tagEndDate, pageSize, affId, selectCurrency, bankAccountNumber, selectStatus, selectTag,ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList())).ToList();
             if (custInfoList.Count > 0)
             {
                 custInfoList.ForEach(x =>
@@ -121,6 +125,12 @@ namespace BackendSite.Service.BLL
                     x.ITagList = string.IsNullOrWhiteSpace(x.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(x.TagList);
                 });
             }
+
+            // if (selectTag.Any())
+            // {
+            //     custInfoList.RemoveAll(item => !item.ITagList.Any(selectTag.Contains));
+            // }
+            
             return custInfoList;
         }
 
@@ -161,11 +171,6 @@ namespace BackendSite.Service.BLL
             var custInfoDetail = _custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
             if (custInfoDetail != null)
             {
-                custInfoDetail.LastDepositTime = custInfoDetail.LastDepositTimeRecord == null ? "N/A" : Convert.ToDateTime(custInfoDetail.LastDepositTimeRecord).ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.LastWithdrawlTime = custInfoDetail.LastWithdrawalTimeRecord == null ? "N/A" : Convert.ToDateTime(custInfoDetail.LastWithdrawalTimeRecord).ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.LastBettingTime = custInfoDetail.LastTpBetRecordTimeRecord == null ? "N/A" : Convert.ToDateTime(custInfoDetail.LastTpBetRecordTimeRecord).ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.FirstDepositTime = custInfoDetail.FirstDepositTimeRecord == null ? "N/A" : Convert.ToDateTime(custInfoDetail.FirstDepositTimeRecord).ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-
                 custInfoDetail.tpWallet = await _tpBll.GetTpWalletAsync(custInfoDetail.CustId);
                 custInfoDetail.promotions = _promotionService.GetPromotionListByCustId(custInfoDetail.CustId);
                 if (custInfoDetail.promotions != null)
@@ -250,9 +255,9 @@ namespace BackendSite.Service.BLL
         {
             var statusList = new List<int>
             {
-                (int) BonusStatusType.Initial,
-                (int) BonusStatusType.Running,
-                (int) BonusStatusType.TrasferOut,
+                (int) BonusInfoStatusEnum.Initial,
+                (int) BonusInfoStatusEnum.Running,
+                (int) BonusInfoStatusEnum.TrasferOut,
             };
             return _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), out var CustId);
         }
@@ -645,7 +650,7 @@ namespace BackendSite.Service.BLL
                     Verify = Enum.GetName(typeof(PhoneVerifiedEnum), x.PhoneVerified),
                     RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
                     DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
-                    Status = Enum.GetName(typeof(RegLiveStatusType), x.Status),
+                    Status = Enum.GetName(typeof(Customer_RegLiveStatusStatusEnum), x.Status),
                     AffCode = x.AffCode,
                     Agent = x.Agent
                 });
